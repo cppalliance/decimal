@@ -1,0 +1,22 @@
+////
+Copyright 2023 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+# Decimal: An Implementation of IEEE 754 Decimal Floating Point Numbers
+:toc: left
+:toclevels: 4
+:idprefix:
+:listing-caption: Code Example
+:docinfo: private-footer
+:source-highlighter: rouge
+:source-language: c++
+
+:leveloffset: +1
+
+include::decimal/overview.adoc[]
+include::decimal/reference.adoc[]
+include::decimal/copyright.adoc[]
+
+:leveloffset: -1

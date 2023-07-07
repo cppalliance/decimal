@@ -1,0 +1,20 @@
+# Copyright 2022 Peter Dimov
+# Copyright 2023 Matt Borland
+# Distributed under the Boost Software License, Version 1.0.
+# https://www.boost.org/LICENSE_1_0.txt
+
+import testing ;
+import ../../config/checks/config : requires ;
+
+project : requirements
+
+  <library>/boost/decimal//boost_decimal
+
+  <warnings>extra
+
+  <toolset>msvc:<warnings-as-errors>on
+  <toolset>clang:<warnings-as-errors>on
+  <toolset>gcc:<warnings-as-errors>on ;
+
+run quick.cpp ;
+run test_decimal32.cpp ;
