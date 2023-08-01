@@ -27,6 +27,7 @@ public:
 
     friend constexpr bool signbit(decimal32 rhs) noexcept;
     friend constexpr bool isnan(decimal32 rhs) noexcept;
+    friend constexpr bool issignaling(decimal32 rhs) noexcept;
 
     // 3.2.7 unary arithmetic operators:
     friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
