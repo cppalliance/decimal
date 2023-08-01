@@ -45,6 +45,11 @@ constexpr bool issignaling(decimal32 rhs) noexcept
     return rhs.bits & detail::snan_flag;
 }
 
+constexpr bool isfinite(decimal32 rhs) noexcept
+{
+    return !isinf(rhs) && !isnan(rhs);
+}
+
 constexpr decimal32 operator+(decimal32 rhs) noexcept
 {
     return rhs;
