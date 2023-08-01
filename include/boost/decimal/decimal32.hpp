@@ -18,11 +18,18 @@ class decimal32 final
 private:
     std::uint32_t bits;
 
+    // Construct from bits
+    constexpr explicit decimal32(std::uint32_t value) : bits {value} {}
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept : bits {} {}
 
-    friend constexpr bool signbit(decimal32 v) noexcept;
+    friend constexpr bool signbit(decimal32 rhs) noexcept;
+
+    // 3.2.7 unary arithmetic operators:
+    friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
+    friend constexpr decimal32 operator-(decimal32 rhs) noexcept;
 };
 
 }} // Namespace boost::decimal
