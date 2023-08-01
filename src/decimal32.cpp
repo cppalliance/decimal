@@ -10,6 +10,7 @@ namespace detail {
 
 // See section 3.5.2
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t sign_bit_flag = 1 << 31;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t inf_flag = 0b0111'1000'0000'0000'0000'0000'0000'0000;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t nan_flag = 0b0111'1100'0000'0000'0000'0000'0000'0000;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t snan_flag = 0b0111'1110'0000'0000'0000'0000'0000'0000;
 
@@ -27,6 +28,11 @@ BOOST_ATTRIBUTE_UNUSED static constexpr auto trailing_significand_field_width = 
 constexpr bool signbit(decimal32 rhs) noexcept
 {
     return rhs.bits & detail::sign_bit_flag;
+}
+
+constexpr bool isinf(decimal32 rhs) noexcept
+{
+    return rhs.bits & detail::inf_flag;
 }
 
 constexpr bool isnan(decimal32 rhs) noexcept

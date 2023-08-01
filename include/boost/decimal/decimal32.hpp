@@ -26,6 +26,7 @@ public:
     constexpr decimal32() noexcept : bits {} {}
 
     friend constexpr bool signbit(decimal32 rhs) noexcept;
+    friend constexpr bool isinf(decimal32 rhs) noexcept;
     friend constexpr bool isnan(decimal32 rhs) noexcept;
     friend constexpr bool issignaling(decimal32 rhs) noexcept;
 
