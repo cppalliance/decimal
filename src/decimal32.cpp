@@ -35,4 +35,14 @@ constexpr decimal32 operator-(decimal32 rhs) noexcept
     return decimal32{rhs.bits ^= detail::sign_bit_flag};
 }
 
+constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return lhs.bits == rhs.bits;
+}
+
+constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return lhs.bits != rhs.bits;
+}
+
 }} // Namespace boost::decimal

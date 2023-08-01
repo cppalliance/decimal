@@ -30,6 +30,10 @@ public:
     // 3.2.7 unary arithmetic operators:
     friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
     friend constexpr decimal32 operator-(decimal32 rhs) noexcept;
+
+    // 3.2.9 comparison operators:
+    friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
 };
 
 }} // Namespace boost::decimal
