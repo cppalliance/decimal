@@ -31,31 +31,31 @@ private:
     };
     #pragma pack(pop)
 
-    data_layout_ bits_;
+    data_layout_ bits_{};
 
 public:
     // 3.2.2.1 construct/copy/destroy:
-    decimal32() noexcept : bits_ {} {}
+    BOOST_DECIMAL_DECL decimal32() noexcept : bits_ {} {}
 
     // 3.2.5 initialization from coefficient and exponent:
-    decimal32(long long coeff, int exp) noexcept;
+    BOOST_DECIMAL_DECL decimal32(long long coeff, int exp) noexcept;
 
-    friend bool signbit(decimal32 rhs) noexcept;
-    friend bool isinf(decimal32 rhs) noexcept;
-    friend bool isnan(decimal32 rhs) noexcept;
-    friend bool issignaling(decimal32 rhs) noexcept;
-    friend bool isfinite(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend bool signbit(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend bool isinf(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend bool isnan(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend bool issignaling(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend bool isfinite(decimal32 rhs) noexcept;
 
     // 3.2.7 unary arithmetic operators:
-    friend decimal32 operator+(decimal32 rhs) noexcept;
-    friend decimal32 operator-(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend decimal32 operator+(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend decimal32 operator-(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
-    friend bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
-    friend bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
 
     // 3.2.11 Formatted output:
-    friend std::ostream& operator<<(std::ostream& os, const decimal32& d);
+    BOOST_DECIMAL_DECL friend std::ostream& operator<<(std::ostream& os, const decimal32& d);
 };
 
 }} // Namespace boost::decimal

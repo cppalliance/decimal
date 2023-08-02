@@ -43,21 +43,21 @@ decimal32::decimal32(long long coeff, int exp) noexcept
     // If the coefficient fits directly we don't need to use the combination field
     if (std::abs(coeff) < (1 << 20))
     {
-        this->bits_.significand = std::abs(coeff);
+        bits_.significand = std::abs(coeff);
         if (coeff < 0)
         {
-            this->bits_.sign = 1;
+            bits_.sign = 1;
         }
     }
 
     // If the exponent fits we do not need to use the combination field
     if (exp + detail::bias < (1 << 6))
     {
-        this->bits_.exponent = exp + detail::bias;
+        bits_.exponent = exp + detail::bias;
     }
 
     // TODO(mborland): Handle the cases that need the combination field
-    this->bits_.combination_field = 0;
+    bits_.combination_field = 0;
 }
 
 bool signbit(decimal32 rhs) noexcept
@@ -109,6 +109,8 @@ bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
     return !(lhs == rhs);
 }
 
+// TODO(mborland): Add handling for values with non-zero combination field
+// TODO(mborland): Add decimal point. Would be nice to use charconv here
 std::ostream& operator<<(std::ostream& os, const decimal32& d)
 {
     if (d.bits_.sign == 1)
@@ -120,7 +122,7 @@ std::ostream& operator<<(std::ostream& os, const decimal32& d)
 
     if (d.bits_.exponent - detail::bias < 0)
     {
-        os << '-' << d.bits_.exponent - detail::bias;
+        os << d.bits_.exponent - detail::bias;
     }
     else
     {
