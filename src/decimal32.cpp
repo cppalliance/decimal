@@ -11,10 +11,9 @@ namespace boost { namespace decimal {
 namespace detail {
 
 // See section 3.5.2
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t sign_bit_flag = 1 << 31;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t inf_flag = 0b0111'1000'0000'0000'0000'0000'0000'0000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t nan_flag = 0b0111'1100'0000'0000'0000'0000'0000'0000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t snan_flag = 0b0111'1110'0000'0000'0000'0000'0000'0000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t inf_mask = 0b11110;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t nan_mask = 0b11111;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t snan_mask = 0b100000;
 
 // Values from IEEE 754-2019 table 3.6
 BOOST_ATTRIBUTE_UNUSED static constexpr auto storage_width = 32;
@@ -30,32 +29,32 @@ BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_binary_significand = 0
 BOOST_ATTRIBUTE_UNUSED static constexpr auto max_string_length = 15;
 
 // Masks for the combination field since we use the binary encoding for the significand
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g0_mask = 0b0100'0000'0000'0000'0000'0000'0000'0000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g1_mask = 0b0010'0000'0000'0000'0000'0000'0000'0000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g2_mask = 0b0001'0000'0000'0000'0000'0000'0000'0000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g3_mask = 0b0000'1000'0000'0000'0000'0000'0000'0000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g0_mask = 0b10000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g1_mask = 0b01000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g2_mask = 0b00100;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g3_mask = 0b00010;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g4_mask = 0b00001;
 
 } // Namespace detail
 
-// True if negative otherwise false
 constexpr bool signbit(decimal32 rhs) noexcept
 {
-    return rhs.bits & detail::sign_bit_flag;
+    return rhs.bits_.sign;
 }
 
 constexpr bool isinf(decimal32 rhs) noexcept
 {
-    return rhs.bits & detail::inf_flag;
+    return rhs.bits_.combination_field & detail::inf_mask;
 }
 
 constexpr bool isnan(decimal32 rhs) noexcept
 {
-    return rhs.bits & detail::nan_flag;
+    return rhs.bits_.combination_field & detail::nan_mask;
 }
 
 constexpr bool issignaling(decimal32 rhs) noexcept
 {
-    return rhs.bits & detail::snan_flag;
+    return isnan(rhs) && rhs.bits_.exponent & detail::snan_mask;
 }
 
 constexpr bool isfinite(decimal32 rhs) noexcept
@@ -70,17 +69,21 @@ constexpr decimal32 operator+(decimal32 rhs) noexcept
 
 constexpr decimal32 operator-(decimal32 rhs) noexcept
 {
-    return decimal32{rhs.bits ^= detail::sign_bit_flag};
+    rhs.bits_.sign ^= 1;
+    return rhs;
 }
 
 constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
 {
-    return lhs.bits == rhs.bits;
+    return lhs.bits_.sign == rhs.bits_.sign &&
+           lhs.bits_.combination_field == rhs.bits_.combination_field &&
+           lhs.bits_.exponent == rhs.bits_.exponent &&
+           lhs.bits_.significand == rhs.bits_.significand;
 }
 
 constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
 {
-    return lhs.bits != rhs.bits;
+    return !(lhs == rhs);
 }
 
 }} // Namespace boost::decimal

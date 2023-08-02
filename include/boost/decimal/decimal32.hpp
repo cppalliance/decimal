@@ -18,14 +18,19 @@ namespace boost { namespace decimal {
 class decimal32 final
 {
 private:
-    std::uint32_t bits;
+    struct data_layout_
+    {
+        std::uint32_t sign : 1;
+        std::uint32_t combination_field : 5;
+        std::uint32_t exponent : 6;
+        std::uint32_t significand : 20;
+    };
 
-    // Construct from bits
-    constexpr explicit decimal32(std::uint32_t value) : bits {value} {}
+    data_layout_ bits_;
 
 public:
     // 3.2.2.1 construct/copy/destroy:
-    constexpr decimal32() noexcept : bits {} {}
+    constexpr decimal32() noexcept : bits_ {} {}
 
     friend constexpr bool signbit(decimal32 rhs) noexcept;
     friend constexpr bool isinf(decimal32 rhs) noexcept;
