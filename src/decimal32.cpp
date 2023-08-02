@@ -3,6 +3,8 @@
 // https://www.boost.org/LICENSE_1_0.txt
 
 #include <boost/decimal/decimal32.hpp>
+#include <cmath>
+#include <cstring>
 
 namespace boost { namespace decimal {
 
@@ -32,7 +34,6 @@ BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g0_mask = 0b0100'0000'0000
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g1_mask = 0b0010'0000'0000'0000'0000'0000'0000'0000;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g2_mask = 0b0001'0000'0000'0000'0000'0000'0000'0000;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g3_mask = 0b0000'1000'0000'0000'0000'0000'0000'0000;
-
 
 } // Namespace detail
 

@@ -5,8 +5,10 @@
 #ifndef BOOST_DECIMAL_DECIMAL32_HPP
 #define BOOST_DECIMAL_DECIMAL32_HPP
 
+#include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/config.hpp>
+#include <limits>
 #include <cstdint>
 
 namespace boost { namespace decimal {
@@ -41,5 +43,15 @@ public:
 };
 
 }} // Namespace boost::decimal
+
+namespace std {
+
+template <>
+struct numeric_limits<boost::decimal::decimal32>
+{
+
+};
+
+} // Namespace std
 
 #endif // BOOST_DECIMAL_DECIMAL32_HPP
