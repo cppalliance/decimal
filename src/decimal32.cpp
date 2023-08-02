@@ -26,6 +26,7 @@ BOOST_ATTRIBUTE_UNUSED static constexpr auto trailing_significand_field_width = 
 // Other useful values
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_significand = 9'999'999;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_binary_significand = 0b1001'1000100101'1001111111;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_hex_significand = 0x98967F;
 BOOST_ATTRIBUTE_UNUSED static constexpr auto max_string_length = 15;
 
 // Masks for the combination field since we use the binary encoding for the significand
@@ -106,6 +107,27 @@ bool operator==(decimal32 lhs, decimal32 rhs) noexcept
 bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
 {
     return !(lhs == rhs);
+}
+
+std::ostream& operator<<(std::ostream& os, const decimal32& d)
+{
+    if (d.bits_.sign == 1)
+    {
+        os << "-";
+    }
+
+    os << d.bits_.significand << "e";
+
+    if (d.bits_.exponent - detail::bias < 0)
+    {
+        os << '-' << d.bits_.exponent - detail::bias;
+    }
+    else
+    {
+        os << '+' << d.bits_.exponent - detail::bias;
+    }
+
+    return os;
 }
 
 }} // Namespace boost::decimal

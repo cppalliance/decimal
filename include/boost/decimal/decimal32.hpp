@@ -8,6 +8,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/config.hpp>
+#include <iostream>
 #include <limits>
 #include <cstdint>
 
@@ -52,6 +53,9 @@ public:
     // 3.2.9 comparison operators:
     friend bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
     friend bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
+
+    // 3.2.11 Formatted output:
+    friend std::ostream& operator<<(std::ostream& os, const decimal32& d);
 };
 
 }} // Namespace boost::decimal
