@@ -18,6 +18,9 @@ namespace boost { namespace decimal {
 class decimal32 final
 {
 private:
+
+    // MSVC pragma that GCC and clang also support
+    #pragma pack(push, 1)
     struct data_layout_
     {
         std::uint32_t sign : 1;
@@ -25,26 +28,30 @@ private:
         std::uint32_t exponent : 6;
         std::uint32_t significand : 20;
     };
+    #pragma pack(pop)
 
     data_layout_ bits_;
 
 public:
     // 3.2.2.1 construct/copy/destroy:
-    constexpr decimal32() noexcept : bits_ {} {}
+    decimal32() noexcept : bits_ {} {}
 
-    friend constexpr bool signbit(decimal32 rhs) noexcept;
-    friend constexpr bool isinf(decimal32 rhs) noexcept;
-    friend constexpr bool isnan(decimal32 rhs) noexcept;
-    friend constexpr bool issignaling(decimal32 rhs) noexcept;
-    friend constexpr bool isfinite(decimal32 rhs) noexcept;
+    // 3.2.5 initialization from coefficient and exponent:
+    decimal32(long long coeff, int exp) noexcept;
+
+    friend bool signbit(decimal32 rhs) noexcept;
+    friend bool isinf(decimal32 rhs) noexcept;
+    friend bool isnan(decimal32 rhs) noexcept;
+    friend bool issignaling(decimal32 rhs) noexcept;
+    friend bool isfinite(decimal32 rhs) noexcept;
 
     // 3.2.7 unary arithmetic operators:
-    friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
-    friend constexpr decimal32 operator-(decimal32 rhs) noexcept;
+    friend decimal32 operator+(decimal32 rhs) noexcept;
+    friend decimal32 operator-(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
-    friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
-    friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
+    friend bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
+    friend bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
 };
 
 }} // Namespace boost::decimal

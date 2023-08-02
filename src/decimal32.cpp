@@ -37,43 +37,65 @@ BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g4_mask = 0b00001;
 
 } // Namespace detail
 
-constexpr bool signbit(decimal32 rhs) noexcept
+decimal32::decimal32(long long coeff, int exp) noexcept
+{
+    // If the coefficient fits directly we don't need to use the combination field
+    if (std::abs(coeff) < (1 << 20))
+    {
+        this->bits_.significand = std::abs(coeff);
+        if (coeff < 0)
+        {
+            this->bits_.sign = 1;
+        }
+    }
+
+    // If the exponent fits we do not need to use the combination field
+    if (exp + detail::bias < (1 << 6))
+    {
+        this->bits_.exponent = exp + detail::bias;
+    }
+
+    // TODO(mborland): Handle the cases that need the combination field
+    this->bits_.combination_field = 0;
+}
+
+bool signbit(decimal32 rhs) noexcept
 {
     return rhs.bits_.sign;
 }
 
-constexpr bool isinf(decimal32 rhs) noexcept
+bool isinf(decimal32 rhs) noexcept
 {
     return rhs.bits_.combination_field & detail::inf_mask;
 }
 
-constexpr bool isnan(decimal32 rhs) noexcept
+bool isnan(decimal32 rhs) noexcept
 {
     return rhs.bits_.combination_field & detail::nan_mask;
 }
 
-constexpr bool issignaling(decimal32 rhs) noexcept
+bool issignaling(decimal32 rhs) noexcept
 {
     return isnan(rhs) && rhs.bits_.exponent & detail::snan_mask;
 }
 
-constexpr bool isfinite(decimal32 rhs) noexcept
+bool isfinite(decimal32 rhs) noexcept
 {
     return !isinf(rhs) && !isnan(rhs);
 }
 
-constexpr decimal32 operator+(decimal32 rhs) noexcept
+decimal32 operator+(decimal32 rhs) noexcept
 {
     return rhs;
 }
 
-constexpr decimal32 operator-(decimal32 rhs) noexcept
+decimal32 operator-(decimal32 rhs) noexcept
 {
     rhs.bits_.sign ^= 1;
     return rhs;
 }
 
-constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
+bool operator==(decimal32 lhs, decimal32 rhs) noexcept
 {
     return lhs.bits_.sign == rhs.bits_.sign &&
            lhs.bits_.combination_field == rhs.bits_.combination_field &&
@@ -81,7 +103,7 @@ constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
            lhs.bits_.significand == rhs.bits_.significand;
 }
 
-constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
+bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
 {
     return !(lhs == rhs);
 }
