@@ -22,6 +22,18 @@ BOOST_ATTRIBUTE_UNUSED static constexpr auto bias = 101;
 BOOST_ATTRIBUTE_UNUSED static constexpr auto combination_field_width = 11;
 BOOST_ATTRIBUTE_UNUSED static constexpr auto trailing_significand_field_width = 20;
 
+// Other useful values
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_significand = 9'999'999;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_binary_significand = 0b1001'1000100101'1001111111;
+BOOST_ATTRIBUTE_UNUSED static constexpr auto max_string_length = 15;
+
+// Masks for the combination field since we use the binary encoding for the significand
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g0_mask = 0b0100'0000'0000'0000'0000'0000'0000'0000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g1_mask = 0b0010'0000'0000'0000'0000'0000'0000'0000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g2_mask = 0b0001'0000'0000'0000'0000'0000'0000'0000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g3_mask = 0b0000'1000'0000'0000'0000'0000'0000'0000;
+
+
 } // Namespace detail
 
 // True if negative otherwise false
