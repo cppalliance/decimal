@@ -80,4 +80,11 @@ std::ostream& operator<<(std::ostream& os, const decimal32& d)
     return os;
 }
 
+std::uint32_t to_bits(decimal32 rhs) noexcept
+{
+    std::uint32_t bits;
+    std::memcpy(&bits, &rhs.bits_, sizeof(std::uint32_t));
+    return bits;
+}
+
 }} // Namespace boost::decimal

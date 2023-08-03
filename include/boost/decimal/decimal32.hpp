@@ -114,6 +114,9 @@ public:
 
     // 3.2.11 Formatted output:
     BOOST_DECIMAL_DECL friend std::ostream& operator<<(std::ostream& os, const decimal32& d);
+
+    // Debug bit pattern
+    BOOST_DECIMAL_DECL friend std::uint32_t to_bits(decimal32 rhs) noexcept;
 };
 
 }} // Namespace boost::decimal
