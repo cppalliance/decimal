@@ -103,10 +103,21 @@ private:
     #pragma pack(push, 1)
     struct data_layout_
     {
+        #ifdef BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+
         std::uint32_t significand : 20;
         std::uint32_t exponent : 6;
         std::uint32_t combination_field : 5;
         std::uint32_t sign : 1;
+
+        #else
+
+        std::uint32_t sign : 1;
+        std::uint32_t combination_field : 5;
+        std::uint32_t exponent : 6;
+        std::uint32_t significand : 20;
+
+        #endif
     };
     #pragma pack(pop)
 
