@@ -12,6 +12,7 @@
 #include <limits>
 #include <cstdint>
 #include <cmath>
+#include <cassert>
 
 namespace boost { namespace decimal {
 
@@ -69,6 +70,26 @@ BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_1100_mask = 0b11000;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_1101_mask = 0b11010;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_1110_mask = 0b11100;
 
+// Powers of 2 used to determine the size of the significand
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t no_combination = 0b1111111111'1111111111;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t big_combination = 0b0111'1111111111'1111111111;
+
+// Significand field
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t significand_20_mask = no_combination;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t significand_21_mask = 0b0001'0000000000'0000000000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_1_significand_mask = 0b00001;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t significand_22_mask = 0b0010'0000000000'0000000000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_2_significand_mask = 0b00010;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t significand_23_mask = 0b0100'0000000000'0000000000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_3_significand_mask = 0b00100;
+
+// Exponent fields
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_exp_no_combination = 0b111111;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t exp_one_combination = 0b1'111111;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_biased_exp = 0b10'111111;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t small_combination_field_mask = 0b0000'0000'0111'0000'0000'0000'0000'0000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t big_combination_field_mask = 0b0000'0000'0001'0000'0000'0000'0000'0000;
+
 } // Namespace detail
 
 
@@ -96,7 +117,8 @@ public:
     BOOST_DECIMAL_DECL decimal32() noexcept : bits_ {} {}
 
     // 3.2.5 initialization from coefficient and exponent:
-    BOOST_DECIMAL_DECL decimal32(long long coeff, int exp) noexcept;
+    template <typename T>
+    BOOST_DECIMAL_DECL decimal32(T coeff, int exp) noexcept;
 
     BOOST_DECIMAL_DECL friend bool signbit(decimal32 rhs) noexcept;
     BOOST_DECIMAL_DECL friend bool isinf(decimal32 rhs) noexcept;
@@ -118,6 +140,104 @@ public:
     // Debug bit pattern
     BOOST_DECIMAL_DECL friend std::uint32_t to_bits(decimal32 rhs) noexcept;
 };
+
+template <typename T>
+decimal32::decimal32(T coeff, int exp) noexcept
+{
+    std::uint32_t unsigned_coeff;
+
+    bits_.sign = coeff < 0;
+    if (bits_.sign)
+    {
+        unsigned_coeff = -(static_cast<std::uint32_t>(coeff));
+    }
+    else
+    {
+        unsigned_coeff = coeff;
+    }
+
+    // If the coeff is not in range make it so
+    while (unsigned_coeff > detail::max_significand)
+    {
+        unsigned_coeff /= 10;
+        ++exp;
+    }
+
+    // zero the combination field, so we can mask in the following
+    bits_.combination_field = 0;
+    bits_.significand = 0;
+    bool big_combination = false;
+
+    if (unsigned_coeff < detail::no_combination)
+    {
+        // If the coefficient fits directly we don't need to use the combination field
+        bits_.significand = unsigned_coeff;
+    }
+    else if (unsigned_coeff < detail::big_combination)
+    {
+        // Break the number into 3 bits for the combination field and 20 bits for the significand field
+
+        // Use the least significant 20 bits to set the significand
+        bits_.significand = unsigned_coeff & detail::no_combination;
+
+        // Now set the combination field (maximum of 3 bits)
+        uint32_t remaining_bits = unsigned_coeff & detail::small_combination_field_mask;
+        remaining_bits >>= 20;
+        assert(remaining_bits <= 3); // Only allowed 00, 01, or 10
+
+        bits_.combination_field |= remaining_bits;
+    }
+    else
+    {
+        // Have to use the full combination field
+        bits_.combination_field |= detail::comb_11_mask;
+        big_combination = true;
+
+        bits_.significand = unsigned_coeff & detail::no_combination;
+        const uint32_t remaining_bit = unsigned_coeff & detail::big_combination_field_mask;
+        assert(remaining_bit <= 1);
+
+        if (remaining_bit)
+        {
+            bits_.combination_field |= 1U;
+        }
+    }
+
+    // If the exponent fits we do not need to use the combination field
+    const std::uint32_t biased_exp = exp + detail::bias;
+    if (biased_exp < detail::max_exp_no_combination)
+    {
+        bits_.exponent = exp + detail::bias;
+    }
+    else if (biased_exp < detail::exp_one_combination)
+    {
+        if (big_combination)
+        {
+            bits_.combination_field |= detail::comb_1101_mask;
+        }
+        else
+        {
+            bits_.combination_field |= detail::comb_01_mask;
+        }
+    }
+    else if (biased_exp < detail::max_biased_exp)
+    {
+        if (big_combination)
+        {
+            bits_.combination_field |= detail::comb_1110_mask;
+        }
+        else
+        {
+            bits_.combination_field |= detail::comb_10_mask;
+        }
+    }
+    else
+    {
+        // The value is infinity
+        bits_.combination_field = detail::inf_mask;
+    }
+
+}
 
 }} // Namespace boost::decimal
 

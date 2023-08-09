@@ -3,6 +3,7 @@
 // https://www.boost.org/LICENSE_1_0.txt
 
 #include <boost/decimal/decimal32.hpp>
+#include <iostream>
 #include <cmath>
 #include <cstring>
 
