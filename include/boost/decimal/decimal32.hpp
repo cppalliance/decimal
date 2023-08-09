@@ -103,10 +103,10 @@ private:
     #pragma pack(push, 1)
     struct data_layout_
     {
-        std::uint32_t sign : 1;
-        std::uint32_t combination_field : 5;
-        std::uint32_t exponent : 6;
         std::uint32_t significand : 20;
+        std::uint32_t exponent : 6;
+        std::uint32_t combination_field : 5;
+        std::uint32_t sign : 1;
     };
     #pragma pack(pop)
 

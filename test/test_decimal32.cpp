@@ -25,6 +25,14 @@ void test_constructor()
     // 0000000000'0000000001 for significand
     BOOST_TEST_EQ(one_bits, std::bitset<32>(0b0'00000'000001'0000000000'0000000001));
 
+    boost::decimal::decimal32 neg_one(-0b1, -100);
+    const auto neg_one_bits = std::bitset<32>(to_bits(neg_one));
+    // 1 for sign
+    // 00000 for combination field
+    // 000001 for exp
+    // 0000000000'0000000001 for significand
+    BOOST_TEST_EQ(neg_one_bits, std::bitset<32>(0b1'00000'000001'0000000000'0000000001));
+
     boost::decimal::decimal32 big_sig(0b1111111111'1111111111, -100);
     const auto big_sig_bits = std::bitset<32>(to_bits(big_sig));
     // 0 for sign
