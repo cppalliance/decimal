@@ -63,6 +63,8 @@ BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_10_mask = 0b10000;
 
 // This mask is used to determine if we use the masks above or below since 11 TTT is invalid
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_11_mask = 0b11000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_11_exp_bits = 0b00110;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_11_significand_bits = 0b00001;
 
 // For these masks the first two bits of the combination field imply 100 T as the
 // leading bits of the significand and then bits 3 and 4 are the exp
@@ -135,6 +137,7 @@ private:
 
     data_layout_ bits_{};
 
+    constexpr std::uint32_t full_exponent() noexcept;
 public:
     // 3.2.2.1 construct/copy/destroy:
     BOOST_DECIMAL_DECL constexpr decimal32() noexcept : bits_ {} {}
@@ -302,6 +305,26 @@ constexpr decimal32 operator-(decimal32 rhs) noexcept
 {
     rhs.bits_.sign ^= 1;
     return rhs;
+}
+
+constexpr std::uint32_t decimal32::full_exponent() noexcept
+{
+    std::uint32_t exp = 0;
+
+    if ((bits_.combination_field & detail::comb_11_mask) == 0b11000)
+    {
+        // bits 2 and 3 are the exp part of the combination field
+        exp |= (bits_.combination_field & detail::comb_11_exp_bits) << 5;
+    }
+    else
+    {
+        // bits 0 and 1 are the exp part of the combination field
+        exp |= (bits_.combination_field & detail::comb_11_mask) << 3;
+    }
+
+    exp |= bits_.exponent;
+
+    return exp;
 }
 
 }} // Namespace boost::decimal
