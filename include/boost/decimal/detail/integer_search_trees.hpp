@@ -12,7 +12,7 @@
 #include <array>
 #include <cstdint>
 
-namespace boost { namespace charconv { namespace detail {
+namespace boost { namespace decimal { namespace detail {
 
 // Generic solution
 template <typename T>

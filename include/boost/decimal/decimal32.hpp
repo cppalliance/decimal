@@ -107,6 +107,17 @@ BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t construct_significand_mask
 
 } // Namespace detail
 
+constexpr void normalize(std::uint32_t& significand, std::uint32_t& exp) noexcept
+{
+    auto digits = detail::num_digits(significand);
+
+    while (digits < detail::precision)
+    {
+        significand *= 10;
+        --exp;
+        ++digits;
+    }
+}
 
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
