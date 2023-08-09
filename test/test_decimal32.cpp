@@ -18,28 +18,33 @@ void test_comp()
 void test_constructor()
 {
     boost::decimal::decimal32 one(0b1, -100);
-    const auto one_bits = std::bitset<32>(to_bits(one));
     // 0 for sign
     // 00000 for combination field
     // 000001 for exp
     // 0000000000'0000000001 for significand
-    BOOST_TEST_EQ(one_bits, std::bitset<32>(0b0'00000'000001'0000000000'0000000001));
+    BOOST_TEST_EQ(std::bitset<32>(to_bits(one)), std::bitset<32>(0b0'00000'000001'0000000000'0000000001));
 
     boost::decimal::decimal32 neg_one(-0b1, -100);
-    const auto neg_one_bits = std::bitset<32>(to_bits(neg_one));
     // 1 for sign
     // 00000 for combination field
     // 000001 for exp
     // 0000000000'0000000001 for significand
-    BOOST_TEST_EQ(neg_one_bits, std::bitset<32>(0b1'00000'000001'0000000000'0000000001));
+    BOOST_TEST_EQ(std::bitset<32>(to_bits(neg_one)), std::bitset<32>(0b1'00000'000001'0000000000'0000000001));
 
     boost::decimal::decimal32 big_sig(0b1111111111'1111111111, -100);
-    const auto big_sig_bits = std::bitset<32>(to_bits(big_sig));
     // 0 for sign
     // 00000 for combination field
     // 000001 for exp
     // 1111111111'1111111111 for significand
-    BOOST_TEST_EQ(big_sig_bits, std::bitset<32>(0b0'00000'000001'1111111111'1111111111));
+    BOOST_TEST_EQ(std::bitset<32>(to_bits(big_sig)), std::bitset<32>(0b0'00000'000001'1111111111'1111111111));
+
+    // Test the combination field
+    boost::decimal::decimal32 one_e_max(0b1, 90);
+    // 0 for sign
+    // 10000 for combination field
+    // 111111 for exp
+    // 0000000000'0000000001 for significand
+    BOOST_TEST_EQ(std::bitset<32>(to_bits(one_e_max)), std::bitset<32>(0b0'10000'111111'0000000000'0000000001));
 }
 
 int main()

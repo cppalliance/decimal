@@ -85,6 +85,7 @@ BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_3_significand_mask = 
 
 // Exponent fields
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_exp_no_combination = 0b111111;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t exp_combination_field_mask = max_exp_no_combination;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t exp_one_combination = 0b1'111111;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_biased_exp = 0b10'111111;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t small_combination_field_mask = 0b0000'0000'0111'0000'0000'0000'0000'0000;
@@ -216,9 +217,10 @@ decimal32::decimal32(T coeff, int exp) noexcept
 
     // If the exponent fits we do not need to use the combination field
     const std::uint32_t biased_exp = exp + detail::bias;
-    if (biased_exp < detail::max_exp_no_combination)
+    const std::uint32_t biased_exp_low_six = biased_exp & detail::exp_combination_field_mask;
+    if (biased_exp <= detail::max_exp_no_combination)
     {
-        bits_.exponent = exp + detail::bias;
+        bits_.exponent = biased_exp;
     }
     else if (biased_exp < detail::exp_one_combination)
     {
@@ -230,8 +232,10 @@ decimal32::decimal32(T coeff, int exp) noexcept
         {
             bits_.combination_field |= detail::comb_01_mask;
         }
+
+        bits_.exponent = biased_exp_low_six;
     }
-    else if (biased_exp < detail::max_biased_exp)
+    else if (biased_exp <= detail::max_biased_exp)
     {
         if (big_combination)
         {
@@ -241,6 +245,8 @@ decimal32::decimal32(T coeff, int exp) noexcept
         {
             bits_.combination_field |= detail::comb_10_mask;
         }
+
+        bits_.exponent = biased_exp_low_six;
     }
     else
     {
