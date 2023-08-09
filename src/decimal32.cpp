@@ -9,17 +9,6 @@
 
 namespace boost { namespace decimal {
 
-decimal32 operator+(decimal32 rhs) noexcept
-{
-    return rhs;
-}
-
-decimal32 operator-(decimal32 rhs) noexcept
-{
-    rhs.bits_.sign ^= 1;
-    return rhs;
-}
-
 bool operator==(decimal32 lhs, decimal32 rhs) noexcept
 {
     return lhs.bits_.sign == rhs.bits_.sign &&

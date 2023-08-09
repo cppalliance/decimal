@@ -152,8 +152,8 @@ public:
     BOOST_DECIMAL_DECL friend constexpr bool isfinite(decimal32 rhs) noexcept;
 
     // 3.2.7 unary arithmetic operators:
-    BOOST_DECIMAL_DECL friend decimal32 operator+(decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend decimal32 operator-(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr decimal32 operator-(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
     BOOST_DECIMAL_DECL friend bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
@@ -291,6 +291,17 @@ constexpr bool issignaling(decimal32 rhs) noexcept
 constexpr bool isfinite(decimal32 rhs) noexcept
 {
     return !isinf(rhs) && !isnan(rhs);
+}
+
+constexpr decimal32 operator+(decimal32 rhs) noexcept
+{
+    return rhs;
+}
+
+constexpr decimal32 operator-(decimal32 rhs) noexcept
+{
+    rhs.bits_.sign ^= 1;
+    return rhs;
 }
 
 }} // Namespace boost::decimal

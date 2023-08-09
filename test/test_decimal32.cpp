@@ -74,11 +74,19 @@ void test_non_finite_values()
     BOOST_TEST(!isfinite(std::numeric_limits<decimal32>::signaling_NaN()));
 }
 
+void test_unary_arithmetic()
+{
+    constexpr decimal32 one(0b1, -100);
+    BOOST_TEST(+one == one);
+    BOOST_TEST(-one != one);
+}
+
 int main()
 {
     test_comp();
     test_constructor();
     test_non_finite_values();
+    test_unary_arithmetic();
 
     return boost::report_errors();
 }
