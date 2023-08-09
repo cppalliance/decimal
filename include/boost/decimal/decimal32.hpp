@@ -19,15 +19,19 @@ namespace boost { namespace decimal {
 namespace detail {
 
 // See section 3.5.2
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t inf_mask = 0b11110;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t nan_mask = 0b11111;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t snan_mask = 0b100000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t inf_mask =   0b0'11110'000000'0000000000'0000000000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t nan_mask =   0b0'11111'000000'0000000000'0000000000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t snan_mask =  0b0'11111'100000'0000000000'0000000000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_inf_mask = 0b11110;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_nan_mask = 0b11111;
 
 // Values from IEEE 754-2019 table 3.6
 BOOST_ATTRIBUTE_UNUSED static constexpr auto storage_width = 32;
 BOOST_ATTRIBUTE_UNUSED static constexpr auto precision = 7;
-BOOST_ATTRIBUTE_UNUSED static constexpr auto emax = 96;
 BOOST_ATTRIBUTE_UNUSED static constexpr auto bias = 101;
+BOOST_ATTRIBUTE_UNUSED static constexpr auto emax = 96;
+BOOST_ATTRIBUTE_UNUSED static constexpr auto emin = -95;
+BOOST_ATTRIBUTE_UNUSED static constexpr auto etiny = -bias;
 BOOST_ATTRIBUTE_UNUSED static constexpr auto combination_field_width = 11;
 BOOST_ATTRIBUTE_UNUSED static constexpr auto trailing_significand_field_width = 20;
 
@@ -132,7 +136,7 @@ private:
 
 public:
     // 3.2.2.1 construct/copy/destroy:
-    BOOST_DECIMAL_DECL decimal32() noexcept : bits_ {} {}
+    BOOST_DECIMAL_DECL constexpr decimal32() noexcept : bits_ {} {}
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T>
@@ -259,7 +263,7 @@ constexpr decimal32::decimal32(T coeff, int exp) noexcept
     else
     {
         // The value is infinity
-        bits_.combination_field = detail::inf_mask;
+        bits_.combination_field = detail::comb_inf_mask;
     }
 
 }
@@ -302,6 +306,17 @@ struct numeric_limits<boost::decimal::decimal32>
     BOOST_ATTRIBUTE_UNUSED static constexpr int max_exponent_10 = max_exponent;
     BOOST_ATTRIBUTE_UNUSED static constexpr bool traps = numeric_limits<std::uint32_t>::traps;
     BOOST_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = true;
+
+    // Member functions
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (min)() { return {1, min_exponent}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (max)() { return {9999999, max_exponent}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 lowest() { return {-9999999, max_exponent}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 epsilon() { return {1, -7}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 round_error() { return epsilon(); }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 infinity() { return {boost::decimal::detail::inf_mask}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 quiet_NaN() { return {boost::decimal::detail::nan_mask}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 signaling_NaN() { return {boost::decimal::detail::snan_mask}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 denorm_min() { return {1, boost::decimal::detail::etiny}; }
 };
 
 } // Namespace std
