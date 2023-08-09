@@ -327,10 +327,22 @@ constexpr decimal32 operator-(decimal32 rhs) noexcept
 
 constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
 {
-    return lhs.bits_.sign == rhs.bits_.sign &&
-           lhs.bits_.combination_field == rhs.bits_.combination_field &&
-           lhs.bits_.exponent == rhs.bits_.exponent &&
-           lhs.bits_.significand == rhs.bits_.significand;
+    if (lhs.bits_.sign != rhs.bits_.sign)
+    {
+        return false;
+    }
+
+    std::uint32_t lhs_real_exp = lhs.full_exponent();
+    std::uint32_t rhs_real_exp = rhs.full_exponent();
+    std::uint32_t lhs_significand = lhs.full_significand();
+    std::uint32_t rhs_significand = rhs.full_significand();
+
+    // Normalize the significands
+    normalize(lhs_significand, lhs_real_exp);
+    normalize(rhs_significand, rhs_real_exp);
+
+    return lhs_real_exp == rhs_real_exp &&
+           lhs_significand == rhs_significand;
 }
 
 constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
