@@ -9,31 +9,6 @@
 
 namespace boost { namespace decimal {
 
-bool signbit(decimal32 rhs) noexcept
-{
-    return rhs.bits_.sign;
-}
-
-bool isinf(decimal32 rhs) noexcept
-{
-    return rhs.bits_.combination_field & detail::inf_mask;
-}
-
-bool isnan(decimal32 rhs) noexcept
-{
-    return rhs.bits_.combination_field & detail::nan_mask;
-}
-
-bool issignaling(decimal32 rhs) noexcept
-{
-    return isnan(rhs) && rhs.bits_.exponent & detail::snan_mask;
-}
-
-bool isfinite(decimal32 rhs) noexcept
-{
-    return !isinf(rhs) && !isnan(rhs);
-}
-
 decimal32 operator+(decimal32 rhs) noexcept
 {
     return rhs;

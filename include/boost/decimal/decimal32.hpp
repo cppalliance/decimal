@@ -24,6 +24,7 @@ BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t nan_mask =   0b0'11111'000
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t snan_mask =  0b0'11111'100000'0000000000'0000000000;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_inf_mask = 0b11110;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_nan_mask = 0b11111;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t exp_snan_mask = 0b100000;
 
 // Values from IEEE 754-2019 table 3.6
 BOOST_ATTRIBUTE_UNUSED static constexpr auto storage_width = 32;
@@ -144,11 +145,11 @@ public:
 
     BOOST_DECIMAL_DECL constexpr decimal32(std::uint32_t bits) noexcept;
 
-    BOOST_DECIMAL_DECL friend bool signbit(decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend bool isinf(decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend bool isnan(decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend bool issignaling(decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend bool isfinite(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool signbit(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool isinf(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool isnan(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool issignaling(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool isfinite(decimal32 rhs) noexcept;
 
     // 3.2.7 unary arithmetic operators:
     BOOST_DECIMAL_DECL friend decimal32 operator+(decimal32 rhs) noexcept;
@@ -168,17 +169,8 @@ public:
 template <typename T>
 constexpr decimal32::decimal32(T coeff, int exp) noexcept
 {
-    std::uint32_t unsigned_coeff {};
-
     bits_.sign = coeff < 0;
-    if (bits_.sign)
-    {
-        unsigned_coeff = -(static_cast<std::uint32_t>(coeff));
-    }
-    else
-    {
-        unsigned_coeff = coeff;
-    }
+    std::uint32_t unsigned_coeff = bits_.sign ? -(static_cast<std::uint32_t>(coeff)) : static_cast<std::uint32_t>(coeff);
 
     // If the coeff is not in range make it so
     while (unsigned_coeff > detail::max_significand)
@@ -274,6 +266,31 @@ constexpr decimal32::decimal32(std::uint32_t bits) noexcept
     bits_.combination_field = (bits & detail::construct_combination_mask) >> 26;
     bits_.exponent = (bits & detail::construct_exp_mask) >> 20;
     bits_.significand = bits & detail::construct_significand_mask;
+}
+
+constexpr bool signbit(decimal32 rhs) noexcept
+{
+    return rhs.bits_.sign;
+}
+
+constexpr bool isinf(decimal32 rhs) noexcept
+{
+    return rhs.bits_.combination_field & detail::comb_inf_mask;
+}
+
+constexpr bool isnan(decimal32 rhs) noexcept
+{
+    return rhs.bits_.combination_field & detail::comb_nan_mask;
+}
+
+constexpr bool issignaling(decimal32 rhs) noexcept
+{
+    return isnan(rhs) && (rhs.bits_.exponent & detail::exp_snan_mask);
+}
+
+constexpr bool isfinite(decimal32 rhs) noexcept
+{
+    return !isinf(rhs) && !isnan(rhs);
 }
 
 }} // Namespace boost::decimal
