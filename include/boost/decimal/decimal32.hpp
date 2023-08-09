@@ -246,29 +246,29 @@ namespace std {
 template <>
 struct numeric_limits<boost::decimal::decimal32>
 {
-    static constexpr bool is_specialized = true;
-    static constexpr bool is_signed = true;
-    static constexpr bool is_integer = false;
-    static constexpr bool is_exact = false;
-    static constexpr bool has_infinity = true;
-    static constexpr bool has_quiet_NaN = true;
-    static constexpr bool has_signaling_NaN = true;
-    static constexpr std::float_denorm_style has_denorm = std::denorm_present;
-    static constexpr bool has_denorm_loss = true;
-    static constexpr std::float_round_style round_style = std::round_indeterminate;
-    static constexpr bool is_iec559 = true;
-    static constexpr bool is_bounded = true;
-    static constexpr bool is_modulo = false;
-    static constexpr int digits = 7;
-    static constexpr int digits10 = digits;
-    static constexpr int max_digits10 = digits;
-    static constexpr int radix = 10;
-    static constexpr int min_exponent = -95;
-    static constexpr int min_exponent_10 = min_exponent;
-    static constexpr int max_exponent = 96;
-    static constexpr int max_exponent_10 = max_exponent;
-    static constexpr bool traps = numeric_limits<std::uint32_t>::traps;
-    static constexpr bool tinyness_before = true;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_signed = true;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_integer = false;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_exact = false;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_infinity = true;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = true;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = true;
+    BOOST_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_present;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = true;
+    BOOST_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_indeterminate;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = true;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_modulo = false;
+    BOOST_ATTRIBUTE_UNUSED static constexpr int digits = 7;
+    BOOST_ATTRIBUTE_UNUSED static constexpr int digits10 = digits;
+    BOOST_ATTRIBUTE_UNUSED static constexpr int max_digits10 = digits;
+    BOOST_ATTRIBUTE_UNUSED static constexpr int radix = 10;
+    BOOST_ATTRIBUTE_UNUSED static constexpr int min_exponent = -95;
+    BOOST_ATTRIBUTE_UNUSED static constexpr int min_exponent_10 = min_exponent;
+    BOOST_ATTRIBUTE_UNUSED static constexpr int max_exponent = 96;
+    BOOST_ATTRIBUTE_UNUSED static constexpr int max_exponent_10 = max_exponent;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool traps = numeric_limits<std::uint32_t>::traps;
+    BOOST_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = true;
 };
 
 } // Namespace std
