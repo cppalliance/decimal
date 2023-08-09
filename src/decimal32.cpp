@@ -9,19 +9,6 @@
 
 namespace boost { namespace decimal {
 
-bool operator==(decimal32 lhs, decimal32 rhs) noexcept
-{
-    return lhs.bits_.sign == rhs.bits_.sign &&
-           lhs.bits_.combination_field == rhs.bits_.combination_field &&
-           lhs.bits_.exponent == rhs.bits_.exponent &&
-           lhs.bits_.significand == rhs.bits_.significand;
-}
-
-bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
-{
-    return !(lhs == rhs);
-}
-
 // TODO(mborland): Add handling for values with non-zero combination field
 // TODO(mborland): Add decimal point. Would be nice to use charconv here
 std::ostream& operator<<(std::ostream& os, const decimal32& d)

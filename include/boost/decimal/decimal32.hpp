@@ -162,8 +162,12 @@ public:
     BOOST_DECIMAL_DECL friend constexpr decimal32 operator-(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
-    BOOST_DECIMAL_DECL friend bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
 
     // 3.2.11 Formatted output:
     BOOST_DECIMAL_DECL friend std::ostream& operator<<(std::ostream& os, const decimal32& d);
@@ -308,6 +312,85 @@ constexpr decimal32 operator-(decimal32 rhs) noexcept
 {
     rhs.bits_.sign ^= 1;
     return rhs;
+}
+
+constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return lhs.bits_.sign == rhs.bits_.sign &&
+           lhs.bits_.combination_field == rhs.bits_.combination_field &&
+           lhs.bits_.exponent == rhs.bits_.exponent &&
+           lhs.bits_.significand == rhs.bits_.significand;
+}
+
+constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return !(lhs == rhs);
+}
+
+constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
+{
+    if (lhs.bits_.sign && !rhs.bits_.sign)
+    {
+        return true;
+    }
+    else if (!lhs.bits_.sign && rhs.bits_.sign)
+    {
+        return false;
+    }
+    else if (isfinite(lhs) && isinf(rhs))
+    {
+        if (!signbit(rhs))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    const std::uint32_t lhs_real_exp = lhs.full_exponent();
+    const std::uint32_t rhs_real_exp = rhs.full_exponent();
+
+    if (lhs_real_exp == rhs_real_exp)
+    {
+        const std::uint32_t lhs_significand = lhs.full_significand();
+        const std::uint32_t rhs_significand = rhs.full_significand();
+
+        if (lhs_significand < rhs_significand)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else if (lhs_real_exp < rhs_real_exp)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return !(rhs < lhs);
+}
+
+constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return rhs < lhs;
+}
+
+constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return !(lhs < rhs);
 }
 
 constexpr std::uint32_t decimal32::full_exponent() noexcept

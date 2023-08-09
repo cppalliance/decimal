@@ -16,6 +16,8 @@ void test_comp()
 
     constexpr decimal32 sig(123456, -50);
     BOOST_TEST(sig != small);
+
+    BOOST_TEST(small < sig);
 }
 
 void test_constructor()
