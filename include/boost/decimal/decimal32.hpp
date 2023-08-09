@@ -91,6 +91,12 @@ BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_biased_exp = 0b10'1111
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t small_combination_field_mask = 0b0000'0000'0111'0000'0000'0000'0000'0000;
 BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t big_combination_field_mask = 0b0000'0000'0001'0000'0000'0000'0000'0000;
 
+// Constexpr construction from an uint32_t without having to memcpy
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t construct_sign_mask = 0b1'00000'000000'0000000000'0000000000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t construct_combination_mask = 0b0'11111'000000'0000000000'0000000000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t construct_exp_mask = 0b0'00000'111111'0000000000'0000000000;
+BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t construct_significand_mask = no_combination;
+
 } // Namespace detail
 
 
@@ -131,6 +137,8 @@ public:
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T>
     BOOST_DECIMAL_DECL decimal32(T coeff, int exp) noexcept;
+
+    BOOST_DECIMAL_DECL constexpr decimal32(std::uint32_t bits) noexcept;
 
     BOOST_DECIMAL_DECL friend bool signbit(decimal32 rhs) noexcept;
     BOOST_DECIMAL_DECL friend bool isinf(decimal32 rhs) noexcept;
@@ -254,6 +262,14 @@ decimal32::decimal32(T coeff, int exp) noexcept
         bits_.combination_field = detail::inf_mask;
     }
 
+}
+
+constexpr decimal32::decimal32(std::uint32_t bits) noexcept
+{
+    bits_.exponent = (bits & detail::construct_sign_mask) >> 31;
+    bits_.combination_field = (bits & detail::construct_combination_mask) >> 26;
+    bits_.exponent = (bits & detail::construct_exp_mask) >> 20;
+    bits_.significand = bits & detail::construct_significand_mask;
 }
 
 }} // Namespace boost::decimal
