@@ -136,7 +136,7 @@ public:
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T>
-    BOOST_DECIMAL_DECL decimal32(T coeff, int exp) noexcept;
+    BOOST_DECIMAL_DECL constexpr decimal32(T coeff, int exp) noexcept;
 
     BOOST_DECIMAL_DECL constexpr decimal32(std::uint32_t bits) noexcept;
 
@@ -162,9 +162,9 @@ public:
 };
 
 template <typename T>
-decimal32::decimal32(T coeff, int exp) noexcept
+constexpr decimal32::decimal32(T coeff, int exp) noexcept
 {
-    std::uint32_t unsigned_coeff;
+    std::uint32_t unsigned_coeff {};
 
     bits_.sign = coeff < 0;
     if (bits_.sign)

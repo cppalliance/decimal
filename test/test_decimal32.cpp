@@ -8,10 +8,10 @@
 
 void test_comp()
 {
-    boost::decimal::decimal32 small(1, -50);
+    constexpr boost::decimal::decimal32 small(1, -50);
     BOOST_TEST(small == small);
 
-    boost::decimal::decimal32 sig(123456, -50);
+    constexpr boost::decimal::decimal32 sig(123456, -50);
     BOOST_TEST(sig != small);
 }
 
