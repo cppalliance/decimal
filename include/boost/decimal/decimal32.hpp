@@ -149,8 +149,8 @@ private:
 
     data_layout_ bits_{};
 
-    constexpr std::uint32_t full_exponent() noexcept;
-    constexpr std::uint32_t full_significand() noexcept;
+    constexpr std::uint32_t full_exponent() const noexcept;
+    constexpr std::uint32_t full_significand() const noexcept;
 
 public:
     // 3.2.2.1 construct/copy/destroy:
@@ -376,29 +376,26 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
         return false;
     }
 
-    const std::uint32_t lhs_real_exp = lhs.full_exponent();
-    const std::uint32_t rhs_real_exp = rhs.full_exponent();
+    std::uint32_t lhs_real_exp = lhs.full_exponent();
+    std::uint32_t rhs_real_exp = rhs.full_exponent();
+    std::uint32_t lhs_significand = lhs.full_significand();
+    std::uint32_t rhs_significand = rhs.full_significand();
 
-    if (lhs_real_exp == rhs_real_exp)
-    {
-        const std::uint32_t lhs_significand = lhs.full_significand();
-        const std::uint32_t rhs_significand = rhs.full_significand();
+    // Normalize the significands
+    normalize(lhs_significand, lhs_real_exp);
+    normalize(rhs_significand, rhs_real_exp);
 
-        if (lhs_significand < rhs_significand)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    else if (lhs_real_exp < rhs_real_exp)
+    if (lhs_real_exp < rhs_real_exp)
     {
         return true;
     }
+    else if (lhs_real_exp > rhs_real_exp)
+    {
+        return false;
+    }
 
-    return false;
+    // exponents are equal
+    return lhs_significand < rhs_significand;
 }
 
 constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept
@@ -416,7 +413,7 @@ constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
     return !(lhs < rhs);
 }
 
-constexpr std::uint32_t decimal32::full_exponent() noexcept
+constexpr std::uint32_t decimal32::full_exponent() const noexcept
 {
     std::uint32_t exp = 0;
 
@@ -436,7 +433,7 @@ constexpr std::uint32_t decimal32::full_exponent() noexcept
     return exp;
 }
 
-constexpr std::uint32_t decimal32::full_significand() noexcept
+constexpr std::uint32_t decimal32::full_significand() const noexcept
 {
     std::uint32_t significand = 0;
 

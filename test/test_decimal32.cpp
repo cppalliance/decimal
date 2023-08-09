@@ -12,12 +12,21 @@ using namespace boost::decimal;
 void test_comp()
 {
     constexpr decimal32 small(1, -50);
+
     BOOST_TEST(small == small);
 
     constexpr decimal32 sig(123456, -50);
     BOOST_TEST(sig != small);
 
     BOOST_TEST(small < sig);
+    BOOST_TEST(small <= sig);
+    BOOST_TEST(small <= small);
+    BOOST_TEST(sig > small);
+    BOOST_TEST(sig >= small);
+
+    // Test cohorts
+    constexpr decimal32 small_cohort(10, -51);
+    BOOST_TEST(small == small_cohort);
 }
 
 void test_constructor()
