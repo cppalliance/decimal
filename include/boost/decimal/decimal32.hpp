@@ -7,6 +7,7 @@
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/config.hpp>
 #include <iostream>
 #include <limits>
@@ -138,6 +139,8 @@ private:
     data_layout_ bits_{};
 
     constexpr std::uint32_t full_exponent() noexcept;
+    constexpr std::uint32_t full_significand() noexcept;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     BOOST_DECIMAL_DECL constexpr decimal32() noexcept : bits_ {} {}
@@ -325,6 +328,32 @@ constexpr std::uint32_t decimal32::full_exponent() noexcept
     exp |= bits_.exponent;
 
     return exp;
+}
+
+constexpr std::uint32_t decimal32::full_significand() noexcept
+{
+    std::uint32_t significand = 0;
+
+    if ((bits_.combination_field & detail::comb_11_mask) == 0b11000)
+    {
+        // Only need the one bit of T because the other 3 are implied
+        if (bits_.combination_field & 1U)
+        {
+            significand = 0b1001'0000000000'0000000000;
+        }
+        else
+        {
+            significand = 0b1000'0000000000'0000000000;
+        }
+    }
+    else
+    {
+        significand |= ((bits_.combination_field & 0b00111) << 20);
+    }
+
+    significand |= bits_.significand;
+
+    return significand;
 }
 
 }} // Namespace boost::decimal
