@@ -296,17 +296,17 @@ constexpr bool signbit(decimal32 rhs) noexcept
 
 constexpr bool isinf(decimal32 rhs) noexcept
 {
-    return rhs.bits_.combination_field & detail::comb_inf_mask;
+    return (rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask;
 }
 
 constexpr bool isnan(decimal32 rhs) noexcept
 {
-    return rhs.bits_.combination_field & detail::comb_nan_mask;
+    return (rhs.bits_.combination_field & detail::comb_nan_mask) == detail::comb_nan_mask;
 }
 
 constexpr bool issignaling(decimal32 rhs) noexcept
 {
-    return isnan(rhs) && (rhs.bits_.exponent & detail::exp_snan_mask);
+    return isnan(rhs) && (rhs.bits_.exponent & detail::exp_snan_mask) == detail::exp_snan_mask;
 }
 
 constexpr bool isfinite(decimal32 rhs) noexcept
@@ -352,7 +352,11 @@ constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
 
 constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
 {
-    if (lhs.bits_.sign && !rhs.bits_.sign)
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+    else if (lhs.bits_.sign && !rhs.bits_.sign)
     {
         return true;
     }
@@ -370,10 +374,6 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
         {
             return false;
         }
-    }
-    else if (isnan(lhs) || isnan(rhs))
-    {
-        return false;
     }
 
     std::uint32_t lhs_real_exp = lhs.full_exponent();
