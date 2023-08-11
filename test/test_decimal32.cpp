@@ -31,6 +31,17 @@ void test_comp()
     BOOST_TEST(small == decimal32(10000, -54));
     BOOST_TEST(small == decimal32(100000, -55));
     BOOST_TEST(small == decimal32(1000000, -56));
+
+    // Test non-finite comp
+    BOOST_TEST(small < std::numeric_limits<decimal32>::infinity());
+    BOOST_TEST(small > -std::numeric_limits<decimal32>::infinity());
+    BOOST_TEST(!(small == std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(small != std::numeric_limits<decimal32>::infinity());
+
+    BOOST_TEST(!(small < std::numeric_limits<decimal32>::signaling_NaN()));
+    BOOST_TEST(!(small < std::numeric_limits<decimal32>::quiet_NaN()));
+    BOOST_TEST(small != std::numeric_limits<decimal32>::quiet_NaN());
+    BOOST_TEST(std::numeric_limits<decimal32>::quiet_NaN() != std::numeric_limits<decimal32>::quiet_NaN());
 }
 
 void test_constructor()
