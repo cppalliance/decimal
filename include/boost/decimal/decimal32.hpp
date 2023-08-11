@@ -327,6 +327,11 @@ constexpr decimal32 operator-(decimal32 rhs) noexcept
 
 constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
 {
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
     if (lhs.bits_.sign != rhs.bits_.sign)
     {
         return false;
