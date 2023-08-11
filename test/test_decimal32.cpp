@@ -25,8 +25,12 @@ void test_comp()
     BOOST_TEST(sig >= small);
 
     // Test cohorts
-    constexpr decimal32 small_cohort(10, -51);
-    BOOST_TEST(small == small_cohort);
+    BOOST_TEST(small == decimal32(10, -51));
+    BOOST_TEST(small == decimal32(100, -52));
+    BOOST_TEST(small == decimal32(1000, -53));
+    BOOST_TEST(small == decimal32(10000, -54));
+    BOOST_TEST(small == decimal32(100000, -55));
+    BOOST_TEST(small == decimal32(1000000, -56));
 }
 
 void test_constructor()
