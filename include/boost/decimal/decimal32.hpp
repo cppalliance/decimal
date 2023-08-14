@@ -162,11 +162,11 @@ public:
 
     BOOST_DECIMAL_DECL constexpr decimal32(std::uint32_t bits) noexcept;
 
-    BOOST_DECIMAL_DECL friend constexpr bool signbit(decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool isinf(decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool isnan(decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool issignaling(decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool isfinite(decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    BOOST_DECIMAL_DECL friend constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
 
     // 3.2.7 unary arithmetic operators:
     BOOST_DECIMAL_DECL friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
@@ -289,27 +289,27 @@ constexpr decimal32::decimal32(std::uint32_t bits) noexcept
     bits_.significand = bits & detail::construct_significand_mask;
 }
 
-constexpr bool signbit(decimal32 rhs) noexcept
+constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return rhs.bits_.sign;
 }
 
-constexpr bool isinf(decimal32 rhs) noexcept
+constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return (rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask;
 }
 
-constexpr bool isnan(decimal32 rhs) noexcept
+constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return (rhs.bits_.combination_field & detail::comb_nan_mask) == detail::comb_nan_mask;
 }
 
-constexpr bool issignaling(decimal32 rhs) noexcept
+constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return isnan(rhs) && (rhs.bits_.exponent & detail::exp_snan_mask) == detail::exp_snan_mask;
 }
 
-constexpr bool isfinite(decimal32 rhs) noexcept
+constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return !isinf(rhs) && !isnan(rhs);
 }
