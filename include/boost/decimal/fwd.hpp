@@ -16,7 +16,11 @@ class decimal32;
 namespace std {
 
 template <>
+#ifdef BOOST_MSVC
 class numeric_limits<boost::decimal::decimal32>;
+#else
+struct numeric_limits<boost::decimal::decimal32>;
+#endif
 
 } // Namespace std
 

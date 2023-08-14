@@ -470,9 +470,17 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
 namespace std {
 
 template <>
+#ifdef BOOST_MSVC
 class numeric_limits<boost::decimal::decimal32>
+#else
+struct numeric_limits<boost::decimal::decimal32>
+#endif
 {
+
+#ifdef BOOST_MSVC
 public:
+#endif
+
     BOOST_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
     BOOST_ATTRIBUTE_UNUSED static constexpr bool is_signed = true;
     BOOST_ATTRIBUTE_UNUSED static constexpr bool is_integer = false;
