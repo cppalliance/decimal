@@ -419,7 +419,7 @@ BOOST_DECIMAL_DECL constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexc
     return !(lhs < rhs);
 }
 
-BOOST_DECIMAL_DECL constexpr std::uint32_t decimal32::full_exponent() const noexcept
+constexpr std::uint32_t decimal32::full_exponent() const noexcept
 {
     std::uint32_t exp = 0;
 
@@ -439,7 +439,7 @@ BOOST_DECIMAL_DECL constexpr std::uint32_t decimal32::full_exponent() const noex
     return exp;
 }
 
-BOOST_DECIMAL_DECL constexpr std::uint32_t decimal32::full_significand() const noexcept
+constexpr std::uint32_t decimal32::full_significand() const noexcept
 {
     std::uint32_t significand = 0;
 
