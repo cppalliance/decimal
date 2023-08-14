@@ -469,8 +469,9 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
 namespace std {
 
 template <>
-struct numeric_limits<boost::decimal::decimal32>
+class numeric_limits<boost::decimal::decimal32>
 {
+public:
     BOOST_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
     BOOST_ATTRIBUTE_UNUSED static constexpr bool is_signed = true;
     BOOST_ATTRIBUTE_UNUSED static constexpr bool is_integer = false;

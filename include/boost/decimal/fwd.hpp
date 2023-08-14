@@ -16,7 +16,7 @@ class decimal32;
 namespace std {
 
 template <>
-struct numeric_limits<boost::decimal::decimal32>;
+class numeric_limits<boost::decimal::decimal32>;
 
 } // Namespace std
 
