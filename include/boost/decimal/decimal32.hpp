@@ -155,31 +155,31 @@ private:
 
 public:
     // 3.2.2.1 construct/copy/destroy:
-    BOOST_DECIMAL_DECL constexpr decimal32() noexcept : bits_ {} {}
+    constexpr decimal32() noexcept : bits_ {} {}
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T>
-    BOOST_DECIMAL_DECL constexpr decimal32(T coeff, int exp) noexcept;
+    constexpr decimal32(T coeff, int exp) noexcept;
 
-    BOOST_DECIMAL_DECL constexpr decimal32(std::uint32_t bits) noexcept;
+    constexpr decimal32(std::uint32_t bits) noexcept;
 
-    BOOST_DECIMAL_DECL friend constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
 
     // 3.2.7 unary arithmetic operators:
-    BOOST_DECIMAL_DECL friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr decimal32 operator-(decimal32 rhs) noexcept;
+    friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
+    friend constexpr decimal32 operator-(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
-    BOOST_DECIMAL_DECL friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept;
-    BOOST_DECIMAL_DECL friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
 
     // 3.2.11 Formatted output:
     BOOST_DECIMAL_DECL friend std::ostream& operator<<(std::ostream& os, const decimal32& d);
@@ -189,7 +189,7 @@ public:
 };
 
 template <typename T>
-BOOST_DECIMAL_DECL constexpr decimal32::decimal32(T coeff, int exp) noexcept
+constexpr decimal32::decimal32(T coeff, int exp) noexcept
 {
     bits_.sign = coeff < 0;
     std::uint32_t unsigned_coeff = bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff);
@@ -282,7 +282,7 @@ BOOST_DECIMAL_DECL constexpr decimal32::decimal32(T coeff, int exp) noexcept
 
 }
 
-BOOST_DECIMAL_DECL constexpr decimal32::decimal32(std::uint32_t bits) noexcept
+constexpr decimal32::decimal32(std::uint32_t bits) noexcept
 {
     bits_.exponent = (bits & detail::construct_sign_mask) >> 31;
     bits_.combination_field = (bits & detail::construct_combination_mask) >> 26;
@@ -290,43 +290,43 @@ BOOST_DECIMAL_DECL constexpr decimal32::decimal32(std::uint32_t bits) noexcept
     bits_.significand = bits & detail::construct_significand_mask;
 }
 
-BOOST_DECIMAL_DECL constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return rhs.bits_.sign;
 }
 
-BOOST_DECIMAL_DECL constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return (rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask;
 }
 
-BOOST_DECIMAL_DECL constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return (rhs.bits_.combination_field & detail::comb_nan_mask) == detail::comb_nan_mask;
 }
 
-BOOST_DECIMAL_DECL constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return isnan(rhs) && (rhs.bits_.exponent & detail::exp_snan_mask) == detail::exp_snan_mask;
 }
 
-BOOST_DECIMAL_DECL constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return !isinf(rhs) && !isnan(rhs);
 }
 
-BOOST_DECIMAL_DECL constexpr decimal32 operator+(decimal32 rhs) noexcept
+constexpr decimal32 operator+(decimal32 rhs) noexcept
 {
     return rhs;
 }
 
-BOOST_DECIMAL_DECL constexpr decimal32 operator-(decimal32 rhs) noexcept
+constexpr decimal32 operator-(decimal32 rhs) noexcept
 {
     rhs.bits_.sign ^= 1;
     return rhs;
 }
 
-BOOST_DECIMAL_DECL constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
+constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
 {
     if (isnan(lhs) || isnan(rhs))
     {
@@ -351,12 +351,12 @@ BOOST_DECIMAL_DECL constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexc
            lhs_significand == rhs_significand;
 }
 
-BOOST_DECIMAL_DECL constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
+constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
-BOOST_DECIMAL_DECL constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
+constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
 {
     if (isnan(lhs) || isnan(rhs))
     {
@@ -404,17 +404,17 @@ BOOST_DECIMAL_DECL constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexce
     return lhs_significand < rhs_significand;
 }
 
-BOOST_DECIMAL_DECL constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept
+constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept
 {
     return !(rhs < lhs);
 }
 
-BOOST_DECIMAL_DECL constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept
+constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept
 {
     return rhs < lhs;
 }
 
-BOOST_DECIMAL_DECL constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
+constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
 {
     return !(lhs < rhs);
 }
