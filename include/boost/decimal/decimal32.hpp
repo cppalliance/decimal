@@ -189,7 +189,7 @@ public:
 };
 
 template <typename T>
-constexpr decimal32::decimal32(T coeff, int exp) noexcept
+BOOST_DECIMAL_DECL constexpr decimal32::decimal32(T coeff, int exp) noexcept
 {
     bits_.sign = coeff < 0;
     std::uint32_t unsigned_coeff = bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff);
@@ -282,7 +282,7 @@ constexpr decimal32::decimal32(T coeff, int exp) noexcept
 
 }
 
-constexpr decimal32::decimal32(std::uint32_t bits) noexcept
+BOOST_DECIMAL_DECL constexpr decimal32::decimal32(std::uint32_t bits) noexcept
 {
     bits_.exponent = (bits & detail::construct_sign_mask) >> 31;
     bits_.combination_field = (bits & detail::construct_combination_mask) >> 26;
@@ -290,43 +290,43 @@ constexpr decimal32::decimal32(std::uint32_t bits) noexcept
     bits_.significand = bits & detail::construct_significand_mask;
 }
 
-constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return rhs.bits_.sign;
 }
 
-constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return (rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask;
 }
 
-constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return (rhs.bits_.combination_field & detail::comb_nan_mask) == detail::comb_nan_mask;
 }
 
-constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return isnan(rhs) && (rhs.bits_.exponent & detail::exp_snan_mask) == detail::exp_snan_mask;
 }
 
-constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return !isinf(rhs) && !isnan(rhs);
 }
 
-constexpr decimal32 operator+(decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr decimal32 operator+(decimal32 rhs) noexcept
 {
     return rhs;
 }
 
-constexpr decimal32 operator-(decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr decimal32 operator-(decimal32 rhs) noexcept
 {
     rhs.bits_.sign ^= 1;
     return rhs;
 }
 
-constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
 {
     if (isnan(lhs) || isnan(rhs))
     {
@@ -351,12 +351,12 @@ constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
            lhs_significand == rhs_significand;
 }
 
-constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
-constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
 {
     if (isnan(lhs) || isnan(rhs))
     {
@@ -404,22 +404,22 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
     return lhs_significand < rhs_significand;
 }
 
-constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept
 {
     return !(rhs < lhs);
 }
 
-constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept
 {
     return rhs < lhs;
 }
 
-constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
+BOOST_DECIMAL_DECL constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
 {
     return !(lhs < rhs);
 }
 
-constexpr std::uint32_t decimal32::full_exponent() const noexcept
+BOOST_DECIMAL_DECL constexpr std::uint32_t decimal32::full_exponent() const noexcept
 {
     std::uint32_t exp = 0;
 
@@ -439,7 +439,7 @@ constexpr std::uint32_t decimal32::full_exponent() const noexcept
     return exp;
 }
 
-constexpr std::uint32_t decimal32::full_significand() const noexcept
+BOOST_DECIMAL_DECL constexpr std::uint32_t decimal32::full_significand() const noexcept
 {
     std::uint32_t significand = 0;
 
