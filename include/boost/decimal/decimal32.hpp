@@ -8,6 +8,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
+#include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/config.hpp>
 #include <iostream>
 #include <limits>
@@ -191,7 +192,7 @@ template <typename T>
 constexpr decimal32::decimal32(T coeff, int exp) noexcept
 {
     bits_.sign = coeff < 0;
-    std::uint32_t unsigned_coeff = bits_.sign ? -(static_cast<std::uint32_t>(coeff)) : static_cast<std::uint32_t>(coeff);
+    std::uint32_t unsigned_coeff = bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff);
 
     // If the coeff is not in range make it so
     while (unsigned_coeff > detail::max_significand)
