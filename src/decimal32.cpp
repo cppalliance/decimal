@@ -9,8 +9,6 @@
 
 namespace boost { namespace decimal {
 
-// TODO(mborland): Add handling for values with non-zero combination field
-// TODO(mborland): Add decimal point. Would be nice to use charconv here
 std::ostream& operator<<(std::ostream& os, const decimal32& d)
 {
     if (d.bits_.sign == 1)
@@ -18,16 +16,25 @@ std::ostream& operator<<(std::ostream& os, const decimal32& d)
         os << "-";
     }
 
-    os << d.bits_.significand << "e";
+    os << d.full_significand() << "e";
 
-    if (d.bits_.exponent - detail::bias < 0)
+    const auto print_exp = static_cast<int>(d.full_exponent()) - detail::bias;
+
+    if (print_exp < 0)
     {
-        os << d.bits_.exponent - detail::bias;
+        os << '-';
     }
     else
     {
-        os << '+' << d.bits_.exponent - detail::bias;
+        os << '+';
     }
+
+    if (abs(print_exp) < 10)
+    {
+        os << '0';
+    }
+
+    os << print_exp;
 
     return os;
 }
