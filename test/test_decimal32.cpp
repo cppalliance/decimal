@@ -207,6 +207,19 @@ void test_addition()
     BOOST_TEST(isinf(max_val + one));
 }
 
+template <typename T>
+void test_construct_from_integer()
+{
+    constexpr decimal32 one(1, 0);
+    BOOST_TEST_EQ(one, decimal32(T(1)));
+
+    constexpr decimal32 one_pow_eight(1, 8);
+    BOOST_TEST_EQ(one_pow_eight, decimal32(T(100'000'000)));
+
+    constexpr decimal32 rounded(1234568, 1);
+    BOOST_TEST_EQ(rounded, decimal32(T(12345678)));
+}
+
 int main()
 {
     test_comp();
@@ -216,6 +229,10 @@ int main()
     test_unary_arithmetic();
 
     test_addition();
+
+    test_construct_from_integer<int>();
+    test_construct_from_integer<long>();
+    test_construct_from_integer<long long>();
 
     return boost::report_errors();
 }

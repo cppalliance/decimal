@@ -157,6 +157,10 @@ public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept : bits_ {} {}
 
+    // 3.2.2.3 Conversion from integral type
+    template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
+    constexpr decimal32(Integer val) noexcept;
+
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T, typename T2>
     constexpr decimal32(T coeff, T2 exp) noexcept;
@@ -654,6 +658,12 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
     significand |= bits_.significand;
 
     return significand;
+}
+
+template<typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool>>
+constexpr decimal32::decimal32(Integer val) noexcept
+{
+    *this = decimal32{val, 0};
 }
 
 }} // Namespace boost::decimal
