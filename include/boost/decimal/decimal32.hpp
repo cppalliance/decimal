@@ -406,7 +406,7 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
 
         if (lhs_bigger)
         {
-            if (sig_rhs > UINT32_C(5'000'000))
+            if (sig_rhs >= UINT32_C(5'000'000))
             {
                 ++sig_lhs;
                 return {sig_lhs, static_cast<int>(exp_lhs) - detail::bias};
@@ -418,7 +418,7 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         }
         else
         {
-            if (sig_lhs > UINT32_C(5'000'000))
+            if (sig_lhs >= UINT32_C(5'000'000))
             {
                 ++sig_rhs;
                 return {sig_rhs, static_cast<int>(exp_rhs) - detail::bias};

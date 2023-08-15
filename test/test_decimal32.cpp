@@ -163,6 +163,10 @@ void test_addition()
     BOOST_TEST(isinf(one + inf_val));
     BOOST_TEST(isnan(inf_val + qnan_val));
     BOOST_TEST(isnan(qnan_val + inf_val));
+
+    // Overflow
+    constexpr decimal32 max_val((std::numeric_limits<decimal32>::max)());
+    BOOST_TEST(isinf(max_val + one));
 }
 
 int main()
