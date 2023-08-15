@@ -141,6 +141,15 @@ void test_addition()
     BOOST_TEST_EQ(one + one, two);
     BOOST_TEST_EQ(two + one, three);
     BOOST_TEST_EQ(one + one + one, three);
+
+    // Different orders of magnitude
+    constexpr decimal32 ten(10, 0);
+    constexpr decimal32 eleven(11, 0);
+    BOOST_TEST_EQ(ten + one, eleven);
+
+    constexpr decimal32 max_sig(9'999'999, 0);
+    constexpr decimal32 max_plus_one(10'000'000, 0);
+    BOOST_TEST_EQ(max_sig + one, max_plus_one);
 }
 
 int main()

@@ -261,7 +261,6 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
 
         bits_.significand = unsigned_coeff & detail::no_combination;
         const uint32_t remaining_bit = unsigned_coeff & detail::big_combination_field_mask;
-        assert(remaining_bit <= 1);
 
         if (remaining_bit)
         {
@@ -357,6 +356,8 @@ constexpr decimal32 operator-(decimal32 rhs) noexcept
 // https://en.wikipedia.org/wiki/Kahan_summation_algorithm
 constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
 {
+    // Check non-finite values
+
     auto sig_lhs = lhs.full_significand();
     auto exp_lhs = lhs.full_exponent();
     normalize(sig_lhs, exp_lhs);
@@ -377,7 +378,7 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
 
         return lhs_bigger ? lhs : rhs;
     }
-    else if (delta_exp + 1 == detail::precision)
+    else if (delta_exp == detail::precision + 1)
     {
         // Only need to see if we need to add one to the
         // significand of the bigger value
