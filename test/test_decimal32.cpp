@@ -74,6 +74,14 @@ void test_binary_constructor()
     // 111111 for exp
     // 0000000000'0000000001 for significand
     BOOST_TEST_EQ(std::bitset<32>(to_bits(one_e_max)), std::bitset<32>(0b0'10000'111111'0000000000'0000000001));
+
+    // Construct denorm min
+    decimal32 denorm_min(0b1, -101);
+    // 0 for sign
+    // 00000 for combination field
+    // 000000 for exp
+    // 0000000000'00000000001
+    BOOST_TEST_EQ(std::bitset<32>(to_bits(denorm_min)), std::bitset<32>(0b0'00000'000000'0000000000'0000000001));
 }
 
 void test_decimal_constructor()
