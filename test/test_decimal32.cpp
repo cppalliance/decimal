@@ -44,7 +44,7 @@ void test_comp()
     BOOST_TEST(std::numeric_limits<decimal32>::quiet_NaN() != std::numeric_limits<decimal32>::quiet_NaN());
 }
 
-void test_constructor()
+void test_binary_constructor()
 {
     decimal32 one(0b1, -100);
     // 0 for sign
@@ -74,6 +74,16 @@ void test_constructor()
     // 111111 for exp
     // 0000000000'0000000001 for significand
     BOOST_TEST_EQ(std::bitset<32>(to_bits(one_e_max)), std::bitset<32>(0b0'10000'111111'0000000000'0000000001));
+}
+
+void test_decimal_constructor()
+{
+    // The significand is more than 7 digits
+    // Apply correct rounding when in the range of 7 digits
+    decimal32 big(123456789, 0);
+    decimal32 rounded_big(1234568, 2);
+
+    BOOST_TEST_EQ(big, rounded_big);
 }
 
 void test_non_finite_values()
@@ -136,7 +146,8 @@ void test_addition()
 int main()
 {
     test_comp();
-    test_constructor();
+    test_binary_constructor();
+    test_decimal_constructor();
     test_non_finite_values();
     test_unary_arithmetic();
 

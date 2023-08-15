@@ -201,10 +201,32 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     std::uint32_t unsigned_coeff = bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff);
 
     // If the coeff is not in range make it so
-    while (unsigned_coeff > detail::max_significand)
+    auto unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
+    const bool reduced = unsigned_coeff_digits > detail::precision;
+    while (unsigned_coeff_digits > detail::precision + 1)
     {
         unsigned_coeff /= 10;
         ++exp;
+        --unsigned_coeff_digits;
+    }
+
+    if (reduced)
+    {
+        const auto trailing_num = unsigned_coeff % 10;
+        unsigned_coeff /= 10;
+        ++exp;
+        if (trailing_num >= 5)
+        {
+            ++unsigned_coeff;
+        }
+
+        // If the significand was e.g. 99'999'999 rounding up
+        // would put it out of range again
+        if (unsigned_coeff > detail::max_significand)
+        {
+            unsigned_coeff /= 10;
+            ++exp;
+        }
     }
 
     // zero the combination field, so we can mask in the following
