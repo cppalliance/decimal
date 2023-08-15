@@ -182,6 +182,8 @@ public:
 
     // 3.2.8 binary arithmetic operators:
     friend constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept;
+    constexpr decimal32& operator++() noexcept;
+    constexpr decimal32 operator++(int) noexcept;
 
     // 3.2.9 comparison operators:
     friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
@@ -494,6 +496,18 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
 
         return {new_sig, new_exp};
     }
+}
+
+constexpr decimal32& decimal32::operator++() noexcept
+{
+    constexpr decimal32 one(1, 0);
+    *this = *this + one;
+    return *this;
+}
+
+constexpr decimal32 decimal32::operator++(int) noexcept
+{
+    return ++(*this);
 }
 
 constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept

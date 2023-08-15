@@ -169,10 +169,16 @@ void test_addition()
     constexpr decimal32 one(1, 0);
     constexpr decimal32 two(2, 0);
     constexpr decimal32 three(3, 0);
+    decimal32 mutable_one(1, 0);
 
     BOOST_TEST_EQ(one + one, two);
     BOOST_TEST_EQ(two + one, three);
     BOOST_TEST_EQ(one + one + one, three);
+
+    // Pre- and post- increment
+    BOOST_TEST_EQ(mutable_one, one);
+    BOOST_TEST_EQ(mutable_one++, two);
+    BOOST_TEST_EQ(++mutable_one, three);
 
     // Different orders of magnitude
     constexpr decimal32 ten(10, 0);
