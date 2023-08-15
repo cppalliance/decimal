@@ -158,8 +158,8 @@ public:
     constexpr decimal32() noexcept : bits_ {} {}
 
     // 3.2.5 initialization from coefficient and exponent:
-    template <typename T>
-    constexpr decimal32(T coeff, int exp) noexcept;
+    template <typename T, typename T2>
+    constexpr decimal32(T coeff, T2 exp) noexcept;
 
     constexpr decimal32(std::uint32_t bits) noexcept;
 
@@ -188,9 +188,12 @@ public:
     BOOST_DECIMAL_DECL friend std::uint32_t to_bits(decimal32 rhs) noexcept;
 };
 
-template <typename T>
-constexpr decimal32::decimal32(T coeff, int exp) noexcept
+template <typename T, typename T2>
+constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
 {
+    static_assert(std::is_integral<T>::value, "Coefficient must be an integer");
+    static_assert(std::is_integral<T2>::value, "Exponent must be an integer");
+
     bits_.sign = coeff < 0;
     std::uint32_t unsigned_coeff = bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff);
 
