@@ -171,6 +171,7 @@ public:
     friend constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
 
     // 3.2.7 unary arithmetic operators:
     friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
@@ -356,6 +357,30 @@ constexpr bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcep
     }
 
     return sig != 0 && isfinite(rhs);
+}
+
+constexpr int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+{
+    if (isinf(rhs))
+    {
+        return FP_INFINITE;
+    }
+    else if (isnan(rhs))
+    {
+        return FP_NAN;
+    }
+    else if (rhs.full_significand() == 0)
+    {
+        return FP_ZERO;
+    }
+    else if (!isnormal(rhs))
+    {
+        return FP_SUBNORMAL;
+    }
+    else
+    {
+        return FP_NORMAL;
+    }
 }
 
 constexpr decimal32 operator+(decimal32 rhs) noexcept

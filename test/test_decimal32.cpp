@@ -6,6 +6,7 @@
 #include <boost/core/lightweight_test.hpp>
 #include <bitset>
 #include <limits>
+#include <cmath>
 
 using namespace boost::decimal;
 
@@ -117,8 +118,11 @@ void test_non_finite_values()
     BOOST_TEST(!issignaling(std::numeric_limits<decimal32>::quiet_NaN()));
     BOOST_TEST(issignaling(std::numeric_limits<decimal32>::signaling_NaN()));
     BOOST_TEST(!issignaling(one));
+    BOOST_TEST(!issignaling(std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(!issignaling(-std::numeric_limits<decimal32>::infinity()));
 
     BOOST_TEST(isfinite(one));
+    BOOST_TEST(isfinite(std::numeric_limits<decimal32>::denorm_min()));
     BOOST_TEST(!isfinite(std::numeric_limits<decimal32>::infinity()));
     BOOST_TEST(!isfinite(std::numeric_limits<decimal32>::quiet_NaN()));
     BOOST_TEST(!isfinite(std::numeric_limits<decimal32>::signaling_NaN()));
@@ -128,6 +132,14 @@ void test_non_finite_values()
     BOOST_TEST(!isnormal(std::numeric_limits<decimal32>::quiet_NaN()));
     BOOST_TEST(!isnormal(std::numeric_limits<decimal32>::signaling_NaN()));
     BOOST_TEST(!isnormal(std::numeric_limits<decimal32>::denorm_min()));
+
+    BOOST_TEST_EQ(fpclassify(one), FP_NORMAL);
+    BOOST_TEST_EQ(fpclassify(-one), FP_NORMAL);
+    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32>::quiet_NaN()), FP_NAN);
+    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32>::signaling_NaN()), FP_NAN);
+    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32>::infinity()), FP_INFINITE);
+    BOOST_TEST_EQ(fpclassify(-std::numeric_limits<decimal32>::infinity()), FP_INFINITE);
+    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32>::denorm_min()), FP_SUBNORMAL);
 }
 
 void test_unary_arithmetic()
