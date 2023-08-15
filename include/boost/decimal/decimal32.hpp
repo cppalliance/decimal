@@ -324,11 +324,6 @@ constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
     return rhs.bits_.sign;
 }
 
-constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
-{
-    return (rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask;
-}
-
 constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return (rhs.bits_.combination_field & detail::comb_nan_mask) == detail::comb_nan_mask;
@@ -337,6 +332,11 @@ constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return isnan(rhs) && (rhs.bits_.exponent & detail::exp_snan_mask) == detail::exp_snan_mask;
+}
+
+constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+{
+    return ((rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask) && !isnan(rhs);
 }
 
 constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept

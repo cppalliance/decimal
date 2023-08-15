@@ -100,13 +100,19 @@ void test_non_finite_values()
 
     BOOST_TEST(std::numeric_limits<decimal32>::has_infinity);
     BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(isinf(-std::numeric_limits<decimal32>::infinity()));
     BOOST_TEST(!isinf(one));
+    BOOST_TEST(!isinf(std::numeric_limits<decimal32>::quiet_NaN()));
+    BOOST_TEST(!isinf(std::numeric_limits<decimal32>::signaling_NaN()));
+    BOOST_TEST(!isinf(std::numeric_limits<decimal32>::denorm_min()));
 
     BOOST_TEST(std::numeric_limits<decimal32>::has_quiet_NaN);
     BOOST_TEST(std::numeric_limits<decimal32>::has_signaling_NaN);
     BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN()));
     BOOST_TEST(isnan(std::numeric_limits<decimal32>::signaling_NaN()));
     BOOST_TEST(!isnan(one));
+    BOOST_TEST(!isnan(std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(!isnan(-std::numeric_limits<decimal32>::infinity()));
 
     BOOST_TEST(!issignaling(std::numeric_limits<decimal32>::quiet_NaN()));
     BOOST_TEST(issignaling(std::numeric_limits<decimal32>::signaling_NaN()));
