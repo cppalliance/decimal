@@ -170,6 +170,7 @@ public:
     friend constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
 
     // 3.2.7 unary arithmetic operators:
     friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
@@ -341,6 +342,20 @@ constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noex
 constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return !isinf(rhs) && !isnan(rhs);
+}
+
+constexpr bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+{
+    // Check for de-normals
+    const auto sig = rhs.full_significand();
+    const auto exp = rhs.full_exponent();
+
+    if (exp <= detail::precision - 1)
+    {
+        return false;
+    }
+
+    return sig != 0 && isfinite(rhs);
 }
 
 constexpr decimal32 operator+(decimal32 rhs) noexcept

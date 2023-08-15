@@ -96,7 +96,7 @@ void test_decimal_constructor()
 
 void test_non_finite_values()
 {
-    constexpr decimal32 one(0b1, -100);
+    constexpr decimal32 one(0b1, 0);
 
     BOOST_TEST(std::numeric_limits<decimal32>::has_infinity);
     BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity()));
@@ -116,6 +116,12 @@ void test_non_finite_values()
     BOOST_TEST(!isfinite(std::numeric_limits<decimal32>::infinity()));
     BOOST_TEST(!isfinite(std::numeric_limits<decimal32>::quiet_NaN()));
     BOOST_TEST(!isfinite(std::numeric_limits<decimal32>::signaling_NaN()));
+
+    BOOST_TEST(isnormal(one));
+    BOOST_TEST(!isnormal(std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(!isnormal(std::numeric_limits<decimal32>::quiet_NaN()));
+    BOOST_TEST(!isnormal(std::numeric_limits<decimal32>::signaling_NaN()));
+    BOOST_TEST(!isnormal(std::numeric_limits<decimal32>::denorm_min()));
 }
 
 void test_unary_arithmetic()
