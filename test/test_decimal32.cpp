@@ -126,7 +126,7 @@ void test_addition()
     BOOST_TEST_EQ(small_num + big_num, big_num);
 
     // Case 2: Round the last digit of the significand
-    constexpr decimal32 full_length_num(10000000, 0);
+    constexpr decimal32 full_length_num {10000000, 0};
     constexpr decimal32 rounded_full_length_num(10000000, 0);
     constexpr decimal32 no_round(1, -1);
     constexpr decimal32 round(9, -1);
@@ -150,6 +150,19 @@ void test_addition()
     constexpr decimal32 max_sig(9'999'999, 0);
     constexpr decimal32 max_plus_one(10'000'000, 0);
     BOOST_TEST_EQ(max_sig + one, max_plus_one);
+
+    // Non-finite values
+    constexpr decimal32 qnan_val(std::numeric_limits<decimal32>::quiet_NaN());
+    constexpr decimal32 snan_val(std::numeric_limits<decimal32>::signaling_NaN());
+    constexpr decimal32 inf_val(std::numeric_limits<decimal32>::infinity());
+    BOOST_TEST(isnan(qnan_val + one));
+    BOOST_TEST(isnan(snan_val + one));
+    BOOST_TEST(isnan(one + qnan_val));
+    BOOST_TEST(isnan(one + snan_val));
+    BOOST_TEST(isinf(inf_val + one));
+    BOOST_TEST(isinf(one + inf_val));
+    BOOST_TEST(isnan(inf_val + qnan_val));
+    BOOST_TEST(isnan(qnan_val + inf_val));
 }
 
 int main()

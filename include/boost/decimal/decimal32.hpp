@@ -161,7 +161,9 @@ public:
     template <typename T, typename T2>
     constexpr decimal32(T coeff, T2 exp) noexcept;
 
-    constexpr decimal32(std::uint32_t bits) noexcept;
+    constexpr decimal32(const decimal32 &val) noexcept = default;
+
+    explicit constexpr decimal32(std::uint32_t bits) noexcept;
 
     friend constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
@@ -357,6 +359,23 @@ constexpr decimal32 operator-(decimal32 rhs) noexcept
 constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
 {
     // Check non-finite values
+    // Check nans before infinities
+    if (isnan(lhs))
+    {
+        return lhs;
+    }
+    else if (isnan(rhs))
+    {
+        return rhs;
+    }
+    else if (isinf(lhs))
+    {
+        return lhs;
+    }
+    else if (isinf(rhs))
+    {
+        return rhs;
+    }
 
     auto sig_lhs = lhs.full_significand();
     auto exp_lhs = lhs.full_exponent();
@@ -619,9 +638,9 @@ public:
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 lowest() { return {-9999999, max_exponent}; }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 epsilon() { return {1, -7}; }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 round_error() { return epsilon(); }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 infinity() { return {boost::decimal::detail::inf_mask}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 quiet_NaN() { return {boost::decimal::detail::nan_mask}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 signaling_NaN() { return {boost::decimal::detail::snan_mask}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 infinity() { return boost::decimal::decimal32{boost::decimal::detail::inf_mask}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 quiet_NaN() { return boost::decimal::decimal32{boost::decimal::detail::nan_mask}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 signaling_NaN() { return boost::decimal::decimal32{boost::decimal::detail::snan_mask}; }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 denorm_min() { return {1, boost::decimal::detail::etiny}; }
 };
 

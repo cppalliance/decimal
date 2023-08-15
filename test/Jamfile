@@ -10,7 +10,7 @@ project : requirements
 
   <library>/boost/decimal//boost_decimal
 
-  <warnings>extra
+  <warnings>pedantic
 
   <toolset>msvc:<warnings-as-errors>on
   <toolset>clang:<warnings-as-errors>on
