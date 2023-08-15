@@ -161,7 +161,10 @@ public:
     template <typename T, typename T2>
     constexpr decimal32(T coeff, T2 exp) noexcept;
 
-    constexpr decimal32(const decimal32 &val) noexcept = default;
+    constexpr decimal32(const decimal32& val) noexcept = default;
+    constexpr decimal32& operator=(const decimal32& val) noexcept = default;
+    constexpr decimal32(decimal32&& val) noexcept = default;
+    constexpr decimal32& operator=(decimal32&& val) noexcept = default;
 
     explicit constexpr decimal32(std::uint32_t bits) noexcept;
 
