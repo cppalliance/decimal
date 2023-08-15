@@ -107,12 +107,40 @@ void test_unary_arithmetic()
     BOOST_TEST(-one != one);
 }
 
+void test_addition()
+{
+    // Case 1: The difference is more than the digits of accuracy
+    constexpr decimal32 big_num(0b1, 20);
+    constexpr decimal32 small_num(0b1, -20);
+    BOOST_TEST_EQ(big_num + small_num, big_num);
+    BOOST_TEST_EQ(small_num + big_num, big_num);
+
+    // Case 2: Round the last digit of the significand
+    constexpr decimal32 full_length_num(10000000, 0);
+    constexpr decimal32 rounded_full_length_num(10000000, 0);
+    constexpr decimal32 no_round(1, -1);
+    constexpr decimal32 round(9, -1);
+    BOOST_TEST_EQ(full_length_num + no_round, full_length_num);
+    BOOST_TEST_EQ(full_length_num + round, rounded_full_length_num);
+
+    // Case 3: Add away
+    constexpr decimal32 one(1, 0);
+    constexpr decimal32 two(2, 0);
+    constexpr decimal32 three(3, 0);
+
+    BOOST_TEST_EQ(one + one, two);
+    BOOST_TEST_EQ(two + one, three);
+    BOOST_TEST_EQ(one + one + one, three);
+}
+
 int main()
 {
     test_comp();
     test_constructor();
     test_non_finite_values();
     test_unary_arithmetic();
+
+    test_addition();
 
     return boost::report_errors();
 }

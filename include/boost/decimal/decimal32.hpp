@@ -173,6 +173,9 @@ public:
     friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
     friend constexpr decimal32 operator-(decimal32 rhs) noexcept;
 
+    // 3.2.8 binary arithmetic operators:
+    friend constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept;
+
     // 3.2.9 comparison operators:
     friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
@@ -282,7 +285,6 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
         // The value is infinity
         bits_.combination_field = detail::comb_inf_mask;
     }
-
 }
 
 constexpr decimal32::decimal32(std::uint32_t bits) noexcept
@@ -327,6 +329,86 @@ constexpr decimal32 operator-(decimal32 rhs) noexcept
 {
     rhs.bits_.sign ^= 1;
     return rhs;
+}
+
+// We use kahan summation here where applicable
+// https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
+{
+    auto sig_lhs = lhs.full_significand();
+    auto exp_lhs = lhs.full_exponent();
+    normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs = rhs.full_significand();
+    auto exp_rhs = rhs.full_exponent();
+    normalize(sig_rhs, exp_rhs);
+
+    const bool lhs_bigger = lhs > rhs;
+    auto delta_exp = exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs;
+
+    if (delta_exp + 1 > detail::precision)
+    {
+        // If the difference in exponents is more than the digits of accuracy
+        // we return the larger of the two
+        //
+        // e.g. 1e20 + 1e-20 = 1e20
+
+        return lhs_bigger ? lhs : rhs;
+    }
+    else if (delta_exp + 1 == detail::precision)
+    {
+        // Only need to see if we need to add one to the
+        // significand of the bigger value
+        //
+        // e.g. 1.234567e5 + 9.876543e-3 = 1.234568e5
+
+        if (lhs_bigger)
+        {
+            if (sig_rhs > UINT32_C(5'000'000))
+            {
+                ++sig_lhs;
+                return {sig_lhs, static_cast<int>(exp_lhs) - detail::bias};
+            }
+            else
+            {
+                return lhs;
+            }
+        }
+        else
+        {
+            if (sig_lhs > UINT32_C(5'000'000))
+            {
+                ++sig_rhs;
+                return {sig_rhs, static_cast<int>(exp_rhs) - detail::bias};
+            }
+            else
+            {
+                return rhs;
+            }
+        }
+    }
+    else
+    {
+        // The two numbers can be added together without special handling
+        while (delta_exp > 0)
+        {
+            if (lhs_bigger)
+            {
+                sig_rhs /= 10;
+            }
+            else
+            {
+                sig_lhs /= 10;
+            }
+
+            --delta_exp;
+        }
+
+        const auto new_sig = sig_lhs + sig_rhs;
+        const auto new_exp = static_cast<int>(lhs_bigger ? exp_lhs : exp_rhs) - detail::bias;
+
+        return {new_sig, new_exp};
+    }
 }
 
 constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
