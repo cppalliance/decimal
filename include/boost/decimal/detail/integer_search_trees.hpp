@@ -8,6 +8,7 @@
 // https://stackoverflow.com/questions/1489830/efficient-way-to-determine-number-of-digits-in-an-integer?page=1&tab=scoredesc#tab-top
 // https://graphics.stanford.edu/~seander/bithacks.html
 
+#include <boost/decimal/detail/power_tables.hpp>
 #include <limits>
 #include <array>
 #include <cstdint>
@@ -156,14 +157,6 @@ constexpr int num_digits(std::uint64_t x) noexcept
 }
 
 #ifdef BOOST_HAS_INT128
-static constexpr std::array<std::uint64_t, 20> powers_of_10 =
-{{
-    UINT64_C(1), UINT64_C(10), UINT64_C(100), UINT64_C(1000), UINT64_C(10000), UINT64_C(100000), UINT64_C(1000000), 
-    UINT64_C(10000000), UINT64_C(100000000), UINT64_C(1000000000), UINT64_C(10000000000), UINT64_C(100000000000), 
-    UINT64_C(1000000000000), UINT64_C(10000000000000), UINT64_C(100000000000000), UINT64_C(1000000000000000), 
-    UINT64_C(10000000000000000), UINT64_C(100000000000000000), UINT64_C(1000000000000000000), UINT64_C(10000000000000000000)
-}};
-
 // Assume that if someone is using 128 bit ints they are favoring the top end of the range
 // Max value is 340,282,366,920,938,463,463,374,607,431,768,211,455 (39 digits)
 constexpr int num_digits(boost::uint128_type x) noexcept
