@@ -221,50 +221,6 @@ void test_construct_from_integer()
     BOOST_TEST_EQ(rounded, decimal32(T(12345678)));
 }
 
-template <typename T>
-void test_conversion_to_integer()
-{
-    errno = 0;
-    constexpr decimal32 neg_one(-1, 0);
-    constexpr decimal32 one(1, 0);
-    constexpr decimal32 zero(0, 0);
-    constexpr decimal32 half(5, -1);
-    BOOST_TEST_EQ(static_cast<T>(one), static_cast<T>(1)) && BOOST_TEST_EQ(errno, 0);
-    BOOST_TEST_EQ(static_cast<T>(one + one), static_cast<T>(2)) && BOOST_TEST_EQ(errno, 0);
-    BOOST_TEST_EQ(static_cast<T>(zero), static_cast<T>(0)) && BOOST_TEST_EQ(errno, 0);
-
-    BOOST_IF_CONSTEXPR (std::is_signed<T>::value)
-    {
-        BOOST_TEST_EQ(static_cast<T>(neg_one), static_cast<T>(-1)) && BOOST_TEST_EQ(errno, 0);
-    }
-    else
-    {
-        // Bad conversion so we use zero
-        BOOST_TEST_EQ(static_cast<T>(neg_one), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
-    }
-
-    errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::infinity()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
-
-    errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal32>::infinity()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
-
-    errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::quiet_NaN()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, EINVAL);
-
-    errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::signaling_NaN()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, EINVAL);
-
-    errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(half), static_cast<T>(0)) && BOOST_TEST_EQ(errno, 0);
-
-    constexpr decimal32 one_e_8(1, 8);
-    BOOST_TEST_EQ(static_cast<T>(one_e_8), static_cast<T>(100'000'000)) && BOOST_TEST_EQ(errno, 0);
-
-    constexpr decimal32 one_e_8_2(1'000'000, 2);
-    BOOST_TEST_EQ(static_cast<T>(one_e_8_2), static_cast<T>(100'000'000)) && BOOST_TEST_EQ(errno, 0);
-}
-
 int main()
 {
     test_comp();
@@ -278,13 +234,6 @@ int main()
     test_construct_from_integer<int>();
     test_construct_from_integer<long>();
     test_construct_from_integer<long long>();
-
-    test_conversion_to_integer<int>();
-    test_conversion_to_integer<unsigned>();
-    test_conversion_to_integer<long>();
-    test_conversion_to_integer<unsigned long>();
-    test_conversion_to_integer<long long>();
-    test_conversion_to_integer<unsigned long long>();
 
     return boost::report_errors();
 }

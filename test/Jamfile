@@ -21,3 +21,4 @@ project : requirements
 
 run quick.cpp ;
 run test_decimal32.cpp ;
+run roundtrip_decimal32.cpp ;
