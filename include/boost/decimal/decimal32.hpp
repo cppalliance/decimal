@@ -9,12 +9,14 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
+#include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/config.hpp>
 #include <iostream>
 #include <limits>
 #include <cstdint>
 #include <cmath>
 #include <cassert>
+#include <cerrno>
 
 namespace boost { namespace decimal {
 
@@ -153,13 +155,27 @@ private:
     constexpr std::uint32_t full_exponent() const noexcept;
     constexpr std::uint32_t full_significand() const noexcept;
 
+    // Attempts coneversion to integral type:
+    // If this is nan sets errno to EINVAL and returns 0
+    // If this is not representable sets errno to ERANGE and returns 0
+    template <typename TargetType>
+    constexpr TargetType to_integral() const noexcept;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept : bits_ {} {}
 
     // 3.2.2.3 Conversion from integral type
     template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
-    constexpr decimal32(Integer val) noexcept;
+    explicit constexpr decimal32(Integer val) noexcept;
+
+    // 3.2.2.4 Conversion to integral type
+    explicit constexpr operator int() const noexcept { return this->to_integral<int>(); }
+    explicit constexpr operator unsigned() const noexcept { return this->to_integral<unsigned>(); }
+    explicit constexpr operator long() const noexcept { return this->to_integral<long>(); }
+    explicit constexpr operator unsigned long() const noexcept { return this->to_integral<unsigned long>(); }
+    explicit constexpr operator long long() const noexcept { return this->to_integral<long long>(); }
+    explicit constexpr operator unsigned long long() const noexcept { return this->to_integral<unsigned long long>(); }
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T, typename T2>
@@ -659,6 +675,47 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
     significand |= bits_.significand;
 
     return significand;
+}
+
+template <typename TargetType>
+constexpr TargetType decimal32::to_integral() const noexcept
+{
+    TargetType result;
+
+    const decimal32 unsigned_this = this->bits_.sign ? -(*this) : *this;
+
+    if (isnan(*this))
+    {
+        errno = EINVAL;
+        return static_cast<TargetType>(0);
+    }
+    if (unsigned_this > static_cast<decimal32>((std::numeric_limits<TargetType>::max)()))
+    {
+        errno = ERANGE;
+        return static_cast<TargetType>(0);
+    }
+
+    result = static_cast<TargetType>(this->full_significand());
+    int exp = static_cast<int>(this->full_exponent()) - detail::bias;
+    if (exp > 0)
+    {
+        result *= powers_of_10[exp];
+    }
+    else if (exp == 0)
+    {
+        result = 0;
+    }
+    else
+    {
+        result /= powers_of_10[-exp];
+    }
+
+    BOOST_IF_CONSTEXPR (std::is_signed<TargetType>::value)
+    {
+        result = this->bits_.sign ? detail::apply_sign(result) : result;
+    }
+
+    return result;
 }
 
 template<typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool>>
