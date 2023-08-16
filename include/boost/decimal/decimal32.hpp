@@ -418,7 +418,8 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
     {
         return rhs;
     }
-    else if (isinf(lhs))
+
+    if (isinf(lhs))
     {
         return lhs;
     }
