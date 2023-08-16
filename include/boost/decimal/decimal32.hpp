@@ -224,11 +224,13 @@ public:
 template <typename T, typename T2>
 constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
 {
+    using Unsigned_Integer = std::make_unsigned_t<T>;
+
     static_assert(std::is_integral<T>::value, "Coefficient must be an integer");
     static_assert(std::is_integral<T2>::value, "Exponent must be an integer");
 
     bits_.sign = coeff < 0;
-    std::uint32_t unsigned_coeff = bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff);
+    auto unsigned_coeff = static_cast<Unsigned_Integer>(bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff));
 
     // If the coeff is not in range make it so
     auto unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
@@ -679,7 +681,7 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
 template <typename TargetType>
 constexpr TargetType decimal32::to_integral() const noexcept
 {
-    TargetType result;
+    TargetType result {};
 
     const bool this_is_neg = this->bits_.sign;
     const decimal32 unsigned_this = this_is_neg ? -(*this) : *this;
