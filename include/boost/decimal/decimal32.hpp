@@ -710,11 +710,11 @@ constexpr TargetType decimal32::to_integral() const noexcept
     int exp = static_cast<int>(this->full_exponent()) - detail::bias;
     if (exp > 0)
     {
-        result *= powers_of_10[exp];
+        result *= detail::pow10<TargetType>(exp);
     }
     else if (exp < 0)
     {
-        result /= powers_of_10[-exp];
+        result /= detail::pow10<TargetType>(-exp);
     }
 
     BOOST_IF_CONSTEXPR (std::is_signed<TargetType>::value)
