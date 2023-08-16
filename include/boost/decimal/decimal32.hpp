@@ -170,12 +170,12 @@ public:
     explicit constexpr decimal32(Integer val) noexcept;
 
     // 3.2.2.4 Conversion to integral type
-    explicit constexpr operator int() const noexcept { return this->to_integral<int>(); }
-    explicit constexpr operator unsigned() const noexcept { return this->to_integral<unsigned>(); }
-    explicit constexpr operator long() const noexcept { return this->to_integral<long>(); }
-    explicit constexpr operator unsigned long() const noexcept { return this->to_integral<unsigned long>(); }
-    explicit constexpr operator long long() const noexcept { return this->to_integral<long long>(); }
-    explicit constexpr operator unsigned long long() const noexcept { return this->to_integral<unsigned long long>(); }
+    explicit constexpr operator int() const noexcept;
+    explicit constexpr operator unsigned() const noexcept;
+    explicit constexpr operator long() const noexcept;
+    explicit constexpr operator unsigned long() const noexcept;
+    explicit constexpr operator long long() const noexcept;
+    explicit constexpr operator unsigned long long() const noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T, typename T2>
@@ -678,20 +678,27 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
     return significand;
 }
 
+template<typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool>>
+constexpr decimal32::decimal32(Integer val) noexcept
+{
+    *this = decimal32{val, 0};
+}
+
 template <typename TargetType>
 constexpr TargetType decimal32::to_integral() const noexcept
 {
     TargetType result {};
 
-    const bool this_is_neg = this->bits_.sign;
-    const decimal32 unsigned_this = this_is_neg ? -(*this) : *this;
+    const bool this_is_neg {static_cast<bool>(this->bits_.sign)};
+    const decimal32 unsigned_this {this_is_neg ? -(*this) : *this};
+    constexpr decimal32 max_target_type {(std::numeric_limits<TargetType>::max)()};
 
     if (isnan(*this))
     {
         errno = EINVAL;
         return static_cast<TargetType>(0);
     }
-    if (isinf(*this) || unsigned_this > static_cast<decimal32>((std::numeric_limits<TargetType>::max)()))
+    if (isinf(*this) || unsigned_this > max_target_type)
     {
         errno = ERANGE;
         return static_cast<TargetType>(0);
@@ -707,7 +714,7 @@ constexpr TargetType decimal32::to_integral() const noexcept
     }
 
     result = static_cast<TargetType>(this->full_significand());
-    int exp = static_cast<int>(this->full_exponent()) - detail::bias;
+    int exp {static_cast<int>(this->full_exponent()) - detail::bias};
     if (exp > 0)
     {
         result *= detail::pow10<TargetType>(exp);
@@ -725,10 +732,34 @@ constexpr TargetType decimal32::to_integral() const noexcept
     return result;
 }
 
-template<typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool>>
-constexpr decimal32::decimal32(Integer val) noexcept
+constexpr decimal32::operator int() const noexcept
 {
-    *this = decimal32{val, 0};
+    return to_integral<int>();
+}
+
+constexpr decimal32::operator unsigned() const noexcept
+{
+    return to_integral<unsigned>();
+}
+
+constexpr decimal32::operator long() const noexcept
+{
+    return to_integral<long>();
+}
+
+constexpr decimal32::operator unsigned long() const noexcept
+{
+    return to_integral<unsigned long>();
+}
+
+constexpr decimal32::operator long long() const noexcept
+{
+    return to_integral<long long>();
+}
+
+constexpr decimal32::operator unsigned long long() const noexcept
+{
+    return to_integral<unsigned long long>();
 }
 
 }} // Namespace boost::decimal
