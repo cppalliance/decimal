@@ -186,8 +186,6 @@ public:
     constexpr decimal32(decimal32&& val) noexcept = default;
     constexpr decimal32& operator=(decimal32&& val) noexcept = default;
 
-    explicit constexpr decimal32(std::uint32_t bits) noexcept;
-
     friend constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
@@ -218,6 +216,7 @@ public:
     BOOST_DECIMAL_DECL friend std::ostream& operator<<(std::ostream& os, const decimal32& d);
 
     // Debug bit pattern
+    friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
     BOOST_DECIMAL_DECL friend std::uint32_t to_bits(decimal32 rhs) noexcept;
 };
 
@@ -339,12 +338,16 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     }
 }
 
-constexpr decimal32::decimal32(std::uint32_t bits) noexcept
+constexpr decimal32 from_bits(std::uint32_t bits) noexcept
 {
-    bits_.exponent = (bits & detail::construct_sign_mask) >> 31;
-    bits_.combination_field = (bits & detail::construct_combination_mask) >> 26;
-    bits_.exponent = (bits & detail::construct_exp_mask) >> 20;
-    bits_.significand = bits & detail::construct_significand_mask;
+    decimal32 result;
+
+    result.bits_.exponent = (bits & detail::construct_sign_mask) >> 31;
+    result.bits_.combination_field = (bits & detail::construct_combination_mask) >> 26;
+    result.bits_.exponent = (bits & detail::construct_exp_mask) >> 20;
+    result.bits_.significand = bits & detail::construct_significand_mask;
+
+    return result;
 }
 
 constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
@@ -808,9 +811,9 @@ public:
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 lowest() { return {-9999999, max_exponent}; }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 epsilon() { return {1, -7}; }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 round_error() { return epsilon(); }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 infinity() { return boost::decimal::decimal32{boost::decimal::detail::inf_mask}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 quiet_NaN() { return boost::decimal::decimal32{boost::decimal::detail::nan_mask}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 signaling_NaN() { return boost::decimal::decimal32{boost::decimal::detail::snan_mask}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 infinity() { return boost::decimal::from_bits(boost::decimal::detail::inf_mask); }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 quiet_NaN() { return boost::decimal::from_bits(boost::decimal::detail::nan_mask); }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 signaling_NaN() { return boost::decimal::from_bits(boost::decimal::detail::snan_mask); }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 denorm_min() { return {1, boost::decimal::detail::etiny}; }
 };
 

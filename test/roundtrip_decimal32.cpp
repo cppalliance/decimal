@@ -91,14 +91,14 @@ void test_roundtrip_conversion()
 int main()
 {
     test_conversion_to_integer<int>();
-    //test_conversion_to_integer<unsigned>();
+    test_conversion_to_integer<unsigned>();
     test_conversion_to_integer<long>();
     test_conversion_to_integer<unsigned long>();
     test_conversion_to_integer<long long>();
     test_conversion_to_integer<unsigned long long>();
 
     test_roundtrip_conversion<int>();
-    //test_roundtrip_conversion<unsigned>();
+    test_roundtrip_conversion<unsigned>();
     test_roundtrip_conversion<long>();
     test_roundtrip_conversion<unsigned long>();
     test_roundtrip_conversion<long long>();
