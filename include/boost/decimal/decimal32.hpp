@@ -279,7 +279,6 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
         // Now set the combination field (maximum of 3 bits)
         uint32_t remaining_bits = unsigned_coeff & detail::small_combination_field_mask;
         remaining_bits >>= 20;
-        assert(remaining_bits <= 3); // Only allowed 00, 01, or 10
 
         bits_.combination_field |= remaining_bits;
     }
@@ -682,17 +681,27 @@ constexpr TargetType decimal32::to_integral() const noexcept
 {
     TargetType result;
 
-    const decimal32 unsigned_this = this->bits_.sign ? -(*this) : *this;
+    const bool this_is_neg = this->bits_.sign;
+    const decimal32 unsigned_this = this_is_neg ? -(*this) : *this;
 
     if (isnan(*this))
     {
         errno = EINVAL;
         return static_cast<TargetType>(0);
     }
-    if (unsigned_this > static_cast<decimal32>((std::numeric_limits<TargetType>::max)()))
+    if (isinf(*this) || unsigned_this > static_cast<decimal32>((std::numeric_limits<TargetType>::max)()))
     {
         errno = ERANGE;
         return static_cast<TargetType>(0);
+    }
+
+    BOOST_IF_CONSTEXPR (std::is_unsigned<TargetType>::value)
+    {
+        if (this_is_neg)
+        {
+            errno = ERANGE;
+            return static_cast<TargetType>(0);
+        }
     }
 
     result = static_cast<TargetType>(this->full_significand());
@@ -701,18 +710,14 @@ constexpr TargetType decimal32::to_integral() const noexcept
     {
         result *= powers_of_10[exp];
     }
-    else if (exp == 0)
-    {
-        result = 0;
-    }
-    else
+    else if (exp < 0)
     {
         result /= powers_of_10[-exp];
     }
 
     BOOST_IF_CONSTEXPR (std::is_signed<TargetType>::value)
     {
-        result = this->bits_.sign ? detail::apply_sign(result) : result;
+        result = this_is_neg ? detail::apply_sign(result) : result;
     }
 
     return result;
