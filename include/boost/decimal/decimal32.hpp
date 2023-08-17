@@ -211,11 +211,11 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     static_assert(std::is_integral<T2>::value, "Exponent must be an integer");
 
     bits_.sign = coeff < 0;
-    auto unsigned_coeff = static_cast<Unsigned_Integer>(bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff));
+    auto unsigned_coeff {static_cast<Unsigned_Integer>(bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff))};
 
     // If the coeff is not in range make it so
-    auto unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
-    const bool reduced = unsigned_coeff_digits > detail::precision;
+    auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
+    const bool reduced {unsigned_coeff_digits > detail::precision};
     while (unsigned_coeff_digits > detail::precision + 1)
     {
         unsigned_coeff /= 10;
@@ -225,7 +225,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
 
     if (reduced)
     {
-        const auto trailing_num = unsigned_coeff % 10;
+        const auto trailing_num {unsigned_coeff % 10};
         unsigned_coeff /= 10;
         ++exp;
         if (trailing_num >= 5)
@@ -245,7 +245,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     // zero the combination field, so we can mask in the following
     bits_.combination_field = 0;
     bits_.significand = 0;
-    bool big_combination = false;
+    bool big_combination {false};
 
     if (unsigned_coeff < detail::no_combination)
     {
@@ -260,7 +260,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
         bits_.significand = unsigned_coeff & detail::no_combination;
 
         // Now set the combination field (maximum of 3 bits)
-        uint32_t remaining_bits = unsigned_coeff & detail::small_combination_field_mask;
+        auto remaining_bits {static_cast<std::uint32_t>(unsigned_coeff) & detail::small_combination_field_mask};
         remaining_bits >>= 20;
 
         bits_.combination_field |= remaining_bits;
@@ -272,7 +272,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
         big_combination = true;
 
         bits_.significand = unsigned_coeff & detail::no_combination;
-        const uint32_t remaining_bit = unsigned_coeff & detail::big_combination_field_mask;
+        const auto remaining_bit {static_cast<std::uint32_t>(unsigned_coeff & detail::big_combination_field_mask)};
 
         if (remaining_bit)
         {
@@ -281,8 +281,8 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     }
 
     // If the exponent fits we do not need to use the combination field
-    const std::uint32_t biased_exp = exp + detail::bias;
-    const std::uint32_t biased_exp_low_six = biased_exp & detail::exp_combination_field_mask;
+    const std::uint32_t biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
+    const std::uint32_t biased_exp_low_six {biased_exp & detail::exp_combination_field_mask};
     if (biased_exp <= detail::max_exp_no_combination)
     {
         bits_.exponent = biased_exp;
@@ -360,8 +360,8 @@ constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcep
 constexpr bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     // Check for de-normals
-    const auto sig = rhs.full_significand();
-    const auto exp = rhs.full_exponent();
+    const auto sig {rhs.full_significand()};
+    const auto exp {rhs.full_exponent()};
 
     if (exp <= detail::precision - 1)
     {
@@ -534,10 +534,10 @@ constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
         return false;
     }
 
-    std::uint32_t lhs_real_exp = lhs.full_exponent();
-    std::uint32_t rhs_real_exp = rhs.full_exponent();
-    std::uint32_t lhs_significand = lhs.full_significand();
-    std::uint32_t rhs_significand = rhs.full_significand();
+    std::uint32_t lhs_real_exp {lhs.full_exponent()};
+    std::uint32_t rhs_real_exp {rhs.full_exponent()};
+    std::uint32_t lhs_significand {lhs.full_significand()};
+    std::uint32_t rhs_significand {rhs.full_significand()};
 
     // Normalize the significands
     normalize(lhs_significand, lhs_real_exp);
@@ -575,10 +575,10 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
         }
     }
 
-    std::uint32_t lhs_real_exp = lhs.full_exponent();
-    std::uint32_t rhs_real_exp = rhs.full_exponent();
-    std::uint32_t lhs_significand = lhs.full_significand();
-    std::uint32_t rhs_significand = rhs.full_significand();
+    std::uint32_t lhs_real_exp {lhs.full_exponent()};
+    std::uint32_t rhs_real_exp {rhs.full_exponent()};
+    std::uint32_t lhs_significand {lhs.full_significand()};
+    std::uint32_t rhs_significand {rhs.full_significand()};
 
     // Normalize the significands
     normalize(lhs_significand, lhs_real_exp);
@@ -614,7 +614,7 @@ constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
 
 constexpr std::uint32_t decimal32::full_exponent() const noexcept
 {
-    std::uint32_t exp = 0;
+    std::uint32_t exp {};
 
     if ((bits_.combination_field & detail::comb_11_mask) == 0b11000)
     {
@@ -634,7 +634,7 @@ constexpr std::uint32_t decimal32::full_exponent() const noexcept
 
 constexpr std::uint32_t decimal32::full_significand() const noexcept
 {
-    std::uint32_t significand = 0;
+    std::uint32_t significand {};
 
     if ((bits_.combination_field & detail::comb_11_mask) == 0b11000)
     {
