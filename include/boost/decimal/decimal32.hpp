@@ -144,7 +144,7 @@ private:
 
 public:
     // 3.2.2.1 construct/copy/destroy:
-    constexpr decimal32() noexcept : bits_ {} {}
+    constexpr decimal32() noexcept = default;
 
     // 3.2.2.3 Conversion from integral type
     template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
@@ -249,7 +249,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     if (unsigned_coeff < detail::no_combination)
     {
         // If the coefficient fits directly we don't need to use the combination field
-        bits_.significand = unsigned_coeff;
+        bits_.significand = static_cast<std::uint32_t>(unsigned_coeff);
     }
     else if (unsigned_coeff < detail::big_combination)
     {
@@ -405,12 +405,11 @@ constexpr decimal32 operator-(decimal32 rhs) noexcept
     return rhs;
 }
 
-// We use kahan summation here where applicable
-// https://en.wikipedia.org/wiki/Kahan_summation_algorithm
-constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
+// Prioritizes checking for nans and then checks for infs
+constexpr decimal32 check_non_finite(decimal32 lhs, decimal32 rhs) noexcept
 {
-    // Check non-finite values
-    // Check nans before infinities
+    constexpr decimal32 zero(0, 0);
+
     if (isnan(lhs))
     {
         return lhs;
@@ -427,6 +426,21 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
     else if (isinf(rhs))
     {
         return rhs;
+    }
+
+    return zero;
+}
+
+// We use kahan summation here where applicable
+// https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
+{
+    constexpr decimal32 zero(0, 0);
+
+    const auto res = check_non_finite(lhs, rhs);
+    if (res != zero)
+    {
+        return res;
     }
 
     auto sig_lhs = lhs.full_significand();
@@ -671,8 +685,8 @@ constexpr TargetType decimal32::to_integral() const noexcept
     TargetType result {};
 
     const bool this_is_neg {static_cast<bool>(this->bits_.sign)};
-    const decimal32 unsigned_this {this_is_neg ? -(*this) : *this};
-    constexpr decimal32 max_target_type {(std::numeric_limits<TargetType>::max)()};
+    const decimal32 unsigned_this {this_is_neg ? -*this : *this};
+    constexpr decimal32 max_target_type {std::numeric_limits<TargetType>::max()};
 
     if (isnan(*this))
     {
