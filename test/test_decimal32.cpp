@@ -46,6 +46,7 @@ void test_comp()
     BOOST_TEST(std::numeric_limits<decimal32>::quiet_NaN() != std::numeric_limits<decimal32>::quiet_NaN());
 }
 
+#if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
 void test_binary_constructor()
 {
     decimal32 one(0b1, -100);
@@ -85,6 +86,7 @@ void test_binary_constructor()
     // 0000000000'00000000001
     BOOST_TEST_EQ(std::bitset<32>(to_bits(denorm_min)), std::bitset<32>(0b0'00000'000000'0000000000'0000000001));
 }
+#endif
 
 void test_decimal_constructor()
 {
@@ -224,7 +226,11 @@ void test_construct_from_integer()
 int main()
 {
     test_comp();
+
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     test_binary_constructor();
+    #endif
+
     test_decimal_constructor();
     test_non_finite_values();
     test_unary_arithmetic();

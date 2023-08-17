@@ -97,12 +97,6 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
 
 [
     linux_pipeline(
-        "Linux 16.04 GCC 5* 32/64",
-        "cppalliance/droneubuntu1604:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++', CXXSTD: '03,11,14', ADDRMD: '32,64' },
-    ),
-
-    linux_pipeline(
         "Linux 18.04 GCC 6 32/64",
         "cppalliance/droneubuntu1804:1",
         { TOOLSET: 'gcc', COMPILER: 'g++-6', CXXSTD: '03,11,14', ADDRMD: '32,64' },
@@ -195,41 +189,6 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
         "cppalliance/droneubuntu2304:1",
         { TOOLSET: 'gcc', COMPILER: 'g++-13', CXXSTD: '03,11,14,17,20,23', ADDRMD: '32,64', CXXFLAGS: "-fexcess-precision=fast", CXXSTDDIALECT: "gnu" } + asan,
         "g++-13-multilib",
-    ),
-
-    linux_pipeline(
-        "Linux 16.04 Clang 3.5",
-        "cppalliance/droneubuntu1604:1",
-        { TOOLSET: 'clang', COMPILER: 'clang++-3.5', CXXSTD: '03,11' },
-        "clang-3.5",
-    ),
-
-    linux_pipeline(
-        "Linux 16.04 Clang 3.6",
-        "cppalliance/droneubuntu1604:1",
-        { TOOLSET: 'clang', COMPILER: 'clang++-3.6', CXXSTD: '03,11,14' },
-        "clang-3.6",
-    ),
-
-    linux_pipeline(
-        "Linux 16.04 Clang 3.7",
-        "cppalliance/droneubuntu1604:1",
-        { TOOLSET: 'clang', COMPILER: 'clang++-3.7', CXXSTD: '03,11,14' },
-        "clang-3.7",
-    ),
-
-    linux_pipeline(
-        "Linux 16.04 Clang 3.8",
-        "cppalliance/droneubuntu1604:1",
-        { TOOLSET: 'clang', COMPILER: 'clang++-3.8', CXXSTD: '03,11,14' },
-        "clang-3.8",
-    ),
-
-    linux_pipeline(
-        "Linux 18.04 Clang 3.9",
-        "cppalliance/droneubuntu1804:1",
-        { TOOLSET: 'clang', COMPILER: 'clang++-3.9', CXXSTD: '03,11,14' },
-        "clang-3.9",
     ),
 
     linux_pipeline(
@@ -344,12 +303,6 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
         "MacOS 12.4 Xcode 13.4.1 ASAN",
         { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,20,2b' } + asan,
         xcode_version = "13.4.1", osx_version = "monterey", arch = "arm64",
-    ),
-
-    windows_pipeline(
-        "Windows VS2015 msvc-14.0",
-        "cppalliance/dronevs2015",
-        { TOOLSET: 'msvc-14.0', CXXSTD: '14,latest' },
     ),
 
     windows_pipeline(

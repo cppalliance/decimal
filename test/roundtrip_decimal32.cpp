@@ -16,7 +16,6 @@ template <typename T>
 void test_conversion_to_integer()
 {
     errno = 0;
-    constexpr decimal32 neg_one(-1, 0);
     constexpr decimal32 one(1, 0);
     constexpr decimal32 zero(0, 0);
     constexpr decimal32 half(5, -1);
@@ -26,12 +25,12 @@ void test_conversion_to_integer()
 
     BOOST_IF_CONSTEXPR (std::is_signed<T>::value)
     {
-        BOOST_TEST_EQ(static_cast<T>(neg_one), static_cast<T>(-1)) && BOOST_TEST_EQ(errno, 0);
+        BOOST_TEST_EQ(static_cast<T>(-one), static_cast<T>(-1)) && BOOST_TEST_EQ(errno, 0);
     }
     else
     {
         // Bad conversion so we use zero
-        BOOST_TEST_EQ(static_cast<T>(neg_one), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+        BOOST_TEST_EQ(static_cast<T>(-one), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
     }
 
     errno = 0;
