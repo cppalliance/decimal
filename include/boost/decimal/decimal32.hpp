@@ -186,6 +186,8 @@ public:
     constexpr decimal32 operator++(int) noexcept; // NOLINT : C++14 so constexpr implies const
     constexpr decimal32& operator+=(decimal32 rhs) noexcept;
 
+    friend constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept;
+
     // 3.2.9 comparison operators:
     friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
@@ -476,7 +478,7 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         // Only need to see if we need to add one to the
         // significand of the bigger value
         //
-        // e.g. 1.234567e5 + 9.876543e-3 = 1.234568e5
+        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
 
         if (sig_rhs >= UINT32_C(5'000'000))
         {
@@ -520,6 +522,78 @@ constexpr decimal32& decimal32::operator+=(decimal32 rhs) noexcept
 {
     *this = *this + rhs;
     return *this;
+}
+
+constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
+{
+    constexpr decimal32 zero {0, 0};
+
+    const auto res {check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    const bool lhs_bigger = lhs > rhs;
+
+    // Ensure that lhs is always the larger for ease of implementation
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs, rhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.full_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.full_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    auto delta_exp {exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs};
+
+    if (delta_exp + 1 > detail::precision)
+    {
+        // If the difference in exponents is more than the digits of accuracy
+        // we return the larger of the two
+        //
+        // e.g. 1e20 - 1e-20 = 1e20
+
+        return lhs;
+    }
+    else if (delta_exp == detail::precision + 1)
+    {
+        // Only need to see if we need to add one to the
+        // significand of the bigger value
+        //
+        // e.g. 1.234567e5 - 9.876543e-2 = 1.234566e5
+
+        if (sig_rhs >= UINT32_C(5'000'000))
+        {
+            --sig_lhs;
+            return {sig_lhs, static_cast<int>(exp_lhs) - detail::bias};
+        }
+        else
+        {
+            return lhs;
+        }
+    }
+    else
+    {
+        // The two numbers can be subtracted together without special handling
+        while (delta_exp > 0)
+        {
+            sig_rhs /= 10;
+            --delta_exp;
+        }
+
+        // Both of the significands are less than 9'999'999, so we can safely
+        // cast them to signed 32-bit ints to calculate the new significand
+        const auto new_sig {static_cast<std::int32_t>(sig_lhs) - static_cast<std::int32_t>(sig_rhs)};
+        const auto new_exp {static_cast<int>(lhs_bigger ? exp_lhs : exp_rhs) - detail::bias};
+
+        return {new_sig, new_exp};
+    }
 }
 
 constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
