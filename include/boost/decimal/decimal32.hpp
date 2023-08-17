@@ -10,6 +10,7 @@
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
+#include <boost/decimal/detail/utilities.hpp>
 #include <iostream>
 #include <limits>
 #include <cstdint>
@@ -408,7 +409,7 @@ constexpr decimal32 operator-(decimal32 rhs) noexcept
 // Prioritizes checking for nans and then checks for infs
 constexpr decimal32 check_non_finite(decimal32 lhs, decimal32 rhs) noexcept
 {
-    constexpr decimal32 zero(0, 0);
+    constexpr decimal32 zero {0, 0};
 
     if (isnan(lhs))
     {
@@ -435,24 +436,31 @@ constexpr decimal32 check_non_finite(decimal32 lhs, decimal32 rhs) noexcept
 // https://en.wikipedia.org/wiki/Kahan_summation_algorithm
 constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
 {
-    constexpr decimal32 zero(0, 0);
+    constexpr decimal32 zero {0, 0};
 
-    const auto res = check_non_finite(lhs, rhs);
+    const auto res {check_non_finite(lhs, rhs)};
     if (res != zero)
     {
         return res;
     }
 
-    auto sig_lhs = lhs.full_significand();
-    auto exp_lhs = lhs.full_exponent();
+    const bool lhs_bigger = lhs > rhs;
+
+    // Ensure that lhs is always the larger for ease of implementation
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs, rhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.full_exponent()};
     normalize(sig_lhs, exp_lhs);
 
-    auto sig_rhs = rhs.full_significand();
-    auto exp_rhs = rhs.full_exponent();
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.full_exponent()};
     normalize(sig_rhs, exp_rhs);
 
-    const bool lhs_bigger = lhs > rhs;
-    auto delta_exp = exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs;
+    auto delta_exp {exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs};
 
     if (delta_exp + 1 > detail::precision)
     {
@@ -461,7 +469,7 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         //
         // e.g. 1e20 + 1e-20 = 1e20
 
-        return lhs_bigger ? lhs : rhs;
+        return lhs;
     }
     else if (delta_exp == detail::precision + 1)
     {
@@ -470,29 +478,14 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         //
         // e.g. 1.234567e5 + 9.876543e-3 = 1.234568e5
 
-        if (lhs_bigger)
+        if (sig_rhs >= UINT32_C(5'000'000))
         {
-            if (sig_rhs >= UINT32_C(5'000'000))
-            {
-                ++sig_lhs;
-                return {sig_lhs, static_cast<int>(exp_lhs) - detail::bias};
-            }
-            else
-            {
-                return lhs;
-            }
+            ++sig_lhs;
+            return {sig_lhs, static_cast<int>(exp_lhs) - detail::bias};
         }
         else
         {
-            if (sig_lhs >= UINT32_C(5'000'000))
-            {
-                ++sig_rhs;
-                return {sig_rhs, static_cast<int>(exp_rhs) - detail::bias};
-            }
-            else
-            {
-                return rhs;
-            }
+            return lhs;
         }
     }
     else
@@ -500,20 +493,12 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         // The two numbers can be added together without special handling
         while (delta_exp > 0)
         {
-            if (lhs_bigger)
-            {
-                sig_rhs /= 10;
-            }
-            else
-            {
-                sig_lhs /= 10;
-            }
-
+            sig_rhs /= 10;
             --delta_exp;
         }
 
-        const auto new_sig = sig_lhs + sig_rhs;
-        const auto new_exp = static_cast<int>(lhs_bigger ? exp_lhs : exp_rhs) - detail::bias;
+        const auto new_sig {sig_lhs + sig_rhs};
+        const auto new_exp {static_cast<int>(lhs_bigger ? exp_lhs : exp_rhs) - detail::bias};
 
         return {new_sig, new_exp};
     }
@@ -674,7 +659,7 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
 }
 
 template<typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool>>
-constexpr decimal32::decimal32(Integer val) noexcept
+constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
     *this = decimal32{val, 0};
 }
