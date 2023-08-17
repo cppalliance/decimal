@@ -10,6 +10,7 @@
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
+#include <boost/decimal/detail/utilities.hpp>
 #include <iostream>
 #include <limits>
 #include <cstdint>
@@ -144,7 +145,7 @@ private:
 
 public:
     // 3.2.2.1 construct/copy/destroy:
-    constexpr decimal32() noexcept : bits_ {} {}
+    constexpr decimal32() noexcept = default;
 
     // 3.2.2.3 Conversion from integral type
     template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
@@ -210,11 +211,11 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     static_assert(std::is_integral<T2>::value, "Exponent must be an integer");
 
     bits_.sign = coeff < 0;
-    auto unsigned_coeff = static_cast<Unsigned_Integer>(bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff));
+    auto unsigned_coeff {static_cast<Unsigned_Integer>(bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff))};
 
     // If the coeff is not in range make it so
-    auto unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
-    const bool reduced = unsigned_coeff_digits > detail::precision;
+    auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
+    const bool reduced {unsigned_coeff_digits > detail::precision};
     while (unsigned_coeff_digits > detail::precision + 1)
     {
         unsigned_coeff /= 10;
@@ -224,7 +225,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
 
     if (reduced)
     {
-        const auto trailing_num = unsigned_coeff % 10;
+        const auto trailing_num {unsigned_coeff % 10};
         unsigned_coeff /= 10;
         ++exp;
         if (trailing_num >= 5)
@@ -244,12 +245,12 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     // zero the combination field, so we can mask in the following
     bits_.combination_field = 0;
     bits_.significand = 0;
-    bool big_combination = false;
+    bool big_combination {false};
 
     if (unsigned_coeff < detail::no_combination)
     {
         // If the coefficient fits directly we don't need to use the combination field
-        bits_.significand = unsigned_coeff;
+        bits_.significand = static_cast<std::uint32_t>(unsigned_coeff);
     }
     else if (unsigned_coeff < detail::big_combination)
     {
@@ -259,7 +260,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
         bits_.significand = unsigned_coeff & detail::no_combination;
 
         // Now set the combination field (maximum of 3 bits)
-        uint32_t remaining_bits = unsigned_coeff & detail::small_combination_field_mask;
+        auto remaining_bits {static_cast<std::uint32_t>(unsigned_coeff) & detail::small_combination_field_mask};
         remaining_bits >>= 20;
 
         bits_.combination_field |= remaining_bits;
@@ -271,7 +272,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
         big_combination = true;
 
         bits_.significand = unsigned_coeff & detail::no_combination;
-        const uint32_t remaining_bit = unsigned_coeff & detail::big_combination_field_mask;
+        const auto remaining_bit {static_cast<std::uint32_t>(unsigned_coeff & detail::big_combination_field_mask)};
 
         if (remaining_bit)
         {
@@ -280,8 +281,8 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     }
 
     // If the exponent fits we do not need to use the combination field
-    const std::uint32_t biased_exp = exp + detail::bias;
-    const std::uint32_t biased_exp_low_six = biased_exp & detail::exp_combination_field_mask;
+    const std::uint32_t biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
+    const std::uint32_t biased_exp_low_six {biased_exp & detail::exp_combination_field_mask};
     if (biased_exp <= detail::max_exp_no_combination)
     {
         bits_.exponent = biased_exp;
@@ -359,8 +360,8 @@ constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcep
 constexpr bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     // Check for de-normals
-    const auto sig = rhs.full_significand();
-    const auto exp = rhs.full_exponent();
+    const auto sig {rhs.full_significand()};
+    const auto exp {rhs.full_exponent()};
 
     if (exp <= detail::precision - 1)
     {
@@ -405,12 +406,11 @@ constexpr decimal32 operator-(decimal32 rhs) noexcept
     return rhs;
 }
 
-// We use kahan summation here where applicable
-// https://en.wikipedia.org/wiki/Kahan_summation_algorithm
-constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
+// Prioritizes checking for nans and then checks for infs
+constexpr decimal32 check_non_finite(decimal32 lhs, decimal32 rhs) noexcept
 {
-    // Check non-finite values
-    // Check nans before infinities
+    constexpr decimal32 zero {0, 0};
+
     if (isnan(lhs))
     {
         return lhs;
@@ -429,16 +429,38 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         return rhs;
     }
 
-    auto sig_lhs = lhs.full_significand();
-    auto exp_lhs = lhs.full_exponent();
-    normalize(sig_lhs, exp_lhs);
+    return zero;
+}
 
-    auto sig_rhs = rhs.full_significand();
-    auto exp_rhs = rhs.full_exponent();
-    normalize(sig_rhs, exp_rhs);
+// We use kahan summation here where applicable
+// https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
+{
+    constexpr decimal32 zero {0, 0};
+
+    const auto res {check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
 
     const bool lhs_bigger = lhs > rhs;
-    auto delta_exp = exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs;
+
+    // Ensure that lhs is always the larger for ease of implementation
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs, rhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.full_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.full_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    auto delta_exp {exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs};
 
     if (delta_exp + 1 > detail::precision)
     {
@@ -447,7 +469,7 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         //
         // e.g. 1e20 + 1e-20 = 1e20
 
-        return lhs_bigger ? lhs : rhs;
+        return lhs;
     }
     else if (delta_exp == detail::precision + 1)
     {
@@ -456,29 +478,14 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         //
         // e.g. 1.234567e5 + 9.876543e-3 = 1.234568e5
 
-        if (lhs_bigger)
+        if (sig_rhs >= UINT32_C(5'000'000))
         {
-            if (sig_rhs >= UINT32_C(5'000'000))
-            {
-                ++sig_lhs;
-                return {sig_lhs, static_cast<int>(exp_lhs) - detail::bias};
-            }
-            else
-            {
-                return lhs;
-            }
+            ++sig_lhs;
+            return {sig_lhs, static_cast<int>(exp_lhs) - detail::bias};
         }
         else
         {
-            if (sig_lhs >= UINT32_C(5'000'000))
-            {
-                ++sig_rhs;
-                return {sig_rhs, static_cast<int>(exp_rhs) - detail::bias};
-            }
-            else
-            {
-                return rhs;
-            }
+            return lhs;
         }
     }
     else
@@ -486,20 +493,12 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         // The two numbers can be added together without special handling
         while (delta_exp > 0)
         {
-            if (lhs_bigger)
-            {
-                sig_rhs /= 10;
-            }
-            else
-            {
-                sig_lhs /= 10;
-            }
-
+            sig_rhs /= 10;
             --delta_exp;
         }
 
-        const auto new_sig = sig_lhs + sig_rhs;
-        const auto new_exp = static_cast<int>(lhs_bigger ? exp_lhs : exp_rhs) - detail::bias;
+        const auto new_sig {sig_lhs + sig_rhs};
+        const auto new_exp {static_cast<int>(lhs_bigger ? exp_lhs : exp_rhs) - detail::bias};
 
         return {new_sig, new_exp};
     }
@@ -535,10 +534,10 @@ constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
         return false;
     }
 
-    std::uint32_t lhs_real_exp = lhs.full_exponent();
-    std::uint32_t rhs_real_exp = rhs.full_exponent();
-    std::uint32_t lhs_significand = lhs.full_significand();
-    std::uint32_t rhs_significand = rhs.full_significand();
+    std::uint32_t lhs_real_exp {lhs.full_exponent()};
+    std::uint32_t rhs_real_exp {rhs.full_exponent()};
+    std::uint32_t lhs_significand {lhs.full_significand()};
+    std::uint32_t rhs_significand {rhs.full_significand()};
 
     // Normalize the significands
     normalize(lhs_significand, lhs_real_exp);
@@ -576,10 +575,10 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
         }
     }
 
-    std::uint32_t lhs_real_exp = lhs.full_exponent();
-    std::uint32_t rhs_real_exp = rhs.full_exponent();
-    std::uint32_t lhs_significand = lhs.full_significand();
-    std::uint32_t rhs_significand = rhs.full_significand();
+    std::uint32_t lhs_real_exp {lhs.full_exponent()};
+    std::uint32_t rhs_real_exp {rhs.full_exponent()};
+    std::uint32_t lhs_significand {lhs.full_significand()};
+    std::uint32_t rhs_significand {rhs.full_significand()};
 
     // Normalize the significands
     normalize(lhs_significand, lhs_real_exp);
@@ -615,7 +614,7 @@ constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
 
 constexpr std::uint32_t decimal32::full_exponent() const noexcept
 {
-    std::uint32_t exp = 0;
+    std::uint32_t exp {};
 
     if ((bits_.combination_field & detail::comb_11_mask) == 0b11000)
     {
@@ -635,7 +634,7 @@ constexpr std::uint32_t decimal32::full_exponent() const noexcept
 
 constexpr std::uint32_t decimal32::full_significand() const noexcept
 {
-    std::uint32_t significand = 0;
+    std::uint32_t significand {};
 
     if ((bits_.combination_field & detail::comb_11_mask) == 0b11000)
     {
@@ -660,7 +659,7 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
 }
 
 template<typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool>>
-constexpr decimal32::decimal32(Integer val) noexcept
+constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
     *this = decimal32{val, 0};
 }
@@ -671,8 +670,8 @@ constexpr TargetType decimal32::to_integral() const noexcept
     TargetType result {};
 
     const bool this_is_neg {static_cast<bool>(this->bits_.sign)};
-    const decimal32 unsigned_this {this_is_neg ? -(*this) : *this};
-    constexpr decimal32 max_target_type {(std::numeric_limits<TargetType>::max)()};
+    const decimal32 unsigned_this {this_is_neg ? -*this : *this};
+    constexpr decimal32 max_target_type {std::numeric_limits<TargetType>::max()};
 
     if (isnan(*this))
     {
