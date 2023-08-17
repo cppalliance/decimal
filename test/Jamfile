@@ -8,13 +8,15 @@ import ../../config/checks/config : requires ;
 
 project : requirements
 
-  <library>/boost/decimal//boost_decimal
-
-  <warnings>extra
+  <warnings>pedantic
 
   <toolset>msvc:<warnings-as-errors>on
   <toolset>clang:<warnings-as-errors>on
-  <toolset>gcc:<warnings-as-errors>on ;
+  <toolset>gcc:<warnings-as-errors>on
+
+  [ requires cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction cxx14_variable_templates cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction ]
+  ;
 
 run quick.cpp ;
 run test_decimal32.cpp ;
+run roundtrip_decimal32.cpp ;

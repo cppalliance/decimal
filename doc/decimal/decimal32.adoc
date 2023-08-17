@@ -1,0 +1,20 @@
+////
+Copyright 2023 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#decimal32]
+= Decimal32
+:idprefix: decimal32_
+
+== Description
+
+Decimal32 is the 32-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6
+
+- Storage width - 32 bits
+- Precision - 7 decimal digits (not bits like binary)
+- Max exponent - 96
+- Max Value - 9.999999e96
+- Smallest normalized value - 1.000000e-95
+- Smallest subnormal - 1e-101

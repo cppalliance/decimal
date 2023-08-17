@@ -5,6 +5,6 @@
 #ifndef BOOST_DECIMAL_HPP
 #define BOOST_DECIMAL_HPP
 
-#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/fwd.hpp>
 
 #endif //BOOST_DECIMAL_HPP
