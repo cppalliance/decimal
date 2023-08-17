@@ -201,7 +201,7 @@ public:
     // 3.2.8 binary arithmetic operators:
     friend constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept;
     constexpr decimal32& operator++() noexcept;
-    constexpr decimal32 operator++(int) noexcept;
+    constexpr decimal32 operator++(int) noexcept; // NOLINT : C++14 so constexpr implies const
     constexpr decimal32& operator+=(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
@@ -531,7 +531,7 @@ constexpr decimal32& decimal32::operator++() noexcept
     return *this;
 }
 
-constexpr decimal32 decimal32::operator++(int) noexcept
+constexpr decimal32 decimal32::operator++(int) noexcept // NOLINT
 {
     return ++(*this);
 }
@@ -574,17 +574,14 @@ constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
 
 constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
 {
-    if (isnan(lhs) || isnan(rhs))
+    if (isnan(lhs) || isnan(rhs) ||
+        (!lhs.bits_.sign && rhs.bits_.sign))
     {
         return false;
     }
     else if (lhs.bits_.sign && !rhs.bits_.sign)
     {
         return true;
-    }
-    else if (!lhs.bits_.sign && rhs.bits_.sign)
-    {
-        return false;
     }
     else if (isfinite(lhs) && isinf(rhs))
     {
