@@ -187,6 +187,9 @@ public:
     constexpr decimal32& operator+=(decimal32 rhs) noexcept;
 
     friend constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept;
+    constexpr decimal32& operator--() noexcept;
+    constexpr decimal32 operator--(int) noexcept; // NOLINT : C++14 so constexpr implies const
+    constexpr decimal32& operator-=(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
     friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
@@ -594,6 +597,24 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
 
         return {new_sig, new_exp};
     }
+}
+
+constexpr decimal32& decimal32::operator--() noexcept
+{
+    constexpr decimal32 one(1, 0);
+    *this = *this - one;
+    return *this;
+}
+
+constexpr decimal32 decimal32::operator--(int) noexcept // NOLINT
+{
+    return --(*this);
+}
+
+constexpr decimal32& decimal32::operator-=(decimal32 rhs) noexcept
+{
+    *this = *this - rhs;
+    return *this;
 }
 
 constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
