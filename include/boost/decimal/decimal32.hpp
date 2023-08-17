@@ -23,12 +23,12 @@ namespace boost { namespace decimal {
 namespace detail {
 
 // See section 3.5.2
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t inf_mask =   0b0'11110'000000'0000000000'0000000000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t nan_mask =   0b0'11111'000000'0000000000'0000000000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t snan_mask =  0b0'11111'100000'0000000000'0000000000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_inf_mask = 0b11110;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_nan_mask = 0b11111;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t exp_snan_mask = 0b100000;
+static constexpr std::uint32_t inf_mask =   0b0'11110'000000'0000000000'0000000000;
+static constexpr std::uint32_t nan_mask =   0b0'11111'000000'0000000000'0000000000;
+static constexpr std::uint32_t snan_mask =  0b0'11111'100000'0000000000'0000000000;
+static constexpr std::uint32_t comb_inf_mask = 0b11110;
+static constexpr std::uint32_t comb_nan_mask = 0b11111;
+static constexpr std::uint32_t exp_snan_mask = 0b100000;
 
 // Values from IEEE 754-2019 table 3.6
 BOOST_ATTRIBUTE_UNUSED static constexpr auto storage_width = 32;
@@ -41,17 +41,8 @@ BOOST_ATTRIBUTE_UNUSED static constexpr auto combination_field_width = 11;
 BOOST_ATTRIBUTE_UNUSED static constexpr auto trailing_significand_field_width = 20;
 
 // Other useful values
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_significand = 9'999'999;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_binary_significand = 0b1001'1000100101'1001111111;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_hex_significand = 0x98967F;
-BOOST_ATTRIBUTE_UNUSED static constexpr auto max_string_length = 15;
-
-// Masks for the combination field since we use the binary encoding for the significand
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g0_mask = 0b10000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g1_mask = 0b01000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g2_mask = 0b00100;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g3_mask = 0b00010;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g4_mask = 0b00001;
+static constexpr std::uint32_t max_significand = 9'999'999;
+BOOST_ATTRIBUTE_UNUSED constexpr auto max_string_length = 15;
 
 // Masks to update the significand based on the combination field
 // In these first three 00, 01, or 10 are the leading 2 bits of the exp
@@ -61,14 +52,13 @@ BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t g4_mask = 0b00001;
 // s 00 TTT (00)eeeeee (0TTT)[tttttttttt][tttttttttt]
 // s 01 TTT (01)eeeeee (0TTT)[tttttttttt][tttttttttt]
 // s 10 TTT (10)eeeeee (0TTT)[tttttttttt][tttttttttt]
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_00_mask = 0b00000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_01_mask = 0b01000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_10_mask = 0b10000;
+static constexpr std::uint32_t comb_01_mask = 0b01000;
+static constexpr std::uint32_t comb_10_mask = 0b10000;
 
 // This mask is used to determine if we use the masks above or below since 11 TTT is invalid
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_11_mask = 0b11000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_11_exp_bits = 0b00110;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_11_significand_bits = 0b00001;
+static constexpr std::uint32_t comb_11_mask = 0b11000;
+static constexpr std::uint32_t comb_11_exp_bits = 0b00110;
+static constexpr std::uint32_t comb_11_significand_bits = 0b00001;
 
 // For these masks the first two bits of the combination field imply 100 T as the
 // leading bits of the significand and then bits 3 and 4 are the exp
@@ -77,36 +67,27 @@ BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_11_significand_bits =
 // s 1100 T (00)eeeeee (100T)[tttttttttt][tttttttttt]
 // s 1101 T (01)eeeeee (100T)[tttttttttt][tttttttttt]
 // s 1110 T (10)eeeeee (100T)[tttttttttt][tttttttttt]
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_1100_mask = 0b11000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_1101_mask = 0b11010;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_1110_mask = 0b11100;
+// static constexpr std::uint32_t comb_1100_mask = 0b11000;
+static constexpr std::uint32_t comb_1101_mask = 0b11010;
+static constexpr std::uint32_t comb_1110_mask = 0b11100;
 
 // Powers of 2 used to determine the size of the significand
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t no_combination = 0b1111111111'1111111111;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t big_combination = 0b0111'1111111111'1111111111;
-
-// Significand field
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t significand_20_mask = no_combination;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t significand_21_mask = 0b0001'0000000000'0000000000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_1_significand_mask = 0b00001;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t significand_22_mask = 0b0010'0000000000'0000000000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_2_significand_mask = 0b00010;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t significand_23_mask = 0b0100'0000000000'0000000000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t comb_3_significand_mask = 0b00100;
+static constexpr std::uint32_t no_combination = 0b1111111111'1111111111;
+static constexpr std::uint32_t big_combination = 0b0111'1111111111'1111111111;
 
 // Exponent fields
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_exp_no_combination = 0b111111;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t exp_combination_field_mask = max_exp_no_combination;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t exp_one_combination = 0b1'111111;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t max_biased_exp = 0b10'111111;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t small_combination_field_mask = 0b0000'0000'0111'0000'0000'0000'0000'0000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t big_combination_field_mask = 0b0000'0000'0001'0000'0000'0000'0000'0000;
+static constexpr std::uint32_t max_exp_no_combination = 0b111111;
+static constexpr std::uint32_t exp_combination_field_mask = max_exp_no_combination;
+static constexpr std::uint32_t exp_one_combination = 0b1'111111;
+static constexpr std::uint32_t max_biased_exp = 0b10'111111;
+static constexpr std::uint32_t small_combination_field_mask = 0b0000'0000'0111'0000'0000'0000'0000'0000;
+static constexpr std::uint32_t big_combination_field_mask = 0b0000'0000'0001'0000'0000'0000'0000'0000;
 
 // Constexpr construction from an uint32_t without having to memcpy
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t construct_sign_mask = 0b1'00000'000000'0000000000'0000000000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t construct_combination_mask = 0b0'11111'000000'0000000000'0000000000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t construct_exp_mask = 0b0'00000'111111'0000000000'0000000000;
-BOOST_ATTRIBUTE_UNUSED static constexpr std::uint32_t construct_significand_mask = no_combination;
+static constexpr std::uint32_t construct_sign_mask = 0b1'00000'000000'0000000000'0000000000;
+static constexpr std::uint32_t construct_combination_mask = 0b0'11111'000000'0000000000'0000000000;
+static constexpr std::uint32_t construct_exp_mask = 0b0'00000'111111'0000000000'0000000000;
+static constexpr std::uint32_t construct_significand_mask = no_combination;
 
 } // Namespace detail
 
@@ -659,7 +640,7 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
     if ((bits_.combination_field & detail::comb_11_mask) == 0b11000)
     {
         // Only need the one bit of T because the other 3 are implied
-        if (bits_.combination_field & 1U)
+        if (bits_.combination_field & detail::comb_11_significand_bits)
         {
             significand = 0b1001'0000000000'0000000000;
         }
