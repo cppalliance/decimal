@@ -8,8 +8,6 @@ import ../../config/checks/config : requires ;
 
 project : requirements
 
-  <library>/boost/decimal//boost_decimal
-
   <warnings>pedantic
 
   <toolset>msvc:<warnings-as-errors>on

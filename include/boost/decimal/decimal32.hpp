@@ -10,13 +10,13 @@
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
-#include <boost/decimal/config.hpp>
 #include <iostream>
 #include <limits>
 #include <cstdint>
 #include <cmath>
 #include <cassert>
 #include <cerrno>
+#include <cstring>
 
 namespace boost { namespace decimal {
 
@@ -213,11 +213,11 @@ public:
     friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
 
     // 3.2.11 Formatted output:
-    BOOST_DECIMAL_DECL friend std::ostream& operator<<(std::ostream& os, const decimal32& d);
+    friend std::ostream& operator<<(std::ostream& os, const decimal32& d);
 
     // Debug bit pattern
     friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
-    BOOST_DECIMAL_DECL friend std::uint32_t to_bits(decimal32 rhs) noexcept;
+    friend std::uint32_t to_bits(decimal32 rhs) noexcept;
 };
 
 template <typename T, typename T2>
@@ -763,6 +763,43 @@ constexpr decimal32::operator long long() const noexcept
 constexpr decimal32::operator unsigned long long() const noexcept
 {
     return to_integral<unsigned long long>();
+}
+
+std::ostream& operator<<(std::ostream& os, const decimal32& d)
+{
+    if (d.bits_.sign == 1)
+    {
+        os << "-";
+    }
+
+    os << d.full_significand() << "e";
+
+    const auto print_exp = static_cast<int>(d.full_exponent()) - detail::bias;
+
+    if (print_exp < 0)
+    {
+        os << '-';
+    }
+    else
+    {
+        os << '+';
+    }
+
+    if (abs(print_exp) < 10)
+    {
+        os << '0';
+    }
+
+    os << print_exp;
+
+    return os;
+}
+
+std::uint32_t to_bits(decimal32 rhs) noexcept
+{
+    std::uint32_t bits;
+    std::memcpy(&bits, &rhs.bits_, sizeof(std::uint32_t));
+    return bits;
 }
 
 }} // Namespace boost::decimal
