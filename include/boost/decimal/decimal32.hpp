@@ -948,8 +948,8 @@ public:
 
     // Member functions
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (min)() { return {1, min_exponent}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (max)() { return {9999999, max_exponent}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 lowest() { return {-9999999, max_exponent}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (max)() { return {9'999'999, max_exponent}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 lowest() { return {-9'999'999, max_exponent}; }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 epsilon() { return {1, -7}; }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 round_error() { return epsilon(); }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 infinity() { return boost::decimal::from_bits(boost::decimal::detail::inf_mask); }
