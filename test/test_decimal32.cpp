@@ -317,6 +317,7 @@ int main()
     test_construct_from_integer<long long>();
 
     spot_check_addition(-1054191000, -920209700, -1974400700);
+    spot_check_addition(353582500, -32044770, 321537730);
 
     return boost::report_errors();
 }

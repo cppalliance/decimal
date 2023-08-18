@@ -640,24 +640,55 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
         // The two numbers can be subtracted together without special handling
         if (abs_lhs_bigger)
         {
-            while (delta_exp > 0)
+            while (delta_exp > 1)
             {
                 signed_sig_rhs /= 10;
                 --delta_exp;
             }
+
+            if (delta_exp == 1)
+            {
+                const auto carry_dig {signed_sig_rhs % 10};
+                signed_sig_rhs /= 10;
+                if (carry_dig >= 5)
+                {
+                    ++signed_sig_rhs;
+                }
+                else if (carry_dig <= -5)
+                {
+                    --signed_sig_rhs;
+                }
+            }
         }
         else
         {
-            while (delta_exp > 0)
+            while (delta_exp > 1)
             {
                 signed_sig_lhs /= 10;
                 --delta_exp;
+            }
+
+            if (delta_exp == 1)
+            {
+                const auto carry_dig {signed_sig_lhs % 10};
+                signed_sig_lhs /= 10;
+
+                if (carry_dig >= 5)
+                {
+                    ++signed_sig_lhs;
+                }
+                else if (carry_dig <= -5)
+                {
+                    --signed_sig_rhs;
+                }
+
             }
         }
 
         // Both of the significands are less than 9'999'999, so we can safely
         // cast them to signed 32-bit ints to calculate the new significand
         std::int32_t new_sig {};
+
         if (rhs.isneg() && !lhs.isneg())
         {
             new_sig = signed_sig_lhs + signed_sig_rhs;
