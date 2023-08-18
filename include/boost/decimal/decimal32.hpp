@@ -559,12 +559,6 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
 
     const bool lhs_bigger = lhs > rhs;
 
-    // Ensure that lhs is always the larger for ease of implementation
-    if (!lhs_bigger)
-    {
-        detail::swap(lhs, rhs);
-    }
-
     if (lhs.isneg())
     {
         return lhs + rhs;
@@ -587,7 +581,7 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
         //
         // e.g. 1e20 - 1e-20 = 1e20
 
-        return lhs;
+        return lhs_bigger ? lhs : -rhs;
     }
     else if (delta_exp == detail::precision + 1)
     {
