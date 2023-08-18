@@ -569,6 +569,7 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
     }
 
     const bool lhs_bigger {lhs > rhs};
+    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.full_exponent()};
@@ -615,7 +616,7 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
     else
     {
         // The two numbers can be subtracted together without special handling
-        if (lhs_bigger)
+        if (abs_lhs_bigger)
         {
             while (delta_exp > 0)
             {
@@ -643,7 +644,7 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
         {
             new_sig = signed_sig_lhs - signed_sig_rhs;
         }
-        const auto new_exp {(lhs_bigger? static_cast<int>(exp_lhs) : static_cast<int>(exp_rhs)) - detail::bias};
+        const auto new_exp {(abs_lhs_bigger ? static_cast<int>(exp_lhs) : static_cast<int>(exp_rhs)) - detail::bias};
 
         return {new_sig, new_exp};
     }

@@ -8,7 +8,7 @@
 
 using namespace boost::decimal;
 
-static constexpr auto N {100U};
+static constexpr auto N {1024U};
 
 static std::mt19937_64 rng(42); // NOLINT : Seed with a constant for repeatability
 
@@ -35,7 +35,7 @@ void random_addition(T lower, T upper)
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
-                      << "\nInt res: " << res_int << std::endl;
+                      << "\nInt res: " << val1 + val2 << std::endl;
         }
     }
 }
@@ -63,7 +63,7 @@ void random_subtraction(T lower, T upper)
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
-                      << "\nInt res: " << res_int << std::endl;
+                      << "\nInt res: " << val1 - val2 << std::endl;
         }
     }
 }
