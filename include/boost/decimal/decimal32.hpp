@@ -559,18 +559,19 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
 
     const bool lhs_bigger = lhs > rhs;
 
-    if (lhs.isneg())
-    {
-        return lhs + rhs;
-    }
-
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.full_exponent()};
     normalize(sig_lhs, exp_lhs);
 
+    auto signed_sig_lhs = static_cast<std::int32_t>(sig_lhs);
+    signed_sig_lhs = lhs.isneg() ? -signed_sig_lhs : signed_sig_lhs;
+
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.full_exponent()};
     normalize(sig_rhs, exp_rhs);
+
+    auto signed_sig_rhs = static_cast<std::int32_t>(sig_rhs);
+    signed_sig_rhs = rhs.isneg() ? -signed_sig_rhs : signed_sig_rhs;
 
     auto delta_exp {exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs};
 
@@ -603,15 +604,26 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
     else
     {
         // The two numbers can be subtracted together without special handling
-        while (delta_exp > 0)
+        if (lhs_bigger)
         {
-            sig_rhs /= 10;
-            --delta_exp;
+            while (delta_exp > 0)
+            {
+                signed_sig_rhs /= 10;
+                --delta_exp;
+            }
+        }
+        else
+        {
+            while (delta_exp > 0)
+            {
+                signed_sig_lhs /= 10;
+                --delta_exp;
+            }
         }
 
         // Both of the significands are less than 9'999'999, so we can safely
         // cast them to signed 32-bit ints to calculate the new significand
-        const auto new_sig {static_cast<std::int32_t>(sig_lhs) - static_cast<std::int32_t>(sig_rhs)};
+        const auto new_sig {signed_sig_lhs - signed_sig_rhs};
         const auto new_exp {static_cast<int>(exp_lhs) - detail::bias};
 
         return {new_sig, new_exp};

@@ -216,7 +216,7 @@ void test_subtraction()
     constexpr decimal32 big_num(0b1, 20);
     constexpr decimal32 small_num(0b1, -20);
     BOOST_TEST_EQ(big_num - small_num, big_num);
-    BOOST_TEST_EQ(small_num - big_num, big_num);
+    BOOST_TEST_EQ(small_num - big_num, -big_num);
 
     // Case 2: Round the last digit of the significand
     constexpr decimal32 no_round {1234567, 5};
