@@ -254,7 +254,14 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     bits_.significand = 0;
     bool big_combination {false};
 
-    if (unsigned_coeff < detail::no_combination)
+    if (unsigned_coeff == 0)
+    {
+        bits_.significand = 0;
+        bits_.combination_field = 0;
+
+        exp = 0;
+    }
+    else if (unsigned_coeff < detail::no_combination)
     {
         // If the coefficient fits directly we don't need to use the combination field
         bits_.significand = static_cast<std::uint32_t>(unsigned_coeff);
