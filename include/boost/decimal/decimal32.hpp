@@ -517,7 +517,7 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         // Cast the results to signed types so that we can apply a sign at the end if necessary
         // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
         auto new_sig {static_cast<std::int32_t>(sig_lhs + sig_rhs)};
-        const auto new_exp {static_cast<int>(lhs_bigger ? exp_lhs : exp_rhs) - detail::bias};
+        const auto new_exp {static_cast<int>(exp_lhs) - detail::bias};
 
         if (sign)
         {
@@ -618,7 +618,7 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
         // Both of the significands are less than 9'999'999, so we can safely
         // cast them to signed 32-bit ints to calculate the new significand
         const auto new_sig {static_cast<std::int32_t>(sig_lhs) - static_cast<std::int32_t>(sig_rhs)};
-        const auto new_exp {static_cast<int>(lhs_bigger ? exp_lhs : exp_rhs) - detail::bias};
+        const auto new_exp {static_cast<int>(exp_lhs) - detail::bias};
 
         return {new_sig, new_exp};
     }
