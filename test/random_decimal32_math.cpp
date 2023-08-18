@@ -11,7 +11,7 @@
 
 using namespace boost::decimal;
 
-static constexpr auto N {10U};
+static constexpr auto N {1024U};
 
 template <typename T>
 void random_addition(T lower, T upper)

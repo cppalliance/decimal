@@ -624,7 +624,7 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
         // Both of the significands are less than 9'999'999, so we can safely
         // cast them to signed 32-bit ints to calculate the new significand
         const auto new_sig {signed_sig_lhs - signed_sig_rhs};
-        const auto new_exp {static_cast<int>(exp_lhs) - detail::bias};
+        const auto new_exp {(lhs_bigger ? static_cast<int>(exp_lhs) : static_cast<int>(exp_rhs)) - detail::bias};
 
         return {new_sig, new_exp};
     }
