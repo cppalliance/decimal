@@ -136,6 +136,7 @@ private:
 
     constexpr std::uint32_t full_exponent() const noexcept;
     constexpr std::uint32_t full_significand() const noexcept;
+    constexpr bool isneg() const noexcept;
 
     // Attempts coneversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
@@ -439,6 +440,7 @@ constexpr decimal32 check_non_finite(decimal32 lhs, decimal32 rhs) noexcept
 
 // We use kahan summation here where applicable
 // https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+// NOLINTNEXTLINE : If addition is actually subtraction than change operator and vice versa
 constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
 {
     constexpr decimal32 zero {0, 0};
@@ -449,12 +451,22 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         return res;
     }
 
-    const bool lhs_bigger = lhs > rhs;
+    const bool lhs_bigger {lhs > rhs};
+    bool sign {};
 
     // Ensure that lhs is always the larger for ease of implementation
     if (!lhs_bigger)
     {
         detail::swap(lhs, rhs);
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs - rhs;
+    }
+    else if (lhs.isneg())
+    {
+        sign = true;
     }
 
     auto sig_lhs {lhs.full_significand()};
@@ -502,8 +514,15 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
             --delta_exp;
         }
 
-        const auto new_sig {sig_lhs + sig_rhs};
+        // Cast the results to signed types so that we can apply a sign at the end if necessary
+        // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
+        auto new_sig {static_cast<std::int32_t>(sig_lhs + sig_rhs)};
         const auto new_exp {static_cast<int>(lhs_bigger ? exp_lhs : exp_rhs) - detail::bias};
+
+        if (sign)
+        {
+            new_sig = -new_sig;
+        }
 
         return {new_sig, new_exp};
     }
@@ -527,6 +546,7 @@ constexpr decimal32& decimal32::operator+=(decimal32 rhs) noexcept
     return *this;
 }
 
+// NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
 constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
 {
     constexpr decimal32 zero {0, 0};
@@ -543,6 +563,11 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
     if (!lhs_bigger)
     {
         detail::swap(lhs, rhs);
+    }
+
+    if (lhs.isneg())
+    {
+        return lhs + rhs;
     }
 
     auto sig_lhs {lhs.full_significand()};
@@ -753,6 +778,11 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
     return significand;
 }
 
+constexpr bool decimal32::isneg() const noexcept
+{
+    return static_cast<bool>(bits_.sign);
+}
+
 template<typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool>>
 constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
@@ -848,6 +878,7 @@ std::ostream& operator<<(std::ostream& os, const decimal32& d)
 
     const auto print_exp = static_cast<int>(d.full_exponent()) - detail::bias;
 
+    /*
     if (print_exp < 0)
     {
         os << '-';
@@ -861,6 +892,7 @@ std::ostream& operator<<(std::ostream& os, const decimal32& d)
     {
         os << '0';
     }
+    */
 
     os << print_exp;
 
