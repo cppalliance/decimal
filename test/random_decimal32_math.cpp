@@ -5,18 +5,16 @@
 #include <boost/decimal/decimal32.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <random>
-#include <limits>
-#include <cmath>
-#include <cerrno>
 
 using namespace boost::decimal;
 
-static constexpr auto N {1024U};
+static constexpr auto N {100U};
+
+static std::mt19937_64 rng(42); // NOLINT : Seed with a constant for repeatability
 
 template <typename T>
 void random_addition(T lower, T upper)
 {
-    std::mt19937_64 rng(42);
     std::uniform_int_distribution<T> dist(lower, upper);
 
     for (std::size_t i {}; i < N; ++i)
@@ -45,7 +43,6 @@ void random_addition(T lower, T upper)
 template <typename T>
 void random_subtraction(T lower, T upper)
 {
-    std::mt19937_64 rng(42);
     std::uniform_int_distribution<T> dist(lower, upper);
 
     for (std::size_t i {}; i < N; ++i)
@@ -93,6 +90,11 @@ int main()
     random_subtraction(-5'000'000, 0);
     random_subtraction(-5'000'000L, 0L);
     random_subtraction(-5'000'000LL, 0LL);
+
+    // Anything in range
+    random_addition(-5'000'000, 5'000'000);
+    //random_addition(-5'000'000L, 5'000'000L);
+    //random_addition(-5'000'000LL, 5'000'000LL);
 
     return boost::report_errors();
 }

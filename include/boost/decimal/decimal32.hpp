@@ -557,7 +557,7 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
         return res;
     }
 
-    const bool lhs_bigger = lhs > rhs;
+    const bool lhs_bigger {lhs > rhs};
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.full_exponent()};
@@ -623,8 +623,16 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
 
         // Both of the significands are less than 9'999'999, so we can safely
         // cast them to signed 32-bit ints to calculate the new significand
-        const auto new_sig {signed_sig_lhs - signed_sig_rhs};
-        const auto new_exp {(lhs_bigger ? static_cast<int>(exp_lhs) : static_cast<int>(exp_rhs)) - detail::bias};
+        std::int32_t new_sig {};
+        if (rhs.isneg() && !lhs.isneg())
+        {
+            new_sig = signed_sig_lhs + signed_sig_rhs;
+        }
+        else
+        {
+            new_sig = signed_sig_lhs - signed_sig_rhs;
+        }
+        const auto new_exp {(lhs_bigger? static_cast<int>(exp_lhs) : static_cast<int>(exp_rhs)) - detail::bias};
 
         return {new_sig, new_exp};
     }
