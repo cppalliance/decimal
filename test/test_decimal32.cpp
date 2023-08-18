@@ -287,6 +287,16 @@ void test_construct_from_integer()
     BOOST_TEST_EQ(rounded, decimal32(T(12345678)));
 }
 
+template <typename T>
+void spot_check_addition(T a, T b, T res)
+{
+    decimal32 dec_a {a};
+    decimal32 dec_b {b};
+    decimal32 dec_res {res};
+
+    BOOST_TEST_EQ(dec_a + dec_b, dec_res);
+}
+
 int main()
 {
     test_comp();
@@ -305,6 +315,8 @@ int main()
     test_construct_from_integer<int>();
     test_construct_from_integer<long>();
     test_construct_from_integer<long long>();
+
+    spot_check_addition(-1054191000, -920209700, -1974400700);
 
     return boost::report_errors();
 }

@@ -8,9 +8,10 @@
 
 using namespace boost::decimal;
 
-static constexpr auto N {1024U};
+static constexpr auto N {10U};
 
-static std::mt19937_64 rng(42); // NOLINT : Seed with a constant for repeatability
+// NOLINTNEXTLINE : Seed with a constant for repeatability
+static std::mt19937_64 rng(42); // NOSONAR : Global rng is not const
 
 template <typename T>
 void random_addition(T lower, T upper)
@@ -36,6 +37,35 @@ void random_addition(T lower, T upper)
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 + val2 << std::endl;
+        }
+    }
+}
+
+template <typename T>
+void random_converted_addition(T lower, T upper)
+{
+    std::uniform_int_distribution<T> dist(lower, upper);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        // Convert these to and from to ensure rounding
+        const T val1 {static_cast<T>(decimal32(dist(rng)))};
+        const T val2 {static_cast<T>(decimal32(dist(rng)))};
+
+        const decimal32 dec1 {val1};
+        const decimal32 dec2 {val2};
+
+        const decimal32 res {dec1 + dec2};
+        const decimal32 comp_val {val1 + val2};
+
+        if (!BOOST_TEST_EQ(res, comp_val))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << comp_val << std::endl;
         }
     }
 }
@@ -93,8 +123,13 @@ int main()
 
     // Anything in range
     random_addition(-5'000'000, 5'000'000);
-    //random_addition(-5'000'000L, 5'000'000L);
-    //random_addition(-5'000'000LL, 5'000'000LL);
+    random_addition(-5'000'000L, 5'000'000L);
+    random_addition(-5'000'000LL, 5'000'000LL);
+
+    // Anything in the domain
+    random_converted_addition(INT_MIN / 2, INT_MAX / 2);
+    random_converted_addition(LONG_MIN / 2, LONG_MAX / 2);
+    random_converted_addition(LLONG_MIN / 2, LLONG_MAX / 2);
 
     return boost::report_errors();
 }

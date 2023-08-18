@@ -518,16 +518,31 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
     }
     else
     {
+        bool carry {};
+
         // The two numbers can be added together without special handling
-        while (delta_exp > 0)
+        if (delta_exp > 1)
         {
+            while (delta_exp > 1)
+            {
+                sig_rhs /= 10;
+                --delta_exp;
+            }
+        }
+
+        if (delta_exp == 1)
+        {
+            auto carry_dig = sig_rhs % 10;
             sig_rhs /= 10;
-            --delta_exp;
+            if (carry_dig >= 5)
+            {
+                carry = true;
+            }
         }
 
         // Cast the results to signed types so that we can apply a sign at the end if necessary
         // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
-        auto new_sig {static_cast<std::int32_t>(sig_lhs + sig_rhs)};
+        auto new_sig {static_cast<std::int32_t>(sig_lhs + sig_rhs) + static_cast<std::int32_t>(carry)};
         const auto new_exp {static_cast<int>(exp_lhs) - detail::bias};
 
         if (sign)
