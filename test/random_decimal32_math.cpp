@@ -121,6 +121,9 @@ int main()
     random_subtraction(-5'000'000L, 0L);
     random_subtraction(-5'000'000LL, 0LL);
 
+    // Mixed Values
+    random_subtraction(-5'000'000, 5'000'000);
+
     // Anything in range
     random_addition(-5'000'000, 5'000'000);
     random_addition(-5'000'000L, 5'000'000L);
