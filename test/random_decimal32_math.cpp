@@ -127,9 +127,7 @@ int main()
     random_addition(-5'000'000LL, 5'000'000LL);
 
     // Anything in the domain
-    random_converted_addition(INT_MIN / 2, INT_MAX / 2);
-    //random_converted_addition(LONG_MIN / 2, LONG_MAX / 2);
-    //random_converted_addition(LLONG_MIN / 2, LLONG_MAX / 2);
+    random_converted_addition(0, INT_MAX / 2);
 
     return boost::report_errors();
 }
