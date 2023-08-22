@@ -99,6 +99,34 @@ void random_subtraction(T lower, T upper)
     }
 }
 
+template <typename T>
+void random_multiplication(T lower, T upper)
+{
+    std::uniform_int_distribution<T> dist(lower, upper);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const decimal32 dec1 {val1};
+        const decimal32 dec2 {val2};
+
+        const decimal32 res {dec1 * dec2};
+        const decimal32 res_int {val1 * val2};
+
+        if (!BOOST_TEST_EQ(res, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << val1 * val2 << std::endl;
+        }
+    }
+}
+
 int main()
 {
     // Values that won't exceed the range of the significand
@@ -136,6 +164,26 @@ int main()
     random_converted_addition(0, (std::numeric_limits<int>::max)() / 2);
     random_converted_addition((std::numeric_limits<int>::min)() / 2, 0);
     random_converted_addition((std::numeric_limits<int>::min)() / 2, (std::numeric_limits<int>::max)() / 2);
+
+    // Positive values
+    const auto sqrt_int_max = static_cast<int>(std::sqrt(static_cast<double>((std::numeric_limits<int>::max)())));
+
+    random_multiplication(0, 5'000);
+    random_multiplication(0L, 5'000L);
+    random_multiplication(0LL, 5'000LL);
+    random_multiplication(0, sqrt_int_max);
+
+    // Only negative values
+    random_multiplication(-5'000, 0);
+    random_multiplication(-5'000L, 0L);
+    random_multiplication(-5'000LL, 0LL);
+    random_multiplication(-sqrt_int_max, 0);
+
+    // Mixed values
+    random_multiplication(-5'000, 5'000);
+    random_multiplication(-5'000L, 5'000L);
+    random_multiplication(-5'000LL, 5'000LL);
+    random_multiplication(-sqrt_int_max, sqrt_int_max);
 
     return boost::report_errors();
 }
