@@ -161,7 +161,7 @@ public:
     explicit constexpr operator unsigned long long() const noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
-    template <typename T, typename T2>
+    template <typename T, typename T2, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     constexpr decimal32(T coeff, T2 exp) noexcept;
 
     constexpr decimal32(const decimal32& val) noexcept = default;
@@ -209,7 +209,7 @@ public:
     friend std::uint32_t to_bits(decimal32 rhs) noexcept;
 };
 
-template <typename T, typename T2>
+template <typename T, typename T2, std::enable_if_t<std::is_integral<T>::value, bool>>
 constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
 {
     using Unsigned_Integer = std::make_unsigned_t<T>;
@@ -218,7 +218,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     static_assert(std::is_integral<T2>::value, "Exponent must be an integer");
 
     bits_.sign = coeff < 0;
-    auto unsigned_coeff {static_cast<Unsigned_Integer>(bits_.sign ? detail::apply_sign(coeff) : static_cast<std::uint32_t>(coeff))};
+    auto unsigned_coeff {static_cast<Unsigned_Integer>(bits_.sign ? detail::apply_sign(coeff) : coeff)};
 
     // If the coeff is not in range make it so
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
