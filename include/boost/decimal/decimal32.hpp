@@ -92,7 +92,8 @@ static constexpr std::uint32_t construct_significand_mask = no_combination;
 
 } // Namespace detail
 
-constexpr void normalize(std::uint32_t& significand, std::uint32_t& exp) noexcept
+template <typename T>
+constexpr void normalize(std::uint32_t& significand, T& exp) noexcept
 {
     auto digits = detail::num_digits(significand);
 
@@ -135,6 +136,7 @@ private:
     data_layout_ bits_{};
 
     constexpr std::uint32_t full_exponent() const noexcept;
+    constexpr std::int32_t biased_exponent() const noexcept;
     constexpr std::uint32_t full_significand() const noexcept;
     constexpr bool isneg() const noexcept;
 
@@ -192,6 +194,9 @@ public:
     constexpr decimal32& operator--() noexcept;
     constexpr decimal32 operator--(int) noexcept; // NOLINT : C++14 so constexpr implies const
     constexpr decimal32& operator-=(decimal32 rhs) noexcept;
+
+    friend constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept;
+    constexpr decimal32& operator*=(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
     friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
@@ -892,6 +897,11 @@ constexpr std::uint32_t decimal32::full_exponent() const noexcept
     return exp;
 }
 
+constexpr std::int32_t decimal32::biased_exponent() const noexcept
+{
+    return static_cast<std::int32_t>(full_exponent()) - detail::bias;
+}
+
 constexpr std::uint32_t decimal32::full_significand() const noexcept
 {
     std::uint32_t significand {};
@@ -1028,6 +1038,66 @@ std::uint32_t to_bits(decimal32 rhs) noexcept
     std::uint32_t bits;
     std::memcpy(&bits, &rhs.bits_, sizeof(std::uint32_t));
     return bits;
+}
+
+constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept
+{
+    constexpr decimal32 zero {0, 0};
+
+    const auto res {check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "sig lhs: " << sig_lhs
+              << "\nexp lhs: " << exp_lhs
+              << "\nsig rhs: " << sig_rhs
+              << "\nexp rhs: " << exp_rhs;
+    #endif
+
+    const bool sign {!(lhs.isneg() == rhs.isneg())};
+
+    // Once we have the normalized significands and exponents all we have to do is
+    // multiply the significands and add the exponents
+    //
+    // We use a 64 bit resultant significand because the two 23-bit unsigned significands will always fit
+
+    auto res_sig {static_cast<std::uint64_t>(sig_lhs) * static_cast<std::uint64_t>(sig_rhs)};
+    auto res_exp {exp_lhs + exp_rhs};
+
+    const auto sig_dig {detail::num_digits(res_sig)};
+
+    if (sig_dig > 9)
+    {
+        res_sig /= detail::powers_of_10[sig_dig - 9];
+        res_exp += sig_dig - 9;
+    }
+
+    auto res_sig_32 {static_cast<std::int32_t>(res_sig)};
+    res_sig_32 = sign ? -res_sig_32 : res_sig_32;
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "\nres sig: " << res_sig_32
+              << "\nres exp: " << res_exp << std::endl;
+    #endif
+
+    return decimal32 {res_sig_32, res_exp};
+}
+
+constexpr decimal32& decimal32::operator*=(decimal32 rhs) noexcept
+{
+    *this = *this * rhs;
+    return *this;
 }
 
 }} // Namespace boost::decimal

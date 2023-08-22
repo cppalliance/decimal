@@ -274,6 +274,37 @@ void test_subtraction()
     #endif
 }
 
+void test_multiplicatiom()
+{
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 one {1, 0};
+    constexpr decimal32 two {2, 0};
+    constexpr decimal32 four {4, 0};
+    constexpr decimal32 eight {8, 0};
+
+    BOOST_TEST_EQ(zero * one, zero);
+    BOOST_TEST_EQ(zero * -one, zero);
+    BOOST_TEST_EQ(one * two, two);
+
+    decimal32 pow_two {1, 0};
+    BOOST_TEST_EQ(pow_two *= two, two);
+    BOOST_TEST_EQ(pow_two *= two, four);
+    BOOST_TEST_EQ(pow_two *= -two, -eight);
+
+    // Non-finite values
+    constexpr decimal32 qnan_val(std::numeric_limits<decimal32>::quiet_NaN());
+    constexpr decimal32 snan_val(std::numeric_limits<decimal32>::signaling_NaN());
+    constexpr decimal32 inf_val(std::numeric_limits<decimal32>::infinity());
+    BOOST_TEST(isnan(qnan_val * one));
+    BOOST_TEST(isnan(snan_val * one));
+    BOOST_TEST(isnan(one * qnan_val));
+    BOOST_TEST(isnan(one * snan_val));
+    BOOST_TEST(isinf(inf_val * one));
+    BOOST_TEST(isinf(one * inf_val));
+    BOOST_TEST(isnan(inf_val * qnan_val));
+    BOOST_TEST(isnan(qnan_val * inf_val));
+}
+
 template <typename T>
 void test_construct_from_integer()
 {
@@ -315,6 +346,7 @@ int main()
 
     test_addition();
     test_subtraction();
+    test_multiplicatiom();
 
     test_construct_from_integer<int>();
     test_construct_from_integer<long>();
