@@ -480,7 +480,7 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
 
     if (!lhs.isneg() && rhs.isneg())
     {
-        return lhs - rhs;
+        return lhs - abs(rhs);
     }
     else if (lhs.isneg())
     {
@@ -588,6 +588,11 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
     if (res != zero)
     {
         return res;
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs + (-rhs);
     }
 
     const bool lhs_bigger {lhs > rhs};
