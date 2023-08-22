@@ -665,6 +665,16 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
     // The two numbers can be subtracted together without special handling
     if (abs_lhs_bigger)
     {
+        if (delta_exp <= 2)
+        {
+            while (delta_exp > 0)
+            {
+                signed_sig_lhs *= 10;
+                --delta_exp;
+                --exp_lhs;
+            }
+        }
+
         while (delta_exp > 1)
         {
             signed_sig_rhs /= 10;
@@ -687,6 +697,16 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
     }
     else
     {
+        if (delta_exp <= 2)
+        {
+            while (delta_exp > 0)
+            {
+                signed_sig_rhs *= 10;
+                --delta_exp;
+                --exp_rhs;
+            }
+        }
+
         while (delta_exp > 1)
         {
             signed_sig_lhs /= 10;
