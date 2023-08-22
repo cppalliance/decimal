@@ -497,8 +497,10 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
 
     auto delta_exp {exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs};
 
+    #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "Starting sig lhs: " << sig_lhs
               << "\nStarting sig rhs: " << sig_rhs << std::endl;
+    #endif
 
     if (delta_exp + 1 > detail::precision)
     {
@@ -526,58 +528,58 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
             return lhs;
         }
     }
+
+    bool carry {};
+
+    // The two numbers can be added together without special handling
+
+    // If we can add to the lhs sig rather than dividing we can save some precision
+    // 32-bit signed int can have 9 digits and our normalized significand has 7
+    if (delta_exp <= 2)
+    {
+        while (delta_exp > 0)
+        {
+            sig_lhs *= 10;
+            --delta_exp;
+            --exp_lhs;
+        }
+    }
     else
     {
-        bool carry {};
-
-        // The two numbers can be added together without special handling
-
-        // If we can add to the lhs sig rather than dividing we can save some precision
-        // 32-bit signed int can have 9 digits and our normalized significand has 7
-        if (delta_exp <= 2)
+        while (delta_exp > 1)
         {
-            while (delta_exp > 0)
-            {
-                sig_lhs *= 10;
-                --delta_exp;
-                --exp_lhs;
-            }
-        }
-        else
-        {
-            while (delta_exp > 1)
-            {
-                sig_rhs /= 10;
-                --delta_exp;
-            }
-        }
-
-        if (delta_exp == 1)
-        {
-            auto carry_dig = sig_rhs % 10;
             sig_rhs /= 10;
-            if (carry_dig >= 5)
-            {
-                carry = true;
-            }
+            --delta_exp;
         }
-
-        // Cast the results to signed types so that we can apply a sign at the end if necessary
-        // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
-        auto new_sig {static_cast<std::int32_t>(sig_lhs + sig_rhs) + static_cast<std::int32_t>(carry)};
-        const auto new_exp {static_cast<int>(exp_lhs) - detail::bias};
-
-        if (sign)
-        {
-            new_sig = -new_sig;
-        }
-
-        std::cerr << "Final sig lhs: " << sig_lhs
-                  << "\nFinal sig rhs: " << sig_rhs
-                  << "\nResult sig: " << new_sig << std::endl;
-
-        return {new_sig, new_exp};
     }
+
+    if (delta_exp == 1)
+    {
+        auto carry_dig = sig_rhs % 10;
+        sig_rhs /= 10;
+        if (carry_dig >= 5)
+        {
+            carry = true;
+        }
+    }
+
+    // Cast the results to signed types so that we can apply a sign at the end if necessary
+    // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
+    auto new_sig {static_cast<std::int32_t>(sig_lhs + sig_rhs) + static_cast<std::int32_t>(carry)};
+    const auto new_exp {static_cast<int>(exp_lhs) - detail::bias};
+
+    if (sign)
+    {
+        new_sig = -new_sig;
+    }
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "Final sig lhs: " << sig_lhs
+              << "\nFinal sig rhs: " << sig_rhs
+              << "\nResult sig: " << new_sig << std::endl;
+    #endif
+
+    return {new_sig, new_exp};
 }
 
 constexpr decimal32& decimal32::operator++() noexcept
@@ -659,72 +661,70 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
             return lhs;
         }
     }
+
+    // The two numbers can be subtracted together without special handling
+    if (abs_lhs_bigger)
+    {
+        while (delta_exp > 1)
+        {
+            signed_sig_rhs /= 10;
+            --delta_exp;
+        }
+
+        if (delta_exp == 1)
+        {
+            const auto carry_dig {signed_sig_rhs % 10};
+            signed_sig_rhs /= 10;
+            if (carry_dig >= 5)
+            {
+                ++signed_sig_rhs;
+            }
+            else if (carry_dig <= -5)
+            {
+                --signed_sig_rhs;
+            }
+        }
+    }
     else
     {
-        // The two numbers can be subtracted together without special handling
-        if (abs_lhs_bigger)
+        while (delta_exp > 1)
         {
-            while (delta_exp > 1)
-            {
-                signed_sig_rhs /= 10;
-                --delta_exp;
-            }
-
-            if (delta_exp == 1)
-            {
-                const auto carry_dig {signed_sig_rhs % 10};
-                signed_sig_rhs /= 10;
-                if (carry_dig >= 5)
-                {
-                    ++signed_sig_rhs;
-                }
-                else if (carry_dig <= -5)
-                {
-                    --signed_sig_rhs;
-                }
-            }
-        }
-        else
-        {
-            while (delta_exp > 1)
-            {
-                signed_sig_lhs /= 10;
-                --delta_exp;
-            }
-
-            if (delta_exp == 1)
-            {
-                const auto carry_dig {signed_sig_lhs % 10};
-                signed_sig_lhs /= 10;
-
-                if (carry_dig >= 5)
-                {
-                    ++signed_sig_lhs;
-                }
-                else if (carry_dig <= -5)
-                {
-                    --signed_sig_rhs;
-                }
-
-            }
+            signed_sig_lhs /= 10;
+            --delta_exp;
         }
 
-        // Both of the significands are less than 9'999'999, so we can safely
-        // cast them to signed 32-bit ints to calculate the new significand
-        std::int32_t new_sig {};
-
-        if (rhs.isneg() && !lhs.isneg())
+        if (delta_exp == 1)
         {
-            new_sig = signed_sig_lhs + signed_sig_rhs;
-        }
-        else
-        {
-            new_sig = signed_sig_lhs - signed_sig_rhs;
-        }
-        const auto new_exp {(abs_lhs_bigger ? static_cast<int>(exp_lhs) : static_cast<int>(exp_rhs)) - detail::bias};
+            const auto carry_dig {signed_sig_lhs % 10};
+            signed_sig_lhs /= 10;
 
-        return {new_sig, new_exp};
+            if (carry_dig >= 5)
+            {
+                ++signed_sig_lhs;
+            }
+            else if (carry_dig <= -5)
+            {
+                --signed_sig_rhs;
+            }
+
+        }
     }
+
+    // Both of the significands are less than 9'999'999, so we can safely
+    // cast them to signed 32-bit ints to calculate the new significand
+    std::int32_t new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
+
+    if (rhs.isneg() && !lhs.isneg())
+    {
+        new_sig = signed_sig_lhs + signed_sig_rhs;
+    }
+    else
+    {
+        new_sig = signed_sig_lhs - signed_sig_rhs;
+    }
+    const auto new_exp {(abs_lhs_bigger ? static_cast<int>(exp_lhs) : static_cast<int>(exp_rhs)) - detail::bias};
+
+    return {new_sig, new_exp};
 }
 
 constexpr decimal32& decimal32::operator--() noexcept
@@ -980,22 +980,6 @@ std::ostream& operator<<(std::ostream& os, const decimal32& d)
     os << d.full_significand() << "e";
 
     const auto print_exp = static_cast<int>(d.full_exponent()) - detail::bias;
-
-    /*
-    if (print_exp < 0)
-    {
-        os << '-';
-    }
-    else
-    {
-        os << '+';
-    }
-
-    if (abs(print_exp) < 10)
-    {
-        os << '0';
-    }
-    */
 
     os << print_exp;
 
