@@ -497,6 +497,9 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
 
     auto delta_exp {exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs};
 
+    std::cerr << "Starting sig lhs: " << sig_lhs
+              << "\nStarting sig rhs: " << sig_rhs << std::endl;
+
     if (delta_exp + 1 > detail::precision)
     {
         // If the difference in exponents is more than the digits of accuracy
@@ -528,7 +531,19 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         bool carry {};
 
         // The two numbers can be added together without special handling
-        if (delta_exp > 1)
+
+        // If we can add to the lhs sig rather than dividing we can save some precision
+        // 32-bit signed int can have 9 digits and our normalized significand has 7
+        if (delta_exp <= 2)
+        {
+            while (delta_exp > 0)
+            {
+                sig_lhs *= 10;
+                --delta_exp;
+                --exp_lhs;
+            }
+        }
+        else
         {
             while (delta_exp > 1)
             {
@@ -556,6 +571,10 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         {
             new_sig = -new_sig;
         }
+
+        std::cerr << "Final sig lhs: " << sig_lhs
+                  << "\nFinal sig rhs: " << sig_rhs
+                  << "\nResult sig: " << new_sig << std::endl;
 
         return {new_sig, new_exp};
     }

@@ -294,7 +294,11 @@ void spot_check_addition(T a, T b, T res)
     decimal32 dec_b {b};
     decimal32 dec_res {res};
 
-    BOOST_TEST_EQ(dec_a + dec_b, dec_res);
+    if (!BOOST_TEST_EQ(dec_a + dec_b, dec_res))
+    {
+        std::cerr << "A + B: " << a + b
+                  << "\nIn dec: " << decimal32(a + b) << std::endl;
+    }
 }
 
 int main()
@@ -318,6 +322,7 @@ int main()
 
     spot_check_addition(-1054191000, -920209700, -1974400700);
     spot_check_addition(353582500, -32044770, 321537730);
+    spot_check_addition(989629100, 58451350, 1048080000);
 
     return boost::report_errors();
 }
