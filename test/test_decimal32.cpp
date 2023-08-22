@@ -210,6 +210,70 @@ void test_addition()
     BOOST_TEST(isinf(max_val + one));
 }
 
+void test_subtraction()
+{
+    // Case 1: The difference is more than the digits of accuracy
+    constexpr decimal32 big_num(0b1, 20);
+    constexpr decimal32 small_num(0b1, -20);
+    BOOST_TEST_EQ(big_num - small_num, big_num);
+    BOOST_TEST_EQ(small_num - big_num, -big_num);
+
+    // Case 2: Round the last digit of the significand
+    constexpr decimal32 no_round {1234567, 5};
+    constexpr decimal32 round {9876543, -2};
+    BOOST_TEST_EQ(no_round - round, no_round);
+
+    // Case 3: Add away
+    constexpr decimal32 one(1, 0);
+    constexpr decimal32 two(2, 0);
+    constexpr decimal32 three(3, 0);
+    decimal32 mutable_three(3, 0);
+
+    BOOST_TEST_EQ(two - one, one);
+    BOOST_TEST_EQ(three - one - one, one);
+
+    // Pre- and post- increment
+    BOOST_TEST_EQ(mutable_three, three);
+    BOOST_TEST_EQ(mutable_three--, two);
+    BOOST_TEST_EQ(--mutable_three, one);
+
+    // Different orders of magnitude
+    constexpr decimal32 ten(10, 0);
+    constexpr decimal32 eleven(11, 0);
+    BOOST_TEST_EQ(eleven - one, ten);
+
+    // Too great a difference for one to matter
+    constexpr decimal32 max_plus_one(10'000'000, 0);
+    BOOST_TEST_EQ(max_plus_one - one, max_plus_one);
+
+    // Non-finite values
+    constexpr decimal32 qnan_val(std::numeric_limits<decimal32>::quiet_NaN());
+    constexpr decimal32 snan_val(std::numeric_limits<decimal32>::signaling_NaN());
+    constexpr decimal32 inf_val(std::numeric_limits<decimal32>::infinity());
+    BOOST_TEST(isnan(qnan_val - one));
+    BOOST_TEST(isnan(snan_val - one));
+    BOOST_TEST(isnan(one - qnan_val));
+    BOOST_TEST(isnan(one - snan_val));
+    BOOST_TEST(isinf(inf_val - one));
+    BOOST_TEST(isinf(one - inf_val));
+    BOOST_TEST(isnan(inf_val - qnan_val));
+    BOOST_TEST(isnan(qnan_val - inf_val));
+
+    // Why does MSVC 14.1 warn about unary minus but nothing else does?
+    #ifdef BOOST_MSVC
+    #  pragma warning(push)
+    #  pragma warning(disable: 4146)
+    #endif
+
+    // Underflow
+    constexpr decimal32 lowest_val(std::numeric_limits<decimal32>::lowest());
+    BOOST_TEST(isinf(lowest_val - one));
+
+    #ifdef BOOST_MSVC
+    #  pragma warning(pop)
+    #endif
+}
+
 template <typename T>
 void test_construct_from_integer()
 {
@@ -221,6 +285,20 @@ void test_construct_from_integer()
 
     constexpr decimal32 rounded(1234568, 1);
     BOOST_TEST_EQ(rounded, decimal32(T(12345678)));
+}
+
+template <typename T>
+void spot_check_addition(T a, T b, T res)
+{
+    decimal32 dec_a {a};
+    decimal32 dec_b {b};
+    decimal32 dec_res {res};
+
+    if (!BOOST_TEST_EQ(dec_a + dec_b, dec_res))
+    {
+        std::cerr << "A + B: " << a + b
+                  << "\nIn dec: " << decimal32(a + b) << std::endl;
+    }
 }
 
 int main()
@@ -236,10 +314,15 @@ int main()
     test_unary_arithmetic();
 
     test_addition();
+    test_subtraction();
 
     test_construct_from_integer<int>();
     test_construct_from_integer<long>();
     test_construct_from_integer<long long>();
+
+    spot_check_addition(-1054191000, -920209700, -1974400700);
+    spot_check_addition(353582500, -32044770, 321537730);
+    spot_check_addition(989629100, 58451350, 1048080000);
 
     return boost::report_errors();
 }

@@ -136,6 +136,7 @@ private:
 
     constexpr std::uint32_t full_exponent() const noexcept;
     constexpr std::uint32_t full_significand() const noexcept;
+    constexpr bool isneg() const noexcept;
 
     // Attempts coneversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
@@ -175,6 +176,7 @@ public:
     friend constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr decimal32 abs BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
 
     // 3.2.7 unary arithmetic operators:
     friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
@@ -185,6 +187,11 @@ public:
     constexpr decimal32& operator++() noexcept;
     constexpr decimal32 operator++(int) noexcept; // NOLINT : C++14 so constexpr implies const
     constexpr decimal32& operator+=(decimal32 rhs) noexcept;
+
+    friend constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept;
+    constexpr decimal32& operator--() noexcept;
+    constexpr decimal32 operator--(int) noexcept; // NOLINT : C++14 so constexpr implies const
+    constexpr decimal32& operator-=(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
     friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
@@ -247,7 +254,14 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
     bits_.significand = 0;
     bool big_combination {false};
 
-    if (unsigned_coeff < detail::no_combination)
+    if (unsigned_coeff == 0)
+    {
+        bits_.significand = 0;
+        bits_.combination_field = 0;
+
+        exp = 0;
+    }
+    else if (unsigned_coeff < detail::no_combination)
     {
         // If the coefficient fits directly we don't need to use the combination field
         bits_.significand = static_cast<std::uint32_t>(unsigned_coeff);
@@ -395,6 +409,16 @@ constexpr int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexce
     }
 }
 
+constexpr decimal32 abs BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+{
+    if (rhs.isneg())
+    {
+        return -rhs;
+    }
+
+    return rhs;
+}
+
 constexpr decimal32 operator+(decimal32 rhs) noexcept
 {
     return rhs;
@@ -434,6 +458,7 @@ constexpr decimal32 check_non_finite(decimal32 lhs, decimal32 rhs) noexcept
 
 // We use kahan summation here where applicable
 // https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+// NOLINTNEXTLINE : If addition is actually subtraction than change operator and vice versa
 constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
 {
     constexpr decimal32 zero {0, 0};
@@ -444,12 +469,22 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         return res;
     }
 
-    const bool lhs_bigger = lhs > rhs;
+    const bool lhs_bigger {lhs > rhs};
+    bool sign {};
 
     // Ensure that lhs is always the larger for ease of implementation
     if (!lhs_bigger)
     {
         detail::swap(lhs, rhs);
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs - abs(rhs);
+    }
+    else if (lhs.isneg())
+    {
+        sign = true;
     }
 
     auto sig_lhs {lhs.full_significand()};
@@ -461,6 +496,11 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
     normalize(sig_rhs, exp_rhs);
 
     auto delta_exp {exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs};
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "Starting sig lhs: " << sig_lhs
+              << "\nStarting sig rhs: " << sig_rhs << std::endl;
+    #endif
 
     if (delta_exp + 1 > detail::precision)
     {
@@ -476,7 +516,7 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         // Only need to see if we need to add one to the
         // significand of the bigger value
         //
-        // e.g. 1.234567e5 + 9.876543e-3 = 1.234568e5
+        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
 
         if (sig_rhs >= UINT32_C(5'000'000))
         {
@@ -488,20 +528,63 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
             return lhs;
         }
     }
-    else
+
+    bool carry {};
+
+    // The two numbers can be added together without special handling
+
+    // If we can add to the lhs sig rather than dividing we can save some precision
+    // 32-bit signed int can have 9 digits and our normalized significand has 7
+    if (delta_exp <= 2)
     {
-        // The two numbers can be added together without special handling
         while (delta_exp > 0)
         {
-            sig_rhs /= 10;
+            sig_lhs *= 10;
             --delta_exp;
+            --exp_lhs;
         }
-
-        const auto new_sig {sig_lhs + sig_rhs};
-        const auto new_exp {static_cast<int>(lhs_bigger ? exp_lhs : exp_rhs) - detail::bias};
-
-        return {new_sig, new_exp};
     }
+    else
+    {
+        sig_lhs *= 100;
+        delta_exp -= 2;
+        exp_lhs -=2;
+    }
+
+    while (delta_exp > 1)
+    {
+        sig_rhs /= 10;
+        --delta_exp;
+    }
+
+
+    if (delta_exp == 1)
+    {
+        auto carry_dig = sig_rhs % 10;
+        sig_rhs /= 10;
+        if (carry_dig >= 5)
+        {
+            carry = true;
+        }
+    }
+
+    // Cast the results to signed types so that we can apply a sign at the end if necessary
+    // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
+    auto new_sig {static_cast<std::int32_t>(sig_lhs + sig_rhs) + static_cast<std::int32_t>(carry)};
+    const auto new_exp {static_cast<int>(exp_lhs) - detail::bias};
+
+    if (sign)
+    {
+        new_sig = -new_sig;
+    }
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "Final sig lhs: " << sig_lhs
+              << "\nFinal sig rhs: " << sig_rhs
+              << "\nResult sig: " << new_sig << std::endl;
+    #endif
+
+    return {new_sig, new_exp};
 }
 
 constexpr decimal32& decimal32::operator++() noexcept
@@ -519,6 +602,183 @@ constexpr decimal32 decimal32::operator++(int) noexcept // NOLINT
 constexpr decimal32& decimal32::operator+=(decimal32 rhs) noexcept
 {
     *this = *this + rhs;
+    return *this;
+}
+
+// NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
+constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
+{
+    constexpr decimal32 zero {0, 0};
+
+    const auto res {check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool lhs_bigger {lhs > rhs};
+    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.full_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto signed_sig_lhs = static_cast<std::int32_t>(sig_lhs);
+    signed_sig_lhs = lhs.isneg() ? -signed_sig_lhs : signed_sig_lhs;
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.full_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    auto signed_sig_rhs = static_cast<std::int32_t>(sig_rhs);
+    signed_sig_rhs = rhs.isneg() ? -signed_sig_rhs : signed_sig_rhs;
+
+    auto delta_exp {exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs};
+
+    if (delta_exp + 1 > detail::precision)
+    {
+        // If the difference in exponents is more than the digits of accuracy
+        // we return the larger of the two
+        //
+        // e.g. 1e20 - 1e-20 = 1e20
+
+        return lhs_bigger ? lhs : -rhs;
+    }
+    else if (delta_exp == detail::precision + 1)
+    {
+        // Only need to see if we need to add one to the
+        // significand of the bigger value
+        //
+        // e.g. 1.234567e5 - 9.876543e-2 = 1.234566e5
+
+        if (sig_rhs >= UINT32_C(5'000'000))
+        {
+            --sig_lhs;
+            return {sig_lhs, static_cast<int>(exp_lhs) - detail::bias};
+        }
+        else
+        {
+            return lhs;
+        }
+    }
+
+    // The two numbers can be subtracted together without special handling
+    if (abs_lhs_bigger)
+    {
+        if (delta_exp <= 2)
+        {
+            while (delta_exp > 0)
+            {
+                signed_sig_lhs *= 10;
+                --delta_exp;
+                --exp_lhs;
+            }
+        }
+        else
+        {
+            signed_sig_lhs *= 100;
+            delta_exp -= 2;
+            exp_lhs -= 2;
+        }
+
+        while (delta_exp > 1)
+        {
+            signed_sig_rhs /= 10;
+            --delta_exp;
+        }
+
+        if (delta_exp == 1)
+        {
+            const auto carry_dig {signed_sig_rhs % 10};
+            signed_sig_rhs /= 10;
+            if (carry_dig >= 5)
+            {
+                ++signed_sig_rhs;
+            }
+            else if (carry_dig <= -5)
+            {
+                --signed_sig_rhs;
+            }
+        }
+    }
+    else
+    {
+        if (delta_exp <= 2)
+        {
+            while (delta_exp > 0)
+            {
+                signed_sig_rhs *= 10;
+                --delta_exp;
+                --exp_rhs;
+            }
+        }
+        else
+        {
+            signed_sig_rhs *= 100;
+            delta_exp -= 2;
+            exp_rhs -= 2;
+        }
+
+        while (delta_exp > 1)
+        {
+            signed_sig_lhs /= 10;
+            --delta_exp;
+        }
+
+        if (delta_exp == 1)
+        {
+            const auto carry_dig {signed_sig_lhs % 10};
+            signed_sig_lhs /= 10;
+
+            if (carry_dig >= 5)
+            {
+                ++signed_sig_lhs;
+            }
+            else if (carry_dig <= -5)
+            {
+                --signed_sig_rhs;
+            }
+
+        }
+    }
+
+    // Both of the significands are less than 9'999'999, so we can safely
+    // cast them to signed 32-bit ints to calculate the new significand
+    std::int32_t new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
+
+    if (rhs.isneg() && !lhs.isneg())
+    {
+        new_sig = signed_sig_lhs + signed_sig_rhs;
+    }
+    else
+    {
+        new_sig = signed_sig_lhs - signed_sig_rhs;
+    }
+    const auto new_exp {(abs_lhs_bigger ? static_cast<int>(exp_lhs) : static_cast<int>(exp_rhs)) - detail::bias};
+
+    return {new_sig, new_exp};
+}
+
+constexpr decimal32& decimal32::operator--() noexcept
+{
+    constexpr decimal32 one(1, 0);
+    *this = *this - one;
+    return *this;
+}
+
+constexpr decimal32 decimal32::operator--(int) noexcept // NOLINT
+{
+    return --(*this);
+}
+
+constexpr decimal32& decimal32::operator-=(decimal32 rhs) noexcept
+{
+    *this = *this - rhs;
     return *this;
 }
 
@@ -658,6 +918,11 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
     return significand;
 }
 
+constexpr bool decimal32::isneg() const noexcept
+{
+    return static_cast<bool>(bits_.sign);
+}
+
 template<typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool>>
 constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
@@ -753,20 +1018,6 @@ std::ostream& operator<<(std::ostream& os, const decimal32& d)
 
     const auto print_exp = static_cast<int>(d.full_exponent()) - detail::bias;
 
-    if (print_exp < 0)
-    {
-        os << '-';
-    }
-    else
-    {
-        os << '+';
-    }
-
-    if (abs(print_exp) < 10)
-    {
-        os << '0';
-    }
-
     os << print_exp;
 
     return os;
@@ -821,8 +1072,8 @@ public:
 
     // Member functions
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (min)() { return {1, min_exponent}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (max)() { return {9999999, max_exponent}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 lowest() { return {-9999999, max_exponent}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (max)() { return {9'999'999, max_exponent}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 lowest() { return {-9'999'999, max_exponent}; }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 epsilon() { return {1, -7}; }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 round_error() { return epsilon(); }
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 infinity() { return boost::decimal::from_bits(boost::decimal::detail::inf_mask); }
