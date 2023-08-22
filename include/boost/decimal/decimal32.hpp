@@ -546,12 +546,17 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
     }
     else
     {
-        while (delta_exp > 1)
-        {
-            sig_rhs /= 10;
-            --delta_exp;
-        }
+        sig_lhs *= 100;
+        delta_exp -= 2;
+        exp_lhs -=2;
     }
+
+    while (delta_exp > 1)
+    {
+        sig_rhs /= 10;
+        --delta_exp;
+    }
+
 
     if (delta_exp == 1)
     {
@@ -674,6 +679,12 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
                 --exp_lhs;
             }
         }
+        else
+        {
+            signed_sig_lhs *= 100;
+            delta_exp -= 2;
+            exp_lhs -= 2;
+        }
 
         while (delta_exp > 1)
         {
@@ -705,6 +716,12 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
                 --delta_exp;
                 --exp_rhs;
             }
+        }
+        else
+        {
+            signed_sig_rhs *= 100;
+            delta_exp -= 2;
+            exp_rhs -= 2;
         }
 
         while (delta_exp > 1)
