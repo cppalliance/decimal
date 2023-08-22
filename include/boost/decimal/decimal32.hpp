@@ -92,7 +92,8 @@ static constexpr std::uint32_t construct_significand_mask = no_combination;
 
 } // Namespace detail
 
-constexpr void normalize(std::uint32_t& significand, std::uint32_t& exp) noexcept
+template <typename T>
+constexpr void normalize(std::uint32_t& significand, T& exp) noexcept
 {
     auto digits = detail::num_digits(significand);
 
@@ -135,6 +136,7 @@ private:
     data_layout_ bits_{};
 
     constexpr std::uint32_t full_exponent() const noexcept;
+    constexpr std::int32_t biased_exponent() const noexcept;
     constexpr std::uint32_t full_significand() const noexcept;
     constexpr bool isneg() const noexcept;
 
@@ -890,6 +892,11 @@ constexpr std::uint32_t decimal32::full_exponent() const noexcept
     exp |= bits_.exponent;
 
     return exp;
+}
+
+constexpr std::int32_t decimal32::biased_exponent() const noexcept
+{
+    return static_cast<std::int32_t>(full_exponent()) - detail::bias;
 }
 
 constexpr std::uint32_t decimal32::full_significand() const noexcept
