@@ -124,6 +124,8 @@ int main()
 
     // Mixed Values
     random_subtraction(-5'000'000, 5'000'000);
+    random_subtraction(-5'000'000L, 5'000'000L);
+    random_subtraction(-5'000'000LL, 5'000'000LL);
 
     // Anything in range
     random_addition(-5'000'000, 5'000'000);
@@ -132,6 +134,8 @@ int main()
 
     // Anything in the domain
     random_converted_addition(0, (std::numeric_limits<int>::max)() / 2);
+    random_converted_addition((std::numeric_limits<int>::min)() / 2, 0);
+    random_converted_addition((std::numeric_limits<int>::min)() / 2, (std::numeric_limits<int>::max)() / 2);
 
     return boost::report_errors();
 }
