@@ -5,6 +5,7 @@
 #include <boost/decimal/decimal32.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <random>
+#include <limits>
 
 using namespace boost::decimal;
 
@@ -130,7 +131,7 @@ int main()
     random_addition(-5'000'000LL, 5'000'000LL);
 
     // Anything in the domain
-    random_converted_addition(0, INT_MAX / 2);
+    random_converted_addition(0, (std::numeric_limits<int>::max)() / 2);
 
     return boost::report_errors();
 }
