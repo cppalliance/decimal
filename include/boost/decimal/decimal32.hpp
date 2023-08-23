@@ -1181,8 +1181,8 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
     // Let the constructor handle shrinking it back down and rounding correctly
     q = decimal32{res_sig, res_exp};
 
-    // https://en.cppreference.com/w/cpp/numeric/math/remainder
-    r = lhs - q * rhs;
+    // https://en.cppreference.com/w/cpp/numeric/math/fmod
+    r = lhs - decimal32(q.full_significand() % detail::precision) * rhs;
 }
 
 constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept

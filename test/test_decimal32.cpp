@@ -325,8 +325,8 @@ void test_div_mod()
     BOOST_TEST_EQ(one / eight, eighth);
     BOOST_TEST_EQ(three / two, one + half);
 
-    // From https://en.cppreference.com/w/cpp/numeric/math/remainder
-    //BOOST_TEST_EQ(decimal32(51, -1) % decimal32(30, -1), decimal32(-9, -1));
+    // From https://en.cppreference.com/w/cpp/numeric/math/fmod
+    BOOST_TEST_EQ(decimal32(51, -1) % decimal32(30, -1), decimal32(21, -1));
 
     // Non-finite values
     constexpr decimal32 qnan_val(std::numeric_limits<decimal32>::quiet_NaN());
