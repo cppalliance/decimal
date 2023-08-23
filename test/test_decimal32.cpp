@@ -310,9 +310,18 @@ void test_div_mod()
     constexpr decimal32 zero {0, 0};
     constexpr decimal32 one {1, 0};
     constexpr decimal32 two {2, 0};
+    constexpr decimal32 four {4, 0};
+    constexpr decimal32 eight {8, 0};
+    constexpr decimal32 half {5, -1};
+    constexpr decimal32 quarter {25, -2};
+    constexpr decimal32 eighth {125, -3};
 
     BOOST_TEST_EQ(two / one, two);
     BOOST_TEST_EQ(two % one, zero);
+    BOOST_TEST_EQ(eight / four, two);
+    BOOST_TEST_EQ(four / eight, half);
+    BOOST_TEST_EQ(one / four, quarter);
+    BOOST_TEST_EQ(one / eight, eighth);
 
     // Non-finite values
     constexpr decimal32 qnan_val(std::numeric_limits<decimal32>::quiet_NaN());
