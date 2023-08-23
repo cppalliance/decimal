@@ -310,6 +310,7 @@ void test_div_mod()
     constexpr decimal32 zero {0, 0};
     constexpr decimal32 one {1, 0};
     constexpr decimal32 two {2, 0};
+    constexpr decimal32 three {3, 0};
     constexpr decimal32 four {4, 0};
     constexpr decimal32 eight {8, 0};
     constexpr decimal32 half {5, -1};
@@ -322,6 +323,10 @@ void test_div_mod()
     BOOST_TEST_EQ(four / eight, half);
     BOOST_TEST_EQ(one / four, quarter);
     BOOST_TEST_EQ(one / eight, eighth);
+    BOOST_TEST_EQ(three / two, one + half);
+
+    // From https://en.cppreference.com/w/cpp/numeric/math/remainder
+    //BOOST_TEST_EQ(decimal32(51, -1) % decimal32(30, -1), decimal32(-9, -1));
 
     // Non-finite values
     constexpr decimal32 qnan_val(std::numeric_limits<decimal32>::quiet_NaN());

@@ -1172,24 +1172,14 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
 
     // If rhs is greater than we need to offset the significands to get the correct values
     // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    if (rhs > lhs)
-    {
-        const auto big_sig_lhs {static_cast<std::uint64_t>(sig_lhs) * detail::powers_of_10[detail::precision]};
-        exp_lhs -= 7;
+    const auto big_sig_lhs {static_cast<std::uint64_t>(sig_lhs) * detail::powers_of_10[detail::precision]};
+    exp_lhs -= 7;
 
-        auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(sig_rhs)};
-        auto res_exp {exp_lhs - exp_rhs};
+    auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(sig_rhs)};
+    auto res_exp {exp_lhs - exp_rhs};
 
-        // Let the constructor handle shrinking it back down and rounding correctly
-        q = decimal32{res_sig, res_exp};
-    }
-    else
-    {
-        auto res_sig {sig_lhs / sig_rhs};
-        auto res_exp {exp_lhs - exp_rhs};
-
-        q = decimal32{res_sig, res_exp};
-    }
+    // Let the constructor handle shrinking it back down and rounding correctly
+    q = decimal32{res_sig, res_exp};
 
     // https://en.cppreference.com/w/cpp/numeric/math/remainder
     r = lhs - q * rhs;
