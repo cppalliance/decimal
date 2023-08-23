@@ -1118,37 +1118,39 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
     const bool sign {!(lhs.isneg() == rhs.isneg())};
 
     const auto lhs_fp {fpclassify(lhs)};
+    const auto rhs_fp {fpclassify(rhs)};
+    
+    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+    {
+        q = nan;
+        r = nan;
+        return;
+    }
+
     switch (lhs_fp)
     {
-        case FP_NAN:
-            q = nan;
-            r = nan;
-            break;
         case FP_INFINITE:
             q = inf;
             r = zero;
-            break;
+            return;
         case FP_ZERO:
             q = sign ? -zero : zero;
             r = sign ? -zero : zero;
-            break;
+            return;
         default:
             static_cast<void>(lhs);
     }
 
-    const auto rhs_fp {fpclassify(rhs)};
     switch (rhs_fp)
     {
         case FP_ZERO:
-            BOOST_FALLTHROUGH;
-        case FP_NAN:
             q = nan;
             r = nan;
-            break;
+            return;
         case FP_INFINITE:
             q = sign ? -zero : zero;
             r = lhs;
-            break;
+            return;
         default:
             static_cast<void>(rhs);
     }
