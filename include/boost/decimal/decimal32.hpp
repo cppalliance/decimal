@@ -203,6 +203,9 @@ public:
     friend constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept;
     constexpr decimal32& operator/=(decimal32 rhs) noexcept;
 
+    friend constexpr decimal32 operator%(decimal32 lhs, decimal32 rhs) noexcept;
+    constexpr decimal32& operator%=(decimal32 rhs) noexcept;
+
     // 3.2.9 comparison operators:
     friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
@@ -1173,6 +1176,21 @@ constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept
 constexpr decimal32& decimal32::operator/=(decimal32 rhs) noexcept
 {
     *this = *this / rhs;
+    return *this;
+}
+
+constexpr decimal32 operator%(decimal32 lhs, decimal32 rhs) noexcept
+{
+    decimal32 q {};
+    decimal32 r {};
+    div_mod_impl(lhs, rhs, q, r);
+
+    return r;
+}
+
+constexpr decimal32& decimal32::operator%=(boost::decimal::decimal32 rhs) noexcept
+{
+    *this = *this % rhs;
     return *this;
 }
 
