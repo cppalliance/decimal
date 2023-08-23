@@ -146,6 +146,8 @@ private:
     template <typename TargetType>
     constexpr TargetType to_integral() const noexcept;
 
+    friend constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -197,6 +199,12 @@ public:
 
     friend constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept;
     constexpr decimal32& operator*=(decimal32 rhs) noexcept;
+
+    friend constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept;
+    constexpr decimal32& operator/=(decimal32 rhs) noexcept;
+
+    friend constexpr decimal32 operator%(decimal32 lhs, decimal32 rhs) noexcept;
+    constexpr decimal32& operator%=(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
     friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
@@ -1097,6 +1105,113 @@ constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept
 constexpr decimal32& decimal32::operator*=(decimal32 rhs) noexcept
 {
     *this = *this * rhs;
+    return *this;
+}
+
+constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept
+{
+    // Check pre-conditions
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::snan_mask)};
+    constexpr decimal32 inf {boost::decimal::from_bits(boost::decimal::detail::inf_mask)};
+
+    const bool sign {!(lhs.isneg() == rhs.isneg())};
+
+    const auto lhs_fp {fpclassify(lhs)};
+    const auto rhs_fp {fpclassify(rhs)};
+    
+    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+    {
+        q = nan;
+        r = nan;
+        return;
+    }
+
+    switch (lhs_fp)
+    {
+        case FP_INFINITE:
+            q = inf;
+            r = zero;
+            return;
+        case FP_ZERO:
+            q = sign ? -zero : zero;
+            r = sign ? -zero : zero;
+            return;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_ZERO:
+            q = nan;
+            r = nan;
+            return;
+        case FP_INFINITE:
+            q = sign ? -zero : zero;
+            r = lhs;
+            return;
+        default:
+            static_cast<void>(rhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "sig lhs: " << sig_lhs
+              << "\nexp lhs: " << exp_lhs
+              << "\nsig rhs: " << sig_rhs
+              << "\nexp rhs: " << exp_rhs << std::endl;
+    #endif
+
+    // If rhs is greater than we need to offset the significands to get the correct values
+    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
+    const auto big_sig_lhs {static_cast<std::uint64_t>(sig_lhs) * detail::powers_of_10[detail::precision]};
+    exp_lhs -= 7;
+
+    auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(sig_rhs)};
+    auto res_exp {exp_lhs - exp_rhs};
+
+    // Let the constructor handle shrinking it back down and rounding correctly
+    q = decimal32{res_sig, res_exp};
+
+    // https://en.cppreference.com/w/cpp/numeric/math/fmod
+    r = lhs - decimal32(q.full_significand() % detail::precision) * rhs;
+}
+
+constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept
+{
+    decimal32 q {};
+    decimal32 r {};
+    div_mod_impl(lhs, rhs, q, r);
+
+    return q;
+}
+
+constexpr decimal32& decimal32::operator/=(decimal32 rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+constexpr decimal32 operator%(decimal32 lhs, decimal32 rhs) noexcept
+{
+    decimal32 q {};
+    decimal32 r {};
+    div_mod_impl(lhs, rhs, q, r);
+
+    return r;
+}
+
+constexpr decimal32& decimal32::operator%=(boost::decimal::decimal32 rhs) noexcept
+{
+    *this = *this % rhs;
     return *this;
 }
 

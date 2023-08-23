@@ -305,6 +305,43 @@ void test_multiplicatiom()
     BOOST_TEST(isnan(qnan_val * inf_val));
 }
 
+void test_div_mod()
+{
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 one {1, 0};
+    constexpr decimal32 two {2, 0};
+    constexpr decimal32 three {3, 0};
+    constexpr decimal32 four {4, 0};
+    constexpr decimal32 eight {8, 0};
+    constexpr decimal32 half {5, -1};
+    constexpr decimal32 quarter {25, -2};
+    constexpr decimal32 eighth {125, -3};
+
+    BOOST_TEST_EQ(two / one, two);
+    BOOST_TEST_EQ(two % one, zero);
+    BOOST_TEST_EQ(eight / four, two);
+    BOOST_TEST_EQ(four / eight, half);
+    BOOST_TEST_EQ(one / four, quarter);
+    BOOST_TEST_EQ(one / eight, eighth);
+    BOOST_TEST_EQ(three / two, one + half);
+
+    // From https://en.cppreference.com/w/cpp/numeric/math/fmod
+    BOOST_TEST_EQ(decimal32(51, -1) % decimal32(30, -1), decimal32(21, -1));
+
+    // Non-finite values
+    constexpr decimal32 qnan_val(std::numeric_limits<decimal32>::quiet_NaN());
+    constexpr decimal32 snan_val(std::numeric_limits<decimal32>::signaling_NaN());
+    constexpr decimal32 inf_val(std::numeric_limits<decimal32>::infinity());
+    BOOST_TEST(isnan(qnan_val / one));
+    BOOST_TEST(isnan(snan_val / one));
+    BOOST_TEST(isnan(one / qnan_val));
+    BOOST_TEST(isnan(one / snan_val));
+    BOOST_TEST(isinf(inf_val / one));
+    BOOST_TEST_EQ(one / inf_val, zero);
+    BOOST_TEST(isnan(inf_val / qnan_val));
+    BOOST_TEST(isnan(qnan_val / inf_val));
+}
+
 template <typename T>
 void test_construct_from_integer()
 {
@@ -347,6 +384,7 @@ int main()
     test_addition();
     test_subtraction();
     test_multiplicatiom();
+    test_div_mod();
 
     test_construct_from_integer<int>();
     test_construct_from_integer<long>();
