@@ -146,6 +146,8 @@ private:
     template <typename TargetType>
     constexpr TargetType to_integral() const noexcept;
 
+    friend constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -197,6 +199,9 @@ public:
 
     friend constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept;
     constexpr decimal32& operator*=(decimal32 rhs) noexcept;
+
+    friend constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept;
+    constexpr decimal32& operator/=(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
     friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
@@ -1097,6 +1102,77 @@ constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept
 constexpr decimal32& decimal32::operator*=(decimal32 rhs) noexcept
 {
     *this = *this * rhs;
+    return *this;
+}
+
+constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept
+{
+    // Check pre-conditions
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::snan_mask)};
+    constexpr decimal32 inf {boost::decimal::from_bits(boost::decimal::detail::inf_mask)};
+
+    const bool sign {!(lhs.isneg() == rhs.isneg())};
+
+    const auto lhs_fp {fpclassify(lhs)};
+    switch (lhs_fp)
+    {
+        case FP_NAN:
+            q = nan;
+            r = nan;
+            break;
+        case FP_INFINITE:
+            q = inf;
+            r = zero;
+            break;
+        case FP_ZERO:
+            q = sign ? -zero : zero;
+            r = sign ? -zero : zero;
+            break;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    const auto rhs_fp {fpclassify(rhs)};
+    switch (rhs_fp)
+    {
+        case FP_ZERO:
+            BOOST_FALLTHROUGH;
+        case FP_NAN:
+            q = nan;
+            r = nan;
+            break;
+        case FP_INFINITE:
+            q = sign ? -zero : zero;
+            r = lhs;
+            break;
+        default:
+            static_cast<void>(rhs);
+    }
+
+    q = zero;
+    r = lhs;
+
+    while (r >= rhs)
+    {
+        r -= rhs;
+        ++q;
+    }
+}
+
+// Trivially implemented as division by repeated subtraction
+constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept
+{
+    decimal32 q {};
+    decimal32 r {};
+    div_mod_impl(lhs, rhs, q, r);
+
+    return q;
+}
+
+constexpr decimal32& decimal32::operator/=(decimal32 rhs) noexcept
+{
+    *this = *this / rhs;
     return *this;
 }
 
