@@ -1155,14 +1155,21 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
             static_cast<void>(rhs);
     }
 
-    q = zero;
-    r = lhs;
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
 
-    while (r >= rhs)
-    {
-        r -= rhs;
-        ++q;
-    }
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    auto res_sig {sig_lhs / sig_rhs};
+    auto res_exp {exp_lhs - exp_rhs};
+
+    q = decimal32{res_sig, res_exp};
+
+    // https://en.cppreference.com/w/cpp/numeric/math/remainder
+    r = lhs - q * rhs;
 }
 
 // Trivially implemented as division by repeated subtraction
