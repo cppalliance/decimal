@@ -17,6 +17,7 @@ target_include_directories(boost_decimal INTERFACE include)
 target_link_libraries(boost_decimal
         INTERFACE
         Boost::config
+        Boost::core
         )
 
 target_compile_features(boost_decimal INTERFACE cxx_std_14)
