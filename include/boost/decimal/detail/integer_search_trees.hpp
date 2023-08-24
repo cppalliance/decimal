@@ -8,6 +8,7 @@
 // https://stackoverflow.com/questions/1489830/efficient-way-to-determine-number-of-digits-in-an-integer?page=1&tab=scoredesc#tab-top
 // https://graphics.stanford.edu/~seander/bithacks.html
 
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <limits>
 #include <array>
@@ -156,34 +157,34 @@ constexpr int num_digits(std::uint64_t x) noexcept
     return 1;
 }
 
-#ifdef BOOST_HAS_INT128
+#ifdef BOOST_DECIMAL_HAS_INT128
 // Assume that if someone is using 128 bit ints they are favoring the top end of the range
 // Max value is 340,282,366,920,938,463,463,374,607,431,768,211,455 (39 digits)
-constexpr int num_digits(boost::uint128_type x) noexcept
+constexpr int num_digits(boost::decimal::detail::uint128_t x) noexcept
 {
-    // There is no literal for boost::uint128_type, so we need to calculate them using the max value of the
+    // There is no literal for boost::decimal::detail::uint128_t, so we need to calculate them using the max value of the
     // std::uint64_t powers of 10
-    constexpr boost::uint128_type digits_39 = static_cast<boost::uint128_type>(UINT64_C(10000000000000000000)) * 
-                                              static_cast<boost::uint128_type>(UINT64_C(10000000000000000000));
+    constexpr boost::decimal::detail::uint128_t digits_39 = static_cast<boost::decimal::detail::uint128_t>(UINT64_C(10000000000000000000)) * 
+                                              static_cast<boost::decimal::detail::uint128_t>(UINT64_C(10000000000000000000));
 
-    constexpr boost::uint128_type digits_38 = digits_39 / 10;
-    constexpr boost::uint128_type digits_37 = digits_38 / 10;
-    constexpr boost::uint128_type digits_36 = digits_37 / 10;
-    constexpr boost::uint128_type digits_35 = digits_36 / 10;
-    constexpr boost::uint128_type digits_34 = digits_35 / 10;
-    constexpr boost::uint128_type digits_33 = digits_34 / 10;
-    constexpr boost::uint128_type digits_32 = digits_33 / 10;
-    constexpr boost::uint128_type digits_31 = digits_32 / 10;
-    constexpr boost::uint128_type digits_30 = digits_31 / 10;
-    constexpr boost::uint128_type digits_29 = digits_30 / 10;
-    constexpr boost::uint128_type digits_28 = digits_29 / 10;
-    constexpr boost::uint128_type digits_27 = digits_28 / 10;
-    constexpr boost::uint128_type digits_26 = digits_27 / 10;
-    constexpr boost::uint128_type digits_25 = digits_26 / 10;
-    constexpr boost::uint128_type digits_24 = digits_25 / 10;
-    constexpr boost::uint128_type digits_23 = digits_24 / 10;
-    constexpr boost::uint128_type digits_22 = digits_23 / 10;
-    constexpr boost::uint128_type digits_21 = digits_22 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_38 = digits_39 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_37 = digits_38 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_36 = digits_37 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_35 = digits_36 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_34 = digits_35 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_33 = digits_34 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_32 = digits_33 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_31 = digits_32 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_30 = digits_31 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_29 = digits_30 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_28 = digits_29 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_27 = digits_28 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_26 = digits_27 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_25 = digits_26 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_24 = digits_25 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_23 = digits_24 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_22 = digits_23 / 10;
+    constexpr boost::decimal::detail::uint128_t digits_21 = digits_22 / 10;
 
     return (x >= digits_39) ? 39 :
            (x >= digits_38) ? 38 :
