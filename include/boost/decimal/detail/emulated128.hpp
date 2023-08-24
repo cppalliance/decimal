@@ -141,7 +141,8 @@ struct uint128
     #endif
 
     #ifdef BOOST_DECIMAL_HAS_FLOAT128
-    explicit operator __float128() const noexcept { return ldexpq(static_cast<__float128>(high), 64) + static_cast<__float128>(low); }
+    // TODO(mborland): I don't think the conversion functions are going to be necessary
+    // explicit operator __float128() const noexcept { return ldexpq(static_cast<__float128>(high), 64) + static_cast<__float128>(low); }
     #endif
 
     FLOAT_CONVERSION_OPERATOR(float)        // NOLINT

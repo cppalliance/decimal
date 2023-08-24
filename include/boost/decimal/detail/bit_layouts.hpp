@@ -64,7 +64,7 @@ struct ieee754_binary80
     static constexpr int decimal_digits = 18;
 };
 
-#define BOOST_DECIMAL_LDBL_BITS 80;
+#define BOOST_DECIMAL_LDBL_BITS 80
 
 // 128 bit long double (e.g. s390x, ppcle64)
 #elif LDBL_MANT_DIG == 113 && LDBL_MAX_EXP == 16384
@@ -84,7 +84,7 @@ struct IEEEl2bits
 #endif
 };
 
-#define BOOST_DECIMAL_LDBL_BITS 128;
+#define BOOST_DECIMAL_LDBL_BITS 128
 
 // 64 bit long double (double == long double on ARM)
 #elif LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024
