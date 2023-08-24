@@ -2,6 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#include "mini_to_chars.hpp"
+
 #include <boost/decimal/decimal32.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <bitset>
@@ -356,6 +358,13 @@ void test_construct_from_integer()
 }
 
 template <typename T>
+void test_construct_from_float()
+{
+    constexpr decimal32 one(1, 0);
+    BOOST_TEST_EQ(one, decimal32(T(1)));
+}
+
+template <typename T>
 void spot_check_addition(T a, T b, T res)
 {
     decimal32 dec_a {a};
@@ -389,6 +398,10 @@ int main()
     test_construct_from_integer<int>();
     test_construct_from_integer<long>();
     test_construct_from_integer<long long>();
+
+    test_construct_from_float<float>();
+    test_construct_from_float<double>();
+    test_construct_from_float<long double>();
 
     spot_check_addition(-1054191000, -920209700, -1974400700);
     spot_check_addition(353582500, -32044770, 321537730);
