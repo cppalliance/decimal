@@ -126,4 +126,14 @@ typedef unsigned __int128 uint128_t;
 #  endif
 #endif
 
+#if !defined(__cpp_if_constexpr) || (__cpp_if_constexpr < 201606L)
+#  define BOOST_DECIMAL_NO_CXX17_IF_CONSTEXPR
+#endif
+
+#ifndef BOOST_DECIMAL_NO_CXX17_IF_CONSTEXPR
+#  define BOOST_DECIMAL_IF_CONSTEXPR if constexpr
+#else
+#  define BOOST_DECIMAL_IF_CONSTEXPR if
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
