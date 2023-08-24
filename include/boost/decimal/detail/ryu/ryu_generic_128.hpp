@@ -350,7 +350,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd12
 
 #endif
 
-#ifdef BOOST_HAS_FLOAT128
+#ifdef BOOST_DECIMAL_HAS_FLOAT128
 
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<__float128>(__float128 d) noexcept

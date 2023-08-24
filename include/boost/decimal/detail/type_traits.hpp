@@ -19,13 +19,13 @@ struct make_unsigned { using type = std::make_unsigned_t<T>; };
 template <>
 struct make_unsigned<uint128> { using type = uint128; };
 
-#ifdef BOOST_HAS_INT128
+#ifdef BOOST_DECIMAL_HAS_INT128
 
 template <>
-struct make_unsigned<boost::int128_type> { using type = boost::uint128_type; };
+struct make_unsigned<int128_t> { using type = uint128_t; };
 
 template <>
-struct make_unsigned<boost::uint128_type> { using type = boost::uint128_type; };
+struct make_unsigned<uint128_t> { using type = uint128_t; };
 
 #endif
 
@@ -38,13 +38,13 @@ struct is_integral { static constexpr bool value = std::is_integral<T>::value;};
 template <>
 struct is_integral<uint128> { static constexpr bool value = true; };
 
-#ifdef BOOST_HAS_INT128
+#ifdef BOOST_DECIMAL_HAS_INT128
 
 template <>
-struct is_integral<boost::int128_type> { static constexpr bool value = true; };
+struct is_integral<int128_t> { static constexpr bool value = true; };
 
 template <>
-struct is_integral<boost::uint128_type> { static constexpr bool value = true; };
+struct is_integral<uint128_t> { static constexpr bool value = true; };
 
 #endif
 

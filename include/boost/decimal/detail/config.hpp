@@ -5,7 +5,9 @@
 #ifndef BOOST_DECIMAL_DETAIL_CONFIG_HPP
 #define BOOST_DECIMAL_DETAIL_CONFIG_HPP
 
-#include <boost/config.hpp>
+#ifndef BOOST_DECIMAL_STANDALONE
+#  include <boost/config.hpp>
+#endif
 
 // Determine endianness
 #if defined(_WIN32)
@@ -27,11 +29,11 @@
 #if __has_include(<bit>)
 #  if __cplusplus >= 201806L || _MSVC_LANG >= 201806L
 #    include <bit>
-#    define BOOST_DECIMAL_HAS_CONSTEXPR_BITCAST
+#    define BOOST_DECIMAL_HAS_STDBIT
 #  endif
 #endif
 
-#ifdef BOOST_DECIMAL_HAS_CONSTEXPR_BITCAST
+#ifdef BOOST_DECIMAL_HAS_STDBIT
 #  define BOOST_DECIMAL_CXX20_CONSTEXPR constexpr
 #endif
 
@@ -40,7 +42,7 @@
 #endif
 
 // Include intrinsics if available
-#if defined(BOOST_MSVC)
+#if defined(BOOST_MSVC) || defined(_MSC_VER)
 #  include <intrin.h>
 #  if defined(_WIN64)
 #    define BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS
@@ -58,11 +60,29 @@
 #endif
 
 // Use 128-bit integers and suppress warnings for using extensions
-#if defined(BOOST_HAS_INT128)
+#if defined(BOOST_HAS_INT128) || (defined(__SIZEOF_INT128__) && !defined(_MSC_VER))
+
+namespace boost { namespace decimal { namespace detail {
+
+#  ifdef __GNUC__
+__extension__ typedef __int128 int128_t;
+__extension__ typedef unsigned __int128 uint128_t;
+#  else
+typedef __int128 int128_t;
+typedef unsigned __int128 uint128_t;
+#  endif
+
+}}} // Namespaces
+
 #  define BOOST_DECIMAL_HAS_INT128
-#  define BOOST_DECIMAL_INT128_MAX  (boost::int128_type)(((boost::uint128_type) 1 << 127) - 1)
-#  define BOOST_DECIMAL_INT128_MIN  (-BOOST_CHARCONV_INT128_MAX - 1)
-#  define BOOST_DECIMAL_UINT128_MAX ((2 * (boost::uint128_type) BOOST_CHARCONV_INT128_MAX) + 1)
+#  define BOOST_DECIMAL_INT128_MAX  (boost::decimal::detail::int128_t)(((boost::decimal::detail::uint128_t) 1 << 127) - 1)
+#  define BOOST_DECIMAL_INT128_MIN  (-BOOST_DECIMAL_INT128_MAX - 1)
+#  define BOOST_DECIMAL_UINT128_MAX ((2 * (boost::decimal::detail::uint128_t) BOOST_DECIMAL_INT128_MAX) + 1)
+#endif
+
+// 128-bit floats
+#if defined(BOOST_HAS_FLOAT128) || defined(__SIZEOF_FLOAT128__)
+#  define BOOST_DECIMAL_HAS_FLOAT128
 #endif
 
 #if defined(__has_builtin)
@@ -92,6 +112,18 @@
 #endif
 #ifdef __STDCPP_BFLOAT16_T__
 #  define BOOST_DECIMAL_HAS_BRAINFLOAT16
+#endif
+
+#define BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION
+
+#ifndef BOOST_DECIMAL_STANDALONE
+#  define BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_ATTRIBUTE_UNUSED
+#else
+#  if defined(___GNUC__) || defined(__clang__)
+#    define BOOST_DECIMAL_ATTRIBUTE_UNUSED __attribute__((__unused__))
+#  else
+#    define BOOST_DECIMAL_ATTRIBUTE_UNUSED
+#  endif
 #endif
 
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP

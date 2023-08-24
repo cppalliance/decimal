@@ -9,12 +9,15 @@
 #define BOOST_DECIMAL_DETAIL_EMULATED128_HPP
 
 #include <boost/decimal/detail/config.hpp>
-#include <boost/core/bit.hpp>
 #include <type_traits>
 #include <limits>
 #include <cstdint>
 #include <cassert>
 #include <cmath>
+
+#ifndef BOOST_DECIMAL_HAS_STDBIT
+#  include <boost/core/bit.hpp>
+#endif
 
 namespace boost { namespace decimal { namespace detail {
 
@@ -748,11 +751,19 @@ constexpr int high_bit(uint128 v) noexcept
 {
     if (v.high != 0)
     {
+        #ifdef BOOST_DECIMAL_HAS_STDBIT
+        return 127 - std::countl_zero(v.high);
+        #else
         return 127 - boost::core::countl_zero(v.high);
+        #endif
     }
     else if (v.low != 0)
     {
+        #ifdef BOOST_DECIMAL_HAS_STDBIT
+        return 63 - std::countl_zero(v.low);
+        #else
         return 63 - boost::core::countl_zero(v.low);
+        #endif
     }
 
     return 0;

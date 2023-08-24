@@ -18,7 +18,7 @@
 namespace boost { namespace decimal { namespace detail { namespace ryu {
 
 #ifdef BOOST_DECIMAL_HAS_INT128
-using unsigned_128_type = boost::uint128_type;
+using unsigned_128_type = uint128_t;
 #else
 using unsigned_128_type = uint128;
 #endif
@@ -427,7 +427,7 @@ void mul_128_256_shift(
 }
 
 // Computes 5^i in the form required by Ryu, and stores it in the given pointer.
-static BOOST_CXX14_CONSTEXPR void generic_computePow5(const std::uint32_t i, std::uint64_t* const result) noexcept
+static constexpr void generic_computePow5(const std::uint32_t i, std::uint64_t* const result) noexcept
 {
     const std::uint32_t base = i / BOOST_DECIMAL_POW5_TABLE_SIZE;
     const std::uint32_t base2 = base * BOOST_DECIMAL_POW5_TABLE_SIZE;
@@ -450,7 +450,7 @@ static BOOST_CXX14_CONSTEXPR void generic_computePow5(const std::uint32_t i, std
 }
 
 // Computes 5^-i in the form required by Ryu, and stores it in the given pointer.
-static BOOST_CXX14_CONSTEXPR void generic_computeInvPow5(const std::uint32_t i, std::uint64_t* const result) noexcept
+static constexpr void generic_computeInvPow5(const std::uint32_t i, std::uint64_t* const result) noexcept
 {
     const std::uint32_t base = (i + BOOST_DECIMAL_POW5_TABLE_SIZE - 1) / BOOST_DECIMAL_POW5_TABLE_SIZE;
     const std::uint32_t base2 = base * BOOST_DECIMAL_POW5_TABLE_SIZE;
@@ -472,7 +472,7 @@ static BOOST_CXX14_CONSTEXPR void generic_computeInvPow5(const std::uint32_t i, 
     }
 }
 
-static BOOST_CXX14_CONSTEXPR std::uint32_t pow5Factor(unsigned_128_type value) noexcept
+static constexpr std::uint32_t pow5Factor(unsigned_128_type value) noexcept
 {
     for (std::uint32_t count = 0; value > 0; ++count)
     {
