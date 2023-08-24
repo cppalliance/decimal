@@ -24,4 +24,19 @@
 
 #endif // Determine endianness
 
+#if __has_include(<bit>)
+#  if __cplusplus >= 201806L || _MSVC_LANG >= 201806L
+#    include <bit>
+#    define BOOST_DECIMAL_HAS_CONSTEXPR_BITCAST
+#  endif
+#endif
+
+#ifdef BOOST_DECIMAL_HAS_CONSTEXPR_BITCAST
+#  define BOOST_DECIMAL_CXX20_CONSTEXPR constexpr
+#endif
+
+#ifndef BOOST_DECIMAL_CXX20_CONSTEXPR
+#  define BOOST_DECIMAL_CXX20_CONSTEXPR
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
