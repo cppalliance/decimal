@@ -17,14 +17,24 @@ using std::bit_cast;
 
 #else
 
+#if defined(__GNUC__) && !defined(__clang__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 template<class To, class From>
 To bit_cast(const From& src) noexcept
 {
     static_assert(sizeof(To) >= sizeof(From), "To and From must be the same size");
     To dst;
-    std::memcpy(&dst, &src, sizeof(To));
+    std::memcpy(&dst, &src, sizeof(From));
     return dst;
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+#  pragma GCC diagnostic pop
+#endif
+
 #endif
 
 }}} // Namespaces
