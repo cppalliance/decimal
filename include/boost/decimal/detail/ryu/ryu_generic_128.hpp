@@ -283,10 +283,10 @@ static constexpr struct floating_decimal_128 generic_binary_to_decimal(
 }
 
 template <typename T>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128(T val) noexcept;
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128(T val) noexcept;
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<float>(float f) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<float>(float f) noexcept
 {
     static_assert(sizeof(float) == sizeof(uint32_t), "Float is not 32 bits");
     auto bits = bit_cast<uint32_t>(f);
@@ -294,7 +294,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd12
 }
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<double>(double d) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<double>(double d) noexcept
 {
     static_assert(sizeof(double) == sizeof(uint64_t), "Float is not 64 bits");
     auto bits = bit_cast<uint64_t>(d);
@@ -304,7 +304,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd12
 #if BOOST_DECIMAL_LDBL_BITS == 64
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<long double>(long double ld) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long double>(long double ld) noexcept
 {
     static_assert(sizeof(long double) == sizeof(uint64_t), "Float is not 64 bits");
     auto bits = bit_cast<uint64_t>(ld);
@@ -314,7 +314,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd12
 #elif BOOST_DECIMAL_LDBL_BITS == 80
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<long double>(long double ld) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long double>(long double ld) noexcept
 {
     #ifdef BOOST_DECIMAL_HAS_INT128
     auto bits = bit_cast<unsigned_128_type>(ld);
@@ -337,7 +337,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd12
 #elif BOOST_DECIMAL_LDBL_BITS == 128
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<long double>(long double ld) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long double>(long double ld) noexcept
 {
     auto bits = bit_cast<unsigned_128_type>(ld);
 
@@ -352,8 +352,11 @@ BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd12
 
 #ifdef BOOST_DECIMAL_HAS_FLOAT128
 
+/*
+TODO(mborland): constexpr bit_cast does not work on these types
+
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<__float128>(__float128 d) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<__float128>(__float128 d) noexcept
 {
     #ifdef BOOST_DECIMAL_HAS_INT128
     auto bits = bit_cast<unsigned_128_type>(d);
@@ -364,13 +367,13 @@ BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd12
 
     return generic_binary_to_decimal(bits, 112, 15, false);
 }
-
+*/
 #endif
 
 // Use float as an interchange format
 #ifdef BOOST_DECIMAL_HAS_FLOAT16
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<std::float16_t>(std::float16_t val) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<std::float16_t>(std::float16_t val) noexcept
 {
     auto f = static_cast<float>(val);
     static_assert(sizeof(float) == sizeof(uint32_t), "Float is not 32 bits");
@@ -382,7 +385,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd12
 // Use float as an interchange format
 #ifdef BOOST_DECIMAL_HAS_BFLOAT16
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<std::bfloat16_t>(std::bfloat16_t val) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<std::bfloat16_t>(std::bfloat16_t val) noexcept
 {
     float f = static_cast<float>(val);
     static_assert(sizeof(float) == sizeof(uint32_t), "Float is not 32 bits");
@@ -393,7 +396,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd12
 
 #ifdef BOOST_DECIMAL_HAS_FLOAT32
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<std::float32_t>(std::float32_t f) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<std::float32_t>(std::float32_t f) noexcept
 {
     static_assert(sizeof(std::float32_t) == sizeof(uint32_t), "Float is not 32 bits");
     auto bits = bit_cast<uint32_t>(f);
@@ -403,7 +406,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd12
 
 #ifdef BOOST_DECIMAL_HAS_FLOAT64
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<std::float64_t>(std::float64_t f) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<std::float64_t>(std::float64_t f) noexcept
 {
     static_assert(sizeof(std::float64_t) == sizeof(uint64_t), "std::float64_t is not 64 bits");
     auto bits = bit_cast<uint64_t>(f);
@@ -414,7 +417,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd12
 #ifdef BOOST_DECIMAL_HAS_STDFLOAT128
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR struct floating_decimal_128 floating_point_to_fd128<std::float128_t>(std::float128_t d) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<std::float128_t>(std::float128_t d) noexcept
 {
     #ifdef BOOST_DECIMAL_HAS_INT128
     auto bits = bit_cast<unsigned_128_type>(d);

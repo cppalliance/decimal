@@ -30,6 +30,9 @@
 #  if __cplusplus >= 201806L || _MSVC_LANG >= 201806L
 #    include <bit>
 #    define BOOST_DECIMAL_HAS_STDBIT
+#    if defined(__cpp_lib_bit_cast) && (__cpp_lib_bit_cast >= 201806L)
+#      define BOOST_DECIMAL_HAS_CONSTEXPR_BITCAST
+#    endif
 #  endif
 #endif
 
