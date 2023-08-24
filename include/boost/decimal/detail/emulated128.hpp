@@ -11,6 +11,8 @@
 #include <boost/decimal/detail/config.hpp>
 #include <type_traits>
 #include <limits>
+#include <iosfwd>
+#include <ostream>
 #include <cstdint>
 #include <cassert>
 #include <cmath>
@@ -523,6 +525,9 @@ struct uint128
 
     constexpr uint128 &operator%=(uint128 v) noexcept;
 
+    template <class charT, class traits>
+    friend std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, uint128 val);
+
 private:
     constexpr friend int high_bit(uint128 v) noexcept;
 
@@ -969,6 +974,18 @@ inline uint128 umul192_lower128(std::uint64_t x, uint128 y) noexcept
 inline std::uint64_t umul96_lower64(std::uint32_t x, std::uint64_t y) noexcept 
 {
     return x * y;
+}
+
+template <class charT, class traits>
+std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, uint128 val)
+{
+    if (val.high > 0)
+    {
+        os << val.high;
+    }
+
+    os << val.low;
+    return os;
 }
 
 }}} // Namespaces
