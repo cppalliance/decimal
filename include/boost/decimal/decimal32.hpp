@@ -13,6 +13,7 @@
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <type_traits>
 #include <iostream>
@@ -157,7 +158,7 @@ public:
     constexpr decimal32() noexcept = default;
 
     // 3.2.2.2 Conversion from floating-point type
-    template <typename Float, std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
+    template <typename Float, std::enable_if_t<detail::is_floating_point<Float>::value, bool> = true>
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
 
     // 3.2.2.3 Conversion from integral type
@@ -233,7 +234,7 @@ public:
 template <typename T, typename T2, std::enable_if_t<detail::is_integral<T>::value, bool>>
 constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
 {
-    using Unsigned_Integer = std::make_unsigned_t<T>;
+    using Unsigned_Integer = detail::make_unsigned_t<T>;
 
     static_assert(detail::is_integral<T>::value, "Coefficient must be an integer");
     static_assert(detail::is_integral<T2>::value, "Exponent must be an integer");
@@ -957,11 +958,11 @@ constexpr bool decimal32::isneg() const noexcept
     return static_cast<bool>(bits_.sign);
 }
 
-template <typename Float, std::enable_if_t<std::is_floating_point<Float>::value, bool>>
+template <typename Float, std::enable_if_t<detail::is_floating_point<Float>::value, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 {
-    auto components {detail::ryu::floating_point_to_fd128(val)};
-    decimal32(components.mantissa, components.exponent, components.sign);
+    const auto components {detail::ryu::floating_point_to_fd128(val)};
+    *this = decimal32{components.mantissa, components.exponent, components.sign};
 }
 
 template <typename Integer, std::enable_if_t<detail::is_integral<Integer>::value, bool>>
