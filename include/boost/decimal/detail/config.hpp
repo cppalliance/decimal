@@ -36,6 +36,11 @@
 #  endif
 #endif
 
+// Constexpr bit cast is broken on clang-10
+#if defined(BOOST_DECIMAL_HAS_CONSTEXPR_BITCAST) && (defined(__clang__) && __clang_major__ == 10)
+#  undef BOOST_DECIMAL_HAS_CONSTEXPR_BITCAST
+#endif
+
 #ifdef BOOST_DECIMAL_HAS_STDBIT
 #  define BOOST_DECIMAL_CXX20_CONSTEXPR constexpr
 #endif

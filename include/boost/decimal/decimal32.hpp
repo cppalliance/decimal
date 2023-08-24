@@ -279,32 +279,34 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
         }
     }
 
+    auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
+
     // zero the combination field, so we can mask in the following
     bits_.combination_field = 0;
     bits_.significand = 0;
     bool big_combination {false};
 
-    if (unsigned_coeff == 0)
+    if (reduced_coeff == 0)
     {
         bits_.significand = 0;
         bits_.combination_field = 0;
 
         exp = 0;
     }
-    else if (unsigned_coeff < detail::no_combination)
+    else if (reduced_coeff < detail::no_combination)
     {
         // If the coefficient fits directly we don't need to use the combination field
-        bits_.significand = static_cast<std::uint32_t>(unsigned_coeff);
+        bits_.significand = reduced_coeff;
     }
-    else if (unsigned_coeff < detail::big_combination)
+    else if (reduced_coeff < detail::big_combination)
     {
         // Break the number into 3 bits for the combination field and 20 bits for the significand field
 
         // Use the least significant 20 bits to set the significand
-        bits_.significand = unsigned_coeff & detail::no_combination;
+        bits_.significand = reduced_coeff & detail::no_combination;
 
         // Now set the combination field (maximum of 3 bits)
-        auto remaining_bits {static_cast<std::uint32_t>(unsigned_coeff) & detail::small_combination_field_mask};
+        auto remaining_bits {reduced_coeff & detail::small_combination_field_mask};
         remaining_bits >>= 20;
 
         bits_.combination_field |= remaining_bits;
@@ -315,8 +317,8 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
         bits_.combination_field |= detail::comb_11_mask;
         big_combination = true;
 
-        bits_.significand = unsigned_coeff & detail::no_combination;
-        const auto remaining_bit {static_cast<std::uint32_t>(unsigned_coeff & detail::big_combination_field_mask)};
+        bits_.significand = reduced_coeff & detail::no_combination;
+        const auto remaining_bit {reduced_coeff & detail::big_combination_field_mask};
 
         if (remaining_bit)
         {
