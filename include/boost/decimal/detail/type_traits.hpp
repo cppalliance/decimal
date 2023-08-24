@@ -1,0 +1,56 @@
+// Copyright 2023 Matt Borland
+// Distributed under the Boost Software License, Version 1.0.
+// https://www.boost.org/LICENSE_1_0.txt
+
+#ifndef BOOST_DECIMAL_DETAIL_TYPE_TRAITS
+#define BOOST_DECIMAL_DETAIL_TYPE_TRAITS
+
+// Extends the current type traits to include our types and __int128s
+
+#include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
+#include <type_traits>
+
+namespace boost { namespace decimal { namespace detail {
+
+template <typename T>
+struct make_unsigned { using type = std::make_unsigned_t<T>; };
+
+template <>
+struct make_unsigned<uint128> { using type = uint128; };
+
+#ifdef BOOST_HAS_INT128
+
+template <>
+struct make_unsigned<boost::int128_type> { using type = boost::uint128_type; };
+
+template <>
+struct make_unsigned<boost::uint128_type> { using type = boost::uint128_type; };
+
+#endif
+
+template <typename T>
+using make_unsigned_t = typename make_unsigned<T>::type;
+
+template <typename T>
+struct is_integral { static constexpr bool value = std::is_integral<T>::value;};
+
+template <>
+struct is_integral<uint128> { static constexpr bool value = true; };
+
+#ifdef BOOST_HAS_INT128
+
+template <>
+struct is_integral<boost::int128_type> { static constexpr bool value = true; };
+
+template <>
+struct is_integral<boost::uint128_type> { static constexpr bool value = true; };
+
+#endif
+
+template <typename T>
+constexpr bool is_integral<T>::value;
+
+}}} // Namespaces
+
+#endif
