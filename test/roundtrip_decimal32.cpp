@@ -151,9 +151,12 @@ int main()
 
     test_conversion_to_float<float>();
     test_conversion_to_float<double>();
+    test_conversion_to_float<long double>();
 
     test_roundtrip_conversion_float<float>();
     test_roundtrip_conversion_float<double>();
+    test_roundtrip_conversion_float<long double>();
+
 
     return boost::report_errors();
 }

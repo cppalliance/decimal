@@ -190,6 +190,7 @@ public:
     // 3.2.6 Conversion to floating-point type
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
 
     // cmath functions that are easier as friends
     friend constexpr bool signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
@@ -1336,6 +1337,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator float() const noexcept
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator double() const noexcept
 {
     return this->floating_conversion_impl<double>();
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator long double() const noexcept
+{
+    // Double already has more range and precision than a decimal32 will ever be able to provide
+    return static_cast<long double>(this->floating_conversion_impl<double>());
 }
 
 }} // Namespace boost::decimal
