@@ -15,6 +15,8 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+#include <boost/decimal/detail/fast_float/compute_float32.hpp>
+#include <boost/decimal/detail/fast_float/compute_float64.hpp>
 #include <type_traits>
 #include <iostream>
 #include <limits>
@@ -182,6 +184,11 @@ public:
     constexpr decimal32(decimal32&& val) noexcept = default;
     constexpr decimal32& operator=(decimal32&& val) noexcept = default;
 
+    // 3.2.6 Conversion to floating-point type
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
+
+    // cmath functions that are easier as friends
     friend constexpr bool signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
@@ -1249,6 +1256,35 @@ void debug_pattern(decimal32 rhs) noexcept
               << "\nExp: " << rhs.biased_exponent()
               << "\nNeg: " << rhs.isneg() << std::endl;
 }
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator double() const noexcept
+{
+    bool success {};
+
+    auto res {detail::fast_float::compute_float64(this->biased_exponent(), this->full_significand(), this->isneg(), success)};
+
+    if (!success)
+    {
+        return std::numeric_limits<double>::signaling_NaN();
+    }
+
+    return res;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator float() const noexcept
+{
+    bool success {};
+
+    auto res {detail::fast_float::compute_float32(this->biased_exponent(), this->full_significand(), this->isneg(), success)};
+
+    if (!success)
+    {
+        return std::numeric_limits<float>::signaling_NaN();
+    }
+
+    return res;
+}
+
 
 }} // Namespace boost::decimal
 
