@@ -339,13 +339,14 @@ BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long 
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long double>(long double ld) noexcept
 {
-    auto bits = bit_cast<unsigned_128_type>(ld);
-
-    #if LDBL_MANT_DIG == 113 // binary128 (e.g. ARM, S390X)
-    return generic_binary_to_decimal(bits, 112, 15, true);
-    #elif LDBL_MANT_DIG == 106 // ibm128 (e.g. PowerPC)
-    return generic_binary_to_decimal(bits, 105, 11, true);
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    auto bits = bit_cast<unsigned_128_type>(d);
+    #else
+    auto trivial_bits = bit_cast<trivial_uint128>(d);
+    unsigned_128_type bits {trivial_bits};
     #endif
+
+    return generic_binary_to_decimal(bits, 112, 15, false);
 }
 
 #endif
