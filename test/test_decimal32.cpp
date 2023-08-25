@@ -361,7 +361,10 @@ template <typename T>
 void test_construct_from_float()
 {
     constexpr decimal32 one(1, 0);
-    BOOST_TEST_EQ(one, decimal32(T(1)));
+    if(!BOOST_TEST_EQ(one, decimal32(T(1))))
+    {
+        debug_pattern(decimal32(T(1)));
+    }
 }
 
 template <typename T>

@@ -229,6 +229,7 @@ public:
     // Debug bit pattern
     friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
     friend std::uint32_t to_bits(decimal32 rhs) noexcept;
+    friend void debug_pattern(decimal32 rhs) noexcept;
 };
 
 template <typename T, typename T2, std::enable_if_t<detail::is_integral<T>::value, bool>>
@@ -1239,6 +1240,13 @@ constexpr decimal32& decimal32::operator%=(boost::decimal::decimal32 rhs) noexce
 {
     *this = *this % rhs;
     return *this;
+}
+
+void debug_pattern(decimal32 rhs) noexcept
+{
+    std::cerr << "Sig: " << rhs.full_significand()
+              << "\nExp: " << rhs.biased_exponent()
+              << "\nNeg: " << rhs.isneg() << std::endl;
 }
 
 }} // Namespace boost::decimal
