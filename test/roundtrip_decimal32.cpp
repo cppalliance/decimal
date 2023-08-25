@@ -2,6 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#include "mini_to_chars.hpp"
+
 #include <boost/decimal/decimal32.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <limits>
@@ -56,7 +58,7 @@ void test_conversion_to_integer()
 }
 
 template <typename T>
-void test_roundtrip_conversion()
+void test_roundtrip_conversion_integer()
 {
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<T> dist(0, detail::max_significand);
@@ -87,6 +89,50 @@ void test_roundtrip_conversion()
     }
 }
 
+template <typename T>
+void test_conversion_to_float()
+{
+    errno = 0;
+
+    constexpr decimal32 half(5, -1);
+    BOOST_TEST_EQ(static_cast<T>(half), T(0.5)) && BOOST_TEST_EQ(errno, 0);
+
+    errno = 0;
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::infinity()), std::numeric_limits<T>::infinity()) && BOOST_TEST_EQ(errno, 0);
+
+    errno = 0;
+    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal32>::infinity()), std::numeric_limits<T>::infinity()) && BOOST_TEST_EQ(errno, 0);
+
+    errno = 0;
+    BOOST_TEST(static_cast<T>(std::numeric_limits<decimal32>::quiet_NaN()) != std::numeric_limits<T>::quiet_NaN()) && BOOST_TEST_EQ(errno, 0);
+
+    errno = 0;
+    BOOST_TEST(static_cast<T>(std::numeric_limits<decimal32>::signaling_NaN()) != std::numeric_limits<T>::signaling_NaN()) && BOOST_TEST_EQ(errno, 0);
+}
+
+template <typename T>
+void test_roundtrip_conversion_float()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<T> dist(0, (std::numeric_limits<T>::max)());
+
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        const T val {dist(rng)};
+        const decimal32 initial_decimal(val);
+        const T return_val {static_cast<T>(initial_decimal)};
+        const decimal32 return_decimal {return_val};
+
+        if(!BOOST_TEST_EQ(initial_decimal, return_decimal))
+        {
+            std::cerr << "Val: " << val
+                      << "\nDec: " << initial_decimal
+                      << "\nReturn Val: " << return_val
+                      << "\nReturn Dec: " << return_decimal << std::endl;
+        }
+    }
+}
+
 int main()
 {
     test_conversion_to_integer<int>();
@@ -96,12 +142,18 @@ int main()
     test_conversion_to_integer<long long>();
     test_conversion_to_integer<unsigned long long>();
 
-    test_roundtrip_conversion<int>();
-    test_roundtrip_conversion<unsigned>();
-    test_roundtrip_conversion<long>();
-    test_roundtrip_conversion<unsigned long>();
-    test_roundtrip_conversion<long long>();
-    test_roundtrip_conversion<unsigned long long>();
+    test_roundtrip_conversion_integer<int>();
+    test_roundtrip_conversion_integer<unsigned>();
+    test_roundtrip_conversion_integer<long>();
+    test_roundtrip_conversion_integer<unsigned long>();
+    test_roundtrip_conversion_integer<long long>();
+    test_roundtrip_conversion_integer<unsigned long long>();
+
+    test_conversion_to_float<float>();
+    test_conversion_to_float<double>();
+
+    test_roundtrip_conversion_float<float>();
+    test_roundtrip_conversion_float<double>();
 
     return boost::report_errors();
 }
