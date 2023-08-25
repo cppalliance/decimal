@@ -352,9 +352,6 @@ BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long 
 
 #ifdef BOOST_DECIMAL_HAS_FLOAT128
 
-/*
-TODO(mborland): constexpr bit_cast does not work on these types
-
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<__float128>(__float128 d) noexcept
 {
@@ -367,7 +364,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<__flo
 
     return generic_binary_to_decimal(bits, 112, 15, false);
 }
-*/
+
 #endif
 
 // Use float as an interchange format

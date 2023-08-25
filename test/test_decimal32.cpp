@@ -405,6 +405,9 @@ int main()
     test_construct_from_float<float>();
     test_construct_from_float<double>();
     test_construct_from_float<long double>();
+    #ifdef BOOST_DECIMAL_HAS_FLOAT128
+    test_construct_from_float<__float128>();
+    #endif
 
     spot_check_addition(-1054191000, -920209700, -1974400700);
     spot_check_addition(353582500, -32044770, 321537730);
