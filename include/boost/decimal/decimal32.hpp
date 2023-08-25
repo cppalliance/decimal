@@ -975,8 +975,33 @@ constexpr bool decimal32::isneg() const noexcept
 template <typename Float, std::enable_if_t<detail::is_floating_point<Float>::value, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 {
-    const auto components {detail::ryu::floating_point_to_fd128(val)};
-    *this = decimal32{components.mantissa, components.exponent, components.sign};
+    if (val != val)
+    {
+        *this = boost::decimal::from_bits(boost::decimal::detail::nan_mask);
+    }
+    else if (val == std::numeric_limits<Float>::infinity() || -val == std::numeric_limits<Float>::infinity())
+    {
+        *this = boost::decimal::from_bits(boost::decimal::detail::inf_mask);
+    }
+    else
+    {
+        const auto components {detail::ryu::floating_point_to_fd128(val)};
+
+        #ifdef BOOST_DECIMAL_DEBUG
+        std::cerr << "Mant: " << components.mantissa
+                  << "\nExp: " << components.exponent
+                  << "\nSign: " << components.sign << std::endl;
+        #endif
+
+        if (components.exponent > detail::emax)
+        {
+            *this = boost::decimal::from_bits(boost::decimal::detail::inf_mask);
+        }
+        else
+        {
+            *this = decimal32 {components.mantissa, components.exponent, components.sign};
+        }
+    }
 }
 
 template <typename Integer, std::enable_if_t<detail::is_integral<Integer>::value, bool>>
@@ -1286,11 +1311,11 @@ BOOST_DECIMAL_CXX20_CONSTEXPR T decimal32::floating_conversion_impl() const noex
     T result {};
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, float>::value)
     {
-        detail::fast_float::compute_float32(this->biased_exponent(), this->full_significand(), this->isneg(), success);
+        result = detail::fast_float::compute_float32(this->biased_exponent(), this->full_significand(), this->isneg(), success);
     }
     else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, double>::value)
     {
-        detail::fast_float::compute_float64(this->biased_exponent(), this->full_significand(), this->isneg(), success);
+        result = detail::fast_float::compute_float64(this->biased_exponent(), this->full_significand(), this->isneg(), success);
     }
 
     if (!success)
