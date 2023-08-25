@@ -15,7 +15,7 @@
 #include <cstdio>
 #include <cstdint>
 
-#ifdef BOOST_DECIMAL_DEBUG
+#ifdef BOOST_DECIMAL_DEBUG_RYU
 #  include <iostream>
 #endif
 
@@ -31,7 +31,7 @@ struct floating_decimal_128
     bool sign;
 };
 
-#ifdef BOOST_DECIMAL_DEBUG
+#ifdef BOOST_DECIMAL_DEBUG_RYU
 static char* s(unsigned_128_type v) {
   int len = num_digits(v);
   char* b = (char*) malloc((len + 1) * sizeof(char));
@@ -49,7 +49,7 @@ static constexpr struct floating_decimal_128 generic_binary_to_decimal(
         const unsigned_128_type bits,
         const std::uint32_t mantissaBits, const std::uint32_t exponentBits, const bool explicitLeadingBit) noexcept
 {
-    #ifdef BOOST_DECIMAL_DEBUG
+    #ifdef BOOST_DECIMAL_DEBUG_RYU
     printf("IN=");
     for (int32_t bit = 127; bit >= 0; --bit)
     {
@@ -108,7 +108,7 @@ static constexpr struct floating_decimal_128 generic_binary_to_decimal(
     const bool even = (m2 & 1) == 0;
     const bool acceptBounds = even;
 
-    #ifdef BOOST_DECIMAL_DEBUG
+    #ifdef BOOST_DECIMAL_DEBUG_RYU
     printf("-> %s %s * 2^%d\n", ieeeSign ? "-" : "+", s(m2), e2 + 2);
     #endif
 
@@ -140,7 +140,7 @@ static constexpr struct floating_decimal_128 generic_binary_to_decimal(
         vp = mulShift(4 * m2 + 2, pow5, i);
         vm = mulShift(4 * m2 - 1 - mmShift, pow5, i);
 
-        #ifdef BOOST_DECIMAL_DEBUG
+        #ifdef BOOST_DECIMAL_DEBUG_RYU
         printf("%s * 2^%d / 10^%d\n", s(mv), e2, q);
         printf("V+=%s\nV =%s\nV-=%s\n", s(vp), s(vr), s(vm));
         #endif
@@ -181,7 +181,7 @@ static constexpr struct floating_decimal_128 generic_binary_to_decimal(
         vp = mulShift(4 * m2 + 2, pow5, j);
         vm = mulShift(4 * m2 - 1 - mmShift, pow5, j);
 
-        #ifdef BOOST_DECIMAL_DEBUG
+        #ifdef BOOST_DECIMAL_DEBUG_RYU
         printf("%s * 5^%d / 10^%d\n", s(mv), -e2, q);
         printf("%d %d %d %d\n", q, i, k, j);
         printf("V+=%s\nV =%s\nV-=%s\n", s(vp), s(vr), s(vm));
@@ -212,13 +212,13 @@ static constexpr struct floating_decimal_128 generic_binary_to_decimal(
             // We also need to make sure that the left shift does not overflow.
             vrIsTrailingZeros = multipleOfPowerOf2(mv, q - 1);
 
-            #ifdef BOOST_DECIMAL_DEBUG
+            #ifdef BOOST_DECIMAL_DEBUG_RYU
             printf("vr is trailing zeros=%s\n", vrIsTrailingZeros ? "true" : "false");
             #endif
         }
     }
 
-    #ifdef BOOST_DECIMAL_DEBUG
+    #ifdef BOOST_DECIMAL_DEBUG_RYU
     printf("e10=%d\n", e10);
     printf("V+=%s\nV =%s\nV-=%s\n", s(vp), s(vr), s(vm));
     printf("vm is trailing zeros=%s\n", vmIsTrailingZeros ? "true" : "false");
@@ -241,7 +241,7 @@ static constexpr struct floating_decimal_128 generic_binary_to_decimal(
         ++removed;
     }
 
-    #ifdef BOOST_DECIMAL_DEBUG
+    #ifdef BOOST_DECIMAL_DEBUG_RYU
     printf("V+=%s\nV =%s\nV-=%s\n", s(vp), s(vr), s(vm));
     printf("d-10=%s\n", vmIsTrailingZeros ? "true" : "false");
     #endif
@@ -259,7 +259,7 @@ static constexpr struct floating_decimal_128 generic_binary_to_decimal(
         }
     }
 
-    #ifdef BOOST_DECIMAL_DEBUG
+    #ifdef BOOST_DECIMAL_DEBUG_RYU
     printf("%s %d\n", s(vr), lastRemovedDigit);
     printf("vr is trailing zeros=%s\n", vrIsTrailingZeros ? "true" : "false");
     #endif
@@ -273,7 +273,7 @@ static constexpr struct floating_decimal_128 generic_binary_to_decimal(
     output = vr + (unsigned_128_type)((vr == vm && (!acceptBounds || !vmIsTrailingZeros)) || (lastRemovedDigit >= 5));
     const auto exp = static_cast<std::int32_t>(e10 + removed);
 
-    #ifdef BOOST_DECIMAL_DEBUG
+    #ifdef BOOST_DECIMAL_DEBUG_RYU
     printf("V+=%s\nV =%s\nV-=%s\n", s(vp), s(vr), s(vm));
     printf("O=%s\n", s(output));
     printf("EXP=%d\n", exp);
@@ -323,7 +323,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long 
     unsigned_128_type bits {trivial_bits};
     #endif
 
-    #ifdef BOOST_DECIMAL_DEBUG
+    #ifdef BOOST_DECIMAL_DEBUG_RYU
     // For some odd reason, this ends up with noise in the top 48 bits. We can
     // clear out those bits with the following line; this is not required, the
     // conversion routine should ignore those bits, but the debug output can be

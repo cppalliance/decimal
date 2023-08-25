@@ -2,6 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#define BOOST_DECIMAL_DEBUG_RYU
+
 #include "mini_to_chars.hpp"
 
 #include <boost/decimal/decimal32.hpp>
@@ -361,9 +363,10 @@ template <typename T>
 void test_construct_from_float()
 {
     constexpr decimal32 one(1, 0);
-    if(!BOOST_TEST_EQ(one, decimal32(T(1))))
+    decimal32 float_one(T(1));
+    if(!BOOST_TEST_EQ(one, float_one))
     {
-        debug_pattern(decimal32(T(1)));
+        debug_pattern(float_one);
     }
 }
 
