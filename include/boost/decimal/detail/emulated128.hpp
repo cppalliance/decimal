@@ -496,7 +496,7 @@ struct uint128
     #undef INTEGER_BINARY_OPERATOR_EQUALS_RIGHT_SHIFT
 
     // Arithmetic operators (Add, sub, mul, div, mod)
-    inline uint128 &operator+=(std::uint64_t n) noexcept;
+    constexpr uint128 &operator+=(std::uint64_t n) noexcept;
 
     constexpr friend uint128 operator+(uint128 lhs, uint128 rhs) noexcept;
 
@@ -626,34 +626,12 @@ constexpr uint128 &uint128::operator^=(uint128 v) noexcept
     return *this;
 }
 
-inline uint128 &uint128::operator+=(std::uint64_t n) noexcept
+constexpr uint128 &uint128::operator+=(std::uint64_t n) noexcept
 {
-    #if BOOST_DECIMAL_HAS_BUILTIN(__builtin_addcll)
-
-    unsigned long long carry {};
-        low = __builtin_addcll(low, n, 0, &carry);
-        high = __builtin_addcll(high, 0, carry, &carry);
-
-    #elif BOOST_DECIMAL_HAS_BUILTIN(__builtin_ia32_addcarryx_u64)
-
-    unsigned long long result {};
-        auto carry = __builtin_ia32_addcarryx_u64(0, low, n, &result);
-        low = result;
-        __builtin_ia32_addcarryx_u64(carry, high, 0, &result);
-        high = result;
-
-    #elif defined(BOOST_MSVC) && defined(_M_X64)
-
-    auto carry = _addcarry_u64(0, low, n, &low);
-        _addcarry_u64(carry, high, 0, &high);
-
-    #else
-
     auto sum = low + n;
     high += (sum < low ? 1 : 0);
     low = sum;
 
-    #endif
     return *this;
 }
 
@@ -845,41 +823,18 @@ constexpr uint128 &uint128::operator%=(uint128 v) noexcept
     return *this;
 }
 
-static inline std::uint64_t umul64(std::uint32_t x, std::uint32_t y) noexcept
+constexpr std::uint64_t umul64(std::uint32_t x, std::uint32_t y) noexcept
 {
-    // __emulu is not available on ARM https://learn.microsoft.com/en-us/cpp/intrinsics/emul-emulu?view=msvc-170
-    #if defined(BOOST_DECIMAL_HAS_MSVC_32BIT_INTRINSICS) && !defined(_M_ARM)
-
-    return __emulu(x, y);
-
-    #else
-
     return x * static_cast<std::uint64_t>(y);
-
-    #endif
 }
 
 // Get 128-bit result of multiplication of two 64-bit unsigned integers.
-inline uint128 umul128(std::uint64_t x, std::uint64_t y) noexcept
+constexpr uint128 umul128(std::uint64_t x, std::uint64_t y) noexcept
 {
     #if defined(BOOST_DECIMAL_HAS_INT128)
     
     auto result = static_cast<boost::uint128_type>(x) * static_cast<boost::uint128_type>(y);
     return {static_cast<std::uint64_t>(result >> 64), static_cast<std::uint64_t>(result)};
-
-    // _umul128 is x64 only https://learn.microsoft.com/en-us/cpp/intrinsics/umul128?view=msvc-170
-    #elif defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS) && !defined(_M_ARM64)
-    
-    unsigned long long high;
-    std::uint64_t low = _umul128(x, y, &high);
-    return {static_cast<std::uint64_t>(high), low};
-    
-    // https://developer.arm.com/documentation/dui0802/a/A64-General-Instructions/UMULH
-    #elif defined(_M_ARM64) && !defined(__MINGW32__)
-
-    std::uint64_t high = __umulh(x, y);
-    std::uint64_t low = x * y;
-    return {high, low};
 
     #else
     
@@ -901,16 +856,12 @@ inline uint128 umul128(std::uint64_t x, std::uint64_t y) noexcept
     #endif
 }
 
-inline std::uint64_t umul128_upper64(std::uint64_t x, std::uint64_t y) noexcept
+constexpr std::uint64_t umul128_upper64(std::uint64_t x, std::uint64_t y) noexcept
 {
     #if defined(BOOST_DECIMAL_HAS_INT128)
     
     auto result = static_cast<boost::uint128_type>(x) * static_cast<boost::uint128_type>(y);
     return static_cast<std::uint64_t>(result >> 64);
-    
-    #elif defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
-    
-    return __umulh(x, y);
     
     #else
     
@@ -933,7 +884,7 @@ inline std::uint64_t umul128_upper64(std::uint64_t x, std::uint64_t y) noexcept
 
 // Get upper 128-bits of multiplication of a 64-bit unsigned integer and a 128-bit
 // unsigned integer.
-inline uint128 umul192_upper128(std::uint64_t x, uint128 y) noexcept
+constexpr uint128 umul192_upper128(std::uint64_t x, uint128 y) noexcept
 {
     auto r = umul128(x, y.high);
     r += umul128_upper64(x, y.low);
@@ -942,7 +893,7 @@ inline uint128 umul192_upper128(std::uint64_t x, uint128 y) noexcept
 
 // Get upper 64-bits of multiplication of a 32-bit unsigned integer and a 64-bit
 // unsigned integer.
-inline std::uint64_t umul96_upper64(std::uint32_t x, std::uint64_t y) noexcept 
+constexpr std::uint64_t umul96_upper64(std::uint32_t x, std::uint64_t y) noexcept
 {
     #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
     
@@ -963,7 +914,7 @@ inline std::uint64_t umul96_upper64(std::uint32_t x, std::uint64_t y) noexcept
 
 // Get lower 128-bits of multiplication of a 64-bit unsigned integer and a 128-bit
 // unsigned integer.
-inline uint128 umul192_lower128(std::uint64_t x, uint128 y) noexcept
+constexpr uint128 umul192_lower128(std::uint64_t x, uint128 y) noexcept
 {
     auto high = x * y.high;
     auto highlow = umul128(x, y.low);
@@ -972,7 +923,7 @@ inline uint128 umul192_lower128(std::uint64_t x, uint128 y) noexcept
 
 // Get lower 64-bits of multiplication of a 32-bit unsigned integer and a 64-bit
 // unsigned integer.
-inline std::uint64_t umul96_lower64(std::uint32_t x, std::uint64_t y) noexcept 
+constexpr std::uint64_t umul96_lower64(std::uint32_t x, std::uint64_t y) noexcept
 {
     return x * y;
 }

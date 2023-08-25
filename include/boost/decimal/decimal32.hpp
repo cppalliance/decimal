@@ -15,6 +15,8 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+#include <boost/decimal/detail/fast_float/compute_float32.hpp>
+#include <boost/decimal/detail/fast_float/compute_float64.hpp>
 #include <type_traits>
 #include <iostream>
 #include <limits>
@@ -153,6 +155,9 @@ private:
 
     friend constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept;
 
+    template <typename T>
+    BOOST_DECIMAL_CXX20_CONSTEXPR T floating_conversion_impl() const noexcept;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -182,6 +187,12 @@ public:
     constexpr decimal32(decimal32&& val) noexcept = default;
     constexpr decimal32& operator=(decimal32&& val) noexcept = default;
 
+    // 3.2.6 Conversion to floating-point type
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
+
+    // cmath functions that are easier as friends
     friend constexpr bool signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
@@ -965,8 +976,33 @@ constexpr bool decimal32::isneg() const noexcept
 template <typename Float, std::enable_if_t<detail::is_floating_point<Float>::value, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 {
-    const auto components {detail::ryu::floating_point_to_fd128(val)};
-    *this = decimal32{components.mantissa, components.exponent, components.sign};
+    if (val != val)
+    {
+        *this = boost::decimal::from_bits(boost::decimal::detail::nan_mask);
+    }
+    else if (val == std::numeric_limits<Float>::infinity() || -val == std::numeric_limits<Float>::infinity())
+    {
+        *this = boost::decimal::from_bits(boost::decimal::detail::inf_mask);
+    }
+    else
+    {
+        const auto components {detail::ryu::floating_point_to_fd128(val)};
+
+        #ifdef BOOST_DECIMAL_DEBUG
+        std::cerr << "Mant: " << components.mantissa
+                  << "\nExp: " << components.exponent
+                  << "\nSign: " << components.sign << std::endl;
+        #endif
+
+        if (components.exponent > detail::emax)
+        {
+            *this = boost::decimal::from_bits(boost::decimal::detail::inf_mask);
+        }
+        else
+        {
+            *this = decimal32 {components.mantissa, components.exponent, components.sign};
+        }
+    }
 }
 
 template <typename Integer, std::enable_if_t<detail::is_integral<Integer>::value, bool>>
@@ -1248,6 +1284,65 @@ void debug_pattern(decimal32 rhs) noexcept
     std::cerr << "Sig: " << rhs.full_significand()
               << "\nExp: " << rhs.biased_exponent()
               << "\nNeg: " << rhs.isneg() << std::endl;
+}
+
+template <typename T>
+BOOST_DECIMAL_CXX20_CONSTEXPR T decimal32::floating_conversion_impl() const noexcept
+{
+    bool success {};
+
+    auto fp_class = fpclassify(*this);
+
+    switch (fp_class)
+    {
+        case FP_NAN:
+            if (issignaling(*this))
+            {
+                return std::numeric_limits<T>::signaling_NaN();
+            }
+            return std::numeric_limits<T>::quiet_NaN();
+        case FP_INFINITE:
+            return std::numeric_limits<T>::infinity();
+        case FP_ZERO:
+            return 0;
+        default:
+            static_cast<void>(success);
+    }
+
+    // The casts to result are redundant but in pre C++17 modes MSVC warns about implicit conversions
+    T result {};
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, float>::value)
+    {
+        result = static_cast<T>(detail::fast_float::compute_float32(this->biased_exponent(), this->full_significand(), this->isneg(), success));
+    }
+    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, double>::value)
+    {
+        result = static_cast<T>(detail::fast_float::compute_float64(this->biased_exponent(), this->full_significand(), this->isneg(), success));
+    }
+
+    if (!success)
+    {
+        errno = EINVAL;
+        return 0;
+    }
+
+    return result;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator float() const noexcept
+{
+    return this->floating_conversion_impl<float>();
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator double() const noexcept
+{
+    return this->floating_conversion_impl<double>();
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator long double() const noexcept
+{
+    // Double already has more range and precision than a decimal32 will ever be able to provide
+    return static_cast<long double>(this->floating_conversion_impl<double>());
 }
 
 }} // Namespace boost::decimal

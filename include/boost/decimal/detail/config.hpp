@@ -144,4 +144,12 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_IF_CONSTEXPR if
 #endif
 
+#if BOOST_DECIMAL_HAS_BUILTIN(__builtin_expect)
+#  define BOOST_DECIMAL_LIKELY(x) __builtin_expect(x, 1)
+#  define BOOST_DECIMAL_UNLIKELY(x) __builtin_expect(x, 0)
+#else
+#  define BOOST_DECIMAL_LIKELY(x) x
+#  define BOOST_DECIMAL_UNLIKELY(x) x
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
