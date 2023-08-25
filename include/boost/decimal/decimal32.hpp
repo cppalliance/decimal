@@ -155,6 +155,9 @@ private:
 
     friend constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept;
 
+    template <typename T>
+    BOOST_DECIMAL_CXX20_CONSTEXPR T floating_conversion_impl() const noexcept;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -1257,34 +1260,57 @@ void debug_pattern(decimal32 rhs) noexcept
               << "\nNeg: " << rhs.isneg() << std::endl;
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator double() const noexcept
+template <typename T>
+BOOST_DECIMAL_CXX20_CONSTEXPR T decimal32::floating_conversion_impl() const noexcept
 {
     bool success {};
 
-    auto res {detail::fast_float::compute_float64(this->biased_exponent(), this->full_significand(), this->isneg(), success)};
+    auto fp_class = fpclassify(*this);
+
+    switch (fp_class)
+    {
+        case FP_NAN:
+            if (issignaling(*this))
+            {
+                return std::numeric_limits<T>::signaling_NaN();
+            }
+            return std::numeric_limits<T>::quiet_NaN();
+        case FP_INFINITE:
+            return std::numeric_limits<T>::infinity();
+        case FP_ZERO:
+            return 0;
+        default:
+            static_cast<void>(success);
+    }
+
+    T result {};
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, float>::value)
+    {
+        detail::fast_float::compute_float32(this->biased_exponent(), this->full_significand(), this->isneg(), success);
+    }
+    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, double>::value)
+    {
+        detail::fast_float::compute_float64(this->biased_exponent(), this->full_significand(), this->isneg(), success);
+    }
 
     if (!success)
     {
-        return std::numeric_limits<double>::signaling_NaN();
+        errno = EINVAL;
+        return 0;
     }
 
-    return res;
+    return result;
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator float() const noexcept
 {
-    bool success {};
-
-    auto res {detail::fast_float::compute_float32(this->biased_exponent(), this->full_significand(), this->isneg(), success)};
-
-    if (!success)
-    {
-        return std::numeric_limits<float>::signaling_NaN();
-    }
-
-    return res;
+    return this->floating_conversion_impl<float>();
 }
 
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator double() const noexcept
+{
+    return this->floating_conversion_impl<double>();
+}
 
 }} // Namespace boost::decimal
 
