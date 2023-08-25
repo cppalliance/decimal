@@ -823,18 +823,9 @@ constexpr uint128 &uint128::operator%=(uint128 v) noexcept
     return *this;
 }
 
-static inline std::uint64_t umul64(std::uint32_t x, std::uint32_t y) noexcept
+constexpr std::uint64_t umul64(std::uint32_t x, std::uint32_t y) noexcept
 {
-    // __emulu is not available on ARM https://learn.microsoft.com/en-us/cpp/intrinsics/emul-emulu?view=msvc-170
-    #if defined(BOOST_DECIMAL_HAS_MSVC_32BIT_INTRINSICS) && !defined(_M_ARM)
-
-    return __emulu(x, y);
-
-    #else
-
     return x * static_cast<std::uint64_t>(y);
-
-    #endif
 }
 
 // Get 128-bit result of multiplication of two 64-bit unsigned integers.
