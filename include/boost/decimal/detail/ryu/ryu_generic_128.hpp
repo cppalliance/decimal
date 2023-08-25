@@ -319,7 +319,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long 
     #ifdef BOOST_DECIMAL_HAS_INT128
     auto bits = bit_cast<unsigned_128_type>(val);
     #else
-    auto trivial_bits = bit_cast<trivial_uint128>(ld);
+    auto trivial_bits = bit_cast<trivial_uint128>(val);
     unsigned_128_type bits {trivial_bits};
     #endif
 
