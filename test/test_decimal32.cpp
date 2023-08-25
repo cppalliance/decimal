@@ -2,6 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#include "mini_to_chars.hpp"
+
 #include <boost/decimal/decimal32.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <bitset>
@@ -356,6 +358,31 @@ void test_construct_from_integer()
 }
 
 template <typename T>
+void test_construct_from_float()
+{
+    constexpr decimal32 one(1, 0);
+    decimal32 float_one(T(1));
+    if(!BOOST_TEST_EQ(one, float_one))
+    {
+        debug_pattern(float_one);
+    }
+
+    constexpr decimal32 fraction(12345, -4);
+    decimal32 float_frac(T(1.2345));
+    if(!BOOST_TEST_EQ(fraction, float_frac))
+    {
+        debug_pattern(float_frac);
+    }
+
+    constexpr decimal32 neg_frac(98123, -4, true);
+    decimal32 neg_float_frac(T(-9.8123));
+    if(!BOOST_TEST_EQ(neg_frac, neg_float_frac))
+    {
+        debug_pattern(neg_float_frac);
+    }
+}
+
+template <typename T>
 void spot_check_addition(T a, T b, T res)
 {
     decimal32 dec_a {a};
@@ -389,6 +416,13 @@ int main()
     test_construct_from_integer<int>();
     test_construct_from_integer<long>();
     test_construct_from_integer<long long>();
+
+    test_construct_from_float<float>();
+    test_construct_from_float<double>();
+    test_construct_from_float<long double>();
+    #ifdef BOOST_DECIMAL_HAS_FLOAT128
+    test_construct_from_float<__float128>();
+    #endif
 
     spot_check_addition(-1054191000, -920209700, -1974400700);
     spot_check_addition(353582500, -32044770, 321537730);

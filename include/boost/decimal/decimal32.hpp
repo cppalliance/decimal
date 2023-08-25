@@ -11,6 +11,11 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/utilities.hpp>
+#include <boost/decimal/detail/bit_cast.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+#include <type_traits>
 #include <iostream>
 #include <limits>
 #include <cstdint>
@@ -32,18 +37,18 @@ static constexpr std::uint32_t comb_nan_mask = 0b11111;
 static constexpr std::uint32_t exp_snan_mask = 0b100000;
 
 // Values from IEEE 754-2019 table 3.6
-BOOST_ATTRIBUTE_UNUSED static constexpr auto storage_width = 32;
-BOOST_ATTRIBUTE_UNUSED static constexpr auto precision = 7;
-BOOST_ATTRIBUTE_UNUSED static constexpr auto bias = 101;
-BOOST_ATTRIBUTE_UNUSED static constexpr auto emax = 96;
-BOOST_ATTRIBUTE_UNUSED static constexpr auto emin = -95;
-BOOST_ATTRIBUTE_UNUSED static constexpr auto etiny = -bias;
-BOOST_ATTRIBUTE_UNUSED static constexpr auto combination_field_width = 11;
-BOOST_ATTRIBUTE_UNUSED static constexpr auto trailing_significand_field_width = 20;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto storage_width = 32;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto precision = 7;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto bias = 101;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto emax = 96;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto emin = -95;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto etiny = -bias;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto combination_field_width = 11;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto trailing_significand_field_width = 20;
 
 // Other useful values
 static constexpr std::uint32_t max_significand = 9'999'999;
-BOOST_ATTRIBUTE_UNUSED constexpr auto max_string_length = 15;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED constexpr auto max_string_length = 15;
 
 // Masks to update the significand based on the combination field
 // In these first three 00, 01, or 10 are the leading 2 bits of the exp
@@ -140,7 +145,7 @@ private:
     constexpr std::uint32_t full_significand() const noexcept;
     constexpr bool isneg() const noexcept;
 
-    // Attempts coneversion to integral type:
+    // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
     template <typename TargetType>
@@ -152,8 +157,12 @@ public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
 
+    // 3.2.2.2 Conversion from floating-point type
+    template <typename Float, std::enable_if_t<detail::is_floating_point<Float>::value, bool> = true>
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
+
     // 3.2.2.3 Conversion from integral type
-    template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
+    template <typename Integer, std::enable_if_t<detail::is_integral<Integer>::value, bool> = true>
     explicit constexpr decimal32(Integer val) noexcept;
 
     // 3.2.2.4 Conversion to integral type
@@ -165,22 +174,22 @@ public:
     explicit constexpr operator unsigned long long() const noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
-    template <typename T, typename T2, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-    constexpr decimal32(T coeff, T2 exp) noexcept;
+    template <typename T, typename T2, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
+    constexpr decimal32(T coeff, T2 exp, bool sign = false) noexcept;
 
     constexpr decimal32(const decimal32& val) noexcept = default;
     constexpr decimal32& operator=(const decimal32& val) noexcept = default;
     constexpr decimal32(decimal32&& val) noexcept = default;
     constexpr decimal32& operator=(decimal32&& val) noexcept = default;
 
-    friend constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr decimal32 abs BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr bool isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr int fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr decimal32 abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
 
     // 3.2.7 unary arithmetic operators:
     friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
@@ -220,18 +229,28 @@ public:
     // Debug bit pattern
     friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
     friend std::uint32_t to_bits(decimal32 rhs) noexcept;
+    friend void debug_pattern(decimal32 rhs) noexcept;
 };
 
-template <typename T, typename T2, std::enable_if_t<std::is_integral<T>::value, bool>>
-constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
+template <typename T, typename T2, std::enable_if_t<detail::is_integral<T>::value, bool>>
+constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
 {
-    using Unsigned_Integer = std::make_unsigned_t<T>;
+    using Unsigned_Integer = detail::make_unsigned_t<T>;
 
-    static_assert(std::is_integral<T>::value, "Coefficient must be an integer");
-    static_assert(std::is_integral<T2>::value, "Exponent must be an integer");
+    static_assert(detail::is_integral<T>::value, "Coefficient must be an integer");
+    static_assert(detail::is_integral<T2>::value, "Exponent must be an integer");
 
-    bits_.sign = coeff < 0;
-    auto unsigned_coeff {static_cast<Unsigned_Integer>(bits_.sign ? detail::apply_sign(coeff) : coeff)};
+    Unsigned_Integer unsigned_coeff {};
+    BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T>::is_signed)
+    {
+        bits_.sign = coeff < 0 || sign;
+        unsigned_coeff = coeff < 0 ? detail::apply_sign(coeff) : coeff;
+    }
+    else
+    {
+        bits_.sign = sign;
+        unsigned_coeff = coeff;
+    }
 
     // If the coeff is not in range make it so
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
@@ -262,32 +281,34 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
         }
     }
 
+    auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
+
     // zero the combination field, so we can mask in the following
     bits_.combination_field = 0;
     bits_.significand = 0;
     bool big_combination {false};
 
-    if (unsigned_coeff == 0)
+    if (reduced_coeff == 0)
     {
         bits_.significand = 0;
         bits_.combination_field = 0;
 
         exp = 0;
     }
-    else if (unsigned_coeff < detail::no_combination)
+    else if (reduced_coeff < detail::no_combination)
     {
         // If the coefficient fits directly we don't need to use the combination field
-        bits_.significand = static_cast<std::uint32_t>(unsigned_coeff);
+        bits_.significand = reduced_coeff;
     }
-    else if (unsigned_coeff < detail::big_combination)
+    else if (reduced_coeff < detail::big_combination)
     {
         // Break the number into 3 bits for the combination field and 20 bits for the significand field
 
         // Use the least significant 20 bits to set the significand
-        bits_.significand = unsigned_coeff & detail::no_combination;
+        bits_.significand = reduced_coeff & detail::no_combination;
 
         // Now set the combination field (maximum of 3 bits)
-        auto remaining_bits {static_cast<std::uint32_t>(unsigned_coeff) & detail::small_combination_field_mask};
+        auto remaining_bits {reduced_coeff & detail::small_combination_field_mask};
         remaining_bits >>= 20;
 
         bits_.combination_field |= remaining_bits;
@@ -298,8 +319,8 @@ constexpr decimal32::decimal32(T coeff, T2 exp) noexcept
         bits_.combination_field |= detail::comb_11_mask;
         big_combination = true;
 
-        bits_.significand = unsigned_coeff & detail::no_combination;
-        const auto remaining_bit {static_cast<std::uint32_t>(unsigned_coeff & detail::big_combination_field_mask)};
+        bits_.significand = reduced_coeff & detail::no_combination;
+        const auto remaining_bit {reduced_coeff & detail::big_combination_field_mask};
 
         if (remaining_bit)
         {
@@ -359,32 +380,32 @@ constexpr decimal32 from_bits(std::uint32_t bits) noexcept
     return result;
 }
 
-constexpr bool signbit BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr bool signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return rhs.bits_.sign;
 }
 
-constexpr bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr bool isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return (rhs.bits_.combination_field & detail::comb_nan_mask) == detail::comb_nan_mask;
 }
 
-constexpr bool issignaling BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr bool issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return isnan(rhs) && (rhs.bits_.exponent & detail::exp_snan_mask) == detail::exp_snan_mask;
 }
 
-constexpr bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr bool isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return ((rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask) && !isnan(rhs);
 }
 
-constexpr bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr bool isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     return !isinf(rhs) && !isnan(rhs);
 }
 
-constexpr bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr bool isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     // Check for de-normals
     const auto sig {rhs.full_significand()};
@@ -398,7 +419,7 @@ constexpr bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcep
     return sig != 0 && isfinite(rhs);
 }
 
-constexpr int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr int fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     if (isinf(rhs))
     {
@@ -422,7 +443,7 @@ constexpr int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexce
     }
 }
 
-constexpr decimal32 abs BOOST_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr decimal32 abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
 {
     if (rhs.isneg())
     {
@@ -941,7 +962,14 @@ constexpr bool decimal32::isneg() const noexcept
     return static_cast<bool>(bits_.sign);
 }
 
-template<typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool>>
+template <typename Float, std::enable_if_t<detail::is_floating_point<Float>::value, bool>>
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
+{
+    const auto components {detail::ryu::floating_point_to_fd128(val)};
+    *this = decimal32{components.mantissa, components.exponent, components.sign};
+}
+
+template <typename Integer, std::enable_if_t<detail::is_integral<Integer>::value, bool>>
 constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
     *this = decimal32{val, 0};
@@ -967,7 +995,7 @@ constexpr TargetType decimal32::to_integral() const noexcept
         return static_cast<TargetType>(0);
     }
 
-    BOOST_IF_CONSTEXPR (std::is_unsigned<TargetType>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_unsigned<TargetType>::value)
     {
         if (this_is_neg)
         {
@@ -987,7 +1015,7 @@ constexpr TargetType decimal32::to_integral() const noexcept
         result /= detail::pow10<TargetType>(-exp);
     }
 
-    BOOST_IF_CONSTEXPR (std::is_signed<TargetType>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
     {
         result = this_is_neg ? detail::apply_sign(result) : result;
     }
@@ -1215,6 +1243,13 @@ constexpr decimal32& decimal32::operator%=(boost::decimal::decimal32 rhs) noexce
     return *this;
 }
 
+void debug_pattern(decimal32 rhs) noexcept
+{
+    std::cerr << "Sig: " << rhs.full_significand()
+              << "\nExp: " << rhs.biased_exponent()
+              << "\nNeg: " << rhs.isneg() << std::endl;
+}
+
 }} // Namespace boost::decimal
 
 namespace std {
@@ -1231,40 +1266,40 @@ struct numeric_limits<boost::decimal::decimal32>
 public:
 #endif
 
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_signed = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_integer = false;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_exact = false;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_infinity = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_present;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_indeterminate;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_modulo = false;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int digits = 7;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int digits10 = digits;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int max_digits10 = digits;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int radix = 10;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int min_exponent = -95;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int min_exponent_10 = min_exponent;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int max_exponent = 96;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int max_exponent_10 = max_exponent;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool traps = numeric_limits<std::uint32_t>::traps;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_signed = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_integer = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_exact = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_infinity = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_present;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_indeterminate;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_modulo = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits = 7;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits10 = digits;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_digits10 = digits;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int radix = 10;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent = -95;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent_10 = min_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent = 96;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent_10 = max_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = numeric_limits<std::uint32_t>::traps;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = true;
 
     // Member functions
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (min)() { return {1, min_exponent}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (max)() { return {9'999'999, max_exponent}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 lowest() { return {-9'999'999, max_exponent}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 epsilon() { return {1, -7}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 round_error() { return epsilon(); }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 infinity() { return boost::decimal::from_bits(boost::decimal::detail::inf_mask); }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 quiet_NaN() { return boost::decimal::from_bits(boost::decimal::detail::nan_mask); }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 signaling_NaN() { return boost::decimal::from_bits(boost::decimal::detail::snan_mask); }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 denorm_min() { return {1, boost::decimal::detail::etiny}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (min)() { return {1, min_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (max)() { return {9'999'999, max_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 lowest() { return {-9'999'999, max_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 epsilon() { return {1, -7}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 round_error() { return epsilon(); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 infinity() { return boost::decimal::from_bits(boost::decimal::detail::inf_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 quiet_NaN() { return boost::decimal::from_bits(boost::decimal::detail::nan_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 signaling_NaN() { return boost::decimal::from_bits(boost::decimal::detail::snan_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 denorm_min() { return {1, boost::decimal::detail::etiny}; }
 };
 
 } // Namespace std
