@@ -1308,14 +1308,15 @@ BOOST_DECIMAL_CXX20_CONSTEXPR T decimal32::floating_conversion_impl() const noex
             static_cast<void>(success);
     }
 
+    // The casts to result are redundant but in pre C++17 modes MSVC warns about implicit conversions
     T result {};
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, float>::value)
     {
-        result = detail::fast_float::compute_float32(this->biased_exponent(), this->full_significand(), this->isneg(), success);
+        result = static_cast<T>(detail::fast_float::compute_float32(this->biased_exponent(), this->full_significand(), this->isneg(), success));
     }
     else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, double>::value)
     {
-        result = detail::fast_float::compute_float64(this->biased_exponent(), this->full_significand(), this->isneg(), success);
+        result = static_cast<T>(detail::fast_float::compute_float64(this->biased_exponent(), this->full_significand(), this->isneg(), success));
     }
 
     if (!success)
