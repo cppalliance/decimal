@@ -15,7 +15,7 @@ namespace boost { namespace decimal { namespace detail { namespace fast_float {
 BOOST_DECIMAL_CXX20_CONSTEXPR float compute_float32(std::int64_t power, std::uint64_t i, bool negative, bool& success) noexcept
 {
     const double d = compute_float64(power, i, negative, success);
-    float return_val;
+    float return_val {};
 
     if (success)
     {
@@ -31,19 +31,14 @@ BOOST_DECIMAL_CXX20_CONSTEXPR float compute_float32(std::int64_t power, std::uin
         if (abs_return_val > (std::numeric_limits<float>::max)())
         {
             return_val = negative ? -HUGE_VALF : HUGE_VALF;
-            success = false;
+            success = true;
         }
     }
-    else
+    else if (power > 38)
     {
-        if (power > 38)
-        {
-            return_val = negative ? -HUGE_VALF : HUGE_VALF;
-        }
-        else
-        {
-            return_val = negative ? -0.0F : 0.0F;
-        }
+
+        return_val = negative ? -HUGE_VALF : HUGE_VALF;
+        success = true;
     }
 
     return return_val;
