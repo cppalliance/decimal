@@ -16,6 +16,10 @@
 #include <cstring>
 #include <cmath>
 
+#ifndef BOOST_DECIMAL_HAS_STDBIT
+#  include <boost/core/bit.hpp>
+#endif
+
 namespace boost { namespace decimal { namespace detail { namespace fast_float {
 
 static constexpr double double_powers_of_ten[] = {
@@ -101,7 +105,13 @@ BOOST_DECIMAL_CXX20_CONSTEXPR double compute_float64(std::int64_t power, std::ui
 
     const std::uint64_t factor_significand = significand_64[power - smallest_power];
     const std::int64_t exponent = (((152170 + 65536) * power) >> 16) + 1024 + 63;
+
+    #ifdef BOOST_DECIMAL_HAS_STDBIT
+    int leading_zeros = std::countl_zero(i);
+    #else
     int leading_zeros = boost::core::countl_zero(i);
+    #endif
+
     i <<= static_cast<std::uint64_t>(leading_zeros);
 
     uint128 product = umul128(i, factor_significand);
