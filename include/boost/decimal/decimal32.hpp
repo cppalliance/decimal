@@ -240,16 +240,17 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
     static_assert(detail::is_integral<T>::value, "Coefficient must be an integer");
     static_assert(detail::is_integral<T2>::value, "Exponent must be an integer");
 
+    Unsigned_Integer unsigned_coeff {};
     BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T>::is_signed)
     {
         bits_.sign = coeff < 0 || sign;
+        unsigned_coeff = coeff < 0 ? detail::apply_sign(coeff) : coeff;
     }
     else
     {
         bits_.sign = sign;
+        unsigned_coeff = coeff;
     }
-
-    auto unsigned_coeff {static_cast<Unsigned_Integer>(bits_.sign ? detail::apply_sign(coeff) : coeff)};
 
     // If the coeff is not in range make it so
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
