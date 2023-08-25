@@ -286,38 +286,38 @@ template <typename T>
 BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128(T val) noexcept;
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<float>(float f) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<float>(float val) noexcept
 {
     static_assert(sizeof(float) == sizeof(uint32_t), "Float is not 32 bits");
-    auto bits = bit_cast<uint32_t>(f);
+    auto bits = bit_cast<uint32_t>(val);
     return generic_binary_to_decimal(bits, 23, 8, false);
 }
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<double>(double d) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<double>(double val) noexcept
 {
     static_assert(sizeof(double) == sizeof(uint64_t), "Float is not 64 bits");
-    auto bits = bit_cast<uint64_t>(d);
+    auto bits = bit_cast<uint64_t>(val);
     return generic_binary_to_decimal(bits, 52, 11, false);
 }
 
 #if BOOST_DECIMAL_LDBL_BITS == 64
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long double>(long double ld) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long double>(long double val) noexcept
 {
     static_assert(sizeof(long double) == sizeof(uint64_t), "Float is not 64 bits");
-    auto bits = bit_cast<uint64_t>(ld);
+    auto bits = bit_cast<uint64_t>(val);
     return generic_binary_to_decimal(bits, 52, 11, false);
 }
 
 #elif BOOST_DECIMAL_LDBL_BITS == 80
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long double>(long double ld) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long double>(long double val) noexcept
 {
     #ifdef BOOST_DECIMAL_HAS_INT128
-    auto bits = bit_cast<unsigned_128_type>(ld);
+    auto bits = bit_cast<unsigned_128_type>(val);
     #else
     auto trivial_bits = bit_cast<trivial_uint128>(ld);
     unsigned_128_type bits {trivial_bits};
@@ -337,12 +337,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long 
 #elif BOOST_DECIMAL_LDBL_BITS == 128
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long double>(long double ld) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long double>(long double val) noexcept
 {
     #ifdef BOOST_DECIMAL_HAS_INT128
-    auto bits = bit_cast<unsigned_128_type>(d);
+    auto bits = bit_cast<unsigned_128_type>(val);
     #else
-    auto trivial_bits = bit_cast<trivial_uint128>(d);
+    auto trivial_bits = bit_cast<trivial_uint128>(val);
     unsigned_128_type bits {trivial_bits};
     #endif
 
@@ -354,12 +354,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<long 
 #ifdef BOOST_DECIMAL_HAS_FLOAT128
 
 template <>
-BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<__float128>(__float128 d) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR floating_decimal_128 floating_point_to_fd128<__float128>(__float128 val) noexcept
 {
     #ifdef BOOST_DECIMAL_HAS_INT128
-    auto bits = bit_cast<unsigned_128_type>(d);
+    auto bits = bit_cast<unsigned_128_type>(val);
     #else
-    auto trivial_bits = bit_cast<trivial_uint128>(d);
+    auto trivial_bits = bit_cast<trivial_uint128>(val);
     unsigned_128_type bits {trivial_bits};
     #endif
 
