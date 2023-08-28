@@ -51,7 +51,7 @@ inline from_chars_result from_chars_dispatch(const char* first, const char* last
 #endif
 
 template <typename Unsigned_Integer, typename Integer>
-inline from_chars_result parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent, chars_format fmt = chars_format::general) noexcept
+inline from_chars_result parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent) noexcept
 {
     if (first > last)
     {
@@ -186,7 +186,7 @@ inline from_chars_result parser(const char* first, const char* last, bool& sign,
         }
     }
 
-    if (next == last || is_delimiter(*next, fmt))
+    if (next == last || is_delimiter(*next))
     {
         if (dot_position != 0 || fractional)
         {

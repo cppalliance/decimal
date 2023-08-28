@@ -17,6 +17,7 @@
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/fast_float/compute_float32.hpp>
 #include <boost/decimal/detail/fast_float/compute_float64.hpp>
+#include <boost/decimal/detail/parser.hpp>
 #include <type_traits>
 #include <iostream>
 #include <limits>
@@ -233,6 +234,10 @@ public:
     friend constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
+
+    // 3.2.10 Formatted input:
+    template <typename charT, typename traits>
+    friend std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>& is, decimal32& d);
 
     // 3.2.11 Formatted output:
     template <typename charT, typename traits>
@@ -1369,6 +1374,31 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator long double() const noexcept
 {
     // Double already has more range and precision than a decimal32 will ever be able to provide
     return static_cast<long double>(this->floating_conversion_impl<double>());
+}
+
+template <typename charT, typename traits>
+std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>& is, decimal32& d)
+{
+    char buffer[1024] {}; // What should be an unreasonably high maximum
+    is >> buffer;
+
+    bool sign {};
+    std::uint32_t significand {};
+    std::int32_t exp;
+
+    const auto r {detail::parser(buffer, buffer + sizeof(buffer), sign, significand, exp)};
+
+    if (r.ec != std::errc{})
+    {
+        d = decimal32(0);
+        errno = static_cast<int>(r.ec);
+    }
+    else
+    {
+        d = decimal32(significand, exp, sign);
+    }
+
+    return is;
 }
 
 }} // Namespace boost::decimal
