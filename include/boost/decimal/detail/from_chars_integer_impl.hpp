@@ -84,10 +84,10 @@ BOOST_CXX14_CONSTEXPR from_chars_result from_chars_integer_impl(const char* firs
     BOOST_ATTRIBUTE_UNUSED bool is_negative = false;
     auto next = first;
 
-    #ifdef BOOST_CHARCONV_HAS_INT128
-    BOOST_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value || std::is_signed<Integer>::value)
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value || std::is_signed<Integer>::value)
     #else
-    BOOST_IF_CONSTEXPR (std::is_signed<Integer>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<Integer>::value)
     #endif
     {
         if (next != last)
@@ -103,11 +103,11 @@ BOOST_CXX14_CONSTEXPR from_chars_result from_chars_integer_impl(const char* firs
             }
         }
 
-        #ifdef BOOST_CHARCONV_HAS_INT128
-        BOOST_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value)
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value)
         {
-            overflow_value = BOOST_CHARCONV_INT128_MAX;
-            max_digit = BOOST_CHARCONV_INT128_MAX;
+            overflow_value = BOOST_DECIMAL_INT128_MAX;
+            max_digit = BOOST_DECIMAL_INT128_MAX;
         }
         else
         #endif
@@ -129,11 +129,11 @@ BOOST_CXX14_CONSTEXPR from_chars_result from_chars_integer_impl(const char* firs
             return {first, std::errc::invalid_argument};
         }
         
-        #ifdef BOOST_CHARCONV_HAS_INT128
-        BOOST_IF_CONSTEXPR (std::is_same<Integer, boost::uint128_type>::value)
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, boost::uint128_type>::value)
         {
-            overflow_value = BOOST_CHARCONV_UINT128_MAX;
-            max_digit = BOOST_CHARCONV_UINT128_MAX;
+            overflow_value = BOOST_DECIMAL_UINT128_MAX;
+            max_digit = BOOST_DECIMAL_UINT128_MAX;
         }
         else
         #endif
@@ -143,8 +143,8 @@ BOOST_CXX14_CONSTEXPR from_chars_result from_chars_integer_impl(const char* firs
         }
     }
 
-    #ifdef BOOST_CHARCONV_HAS_INT128
-    BOOST_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value)
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value)
     {
         overflow_value /= unsigned_base;
         max_digit %= unsigned_base;
@@ -217,10 +217,10 @@ BOOST_CXX14_CONSTEXPR from_chars_result from_chars_integer_impl(const char* firs
     }
 
     value = static_cast<Integer>(result);
-    #ifdef BOOST_CHARCONV_HAS_INT128
-    BOOST_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value || std::is_signed<Integer>::value)
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value || std::is_signed<Integer>::value)
     #else
-    BOOST_IF_CONSTEXPR (std::is_signed<Integer>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<Integer>::value)
     #endif
     {
         if (is_negative)
@@ -248,7 +248,7 @@ from_chars_result from_chars(const char* first, const char* last, Integer& value
     return detail::from_chars_integer_impl<Integer, Unsigned_Integer>(first, last, value, base);
 }
 
-#ifdef BOOST_CHARCONV_HAS_INT128
+#ifdef BOOST_DECIMAL_HAS_INT128
 template <typename Integer>
 from_chars_result from_chars128(const char* first, const char* last, Integer& value, int base = 10) noexcept
 {
