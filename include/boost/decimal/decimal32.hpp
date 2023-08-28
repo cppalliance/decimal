@@ -1436,8 +1436,26 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
 
     if (r.ec != std::errc{})
     {
-        d = from_bits(boost::decimal::detail::snan_mask);
-        errno = static_cast<int>(r.ec);
+        if (r.ec == std::errc::not_supported)
+        {
+            if (significand)
+            {
+                d = from_bits(boost::decimal::detail::snan_mask);
+            }
+            else
+            {
+                d = from_bits(boost::decimal::detail::nan_mask);
+            }
+        }
+        else if (r.ec == std::errc::value_too_large)
+        {
+            d = from_bits(boost::decimal::detail::inf_mask);
+        }
+        else
+        {
+            d = from_bits(boost::decimal::detail::snan_mask);
+            errno = static_cast<int>(r.ec);
+        }
     }
     else
     {

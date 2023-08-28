@@ -76,6 +76,32 @@ inline from_chars_result parser(const char* first, const char* last, bool& sign,
         sign = false;
     }
 
+    // Handle non-finite values
+    if (*next == 'i' || *next == 'I')
+    {
+        significand = 0;
+        exponent = 0;
+        return {next, std::errc::value_too_large};
+    }
+    if (*next == 'n' || *next == 'N')
+    {
+        const auto dist = last - next;
+
+        if (dist > 4 && *(next + 4) == 's')
+        {
+            significand = 1;
+            exponent = 0;
+            return {next, std::errc::not_supported};
+        }
+        else
+        {
+            significand = 0;
+            exponent = 0;
+            return {next, std::errc::not_supported};
+        }
+    }
+
+
     // Ignore leading zeros (e.g. 00005 or -002.3e+5)
     while (*next == '0' && next != last)
     {

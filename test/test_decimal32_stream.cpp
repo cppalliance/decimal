@@ -32,6 +32,25 @@ void test_istream()
     BOOST_TEST_EQ(errno, EINVAL) && BOOST_TEST_NE(val3, std::numeric_limits<decimal32>::signaling_NaN());
 
     errno = 0;
+    decimal32 inf_val;
+    std::stringstream inf;
+    inf.str("inf");
+    inf >> inf_val;
+    BOOST_TEST_EQ(inf_val, std::numeric_limits<decimal32>::infinity()) && BOOST_TEST_EQ(errno, 0);
+
+    errno = 0;
+    decimal32 inf_val2;
+    std::stringstream inf2;
+    inf2.str("INFINITY");
+    inf2 >> inf_val2;
+    BOOST_TEST_EQ(inf_val2, std::numeric_limits<decimal32>::infinity()) && BOOST_TEST_EQ(errno, 0);
+
+    errno = 0;
+    decimal32 snan_val;
+    std::stringstream snan;
+    snan.str("-nan(snan)");
+    snan >> snan_val;
+    BOOST_TEST_NE(snan_val, std::numeric_limits<decimal32>::signaling_NaN()) && BOOST_TEST_EQ(errno, 0);
 }
 
 void test_ostream()
