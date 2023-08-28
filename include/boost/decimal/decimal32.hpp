@@ -1423,7 +1423,7 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
 
     bool sign {};
     std::uint64_t significand {};
-    std::int32_t exp;
+    std::int32_t exp {};
     const auto buffer_len {std::strlen(buffer)};
 
     if (buffer_len == 0)
