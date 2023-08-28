@@ -235,7 +235,8 @@ public:
     friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
 
     // 3.2.11 Formatted output:
-    friend std::ostream& operator<<(std::ostream& os, const decimal32& d);
+    template <typename charT, typename traits>
+    friend std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d);
 
     // Debug bit pattern
     friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
@@ -1089,16 +1090,41 @@ constexpr decimal32::operator unsigned long long() const noexcept
     return to_integral<unsigned long long>();
 }
 
-std::ostream& operator<<(std::ostream& os, const decimal32& d)
+template <typename charT, typename traits>
+std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d)
 {
+    char buffer[detail::precision + 2] {}; // Precision + decimal point + null terminator
+
     if (d.bits_.sign == 1)
     {
         os << "-";
     }
 
-    os << d.full_significand() << "e";
+    // Print the significand into the buffer so that we can insert the decimal point
+    std::snprintf(buffer, sizeof(buffer), "%u", d.full_significand());
+    std::memmove(buffer + 2, buffer + 1, detail::precision - 1);
+    std::memset(buffer + 1, '.', 1);
+    os << buffer;
+    os << "e";
 
-    const auto print_exp = static_cast<int>(d.full_exponent()) - detail::bias;
+    // Offset will adjust the exponent to compensate for adding the decimal point
+    const auto offset {detail::num_digits(d.full_significand()) - 1};
+    auto print_exp {static_cast<int>(d.full_exponent()) - detail::bias + offset};
+
+    if (print_exp < 0)
+    {
+        os << "-";
+        print_exp = -print_exp;
+    }
+    else
+    {
+        os << "+";
+    }
+
+    if (print_exp < 10)
+    {
+        os << "0";
+    }
 
     os << print_exp;
 
