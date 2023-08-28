@@ -17,7 +17,7 @@ void test_istream()
 
 void test_ostream()
 {
-    decimal32 val(1234567, 0);
+    decimal32 val {1234567, 0};
     std::stringstream out;
     out << val;
     BOOST_TEST_CSTR_EQ(out.str().c_str(), "1.234567e+06");
@@ -26,6 +26,18 @@ void test_ostream()
     std::stringstream zero_out;
     zero_out << zero;
     BOOST_TEST_CSTR_EQ(zero_out.str().c_str(), "0.0e+00");
+
+    std::stringstream inf;
+    inf << std::numeric_limits<decimal32>::infinity();
+    BOOST_TEST_CSTR_EQ(inf.str().c_str(), "inf");
+
+    std::stringstream qnan;
+    qnan << std::numeric_limits<decimal32>::quiet_NaN();
+    BOOST_TEST_CSTR_EQ(qnan.str().c_str(), "nan");
+
+    std::stringstream snan;
+    snan << std::numeric_limits<decimal32>::signaling_NaN();
+    BOOST_TEST_CSTR_EQ(snan.str().c_str(), "nan(snan)");
 }
 
 int main()
