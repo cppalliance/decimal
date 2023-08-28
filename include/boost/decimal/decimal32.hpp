@@ -17,6 +17,7 @@
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/fast_float/compute_float32.hpp>
 #include <boost/decimal/detail/fast_float/compute_float64.hpp>
+#include <boost/decimal/detail/parser.hpp>
 #include <type_traits>
 #include <iostream>
 #include <limits>
@@ -233,6 +234,10 @@ public:
     friend constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
+
+    // 3.2.10 Formatted input:
+    template <typename charT, typename traits>
+    friend std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>& is, decimal32& d);
 
     // 3.2.11 Formatted output:
     template <typename charT, typename traits>
@@ -1093,6 +1098,40 @@ constexpr decimal32::operator unsigned long long() const noexcept
 template <typename charT, typename traits>
 std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d)
 {
+    if (issignaling(d))
+    {
+        if (d.isneg())
+        {
+            os << "-";
+        }
+
+        os << "nan(snan)";
+        return os;
+    }
+    else if (isnan(d)) // only quiet NaNs left
+    {
+        if (d.isneg())
+        {
+            os << "-nan(ind)";
+        }
+        else
+        {
+            os << "nan";
+        }
+
+        return os;
+    }
+    else if (isinf(d))
+    {
+        if (d.isneg())
+        {
+            os << "-";
+        }
+
+        os << "inf";
+        return os;
+    }
+
     char buffer[detail::precision + 2] {}; // Precision + decimal point + null terminator
 
     if (d.bits_.sign == 1)
@@ -1105,10 +1144,15 @@ std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>&
     std::memmove(buffer + 2, buffer + 1, detail::precision - 1);
     std::memset(buffer + 1, '.', 1);
     os << buffer;
-    os << "e";
 
     // Offset will adjust the exponent to compensate for adding the decimal point
     const auto offset {detail::num_digits(d.full_significand()) - 1};
+    if (offset == 0)
+    {
+        os << "0";
+    }
+
+    os << "e";
     auto print_exp {static_cast<int>(d.full_exponent()) - detail::bias + offset};
 
     if (print_exp < 0)
@@ -1369,6 +1413,56 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator long double() const noexcept
 {
     // Double already has more range and precision than a decimal32 will ever be able to provide
     return static_cast<long double>(this->floating_conversion_impl<double>());
+}
+
+template <typename charT, typename traits>
+std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>& is, decimal32& d)
+{
+    char buffer[1024] {}; // What should be an unreasonably high maximum
+    is >> buffer;
+
+    bool sign {};
+    std::uint64_t significand {};
+    std::int32_t exp {};
+    const auto buffer_len {std::strlen(buffer)};
+
+    if (buffer_len == 0)
+    {
+        errno = EINVAL;
+        return is;
+    }
+
+    const auto r {detail::parser(buffer, buffer + buffer_len, sign, significand, exp)};
+
+    if (r.ec != std::errc{})
+    {
+        if (r.ec == std::errc::not_supported)
+        {
+            if (significand)
+            {
+                d = from_bits(boost::decimal::detail::snan_mask);
+            }
+            else
+            {
+                d = from_bits(boost::decimal::detail::nan_mask);
+            }
+        }
+        else if (r.ec == std::errc::value_too_large)
+        {
+            d = from_bits(boost::decimal::detail::inf_mask);
+        }
+        else
+        {
+            d = from_bits(boost::decimal::detail::snan_mask);
+            errno = static_cast<int>(r.ec);
+        }
+    }
+    else
+    {
+        d = decimal32(significand, exp, sign);
+    }
+
+    return is;
 }
 
 }} // Namespace boost::decimal

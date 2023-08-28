@@ -21,3 +21,4 @@ run quick.cpp ;
 run test_decimal32.cpp ;
 run roundtrip_decimal32.cpp ;
 run random_decimal32_math.cpp ;
+run test_decimal32_stream.cpp ;
