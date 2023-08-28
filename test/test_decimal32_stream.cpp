@@ -12,7 +12,26 @@ using namespace boost::decimal;
 
 void test_istream()
 {
+    decimal32 val;
+    std::stringstream in;
+    in.str("1.234567e+06");
+    in >> val;
+    BOOST_TEST_EQ(val, decimal32(1234567, 0));
 
+    errno = 0;
+    decimal32 val2;
+    std::stringstream in_zero;
+    in_zero.str("0");
+    in_zero >> val2;
+    BOOST_TEST_EQ(val2, decimal32(0, 0)) && BOOST_TEST_EQ(errno, 0);
+
+    decimal32 val3;
+    std::stringstream bad;
+    bad.str("");
+    bad >> val3;
+    BOOST_TEST_EQ(errno, EINVAL) && BOOST_TEST_NE(val3, std::numeric_limits<decimal32>::signaling_NaN());
+
+    errno = 0;
 }
 
 void test_ostream()

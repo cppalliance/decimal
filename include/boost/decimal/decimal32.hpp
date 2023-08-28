@@ -1424,12 +1424,19 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
     bool sign {};
     std::uint64_t significand {};
     std::int32_t exp;
+    const auto buffer_len {std::strlen(buffer)};
 
-    const auto r {detail::parser(buffer, buffer + sizeof(buffer), sign, significand, exp)};
+    if (buffer_len == 0)
+    {
+        errno = EINVAL;
+        return is;
+    }
+
+    const auto r {detail::parser(buffer, buffer + buffer_len, sign, significand, exp)};
 
     if (r.ec != std::errc{})
     {
-        d = decimal32(0);
+        d = from_bits(boost::decimal::detail::snan_mask);
         errno = static_cast<int>(r.ec);
     }
     else
