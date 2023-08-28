@@ -1098,6 +1098,40 @@ constexpr decimal32::operator unsigned long long() const noexcept
 template <typename charT, typename traits>
 std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d)
 {
+    if (issignaling(d))
+    {
+        if (d.isneg())
+        {
+            os << "-";
+        }
+
+        os << "nan(snan)";
+        return os;
+    }
+    else if (isnan(d)) // only quiet NaNs left
+    {
+        if (d.isneg())
+        {
+            os << "-nan(ind)";
+        }
+        else
+        {
+            os << "nan";
+        }
+
+        return os;
+    }
+    else if (isinf(d))
+    {
+        if (d.isneg())
+        {
+            os << "-";
+        }
+
+        os << "inf";
+        return os;
+    }
+
     char buffer[detail::precision + 2] {}; // Precision + decimal point + null terminator
 
     if (d.bits_.sign == 1)
@@ -1110,10 +1144,15 @@ std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>&
     std::memmove(buffer + 2, buffer + 1, detail::precision - 1);
     std::memset(buffer + 1, '.', 1);
     os << buffer;
-    os << "e";
 
     // Offset will adjust the exponent to compensate for adding the decimal point
     const auto offset {detail::num_digits(d.full_significand()) - 1};
+    if (offset == 0)
+    {
+        os << "0";
+    }
+
+    os << "e";
     auto print_exp {static_cast<int>(d.full_exponent()) - detail::bias + offset};
 
     if (print_exp < 0)
@@ -1383,7 +1422,7 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
     is >> buffer;
 
     bool sign {};
-    std::uint32_t significand {};
+    std::uint64_t significand {};
     std::int32_t exp;
 
     const auto r {detail::parser(buffer, buffer + sizeof(buffer), sign, significand, exp)};
