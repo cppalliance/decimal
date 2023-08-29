@@ -235,6 +235,10 @@ public:
     friend constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
 
+    #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+    friend constexpr std::strong_ordering operator<=>(decimal32 lhs, decimal32 rhs) noexcept;
+    #endif
+
     // 3.2.10 Formatted input:
     template <typename charT, typename traits>
     friend std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>& is, decimal32& d);
@@ -922,6 +926,22 @@ constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
 {
     return !(lhs < rhs);
 }
+
+#ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+constexpr std::strong_ordering operator<=>(decimal32 lhs, decimal32 rhs) noexcept
+{
+    if (lhs < rhs)
+    {
+        return std::strong_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::strong_ordering::greater;
+    }
+
+    return std::strong_ordering::equal;
+}
+#endif
 
 constexpr std::uint32_t decimal32::full_exponent() const noexcept
 {

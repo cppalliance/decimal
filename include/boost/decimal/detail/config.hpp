@@ -152,4 +152,9 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_UNLIKELY(x) x
 #endif
 
+#if defined(__cpp_lib_three_way_comparison) && __cpp_lib_three_way_comparison >= 201907L
+#  include <compare>
+#  define BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
