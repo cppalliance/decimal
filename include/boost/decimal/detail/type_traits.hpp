@@ -62,6 +62,15 @@ struct is_floating_point<__float128> { static constexpr bool value = true; };
 template <typename T>
 constexpr bool is_floating_point<T>::value;
 
+template <typename T>
+struct is_decimal_floating_point { static constexpr bool value = false; };
+
+template <>
+struct is_decimal_floating_point<decimal32> { static constexpr bool value = true; };
+
+template <typename T>
+constexpr bool is_decimal_floating_point<T>::value;
+
 }}} // Namespaces
 
 #endif
