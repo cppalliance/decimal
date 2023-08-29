@@ -247,6 +247,10 @@ public:
     template <typename charT, typename traits>
     friend std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d);
 
+    // <cmath> extensions
+    // 3.6.4 Same Quantum
+    friend constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept;
+
     // Debug bit pattern
     friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
     friend std::uint32_t to_bits(decimal32 rhs) noexcept;
@@ -1507,6 +1511,28 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
     }
 
     return is;
+}
+
+// 3.6.4
+// Effects: determines if the quantum exponents of x and y are the same.
+// If both x and y are NaN, or infinity, they have the same quantum exponents;
+// if exactly one operand is infinity or exactly one operand is NaN, they do not have the same quantum exponents.
+// The samequantum functions raise no exception.
+constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept
+{
+    const auto lhs_fp {fpclassify(lhs)};
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if ((lhs_fp == FP_NAN && rhs_fp == FP_NAN) || (lhs_fp == FP_INFINITE && rhs_fp == FP_INFINITE))
+    {
+        return true;
+    }
+    if ((lhs_fp == FP_NAN || lhs_fp == FP_INFINITE) ^ (rhs_fp == FP_NAN || rhs_fp == FP_INFINITE))
+    {
+        return false;
+    }
+
+    return lhs.full_exponent() == rhs.full_exponent();
 }
 
 }} // Namespace boost::decimal
