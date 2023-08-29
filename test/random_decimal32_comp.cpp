@@ -38,6 +38,29 @@ void random_LT(T lower, T upper)
 }
 
 template <typename T>
+void random_mixed_LT(T lower, T upper)
+{
+    std::uniform_int_distribution<T> dist(lower, upper);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const decimal32 dec1 {val1};
+        const T dec2 {static_cast<T>(decimal32(val2))};
+
+        if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+}
+
+template <typename T>
 void random_LE(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
@@ -49,6 +72,29 @@ void random_LE(T lower, T upper)
 
         const decimal32 dec1 {val1};
         const decimal32 dec2 {val2};
+
+        if (!BOOST_TEST_EQ(dec1 <= dec2, val1 <= val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+}
+
+template <typename T>
+void random_mixed_LE(T lower, T upper)
+{
+    std::uniform_int_distribution<T> dist(lower, upper);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const decimal32 dec1 {val1};
+        const T dec2 {static_cast<T>(decimal32(val2))};
 
         if (!BOOST_TEST_EQ(dec1 <= dec2, val1 <= val2))
         {
@@ -84,6 +130,29 @@ void random_GT(T lower, T upper)
 }
 
 template <typename T>
+void random_mixed_GT(T lower, T upper)
+{
+    std::uniform_int_distribution<T> dist(lower, upper);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const decimal32 dec1 {val1};
+        const T dec2 {static_cast<T>(decimal32(val2))};
+
+        if (!BOOST_TEST_EQ(dec1 > dec2, val1 > val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+}
+
+template <typename T>
 void random_GE(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
@@ -95,6 +164,29 @@ void random_GE(T lower, T upper)
 
         const decimal32 dec1 {val1};
         const decimal32 dec2 {val2};
+
+        if (!BOOST_TEST_EQ(dec1 >= dec2, val1 >= val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+}
+
+template <typename T>
+void random_mixed_GE(T lower, T upper)
+{
+    std::uniform_int_distribution<T> dist(lower, upper);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const decimal32 dec1 {val1};
+        const T dec2 {static_cast<T>(decimal32(val2))};
 
         if (!BOOST_TEST_EQ(dec1 >= dec2, val1 >= val2))
         {
@@ -130,6 +222,29 @@ void random_EQ(T lower, T upper)
 }
 
 template <typename T>
+void random_mixed_EQ(T lower, T upper)
+{
+    std::uniform_int_distribution<T> dist(lower, upper);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const decimal32 dec1 {val1};
+        const T dec2 {static_cast<T>(decimal32(val2))};
+
+        if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+}
+
+template <typename T>
 void random_NE(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
@@ -141,6 +256,29 @@ void random_NE(T lower, T upper)
 
         const decimal32 dec1 {val1};
         const decimal32 dec2 {val2};
+
+        if (!BOOST_TEST_EQ(dec1 != dec2, val1 != val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+}
+
+template <typename T>
+void random_mixed_NE(T lower, T upper)
+{
+    std::uniform_int_distribution<T> dist(lower, upper);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const decimal32 dec1 {val1};
+        const T dec2 {static_cast<T>(decimal32(val2))};
 
         if (!BOOST_TEST_EQ(dec1 != dec2, val1 != val2))
         {
@@ -175,6 +313,29 @@ void random_SPACESHIP(T lower, T upper)
         }
     }
 }
+
+template <typename T>
+void random_mixed_SPACESHIP(T lower, T upper)
+{
+    std::uniform_int_distribution<T> dist(lower, upper);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const decimal32 dec1 {val1};
+        const T dec2 {static_cast<T>(decimal32(val2))};
+
+        if (!BOOST_TEST((dec1 <=> dec2) == (val1 <=> val2)))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+}
 #endif
 
 int main()
@@ -186,12 +347,26 @@ int main()
     random_LT(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_LT(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
 
+    random_mixed_LT(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+    random_mixed_LT(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
+    random_mixed_LT(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
+    random_mixed_LT(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
+    random_mixed_LT(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
+    random_mixed_LT(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
+
     random_LE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_LE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_LE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_LE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_LE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_LE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
+
+    random_mixed_LE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+    random_mixed_LE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
+    random_mixed_LE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
+    random_mixed_LE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
+    random_mixed_LE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
+    random_mixed_LE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
 
     random_GT(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_GT(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
@@ -200,12 +375,26 @@ int main()
     random_GT(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_GT(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
 
+    random_mixed_GT(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+    random_mixed_GT(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
+    random_mixed_GT(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
+    random_mixed_GT(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
+    random_mixed_GT(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
+    random_mixed_GT(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
+
     random_GE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_GE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_GE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_GE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_GE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_GE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
+
+    random_mixed_GE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+    random_mixed_GE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
+    random_mixed_GE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
+    random_mixed_GE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
+    random_mixed_GE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
+    random_mixed_GE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
 
     random_EQ(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_EQ(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
@@ -214,12 +403,26 @@ int main()
     random_EQ(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_EQ(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
 
+    random_mixed_EQ(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+    random_mixed_EQ(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
+    random_mixed_EQ(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
+    random_mixed_EQ(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
+    random_mixed_EQ(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
+    random_mixed_EQ(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
+
     random_NE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_NE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_NE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_NE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_NE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_NE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
+
+    random_mixed_NE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+    random_mixed_NE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
+    random_mixed_NE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
+    random_mixed_NE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
+    random_mixed_NE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
+    random_mixed_NE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
 
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     random_SPACESHIP(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
@@ -228,6 +431,13 @@ int main()
     random_SPACESHIP(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_SPACESHIP(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_SPACESHIP(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
+
+    random_mixed_SPACESHIP(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+    random_mixed_SPACESHIP(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
+    random_mixed_SPACESHIP(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
+    random_mixed_SPACESHIP(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
+    random_mixed_SPACESHIP(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
+    random_mixed_SPACESHIP(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
     #endif
 
     return boost::report_errors();
