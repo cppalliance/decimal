@@ -4,7 +4,7 @@
 
 #include "mini_to_chars.hpp"
 
-#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <bitset>
 #include <limits>
@@ -19,6 +19,24 @@ static constexpr auto N {1024U};
 
 // NOLINTNEXTLINE : Seed with a constant for repeatability
 static std::mt19937_64 rng(42); // NOSONAR : Global rng is not const
+
+template <typename Dec>
+void test_nonfinite_samequantum()
+{
+    constexpr Dec one(1);
+    constexpr Dec two(2);
+    BOOST_TEST(samequantum(std::numeric_limits<Dec>::infinity(), std::numeric_limits<Dec>::infinity()));
+    BOOST_TEST(samequantum(std::numeric_limits<Dec>::quiet_NaN(), std::numeric_limits<Dec>::quiet_NaN()));
+    BOOST_TEST(samequantum(std::numeric_limits<Dec>::signaling_NaN(), std::numeric_limits<Dec>::signaling_NaN()));
+    BOOST_TEST(!samequantum(std::numeric_limits<Dec>::infinity(), std::numeric_limits<Dec>::quiet_NaN()));
+    BOOST_TEST(!samequantum(one, std::numeric_limits<Dec>::infinity()));
+    BOOST_TEST(!samequantum(one, std::numeric_limits<Dec>::quiet_NaN()));
+    BOOST_TEST(!samequantum(one, std::numeric_limits<Dec>::signaling_NaN()));
+    BOOST_TEST(!samequantum(std::numeric_limits<Dec>::infinity(), one));
+    BOOST_TEST(!samequantum(std::numeric_limits<Dec>::quiet_NaN(), one));
+    BOOST_TEST(!samequantum(std::numeric_limits<Dec>::signaling_NaN(), one));
+    BOOST_TEST(samequantum(one, two));
+}
 
 template <typename Dec>
 void test_same_quantum()
@@ -38,7 +56,7 @@ void test_same_quantum()
 
         if (exp1 == exp2)
         {
-            if (!BOOST_TEST(samequantumd32(val1, val2)))
+            if (!BOOST_TEST(samequantum(val1, val2)))
             {
                 std::cerr << "Val 1: " << val1
                           << "\nVal 2: " << val2 << std::endl;
@@ -46,7 +64,7 @@ void test_same_quantum()
         }
         else
         {
-            if (!BOOST_TEST(!samequantumd32(val1, val2)))
+            if (!BOOST_TEST(!samequantum(val1, val2)))
             {
                 std::cerr << "Val 1: " << val1
                           << "\nVal 2: " << val2 << std::endl;
