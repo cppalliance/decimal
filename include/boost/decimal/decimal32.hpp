@@ -1527,7 +1527,7 @@ constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept
     {
         return true;
     }
-    if ((lhs_fp == FP_NAN || lhs_fp == FP_INFINITE) ^ (rhs_fp == FP_NAN || rhs_fp == FP_INFINITE))
+    if ((lhs_fp == FP_NAN || rhs_fp == FP_INFINITE) || (rhs_fp == FP_NAN || lhs_fp == FP_INFINITE))
     {
         return false;
     }

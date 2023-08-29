@@ -76,6 +76,7 @@ void test_same_quantum()
 int main()
 {
     test_same_quantum<decimal32>();
+    test_nonfinite_samequantum<decimal32>();
 
     return boost::report_errors();
 }
