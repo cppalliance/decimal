@@ -1569,9 +1569,9 @@ public:
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_digits10 = digits;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int radix = 10;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent = -95;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent_10 = min_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent10 = min_exponent;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent = 96;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent_10 = max_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent10 = max_exponent;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = numeric_limits<std::uint32_t>::traps;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = true;
 
