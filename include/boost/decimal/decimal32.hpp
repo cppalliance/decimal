@@ -524,7 +524,11 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
         return res;
     }
 
-    const bool lhs_bigger {lhs > rhs};
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && rhs.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
     bool sign {};
 
     // Ensure that lhs is always the larger for ease of implementation
