@@ -6,5 +6,6 @@
 #define BOOST_DECIMAL_HPP
 
 #include <boost/decimal/fwd.hpp>
+#include <boost/decimal/common_math.hpp>
 
 #endif //BOOST_DECIMAL_HPP
