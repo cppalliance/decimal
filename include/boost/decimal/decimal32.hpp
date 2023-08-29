@@ -890,26 +890,46 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
         }
     }
 
-    std::uint32_t lhs_real_exp {lhs.full_exponent()};
-    std::uint32_t rhs_real_exp {rhs.full_exponent()};
-    std::uint32_t lhs_significand {lhs.full_significand()};
-    std::uint32_t rhs_significand {rhs.full_significand()};
+    const bool both_neg {lhs.bits_.sign && rhs.bits_.sign};
+    auto lhs_real_exp {lhs.biased_exponent()};
+    auto rhs_real_exp {rhs.biased_exponent()};
+    auto lhs_significand {lhs.full_significand()};
+    auto rhs_significand {rhs.full_significand()};
 
-    // Normalize the significands
+    // Normalize the significands and exponents
     normalize(lhs_significand, lhs_real_exp);
     normalize(rhs_significand, rhs_real_exp);
 
-    if (lhs_real_exp < rhs_real_exp)
+    if (both_neg)
     {
-        return true;
+        if (lhs_real_exp > rhs_real_exp)
+        {
+            return true;
+        }
+        else if (lhs_real_exp < rhs_real_exp)
+        {
+            return false;
+        }
+        else
+        {
+            return lhs_significand > rhs_significand;
+        }
     }
-    else if (lhs_real_exp > rhs_real_exp)
+    else
     {
-        return false;
+        if (lhs_real_exp < rhs_real_exp)
+        {
+            return true;
+        }
+        else if (lhs_real_exp > rhs_real_exp)
+        {
+            return false;
+        }
+        else
+        {
+            return lhs_significand < rhs_significand;
+        }
     }
-
-    // exponents are equal
-    return lhs_significand < rhs_significand;
 }
 
 constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept
