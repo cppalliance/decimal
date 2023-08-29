@@ -52,6 +52,9 @@ template <typename T>
 constexpr bool is_integral<T>::value;
 
 template <typename T>
+constexpr bool is_integral_v = is_integral<T>::value;
+
+template <typename T>
 struct is_floating_point { static constexpr bool value = std::is_floating_point<T>::value; };
 
 #ifdef BOOST_DECIMAL_HAS_FLOAT128
@@ -61,6 +64,21 @@ struct is_floating_point<__float128> { static constexpr bool value = true; };
 
 template <typename T>
 constexpr bool is_floating_point<T>::value;
+
+template <typename T>
+constexpr bool is_floating_point_v = is_floating_point<T>::value;
+
+template <typename T>
+struct is_decimal_floating_point { static constexpr bool value = false; };
+
+template <>
+struct is_decimal_floating_point<decimal32> { static constexpr bool value = true; };
+
+template <typename T>
+constexpr bool is_decimal_floating_point<T>::value;
+
+template <typename T>
+constexpr bool is_decimal_floating_point_v = is_decimal_floating_point<T>::value;
 
 }}} // Namespaces
 

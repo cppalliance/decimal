@@ -63,6 +63,11 @@ constexpr decimal32 operator/(T lhs, decimal32 rhs) noexcept
     return static_cast<decimal32>(lhs) / rhs;
 }
 
+constexpr bool samequantum(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return samequantumd32(lhs, rhs);
+}
+
 }}
 
 #endif // BOOST_DECIMAL_COMMON_MATH_HPP
