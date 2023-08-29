@@ -7,5 +7,6 @@
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/common_math.hpp>
+#include <boost/decimal/common_comp.hpp>
 
 #endif //BOOST_DECIMAL_HPP
