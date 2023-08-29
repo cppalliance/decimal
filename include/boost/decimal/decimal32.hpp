@@ -164,11 +164,11 @@ public:
     constexpr decimal32() noexcept = default;
 
     // 3.2.2.2 Conversion from floating-point type
-    template <typename Float, std::enable_if_t<detail::is_floating_point<Float>::value, bool> = true>
+    template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
 
     // 3.2.2.3 Conversion from integral type
-    template <typename Integer, std::enable_if_t<detail::is_integral<Integer>::value, bool> = true>
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal32(Integer val) noexcept;
 
     // 3.2.2.4 Conversion to integral type
@@ -180,7 +180,7 @@ public:
     explicit constexpr operator unsigned long long() const noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
-    template <typename T, typename T2, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
+    template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
     constexpr decimal32(T coeff, T2 exp, bool sign = false) noexcept;
 
     constexpr decimal32(const decimal32& val) noexcept = default;
@@ -253,13 +253,13 @@ public:
     friend void debug_pattern(decimal32 rhs) noexcept;
 };
 
-template <typename T, typename T2, std::enable_if_t<detail::is_integral<T>::value, bool>>
+template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
 constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
 {
     using Unsigned_Integer = detail::make_unsigned_t<T>;
 
-    static_assert(detail::is_integral<T>::value, "Coefficient must be an integer");
-    static_assert(detail::is_integral<T2>::value, "Exponent must be an integer");
+    static_assert(detail::is_integral_v<T>, "Coefficient must be an integer");
+    static_assert(detail::is_integral_v<T2>, "Exponent must be an integer");
 
     Unsigned_Integer unsigned_coeff {};
     BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T>::is_signed)
@@ -1023,7 +1023,7 @@ constexpr bool decimal32::isneg() const noexcept
     return static_cast<bool>(bits_.sign);
 }
 
-template <typename Float, std::enable_if_t<detail::is_floating_point<Float>::value, bool>>
+template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 {
     if (val != val)
@@ -1055,7 +1055,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
     }
 }
 
-template <typename Integer, std::enable_if_t<detail::is_integral<Integer>::value, bool>>
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
     *this = decimal32{val, 0};
