@@ -209,15 +209,10 @@ public:
 
     // 3.2.8 binary arithmetic operators:
     friend constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept;
-
     friend constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept;
-
     friend constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept;
-
     friend constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept;
-
     friend constexpr decimal32 operator%(decimal32 lhs, decimal32 rhs) noexcept;
-
 
     // 3.2.2.5 Increment and Decrement
     constexpr decimal32& operator++() noexcept;
