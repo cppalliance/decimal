@@ -17,7 +17,8 @@ constexpr void swap(T& x, T& y) noexcept
     y = temp;
 }
 
-constexpr std::size_t strlen(const char* str)
+template <typename T>
+constexpr std::size_t strlen(const T* str) noexcept
 {
     std::size_t i {};
     while (*str != '\0')
