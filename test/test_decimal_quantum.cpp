@@ -88,14 +88,25 @@ void test_quantexp()
     constexpr Dec test_val {1, 26};
     BOOST_TEST_EQ(quantexp(test_val), 127);
 
+    // Loop through every possible exponent
     for (auto i {std::numeric_limits<Dec>::min_exponent10}; i < std::numeric_limits<Dec>::max_exponent10; ++i)
     {
         const Dec val1 {1, i};
 
-        if (!BOOST_TEST_EQ(quantexp(val1), i + detail::bias))
+        if (static_cast<std::uint32_t>(i) + detail::bias > detail::max_biased_exp)
         {
-            std::cerr << "Val 1: " << val1
-                      << "\nExp 1: " << i << std::endl;
+            if (!BOOST_TEST_EQ(quantexp(val1), detail::max_biased_exp))
+            {
+                std::cerr << "Val: " << val1 << std::endl;
+            }
+        }
+        else
+        {
+            if (!BOOST_TEST_EQ(quantexp(val1), i + detail::bias))
+            {
+                std::cerr << "Val: " << val1
+                          << "\nExp 1: " << i << std::endl;
+            }
         }
     }
 }
