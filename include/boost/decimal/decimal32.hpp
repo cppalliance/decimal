@@ -27,6 +27,7 @@
 #include <cerrno>
 #include <cstring>
 #include <climits>
+#include <cwchar>
 
 namespace boost { namespace decimal {
 
@@ -270,6 +271,9 @@ public:
 
     // 3.8.2 strtod
     friend constexpr decimal32 strtod32(const char* str, char** endptr) noexcept;
+
+    // 3.9.2 wcstod
+    friend constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept;
 };
 
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
@@ -1629,6 +1633,12 @@ constexpr decimal32 quantized32(decimal32 lhs, decimal32 rhs) noexcept
 
 constexpr decimal32 strtod32(const char* str, char** endptr) noexcept
 {
+    if (str == nullptr)
+    {
+        errno = EINVAL;
+        return boost::decimal::from_bits(boost::decimal::detail::snan_mask);
+    }
+
     bool sign {};
     std::uint64_t significand {};
     std::int32_t exp {};
@@ -1673,6 +1683,35 @@ constexpr decimal32 strtod32(const char* str, char** endptr) noexcept
 
     *endptr = const_cast<char*>(str + (r.ptr - str));
     return d;
+}
+
+constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept
+{
+    char buffer[1024] {};
+    if (str == nullptr || detail::strlen(str) > sizeof(buffer))
+    {
+        errno = EINVAL;
+        return boost::decimal::from_bits(boost::decimal::detail::snan_mask);
+    }
+
+    // Convert all the characters from wchar_t to char and use regular strtod32
+    for (std::size_t i {}; i < detail::strlen(str); ++i)
+    {
+        auto val {*(str + i)};
+        if (BOOST_DECIMAL_UNLIKELY(val < 0 || val > 255))
+        {
+            // Character can not be converted
+            break;
+        }
+
+        buffer[i] = static_cast<char>(val);
+    }
+
+    char* short_endptr {};
+    const auto return_val {strtod32(buffer, &short_endptr)};
+
+    *endptr = const_cast<wchar_t*>(str + (short_endptr - buffer));
+    return return_val;
 }
 
 }} // Namespace boost::decimal

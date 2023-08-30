@@ -9,9 +9,16 @@
 
 namespace boost { namespace decimal {
 
+// TODO(mborland): To match regular strtod these should return decimal64 once it exists
+
 constexpr decimal32 strtod(const char* str, char** endptr) noexcept
 {
     return strtod32(str, endptr);
+}
+
+constexpr decimal32 wcstod(const wchar_t* str, wchar_t** endptr) noexcept
+{
+    return wcstod32(str, endptr);
 }
 
 }} // Namespaces
