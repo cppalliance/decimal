@@ -28,7 +28,7 @@ void roundtrip_strtod()
         const T val {sig(rng), exp(rng)};
         std::stringstream ss;
         ss << val;
-        char* endptr;
+        char* endptr {};
 
         const T return_val {boost::decimal::strtod(ss.str().c_str(), &endptr)};
         const auto len {std::strlen(ss.str().c_str())};
@@ -58,7 +58,7 @@ void roundtrip_wcstrtod()
         const T val {sig(rng), exp(rng)};
         std::wstringstream ss;
         ss << val;
-        wchar_t* endptr;
+        wchar_t* endptr {};
 
         const T return_val {boost::decimal::wcstod(ss.str().c_str(), &endptr)};
         const auto len {ss.str().size()};
