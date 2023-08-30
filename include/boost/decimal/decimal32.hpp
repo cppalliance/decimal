@@ -264,6 +264,9 @@ public:
     // 3.6.6 Quantize
     friend constexpr decimal32 quantized32(decimal32 lhs, decimal32 rhs) noexcept;
 
+    // 3.8.2 strtod
+    friend constexpr decimal32 strtod32(const char* str, char** endptr) noexcept;
+
     // Debug bit pattern
     friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
     friend std::uint32_t to_bits(decimal32 rhs) noexcept;
@@ -1623,6 +1626,54 @@ constexpr decimal32 quantized32(decimal32 lhs, decimal32 rhs) noexcept
     }
 
     return {lhs.full_significand(), rhs.biased_exponent(), lhs.isneg()};
+}
+
+constexpr decimal32 strtod32(const char* str, char** endptr) noexcept
+{
+    bool sign {};
+    std::uint64_t significand {};
+    std::int32_t exp {};
+    const auto buffer_len {detail::strlen(str)};
+
+    if (buffer_len == 0)
+    {
+        errno = EINVAL;
+        return from_bits(boost::decimal::detail::snan_mask);
+    }
+
+    const auto r {detail::parser(str, str + buffer_len, sign, significand, exp)};
+    decimal32 d;
+
+    if (r.ec != std::errc{})
+    {
+        if (r.ec == std::errc::not_supported)
+        {
+            if (significand)
+            {
+                d = from_bits(boost::decimal::detail::snan_mask);
+            }
+            else
+            {
+                d = from_bits(boost::decimal::detail::nan_mask);
+            }
+        }
+        else if (r.ec == std::errc::value_too_large)
+        {
+            d = from_bits(boost::decimal::detail::inf_mask);
+        }
+        else
+        {
+            d = from_bits(boost::decimal::detail::snan_mask);
+            errno = static_cast<int>(r.ec);
+        }
+    }
+    else
+    {
+        d = decimal32(significand, exp, sign);
+    }
+
+    *endptr = const_cast<char*>(str + (r.ptr - str));
+    return d;
 }
 
 }} // Namespace boost::decimal
