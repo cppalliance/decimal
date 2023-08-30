@@ -5,14 +5,28 @@
 #ifndef BOOST_DECIMAL_DETAIL_UTILITIES_HPP
 #define BOOST_DECIMAL_DETAIL_UTILITIES_HPP
 
+#include <cstddef>
+
 namespace boost { namespace decimal { namespace detail {
 
 template <typename T>
 constexpr void swap(T& x, T& y) noexcept
 {
-    const T temp = x;
+    const T temp {x};
     x = y;
     y = temp;
+}
+
+constexpr std::size_t strlen(const char* str)
+{
+    std::size_t i {};
+    while (*str != '\0')
+    {
+        ++str;
+        ++i;
+    }
+
+    return i;
 }
 
 }}} // Namespaces
