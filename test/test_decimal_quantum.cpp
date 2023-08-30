@@ -73,10 +73,49 @@ void test_same_quantum()
     }
 }
 
+template <typename Dec>
+void test_quantexp()
+{
+    // Loop through every possible exponent
+    for (auto i {std::numeric_limits<Dec>::min_exponent10}; i < std::numeric_limits<Dec>::max_exponent10; ++i)
+    {
+        const Dec val1 {1, i};
+
+        if (static_cast<std::uint32_t>(i) + detail::bias > detail::max_biased_exp)
+        {
+            if (!BOOST_TEST_EQ(quantexp(val1), detail::max_biased_exp))
+            {
+                std::cerr << "Val: " << val1 << std::endl;
+            }
+        }
+        else
+        {
+            if (!BOOST_TEST_EQ(quantexp(val1), i + detail::bias))
+            {
+                std::cerr << "Val: " << val1
+                          << "\nExp 1: " << i << std::endl;
+            }
+        }
+    }
+}
+
+template <typename Dec>
+void test_nonfinite_quantexp()
+{
+    BOOST_TEST_EQ(quantexp(std::numeric_limits<Dec>::infinity()), INT_MIN);
+    BOOST_TEST_EQ(quantexp(-std::numeric_limits<Dec>::infinity()), INT_MIN);
+    BOOST_TEST_EQ(quantexp(std::numeric_limits<Dec>::quiet_NaN()), INT_MIN);
+    BOOST_TEST_EQ(quantexp(-std::numeric_limits<Dec>::quiet_NaN()), INT_MIN);
+    BOOST_TEST_EQ(quantexp(std::numeric_limits<Dec>::signaling_NaN()), INT_MIN);
+    BOOST_TEST_EQ(quantexp(-std::numeric_limits<Dec>::signaling_NaN()), INT_MIN);
+}
+
 int main()
 {
     test_same_quantum<decimal32>();
     test_nonfinite_samequantum<decimal32>();
+    test_quantexp<decimal32>();
+    test_nonfinite_quantexp<decimal32>();
 
     return boost::report_errors();
 }

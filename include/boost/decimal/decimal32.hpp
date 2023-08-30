@@ -26,6 +26,7 @@
 #include <cassert>
 #include <cerrno>
 #include <cstring>
+#include <climits>
 
 namespace boost { namespace decimal {
 
@@ -100,6 +101,7 @@ static constexpr std::uint32_t construct_significand_mask = no_combination;
 
 } // Namespace detail
 
+// Converts the significand to 9 digits to remove the effects of cohorts.
 template <typename T>
 constexpr void normalize(std::uint32_t& significand, T& exp) noexcept
 {
@@ -143,8 +145,13 @@ private:
 
     data_layout_ bits_{};
 
+    // Returns the un-biased (quantum) exponent
     constexpr std::uint32_t full_exponent() const noexcept;
+
+    // Returns the biased exponent
     constexpr std::int32_t biased_exponent() const noexcept;
+
+    // Returns the significand complete with the bits implied from the combination field
     constexpr std::uint32_t full_significand() const noexcept;
     constexpr bool isneg() const noexcept;
 
@@ -251,6 +258,9 @@ public:
     // 3.6.4 Same Quantum
     friend constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept;
 
+    // 3.6.5 Quantum exponent
+    friend constexpr int quantexpd32(decimal32 x) noexcept;
+
     // Debug bit pattern
     friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
     friend std::uint32_t to_bits(decimal32 rhs) noexcept;
@@ -354,13 +364,13 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
     }
 
     // If the exponent fits we do not need to use the combination field
-    const std::uint32_t biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
+    std::uint32_t biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
     const std::uint32_t biased_exp_low_six {biased_exp & detail::exp_combination_field_mask};
     if (biased_exp <= detail::max_exp_no_combination)
     {
         bits_.exponent = biased_exp;
     }
-    else if (biased_exp < detail::exp_one_combination)
+    else if (biased_exp <= detail::exp_one_combination)
     {
         if (big_combination)
         {
@@ -388,8 +398,36 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
     }
     else
     {
-        // The value is infinity
-        bits_.combination_field = detail::comb_inf_mask;
+        // The value is probably infinity
+
+        // If we can offset some extra power in the coefficient try to do so
+        const auto coeff_dig {detail::num_digits(reduced_coeff)};
+        if (coeff_dig < detail::precision)
+        {
+            for (auto i {coeff_dig}; i <= detail::precision; ++i)
+            {
+                reduced_coeff *= 10;
+                --biased_exp;
+                --exp;
+                if (biased_exp == detail::max_biased_exp)
+                {
+                    break;
+                }
+            }
+
+            if (detail::num_digits(reduced_coeff) <= detail::precision)
+            {
+                *this = decimal32(reduced_coeff, exp, static_cast<bool>(bits_.sign));
+            }
+            else
+            {
+                bits_.combination_field = detail::comb_inf_mask;
+            }
+        }
+        else
+        {
+            bits_.combination_field = detail::comb_inf_mask;
+        }
     }
 }
 
@@ -1533,6 +1571,19 @@ constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept
     }
 
     return lhs.full_exponent() == rhs.full_exponent();
+}
+
+// 3.6.5
+// Effects: if x is finite, returns its quantum exponent.
+// Otherwise, a domain error occurs and INT_MIN is returned.
+constexpr int quantexpd32(decimal32 x) noexcept
+{
+    if (!isfinite(x))
+    {
+        return INT_MIN;
+    }
+
+    return static_cast<int>(x.full_exponent());
 }
 
 }} // Namespace boost::decimal

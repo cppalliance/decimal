@@ -68,6 +68,11 @@ constexpr bool samequantum(decimal32 lhs, decimal32 rhs) noexcept
     return samequantumd32(lhs, rhs);
 }
 
+constexpr int quantexp(decimal32 x) noexcept
+{
+    return quantexpd32(x);
+}
+
 }}
 
 #endif // BOOST_DECIMAL_COMMON_MATH_HPP
