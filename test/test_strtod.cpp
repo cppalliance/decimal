@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <random>
+#include <cwchar>
 
 using namespace boost::decimal;
 
@@ -43,9 +44,40 @@ void roundtrip_strtod()
     }
 }
 
+template <typename T>
+void roundtrip_wcstrtod()
+{
+    std::mt19937_64 rng(42);
+
+    std::uniform_int_distribution<std::int64_t> sig(1'000'000, 9'999'999);
+    std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<T>::min_exponent10 + 19,
+                                                    std::numeric_limits<T>::max_exponent10 - 19);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val {sig(rng), exp(rng)};
+        std::wstringstream ss;
+        ss << val;
+        wchar_t* endptr;
+
+        const T return_val {boost::decimal::wcstod(ss.str().c_str(), &endptr)};
+        const auto len {ss.str().size()};
+        const auto dist {endptr - ss.str().c_str()};
+
+        if (!BOOST_TEST_EQ(val, return_val) && BOOST_TEST_EQ(len, dist))
+        {
+            std::cerr << "Val 1: " << val
+                      << "\nVal 2: " << return_val
+                      << "\nStrlen: " << len
+                      << "\n  Dist: " << dist << std::endl;
+        }
+    }
+}
+
 int main()
 {
     roundtrip_strtod<decimal32>();
+    roundtrip_wcstrtod<decimal32>();
 
     return boost::report_errors();
 }
