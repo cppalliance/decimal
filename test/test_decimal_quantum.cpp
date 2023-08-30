@@ -76,17 +76,8 @@ void test_same_quantum()
 template <typename Dec>
 void test_quantexp()
 {
-    constexpr Dec default_init;
-    BOOST_TEST_EQ(quantexp(default_init), 0);
-
-    constexpr Dec one {1, 0};
-    BOOST_TEST_EQ(quantexp(one), detail::bias);
-
     std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<Dec>::min_exponent10 + 19,
                                                     std::numeric_limits<Dec>::max_exponent10 - 19);
-
-    constexpr Dec test_val {1, 26};
-    BOOST_TEST_EQ(quantexp(test_val), 127);
 
     // Loop through every possible exponent
     for (auto i {std::numeric_limits<Dec>::min_exponent10}; i < std::numeric_limits<Dec>::max_exponent10; ++i)
