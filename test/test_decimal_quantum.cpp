@@ -76,9 +76,6 @@ void test_same_quantum()
 template <typename Dec>
 void test_quantexp()
 {
-    std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<Dec>::min_exponent10 + 19,
-                                                    std::numeric_limits<Dec>::max_exponent10 - 19);
-
     // Loop through every possible exponent
     for (auto i {std::numeric_limits<Dec>::min_exponent10}; i < std::numeric_limits<Dec>::max_exponent10; ++i)
     {
