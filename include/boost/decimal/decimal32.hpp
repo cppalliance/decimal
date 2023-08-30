@@ -26,6 +26,7 @@
 #include <cassert>
 #include <cerrno>
 #include <cstring>
+#include <climits>
 
 namespace boost { namespace decimal {
 
