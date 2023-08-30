@@ -73,6 +73,11 @@ constexpr int quantexp(decimal32 x) noexcept
     return quantexpd32(x);
 }
 
+constexpr decimal32 quantize(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return quantized32(lhs, rhs);
+}
+
 }}
 
 #endif // BOOST_DECIMAL_COMMON_MATH_HPP
