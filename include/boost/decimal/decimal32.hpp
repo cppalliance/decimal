@@ -363,7 +363,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
     }
 
     // If the exponent fits we do not need to use the combination field
-    const std::uint32_t biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
+    std::uint32_t biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
     const std::uint32_t biased_exp_low_six {biased_exp & detail::exp_combination_field_mask};
     if (biased_exp <= detail::max_exp_no_combination)
     {
@@ -397,8 +397,36 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
     }
     else
     {
-        // The value is infinity
-        bits_.combination_field = detail::comb_inf_mask;
+        // The value is probably infinity
+
+        // If we can offset some extra power in the coefficient try to do so
+        const auto coeff_dig {detail::num_digits(reduced_coeff)};
+        if (coeff_dig < detail::precision)
+        {
+            for (auto i {coeff_dig}; i <= detail::precision; ++i)
+            {
+                reduced_coeff *= 10;
+                --biased_exp;
+                --exp;
+                if (biased_exp == detail::max_biased_exp)
+                {
+                    break;
+                }
+            }
+
+            if (detail::num_digits(reduced_coeff) <= detail::precision)
+            {
+                *this = decimal32(reduced_coeff, exp, static_cast<bool>(bits_.sign));
+            }
+            else
+            {
+                bits_.combination_field = detail::comb_inf_mask;
+            }
+        }
+        else
+        {
+            bits_.combination_field = detail::comb_inf_mask;
+        }
     }
 }
 
