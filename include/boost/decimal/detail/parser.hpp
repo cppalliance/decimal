@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_CHARCONV_DETAIL_PARSER_HPP
-#define BOOST_CHARCONV_DETAIL_PARSER_HPP
+#ifndef BOOST_DECIMAL_DETAIL_PARSER_HPP
+#define BOOST_DECIMAL_DETAIL_PARSER_HPP
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/from_chars_result.hpp>
@@ -23,22 +23,22 @@
 
 namespace boost { namespace decimal { namespace detail {
 
-inline bool is_integer_char(char c) noexcept
+constexpr bool is_integer_char(char c) noexcept
 {
     return (c >= '0') && (c <= '9');
 }
 
-inline bool is_delimiter(char c) noexcept
+constexpr bool is_delimiter(char c) noexcept
 {
     return !is_integer_char(c) && c != 'e' && c != 'E';
 }
 
-inline from_chars_result from_chars_dispatch(const char* first, const char* last, std::uint64_t& value, int base) noexcept
+constexpr inline from_chars_result from_chars_dispatch(const char* first, const char* last, std::uint64_t& value, int base) noexcept
 {
     return boost::decimal::detail::from_chars(first, last, value, base);
 }
 
-inline from_chars_result from_chars_dispatch(const char* first, const char* last, uint128& value, int base) noexcept
+constexpr from_chars_result from_chars_dispatch(const char* first, const char* last, uint128& value, int base) noexcept
 {
     return boost::decimal::detail::from_chars128(first, last, value, base);
 }
@@ -51,7 +51,7 @@ inline from_chars_result from_chars_dispatch(const char* first, const char* last
 #endif
 
 template <typename Unsigned_Integer, typename Integer>
-inline from_chars_result parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent) noexcept
+constexpr from_chars_result parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent) noexcept
 {
     if (first > last)
     {
@@ -109,11 +109,8 @@ inline from_chars_result parser(const char* first, const char* last, bool& sign,
     }
 
     // If the number is 0 we can abort now
-    char exp_char;
-    char capital_exp_char;
-
-    exp_char = 'e';
-    capital_exp_char = 'E';
+    constexpr char exp_char {'e'};
+    constexpr char capital_exp_char {'E'};
 
     if (next == last || *next == exp_char || *next == -capital_exp_char)
     {
@@ -378,4 +375,4 @@ inline from_chars_result parser(const char* first, const char* last, bool& sign,
 # pragma GCC diagnostic pop
 #endif
 
-#endif // BOOST_CHARCONV_DETAIL_PARSER_HPP
+#endif // BOOST_DECIMAL_DETAIL_PARSER_HPP
