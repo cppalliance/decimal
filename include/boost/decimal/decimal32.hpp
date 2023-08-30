@@ -261,6 +261,9 @@ public:
     // 3.6.5 Quantum exponent
     friend constexpr int quantexpd32(decimal32 x) noexcept;
 
+    // 3.6.6 Quantize
+    friend constexpr decimal32 quantized32(decimal32 lhs, decimal32 rhs) noexcept;
+
     // Debug bit pattern
     friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
     friend std::uint32_t to_bits(decimal32 rhs) noexcept;
@@ -1584,6 +1587,42 @@ constexpr int quantexpd32(decimal32 x) noexcept
     }
 
     return static_cast<int>(x.full_exponent());
+}
+
+// 3.6.6
+// Returns: a number that is equal in value (except for any rounding) and sign to x,
+// and which has an exponent set to be equal to the exponent of y.
+// If the exponent is being increased, the value is correctly rounded according to the current rounding mode;
+// if the result does not have the same value as x, the "inexact" floating-point exception is raised.
+// If the exponent is being decreased and the significand of the result has more digits than the type would allow,
+// the "invalid" floating-point exception is raised and the result is NaN.
+// If one or both operands are NaN the result is NaN.
+// Otherwise, if only one operand is infinity, the "invalid" floating-point exception is raised and the result is NaN.
+// If both operands are infinity, the result is DEC_INFINITY, with the same sign as x, converted to the type of x.
+// The quantize functions do not signal underflow.
+constexpr decimal32 quantized32(decimal32 lhs, decimal32 rhs) noexcept
+{
+    // Return the correct type of nan
+    if (isnan(lhs))
+    {
+        return lhs;
+    }
+    else if (isnan(rhs))
+    {
+        return rhs;
+    }
+
+    // If one is infinity then return a signaling NAN
+    if (isinf(lhs) != isinf(rhs))
+    {
+        return boost::decimal::from_bits(boost::decimal::detail::snan_mask);
+    }
+    else if (isinf(lhs) && isinf(rhs))
+    {
+        return lhs;
+    }
+
+    return {lhs.full_significand(), rhs.biased_exponent(), lhs.isneg()};
 }
 
 }} // Namespace boost::decimal
