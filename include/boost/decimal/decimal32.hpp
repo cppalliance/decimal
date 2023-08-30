@@ -166,6 +166,10 @@ private:
     template <typename T>
     BOOST_DECIMAL_CXX20_CONSTEXPR T floating_conversion_impl() const noexcept;
 
+    // Debug bit pattern
+    friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
+    friend std::uint32_t to_bits(decimal32 rhs) noexcept;
+    friend void debug_pattern(decimal32 rhs) noexcept;
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -266,11 +270,6 @@ public:
 
     // 3.8.2 strtod
     friend constexpr decimal32 strtod32(const char* str, char** endptr) noexcept;
-
-    // Debug bit pattern
-    friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
-    friend std::uint32_t to_bits(decimal32 rhs) noexcept;
-    friend void debug_pattern(decimal32 rhs) noexcept;
 };
 
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
