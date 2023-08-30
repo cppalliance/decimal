@@ -100,6 +100,7 @@ static constexpr std::uint32_t construct_significand_mask = no_combination;
 
 } // Namespace detail
 
+// Converts the significand to 9 digits to remove the effects of cohorts.
 template <typename T>
 constexpr void normalize(std::uint32_t& significand, T& exp) noexcept
 {
@@ -143,8 +144,13 @@ private:
 
     data_layout_ bits_{};
 
+    // Returns the un-biased (quantum) exponent
     constexpr std::uint32_t full_exponent() const noexcept;
+
+    // Returns the biased exponent
     constexpr std::int32_t biased_exponent() const noexcept;
+
+    // Returns the significand complete with the bits implied from the combination field
     constexpr std::uint32_t full_significand() const noexcept;
     constexpr bool isneg() const noexcept;
 
@@ -250,6 +256,9 @@ public:
     // <cmath> extensions
     // 3.6.4 Same Quantum
     friend constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept;
+
+    // 3.6.5 Quantum exponent
+    friend constexpr int quantexpd32(decimal32 x) noexcept;
 
     // Debug bit pattern
     friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
@@ -1533,6 +1542,19 @@ constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept
     }
 
     return lhs.full_exponent() == rhs.full_exponent();
+}
+
+// 3.6.5
+// Effects: if x is finite, returns its quantum exponent.
+// Otherwise, a domain error occurs and INT_MIN is returned.
+constexpr int quantexpd32(decimal32 x) noexcept
+{
+    if (!isfinite(x))
+    {
+        return INT_MIN;
+    }
+
+    return static_cast<int>(x.full_exponent());
 }
 
 }} // Namespace boost::decimal
