@@ -86,7 +86,7 @@ void test_quantexp()
                                                     std::numeric_limits<Dec>::max_exponent10 - 19);
 
     constexpr Dec test_val {1, 26};
-    BOOST_TEST_EQ(quantexp(test_val), 121);
+    BOOST_TEST_EQ(quantexp(test_val), 127);
 
     for (auto i {std::numeric_limits<Dec>::min_exponent10}; i < std::numeric_limits<Dec>::max_exponent10; ++i)
     {

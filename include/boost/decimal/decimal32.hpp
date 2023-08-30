@@ -369,7 +369,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
     {
         bits_.exponent = biased_exp;
     }
-    else if (biased_exp < detail::exp_one_combination)
+    else if (biased_exp <= detail::exp_one_combination)
     {
         if (big_combination)
         {
