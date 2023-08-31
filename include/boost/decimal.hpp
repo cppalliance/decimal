@@ -9,5 +9,6 @@
 #include <boost/decimal/common_math.hpp>
 #include <boost/decimal/common_comp.hpp>
 #include <boost/decimal/cstdlib.hpp>
+#include <boost/decimal/fenv.hpp>
 
 #endif //BOOST_DECIMAL_HPP

@@ -5,6 +5,8 @@
 #ifndef BOOST_DECIMAL_FENV_HPP
 #define BOOST_DECIMAL_FENV_HPP
 
+#include <cfenv>
+
 namespace boost { namespace decimal {
 
 enum class rounding_mode : unsigned
