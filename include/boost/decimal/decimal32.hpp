@@ -307,94 +307,22 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
         --unsigned_coeff_digits;
     }
 
-    // If we don't have consteval detection we need to default to the constexpr path
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-    if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
+    if (reduced)
     {
-        // In runtime mode we can round based on what the fenv says
-        if (reduced)
+        const auto trailing_num {unsigned_coeff % 10};
+        unsigned_coeff /= 10;
+        ++exp;
+        if (trailing_num >= 5)
         {
-            const auto round {fegetround()};
-
-            const auto trailing_num {unsigned_coeff % 10};
-            unsigned_coeff /= 10;
-            ++exp;
-
-            // Default rounding mode
-            if (round == rounding_mode::fe_dec_to_nearest_from_zero)
-            {
-                if (trailing_num >= 5)
-                {
-                    ++unsigned_coeff;
-                }
-            }
-            else if (round == rounding_mode::fe_dec_downward)
-            {
-                // Do nothing
-            }
-            else if (round == rounding_mode::fe_dec_to_nearest)
-            {
-                // Round to even
-                if (trailing_num == 5)
-                {
-                    if (unsigned_coeff % 2 == 1)
-                    {
-                        ++unsigned_coeff;
-                    }
-                }
-                // ... or nearest
-                else if (trailing_num > 5)
-                {
-                    ++unsigned_coeff;
-                }
-            }
-            else if (round == rounding_mode::fe_dec_toward_zero)
-            {
-                if (bits_.sign && trailing_num != 0)
-                {
-                    ++unsigned_coeff;
-                }
-            }
-            else // rounding_mode::fe_dec_upward
-            {
-                if (trailing_num != 0)
-                {
-                    ++unsigned_coeff;
-                }
-            }
-
-
-            // If the significand was e.g. 99'999'999 rounding up
-            // would put it out of range again
-            if (unsigned_coeff > detail::max_significand)
-            {
-                unsigned_coeff /= 10;
-                ++exp;
-            }
+            ++unsigned_coeff;
         }
-    }
-    else
-    #endif
-    {
-        // Default rounding mode
-        // Will be constexpr
-        if (reduced)
+
+        // If the significand was e.g. 99'999'999 rounding up
+        // would put it out of range again
+        if (unsigned_coeff > detail::max_significand)
         {
-            const auto trailing_num {unsigned_coeff % 10};
             unsigned_coeff /= 10;
             ++exp;
-            if (trailing_num >= 5)
-            {
-                ++unsigned_coeff;
-            }
-
-            // If the significand was e.g. 99'999'999 rounding up
-            // would put it out of range again
-            if (unsigned_coeff > detail::max_significand)
-            {
-                unsigned_coeff /= 10;
-                ++exp;
-            }
         }
     }
 
@@ -745,8 +673,6 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
     {
         auto carry_dig = sig_rhs % 10;
         sig_rhs /= 10;
-
-        // TODO(mborland): Rounding modes
         if (carry_dig >= 5)
         {
             carry = true;
@@ -920,7 +846,6 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
             const auto carry_dig {signed_sig_lhs % 10};
             signed_sig_lhs /= 10;
 
-            // TODO(mborland): rounding modes
             if (carry_dig >= 5)
             {
                 ++signed_sig_lhs;
@@ -1153,7 +1078,7 @@ constexpr bool decimal32::isneg() const noexcept
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 {
-    if (std::isnan(val))
+    if (val != val)
     {
         *this = boost::decimal::from_bits(boost::decimal::detail::nan_mask);
     }
