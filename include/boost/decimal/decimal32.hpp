@@ -18,7 +18,7 @@
 #include <boost/decimal/detail/fast_float/compute_float32.hpp>
 #include <boost/decimal/detail/fast_float/compute_float64.hpp>
 #include <boost/decimal/detail/parser.hpp>
-#include <boost/decimal/fenv.hpp>
+#include <boost/decimal/detail/fenv_rounding.hpp>
 #include <type_traits>
 #include <iostream>
 #include <limits>
@@ -380,21 +380,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
         // Will be constexpr
         if (reduced)
         {
-            const auto trailing_num {unsigned_coeff % 10};
-            unsigned_coeff /= 10;
-            ++exp;
-            if (trailing_num >= 5)
-            {
-                ++unsigned_coeff;
-            }
-
-            // If the significand was e.g. 99'999'999 rounding up
-            // would put it out of range again
-            if (unsigned_coeff > detail::max_significand)
-            {
-                unsigned_coeff /= 10;
-                ++exp;
-            }
+            exp += detail::fenv_round(unsigned_coeff);
         }
     }
 
