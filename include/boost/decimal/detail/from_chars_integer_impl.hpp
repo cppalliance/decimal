@@ -65,7 +65,7 @@ constexpr unsigned char digit_from_char(char val) noexcept
 #endif
 
 template <typename Integer, typename Unsigned_Integer>
-BOOST_CXX14_CONSTEXPR from_chars_result from_chars_integer_impl(const char* first, const char* last, Integer& value, int base) noexcept
+constexpr from_chars_result from_chars_integer_impl(const char* first, const char* last, Integer& value, int base) noexcept
 {
     Unsigned_Integer result = 0;
     Unsigned_Integer overflow_value = 0;
@@ -242,22 +242,22 @@ BOOST_CXX14_CONSTEXPR from_chars_result from_chars_integer_impl(const char* firs
 
 // Only from_chars for integer types is constexpr (as of C++23)
 template <typename Integer>
-from_chars_result from_chars(const char* first, const char* last, Integer& value, int base = 10) noexcept
+constexpr from_chars_result from_chars(const char* first, const char* last, Integer& value, int base = 10) noexcept
 {
-    using Unsigned_Integer = typename std::make_unsigned<Integer>::type;
+    using Unsigned_Integer = typename std::make_unsigned_t<Integer>;
     return detail::from_chars_integer_impl<Integer, Unsigned_Integer>(first, last, value, base);
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 template <typename Integer>
-from_chars_result from_chars128(const char* first, const char* last, Integer& value, int base = 10) noexcept
+constexpr from_chars_result from_chars128(const char* first, const char* last, Integer& value, int base = 10) noexcept
 {
-    using Unsigned_Integer = boost::uint128_type;
+    using Unsigned_Integer = uint128_t;
     return detail::from_chars_integer_impl<Integer, Unsigned_Integer>(first, last, value, base);
 }
 #endif
 
-from_chars_result from_chars128(const char* first, const char* last, uint128& value, int base = 10) noexcept
+constexpr from_chars_result from_chars128(const char* first, const char* last, uint128& value, int base = 10) noexcept
 {
     return from_chars_integer_impl<uint128, uint128>(first, last, value, base);
 }
