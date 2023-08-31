@@ -157,4 +157,41 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 #endif
 
+// Is constant evaluated detection
+#ifdef __cpp_lib_is_constant_evaluated
+#  define BOOST_DECIMAL_HAS_IS_CONSTANT_EVALUATED
+#endif
+
+#ifdef __has_builtin
+#  if __has_builtin(__builtin_is_constant_evaluated)
+#    define BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED
+#  endif
+#endif
+
+//
+// MSVC also supports __builtin_is_constant_evaluated if it's recent enough:
+//
+#if defined(_MSC_FULL_VER) && (_MSC_FULL_VER >= 192528326)
+#  define BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED
+#endif
+
+//
+// As does GCC-9:
+//
+#if (__GNUC__ >= 9) && !defined(BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
+#  define BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED
+#endif
+
+#if defined(BOOST_DECIMAL_HAS_IS_CONSTANT_EVALUATED)
+#  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) std::is_constant_evaluated()
+#elif defined(BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
+#  define BOOST_CHARCONV_IS_CONSTANT_EVALUATED(x) __builtin_is_constant_evaluated()
+#elif (__GNUC__ >= 6)
+#  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) __builtin_constant_p(x)
+#  define BOOST_DECIMAL_USING_BUILTIN_CONSTANT_P
+#else
+#  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) false
+#  define BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP

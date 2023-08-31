@@ -18,6 +18,7 @@
 #include <boost/decimal/detail/fast_float/compute_float32.hpp>
 #include <boost/decimal/detail/fast_float/compute_float64.hpp>
 #include <boost/decimal/detail/parser.hpp>
+#include <boost/decimal/fenv.hpp>
 #include <type_traits>
 #include <iostream>
 #include <limits>
