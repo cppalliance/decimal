@@ -6,7 +6,9 @@
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 
-int main()
+using namespace boost::decimal;
+
+void test_environment()
 {
     BOOST_TEST(boost::decimal::fegetround() == boost::decimal::rounding_mode::fe_dec_to_nearest_from_zero);
     BOOST_TEST(boost::decimal::fesetround(boost::decimal::rounding_mode::fe_dec_to_nearest) == boost::decimal::rounding_mode::fe_dec_to_nearest);
@@ -15,6 +17,50 @@ int main()
     BOOST_TEST(boost::decimal::fegetround() == boost::decimal::rounding_mode::fe_dec_downward);
     BOOST_TEST(boost::decimal::fesetround(boost::decimal::rounding_mode::fe_dec_upward) == boost::decimal::rounding_mode::fe_dec_upward);
     BOOST_TEST(boost::decimal::fegetround() == boost::decimal::rounding_mode::fe_dec_upward);
+}
+
+void test_constructor_rounding()
+{
+    // Default
+    boost::decimal::fesetround(rounding_mode::fe_dec_to_nearest_from_zero);
+    BOOST_TEST(boost::decimal::fegetround() == rounding_mode::fe_dec_to_nearest_from_zero);
+
+    BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
+    BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'568, 1));
+
+    // Downward
+    boost::decimal::fesetround(rounding_mode::fe_dec_downward);
+    BOOST_TEST(boost::decimal::fegetround() == rounding_mode::fe_dec_downward);
+
+    BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
+    BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'567, 1));
+
+    // To nearest (ties go to even)
+    boost::decimal::fesetround(rounding_mode::fe_dec_to_nearest);
+    BOOST_TEST(boost::decimal::fegetround() == rounding_mode::fe_dec_to_nearest);
+
+    BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
+    BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'568, 1));
+
+    // Toward zero
+    boost::decimal::fesetround(rounding_mode::fe_dec_toward_zero);
+    BOOST_TEST(boost::decimal::fegetround() == rounding_mode::fe_dec_toward_zero);
+
+    BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
+    BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'567, 1));
+
+    // Upward
+    boost::decimal::fesetround(rounding_mode::fe_dec_upward);
+    BOOST_TEST(boost::decimal::fegetround() == rounding_mode::fe_dec_upward);
+
+    BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
+    BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'568, 1));
+}
+
+int main()
+{
+    test_environment();
+    test_constructor_rounding();
 
     return boost::report_errors();
 }
