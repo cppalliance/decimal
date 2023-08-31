@@ -5,6 +5,8 @@
 #ifndef BOOST_DECIMAL_DECIMAL32_HPP
 #define BOOST_DECIMAL_DECIMAL32_HPP
 
+#include <cmath>
+
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
@@ -18,7 +20,6 @@
 #include <boost/decimal/detail/fast_float/compute_float32.hpp>
 #include <boost/decimal/detail/fast_float/compute_float64.hpp>
 #include <boost/decimal/detail/parser.hpp>
-#include <boost/decimal/fenv.hpp>
 #include <type_traits>
 #include <iostream>
 #include <limits>
@@ -27,8 +28,6 @@
 #include <cassert>
 #include <cerrno>
 #include <cstring>
-#include <climits>
-#include <cwchar>
 
 namespace boost { namespace decimal {
 
@@ -103,7 +102,6 @@ static constexpr std::uint32_t construct_significand_mask = no_combination;
 
 } // Namespace detail
 
-// Converts the significand to 9 digits to remove the effects of cohorts.
 template <typename T>
 constexpr void normalize(std::uint32_t& significand, T& exp) noexcept
 {
@@ -116,6 +114,14 @@ constexpr void normalize(std::uint32_t& significand, T& exp) noexcept
         ++digits;
     }
 }
+
+class decimal32;
+
+constexpr inline decimal32 fabs(decimal32 a);
+constexpr inline int ilogb(decimal32 a);
+constexpr inline decimal32 frexp(decimal32 v, int* expon);
+constexpr inline decimal32 ldexp(decimal32 v, int e2);
+constexpr inline decimal32 pow(decimal32 b, int p);
 
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
@@ -147,13 +153,8 @@ private:
 
     data_layout_ bits_{};
 
-    // Returns the un-biased (quantum) exponent
     constexpr std::uint32_t full_exponent() const noexcept;
-
-    // Returns the biased exponent
     constexpr std::int32_t biased_exponent() const noexcept;
-
-    // Returns the significand complete with the bits implied from the combination field
     constexpr std::uint32_t full_significand() const noexcept;
     constexpr bool isneg() const noexcept;
 
@@ -165,13 +166,12 @@ private:
 
     friend constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept;
 
+    friend constexpr inline int ilogb(decimal32 a);
+    friend constexpr inline decimal32 frexp(decimal32 v, int* expon);
+
     template <typename T>
     BOOST_DECIMAL_CXX20_CONSTEXPR T floating_conversion_impl() const noexcept;
 
-    // Debug bit pattern
-    friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
-    friend std::uint32_t to_bits(decimal32 rhs) noexcept;
-    friend void debug_pattern(decimal32 rhs) noexcept;
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -264,17 +264,10 @@ public:
     // 3.6.4 Same Quantum
     friend constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept;
 
-    // 3.6.5 Quantum exponent
-    friend constexpr int quantexpd32(decimal32 x) noexcept;
-
-    // 3.6.6 Quantize
-    friend constexpr decimal32 quantized32(decimal32 lhs, decimal32 rhs) noexcept;
-
-    // 3.8.2 strtod
-    friend constexpr decimal32 strtod32(const char* str, char** endptr) noexcept;
-
-    // 3.9.2 wcstod
-    friend constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept;
+    // Debug bit pattern
+    friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
+    friend std::uint32_t to_bits(decimal32 rhs) noexcept;
+    friend void debug_pattern(decimal32 rhs) noexcept;
 };
 
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
@@ -374,13 +367,13 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
     }
 
     // If the exponent fits we do not need to use the combination field
-    std::uint32_t biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
+    const std::uint32_t biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
     const std::uint32_t biased_exp_low_six {biased_exp & detail::exp_combination_field_mask};
     if (biased_exp <= detail::max_exp_no_combination)
     {
         bits_.exponent = biased_exp;
     }
-    else if (biased_exp <= detail::exp_one_combination)
+    else if (biased_exp < detail::exp_one_combination)
     {
         if (big_combination)
         {
@@ -408,36 +401,8 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
     }
     else
     {
-        // The value is probably infinity
-
-        // If we can offset some extra power in the coefficient try to do so
-        const auto coeff_dig {detail::num_digits(reduced_coeff)};
-        if (coeff_dig < detail::precision)
-        {
-            for (auto i {coeff_dig}; i <= detail::precision; ++i)
-            {
-                reduced_coeff *= 10;
-                --biased_exp;
-                --exp;
-                if (biased_exp == detail::max_biased_exp)
-                {
-                    break;
-                }
-            }
-
-            if (detail::num_digits(reduced_coeff) <= detail::precision)
-            {
-                *this = decimal32(reduced_coeff, exp, static_cast<bool>(bits_.sign));
-            }
-            else
-            {
-                bits_.combination_field = detail::comb_inf_mask;
-            }
-        }
-        else
-        {
-            bits_.combination_field = detail::comb_inf_mask;
-        }
+        // The value is infinity
+        bits_.combination_field = detail::comb_inf_mask;
     }
 }
 
@@ -1583,138 +1548,6 @@ constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept
     return lhs.full_exponent() == rhs.full_exponent();
 }
 
-// 3.6.5
-// Effects: if x is finite, returns its quantum exponent.
-// Otherwise, a domain error occurs and INT_MIN is returned.
-constexpr int quantexpd32(decimal32 x) noexcept
-{
-    if (!isfinite(x))
-    {
-        return INT_MIN;
-    }
-
-    return static_cast<int>(x.full_exponent());
-}
-
-// 3.6.6
-// Returns: a number that is equal in value (except for any rounding) and sign to x,
-// and which has an exponent set to be equal to the exponent of y.
-// If the exponent is being increased, the value is correctly rounded according to the current rounding mode;
-// if the result does not have the same value as x, the "inexact" floating-point exception is raised.
-// If the exponent is being decreased and the significand of the result has more digits than the type would allow,
-// the "invalid" floating-point exception is raised and the result is NaN.
-// If one or both operands are NaN the result is NaN.
-// Otherwise, if only one operand is infinity, the "invalid" floating-point exception is raised and the result is NaN.
-// If both operands are infinity, the result is DEC_INFINITY, with the same sign as x, converted to the type of x.
-// The quantize functions do not signal underflow.
-constexpr decimal32 quantized32(decimal32 lhs, decimal32 rhs) noexcept
-{
-    // Return the correct type of nan
-    if (isnan(lhs))
-    {
-        return lhs;
-    }
-    else if (isnan(rhs))
-    {
-        return rhs;
-    }
-
-    // If one is infinity then return a signaling NAN
-    if (isinf(lhs) != isinf(rhs))
-    {
-        return boost::decimal::from_bits(boost::decimal::detail::snan_mask);
-    }
-    else if (isinf(lhs) && isinf(rhs))
-    {
-        return lhs;
-    }
-
-    return {lhs.full_significand(), rhs.biased_exponent(), lhs.isneg()};
-}
-
-constexpr decimal32 strtod32(const char* str, char** endptr) noexcept
-{
-    if (str == nullptr)
-    {
-        errno = EINVAL;
-        return boost::decimal::from_bits(boost::decimal::detail::snan_mask);
-    }
-
-    bool sign {};
-    std::uint64_t significand {};
-    std::int32_t exp {};
-    const auto buffer_len {detail::strlen(str)};
-
-    if (buffer_len == 0)
-    {
-        errno = EINVAL;
-        return from_bits(boost::decimal::detail::snan_mask);
-    }
-
-    const auto r {detail::parser(str, str + buffer_len, sign, significand, exp)};
-    decimal32 d;
-
-    if (r.ec != std::errc{})
-    {
-        if (r.ec == std::errc::not_supported)
-        {
-            if (significand)
-            {
-                d = from_bits(boost::decimal::detail::snan_mask);
-            }
-            else
-            {
-                d = from_bits(boost::decimal::detail::nan_mask);
-            }
-        }
-        else if (r.ec == std::errc::value_too_large)
-        {
-            d = from_bits(boost::decimal::detail::inf_mask);
-        }
-        else
-        {
-            d = from_bits(boost::decimal::detail::snan_mask);
-            errno = static_cast<int>(r.ec);
-        }
-    }
-    else
-    {
-        d = decimal32(significand, exp, sign);
-    }
-
-    *endptr = const_cast<char*>(str + (r.ptr - str));
-    return d;
-}
-
-constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept
-{
-    char buffer[1024] {};
-    if (str == nullptr || detail::strlen(str) > sizeof(buffer))
-    {
-        errno = EINVAL;
-        return boost::decimal::from_bits(boost::decimal::detail::snan_mask);
-    }
-
-    // Convert all the characters from wchar_t to char and use regular strtod32
-    for (std::size_t i {}; i < detail::strlen(str); ++i)
-    {
-        auto val {*(str + i)};
-        if (BOOST_DECIMAL_UNLIKELY(val > 255))
-        {
-            // Character can not be converted
-            break;
-        }
-
-        buffer[i] = static_cast<char>(val);
-    }
-
-    char* short_endptr {};
-    const auto return_val {strtod32(buffer, &short_endptr)};
-
-    *endptr = const_cast<wchar_t*>(str + (short_endptr - buffer));
-    return return_val;
-}
-
 }} // Namespace boost::decimal
 
 namespace std {
@@ -1768,5 +1601,159 @@ public:
 };
 
 } // Namespace std
+
+
+namespace boost { namespace decimal {
+
+constexpr inline decimal32 fabs(decimal32 a)
+{
+  return ((a < (decimal32(0))) ? -a : a);
+}
+
+constexpr inline int ilogb(decimal32 d)
+{
+    const auto offset = int { detail::num_digits(d.full_significand()) - 1 };
+
+    auto e10 = int { static_cast<int>(d.full_exponent()) - detail::bias + offset };
+
+    if (offset == 0)
+    {
+        --e10;
+    }
+
+    return e10;
+}
+
+constexpr inline decimal32 frexp(decimal32 v, int* expon)
+{
+    // This implementation of frexp follows closely that of eval_frexp
+    // in Boost.Multiprecision's cpp_dec_float template class.
+
+    auto result = decimal32(static_cast<int>(INT8_C(0)));
+
+    if(v == decimal32(0))
+    {
+      *expon = static_cast<int>(INT8_C(0));
+    }
+    else
+    {
+        result = v;
+
+        const auto sign_bit = static_cast<unsigned>(result.bits_.sign);
+
+        result.bits_.sign = 0U;
+
+        using std::ilogb;
+
+        // N[1000/301, 44]
+        auto t =
+            static_cast<int>
+            (
+                  static_cast<long double>(ilogb(result))
+                * static_cast<long double>(3.3222591362126245847176079734219269102990033L)
+            );
+
+        const auto local_two = decimal32(static_cast<int>(INT8_C(2)));
+
+        result *= pow(local_two, -t);
+
+        // TBD: Handle underflow/overflow if (or when) needed.
+
+        const auto local_one = decimal32(static_cast<int>(INT8_C(1)));
+
+        while(result >= local_one)
+        {
+          result /= local_two;
+
+          ++t;
+        }
+
+        const auto local_half = decimal32(0.5L);
+
+        while(result < local_half)
+        {
+          result *= local_two;
+
+          --t;
+        }
+
+        *expon = t;
+
+        result.bits_.sign = static_cast<std::uint32_t>(sign_bit);
+    }
+
+    return result;
+}
+
+constexpr inline decimal32 ldexp(decimal32 v, int e2)
+{
+    decimal32 ldexp_result(v);
+
+    if(e2 > static_cast<int>(INT8_C(0)))
+    {
+      const auto local_two = decimal32(static_cast<int>(INT8_C(2)));
+
+      // TBD: Can direct modification of the exponent field(s) be done here?
+      ldexp_result *= pow(local_two, e2);
+    }
+    else if(e2 < static_cast<int>(INT8_C(0)))
+    {
+      const auto local_half = decimal32(static_cast<float>(0.5L));
+
+      // TBD: Can direct modification of the exponent field(s) be done here?
+      ldexp_result *= pow(local_half, -e2);
+    }
+
+    return ldexp_result;
+}
+
+constexpr inline decimal32 pow(decimal32 b, int p)
+{
+    // Calculate (b ^ p).
+
+    using local_numeric_type = decimal32;
+
+    local_numeric_type result;
+
+    if     (p <  static_cast<std::int64_t>(INT8_C(0))) { result = local_numeric_type(1) / pow(b, -p); }
+    else if(p == static_cast<std::int64_t>(INT8_C(0))) { result = local_numeric_type(static_cast<unsigned>(UINT8_C(1))); }
+    else if(p == static_cast<std::int64_t>(INT8_C(1))) { result = b; }
+    else if(p == static_cast<std::int64_t>(INT8_C(2))) { result = b; result *= b; }
+    else if(p == static_cast<std::int64_t>(INT8_C(3))) { result = b; result *= b; result *= b; }
+    else if(p == static_cast<std::int64_t>(INT8_C(4))) { result = b; result *= b; result *= result; }
+    else
+    {
+        result = local_numeric_type(static_cast<unsigned>(UINT8_C(1)));
+
+        local_numeric_type y(b);
+
+        auto p_local = static_cast<std::uint64_t>(p);
+
+        // Use the so-called ladder method for the power calculation.
+        for(;;)
+        {
+            const auto do_power_multiply =
+              (static_cast<std::uint_fast8_t>(p_local & static_cast<unsigned>(UINT8_C(1))) != static_cast<std::uint_fast8_t>(UINT8_C(0)));
+
+            if(do_power_multiply)
+            {
+              result *= y;
+            }
+
+            p_local >>= static_cast<unsigned>(UINT8_C(1));
+
+            if(p_local == static_cast<std::uint64_t>(UINT8_C(0)))
+            {
+                break;
+            }
+
+            y *= y;
+        }
+    }
+
+    return result;
+}
+
+}} // Namespace boost::decimal
 
 #endif // BOOST_DECIMAL_DECIMAL32_HPP
