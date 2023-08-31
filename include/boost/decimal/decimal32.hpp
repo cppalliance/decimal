@@ -1698,7 +1698,7 @@ constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept
     for (std::size_t i {}; i < detail::strlen(str); ++i)
     {
         auto val {*(str + i)};
-        if (BOOST_DECIMAL_UNLIKELY(val < 0 || val > 255))
+        if (BOOST_DECIMAL_UNLIKELY(val > 255))
         {
             // Character can not be converted
             break;
