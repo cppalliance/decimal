@@ -1406,7 +1406,7 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
     constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::snan_mask)};
     constexpr decimal32 inf {boost::decimal::from_bits(boost::decimal::detail::inf_mask)};
 
-    const bool sign {!(lhs.isneg() == rhs.isneg())};
+    const bool sign {lhs.isneg() != rhs.isneg()};
 
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
@@ -1470,7 +1470,7 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
     auto res_exp {exp_lhs - exp_rhs};
 
     // Let the constructor handle shrinking it back down and rounding correctly
-    q = decimal32{res_sig, res_exp};
+    q = decimal32{res_sig, res_exp, sign};
 
     // https://en.cppreference.com/w/cpp/numeric/math/fmod
     r = lhs - decimal32(q.full_significand() % detail::precision) * rhs;
