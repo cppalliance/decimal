@@ -1153,7 +1153,7 @@ constexpr bool decimal32::isneg() const noexcept
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 {
-    if (std::isnan(val))
+    if (val != val)
     {
         *this = boost::decimal::from_bits(boost::decimal::detail::nan_mask);
     }
