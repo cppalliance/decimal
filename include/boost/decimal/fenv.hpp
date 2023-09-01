@@ -25,10 +25,22 @@ rounding_mode fegetround() noexcept
     return _boost_decimal_global_rounding_mode;
 }
 
+// If we can't support constexpr and non-constexpr code paths we won't honor the updated rounding-mode,
+// since it will not be used anyway.
+// Return the default rounding mode
 rounding_mode fesetround(rounding_mode round) noexcept
 {
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
     _boost_decimal_global_rounding_mode = round;
     return round;
+
+    #else
+
+    static_cast<void>(round);
+    return _boost_decimal_global_rounding_mode;
+
+    #endif
 }
 
 }} // Namespaces
