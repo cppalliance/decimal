@@ -15,7 +15,7 @@ namespace boost { namespace decimal { namespace detail {
 
 // Rounds the value provided and returns an offset of exponent values as required
 template <typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
-constexpr int fenv_round(T& val, bool) noexcept
+constexpr int fenv_round(T& val) noexcept
 {
     const auto trailing_num {val % 10};
     int exp_delta {};
