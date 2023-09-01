@@ -118,7 +118,7 @@ namespace local
       int n_dec;
       const auto frexp_dec = frexp(dec, &n_dec);
 
-      using std::frexp;
+      using std::ldexp;
 
       const auto ldexp_flt = ldexp(frexp_flt, n_flt);
       const auto ldexp_dec = ldexp(frexp_dec, n_dec);
