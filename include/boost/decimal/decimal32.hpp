@@ -340,12 +340,12 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
 
         exp = 0;
     }
-    else if (reduced_coeff < detail::no_combination)
+    else if (reduced_coeff <= detail::no_combination)
     {
         // If the coefficient fits directly we don't need to use the combination field
         bits_.significand = reduced_coeff;
     }
-    else if (reduced_coeff < detail::big_combination)
+    else if (reduced_coeff <= detail::big_combination)
     {
         // Break the number into 3 bits for the combination field and 20 bits for the significand field
 
