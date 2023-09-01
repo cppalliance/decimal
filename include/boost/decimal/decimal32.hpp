@@ -309,8 +309,19 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
 
     // If we don't have consteval detection we need to default to the constexpr path
     #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-    if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
     {
+        // Default rounding mode
+        // Will be constexpr
+        if (reduced)
+        {
+            exp += detail::fenv_round(unsigned_coeff);
+        }
+    }
+    else
+    {
+
         // In runtime mode we can round based on what the fenv says
         if (reduced)
         {
@@ -373,16 +384,17 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
             }
         }
     }
-    else
-    #endif
+
+    #else
+
+    // Default rounding mode
+    // Will be constexpr
+    if (reduced)
     {
-        // Default rounding mode
-        // Will be constexpr
-        if (reduced)
-        {
-            exp += detail::fenv_round(unsigned_coeff);
-        }
+        exp += detail::fenv_round(unsigned_coeff);
     }
+
+    #endif
 
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
 
