@@ -325,63 +325,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
         // In runtime mode we can round based on what the fenv says
         if (reduced)
         {
-            const auto round {fegetround()};
-
-            const auto trailing_num {unsigned_coeff % 10};
-            unsigned_coeff /= 10;
-            ++exp;
-
-            // Default rounding mode
-            if (round == rounding_mode::fe_dec_to_nearest_from_zero)
-            {
-                if (trailing_num >= 5)
-                {
-                    ++unsigned_coeff;
-                }
-            }
-            else if (round == rounding_mode::fe_dec_downward)
-            {
-                // Do nothing
-            }
-            else if (round == rounding_mode::fe_dec_to_nearest)
-            {
-                // Round to even
-                if (trailing_num == 5)
-                {
-                    if (unsigned_coeff % 2 == 1)
-                    {
-                        ++unsigned_coeff;
-                    }
-                }
-                // ... or nearest
-                else if (trailing_num > 5)
-                {
-                    ++unsigned_coeff;
-                }
-            }
-            else if (round == rounding_mode::fe_dec_toward_zero)
-            {
-                if (bits_.sign && trailing_num != 0)
-                {
-                    ++unsigned_coeff;
-                }
-            }
-            else // rounding_mode::fe_dec_upward
-            {
-                if (trailing_num != 0)
-                {
-                    ++unsigned_coeff;
-                }
-            }
-
-
-            // If the significand was e.g. 99'999'999 rounding up
-            // would put it out of range again
-            if (unsigned_coeff > detail::max_significand)
-            {
-                unsigned_coeff /= 10;
-                ++exp;
-            }
+            exp += detail::fenv_round(unsigned_coeff, bits_.sign);
         }
     }
 

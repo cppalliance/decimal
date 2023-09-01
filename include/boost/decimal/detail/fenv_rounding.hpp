@@ -11,9 +11,11 @@
 
 namespace boost { namespace decimal { namespace detail {
 
+#ifdef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
 // Rounds the value provided and returns an offset of exponent values as required
 template <typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
-constexpr int fenv_round(T& val) noexcept
+constexpr int fenv_round(T& val, bool) noexcept
 {
     const auto trailing_num {val % 10};
     int exp_delta {};
@@ -37,6 +39,104 @@ constexpr int fenv_round(T& val) noexcept
 
     return exp_delta;
 }
+
+#else
+
+template <typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
+constexpr int fenv_round(T& val, bool is_neg = false) noexcept
+{
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
+    {
+        const auto trailing_num {val % 10};
+        int exp_delta {};
+        val /= 10;
+        ++exp_delta;
+
+        if (trailing_num >= 5)
+        {
+            ++val;
+        }
+
+        // If the significand was e.g. 99'999'999 rounding up
+        // would put it out of range again
+        constexpr auto max_sig_val = 9'999'999; // TODO(mborland): dynamic based on type
+
+        if (val > max_sig_val)
+        {
+            val /= 10;
+            ++exp_delta;
+        }
+
+        return exp_delta;
+    }
+    else
+    {
+        const auto round {fegetround()};
+        int exp {};
+
+        const auto trailing_num {val % 10};
+        val /= 10;
+        ++exp;
+
+        // Default rounding mode
+        if (round == rounding_mode::fe_dec_to_nearest_from_zero)
+        {
+            if (trailing_num >= 5)
+            {
+                ++val;
+            }
+        }
+        else if (round == rounding_mode::fe_dec_downward)
+        {
+            // Do nothing
+        }
+        else if (round == rounding_mode::fe_dec_to_nearest)
+        {
+            // Round to even
+            if (trailing_num == 5)
+            {
+                if (val % 2 == 1)
+                {
+                    ++val;
+                }
+            }
+            // ... or nearest
+            else if (trailing_num > 5)
+            {
+                ++val;
+            }
+        }
+        else if (round == rounding_mode::fe_dec_toward_zero)
+        {
+            if (is_neg && trailing_num != 0)
+            {
+                ++val;
+            }
+        }
+        else // rounding_mode::fe_dec_upward
+        {
+            if (trailing_num != 0)
+            {
+                ++val;
+            }
+        }
+
+
+        // If the significand was e.g. 99'999'999 rounding up
+        // would put it out of range again
+        constexpr auto max_sig_val = 9'999'999; // TODO(mborland): dynamic based on type
+
+        if (val > max_sig_val)
+        {
+            val /= 10;
+            ++exp;
+        }
+
+        return exp;
+    }
+}
+
+#endif
 
 }}} // Namespaces
 
