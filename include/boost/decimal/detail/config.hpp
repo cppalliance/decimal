@@ -191,4 +191,11 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
 #endif
 
+// https://github.com/llvm/llvm-project/issues/55638
+#if defined(__clang__) && __cplusplus > 202002L
+#  undef BOOST_DECIMAL_IS_CONSTANT_EVALUATED
+#  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) false
+#  define BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
