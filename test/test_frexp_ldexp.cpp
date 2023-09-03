@@ -153,11 +153,11 @@ auto main() -> int
   constexpr auto flt_ctrl =
     std::array<local::test_frexp_ldexp_ctrl, static_cast<std::size_t>(UINT8_C(5))>
     {
-      local::test_frexp_ldexp_ctrl(-1.0E7F  , +1.0E7F,  false, static_cast<std::uint32_t>(UINT32_C(0x10000))),
-      local::test_frexp_ldexp_ctrl( 1.0E-20F, +1.0E-1F, false, static_cast<std::uint32_t>(UINT32_C(0x10000))),
-      local::test_frexp_ldexp_ctrl( 1.0E-20F, +1.0E-1F, true , static_cast<std::uint32_t>(UINT32_C(0x10000))),
-      local::test_frexp_ldexp_ctrl( 10.0F   , +1.0E12F, false, static_cast<std::uint32_t>(UINT32_C(0x10000))),
-      local::test_frexp_ldexp_ctrl( 10.0F   , +1.0E12F, true , static_cast<std::uint32_t>(UINT32_C(0x10000))),
+      local::test_frexp_ldexp_ctrl( { -1.0E7F  , +1.0E7F,  false, static_cast<std::uint32_t>(UINT32_C(0x10000)) } ),
+      local::test_frexp_ldexp_ctrl( {  1.0E-20F, +1.0E-1F, false, static_cast<std::uint32_t>(UINT32_C(0x10000)) } ),
+      local::test_frexp_ldexp_ctrl( {  1.0E-20F, +1.0E-1F, true , static_cast<std::uint32_t>(UINT32_C(0x10000)) } ),
+      local::test_frexp_ldexp_ctrl( {  10.0F   , +1.0E12F, false, static_cast<std::uint32_t>(UINT32_C(0x10000)) } ),
+      local::test_frexp_ldexp_ctrl( {  10.0F   , +1.0E12F, true , static_cast<std::uint32_t>(UINT32_C(0x10000)) } ),
     };
 
   auto result_is_ok = true;
