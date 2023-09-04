@@ -3,6 +3,23 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#if defined(__clang__)
+  #if defined __has_feature
+  #if __has_feature(thread_sanitizer)
+  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
+  #endif
+  #endif
+#elif defined(__GNUC__)
+  #if defined(__SANITIZE_THREAD__)
+  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
+  #endif
+#elif defined(_MSC_VER)
+  #if defined(_DEBUG)
+  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
+  #endif
+#endif
+
+#include <atomic>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -12,7 +29,7 @@
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 
-using decimal_type = boost::decimal::decimal32;
+#include "parallel_for.h"
 
 namespace local
 {
@@ -58,6 +75,8 @@ namespace local
 
   auto test_frexp_ldexp(const test_frexp_ldexp_ctrl& ctrl) -> bool
   {
+    using decimal_type = boost::decimal::decimal32;
+
     std::random_device rd;  // Will be used to obtain a seed for the random number engine
     std::mt19937_64 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
 
@@ -135,34 +154,74 @@ namespace local
 
     return result_is_ok;
   }
+
+  #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+  constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x80000));
+  #else
+  constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x4000));
+  #endif
+
+  const local::test_frexp_ldexp_ctrl flt_ctrl[static_cast<std::size_t>(UINT8_C(6))] =
+  {
+    { 8388606.5F, 8388607.5F, false, static_cast<std::uint32_t>(UINT32_C(0x100)) },
+    { -1.0E7F   , +1.0E7F,    false, test_frexp_ldexp_depth },
+    {  1.0E-20F , +1.0E-1F,   false, test_frexp_ldexp_depth },
+    {  1.0E-20F , +1.0E-1F,   true , test_frexp_ldexp_depth },
+    {  10.0F    , +1.0E12F,   false, test_frexp_ldexp_depth },
+    {  10.0F    , +1.0E12F,   true , test_frexp_ldexp_depth },
+  };
 }
 
 auto main() -> int
 {
-  const local::test_frexp_ldexp_ctrl flt_ctrl[static_cast<std::size_t>(UINT8_C(6))] =
-  {
-    { 8388606.5F, 8388607.5F, false, static_cast<std::uint32_t>(UINT32_C(0x100)) },
-    { -1.0E7F   , +1.0E7F,    false, static_cast<std::uint32_t>(UINT32_C(0x20000)) },
-    {  1.0E-20F , +1.0E-1F,   false, static_cast<std::uint32_t>(UINT32_C(0x20000)) },
-    {  1.0E-20F , +1.0E-1F,   true , static_cast<std::uint32_t>(UINT32_C(0x20000)) },
-    {  10.0F    , +1.0E12F,   false, static_cast<std::uint32_t>(UINT32_C(0x20000)) },
-    {  10.0F    , +1.0E12F,   true , static_cast<std::uint32_t>(UINT32_C(0x20000)) },
-  };
+  std::atomic_flag test_lock = ATOMIC_FLAG_INIT;
 
   auto result_is_ok = true;
 
-  for(const auto& ctrl : flt_ctrl)
-  {
-    const auto result_test_frexp_ldexp_is_ok = local::test_frexp_ldexp(ctrl);
+  constexpr auto flt_ctrl_count =
+    static_cast<std::size_t>
+    (
+      sizeof(local::flt_ctrl) / sizeof(local::flt_ctrl[static_cast<std::size_t>(UINT8_C(0))])
+    );
 
-    BOOST_TEST(result_test_frexp_ldexp_is_ok);
+  const auto flg = std::cout.flags();
 
-    result_is_ok = (result_test_frexp_ldexp_is_ok && result_is_ok);
+  const auto start = std::chrono::high_resolution_clock::now();
 
-    std::cout << "result_test_frexp_ldexp_is_ok: " << std::boolalpha << result_test_frexp_ldexp_is_ok << std::endl;
-  }
+  my_concurrency::parallel_for
+  (
+    static_cast<std::size_t>(UINT8_C(0)),
+    flt_ctrl_count,
+    [&test_lock, &result_is_ok](std::size_t index)
+    {
+      const auto result_test_frexp_ldexp_is_ok = local::test_frexp_ldexp(local::flt_ctrl[index]);
 
-  std::cout << "result_is_ok                 : " << std::boolalpha << result_is_ok << std::endl;
+      while(test_lock.test_and_set()) { ; }
+
+      BOOST_TEST(result_test_frexp_ldexp_is_ok);
+
+      result_is_ok = (result_test_frexp_ldexp_is_ok && result_is_ok);
+
+      std::cout << "result_test_frexp_ldexp_is_ok (index " << index << "): " << std::boolalpha << result_test_frexp_ldexp_is_ok << std::endl;
+
+      test_lock.clear();
+    }
+  );
+
+  const auto stop = std::chrono::high_resolution_clock::now();
+
+  std::cout << "result_is_ok (total): " << std::boolalpha << result_is_ok << std::endl;
+
+  const auto time_of_test =
+    static_cast<float>
+    (
+        static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count())
+      / static_cast<float>(1000.0L)
+    );
+
+  std::cout << "time_of_test: " << std::fixed << std::setprecision(1) << time_of_test << "s" << std::endl;
+
+  std::cout.flags(flg);
 
   return boost::report_errors();
 }
