@@ -9,7 +9,7 @@ project(cmake_install_test LANGUAGES CXX)
 find_package(boost_decimal REQUIRED)
 
 add_executable(quick ../quick.cpp)
-target_link_libraries(quick Boost::decimal)
+target_link_libraries(quick Boost::decimal pthread)
 
 enable_testing()
 add_test(quick quick)

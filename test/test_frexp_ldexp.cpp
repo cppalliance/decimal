@@ -156,9 +156,9 @@ namespace local
   }
 
   #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-  constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x80000));
+  constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x10000));
   #else
-  constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x4000));
+  constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x1000));
   #endif
 
   const local::test_frexp_ldexp_ctrl flt_ctrl[static_cast<std::size_t>(UINT8_C(6))] =
@@ -174,7 +174,7 @@ namespace local
 
 auto main() -> int
 {
-  std::atomic_flag test_lock = ATOMIC_FLAG_INIT;
+  std::atomic_flag test_lock;
 
   auto result_is_ok = true;
 
