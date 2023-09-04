@@ -19,12 +19,6 @@
   #endif
 #endif
 
-#if (defined(__clang__) && !defined(__APPLE__))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-pragma"
-#endif
-
-#include <atomic>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -33,8 +27,6 @@
 
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
-
-#include "parallel_for.h"
 
 namespace local
 {
@@ -159,11 +151,14 @@ namespace local
 
     return result_is_ok;
   }
+}
 
+auto main() -> int
+{
   #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-  constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x10000));
+  constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x4000));
   #else
-  constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x1000));
+  constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x400));
   #endif
 
   const local::test_frexp_ldexp_ctrl flt_ctrl[static_cast<std::size_t>(UINT8_C(6))] =
@@ -175,43 +170,25 @@ namespace local
     {  10.0F    , +1.0E12F,   false, test_frexp_ldexp_depth },
     {  10.0F    , +1.0E12F,   true , test_frexp_ldexp_depth },
   };
-}
-
-auto main() -> int
-{
-  std::atomic_flag test_lock = ATOMIC_FLAG_INIT;
-
-  auto result_is_ok = true;
-
-  constexpr auto flt_ctrl_count =
-    static_cast<std::size_t>
-    (
-      sizeof(local::flt_ctrl) / sizeof(local::flt_ctrl[static_cast<std::size_t>(UINT8_C(0))])
-    );
 
   const auto flg = std::cout.flags();
 
+  auto result_is_ok = true;
+
   const auto start = std::chrono::high_resolution_clock::now();
 
-  my_concurrency::parallel_for
-  (
-    static_cast<std::size_t>(UINT8_C(0)),
-    flt_ctrl_count,
-    [&test_lock, &result_is_ok](std::size_t index)
-    {
-      const auto result_test_frexp_ldexp_is_ok = local::test_frexp_ldexp(local::flt_ctrl[index]);
+  for(const auto& ctrl : flt_ctrl)
+  {
+    const auto result_test_frexp_ldexp_is_ok = local::test_frexp_ldexp(ctrl);
 
-      while(test_lock.test_and_set()) { ; }
+    BOOST_TEST(result_test_frexp_ldexp_is_ok);
 
-      BOOST_TEST(result_test_frexp_ldexp_is_ok);
+    result_is_ok = (result_test_frexp_ldexp_is_ok && result_is_ok);
 
-      result_is_ok = (result_test_frexp_ldexp_is_ok && result_is_ok);
+    std::cout << "result_test_frexp_ldexp_is_ok: " << std::boolalpha << result_test_frexp_ldexp_is_ok << std::endl;
+  }
 
-      std::cout << "result_test_frexp_ldexp_is_ok (index " << index << "): " << std::boolalpha << result_test_frexp_ldexp_is_ok << std::endl;
-
-      test_lock.clear();
-    }
-  );
+  std::cout << "result_is_ok                 : " << std::boolalpha << result_is_ok << std::endl;
 
   const auto stop = std::chrono::high_resolution_clock::now();
 
@@ -230,7 +207,3 @@ auto main() -> int
 
   return boost::report_errors();
 }
-
-#if (defined(__clang__) && !defined(__APPLE__))
-#pragma GCC diagnostic pop
-#endif
