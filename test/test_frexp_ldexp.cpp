@@ -19,6 +19,11 @@
   #endif
 #endif
 
+#if (defined(__clang__) && !defined(__APPLE__))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-pragma"
+#endif
+
 #include <atomic>
 #include <chrono>
 #include <iomanip>
@@ -174,7 +179,7 @@ namespace local
 
 auto main() -> int
 {
-  std::atomic_flag test_lock;
+  std::atomic_flag test_lock = ATOMIC_FLAG_INIT;
 
   auto result_is_ok = true;
 
@@ -225,3 +230,7 @@ auto main() -> int
 
   return boost::report_errors();
 }
+
+#if (defined(__clang__) && !defined(__APPLE__))
+#pragma GCC diagnostic pop
+#endif
