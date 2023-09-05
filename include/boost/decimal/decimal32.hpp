@@ -20,7 +20,7 @@
 #include <boost/decimal/detail/fast_float/compute_float32.hpp>
 #include <boost/decimal/detail/fast_float/compute_float64.hpp>
 #include <boost/decimal/detail/parser.hpp>
-#include <boost/decimal/fenv.hpp>
+#include <boost/decimal/detail/fenv_rounding.hpp>
 #include <type_traits>
 #include <iostream>
 #include <limits>
@@ -320,24 +320,38 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
         --unsigned_coeff_digits;
     }
 
-    if (reduced)
-    {
-        const auto trailing_num {unsigned_coeff % 10};
-        unsigned_coeff /= 10;
-        ++exp;
-        if (trailing_num >= 5)
-        {
-            ++unsigned_coeff;
-        }
+    // If we don't have consteval detection we need to default to the constexpr path
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
 
-        // If the significand was e.g. 99'999'999 rounding up
-        // would put it out of range again
-        if (unsigned_coeff > detail::max_significand)
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
+    {
+        // Default rounding mode
+        // Will be constexpr
+        if (reduced)
         {
-            unsigned_coeff /= 10;
-            ++exp;
+            exp += detail::fenv_round(unsigned_coeff);
         }
     }
+    else
+    {
+
+        // In runtime mode we can round based on what the fenv says
+        if (reduced)
+        {
+            exp += detail::fenv_round(unsigned_coeff, bits_.sign);
+        }
+    }
+
+    #else
+
+    // Default rounding mode
+    // Will be constexpr
+    if (reduced)
+    {
+        exp += detail::fenv_round(unsigned_coeff);
+    }
+
+    #endif
 
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
 
@@ -686,6 +700,8 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
     {
         auto carry_dig = sig_rhs % 10;
         sig_rhs /= 10;
+
+        // TODO(mborland): Rounding modes
         if (carry_dig >= 5)
         {
             carry = true;
@@ -859,6 +875,7 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
             const auto carry_dig {signed_sig_lhs % 10};
             signed_sig_lhs /= 10;
 
+            // TODO(mborland): rounding modes
             if (carry_dig >= 5)
             {
                 ++signed_sig_lhs;
@@ -1358,7 +1375,7 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
     constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::snan_mask)};
     constexpr decimal32 inf {boost::decimal::from_bits(boost::decimal::detail::inf_mask)};
 
-    const bool sign {!(lhs.isneg() == rhs.isneg())};
+    const bool sign {lhs.isneg() != rhs.isneg()};
 
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
@@ -1422,7 +1439,7 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
     auto res_exp {exp_lhs - exp_rhs};
 
     // Let the constructor handle shrinking it back down and rounding correctly
-    q = decimal32{res_sig, res_exp};
+    q = decimal32{res_sig, res_exp, sign};
 
     // https://en.cppreference.com/w/cpp/numeric/math/fmod
     r = lhs - decimal32(q.full_significand() % detail::precision) * rhs;

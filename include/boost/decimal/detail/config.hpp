@@ -185,11 +185,15 @@ typedef unsigned __int128 uint128_t;
 #if defined(BOOST_DECIMAL_HAS_IS_CONSTANT_EVALUATED)
 #  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) std::is_constant_evaluated()
 #elif defined(BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
-#  define BOOST_CHARCONV_IS_CONSTANT_EVALUATED(x) __builtin_is_constant_evaluated()
-#elif (__GNUC__ >= 6)
-#  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) __builtin_constant_p(x)
-#  define BOOST_DECIMAL_USING_BUILTIN_CONSTANT_P
+#  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) __builtin_is_constant_evaluated()
 #else
+#  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) false
+#  define BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+#endif
+
+// https://github.com/llvm/llvm-project/issues/55638
+#if defined(__clang__) && __cplusplus > 202002L
+#  undef BOOST_DECIMAL_IS_CONSTANT_EVALUATED
 #  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) false
 #  define BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
 #endif
