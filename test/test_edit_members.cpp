@@ -19,9 +19,9 @@ static std::mt19937_64 rng(42); // NOSONAR : Global rng is not const
 template <typename T>
 void test_edit_exp()
 {
-    std::uniform_int_distribution<std::int64_t> sig(1'000'000, 9'999'999);
-    std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<T>::min_exponent10 + 19,
-                                                    std::numeric_limits<T>::max_exponent10 - 19);
+    std::uniform_int_distribution<T> sig(1'000'000, 9'999'999);
+    std::uniform_int_distribution<T> exp(T(std::numeric_limits<decimal32>::min_exponent10 + 19),
+                                         T(std::numeric_limits<decimal32>::max_exponent10 - 19));
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -44,8 +44,8 @@ template <typename T>
 void test_edit_sig()
 {
     std::uniform_int_distribution<T> sig(1'000'000, 9'999'999);
-    std::uniform_int_distribution<T> exp(std::numeric_limits<T>::min_exponent10 + 19,
-                                         std::numeric_limits<T>::max_exponent10 - 19);
+    std::uniform_int_distribution<T> exp(T(std::numeric_limits<decimal32>::min_exponent10 + 19),
+                                         T(std::numeric_limits<decimal32>::max_exponent10 - 19));
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -68,18 +68,12 @@ void test_edit_sig()
 int main()
 {
     test_edit_exp<int>();
-    test_edit_exp<unsigned>();
     test_edit_exp<long>();
-    test_edit_exp<unsigned long>();
     test_edit_exp<long long>();
-    test_edit_exp<unsigned long long>();
 
     test_edit_sig<int>();
-    test_edit_sig<unsigned>();
     test_edit_sig<long>();
-    test_edit_sig<unsigned long>();
     test_edit_sig<long long>();
-    test_edit_sig<unsigned long long>();
 
     return boost::report_errors();
 }
