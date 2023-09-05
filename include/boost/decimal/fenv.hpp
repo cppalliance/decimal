@@ -30,17 +30,8 @@ rounding_mode fegetround() noexcept
 // Return the default rounding mode
 rounding_mode fesetround(rounding_mode round) noexcept
 {
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
     _boost_decimal_global_rounding_mode = round;
     return round;
-
-    #else
-
-    static_cast<void>(round);
-    return _boost_decimal_global_rounding_mode;
-
-    #endif
 }
 
 }} // Namespaces
