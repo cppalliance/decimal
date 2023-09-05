@@ -5,6 +5,8 @@
 #ifndef BOOST_DECIMAL_DECIMAL32_HPP
 #define BOOST_DECIMAL_DECIMAL32_HPP
 
+#include <cmath>
+
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
@@ -117,6 +119,14 @@ constexpr void normalize(std::uint32_t& significand, T& exp) noexcept
     }
 }
 
+class decimal32;
+
+constexpr inline decimal32 fabs(decimal32 a);
+constexpr inline int ilogb(decimal32 a);
+constexpr inline decimal32 frexp(decimal32 v, int* expon);
+constexpr inline decimal32 ldexp(decimal32 v, int e2);
+constexpr inline decimal32 pow(decimal32 b, int p);
+
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
 class decimal32 final
@@ -164,6 +174,9 @@ private:
     constexpr TargetType to_integral() const noexcept;
 
     friend constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept;
+
+    friend constexpr inline int ilogb(decimal32 a);
+    friend constexpr inline decimal32 frexp(decimal32 v, int* expon);
 
     template <typename T>
     BOOST_DECIMAL_CXX20_CONSTEXPR T floating_conversion_impl() const noexcept;
@@ -354,12 +367,12 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
 
         exp = 0;
     }
-    else if (reduced_coeff < detail::no_combination)
+    else if (reduced_coeff <= detail::no_combination)
     {
         // If the coefficient fits directly we don't need to use the combination field
         bits_.significand = reduced_coeff;
     }
-    else if (reduced_coeff < detail::big_combination)
+    else if (reduced_coeff <= detail::big_combination)
     {
         // Break the number into 3 bits for the combination field and 20 bits for the significand field
 
@@ -1785,5 +1798,159 @@ public:
 };
 
 } // Namespace std
+
+
+namespace boost { namespace decimal {
+
+constexpr inline decimal32 fabs(decimal32 a)
+{
+  return ((a < (decimal32(0))) ? -a : a);
+}
+
+constexpr inline int ilogb(decimal32 d)
+{
+    const auto offset = int { detail::num_digits(d.full_significand()) - 1 };
+
+    auto e10 = int { static_cast<int>(d.full_exponent()) - detail::bias + offset };
+
+    if (offset == 0)
+    {
+        --e10;
+    }
+
+    return e10;
+}
+
+constexpr inline decimal32 frexp(decimal32 v, int* expon)
+{
+    // This implementation of frexp follows closely that of eval_frexp
+    // in Boost.Multiprecision's cpp_dec_float template class.
+
+    auto result = decimal32(static_cast<int>(INT8_C(0)));
+
+    if(v == decimal32(0))
+    {
+      *expon = static_cast<int>(INT8_C(0));
+    }
+    else
+    {
+        result = v;
+
+        const auto sign_bit = static_cast<unsigned>(result.bits_.sign);
+
+        result.bits_.sign = 0U;
+
+        using std::ilogb;
+
+        // N[1000/301, 44]
+        auto t =
+            static_cast<int>
+            (
+                  static_cast<long double>(ilogb(result))
+                * static_cast<long double>(3.3222591362126245847176079734219269102990033L)
+            );
+
+        const auto local_two = decimal32(static_cast<int>(INT8_C(2)));
+
+        result *= pow(local_two, -t);
+
+        // TBD: Handle underflow/overflow if (or when) needed.
+
+        const auto local_one = decimal32(static_cast<int>(INT8_C(1)));
+
+        while(result >= local_one)
+        {
+          result /= local_two;
+
+          ++t;
+        }
+
+        const auto local_half = decimal32(0.5L);
+
+        while(result < local_half)
+        {
+          result *= local_two;
+
+          --t;
+        }
+
+        *expon = t;
+
+        result.bits_.sign = static_cast<std::uint32_t>(sign_bit);
+    }
+
+    return result;
+}
+
+constexpr inline decimal32 ldexp(decimal32 v, int e2)
+{
+    decimal32 ldexp_result(v);
+
+    if(e2 > static_cast<int>(INT8_C(0)))
+    {
+      const auto local_two = decimal32(static_cast<int>(INT8_C(2)));
+
+      // TBD: Can direct modification of the exponent field(s) be done here?
+      ldexp_result *= pow(local_two, e2);
+    }
+    else if(e2 < static_cast<int>(INT8_C(0)))
+    {
+      const auto local_half = decimal32(static_cast<float>(0.5L));
+
+      // TBD: Can direct modification of the exponent field(s) be done here?
+      ldexp_result *= pow(local_half, -e2);
+    }
+
+    return ldexp_result;
+}
+
+constexpr inline decimal32 pow(decimal32 b, int p)
+{
+    // Calculate (b ^ p).
+
+    using local_numeric_type = decimal32;
+
+    local_numeric_type result;
+
+    if     (p <  static_cast<std::int64_t>(INT8_C(0))) { result = local_numeric_type(1) / pow(b, -p); }
+    else if(p == static_cast<std::int64_t>(INT8_C(0))) { result = local_numeric_type(static_cast<unsigned>(UINT8_C(1))); }
+    else if(p == static_cast<std::int64_t>(INT8_C(1))) { result = b; }
+    else if(p == static_cast<std::int64_t>(INT8_C(2))) { result = b; result *= b; }
+    else if(p == static_cast<std::int64_t>(INT8_C(3))) { result = b; result *= b; result *= b; }
+    else if(p == static_cast<std::int64_t>(INT8_C(4))) { result = b; result *= b; result *= result; }
+    else
+    {
+        result = local_numeric_type(static_cast<unsigned>(UINT8_C(1)));
+
+        local_numeric_type y(b);
+
+        auto p_local = static_cast<std::uint64_t>(p);
+
+        // Use the so-called ladder method for the power calculation.
+        for(;;)
+        {
+            const auto do_power_multiply =
+              (static_cast<std::uint_fast8_t>(p_local & static_cast<unsigned>(UINT8_C(1))) != static_cast<std::uint_fast8_t>(UINT8_C(0)));
+
+            if(do_power_multiply)
+            {
+              result *= y;
+            }
+
+            p_local >>= static_cast<unsigned>(UINT8_C(1));
+
+            if(p_local == static_cast<std::uint64_t>(UINT8_C(0)))
+            {
+                break;
+            }
+
+            y *= y;
+        }
+    }
+
+    return result;
+}
+
+}} // Namespace boost::decimal
 
 #endif // BOOST_DECIMAL_DECIMAL32_HPP
