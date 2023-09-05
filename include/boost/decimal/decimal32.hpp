@@ -5,8 +5,6 @@
 #ifndef BOOST_DECIMAL_DECIMAL32_HPP
 #define BOOST_DECIMAL_DECIMAL32_HPP
 
-#include <cmath>
-
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
@@ -288,6 +286,16 @@ public:
 
     // 3.9.2 wcstod
     friend constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept;
+
+    // These can be made public only for debugging matters
+#ifndef BOOST_DECIMAL_DEBUG_MEMBERS
+private:
+#endif
+    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
+    constexpr auto edit_exponent(T exp) noexcept -> void;
+    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
+    constexpr auto edit_significand(T sig) noexcept -> void;
+    constexpr auto edit_sign(bool sign) noexcept -> void;
 };
 
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
@@ -1074,6 +1082,12 @@ constexpr std::int32_t decimal32::biased_exponent() const noexcept
     return static_cast<std::int32_t>(full_exponent()) - detail::bias;
 }
 
+template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
+constexpr auto decimal32::edit_exponent(T exp) noexcept -> void
+{
+    *this = decimal32(this->full_significand(), exp, this->isneg());
+}
+
 constexpr std::uint32_t decimal32::full_significand() const noexcept
 {
     std::uint32_t significand {};
@@ -1100,9 +1114,20 @@ constexpr std::uint32_t decimal32::full_significand() const noexcept
     return significand;
 }
 
+template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
+constexpr auto decimal32::edit_significand(T sig) noexcept -> void
+{
+    *this = decimal32(sig, this->biased_exponent(), this->isneg());
+}
+
 constexpr bool decimal32::isneg() const noexcept
 {
     return static_cast<bool>(bits_.sign);
+}
+
+constexpr auto decimal32::edit_sign(bool sign) noexcept -> void
+{
+    *this = sign ? -abs(*this) : abs(*this);
 }
 
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
