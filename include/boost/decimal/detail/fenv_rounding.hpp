@@ -15,7 +15,7 @@ namespace boost { namespace decimal { namespace detail {
 
 // Rounds the value provided and returns an offset of exponent values as required
 template <typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
-constexpr int fenv_round(T& val) noexcept
+constexpr auto fenv_round(T& val) noexcept -> int
 {
     const auto trailing_num {val % 10};
     int exp_delta {};
@@ -43,7 +43,7 @@ constexpr int fenv_round(T& val) noexcept
 #else
 
 template <typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
-constexpr int fenv_round(T& val, bool is_neg = false) noexcept
+constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int
 {
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
     {
@@ -88,7 +88,10 @@ constexpr int fenv_round(T& val, bool is_neg = false) noexcept
         }
         else if (round == rounding_mode::fe_dec_downward)
         {
-            // Do nothing
+            if (trailing_num >= 5 && is_neg)
+            {
+                ++val;
+            }
         }
         else if (round == rounding_mode::fe_dec_to_nearest)
         {
@@ -108,14 +111,11 @@ constexpr int fenv_round(T& val, bool is_neg = false) noexcept
         }
         else if (round == rounding_mode::fe_dec_toward_zero)
         {
-            if (is_neg && trailing_num != 0)
-            {
-                ++val;
-            }
+            // Do nothing
         }
         else // rounding_mode::fe_dec_upward
         {
-            if (trailing_num != 0)
+            if (!is_neg && trailing_num != 0)
             {
                 ++val;
             }

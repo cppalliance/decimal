@@ -27,6 +27,7 @@ void test_constructor_rounding()
 
     BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
     BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'568, 1));
+    BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'568, 1));
 
     // Downward
     boost::decimal::fesetround(rounding_mode::fe_dec_downward);
@@ -34,6 +35,7 @@ void test_constructor_rounding()
 
     BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
     BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'567, 1));
+    BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'568, 1));
 
     // To nearest (ties go to even)
     boost::decimal::fesetround(rounding_mode::fe_dec_to_nearest);
@@ -41,6 +43,7 @@ void test_constructor_rounding()
 
     BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
     BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'568, 1));
+    BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'568, 1));
 
     // Toward zero
     boost::decimal::fesetround(rounding_mode::fe_dec_toward_zero);
@@ -48,6 +51,7 @@ void test_constructor_rounding()
 
     BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
     BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'567, 1));
+    BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'567, 1));
 
     // Upward
     boost::decimal::fesetround(rounding_mode::fe_dec_upward);
@@ -55,6 +59,7 @@ void test_constructor_rounding()
 
     BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
     BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'568, 1));
+    BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'567, 1));
 }
 
 int main()
