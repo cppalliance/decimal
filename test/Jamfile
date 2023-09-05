@@ -27,3 +27,4 @@ run test_decimal_quantum.cpp ;
 run test_strtod.cpp ;
 run test_fenv.cpp ;
 run test_frexp_ldexp.cpp ;
+run test_edit_members.cpp ;
