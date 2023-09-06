@@ -23,6 +23,32 @@ void test_fmax()
 }
 
 template <typename Dec>
+void test_isgreater()
+{
+    BOOST_TEST_EQ(isgreater(Dec(1), BOOST_DECIMAL_DEC_NAN), false);
+    BOOST_TEST_EQ(isgreater(BOOST_DECIMAL_DEC_NAN, Dec(1)), false);
+    BOOST_TEST_EQ(isgreater(BOOST_DECIMAL_DEC_NAN, BOOST_DECIMAL_DEC_NAN), false);
+    BOOST_TEST_EQ(isgreater(BOOST_DECIMAL_DEC_INFINITY, -BOOST_DECIMAL_DEC_INFINITY), true);
+
+    BOOST_TEST_EQ(isgreater(Dec(1), Dec(0)), true);
+    BOOST_TEST_EQ(isgreater(Dec(-2), Dec(1)), false);
+    BOOST_TEST_EQ(isgreater(Dec(1), Dec(1)), false);
+}
+
+template <typename Dec>
+void test_isgreaterequal()
+{
+    BOOST_TEST_EQ(isgreaterequal(Dec(1), BOOST_DECIMAL_DEC_NAN), false);
+    BOOST_TEST_EQ(isgreaterequal(BOOST_DECIMAL_DEC_NAN, Dec(1)), false);
+    BOOST_TEST_EQ(isgreaterequal(BOOST_DECIMAL_DEC_NAN, BOOST_DECIMAL_DEC_NAN), false);
+    BOOST_TEST_EQ(isgreaterequal(BOOST_DECIMAL_DEC_INFINITY, -BOOST_DECIMAL_DEC_INFINITY), true);
+
+    BOOST_TEST_EQ(isgreaterequal(Dec(1), Dec(0)), true);
+    BOOST_TEST_EQ(isgreaterequal(Dec(-2), Dec(1)), false);
+    BOOST_TEST_EQ(isgreaterequal(Dec(1), Dec(1)), true);
+}
+
+template <typename Dec>
 void test_fmin()
 {
     BOOST_TEST_EQ(fmin(Dec(1), BOOST_DECIMAL_DEC_NAN), Dec(1));
@@ -37,6 +63,8 @@ void test_fmin()
 int main()
 {
     test_fmax<decimal32>();
+    test_isgreater<decimal32>();
+    test_isgreaterequal<decimal32>();
     test_fmin<decimal32>();
 
     return boost::report_errors();

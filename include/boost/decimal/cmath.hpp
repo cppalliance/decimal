@@ -11,8 +11,10 @@
 
 namespace boost { namespace decimal {
 
+// TODO(mborland): Allow conversion between decimal types via a promotion system
+
 template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto fmax(T lhs, T rhs) noexcept
+constexpr auto fmax(T lhs, T rhs) noexcept -> T
 {
     if (isnan(lhs) && !isnan(rhs))
     {
@@ -28,7 +30,29 @@ constexpr auto fmax(T lhs, T rhs) noexcept
 }
 
 template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto fmin(T lhs, T rhs) noexcept
+constexpr auto isgreater(T lhs, T rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return lhs > rhs;
+}
+
+template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
+constexpr auto isgreaterequal(T lhs, T rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return lhs >= rhs;
+}
+
+template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
+constexpr auto fmin(T lhs, T rhs) noexcept -> T
 {
     if (isnan(lhs) && !isnan(rhs))
     {
