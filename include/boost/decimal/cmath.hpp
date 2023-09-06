@@ -5,107 +5,11 @@
 #ifndef BOOST_DECIMAL_CMATH_HPP
 #define BOOST_DECIMAL_CMATH_HPP
 
-#include <boost/decimal/fwd.hpp>
-#include <boost/decimal/detail/type_traits.hpp>
-#include <cmath>
-
-namespace boost { namespace decimal {
-
 // TODO(mborland): Allow conversion between decimal types via a promotion system
-
-template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto fmax(T lhs, T rhs) noexcept -> T
-{
-    if (isnan(lhs) && !isnan(rhs))
-    {
-        return rhs;
-    }
-    else if ((!isnan(lhs) && isnan(rhs)) ||
-             (isnan(lhs) && isnan(rhs)))
-    {
-        return lhs;
-    }
-
-    return lhs > rhs ? lhs : rhs;
-}
-
-template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto isgreater(T lhs, T rhs) noexcept -> bool
-{
-    if (isnan(lhs) || isnan(rhs))
-    {
-        return false;
-    }
-
-    return lhs > rhs;
-}
-
-template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto isgreaterequal(T lhs, T rhs) noexcept -> bool
-{
-    if (isnan(lhs) || isnan(rhs))
-    {
-        return false;
-    }
-
-    return lhs >= rhs;
-}
-
-template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto fmin(T lhs, T rhs) noexcept -> T
-{
-    if (isnan(lhs) && !isnan(rhs))
-    {
-        return rhs;
-    }
-    else if ((!isnan(lhs) && isnan(rhs)) ||
-             (isnan(lhs) && isnan(rhs)))
-    {
-        return lhs;
-    }
-
-    return lhs < rhs ? lhs : rhs;
-}
-
-template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto isless(T lhs, T rhs) noexcept -> bool
-{
-    if (isnan(lhs) || isnan(rhs))
-    {
-        return false;
-    }
-
-    return lhs < rhs;
-}
-
-template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto islessequal(T lhs, T rhs) noexcept -> bool
-{
-    if (isnan(lhs) || isnan(rhs))
-    {
-        return false;
-    }
-
-    return lhs <= rhs;
-}
-
-template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto islessgreater(T lhs, T rhs) noexcept -> bool
-{
-    if (isnan(lhs) || isnan(rhs))
-    {
-        return false;
-    }
-
-    return lhs < rhs || lhs > rhs;
-}
-
-template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto isunordered(T lhs, T rhs) noexcept -> bool
-{
-    return isnan(lhs) || isnan(rhs);
-}
-
-}} // Namespaces
+#include <boost/decimal/detail/cmath/fmax.hpp>
+#include <boost/decimal/detail/cmath/fmin.hpp>
+#include <boost/decimal/detail/cmath/isgreater.hpp>
+#include <boost/decimal/detail/cmath/isless.hpp>
+#include <boost/decimal/detail/cmath/isunordered.hpp>
 
 #endif // BOOST_DECIMAL_CMATH_HPP
