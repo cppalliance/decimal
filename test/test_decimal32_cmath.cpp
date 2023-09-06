@@ -60,12 +60,40 @@ void test_fmin()
     BOOST_TEST_EQ(fmin(Dec(-2), Dec(1)), Dec(-2));
 }
 
+template <typename Dec>
+void test_isless()
+{
+    BOOST_TEST_EQ(isless(Dec(1), BOOST_DECIMAL_DEC_NAN), false);
+    BOOST_TEST_EQ(isless(BOOST_DECIMAL_DEC_NAN, Dec(1)), false);
+    BOOST_TEST_EQ(isless(BOOST_DECIMAL_DEC_NAN, BOOST_DECIMAL_DEC_NAN), false);
+    BOOST_TEST_EQ(isless(BOOST_DECIMAL_DEC_INFINITY, -BOOST_DECIMAL_DEC_INFINITY), true);
+
+    BOOST_TEST_EQ(isless(Dec(1), Dec(0)), false);
+    BOOST_TEST_EQ(isless(Dec(-2), Dec(1)), true);
+    BOOST_TEST_EQ(isless(Dec(1), Dec(1)), false);
+}
+
+template <typename Dec>
+void test_islessequal()
+{
+    BOOST_TEST_EQ(islessequal(Dec(1), BOOST_DECIMAL_DEC_NAN), false);
+    BOOST_TEST_EQ(islessequal(BOOST_DECIMAL_DEC_NAN, Dec(1)), false);
+    BOOST_TEST_EQ(islessequal(BOOST_DECIMAL_DEC_NAN, BOOST_DECIMAL_DEC_NAN), false);
+    BOOST_TEST_EQ(islessequal(BOOST_DECIMAL_DEC_INFINITY, -BOOST_DECIMAL_DEC_INFINITY), true);
+
+    BOOST_TEST_EQ(islessequal(Dec(1), Dec(0)), false);
+    BOOST_TEST_EQ(islessequal(Dec(-2), Dec(1)), true);
+    BOOST_TEST_EQ(islessequal(Dec(1), Dec(1)), true);
+}
+
 int main()
 {
     test_fmax<decimal32>();
     test_isgreater<decimal32>();
     test_isgreaterequal<decimal32>();
     test_fmin<decimal32>();
+    test_isless<decimal32>();
+    test_islessequal<decimal32>();
 
     return boost::report_errors();
 }
