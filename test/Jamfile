@@ -29,3 +29,4 @@ run test_fenv.cpp ;
 run test_frexp_ldexp.cpp ;
 run test_edit_members.cpp ;
 run test_literals.cpp ;
+run test_decimal32_cmath.cpp ;
