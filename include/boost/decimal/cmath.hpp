@@ -89,6 +89,17 @@ constexpr auto islessequal(T lhs, T rhs) noexcept -> bool
     return lhs <= rhs;
 }
 
+template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
+constexpr auto islessgreater(T lhs, T rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return lhs < rhs || lhs > rhs;
+}
+
 }} // Namespaces
 
 #endif // BOOST_DECIMAL_CMATH_HPP
