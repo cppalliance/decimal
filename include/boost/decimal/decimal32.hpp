@@ -1791,8 +1791,13 @@ public:
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_infinity = true;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = true;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = true;
+
+    // These members were deprecated in C++23
+    #if __cplusplus <= 202002L || _MSVC_LANG <= 202002L
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_present;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = true;
+    #endif
+
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_indeterminate;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = true;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
