@@ -10,20 +10,34 @@
 
 using namespace boost::decimal;
 
+template <typename Dec>
 void test_fmax()
 {
-    BOOST_TEST_EQ(fmax(decimal32(1), BOOST_DECIMAL_DEC_NAN), decimal32(1));
-    BOOST_TEST_EQ(fmax(BOOST_DECIMAL_DEC_NAN, decimal32(1)), decimal32(1));
+    BOOST_TEST_EQ(fmax(Dec(1), BOOST_DECIMAL_DEC_NAN), Dec(1));
+    BOOST_TEST_EQ(fmax(BOOST_DECIMAL_DEC_NAN, Dec(1)), Dec(1));
     BOOST_TEST(isnan(fmax(BOOST_DECIMAL_DEC_NAN, BOOST_DECIMAL_DEC_NAN)));
     BOOST_TEST_EQ(fmax(BOOST_DECIMAL_DEC_INFINITY, -BOOST_DECIMAL_DEC_INFINITY), BOOST_DECIMAL_DEC_INFINITY);
 
-    BOOST_TEST_EQ(fmax(decimal32(1), decimal32(0)), decimal32(1));
-    BOOST_TEST_EQ(fmax(decimal32(-2), decimal32(1)), decimal32(1));
+    BOOST_TEST_EQ(fmax(Dec(1), Dec(0)), Dec(1));
+    BOOST_TEST_EQ(fmax(Dec(-2), Dec(1)), Dec(1));
+}
+
+template <typename Dec>
+void test_fmin()
+{
+    BOOST_TEST_EQ(fmin(Dec(1), BOOST_DECIMAL_DEC_NAN), Dec(1));
+    BOOST_TEST_EQ(fmin(BOOST_DECIMAL_DEC_NAN, Dec(1)), Dec(1));
+    BOOST_TEST(isnan(fmin(BOOST_DECIMAL_DEC_NAN, BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST_EQ(fmin(BOOST_DECIMAL_DEC_INFINITY, -BOOST_DECIMAL_DEC_INFINITY), -BOOST_DECIMAL_DEC_INFINITY);
+
+    BOOST_TEST_EQ(fmin(Dec(1), Dec(0)), Dec(0));
+    BOOST_TEST_EQ(fmin(Dec(-2), Dec(1)), Dec(-2));
 }
 
 int main()
 {
-    test_fmax();
+    test_fmax<decimal32>();
+    test_fmin<decimal32>();
 
     return boost::report_errors();
 }

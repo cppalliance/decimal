@@ -27,6 +27,22 @@ constexpr auto fmax(T lhs, T rhs) noexcept
     return lhs > rhs ? lhs : rhs;
 }
 
+template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
+constexpr auto fmin(T lhs, T rhs) noexcept
+{
+    if (isnan(lhs) && !isnan(rhs))
+    {
+        return rhs;
+    }
+    else if ((!isnan(lhs) && isnan(rhs)) ||
+             (isnan(lhs) && isnan(rhs)))
+    {
+        return lhs;
+    }
+
+    return lhs < rhs ? lhs : rhs;
+}
+
 }} // Namespaces
 
 #endif // BOOST_DECIMAL_CMATH_HPP
