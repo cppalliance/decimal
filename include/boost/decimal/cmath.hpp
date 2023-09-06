@@ -100,6 +100,12 @@ constexpr auto islessgreater(T lhs, T rhs) noexcept -> bool
     return lhs < rhs || lhs > rhs;
 }
 
+template <typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
+constexpr auto isunordered(T lhs, T rhs) noexcept -> bool
+{
+    return isnan(lhs) || isnan(rhs);
+}
+
 }} // Namespaces
 
 #endif // BOOST_DECIMAL_CMATH_HPP

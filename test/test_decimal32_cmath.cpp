@@ -99,6 +99,19 @@ void test_islessgreater()
     BOOST_TEST_EQ(islessgreater(Dec(1), Dec(1)), false);
 }
 
+template <typename Dec>
+void test_isunordered()
+{
+    BOOST_TEST_EQ(isunordered(Dec(1), BOOST_DECIMAL_DEC_NAN), true);
+    BOOST_TEST_EQ(isunordered(BOOST_DECIMAL_DEC_NAN, Dec(1)), true);
+    BOOST_TEST_EQ(isunordered(BOOST_DECIMAL_DEC_NAN, BOOST_DECIMAL_DEC_NAN), true);
+    BOOST_TEST_EQ(isunordered(BOOST_DECIMAL_DEC_INFINITY, -BOOST_DECIMAL_DEC_INFINITY), false);
+
+    BOOST_TEST_EQ(isunordered(Dec(1), Dec(0)), false);
+    BOOST_TEST_EQ(isunordered(Dec(-2), Dec(1)), false);
+    BOOST_TEST_EQ(isunordered(Dec(1), Dec(1)), false);
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -108,6 +121,7 @@ int main()
     test_isless<decimal32>();
     test_islessequal<decimal32>();
     test_islessgreater<decimal32>();
+    test_isunordered<decimal32>();
 
     return boost::report_errors();
 }
