@@ -286,8 +286,9 @@ public:
     friend constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept;
 
     // <cmath> functions that need to be friends
-    friend constexpr auto floor(decimal32 val) noexcept -> decimal32;
-    friend constexpr auto ceil(decimal32 val) noexcept -> decimal32;
+    friend constexpr auto floord32(decimal32 val) noexcept -> decimal32;
+    friend constexpr auto ceild32(decimal32 val) noexcept -> decimal32;
+    friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) -> decimal32;
 
     // Related to <cmath>
     friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
@@ -1777,7 +1778,7 @@ constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept
     return return_val;
 }
 
-constexpr auto floor(decimal32 val) noexcept -> decimal32
+constexpr auto floord32(decimal32 val) noexcept -> decimal32
 {
     const auto fp {fpclassify(val)};
 
@@ -1800,7 +1801,7 @@ constexpr auto floor(decimal32 val) noexcept -> decimal32
     }
 }
 
-constexpr auto ceil(decimal32 val) noexcept -> decimal32
+constexpr auto ceild32(decimal32 val) noexcept -> decimal32
 {
     const auto fp {fpclassify(val)};
 

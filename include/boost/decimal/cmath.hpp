@@ -6,11 +6,43 @@
 #define BOOST_DECIMAL_CMATH_HPP
 
 // TODO(mborland): Allow conversion between decimal types via a promotion system
+#include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/detail/cmath/fmax.hpp>
 #include <boost/decimal/detail/cmath/fmin.hpp>
 #include <boost/decimal/detail/cmath/isgreater.hpp>
 #include <boost/decimal/detail/cmath/isless.hpp>
 #include <boost/decimal/detail/cmath/isunordered.hpp>
 #include <boost/decimal/detail/cmath/trunc.hpp>
+
+namespace boost { namespace decimal {
+
+// Generic overloads
+
+constexpr auto floor(decimal32 num) noexcept -> decimal32
+{
+    return floord32(num);
+}
+
+constexpr auto ceil(decimal32 num) noexcept -> decimal32
+{
+    return ceild32(num);
+}
+
+constexpr auto frexp10(decimal32 num, int *exp) noexcept -> std::int32_t
+{
+    return frexp10d32(num, exp);
+}
+
+constexpr auto scalbn(decimal32 num, int exp) noexcept -> decimal32
+{
+    return scalbnd32(num, exp);
+}
+
+constexpr auto scalbln(decimal32 num, long exp) noexcept -> decimal32
+{
+    return scalblnd32(num, exp);
+}
+
+}} // Namespaces
 
 #endif // BOOST_DECIMAL_CMATH_HPP
