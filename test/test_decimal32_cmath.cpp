@@ -160,6 +160,31 @@ void test_trunc()
     BOOST_TEST_EQ(trunc(Dec(-27777, -4)), Dec(-2, 0));
 }
 
+template <typename Dec>
+void test_frexp10()
+{
+    int exp {};
+    BOOST_TEST_EQ(frexp10(Dec(0,0), &exp), 0);
+    BOOST_TEST_EQ(exp, 0);
+
+    exp = -1;
+    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_NAN, &exp), -1);
+    BOOST_TEST_EQ(exp, 0);
+
+    exp = -1;
+    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_INFINITY, &exp), -1);
+    BOOST_TEST_EQ(exp, 0);
+
+    BOOST_TEST_EQ(frexp10(Dec(10, 0), &exp), 1'000'000);
+    BOOST_TEST_EQ(exp, -5);
+
+    BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &exp), 1'000'000);
+    BOOST_TEST_EQ(exp, 5);
+
+    BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &exp), -1'000'000);
+    BOOST_TEST_EQ(exp, 5);
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -174,6 +199,8 @@ int main()
     test_floor<decimal32>();
     test_ceil<decimal32>();
     test_trunc<decimal32>();
+
+    test_frexp10<decimal32>();
 
     return boost::report_errors();
 }
