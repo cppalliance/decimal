@@ -1785,7 +1785,7 @@ constexpr auto floor(decimal32 val) noexcept -> decimal32
         default:
             auto new_sig {val.full_significand()};
             const auto decimal_digits {detail::num_digits(new_sig) - 1};
-            new_sig /= detail::powers_of_10[decimal_digits];
+            new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
             if (val.isneg())
             {
                 ++new_sig;
@@ -1808,7 +1808,7 @@ constexpr auto ceil(decimal32 val) noexcept -> decimal32
         default:
             auto new_sig {val.full_significand()};
             const auto decimal_digits {detail::num_digits(new_sig) - 1};
-            new_sig /= detail::powers_of_10[decimal_digits];
+            new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
             if (!val.isneg())
             {
                 ++new_sig;
