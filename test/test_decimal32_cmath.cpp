@@ -144,6 +144,22 @@ void test_ceil()
     BOOST_TEST_EQ(ceil(Dec(-27777, -4)), Dec(-2, 0));
 }
 
+template <typename Dec>
+void test_trunc()
+{
+    BOOST_TEST(isnan(trunc(BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST(isnan(trunc(-BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST(isinf(trunc(BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST(isinf(trunc(-BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST_EQ(trunc(Dec(0, 0)), Dec(0, 0));
+    BOOST_TEST_EQ(trunc(Dec(-0, 0)), Dec(-0, 0));
+
+    BOOST_TEST_EQ(trunc(Dec(27, -1)), Dec(2, 0));
+    BOOST_TEST_EQ(trunc(Dec(-27, -1)), Dec(-2, 0));
+    BOOST_TEST_EQ(trunc(Dec(27777, -4)), Dec(2, 0));
+    BOOST_TEST_EQ(trunc(Dec(-27777, -4)), Dec(-2, 0));
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -157,6 +173,7 @@ int main()
 
     test_floor<decimal32>();
     test_ceil<decimal32>();
+    test_trunc<decimal32>();
 
     return boost::report_errors();
 }
