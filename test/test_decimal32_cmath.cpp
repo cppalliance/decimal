@@ -112,6 +112,22 @@ void test_isunordered()
     BOOST_TEST_EQ(isunordered(Dec(1), Dec(1)), false);
 }
 
+template <typename Dec>
+void test_floor()
+{
+    BOOST_TEST(isnan(floor(BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST(isnan(floor(-BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST(isinf(floor(BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST(isinf(floor(-BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST_EQ(floor(decimal32(0, 0)), decimal32(0, 0));
+    BOOST_TEST_EQ(floor(decimal32(-0, 0)), decimal32(-0, 0));
+
+    BOOST_TEST_EQ(floor(decimal32(27, -1)), decimal32(2, 0));
+    BOOST_TEST_EQ(floor(decimal32(-27, -1)), decimal32(-3, 0));
+    BOOST_TEST_EQ(floor(decimal32(27777, -4)), decimal32(2, 0));
+    BOOST_TEST_EQ(floor(decimal32(-27777, -4)), decimal32(-3, 0));
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -122,6 +138,8 @@ int main()
     test_islessequal<decimal32>();
     test_islessgreater<decimal32>();
     test_isunordered<decimal32>();
+
+    test_floor<decimal32>();
 
     return boost::report_errors();
 }
