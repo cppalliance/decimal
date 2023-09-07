@@ -83,6 +83,16 @@ constexpr auto frexp10(decimal32 num, int* exp) noexcept -> std::int32_t
     return frexp10d32(num, exp);
 }
 
+constexpr auto scalbn(decimal32 num, int exp) noexcept -> decimal32
+{
+    return scalbnd32(num, exp);
+}
+
+constexpr auto scalbln(decimal32 num, long exp) noexcept -> decimal32
+{
+    return scalblnd32(num, exp);
+}
+
 }}
 
 #endif // BOOST_DECIMAL_COMMON_MATH_HPP

@@ -291,6 +291,8 @@ public:
 
     // Related to <cmath>
     friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
+    friend constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32;
+    friend constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32;
 
     // These can be made public only for debugging matters
 #ifndef BOOST_DECIMAL_DEBUG_MEMBERS
@@ -1850,6 +1852,25 @@ constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t
     signed_sig = num.isneg() ? -signed_sig : signed_sig;
 
     return signed_sig;
+}
+
+constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32
+{
+    constexpr decimal32 zero {0, 0};
+
+    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    {
+        return num;
+    }
+
+    num.edit_exponent(num.biased_exponent() + exp);
+
+    return num;
+}
+
+constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32
+{
+    return scalblnd32(num, static_cast<long>(exp));
 }
 
 }} // Namespace boost::decimal
