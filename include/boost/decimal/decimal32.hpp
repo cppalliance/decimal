@@ -290,7 +290,7 @@ public:
     friend constexpr auto ceil(decimal32 val) noexcept -> decimal32;
 
     // Related to <cmath>
-    friend constexpr auto frexp10(decimal32 num, int* exp) noexcept -> std::int32_t;
+    friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
 
     // These can be made public only for debugging matters
 #ifndef BOOST_DECIMAL_DEBUG_MEMBERS
@@ -1826,7 +1826,7 @@ constexpr auto ceil(decimal32 val) noexcept -> decimal32
 // Returns num in the range [1'000'000, 9'999'999]
 //
 // If the conversion can not be performed returns -1 and exp = 0
-constexpr auto frexp10(decimal32 num, int* exp) noexcept -> std::int32_t
+constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t
 {
     constexpr decimal32 zero {0, 0};
 
