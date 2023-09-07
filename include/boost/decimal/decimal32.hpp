@@ -287,6 +287,8 @@ public:
 
     // <cmath> functions that need to be friends
     friend constexpr auto floor(decimal32 val) noexcept -> decimal32;
+    friend constexpr auto ceil(decimal32 val) noexcept -> decimal32;
+
     // These can be made public only for debugging matters
 #ifndef BOOST_DECIMAL_DEBUG_MEMBERS
 private:
@@ -1790,6 +1792,30 @@ constexpr auto floor(decimal32 val) noexcept -> decimal32
             }
 
             return {new_sig, val.biased_exponent() + decimal_digits, val.isneg()};
+    }
+}
+
+constexpr auto ceil(decimal32 val) noexcept -> decimal32
+{
+    const auto fp {fpclassify(val)};
+
+    switch (fp)
+    {
+        case FP_ZERO:
+        case FP_NAN:
+        case FP_INFINITE:
+            return val;
+        default:
+            auto new_sig {val.full_significand()};
+            const auto decimal_digits {detail::num_digits(new_sig) - 1};
+            new_sig /= detail::powers_of_10[decimal_digits];
+            if (!val.isneg())
+            {
+                ++new_sig;
+            }
+
+            new_sig *= 10;
+            return {new_sig, val.biased_exponent() + decimal_digits - 1, val.isneg()};
     }
 }
 
