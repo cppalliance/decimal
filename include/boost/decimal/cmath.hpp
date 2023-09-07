@@ -11,5 +11,6 @@
 #include <boost/decimal/detail/cmath/isgreater.hpp>
 #include <boost/decimal/detail/cmath/isless.hpp>
 #include <boost/decimal/detail/cmath/isunordered.hpp>
+#include <boost/decimal/detail/cmath/trunc.hpp>
 
 #endif // BOOST_DECIMAL_CMATH_HPP
