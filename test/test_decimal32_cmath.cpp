@@ -160,6 +160,71 @@ void test_trunc()
     BOOST_TEST_EQ(trunc(Dec(-27777, -4)), Dec(-2, 0));
 }
 
+template <typename Dec>
+void test_frexp10()
+{
+    int exp {};
+    BOOST_TEST_EQ(frexp10(Dec(0,0), &exp), 0);
+    BOOST_TEST_EQ(exp, 0);
+
+    exp = -1;
+    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_NAN, &exp), -1);
+    BOOST_TEST_EQ(exp, 0);
+
+    exp = -1;
+    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_INFINITY, &exp), -1);
+    BOOST_TEST_EQ(exp, 0);
+
+    BOOST_TEST_EQ(frexp10(Dec(10, 0), &exp), 1'000'000);
+    BOOST_TEST_EQ(exp, -5);
+
+    BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &exp), 1'000'000);
+    BOOST_TEST_EQ(exp, 5);
+
+    BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &exp), -1'000'000);
+    BOOST_TEST_EQ(exp, 5);
+}
+
+template <typename Dec>
+void test_scalbn()
+{
+    BOOST_TEST(isinf(scalbn(BOOST_DECIMAL_DEC_INFINITY, 1)));
+    BOOST_TEST(isnan(scalbn(BOOST_DECIMAL_DEC_NAN, 1)));
+    BOOST_TEST_EQ(scalbn(Dec(0, 0), 1), Dec(0, 0));
+
+    decimal32 one {1, 0};
+    decimal32 ten {1, 1};
+    decimal32 hundred {1, 2};
+
+    BOOST_TEST_EQ(scalbn(one, 1), ten);
+    BOOST_TEST_EQ(scalbn(one, 2), hundred);
+    BOOST_TEST_EQ(scalbn(ten, 1), hundred);
+    BOOST_TEST_EQ(scalbn(hundred, -1), ten);
+    BOOST_TEST_EQ(scalbn(hundred, -2), one);
+    BOOST_TEST_EQ(scalbn(hundred, 0), hundred);
+    BOOST_TEST(isinf(scalbn(one, 10000)));
+}
+
+template <typename Dec>
+void test_scalbln()
+{
+    BOOST_TEST(isinf(scalbln(BOOST_DECIMAL_DEC_INFINITY, 1)));
+    BOOST_TEST(isnan(scalbln(BOOST_DECIMAL_DEC_NAN, 1)));
+    BOOST_TEST_EQ(scalbln(Dec(0, 0), 1), Dec(0, 0));
+
+    decimal32 one {1, 0};
+    decimal32 ten {1, 1};
+    decimal32 hundred {1, 2};
+
+    BOOST_TEST_EQ(scalbln(one, 1), ten);
+    BOOST_TEST_EQ(scalbln(one, 2), hundred);
+    BOOST_TEST_EQ(scalbln(ten, 1), hundred);
+    BOOST_TEST_EQ(scalbln(hundred, -1), ten);
+    BOOST_TEST_EQ(scalbln(hundred, -2), one);
+    BOOST_TEST_EQ(scalbln(hundred, 0), hundred);
+    BOOST_TEST(isinf(scalbln(one, 10000)));
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -174,6 +239,10 @@ int main()
     test_floor<decimal32>();
     test_ceil<decimal32>();
     test_trunc<decimal32>();
+
+    test_frexp10<decimal32>();
+    test_scalbn<decimal32>();
+    test_scalbln<decimal32>();
 
     return boost::report_errors();
 }

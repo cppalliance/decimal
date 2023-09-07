@@ -289,6 +289,11 @@ public:
     friend constexpr auto floor(decimal32 val) noexcept -> decimal32;
     friend constexpr auto ceil(decimal32 val) noexcept -> decimal32;
 
+    // Related to <cmath>
+    friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
+    friend constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32;
+    friend constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32;
+
     // These can be made public only for debugging matters
 #ifndef BOOST_DECIMAL_DEBUG_MEMBERS
 private:
@@ -1817,6 +1822,55 @@ constexpr auto ceil(decimal32 val) noexcept -> decimal32
             new_sig *= 10;
             return {new_sig, val.biased_exponent() + decimal_digits - 1, val.isneg()};
     }
+}
+
+// Returns the normalized significand and exponent to be cohort agnostic
+// Returns num in the range [1'000'000, 9'999'999]
+//
+// If the conversion can not be performed returns -1 and exp = 0
+constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t
+{
+    constexpr decimal32 zero {0, 0};
+
+    if (num == zero)
+    {
+        *exp = 0;
+        return 0;
+    }
+    else if (isinf(num) || isnan(num))
+    {
+        *exp = 0;
+        return -1;
+    }
+
+    auto num_exp {num.biased_exponent()};
+    auto num_sig {num.full_significand()};
+    normalize(num_sig, num_exp);
+
+    *exp = num_exp;
+    auto signed_sig {static_cast<std::int32_t>(num_sig)};
+    signed_sig = num.isneg() ? -signed_sig : signed_sig;
+
+    return signed_sig;
+}
+
+constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32
+{
+    constexpr decimal32 zero {0, 0};
+
+    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    {
+        return num;
+    }
+
+    num.edit_exponent(num.biased_exponent() + exp);
+
+    return num;
+}
+
+constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32
+{
+    return scalblnd32(num, static_cast<long>(exp));
 }
 
 }} // Namespace boost::decimal

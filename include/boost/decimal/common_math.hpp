@@ -78,6 +78,21 @@ constexpr decimal32 quantize(decimal32 lhs, decimal32 rhs) noexcept
     return quantized32(lhs, rhs);
 }
 
+constexpr auto frexp10(decimal32 num, int* exp) noexcept -> std::int32_t
+{
+    return frexp10d32(num, exp);
+}
+
+constexpr auto scalbn(decimal32 num, int exp) noexcept -> decimal32
+{
+    return scalbnd32(num, exp);
+}
+
+constexpr auto scalbln(decimal32 num, long exp) noexcept -> decimal32
+{
+    return scalblnd32(num, exp);
+}
+
 }}
 
 #endif // BOOST_DECIMAL_COMMON_MATH_HPP
