@@ -5,8 +5,12 @@
 #include "mini_to_chars.hpp"
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
+#include <boost/math/special_functions/next.hpp>
 #include <iostream>
+#include <random>
 #include <cmath>
+
+static constexpr auto N {1024};
 
 using namespace boost::decimal;
 
@@ -126,6 +130,9 @@ void test_floor()
     BOOST_TEST_EQ(floor(Dec(-27, -1)), Dec(-3, 0));
     BOOST_TEST_EQ(floor(Dec(27777, -4)), Dec(2, 0));
     BOOST_TEST_EQ(floor(Dec(-27777, -4)), Dec(-3, 0));
+
+    // Bigger numbers
+    BOOST_TEST_EQ(floor(Dec(27777, -2)), Dec(277, 0));
 }
 
 template <typename Dec>
@@ -225,6 +232,42 @@ void test_scalbln()
     BOOST_TEST(isinf(scalbln(one, 10000)));
 }
 
+template <typename Dec>
+void test_div_fmod()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(0.0F, 1e30F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        decimal32 d1 {val1};
+        decimal32 d2 {val2};
+
+        auto float_div {val1 / val2};
+        auto decimal_div {static_cast<float>(d1 / d2)};
+        auto float_fmod {std::fmod(val1, val2)};
+        auto decimal_fmod {static_cast<float>(fmod(d1, d2))};
+
+        // Decimal types are all higher precision than float
+        if (!(BOOST_TEST(abs(boost::math::float_distance(float_fmod, decimal_fmod)) < 1e7) &&
+              BOOST_TEST(abs(boost::math::float_distance(float_div, decimal_div)) < 20)))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nVal div: " << float_div
+                      << "\nDec div: " << decimal_div
+                      << "\nDist: " << boost::math::float_distance(float_div, decimal_div)
+                      << "\nVal fmod: " << float_fmod
+                      << "\nDec fmod: " << decimal_fmod
+                      << "\nDist: " << boost::math::float_distance(float_fmod, decimal_fmod) << std::endl;
+        }
+    }
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -243,6 +286,8 @@ int main()
     test_frexp10<decimal32>();
     test_scalbn<decimal32>();
     test_scalbln<decimal32>();
+
+    test_div_fmod<decimal32>();
 
     return boost::report_errors();
 }
