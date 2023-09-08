@@ -2,6 +2,9 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+// Propogates up from boost.math
+#define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
+
 #include "mini_to_chars.hpp"
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
