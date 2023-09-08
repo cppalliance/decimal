@@ -1781,6 +1781,8 @@ constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept
 
 constexpr auto floord32(decimal32 val) noexcept -> decimal32
 {
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 neg_one {-1, 0};
     const auto fp {fpclassify(val)};
 
     switch (fp)
@@ -1790,20 +1792,45 @@ constexpr auto floord32(decimal32 val) noexcept -> decimal32
         case FP_INFINITE:
             return val;
         default:
-            auto new_sig {val.full_significand()};
-            const auto decimal_digits {detail::num_digits(new_sig) - 1};
-            new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
-            if (val.isneg())
-            {
-                ++new_sig;
-            }
-
-            return {new_sig, val.biased_exponent() + decimal_digits, val.isneg()};
+            static_cast<void>(val);
     }
+
+    auto new_sig {val.full_significand()};
+    auto abs_exp {std::abs(val.biased_exponent())};
+    const auto sig_dig {detail::num_digits(new_sig)};
+    auto decimal_digits {sig_dig};
+    bool round {false};
+
+    if (sig_dig > abs_exp)
+    {
+        decimal_digits = abs_exp;
+        if (sig_dig == abs_exp + 1)
+        {
+            round = true;
+        }
+    }
+    else if (val.biased_exponent() < 1 && abs_exp >= sig_dig)
+    {
+        return val.isneg() ? neg_one : zero;
+    }
+    else
+    {
+        decimal_digits--;
+    }
+
+    new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
+    if (val.isneg() && round)
+    {
+        ++new_sig;
+    }
+    std::cerr << "New sig: " << new_sig << std::endl;
+    return {new_sig, val.biased_exponent() + decimal_digits, val.isneg()};
 }
 
 constexpr auto ceild32(decimal32 val) noexcept -> decimal32
 {
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 one {1, 0};
     const auto fp {fpclassify(val)};
 
     switch (fp)
@@ -1813,6 +1840,11 @@ constexpr auto ceild32(decimal32 val) noexcept -> decimal32
         case FP_INFINITE:
             return val;
         default:
+            if (abs(val) < one)
+            {
+                return zero;
+            }
+
             auto new_sig {val.full_significand()};
             const auto decimal_digits {detail::num_digits(new_sig) - 1};
             new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
