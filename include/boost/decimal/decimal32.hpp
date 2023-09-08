@@ -1002,7 +1002,19 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
     normalize(lhs_significand, lhs_real_exp);
     normalize(rhs_significand, rhs_real_exp);
 
-    if (both_neg)
+    if (lhs_significand == 0 && rhs_significand != 0)
+    {
+        return rhs.isneg() ? false : true;
+    }
+    else if (lhs_significand != 0 && rhs_significand == 0)
+    {
+        return lhs.isneg() ? true : false;
+    }
+    else if (lhs_significand == 0 && rhs_significand == 0)
+    {
+        return false;
+    }
+    else if (both_neg)
     {
         if (lhs_real_exp > rhs_real_exp)
         {
@@ -1019,7 +1031,7 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
     }
     else
     {
-        if (lhs_real_exp < rhs_real_exp)
+        if (lhs_real_exp < rhs_real_exp && lhs_significand)
         {
             return true;
         }
