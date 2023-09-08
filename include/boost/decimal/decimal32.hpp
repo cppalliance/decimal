@@ -1487,7 +1487,7 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
     q = decimal32{res_sig, res_exp, sign};
 
     // https://en.cppreference.com/w/cpp/numeric/math/fmod
-    auto q_trunc {floord32(q)};
+    auto q_trunc {q > zero ? floord32(q) : ceild32(q)};
     r = lhs - (decimal32(q_trunc) * rhs);
 }
 
