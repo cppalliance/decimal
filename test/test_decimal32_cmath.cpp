@@ -155,6 +155,15 @@ void test_ceil()
     BOOST_TEST_EQ(ceil(Dec(-27, -1)), Dec(-2, 0));
     BOOST_TEST_EQ(ceil(Dec(27777, -4)), Dec(3, 0));
     BOOST_TEST_EQ(ceil(Dec(-27777, -4)), Dec(-2, 0));
+
+    // Bigger numbers
+    BOOST_TEST_EQ(ceil(Dec(27777, -2)), Dec(278, 0));
+    BOOST_TEST_EQ(ceil(Dec(-27777, -2)), Dec(-277, 0));
+    BOOST_TEST_EQ(ceil(Dec(27777, -1)), Dec(2778, 0));
+
+    // Near zero
+    BOOST_TEST_EQ(ceil(Dec(3, -1)), Dec(1, 0));
+    BOOST_TEST_EQ(ceil(Dec(-3, -1)), Dec(0, 0));
 }
 
 template <typename Dec>
