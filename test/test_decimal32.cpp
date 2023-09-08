@@ -28,6 +28,18 @@ void test_comp()
     BOOST_TEST(sig > small);
     BOOST_TEST(sig >= small);
 
+    decimal32 zero {0, 0};
+    decimal32 one {1, 0};
+    decimal32 half {5, -1};
+    BOOST_TEST(zero < one);
+    BOOST_TEST(zero < half);
+    BOOST_TEST(one > zero);
+    BOOST_TEST(half > zero);
+    BOOST_TEST(zero > -one);
+    BOOST_TEST(half > -one);
+    BOOST_TEST(-one < zero);
+    BOOST_TEST(-one < half);
+
     // Test cohorts
     BOOST_TEST(small == decimal32(10, -51));
     BOOST_TEST(small == decimal32(100, -52));

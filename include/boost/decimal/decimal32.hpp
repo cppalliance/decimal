@@ -104,8 +104,8 @@ static constexpr std::uint32_t construct_significand_mask = no_combination;
 } // Namespace detail
 
 // Converts the significand to 9 digits to remove the effects of cohorts.
-template <typename T>
-constexpr void normalize(std::uint32_t& significand, T& exp) noexcept
+template <typename T, typename T2>
+constexpr void normalize(T& significand, T2& exp) noexcept
 {
     auto digits = detail::num_digits(significand);
 
@@ -286,8 +286,9 @@ public:
     friend constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept;
 
     // <cmath> functions that need to be friends
-    friend constexpr auto floor(decimal32 val) noexcept -> decimal32;
-    friend constexpr auto ceil(decimal32 val) noexcept -> decimal32;
+    friend constexpr auto floord32(decimal32 val) noexcept -> decimal32;
+    friend constexpr auto ceild32(decimal32 val) noexcept -> decimal32;
+    friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     // Related to <cmath>
     friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
@@ -1001,7 +1002,19 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
     normalize(lhs_significand, lhs_real_exp);
     normalize(rhs_significand, rhs_real_exp);
 
-    if (both_neg)
+    if (lhs_significand == 0 && rhs_significand != 0)
+    {
+        return rhs.isneg() ? false : true;
+    }
+    else if (lhs_significand != 0 && rhs_significand == 0)
+    {
+        return lhs.isneg() ? true : false;
+    }
+    else if (lhs_significand == 0 && rhs_significand == 0)
+    {
+        return false;
+    }
+    else if (both_neg)
     {
         if (lhs_real_exp > rhs_real_exp)
         {
@@ -1018,7 +1031,7 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
     }
     else
     {
-        if (lhs_real_exp < rhs_real_exp)
+        if (lhs_real_exp < rhs_real_exp && lhs_significand)
         {
             return true;
         }
@@ -1474,7 +1487,8 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
     q = decimal32{res_sig, res_exp, sign};
 
     // https://en.cppreference.com/w/cpp/numeric/math/fmod
-    r = lhs - decimal32(q.full_significand() % detail::precision) * rhs;
+    auto q_trunc {q > zero ? floord32(q) : ceild32(q)};
+    r = lhs - (decimal32(q_trunc) * rhs);
 }
 
 constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept
@@ -1777,8 +1791,10 @@ constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept
     return return_val;
 }
 
-constexpr auto floor(decimal32 val) noexcept -> decimal32
+constexpr auto floord32(decimal32 val) noexcept -> decimal32
 {
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 neg_one {1, 0, true};
     const auto fp {fpclassify(val)};
 
     switch (fp)
@@ -1788,20 +1804,45 @@ constexpr auto floor(decimal32 val) noexcept -> decimal32
         case FP_INFINITE:
             return val;
         default:
-            auto new_sig {val.full_significand()};
-            const auto decimal_digits {detail::num_digits(new_sig) - 1};
-            new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
-            if (val.isneg())
-            {
-                ++new_sig;
-            }
-
-            return {new_sig, val.biased_exponent() + decimal_digits, val.isneg()};
+            static_cast<void>(val);
     }
+
+    auto new_sig {val.full_significand()};
+    auto abs_exp {std::abs(val.biased_exponent())};
+    const auto sig_dig {detail::num_digits(new_sig)};
+    auto decimal_digits {sig_dig};
+    bool round {false};
+
+    if (sig_dig > abs_exp)
+    {
+        decimal_digits = abs_exp;
+        if (sig_dig == abs_exp + 1)
+        {
+            round = true;
+        }
+    }
+    else if (val.biased_exponent() < 1 && abs_exp >= sig_dig)
+    {
+        return val.isneg() ? neg_one : zero;
+    }
+    else
+    {
+        decimal_digits--;
+    }
+
+    new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
+    if (val.isneg() && round)
+    {
+        ++new_sig;
+    }
+
+    return {new_sig, val.biased_exponent() + decimal_digits, val.isneg()};
 }
 
-constexpr auto ceil(decimal32 val) noexcept -> decimal32
+constexpr auto ceild32(decimal32 val) noexcept -> decimal32
 {
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 one {1, 0};
     const auto fp {fpclassify(val)};
 
     switch (fp)
@@ -1811,17 +1852,44 @@ constexpr auto ceil(decimal32 val) noexcept -> decimal32
         case FP_INFINITE:
             return val;
         default:
-            auto new_sig {val.full_significand()};
-            const auto decimal_digits {detail::num_digits(new_sig) - 1};
-            new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
-            if (!val.isneg())
-            {
-                ++new_sig;
-            }
-
-            new_sig *= 10;
-            return {new_sig, val.biased_exponent() + decimal_digits - 1, val.isneg()};
+            static_cast<void>(val);
     }
+
+    auto new_sig {val.full_significand()};
+    auto abs_exp {std::abs(val.biased_exponent())};
+    const auto sig_dig {detail::num_digits(new_sig)};
+    auto decimal_digits {sig_dig};
+
+    if (sig_dig > abs_exp)
+    {
+        decimal_digits = abs_exp;
+    }
+    else if (val.biased_exponent() < 1 && abs_exp >= sig_dig)
+    {
+        return val.isneg() ? zero : one;
+    }
+    else
+    {
+        decimal_digits--;
+    }
+
+    new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
+    if (!val.isneg())
+    {
+        ++new_sig;
+    }
+    new_sig *= 10;
+
+    return {new_sig, val.biased_exponent() + decimal_digits - 1, val.isneg()};
+}
+
+constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    decimal32 q {};
+    decimal32 r {};
+
+    div_mod_impl(lhs, rhs, q, r);
+    return r;
 }
 
 // Returns the normalized significand and exponent to be cohort agnostic
