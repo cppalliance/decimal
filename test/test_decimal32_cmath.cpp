@@ -302,7 +302,7 @@ int main()
     test_scalbn<decimal32>();
     test_scalbln<decimal32>();
 
-    // test_div_fmod<decimal32>();
+    test_div_fmod<decimal32>();
 
     return boost::report_errors();
 }
