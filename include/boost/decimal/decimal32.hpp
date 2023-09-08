@@ -104,8 +104,8 @@ static constexpr std::uint32_t construct_significand_mask = no_combination;
 } // Namespace detail
 
 // Converts the significand to 9 digits to remove the effects of cohorts.
-template <typename T>
-constexpr void normalize(std::uint32_t& significand, T& exp) noexcept
+template <typename T, typename T2>
+constexpr void normalize(T& significand, T2& exp) noexcept
 {
     auto digits = detail::num_digits(significand);
 
@@ -288,7 +288,7 @@ public:
     // <cmath> functions that need to be friends
     friend constexpr auto floord32(decimal32 val) noexcept -> decimal32;
     friend constexpr auto ceild32(decimal32 val) noexcept -> decimal32;
-    friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) -> decimal32;
+    friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     // Related to <cmath>
     friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
@@ -1475,7 +1475,8 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
     q = decimal32{res_sig, res_exp, sign};
 
     // https://en.cppreference.com/w/cpp/numeric/math/fmod
-    r = lhs - decimal32(q.full_significand() % detail::precision) * rhs;
+    auto q_trunc {floord32(q)};
+    r = lhs - (decimal32(q_trunc) * rhs);
 }
 
 constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept
@@ -1823,6 +1824,15 @@ constexpr auto ceild32(decimal32 val) noexcept -> decimal32
             new_sig *= 10;
             return {new_sig, val.biased_exponent() + decimal_digits - 1, val.isneg()};
     }
+}
+
+constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    decimal32 q {};
+    decimal32 r {};
+
+    div_mod_impl(lhs, rhs, q, r);
+    return r;
 }
 
 // Returns the normalized significand and exponent to be cohort agnostic

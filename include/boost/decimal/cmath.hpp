@@ -43,6 +43,11 @@ constexpr auto scalbln(decimal32 num, long exp) noexcept -> decimal32
     return scalblnd32(num, exp);
 }
 
+constexpr auto fmod(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    return fmodd32(lhs, rhs);
+}
+
 }} // Namespaces
 
 #endif // BOOST_DECIMAL_CMATH_HPP
