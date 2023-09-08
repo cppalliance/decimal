@@ -1794,7 +1794,7 @@ constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept
 constexpr auto floord32(decimal32 val) noexcept -> decimal32
 {
     constexpr decimal32 zero {0, 0};
-    constexpr decimal32 neg_one {-1, 0};
+    constexpr decimal32 neg_one {1, 0, true};
     const auto fp {fpclassify(val)};
 
     switch (fp)
