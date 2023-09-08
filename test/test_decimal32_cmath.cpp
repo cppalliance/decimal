@@ -266,8 +266,8 @@ void test_div_fmod()
         auto decimal_fmod {static_cast<float>(fmod(d1, d2))};
 
         // Decimal types are all higher precision than float
-        if (!(BOOST_TEST(abs(boost::math::float_distance(float_fmod, decimal_fmod)) < 1e7) &&
-              BOOST_TEST(abs(boost::math::float_distance(float_div, decimal_div)) < 20)))
+        if (!(BOOST_TEST(std::fabs(boost::math::float_distance(float_fmod, decimal_fmod)) < 1e7) &&
+              BOOST_TEST(std::fabs(boost::math::float_distance(float_div, decimal_div)) < 20)))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
