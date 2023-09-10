@@ -30,22 +30,31 @@ jobs:
           fetch-depth: '0'
       - name: update-tools
         run: sudo apt install lcov
-      - name: install Boost
+      - name: clone-submods-bootstrap-headers-boost-develop
         run: |
-          sudo apt-get update --quiet
-          sudo apt-get install --no-install-recommends --quiet --yes libboost-dev
+          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+          cd ../boost-root
+          git submodule update --init tools
+          git submodule update --init libs/assert
+          git submodule update --init libs/config
+          git submodule update --init libs/core
+          git submodule update --init libs/math
+          git submodule update --init libs/static_assert
+          git submodule update --init libs/test
+          ./bootstrap.sh
+          ./b2 headers
       - name: gcc-gcov-native
         run: |
           cd test
           mkdir -p cover
           cd cover
           mkdir -p obj
-          g++ -x c++ -std=c++20 -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage -I../.. -I../../include -c ../test_decimal32_cmath.cpp -o obj/test_decimal32_cmath.o
+          g++ -x c++ -std=c++20 -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage -I../.. -I../../include -c -I../../../boost-root ../test_decimal32_cmath.cpp -o obj/test_decimal32_cmath.o
           g++ -std=c++20 -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage obj/test_decimal32_cmath.o -o test_decimal32_cmath.exe
           ./test_decimal32_cmath.exe
           gcov --object-directory obj --demangled-names ../test_decimal32_cmath.cpp
           lcov --rc lcov_branch_coverage=1 -c --directory obj --output-file coverage_unfiltered.info
-          lcov --rc lcov_branch_coverage=1 --remove coverage_unfiltered.info '/usr/*' '*1.74.0*/*' --output-file coverage.info
+          lcov --rc lcov_branch_coverage=1 --remove coverage_unfiltered.info '/usr/*' '*boost-root/*' --output-file coverage.info
           genhtml coverage.info --rc lcov_branch_coverage=1 --demangle-cpp --output-directory ./report
       - name: upload-codecov
         uses: codecov/codecov-action@v3
