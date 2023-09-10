@@ -30,19 +30,10 @@ jobs:
           fetch-depth: '0'
       - name: update-tools
         run: sudo apt install lcov
-      - name: clone-submods-bootstrap-headers-boost-develop
+      - name: install Boost
         run: |
-          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
-          cd ../boost-root
-          git submodule update --init tools
-          git submodule update --init libs/assert
-          git submodule update --init libs/config
-          git submodule update --init libs/core
-          git submodule update --init libs/math
-          git submodule update --init libs/static_assert
-          git submodule update --init libs/test
-          ./bootstrap.sh
-          ./b2 headers
+          sudo apt-get update --quiet
+          sudo apt-get install --no-install-recommends --quiet --yes libboost-dev
       - name: gcc-gcov-native
         run: |
           cd test
