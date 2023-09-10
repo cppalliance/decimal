@@ -6,7 +6,7 @@
 #  or copy at http://www.boost.org/LICENSE_1_0.txt)
 # ------------------------------------------------------------------------------
 
-name: decimal_codecov
+name: codecov
 on:
   push:
     branches:
@@ -50,8 +50,8 @@ jobs:
           mkdir -p cover
           cd cover
           mkdir -p obj
-          g++ -x c++ -std=c++20 -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage -I../.. -I../../include -c -I../../../boost-root ../test_decimal32_cmath.cpp -o obj/test_decimal32_cmath.o
-          g++ -std=c++20 -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage obj/test_decimal32_cmath.o -o test_decimal32_cmath.exe
+          ${{ matrix.compiler }} -x c++ -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage -I../.. -I../../include -c -I../../../boost-root ../test_decimal32_cmath.cpp -o obj/test_decimal32_cmath.o
+          ${{ matrix.compiler }} -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage obj/test_decimal32_cmath.o -o test_decimal32_cmath.exe
           ./test_decimal32_cmath.exe
           gcov --object-directory obj --demangled-names ../test_decimal32_cmath.cpp
           lcov --rc lcov_branch_coverage=1 -c --directory obj --output-file coverage_unfiltered.info
