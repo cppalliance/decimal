@@ -10,7 +10,9 @@ name: codecov
 on:
   push:
     branches:
-      - main
+      - master
+      - develop
+      - feature/**
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
