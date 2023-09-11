@@ -48,6 +48,11 @@ constexpr auto fmod(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     return fmodd32(lhs, rhs);
 }
 
+constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
+{
+    return copysignd32(mag, sgn);
+}
+
 }} // Namespaces
 
 #endif // BOOST_DECIMAL_CMATH_HPP

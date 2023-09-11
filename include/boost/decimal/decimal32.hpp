@@ -289,6 +289,7 @@ public:
     friend constexpr auto floord32(decimal32 val) noexcept -> decimal32;
     friend constexpr auto ceild32(decimal32 val) noexcept -> decimal32;
     friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+    friend constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32;
 
     // Related to <cmath>
     friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
@@ -1145,9 +1146,10 @@ constexpr bool decimal32::isneg() const noexcept
     return static_cast<bool>(bits_.sign);
 }
 
+// Allows changing the sign even on nans and infs
 constexpr auto decimal32::edit_sign(bool sign) noexcept -> void
 {
-    *this = sign ? -abs(*this) : abs(*this);
+    this->bits_.sign = static_cast<std::uint32_t>(sign);
 }
 
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
@@ -1939,6 +1941,12 @@ constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32
 constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32
 {
     return scalblnd32(num, static_cast<long>(exp));
+}
+
+constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32
+{
+    mag.edit_sign(sgn.isneg());
+    return mag;
 }
 
 }} // Namespace boost::decimal

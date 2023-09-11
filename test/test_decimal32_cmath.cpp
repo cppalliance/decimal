@@ -286,6 +286,34 @@ void test_div_fmod()
     }
 }
 
+template <typename Dec>
+void test_copysign()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(0.0F, 1e30F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        decimal32 d1 {val1};
+        decimal32 d2 {val2};
+
+        auto ret_val {std::copysign(val1, val2)};
+        auto ret_dec {static_cast<float>(copysign(d1, d2))};
+
+        if (!BOOST_TEST(std::fabs(boost::math::float_distance(ret_val, ret_dec)) < 20))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -306,6 +334,8 @@ int main()
     test_scalbln<decimal32>();
 
     test_div_fmod<decimal32>();
+
+    test_copysign<decimal32>();
 
     return boost::report_errors();
 }
