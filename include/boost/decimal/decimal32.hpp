@@ -1949,6 +1949,11 @@ constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32
     return mag;
 }
 
+constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
+{
+    return (x * y) + z;
+}
+
 }} // Namespace boost::decimal
 
 namespace std {
