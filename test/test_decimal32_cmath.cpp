@@ -314,6 +314,12 @@ void test_copysign()
     }
 }
 
+template <typename Dec>
+void test_fma()
+{
+    BOOST_TEST_EQ(fma(decimal32(1, -1), decimal32(1, 1), decimal32(1, 0, true)), decimal32(0, 0));
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -336,6 +342,8 @@ int main()
     test_div_fmod<decimal32>();
 
     test_copysign<decimal32>();
+
+    test_fma<decimal32>();
 
     return boost::report_errors();
 }
