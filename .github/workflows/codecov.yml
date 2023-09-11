@@ -1,0 +1,66 @@
+﻿# ------------------------------------------------------------------------------
+#  Copyright Matt Borland 2023.
+#  Copyright Christopher Kormanyos 2023.
+#  Distributed under the Boost Software License,
+#  Version 1.0. (See accompanying file LICENSE_1_0.txt
+#  or copy at http://www.boost.org/LICENSE_1_0.txt)
+# ------------------------------------------------------------------------------
+
+name: codecov
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  gcc-gcov-native:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        standard: [ c++20 ]
+        compiler: [ g++ ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: update-tools
+        run: sudo apt install lcov
+      - name: clone-submods-bootstrap-headers-boost-develop
+        run: |
+          git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+          cd ../boost-root
+          git submodule update --init tools
+          git submodule update --init libs/assert
+          git submodule update --init libs/config
+          git submodule update --init libs/core
+          git submodule update --init libs/math
+          git submodule update --init libs/predef
+          git submodule update --init libs/static_assert
+          git submodule update --init libs/test
+          ./bootstrap.sh
+          ./b2 headers
+      - name: gcc-gcov-native
+        run: |
+          cd test
+          mkdir -p cover
+          cd cover
+          mkdir -p obj
+          ${{ matrix.compiler }} -x c++ -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage -I../.. -I../../include -c -I../../../boost-root ../test_decimal32_cmath.cpp -o obj/test_decimal32_cmath.o
+          ${{ matrix.compiler }} -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage obj/test_decimal32_cmath.o -o test_decimal32_cmath.exe
+          ./test_decimal32_cmath.exe
+          gcov --object-directory obj --demangled-names ../test_decimal32_cmath.cpp
+          lcov --rc lcov_branch_coverage=1 -c --directory obj --output-file coverage_unfiltered.info
+          lcov --rc lcov_branch_coverage=1 --remove coverage_unfiltered.info '/usr/*' '*boost-root/*' --output-file coverage.info
+          genhtml coverage.info --rc lcov_branch_coverage=1 --demangle-cpp --output-directory ./report
+      - name: upload-codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./test/cover/coverage.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          functionalities: fix
