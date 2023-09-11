@@ -65,5 +65,8 @@ ifneq ($(ALL_COV),0)
 LCOV_BRANCH := --rc lcov_branch_coverage=1
 endif
 
-LCOV_REMOVES = '/usr/*'                                                       \
-               '*boost-root/*'
+LCOV_REMOVES = '*/test/mini_to_chars.hpp'                                     \
+               '*/test/*.cpp'                                                 \
+               '*$(MY_BOOST_ROOT)/*'                                          \
+               '/usr/*'
+               
