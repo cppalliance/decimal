@@ -15,7 +15,7 @@
 namespace boost { namespace decimal { namespace numbers {
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-static constexpr Dec e_v = Dec{UINT64_C(2718281828459045235), -18};;
+static constexpr Dec e_v = Dec{UINT64_C(2718281828459045235), -18};
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec log2e_v = Dec{UINT64_C(1442695040888963407), -18};
