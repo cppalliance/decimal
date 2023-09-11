@@ -7,6 +7,7 @@
 
 // TODO(mborland): Allow conversion between decimal types via a promotion system
 #include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/numbers.hpp>
 #include <boost/decimal/detail/cmath/fmax.hpp>
 #include <boost/decimal/detail/cmath/fmin.hpp>
 #include <boost/decimal/detail/cmath/isgreater.hpp>
