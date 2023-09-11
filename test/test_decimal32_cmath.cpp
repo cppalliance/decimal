@@ -321,6 +321,30 @@ void test_fma()
 }
 
 template <typename Dec>
+void test_sin()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(-M_PI / 2, M_PI / 2);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        decimal32 d1 {val1};
+
+        auto ret_val {std::sin(val1)};
+        auto ret_dec {static_cast<float>(sin(d1))};
+
+        if (!BOOST_TEST(std::fabs(boost::math::float_distance(ret_val, ret_dec)) < 20))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+}
+
+template <typename Dec>
 void test_modf()
 {
     Dec ptr {};
@@ -434,6 +458,8 @@ int main()
     test_copysign<decimal32>();
 
     test_fma<decimal32>();
+
+    test_sin<decimal32>();
 
     test_modf<decimal32>();
 
