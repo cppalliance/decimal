@@ -67,6 +67,5 @@ endif
 
 LCOV_REMOVES = '*/test/mini_to_chars.hpp'                                     \
                '*/test/*.cpp'                                                 \
-               '*$(MY_BOOST_ROOT)/*'                                          \
+               '*$(MY_BOOST_ROOT)*'                                           \
                '/usr/*'
-               
