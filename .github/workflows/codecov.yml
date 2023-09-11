@@ -48,26 +48,16 @@ jobs:
           ./b2 headers
       - name: gcc-gcov-native
         run: |
-          cd test
-          mkdir -p cover
-          cd cover
-          mkdir -p obj
-          ${{ matrix.compiler }} -x c++ -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage -I../.. -I../../include -c -I../../../boost-root ../random_decimal32_comp.cpp -o obj/random_decimal32_comp.o
-          ${{ matrix.compiler }} -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage obj/random_decimal32_comp.o -o random_decimal32_comp.exe
-          ./random_decimal32_comp.exe
-          ${{ matrix.compiler }} -x c++ -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage -I../.. -I../../include -c -I../../../boost-root ../random_decimal32_math.cpp -o obj/random_decimal32_math.o
-          ${{ matrix.compiler }} -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage obj/random_decimal32_math.o -o random_decimal32_math.exe
-          ./random_decimal32_math.exe
-          ${{ matrix.compiler }} -x c++ -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage -I../.. -I../../include -c -I../../../boost-root ../roundtrip_decimal32.cpp -o obj/roundtrip_decimal32.o
-          ${{ matrix.compiler }} -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage obj/roundtrip_decimal32.o -o roundtrip_decimal32.exe
-          ./roundtrip_decimal32.exe
-          ${{ matrix.compiler }} -x c++ -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage -I../.. -I../../include -c -I../../../boost-root ../test_decimal32_cmath.cpp -o obj/test_decimal32_cmath.o
-          ${{ matrix.compiler }} -std=${{ matrix.standard }} -O1 -march=native -mtune=native -fno-inline-functions -fprofile-arcs -ftest-coverage obj/test_decimal32_cmath.o -o test_decimal32_cmath.exe
-          ./test_decimal32_cmath.exe
-          gcov --object-directory obj --demangled-names ../random_decimal32_comp.cpp ../random_decimal32_math.cpp ../roundtrip_decimal32.cpp ../roundtrip_decimal32.cpp ../test_decimal32_cmath.cpp
-          lcov --rc lcov_branch_coverage=1 -c --directory obj --output-file coverage_unfiltered.info
-          lcov --rc lcov_branch_coverage=1 --remove coverage_unfiltered.info '/usr/*' '*boost-root/*' '*/test/*.cpp' --output-file coverage.info
-          genhtml coverage.info --rc lcov_branch_coverage=1 --demangle-cpp --output-directory ./report
+          cd test/cover
+          echo "build and run gcov/lcov/genhtml"
+          echo "make prepare -f make_gcov_01_generic.gmk MY_ALL_COV=0 MY_BOOST_ROOT=../../../boost-root MY_CC=${{ matrix.compiler }} MY_STD=${{ matrix.standard }}"
+          echo
+          make prepare -f make_gcov_01_generic.gmk MY_ALL_COV=0 MY_BOOST_ROOT=../../../boost-root MY_CC=${{ matrix.compiler }} MY_STD=${{ matrix.standard }}
+          echo
+          echo "make gcov -f make_gcov_01_generic.gmk --jobs=8 MY_ALL_COV=0 MY_BOOST_ROOT=../../../boost-root MY_CC=${{ matrix.compiler }} MY_STD=${{ matrix.standard }}"
+          echo
+          make gcov -f make_gcov_01_generic.gmk --jobs=8 MY_ALL_COV=0 MY_BOOST_ROOT=../../../boost-root MY_CC=${{ matrix.compiler }} MY_STD=${{ matrix.standard }}
+          echo
       - name: upload-codecov
         uses: codecov/codecov-action@v3
         with:
