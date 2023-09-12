@@ -12,7 +12,7 @@
 
 namespace boost { namespace decimal {
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
+template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
 constexpr auto ldexp(T v, int e2) noexcept -> T
 {
     constexpr T zero {0};
@@ -23,6 +23,14 @@ constexpr auto ldexp(T v, int e2) noexcept -> T
 
     if (v_fp != FP_NORMAL)
     {
+        if (v_fp == FP_NAN)
+        {
+            ldexp_result = boost::decimal::from_bits(boost::decimal::detail::nan_mask);
+        }
+        else if (v_fp == FP_INFINITE)
+        {
+            ldexp_result = boost::decimal::from_bits(boost::decimal::detail::inf_mask);
+        }
     }
     else
     {

@@ -158,14 +158,15 @@ namespace local
     constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x400));
     #endif
 
-    const local::test_frexp_ldexp_ctrl flt_ctrl[/*static_cast<std::size_t>(UINT8_C(6))*/] =
+    const local::test_frexp_ldexp_ctrl flt_ctrl[static_cast<std::size_t>(UINT8_C(7))] =
     {
       { 8388606.5F, 8388607.5F, false, static_cast<std::uint32_t>(UINT32_C(0x100)) },
       { -1.0E7F   , +1.0E7F,    false, test_frexp_ldexp_depth },
-      {  1.0E-20F , +1.0E-1F,   false, test_frexp_ldexp_depth },
-      {  1.0E-20F , +1.0E-1F,   true , test_frexp_ldexp_depth },
-      {  10.0F    , +1.0E12F,   false, test_frexp_ldexp_depth },
-      {  10.0F    , +1.0E12F,   true , test_frexp_ldexp_depth },
+      { +1.0E-20F , +1.0E-1F,   false, test_frexp_ldexp_depth },
+      { +1.0E-20F , +1.0E-1F,   true,  test_frexp_ldexp_depth },
+      { +1.0E-28F , +1.0E-26F,  false, test_frexp_ldexp_depth },
+      { +10.0F    , +1.0E12F,   false, test_frexp_ldexp_depth },
+      { +10.0F    , +1.0E12F,   true , test_frexp_ldexp_depth },
     };
 
     auto result_is_ok = true;
@@ -250,9 +251,42 @@ namespace local
 
   auto test_ldexp_edge() -> bool
   {
+    using decimal_type = boost::decimal::decimal32;
+
     auto result_is_ok = true;
 
-    BOOST_TEST(result_is_ok);
+    {
+      auto ldexp_dec = ldexp(static_cast<decimal_type>(0.0L), 0);
+      auto result_zero_is_ok = (ldexp_dec == 0);
+
+      ldexp_dec = ldexp(static_cast<decimal_type>(0.0L), 3);
+      result_zero_is_ok = ((ldexp_dec == 0) && result_zero_is_ok);
+
+      result_is_ok = (result_zero_is_ok && result_is_ok);
+      BOOST_TEST(result_is_ok);
+    }
+
+    {
+      auto ldexp_dec = ldexp(std::numeric_limits<decimal_type>::infinity(), 0);
+      auto result_inf_is_ok = isinf(ldexp_dec);
+
+      ldexp_dec = ldexp(std::numeric_limits<decimal_type>::infinity(), 3);
+      result_inf_is_ok = (isinf(ldexp_dec) && result_inf_is_ok);
+
+      result_is_ok = (result_inf_is_ok && result_is_ok);
+      BOOST_TEST(result_is_ok);
+    }
+
+    {
+      auto ldexp_dec = ldexp(std::numeric_limits<decimal_type>::quiet_NaN(), 0);
+      auto result_nan_is_ok = isnan(ldexp_dec);
+
+      ldexp_dec = ldexp(std::numeric_limits<decimal_type>::quiet_NaN(), 3);
+      result_nan_is_ok = (isnan(ldexp_dec) && result_nan_is_ok);
+
+      result_is_ok = (result_nan_is_ok && result_is_ok);
+      BOOST_TEST(result_is_ok);
+    }
 
     return result_is_ok;
   }

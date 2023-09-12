@@ -12,7 +12,7 @@
 
 namespace boost { namespace decimal {
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
+template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
 constexpr auto pow(T b, int p) noexcept -> T
 {
     // Calculate (b ^ p).
