@@ -251,9 +251,42 @@ namespace local
 
   auto test_ldexp_edge() -> bool
   {
+    using decimal_type = boost::decimal::decimal32;
+
     auto result_is_ok = true;
 
-    BOOST_TEST(result_is_ok);
+    {
+      auto ldexp_dec = ldexp(static_cast<decimal_type>(0.0L), 0);
+      auto result_zero_is_ok = (ldexp_dec == 0);
+
+      ldexp_dec = ldexp(static_cast<decimal_type>(0.0L), 3);
+      result_zero_is_ok = ((ldexp_dec == 0) && result_zero_is_ok);
+
+      result_is_ok = (result_zero_is_ok && result_is_ok);
+      BOOST_TEST(result_is_ok);
+    }
+
+    {
+      auto ldexp_dec = ldexp(std::numeric_limits<decimal_type>::infinity(), 0);
+      auto result_inf_is_ok = isinf(ldexp_dec);
+
+      ldexp_dec = ldexp(std::numeric_limits<decimal_type>::infinity(), 3);
+      result_inf_is_ok = (isinf(ldexp_dec) && result_inf_is_ok);
+
+      result_is_ok = (result_inf_is_ok && result_is_ok);
+      BOOST_TEST(result_is_ok);
+    }
+
+    {
+      auto ldexp_dec = ldexp(std::numeric_limits<decimal_type>::quiet_NaN(), 0);
+      auto result_nan_is_ok = isnan(ldexp_dec);
+
+      ldexp_dec = ldexp(std::numeric_limits<decimal_type>::quiet_NaN(), 3);
+      result_nan_is_ok = (isnan(ldexp_dec) && result_nan_is_ok);
+
+      result_is_ok = (result_nan_is_ok && result_is_ok);
+      BOOST_TEST(result_is_ok);
+    }
 
     return result_is_ok;
   }

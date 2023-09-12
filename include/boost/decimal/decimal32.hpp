@@ -117,17 +117,17 @@ constexpr void normalize(T& significand, T2& exp) noexcept
     }
 }
 
+// TBD: Remove the need for class friendship. Then remove this prototype
+// and the friendship below. Then in the <cmath>-style header, remember to
+// replace the default value of the second template parameter to (= true).
 template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
 constexpr auto ilogb(T a) noexcept -> int;
 
+// TBD: Remove the need for class friendship. Then remove this prototype
+// and the friendship below. Then in the <cmath>-style header, remember to
+// replace the default value of the second template parameter to (= true).
 template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
 constexpr auto frexp(T v, int* expon) noexcept -> T;
-
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto ldexp(T v, int e2) noexcept -> T;
-
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto pow(T b, int p) noexcept -> T;
 
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
