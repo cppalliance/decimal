@@ -2064,9 +2064,20 @@ constexpr auto frexp(decimal32 v, int* expon) noexcept -> decimal32
 
     auto result = zero;
 
-    if(v == zero)
+    const auto v_fp {fpclassify(v)};
+
+    if (v_fp != FP_NORMAL)
     {
-        *expon = 0;
+        if (expon != nullptr) { *expon = 0; }
+
+        if (v_fp == FP_NAN)
+        {
+            result = boost::decimal::from_bits(boost::decimal::detail::nan_mask);
+        }
+        else if (v_fp == FP_INFINITE)
+        {
+            result = boost::decimal::from_bits(boost::decimal::detail::inf_mask);
+        }
     }
     else
     {
@@ -2094,7 +2105,7 @@ constexpr auto frexp(decimal32 v, int* expon) noexcept -> decimal32
 
         constexpr decimal32 local_one {1};
 
-        while(result >= local_one)
+        while (result >= local_one)
         {
           result /= local_two;
 
@@ -2103,7 +2114,7 @@ constexpr auto frexp(decimal32 v, int* expon) noexcept -> decimal32
 
         constexpr decimal32 local_half {5, -1};
 
-        while(result < local_half)
+        while (result < local_half)
         {
           result *= local_two;
 
@@ -2124,21 +2135,33 @@ constexpr auto ldexp(decimal32 v, int e2) noexcept -> decimal32
 
     if(e2 > 0)
     {
-        constexpr decimal32 local_two {2};
+        if(e2 < 32)
+        {
+            const decimal32 local_p2 { static_cast<std::uint32_t>(1ULL << e2) };
 
-        // TBD: Matt, can direct modification of the exponent field be done here?
-        // I tried the commented out line but I failed there.
+            ldexp_result *= local_p2;
+        }
+        else
+        {
+            constexpr decimal32 local_two {2};
 
-        // ldexp_result.edit_exponent(ldexp_result.bits_.exponent + e2);
-
-        ldexp_result *= pow(local_two, e2);
+            ldexp_result *= pow(local_two, e2);
+        }
     }
     else if(e2 < 0)
     {
-        constexpr decimal32 local_half {5, -1};
+        if(e2 > -32)
+        {
+            const decimal32 local_p2 { static_cast<std::uint32_t>(1ULL << -e2) };
 
-        // TBD: Can direct modification of the exponent field(s) be done here?
-        ldexp_result *= pow(local_half, -e2);
+            ldexp_result /= local_p2;
+        }
+        else
+        {
+            constexpr decimal32 local_half {5, -1};
+
+            ldexp_result *= pow(local_half, -e2);
+        }
     }
 
     return ldexp_result;
