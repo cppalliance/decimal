@@ -14,6 +14,7 @@
 #include <boost/decimal/detail/cmath/isless.hpp>
 #include <boost/decimal/detail/cmath/isunordered.hpp>
 #include <boost/decimal/detail/cmath/trunc.hpp>
+#include <boost/decimal/detail/cmath/remainder.hpp>
 
 namespace boost { namespace decimal {
 
