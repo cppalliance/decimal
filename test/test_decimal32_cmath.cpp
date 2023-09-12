@@ -334,6 +334,40 @@ void test_modf()
     BOOST_TEST(ptr != BOOST_DECIMAL_DEC_NAN);
 }
 
+template <typename Dec>
+void test_remainder()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(1e2F, 1e3F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        decimal32 d1 {val1};
+        decimal32 d2 {val2};
+
+        auto ret_val {std::remainder(val1, val2)};
+        auto ret_dec {static_cast<float>(remainder(d1, d2))};
+
+        if (!BOOST_TEST(std::fabs(boost::math::float_distance(ret_val, ret_dec)) < 2000))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nFloat dist: " << boost::math::float_distance(ret_val, ret_dec) << std::endl;
+        }
+    }
+
+    BOOST_TEST(remainder(BOOST_DECIMAL_DEC_INFINITY, Dec(1)) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(remainder(BOOST_DECIMAL_DEC_NAN, Dec(1)) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(remainder(Dec(1), BOOST_DECIMAL_DEC_NAN) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(remainder(Dec(1), Dec(0)) != BOOST_DECIMAL_DEC_NAN);
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -360,6 +394,8 @@ int main()
     test_fma<decimal32>();
 
     test_modf<decimal32>();
+
+    test_remainder<decimal32>();
 
     return boost::report_errors();
 }
