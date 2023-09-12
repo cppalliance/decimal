@@ -39,7 +39,15 @@ constexpr auto remquo(T x, T y, int* quo) noexcept -> T
     const T frac {modf(div, &n)};
     auto sig {static_cast<std::int64_t>(n)};
     auto usig {static_cast<std::uint64_t>(sig < 0 ? -sig : sig)};
+
+    // Apple clang and MSVC use the last byte.
+    // Everyone else uses 3 bits.
+    // Standard only specifies at least 3, so they are both correct
+    #if defined(__APPLE__) || (_MSC_VER)
     *quo = static_cast<int>(usig & 0b1111);
+    #else
+    *quo = static_cast<int>(usig & 0b111);
+    #endif
     *quo = sig < 0 ? -*quo : *quo;
 
     // Now compute the remainder
