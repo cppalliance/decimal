@@ -403,10 +403,11 @@ void test_remquo()
         }
     }
 
-    BOOST_TEST(remainder(BOOST_DECIMAL_DEC_INFINITY, Dec(1)) != BOOST_DECIMAL_DEC_NAN);
-    BOOST_TEST(remainder(BOOST_DECIMAL_DEC_NAN, Dec(1)) != BOOST_DECIMAL_DEC_NAN);
-    BOOST_TEST(remainder(Dec(1), BOOST_DECIMAL_DEC_NAN) != BOOST_DECIMAL_DEC_NAN);
-    BOOST_TEST(remainder(Dec(1), Dec(0)) != BOOST_DECIMAL_DEC_NAN);
+    int quo {};
+    BOOST_TEST(remquo(BOOST_DECIMAL_DEC_INFINITY, Dec(1), &quo) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(remquo(BOOST_DECIMAL_DEC_NAN, Dec(1), &quo) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(remquo(Dec(1), BOOST_DECIMAL_DEC_NAN, &quo) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(remquo(Dec(1), Dec(0), &quo) != BOOST_DECIMAL_DEC_NAN);
 }
 
 int main()
