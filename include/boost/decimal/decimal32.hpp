@@ -122,8 +122,6 @@ constexpr auto ilogb(decimal32 a) noexcept -> int;
 constexpr auto frexp(decimal32 v, int* expon) noexcept -> decimal32;
 constexpr auto ldexp(decimal32 v, int e2) noexcept -> decimal32;
 constexpr auto pow(decimal32 b, int p) noexcept -> decimal32;
-constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
-constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
 
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32

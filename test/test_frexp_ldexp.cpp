@@ -230,17 +230,17 @@ namespace local
     }
 
     {
-      frexp_dec = frexp(decimal_type { std::numeric_limits<float>::infinity() }, &n_dec);
+      frexp_dec = frexp(std::numeric_limits<decimal_type>::infinity(), &n_dec);
 
-      const auto result_inf_is_ok = ((isinf)(frexp_dec) && (n_dec == 0));
+      const auto result_inf_is_ok = (isinf(frexp_dec) && (n_dec == 0));
       result_is_ok = (result_inf_is_ok && result_is_ok);
       BOOST_TEST(result_is_ok);
     }
 
     {
-      frexp_dec = frexp(decimal_type { std::numeric_limits<float>::quiet_NaN() }, &n_dec);
+      frexp_dec = frexp(std::numeric_limits<decimal_type>::quiet_NaN(), &n_dec);
 
-      const auto result_nan_is_ok = ((isnan)(frexp_dec) && (n_dec == 0));
+      const auto result_nan_is_ok = (isnan(frexp_dec) && (n_dec == 0));
       result_is_ok = (result_nan_is_ok && result_is_ok);
       BOOST_TEST(result_is_ok);
     }
