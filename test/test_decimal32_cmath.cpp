@@ -324,7 +324,7 @@ template <typename Dec>
 void test_sin()
 {
     std::mt19937_64 rng(42);
-    std::uniform_real_distribution<float> dist(-M_PI / 2, M_PI / 2);
+    std::uniform_real_distribution<float> dist(-3.14F / 2, 3.14F / 2);
 
     for (std::size_t n {}; n < N; ++n)
     {
