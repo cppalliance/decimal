@@ -26,6 +26,12 @@ constexpr auto sin(T x) noexcept -> T
         return x;
     }
 
+    // Return x for small angles
+    if (abs(x) < std::numeric_limits<T>::epsilon())
+    {
+        return x;
+    }
+
     // Use argument reduction to get val in the range [-pi/2, pi/2]
     x = fmin(x, numbers::pi_v<T> - x);
     x = fmax(x, -numbers::pi_v<T> - x);
