@@ -320,6 +320,20 @@ void test_fma()
     BOOST_TEST_EQ(fma(decimal32(1, -1), decimal32(1, 1), decimal32(1, 0, true)), decimal32(0, 0));
 }
 
+template <typename Dec>
+void test_modf()
+{
+    Dec ptr {};
+    BOOST_TEST_EQ(modf(decimal32(123.45), &ptr), Dec(0.45));
+    BOOST_TEST_EQ(ptr, Dec(123));
+
+    BOOST_TEST_EQ(modf(BOOST_DECIMAL_DEC_INFINITY, &ptr), Dec(0));
+    BOOST_TEST_EQ(ptr, BOOST_DECIMAL_DEC_INFINITY);
+
+    BOOST_TEST(modf(BOOST_DECIMAL_DEC_NAN, &ptr) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(ptr != BOOST_DECIMAL_DEC_NAN);
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -344,6 +358,8 @@ int main()
     test_copysign<decimal32>();
 
     test_fma<decimal32>();
+
+    test_modf<decimal32>();
 
     return boost::report_errors();
 }

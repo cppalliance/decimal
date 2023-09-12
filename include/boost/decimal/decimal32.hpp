@@ -290,6 +290,7 @@ public:
     friend constexpr auto ceild32(decimal32 val) noexcept -> decimal32;
     friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32;
+    friend constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32;
 
     // Related to <cmath>
     friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
@@ -1952,6 +1953,25 @@ constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
     return (x * y) + z;
+}
+
+constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32
+{
+    constexpr decimal32 zero {0, 0};
+
+    if (abs(x) == zero || isinf(x))
+    {
+        *iptr = x;
+        return x.isneg() ? -zero : zero;
+    }
+    else if (isnan(x))
+    {
+        *iptr = x;
+        return x;
+    }
+
+    *iptr = (x > zero) ? floord32(x) : ceild32(x);
+    return (x - *iptr);
 }
 
 }} // Namespace boost::decimal
