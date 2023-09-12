@@ -20,6 +20,8 @@
 #include <boost/decimal/detail/cmath/pow.hpp>
 #include <boost/decimal/detail/cmath/remainder.hpp>
 #include <boost/decimal/detail/cmath/trunc.hpp>
+#include <boost/decimal/detail/cmath/remainder.hpp>
+#include <boost/decimal/detail/cmath/remquo.hpp>
 
 namespace boost { namespace decimal {
 
