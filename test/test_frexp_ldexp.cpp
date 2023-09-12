@@ -158,14 +158,15 @@ namespace local
     constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x400));
     #endif
 
-    const local::test_frexp_ldexp_ctrl flt_ctrl[/*static_cast<std::size_t>(UINT8_C(6))*/] =
+    const local::test_frexp_ldexp_ctrl flt_ctrl[static_cast<std::size_t>(UINT8_C(7))] =
     {
       { 8388606.5F, 8388607.5F, false, static_cast<std::uint32_t>(UINT32_C(0x100)) },
       { -1.0E7F   , +1.0E7F,    false, test_frexp_ldexp_depth },
-      {  1.0E-20F , +1.0E-1F,   false, test_frexp_ldexp_depth },
-      {  1.0E-20F , +1.0E-1F,   true , test_frexp_ldexp_depth },
+      {  1.0E-33F , +1.0E-1F,   false, test_frexp_ldexp_depth },
+      {  1.0E-33F , +1.0E-31F,  false, test_frexp_ldexp_depth },
+      {  1.0E-33F , +1.0E-1F,   true , test_frexp_ldexp_depth },
       {  10.0F    , +1.0E12F,   false, test_frexp_ldexp_depth },
-      {  10.0F    , +1.0E12F,   true , test_frexp_ldexp_depth },
+      {  10.0F    , +1.0E12F,   true , test_frexp_ldexp_depth }
     };
 
     auto result_is_ok = true;
