@@ -173,6 +173,7 @@ private:
 
     friend constexpr auto ilogb(decimal32 a) noexcept -> int;
     friend constexpr auto frexp(decimal32 v, int* expon) noexcept -> decimal32;
+    friend constexpr auto ldexp(decimal32 v, int e2) noexcept -> decimal32;
 
     template <typename T>
     BOOST_DECIMAL_CXX20_CONSTEXPR T floating_conversion_impl() const noexcept;
@@ -2025,7 +2026,7 @@ constexpr auto ilogb(decimal32 d) noexcept -> int
 {
     const auto offset = int { detail::num_digits(d.full_significand()) - 1 };
 
-    auto e10 = int { static_cast<int>(d.full_exponent()) - detail::bias + offset };
+    auto e10 = int { static_cast<int>(d.full_exponent()) + static_cast<int>(offset - detail::bias) };
 
     if (offset == 0)
     {
@@ -2105,7 +2106,11 @@ constexpr auto ldexp(decimal32 v, int e2) noexcept -> decimal32
     {
         constexpr decimal32 local_two {2};
 
-        // TBD: Can direct modification of the exponent field(s) be done here?
+        // TBD: Matt, can direct modification of the exponent field be done here?
+        // I tried the commented out line but I failed there.
+
+        // ldexp_result.edit_exponent(ldexp_result.bits_.exponent + e2);
+
         ldexp_result *= pow(local_two, e2);
     }
     else if(e2 < 0)

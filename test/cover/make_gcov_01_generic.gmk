@@ -98,9 +98,4 @@ prepare: clean
 	@$(GNUECHO) $(C_INCLUDES)
 	@$(GNUECHO)
 
-# ------------------------------------------------------------------------------
-# pattern rule for compilation of cpp-files
-# ------------------------------------------------------------------------------
-$(PATH_BIN)/%.gcov : %.cpp
-	@-$(GNUECHO) +++ compile and link and execute: $(notdir $<) to $(notdir $(PATH_BIN)/$(basename $(@F)).exe)
-	@-$(CC) $(CXXFLAGS) -x c++ -c $(C_INCLUDES) $(C_DEFINES) $< -o $(PATH_OBJ)/$(basename $(@F)).o && $(CC) $(CXXFLAGS) $(PATH_OBJ)/$(basename $(@F)).o -o $(PATH_BIN)/$(basename $(@F)).exe && $(PATH_BIN)/$(basename $(@F)).exe
+include make_gcov_04_rules.gmk

@@ -15,5 +15,6 @@ FILES_PRJ  =   $(PATH_SRC)/random_decimal32_comp                                
                $(PATH_SRC)/test_decimal_quantum                                 \
                $(PATH_SRC)/test_edit_members                                    \
                $(PATH_SRC)/test_fenv                                            \
+               $(PATH_SRC)/test_frexp_ldexp                                     \
                $(PATH_SRC)/test_literals                                        \
                $(PATH_SRC)/test_strtod

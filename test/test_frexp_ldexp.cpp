@@ -20,8 +20,6 @@
 #endif
 
 #include <chrono>
-#include <iomanip>
-#include <iostream>
 #include <limits>
 #include <random>
 
@@ -171,11 +169,7 @@ auto main() -> int
     {  10.0F    , +1.0E12F,   true , test_frexp_ldexp_depth },
   };
 
-  const auto flg = std::cout.flags();
-
   auto result_is_ok = true;
-
-  const auto start = std::chrono::high_resolution_clock::now();
 
   for(const auto& ctrl : flt_ctrl)
   {
@@ -184,26 +178,9 @@ auto main() -> int
     BOOST_TEST(result_test_frexp_ldexp_is_ok);
 
     result_is_ok = (result_test_frexp_ldexp_is_ok && result_is_ok);
-
-    std::cout << "result_test_frexp_ldexp_is_ok: " << std::boolalpha << result_test_frexp_ldexp_is_ok << std::endl;
   }
 
-  std::cout << "result_is_ok                 : " << std::boolalpha << result_is_ok << std::endl;
+  result_is_ok = (boost::report_errors() == 0 && result_is_ok);
 
-  const auto stop = std::chrono::high_resolution_clock::now();
-
-  std::cout << "result_is_ok (total): " << std::boolalpha << result_is_ok << std::endl;
-
-  const auto time_of_test =
-    static_cast<float>
-    (
-        static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count())
-      / static_cast<float>(1000.0L)
-    );
-
-  std::cout << "time_of_test: " << std::fixed << std::setprecision(1) << time_of_test << "s" << std::endl;
-
-  std::cout.flags(flg);
-
-  return boost::report_errors();
+  return (result_is_ok ? 0 : -1);
 }
