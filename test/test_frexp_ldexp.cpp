@@ -247,6 +247,15 @@ namespace local
 
     return result_is_ok;
   }
+
+  auto test_ldexp_edge() -> bool
+  {
+    auto result_is_ok = true;
+
+    BOOST_TEST(result_is_ok);
+
+    return result_is_ok;
+  }
 }
 
 auto main() -> int
@@ -256,6 +265,7 @@ auto main() -> int
        local::test_frexp_ldexp()
     && local::test_frexp_ldexp_exact()
     && local::test_frexp_edge()
+    && local::test_ldexp_edge()
   );
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
