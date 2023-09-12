@@ -59,6 +59,11 @@ constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
     return fmad32(x, y, z);
 }
 
+constexpr auto modf(decimal32 x, decimal32* iptr) noexcept -> decimal32
+{
+    return modfd32(x, iptr);
+}
+
 }} // Namespaces
 
 #endif // BOOST_DECIMAL_CMATH_HPP
