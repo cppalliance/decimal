@@ -368,6 +368,47 @@ void test_remainder()
     BOOST_TEST(remainder(Dec(1), Dec(0)) != BOOST_DECIMAL_DEC_NAN);
 }
 
+template <typename Dec>
+void test_remquo()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(1e2F, 1e3F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        decimal32 d1 {val1};
+        decimal32 d2 {val2};
+        int flt_int {};
+        int dec_int {};
+
+        auto ret_val {std::remquo(val1, val2, &flt_int)};
+        auto ret_dec {static_cast<float>(remquo(d1, d2, &dec_int))};
+
+        if (!(BOOST_TEST(std::fabs(boost::math::float_distance(ret_val, ret_dec)) < 2000) &&
+             (BOOST_TEST(flt_int == dec_int))))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nInt val: " << flt_int
+                      << "\nInt quo: " << val1 / val2
+                      << "\nInt dec: " << dec_int
+                      << "\nDec quo: " << d1 / d2
+                      << "\nFloat dist: " << boost::math::float_distance(ret_val, ret_dec) << std::endl;
+        }
+    }
+
+    BOOST_TEST(remainder(BOOST_DECIMAL_DEC_INFINITY, Dec(1)) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(remainder(BOOST_DECIMAL_DEC_NAN, Dec(1)) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(remainder(Dec(1), BOOST_DECIMAL_DEC_NAN) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(remainder(Dec(1), Dec(0)) != BOOST_DECIMAL_DEC_NAN);
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -396,6 +437,7 @@ int main()
     test_modf<decimal32>();
 
     test_remainder<decimal32>();
+    test_remquo<decimal32>();
 
     return boost::report_errors();
 }
