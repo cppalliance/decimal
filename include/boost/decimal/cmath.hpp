@@ -21,6 +21,7 @@
 #include <boost/decimal/detail/cmath/remainder.hpp>
 #include <boost/decimal/detail/cmath/trunc.hpp>
 #include <boost/decimal/detail/cmath/sin.hpp>
+#include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/remainder.hpp>
 #include <boost/decimal/detail/cmath/remquo.hpp>
 

@@ -9,6 +9,8 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/cmath/fmin.hpp>
 #include <boost/decimal/detail/cmath/fmax.hpp>
+#include <boost/decimal/detail/cmath/cos.hpp>
+#include <boost/decimal/detail/cmath/remquo.hpp>
 #include <boost/decimal/numbers.hpp>
 #include <type_traits>
 #include <cstdint>
@@ -16,26 +18,13 @@
 namespace boost { namespace decimal {
 
 template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto sin(T x) noexcept -> T
+constexpr auto sin_impl(T x) noexcept -> T
 {
     constexpr T zero {0, 0};
-
-    // First check non-finite values
-    if (abs(x) == zero || isinf(x) || isnan(x))
+    if (x < zero)
     {
-        return x;
+        return -sin_impl(-x);
     }
-
-    // Return x for small angles
-    if (abs(x) < std::numeric_limits<T>::epsilon())
-    {
-        return x;
-    }
-
-    // Use argument reduction to get val in the range [-pi/2, pi/2]
-    x = fmin(x, numbers::pi_v<T> - x);
-    x = fmax(x, -numbers::pi_v<T> - x);
-    x = fmin(x, numbers::pi_v<T> - x);
 
     // Pre-calculated coefficients from the minmax polynomial
     constexpr T a0 {UINT64_C(1), 0};
@@ -58,6 +47,72 @@ constexpr auto sin(T x) noexcept -> T
     const T C = a0 * x;
 
     return fma(x9, B, C) + A;
+}
+
+template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
+constexpr auto sin(T x) noexcept -> T
+{
+    constexpr T zero {0, 0};
+
+    // First check non-finite values and small angles
+    if (abs(x) < std::numeric_limits<T>::epsilon() || isinf(x) || isnan(x))
+    {
+        return x;
+    }
+
+    if (x < zero)
+    {
+        return -sin(-x);
+    }
+
+    int quo {};
+    auto x90 {remquo(x, numbers::pi_v<T>/T(2), &quo)};
+    switch (quo)
+    {
+        case 0:
+            return sin_impl(x90);
+        case 1:
+            return cos_impl(x90);
+        case 3:
+            return sin_impl(-x90);
+        case 4:
+            return -cos_impl(x90);
+        default:
+            BOOST_UNREACHABLE_RETURN(quo)
+    }
+}
+
+template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
+constexpr auto cos(T x) noexcept -> T
+{
+    constexpr T zero {0, 0};
+
+    // First check non-finite values and small angles
+    if (abs(x) < std::numeric_limits<T>::epsilon() || isinf(x) || isnan(x))
+    {
+        return x;
+    }
+
+    if (x < zero)
+    {
+        return cos(-x);
+    }
+
+    int quo {};
+    auto x90 {remquo(x, numbers::pi_v<T>/T(2), &quo)};
+    switch (quo)
+    {
+        case 0:
+            return cos_impl(x90);
+        case 1:
+            return -sin_impl(x90);
+        case 3:
+            return cos_impl(-x90);
+        case 4:
+            return sin_impl(x90);
+        default:
+            BOOST_UNREACHABLE_RETURN(quo)
+    }
 }
 
 }} // Namespaces

@@ -334,12 +334,38 @@ void test_sin()
         auto ret_val {std::sin(val1)};
         auto ret_dec {static_cast<float>(sin(d1))};
 
-        if (!BOOST_TEST(std::fabs(boost::math::float_distance(ret_val, ret_dec)) < 20))
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 5*std::numeric_limits<float>::epsilon()))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
-                      << "\nRet dec: " << ret_dec << std::endl;
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+}
+
+template <typename Dec>
+void test_cos()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(-3.14F / 2, 3.14F / 2);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        decimal32 d1 {val1};
+
+        auto ret_val {std::cos(val1)};
+        auto ret_dec {static_cast<float>(cos(d1))};
+
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 5*std::numeric_limits<float>::epsilon()))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
         }
     }
 }
@@ -460,6 +486,7 @@ int main()
     test_fma<decimal32>();
 
     test_sin<decimal32>();
+    test_cos<decimal32>();
 
     test_modf<decimal32>();
 
