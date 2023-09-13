@@ -468,6 +468,43 @@ void test_remquo()
     BOOST_TEST(remquo(Dec(1), Dec(0), &quo) != BOOST_DECIMAL_DEC_NAN);
 }
 
+template <typename Dec>
+void test_fdim()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        decimal32 d1 {val1};
+        decimal32 d2 {val2};
+
+        auto ret_val {std::fdim(val1, val2)};
+        auto ret_dec {static_cast<float>(fdim(d1, d2))};
+
+        if (ret_val == 0 || ret_dec == 0)
+        {
+            BOOST_TEST_EQ(ret_val, ret_dec);
+        }
+        else if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(fdim(BOOST_DECIMAL_DEC_INFINITY, Dec(1))));
+    BOOST_TEST(isnan(fdim(BOOST_DECIMAL_DEC_NAN, Dec(1))));
+    BOOST_TEST(isnan((Dec(1), BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST_EQ(fdim(Dec(1), Dec(1)), Dec(0));
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -500,6 +537,8 @@ int main()
 
     test_remainder<decimal32>();
     test_remquo<decimal32>();
+
+    test_fdim<decimal32>();
 
     return boost::report_errors();
 }
