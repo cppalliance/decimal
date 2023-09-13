@@ -343,6 +343,10 @@ void test_sin()
                       << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
         }
     }
+
+    BOOST_TEST(isinf(sin(BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST(isnan(sin(BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST_EQ(sin(Dec(0)), Dec(0));
 }
 
 template <typename Dec>
@@ -368,6 +372,10 @@ void test_cos()
                       << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
         }
     }
+
+    BOOST_TEST(isinf(cos(BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST(isnan(cos(BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST_EQ(cos(Dec(0)), Dec(1));
 }
 
 template <typename Dec>
