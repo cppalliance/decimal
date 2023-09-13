@@ -321,6 +321,64 @@ void test_fma()
 }
 
 template <typename Dec>
+void test_sin()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(-3.14F / 2, 3.14F / 2);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        decimal32 d1 {val1};
+
+        auto ret_val {std::sin(val1)};
+        auto ret_dec {static_cast<float>(sin(d1))};
+
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 10*std::numeric_limits<float>::epsilon()))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(sin(BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST(isnan(sin(BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST_EQ(sin(Dec(0)), Dec(0));
+}
+
+template <typename Dec>
+void test_cos()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(-3.14F / 2, 3.14F / 2);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        decimal32 d1 {val1};
+
+        auto ret_val {std::cos(val1)};
+        auto ret_dec {static_cast<float>(cos(d1))};
+
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 10*std::numeric_limits<float>::epsilon()))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(cos(BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST(isnan(cos(BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST_EQ(cos(Dec(0)), Dec(1));
+}
+
+template <typename Dec>
 void test_modf()
 {
     Dec ptr {};
@@ -434,6 +492,9 @@ int main()
     test_copysign<decimal32>();
 
     test_fma<decimal32>();
+
+    test_sin<decimal32>();
+    test_cos<decimal32>();
 
     test_modf<decimal32>();
 
