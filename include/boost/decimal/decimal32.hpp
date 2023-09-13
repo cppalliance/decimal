@@ -117,13 +117,13 @@ constexpr void normalize(T& significand, T2& exp) noexcept
     }
 }
 
-// TBD: Remove the need for class friendship. Then remove this prototype
+// TODO(ckormanyos): Remove the need for class friendship. Then remove this prototype
 // and the friendship below. Then in the <cmath>-style header, remember to
 // replace the default value of the second template parameter to (= true).
 template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
 constexpr auto ilogb(T a) noexcept -> int;
 
-// TBD: Remove the need for class friendship. Then remove this prototype
+// TODO(ckormanyos): Remove the need for class friendship. Then remove this prototype
 // and the friendship below. Then in the <cmath>-style header, remember to
 // replace the default value of the second template parameter to (= true).
 template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
@@ -1908,18 +1908,18 @@ constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 // Returns num in the range [1'000'000, 9'999'999]
 //
 // If the conversion can not be performed returns -1 and exp = 0
-constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t
+constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::int32_t
 {
     constexpr decimal32 zero {0, 0};
 
     if (num == zero)
     {
-        *exp = 0;
+        *expptr = 0;
         return 0;
     }
     else if (isinf(num) || isnan(num))
     {
-        *exp = 0;
+        *expptr = 0;
         return -1;
     }
 
@@ -1927,7 +1927,7 @@ constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t
     auto num_sig {num.full_significand()};
     normalize(num_sig, num_exp);
 
-    *exp = num_exp;
+    *expptr = num_exp;
     auto signed_sig {static_cast<std::int32_t>(num_sig)};
     signed_sig = num.isneg() ? -signed_sig : signed_sig;
 

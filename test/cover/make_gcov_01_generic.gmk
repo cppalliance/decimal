@@ -26,7 +26,7 @@ include make_gcov_02_files.gmk
 include make_gcov_03_flags.gmk
 
 FILES_ALL        = $(FILES_PRJ)
-FILES_GCOV       = $(addprefix $(PATH_BIN)/, $(notdir $(addsuffix .gcov, $(FILES_ALL))))
+FILES_EXE        = $(addprefix $(PATH_BIN)/, $(notdir $(addsuffix .exe, $(FILES_ALL))))
 
 # ------------------------------------------------------------------------------
 # VPATH definition: VPATH is required for make to find the source files.
@@ -39,7 +39,7 @@ VPATH    := $(sort $(dir $(FILES_ALL)))
 # ------------------------------------------------------------------------------
 
 .PHONY: $(PATH_BIN)/wide_integer.exe
-objects: $(FILES_GCOV)
+objects: $(FILES_EXE)
   # Compile, link and execute coverage-instrumented executable
 	@$(GNUECHO) +++ compile source to object then link and execute
 	@$(GNUECHO)
