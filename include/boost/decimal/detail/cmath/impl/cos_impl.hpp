@@ -21,15 +21,28 @@ constexpr auto cos_impl(T x) noexcept -> T
         return cos_impl(-x);
     }
 
-    T u = T(2.2805960529562646e-05);
-    u = u * x + T(3.9171880037888081e-06);
-    u = u * x + T(-0.001392392773950284);
-    u = u * x + T(1.7339629614857501e-06);
-    u = u * x + T(0.041666173896377827);
-    u = u * x + T(7.7764646000512304e-08);
-    u = u * x + T(-0.50000000610949535);
-    u = u * x + T(1.8421494272283811e-10);
-    return u * x + T(0.99999999999908662);
+    // Constants calculated for [0, pi/4]
+    constexpr T a0 {UINT64_C(22805960529562646), -21};
+    constexpr T a1 {UINT64_C(39171880037888081), -22};
+    constexpr T a2 {UINT64_C(1392392773950284), -18, true};
+    constexpr T a3 {UINT64_C(17339629614857501), -22};
+    constexpr T a4 {UINT64_C(41666173896377827), -18};
+    constexpr T a5 {UINT64_C(77764646000512304), -24};
+    constexpr T a6 {UINT64_C(50000000610949535), -17, true};
+    constexpr T a7 {UINT64_C(18421494272283811), -26};
+    constexpr T a8 {UINT64_C(99999999999908662), -17};
+
+    T u {a0};
+    u = fma(u, x, a1);
+    u = fma(u, x, a2);
+    u = fma(u, x, a3);
+    u = fma(u, x, a4);
+    u = fma(u, x, a5);
+    u = fma(u, x, a6);
+    u = fma(u, x, a7);
+    u = fma(u, x, a8);
+
+    return u;
 }
 }}} // Namespaces
 
