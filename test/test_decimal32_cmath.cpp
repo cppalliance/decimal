@@ -501,7 +501,7 @@ void test_fdim()
 
     BOOST_TEST(isinf(fdim(BOOST_DECIMAL_DEC_INFINITY, Dec(1))));
     BOOST_TEST(isnan(fdim(BOOST_DECIMAL_DEC_NAN, Dec(1))));
-    BOOST_TEST(isnan((Dec(1), BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST(isnan(fdim(Dec(1), BOOST_DECIMAL_DEC_NAN)));
     BOOST_TEST_EQ(fdim(Dec(1), Dec(1)), Dec(0));
 }
 
