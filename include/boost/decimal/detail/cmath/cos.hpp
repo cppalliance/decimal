@@ -21,11 +21,16 @@ template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bo
 constexpr auto cos(T x) noexcept -> T
 {
     constexpr T zero {0, 0};
+    constexpr T one {1, 0};
 
     // First check non-finite values and small angles
-    if (abs(x) < std::numeric_limits<T>::epsilon() || isinf(x) || isnan(x))
+    if (isinf(x) || isnan(x))
     {
         return x;
+    }
+    else if (abs(x) < std::numeric_limits<T>::epsilon())
+    {
+        return one;
     }
 
     if (x < zero)

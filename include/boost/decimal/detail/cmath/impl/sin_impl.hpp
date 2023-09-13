@@ -20,7 +20,8 @@ constexpr auto sin_impl(T x) noexcept -> T
     {
         return -sin_impl(-x);
     }
-    
+
+    // Constants calculated for [0, pi/4]
     constexpr T a0 {UINT64_C(94465293626777997), -22};
     constexpr T a1 {UINT64_C(2121051143997598), -19, true};
     constexpr T a2 {UINT64_C(10766679285155848), -21};
