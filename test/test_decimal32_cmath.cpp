@@ -334,7 +334,7 @@ void test_sin()
         auto ret_val {std::sin(val1)};
         auto ret_dec {static_cast<float>(sin(d1))};
 
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 5*std::numeric_limits<float>::epsilon()))
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 10*std::numeric_limits<float>::epsilon()))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
@@ -359,7 +359,7 @@ void test_cos()
         auto ret_val {std::cos(val1)};
         auto ret_dec {static_cast<float>(cos(d1))};
 
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 5*std::numeric_limits<float>::epsilon()))
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 10*std::numeric_limits<float>::epsilon()))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1

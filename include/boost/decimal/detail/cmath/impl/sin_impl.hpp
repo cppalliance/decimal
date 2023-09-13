@@ -10,7 +10,6 @@
 #include <type_traits>
 #include <cstdint>
 
-
 namespace boost { namespace decimal { namespace detail {
 
 template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
