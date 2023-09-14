@@ -1052,7 +1052,7 @@ constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool
 
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
     {
-        if (lhs.bits_.sign != (rhs < 0))
+        if (lhs.bits_.sign != static_cast<std::uint32_t>(rhs < 0))
         {
             return false;
         }
