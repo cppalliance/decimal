@@ -103,17 +103,31 @@ static constexpr std::uint32_t construct_significand_mask = no_combination;
 
 } // Namespace detail
 
-// Converts the significand to 9 digits to remove the effects of cohorts.
+// Converts the significand to 7 digits to remove the effects of cohorts.
 template <typename T, typename T2>
 constexpr void normalize(T& significand, T2& exp) noexcept
 {
     auto digits = detail::num_digits(significand);
 
-    while (digits < detail::precision)
+    if (digits < detail::precision)
     {
-        significand *= 10;
-        --exp;
-        ++digits;
+        while (digits < detail::precision)
+        {
+            significand *= 10;
+            --exp;
+            ++digits;
+        }
+    }
+    else if (digits > detail::precision)
+    {
+        while (digits > detail::precision + 1)
+        {
+            significand /= 10;
+            ++exp;
+            --digits;
+        }
+
+        exp += detail::fenv_round(significand, significand < 0);
     }
 }
 
