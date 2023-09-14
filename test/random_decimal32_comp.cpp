@@ -58,6 +58,33 @@ void random_mixed_LT(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    // Reverse order of the operands
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const T dec1 {static_cast<T>(decimal32(val1))};
+        const decimal32 dec2 {val2};
+
+        if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+
+    // Edge Cases
+    BOOST_TEST_EQ(decimal32(1) < T(1), false);
+    BOOST_TEST_EQ(decimal32(10) < T(10), false);
+    BOOST_TEST_EQ(T(1) < decimal32(1), false);
+    BOOST_TEST_EQ(T(10) < decimal32(10), false);
+    BOOST_TEST_EQ(BOOST_DECIMAL_DEC_INFINITY < T(1), false);
+    BOOST_TEST_EQ(-BOOST_DECIMAL_DEC_INFINITY < T(1), true);
+    BOOST_TEST_EQ(BOOST_DECIMAL_DEC_NAN < T(1), false);
 }
 
 template <typename T>
@@ -242,6 +269,33 @@ void random_mixed_EQ(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const T dec1 {static_cast<T>(decimal32(val1))};
+        const decimal32 dec2 {val2};
+
+        if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+
+    // Edge Cases
+    BOOST_TEST_EQ(decimal32(1), T(1));
+    BOOST_TEST_EQ(decimal32(10), T(10));
+    BOOST_TEST_EQ(decimal32(100), T(100));
+    BOOST_TEST_EQ(decimal32(1000), T(1000));
+    BOOST_TEST_EQ(decimal32(10000), T(10000));
+    BOOST_TEST_EQ(decimal32(100000), T(100000));
+    BOOST_TEST_EQ(BOOST_DECIMAL_DEC_NAN == T(1), false);
+    BOOST_TEST_EQ(BOOST_DECIMAL_DEC_INFINITY == T(1), false);
 }
 
 template <typename T>
