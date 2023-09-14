@@ -331,10 +331,15 @@ public:
 #ifndef BOOST_DECIMAL_DEBUG_MEMBERS
 private:
 #endif
+    // Replaces the biased exponent with the value of exp
     template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
     constexpr auto edit_exponent(T exp) noexcept -> void;
+
+    // Replaces the value of the significand with sig
     template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
     constexpr auto edit_significand(T sig) noexcept -> void;
+
+    // Replaces the current sign with the one provided
     constexpr auto edit_sign(bool sign) noexcept -> void;
 };
 
