@@ -76,6 +76,15 @@ void random_mixed_LT(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    // Edge Cases
+    BOOST_TEST_EQ(decimal32(1) < T(1), false);
+    BOOST_TEST_EQ(decimal32(10) < T(10), false);
+    BOOST_TEST_EQ(T(1) < decimal32(1), false);
+    BOOST_TEST_EQ(T(10) < decimal32(10), false);
+    BOOST_TEST_EQ(BOOST_DECIMAL_DEC_INFINITY < T(1), false);
+    BOOST_TEST_EQ(-BOOST_DECIMAL_DEC_INFINITY < T(1), true);
+    BOOST_TEST_EQ(BOOST_DECIMAL_DEC_NAN < T(1), false);
 }
 
 template <typename T>
