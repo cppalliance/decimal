@@ -349,6 +349,12 @@ public:
 
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     friend constexpr std::strong_ordering operator<=>(decimal32 lhs, decimal32 rhs) noexcept;
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>;
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>;
     #endif
 
     // 3.2.10 Formatted input:
@@ -1313,6 +1319,7 @@ constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if
 }
 
 #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+
 constexpr std::strong_ordering operator<=>(decimal32 lhs, decimal32 rhs) noexcept
 {
     if (lhs < rhs)
@@ -1326,6 +1333,37 @@ constexpr std::strong_ordering operator<=>(decimal32 lhs, decimal32 rhs) noexcep
 
     return std::strong_ordering::equal;
 }
+
+template <typename Integer>
+constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>
+{
+    if (lhs < rhs)
+    {
+        return std::strong_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::strong_ordering::greater;
+    }
+
+    return std::strong_ordering::equal;
+}
+
+template <typename Integer>
+constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>
+{
+    if (lhs < rhs)
+    {
+        return std::strong_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::strong_ordering::greater;
+    }
+
+    return std::strong_ordering::equal;
+}
+
 #endif
 
 constexpr std::uint32_t decimal32::full_exponent() const noexcept
