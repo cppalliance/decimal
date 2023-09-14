@@ -332,6 +332,12 @@ public:
     // Greater
     friend constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept;
 
+    template <typename Integer>
+    friend constexpr auto operator>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
     // Greater equal
     friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
 
@@ -1267,6 +1273,18 @@ constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if
 }
 
 constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return rhs < lhs;
+}
+
+template <typename Integer>
+constexpr auto operator>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return rhs < lhs;
+}
+
+template <typename Integer>
+constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return rhs < lhs;
 }
