@@ -190,6 +190,11 @@ private:
     friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
     friend std::uint32_t to_bits(decimal32 rhs) noexcept;
     friend void debug_pattern(decimal32 rhs) noexcept;
+
+    // Integer comparisons
+    template <typename Integer>
+    friend constexpr bool equal_impl(decimal32 lhs, Integer rhs) noexcept;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -260,6 +265,11 @@ public:
 
     // 3.2.9 comparison operators:
     friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+    friend constexpr bool operator==(decimal32 lhs, Integer rhs) noexcept;
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+    friend constexpr bool operator==(Integer lhs, decimal32 rhs) noexcept;
+
     friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept;
@@ -973,6 +983,56 @@ constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
 
     return lhs_real_exp == rhs_real_exp &&
            lhs_significand == rhs_significand;
+}
+
+template <typename Integer>
+constexpr bool equal_impl(decimal32 lhs, Integer rhs) noexcept
+{
+    using Unsigned_Integer = detail::make_unsigned_t<Integer>;
+
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return false;
+    }
+
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
+    {
+        if (lhs.bits_.sign != (rhs < 0))
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if (lhs.bits_.sign)
+        {
+            return false;
+        }
+    }
+
+    std::int32_t lhs_real_exp {lhs.biased_exponent()};
+    std::uint32_t lhs_significand {lhs.full_significand()};
+    std::int32_t rhs_emulated_exp {0};
+    Unsigned_Integer rhs_significand {rhs < 0 ? detail::apply_sign(rhs) : rhs};
+
+    // Normalize for fair comparison
+    normalize(lhs_significand, lhs_real_exp);
+    normalize(rhs_significand, rhs_emulated_exp);
+
+    return lhs_real_exp == rhs_emulated_exp &&
+           lhs_significand == rhs_significand;
+}
+
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+constexpr bool operator==(decimal32 lhs, Integer rhs) noexcept
+{
+    return equal_impl(lhs, rhs);
+}
+
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+constexpr bool operator==(Integer lhs, decimal32 rhs) noexcept
+{
+    return equal_impl(rhs, lhs);
 }
 
 constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept

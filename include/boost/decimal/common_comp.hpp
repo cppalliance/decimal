@@ -11,19 +11,6 @@
 
 namespace boost { namespace decimal {
 
-// Overloads may be any integral type or decimal type
-template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr bool operator==(decimal32 lhs, T rhs) noexcept
-{
-    return lhs == static_cast<decimal32>(rhs);
-}
-
-template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr bool operator==(T lhs, decimal32 rhs) noexcept
-{
-    return static_cast<decimal32>(lhs) == rhs;
-}
-
 template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
 constexpr bool operator!=(decimal32 lhs, T rhs) noexcept
 {

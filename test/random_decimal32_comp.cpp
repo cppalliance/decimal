@@ -242,6 +242,16 @@ void random_mixed_EQ(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    // Edge Cases
+    BOOST_TEST_EQ(decimal32(1), T(1));
+    BOOST_TEST_EQ(decimal32(10), T(10));
+    BOOST_TEST_EQ(decimal32(100), T(100));
+    BOOST_TEST_EQ(decimal32(1000), T(1000));
+    BOOST_TEST_EQ(decimal32(10000), T(10000));
+    BOOST_TEST_EQ(decimal32(100000), T(100000));
+    BOOST_TEST_EQ(BOOST_DECIMAL_DEC_NAN == T(1), false);
+    BOOST_TEST_EQ(BOOST_DECIMAL_DEC_INFINITY == T(1), false);
 }
 
 template <typename T>
