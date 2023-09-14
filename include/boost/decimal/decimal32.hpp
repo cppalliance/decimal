@@ -201,6 +201,11 @@ private:
     friend constexpr auto equal_parts_impl(T lhs_sig, std::int32_t lhs_exp,
                                            T2 rhs_sig, std::int32_t rhs_exp) noexcept -> bool;
 
+    // Implements less than using the components of lhs and rhs
+    template <typename T, typename T2>
+    friend constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                          T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -1074,6 +1079,60 @@ constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if
     return !(lhs == rhs);
 }
 
+template <typename T, typename T2>
+constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                               T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool
+{
+    const bool both_neg {lhs_sign && rhs_sign};
+
+    // Normalize the significands and exponents
+    normalize(lhs_sig, lhs_exp);
+    normalize(rhs_sig, rhs_exp);
+
+    if (lhs_sig == 0 && rhs_sig != 0)
+    {
+        return rhs_sign ? false : true;
+    }
+    else if (lhs_sig != 0 && rhs_sig == 0)
+    {
+        return lhs_sign ? true : false;
+    }
+    else if (lhs_sig == 0 && rhs_sig == 0)
+    {
+        return false;
+    }
+    else if (both_neg)
+    {
+        if (lhs_exp > rhs_exp)
+        {
+            return true;
+        }
+        else if (lhs_exp < rhs_exp)
+        {
+            return false;
+        }
+        else
+        {
+            return lhs_sig > rhs_sig;
+        }
+    }
+    else
+    {
+        if (lhs_exp < rhs_exp && lhs_sig)
+        {
+            return true;
+        }
+        else if (lhs_exp > rhs_exp)
+        {
+            return false;
+        }
+        else
+        {
+            return lhs_sig < rhs_sig;
+        }
+    }
+}
+
 constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
 {
     if (isnan(lhs) || isnan(rhs) ||
@@ -1097,58 +1156,8 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
         }
     }
 
-    const bool both_neg {lhs.bits_.sign && rhs.bits_.sign};
-    auto lhs_real_exp {lhs.biased_exponent()};
-    auto rhs_real_exp {rhs.biased_exponent()};
-    auto lhs_significand {lhs.full_significand()};
-    auto rhs_significand {rhs.full_significand()};
-
-    // Normalize the significands and exponents
-    normalize(lhs_significand, lhs_real_exp);
-    normalize(rhs_significand, rhs_real_exp);
-
-    if (lhs_significand == 0 && rhs_significand != 0)
-    {
-        return rhs.isneg() ? false : true;
-    }
-    else if (lhs_significand != 0 && rhs_significand == 0)
-    {
-        return lhs.isneg() ? true : false;
-    }
-    else if (lhs_significand == 0 && rhs_significand == 0)
-    {
-        return false;
-    }
-    else if (both_neg)
-    {
-        if (lhs_real_exp > rhs_real_exp)
-        {
-            return true;
-        }
-        else if (lhs_real_exp < rhs_real_exp)
-        {
-            return false;
-        }
-        else
-        {
-            return lhs_significand > rhs_significand;
-        }
-    }
-    else
-    {
-        if (lhs_real_exp < rhs_real_exp && lhs_significand)
-        {
-            return true;
-        }
-        else if (lhs_real_exp > rhs_real_exp)
-        {
-            return false;
-        }
-        else
-        {
-            return lhs_significand < rhs_significand;
-        }
-    }
+    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
 constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept
