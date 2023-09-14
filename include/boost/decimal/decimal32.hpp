@@ -215,6 +215,10 @@ private:
     friend constexpr auto equal_parts_impl(T lhs_sig, std::int32_t lhs_exp,
                                            T2 rhs_sig, std::int32_t rhs_exp) noexcept -> bool;
 
+    // Template to compare operator< for any integer type and decimal32
+    template <typename Integer>
+    friend constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool;
+
     // Implements less than using the components of lhs and rhs
     template <typename T, typename T2>
     friend constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
@@ -309,6 +313,12 @@ public:
 
     // Less
     friend constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept;
+
+    template <typename Integer>
+    friend constexpr auto operator<(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Less equal
     friend constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept;
@@ -1172,6 +1182,61 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
 
     return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+template <typename Integer>
+constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool
+{
+    using Unsigned_Integer = detail::make_unsigned_t<Integer>;
+
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return false;
+    }
+
+    bool lhs_sign {lhs.isneg()};
+    bool rhs_sign {false};
+
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
+    {
+        if (rhs < 0)
+        {
+            rhs_sign = true;
+        }
+
+        if (lhs_sign && !rhs_sign)
+        {
+            return true;
+        }
+        else if (!lhs_sign && rhs_sign)
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if (lhs_sign)
+        {
+            return true;
+        }
+    }
+
+    Unsigned_Integer rhs_significand {rhs_sign ? detail::apply_sign(rhs) : rhs};
+
+    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs_sign,
+                           rhs_significand, INT32_C(0), rhs_sign);
+}
+
+template <typename Integer>
+constexpr auto operator<(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return less_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !less_impl(rhs, lhs);
 }
 
 constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept

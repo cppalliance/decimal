@@ -58,6 +58,24 @@ void random_mixed_LT(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    // Reverse order of the operands
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const T dec1 {static_cast<T>(decimal32(val1))};
+        const decimal32 dec2 {val2};
+
+        if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
 }
 
 template <typename T>
@@ -233,6 +251,23 @@ void random_mixed_EQ(T lower, T upper)
 
         const decimal32 dec1 {val1};
         const T dec2 {static_cast<T>(decimal32(val2))};
+
+        if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const T dec1 {static_cast<T>(decimal32(val1))};
+        const decimal32 dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
