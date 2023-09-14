@@ -271,6 +271,11 @@ public:
     friend constexpr bool operator==(Integer lhs, decimal32 rhs) noexcept;
 
     friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+    friend constexpr bool operator!=(decimal32 lhs, Integer rhs) noexcept;
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+    friend constexpr bool operator!=(Integer lhs, decimal32 rhs) noexcept;
+
     friend constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept;
     friend constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept;
@@ -1036,6 +1041,18 @@ constexpr bool operator==(Integer lhs, decimal32 rhs) noexcept
 }
 
 constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return !(lhs == rhs);
+}
+
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+constexpr bool operator!=(decimal32 lhs, Integer rhs) noexcept
+{
+    return !(lhs == rhs);
+}
+
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+constexpr bool operator!=(Integer lhs, decimal32 rhs) noexcept
 {
     return !(lhs == rhs);
 }
