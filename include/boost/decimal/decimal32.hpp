@@ -341,6 +341,12 @@ public:
     // Greater equal
     friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
 
+    template <typename Integer>
+    friend constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     friend constexpr std::strong_ordering operator<=>(decimal32 lhs, decimal32 rhs) noexcept;
     #endif
@@ -1290,6 +1296,18 @@ constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
 }
 
 constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return !(lhs < rhs);
+}
+
+template <typename Integer>
+constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !(lhs < rhs);
+}
+
+template <typename Integer>
+constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return !(lhs < rhs);
 }
