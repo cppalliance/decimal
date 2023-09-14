@@ -1189,9 +1189,13 @@ constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool
 {
     using Unsigned_Integer = detail::make_unsigned_t<Integer>;
 
-    if (isnan(lhs) || isinf(lhs))
+    if (isnan(lhs))
     {
         return false;
+    }
+    else if (isinf(lhs))
+    {
+        return lhs.isneg();
     }
 
     bool lhs_sign {lhs.isneg()};
@@ -1236,7 +1240,7 @@ constexpr auto operator<(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 template <typename Integer>
 constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
-    return !less_impl(rhs, lhs);
+    return !less_impl(rhs, lhs) && lhs != rhs;
 }
 
 constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept
