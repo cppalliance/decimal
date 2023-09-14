@@ -193,13 +193,13 @@ private:
 
     // Equality template between any integer type and decimal32
     template <typename Integer>
-    friend constexpr bool mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept;
+    friend constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool;
 
     // Compares the components of the lhs with rhs for equality
     // Can be any type broken down into a sig and an exp that will be normalized for fair comparison
     template <typename T, typename T2>
-    friend constexpr bool equal_parts_impl(T lhs_sig, std::int32_t lhs_exp,
-                                           T2 rhs_sig, std::int32_t rhs_exp) noexcept;
+    friend constexpr auto equal_parts_impl(T lhs_sig, std::int32_t lhs_exp,
+                                           T2 rhs_sig, std::int32_t rhs_exp) noexcept -> bool;
 
 public:
     // 3.2.2.1 construct/copy/destroy:
@@ -270,21 +270,34 @@ public:
     constexpr decimal32& operator%=(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
-    friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
-    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
-    friend constexpr bool operator==(decimal32 lhs, Integer rhs) noexcept;
-    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
-    friend constexpr bool operator==(Integer lhs, decimal32 rhs) noexcept;
+    // Equality
+    friend constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
-    friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
-    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
-    friend constexpr bool operator!=(decimal32 lhs, Integer rhs) noexcept;
-    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
-    friend constexpr bool operator!=(Integer lhs, decimal32 rhs) noexcept;
+    template <typename Integer>
+    friend constexpr auto operator==(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
+    template <typename Integer>
+    friend constexpr auto operator==(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Inequality
+    friend constexpr auto operator!=(decimal32 lhs, decimal32 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator!=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Less
     friend constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept;
+
+    // Less equal
     friend constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept;
+
+    // Greater
     friend constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept;
+
+    // Greater equal
     friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
@@ -977,7 +990,7 @@ constexpr decimal32& decimal32::operator-=(decimal32 rhs) noexcept
 }
 
 template <typename T, typename T2>
-constexpr bool equal_parts_impl(T lhs_sig, std::int32_t lhs_exp, T2 rhs_sig, std::int32_t rhs_exp) noexcept
+constexpr auto equal_parts_impl(T lhs_sig, std::int32_t lhs_exp, T2 rhs_sig, std::int32_t rhs_exp) noexcept -> bool
 {
     normalize(lhs_sig, lhs_exp);
     normalize(rhs_sig, rhs_exp);
@@ -985,7 +998,7 @@ constexpr bool equal_parts_impl(T lhs_sig, std::int32_t lhs_exp, T2 rhs_sig, std
     return lhs_exp == rhs_exp && lhs_sig == rhs_sig;
 }
 
-constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     if (isnan(lhs) || isnan(rhs))
     {
@@ -1002,7 +1015,7 @@ constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
 }
 
 template <typename Integer>
-constexpr bool mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept
+constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool
 {
     using Unsigned_Integer = detail::make_unsigned_t<Integer>;
 
@@ -1032,31 +1045,31 @@ constexpr bool mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept
                             rhs_significand, INT32_C(0));
 }
 
-template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
-constexpr bool operator==(decimal32 lhs, Integer rhs) noexcept
+template <typename Integer>
+constexpr auto operator==(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return mixed_equality_impl(lhs, rhs);
 }
 
-template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
-constexpr bool operator==(Integer lhs, decimal32 rhs) noexcept
+template <typename Integer>
+constexpr auto operator==(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return mixed_equality_impl(rhs, lhs);
 }
 
-constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator!=(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     return !(lhs == rhs);
 }
 
-template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
-constexpr bool operator!=(decimal32 lhs, Integer rhs) noexcept
+template <typename Integer>
+constexpr auto operator!=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return !(lhs == rhs);
 }
 
-template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
-constexpr bool operator!=(Integer lhs, decimal32 rhs) noexcept
+template <typename Integer>
+constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return !(lhs == rhs);
 }
