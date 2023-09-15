@@ -14,6 +14,25 @@
 namespace boost { namespace decimal { namespace detail {
 
 template <typename T>
+struct is_signed { static constexpr bool value = std::is_signed<T>::value; };
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+template <>
+struct is_signed<int128_t> { static constexpr bool value = true; };
+
+template <>
+struct is_signed<uint128_t> { static constexpr bool value = false;};
+
+#endif
+
+template <typename T>
+constexpr bool is_signed<T>::value;
+
+template <typename T>
+constexpr bool is_signed_v = is_signed<T>::value;
+
+template <typename T>
 struct make_unsigned { using type = std::make_unsigned_t<T>; };
 
 template <>

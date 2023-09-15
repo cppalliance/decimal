@@ -103,17 +103,31 @@ static constexpr std::uint32_t construct_significand_mask = no_combination;
 
 } // Namespace detail
 
-// Converts the significand to 9 digits to remove the effects of cohorts.
+// Converts the significand to 7 digits to remove the effects of cohorts.
 template <typename T, typename T2>
 constexpr void normalize(T& significand, T2& exp) noexcept
 {
     auto digits = detail::num_digits(significand);
 
-    while (digits < detail::precision)
+    if (digits < detail::precision)
     {
-        significand *= 10;
-        --exp;
-        ++digits;
+        while (digits < detail::precision)
+        {
+            significand *= 10;
+            --exp;
+            ++digits;
+        }
+    }
+    else if (digits > detail::precision)
+    {
+        while (digits > detail::precision + 1)
+        {
+            significand /= 10;
+            ++exp;
+            --digits;
+        }
+
+        exp += detail::fenv_round(significand, significand < 0);
     }
 }
 
@@ -190,6 +204,26 @@ private:
     friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
     friend std::uint32_t to_bits(decimal32 rhs) noexcept;
     friend void debug_pattern(decimal32 rhs) noexcept;
+
+    // Equality template between any integer type and decimal32
+    template <typename Integer>
+    friend constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool;
+
+    // Compares the components of the lhs with rhs for equality
+    // Can be any type broken down into a sig and an exp that will be normalized for fair comparison
+    template <typename T, typename T2>
+    friend constexpr auto equal_parts_impl(T lhs_sig, std::int32_t lhs_exp,
+                                           T2 rhs_sig, std::int32_t rhs_exp) noexcept -> bool;
+
+    // Template to compare operator< for any integer type and decimal32
+    template <typename Integer>
+    friend constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool;
+
+    // Implements less than using the components of lhs and rhs
+    template <typename T, typename T2>
+    friend constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                          T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -259,15 +293,68 @@ public:
     constexpr decimal32& operator%=(decimal32 rhs) noexcept;
 
     // 3.2.9 comparison operators:
-    friend constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept;
-    friend constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept;
+    // Equality
+    friend constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator==(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator==(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Inequality
+    friend constexpr auto operator!=(decimal32 lhs, decimal32 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator!=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Less
     friend constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept;
+
+    template <typename Integer>
+    friend constexpr auto operator<(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Less equal
     friend constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept;
+
+    template <typename Integer>
+    friend constexpr auto operator<=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Greater
     friend constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept;
+
+    template <typename Integer>
+    friend constexpr auto operator>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Greater equal
     friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
+
+    template <typename Integer>
+    friend constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     friend constexpr std::strong_ordering operator<=>(decimal32 lhs, decimal32 rhs) noexcept;
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>;
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>;
     #endif
 
     // 3.2.10 Formatted input:
@@ -310,10 +397,15 @@ public:
 #ifndef BOOST_DECIMAL_DEBUG_MEMBERS
 private:
 #endif
+    // Replaces the biased exponent with the value of exp
     template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
     constexpr auto edit_exponent(T exp) noexcept -> void;
+
+    // Replaces the value of the significand with sig
     template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
     constexpr auto edit_significand(T sig) noexcept -> void;
+
+    // Replaces the current sign with the one provided
     constexpr auto edit_sign(bool sign) noexcept -> void;
 };
 
@@ -347,38 +439,11 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
         --unsigned_coeff_digits;
     }
 
-    // If we don't have consteval detection we need to default to the constexpr path
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
-    {
-        // Default rounding mode
-        // Will be constexpr
-        if (reduced)
-        {
-            exp += detail::fenv_round(unsigned_coeff);
-        }
-    }
-    else
-    {
-
-        // In runtime mode we can round based on what the fenv says
-        if (reduced)
-        {
-            exp += detail::fenv_round(unsigned_coeff, bits_.sign);
-        }
-    }
-
-    #else
-
-    // Default rounding mode
-    // Will be constexpr
+    // Round as required
     if (reduced)
     {
-        exp += detail::fenv_round(unsigned_coeff);
+        exp += detail::fenv_round(unsigned_coeff, bits_.sign);
     }
-
-    #endif
 
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
 
@@ -950,7 +1015,16 @@ constexpr decimal32& decimal32::operator-=(decimal32 rhs) noexcept
     return *this;
 }
 
-constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
+template <typename T, typename T2>
+constexpr auto equal_parts_impl(T lhs_sig, std::int32_t lhs_exp, T2 rhs_sig, std::int32_t rhs_exp) noexcept -> bool
+{
+    normalize(lhs_sig, lhs_exp);
+    normalize(rhs_sig, rhs_exp);
+
+    return lhs_exp == rhs_exp && lhs_sig == rhs_sig;
+}
+
+constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     if (isnan(lhs) || isnan(rhs))
     {
@@ -962,22 +1036,122 @@ constexpr bool operator==(decimal32 lhs, decimal32 rhs) noexcept
         return false;
     }
 
-    std::uint32_t lhs_real_exp {lhs.full_exponent()};
-    std::uint32_t rhs_real_exp {rhs.full_exponent()};
-    std::uint32_t lhs_significand {lhs.full_significand()};
-    std::uint32_t rhs_significand {rhs.full_significand()};
-
-    // Normalize the significands
-    normalize(lhs_significand, lhs_real_exp);
-    normalize(rhs_significand, rhs_real_exp);
-
-    return lhs_real_exp == rhs_real_exp &&
-           lhs_significand == rhs_significand;
+    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(),
+                            rhs.full_significand(), rhs.biased_exponent());
 }
 
-constexpr bool operator!=(decimal32 lhs, decimal32 rhs) noexcept
+template <typename Integer>
+constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool
+{
+    using Unsigned_Integer = detail::make_unsigned_t<Integer>;
+
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return false;
+    }
+
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
+    {
+        if (lhs.bits_.sign != static_cast<std::uint32_t>(rhs < 0))
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if (lhs.bits_.sign)
+        {
+            return false;
+        }
+    }
+
+    Unsigned_Integer rhs_significand {rhs < 0 ? detail::apply_sign(rhs) : rhs};
+
+    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(),
+                            rhs_significand, INT32_C(0));
+}
+
+template <typename Integer>
+constexpr auto operator==(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return mixed_equality_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator==(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return mixed_equality_impl(rhs, lhs);
+}
+
+constexpr auto operator!=(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     return !(lhs == rhs);
+}
+
+template <typename Integer>
+constexpr auto operator!=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !(lhs == rhs);
+}
+
+template <typename Integer>
+constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !(lhs == rhs);
+}
+
+template <typename T, typename T2>
+constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                               T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool
+{
+    const bool both_neg {lhs_sign && rhs_sign};
+
+    // Normalize the significands and exponents
+    normalize(lhs_sig, lhs_exp);
+    normalize(rhs_sig, rhs_exp);
+
+    if (lhs_sig == 0 && rhs_sig != 0)
+    {
+        return rhs_sign ? false : true;
+    }
+    else if (lhs_sig != 0 && rhs_sig == 0)
+    {
+        return lhs_sign ? true : false;
+    }
+    else if (lhs_sig == 0 && rhs_sig == 0)
+    {
+        return false;
+    }
+    else if (both_neg)
+    {
+        if (lhs_exp > rhs_exp)
+        {
+            return true;
+        }
+        else if (lhs_exp < rhs_exp)
+        {
+            return false;
+        }
+        else
+        {
+            return lhs_sig > rhs_sig;
+        }
+    }
+    else
+    {
+        if (lhs_exp < rhs_exp && lhs_sig)
+        {
+            return true;
+        }
+        else if (lhs_exp > rhs_exp)
+        {
+            return false;
+        }
+        else
+        {
+            return lhs_sig < rhs_sig;
+        }
+    }
 }
 
 constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
@@ -1003,61 +1177,82 @@ constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
         }
     }
 
-    const bool both_neg {lhs.bits_.sign && rhs.bits_.sign};
-    auto lhs_real_exp {lhs.biased_exponent()};
-    auto rhs_real_exp {rhs.biased_exponent()};
-    auto lhs_significand {lhs.full_significand()};
-    auto rhs_significand {rhs.full_significand()};
+    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
 
-    // Normalize the significands and exponents
-    normalize(lhs_significand, lhs_real_exp);
-    normalize(rhs_significand, rhs_real_exp);
+template <typename Integer>
+constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool
+{
+    using Unsigned_Integer = detail::make_unsigned_t<Integer>;
 
-    if (lhs_significand == 0 && rhs_significand != 0)
-    {
-        return rhs.isneg() ? false : true;
-    }
-    else if (lhs_significand != 0 && rhs_significand == 0)
-    {
-        return lhs.isneg() ? true : false;
-    }
-    else if (lhs_significand == 0 && rhs_significand == 0)
+    if (isnan(lhs))
     {
         return false;
     }
-    else if (both_neg)
+    else if (isinf(lhs))
     {
-        if (lhs_real_exp > rhs_real_exp)
+        return lhs.isneg();
+    }
+
+    bool lhs_sign {lhs.isneg()};
+    bool rhs_sign {false};
+
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
+    {
+        if (rhs < 0)
+        {
+            rhs_sign = true;
+        }
+
+        if (lhs_sign && !rhs_sign)
         {
             return true;
         }
-        else if (lhs_real_exp < rhs_real_exp)
+        else if (!lhs_sign && rhs_sign)
         {
             return false;
-        }
-        else
-        {
-            return lhs_significand > rhs_significand;
         }
     }
     else
     {
-        if (lhs_real_exp < rhs_real_exp && lhs_significand)
+        if (lhs_sign)
         {
             return true;
         }
-        else if (lhs_real_exp > rhs_real_exp)
-        {
-            return false;
-        }
-        else
-        {
-            return lhs_significand < rhs_significand;
-        }
     }
+
+    Unsigned_Integer rhs_significand {rhs_sign ? detail::apply_sign(rhs) : rhs};
+
+    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs_sign,
+                           rhs_significand, INT32_C(0), rhs_sign);
+}
+
+template <typename Integer>
+constexpr auto operator<(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return less_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !less_impl(rhs, lhs) && lhs != rhs;
 }
 
 constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept
+{
+    return !(rhs < lhs);
+}
+
+template <typename Integer>
+constexpr auto operator<=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !(rhs < lhs);
+}
+
+template <typename Integer>
+constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return !(rhs < lhs);
 }
@@ -1067,12 +1262,37 @@ constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept
     return rhs < lhs;
 }
 
+template <typename Integer>
+constexpr auto operator>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return rhs < lhs;
+}
+
+template <typename Integer>
+constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return rhs < lhs;
+}
+
 constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
 {
     return !(lhs < rhs);
 }
 
+template <typename Integer>
+constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !(lhs < rhs);
+}
+
+template <typename Integer>
+constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !(lhs < rhs);
+}
+
 #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+
 constexpr std::strong_ordering operator<=>(decimal32 lhs, decimal32 rhs) noexcept
 {
     if (lhs < rhs)
@@ -1086,6 +1306,37 @@ constexpr std::strong_ordering operator<=>(decimal32 lhs, decimal32 rhs) noexcep
 
     return std::strong_ordering::equal;
 }
+
+template <typename Integer>
+constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>
+{
+    if (lhs < rhs)
+    {
+        return std::strong_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::strong_ordering::greater;
+    }
+
+    return std::strong_ordering::equal;
+}
+
+template <typename Integer>
+constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>
+{
+    if (lhs < rhs)
+    {
+        return std::strong_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::strong_ordering::greater;
+    }
+
+    return std::strong_ordering::equal;
+}
+
 #endif
 
 constexpr std::uint32_t decimal32::full_exponent() const noexcept
