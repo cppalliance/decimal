@@ -131,18 +131,6 @@ constexpr void normalize(T& significand, T2& exp) noexcept
     }
 }
 
-// TODO(ckormanyos): Remove the need for class friendship. Then remove this prototype
-// and the friendship below. Then in the <cmath>-style header, remember to
-// replace the default value of the second template parameter to (= true).
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto ilogb(T a) noexcept -> int;
-
-// TODO(ckormanyos): Remove the need for class friendship. Then remove this prototype
-// and the friendship below. Then in the <cmath>-style header, remember to
-// replace the default value of the second template parameter to (= true).
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto frexp(T v, int* expon) noexcept -> T;
-
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
 class decimal32 final
@@ -173,15 +161,8 @@ private:
 
     data_layout_ bits_{};
 
-    // Returns the un-biased (quantum) exponent
-    constexpr std::uint32_t full_exponent() const noexcept;
-
     // Returns the biased exponent
     constexpr std::int32_t biased_exponent() const noexcept;
-
-    // Returns the significand complete with the bits implied from the combination field
-    constexpr std::uint32_t full_significand() const noexcept;
-    constexpr bool isneg() const noexcept;
 
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
@@ -190,12 +171,6 @@ private:
     constexpr TargetType to_integral() const noexcept;
 
     friend constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept;
-
-    template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
-    friend constexpr auto ilogb(T a) noexcept -> int;
-
-    template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
-    friend constexpr auto frexp(T v, int* expon) noexcept -> T;
 
     template <typename T>
     BOOST_DECIMAL_CXX20_CONSTEXPR T floating_conversion_impl() const noexcept;
@@ -258,6 +233,13 @@ public:
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
 
+    // Returns the un-biased (quantum) exponent
+    constexpr std::uint32_t full_exponent() const noexcept;
+
+    // Returns the significand complete with the bits implied from the combination field
+    constexpr std::uint32_t full_significand() const noexcept;
+    constexpr bool isneg() const noexcept;
+
     // cmath functions that are easier as friends
     friend constexpr bool signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
@@ -291,6 +273,9 @@ public:
     constexpr decimal32& operator*=(decimal32 rhs) noexcept;
     constexpr decimal32& operator/=(decimal32 rhs) noexcept;
     constexpr decimal32& operator%=(decimal32 rhs) noexcept;
+
+    // Replaces the current sign with the one provided
+    constexpr auto edit_sign(bool sign) noexcept -> void;
 
     // 3.2.9 comparison operators:
     // Equality
@@ -404,9 +389,6 @@ private:
     // Replaces the value of the significand with sig
     template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
     constexpr auto edit_significand(T sig) noexcept -> void;
-
-    // Replaces the current sign with the one provided
-    constexpr auto edit_sign(bool sign) noexcept -> void;
 };
 
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>

@@ -14,7 +14,7 @@ namespace boost { namespace decimal {
 
 // TODO(mborland): Allow conversion between decimal types via a promotion system
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
+template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
 constexpr auto ilogb(T d) noexcept -> int
 {
     const auto offset = int { detail::num_digits(d.full_significand()) - 1 };

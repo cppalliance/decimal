@@ -12,7 +12,7 @@
 
 namespace boost { namespace decimal {
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
+template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
 constexpr auto frexp(T v, int* expon) noexcept -> T
 {
     // This implementation of frexp follows closely that of eval_frexp
@@ -78,7 +78,7 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
 
         if (expon != nullptr) { *expon = t; }
 
-        result_frexp.bits_.sign = sign_bit;
+        result_frexp.edit_sign(sign_bit);
     }
 
     return result_frexp;
