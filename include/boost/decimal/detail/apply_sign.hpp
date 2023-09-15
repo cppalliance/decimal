@@ -30,6 +30,19 @@ constexpr Unsigned_Integer apply_sign(Unsigned_Integer val) noexcept
     return val;
 }
 
+template <typename Integer, typename Unsigned_Integer = detail::make_unsigned_t<Integer>,
+        std::enable_if_t<std::numeric_limits<Integer>::is_signed, bool> = true>
+constexpr Unsigned_Integer make_positive_unsigned(Integer val) noexcept
+{
+    return static_cast<Unsigned_Integer>(val < 0 ? apply_sign(val) : val);
+}
+
+template <typename Unsigned_Integer, std::enable_if_t<!std::numeric_limits<Unsigned_Integer>::is_signed, bool> = true>
+constexpr Unsigned_Integer make_positive_unsigned(Unsigned_Integer val) noexcept
+{
+    return val;
+}
+
 }}} // Namespaces
 
 #ifdef _MSC_VER

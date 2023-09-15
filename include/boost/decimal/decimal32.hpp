@@ -769,7 +769,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
     const auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig)};
     const auto new_exp {lhs_exp};
-    const auto res_sig {static_cast<std::uint32_t>(new_sig < 0 ? detail::apply_sign(new_sig) : new_sig)};
+    const auto res_sig {detail::make_positive_unsigned(new_sig)};
 
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "Final sig lhs: " << sig_lhs
