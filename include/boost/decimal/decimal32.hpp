@@ -884,63 +884,37 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     }
 
     // The two numbers can be subtracted together without special handling
-    if (abs_lhs_bigger)
+
+    auto& sig_to_change {abs_lhs_bigger ? signed_sig_lhs : signed_sig_rhs};
+    auto& exp_to_change {abs_lhs_bigger ? lhs_exp : rhs_exp};
+    auto& sig_smaller {abs_lhs_bigger ? signed_sig_rhs : signed_sig_lhs};
+    auto& smaller_sign {abs_lhs_bigger ? rhs_sign : lhs_sign};
+
+    if (delta_exp <= 2)
     {
-        if (delta_exp <= 2)
+        while (delta_exp > 0)
         {
-            while (delta_exp > 0)
-            {
-                signed_sig_lhs *= 10;
-                --delta_exp;
-                --lhs_exp;
-            }
-        }
-        else
-        {
-            signed_sig_lhs *= 100;
-            delta_exp -= 2;
-            lhs_exp -= 2;
-        }
-
-        while (delta_exp > 1)
-        {
-            signed_sig_rhs /= 10;
+            sig_to_change *= 10;
             --delta_exp;
-        }
-
-        if (delta_exp == 1)
-        {
-            detail::fenv_round(signed_sig_rhs, rhs_sign);
+            --exp_to_change;
         }
     }
     else
     {
-        if (delta_exp <= 2)
-        {
-            while (delta_exp > 0)
-            {
-                signed_sig_rhs *= 10;
-                --delta_exp;
-                --rhs_exp;
-            }
-        }
-        else
-        {
-            signed_sig_rhs *= 100;
-            delta_exp -= 2;
-            rhs_exp -= 2;
-        }
+        sig_to_change *= 100;
+        delta_exp -= 2;
+        exp_to_change -= 2;
+    }
 
-        while (delta_exp > 1)
-        {
-            signed_sig_lhs /= 10;
-            --delta_exp;
-        }
+    while (delta_exp > 1)
+    {
+        sig_smaller /= 10;
+        --delta_exp;
+    }
 
-        if (delta_exp == 1)
-        {
-            detail::fenv_round(signed_sig_lhs, lhs_sign);
-        }
+    if (delta_exp == 1)
+    {
+        detail::fenv_round(sig_smaller, smaller_sign);
     }
 
     // Both of the significands are less than 9'999'999, so we can safely
