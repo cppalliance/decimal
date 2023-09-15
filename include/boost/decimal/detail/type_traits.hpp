@@ -52,6 +52,22 @@ template <typename T>
 using make_unsigned_t = typename make_unsigned<T>::type;
 
 template <typename T>
+struct make_signed { using type = std::make_signed_t<T>; };
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+template <>
+struct make_signed<int128_t> { using type = int128_t; };
+
+template <>
+struct make_signed<uint128_t> { using type = int128_t; };
+
+#endif
+
+template <typename T>
+using make_signed_t = typename make_signed<T>::type;
+
+template <typename T>
 struct is_integral { static constexpr bool value = std::is_integral<T>::value;};
 
 template <>
