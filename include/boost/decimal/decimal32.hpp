@@ -101,6 +101,13 @@ static constexpr std::uint32_t construct_combination_mask = 0b0'11111'000000'000
 static constexpr std::uint32_t construct_exp_mask = 0b0'00000'111111'0000000000'0000000000;
 static constexpr std::uint32_t construct_significand_mask = no_combination;
 
+struct decimal32_components
+{
+    std::uint32_t sig;
+    std::int32_t exp;
+    bool sign;
+};
+
 } // Namespace detail
 
 // Converts the significand to 7 digits to remove the effects of cohorts.
@@ -223,6 +230,10 @@ private:
     template <typename T, typename T2>
     friend constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                           T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
+
+    template <typename T, typename T2>
+    friend constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components;
 
 public:
     // 3.2.2.1 construct/copy/destroy:
@@ -682,6 +693,93 @@ constexpr decimal32 check_non_finite(decimal32 lhs, decimal32 rhs) noexcept
     return zero;
 }
 
+template <typename T, typename T2>
+constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components
+{
+    const bool sign {lhs_sign};
+
+    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "Starting sig lhs: " << sig_lhs
+              << "\nStarting sig rhs: " << sig_rhs << std::endl;
+    #endif
+
+    if (delta_exp + 1 > detail::precision)
+    {
+        // If the difference in exponents is more than the digits of accuracy
+        // we return the larger of the two
+        //
+        // e.g. 1e20 + 1e-20 = 1e20
+
+        return {lhs_sig, lhs_exp, lhs_sign};
+    }
+    else if (delta_exp == detail::precision + 1)
+    {
+        // Only need to see if we need to add one to the
+        // significand of the bigger value
+        //
+        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
+
+        if (rhs_sig >= UINT32_C(5'000'000))
+        {
+            ++lhs_sig;
+            return {lhs_sig, lhs_exp, lhs_sign};
+        }
+        else
+        {
+            return {lhs_sig, lhs_exp, lhs_sign};
+        }
+    }
+
+    // The two numbers can be added together without special handling
+    //
+    // If we can add to the lhs sig rather than dividing we can save some precision
+    // 32-bit signed int can have 9 digits and our normalized significand has 7
+    if (delta_exp <= 2)
+    {
+        while (delta_exp > 0)
+        {
+            lhs_sig *= 10;
+            --delta_exp;
+            --lhs_exp;
+        }
+    }
+    else
+    {
+        lhs_sig *= 100;
+        delta_exp -= 2;
+        lhs_exp -=2;
+    }
+
+    while (delta_exp > 1)
+    {
+        rhs_sig /= 10;
+        --delta_exp;
+    }
+
+
+    if (delta_exp == 1)
+    {
+        detail::fenv_round(rhs_sig, rhs_sign);
+    }
+
+    // Cast the results to signed types so that we can apply a sign at the end if necessary
+    // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
+    const auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig)};
+    const auto new_exp {lhs_exp};
+    const auto res_sig {detail::make_positive_unsigned(new_sig)};
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "Final sig lhs: " << sig_lhs
+              << "\nFinal sig rhs: " << sig_rhs
+              << "\nResult sig: " << new_sig << std::endl;
+    #endif
+
+    return {res_sig, new_exp, sign};
+}
+
 // We use kahan summation here where applicable
 // https://en.wikipedia.org/wiki/Kahan_summation_algorithm
 // NOLINTNEXTLINE : If addition is actually subtraction than change operator and vice versa
@@ -700,7 +798,6 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
     {
         lhs_bigger = !lhs_bigger;
     }
-    bool sign {};
 
     // Ensure that lhs is always the larger for ease of implementation
     if (!lhs_bigger)
@@ -712,111 +809,18 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
     {
         return lhs - abs(rhs);
     }
-    else if (lhs.isneg())
-    {
-        sign = true;
-    }
 
     auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.full_exponent()};
+    auto exp_lhs {lhs.biased_exponent()};
     normalize(sig_lhs, exp_lhs);
 
     auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.full_exponent()};
+    auto exp_rhs {rhs.biased_exponent()};
     normalize(sig_rhs, exp_rhs);
 
-    auto delta_exp {exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs};
+    const auto result {add_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
 
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "Starting sig lhs: " << sig_lhs
-              << "\nStarting sig rhs: " << sig_rhs << std::endl;
-    #endif
-
-    if (delta_exp + 1 > detail::precision)
-    {
-        // If the difference in exponents is more than the digits of accuracy
-        // we return the larger of the two
-        //
-        // e.g. 1e20 + 1e-20 = 1e20
-
-        return lhs;
-    }
-    else if (delta_exp == detail::precision + 1)
-    {
-        // Only need to see if we need to add one to the
-        // significand of the bigger value
-        //
-        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
-
-        if (sig_rhs >= UINT32_C(5'000'000))
-        {
-            ++sig_lhs;
-            return {sig_lhs, static_cast<int>(exp_lhs) - detail::bias};
-        }
-        else
-        {
-            return lhs;
-        }
-    }
-
-    bool carry {};
-
-    // The two numbers can be added together without special handling
-
-    // If we can add to the lhs sig rather than dividing we can save some precision
-    // 32-bit signed int can have 9 digits and our normalized significand has 7
-    if (delta_exp <= 2)
-    {
-        while (delta_exp > 0)
-        {
-            sig_lhs *= 10;
-            --delta_exp;
-            --exp_lhs;
-        }
-    }
-    else
-    {
-        sig_lhs *= 100;
-        delta_exp -= 2;
-        exp_lhs -=2;
-    }
-
-    while (delta_exp > 1)
-    {
-        sig_rhs /= 10;
-        --delta_exp;
-    }
-
-
-    if (delta_exp == 1)
-    {
-        auto carry_dig = sig_rhs % 10;
-        sig_rhs /= 10;
-
-        // TODO(mborland): Rounding modes
-        if (carry_dig >= 5)
-        {
-            carry = true;
-        }
-    }
-
-    // Cast the results to signed types so that we can apply a sign at the end if necessary
-    // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
-    auto new_sig {static_cast<std::int32_t>(sig_lhs + sig_rhs) + static_cast<std::int32_t>(carry)};
-    const auto new_exp {static_cast<int>(exp_lhs) - detail::bias};
-
-    if (sign)
-    {
-        new_sig = -new_sig;
-    }
-
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "Final sig lhs: " << sig_lhs
-              << "\nFinal sig rhs: " << sig_rhs
-              << "\nResult sig: " << new_sig << std::endl;
-    #endif
-
-    return {new_sig, new_exp};
+    return {result.sig, result.exp, result.sign};
 }
 
 constexpr decimal32& decimal32::operator++() noexcept
