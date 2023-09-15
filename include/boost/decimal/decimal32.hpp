@@ -688,7 +688,7 @@ constexpr decimal32 check_non_finite(decimal32 lhs, decimal32 rhs) noexcept
 
 template <typename T, typename T2>
 constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                        T2 rhs_sig, std::int32_t rhs_exp, bool) noexcept -> decimal32
+                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> decimal32
 {
     const bool sign {lhs_sign};
 
@@ -726,10 +726,8 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         }
     }
 
-    bool carry {};
-
     // The two numbers can be added together without special handling
-
+    //
     // If we can add to the lhs sig rather than dividing we can save some precision
     // 32-bit signed int can have 9 digits and our normalized significand has 7
     if (delta_exp <= 2)
@@ -757,25 +755,13 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (delta_exp == 1)
     {
-        auto carry_dig = rhs_sig % 10;
-        rhs_sig /= 10;
-
-        // TODO(mborland): Rounding modes
-        if (carry_dig >= 5)
-        {
-            carry = true;
-        }
+        detail::fenv_round(rhs_sig, rhs_sign);
     }
 
     // Cast the results to signed types so that we can apply a sign at the end if necessary
     // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
-    auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig) + static_cast<std::int32_t>(carry)};
+    const auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig)};
     const auto new_exp {lhs_exp};
-
-    if (sign)
-    {
-        new_sig = -new_sig;
-    }
 
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "Final sig lhs: " << sig_lhs
@@ -783,7 +769,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
               << "\nResult sig: " << new_sig << std::endl;
     #endif
 
-    return {new_sig, new_exp};
+    return {new_sig, new_exp, sign};
 }
 
 // We use kahan summation here where applicable
