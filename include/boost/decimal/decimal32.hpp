@@ -240,6 +240,10 @@ private:
                                    T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
                                    bool lhs_bigger, bool abs_lhs_bigger) noexcept -> detail::decimal32_components;
 
+    template <typename T, typename T2>
+    friend constexpr auto mul_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -1587,6 +1591,50 @@ std::uint32_t to_bits(decimal32 rhs) noexcept
     return bits;
 }
 
+template <typename T, typename T2>
+constexpr auto mul_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components
+{
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "sig lhs: " << sig_lhs
+              << "\nexp lhs: " << exp_lhs
+              << "\nsig rhs: " << sig_rhs
+              << "\nexp rhs: " << exp_rhs;
+    #endif
+
+    bool sign {!(lhs_sign == rhs_sign)};
+
+    // Once we have the normalized significands and exponents all we have to do is
+    // multiply the significands and add the exponents
+    //
+    // We use a 64 bit resultant significand because the two 23-bit unsigned significands will always fit
+
+    auto res_sig {static_cast<std::uint64_t>(lhs_sig) * static_cast<std::uint64_t>(rhs_sig)};
+    auto res_exp {lhs_exp + rhs_exp};
+
+    const auto sig_dig {detail::num_digits(res_sig)};
+
+    if (sig_dig > 9)
+    {
+        res_sig /= detail::powers_of_10[sig_dig - 9];
+        res_exp += sig_dig - 9;
+    }
+
+    const auto res_sig_32 {static_cast<std::uint32_t>(res_sig)};
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "\nres sig: " << res_sig_32
+              << "\nres exp: " << res_exp << std::endl;
+    #endif
+
+    if (res_sig_32 == 0)
+    {
+        sign = false;
+    }
+
+    return {res_sig_32, res_exp, sign};
+}
+
 constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept
 {
     constexpr decimal32 zero {0, 0};
@@ -1605,40 +1653,9 @@ constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept
     auto exp_rhs {rhs.biased_exponent()};
     normalize(sig_rhs, exp_rhs);
 
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "sig lhs: " << sig_lhs
-              << "\nexp lhs: " << exp_lhs
-              << "\nsig rhs: " << sig_rhs
-              << "\nexp rhs: " << exp_rhs;
-    #endif
+    const auto result {mul_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
 
-    const bool sign {!(lhs.isneg() == rhs.isneg())};
-
-    // Once we have the normalized significands and exponents all we have to do is
-    // multiply the significands and add the exponents
-    //
-    // We use a 64 bit resultant significand because the two 23-bit unsigned significands will always fit
-
-    auto res_sig {static_cast<std::uint64_t>(sig_lhs) * static_cast<std::uint64_t>(sig_rhs)};
-    auto res_exp {exp_lhs + exp_rhs};
-
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > 9)
-    {
-        res_sig /= detail::powers_of_10[sig_dig - 9];
-        res_exp += sig_dig - 9;
-    }
-
-    auto res_sig_32 {static_cast<std::int32_t>(res_sig)};
-    res_sig_32 = sign ? -res_sig_32 : res_sig_32;
-
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "\nres sig: " << res_sig_32
-              << "\nres exp: " << res_exp << std::endl;
-    #endif
-
-    return decimal32 {res_sig_32, res_exp};
+    return {result.sig, result.exp, result.sign};
 }
 
 constexpr decimal32& decimal32::operator*=(decimal32 rhs) noexcept
