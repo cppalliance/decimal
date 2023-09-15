@@ -885,25 +885,22 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     // The two numbers can be subtracted together without special handling
 
-    auto& sig_to_change {abs_lhs_bigger ? signed_sig_lhs : signed_sig_rhs};
-    auto& exp_to_change {abs_lhs_bigger ? lhs_exp : rhs_exp};
+    auto& sig_bigger {abs_lhs_bigger ? signed_sig_lhs : signed_sig_rhs};
+    auto& exp_bigger {abs_lhs_bigger ? lhs_exp : rhs_exp};
     auto& sig_smaller {abs_lhs_bigger ? signed_sig_rhs : signed_sig_lhs};
     auto& smaller_sign {abs_lhs_bigger ? rhs_sign : lhs_sign};
 
-    if (delta_exp <= 2)
+    if (delta_exp == 1)
     {
-        while (delta_exp > 0)
-        {
-            sig_to_change *= 10;
-            --delta_exp;
-            --exp_to_change;
-        }
+        sig_bigger *= 10;
+        --delta_exp;
+        --exp_bigger;
     }
-    else
+    else if (delta_exp >= 2)
     {
-        sig_to_change *= 100;
+        sig_bigger *= 100;
         delta_exp -= 2;
-        exp_to_change -= 2;
+        exp_bigger -= 2;
     }
 
     while (delta_exp > 1)
@@ -929,6 +926,7 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     {
         new_sig = signed_sig_lhs - signed_sig_rhs;
     }
+
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
     const auto new_sign {new_sig < 0};
     const auto res_sig {detail::make_positive_unsigned(new_sig)};
