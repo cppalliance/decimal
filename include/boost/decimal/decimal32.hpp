@@ -101,6 +101,13 @@ static constexpr std::uint32_t construct_combination_mask = 0b0'11111'000000'000
 static constexpr std::uint32_t construct_exp_mask = 0b0'00000'111111'0000000000'0000000000;
 static constexpr std::uint32_t construct_significand_mask = no_combination;
 
+struct decimal32_components
+{
+    std::uint32_t sig;
+    std::int32_t exp;
+    bool sign;
+};
+
 } // Namespace detail
 
 // Converts the significand to 7 digits to remove the effects of cohorts.
@@ -226,7 +233,7 @@ private:
 
     template <typename T, typename T2>
     friend constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                   T rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> decimal32;
+                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components;
 
 public:
     // 3.2.2.1 construct/copy/destroy:
@@ -688,7 +695,7 @@ constexpr decimal32 check_non_finite(decimal32 lhs, decimal32 rhs) noexcept
 
 template <typename T, typename T2>
 constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> decimal32
+                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components
 {
     const bool sign {lhs_sign};
 
@@ -762,6 +769,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
     const auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig)};
     const auto new_exp {lhs_exp};
+    const auto res_sig {static_cast<std::uint32_t>(new_sig < 0 ? detail::apply_sign(new_sig) : new_sig)};
 
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "Final sig lhs: " << sig_lhs
@@ -769,7 +777,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
               << "\nResult sig: " << new_sig << std::endl;
     #endif
 
-    return {new_sig, new_exp, sign};
+    return {res_sig, new_exp, sign};
 }
 
 // We use kahan summation here where applicable
@@ -810,7 +818,9 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
     auto exp_rhs {rhs.biased_exponent()};
     normalize(sig_rhs, exp_rhs);
 
-    return add_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg());
+    const auto result {add_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
+
+    return {result.sig, result.exp, result.sign};
 }
 
 constexpr decimal32& decimal32::operator++() noexcept
