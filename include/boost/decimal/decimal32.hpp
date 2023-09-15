@@ -235,6 +235,11 @@ private:
     friend constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                    T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components;
 
+    template <typename T, typename T2>
+    friend constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
+                                   bool lhs_bigger, bool abs_lhs_bigger) noexcept -> detail::decimal32_components;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -841,40 +846,14 @@ constexpr decimal32& decimal32::operator+=(decimal32 rhs) noexcept
     return *this;
 }
 
-// NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
-constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
+template <typename T, typename T2>
+constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
+                        bool lhs_bigger, bool abs_lhs_bigger) noexcept -> detail::decimal32_components
 {
-    constexpr decimal32 zero {0, 0};
-
-    const auto res {check_non_finite(lhs, rhs)};
-    if (res != zero)
-    {
-        return res;
-    }
-
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
-
-    const bool lhs_bigger {lhs > rhs};
-    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
-
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.full_exponent()};
-    normalize(sig_lhs, exp_lhs);
-
-    auto signed_sig_lhs = static_cast<std::int32_t>(sig_lhs);
-    signed_sig_lhs = lhs.isneg() ? -signed_sig_lhs : signed_sig_lhs;
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.full_exponent()};
-    normalize(sig_rhs, exp_rhs);
-
-    auto signed_sig_rhs = static_cast<std::int32_t>(sig_rhs);
-    signed_sig_rhs = rhs.isneg() ? -signed_sig_rhs : signed_sig_rhs;
-
-    auto delta_exp {exp_lhs > exp_rhs ? exp_lhs - exp_rhs : exp_rhs - exp_lhs};
+    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
+    auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
+    auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
 
     if (delta_exp + 1 > detail::precision)
     {
@@ -883,7 +862,8 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
         //
         // e.g. 1e20 - 1e-20 = 1e20
 
-        return lhs_bigger ? lhs : -rhs;
+        return lhs_bigger ? detail::decimal32_components{lhs_sig, lhs_exp, lhs_sign} :
+                            detail::decimal32_components{rhs_sig, rhs_exp, !rhs_sign};
     }
     else if (delta_exp == detail::precision + 1)
     {
@@ -892,14 +872,14 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
         //
         // e.g. 1.234567e5 - 9.876543e-2 = 1.234566e5
 
-        if (sig_rhs >= UINT32_C(5'000'000))
+        if (rhs_sig >= UINT32_C(5'000'000))
         {
-            --sig_lhs;
-            return {sig_lhs, static_cast<int>(exp_lhs) - detail::bias};
+            --lhs_sig;
+            return {lhs_sig, lhs_exp, lhs_sign};
         }
         else
         {
-            return lhs;
+            return {lhs_sig, lhs_exp, lhs_sign};
         }
     }
 
@@ -912,14 +892,14 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
             {
                 signed_sig_lhs *= 10;
                 --delta_exp;
-                --exp_lhs;
+                --lhs_exp;
             }
         }
         else
         {
             signed_sig_lhs *= 100;
             delta_exp -= 2;
-            exp_lhs -= 2;
+            lhs_exp -= 2;
         }
 
         while (delta_exp > 1)
@@ -950,14 +930,14 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
             {
                 signed_sig_rhs *= 10;
                 --delta_exp;
-                --exp_rhs;
+                --rhs_exp;
             }
         }
         else
         {
             signed_sig_rhs *= 100;
             delta_exp -= 2;
-            exp_rhs -= 2;
+            rhs_exp -= 2;
         }
 
         while (delta_exp > 1)
@@ -988,7 +968,7 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
     // cast them to signed 32-bit ints to calculate the new significand
     std::int32_t new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
 
-    if (rhs.isneg() && !lhs.isneg())
+    if (rhs_sign && !lhs_sign)
     {
         new_sig = signed_sig_lhs + signed_sig_rhs;
     }
@@ -996,9 +976,45 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
     {
         new_sig = signed_sig_lhs - signed_sig_rhs;
     }
-    const auto new_exp {(abs_lhs_bigger ? static_cast<int>(exp_lhs) : static_cast<int>(exp_rhs)) - detail::bias};
+    const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
+    const auto new_sign {new_sig < 0};
+    const auto res_sig {detail::make_positive_unsigned(new_sig)};
 
-    return {new_sig, new_exp};
+    return {res_sig, new_exp, new_sign};
+}
+
+// NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
+constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
+{
+    constexpr decimal32 zero {0, 0};
+
+    const auto res {check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool lhs_bigger {lhs > rhs};
+    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    const auto result {sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
+                                sig_rhs, exp_rhs, rhs.isneg(),
+                                lhs_bigger, abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
 }
 
 constexpr decimal32& decimal32::operator--() noexcept
