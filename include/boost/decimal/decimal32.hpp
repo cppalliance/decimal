@@ -910,16 +910,7 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
         if (delta_exp == 1)
         {
-            const auto carry_dig {signed_sig_rhs % 10};
-            signed_sig_rhs /= 10;
-            if (carry_dig >= 5)
-            {
-                ++signed_sig_rhs;
-            }
-            else if (carry_dig <= -5)
-            {
-                --signed_sig_rhs;
-            }
+            detail::fenv_round(signed_sig_rhs, rhs_sign);
         }
     }
     else
@@ -948,19 +939,7 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
         if (delta_exp == 1)
         {
-            const auto carry_dig {signed_sig_lhs % 10};
-            signed_sig_lhs /= 10;
-
-            // TODO(mborland): rounding modes
-            if (carry_dig >= 5)
-            {
-                ++signed_sig_lhs;
-            }
-            else if (carry_dig <= -5)
-            {
-                --signed_sig_rhs;
-            }
-
+            detail::fenv_round(signed_sig_lhs, lhs_sign);
         }
     }
 
