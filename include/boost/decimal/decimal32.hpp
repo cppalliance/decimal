@@ -168,8 +168,15 @@ private:
 
     data_layout_ bits_{};
 
+    // Returns the un-biased (quantum) exponent
+    constexpr std::uint32_t full_exponent() const noexcept;
+
     // Returns the biased exponent
     constexpr std::int32_t biased_exponent() const noexcept;
+
+    // Returns the significand complete with the bits implied from the combination field
+    constexpr std::uint32_t full_significand() const noexcept;
+    constexpr bool isneg() const noexcept;
 
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
@@ -253,13 +260,6 @@ public:
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
 
-    // Returns the un-biased (quantum) exponent
-    constexpr std::uint32_t full_exponent() const noexcept;
-
-    // Returns the significand complete with the bits implied from the combination field
-    constexpr std::uint32_t full_significand() const noexcept;
-    constexpr bool isneg() const noexcept;
-
     // cmath functions that are easier as friends
     friend constexpr bool signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
     friend constexpr bool isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
@@ -293,9 +293,6 @@ public:
     constexpr decimal32& operator*=(decimal32 rhs) noexcept;
     constexpr decimal32& operator/=(decimal32 rhs) noexcept;
     constexpr decimal32& operator%=(decimal32 rhs) noexcept;
-
-    // Replaces the current sign with the one provided
-    constexpr auto edit_sign(bool sign) noexcept -> void;
 
     // 3.2.9 comparison operators:
     // Equality
@@ -409,6 +406,9 @@ private:
     // Replaces the value of the significand with sig
     template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
     constexpr auto edit_significand(T sig) noexcept -> void;
+
+    // Replaces the current sign with the one provided
+    constexpr auto edit_sign(bool sign) noexcept -> void;
 };
 
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
@@ -1298,22 +1298,22 @@ constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_i
 
 constexpr std::uint32_t decimal32::full_exponent() const noexcept
 {
-    std::uint32_t exp {};
+    std::uint32_t expval {};
 
     if ((bits_.combination_field & detail::comb_11_mask) == 0b11000)
     {
         // bits 2 and 3 are the exp part of the combination field
-        exp |= (bits_.combination_field & detail::comb_11_exp_bits) << 5;
+        expval |= (bits_.combination_field & detail::comb_11_exp_bits) << 5;
     }
     else
     {
         // bits 0 and 1 are the exp part of the combination field
-        exp |= (bits_.combination_field & detail::comb_11_mask) << 3;
+        expval |= (bits_.combination_field & detail::comb_11_mask) << 3;
     }
 
-    exp |= bits_.exponent;
+    expval |= bits_.exponent;
 
-    return exp;
+    return expval;
 }
 
 constexpr std::int32_t decimal32::biased_exponent() const noexcept
@@ -1322,9 +1322,9 @@ constexpr std::int32_t decimal32::biased_exponent() const noexcept
 }
 
 template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
-constexpr auto decimal32::edit_exponent(T exp) noexcept -> void
+constexpr auto decimal32::edit_exponent(T expval) noexcept -> void
 {
-    *this = decimal32(this->full_significand(), exp, this->isneg());
+    *this = decimal32(this->full_significand(), expval, this->isneg());
 }
 
 constexpr std::uint32_t decimal32::full_significand() const noexcept
@@ -1438,14 +1438,14 @@ constexpr TargetType decimal32::to_integral() const noexcept
     }
 
     result = static_cast<TargetType>(this->full_significand());
-    int exp {static_cast<int>(this->full_exponent()) - detail::bias};
-    if (exp > 0)
+    int expval {static_cast<int>(this->full_exponent()) - detail::bias};
+    if (expval > 0)
     {
-        result *= detail::pow10<TargetType>(exp);
+        result *= detail::pow10<TargetType>(expval);
     }
-    else if (exp < 0)
+    else if (expval < 0)
     {
-        result /= detail::pow10<TargetType>(-exp);
+        result /= detail::pow10<TargetType>(-expval);
     }
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
@@ -1828,7 +1828,7 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
 
     bool sign {};
     std::uint64_t significand {};
-    std::int32_t exp {};
+    std::int32_t expval {};
     const auto buffer_len {std::strlen(buffer)};
 
     if (buffer_len == 0)
@@ -1837,7 +1837,7 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
         return is;
     }
 
-    const auto r {detail::parser(buffer, buffer + buffer_len, sign, significand, exp)};
+    const auto r {detail::parser(buffer, buffer + buffer_len, sign, significand, expval)};
 
     if (r.ec != std::errc{})
     {
@@ -1864,7 +1864,7 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
     }
     else
     {
-        d = decimal32(significand, exp, sign);
+        d = decimal32(significand, expval, sign);
     }
 
     return is;
@@ -1951,7 +1951,7 @@ constexpr decimal32 strtod32(const char* str, char** endptr) noexcept
 
     bool sign {};
     std::uint64_t significand {};
-    std::int32_t exp {};
+    std::int32_t expval {};
     const auto buffer_len {detail::strlen(str)};
 
     if (buffer_len == 0)
@@ -1960,7 +1960,7 @@ constexpr decimal32 strtod32(const char* str, char** endptr) noexcept
         return from_bits(boost::decimal::detail::snan_mask);
     }
 
-    const auto r {detail::parser(str, str + buffer_len, sign, significand, exp)};
+    const auto r {detail::parser(str, str + buffer_len, sign, significand, expval)};
     decimal32 d;
 
     if (r.ec != std::errc{})
@@ -1988,7 +1988,7 @@ constexpr decimal32 strtod32(const char* str, char** endptr) noexcept
     }
     else
     {
-        d = decimal32(significand, exp, sign);
+        d = decimal32(significand, expval, sign);
     }
 
     *endptr = const_cast<char*>(str + (r.ptr - str));
@@ -2144,11 +2144,20 @@ constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::int32_t
         return -1;
     }
 
+
     auto num_exp {num.biased_exponent()};
     auto num_sig {num.full_significand()};
     normalize(num_sig, num_exp);
 
-    *expptr = num_exp;
+    const auto offset = int { detail::num_digits(num.full_significand()) - 1 };
+
+    *expptr = int { static_cast<int>(num.full_exponent()) + static_cast<int>(offset - detail::bias) };
+
+    if (offset == 0)
+    {
+        --*expptr;
+    }
+
     auto signed_sig {static_cast<std::int32_t>(num_sig)};
     signed_sig = num.isneg() ? -signed_sig : signed_sig;
 
@@ -2169,9 +2178,9 @@ constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32
     return num;
 }
 
-constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32
+constexpr auto scalbnd32(decimal32 num, int expval) noexcept -> decimal32
 {
-    return scalblnd32(num, static_cast<long>(exp));
+    return scalblnd32(num, static_cast<long>(expval));
 }
 
 constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32

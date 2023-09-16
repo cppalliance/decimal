@@ -40,9 +40,9 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
     {
         result_frexp = v;
 
-        const auto sign_bit = v.isneg();
+        const auto b_neg = signbit(v);
 
-        result_frexp.edit_sign(false);
+        if(b_neg) { result_frexp = -result_frexp; }
 
         // N[1000/301, 44]
         auto t =
@@ -78,7 +78,7 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
 
         if (expon != nullptr) { *expon = t; }
 
-        result_frexp.edit_sign(sign_bit);
+        if(b_neg) { result_frexp = -result_frexp; }
     }
 
     return result_frexp;

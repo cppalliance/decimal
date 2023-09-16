@@ -17,16 +17,11 @@ namespace boost { namespace decimal {
 template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
 constexpr auto ilogb(T d) noexcept -> int
 {
-    const auto offset = int { detail::num_digits(d.full_significand()) - 1 };
+    auto expval = int { };
 
-    auto e10 = int { static_cast<int>(d.full_exponent()) + static_cast<int>(offset - detail::bias) };
+    static_cast<void>(frexp10d32(d, &expval));
 
-    if (offset == 0)
-    {
-        --e10;
-    }
-
-    return e10;
+    return expval;
 }
 
 }} // Namespaces

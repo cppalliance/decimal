@@ -40,19 +40,19 @@ constexpr auto ceil(decimal32 num) noexcept -> decimal32
     return ceild32(num);
 }
 
-constexpr auto frexp10(decimal32 num, int *exp) noexcept -> std::int32_t
+constexpr auto frexp10(decimal32 num, int *expptr) noexcept -> std::int32_t
 {
-    return frexp10d32(num, exp);
+    return frexp10d32(num, expptr);
 }
 
-constexpr auto scalbn(decimal32 num, int exp) noexcept -> decimal32
+constexpr auto scalbn(decimal32 num, int expval) noexcept -> decimal32
 {
-    return scalbnd32(num, exp);
+    return scalbnd32(num, expval);
 }
 
-constexpr auto scalbln(decimal32 num, long exp) noexcept -> decimal32
+constexpr auto scalbln(decimal32 num, long expval) noexcept -> decimal32
 {
-    return scalblnd32(num, exp);
+    return scalblnd32(num, expval);
 }
 
 constexpr auto fmod(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
