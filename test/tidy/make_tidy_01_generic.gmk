@@ -35,17 +35,16 @@ VPATH    := $(sort $(dir $(FILES_ALL)))
 
 .PHONY: tidy
 tidy: $(FILES_TIDY_TXT)
-  # Summarize tidy results
+	@$(GNUECHO)
 	@$(GNUECHO) +++ summarize clang-tidy results
 	@$(GNUECHO) +++ concatenate $(PATH_TMP)/*.tidy_txt to $(PATH_TMP)/all.tidy_txt
 	@$(CAT) $(PATH_TMP)/*.tidy_txt > $(PATH_TMP)/all.tidy_txt
 	@$(GNUECHO)
 	@$(GNUECHO) +++ verify existence of $(PATH_TMP)/all.tidy_txt
 	@$(LS) -la $(PATH_TMP)/all.tidy_txt
-	@$(GNUECHO)
-	@$(GNUECHO) +++ print summary of tidy from $(PATH_TMP)/all.tidy_txt:
-	@-$(SED) -n l $(PATH_TMP)/all.tidy_txt
-	@$(GNUECHO)
+#	@$(GNUECHO)
+#	@$(GNUECHO) +++ print summary of tidy from $(PATH_TMP)/all.tidy_txt:
+#	@-$(SED) -n l $(PATH_TMP)/all.tidy_txt
 
 
 # -----------------------------------------------------------------------------
@@ -54,7 +53,7 @@ tidy: $(FILES_TIDY_TXT)
 
 .PHONY: prepare
 prepare:
-  # creating output directories
+	@$(GNUECHO)
 	@$(GNUECHO) +++ creating output directories
 	@-$(MKDIR) -p $(PATH_ERR)
 	@-$(MKDIR) -p $(PATH_TMP)
@@ -74,9 +73,9 @@ prepare:
 # pattern rule for clang-tidy analysis of cpp-files
 # -----------------------------------------------------------------------------
 $(PATH_TMP)/%.tidy_txt : %.cpp
+	@$(GNUECHO)
 	@-$(GNUECHO) +++ tidying: $<
 	@-$(TIDY) $(TIDY_FLAGS) $< -- $(CXX_FLAGS) $(C_INCLUDES) $(C_DEFINES) > $(PATH_TMP)/$(basename $(@F)).tidy_txt 2> $(PATH_ERR)/$(basename $(@F)).tidy_err
 	@-$(GNUECHO)
 	@-$(GNUECHO) +++ print $(PATH_ERR)/$(basename $(@F)).tidy_err
 	@-$(SED) -n l $(PATH_ERR)/$(basename $(@F)).tidy_err
-	@-$(GNUECHO)

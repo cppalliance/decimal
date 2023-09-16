@@ -59,7 +59,11 @@ jobs:
           echo
           make tidy -f make_tidy_01_generic.gmk --jobs=8 MY_ALL_COV=0 MY_BOOST_ROOT=../../../boost-root MY_CC=${{ matrix.compiler }} MY_STD=${{ matrix.standard }}
           echo
+          echo "print tidy result for quick.cpp only"
+          cat tmp/quick.tidy_txt
       - name: quality-gate-clang-tidy
         run: |
           echo
           echo quality-gate-clang-tidy not yet implemented
+          ls -la tmp/all.tidy_txt
+          ls -la tmp/quick.tidy_txt
