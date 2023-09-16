@@ -65,6 +65,9 @@ jobs:
         run: |
           cd test/tidy
           echo
-          echo quality-gate-clang-tidy not yet implemented
+          echo "quality-gate-clang-tidy not yet implemented"
           ls -la tmp/all.tidy_txt
           ls -la tmp/quick.tidy_txt
+          echo
+          echo "word-count on tmp/quick.tidy_txt"
+          cat tmp/quick.tidy_txt | grep warning | wc
