@@ -108,7 +108,7 @@ struct decimal32_components
     bool sign;
 };
 
-} // Namespace detail
+} // namespace detail
 
 // Converts the significand to 7 digits to remove the effects of cohorts.
 template <typename T, typename T2>
@@ -418,7 +418,7 @@ private:
 };
 
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
-constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept
+constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity)
 {
     using Unsigned_Integer = detail::make_unsigned_t<T>;
 
@@ -2210,7 +2210,8 @@ constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32
     return (x - *iptr);
 }
 
-}} // Namespace boost::decimal
+} // namespace decimal
+} // namespace boost
 
 namespace std {
 

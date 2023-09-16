@@ -135,6 +135,8 @@ struct ieee754_binary128
     static constexpr int decimal_digits = 33;
 };
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_BIT_LAYOUTS_HPP

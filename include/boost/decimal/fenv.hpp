@@ -35,6 +35,7 @@ auto fesetround(rounding_mode round) noexcept -> rounding_mode
     return round;
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif //BOOST_DECIMAL_FENV_HPP

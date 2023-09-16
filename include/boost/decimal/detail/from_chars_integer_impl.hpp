@@ -262,6 +262,8 @@ constexpr from_chars_result from_chars128(const char* first, const char* last, u
     return from_chars_integer_impl<uint128, uint128>(first, last, value, base);
 }
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_FROM_CHARS_INTEGER_IMPL_HPP

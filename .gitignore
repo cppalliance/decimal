@@ -35,3 +35,5 @@ test/cover/bin/
 test/cover/obj/
 test/cover/coverage.info
 test/cover/coverage_unfiltered.info
+test/tidy/err/
+test/tidy/tmp/

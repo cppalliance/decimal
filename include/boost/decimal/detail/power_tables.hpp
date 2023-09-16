@@ -26,6 +26,8 @@ constexpr T pow10(int n) noexcept
     return static_cast<T>(powers_of_10[n]);
 }
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_POWER_TABLES_HPP

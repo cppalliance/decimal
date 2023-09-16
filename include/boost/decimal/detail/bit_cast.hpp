@@ -37,6 +37,8 @@ To bit_cast(const From& src) noexcept
 
 #endif
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_BIT_CAST_HPP

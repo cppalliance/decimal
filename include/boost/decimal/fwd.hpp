@@ -11,7 +11,8 @@ namespace boost { namespace decimal {
 
 class decimal32;
 
-}} // Namespace boost::decimal
+} // namespace decimal
+} // namespace boost
 
 namespace std {
 

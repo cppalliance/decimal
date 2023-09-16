@@ -34,6 +34,7 @@ struct from_chars_result_t
 };
 using from_chars_result = from_chars_result_t<char>;
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_FROM_CHARS_RESULT_HPP

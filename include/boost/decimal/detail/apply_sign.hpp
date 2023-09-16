@@ -58,7 +58,9 @@ constexpr Integer make_signed_value(Unsigned_Integer val, bool sign) noexcept
 }
 
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #ifdef _MSC_VER
 # pragma warning(pop)

@@ -75,6 +75,7 @@ constexpr auto modf(decimal32 x, decimal32* iptr) noexcept -> decimal32
     return modfd32(x, iptr);
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_CMATH_HPP

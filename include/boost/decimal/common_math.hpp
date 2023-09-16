@@ -78,6 +78,7 @@ constexpr decimal32 quantize(decimal32 lhs, decimal32 rhs) noexcept
     return quantized32(lhs, rhs);
 }
 
-}}
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_COMMON_MATH_HPP

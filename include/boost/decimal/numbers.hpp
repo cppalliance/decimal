@@ -67,6 +67,8 @@ static constexpr auto inv_sqrt3 {inv_sqrt3_v<decimal32>};
 static constexpr auto egamma {egamma_v<decimal32>};
 static constexpr auto phi {phi_v<decimal32>};
 
-}}} // Namespaces
+} // namespace numbers
+} // namespace decimal
+} // namespace boost
 
 #endif //BOOST_NUMBERS_HPP
