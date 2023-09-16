@@ -138,6 +138,8 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int
 
 #endif
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif //BOOST_DECIMAL_DETAIL_FENV_ROUNDING_HPP

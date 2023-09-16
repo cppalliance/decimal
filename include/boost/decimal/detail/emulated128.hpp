@@ -940,7 +940,9 @@ std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>&
     return os;
 }
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 // Non-standard libraries may add specializations for library-provided types
 namespace std {
@@ -990,6 +992,6 @@ struct numeric_limits<boost::decimal::detail::uint128>
     BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::detail::uint128 denorm_min() { return 0; }
 };
 
-} // Namespace std
+} // namespace std
 
 #endif // BOOST_DECIMAL_DETAIL_EMULATED128_HPP

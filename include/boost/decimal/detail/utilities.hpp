@@ -30,6 +30,8 @@ constexpr std::size_t strlen(const T* str) noexcept
     return i;
 }
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif //BOOST_DECIMAL_DETAIL_UTILITIES_HPP

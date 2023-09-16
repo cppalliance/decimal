@@ -228,6 +228,8 @@ constexpr int num_digits(boost::decimal::detail::uint128_t x) noexcept
 }
 #endif
 
-}}} // Namespace boost::charconv::detail
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_INTEGER_SEARCH_TREES_HPP

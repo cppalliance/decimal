@@ -369,7 +369,9 @@ constexpr from_chars_result parser(const char* first, const char* last, bool& si
     }
 }
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #if defined(__GNUC__) && __GNUC__ < 5 && !defined(__clang__)
 # pragma GCC diagnostic pop

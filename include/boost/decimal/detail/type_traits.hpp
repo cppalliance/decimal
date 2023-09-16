@@ -115,6 +115,8 @@ constexpr bool is_decimal_floating_point<T>::value;
 template <typename T>
 constexpr bool is_decimal_floating_point_v = is_decimal_floating_point<T>::value;
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif

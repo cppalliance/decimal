@@ -45,6 +45,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _df(long double v) -> decimal32
     return decimal32{v};
 }
 
-}}
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_LITERALS_HPP
