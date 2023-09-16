@@ -187,26 +187,27 @@ void test_trunc()
 template <typename Dec>
 void test_frexp10()
 {
-    int exp10 {};
-    BOOST_TEST_EQ(frexp10(Dec(0,0), &exp10), 0);
-    BOOST_TEST_EQ(exp10, 0);
+    auto expval = int {};
 
-    exp10 = -1;
-    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_NAN, &exp10), -1);
-    BOOST_TEST_EQ(exp10, 0);
+    BOOST_TEST_EQ(frexp10(Dec(0,0), &expval), 0);
+    BOOST_TEST_EQ(expval, 0);
 
-    exp10 = -1;
-    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_INFINITY, &exp10), -1);
-    BOOST_TEST_EQ(exp10, 0);
+    expval = -1;
+    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_NAN, &expval), -1);
+    BOOST_TEST_EQ(expval, 0);
 
-    /*BOOST_TEST_EQ(*/frexp10(Dec(10, 0), &exp10)/*, 1)*/; // TODO(mborland) Shouldn't this be 10^0?
-    BOOST_TEST_EQ(exp10, 1);
+    expval = -1;
+    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_INFINITY, &expval), -1);
+    BOOST_TEST_EQ(expval, 0);
 
-    /*BOOST_TEST_EQ(*/frexp10(Dec(1'000'000, 5), &exp10)/*, 1'000'000)*/; // TODO(mborland) Shouldn't this be 10^11?
-    BOOST_TEST_EQ(exp10, 11);
+    BOOST_TEST_EQ(frexp10(Dec(10, 0), &expval), 1'000'000);
+    BOOST_TEST_EQ(expval, -5);
 
-    /*BOOST_TEST_EQ(*/frexp10(Dec(-1'000'000, 5), &exp10)/*, -1'000'000)*/; // TODO(mborland) Shouldn't this be -10^11?
-    BOOST_TEST_EQ(exp10, 11);
+    BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &expval), 1'000'000);
+    BOOST_TEST_EQ(expval, 5);
+
+    BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), -1'000'000);
+    BOOST_TEST_EQ(expval, 5);
 }
 
 template <typename Dec>

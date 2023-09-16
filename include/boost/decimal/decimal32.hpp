@@ -138,6 +138,9 @@ constexpr void normalize(T& significand, T2& exp) noexcept
     }
 }
 
+template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
+constexpr auto ilogb(T d) noexcept -> int;
+
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
 class decimal32 final
@@ -185,6 +188,9 @@ private:
     constexpr TargetType to_integral() const noexcept;
 
     friend constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept;
+
+    template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
+    friend constexpr auto ilogb(T d) noexcept -> int;
 
     template <typename T>
     BOOST_DECIMAL_CXX20_CONSTEXPR T floating_conversion_impl() const noexcept;
@@ -2144,20 +2150,11 @@ constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::int32_t
         return -1;
     }
 
-
     auto num_exp {num.biased_exponent()};
     auto num_sig {num.full_significand()};
     normalize(num_sig, num_exp);
 
-    const auto offset = int { detail::num_digits(num.full_significand()) - 1 };
-
-    *expptr = int { static_cast<int>(num.full_exponent()) + static_cast<int>(offset - detail::bias) };
-
-    if (offset == 0)
-    {
-        --*expptr;
-    }
-
+    *expptr = num_exp;
     auto signed_sig {static_cast<std::int32_t>(num_sig)};
     signed_sig = num.isneg() ? -signed_sig : signed_sig;
 

@@ -14,12 +14,17 @@ namespace boost { namespace decimal {
 
 // TODO(mborland): Allow conversion between decimal types via a promotion system
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
+template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
 constexpr auto ilogb(T d) noexcept -> int
 {
-    auto expval = int { };
+    const auto offset = int { detail::num_digits(d.full_significand()) - 1 };
 
-    static_cast<void>(frexp10d32(d, &expval));
+    auto expval = int { static_cast<int>(d.full_exponent()) + static_cast<int>(offset - detail::bias) };
+
+    if (offset == 0)
+    {
+        --expval;
+    }
 
     return expval;
 }
