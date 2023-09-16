@@ -12,14 +12,14 @@
 
 namespace boost { namespace decimal {
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
+template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
 constexpr auto frexp(T v, int* expon) noexcept -> T
 {
     // This implementation of frexp follows closely that of eval_frexp
     // in Boost.Multiprecision's cpp_dec_float template class.
     constexpr T zero {0};
 
-    auto result = zero;
+    auto result_frexp = zero;
 
     const auto v_fp {fpclassify(v)};
 
@@ -29,61 +29,59 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
 
         if (v_fp == FP_NAN)
         {
-            result = boost::decimal::from_bits(boost::decimal::detail::nan_mask);
+            result_frexp = boost::decimal::from_bits(boost::decimal::detail::nan_mask);
         }
         else if (v_fp == FP_INFINITE)
         {
-            result = boost::decimal::from_bits(boost::decimal::detail::inf_mask);
+            result_frexp = boost::decimal::from_bits(boost::decimal::detail::inf_mask);
         }
     }
     else
     {
-        result = v;
+        result_frexp = v;
 
-        const auto sign_bit = result.bits_.sign;
+        const auto b_neg = signbit(v);
 
-        result.edit_sign(false);
-
-        using std::ilogb;
+        if(b_neg) { result_frexp = -result_frexp; }
 
         // N[1000/301, 44]
         auto t =
             static_cast<int>
             (
-                  static_cast<long double>(ilogb(result))
+                  static_cast<long double>(ilogb(result_frexp))
                 * static_cast<long double>(3.3222591362126245847176079734219269102990033L)
             );
 
         constexpr T local_two {2};
 
-        result *= pow(local_two, -t);
+        result_frexp *= pow(local_two, -t);
 
-        // TBD: Handle underflow/overflow if (or when) needed.
+        // TODO(ckormanyos): Handle underflow/overflow if (or when) needed.
 
         constexpr T local_one {1};
 
-        while (result >= local_one)
+        while (result_frexp >= local_one)
         {
-          result /= local_two;
+          result_frexp /= local_two;
 
           ++t;
         }
 
         constexpr T local_half {5, -1};
 
-        while (result < local_half)
+        while (result_frexp < local_half)
         {
-          result *= local_two;
+          result_frexp *= local_two;
 
           --t;
         }
 
         if (expon != nullptr) { *expon = t; }
 
-        result.bits_.sign = sign_bit;
+        if(b_neg) { result_frexp = -result_frexp; }
     }
 
-    return result;
+    return result_frexp;
 }
 
 }} // Namespaces

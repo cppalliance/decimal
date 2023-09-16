@@ -19,14 +19,14 @@ constexpr auto ilogb(T d) noexcept -> int
 {
     const auto offset = int { detail::num_digits(d.full_significand()) - 1 };
 
-    auto e10 = int { static_cast<int>(d.full_exponent()) + static_cast<int>(offset - detail::bias) };
+    auto expval = int { static_cast<int>(d.full_exponent()) + static_cast<int>(offset - detail::bias) };
 
     if (offset == 0)
     {
-        --e10;
+        --expval;
     }
 
-    return e10;
+    return expval;
 }
 
 }} // Namespaces

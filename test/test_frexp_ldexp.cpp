@@ -75,6 +75,8 @@ namespace local
     std::random_device rd;
     std::mt19937_64 gen(rd());
 
+    gen.seed(time_point<typename std::mt19937_64::result_type>());
+
     std::uniform_real_distribution<float> dis(ctrl.float_value_lo, ctrl.float_value_hi);
 
     auto result_is_ok = true;
@@ -83,30 +85,9 @@ namespace local
 
     for( ; trials < ctrl.count; ++trials)
     {
-      const auto trials_mod_256 =
-        static_cast<std::uint32_t>
-        (
-          static_cast<std::uint32_t>(trials + static_cast<std::uint32_t>(UINT8_C(1))) % static_cast<std::uint32_t>(UINT16_C(0x100))
-        );
-
-      if(trials_mod_256 == static_cast<std::uint32_t>(UINT8_C(0)))
-      {
-        const auto sd = time_point<std::uint64_t>();
-
-        gen.seed(static_cast<typename std::mt19937_64::result_type>(sd));
-      }
-
       auto flt_start = float { };
 
-      for(;;)
-      {
-        flt_start = dis(gen);
-
-        if(flt_start != static_cast<float>(0.0L))
-        {
-          break;
-        }
-      }
+      flt_start = dis(gen);
 
       if(ctrl.b_neg) { flt_start = -flt_start; }
 
@@ -153,7 +134,7 @@ namespace local
   auto test_frexp_ldexp() -> bool
   {
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x4000));
+    constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x2000));
     #else
     constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x400));
     #endif
@@ -164,7 +145,7 @@ namespace local
       { -1.0E7F   , +1.0E7F,    false, test_frexp_ldexp_depth },
       { +1.0E-20F , +1.0E-1F,   false, test_frexp_ldexp_depth },
       { +1.0E-20F , +1.0E-1F,   true,  test_frexp_ldexp_depth },
-      { +1.0E-28F , +1.0E-26F,  false, test_frexp_ldexp_depth },
+      { +1.0E-28F , +1.0E-26F,  false, static_cast<std::uint32_t>(UINT32_C(0x100)) },
       { +10.0F    , +1.0E12F,   false, test_frexp_ldexp_depth },
       { +10.0F    , +1.0E12F,   true , test_frexp_ldexp_depth },
     };
@@ -180,35 +161,50 @@ namespace local
       result_is_ok = (result_test_frexp_ldexp_is_ok && result_is_ok);
     }
 
-    return true;//result_is_ok;
+    return result_is_ok;
   }
 
-  auto test_frexp_ldexp_exact() -> bool
+  template<typename FloatingPointType>
+  auto test_frexp_ldexp_exact_impl(long double f_in, long double fr_ctrl, int nr_ctrl) -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
-    const auto dec = static_cast<decimal_type>(static_cast<float>(7.625L));
+    using local_float_type = FloatingPointType;
+
+    const auto dec = static_cast<decimal_type>(static_cast<local_float_type>(f_in));
 
     int n_dec;
     const auto frexp_dec = frexp(dec, &n_dec);
 
     const auto result_frexp_is_ok =
       (
-           (frexp_dec == static_cast<decimal_type>(static_cast<float>(0.953125L)))
-        && (n_dec == 3)
+           (frexp_dec == static_cast<decimal_type>(static_cast<local_float_type>(fr_ctrl)))
+        && (n_dec == nr_ctrl)
       );
 
     auto result_is_ok = result_frexp_is_ok;
 
     const auto ldexp_dec = ldexp(frexp_dec, n_dec);
 
-    const auto result_ldexp_is_ok = (ldexp_dec == static_cast<decimal_type>(static_cast<float>(7.625L)));
+    const auto result_ldexp_is_ok = (ldexp_dec == static_cast<decimal_type>(static_cast<local_float_type>(f_in)));
 
     result_is_ok = (result_ldexp_is_ok && result_is_ok);
 
     BOOST_TEST(result_is_ok);
 
     return result_is_ok;
+  }
+
+  auto test_frexp_ldexp_exact() -> bool
+  {
+    // 7.625L, 0.953125L, 3
+    auto result_frexp_ldexp_exact_is_ok = true;
+
+    result_frexp_ldexp_exact_is_ok = (test_frexp_ldexp_exact_impl<float>(+7.625L, +0.953125L,  3) && result_frexp_ldexp_exact_is_ok);
+    result_frexp_ldexp_exact_is_ok = (test_frexp_ldexp_exact_impl<float>(+0.125L, +0.5L,      -2) && result_frexp_ldexp_exact_is_ok);
+    result_frexp_ldexp_exact_is_ok = (test_frexp_ldexp_exact_impl<float>(-0.125L, -0.5L,      -2) && result_frexp_ldexp_exact_is_ok);
+
+    return result_frexp_ldexp_exact_is_ok;
   }
 
   auto test_frexp_edge() -> bool

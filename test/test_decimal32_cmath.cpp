@@ -5,7 +5,6 @@
 // Propogates up from boost.math
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
-#include "mini_to_chars.hpp"
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <boost/math/special_functions/next.hpp>
@@ -188,26 +187,27 @@ void test_trunc()
 template <typename Dec>
 void test_frexp10()
 {
-    int exp {};
-    BOOST_TEST_EQ(frexp10(Dec(0,0), &exp), 0);
-    BOOST_TEST_EQ(exp, 0);
+    auto expval = int {};
 
-    exp = -1;
-    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_NAN, &exp), -1);
-    BOOST_TEST_EQ(exp, 0);
+    BOOST_TEST_EQ(frexp10(Dec(0,0), &expval), 0);
+    BOOST_TEST_EQ(expval, 0);
 
-    exp = -1;
-    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_INFINITY, &exp), -1);
-    BOOST_TEST_EQ(exp, 0);
+    expval = -1;
+    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_NAN, &expval), -1);
+    BOOST_TEST_EQ(expval, 0);
 
-    BOOST_TEST_EQ(frexp10(Dec(10, 0), &exp), 1'000'000);
-    BOOST_TEST_EQ(exp, -5);
+    expval = -1;
+    BOOST_TEST_EQ(frexp10(BOOST_DECIMAL_DEC_INFINITY, &expval), -1);
+    BOOST_TEST_EQ(expval, 0);
 
-    BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &exp), 1'000'000);
-    BOOST_TEST_EQ(exp, 5);
+    BOOST_TEST_EQ(frexp10(Dec(10, 0), &expval), 1'000'000);
+    BOOST_TEST_EQ(expval, -5);
 
-    BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &exp), -1'000'000);
-    BOOST_TEST_EQ(exp, 5);
+    BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &expval), 1'000'000);
+    BOOST_TEST_EQ(expval, 5);
+
+    BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), -1'000'000);
+    BOOST_TEST_EQ(expval, 5);
 }
 
 template <typename Dec>
