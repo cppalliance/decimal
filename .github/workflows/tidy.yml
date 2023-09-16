@@ -63,6 +63,7 @@ jobs:
           cat tmp/quick.tidy_txt
       - name: quality-gate-clang-tidy
         run: |
+          cd test/tidy
           echo
           echo quality-gate-clang-tidy not yet implemented
           ls -la tmp/all.tidy_txt
