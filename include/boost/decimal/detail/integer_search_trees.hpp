@@ -8,17 +8,18 @@
 // https://stackoverflow.com/questions/1489830/efficient-way-to-determine-number-of-digits-in-an-integer?page=1&tab=scoredesc#tab-top
 // https://graphics.stanford.edu/~seander/bithacks.html
 
-#include <boost/decimal/detail/config.hpp>
-#include <boost/decimal/detail/power_tables.hpp>
-#include <limits>
 #include <array>
 #include <cstdint>
+#include <limits>
+
+#include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/power_tables.hpp>
 
 namespace boost { namespace decimal { namespace detail {
 
 // Generic solution
 template <typename T>
-constexpr int num_digits(T x) noexcept
+constexpr auto num_digits(T x) noexcept -> int
 {
     int digits = 0;
 
@@ -32,7 +33,7 @@ constexpr int num_digits(T x) noexcept
 }
 
 template <>
-constexpr int num_digits(std::uint32_t x) noexcept
+constexpr auto num_digits(std::uint32_t x) noexcept -> int
 {
     if (x >= UINT32_C(10000))
     {
@@ -76,7 +77,7 @@ constexpr int num_digits(std::uint32_t x) noexcept
 }
 
 template <>
-constexpr int num_digits(std::uint64_t x) noexcept
+constexpr auto num_digits(std::uint64_t x) noexcept -> int
 {
     if (x >= UINT64_C(10000000000))
     {
@@ -160,7 +161,7 @@ constexpr int num_digits(std::uint64_t x) noexcept
 #ifdef BOOST_DECIMAL_HAS_INT128
 // Assume that if someone is using 128 bit ints they are favoring the top end of the range
 // Max value is 340,282,366,920,938,463,463,374,607,431,768,211,455 (39 digits)
-constexpr int num_digits(boost::decimal::detail::uint128_t x) noexcept
+constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
 {
     // There is no literal for boost::decimal::detail::uint128_t, so we need to calculate them using the max value of the
     // std::uint64_t powers of 10

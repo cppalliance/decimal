@@ -40,7 +40,7 @@ static constexpr unsigned char uchar_values[] =
 static_assert(sizeof(uchar_values) == 256, "uchar_values should represent all 256 values of unsigned char");
 
 // Convert characters for 0-9, A-Z, a-z to 0-35. Anything else is 255
-constexpr unsigned char digit_from_char(char val) noexcept
+constexpr auto digit_from_char(char val) noexcept -> unsigned char
 {
     return uchar_values[static_cast<unsigned char>(val)];
 }
@@ -65,7 +65,7 @@ constexpr unsigned char digit_from_char(char val) noexcept
 #endif
 
 template <typename Integer, typename Unsigned_Integer>
-constexpr from_chars_result from_chars_integer_impl(const char* first, const char* last, Integer& value, int base) noexcept
+constexpr auto from_chars_integer_impl(const char* first, const char* last, Integer& value, int base) noexcept -> from_chars_result
 {
     Unsigned_Integer result = 0;
     Unsigned_Integer overflow_value = 0;
@@ -242,7 +242,7 @@ constexpr from_chars_result from_chars_integer_impl(const char* first, const cha
 
 // Only from_chars for integer types is constexpr (as of C++23)
 template <typename Integer>
-constexpr from_chars_result from_chars(const char* first, const char* last, Integer& value, int base = 10) noexcept
+constexpr auto from_chars(const char* first, const char* last, Integer& value, int base = 10) noexcept -> from_chars_result
 {
     using Unsigned_Integer = typename std::make_unsigned_t<Integer>;
     return detail::from_chars_integer_impl<Integer, Unsigned_Integer>(first, last, value, base);
@@ -257,7 +257,7 @@ constexpr from_chars_result from_chars128(const char* first, const char* last, I
 }
 #endif
 
-constexpr from_chars_result from_chars128(const char* first, const char* last, uint128& value, int base = 10) noexcept
+constexpr auto from_chars128(const char* first, const char* last, uint128& value, int base = 10) noexcept -> from_chars_result
 {
     return from_chars_integer_impl<uint128, uint128>(first, last, value, base);
 }
