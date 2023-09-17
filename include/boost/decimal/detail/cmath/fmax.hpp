@@ -30,6 +30,7 @@ constexpr auto fmax(T lhs, T rhs) noexcept -> T
     return lhs > rhs ? lhs : rhs;
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_FMAX_HPP

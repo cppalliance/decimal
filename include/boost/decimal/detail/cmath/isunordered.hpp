@@ -18,6 +18,7 @@ constexpr auto isunordered(T lhs, T rhs) noexcept -> bool
     return isnan(lhs) || isnan(rhs);
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_ISUNORDERED_HPP

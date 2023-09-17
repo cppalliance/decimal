@@ -60,6 +60,7 @@ constexpr auto pow(T b, int p) noexcept -> T
     return result;
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_POW_HPP

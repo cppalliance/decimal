@@ -45,6 +45,8 @@ constexpr auto sin_impl(T x) noexcept -> T
     return u;
 }
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif

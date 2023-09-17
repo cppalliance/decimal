@@ -34,6 +34,7 @@ constexpr auto isgreaterequal(T lhs, T rhs) noexcept -> bool
     return lhs >= rhs;
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_ISGREATER_HPP

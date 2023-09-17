@@ -20,6 +20,7 @@ constexpr auto fabs(T a) noexcept -> T
     return abs(a);
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_FABS_HPP

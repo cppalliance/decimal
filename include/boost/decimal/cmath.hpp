@@ -7,8 +7,9 @@
 
 // TODO(mborland): Allow conversion between decimal types via a promotion system
 #include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/numbers.hpp>
+#include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/fabs.hpp>
+#include <boost/decimal/detail/cmath/fdim.hpp>
 #include <boost/decimal/detail/cmath/fmax.hpp>
 #include <boost/decimal/detail/cmath/fmin.hpp>
 #include <boost/decimal/detail/cmath/frexp.hpp>
@@ -19,12 +20,10 @@
 #include <boost/decimal/detail/cmath/ldexp.hpp>
 #include <boost/decimal/detail/cmath/pow.hpp>
 #include <boost/decimal/detail/cmath/remainder.hpp>
-#include <boost/decimal/detail/cmath/trunc.hpp>
-#include <boost/decimal/detail/cmath/sin.hpp>
-#include <boost/decimal/detail/cmath/cos.hpp>
-#include <boost/decimal/detail/cmath/remainder.hpp>
 #include <boost/decimal/detail/cmath/remquo.hpp>
-#include <boost/decimal/detail/cmath/fdim.hpp>
+#include <boost/decimal/detail/cmath/sin.hpp>
+#include <boost/decimal/detail/cmath/trunc.hpp>
+#include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
 

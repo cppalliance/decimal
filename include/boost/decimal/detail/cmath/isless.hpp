@@ -45,6 +45,7 @@ constexpr auto islessgreater(T lhs, T rhs) noexcept -> bool
     return lhs < rhs || lhs > rhs;
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_ISLESS_HPP

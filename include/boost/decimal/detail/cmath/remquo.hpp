@@ -64,6 +64,7 @@ constexpr auto remquo(T x, T y, int* quo) noexcept -> T
     return x - n*y;
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_REMQUO_HPP

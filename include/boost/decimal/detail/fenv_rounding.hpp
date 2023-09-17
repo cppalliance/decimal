@@ -43,7 +43,7 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 #else
 
 template <typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
-constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int
+constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT(readability-function-cognitive-complexity)
 {
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
     {

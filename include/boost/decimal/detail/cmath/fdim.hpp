@@ -35,6 +35,7 @@ constexpr auto fdim(T x, T y) noexcept -> T
     return x - y;
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_FDIM_HPP

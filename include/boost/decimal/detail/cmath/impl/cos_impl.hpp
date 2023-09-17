@@ -44,6 +44,9 @@ constexpr auto cos_impl(T x) noexcept -> T
 
     return u;
 }
-}}} // Namespaces
+
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_IMPL_COS_IMPL_HPP

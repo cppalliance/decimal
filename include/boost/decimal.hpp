@@ -5,11 +5,11 @@
 #ifndef BOOST_DECIMAL_HPP
 #define BOOST_DECIMAL_HPP
 
-#include <boost/decimal/fwd.hpp>
+#include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
+#include <boost/decimal/cmath.hpp>
 #include <boost/decimal/common_math.hpp>
 #include <boost/decimal/cstdlib.hpp>
 #include <boost/decimal/fenv.hpp>
 #include <boost/decimal/literals.hpp>
-#include <boost/decimal/cmath.hpp>
 
-#endif //BOOST_DECIMAL_HPP
+#endif // BOOST_DECIMAL_HPP

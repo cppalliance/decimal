@@ -24,4 +24,4 @@ constexpr decimal32 wcstod(const wchar_t* str, wchar_t** endptr) noexcept
 } // namespace decimal
 } // namespace boost
 
-#endif //BOOST_DECIMAL_CSTDLIB_HPP
+#endif // BOOST_DECIMAL_CSTDLIB_HPP

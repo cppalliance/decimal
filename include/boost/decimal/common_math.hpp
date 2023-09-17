@@ -5,9 +5,9 @@
 #ifndef BOOST_DECIMAL_COMMON_MATH_HPP
 #define BOOST_DECIMAL_COMMON_MATH_HPP
 
-#include <boost/decimal/detail/type_traits.hpp>
-#include <boost/decimal/decimal32.hpp>
 #include <type_traits>
+
+#include <boost/decimal/decimal32.hpp>
 
 namespace boost { namespace decimal {
 
