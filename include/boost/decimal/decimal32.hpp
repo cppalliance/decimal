@@ -430,7 +430,11 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T>::is_signed)
     {
         bits_.sign = coeff < 0 || sign;
-        unsigned_coeff = coeff < 0 ? detail::apply_sign(coeff) : coeff;
+        unsigned_coeff =
+            static_cast<Unsigned_Integer>
+            (
+                coeff < static_cast<T>(0) ? static_cast<Unsigned_Integer>(detail::apply_sign(coeff)) : static_cast<Unsigned_Integer>(coeff)
+            );
     }
     else
     {
@@ -1071,11 +1075,11 @@ constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (lhs_sig == 0 && rhs_sig != 0)
     {
-        return rhs_sign ? false : true;
+        return (!rhs_sign);
     }
     else if (lhs_sig != 0 && rhs_sig == 0)
     {
-        return lhs_sign ? true : false;
+        return lhs_sign;
     }
     else if (lhs_sig == 0 && rhs_sig == 0)
     {
@@ -1093,12 +1097,12 @@ constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         }
         else
         {
-            return lhs_sig > rhs_sig;
+            return (lhs_sig > rhs_sig);
         }
     }
     else
     {
-        if (lhs_exp < rhs_exp && lhs_sig)
+        if ((lhs_exp < rhs_exp) && (lhs_sig != static_cast<T>(0)))
         {
             return true;
         }
@@ -1108,7 +1112,7 @@ constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         }
         else
         {
-            return lhs_sig < rhs_sig;
+            return (lhs_sig < rhs_sig);
         }
     }
 }
@@ -1415,9 +1419,10 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
 {
     TargetType result {};
 
-    const bool this_is_neg {static_cast<bool>(this->bits_.sign)};
-    const decimal32 unsigned_this {this_is_neg ? -*this : *this};
-    constexpr decimal32 max_target_type {std::numeric_limits<TargetType>::max()};
+    const auto this_is_neg   = static_cast<bool>(this->bits_.sign);
+    const auto unsigned_this = decimal32 {this_is_neg ? -*this : *this};
+
+    constexpr auto max_target_type = decimal32 { (std::numeric_limits<TargetType>::max)() };
 
     if (isnan(*this))
     {

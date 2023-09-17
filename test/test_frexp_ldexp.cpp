@@ -54,9 +54,20 @@ namespace local
   {
     using std::fabs;
 
-    const auto delta = fabs(1 - fabs(a / b));
+    auto result_is_ok = bool { };
 
-    return (delta < tol);
+    if(b == static_cast<NumericType>(0))
+    {
+      result_is_ok = (fabs(a - b) < tol);
+    }
+    else
+    {
+      const auto delta = fabs(1 - fabs(a / b));
+
+      result_is_ok = (delta < tol);
+    }
+
+    return result_is_ok;
   }
 
   typedef struct test_frexp_ldexp_ctrl
@@ -68,7 +79,7 @@ namespace local
   }
   test_frexp_ldexp_ctrl;
 
-  auto test_frexp_ldexp_impl(const test_frexp_ldexp_ctrl& ctrl) -> bool
+  auto test_frexp_ldexp_impl(const test_frexp_ldexp_ctrl& ctrl, const int eps_tol_factor = 16) -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
@@ -87,7 +98,11 @@ namespace local
     {
       auto flt_start = float { };
 
-      flt_start = dis(gen);
+      do
+      {
+        flt_start = dis(gen);
+      }
+      while (flt_start == static_cast<float>(0.0L));
 
       if(ctrl.b_neg) { flt_start = -flt_start; }
 
@@ -113,13 +128,15 @@ namespace local
         static_cast<float>
         (
             static_cast<float>(std::numeric_limits<decimal_type>::epsilon())
-          * static_cast<float>(24)
+          * static_cast<float>(eps_tol_factor)
         );
 
       const auto result_frexp_ldexp_is_ok = is_close_fraction(ldexp_flt, ldexp_dec_as_float, tol_n);
 
       if(!result_frexp_ldexp_is_ok)
       {
+        std::cout << "Error: frexp/ldexp, for flt: " << flt << std::endl;
+
         break;
       }
 
