@@ -258,9 +258,9 @@ public:
     constexpr decimal32(T coeff, T2 exp, bool sign = false) noexcept;
 
     constexpr decimal32(const decimal32& val) noexcept = default;
-    constexpr decimal32& operator=(const decimal32& val) noexcept = default;
     constexpr decimal32(decimal32&& val) noexcept = default;
-    constexpr decimal32& operator=(decimal32&& val) noexcept = default;
+    constexpr auto operator=(const decimal32& val) noexcept -> decimal32& = default;
+    constexpr auto operator=(decimal32&& val) noexcept -> decimal32& = default;
 
     // 3.2.6 Conversion to floating-point type
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
@@ -321,7 +321,7 @@ public:
     friend constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Less
-    friend constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
     template <typename Integer>
     friend constexpr auto operator<(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
@@ -1203,7 +1203,7 @@ constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
     return !less_impl(rhs, lhs) && lhs != rhs;
 }
 
-constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator<=(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     return !(rhs < lhs);
 }
