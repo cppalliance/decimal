@@ -44,6 +44,9 @@ BOOST_DECIMAL_CXX20_CONSTEXPR float compute_float32(std::int64_t power, std::uin
     return return_val;
 }
 
-}}}} // Namespaces
+} // namespace fast_float
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_FAST_FLOAT_COMPUTE_FLOAT32_HPP

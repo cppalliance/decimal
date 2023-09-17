@@ -80,7 +80,9 @@ typedef __int128 int128_t;
 typedef unsigned __int128 uint128_t;
 #  endif
 
-}}} // Namespaces
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #  define BOOST_DECIMAL_HAS_INT128
 #  define BOOST_DECIMAL_INT128_MAX  (boost::decimal::detail::int128_t)(((boost::decimal::detail::uint128_t) 1 << 127) - 1)

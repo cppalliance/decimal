@@ -28,6 +28,7 @@ constexpr auto fmin(T lhs, T rhs) noexcept -> T
     return lhs < rhs ? lhs : rhs;
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif //BOOST_FMIN_HPP

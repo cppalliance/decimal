@@ -18,6 +18,7 @@ constexpr auto trunc(T val) noexcept -> T
     return (val > 0) ? floor(val) : ceil(val);
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_TRUNC_HPP

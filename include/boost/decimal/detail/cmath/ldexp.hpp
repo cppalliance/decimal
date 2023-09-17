@@ -71,6 +71,7 @@ constexpr auto ldexp(T v, int e2) noexcept -> T
     return ldexp_result;
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_LDEXP_HPP

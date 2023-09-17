@@ -56,6 +56,7 @@ constexpr auto cos(T x) noexcept -> T
     }
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_COS_HPP

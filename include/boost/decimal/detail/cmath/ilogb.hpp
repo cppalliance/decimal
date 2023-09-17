@@ -29,6 +29,7 @@ constexpr auto ilogb(T d) noexcept -> int
     return expval;
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_ILOGB_HPP

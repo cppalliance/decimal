@@ -206,6 +206,9 @@ BOOST_DECIMAL_CXX20_CONSTEXPR double compute_float64(std::int64_t power, std::ui
     return d;
 }
 
-}}}} // Namespaces
+} // namespace fast_float
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_FAST_FLOAT_COMPUTE_FLOAT64_HPP

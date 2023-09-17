@@ -51,6 +51,7 @@ constexpr auto sin(T x) noexcept -> T
     }
 }
 
-}} // Namespaces
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_SIN_HPP
