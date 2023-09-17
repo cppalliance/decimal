@@ -12,7 +12,7 @@
 
 namespace boost { namespace decimal { namespace detail { namespace fast_float {
 
-BOOST_DECIMAL_CXX20_CONSTEXPR float compute_float32(std::int64_t power, std::uint64_t i, bool negative, bool& success) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR auto compute_float32(std::int64_t power, std::uint64_t i, bool negative, bool& success) noexcept -> float
 {
     const double d = compute_float64(power, i, negative, success);
     float return_val {};

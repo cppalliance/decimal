@@ -32,7 +32,7 @@ static constexpr double double_powers_of_ten[] = {
 // This function will only work in some cases, when it does not work, success is
 // set to false. This should work *most of the time* (like 99% of the time).
 // We assume that power is in the [-325, 308] interval.
-BOOST_DECIMAL_CXX20_CONSTEXPR double compute_float64(std::int64_t power, std::uint64_t i, bool negative, bool& success) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR auto compute_float64(std::int64_t power, std::uint64_t i, bool negative, bool& success) noexcept -> double
 {
     constexpr auto smallest_power = -325;
     constexpr auto largest_power = 308;

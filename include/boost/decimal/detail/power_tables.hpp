@@ -20,7 +20,7 @@ static constexpr std::array<std::uint64_t, 20> powers_of_10 =
  }};
 
 template <typename T>
-constexpr T pow10(int n) noexcept
+constexpr auto pow10(int n) noexcept -> T
 {
     assert(n >= 0);
     return static_cast<T>(powers_of_10[n]);

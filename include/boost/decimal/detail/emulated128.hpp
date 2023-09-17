@@ -179,7 +179,7 @@ struct uint128
     constexpr friend auto operator==(uint128 lhs, boost::uint128_type rhs) noexcept -> bool { return lhs == uint128(rhs); }
     #endif
 
-    constexpr friend bool operator==(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator==(uint128 lhs, uint128 rhs) noexcept -> bool;
 
     #undef INTEGER_OPERATOR_EQUAL
     #undef UNSIGNED_INTEGER_OPERATOR_EQUAL
@@ -229,7 +229,7 @@ struct uint128
     constexpr friend auto operator<(uint128 lhs, boost::uint128_type rhs) noexcept -> bool { return lhs < uint128(rhs); }
     #endif
 
-    constexpr friend bool operator<(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator<(uint128 lhs, uint128 rhs) noexcept -> bool;
 
     #undef INTEGER_OPERATOR_LESS_THAN
     #undef UNSIGNED_INTEGER_OPERATOR_LESS_THAN
@@ -359,8 +359,8 @@ struct uint128
     INTEGER_BINARY_OPERATOR_AND(unsigned long long)     // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend uint128 operator&(uint128 lhs, boost::int128_type  rhs) noexcept { return lhs & uint128(rhs); }
-    constexpr friend uint128 operator&(uint128 lhs, boost::uint128_type rhs) noexcept { return lhs & uint128(rhs); }
+    constexpr friend auto operator&(uint128 lhs, boost::int128_type  rhs) noexcept -> uint128 { return lhs & uint128(rhs); }
+    constexpr friend auto operator&(uint128 lhs, boost::uint128_type rhs) noexcept -> uint128 { return lhs & uint128(rhs); }
     #endif
 
     constexpr friend auto operator&(uint128 lhs, uint128 rhs) noexcept-> uint128;
@@ -530,40 +530,39 @@ struct uint128
     friend auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&;
 
 private:
-    constexpr friend int high_bit(uint128 v) noexcept;
+    constexpr friend auto high_bit(uint128 v) noexcept -> int;
 
-    constexpr friend void
-    div_impl(uint128 lhs, uint128 rhs, uint128 &quotient, uint128 &remainder) noexcept;
+    constexpr friend auto div_impl(uint128 lhs, uint128 rhs, uint128 &quotient, uint128 &remainder) noexcept -> void;
 };
 
-constexpr uint128 operator-(uint128 val) noexcept
+constexpr auto operator-(uint128 val) noexcept -> uint128
 {
     return {~val.high + static_cast<std::uint64_t>(val.low == 0), ~val.low + 1};
 }
 
-constexpr uint128 operator+(uint128 val) noexcept
+constexpr auto operator+(uint128 val) noexcept -> uint128
 {
     return val;
 }
 
-constexpr uint128 &uint128::operator=(const uint128& v) noexcept // NOLINT : User defined for older compilers
+constexpr auto uint128::operator=(const uint128& v) noexcept -> uint128&
 {
     low = v.low;
     high = v.high;
     return *this;
 }
 
-constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator==(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return lhs.high == rhs.high && lhs.low == rhs.low;
 }
 
-constexpr bool operator!=(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator!=(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return !(lhs == rhs);
 }
 
-constexpr bool operator<(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator<(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     if (lhs.high == rhs.high)
     {
@@ -573,43 +572,43 @@ constexpr bool operator<(uint128 lhs, uint128 rhs) noexcept
     return lhs.high < rhs.high;
 }
 
-constexpr bool operator<=(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator<=(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return !(rhs < lhs);
 }
 
-constexpr bool operator>(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator>(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return rhs < lhs;
 }
 
-constexpr bool operator>=(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator>=(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return !(lhs < rhs);
 }
 
-constexpr uint128 operator~(uint128 v) noexcept
+constexpr auto operator~(uint128 v) noexcept -> uint128
 {
     return {~v.high, ~v.low};
 }
 
-constexpr uint128 operator|(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator|(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     return {lhs.high | rhs.high, lhs.low | rhs.low};
 }
 
-constexpr uint128 &uint128::operator|=(uint128 v) noexcept
+constexpr auto uint128::operator|=(uint128 v) noexcept -> uint128&
 {
     *this = *this | v;
     return *this;
 }
 
-constexpr uint128 operator&(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator&(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     return {lhs.high & rhs.high, lhs.low & rhs.low};
 }
 
-constexpr uint128 &uint128::operator&=(uint128 v) noexcept
+constexpr auto uint128::operator&=(uint128 v) noexcept -> uint128&
 {
     *this = *this & v;
     return *this;
@@ -823,7 +822,7 @@ constexpr auto uint128::operator%=(uint128 v) noexcept -> uint128&
     return *this;
 }
 
-constexpr std::uint64_t umul64(std::uint32_t x, std::uint32_t y) noexcept
+constexpr auto umul64(std::uint32_t x, std::uint32_t y) noexcept -> std::uint64_t
 {
     return x * static_cast<std::uint64_t>(y);
 }
@@ -832,12 +831,12 @@ constexpr std::uint64_t umul64(std::uint32_t x, std::uint32_t y) noexcept
 constexpr auto umul128(std::uint64_t x, std::uint64_t y) noexcept -> uint128
 {
     #if defined(BOOST_DECIMAL_HAS_INT128)
-    
+
     auto result = static_cast<boost::uint128_type>(x) * static_cast<boost::uint128_type>(y);
     return {static_cast<std::uint64_t>(result >> 64), static_cast<std::uint64_t>(result)};
 
     #else
-    
+
     auto a = static_cast<std::uint32_t>(x >> 32);
     auto b = static_cast<std::uint32_t>(x);
     auto c = static_cast<std::uint32_t>(y >> 32);
