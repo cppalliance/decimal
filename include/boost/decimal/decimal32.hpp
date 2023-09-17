@@ -5,42 +5,43 @@
 #ifndef BOOST_DECIMAL_DECIMAL32_HPP
 #define BOOST_DECIMAL_DECIMAL32_HPP
 
-#include <boost/decimal/fwd.hpp>
-#include <boost/decimal/detail/config.hpp>
-#include <boost/decimal/detail/integer_search_trees.hpp>
-#include <boost/decimal/detail/apply_sign.hpp>
-#include <boost/decimal/detail/power_tables.hpp>
-#include <boost/decimal/detail/utilities.hpp>
-#include <boost/decimal/detail/bit_cast.hpp>
-#include <boost/decimal/detail/type_traits.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
-#include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
-#include <boost/decimal/detail/fast_float/compute_float32.hpp>
-#include <boost/decimal/detail/fast_float/compute_float64.hpp>
-#include <boost/decimal/detail/parser.hpp>
-#include <boost/decimal/detail/fenv_rounding.hpp>
-#include <type_traits>
-#include <iostream>
-#include <limits>
-#include <cstdint>
-#include <cmath>
 #include <cassert>
 #include <cerrno>
-#include <cstring>
 #include <climits>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
 #include <cwchar>
+#include <iostream>
+#include <limits>
+#include <type_traits>
+
+#include <boost/decimal/fwd.hpp>
+#include <boost/decimal/detail/apply_sign.hpp>
+#include <boost/decimal/detail/bit_cast.hpp>
+#include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/decimal/detail/fast_float/compute_float32.hpp>
+#include <boost/decimal/detail/fast_float/compute_float64.hpp>
+#include <boost/decimal/detail/fenv_rounding.hpp>
+#include <boost/decimal/detail/integer_search_trees.hpp>
+#include <boost/decimal/detail/parser.hpp>
+#include <boost/decimal/detail/power_tables.hpp>
+#include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/utilities.hpp>
 
 namespace boost { namespace decimal {
 
 namespace detail {
 
 // See section 3.5.2
-static constexpr std::uint32_t inf_mask =   0b0'11110'000000'0000000000'0000000000;
-static constexpr std::uint32_t nan_mask =   0b0'11111'000000'0000000000'0000000000;
-static constexpr std::uint32_t snan_mask =  0b0'11111'100000'0000000000'0000000000;
-static constexpr std::uint32_t comb_inf_mask = 0b11110;
-static constexpr std::uint32_t comb_nan_mask = 0b11111;
-static constexpr std::uint32_t exp_snan_mask = 0b100000;
+static constexpr auto inf_mask      = static_cast<std::uint32_t>(UINT32_C(0b0'11110'000000'0000000000'0000000000));
+static constexpr auto nan_mask      = static_cast<std::uint32_t>(UINT32_C(0b0'11111'000000'0000000000'0000000000));
+static constexpr auto snan_mask     = static_cast<std::uint32_t>(UINT32_C(0b0'11111'100000'0000000000'0000000000));
+static constexpr auto comb_inf_mask = static_cast<std::uint32_t>(UINT32_C(0b11110));
+static constexpr auto comb_nan_mask = static_cast<std::uint32_t>(UINT32_C(0b11111));
+static constexpr auto exp_snan_mask = static_cast<std::uint32_t>(UINT32_C(0b100000));
 
 // Values from IEEE 754-2019 table 3.6
 BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto storage_width = 32;
@@ -112,7 +113,7 @@ struct decimal32_components
 
 // Converts the significand to 7 digits to remove the effects of cohorts.
 template <typename T, typename T2>
-constexpr void normalize(T& significand, T2& exp) noexcept
+constexpr auto normalize(T& significand, T2& exp) noexcept -> void
 {
     auto digits = detail::num_digits(significand);
 
@@ -143,7 +144,7 @@ constexpr auto ilogb(T d) noexcept -> int;
 
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
-class decimal32 final
+class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
 {
 private:
 
@@ -172,33 +173,33 @@ private:
     data_layout_ bits_{};
 
     // Returns the un-biased (quantum) exponent
-    constexpr std::uint32_t full_exponent() const noexcept;
+    constexpr auto full_exponent() const noexcept -> std::uint32_t;
 
     // Returns the biased exponent
-    constexpr std::int32_t biased_exponent() const noexcept;
+    constexpr auto biased_exponent() const noexcept -> std::int32_t;
 
     // Returns the significand complete with the bits implied from the combination field
-    constexpr std::uint32_t full_significand() const noexcept;
-    constexpr bool isneg() const noexcept;
+    constexpr auto full_significand() const noexcept -> std::uint32_t;
+    constexpr auto isneg() const noexcept -> bool;
 
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
     template <typename TargetType>
-    constexpr TargetType to_integral() const noexcept;
+    constexpr auto to_integral() const noexcept -> TargetType;
 
-    friend constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept;
+    friend constexpr auto div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
 
     template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
     friend constexpr auto ilogb(T d) noexcept -> int;
 
     template <typename T>
-    BOOST_DECIMAL_CXX20_CONSTEXPR T floating_conversion_impl() const noexcept;
+    BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_conversion_impl() const noexcept -> T;
 
     // Debug bit pattern
-    friend constexpr decimal32 from_bits(std::uint32_t bits) noexcept;
-    friend std::uint32_t to_bits(decimal32 rhs) noexcept;
-    friend void debug_pattern(decimal32 rhs) noexcept;
+    friend constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32;
+    friend auto to_bits(decimal32 rhs) noexcept -> std::uint32_t;
+    friend auto debug_pattern(decimal32 rhs) noexcept -> void;
 
     // Equality template between any integer type and decimal32
     template <typename Integer>
@@ -267,38 +268,38 @@ public:
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
 
     // cmath functions that are easier as friends
-    friend constexpr bool signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr bool isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr bool isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr bool issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr bool isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr bool isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr int fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
-    friend constexpr decimal32 abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept;
+    friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
+    friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
+    friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
+    friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
+    friend constexpr auto isfinite    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
+    friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
+    friend constexpr auto fpclassify  BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> int;
+    friend constexpr auto abs         BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> decimal32;
 
     // 3.2.7 unary arithmetic operators:
-    friend constexpr decimal32 operator+(decimal32 rhs) noexcept;
-    friend constexpr decimal32 operator-(decimal32 rhs) noexcept;
+    friend constexpr auto operator+(decimal32 rhs) noexcept -> decimal32;
+    friend constexpr auto operator-(decimal32 rhs) noexcept -> decimal32;
 
     // 3.2.8 binary arithmetic operators:
-    friend constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept;
-    friend constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept;
-    friend constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept;
-    friend constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept;
-    friend constexpr decimal32 operator%(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+    friend constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+    friend constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+    friend constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+    friend constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     // 3.2.2.5 Increment and Decrement
-    constexpr decimal32& operator++() noexcept;
-    constexpr decimal32 operator++(int) noexcept; // NOLINT : C++14 so constexpr implies const
-    constexpr decimal32& operator--() noexcept;
-    constexpr decimal32 operator--(int) noexcept; // NOLINT : C++14 so constexpr implies const
+    constexpr auto operator++()    noexcept -> decimal32&;
+    constexpr auto operator++(int) noexcept -> decimal32;  // NOLINT : C++14 so constexpr implies const
+    constexpr auto operator--()    noexcept -> decimal32&;
+    constexpr auto operator--(int) noexcept -> decimal32;  // NOLINT : C++14 so constexpr implies const
 
     // 3.2.2.6 Compound assignment
-    constexpr decimal32& operator+=(decimal32 rhs) noexcept;
-    constexpr decimal32& operator-=(decimal32 rhs) noexcept;
-    constexpr decimal32& operator*=(decimal32 rhs) noexcept;
-    constexpr decimal32& operator/=(decimal32 rhs) noexcept;
-    constexpr decimal32& operator%=(decimal32 rhs) noexcept;
+    constexpr auto operator+=(decimal32 rhs) noexcept -> decimal32&;
+    constexpr auto operator-=(decimal32 rhs) noexcept -> decimal32&;
+    constexpr auto operator*=(decimal32 rhs) noexcept -> decimal32&;
+    constexpr auto operator/=(decimal32 rhs) noexcept -> decimal32&;
+    constexpr auto operator%=(decimal32 rhs) noexcept -> decimal32&;
 
     // 3.2.9 comparison operators:
     // Equality
@@ -329,7 +330,7 @@ public:
     friend constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Less equal
-    friend constexpr bool operator<=(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr auto operator<=(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
     template <typename Integer>
     friend constexpr auto operator<=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
@@ -338,7 +339,7 @@ public:
     friend constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Greater
-    friend constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr auto operator>(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
     template <typename Integer>
     friend constexpr auto operator>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
@@ -347,7 +348,7 @@ public:
     friend constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Greater equal
-    friend constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr auto operator>=(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
     template <typename Integer>
     friend constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
@@ -356,7 +357,7 @@ public:
     friend constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
-    friend constexpr std::strong_ordering operator<=>(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::strong_ordering;
 
     template <typename Integer>
     friend constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>;
@@ -367,27 +368,27 @@ public:
 
     // 3.2.10 Formatted input:
     template <typename charT, typename traits>
-    friend std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>& is, decimal32& d);
+    friend auto operator>>(std::basic_istream<charT, traits>& is, decimal32& d) -> std::basic_istream<charT, traits>&;
 
     // 3.2.11 Formatted output:
     template <typename charT, typename traits>
-    friend std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d);
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d) -> std::basic_ostream<charT, traits>&;
 
     // <cmath> extensions
     // 3.6.4 Same Quantum
-    friend constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr auto samequantumd32(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
     // 3.6.5 Quantum exponent
-    friend constexpr int quantexpd32(decimal32 x) noexcept;
+    friend constexpr auto quantexpd32(decimal32 x) noexcept -> int;
 
     // 3.6.6 Quantize
-    friend constexpr decimal32 quantized32(decimal32 lhs, decimal32 rhs) noexcept;
+    friend constexpr auto quantized32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     // 3.8.2 strtod
-    friend constexpr decimal32 strtod32(const char* str, char** endptr) noexcept;
+    friend constexpr auto strtod32(const char* str, char** endptr) noexcept -> decimal32;
 
     // 3.9.2 wcstod
-    friend constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept;
+    friend constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept-> decimal32;
 
     // <cmath> functions that need to be friends
     friend constexpr auto floord32(decimal32 val) noexcept -> decimal32;
@@ -418,7 +419,7 @@ private:
 };
 
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
-constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity)
+constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)
 {
     using Unsigned_Integer = detail::make_unsigned_t<T>;
 
@@ -568,7 +569,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
 }
 
-constexpr decimal32 from_bits(std::uint32_t bits) noexcept
+constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32
 {
     decimal32 result;
 
@@ -580,32 +581,32 @@ constexpr decimal32 from_bits(std::uint32_t bits) noexcept
     return result;
 }
 
-constexpr bool signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
     return rhs.bits_.sign;
 }
 
-constexpr bool isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
     return (rhs.bits_.combination_field & detail::comb_nan_mask) == detail::comb_nan_mask;
 }
 
-constexpr bool issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
     return isnan(rhs) && (rhs.bits_.exponent & detail::exp_snan_mask) == detail::exp_snan_mask;
 }
 
-constexpr bool isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
     return ((rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask) && !isnan(rhs);
 }
 
-constexpr bool isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
     return !isinf(rhs) && !isnan(rhs);
 }
 
-constexpr bool isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
     // Check for de-normals
     const auto sig {rhs.full_significand()};
@@ -619,7 +620,7 @@ constexpr bool isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs)
     return sig != 0 && isfinite(rhs);
 }
 
-constexpr int fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> int
 {
     if (isinf(rhs))
     {
@@ -643,29 +644,24 @@ constexpr int fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs
     }
 }
 
-constexpr decimal32 abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept
+constexpr auto abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> decimal32
 {
-    if (rhs.isneg())
-    {
-        return -rhs;
-    }
-
-    return rhs;
+    return (rhs.isneg()) ? -rhs : rhs;
 }
 
-constexpr decimal32 operator+(decimal32 rhs) noexcept
+constexpr auto operator+(decimal32 rhs) noexcept -> decimal32
 {
     return rhs;
 }
 
-constexpr decimal32 operator-(decimal32 rhs) noexcept
+constexpr auto operator-(decimal32 rhs) noexcept-> decimal32
 {
     rhs.bits_.sign ^= 1;
     return rhs;
 }
 
 // Prioritizes checking for nans and then checks for infs
-constexpr decimal32 check_non_finite(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto check_non_finite(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     constexpr decimal32 zero {0, 0};
 
@@ -780,7 +776,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 // We use kahan summation here where applicable
 // https://en.wikipedia.org/wiki/Kahan_summation_algorithm
 // NOLINTNEXTLINE : If addition is actually subtraction than change operator and vice versa
-constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     constexpr decimal32 zero {0, 0};
 
@@ -820,19 +816,19 @@ constexpr decimal32 operator+(decimal32 lhs, decimal32 rhs) noexcept
     return {result.sig, result.exp, result.sign};
 }
 
-constexpr decimal32& decimal32::operator++() noexcept
+constexpr auto decimal32::operator++() noexcept -> decimal32&
 {
     constexpr decimal32 one(1, 0);
     *this = *this + one;
     return *this;
 }
 
-constexpr decimal32 decimal32::operator++(int) noexcept // NOLINT
+constexpr auto decimal32::operator++(int) noexcept -> decimal32
 {
     return ++(*this);
 }
 
-constexpr decimal32& decimal32::operator+=(decimal32 rhs) noexcept
+constexpr auto decimal32::operator+=(decimal32 rhs) noexcept -> decimal32&
 {
     *this = *this + rhs;
     return *this;
@@ -927,7 +923,7 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 }
 
 // NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
-constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     constexpr decimal32 zero {0, 0};
 
@@ -960,19 +956,19 @@ constexpr decimal32 operator-(decimal32 lhs, decimal32 rhs) noexcept
     return {result.sig, result.exp, result.sign};
 }
 
-constexpr decimal32& decimal32::operator--() noexcept
+constexpr auto decimal32::operator--() noexcept -> decimal32&
 {
     constexpr decimal32 one(1, 0);
     *this = *this - one;
     return *this;
 }
 
-constexpr decimal32 decimal32::operator--(int) noexcept // NOLINT
+constexpr auto decimal32::operator--(int) noexcept -> decimal32
 {
     return --(*this);
 }
 
-constexpr decimal32& decimal32::operator-=(decimal32 rhs) noexcept
+constexpr auto decimal32::operator-=(decimal32 rhs) noexcept -> decimal32&
 {
     *this = *this - rhs;
     return *this;
@@ -1117,7 +1113,7 @@ constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     }
 }
 
-constexpr bool operator<(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     if (isnan(lhs) || isnan(rhs) ||
         (!lhs.bits_.sign && rhs.bits_.sign))
@@ -1220,7 +1216,7 @@ constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if
     return !(rhs < lhs);
 }
 
-constexpr bool operator>(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator>(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     return rhs < lhs;
 }
@@ -1237,7 +1233,7 @@ constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
     return rhs < lhs;
 }
 
-constexpr bool operator>=(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator>=(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     return !(lhs < rhs);
 }
@@ -1256,7 +1252,7 @@ constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if
 
 #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 
-constexpr std::strong_ordering operator<=>(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::strong_ordering
 {
     if (lhs < rhs)
     {
@@ -1302,7 +1298,7 @@ constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_i
 
 #endif
 
-constexpr std::uint32_t decimal32::full_exponent() const noexcept
+constexpr auto decimal32::full_exponent() const noexcept -> std::uint32_t
 {
     std::uint32_t expval {};
 
@@ -1322,7 +1318,7 @@ constexpr std::uint32_t decimal32::full_exponent() const noexcept
     return expval;
 }
 
-constexpr std::int32_t decimal32::biased_exponent() const noexcept
+constexpr auto decimal32::biased_exponent() const noexcept -> std::int32_t
 {
     return static_cast<std::int32_t>(full_exponent()) - detail::bias;
 }
@@ -1333,7 +1329,7 @@ constexpr auto decimal32::edit_exponent(T expval) noexcept -> void
     *this = decimal32(this->full_significand(), expval, this->isneg());
 }
 
-constexpr std::uint32_t decimal32::full_significand() const noexcept
+constexpr auto decimal32::full_significand() const noexcept -> std::uint32_t
 {
     std::uint32_t significand {};
 
@@ -1365,7 +1361,7 @@ constexpr auto decimal32::edit_significand(T sig) noexcept -> void
     *this = decimal32(sig, this->biased_exponent(), this->isneg());
 }
 
-constexpr bool decimal32::isneg() const noexcept
+constexpr auto decimal32::isneg() const noexcept -> bool
 {
     return static_cast<bool>(bits_.sign);
 }
@@ -1415,7 +1411,7 @@ constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect param
 }
 
 template <typename TargetType>
-constexpr TargetType decimal32::to_integral() const noexcept
+constexpr auto decimal32::to_integral() const noexcept -> TargetType
 {
     TargetType result {};
 
@@ -1493,7 +1489,7 @@ constexpr decimal32::operator unsigned long long() const noexcept
 }
 
 template <typename charT, typename traits>
-std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d)
+auto operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d) -> std::basic_ostream<charT, traits>&
 {
     if (issignaling(d))
     {
@@ -1572,7 +1568,7 @@ std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>&
     return os;
 }
 
-std::uint32_t to_bits(decimal32 rhs) noexcept
+auto to_bits(decimal32 rhs) noexcept -> std::uint32_t
 {
     std::uint32_t bits;
     std::memcpy(&bits, &rhs.bits_, sizeof(std::uint32_t));
@@ -1623,7 +1619,7 @@ constexpr auto mul_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {res_sig_32, res_exp, sign};
 }
 
-constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     constexpr decimal32 zero {0, 0};
 
@@ -1646,13 +1642,13 @@ constexpr decimal32 operator*(decimal32 lhs, decimal32 rhs) noexcept
     return {result.sig, result.exp, result.sign};
 }
 
-constexpr decimal32& decimal32::operator*=(decimal32 rhs) noexcept
+constexpr auto decimal32::operator*=(decimal32 rhs) noexcept -> decimal32&
 {
     *this = *this * rhs;
     return *this;
 }
 
-constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept
+constexpr auto div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
 {
     // Check pre-conditions
     constexpr decimal32 zero {0, 0};
@@ -1730,7 +1726,7 @@ constexpr void div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
     r = lhs - (decimal32(q_trunc) * rhs);
 }
 
-constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     decimal32 q {};
     decimal32 r {};
@@ -1739,13 +1735,13 @@ constexpr decimal32 operator/(decimal32 lhs, decimal32 rhs) noexcept
     return q;
 }
 
-constexpr decimal32& decimal32::operator/=(decimal32 rhs) noexcept
+constexpr auto decimal32::operator/=(decimal32 rhs) noexcept -> decimal32&
 {
     *this = *this / rhs;
     return *this;
 }
 
-constexpr decimal32 operator%(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     decimal32 q {};
     decimal32 r {};
@@ -1754,13 +1750,13 @@ constexpr decimal32 operator%(decimal32 lhs, decimal32 rhs) noexcept
     return r;
 }
 
-constexpr decimal32& decimal32::operator%=(boost::decimal::decimal32 rhs) noexcept
+constexpr auto decimal32::operator%=(boost::decimal::decimal32 rhs) noexcept -> decimal32&
 {
     *this = *this % rhs;
     return *this;
 }
 
-void debug_pattern(decimal32 rhs) noexcept
+auto debug_pattern(decimal32 rhs) noexcept -> void
 {
     std::cerr << "Sig: " << rhs.full_significand()
               << "\nExp: " << rhs.biased_exponent()
@@ -1768,7 +1764,7 @@ void debug_pattern(decimal32 rhs) noexcept
 }
 
 template <typename T>
-BOOST_DECIMAL_CXX20_CONSTEXPR T decimal32::floating_conversion_impl() const noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal32::floating_conversion_impl() const noexcept -> T
 {
     bool success {};
 
@@ -1827,7 +1823,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator long double() const noexcept
 }
 
 template <typename charT, typename traits>
-std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>& is, decimal32& d)
+auto operator>>(std::basic_istream<charT, traits>& is, decimal32& d) -> std::basic_istream<charT, traits>&
 {
     char buffer[1024] {}; // What should be an unreasonably high maximum
     is >> buffer;
@@ -1881,7 +1877,7 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
 // If both x and y are NaN, or infinity, they have the same quantum exponents;
 // if exactly one operand is infinity or exactly one operand is NaN, they do not have the same quantum exponents.
 // The samequantum functions raise no exception.
-constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto samequantumd32(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
@@ -1901,7 +1897,7 @@ constexpr bool samequantumd32(decimal32 lhs, decimal32 rhs) noexcept
 // 3.6.5
 // Effects: if x is finite, returns its quantum exponent.
 // Otherwise, a domain error occurs and INT_MIN is returned.
-constexpr int quantexpd32(decimal32 x) noexcept
+constexpr auto quantexpd32(decimal32 x) noexcept -> int
 {
     if (!isfinite(x))
     {
@@ -1922,7 +1918,7 @@ constexpr int quantexpd32(decimal32 x) noexcept
 // Otherwise, if only one operand is infinity, the "invalid" floating-point exception is raised and the result is NaN.
 // If both operands are infinity, the result is DEC_INFINITY, with the same sign as x, converted to the type of x.
 // The quantize functions do not signal underflow.
-constexpr decimal32 quantized32(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto quantized32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     // Return the correct type of nan
     if (isnan(lhs))
@@ -1947,7 +1943,7 @@ constexpr decimal32 quantized32(decimal32 lhs, decimal32 rhs) noexcept
     return {lhs.full_significand(), rhs.biased_exponent(), lhs.isneg()};
 }
 
-constexpr decimal32 strtod32(const char* str, char** endptr) noexcept
+constexpr auto strtod32(const char* str, char** endptr) noexcept -> decimal32
 {
     if (str == nullptr)
     {
@@ -1955,9 +1951,10 @@ constexpr decimal32 strtod32(const char* str, char** endptr) noexcept
         return boost::decimal::from_bits(boost::decimal::detail::snan_mask);
     }
 
-    bool sign {};
-    std::uint64_t significand {};
-    std::int32_t expval {};
+    auto sign        = bool {};
+    auto significand = std::uint64_t {};
+    auto expval      = std::int32_t {};
+
     const auto buffer_len {detail::strlen(str)};
 
     if (buffer_len == 0)
@@ -2001,7 +1998,7 @@ constexpr decimal32 strtod32(const char* str, char** endptr) noexcept
     return d;
 }
 
-constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept
+constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decimal32
 {
     char buffer[1024] {};
     if (str == nullptr || detail::strlen(str) > sizeof(buffer))
@@ -2257,15 +2254,15 @@ public:
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = true;
 
     // Member functions
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (min)() { return {1, min_exponent}; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 (max)() { return {9'999'999, max_exponent}; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 lowest() { return {-9'999'999, max_exponent}; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 epsilon() { return {1, -7}; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 round_error() { return epsilon(); }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 infinity() { return boost::decimal::from_bits(boost::decimal::detail::inf_mask); }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 quiet_NaN() { return boost::decimal::from_bits(boost::decimal::detail::nan_mask); }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 signaling_NaN() { return boost::decimal::from_bits(boost::decimal::detail::snan_mask); }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr boost::decimal::decimal32 denorm_min() { return {1, boost::decimal::detail::etiny}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (min)        () -> boost::decimal::decimal32 { return {1, min_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (max)        () -> boost::decimal::decimal32 { return {9'999'999, max_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto lowest       () -> boost::decimal::decimal32 { return {-9'999'999, max_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto epsilon      () -> boost::decimal::decimal32 { return {1, -7}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto round_error  () -> boost::decimal::decimal32 { return epsilon(); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::decimal32 { return boost::decimal::from_bits(boost::decimal::detail::inf_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::decimal32 { return boost::decimal::from_bits(boost::decimal::detail::nan_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::decimal32 { return boost::decimal::from_bits(boost::decimal::detail::snan_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::decimal32 { return {1, boost::decimal::detail::etiny}; }
 };
 
 } // Namespace std

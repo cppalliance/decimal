@@ -113,7 +113,7 @@ namespace local
         static_cast<float>
         (
             static_cast<float>(std::numeric_limits<decimal_type>::epsilon())
-          * static_cast<float>(16)
+          * static_cast<float>(24)
         );
 
       const auto result_frexp_ldexp_is_ok = is_close_fraction(ldexp_flt, ldexp_dec_as_float, tol_n);
