@@ -44,7 +44,6 @@ C_INCLUDES  :=$(addprefix -I,$(C_INCLUDES))
 
 TIDY_CHECKS  = "*,                                                            \
                 -readability-identifier-length,                               \
-                -modernize-use-trailing-return-type,                          \
                 -misc-definitions-in-headers,                                 \
                 -cppcoreguidelines-pro-bounds-pointer-arithmetic,             \
                 -*magic-numbers*,                                             \

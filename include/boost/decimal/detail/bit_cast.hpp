@@ -23,7 +23,7 @@ using std::bit_cast;
 #endif
 
 template<class To, class From>
-To bit_cast(const From& src) noexcept
+auto bit_cast(const From& src) noexcept -> To
 {
     static_assert(sizeof(To) >= sizeof(From), "To and From must be the same size");
     To dst;

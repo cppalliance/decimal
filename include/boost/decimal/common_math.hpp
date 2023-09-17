@@ -16,64 +16,64 @@ namespace boost { namespace decimal {
 
 // Decimal32 overloads
 template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr decimal32 operator+(decimal32 lhs, T rhs) noexcept
+constexpr auto operator+(decimal32 lhs, T rhs) noexcept -> decimal32
 {
     return lhs + static_cast<decimal32>(rhs);
 }
 
 template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr decimal32 operator+(T lhs, decimal32 rhs) noexcept
+constexpr auto operator+(T lhs, decimal32 rhs) noexcept -> decimal32
 {
     return static_cast<decimal32>(lhs) + rhs;
 }
 
 template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr decimal32 operator-(decimal32 lhs, T rhs) noexcept
+constexpr auto operator-(decimal32 lhs, T rhs) noexcept -> decimal32
 {
     return lhs - static_cast<decimal32>(rhs);
 }
 
 template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr decimal32 operator-(T lhs, decimal32 rhs) noexcept
+constexpr auto operator-(T lhs, decimal32 rhs) noexcept -> decimal32
 {
     return static_cast<decimal32>(lhs) - rhs;
 }
 
 template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr decimal32 operator*(decimal32 lhs, T rhs) noexcept
+constexpr auto operator*(decimal32 lhs, T rhs) noexcept -> decimal32
 {
     return lhs * static_cast<decimal32>(rhs);
 }
 
 template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr decimal32 operator*(T lhs, decimal32 rhs) noexcept
+constexpr auto operator*(T lhs, decimal32 rhs) noexcept -> decimal32
 {
     return static_cast<decimal32>(lhs) * rhs;
 }
 
 template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr decimal32 operator/(decimal32 lhs, T rhs) noexcept
+constexpr auto operator/(decimal32 lhs, T rhs) noexcept -> decimal32
 {
     return lhs / static_cast<decimal32>(rhs);
 }
 
 template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr decimal32 operator/(T lhs, decimal32 rhs) noexcept
+constexpr auto operator/(T lhs, decimal32 rhs) noexcept -> decimal32
 {
     return static_cast<decimal32>(lhs) / rhs;
 }
 
-constexpr bool samequantum(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     return samequantumd32(lhs, rhs);
 }
 
-constexpr int quantexp(decimal32 x) noexcept
+constexpr auto quantexp(decimal32 x) noexcept -> int
 {
     return quantexpd32(x);
 }
 
-constexpr decimal32 quantize(decimal32 lhs, decimal32 rhs) noexcept
+constexpr auto quantize(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     return quantized32(lhs, rhs);
 }

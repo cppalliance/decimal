@@ -358,17 +358,17 @@ static_cast<std::uint64_t>(UINT64_C(0x0040000400105555)), static_cast<std::uint6
 };
 
 // Returns e == 0 ? 1 : ceil(log_2(5^e)); requires 0 <= e <= 32768.
-static constexpr std::uint32_t pow5bits(const std::uint32_t e) noexcept
+static constexpr auto pow5bits(const std::uint32_t e) noexcept -> std::uint32_t
 {
     assert(e <= 1 << 15);
     return static_cast<std::uint32_t>(((e * UINT64_C(163391164108059)) >> 46) + 1);
 }
 
 static constexpr
-void mul_128_256_shift(
+auto mul_128_256_shift(
         const std::uint64_t* const a, const std::uint64_t* const b,
         const std::uint32_t shift, const std::uint32_t corr,
-        std::uint64_t* const result) noexcept
+        std::uint64_t* const result) noexcept -> void
 {
     assert(shift > 0);
     assert(shift < 256);
@@ -427,7 +427,7 @@ void mul_128_256_shift(
 }
 
 // Computes 5^i in the form required by Ryu, and stores it in the given pointer.
-static constexpr void generic_computePow5(const std::uint32_t i, std::uint64_t* const result) noexcept
+static constexpr auto generic_computePow5(const std::uint32_t i, std::uint64_t* const result) noexcept -> void
 {
     const std::uint32_t base = i / BOOST_DECIMAL_POW5_TABLE_SIZE;
     const std::uint32_t base2 = base * BOOST_DECIMAL_POW5_TABLE_SIZE;
@@ -450,7 +450,7 @@ static constexpr void generic_computePow5(const std::uint32_t i, std::uint64_t* 
 }
 
 // Computes 5^-i in the form required by Ryu, and stores it in the given pointer.
-static constexpr void generic_computeInvPow5(const std::uint32_t i, std::uint64_t* const result) noexcept
+static constexpr auto generic_computeInvPow5(const std::uint32_t i, std::uint64_t* const result) noexcept -> void
 {
     const std::uint32_t base = (i + BOOST_DECIMAL_POW5_TABLE_SIZE - 1) / BOOST_DECIMAL_POW5_TABLE_SIZE;
     const std::uint32_t base2 = base * BOOST_DECIMAL_POW5_TABLE_SIZE;
@@ -472,7 +472,7 @@ static constexpr void generic_computeInvPow5(const std::uint32_t i, std::uint64_
     }
 }
 
-static constexpr std::uint32_t pow5Factor(unsigned_128_type value) noexcept
+static constexpr auto pow5Factor(unsigned_128_type value) noexcept -> std::uint32_t
 {
     for (std::uint32_t count = 0; value > 0; ++count)
     {
@@ -486,20 +486,20 @@ static constexpr std::uint32_t pow5Factor(unsigned_128_type value) noexcept
 }
 
 // Returns true if value is divisible by 5^p.
-static constexpr bool multipleOfPowerOf5(const unsigned_128_type value, const std::uint32_t p) noexcept
+static constexpr auto multipleOfPowerOf5(const unsigned_128_type value, const std::uint32_t p) noexcept -> bool
 {
     // I tried a case distinction on p, but there was no performance difference.
     return pow5Factor(value) >= p;
 }
 
 // Returns true if value is divisible by 2^p.
-static constexpr bool multipleOfPowerOf2(const unsigned_128_type value, const std::uint32_t p) noexcept
+static constexpr auto multipleOfPowerOf2(const unsigned_128_type value, const std::uint32_t p) noexcept -> bool
 {
     return (value & ((((unsigned_128_type) 1) << p) - 1)) == 0;
 }
 
 static constexpr
-unsigned_128_type mulShift(const unsigned_128_type m, const std::uint64_t* const mul, const int32_t j) noexcept
+auto mulShift(const unsigned_128_type m, const std::uint64_t* const mul, const int32_t j) noexcept -> unsigned_128_type
 {
     assert(j > 128);
     std::uint64_t a[2] {};
@@ -511,7 +511,7 @@ unsigned_128_type mulShift(const unsigned_128_type m, const std::uint64_t* const
 }
 
 // Returns floor(log_10(2^e)).
-static constexpr std::uint32_t log10Pow2(const int32_t e) noexcept
+static constexpr auto log10Pow2(const int32_t e) noexcept -> std::uint32_t
 {
     // The first value this approximation fails for is 2^1651 which is just greater than 10^297.
     assert(e >= 0);
@@ -520,7 +520,7 @@ static constexpr std::uint32_t log10Pow2(const int32_t e) noexcept
 }
 
 // Returns floor(log_10(5^e)).
-static constexpr std::uint32_t log10Pow5(const int32_t e) noexcept
+static constexpr auto log10Pow5(const int32_t e) noexcept -> std::uint32_t
 {
     // The first value this approximation fails for is 5^2621 which is just greater than 10^1832.
     assert(e >= 0);

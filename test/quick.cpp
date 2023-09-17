@@ -4,7 +4,7 @@
 
 #include <boost/decimal.hpp>
 
-int main()
+auto main() -> int
 {
     return 0;
 }

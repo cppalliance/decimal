@@ -23,35 +23,35 @@
 
 namespace boost { namespace decimal { namespace detail {
 
-constexpr bool is_integer_char(char c) noexcept
+constexpr auto is_integer_char(char c) noexcept -> bool
 {
     return (c >= '0') && (c <= '9');
 }
 
-constexpr bool is_delimiter(char c) noexcept
+constexpr auto is_delimiter(char c) noexcept -> bool
 {
     return !is_integer_char(c) && c != 'e' && c != 'E';
 }
 
-constexpr inline from_chars_result from_chars_dispatch(const char* first, const char* last, std::uint64_t& value, int base) noexcept
+constexpr auto from_chars_dispatch(const char* first, const char* last, std::uint64_t& value, int base) noexcept -> from_chars_result
 {
     return boost::decimal::detail::from_chars(first, last, value, base);
 }
 
-constexpr from_chars_result from_chars_dispatch(const char* first, const char* last, uint128& value, int base) noexcept
+constexpr auto from_chars_dispatch(const char* first, const char* last, uint128& value, int base) noexcept -> from_chars_result
 {
     return boost::decimal::detail::from_chars128(first, last, value, base);
 }
 
 #ifdef BOOST_CHARCONV_HAS_INT128
-inline from_chars_result from_chars_dispatch(const char* first, const char* last, boost::uint128_type& value, int base) noexcept
+auto from_chars_dispatch(const char* first, const char* last, boost::uint128_type& value, int base) noexcept -> from_chars_result
 {
     return boost::decimal::detail::from_chars128(first, last, value, base);
 }
 #endif
 
 template <typename Unsigned_Integer, typename Integer>
-constexpr from_chars_result parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent) noexcept
+constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent) noexcept -> from_chars_result
 {
     if (first > last)
     {

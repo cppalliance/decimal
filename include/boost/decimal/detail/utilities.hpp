@@ -10,7 +10,7 @@
 namespace boost { namespace decimal { namespace detail {
 
 template <typename T>
-constexpr void swap(T& x, T& y) noexcept
+constexpr auto swap(T& x, T& y) noexcept -> void
 {
     const T temp {x};
     x = y;
@@ -18,7 +18,7 @@ constexpr void swap(T& x, T& y) noexcept
 }
 
 template <typename T>
-constexpr std::size_t strlen(const T* str) noexcept
+constexpr auto strlen(const T* str) noexcept -> std::size_t
 {
     std::size_t i {};
     while (*str != '\0')

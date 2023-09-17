@@ -89,8 +89,8 @@ struct uint128
     #undef UNSIGNED_CONSTRUCTOR
 
     // Assignment Operators
-    #define SIGNED_ASSIGNMENT_OPERATOR(expr) constexpr uint128 &operator=(const expr& v) noexcept { high = v < 0 ? UINT64_MAX : UINT64_C(0); low = static_cast<std::uint64_t>(v); return *this; } // NOLINT
-    #define UNSIGNED_ASSIGNMENT_OPERATOR(expr) constexpr uint128 &operator=(const expr& v) noexcept { high = 0U; low = static_cast<std::uint64_t>(v); return *this; } // NOLINT
+    #define   SIGNED_ASSIGNMENT_OPERATOR(expr) constexpr auto operator=(const expr& v) noexcept -> uint128& { high = v < 0 ? UINT64_MAX : UINT64_C(0); low = static_cast<std::uint64_t>(v); return *this; } // NOLINT
+    #define UNSIGNED_ASSIGNMENT_OPERATOR(expr) constexpr auto operator=(const expr& v) noexcept -> uint128& { high = 0U; low = static_cast<std::uint64_t>(v); return *this; } // NOLINT
 
     SIGNED_ASSIGNMENT_OPERATOR(char)                    // NOLINT
     SIGNED_ASSIGNMENT_OPERATOR(signed char)             // NOLINT
@@ -106,20 +106,20 @@ struct uint128
     UNSIGNED_ASSIGNMENT_OPERATOR(unsigned long long)    // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr uint128 &operator=(const boost::int128_type&  v) noexcept { *this = uint128(v); return *this; }
-    constexpr uint128 &operator=(const boost::uint128_type& v) noexcept { *this = uint128(v); return *this; }
+    constexpr auto operator=(const boost::int128_type&  v) noexcept -> uint128& { *this = uint128(v); return *this; }
+    constexpr auto operator=(const boost::uint128_type& v) noexcept -> uint128& { *this = uint128(v); return *this; }
     #endif
 
-    constexpr uint128 &operator=(const trivial_uint128& v) noexcept { this->low = v.low; this->high = v.high; return *this; }
+    constexpr auto operator=(const trivial_uint128& v) noexcept -> uint128& { this->low = v.low; this->high = v.high; return *this; }
 
-    constexpr uint128 &operator=(const uint128&) noexcept;
+    constexpr auto operator=(const uint128&) noexcept -> uint128&;
 
     #undef SIGNED_ASSIGNMENT_OPERATOR
     #undef UNSIGNED_ASSIGNMENT_OPERATOR
 
     // Conversion Operators
-    #define INTEGER_CONVERSION_OPERATOR(expr) explicit constexpr operator expr() const noexcept { return static_cast<expr>(low); } // NOLINT
-    #define FLOAT_CONVERSION_OPERATOR(expr) explicit operator expr() const noexcept { return std::ldexp(static_cast<expr>(high), 64) + static_cast<expr>(low); } // NOLINT
+    #define INTEGER_CONVERSION_OPERATOR(expr) explicit constexpr operator expr() const noexcept { return static_cast<expr>(low); }
+    #define   FLOAT_CONVERSION_OPERATOR(expr) explicit           operator expr() const noexcept { return std::ldexp(static_cast<expr>(high), 64) + static_cast<expr>(low); }
 
     INTEGER_CONVERSION_OPERATOR(char)                   // NOLINT
     INTEGER_CONVERSION_OPERATOR(signed char)            // NOLINT
@@ -153,14 +153,14 @@ struct uint128
     #undef FLOAT_CONVERSION_OPERATOR
 
     // Unary Operators
-    constexpr friend uint128 operator-(uint128 val) noexcept;
-    constexpr friend uint128 operator+(uint128 val) noexcept;
+    constexpr friend auto operator-(uint128 val) noexcept -> uint128;
+    constexpr friend auto operator+(uint128 val) noexcept -> uint128;
 
     // Comparison Operators
 
     // Equality
-    #define INTEGER_OPERATOR_EQUAL(expr) constexpr friend bool operator==(uint128 lhs, expr rhs) noexcept { return lhs.high == 0 && rhs >= 0 && lhs.low == static_cast<std::uint64_t>(rhs); } // NOLINT
-    #define UNSIGNED_INTEGER_OPERATOR_EQUAL(expr) constexpr friend bool operator==(uint128 lhs, expr rhs) noexcept { return lhs.high == 0 && lhs.low == static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define          INTEGER_OPERATOR_EQUAL(expr) constexpr friend auto operator==(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0 && rhs >= 0 && lhs.low == static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define UNSIGNED_INTEGER_OPERATOR_EQUAL(expr) constexpr friend auto operator==(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0 && lhs.low == static_cast<std::uint64_t>(rhs); } // NOLINT
 
     INTEGER_OPERATOR_EQUAL(char)                        // NOLINT
     INTEGER_OPERATOR_EQUAL(signed char)                 // NOLINT
@@ -175,17 +175,17 @@ struct uint128
     UNSIGNED_INTEGER_OPERATOR_EQUAL(unsigned long long) // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend bool operator==(uint128 lhs, boost::int128_type  rhs) noexcept { return lhs == uint128(rhs); }
-    constexpr friend bool operator==(uint128 lhs, boost::uint128_type rhs) noexcept { return lhs == uint128(rhs); }
+    constexpr friend auto operator==(uint128 lhs, boost::int128_type  rhs) noexcept -> bool { return lhs == uint128(rhs); }
+    constexpr friend auto operator==(uint128 lhs, boost::uint128_type rhs) noexcept -> bool { return lhs == uint128(rhs); }
     #endif
 
-    constexpr friend bool operator==(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator==(uint128 lhs, uint128 rhs) noexcept -> bool;
 
     #undef INTEGER_OPERATOR_EQUAL
     #undef UNSIGNED_INTEGER_OPERATOR_EQUAL
 
     // Inequality
-    #define INTEGER_OPERATOR_NOTEQUAL(expr) constexpr friend bool operator!=(uint128 lhs, expr rhs) noexcept { return !(lhs == rhs); } // NOLINT
+    #define INTEGER_OPERATOR_NOTEQUAL(expr) constexpr friend auto operator!=(uint128 lhs, expr rhs) noexcept -> bool { return !(lhs == rhs); } // NOLINT
 
     INTEGER_OPERATOR_NOTEQUAL(char)                 // NOLINT
     INTEGER_OPERATOR_NOTEQUAL(signed char)          // NOLINT
@@ -200,17 +200,17 @@ struct uint128
     INTEGER_OPERATOR_NOTEQUAL(unsigned long long)   // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend bool operator!=(uint128 lhs, boost::int128_type  rhs) noexcept { return !(lhs == rhs); }
-    constexpr friend bool operator!=(uint128 lhs, boost::uint128_type rhs) noexcept { return !(lhs == rhs); }
+    constexpr friend auto operator!=(uint128 lhs, boost::int128_type  rhs) noexcept -> bool { return !(lhs == rhs); }
+    constexpr friend auto operator!=(uint128 lhs, boost::uint128_type rhs) noexcept -> bool { return !(lhs == rhs); }
     #endif
 
-    constexpr friend bool operator!=(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator!=(uint128 lhs, uint128 rhs) noexcept -> bool;
 
     #undef INTEGER_OPERATOR_NOTEQUAL
 
     // Less than
-    #define INTEGER_OPERATOR_LESS_THAN(expr) constexpr friend bool operator<(uint128 lhs, expr rhs) noexcept { return lhs.high == 0U && rhs > 0 && lhs.low < static_cast<std::uint64_t>(rhs); } // NOLINT
-    #define UNSIGNED_INTEGER_OPERATOR_LESS_THAN(expr) constexpr friend bool operator<(uint128 lhs, expr rhs) noexcept { return lhs.high == 0U && lhs.low < static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define          INTEGER_OPERATOR_LESS_THAN(expr) constexpr friend auto operator<(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && rhs > 0 && lhs.low < static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define UNSIGNED_INTEGER_OPERATOR_LESS_THAN(expr) constexpr friend auto operator<(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && lhs.low < static_cast<std::uint64_t>(rhs); } // NOLINT
 
     INTEGER_OPERATOR_LESS_THAN(char)                            // NOLINT
     INTEGER_OPERATOR_LESS_THAN(signed char)                     // NOLINT
@@ -225,18 +225,18 @@ struct uint128
     UNSIGNED_INTEGER_OPERATOR_LESS_THAN(unsigned long long)     // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend bool operator<(uint128 lhs, boost::int128_type  rhs) noexcept { return lhs < uint128(rhs); }
-    constexpr friend bool operator<(uint128 lhs, boost::uint128_type rhs) noexcept { return lhs < uint128(rhs); }
+    constexpr friend auto operator<(uint128 lhs, boost::int128_type  rhs) noexcept -> bool { return lhs < uint128(rhs); }
+    constexpr friend auto operator<(uint128 lhs, boost::uint128_type rhs) noexcept -> bool { return lhs < uint128(rhs); }
     #endif
 
-    constexpr friend bool operator<(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator<(uint128 lhs, uint128 rhs) noexcept -> bool;
 
     #undef INTEGER_OPERATOR_LESS_THAN
     #undef UNSIGNED_INTEGER_OPERATOR_LESS_THAN
 
     // Less than or equal to
-    #define INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(expr) constexpr friend bool operator<=(uint128 lhs, expr rhs) noexcept { return lhs.high == 0U && rhs >= 0 && lhs.low <= static_cast<std::uint64_t>(rhs); } // NOLINT
-    #define UNSIGNED_INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(expr) constexpr friend bool operator<=(uint128 lhs, expr rhs) noexcept { return lhs.high == 0U && lhs.low <= static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define          INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(expr) constexpr friend auto operator<=(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && rhs >= 0 && lhs.low <= static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define UNSIGNED_INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(expr) constexpr friend auto operator<=(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && lhs.low <= static_cast<std::uint64_t>(rhs); } // NOLINT
 
     INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(char)                            // NOLINT
     INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(signed char)                     // NOLINT
@@ -251,18 +251,18 @@ struct uint128
     UNSIGNED_INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(unsigned long long)     // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend bool operator<=(uint128 lhs, boost::int128_type  rhs) noexcept { return lhs <= uint128(rhs); }
-    constexpr friend bool operator<=(uint128 lhs, boost::uint128_type rhs) noexcept { return lhs <= uint128(rhs); }
+    constexpr friend auto operator<=(uint128 lhs, boost::int128_type  rhs) noexcept -> bool { return lhs <= uint128(rhs); }
+    constexpr friend auto operator<=(uint128 lhs, boost::uint128_type rhs) noexcept -> bool { return lhs <= uint128(rhs); }
     #endif
 
-    constexpr friend bool operator<=(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator<=(uint128 lhs, uint128 rhs) noexcept -> bool ;
 
     #undef INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO
     #undef UNSIGNED_INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO
 
     // Greater than
-    #define INTEGER_OPERATOR_GREATER_THAN(expr) constexpr friend bool operator>(uint128 lhs, expr rhs) noexcept { return lhs.high > 0U || rhs < 0 || lhs.low > static_cast<std::uint64_t>(rhs); } // NOLINT
-    #define UNSIGNED_INTEGER_OPERATOR_GREATER_THAN(expr) constexpr friend bool operator>(uint128 lhs, expr rhs) noexcept { return lhs.high > 0U || lhs.low > static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define          INTEGER_OPERATOR_GREATER_THAN(expr) constexpr friend auto operator>(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high > 0U || rhs < 0 || lhs.low > static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define UNSIGNED_INTEGER_OPERATOR_GREATER_THAN(expr) constexpr friend auto operator>(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high > 0U || lhs.low > static_cast<std::uint64_t>(rhs); } // NOLINT
 
     INTEGER_OPERATOR_GREATER_THAN(char)                             // NOLINT
     INTEGER_OPERATOR_GREATER_THAN(signed char)                      // NOLINT
@@ -277,18 +277,18 @@ struct uint128
     UNSIGNED_INTEGER_OPERATOR_GREATER_THAN(unsigned long long)      // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend bool operator>(uint128 lhs, boost::int128_type  rhs) noexcept { return lhs > uint128(rhs); }
-    constexpr friend bool operator>(uint128 lhs, boost::uint128_type rhs) noexcept { return lhs > uint128(rhs); }
+    constexpr friend auto operator>(uint128 lhs, boost::int128_type  rhs) noexcept -> bool { return lhs > uint128(rhs); }
+    constexpr friend auto operator>(uint128 lhs, boost::uint128_type rhs) noexcept -> bool { return lhs > uint128(rhs); }
     #endif
 
-    constexpr friend bool operator>(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator>(uint128 lhs, uint128 rhs) noexcept -> bool ;
 
     #undef INTEGER_OPERATOR_GREATER_THAN
     #undef UNSIGNED_INTEGER_OPERATOR_GREATER_THAN
 
     // Greater than or equal to
-    #define INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(expr) constexpr friend bool operator>=(uint128 lhs, expr rhs) noexcept { return lhs.high > 0U || rhs < 0 || lhs.low >= static_cast<std::uint64_t>(rhs); } // NOLINT
-    #define UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(expr) constexpr friend bool operator>=(uint128 lhs, expr rhs) noexcept { return lhs.high > 0U || lhs.low >= static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define          INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(expr) constexpr friend auto operator>=(uint128 lhs, expr rhs) noexcept  -> bool { return lhs.high > 0U || rhs < 0 || lhs.low >= static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(expr) constexpr friend auto operator>=(uint128 lhs, expr rhs) noexcept  -> bool { return lhs.high > 0U || lhs.low >= static_cast<std::uint64_t>(rhs); } // NOLINT
 
     INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(char)                             // NOLINT
     INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(signed char)                      // NOLINT
@@ -303,11 +303,11 @@ struct uint128
     UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(unsigned long long)      // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend bool operator>=(uint128 lhs, boost::int128_type  rhs) noexcept { return lhs >= uint128(rhs); }
-    constexpr friend bool operator>=(uint128 lhs, boost::uint128_type rhs) noexcept { return lhs >= uint128(rhs); }
+    constexpr friend auto operator>=(uint128 lhs, boost::int128_type  rhs) noexcept -> bool { return lhs >= uint128(rhs); }
+    constexpr friend auto operator>=(uint128 lhs, boost::uint128_type rhs) noexcept -> bool { return lhs >= uint128(rhs); }
     #endif
 
-    constexpr friend bool operator>=(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator>=(uint128 lhs, uint128 rhs) noexcept -> bool;
 
     #undef INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO
     #undef UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO
@@ -315,10 +315,10 @@ struct uint128
     // Binary Operators
 
     // Not
-    constexpr friend uint128 operator~(uint128 v) noexcept;
+    constexpr friend auto operator~(uint128 v) noexcept -> uint128;
 
     // Or
-    #define INTEGER_BINARY_OPERATOR_OR(expr) constexpr friend uint128 operator|(uint128 lhs, expr rhs) noexcept { return {lhs.high, lhs.low | static_cast<std::uint64_t>(rhs)}; } // NOLINT
+    #define INTEGER_BINARY_OPERATOR_OR(expr) constexpr friend auto operator|(uint128 lhs, expr rhs) noexcept -> uint128 { return {lhs.high, lhs.low | static_cast<std::uint64_t>(rhs)}; } // NOLINT
 
     INTEGER_BINARY_OPERATOR_OR(char)                // NOLINT
     INTEGER_BINARY_OPERATOR_OR(signed char)         // NOLINT
@@ -333,18 +333,18 @@ struct uint128
     INTEGER_BINARY_OPERATOR_OR(unsigned long long)  // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend uint128 operator|(uint128 lhs, boost::int128_type  rhs) noexcept { return lhs | uint128(rhs); }
-    constexpr friend uint128 operator|(uint128 lhs, boost::uint128_type rhs) noexcept { return lhs | uint128(rhs); }
+    constexpr friend auto operator|(uint128 lhs, boost::int128_type  rhs) noexcept -> uint128 { return lhs | uint128(rhs); }
+    constexpr friend auto operator|(uint128 lhs, boost::uint128_type rhs) noexcept -> uint128 { return lhs | uint128(rhs); }
     #endif
 
-    constexpr friend uint128 operator|(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator|(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr uint128 &operator|=(uint128 v) noexcept;
+    constexpr auto operator|=(uint128 v) noexcept -> uint128&;
 
     #undef INTEGER_BINARY_OPERATOR_OR
 
     // And
-    #define INTEGER_BINARY_OPERATOR_AND(expr) constexpr friend uint128 operator&(uint128 lhs, expr rhs) noexcept { return {lhs.high, lhs.low & static_cast<std::uint64_t>(rhs)}; } // NOLINT
+    #define INTEGER_BINARY_OPERATOR_AND(expr) constexpr friend auto operator&(uint128 lhs, expr rhs) noexcept -> uint128 { return {lhs.high, lhs.low & static_cast<std::uint64_t>(rhs)}; } // NOLINT
 
     INTEGER_BINARY_OPERATOR_AND(char)                   // NOLINT
     INTEGER_BINARY_OPERATOR_AND(signed char)            // NOLINT
@@ -359,18 +359,18 @@ struct uint128
     INTEGER_BINARY_OPERATOR_AND(unsigned long long)     // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend uint128 operator&(uint128 lhs, boost::int128_type  rhs) noexcept { return lhs & uint128(rhs); }
-    constexpr friend uint128 operator&(uint128 lhs, boost::uint128_type rhs) noexcept { return lhs & uint128(rhs); }
+    constexpr friend auto operator&(uint128 lhs, boost::int128_type  rhs) noexcept -> uint128 { return lhs & uint128(rhs); }
+    constexpr friend auto operator&(uint128 lhs, boost::uint128_type rhs) noexcept -> uint128 { return lhs & uint128(rhs); }
     #endif
 
-    constexpr friend uint128 operator&(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator&(uint128 lhs, uint128 rhs) noexcept-> uint128;
 
-    constexpr uint128 &operator&=(uint128 v) noexcept;
+    constexpr auto operator&=(uint128 v) noexcept -> uint128&;
 
     #undef INTEGER_BINARY_OPERATOR_AND
 
     // Xor
-    #define INTEGER_BINARY_OPERATOR_XOR(expr) constexpr friend uint128 operator^(uint128 lhs, expr rhs) noexcept { return {lhs.high, lhs.low ^ static_cast<std::uint64_t>(rhs)}; } // NOLINT
+    #define INTEGER_BINARY_OPERATOR_XOR(expr) constexpr friend auto operator^(uint128 lhs, expr rhs) noexcept -> uint128 { return {lhs.high, lhs.low ^ static_cast<std::uint64_t>(rhs)}; } // NOLINT
 
     INTEGER_BINARY_OPERATOR_XOR(char)                   // NOLINT
     INTEGER_BINARY_OPERATOR_XOR(signed char)            // NOLINT
@@ -385,19 +385,19 @@ struct uint128
     INTEGER_BINARY_OPERATOR_XOR(unsigned long long)     // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend uint128 operator^(uint128 lhs, boost::int128_type  rhs) noexcept { return lhs ^ uint128(rhs); }
-    constexpr friend uint128 operator^(uint128 lhs, boost::uint128_type rhs) noexcept { return lhs ^ uint128(rhs); }
+    constexpr friend auto operator^(uint128 lhs, boost::int128_type  rhs) noexcept -> uint128 { return lhs ^ uint128(rhs); }
+    constexpr friend auto operator^(uint128 lhs, boost::uint128_type rhs) noexcept -> uint128 { return lhs ^ uint128(rhs); }
     #endif
 
-    constexpr friend uint128 operator^(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator^(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr uint128 &operator^=(uint128 v) noexcept;
+    constexpr auto operator^=(uint128 v) noexcept -> uint128&;
 
     #undef INTEGER_BINARY_OPERATOR_XOR
 
     // Left shift
     #define INTEGER_BINARY_OPERATOR_LEFT_SHIFT(expr)                                            \
-    constexpr friend uint128 operator<<(uint128 lhs, expr rhs) noexcept    \
+    constexpr friend auto operator<<(uint128 lhs, expr rhs) noexcept -> uint128                 \
     {                                                                                           \
         if (rhs >= 64)                                                                          \
         {                                                                                       \
@@ -424,7 +424,7 @@ struct uint128
     INTEGER_BINARY_OPERATOR_LEFT_SHIFT(unsigned long long)      // NOLINT
 
     #define INTEGER_BINARY_OPERATOR_EQUALS_LEFT_SHIFT(expr)                     \
-    constexpr uint128 &operator<<=(expr amount) noexcept   \
+    constexpr auto operator<<=(expr amount) noexcept -> uint128&                \
     {                                                                           \
         *this = *this << amount;                                                \
         return *this;                                                           \
@@ -447,7 +447,7 @@ struct uint128
 
     // Right Shift
     #define INTEGER_BINARY_OPERATOR_RIGHT_SHIFT(expr)                                               \
-    constexpr friend uint128 operator>>(uint128 lhs, expr amount) noexcept     \
+    constexpr friend auto operator>>(uint128 lhs, expr amount) noexcept -> uint128                  \
     {                                                                                               \
         if (amount >= 64)                                                                           \
         {                                                                                           \
@@ -474,7 +474,7 @@ struct uint128
     INTEGER_BINARY_OPERATOR_RIGHT_SHIFT(unsigned long long)     // NOLINT
 
     #define INTEGER_BINARY_OPERATOR_EQUALS_RIGHT_SHIFT(expr)                        \
-    constexpr uint128 &operator>>=(expr amount) noexcept       \
+    constexpr auto operator>>=(expr amount) noexcept -> uint128&                    \
     {                                                                               \
         *this = *this >> amount;                                                    \
         return *this;                                                               \
@@ -496,74 +496,73 @@ struct uint128
     #undef INTEGER_BINARY_OPERATOR_EQUALS_RIGHT_SHIFT
 
     // Arithmetic operators (Add, sub, mul, div, mod)
-    constexpr uint128 &operator+=(std::uint64_t n) noexcept;
+    constexpr auto operator+=(std::uint64_t n) noexcept -> uint128&;
 
-    constexpr friend uint128 operator+(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator+(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr uint128 &operator+=(uint128 v) noexcept;
+    constexpr auto operator+=(uint128 v) noexcept -> uint128&;
 
-    constexpr uint128 &operator++() noexcept;
+    constexpr auto operator++() noexcept -> uint128&;
 
-    constexpr const uint128 operator++(int) noexcept;
+    constexpr auto operator++(int) noexcept -> uint128;
 
-    constexpr friend uint128 operator-(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator-(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr uint128 &operator-=(uint128 v) noexcept;
+    constexpr auto operator-=(uint128 v) noexcept -> uint128&;
 
-    constexpr uint128 &operator--() noexcept;
+    constexpr auto operator--() noexcept -> uint128&;
 
-    constexpr const uint128 operator--(int) noexcept;
+    constexpr auto operator--(int) noexcept -> uint128;
 
-    constexpr friend uint128 operator*(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr uint128 &operator*=(uint128 v) noexcept;
+    constexpr auto operator*=(uint128 v) noexcept -> uint128&;
 
-    constexpr friend uint128 operator/(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr uint128 &operator/=(uint128 v) noexcept;
+    constexpr auto operator/=(uint128 v) noexcept -> uint128&;
 
-    constexpr friend uint128 operator%(uint128 lhs, uint128 rhs) noexcept;
+    constexpr friend auto operator%(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr uint128 &operator%=(uint128 v) noexcept;
+    constexpr auto operator%=(uint128 v) noexcept -> uint128&;
 
     template <class charT, class traits>
-    friend std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, uint128 val);
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&;
 
 private:
-    constexpr friend int high_bit(uint128 v) noexcept;
+    constexpr friend auto high_bit(uint128 v) noexcept -> int;
 
-    constexpr friend void
-    div_impl(uint128 lhs, uint128 rhs, uint128 &quotient, uint128 &remainder) noexcept;
+    constexpr friend auto div_impl(uint128 lhs, uint128 rhs, uint128 &quotient, uint128 &remainder) noexcept -> void;
 };
 
-constexpr uint128 operator-(uint128 val) noexcept
+constexpr auto operator-(uint128 val) noexcept -> uint128
 {
     return {~val.high + static_cast<std::uint64_t>(val.low == 0), ~val.low + 1};
 }
 
-constexpr uint128 operator+(uint128 val) noexcept
+constexpr auto operator+(uint128 val) noexcept -> uint128
 {
     return val;
 }
 
-constexpr uint128 &uint128::operator=(const uint128& v) noexcept // NOLINT : User defined for older compilers
+constexpr auto uint128::operator=(const uint128& v) noexcept -> uint128&
 {
     low = v.low;
     high = v.high;
     return *this;
 }
 
-constexpr bool operator==(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator==(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return lhs.high == rhs.high && lhs.low == rhs.low;
 }
 
-constexpr bool operator!=(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator!=(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return !(lhs == rhs);
 }
 
-constexpr bool operator<(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator<(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     if (lhs.high == rhs.high)
     {
@@ -573,60 +572,60 @@ constexpr bool operator<(uint128 lhs, uint128 rhs) noexcept
     return lhs.high < rhs.high;
 }
 
-constexpr bool operator<=(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator<=(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return !(rhs < lhs);
 }
 
-constexpr bool operator>(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator>(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return rhs < lhs;
 }
 
-constexpr bool operator>=(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator>=(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return !(lhs < rhs);
 }
 
-constexpr uint128 operator~(uint128 v) noexcept
+constexpr auto operator~(uint128 v) noexcept -> uint128
 {
     return {~v.high, ~v.low};
 }
 
-constexpr uint128 operator|(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator|(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     return {lhs.high | rhs.high, lhs.low | rhs.low};
 }
 
-constexpr uint128 &uint128::operator|=(uint128 v) noexcept
+constexpr auto uint128::operator|=(uint128 v) noexcept -> uint128&
 {
     *this = *this | v;
     return *this;
 }
 
-constexpr uint128 operator&(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator&(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     return {lhs.high & rhs.high, lhs.low & rhs.low};
 }
 
-constexpr uint128 &uint128::operator&=(uint128 v) noexcept
+constexpr auto uint128::operator&=(uint128 v) noexcept -> uint128&
 {
     *this = *this & v;
     return *this;
 }
 
-constexpr uint128 operator^(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator^(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     return {lhs.high ^ rhs.high, lhs.low ^ rhs.low};
 }
 
-constexpr uint128 &uint128::operator^=(uint128 v) noexcept
+constexpr auto uint128::operator^=(uint128 v) noexcept -> uint128&
 {
     *this = *this ^ v;
     return *this;
 }
 
-constexpr uint128 &uint128::operator+=(std::uint64_t n) noexcept
+constexpr auto uint128::operator+=(std::uint64_t n) noexcept -> uint128&
 {
     auto sum = low + n;
     high += (sum < low ? 1 : 0);
@@ -635,7 +634,7 @@ constexpr uint128 &uint128::operator+=(std::uint64_t n) noexcept
     return *this;
 }
 
-constexpr uint128 operator+(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator+(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     const uint128 temp = {lhs.high + rhs.high, lhs.low + rhs.low};
 
@@ -648,13 +647,13 @@ constexpr uint128 operator+(uint128 lhs, uint128 rhs) noexcept
     return temp;
 }
 
-constexpr uint128 &uint128::operator+=(uint128 v) noexcept
+constexpr auto uint128::operator+=(uint128 v) noexcept -> uint128&
 {
     *this = *this + v;
     return *this;
 }
 
-constexpr uint128 &uint128::operator++() noexcept
+constexpr auto uint128::operator++() noexcept -> uint128&
 {
     if (this->low == UINT64_MAX)
     {
@@ -669,12 +668,12 @@ constexpr uint128 &uint128::operator++() noexcept
     return *this;
 }
 
-constexpr const uint128 uint128::operator++(int) noexcept
+constexpr auto uint128::operator++(int) noexcept -> uint128
 {
     return ++(*this);
 }
 
-constexpr uint128 operator-(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator-(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     const uint128 temp {lhs.high - rhs.high, lhs.low - rhs.low};
 
@@ -687,13 +686,13 @@ constexpr uint128 operator-(uint128 lhs, uint128 rhs) noexcept
     return temp;
 }
 
-constexpr uint128 &uint128::operator-=(uint128 v) noexcept
+constexpr auto uint128::operator-=(uint128 v) noexcept -> uint128&
 {
     *this = *this - v;
     return *this;
 }
 
-constexpr uint128 &uint128::operator--() noexcept
+constexpr auto uint128::operator--() noexcept -> uint128&
 {
 	if (this->low == 0)
 	{
@@ -708,11 +707,11 @@ constexpr uint128 &uint128::operator--() noexcept
     return *this;
 }
 
-constexpr const uint128 uint128::operator--(int) noexcept
+constexpr auto uint128::operator--(int) noexcept -> uint128
 {
     return --(*this);
 }
-constexpr uint128 operator*(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     const auto a = static_cast<std::uint64_t>(lhs.low >> 32);
     const auto b = static_cast<std::uint64_t>(lhs.low & UINT32_MAX);
@@ -725,13 +724,13 @@ constexpr uint128 operator*(uint128 lhs, uint128 rhs) noexcept
     return result;
 }
 
-constexpr uint128 &uint128::operator*=(uint128 v) noexcept
+constexpr auto uint128::operator*=(uint128 v) noexcept -> uint128&
 {
     *this = *this * v;
     return *this;
 }
 
-constexpr int high_bit(uint128 v) noexcept
+constexpr auto high_bit(uint128 v) noexcept -> int
 {
     if (v.high != 0)
     {
@@ -754,7 +753,7 @@ constexpr int high_bit(uint128 v) noexcept
 }
 
 // See: https://stackoverflow.com/questions/5386377/division-without-using
-constexpr void div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& remainder) noexcept
+constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& remainder) noexcept -> void
 {
     constexpr uint128 one {0, 1};
 
@@ -793,7 +792,7 @@ constexpr void div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& re
     remainder = lhs;
 }
 
-constexpr uint128 operator/(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     uint128 quotient {0, 0};
     uint128 remainder {0, 0};
@@ -802,13 +801,13 @@ constexpr uint128 operator/(uint128 lhs, uint128 rhs) noexcept
     return quotient;
 }
 
-constexpr uint128 &uint128::operator/=(uint128 v) noexcept
+constexpr auto uint128::operator/=(uint128 v) noexcept -> uint128&
 {
     *this = *this / v;
     return *this;
 }
 
-constexpr uint128 operator%(uint128 lhs, uint128 rhs) noexcept
+constexpr auto operator%(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     uint128 quotient {0, 0};
     uint128 remainder {0, 0};
@@ -817,27 +816,27 @@ constexpr uint128 operator%(uint128 lhs, uint128 rhs) noexcept
     return remainder;
 }
 
-constexpr uint128 &uint128::operator%=(uint128 v) noexcept
+constexpr auto uint128::operator%=(uint128 v) noexcept -> uint128&
 {
     *this = *this % v;
     return *this;
 }
 
-constexpr std::uint64_t umul64(std::uint32_t x, std::uint32_t y) noexcept
+constexpr auto umul64(std::uint32_t x, std::uint32_t y) noexcept -> std::uint64_t
 {
     return x * static_cast<std::uint64_t>(y);
 }
 
 // Get 128-bit result of multiplication of two 64-bit unsigned integers.
-constexpr uint128 umul128(std::uint64_t x, std::uint64_t y) noexcept
+constexpr auto umul128(std::uint64_t x, std::uint64_t y) noexcept -> uint128
 {
     #if defined(BOOST_DECIMAL_HAS_INT128)
-    
+
     auto result = static_cast<boost::uint128_type>(x) * static_cast<boost::uint128_type>(y);
     return {static_cast<std::uint64_t>(result >> 64), static_cast<std::uint64_t>(result)};
 
     #else
-    
+
     auto a = static_cast<std::uint32_t>(x >> 32);
     auto b = static_cast<std::uint32_t>(x);
     auto c = static_cast<std::uint32_t>(y >> 32);
@@ -856,7 +855,7 @@ constexpr uint128 umul128(std::uint64_t x, std::uint64_t y) noexcept
     #endif
 }
 
-constexpr std::uint64_t umul128_upper64(std::uint64_t x, std::uint64_t y) noexcept
+constexpr auto umul128_upper64(std::uint64_t x, std::uint64_t y) noexcept -> std::uint64_t
 {
     #if defined(BOOST_DECIMAL_HAS_INT128)
     
@@ -884,7 +883,7 @@ constexpr std::uint64_t umul128_upper64(std::uint64_t x, std::uint64_t y) noexce
 
 // Get upper 128-bits of multiplication of a 64-bit unsigned integer and a 128-bit
 // unsigned integer.
-constexpr uint128 umul192_upper128(std::uint64_t x, uint128 y) noexcept
+constexpr auto umul192_upper128(std::uint64_t x, uint128 y) noexcept -> uint128
 {
     auto r = umul128(x, y.high);
     r += umul128_upper64(x, y.low);
@@ -893,7 +892,7 @@ constexpr uint128 umul192_upper128(std::uint64_t x, uint128 y) noexcept
 
 // Get upper 64-bits of multiplication of a 32-bit unsigned integer and a 64-bit
 // unsigned integer.
-constexpr std::uint64_t umul96_upper64(std::uint32_t x, std::uint64_t y) noexcept
+constexpr auto umul96_upper64(std::uint32_t x, std::uint64_t y) noexcept -> std::uint64_t
 {
     #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
     
@@ -914,7 +913,7 @@ constexpr std::uint64_t umul96_upper64(std::uint32_t x, std::uint64_t y) noexcep
 
 // Get lower 128-bits of multiplication of a 64-bit unsigned integer and a 128-bit
 // unsigned integer.
-constexpr uint128 umul192_lower128(std::uint64_t x, uint128 y) noexcept
+constexpr auto umul192_lower128(std::uint64_t x, uint128 y) noexcept -> uint128
 {
     auto high = x * y.high;
     auto highlow = umul128(x, y.low);
@@ -923,13 +922,13 @@ constexpr uint128 umul192_lower128(std::uint64_t x, uint128 y) noexcept
 
 // Get lower 64-bits of multiplication of a 32-bit unsigned integer and a 64-bit
 // unsigned integer.
-constexpr std::uint64_t umul96_lower64(std::uint32_t x, std::uint64_t y) noexcept
+constexpr auto umul96_lower64(std::uint32_t x, std::uint64_t y) noexcept -> std::uint64_t
 {
     return x * y;
 }
 
 template <class charT, class traits>
-std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, uint128 val)
+auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&
 {
     if (val.high > 0)
     {
@@ -981,15 +980,15 @@ struct numeric_limits<boost::decimal::detail::uint128>
     BOOST_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = false;
 
     // Member functions
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::detail::uint128 (min)() { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::detail::uint128 lowest() { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::detail::uint128 (max)() { return {UINT64_MAX, UINT64_MAX}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::detail::uint128 epsilon() { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::detail::uint128 round_error() { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::detail::uint128 infinity() { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::detail::uint128 quiet_NaN() { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::detail::uint128 signaling_NaN() { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr boost::decimal::detail::uint128 denorm_min() { return 0; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr auto (min)        () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr auto lowest       () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr auto (max)        () -> boost::decimal::detail::uint128 { return {UINT64_MAX, UINT64_MAX}; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr auto epsilon      () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr auto round_error  () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::detail::uint128 { return 0; }
 };
 
 } // namespace std

@@ -22,12 +22,12 @@ struct from_chars_result_t
     // ERANGE = result_out_of_range
     std::errc ec;
 
-    friend constexpr bool operator==(const from_chars_result_t<UC>& lhs, const from_chars_result_t<UC>& rhs) noexcept
+    friend constexpr auto operator==(const from_chars_result_t<UC>& lhs, const from_chars_result_t<UC>& rhs) noexcept -> bool
     {
         return lhs.ptr == rhs.ptr && lhs.ec == rhs.ec;
     }
 
-    friend constexpr bool operator!=(const from_chars_result_t<UC>& lhs, const from_chars_result_t<UC>& rhs) noexcept
+    friend constexpr auto operator!=(const from_chars_result_t<UC>& lhs, const from_chars_result_t<UC>& rhs) noexcept -> bool
     {
         return !(lhs == rhs); // NOLINT : Expression can not be simplified since this is the definition
     }
