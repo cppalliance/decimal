@@ -36,12 +36,12 @@ namespace boost { namespace decimal {
 namespace detail {
 
 // See section 3.5.2
-static constexpr auto inf_mask      = static_cast<std::uint32_t>(UINT32_C(0b0'11110'000000'0000000000'0000000000));
-static constexpr auto nan_mask      = static_cast<std::uint32_t>(UINT32_C(0b0'11111'000000'0000000000'0000000000));
-static constexpr auto snan_mask     = static_cast<std::uint32_t>(UINT32_C(0b0'11111'100000'0000000000'0000000000));
-static constexpr auto comb_inf_mask = static_cast<std::uint32_t>(UINT32_C(0b11110));
-static constexpr auto comb_nan_mask = static_cast<std::uint32_t>(UINT32_C(0b11111));
-static constexpr auto exp_snan_mask = static_cast<std::uint32_t>(UINT32_C(0b100000));
+static constexpr auto inf_mask      = UINT32_C(0b0'11110'000000'0000000000'0000000000);
+static constexpr auto nan_mask      = UINT32_C(0b0'11111'000000'0000000000'0000000000);
+static constexpr auto snan_mask     = UINT32_C(0b0'11111'100000'0000000000'0000000000);
+static constexpr auto comb_inf_mask = UINT32_C(0b11110);
+static constexpr auto comb_nan_mask = UINT32_C(0b11111);
+static constexpr auto exp_snan_mask = UINT32_C(0b100000);
 
 // Values from IEEE 754-2019 table 3.6
 BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto storage_width = 32;
@@ -108,6 +108,23 @@ struct decimal32_components
     std::int32_t exp;
     bool sign;
 };
+
+template <typename Integer>
+constexpr auto shrink_significand(Integer sig, std::int32_t& exp) noexcept -> std::uint32_t
+{
+    using Unsigned_Integer = detail::make_unsigned_t<Integer>;
+
+    auto unsigned_sig {detail::make_positive_unsigned(sig)};
+    const auto sig_dig {detail::num_digits(unsigned_sig)};
+
+    if (sig_dig > 9)
+    {
+        unsigned_sig /= static_cast<Unsigned_Integer>(detail::powers_of_10[sig_dig - 9]);
+        exp += sig_dig - 9;
+    }
+
+    return static_cast<std::uint32_t>(unsigned_sig);
+}
 
 } // namespace detail
 
@@ -283,8 +300,29 @@ public:
 
     // 3.2.8 binary arithmetic operators:
     friend constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend constexpr auto operator+(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
     friend constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
     friend constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend constexpr auto operator*(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
     friend constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     template <typename Integer>
@@ -784,67 +822,6 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {res_sig, new_exp, sign};
 }
 
-// We use kahan summation here where applicable
-// https://en.wikipedia.org/wiki/Kahan_summation_algorithm
-// NOLINTNEXTLINE : If addition is actually subtraction than change operator and vice versa
-constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
-{
-    constexpr decimal32 zero {0, 0};
-
-    const auto res {check_non_finite(lhs, rhs)};
-    if (res != zero)
-    {
-        return res;
-    }
-
-    bool lhs_bigger {lhs > rhs};
-    if (lhs.isneg() && rhs.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-
-    // Ensure that lhs is always the larger for ease of implementation
-    if (!lhs_bigger)
-    {
-        detail::swap(lhs, rhs);
-    }
-
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs - abs(rhs);
-    }
-
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    normalize(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    normalize(sig_rhs, exp_rhs);
-
-    const auto result {add_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
-
-    return {result.sig, result.exp, result.sign};
-}
-
-constexpr auto decimal32::operator++() noexcept -> decimal32&
-{
-    constexpr decimal32 one(1, 0);
-    *this = *this + one;
-    return *this;
-}
-
-constexpr auto decimal32::operator++(int) noexcept -> decimal32
-{
-    return ++(*this);
-}
-
-constexpr auto decimal32::operator+=(decimal32 rhs) noexcept -> decimal32&
-{
-    *this = *this + rhs;
-    return *this;
-}
-
 template <typename T, typename T2>
 constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                         T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
@@ -861,8 +838,8 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         //
         // e.g. 1e20 - 1e-20 = 1e20
 
-        return lhs_bigger ? detail::decimal32_components{lhs_sig, lhs_exp, lhs_sign} :
-                            detail::decimal32_components{rhs_sig, rhs_exp, !rhs_sign};
+        return lhs_bigger ? detail::decimal32_components{detail::shrink_significand(lhs_sig, lhs_exp), lhs_exp, lhs_sign} :
+               detail::decimal32_components{detail::shrink_significand(rhs_sig, rhs_exp), rhs_exp, !rhs_sign};
     }
     else if (delta_exp == detail::precision + 1)
     {
@@ -933,6 +910,123 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {res_sig, new_exp, new_sign};
 }
 
+// We use kahan summation here where applicable
+// https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+// NOLINTNEXTLINE : If addition is actually subtraction than change operator and vice versa
+constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    constexpr decimal32 zero {0, 0};
+
+    const auto res {check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && rhs.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+
+    // Ensure that lhs is always the larger for ease of implementation
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs, rhs);
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs - abs(rhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    const auto result {add_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return lhs;
+    }
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && (rhs < 0))
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+    bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto lhs_components {detail::decimal32_components{sig_lhs, exp_lhs, lhs.isneg()}};
+    auto sig_rhs {rhs};
+    std::int32_t exp_rhs {0};
+    normalize(sig_rhs, exp_rhs);
+    auto unsigned_sig_rhs = detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs_components, rhs_components);
+        lhs_bigger = !lhs_bigger;
+        abs_lhs_bigger = !abs_lhs_bigger;
+    }
+
+    detail::decimal32_components result {};
+
+    if (!lhs_components.sign && rhs_components.sign)
+    {
+        result = sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                          rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                          lhs_bigger, abs_lhs_bigger);
+    }
+    else
+    {
+        result = add_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                          rhs_components.sig, rhs_components.exp, rhs_components.sign);
+    }
+
+    return decimal32(result.sig, result.exp, result.sign);
+}
+
+template <typename Integer>
+constexpr auto operator+(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return rhs + lhs;
+}
+
+constexpr auto decimal32::operator++() noexcept -> decimal32&
+{
+    constexpr decimal32 one(1, 0);
+    *this = *this + one;
+    return *this;
+}
+
+constexpr auto decimal32::operator++(int) noexcept -> decimal32
+{
+    return ++(*this);
+}
+
+constexpr auto decimal32::operator+=(decimal32 rhs) noexcept -> decimal32&
+{
+    *this = *this + rhs;
+    return *this;
+}
+
 // NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
 constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
@@ -962,6 +1056,74 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 
     const auto result {sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
                                 sig_rhs, exp_rhs, rhs.isneg(),
+                                lhs_bigger, abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    if (isinf(lhs) || isnan(lhs))
+    {
+        return lhs;
+    }
+
+    if (!lhs.isneg() && (rhs < 0))
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool lhs_bigger {lhs > rhs};
+    const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+    auto lhs_components {detail::decimal32_components{sig_lhs, exp_lhs, lhs.isneg()}};
+
+    auto sig_rhs {rhs};
+    std::int32_t exp_rhs {0};
+    normalize(sig_rhs, exp_rhs);
+    auto unsigned_sig_rhs = detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+
+    const auto result {sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                                lhs_bigger, abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    if (isinf(lhs) || isnan(rhs))
+    {
+        return rhs;
+    }
+
+    if (!(lhs < 0) && rhs.isneg())
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool lhs_bigger {lhs > rhs};
+    const bool abs_lhs_bigger {detail::make_positive_unsigned(lhs) > rhs};
+
+    auto sig_lhs {lhs};
+    std::int32_t exp_lhs {0};
+    normalize(sig_lhs, exp_lhs);
+    auto unsigned_sig_lhs = detail::shrink_significand(detail::make_positive_unsigned(sig_lhs), exp_lhs);
+    auto lhs_components {detail::decimal32_components{unsigned_sig_lhs, exp_lhs, (rhs < 0)}};
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    normalize(sig_rhs, exp_rhs);
+    auto rhs_components {detail::decimal32_components{sig_rhs, exp_rhs, rhs.isneg()}};
+
+    const auto result {sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                rhs_components.sig, rhs_components.exp, rhs_components.sign,
                                 lhs_bigger, abs_lhs_bigger)};
 
     return {result.sig, result.exp, result.sign};
@@ -1652,6 +1814,37 @@ constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     const auto result {mul_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return lhs;
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+    auto lhs_components {detail::decimal32_components{sig_lhs, exp_lhs, lhs.isneg()}};
+
+    auto sig_rhs {rhs};
+    std::int32_t exp_rhs {0};
+    normalize(sig_rhs, exp_rhs);
+    auto unsigned_sig_rhs {detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs)};
+    auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+
+    const auto result {mul_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                rhs_components.sig, rhs_components.exp, rhs_components.sign)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator*(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return rhs * lhs;
 }
 
 constexpr auto decimal32::operator*=(decimal32 rhs) noexcept -> decimal32&

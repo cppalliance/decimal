@@ -74,6 +74,21 @@ constexpr auto modf(decimal32 x, decimal32* iptr) noexcept -> decimal32
     return modfd32(x, iptr);
 }
 
+constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool
+{
+    return samequantumd32(lhs, rhs);
+}
+
+constexpr auto quantexp(decimal32 x) noexcept -> int
+{
+    return quantexpd32(x);
+}
+
+constexpr auto quantize(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    return quantized32(lhs, rhs);
+}
+
 } // namespace decimal
 } // namespace boost
 
