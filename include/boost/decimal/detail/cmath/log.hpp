@@ -25,14 +25,15 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
     if (x < one)
     {
         // Handle reflection.
-        result = ((x > zero) ? -one / log(-x) : std::numeric_limits<T>::infinity());
+        result = ((x > zero) ? -one / log(-x) : -std::numeric_limits<T>::infinity());
     }
     else if(x > one)
     {
         constexpr auto two  = T { 2 };
 
-        // This algorithm for logarithm is based on Chapter 5 of Cody and Waite,
-        // Software Manual for the Elementary Functions, Prentice Hall, 1980.
+        // The algorithm for logarithm is based on Chapter 5, pages 35-36
+        // of Cody and Waite, Software Manual for the Elementary Functions,
+        // Prentice Hall, 1980.
 
         auto exp2val = int { };
 
