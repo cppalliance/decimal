@@ -109,19 +109,21 @@ struct decimal32_components
     bool sign;
 };
 
-template <typename T>
-constexpr auto shrink_significand(T sig, std::int32_t& exp) noexcept -> std::uint32_t
+template <typename Integer>
+constexpr auto shrink_significand(Integer sig, std::int32_t& exp) noexcept -> std::uint32_t
 {
-    auto usig {detail::make_positive_unsigned(sig)};
-    const auto sig_dig {detail::num_digits(usig)};
+    using Unsigned_Integer = detail::make_unsigned_t<Integer>;
+
+    auto unsigned_sig {detail::make_positive_unsigned(sig)};
+    const auto sig_dig {detail::num_digits(unsigned_sig)};
 
     if (sig_dig > 9)
     {
-        usig /= detail::powers_of_10[sig_dig - 9];
+        unsigned_sig /= static_cast<Unsigned_Integer>(detail::powers_of_10[sig_dig - 9]);
         exp += sig_dig - 9;
     }
 
-    return static_cast<std::uint32_t>(usig);
+    return static_cast<std::uint32_t>(unsigned_sig);
 }
 
 } // namespace detail
