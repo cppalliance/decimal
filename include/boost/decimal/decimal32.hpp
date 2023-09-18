@@ -298,6 +298,13 @@ public:
 
     // 3.2.8 binary arithmetic operators:
     friend constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend constexpr auto operator+(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
     friend constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
@@ -799,67 +806,6 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {res_sig, new_exp, sign};
 }
 
-// We use kahan summation here where applicable
-// https://en.wikipedia.org/wiki/Kahan_summation_algorithm
-// NOLINTNEXTLINE : If addition is actually subtraction than change operator and vice versa
-constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
-{
-    constexpr decimal32 zero {0, 0};
-
-    const auto res {check_non_finite(lhs, rhs)};
-    if (res != zero)
-    {
-        return res;
-    }
-
-    bool lhs_bigger {lhs > rhs};
-    if (lhs.isneg() && rhs.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-
-    // Ensure that lhs is always the larger for ease of implementation
-    if (!lhs_bigger)
-    {
-        detail::swap(lhs, rhs);
-    }
-
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs - abs(rhs);
-    }
-
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    normalize(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    normalize(sig_rhs, exp_rhs);
-
-    const auto result {add_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
-
-    return {result.sig, result.exp, result.sign};
-}
-
-constexpr auto decimal32::operator++() noexcept -> decimal32&
-{
-    constexpr decimal32 one(1, 0);
-    *this = *this + one;
-    return *this;
-}
-
-constexpr auto decimal32::operator++(int) noexcept -> decimal32
-{
-    return ++(*this);
-}
-
-constexpr auto decimal32::operator+=(decimal32 rhs) noexcept -> decimal32&
-{
-    *this = *this + rhs;
-    return *this;
-}
-
 template <typename T, typename T2>
 constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                         T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
@@ -876,8 +822,8 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         //
         // e.g. 1e20 - 1e-20 = 1e20
 
-        return lhs_bigger ? detail::decimal32_components{lhs_sig, lhs_exp, lhs_sign} :
-                            detail::decimal32_components{rhs_sig, rhs_exp, !rhs_sign};
+        return lhs_bigger ? detail::decimal32_components{detail::shrink_significand(lhs_sig, lhs_exp), lhs_exp, lhs_sign} :
+               detail::decimal32_components{detail::shrink_significand(rhs_sig, rhs_exp), rhs_exp, !rhs_sign};
     }
     else if (delta_exp == detail::precision + 1)
     {
@@ -946,6 +892,79 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     const auto res_sig {detail::make_positive_unsigned(new_sig)};
 
     return {res_sig, new_exp, new_sign};
+}
+
+// We use kahan summation here where applicable
+// https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+// NOLINTNEXTLINE : If addition is actually subtraction than change operator and vice versa
+constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    constexpr decimal32 zero {0, 0};
+
+    const auto res {check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && rhs.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+
+    // Ensure that lhs is always the larger for ease of implementation
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs, rhs);
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs - abs(rhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    const auto result {add_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return static_cast<decimal32>(rhs) + lhs;
+}
+
+template <typename Integer>
+constexpr auto operator+(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return rhs + lhs;
+}
+
+constexpr auto decimal32::operator++() noexcept -> decimal32&
+{
+    constexpr decimal32 one(1, 0);
+    *this = *this + one;
+    return *this;
+}
+
+constexpr auto decimal32::operator++(int) noexcept -> decimal32
+{
+    return ++(*this);
+}
+
+constexpr auto decimal32::operator+=(decimal32 rhs) noexcept -> decimal32&
+{
+    *this = *this + rhs;
+    return *this;
 }
 
 // NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
