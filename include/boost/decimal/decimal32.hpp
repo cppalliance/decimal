@@ -286,6 +286,13 @@ public:
     friend constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
     friend constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     // 3.2.2.5 Increment and Decrement
@@ -1777,6 +1784,85 @@ constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     div_impl(lhs, rhs, q, r);
 
     return q;
+}
+
+template <typename Integer>
+constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    // Check pre-conditions
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::snan_mask)};
+    constexpr decimal32 inf {boost::decimal::from_bits(boost::decimal::detail::inf_mask)};
+
+    const bool sign {lhs.isneg() != rhs < 0};
+
+    const auto lhs_fp {fpclassify(lhs)};
+
+    if (lhs_fp == FP_NAN)
+    {
+        return nan;
+    }
+
+    switch (lhs_fp)
+    {
+        case FP_INFINITE:
+            return inf;
+        case FP_ZERO:
+            return sign ? -zero : zero;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    detail::decimal32_components rhs_components {rhs, 0, rhs < 0};
+    detail::decimal32_components q_components {};
+
+    generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return decimal32(q_components.sig, q_components.exp, q_components.sign);
+}
+
+template <typename Integer>
+constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    // Check pre-conditions
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::snan_mask)};
+
+    const bool sign {lhs < 0 != rhs.isneg()};
+
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (rhs_fp == FP_NAN)
+    {
+        return nan;
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_INFINITE:
+            return sign ? -zero : zero;
+        case FP_ZERO:
+            return nan;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    detail::decimal32_components lhs_components {lhs, 0, lhs < 0};
+    detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal32_components q_components {};
+
+    generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return decimal32(q_components.sig, q_components.exp, q_components.sign);
 }
 
 constexpr auto decimal32::operator/=(decimal32 rhs) noexcept -> decimal32&
