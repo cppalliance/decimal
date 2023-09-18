@@ -185,7 +185,8 @@ private:
     template <typename TargetType>
     constexpr auto to_integral() const noexcept -> TargetType;
 
-    friend constexpr auto div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
+    friend constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
+    friend constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
 
     template <typename T>
     friend constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>;
@@ -1650,7 +1651,7 @@ constexpr auto decimal32::operator*=(decimal32 rhs) noexcept -> decimal32&
     return *this;
 }
 
-constexpr auto div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
+constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
 {
     // Check pre-conditions
     constexpr decimal32 zero {0, 0};
@@ -1722,6 +1723,11 @@ constexpr auto div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
 
     // Let the constructor handle shrinking it back down and rounding correctly
     q = decimal32{res_sig, res_exp, sign};
+}
+
+constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
+{
+    constexpr decimal32 zero {0, 0};
 
     // https://en.cppreference.com/w/cpp/numeric/math/fmod
     auto q_trunc {q > zero ? floord32(q) : ceild32(q)};
@@ -1732,7 +1738,7 @@ constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     decimal32 q {};
     decimal32 r {};
-    div_mod_impl(lhs, rhs, q, r);
+    div_impl(lhs, rhs, q, r);
 
     return q;
 }
@@ -1747,7 +1753,8 @@ constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     decimal32 q {};
     decimal32 r {};
-    div_mod_impl(lhs, rhs, q, r);
+    div_impl(lhs, rhs, q, r);
+    mod_impl(lhs, rhs, q, r);
 
     return r;
 }
@@ -2123,11 +2130,7 @@ constexpr auto ceild32(decimal32 val) noexcept -> decimal32
 
 constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
-    decimal32 q {};
-    decimal32 r {};
-
-    div_mod_impl(lhs, rhs, q, r);
-    return r;
+    return lhs % rhs;
 }
 
 // Returns the normalized significand and exponent to be cohort agnostic
