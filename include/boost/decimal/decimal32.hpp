@@ -109,19 +109,19 @@ struct decimal32_components
     bool sign;
 };
 
-template <typename T, typename T2>
-constexpr auto shrink_significand(T sig, T2& exp) noexcept -> std::uint32_t
+template <typename T>
+constexpr auto shrink_significand(T sig, std::int32_t& exp) noexcept -> std::uint32_t
 {
-    const auto sig_dig {detail::num_digits(sig)};
+    auto usig {detail::make_positive_unsigned(sig)};
+    const auto sig_dig {detail::num_digits(usig)};
 
     if (sig_dig > 9)
     {
-        sig /= detail::powers_of_10[sig_dig - 9];
+        usig /= detail::powers_of_10[sig_dig - 9];
         exp += sig_dig - 9;
     }
 
-    sig = detail::make_positive_unsigned(sig);
-    return static_cast<std::uint32_t>(sig);
+    return static_cast<std::uint32_t>(usig);
 }
 
 } // namespace detail
@@ -940,7 +940,51 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 template <typename Integer>
 constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
 {
-    return static_cast<decimal32>(rhs) + lhs;
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return lhs;
+    }
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && (rhs < 0))
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+    bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto lhs_components {detail::decimal32_components{sig_lhs, exp_lhs, lhs.isneg()}};
+    auto sig_rhs {rhs};
+    std::int32_t exp_rhs {0};
+    normalize(sig_rhs, exp_rhs);
+    auto unsigned_sig_rhs = detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs_components, rhs_components);
+        lhs_bigger = !lhs_bigger;
+        abs_lhs_bigger = !abs_lhs_bigger;
+    }
+
+    detail::decimal32_components result {};
+
+    if (!lhs_components.sign && rhs_components.sign)
+    {
+        result = sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                          rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                          lhs_bigger, abs_lhs_bigger);
+    }
+    else
+    {
+        result = add_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                          rhs_components.sig, rhs_components.exp, rhs_components.sign);
+    }
+
+    return decimal32(result.sig, result.exp, result.sign);
 }
 
 template <typename Integer>
