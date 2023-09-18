@@ -1794,7 +1794,7 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
     constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::snan_mask)};
     constexpr decimal32 inf {boost::decimal::from_bits(boost::decimal::detail::inf_mask)};
 
-    const bool sign {lhs.isneg() != rhs < 0};
+    const bool sign {lhs.isneg() != (rhs < 0)};
 
     const auto lhs_fp {fpclassify(lhs)};
 
@@ -1833,7 +1833,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
     constexpr decimal32 zero {0, 0};
     constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::snan_mask)};
 
-    const bool sign {lhs < 0 != rhs.isneg()};
+    const bool sign {(lhs < 0) != rhs.isneg()};
 
     const auto rhs_fp {fpclassify(rhs)};
 
