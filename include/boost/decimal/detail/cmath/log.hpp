@@ -25,7 +25,7 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
     if (x < one)
     {
         // Handle reflection.
-        result = (x > zero ? -1 / log(-x) : std::numeric_limits<T>::infinity());
+        result = ((x > zero) ? -one / log(-x) : std::numeric_limits<T>::infinity());
     }
     else if(x > one)
     {
@@ -39,7 +39,7 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         // TODO(ckormanyos) There is probably something more efficient than calling frexp here.
         auto g = (x > two) ? frexp(x, &exp2val) : x;
 
-        constexpr auto sqrt2 = static_cast<T>(1.41421356237309504880L);
+        BOOST_DECIMAL_CXX20_CONSTEXPR auto sqrt2 = static_cast<T>(1.41421356237309504880L);
 
         auto is_sqrt2_scaled = bool { };
 
@@ -85,7 +85,7 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         }
 
         {
-            constexpr auto local_ln2 = static_cast<T>(0.693147180559945309417L);
+            BOOST_DECIMAL_CXX20_CONSTEXPR auto local_ln2 = static_cast<T>(0.693147180559945309417L);
 
             if (exp2val > 0)
             {
