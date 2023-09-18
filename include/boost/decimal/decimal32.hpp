@@ -139,9 +139,6 @@ constexpr auto normalize(T& significand, T2& exp) noexcept -> void
     }
 }
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto ilogb(T d) noexcept -> int;
-
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
 class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
@@ -173,7 +170,7 @@ private:
     data_layout_ bits_{};
 
     // Returns the un-biased (quantum) exponent
-    constexpr auto full_exponent() const noexcept -> std::uint32_t;
+    constexpr auto unbiased_exponent() const noexcept -> std::uint32_t;
 
     // Returns the biased exponent
     constexpr auto biased_exponent() const noexcept -> std::int32_t;
@@ -190,8 +187,8 @@ private:
 
     friend constexpr auto div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
 
-    template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
-    friend constexpr auto ilogb(T d) noexcept -> int;
+    template <typename T>
+    friend constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>;
 
     template <typename T>
     BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_conversion_impl() const noexcept -> T;
@@ -614,7 +611,7 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs)
 {
     // Check for de-normals
     const auto sig {rhs.full_significand()};
-    const auto exp {rhs.full_exponent()};
+    const auto exp {rhs.unbiased_exponent()};
 
     if (exp <= detail::precision - 1)
     {
@@ -1302,7 +1299,7 @@ constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_i
 
 #endif
 
-constexpr auto decimal32::full_exponent() const noexcept -> std::uint32_t
+constexpr auto decimal32::unbiased_exponent() const noexcept -> std::uint32_t
 {
     std::uint32_t expval {};
 
@@ -1324,7 +1321,7 @@ constexpr auto decimal32::full_exponent() const noexcept -> std::uint32_t
 
 constexpr auto decimal32::biased_exponent() const noexcept -> std::int32_t
 {
-    return static_cast<std::int32_t>(full_exponent()) - detail::bias;
+    return static_cast<std::int32_t>(unbiased_exponent()) - detail::bias;
 }
 
 template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
@@ -1445,7 +1442,7 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
     }
 
     result = static_cast<TargetType>(this->full_significand());
-    int expval {static_cast<int>(this->full_exponent()) - detail::bias};
+    int expval {static_cast<int>(this->unbiased_exponent()) - detail::bias};
     if (expval > 0)
     {
         result *= detail::pow10<TargetType>(expval);
@@ -1551,7 +1548,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d) -> st
     }
 
     os << "e";
-    auto print_exp {static_cast<int>(d.full_exponent()) - detail::bias + offset};
+    auto print_exp {static_cast<int>(d.unbiased_exponent()) - detail::bias + offset};
 
     if (print_exp < 0)
     {
@@ -1896,7 +1893,7 @@ constexpr auto samequantumd32(decimal32 lhs, decimal32 rhs) noexcept -> bool
         return false;
     }
 
-    return lhs.full_exponent() == rhs.full_exponent();
+    return lhs.unbiased_exponent() == rhs.unbiased_exponent();
 }
 
 // 3.6.5
@@ -1909,7 +1906,7 @@ constexpr auto quantexpd32(decimal32 x) noexcept -> int
         return INT_MIN;
     }
 
-    return static_cast<int>(x.full_exponent());
+    return static_cast<int>(x.unbiased_exponent());
 }
 
 // 3.6.6
