@@ -185,6 +185,8 @@ private:
     template <typename TargetType>
     constexpr auto to_integral() const noexcept -> TargetType;
 
+    friend constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
+                                           detail::decimal32_components& q) noexcept -> void;
     friend constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
     friend constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
 
@@ -1651,6 +1653,43 @@ constexpr auto decimal32::operator*=(decimal32 rhs) noexcept -> decimal32&
     return *this;
 }
 
+constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
+                                detail::decimal32_components& q) noexcept -> void
+{
+    bool sign {lhs.sign != rhs.sign};
+
+    // If rhs is greater than we need to offset the significands to get the correct values
+    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
+    const auto big_sig_lhs {static_cast<std::uint64_t>(lhs.sig) * detail::powers_of_10[detail::precision]};
+    lhs.exp -= 7;
+
+    auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(rhs.sig)};
+    auto res_exp {lhs.exp - rhs.exp};
+
+    const auto sig_dig {detail::num_digits(res_sig)};
+
+    if (sig_dig > 9)
+    {
+        res_sig /= detail::powers_of_10[sig_dig - 9];
+        res_exp += sig_dig - 9;
+    }
+
+    const auto res_sig_32 {static_cast<std::uint32_t>(res_sig)};
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "\nres sig: " << res_sig_32
+              << "\nres exp: " << res_exp << std::endl;
+    #endif
+
+    if (res_sig_32 == 0)
+    {
+        sign = false;
+    }
+
+    // Let the constructor handle shrinking it back down and rounding correctly
+    q = detail::decimal32_components{res_sig_32, res_exp, sign};
+}
+
 constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
 {
     // Check pre-conditions
@@ -1713,16 +1752,13 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    // If rhs is greater than we need to offset the significands to get the correct values
-    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    const auto big_sig_lhs {static_cast<std::uint64_t>(sig_lhs) * detail::powers_of_10[detail::precision]};
-    exp_lhs -= 7;
+    detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal32_components q_components {};
 
-    auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(sig_rhs)};
-    auto res_exp {exp_lhs - exp_rhs};
+    generic_div_impl(lhs_components, rhs_components, q_components);
 
-    // Let the constructor handle shrinking it back down and rounding correctly
-    q = decimal32{res_sig, res_exp, sign};
+    q = decimal32(q_components.sig, q_components.exp, q_components.sign);
 }
 
 constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
