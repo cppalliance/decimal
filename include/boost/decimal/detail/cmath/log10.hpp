@@ -15,7 +15,7 @@
 namespace boost { namespace decimal {
 
 template<typename T>
-constexpr auto log10(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
+constexpr auto log10(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     return T();
 }

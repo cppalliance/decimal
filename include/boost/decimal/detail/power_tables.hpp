@@ -19,11 +19,14 @@ static constexpr std::array<std::uint64_t, 20> powers_of_10 =
          UINT64_C(10000000000000000), UINT64_C(100000000000000000), UINT64_C(1000000000000000000), UINT64_C(10000000000000000000)
  }};
 
-template <typename T>
-constexpr auto pow10(int n) noexcept -> T
+template <typename UnsignedPowIntType>
+constexpr auto pow10(UnsignedPowIntType n) noexcept -> UnsignedPowIntType
 {
+    // TODO(mborland) Maybe enable_if for unsigned PowIntType?
+    // TODO(mborland) Then remove the assert()?
+
     assert(n >= 0);
-    return static_cast<T>(powers_of_10[n]);
+    return static_cast<UnsignedPowIntType>(powers_of_10[static_cast<std::size_t>(n)]);
 }
 
 } // namespace detail

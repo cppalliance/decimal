@@ -139,14 +139,13 @@ constexpr auto normalize(T& significand, T2& exp) noexcept -> void
     }
 }
 
-template<typename T>
-constexpr auto log10(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
-
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
 class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
 {
 private:
+
+    using unsigned_layout_type = std::uint32_t;
 
     // MSVC pragma that GCC and clang also support
     #pragma pack(push, 1)
@@ -194,7 +193,7 @@ private:
     friend constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>;
 
     template<typename T>
-    constexpr auto log10(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
+    friend constexpr auto log10(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
 
     template <typename T>
     BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_conversion_impl() const noexcept -> T;
@@ -2052,7 +2051,9 @@ constexpr auto floord32(decimal32 val) noexcept -> decimal32
     }
 
     auto new_sig {val.full_significand()};
-    auto abs_exp {std::abs(val.biased_exponent())};
+
+    auto abs_exp = val.biased_exponent(); if (abs_exp < 0) { abs_exp = -abs_exp; }
+
     const auto sig_dig {detail::num_digits(new_sig)};
     auto decimal_digits {sig_dig};
     bool round {false};
