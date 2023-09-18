@@ -142,6 +142,9 @@ constexpr auto normalize(T& significand, T2& exp) noexcept -> void
 template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
 constexpr auto ilogb(T d) noexcept -> int;
 
+template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
+constexpr auto log10(T x) noexcept -> T;
+
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
 class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
@@ -192,6 +195,9 @@ private:
 
     template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
     friend constexpr auto ilogb(T d) noexcept -> int;
+
+    template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>>
+    friend constexpr auto log10(T x) noexcept -> T;
 
     template <typename T>
     BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_conversion_impl() const noexcept -> T;
