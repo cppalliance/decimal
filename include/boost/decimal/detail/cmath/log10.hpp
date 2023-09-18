@@ -17,7 +17,14 @@ namespace boost { namespace decimal {
 template<typename T>
 constexpr auto log10(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
-    return T();
+    // TODO(ckormanyos) Handle non-nermal varguments.
+
+    // TODO(ckormanyos) Put in a bisic check for pure powers of 10, resulting
+    // in an exact result.
+
+    BOOST_DECIMAL_CXX20_CONSTEXPR lg10 = static_cast<T>(2.30258509299404568402L);
+
+    return log(x) / lg10;
 }
 
 } // namespace decimal
