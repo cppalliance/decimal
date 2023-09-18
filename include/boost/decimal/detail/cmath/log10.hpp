@@ -22,9 +22,9 @@ constexpr auto log10(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
     // TODO(ckormanyos) Put in a bisic check for pure powers of 10, resulting
     // in an exact result.
 
-    BOOST_DECIMAL_CXX20_CONSTEXPR lg10 = static_cast<T>(2.30258509299404568402L);
+    BOOST_DECIMAL_CXX20_CONSTEXPR auto value_lg10 = static_cast<T>(2.30258509299404568402L);
 
-    return log(x) / lg10;
+    return log(x) / value_lg10;
 }
 
 } // namespace decimal

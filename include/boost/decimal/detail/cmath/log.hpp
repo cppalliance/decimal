@@ -39,13 +39,13 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         // TODO(ckormanyos) There is probably something more efficient than calling frexp here.
         auto g = (x > two) ? frexp(x, &exp2val) : x;
 
-        BOOST_DECIMAL_CXX20_CONSTEXPR auto sqrt2 = static_cast<T>(1.41421356237309504880L);
+        BOOST_DECIMAL_CXX20_CONSTEXPR auto value_sqrt2 = static_cast<T>(1.41421356237309504880L);
 
         auto is_sqrt2_scaled = bool { };
 
-        if (g > sqrt2)
+        if (g > value_sqrt2)
         {
-            g /= sqrt2;
+            g /= value_sqrt2;
 
             is_sqrt2_scaled = true;
         }
@@ -85,16 +85,16 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         }
 
         {
-            BOOST_DECIMAL_CXX20_CONSTEXPR auto local_ln2 = static_cast<T>(0.693147180559945309417L);
+            BOOST_DECIMAL_CXX20_CONSTEXPR auto value_ln2 = static_cast<T>(0.693147180559945309417L);
 
             if (exp2val > 0)
             {
-                result += static_cast<T>(exp2val * local_ln2);
+                result += static_cast<T>(exp2val * value_ln2);
             }
 
             if(is_sqrt2_scaled)
             {
-                result += local_ln2 / 2U;
+                result += value_ln2 / 2U;
             }
         }
     }
