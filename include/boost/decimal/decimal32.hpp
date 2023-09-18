@@ -109,6 +109,21 @@ struct decimal32_components
     bool sign;
 };
 
+template <typename T, typename T2>
+constexpr auto shrink_significand(T sig, T2& exp) noexcept -> std::uint32_t
+{
+    const auto sig_dig {detail::num_digits(sig)};
+
+    if (sig_dig > 9)
+    {
+        sig /= detail::powers_of_10[sig_dig - 9];
+        exp += sig_dig - 9;
+    }
+
+    sig = detail::make_positive_unsigned(sig);
+    return static_cast<std::uint32_t>(sig);
+}
+
 } // namespace detail
 
 // Converts the significand to 7 digits to remove the effects of cohorts.
