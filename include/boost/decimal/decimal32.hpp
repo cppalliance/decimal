@@ -185,7 +185,10 @@ private:
     template <typename TargetType>
     constexpr auto to_integral() const noexcept -> TargetType;
 
-    friend constexpr auto div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
+    friend constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
+                                           detail::decimal32_components& q) noexcept -> void;
+    friend constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
+    friend constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
 
     template <typename T>
     friend constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>;
@@ -283,6 +286,13 @@ public:
     friend constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
     friend constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     // 3.2.2.5 Increment and Decrement
@@ -1650,7 +1660,44 @@ constexpr auto decimal32::operator*=(decimal32 rhs) noexcept -> decimal32&
     return *this;
 }
 
-constexpr auto div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
+constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
+                                detail::decimal32_components& q) noexcept -> void
+{
+    bool sign {lhs.sign != rhs.sign};
+
+    // If rhs is greater than we need to offset the significands to get the correct values
+    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
+    const auto big_sig_lhs {static_cast<std::uint64_t>(lhs.sig) * detail::powers_of_10[detail::precision]};
+    lhs.exp -= 7;
+
+    auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(rhs.sig)};
+    auto res_exp {lhs.exp - rhs.exp};
+
+    const auto sig_dig {detail::num_digits(res_sig)};
+
+    if (sig_dig > 9)
+    {
+        res_sig /= detail::powers_of_10[sig_dig - 9];
+        res_exp += sig_dig - 9;
+    }
+
+    const auto res_sig_32 {static_cast<std::uint32_t>(res_sig)};
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "\nres sig: " << res_sig_32
+              << "\nres exp: " << res_exp << std::endl;
+    #endif
+
+    if (res_sig_32 == 0)
+    {
+        sign = false;
+    }
+
+    // Let the constructor handle shrinking it back down and rounding correctly
+    q = detail::decimal32_components{res_sig_32, res_exp, sign};
+}
+
+constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
 {
     // Check pre-conditions
     constexpr decimal32 zero {0, 0};
@@ -1712,16 +1759,18 @@ constexpr auto div_mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal3
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    // If rhs is greater than we need to offset the significands to get the correct values
-    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    const auto big_sig_lhs {static_cast<std::uint64_t>(sig_lhs) * detail::powers_of_10[detail::precision]};
-    exp_lhs -= 7;
+    detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal32_components q_components {};
 
-    auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(sig_rhs)};
-    auto res_exp {exp_lhs - exp_rhs};
+    generic_div_impl(lhs_components, rhs_components, q_components);
 
-    // Let the constructor handle shrinking it back down and rounding correctly
-    q = decimal32{res_sig, res_exp, sign};
+    q = decimal32(q_components.sig, q_components.exp, q_components.sign);
+}
+
+constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
+{
+    constexpr decimal32 zero {0, 0};
 
     // https://en.cppreference.com/w/cpp/numeric/math/fmod
     auto q_trunc {q > zero ? floord32(q) : ceild32(q)};
@@ -1732,9 +1781,88 @@ constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     decimal32 q {};
     decimal32 r {};
-    div_mod_impl(lhs, rhs, q, r);
+    div_impl(lhs, rhs, q, r);
 
     return q;
+}
+
+template <typename Integer>
+constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    // Check pre-conditions
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::snan_mask)};
+    constexpr decimal32 inf {boost::decimal::from_bits(boost::decimal::detail::inf_mask)};
+
+    const bool sign {lhs.isneg() != (rhs < 0)};
+
+    const auto lhs_fp {fpclassify(lhs)};
+
+    if (lhs_fp == FP_NAN)
+    {
+        return nan;
+    }
+
+    switch (lhs_fp)
+    {
+        case FP_INFINITE:
+            return inf;
+        case FP_ZERO:
+            return sign ? -zero : zero;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    detail::decimal32_components rhs_components {detail::make_positive_unsigned(rhs), 0, rhs < 0};
+    detail::decimal32_components q_components {};
+
+    generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return decimal32(q_components.sig, q_components.exp, q_components.sign);
+}
+
+template <typename Integer>
+constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    // Check pre-conditions
+    constexpr decimal32 zero {0, 0};
+    constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::snan_mask)};
+
+    const bool sign {(lhs < 0) != rhs.isneg()};
+
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (rhs_fp == FP_NAN)
+    {
+        return nan;
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_INFINITE:
+            return sign ? -zero : zero;
+        case FP_ZERO:
+            return nan;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    detail::decimal32_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
+    detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal32_components q_components {};
+
+    generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return decimal32(q_components.sig, q_components.exp, q_components.sign);
 }
 
 constexpr auto decimal32::operator/=(decimal32 rhs) noexcept -> decimal32&
@@ -1747,7 +1875,8 @@ constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     decimal32 q {};
     decimal32 r {};
-    div_mod_impl(lhs, rhs, q, r);
+    div_impl(lhs, rhs, q, r);
+    mod_impl(lhs, rhs, q, r);
 
     return r;
 }
@@ -2123,11 +2252,7 @@ constexpr auto ceild32(decimal32 val) noexcept -> decimal32
 
 constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
-    decimal32 q {};
-    decimal32 r {};
-
-    div_mod_impl(lhs, rhs, q, r);
-    return r;
+    return lhs % rhs;
 }
 
 // Returns the normalized significand and exponent to be cohort agnostic

@@ -51,18 +51,6 @@ constexpr auto operator*(T lhs, decimal32 rhs) noexcept -> decimal32
     return static_cast<decimal32>(lhs) * rhs;
 }
 
-template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr auto operator/(decimal32 lhs, T rhs) noexcept -> decimal32
-{
-    return lhs / static_cast<decimal32>(rhs);
-}
-
-template <typename T, std::enable_if_t<detail::is_integral<T>::value, bool> = true>
-constexpr auto operator/(T lhs, decimal32 rhs) noexcept -> decimal32
-{
-    return static_cast<decimal32>(lhs) / rhs;
-}
-
 constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     return samequantumd32(lhs, rhs);

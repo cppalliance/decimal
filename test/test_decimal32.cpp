@@ -354,6 +354,14 @@ void test_div_mod()
     BOOST_TEST_EQ(one / inf_val, zero);
     BOOST_TEST(isnan(inf_val / qnan_val));
     BOOST_TEST(isnan(qnan_val / inf_val));
+
+    // Mixed types
+    BOOST_TEST(isnan(qnan_val / 1));
+    BOOST_TEST(isnan(snan_val / 1));
+    BOOST_TEST(isnan(1 / qnan_val));
+    BOOST_TEST(isnan(1 / snan_val));
+    BOOST_TEST(isinf(inf_val / 1));
+    BOOST_TEST_EQ(1 / inf_val, zero);
 }
 
 template <typename T>
