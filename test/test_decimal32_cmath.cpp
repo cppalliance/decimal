@@ -505,6 +505,16 @@ void test_fdim()
     BOOST_TEST_EQ(fdim(Dec(1), Dec(1)), Dec(0));
 }
 
+template <typename Dec>
+void test_ilogb()
+{
+    BOOST_TEST_EQ(ilogb(Dec(1,0)), 101);
+    BOOST_TEST_EQ(ilogb(Dec(10, 0)), 102);
+    BOOST_TEST_EQ(ilogb(Dec(0)), FP_ILOGB0);
+    BOOST_TEST_EQ(ilogb(BOOST_DECIMAL_DEC_INFINITY), INT_MAX);
+    BOOST_TEST_EQ(ilogb(BOOST_DECIMAL_DEC_NAN), FP_ILOGBNAN);
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -539,6 +549,8 @@ int main()
     test_remquo<decimal32>();
 
     test_fdim<decimal32>();
+
+    test_ilogb<decimal32>();
 
     return boost::report_errors();
 }

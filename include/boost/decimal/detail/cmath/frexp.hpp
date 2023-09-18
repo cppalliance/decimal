@@ -48,7 +48,7 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
         auto t =
             static_cast<int>
             (
-                  static_cast<long double>(ilogb(result_frexp))
+                  static_cast<long double>(ilogb(result_frexp) - detail::bias)
                 * static_cast<long double>(3.3222591362126245847176079734219269102990033L)
             );
 
