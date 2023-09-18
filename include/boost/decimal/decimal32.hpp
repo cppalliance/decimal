@@ -36,12 +36,12 @@ namespace boost { namespace decimal {
 namespace detail {
 
 // See section 3.5.2
-static constexpr auto inf_mask      = static_cast<std::uint32_t>(UINT32_C(0b0'11110'000000'0000000000'0000000000));
-static constexpr auto nan_mask      = static_cast<std::uint32_t>(UINT32_C(0b0'11111'000000'0000000000'0000000000));
-static constexpr auto snan_mask     = static_cast<std::uint32_t>(UINT32_C(0b0'11111'100000'0000000000'0000000000));
-static constexpr auto comb_inf_mask = static_cast<std::uint32_t>(UINT32_C(0b11110));
-static constexpr auto comb_nan_mask = static_cast<std::uint32_t>(UINT32_C(0b11111));
-static constexpr auto exp_snan_mask = static_cast<std::uint32_t>(UINT32_C(0b100000));
+static constexpr auto inf_mask      = UINT32_C(0b0'11110'000000'0000000000'0000000000);
+static constexpr auto nan_mask      = UINT32_C(0b0'11111'000000'0000000000'0000000000);
+static constexpr auto snan_mask     = UINT32_C(0b0'11111'100000'0000000000'0000000000);
+static constexpr auto comb_inf_mask = UINT32_C(0b11110);
+static constexpr auto comb_nan_mask = UINT32_C(0b11111);
+static constexpr auto exp_snan_mask = UINT32_C(0b100000);
 
 // Values from IEEE 754-2019 table 3.6
 BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto storage_width = 32;
