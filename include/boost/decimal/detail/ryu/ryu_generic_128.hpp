@@ -271,7 +271,7 @@ static constexpr auto generic_binary_to_decimal(
     }
     // We need to take vr+1 if vr is outside bounds, or we need to round up.
     output = vr + (unsigned_128_type)((vr == vm && (!acceptBounds || !vmIsTrailingZeros)) || (lastRemovedDigit >= 5));
-    const auto exp = static_cast<std::int32_t>(e10 + removed);
+    const auto exp = static_cast<std::int32_t>(e10 + static_cast<std::int32_t>(removed));
 
     #ifdef BOOST_DECIMAL_DEBUG_RYU
     printf("V+=%s\nV =%s\nV-=%s\n", s(vp), s(vr), s(vm));

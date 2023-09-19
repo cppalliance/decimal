@@ -5,11 +5,11 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_ILOGB_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_ILOGB_HPP
 
-#include <boost/decimal/fwd.hpp>
-#include <boost/decimal/detail/type_traits.hpp>
-#include <type_traits>
-#include <climits>
 #include <cmath>
+#include <type_traits>
+
+#include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
+#include <boost/decimal/detail/type_traits.hpp>
 
 namespace boost { namespace decimal {
 
@@ -31,9 +31,9 @@ constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floati
         return FP_ILOGBNAN;
     }
 
-    const auto offset { detail::num_digits(d.full_significand()) - 1 };
+    const auto offset = detail::num_digits(d.full_significand()) - 1;
 
-    auto expval {static_cast<int>(d.unbiased_exponent()) + static_cast<int>(offset) };
+    const auto expval = static_cast<int>(static_cast<int>(d.unbiased_exponent()) + offset);
 
     return expval;
 }

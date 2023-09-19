@@ -18,6 +18,8 @@
 #include <boost/decimal/detail/cmath/isless.hpp>
 #include <boost/decimal/detail/cmath/isunordered.hpp>
 #include <boost/decimal/detail/cmath/ldexp.hpp>
+#include <boost/decimal/detail/cmath/log.hpp>
+#include <boost/decimal/detail/cmath/log10.hpp>
 #include <boost/decimal/detail/cmath/pow.hpp>
 #include <boost/decimal/detail/cmath/remainder.hpp>
 #include <boost/decimal/detail/cmath/remquo.hpp>

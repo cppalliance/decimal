@@ -119,7 +119,7 @@ constexpr auto shrink_significand(Integer sig, std::int32_t& exp) noexcept -> st
 
     if (sig_dig > 9)
     {
-        unsigned_sig /= static_cast<Unsigned_Integer>(detail::powers_of_10[sig_dig - 9]);
+        unsigned_sig /= static_cast<Unsigned_Integer>(detail::powers_of_10[static_cast<std::size_t>(sig_dig - 9)]);
         exp += sig_dig - 9;
     }
 
@@ -161,6 +161,8 @@ constexpr auto normalize(T& significand, T2& exp) noexcept -> void
 class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
 {
 private:
+
+    using unsigned_layout_type = std::uint32_t;
 
     // MSVC pragma that GCC and clang also support
     #pragma pack(push, 1)
@@ -209,6 +211,9 @@ private:
 
     template <typename T>
     friend constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>;
+
+    template<typename T>
+    friend constexpr auto log10(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
 
     template <typename T>
     BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_conversion_impl() const noexcept -> T;
@@ -485,7 +490,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     else
     {
         bits_.sign = sign;
-        unsigned_coeff = coeff;
+        unsigned_coeff = static_cast<Unsigned_Integer>(coeff);
     }
 
     // If the coeff is not in range make it so
@@ -623,10 +628,10 @@ constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32
 {
     decimal32 result;
 
-    result.bits_.exponent = (bits & detail::construct_sign_mask) >> 31;
-    result.bits_.combination_field = (bits & detail::construct_combination_mask) >> 26;
-    result.bits_.exponent = (bits & detail::construct_exp_mask) >> 20;
-    result.bits_.significand = bits & detail::construct_significand_mask;
+    result.bits_.exponent          = static_cast<std::uint32_t>((bits & detail::construct_sign_mask)        >> 31U);
+    result.bits_.combination_field = static_cast<std::uint32_t>((bits & detail::construct_combination_mask) >> 26U);
+    result.bits_.exponent          = static_cast<std::uint32_t>((bits & detail::construct_exp_mask)         >> 20U);
+    result.bits_.significand       = static_cast<std::uint32_t>( bits & detail::construct_significand_mask);
 
     return result;
 }
@@ -648,12 +653,12 @@ constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 r
 
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
-    return ((rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask) && !isnan(rhs);
+    return ((rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask) && (!isnan(rhs));
 }
 
 constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
-    return !isinf(rhs) && !isnan(rhs);
+    return (!isinf(rhs)) && (!isnan(rhs));
 }
 
 constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
@@ -667,7 +672,7 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs)
         return false;
     }
 
-    return sig != 0 && isfinite(rhs);
+    return (sig != 0) && isfinite(rhs);
 }
 
 constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> int
@@ -706,7 +711,7 @@ constexpr auto operator+(decimal32 rhs) noexcept -> decimal32
 
 constexpr auto operator-(decimal32 rhs) noexcept-> decimal32
 {
-    rhs.bits_.sign ^= 1;
+    rhs.bits_.sign ^= 1U;
     return rhs;
 }
 
@@ -1172,8 +1177,6 @@ constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool
 template <typename Integer>
 constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool
 {
-    using Unsigned_Integer = detail::make_unsigned_t<Integer>;
-
     if (isnan(lhs) || isinf(lhs))
     {
         return false;
@@ -1194,7 +1197,7 @@ constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool
         }
     }
 
-    Unsigned_Integer rhs_significand {rhs < 0 ? detail::apply_sign(rhs) : rhs};
+    const auto rhs_significand {detail::make_positive_unsigned(rhs)};
 
     return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(),
                             rhs_significand, INT32_C(0));
@@ -1313,8 +1316,6 @@ constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool
 template <typename Integer>
 constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool
 {
-    using Unsigned_Integer = detail::make_unsigned_t<Integer>;
-
     if (isnan(lhs))
     {
         return false;
@@ -1351,7 +1352,7 @@ constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool
         }
     }
 
-    Unsigned_Integer rhs_significand {rhs_sign ? detail::apply_sign(rhs) : rhs};
+    const auto rhs_significand {detail::make_positive_unsigned(rhs)};
 
     return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs_sign,
                            rhs_significand, INT32_C(0), rhs_sign);
@@ -2365,7 +2366,9 @@ constexpr auto floord32(decimal32 val) noexcept -> decimal32
     }
 
     auto new_sig {val.full_significand()};
-    auto abs_exp {std::abs(val.biased_exponent())};
+
+    auto abs_exp = val.biased_exponent(); if (abs_exp < 0) { abs_exp = -abs_exp; }
+
     const auto sig_dig {detail::num_digits(new_sig)};
     auto decimal_digits {sig_dig};
     bool round {false};
