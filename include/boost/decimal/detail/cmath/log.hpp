@@ -36,7 +36,7 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         }
         else if (x < zero)
         {
-            result = -std::numeric_limits<T>::quiet_NaN();
+            result = std::numeric_limits<T>::quiet_NaN();
         }
         else
         {
