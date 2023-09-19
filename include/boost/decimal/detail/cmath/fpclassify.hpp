@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_FPCLASSIFY_HPP
 
 #include <boost/decimal/fwd.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <type_traits>
 #include <cmath>
@@ -13,7 +14,8 @@
 namespace boost { namespace decimal {
 
 template <typename T>
-constexpr auto fpclassify(T rhs) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>
+constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>
 {
     if (isinf(rhs))
     {
