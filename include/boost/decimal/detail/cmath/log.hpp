@@ -97,22 +97,21 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         const auto z2   = z * z;
               auto term = z;
 
-        // TODO(ckormanyos) Optimize?
-        // Using a loop expansion is scalable from decimal32 up to decimal64.
-        // It might, however, be somewhat slower than using fma statically
-        // expanded on the static, constexpr coefficient list.
+        constexpr auto exp_target = ilogb(std::numeric_limits<T>::epsilon()) - 1;
 
-        for(auto   index = static_cast<std::size_t>(UINT8_C(1));
-                 ((index < std::tuple_size<coef_list_array_type>::value) && (abs(term) >= std::numeric_limits<T>::epsilon()));
-                 ++index)
+        auto coef_itr = coefs.cbegin() + 1U;
 
+        // Using a loop expansion with the above-tabulated coefficients
+        // is scalable from decimal32 up to decimal64.
+        do
         {
           result += term;
 
           zn *= z2;
 
-          term = zn * coefs[index];
+          term = zn * *coef_itr;
         }
+        while((++coef_itr != coefs.cend()) && (ilogb(term) > exp_target));
 
         if (exp2val > 0)
         {
@@ -121,7 +120,9 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 
         if(is_scaled_by_sqrt)
         {
-            result += numbers::ln2_v<T> / 2U;
+            constexpr auto ln2_half = numbers::ln2_v<T> / 2U;
+
+            result += ln2_half;
         }
     }
     else
