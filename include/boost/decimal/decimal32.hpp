@@ -2526,8 +2526,6 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
     auto mul_result {mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
     const decimal32 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
 
-    return dec_result + z;
-
     const auto res_add {check_non_finite(z, dec_result)};
     if (res_add != zero)
     {

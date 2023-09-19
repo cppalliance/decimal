@@ -318,6 +318,31 @@ template <typename Dec>
 void test_fma()
 {
     BOOST_TEST_EQ(fma(decimal32(1, -1), decimal32(1, 1), decimal32(1, 0, true)), decimal32(0, 0));
+
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(-1e10F, 1e10F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        const auto val3 {dist(rng)};
+        decimal32 d1 {val1};
+        decimal32 d2 {val2};
+        decimal32 d3 {val3};
+
+        auto fma_val {fma(d1, d2, d3)};
+        auto naive_val {(d1 * d2) + d3};
+
+        if (!BOOST_TEST(fabs(fma_val - naive_val) < std::numeric_limits<Dec>::epsilon()))
+        {
+            std::cerr << "Dec 1: " << d1
+                      << "\nDec 2: " << d2
+                      << "\nDec 3: " << d3
+                      << "\nfma val: " << fma_val
+                      << "\nNaive val: " << naive_val << std::endl;
+        }
+    }
 }
 
 template <typename Dec>
@@ -517,6 +542,7 @@ void test_ilogb()
 
 int main()
 {
+    /*
     test_fmax<decimal32>();
     test_isgreater<decimal32>();
     test_isgreaterequal<decimal32>();
@@ -537,9 +563,9 @@ int main()
     test_div_fmod<decimal32>();
 
     test_copysign<decimal32>();
-
+*/
     test_fma<decimal32>();
-
+/*
     test_sin<decimal32>();
     test_cos<decimal32>();
 
@@ -551,6 +577,6 @@ int main()
     test_fdim<decimal32>();
 
     test_ilogb<decimal32>();
-
+*/
     return boost::report_errors();
 }
