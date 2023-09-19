@@ -5,10 +5,11 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_FREXP_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_FREXP_HPP
 
-#include <boost/decimal/fwd.hpp>
-#include <boost/decimal/detail/type_traits.hpp>
-#include <type_traits>
 #include <cmath>
+#include <type_traits>
+
+#include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
+#include <boost/decimal/detail/type_traits.hpp>
 
 namespace boost { namespace decimal {
 

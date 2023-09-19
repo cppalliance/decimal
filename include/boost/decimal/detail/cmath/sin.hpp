@@ -17,8 +17,8 @@
 
 namespace boost { namespace decimal {
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto sin(T x) noexcept -> T
+template<typename T>
+constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T zero {0, 0};
 
