@@ -149,6 +149,19 @@ namespace local
     {
       static_cast<void>(index);
 
+      const auto log_zero = log(constants::my_zero());
+
+      const volatile auto result_log_zero_is_ok = (isinf(log_zero) && (log_zero < constants::my_zero()));
+
+      BOOST_TEST(result_log_zero_is_ok);
+
+      result_is_ok = (result_log_zero_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    {
+      static_cast<void>(index);
+
       const auto log_one = log(constants::my_one());
 
       const volatile auto result_log_one_is_ok = (log_one == constants::my_zero());
@@ -156,6 +169,19 @@ namespace local
       BOOST_TEST(result_log_one_is_ok);
 
       result_is_ok = (result_log_one_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    {
+      static_cast<void>(index);
+
+      const auto log_one_minus = log(-constants::my_one());
+
+      const volatile auto result_log_one_minus_is_ok = isnan(log_one_minus);
+
+      BOOST_TEST(result_log_one_minus_is_ok);
+
+      result_is_ok = (result_log_one_minus_is_ok && result_is_ok);
     }
 
     for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
