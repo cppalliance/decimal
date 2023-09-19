@@ -32,6 +32,7 @@
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
+#include <boost/decimal/detail/cmath/abs.hpp>
 
 namespace boost { namespace decimal {
 
@@ -292,7 +293,6 @@ public:
     friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
     friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
-    friend constexpr auto abs         BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> decimal32;
 
     // 3.2.7 unary arithmetic operators:
     friend constexpr auto operator+(decimal32 rhs) noexcept -> decimal32;
@@ -663,11 +663,6 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs)
     }
 
     return sig != 0 && isfinite(rhs);
-}
-
-constexpr auto abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> decimal32
-{
-    return (rhs.isneg()) ? -rhs : rhs;
 }
 
 constexpr auto operator+(decimal32 rhs) noexcept -> decimal32

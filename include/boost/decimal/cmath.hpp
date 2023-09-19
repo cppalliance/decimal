@@ -25,6 +25,7 @@
 #include <boost/decimal/detail/cmath/trunc.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
+#include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
