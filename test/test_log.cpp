@@ -30,7 +30,7 @@ namespace local
 {
   template<typename IntegralTimePointType,
            typename ClockType = std::chrono::high_resolution_clock>
-  auto time_point() -> IntegralTimePointType
+  auto time_point() noexcept -> IntegralTimePointType
   {
     using local_integral_time_point_type = IntegralTimePointType;
     using local_clock_type               = ClockType;
@@ -50,7 +50,7 @@ namespace local
   template<typename NumericType>
   auto is_close_fraction(const NumericType& a,
                          const NumericType& b,
-                         const NumericType& tol) -> bool
+                         const NumericType& tol) noexcept -> bool
   {
     using std::fabs;
 
@@ -79,7 +79,12 @@ namespace local
 
     gen.seed(time_point<typename std::mt19937_64::result_type>());
 
-    std::uniform_real_distribution<float> dis(static_cast<float>(0.1L), static_cast<float>(1.0E17L));
+    auto dis =
+      std::uniform_real_distribution<float>
+      {
+        static_cast<float>(1.0E-17L),
+        static_cast<float>(1.0E+17L)
+      };
 
     auto result_is_ok = true;
 
@@ -119,106 +124,53 @@ namespace local
 
     return result_is_ok;
   }
+
+  auto test_log10_edge() -> bool
+  {
+    using decimal_type = boost::decimal::decimal32;
+
+    auto result_is_ok = true;
+
+    {
+      constexpr auto zero = decimal_type { 0 };
+      constexpr auto one  = decimal_type { 1 };
+
+      const auto log_one = log(one);
+
+      const auto result_log_one_is_ok = (log_one == zero);
+
+      BOOST_TEST(result_log_one_is_ok);
+
+      result_is_ok = (result_log_one_is_ok && result_is_ok);
+    }
+
+    {
+      const auto log_inf = log(std::numeric_limits<decimal_type>::infinity());
+
+      const auto result_log_inf_is_ok = isinf(log_inf);
+
+      BOOST_TEST(result_log_inf_is_ok);
+
+      result_is_ok = (result_log_inf_is_ok && result_is_ok);
+    }
+
+    {
+      const auto log_nan = log(std::numeric_limits<decimal_type>::quiet_NaN());
+
+      const auto result_log_nan_is_ok = isnan(log_nan);
+
+      BOOST_TEST(result_log_nan_is_ok);
+
+      result_is_ok = (result_log_nan_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
 }
-
-#if 0
-template<typename T>
-auto my_log(T x) noexcept -> std::enable_if_t<std::is_floating_point_v<T>, T>
-{
-    constexpr auto zero = T { 0 };
-    constexpr auto one  = T { 1 };
-
-    auto result = T { };
-
-    if (x < one)
-    {
-        // Handle reflection.
-        result = (x > zero ? -1 / log(-x) : std::numeric_limits<T>::infinity());
-    }
-    else if(x > one)
-    {
-        constexpr auto two  = T { 2 };
-
-        // This algorithm for logarithm is based on Chapter 5 of Cody and Waite,
-        // Software Manual for the Elementary Functions, Prentice Hall, 1980.
-
-        auto exp2val = int { };
-
-        // TODO(ckormanyos) There is probably something more efficient than calling frexp here.
-        auto g = (x > two) ? frexp(x, &exp2val) : x;
-
-        constexpr auto sqrt2 = static_cast<T>(1.41421356237309504880L);
-
-        auto is_sqrt2_scaled = bool { };
-
-        if (g > sqrt2)
-        {
-            g /= sqrt2;
-
-            is_sqrt2_scaled = true;
-        }
-
-        // 1, 12, 80, 448, 2304, 11264, 53248, 245760, 1114112, 4980736, 22020096, 96468992
-        using coef_list_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(12))>;
-
-        constexpr auto coefs =
-          coef_list_array_type
-          {
-            one, one / 12U, one / 80U, one / 448U, one / 11264U, one / 53248U, one / UINT32_C(245760),  one / UINT32_C(1114112),  one / UINT32_C(4980736),  one / UINT32_C(22020096),  one / UINT32_C(96468992)
-          };
-
-        const auto s = (g - one) / (g + one);
-        const auto z = s + s;
-
-              auto zn   = z;
-        const auto z2   = z * z;
-              auto term = z;
-
-        // TODO(ckormanyos) Optimize?
-        // Using a loop expansion is scalable from decimal32 up to decimal64.
-        // It might, however, be somewhat slower than using fma statically
-        // expanded on the static, constexpr coefficient list.
-
-        using std::fabs;
-
-        for(auto   index = static_cast<std::size_t>(UINT8_C(1));
-                 ((index < std::tuple_size<coef_list_array_type>::value) && (fabs(term) >= std::numeric_limits<T>::epsilon()));
-                 ++index)
-
-        {
-          result += term;
-
-          zn *= z2;
-
-          term = zn * coefs[index];
-        }
-
-        {
-            constexpr auto local_ln2 = static_cast<T>(0.693147180559945309417L);
-
-            if (exp2val > 0)
-            {
-                result += static_cast<T>(exp2val * local_ln2);
-            }
-
-            if(is_sqrt2_scaled)
-            {
-                result += local_ln2 / 2U;
-            }
-        }
-    }
-    else
-    {
-        result = zero;
-    }
-
-    return result;
-}
-#endif
 
 auto main() -> int
 {
-  auto result_is_ok = local::test_log10();
+  auto result_is_ok = (local::test_log10() && local::test_log10_edge());
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 

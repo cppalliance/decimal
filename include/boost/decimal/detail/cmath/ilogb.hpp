@@ -5,11 +5,11 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_ILOGB_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_ILOGB_HPP
 
-#include <boost/decimal/fwd.hpp>
-#include <boost/decimal/detail/type_traits.hpp>
-#include <type_traits>
-#include <climits>
 #include <cmath>
+#include <type_traits>
+
+#include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
+#include <boost/decimal/detail/type_traits.hpp>
 
 namespace boost { namespace decimal {
 

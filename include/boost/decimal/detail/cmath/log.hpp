@@ -9,20 +9,26 @@
 #include <cmath>
 #include <type_traits>
 
-#include <boost/decimal/fwd.hpp>
+#include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
 
 namespace boost { namespace decimal {
 
 template<typename T>
-constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
 {
+    // TODO(ckormanyos) Handle arguments infinity and NaN.
+
     constexpr auto zero = T { 0 };
     constexpr auto one  = T { 1 };
 
     auto result = T { };
 
-    if (x < one)
+    if (isinf(x) || isnan(x))
+    {
+        result = x;
+    }
+    else if (x < one)
     {
         // Handle reflection.
         result = ((x > zero) ? -one / log(-x) : -std::numeric_limits<T>::infinity());
@@ -58,7 +64,17 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
             {
                 // 1, 12, 80, 448, 2304, 11264, 53248, 245760, 1114112, 4980736, 22020096, 96468992, ...
                 // See also Sloane's A058962 at: https://oeis.org/A058962
-                one, one / 12U, one / 80U, one / 448U, one / 11264U, one / 53248U, one / UINT32_C(245760),  one / UINT32_C(1114112),  one / UINT32_C(4980736),  one / UINT32_C(22020096),  one / UINT32_C(96468992)
+                one,
+                one / static_cast<std::uint8_t>(UINT8_C(12)),
+                one / static_cast<std::uint8_t>(UINT8_C(80)),
+                one / static_cast<std::uint16_t>(UINT16_C(448)),
+                one / static_cast<std::uint16_t>(UINT16_C(11264)),
+                one / static_cast<std::uint16_t>(UINT16_C(53248)),
+                one / static_cast<std::uint32_t>(UINT32_C(245760)),
+                one / static_cast<std::uint32_t>(UINT32_C(1114112)),
+                one / static_cast<std::uint32_t>(UINT32_C(4980736)),
+                one / static_cast<std::uint32_t>(UINT32_C(22020096)),
+                one / static_cast<std::uint32_t>(UINT32_C(96468992))
             };
 
         const auto s = (g - one) / (g + one);

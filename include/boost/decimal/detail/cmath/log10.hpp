@@ -9,7 +9,7 @@
 #include <cmath>
 #include <type_traits>
 
-#include <boost/decimal/fwd.hpp>
+#include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
 
 namespace boost { namespace decimal {
