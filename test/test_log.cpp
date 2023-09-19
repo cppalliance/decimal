@@ -132,8 +132,8 @@ namespace local
     auto result_is_ok = true;
 
     {
-      constexpr auto zero = decimal_type { 0 };
-      constexpr auto one  = decimal_type { 1 };
+      constexpr auto zero = decimal_type { 0, 0 };
+      constexpr auto one  = decimal_type { 1, 0 };
 
       const auto log_one = log(one);
 

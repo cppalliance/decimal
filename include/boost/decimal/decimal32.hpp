@@ -119,7 +119,7 @@ constexpr auto shrink_significand(Integer sig, std::int32_t& exp) noexcept -> st
 
     if (sig_dig > 9)
     {
-        unsigned_sig /= static_cast<Unsigned_Integer>(detail::powers_of_10[sig_dig - 9]);
+        unsigned_sig /= static_cast<Unsigned_Integer>(detail::powers_of_10[static_cast<std::size_t>(sig_dig - 9)]);
         exp += sig_dig - 9;
     }
 
@@ -489,7 +489,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     else
     {
         bits_.sign = sign;
-        unsigned_coeff = coeff;
+        unsigned_coeff = static_cast<Unsigned_Integer>(coeff);
     }
 
     // If the coeff is not in range make it so
@@ -627,10 +627,10 @@ constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32
 {
     decimal32 result;
 
-    result.bits_.exponent = (bits & detail::construct_sign_mask) >> 31;
-    result.bits_.combination_field = (bits & detail::construct_combination_mask) >> 26;
-    result.bits_.exponent = (bits & detail::construct_exp_mask) >> 20;
-    result.bits_.significand = bits & detail::construct_significand_mask;
+    result.bits_.exponent          = static_cast<std::uint32_t>((bits & detail::construct_sign_mask)        >> 31U);
+    result.bits_.combination_field = static_cast<std::uint32_t>((bits & detail::construct_combination_mask) >> 26U);
+    result.bits_.exponent          = static_cast<std::uint32_t>((bits & detail::construct_exp_mask)         >> 20U);
+    result.bits_.significand       = static_cast<std::uint32_t>( bits & detail::construct_significand_mask);
 
     return result;
 }
@@ -652,12 +652,12 @@ constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 r
 
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
-    return ((rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask) && !isnan(rhs);
+    return ((rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask) && (!isnan(rhs));
 }
 
 constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
-    return !isinf(rhs) && !isnan(rhs);
+    return (!isinf(rhs)) && (!isnan(rhs));
 }
 
 constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
@@ -671,7 +671,7 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs)
         return false;
     }
 
-    return sig != 0 && isfinite(rhs);
+    return (sig != 0) && isfinite(rhs);
 }
 
 constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> int
@@ -710,7 +710,7 @@ constexpr auto operator+(decimal32 rhs) noexcept -> decimal32
 
 constexpr auto operator-(decimal32 rhs) noexcept-> decimal32
 {
-    rhs.bits_.sign ^= 1;
+    rhs.bits_.sign ^= 1U;
     return rhs;
 }
 

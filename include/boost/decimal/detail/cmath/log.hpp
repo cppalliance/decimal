@@ -19,8 +19,8 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 {
     // TODO(ckormanyos) Handle arguments infinity and NaN.
 
-    constexpr auto zero = T { 0 };
-    constexpr auto one  = T { 1 };
+    constexpr auto zero = T { 0, 0 };
+    constexpr auto one  = T { 1, 0 };
 
     auto result = T { };
 
@@ -35,7 +35,7 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
     }
     else if(x > one)
     {
-        constexpr auto two  = T { 2 };
+        constexpr auto two  = T { 2, 0 };
 
         // The algorithm for logarithm is based on Chapter 5, pages 35-36
         // of Cody and Waite, Software Manual for the Elementary Functions,
