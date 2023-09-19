@@ -355,13 +355,13 @@ namespace local
     {
       const auto ceil_pi_pos_inline   = ceil(boost::decimal::numbers::pi_v<decimal_type>);
       const auto ceil_pi_neg_inline   = ceil(-boost::decimal::numbers::pi_v<decimal_type>);
-      const auto ceil_pi_pos_callable = ceil(constants::my_pi());
-      const auto ceil_pi_neg_callable = ceil(-constants::my_pi());
+      const auto ceil_pi_pos_callable = ceil(2 * constants::my_pi());
+      const auto ceil_pi_neg_callable = ceil(-2 * constants::my_pi());
 
       const volatile auto result_ceil_is_ok =
         (
              ((ceil_pi_pos_inline   == 4) && (ceil_pi_neg_inline   == -3))
-          && ((ceil_pi_pos_callable == 4) && (ceil_pi_neg_callable == -3))
+          && ((ceil_pi_pos_callable == 7) && (ceil_pi_neg_callable == -6))
         );
 
       BOOST_TEST(result_ceil_is_ok);
