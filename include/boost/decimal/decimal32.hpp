@@ -205,7 +205,7 @@ private:
     friend constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
                                            detail::decimal32_components& q) noexcept -> void;
     friend constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
-    friend constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
+    friend constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, const decimal32& q, decimal32& r) noexcept -> void;
 
     template <typename T>
     friend constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>;
@@ -1958,7 +1958,7 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
     q = decimal32(q_components.sig, q_components.exp, q_components.sign);
 }
 
-constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
+constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, const decimal32& q, decimal32& r) noexcept -> void
 {
     constexpr decimal32 zero {0, 0};
 
@@ -2545,7 +2545,6 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
     if (!lhs_bigger)
     {
         detail::swap(mul_result, z_components);
-        lhs_bigger = !lhs_bigger;
         abs_lhs_bigger = !abs_lhs_bigger;
     }
 
