@@ -542,7 +542,7 @@ void test_ilogb()
 
 int main()
 {
-    /*
+
     test_fmax<decimal32>();
     test_isgreater<decimal32>();
     test_isgreaterequal<decimal32>();
@@ -563,9 +563,9 @@ int main()
     test_div_fmod<decimal32>();
 
     test_copysign<decimal32>();
-*/
+
     test_fma<decimal32>();
-/*
+
     test_sin<decimal32>();
     test_cos<decimal32>();
 
@@ -577,6 +577,6 @@ int main()
     test_fdim<decimal32>();
 
     test_ilogb<decimal32>();
-*/
+
     return boost::report_errors();
 }
