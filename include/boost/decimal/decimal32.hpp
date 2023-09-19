@@ -441,6 +441,7 @@ public:
     friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32;
     friend constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32;
+    friend constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32;
 
     // Related to <cmath>
     friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
@@ -2505,7 +2506,27 @@ constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 
 constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
-    return (x * y) + z;
+    // First calculate x * y without rounding
+    constexpr decimal32 zero {0, 0};
+
+    const auto res {check_non_finite(x, y)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    auto sig_lhs {x.full_significand()};
+    auto exp_lhs {x.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {y.full_significand()};
+    auto exp_rhs {y.biased_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    auto mul_result {mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
+    const decimal32 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
+
+    return dec_result + z;
 }
 
 constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32
