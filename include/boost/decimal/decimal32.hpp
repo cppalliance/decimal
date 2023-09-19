@@ -30,6 +30,7 @@
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/utilities.hpp>
+#include <boost/decimal/detail/cmath/fpclassify.hpp>
 
 namespace boost { namespace decimal {
 
@@ -291,7 +292,6 @@ public:
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
     friend constexpr auto isfinite    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
     friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
-    friend constexpr auto fpclassify  BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> int;
     friend constexpr auto abs         BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> decimal32;
 
     // 3.2.7 unary arithmetic operators:
@@ -668,30 +668,6 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs)
     }
 
     return sig != 0 && isfinite(rhs);
-}
-
-constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> int
-{
-    if (isinf(rhs))
-    {
-        return FP_INFINITE;
-    }
-    else if (isnan(rhs))
-    {
-        return FP_NAN;
-    }
-    else if (rhs.full_significand() == 0)
-    {
-        return FP_ZERO;
-    }
-    else if (!isnormal(rhs))
-    {
-        return FP_SUBNORMAL;
-    }
-    else
-    {
-        return FP_NORMAL;
-    }
 }
 
 constexpr auto abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> decimal32

@@ -23,6 +23,7 @@
 #include <boost/decimal/detail/cmath/remquo.hpp>
 #include <boost/decimal/detail/cmath/sin.hpp>
 #include <boost/decimal/detail/cmath/trunc.hpp>
+#include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
