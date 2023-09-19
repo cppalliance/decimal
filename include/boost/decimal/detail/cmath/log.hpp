@@ -18,12 +18,10 @@ namespace boost { namespace decimal {
 template<typename T>
 constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
 {
-    // TODO(ckormanyos) Handle arguments infinity and NaN.
-
     constexpr T zero { 0, 0 };
     constexpr T one  { 1, 0 };
 
-    T result;
+    auto result = zero;
 
     if (isinf(x) || isnan(x))
     {
@@ -32,7 +30,7 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
     else if (x < one)
     {
         // Handle reflection.
-        result = ((x > zero) ? -one / log(-x) : -std::numeric_limits<T>::infinity());
+        result = ((x > zero) ? -log(one / x) : -std::numeric_limits<T>::infinity());
     }
     else if(x > one)
     {
@@ -63,6 +61,11 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
             {
                 // 1, 12, 80, 448, 2304, 11264, 53248, 245760, 1114112, 4980736, 22020096, 96468992, ...
                 // See also Sloane's A058962 at: https://oeis.org/A058962
+
+                // See also
+                // Series[Log[(1 + (z/2))/(1 - (z/2))], {z, 0, 21}]
+                // Or at Wolfram Alpha: https://www.wolframalpha.com/input?i=Series%5BLog%5B%281+%2B+%28z%2F2%29%29%2F%281+-+%28z%2F2%29%29%5D%2C+%7Bz%2C+0%2C+21%7D%5D
+
                 one,
                 one / UINT8_C(12),
                 one / UINT8_C(80),
