@@ -2527,6 +2527,49 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
     const decimal32 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
 
     return dec_result + z;
+
+    const auto res_add {check_non_finite(z, dec_result)};
+    if (res_add != zero)
+    {
+        return res_add;
+    }
+
+    bool lhs_bigger {z > dec_result};
+    if (z.isneg() && dec_result.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+    bool abs_lhs_bigger {abs(z) > abs(dec_result)};
+
+    auto sig_z {z.full_significand()};
+    auto exp_z {z.biased_exponent()};
+    normalize(sig_z, exp_z);
+    auto z_components {detail::decimal32_components{sig_z, exp_z, z.isneg()}};
+
+    normalize(mul_result.sig, mul_result.exp);
+
+    if (!lhs_bigger)
+    {
+        detail::swap(z_components, mul_result);
+        lhs_bigger = !lhs_bigger;
+        abs_lhs_bigger = !abs_lhs_bigger;
+    }
+
+    detail::decimal32_components result {};
+
+    if (!z_components.sign && mul_result.sign)
+    {
+        result = sub_impl(z_components.sig, z_components.exp, z_components.sign,
+                          mul_result.sig, mul_result.exp, mul_result.sign,
+                          lhs_bigger, abs_lhs_bigger);
+    }
+    else
+    {
+        result = add_impl(z_components.sig, z_components.exp, z_components.sign,
+                          mul_result.sig, mul_result.exp, mul_result.sign);
+    }
+
+    return {result.sig, result.exp, result.sign};
 }
 
 constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32
