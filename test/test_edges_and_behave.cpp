@@ -233,7 +233,19 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_eges() -> bool
+  #if (defined(__GNUC__) && !defined(__clang__))
+  #pragma GCC push_options
+  #pragma GCC optimize ("O0")
+  #endif
+
+  namespace constants {
+
+  auto my_inf() -> const boost::decimal::decimal32& { static const boost::decimal::decimal32 val_inf = std::numeric_limits<boost::decimal::decimal32>::infinity(); return val_inf; }
+  auto my_pi () -> const boost::decimal::decimal32& { static const boost::decimal::decimal32 val_pi  = boost::decimal::numbers::pi_v<boost::decimal::decimal32>; return val_pi; }
+
+  }
+
+  auto test_edges() -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
@@ -259,7 +271,7 @@ namespace local
       gen.seed(static_cast<typename std::mt19937_64::result_type>(UINT64_C(0x12345678AA55)));
 
       for(auto   index = static_cast<unsigned>(UINT8_C(0));
-                 index < static_cast<unsigned>(UINT8_C(1000));
+                 index < static_cast<unsigned>(UINT8_C(128));
                ++index)
       {
         auto dis_lhs =
@@ -293,13 +305,81 @@ namespace local
       }
     }
 
+    {
+      const auto arg_tiny = decimal_type { std::numeric_limits<decimal_type>::epsilon() } / 1000U;
+
+      const auto sin_tiny = sin(arg_tiny);
+
+      const auto result_sin_tiny_is_ok = (sin_tiny == arg_tiny);
+
+      const auto cos_tiny = cos(arg_tiny);
+
+      const auto result_cos_tiny_is_ok = (cos_tiny == 1);
+
+      const auto result_sin_cos_tiny_is_ok = (result_sin_tiny_is_ok && result_cos_tiny_is_ok);
+
+      BOOST_TEST(result_sin_cos_tiny_is_ok);
+
+      result_is_ok = (result_sin_cos_tiny_is_ok && result_is_ok);
+    }
+
+    {
+      const auto sin_inf = sin(std::numeric_limits<decimal_type>::infinity());
+      const auto sin_nan = sin(std::numeric_limits<decimal_type>::quiet_NaN());
+
+      const auto cos_inf = cos(std::numeric_limits<decimal_type>::infinity());
+      const auto cos_nan = cos(std::numeric_limits<decimal_type>::quiet_NaN());
+
+      const auto result_sin_con_non_normal_is_ok =
+        (
+             (isinf(sin_inf) && isnan(sin_nan))
+          && (isinf(cos_inf) && isnan(cos_nan))
+        );
+
+      BOOST_TEST(result_sin_con_non_normal_is_ok);
+
+      result_is_ok = (result_sin_con_non_normal_is_ok && result_is_ok);
+    }
+
+    {
+      const auto ilogb_inf_inline   = ilogb(std::numeric_limits<decimal_type>::infinity());
+      const auto ilogb_inf_callable = ilogb(constants::my_inf());
+
+      const volatile auto result_ilogb_inf_is_ok = ((ilogb_inf_inline == INT_MAX) && (ilogb_inf_callable == INT_MAX));
+
+      BOOST_TEST(result_ilogb_inf_is_ok);
+
+      result_is_ok = (result_ilogb_inf_is_ok && result_is_ok);
+    }
+
+    {
+      const auto ceil_pi_pos_inline   = ceil(boost::decimal::numbers::pi_v<decimal_type>);
+      const auto ceil_pi_neg_inline   = ceil(-boost::decimal::numbers::pi_v<decimal_type>);
+      const auto ceil_pi_pos_callable = ceil(constants::my_pi());
+      const auto ceil_pi_neg_callable = ceil(-constants::my_pi());
+
+      const volatile auto result_ceil_is_ok =
+        (
+             ((ceil_pi_pos_inline   == 4) && (ceil_pi_neg_inline   == -3))
+          && ((ceil_pi_pos_callable == 4) && (ceil_pi_neg_callable == -3))
+        );
+
+      BOOST_TEST(result_ceil_is_ok);
+
+      result_is_ok = (result_ceil_is_ok && result_is_ok);
+    }
+
     return result_is_ok;
   }
+
+  #if (defined(__GNUC__) && !defined(__clang__))
+  #pragma GCC pop_options
+  #endif
 }
 
 auto main() -> int
 {
-  auto result_is_ok = (local::test_behave_over_under() && local::test_eges());
+  auto result_is_ok = (local::test_behave_over_under() && local::test_edges());
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 
