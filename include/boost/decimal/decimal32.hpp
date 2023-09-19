@@ -1202,11 +1202,7 @@ constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool
         }
     }
 
-    const auto rhs_significand =
-        static_cast<Unsigned_Integer>
-        (
-            (rhs < 0) ? static_cast<Unsigned_Integer>(detail::apply_sign(rhs)) : static_cast<Unsigned_Integer>(rhs)
-        );
+    const auto rhs_significand {detail::make_positive_unsigned(rhs)};
 
     return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(),
                             rhs_significand, INT32_C(0));
@@ -1363,7 +1359,7 @@ constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool
         }
     }
 
-    Unsigned_Integer rhs_significand {rhs_sign ? detail::apply_sign(rhs) : rhs};
+    const auto rhs_significand {detail::make_positive_unsigned(rhs)};
 
     return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs_sign,
                            rhs_significand, INT32_C(0), rhs_sign);

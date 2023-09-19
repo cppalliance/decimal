@@ -11,6 +11,7 @@
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
 
@@ -19,10 +20,10 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 {
     // TODO(ckormanyos) Handle arguments infinity and NaN.
 
-    constexpr auto zero = T { 0, 0 };
-    constexpr auto one  = T { 1, 0 };
+    constexpr T zero { 0, 0 };
+    constexpr T one  { 1, 0 };
 
-    auto result = T { };
+    T result;
 
     if (isinf(x) || isnan(x))
     {
@@ -35,26 +36,24 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
     }
     else if(x > one)
     {
-        constexpr auto two  = T { 2, 0 };
+        constexpr T two { 2, 0 };
 
         // The algorithm for logarithm is based on Chapter 5, pages 35-36
         // of Cody and Waite, Software Manual for the Elementary Functions,
         // Prentice Hall, 1980.
 
-        auto exp2val = int { };
+        int exp2val { };
 
         // TODO(ckormanyos) There is probably something more efficient than calling frexp here.
         auto g = (x > two) ? frexp(x, &exp2val) : x;
 
-        BOOST_DECIMAL_CXX20_CONSTEXPR auto value_sqrt2 = static_cast<T>(1.41421356237309504880L);
+        bool is_scaled_by_sqrt { };
 
-        auto is_sqrt2_scaled = bool { };
-
-        if (g > value_sqrt2)
+        if (g > numbers::sqrt2_v<T>)
         {
-            g /= value_sqrt2;
+            g /= numbers::sqrt2_v<T>;
 
-            is_sqrt2_scaled = true;
+            is_scaled_by_sqrt = true;
         }
 
         using coef_list_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(12))>;
@@ -65,16 +64,16 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 // 1, 12, 80, 448, 2304, 11264, 53248, 245760, 1114112, 4980736, 22020096, 96468992, ...
                 // See also Sloane's A058962 at: https://oeis.org/A058962
                 one,
-                one / static_cast<std::uint8_t>(UINT8_C(12)),
-                one / static_cast<std::uint8_t>(UINT8_C(80)),
-                one / static_cast<std::uint16_t>(UINT16_C(448)),
-                one / static_cast<std::uint16_t>(UINT16_C(11264)),
-                one / static_cast<std::uint16_t>(UINT16_C(53248)),
-                one / static_cast<std::uint32_t>(UINT32_C(245760)),
-                one / static_cast<std::uint32_t>(UINT32_C(1114112)),
-                one / static_cast<std::uint32_t>(UINT32_C(4980736)),
-                one / static_cast<std::uint32_t>(UINT32_C(22020096)),
-                one / static_cast<std::uint32_t>(UINT32_C(96468992))
+                one / UINT8_C(12),
+                one / UINT8_C(80),
+                one / UINT16_C(448),
+                one / UINT16_C(11264),
+                one / UINT16_C(53248),
+                one / UINT32_C(245760),
+                one / UINT32_C(1114112),
+                one / UINT32_C(4980736),
+                one / UINT32_C(22020096),
+                one / UINT32_C(96468992)
             };
 
         const auto s = (g - one) / (g + one);
@@ -101,18 +100,14 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
           term = zn * coefs[index];
         }
 
+        if (exp2val > 0)
         {
-            BOOST_DECIMAL_CXX20_CONSTEXPR auto value_ln2 = static_cast<T>(0.693147180559945309417L);
+            result += static_cast<T>(exp2val * numbers::ln2_v<T>);
+        }
 
-            if (exp2val > 0)
-            {
-                result += static_cast<T>(exp2val * value_ln2);
-            }
-
-            if(is_sqrt2_scaled)
-            {
-                result += value_ln2 / 2U;
-            }
+        if(is_scaled_by_sqrt)
+        {
+            result += numbers::ln2_v<T> / 2U;
         }
     }
     else

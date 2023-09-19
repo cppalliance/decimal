@@ -31,11 +31,7 @@ constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floati
         return FP_ILOGBNAN;
     }
 
-    const auto offset =
-        static_cast<int>
-        (
-            detail::num_digits(d.full_significand()) - static_cast<int>(INT8_C(1))
-        );
+    const auto offset = detail::num_digits(d.full_significand()) - 1;
 
     const auto expval = static_cast<int>(static_cast<int>(d.unbiased_exponent()) + offset);
 
