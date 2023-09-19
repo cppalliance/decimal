@@ -205,7 +205,7 @@ private:
     friend constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
                                            detail::decimal32_components& q) noexcept -> void;
     friend constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
-    friend constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
+    friend constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, const decimal32& q, decimal32& r) noexcept -> void;
 
     template <typename T>
     friend constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>;
@@ -244,7 +244,7 @@ private:
     template <typename T, typename T2>
     friend constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                    T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
-                                   bool lhs_bigger, bool abs_lhs_bigger) noexcept -> detail::decimal32_components;
+                                   bool abs_lhs_bigger) noexcept -> detail::decimal32_components;
 
     template <typename T, typename T2>
     friend constexpr auto mul_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
@@ -441,6 +441,7 @@ public:
     friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32;
     friend constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32;
+    friend constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32;
 
     // Related to <cmath>
     friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
@@ -825,7 +826,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 template <typename T, typename T2>
 constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                         T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
-                        bool lhs_bigger, bool abs_lhs_bigger) noexcept -> detail::decimal32_components
+                        bool abs_lhs_bigger) noexcept -> detail::decimal32_components
 {
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
     auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
@@ -837,9 +838,8 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         // we return the larger of the two
         //
         // e.g. 1e20 - 1e-20 = 1e20
-
-        return lhs_bigger ? detail::decimal32_components{detail::shrink_significand(lhs_sig, lhs_exp), lhs_exp, lhs_sign} :
-               detail::decimal32_components{detail::shrink_significand(rhs_sig, rhs_exp), rhs_exp, !rhs_sign};
+        return abs_lhs_bigger ? detail::decimal32_components{detail::shrink_significand(lhs_sig, lhs_exp), lhs_exp, false} :
+                                detail::decimal32_components{detail::shrink_significand(rhs_sig, rhs_exp), rhs_exp, true};
     }
     else if (delta_exp == detail::precision + 1)
     {
@@ -992,7 +992,7 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
     {
         result = sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                           rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                          lhs_bigger, abs_lhs_bigger);
+                          abs_lhs_bigger);
     }
     else
     {
@@ -1043,7 +1043,6 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
         return lhs + (-rhs);
     }
 
-    const bool lhs_bigger {lhs > rhs};
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
     auto sig_lhs {lhs.full_significand()};
@@ -1056,7 +1055,7 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 
     const auto result {sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
                                 sig_rhs, exp_rhs, rhs.isneg(),
-                                lhs_bigger, abs_lhs_bigger)};
+                                abs_lhs_bigger)};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -1074,7 +1073,6 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
         return lhs + (-rhs);
     }
 
-    const bool lhs_bigger {lhs > rhs};
     const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
 
     auto sig_lhs {lhs.full_significand()};
@@ -1090,7 +1088,7 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 
     const auto result {sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                 rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                                lhs_bigger, abs_lhs_bigger)};
+                                abs_lhs_bigger)};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -1108,7 +1106,6 @@ constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
         return lhs + (-rhs);
     }
 
-    const bool lhs_bigger {lhs > rhs};
     const bool abs_lhs_bigger {detail::make_positive_unsigned(lhs) > rhs};
 
     auto sig_lhs {lhs};
@@ -1124,7 +1121,7 @@ constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
 
     const auto result {sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                 rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                                lhs_bigger, abs_lhs_bigger)};
+                                abs_lhs_bigger)};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -1961,7 +1958,7 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
     q = decimal32(q_components.sig, q_components.exp, q_components.sign);
 }
 
-constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
+constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, const decimal32& q, decimal32& r) noexcept -> void
 {
     constexpr decimal32 zero {0, 0};
 
@@ -2505,7 +2502,67 @@ constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 
 constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
-    return (x * y) + z;
+    // First calculate x * y without rounding
+    constexpr decimal32 zero {0, 0};
+
+    const auto res {check_non_finite(x, y)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    auto sig_lhs {x.full_significand()};
+    auto exp_lhs {x.biased_exponent()};
+    normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {y.full_significand()};
+    auto exp_rhs {y.biased_exponent()};
+    normalize(sig_rhs, exp_rhs);
+
+    auto mul_result {mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
+    const decimal32 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
+
+    const auto res_add {check_non_finite(dec_result, z)};
+    if (res_add != zero)
+    {
+        return res_add;
+    }
+
+    bool lhs_bigger {dec_result > z};
+    if (dec_result.isneg() && z.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+    bool abs_lhs_bigger {abs(dec_result) > abs(z)};
+
+    normalize(mul_result.sig, mul_result.exp);
+
+    auto sig_z {z.full_significand()};
+    auto exp_z {z.biased_exponent()};
+    normalize(sig_z, exp_z);
+    detail::decimal32_components z_components {sig_z, exp_z, z.isneg()};
+
+    if (!lhs_bigger)
+    {
+        detail::swap(mul_result, z_components);
+        abs_lhs_bigger = !abs_lhs_bigger;
+    }
+
+    detail::decimal32_components result {};
+
+    if (!mul_result.sign && z_components.sign)
+    {
+        result = sub_impl(mul_result.sig, mul_result.exp, mul_result.sign,
+                          z_components.sig, z_components.exp, z_components.sign,
+                          abs_lhs_bigger);
+    }
+    else
+    {
+        result = add_impl(mul_result.sig, mul_result.exp, mul_result.sign,
+                          z_components.sig, z_components.exp, z_components.sign);
+    }
+
+    return decimal32(result.sig, result.exp, result.sign);
 }
 
 constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32
