@@ -101,6 +101,117 @@ namespace local
     }
 
     {
+      const auto local_inf_lhs  = decimal_type { std::numeric_limits<float>::infinity() };
+      const auto local_inf_rhs  = decimal_type { std::numeric_limits<float>::infinity() };
+
+      const auto local_one = decimal_type { 1, 0 };
+
+      {
+        const auto sum_inf_dec_inf_dec = local_inf_lhs + local_inf_rhs;
+
+        const auto result_sum_inf_dec_inf_dec_is_ok = isinf(sum_inf_dec_inf_dec);
+
+        BOOST_TEST(result_sum_inf_dec_inf_dec_is_ok);
+
+        result_is_ok = (result_sum_inf_dec_inf_dec_is_ok && result_is_ok);
+      }
+
+      {
+        const auto sum_one_dec_inf_dec = local_one + local_inf_rhs;
+
+        const auto result_sum_one_dec_inf_dec_is_ok = isinf(sum_one_dec_inf_dec);
+
+        BOOST_TEST(result_sum_one_dec_inf_dec_is_ok);
+
+        result_is_ok = (result_sum_one_dec_inf_dec_is_ok && result_is_ok);
+      }
+
+      {
+        const auto sum_inf_dec_one_dec = local_inf_lhs + local_one;
+
+        const auto result_sum_inf_dec_one_dec_is_ok = isinf(sum_inf_dec_one_dec);
+
+        BOOST_TEST(result_sum_inf_dec_one_dec_is_ok);
+
+        result_is_ok = (result_sum_inf_dec_one_dec_is_ok && result_is_ok);
+      }
+
+      {
+        const auto result_cmp_01_is_ok = (local_inf_lhs > local_one);
+        const auto result_cmp_02_is_ok = (local_one < local_inf_rhs);
+
+        const auto result_cmp_is_ok = (result_cmp_01_is_ok && result_cmp_02_is_ok);
+
+        BOOST_TEST(result_cmp_is_ok);
+
+        result_is_ok = (result_cmp_is_ok && result_is_ok);
+      }
+
+      {
+        const auto result_cmp_01_is_ok = (-local_inf_lhs < local_one);
+        const auto result_cmp_02_is_ok = (local_one > -local_inf_rhs);
+
+        const auto result_cmp_is_ok = (result_cmp_01_is_ok && result_cmp_02_is_ok);
+
+        BOOST_TEST(result_cmp_is_ok);
+
+        result_is_ok = (result_cmp_is_ok && result_is_ok);
+      }
+
+      {
+        const auto result_cmp_01_is_ok = (local_inf_lhs > 1);
+        const auto result_cmp_02_is_ok = (1 < local_inf_rhs);
+
+        const auto result_cmp_is_ok = (result_cmp_01_is_ok && result_cmp_02_is_ok);
+
+        BOOST_TEST(result_cmp_is_ok);
+
+        result_is_ok = (result_cmp_is_ok && result_is_ok);
+      }
+
+      {
+        const auto result_cmp_01_is_ok = (-local_inf_lhs < 1);
+        const auto result_cmp_02_is_ok = (1 > -local_inf_rhs);
+
+        const auto result_cmp_is_ok = (result_cmp_01_is_ok && result_cmp_02_is_ok);
+
+        BOOST_TEST(result_cmp_is_ok);
+
+        result_is_ok = (result_cmp_is_ok && result_is_ok);
+      }
+
+      {
+        const auto result_div_01 = (local_inf_lhs /  local_one);
+        const auto result_div_02 = (local_inf_lhs / -local_one);
+
+        const auto result_div_01_is_ok = isinf(result_div_01) && (result_div_01 > 0);
+        const auto result_div_02_is_ok = isinf(result_div_02) /*&& (result_div_02 < 0)*/; // TODO(mborland) Check if sign-checking is OK?
+
+        const auto result_cmp_is_ok = (result_div_01_is_ok && result_div_02_is_ok);
+
+        BOOST_TEST(result_cmp_is_ok);
+
+        result_is_ok = (result_cmp_is_ok && result_is_ok);
+      }
+
+      {
+        const auto local_zero = decimal_type { 0, 0 };
+
+        const auto result_div_01 = (local_zero /  local_one);
+        const auto result_div_02 = (local_zero / -local_one);
+
+        const auto result_div_01_is_ok = ((fpclassify(result_div_01) == FP_ZERO) && (!signbit(result_div_01)));
+        const auto result_div_02_is_ok = ((fpclassify(result_div_02) == FP_ZERO) &&   signbit(result_div_02));
+
+        const auto result_cmp_is_ok = (result_div_01_is_ok && result_div_02_is_ok);
+
+        BOOST_TEST(result_cmp_is_ok);
+
+        result_is_ok = (result_cmp_is_ok && result_is_ok);
+      }
+    }
+
+    {
       decimal_type big {2, 0};
 
       for(auto   index = static_cast<std::size_t>(UINT8_C(0));
