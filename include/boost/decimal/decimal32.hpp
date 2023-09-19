@@ -1180,8 +1180,6 @@ constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool
 template <typename Integer>
 constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool
 {
-    using Unsigned_Integer = detail::make_unsigned_t<Integer>;
-
     if (isnan(lhs) || isinf(lhs))
     {
         return false;
@@ -1321,8 +1319,6 @@ constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool
 template <typename Integer>
 constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool
 {
-    using Unsigned_Integer = detail::make_unsigned_t<Integer>;
-
     if (isnan(lhs))
     {
         return false;
