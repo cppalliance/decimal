@@ -2316,7 +2316,7 @@ constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decima
 // Returns the normalized significand and exponent to be cohort agnostic
 // Returns num in the range [1'000'000, 9'999'999]
 //
-// If the conversion can not be performed returns -1 and exp = 0
+// If the conversion can not be performed returns UINT32_MAX and exp = 0
 constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::uint32_t
 {
     constexpr decimal32 zero {0, 0};
@@ -2329,7 +2329,7 @@ constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::uint32_t
     else if (isinf(num) || isnan(num))
     {
         *expptr = 0;
-        return -1;
+        return (std::numeric_limits<std::uint32_t>::max)();
     }
 
     auto num_exp {num.biased_exponent()};
