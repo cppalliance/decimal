@@ -138,11 +138,23 @@ void test_non_finite_values()
     BOOST_TEST(!issignaling(std::numeric_limits<decimal32>::infinity()));
     BOOST_TEST(!issignaling(-std::numeric_limits<decimal32>::infinity()));
 
+    #ifdef _MSC_VER
+
+    BOOST_TEST(boost::decimal::isfinite(one));
+    BOOST_TEST(boost::decimal::isfinite(std::numeric_limits<decimal32>::denorm_min()));
+    BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal32>::quiet_NaN()));
+    BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal32>::signaling_NaN()));
+
+    #else
+
     BOOST_TEST(isfinite(one));
     BOOST_TEST(isfinite(std::numeric_limits<decimal32>::denorm_min()));
     BOOST_TEST(!isfinite(std::numeric_limits<decimal32>::infinity()));
     BOOST_TEST(!isfinite(std::numeric_limits<decimal32>::quiet_NaN()));
     BOOST_TEST(!isfinite(std::numeric_limits<decimal32>::signaling_NaN()));
+
+    #endif
 
     BOOST_TEST(isnormal(one));
     BOOST_TEST(!isnormal(std::numeric_limits<decimal32>::infinity()));
