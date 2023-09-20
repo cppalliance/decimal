@@ -1600,7 +1600,7 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
     }
     else if (expval < 0)
     {
-        result /= detail::pow10<Conversion_Type>(-expval);
+        result /= detail::pow10<Conversion_Type>(detail::make_positive_unsigned(expval));
     }
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
