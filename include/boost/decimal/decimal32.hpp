@@ -279,6 +279,10 @@ public:
     explicit constexpr operator unsigned long() const noexcept;
     explicit constexpr operator long long() const noexcept;
     explicit constexpr operator unsigned long long() const noexcept;
+    explicit constexpr operator std::int8_t() const noexcept;
+    explicit constexpr operator std::uint8_t() const noexcept;
+    explicit constexpr operator std::int16_t() const noexcept;
+    explicit constexpr operator std::uint16_t() const noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
@@ -1548,19 +1552,19 @@ constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect param
 template <typename TargetType>
 constexpr auto decimal32::to_integral() const noexcept -> TargetType
 {
-    TargetType result {};
+    using Conversion_Type = std::conditional_t<(std::numeric_limits<TargetType>::max() < 9'999'999), std::int32_t, TargetType>;
 
-    const auto this_is_neg   = static_cast<bool>(this->bits_.sign);
-    const auto unsigned_this = decimal32 {this_is_neg ? -*this : *this};
+    const auto this_is_neg {static_cast<bool>(this->bits_.sign)};
 
-    constexpr auto max_target_type = decimal32 { (std::numeric_limits<TargetType>::max)() };
+    constexpr decimal32 max_target_type { (std::numeric_limits<TargetType>::max)() };
+    constexpr decimal32 min_target_type { (std::numeric_limits<TargetType>::min)()};
 
     if (isnan(*this))
     {
         errno = EINVAL;
         return static_cast<TargetType>(0);
     }
-    if (isinf(*this) || unsigned_this > max_target_type)
+    if (isinf(*this) || *this > max_target_type || *this < min_target_type)
     {
         errno = ERANGE;
         return static_cast<TargetType>(0);
@@ -1575,7 +1579,7 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
         }
     }
 
-    result = static_cast<TargetType>(this->full_significand());
+    auto result = static_cast<Conversion_Type>(this->full_significand());
     int expval {static_cast<int>(this->unbiased_exponent()) - detail::bias};
     if (expval > 0)
     {
@@ -1591,7 +1595,7 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
         result = this_is_neg ? detail::apply_sign(result) : result;
     }
 
-    return result;
+    return static_cast<TargetType>(result);
 }
 
 constexpr decimal32::operator int() const noexcept
@@ -1622,6 +1626,26 @@ constexpr decimal32::operator long long() const noexcept
 constexpr decimal32::operator unsigned long long() const noexcept
 {
     return to_integral<unsigned long long>();
+}
+
+constexpr decimal32::operator std::int8_t() const noexcept
+{
+    return to_integral<std::int8_t>();
+}
+
+constexpr decimal32::operator std::uint8_t() const noexcept
+{
+    return to_integral<std::uint8_t>();
+}
+
+constexpr decimal32::operator std::int16_t() const noexcept
+{
+    return to_integral<std::int16_t>();
+}
+
+constexpr decimal32::operator std::uint16_t() const noexcept
+{
+    return to_integral<std::uint16_t>();
 }
 
 template <typename charT, typename traits>
