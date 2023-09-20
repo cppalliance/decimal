@@ -28,23 +28,19 @@
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
+#include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
 
 // Generic overloads
 
-constexpr auto floor(decimal32 num) noexcept -> decimal32
-{
-    return floord32(num);
-}
-
 constexpr auto ceil(decimal32 num) noexcept -> decimal32
 {
     return ceild32(num);
 }
 
-constexpr auto frexp10(decimal32 num, int *expptr) noexcept -> std::int32_t
+constexpr auto frexp10(decimal32 num, int *expptr) noexcept -> std::uint32_t
 {
     return frexp10d32(num, expptr);
 }
