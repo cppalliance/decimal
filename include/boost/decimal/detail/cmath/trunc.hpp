@@ -7,13 +7,15 @@
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/cmath/floor.hpp>
+#include <boost/decimal/detail/cmath/ceil.hpp>
 #include <type_traits>
 #include <cmath>
 
 namespace boost { namespace decimal {
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto trunc(T val) noexcept -> T
+template<typename T>
+constexpr auto trunc(T val) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     return (val > 0) ? floor(val) : ceil(val);
 }

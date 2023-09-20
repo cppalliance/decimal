@@ -445,7 +445,6 @@ public:
     // <cmath> functions that need to be friends
     friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32;
-    friend constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32;
     friend constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32;
 
     // Related to <cmath>
@@ -2435,26 +2434,7 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
                           z_components.sig, z_components.exp, z_components.sign);
     }
 
-    return decimal32(result.sig, result.exp, result.sign);
-}
-
-constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32
-{
-    constexpr decimal32 zero {0, 0};
-
-    if (abs(x) == zero || isinf(x))
-    {
-        *iptr = x;
-        return x.isneg() ? -zero : zero;
-    }
-    else if (isnan(x))
-    {
-        *iptr = x;
-        return x;
-    }
-
-    *iptr = (x > zero) ? floor(x) : ceil(x);
-    return (x - *iptr);
+    return {result.sig, result.exp, result.sign};
 }
 
 } // namespace decimal

@@ -30,6 +30,7 @@
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
+#include <boost/decimal/detail/cmath/modf.hpp>
 #include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
@@ -64,11 +65,6 @@ constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
     return fmad32(x, y, z);
-}
-
-constexpr auto modf(decimal32 x, decimal32* iptr) noexcept -> decimal32
-{
-    return modfd32(x, iptr);
 }
 
 constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool
