@@ -31,6 +31,7 @@
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
 #include <boost/decimal/detail/cmath/modf.hpp>
+#include <boost/decimal/detail/cmath/fmod.hpp>
 #include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
@@ -50,11 +51,6 @@ constexpr auto scalbn(decimal32 num, int expval) noexcept -> decimal32
 constexpr auto scalbln(decimal32 num, long expval) noexcept -> decimal32
 {
     return scalblnd32(num, expval);
-}
-
-constexpr auto fmod(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
-{
-    return fmodd32(lhs, rhs);
 }
 
 constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32

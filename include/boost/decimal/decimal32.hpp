@@ -443,7 +443,6 @@ public:
     friend constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept-> decimal32;
 
     // <cmath> functions that need to be friends
-    friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32;
     friend constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32;
 
@@ -627,10 +626,10 @@ constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32
 {
     decimal32 result;
 
-    result.bits_.exponent          = static_cast<std::uint32_t>((bits & detail::construct_sign_mask)        >> 31U);
-    result.bits_.combination_field = static_cast<std::uint32_t>((bits & detail::construct_combination_mask) >> 26U);
-    result.bits_.exponent          = static_cast<std::uint32_t>((bits & detail::construct_exp_mask)         >> 20U);
-    result.bits_.significand       = static_cast<std::uint32_t>( bits & detail::construct_significand_mask);
+    result.bits_.exponent          = (bits & detail::construct_sign_mask)        >> 31U;
+    result.bits_.combination_field = (bits & detail::construct_combination_mask) >> 26U;
+    result.bits_.exponent          = (bits & detail::construct_exp_mask)         >> 20U;
+    result.bits_.significand       =  bits & detail::construct_significand_mask;
 
     return result;
 }
@@ -2312,11 +2311,6 @@ constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decima
 
     *endptr = const_cast<wchar_t*>(str + (short_endptr - buffer));
     return return_val;
-}
-
-constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
-{
-    return lhs % rhs;
 }
 
 // Returns the normalized significand and exponent to be cohort agnostic
