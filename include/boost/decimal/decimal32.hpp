@@ -449,7 +449,7 @@ public:
     friend constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32;
 
     // Related to <cmath>
-    friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
+    friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::uint32_t;
     friend constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32;
     friend constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32;
 
@@ -2418,7 +2418,7 @@ constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 // Returns num in the range [1'000'000, 9'999'999]
 //
 // If the conversion can not be performed returns -1 and exp = 0
-constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::int32_t
+constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::uint32_t
 {
     constexpr decimal32 zero {0, 0};
 
@@ -2438,10 +2438,8 @@ constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::int32_t
     normalize(num_sig, num_exp);
 
     *expptr = num_exp;
-    auto signed_sig {static_cast<std::int32_t>(num_sig)};
-    signed_sig = num.isneg() ? -signed_sig : signed_sig;
 
-    return signed_sig;
+    return num_sig;
 }
 
 constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32
