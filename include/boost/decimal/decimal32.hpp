@@ -34,6 +34,7 @@
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
+#include <boost/decimal/detail/cmath/ceil.hpp>
 
 namespace boost { namespace decimal {
 
@@ -442,7 +443,6 @@ public:
     friend constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept-> decimal32;
 
     // <cmath> functions that need to be friends
-    friend constexpr auto ceild32(decimal32 val) noexcept -> decimal32;
     friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32;
     friend constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32;
@@ -1930,7 +1930,7 @@ constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, const decimal32& q, decima
     constexpr decimal32 zero {0, 0};
 
     // https://en.cppreference.com/w/cpp/numeric/math/fmod
-    auto q_trunc {q > zero ? floor(q) : ceild32(q)};
+    auto q_trunc {q > zero ? floor(q) : ceil(q)};
     r = lhs - (decimal32(q_trunc) * rhs);
 }
 
@@ -2315,50 +2315,6 @@ constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decima
     return return_val;
 }
 
-constexpr auto ceild32(decimal32 val) noexcept -> decimal32
-{
-    constexpr decimal32 zero {0, 0};
-    constexpr decimal32 one {1, 0};
-    const auto fp {fpclassify(val)};
-
-    switch (fp)
-    {
-        case FP_ZERO:
-        case FP_NAN:
-        case FP_INFINITE:
-            return val;
-        default:
-            static_cast<void>(val);
-    }
-
-    auto new_sig {val.full_significand()};
-    auto abs_exp {std::abs(val.biased_exponent())};
-    const auto sig_dig {detail::num_digits(new_sig)};
-    auto decimal_digits {sig_dig};
-
-    if (sig_dig > abs_exp)
-    {
-        decimal_digits = abs_exp;
-    }
-    else if (val.biased_exponent() < 1 && abs_exp >= sig_dig)
-    {
-        return val.isneg() ? zero : one;
-    }
-    else
-    {
-        decimal_digits--;
-    }
-
-    new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
-    if (!val.isneg())
-    {
-        ++new_sig;
-    }
-    new_sig *= 10;
-
-    return {new_sig, val.biased_exponent() + decimal_digits - 1, val.isneg()};
-}
-
 constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     return lhs % rhs;
@@ -2497,7 +2453,7 @@ constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32
         return x;
     }
 
-    *iptr = (x > zero) ? floor(x) : ceild32(x);
+    *iptr = (x > zero) ? floor(x) : ceil(x);
     return (x - *iptr);
 }
 
