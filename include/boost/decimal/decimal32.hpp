@@ -1562,6 +1562,13 @@ constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect param
     *this = decimal32{val, 0};
 }
 
+// MSVC 14.1 warns of unary minus being applied to unsigned type from numeric_limits::min
+// 14.2 and on get it right
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4146)
+#endif
+
 template <typename TargetType>
 constexpr auto decimal32::to_integral() const noexcept -> TargetType
 {
@@ -1610,6 +1617,10 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
 
     return static_cast<TargetType>(result);
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 constexpr decimal32::operator int() const noexcept
 {
