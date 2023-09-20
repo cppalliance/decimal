@@ -18,6 +18,8 @@ namespace boost { namespace decimal {
 template<typename T>
 constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
 {
+    static_cast<void>(x);
+
     constexpr T zero { 0, 0 };
 
     auto result = zero;
