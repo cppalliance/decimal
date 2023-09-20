@@ -279,6 +279,10 @@ public:
     explicit constexpr operator unsigned long() const noexcept;
     explicit constexpr operator long long() const noexcept;
     explicit constexpr operator unsigned long long() const noexcept;
+    explicit constexpr operator std::int8_t() const noexcept;
+    explicit constexpr operator std::uint8_t() const noexcept;
+    explicit constexpr operator std::int16_t() const noexcept;
+    explicit constexpr operator std::uint16_t() const noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
@@ -293,6 +297,19 @@ public:
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_FLOAT16
+    explicit constexpr operator std::float16_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT32
+    explicit constexpr operator std::float32_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT64
+    explicit constexpr operator std::float64_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+    explicit constexpr operator std::bfloat16_t() const noexcept;
+    #endif
 
     // cmath functions that are easier as friends
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
@@ -1545,22 +1562,29 @@ constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect param
     *this = decimal32{val, 0};
 }
 
+// MSVC 14.1 warns of unary minus being applied to unsigned type from numeric_limits::min
+// 14.2 and on get it right
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4146)
+#endif
+
 template <typename TargetType>
 constexpr auto decimal32::to_integral() const noexcept -> TargetType
 {
-    TargetType result {};
+    using Conversion_Type = std::conditional_t<(std::numeric_limits<TargetType>::max() < 9'999'999), std::int32_t, TargetType>;
 
-    const auto this_is_neg   = static_cast<bool>(this->bits_.sign);
-    const auto unsigned_this = decimal32 {this_is_neg ? -*this : *this};
+    const auto this_is_neg {static_cast<bool>(this->bits_.sign)};
 
-    constexpr auto max_target_type = decimal32 { (std::numeric_limits<TargetType>::max)() };
+    constexpr decimal32 max_target_type { (std::numeric_limits<TargetType>::max)() };
+    constexpr decimal32 min_target_type { (std::numeric_limits<TargetType>::min)()};
 
     if (isnan(*this))
     {
         errno = EINVAL;
         return static_cast<TargetType>(0);
     }
-    if (isinf(*this) || unsigned_this > max_target_type)
+    if (isinf(*this) || *this > max_target_type || *this < min_target_type)
     {
         errno = ERANGE;
         return static_cast<TargetType>(0);
@@ -1575,15 +1599,15 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
         }
     }
 
-    result = static_cast<TargetType>(this->full_significand());
+    auto result = static_cast<Conversion_Type>(this->full_significand());
     int expval {static_cast<int>(this->unbiased_exponent()) - detail::bias};
     if (expval > 0)
     {
-        result *= detail::pow10<TargetType>(expval);
+        result *= detail::pow10<Conversion_Type>(expval);
     }
     else if (expval < 0)
     {
-        result /= detail::pow10<TargetType>(-expval);
+        result /= detail::pow10<Conversion_Type>(detail::make_positive_unsigned(expval));
     }
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
@@ -1591,8 +1615,12 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
         result = this_is_neg ? detail::apply_sign(result) : result;
     }
 
-    return result;
+    return static_cast<TargetType>(result);
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 constexpr decimal32::operator int() const noexcept
 {
@@ -1622,6 +1650,26 @@ constexpr decimal32::operator long long() const noexcept
 constexpr decimal32::operator unsigned long long() const noexcept
 {
     return to_integral<unsigned long long>();
+}
+
+constexpr decimal32::operator std::int8_t() const noexcept
+{
+    return to_integral<std::int8_t>();
+}
+
+constexpr decimal32::operator std::uint8_t() const noexcept
+{
+    return to_integral<std::uint8_t>();
+}
+
+constexpr decimal32::operator std::int16_t() const noexcept
+{
+    return to_integral<std::int16_t>();
+}
+
+constexpr decimal32::operator std::uint16_t() const noexcept
+{
+    return to_integral<std::uint16_t>();
 }
 
 template <typename charT, typename traits>
@@ -2107,6 +2155,31 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator long double() const noexcept
     // Double already has more range and precision than a decimal32 will ever be able to provide
     return static_cast<long double>(this->floating_conversion_impl<double>());
 }
+
+#ifdef BOOST_DECIMAL_HAS_FLOAT16
+constexpr decimal32::operator std::float16_t() const noexcept
+{
+    return static_cast<std::float16_t>(this->floating_conversion_impl<float>());
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT32
+constexpr decimal32::operator std::float32_t() const noexcept
+{
+    return static_cast<std::float32_t>(this->floating_conversion_impl<float>());
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT64
+constexpr decimal32::operator std::float64_t() const noexcept
+{
+    return static_cast<std::float64_t>(this->floating_conversion_impl<double>());
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+constexpr decimal32::operator std::bfloat16_t() const noexcept
+{
+    return static_cast<std::bfloat16_t>(this->floating_conversion_impl<float>());
+}
+#endif
 
 template <typename charT, typename traits>
 auto operator>>(std::basic_istream<charT, traits>& is, decimal32& d) -> std::basic_istream<charT, traits>&

@@ -59,10 +59,10 @@ void test_conversion_to_integer()
 }
 
 template <typename T>
-void test_roundtrip_conversion_integer()
+void test_roundtrip_conversion_integer(T min = T(0), T max = T(detail::max_significand))
 {
     std::mt19937_64 rng(42);
-    std::uniform_int_distribution<T> dist(0, detail::max_significand);
+    std::uniform_int_distribution<T> dist(min, max);
 
     for (std::size_t i = 0; i < N; ++i)
     {
@@ -194,13 +194,29 @@ int main()
     test_conversion_to_integer<unsigned long>();
     test_conversion_to_integer<long long>();
     test_conversion_to_integer<unsigned long long>();
+    test_conversion_to_integer<std::int32_t>();
+    test_conversion_to_integer<std::uint32_t>();
+    test_conversion_to_integer<std::int64_t>();
+    test_conversion_to_integer<std::uint64_t>();
 
-    test_roundtrip_conversion_integer<int>();
-    test_roundtrip_conversion_integer<unsigned>();
-    test_roundtrip_conversion_integer<long>();
-    test_roundtrip_conversion_integer<unsigned long>();
-    test_roundtrip_conversion_integer<long long>();
-    test_roundtrip_conversion_integer<unsigned long long>();
+    test_roundtrip_conversion_integer<int>(-9'999'999, 9'999'999);
+    test_roundtrip_conversion_integer<unsigned>(0, 9'999'999);
+    test_roundtrip_conversion_integer<long>(-9'999'999, 9'999'999);
+    test_roundtrip_conversion_integer<unsigned long>(0, 9'999'999);
+    test_roundtrip_conversion_integer<long long>(-9'999'999, 9'999'999);
+    test_roundtrip_conversion_integer<unsigned long long>(0, 9'999'999);
+
+    #ifndef _MSC_VER
+    test_roundtrip_conversion_integer<std::int8_t>(INT8_MIN, INT8_MAX);
+    test_roundtrip_conversion_integer<std::uint8_t>(0, UINT8_MAX);
+    #endif
+
+    test_roundtrip_conversion_integer<std::int16_t>(INT16_MIN, INT16_MAX);
+    test_roundtrip_conversion_integer<std::uint16_t>(0, UINT16_MAX);
+    test_roundtrip_conversion_integer<std::int32_t>(-9'999'999, 9'999'999);
+    test_roundtrip_conversion_integer<std::uint32_t>(0, 9'999'999);
+    test_roundtrip_conversion_integer<std::int64_t>(-9'999'999, 9'999'999);
+    test_roundtrip_conversion_integer<std::uint64_t>(0, 9'999'999);
 
     test_conversion_to_float<float>();
     test_conversion_to_float<double>();
@@ -220,6 +236,27 @@ int main()
     test_roundtrip_float_stream<float>();
     test_roundtrip_float_stream<double>();
     test_roundtrip_float_stream<long double>();
+
+    #ifdef BOOST_DECIMAL_HAS_FLOAT16
+    test_conversion_to_float<std::float16_t>();
+    // test_roundtrip_conversion_float<std::float16_t>();
+    // test_roundtrip_float_stream<std::float16_t>();
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT32
+    test_conversion_to_float<std::float32_t>();
+    test_roundtrip_conversion_float<std::float32_t>();
+    test_roundtrip_float_stream<std::float32_t>();
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT64
+    test_conversion_to_float<std::float64_t>();
+    test_roundtrip_conversion_float<std::float64_t>();
+    test_roundtrip_float_stream<std::float64_t>();
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+    test_conversion_to_float<std::bfloat16_t>();
+    // test_roundtrip_conversion_float<std::bfloat16_t>();
+    // test_roundtrip_float_stream<std::bfloat16_t>();
+    #endif
 
     return boost::report_errors();
 }

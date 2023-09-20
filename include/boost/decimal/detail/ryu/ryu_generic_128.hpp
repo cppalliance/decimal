@@ -381,7 +381,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<std::float16_t>(std::
 #endif
 
 // Use float as an interchange format
-#ifdef BOOST_DECIMAL_HAS_BFLOAT16
+#ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<std::bfloat16_t>(std::bfloat16_t val) noexcept -> floating_decimal_128
 {
