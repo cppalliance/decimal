@@ -1596,11 +1596,11 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
     int expval {static_cast<int>(this->unbiased_exponent()) - detail::bias};
     if (expval > 0)
     {
-        result *= detail::pow10<TargetType>(expval);
+        result *= detail::pow10<Conversion_Type>(expval);
     }
     else if (expval < 0)
     {
-        result /= detail::pow10<TargetType>(-expval);
+        result /= detail::pow10<Conversion_Type>(-expval);
     }
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
