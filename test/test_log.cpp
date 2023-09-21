@@ -106,7 +106,46 @@ namespace local
       const auto lg_flt = log(x_flt);
       const auto lg_dec = log(x_dec);
 
-      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * 16);
+      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * 12);
+
+      result_is_ok = (result_log_is_ok && result_is_ok);
+
+      if(!result_log_is_ok)
+      {
+        std::cout << "x_flt : " <<                    x_flt  << std::endl;
+        std::cout << "lg_flt: " << std::scientific << lg_flt << std::endl;
+        std::cout << "lg_dec: " << std::scientific << lg_dec << std::endl;
+
+        break;
+      }
+    }
+
+    BOOST_TEST(result_is_ok);
+
+    return result_is_ok;
+  }
+
+  auto test_log_between_1_and_two() -> bool
+  {
+    using decimal_type = boost::decimal::decimal32;
+
+    auto result_is_ok = true;
+
+    auto trials = static_cast<std::uint32_t>(UINT8_C(0));
+
+    for(auto   ui_arg = static_cast<unsigned>(UINT8_C(106));
+               ui_arg < static_cast<unsigned>(UINT8_C(205));
+             ++ui_arg)
+    {
+      const auto x_dec = static_cast<decimal_type>(ui_arg) / 100U;
+      const auto x_flt = static_cast<float>(x_dec);
+
+      using std::log;
+
+      const auto lg_flt = log(x_flt);
+      const auto lg_dec = log(x_dec);
+
+      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * 12);
 
       result_is_ok = (result_log_is_ok && result_is_ok);
 
@@ -162,6 +201,19 @@ namespace local
     {
       static_cast<void>(index);
 
+      const auto log_zero_minus = log(-constants::my_zero());
+
+      const volatile auto result_log_zero_minus_is_ok = (isinf(log_zero_minus) && (log_zero_minus < constants::my_zero()));
+
+      BOOST_TEST(result_log_zero_minus_is_ok);
+
+      result_is_ok = (result_log_zero_minus_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    {
+      static_cast<void>(index);
+
       const auto log_one = log(constants::my_one());
 
       const volatile auto result_log_one_is_ok = (log_one == constants::my_zero());
@@ -203,6 +255,21 @@ namespace local
     {
       static_cast<void>(index);
 
+      const auto log_inf_minus = log(-constants::my_inf());
+
+      const volatile auto result_log_inf_minus_is_ok = isnan(log_inf_minus);
+
+      assert(isnan(log_inf_minus));
+
+      BOOST_TEST(result_log_inf_minus_is_ok);
+
+      result_is_ok = (result_log_inf_minus_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    {
+      static_cast<void>(index);
+
       const auto log_nan = log(std::numeric_limits<decimal_type>::quiet_NaN());
 
       const volatile auto result_log_nan_is_ok = isnan(constants::my_nan());
@@ -224,7 +291,7 @@ namespace local
       const auto lg_flt = log(x_flt);
       const auto lg_dec = log(x_dec);
 
-      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * 16);
+      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * 12);
 
       BOOST_TEST(result_log_is_ok);
 
@@ -242,7 +309,7 @@ namespace local
       const auto lg_dec          = log(x_dec);
       const auto lg_dec_as_float = static_cast<float>(lg_dec);
 
-      const auto result_log_is_ok = is_close_fraction(lg_flt, lg_dec_as_float, std::numeric_limits<float>::epsilon() * 24);
+      const auto result_log_is_ok = is_close_fraction(lg_flt, lg_dec_as_float, std::numeric_limits<float>::epsilon() * 12);
 
       BOOST_TEST(result_log_is_ok);
 
@@ -259,7 +326,7 @@ namespace local
 
 auto main() -> int
 {
-  auto result_is_ok = (local::test_log() && local::test_log_edge());
+  auto result_is_ok = (local::test_log() && local::test_log_between_1_and_two() && local::test_log_edge());
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 

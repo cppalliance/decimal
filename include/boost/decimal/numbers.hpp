@@ -45,6 +45,9 @@ template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec
 static constexpr Dec sqrt3_v = Dec{UINT64_C(1732050807568877294), -18};
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
+static constexpr Dec inv_sqrt2_v = Dec{UINT64_C(7071067811865475244), -19};
+
+template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec inv_sqrt3_v = Dec{UINT64_C(5773502691896257645), -19};
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
@@ -63,6 +66,7 @@ static constexpr auto ln2 {ln2_v<decimal32>};
 static constexpr auto ln10 {ln10_v<decimal32>};
 static constexpr auto sqrt2 {sqrt2_v<decimal32>};
 static constexpr auto sqrt3 {sqrt3_v<decimal32>};
+static constexpr auto inv_sqrt2 {inv_sqrt2_v<decimal32>};
 static constexpr auto inv_sqrt3 {inv_sqrt3_v<decimal32>};
 static constexpr auto egamma {egamma_v<decimal32>};
 static constexpr auto phi {phi_v<decimal32>};
