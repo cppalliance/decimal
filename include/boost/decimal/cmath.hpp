@@ -32,6 +32,8 @@
 #include <boost/decimal/detail/cmath/ceil.hpp>
 #include <boost/decimal/detail/cmath/modf.hpp>
 #include <boost/decimal/detail/cmath/fmod.hpp>
+#include <boost/decimal/detail/cmath/sqrt.hpp>
+#include <boost/decimal/detail/cmath/hypot.hpp>
 #include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
