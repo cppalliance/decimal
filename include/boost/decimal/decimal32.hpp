@@ -30,6 +30,11 @@
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/utilities.hpp>
+#include <boost/decimal/detail/cmath/isfinite.hpp>
+#include <boost/decimal/detail/cmath/fpclassify.hpp>
+#include <boost/decimal/detail/cmath/abs.hpp>
+#include <boost/decimal/detail/cmath/floor.hpp>
+#include <boost/decimal/detail/cmath/ceil.hpp>
 
 namespace boost { namespace decimal {
 
@@ -274,6 +279,10 @@ public:
     explicit constexpr operator unsigned long() const noexcept;
     explicit constexpr operator long long() const noexcept;
     explicit constexpr operator unsigned long long() const noexcept;
+    explicit constexpr operator std::int8_t() const noexcept;
+    explicit constexpr operator std::uint8_t() const noexcept;
+    explicit constexpr operator std::int16_t() const noexcept;
+    explicit constexpr operator std::uint16_t() const noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
@@ -289,15 +298,25 @@ public:
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
 
+    #ifdef BOOST_DECIMAL_HAS_FLOAT16
+    explicit constexpr operator std::float16_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT32
+    explicit constexpr operator std::float32_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT64
+    explicit constexpr operator std::float64_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+    explicit constexpr operator std::bfloat16_t() const noexcept;
+    #endif
+
     // cmath functions that are easier as friends
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
     friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
     friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
-    friend constexpr auto isfinite    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
     friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
-    friend constexpr auto fpclassify  BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> int;
-    friend constexpr auto abs         BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> decimal32;
 
     // 3.2.7 unary arithmetic operators:
     friend constexpr auto operator+(decimal32 rhs) noexcept -> decimal32;
@@ -441,15 +460,11 @@ public:
     friend constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept-> decimal32;
 
     // <cmath> functions that need to be friends
-    friend constexpr auto floord32(decimal32 val) noexcept -> decimal32;
-    friend constexpr auto ceild32(decimal32 val) noexcept -> decimal32;
-    friend constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
     friend constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32;
-    friend constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32;
     friend constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32;
 
     // Related to <cmath>
-    friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::int32_t;
+    friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::uint32_t;
     friend constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32;
     friend constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32;
 
@@ -628,10 +643,10 @@ constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32
 {
     decimal32 result;
 
-    result.bits_.exponent          = static_cast<std::uint32_t>((bits & detail::construct_sign_mask)        >> 31U);
-    result.bits_.combination_field = static_cast<std::uint32_t>((bits & detail::construct_combination_mask) >> 26U);
-    result.bits_.exponent          = static_cast<std::uint32_t>((bits & detail::construct_exp_mask)         >> 20U);
-    result.bits_.significand       = static_cast<std::uint32_t>( bits & detail::construct_significand_mask);
+    result.bits_.exponent          = (bits & detail::construct_sign_mask)        >> 31U;
+    result.bits_.combination_field = (bits & detail::construct_combination_mask) >> 26U;
+    result.bits_.exponent          = (bits & detail::construct_exp_mask)         >> 20U;
+    result.bits_.significand       =  bits & detail::construct_significand_mask;
 
     return result;
 }
@@ -656,11 +671,6 @@ constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) no
     return ((rhs.bits_.combination_field & detail::comb_inf_mask) == detail::comb_inf_mask) && (!isnan(rhs));
 }
 
-constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
-{
-    return (!isinf(rhs)) && (!isnan(rhs));
-}
-
 constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
     // Check for de-normals
@@ -673,35 +683,6 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs)
     }
 
     return (sig != 0) && isfinite(rhs);
-}
-
-constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> int
-{
-    if (isinf(rhs))
-    {
-        return FP_INFINITE;
-    }
-    else if (isnan(rhs))
-    {
-        return FP_NAN;
-    }
-    else if (rhs.full_significand() == 0)
-    {
-        return FP_ZERO;
-    }
-    else if (!isnormal(rhs))
-    {
-        return FP_SUBNORMAL;
-    }
-    else
-    {
-        return FP_NORMAL;
-    }
-}
-
-constexpr auto abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> decimal32
-{
-    return (rhs.isneg()) ? -rhs : rhs;
 }
 
 constexpr auto operator+(decimal32 rhs) noexcept -> decimal32
@@ -1581,22 +1562,29 @@ constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect param
     *this = decimal32{val, 0};
 }
 
+// MSVC 14.1 warns of unary minus being applied to unsigned type from numeric_limits::min
+// 14.2 and on get it right
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4146)
+#endif
+
 template <typename TargetType>
 constexpr auto decimal32::to_integral() const noexcept -> TargetType
 {
-    TargetType result {};
+    using Conversion_Type = std::conditional_t<(std::numeric_limits<TargetType>::max() < 9'999'999), std::int32_t, TargetType>;
 
-    const auto this_is_neg   = static_cast<bool>(this->bits_.sign);
-    const auto unsigned_this = decimal32 {this_is_neg ? -*this : *this};
+    const auto this_is_neg {static_cast<bool>(this->bits_.sign)};
 
-    constexpr auto max_target_type = decimal32 { (std::numeric_limits<TargetType>::max)() };
+    constexpr decimal32 max_target_type { (std::numeric_limits<TargetType>::max)() };
+    constexpr decimal32 min_target_type { (std::numeric_limits<TargetType>::min)()};
 
     if (isnan(*this))
     {
         errno = EINVAL;
         return static_cast<TargetType>(0);
     }
-    if (isinf(*this) || unsigned_this > max_target_type)
+    if (isinf(*this) || *this > max_target_type || *this < min_target_type)
     {
         errno = ERANGE;
         return static_cast<TargetType>(0);
@@ -1611,15 +1599,15 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
         }
     }
 
-    result = static_cast<TargetType>(this->full_significand());
+    auto result = static_cast<Conversion_Type>(this->full_significand());
     int expval {static_cast<int>(this->unbiased_exponent()) - detail::bias};
     if (expval > 0)
     {
-        result *= detail::pow10<TargetType>(expval);
+        result *= detail::pow10<Conversion_Type>(expval);
     }
     else if (expval < 0)
     {
-        result /= detail::pow10<TargetType>(-expval);
+        result /= detail::pow10<Conversion_Type>(detail::make_positive_unsigned(expval));
     }
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
@@ -1627,8 +1615,12 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
         result = this_is_neg ? detail::apply_sign(result) : result;
     }
 
-    return result;
+    return static_cast<TargetType>(result);
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 constexpr decimal32::operator int() const noexcept
 {
@@ -1658,6 +1650,26 @@ constexpr decimal32::operator long long() const noexcept
 constexpr decimal32::operator unsigned long long() const noexcept
 {
     return to_integral<unsigned long long>();
+}
+
+constexpr decimal32::operator std::int8_t() const noexcept
+{
+    return to_integral<std::int8_t>();
+}
+
+constexpr decimal32::operator std::uint8_t() const noexcept
+{
+    return to_integral<std::uint8_t>();
+}
+
+constexpr decimal32::operator std::int16_t() const noexcept
+{
+    return to_integral<std::int16_t>();
+}
+
+constexpr decimal32::operator std::uint16_t() const noexcept
+{
+    return to_integral<std::uint16_t>();
 }
 
 template <typename charT, typename traits>
@@ -1964,7 +1976,7 @@ constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, const decimal32& q, decima
     constexpr decimal32 zero {0, 0};
 
     // https://en.cppreference.com/w/cpp/numeric/math/fmod
-    auto q_trunc {q > zero ? floord32(q) : ceild32(q)};
+    auto q_trunc {q > zero ? floor(q) : ceil(q)};
     r = lhs - (decimal32(q_trunc) * rhs);
 }
 
@@ -2143,6 +2155,31 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator long double() const noexcept
     // Double already has more range and precision than a decimal32 will ever be able to provide
     return static_cast<long double>(this->floating_conversion_impl<double>());
 }
+
+#ifdef BOOST_DECIMAL_HAS_FLOAT16
+constexpr decimal32::operator std::float16_t() const noexcept
+{
+    return static_cast<std::float16_t>(this->floating_conversion_impl<float>());
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT32
+constexpr decimal32::operator std::float32_t() const noexcept
+{
+    return static_cast<std::float32_t>(this->floating_conversion_impl<float>());
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT64
+constexpr decimal32::operator std::float64_t() const noexcept
+{
+    return static_cast<std::float64_t>(this->floating_conversion_impl<double>());
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+constexpr decimal32::operator std::bfloat16_t() const noexcept
+{
+    return static_cast<std::bfloat16_t>(this->floating_conversion_impl<float>());
+}
+#endif
 
 template <typename charT, typename traits>
 auto operator>>(std::basic_istream<charT, traits>& is, decimal32& d) -> std::basic_istream<charT, traits>&
@@ -2349,110 +2386,11 @@ constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decima
     return return_val;
 }
 
-constexpr auto floord32(decimal32 val) noexcept -> decimal32
-{
-    constexpr decimal32 zero {0, 0};
-    constexpr decimal32 neg_one {1, 0, true};
-    const auto fp {fpclassify(val)};
-
-    switch (fp)
-    {
-        case FP_ZERO:
-        case FP_NAN:
-        case FP_INFINITE:
-            return val;
-        default:
-            static_cast<void>(val);
-    }
-
-    auto new_sig {val.full_significand()};
-
-    auto abs_exp = val.biased_exponent(); if (abs_exp < 0) { abs_exp = -abs_exp; }
-
-    const auto sig_dig {detail::num_digits(new_sig)};
-    auto decimal_digits {sig_dig};
-    bool round {false};
-
-    if (sig_dig > abs_exp)
-    {
-        decimal_digits = abs_exp;
-        if (sig_dig == abs_exp + 1)
-        {
-            round = true;
-        }
-    }
-    else if (val.biased_exponent() < 1 && abs_exp >= sig_dig)
-    {
-        return val.isneg() ? neg_one : zero;
-    }
-    else
-    {
-        decimal_digits--;
-    }
-
-    new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
-    if (val.isneg() && round)
-    {
-        ++new_sig;
-    }
-
-    return {new_sig, val.biased_exponent() + decimal_digits, val.isneg()};
-}
-
-constexpr auto ceild32(decimal32 val) noexcept -> decimal32
-{
-    constexpr decimal32 zero {0, 0};
-    constexpr decimal32 one {1, 0};
-    const auto fp {fpclassify(val)};
-
-    switch (fp)
-    {
-        case FP_ZERO:
-        case FP_NAN:
-        case FP_INFINITE:
-            return val;
-        default:
-            static_cast<void>(val);
-    }
-
-    auto new_sig {val.full_significand()};
-    auto abs_exp {std::abs(val.biased_exponent())};
-    const auto sig_dig {detail::num_digits(new_sig)};
-    auto decimal_digits {sig_dig};
-
-    if (sig_dig > abs_exp)
-    {
-        decimal_digits = abs_exp;
-    }
-    else if (val.biased_exponent() < 1 && abs_exp >= sig_dig)
-    {
-        return val.isneg() ? zero : one;
-    }
-    else
-    {
-        decimal_digits--;
-    }
-
-    new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
-    if (!val.isneg())
-    {
-        ++new_sig;
-    }
-    new_sig *= 10;
-
-    return {new_sig, val.biased_exponent() + decimal_digits - 1, val.isneg()};
-}
-
-constexpr auto fmodd32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
-{
-    return lhs % rhs;
-}
-
 // Returns the normalized significand and exponent to be cohort agnostic
 // Returns num in the range [1'000'000, 9'999'999]
 //
-// If the conversion can not be performed returns -1 and exp = 0
-constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::int32_t
+// If the conversion can not be performed returns UINT32_MAX and exp = 0
+constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::uint32_t
 {
     constexpr decimal32 zero {0, 0};
 
@@ -2464,7 +2402,7 @@ constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::int32_t
     else if (isinf(num) || isnan(num))
     {
         *expptr = 0;
-        return -1;
+        return (std::numeric_limits<std::uint32_t>::max)();
     }
 
     auto num_exp {num.biased_exponent()};
@@ -2472,10 +2410,8 @@ constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::int32_t
     normalize(num_sig, num_exp);
 
     *expptr = num_exp;
-    auto signed_sig {static_cast<std::int32_t>(num_sig)};
-    signed_sig = num.isneg() ? -signed_sig : signed_sig;
 
-    return signed_sig;
+    return num_sig;
 }
 
 constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32
@@ -2565,26 +2501,7 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
                           z_components.sig, z_components.exp, z_components.sign);
     }
 
-    return decimal32(result.sig, result.exp, result.sign);
-}
-
-constexpr auto modfd32(decimal32 x, decimal32* iptr) noexcept -> decimal32
-{
-    constexpr decimal32 zero {0, 0};
-
-    if (abs(x) == zero || isinf(x))
-    {
-        *iptr = x;
-        return x.isneg() ? -zero : zero;
-    }
-    else if (isnan(x))
-    {
-        *iptr = x;
-        return x;
-    }
-
-    *iptr = (x > zero) ? floord32(x) : ceild32(x);
-    return (x - *iptr);
+    return {result.sig, result.exp, result.sign};
 }
 
 } // namespace decimal

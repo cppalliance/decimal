@@ -8,6 +8,7 @@
 #include <array>
 #include <cstdint>
 #include <cassert>
+#include <boost/decimal/detail/type_traits.hpp>
 
 namespace boost { namespace decimal { namespace detail {
 
@@ -19,14 +20,14 @@ static constexpr std::array<std::uint64_t, 20> powers_of_10 =
          UINT64_C(10000000000000000), UINT64_C(100000000000000000), UINT64_C(1000000000000000000), UINT64_C(10000000000000000000)
  }};
 
-template <typename UnsignedPowIntType>
-constexpr auto pow10(UnsignedPowIntType n) noexcept -> UnsignedPowIntType
+template <typename T>
+constexpr auto pow10(T n) noexcept -> T
 {
-    // TODO(mborland) Maybe enable_if for unsigned PowIntType?
-    // TODO(mborland) Then remove the assert()?
-
-    assert(n >= 0);
-    return static_cast<UnsignedPowIntType>(powers_of_10[static_cast<std::size_t>(n)]);
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T>)
+    {
+        assert(n >= 0);
+    }
+    return static_cast<T>(powers_of_10[static_cast<std::size_t>(n)]);
 }
 
 } // namespace detail

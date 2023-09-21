@@ -206,7 +206,7 @@ void test_frexp10()
     BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &expval), 1'000'000);
     BOOST_TEST_EQ(expval, 5);
 
-    BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), -1'000'000);
+    BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), 1'000'000);
     BOOST_TEST_EQ(expval, 5);
 }
 

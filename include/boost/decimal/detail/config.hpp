@@ -105,7 +105,9 @@ typedef unsigned __int128 uint128_t;
 // All of these types are optional so check for each of them individually
 #ifdef __has_include
 #  if __has_include(<stdfloat>)
+#    if __cplusplus > 202002L || _MSVC_LANG > 202002L
 #    include <stdfloat>
+#    endif
 #  endif
 #endif
 #ifdef __STDCPP_FLOAT16_T__

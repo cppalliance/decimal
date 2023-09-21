@@ -26,23 +26,20 @@
 #include <boost/decimal/detail/cmath/remquo.hpp>
 #include <boost/decimal/detail/cmath/sin.hpp>
 #include <boost/decimal/detail/cmath/trunc.hpp>
+#include <boost/decimal/detail/cmath/isfinite.hpp>
+#include <boost/decimal/detail/cmath/fpclassify.hpp>
+#include <boost/decimal/detail/cmath/abs.hpp>
+#include <boost/decimal/detail/cmath/floor.hpp>
+#include <boost/decimal/detail/cmath/ceil.hpp>
+#include <boost/decimal/detail/cmath/modf.hpp>
+#include <boost/decimal/detail/cmath/fmod.hpp>
 #include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
 
 // Generic overloads
 
-constexpr auto floor(decimal32 num) noexcept -> decimal32
-{
-    return floord32(num);
-}
-
-constexpr auto ceil(decimal32 num) noexcept -> decimal32
-{
-    return ceild32(num);
-}
-
-constexpr auto frexp10(decimal32 num, int *expptr) noexcept -> std::int32_t
+constexpr auto frexp10(decimal32 num, int *expptr) noexcept -> std::uint32_t
 {
     return frexp10d32(num, expptr);
 }
@@ -57,11 +54,6 @@ constexpr auto scalbln(decimal32 num, long expval) noexcept -> decimal32
     return scalblnd32(num, expval);
 }
 
-constexpr auto fmod(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
-{
-    return fmodd32(lhs, rhs);
-}
-
 constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 {
     return copysignd32(mag, sgn);
@@ -70,11 +62,6 @@ constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
     return fmad32(x, y, z);
-}
-
-constexpr auto modf(decimal32 x, decimal32* iptr) noexcept -> decimal32
-{
-    return modfd32(x, iptr);
 }
 
 constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool
