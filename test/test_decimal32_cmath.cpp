@@ -564,11 +564,16 @@ void test_sqrt()
         }
     }
 
-    BOOST_TEST(isinf(sqrt(BOOST_DECIMAL_DEC_INFINITY)));
-    BOOST_TEST(isnan(sqrt(-BOOST_DECIMAL_DEC_INFINITY)));
-    BOOST_TEST(isnan(sqrt(BOOST_DECIMAL_DEC_NAN)));
-    BOOST_TEST_EQ(sqrt(Dec(0)), Dec(0));
-    BOOST_TEST(isnan(sqrt(Dec(-1))));
+    decimal32 inf {BOOST_DECIMAL_DEC_INFINITY * static_cast<int>(dist(rng))};
+    decimal32 nan {BOOST_DECIMAL_DEC_NAN * static_cast<int>(dist(rng))};
+    decimal32 zero {0 * static_cast<int>(dist(rng))};
+    decimal32 neg_num {-static_cast<int>(dist(rng))};
+    BOOST_TEST(isinf(sqrt(inf)));
+    BOOST_TEST(isnan(sqrt(-inf)));
+    BOOST_TEST(isnan(sqrt(nan)));
+    BOOST_TEST(isnan(sqrt(-nan)));
+    BOOST_TEST_EQ(sqrt(zero), zero);
+    BOOST_TEST(isnan(sqrt(neg_num)));
 }
 
 template <typename Dec>
@@ -603,12 +608,15 @@ void test_two_val_hypot()
         }
     }
 
-    BOOST_TEST_EQ(hypot(Dec(0), Dec(1)), Dec(1));
-    BOOST_TEST_EQ(hypot(Dec(1), Dec(0)), Dec(1));
-    BOOST_TEST(isinf(hypot(BOOST_DECIMAL_DEC_INFINITY, Dec(1))));
-    BOOST_TEST(isinf(hypot(Dec(1), BOOST_DECIMAL_DEC_INFINITY)));
-    BOOST_TEST(isnan(hypot(BOOST_DECIMAL_DEC_NAN, Dec(1))));
-    BOOST_TEST(isnan(hypot(Dec(1), BOOST_DECIMAL_DEC_NAN)));
+    decimal32 inf {BOOST_DECIMAL_DEC_INFINITY * static_cast<int>(dist(rng))};
+    decimal32 nan {BOOST_DECIMAL_DEC_NAN * static_cast<int>(dist(rng))};
+    decimal32 zero {0 * static_cast<int>(dist(rng))};
+    BOOST_TEST_EQ(hypot(zero, Dec(1)), Dec(1));
+    BOOST_TEST_EQ(hypot(Dec(1), zero), Dec(1));
+    BOOST_TEST(isinf(hypot(inf, Dec(1))));
+    BOOST_TEST(isinf(hypot(Dec(1), inf)));
+    BOOST_TEST(isnan(hypot(nan, Dec(1))));
+    BOOST_TEST(isnan(hypot(Dec(1), nan)));
 }
 
 #if defined(__cpp_lib_hypot) && __cpp_lib_hypot >= 201603L
@@ -645,12 +653,15 @@ void test_three_val_hypot()
         }
     }
 
-    BOOST_TEST(isinf(hypot(BOOST_DECIMAL_DEC_INFINITY, Dec(1), Dec(1))));
-    BOOST_TEST(isinf(hypot(Dec(1), BOOST_DECIMAL_DEC_INFINITY, Dec(1))));
-    BOOST_TEST(isinf(hypot(BOOST_DECIMAL_DEC_INFINITY, Dec(1), Dec(1))));
-    BOOST_TEST(isnan(hypot(BOOST_DECIMAL_DEC_NAN, Dec(1), Dec(1))));
-    BOOST_TEST(isnan(hypot(Dec(1), BOOST_DECIMAL_DEC_NAN, Dec(1))));
-    BOOST_TEST(isnan(hypot(BOOST_DECIMAL_DEC_NAN, Dec(1), Dec(1))));
+    decimal32 inf {BOOST_DECIMAL_DEC_INFINITY * static_cast<int>(dist(rng))};
+    decimal32 nan {BOOST_DECIMAL_DEC_NAN * static_cast<int>(dist(rng))};
+    decimal32 zero {0 * static_cast<int>(dist(rng))};
+    BOOST_TEST(isinf(hypot(inf, Dec(1), Dec(1))));
+    BOOST_TEST(isinf(hypot(Dec(1), inf, Dec(1))));
+    BOOST_TEST(isinf(hypot(inf, Dec(1), Dec(1))));
+    BOOST_TEST(isnan(hypot(nan, Dec(1), Dec(1))));
+    BOOST_TEST(isnan(hypot(Dec(1), nan, Dec(1))));
+    BOOST_TEST(isnan(hypot(nan, Dec(1), Dec(1))));
 }
 
 #else
