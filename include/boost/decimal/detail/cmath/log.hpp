@@ -67,8 +67,6 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         // TODO(ckormanyos) There is probably something more efficient than calling frexp here.
         auto g = frexp(x, &exp2val);
 
-        bool is_scaled_by_sqrt { };
-
         if (g < numbers::inv_sqrt2_v<T>)
         {
             g += g;
