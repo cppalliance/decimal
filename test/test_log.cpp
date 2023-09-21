@@ -26,6 +26,11 @@
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 
+extern auto my_global_test_log_zero() -> boost::decimal::decimal32&;
+extern auto my_global_test_log_one () -> boost::decimal::decimal32&;
+extern auto my_global_test_log_inf () -> boost::decimal::decimal32&;
+extern auto my_global_test_log_nan () -> boost::decimal::decimal32&;
+
 namespace local
 {
   template<typename IntegralTimePointType,
@@ -164,15 +169,6 @@ namespace local
     return result_is_ok;
   }
 
-  namespace constants {
-
-  auto my_zero() -> const boost::decimal::decimal32& { static const boost::decimal::decimal32& my_zero { 0, 0 }; return my_zero; }
-  auto my_one () -> const boost::decimal::decimal32& { static const boost::decimal::decimal32& my_one  { 1, 0 }; return my_one; }
-  auto my_inf () -> const boost::decimal::decimal32& { static const boost::decimal::decimal32& my_inf  { std::numeric_limits<boost::decimal::decimal32>::infinity() };  return my_inf; }
-  auto my_nan () -> const boost::decimal::decimal32& { static const boost::decimal::decimal32& my_nan  { std::numeric_limits<boost::decimal::decimal32>::quiet_NaN() }; return my_nan; }
-
-  } // namespace constants
-
   #if (defined(__GNUC__) && !defined(__clang__))
   #pragma GCC push_options
   #pragma GCC optimize ("O0")
@@ -188,9 +184,9 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_zero = log(constants::my_zero());
+      const auto log_zero = log(::my_global_test_log_zero());
 
-      const volatile auto result_log_zero_is_ok = (isinf(log_zero) && (log_zero < constants::my_zero()));
+      const volatile auto result_log_zero_is_ok = (isinf(log_zero) && (log_zero < ::my_global_test_log_zero()));
 
       BOOST_TEST(result_log_zero_is_ok);
 
@@ -201,9 +197,9 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_zero_minus = log(-constants::my_zero());
+      const auto log_zero_minus = log(-::my_global_test_log_zero());
 
-      const volatile auto result_log_zero_minus_is_ok = (isinf(log_zero_minus) && (log_zero_minus < constants::my_zero()));
+      const volatile auto result_log_zero_minus_is_ok = (isinf(log_zero_minus) && (log_zero_minus < ::my_global_test_log_zero()));
 
       BOOST_TEST(result_log_zero_minus_is_ok);
 
@@ -214,9 +210,9 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_one = log(constants::my_one());
+      const auto log_one = log(::my_global_test_log_one());
 
-      const volatile auto result_log_one_is_ok = (log_one == constants::my_zero());
+      const volatile auto result_log_one_is_ok = (log_one == ::my_global_test_log_zero());
 
       BOOST_TEST(result_log_one_is_ok);
 
@@ -227,7 +223,7 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_one_minus = log(-constants::my_one());
+      const auto log_one_minus = log(-::my_global_test_log_one());
 
       const volatile auto result_log_one_minus_is_ok = isnan(log_one_minus);
 
@@ -240,7 +236,7 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_inf = log(constants::my_inf());
+      const auto log_inf = log(::my_global_test_log_inf());
 
       const volatile auto result_log_inf_is_ok = isinf(log_inf);
 
@@ -255,7 +251,7 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_inf_minus = log(-constants::my_inf());
+      const auto log_inf_minus = log(-::my_global_test_log_inf());
 
       const volatile auto result_log_inf_minus_is_ok = isnan(log_inf_minus);
 
@@ -272,7 +268,7 @@ namespace local
 
       const auto log_nan = log(std::numeric_limits<decimal_type>::quiet_NaN());
 
-      const volatile auto result_log_nan_is_ok = isnan(constants::my_nan());
+      const volatile auto result_log_nan_is_ok = isnan(::my_global_test_log_nan());
 
       assert(isnan(log_nan));
 
@@ -332,3 +328,17 @@ auto main() -> int
 
   return (result_is_ok ? 0 : -1);
 }
+
+#if (defined(__GNUC__) && !defined(__clang__))
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+#endif
+
+auto my_global_test_log_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_zero { 0, 0 }; return my_zero; }
+auto my_global_test_log_one () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_one  { 1, 0 }; return my_one; }
+auto my_global_test_log_inf () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_inf  { std::numeric_limits<boost::decimal::decimal32>::infinity() };  return my_inf; }
+auto my_global_test_log_nan () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_nan  { std::numeric_limits<boost::decimal::decimal32>::quiet_NaN() }; return my_nan; }
+
+#if (defined(__GNUC__) && !defined(__clang__))
+#pragma GCC pop_options
+#endif
