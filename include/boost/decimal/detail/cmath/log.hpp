@@ -25,7 +25,9 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 
     if (isnan(x))
     {
-        result = x;
+        // The cover tool is wrong. Exclude the following line from coverage.
+
+        result = x; // LCOV_EXCL_LINE
     }
     else if (isinf(x))
     {

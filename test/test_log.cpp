@@ -31,6 +31,8 @@ extern auto my_global_test_log_one () -> boost::decimal::decimal32&;
 extern auto my_global_test_log_inf () -> boost::decimal::decimal32&;
 extern auto my_global_test_log_nan () -> boost::decimal::decimal32&;
 
+extern volatile int force_init;
+
 namespace local
 {
   template<typename IntegralTimePointType,
@@ -334,11 +336,13 @@ auto main() -> int
 #pragma GCC optimize ("O0")
 #endif
 
-auto my_global_test_log_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_zero { 0, 0 }; return my_zero; }
-auto my_global_test_log_one () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_one  { 1, 0 }; return my_one; }
-auto my_global_test_log_inf () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_inf  { std::numeric_limits<boost::decimal::decimal32>::infinity() };  return my_inf; }
-auto my_global_test_log_nan () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_nan  { std::numeric_limits<boost::decimal::decimal32>::quiet_NaN() }; return my_nan; }
+auto my_global_test_log_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 dummy { }; static boost::decimal::decimal32 my_zero { 0, 0 }; return ((++::force_init > 0) && (::force_init < INT_MAX)) ? my_zero : dummy; }
+auto my_global_test_log_one () -> boost::decimal::decimal32& { static boost::decimal::decimal32 dummy { }; static boost::decimal::decimal32 my_one  { 1, 0 }; return ((++::force_init > 0) && (::force_init < INT_MAX)) ? my_one  : dummy; }
+auto my_global_test_log_inf () -> boost::decimal::decimal32& { static boost::decimal::decimal32 dummy { }; static boost::decimal::decimal32 my_inf  { std::numeric_limits<boost::decimal::decimal32>::infinity() };  return ((++::force_init > 0) && (::force_init < INT_MAX)) ? my_inf : dummy; }
+auto my_global_test_log_nan () -> boost::decimal::decimal32& { static boost::decimal::decimal32 dummy { }; static boost::decimal::decimal32 my_nan  { std::numeric_limits<boost::decimal::decimal32>::quiet_NaN() }; return ((++::force_init > 0) && (::force_init < INT_MAX)) ? my_nan : dummy; }
 
 #if (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC pop_options
 #endif
+
+volatile int force_init { };
