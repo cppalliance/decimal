@@ -7,6 +7,7 @@
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/cmath/abs.hpp>
 #include <type_traits>
 #include <cstdint>
 #include <cmath>
@@ -17,6 +18,27 @@ namespace boost { namespace decimal {
 template <typename T>
 constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
+    constexpr T zero {0, 0};
+    if (isnan(val) || abs(val) == zero)
+    {
+        return val;
+    }
+    else if (isinf(val))
+    {
+        if (signbit(val))
+        {
+            return std::numeric_limits<T>::quiet_NaN();
+        }
+        else
+        {
+            return val;
+        }
+    }
+    else if (val < 0)
+    {
+        return std::numeric_limits<T>::quiet_NaN();
+    }
+
     std::uint64_t i {};
     while ((i * i) <= val)
     {

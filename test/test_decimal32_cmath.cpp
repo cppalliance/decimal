@@ -564,9 +564,11 @@ void test_sqrt()
         }
     }
 
-    BOOST_TEST(isinf(sin(BOOST_DECIMAL_DEC_INFINITY)));
-    BOOST_TEST(isnan(sin(BOOST_DECIMAL_DEC_NAN)));
-    BOOST_TEST_EQ(sin(Dec(0)), Dec(0));
+    BOOST_TEST(isinf(sqrt(BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST(isnan(sqrt(-BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST(isnan(sqrt(BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST_EQ(sqrt(Dec(0)), Dec(0));
+    BOOST_TEST(isnan(sqrt(Dec(-1))));
 }
 
 int main()
