@@ -611,6 +611,58 @@ void test_two_val_hypot()
     BOOST_TEST(isnan(hypot(Dec(1), BOOST_DECIMAL_DEC_NAN)));
 }
 
+#if defined(__cpp_lib_hypot) && __cpp_lib_hypot >= 201603L
+
+template <typename Dec>
+void test_three_val_hypot()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        const auto val3 {dist(rng)};
+        Dec d1 {val1};
+        Dec d2 {val2};
+        Dec d3 {val3};
+
+        auto ret_val {std::hypot(val1, val2, val3)};
+        auto ret_dec {static_cast<float>(hypot(d1, d2, d3))};
+
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nVal 3: " << val3
+                      << "\nDec 3: " << d3
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(hypot(BOOST_DECIMAL_DEC_INFINITY, Dec(1), Dec(1))));
+    BOOST_TEST(isinf(hypot(Dec(1), BOOST_DECIMAL_DEC_INFINITY, Dec(1))));
+    BOOST_TEST(isinf(hypot(BOOST_DECIMAL_DEC_INFINITY, Dec(1), Dec(1))));
+    BOOST_TEST(isnan(hypot(BOOST_DECIMAL_DEC_NAN, Dec(1), Dec(1))));
+    BOOST_TEST(isnan(hypot(Dec(1), BOOST_DECIMAL_DEC_NAN, Dec(1))));
+    BOOST_TEST(isnan(hypot(BOOST_DECIMAL_DEC_NAN, Dec(1), Dec(1))));
+}
+
+#else
+
+template <typename Dec>
+void test_three_val_hypot()
+{
+    // Empty because we can't test against it yet
+}
+
+#endif
+
 int main()
 {
 
@@ -652,6 +704,7 @@ int main()
     test_sqrt<decimal32>();
 
     test_two_val_hypot<decimal32>();
+    test_three_val_hypot<decimal32>();
 
     return boost::report_errors();
 }
