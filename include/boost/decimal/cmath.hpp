@@ -5,7 +5,7 @@
 #ifndef BOOST_DECIMAL_CMATH_HPP
 #define BOOST_DECIMAL_CMATH_HPP
 
-// TODO(mborland): Allow conversion between decimal types via a promotion system
+#include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/fabs.hpp>
@@ -32,6 +32,8 @@
 #include <boost/decimal/detail/cmath/ceil.hpp>
 #include <boost/decimal/detail/cmath/modf.hpp>
 #include <boost/decimal/detail/cmath/fmod.hpp>
+#include <boost/decimal/detail/cmath/sqrt.hpp>
+#include <boost/decimal/detail/cmath/hypot.hpp>
 #include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
