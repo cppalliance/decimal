@@ -540,6 +540,35 @@ void test_ilogb()
     BOOST_TEST_EQ(ilogb(BOOST_DECIMAL_DEC_NAN), FP_ILOGBNAN);
 }
 
+template <typename Dec>
+void test_sqrt()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(0.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        decimal32 d1 {val1};
+
+        auto ret_val {std::sqrt(val1)};
+        auto ret_dec {static_cast<float>(sqrt(d1))};
+
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(sin(BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST(isnan(sin(BOOST_DECIMAL_DEC_NAN)));
+    BOOST_TEST_EQ(sin(Dec(0)), Dec(0));
+}
+
 int main()
 {
 
@@ -577,6 +606,8 @@ int main()
     test_fdim<decimal32>();
 
     test_ilogb<decimal32>();
+
+    test_sqrt<decimal32>();
 
     return boost::report_errors();
 }
