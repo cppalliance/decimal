@@ -608,6 +608,9 @@ void test_two_val_hypot()
         }
     }
 
+    const auto big_val {dist(rng)};
+    BOOST_TEST_EQ(hypot(Dec(big_val), Dec(big_val * 1e20F)), Dec(big_val * 1e20F));
+
     decimal32 inf {BOOST_DECIMAL_DEC_INFINITY * static_cast<int>(dist(rng))};
     decimal32 nan {BOOST_DECIMAL_DEC_NAN * static_cast<int>(dist(rng))};
     decimal32 zero {0 * static_cast<int>(dist(rng))};
@@ -658,10 +661,10 @@ void test_three_val_hypot()
     decimal32 zero {0 * static_cast<int>(dist(rng))};
     BOOST_TEST(isinf(hypot(inf, Dec(1), Dec(1))));
     BOOST_TEST(isinf(hypot(Dec(1), inf, Dec(1))));
-    BOOST_TEST(isinf(hypot(inf, Dec(1), Dec(1))));
+    BOOST_TEST(isinf(hypot(Dec(1), Dec(1), inf)));
     BOOST_TEST(isnan(hypot(nan, Dec(1), Dec(1))));
     BOOST_TEST(isnan(hypot(Dec(1), nan, Dec(1))));
-    BOOST_TEST(isnan(hypot(nan, Dec(1), Dec(1))));
+    BOOST_TEST(isnan(hypot(Dec(1), Dec(1), nan)));
 }
 
 #else
