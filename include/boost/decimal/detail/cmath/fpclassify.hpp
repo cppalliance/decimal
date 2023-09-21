@@ -25,7 +25,7 @@ constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexc
     {
         return FP_NAN;
     }
-    else if (rhs == 0)
+    else if (abs(rhs) == 0)
     {
         return FP_ZERO;
     }
