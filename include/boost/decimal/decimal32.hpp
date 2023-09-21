@@ -1056,7 +1056,7 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 
     if (!lhs.isneg() && (rhs < 0))
     {
-        return lhs + (-rhs);
+        return lhs + detail::make_positive_unsigned(rhs);
     }
 
     const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
@@ -2021,7 +2021,8 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
     normalize(sig_lhs, exp_lhs);
 
     detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
-    detail::decimal32_components rhs_components {detail::make_positive_unsigned(rhs), 0, rhs < 0};
+    std::int32_t exp_rhs {};
+    detail::decimal32_components rhs_components {detail::shrink_significand(detail::make_positive_unsigned(rhs), exp_rhs), exp_rhs, rhs < 0};
     detail::decimal32_components q_components {};
 
     generic_div_impl(lhs_components, rhs_components, q_components);

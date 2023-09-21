@@ -23,30 +23,43 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 
     auto result = zero;
 
-    if (isinf(x) || isnan(x))
+    if (isnan(x))
     {
-        result = x;
+        // The cover tool is wrong. Exclude the following line from coverage.
+
+        result = x; // LCOV_EXCL_LINE
+    }
+    else if (isinf(x))
+    {
+        if (!signbit(x))
+        {
+            result = x;
+        }
+        else
+        {
+            result = std::numeric_limits<T>::quiet_NaN();
+        }
     }
     else if (x < one)
     {
-        // Handle reflection.
+        // Handle reflection, the [+/-] zero-pole, and non-pole, negative x.
         if (x > zero)
         {
             result = -log(one / x);
         }
-        else if (x < zero)
+        else if ((x == zero) || (-x == zero))
         {
-            result = std::numeric_limits<T>::quiet_NaN();
+            // Actually, this should be equivalent to -HUGE_VAL.
+
+            result = -std::numeric_limits<T>::infinity();
         }
         else
         {
-            result = -std::numeric_limits<T>::infinity();
+            result = std::numeric_limits<T>::quiet_NaN();
         }
     }
     else if(x > one)
     {
-        constexpr T two { 2, 0 };
-
         // The algorithm for logarithm is based on Chapter 5, pages 35-36
         // of Cody and Waite, Software Manual for the Elementary Functions,
         // Prentice Hall, 1980.
@@ -54,30 +67,27 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         int exp2val { };
 
         // TODO(ckormanyos) There is probably something more efficient than calling frexp here.
-        auto g = (x > two) ? frexp(x, &exp2val) : x;
+        auto g = frexp(x, &exp2val);
 
-        bool is_scaled_by_sqrt { };
-
-        if (g > numbers::sqrt2_v<T>)
+        if (g < numbers::inv_sqrt2_v<T>)
         {
-            g /= numbers::sqrt2_v<T>;
+            g += g;
 
-            is_scaled_by_sqrt = true;
+            --exp2val;
         }
 
-        using coef_list_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(12))>;
+        using coef_list_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(11))>;
 
-        constexpr auto coefs =
+        constexpr auto coefficient_table =
             coef_list_array_type
             {
-                // 1, 12, 80, 448, 2304, 11264, 53248, 245760, 1114112, 4980736, 22020096, 96468992, ...
+                // (1,) 12, 80, 448, 2304, 11264, 53248, 245760, 1114112, 4980736, 22020096, 96468992, ...
                 // See also Sloane's A058962 at: https://oeis.org/A058962
 
                 // See also
                 // Series[Log[(1 + (z/2))/(1 - (z/2))], {z, 0, 21}]
                 // Or at Wolfram Alpha: https://www.wolframalpha.com/input?i=Series%5BLog%5B%281+%2B+%28z%2F2%29%29%2F%281+-+%28z%2F2%29%29%5D%2C+%7Bz%2C+0%2C+21%7D%5D
 
-                one,
                 one / UINT8_C(12),
                 one / UINT8_C(80),
                 one / UINT16_C(448),
@@ -94,35 +104,29 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         const auto z = s + s;
 
               auto zn   = z;
-        const auto z2   = z * z;
+        const auto zsq  = z * z;
               auto term = z;
-
-        constexpr auto exp_target = ilogb(std::numeric_limits<T>::epsilon()) - 1;
-
-        auto coef_itr = coefs.cbegin() + 1U;
 
         // Using a loop expansion with the above-tabulated coefficients
         // is scalable from decimal32 up to decimal64.
-        do
+        for(const auto& coef : coefficient_table)
         {
-          result += term;
+            result += term;
 
-          zn *= z2;
+            term = (zn *= zsq) * coef;
 
-          term = zn * *coef_itr;
+            constexpr auto iteration_ilogb_target = ilogb(std::numeric_limits<T>::epsilon()) - 1;
+
+            if(ilogb(term) < iteration_ilogb_target)
+            {
+                break;
+            }
         }
-        while((++coef_itr != coefs.cend()) && (ilogb(term) > exp_target));
+
 
         if (exp2val > 0)
         {
             result += static_cast<T>(exp2val * numbers::ln2_v<T>);
-        }
-
-        if(is_scaled_by_sqrt)
-        {
-            constexpr auto ln2_half = numbers::ln2_v<T> / 2U;
-
-            result += ln2_half;
         }
     }
     else
