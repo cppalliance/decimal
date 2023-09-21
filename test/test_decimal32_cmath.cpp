@@ -571,6 +571,46 @@ void test_sqrt()
     BOOST_TEST(isnan(sqrt(Dec(-1))));
 }
 
+template <typename Dec>
+void test_two_val_hypot()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        decimal32 d1 {val1};
+        decimal32 d2 {val2};
+
+        auto ret_val {std::hypot(val1, val2)};
+        auto ret_dec {static_cast<float>(hypot(d1, d2))};
+
+        if (ret_val == 0 || ret_dec == 0)
+        {
+            BOOST_TEST_EQ(ret_val, ret_dec);
+        }
+        else if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST_EQ(hypot(Dec(0), Dec(1)), Dec(1));
+    BOOST_TEST_EQ(hypot(Dec(1), Dec(0)), Dec(1));
+    BOOST_TEST(isinf(hypot(BOOST_DECIMAL_DEC_INFINITY, Dec(1))));
+    BOOST_TEST(isinf(hypot(Dec(1), BOOST_DECIMAL_DEC_INFINITY)));
+    BOOST_TEST(isnan(hypot(BOOST_DECIMAL_DEC_NAN, Dec(1))));
+    BOOST_TEST(isnan(hypot(Dec(1), BOOST_DECIMAL_DEC_NAN)));
+}
+
 int main()
 {
 
@@ -610,6 +650,8 @@ int main()
     test_ilogb<decimal32>();
 
     test_sqrt<decimal32>();
+
+    test_two_val_hypot<decimal32>();
 
     return boost::report_errors();
 }
