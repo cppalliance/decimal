@@ -1056,7 +1056,7 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 
     if (!lhs.isneg() && (rhs < 0))
     {
-        return lhs + (-rhs);
+        return lhs + detail::make_positive_unsigned(rhs);
     }
 
     const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
