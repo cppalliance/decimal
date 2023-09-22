@@ -10,7 +10,9 @@
 #include <boost/core/lightweight_test.hpp>
 
 auto my_zero() -> boost::decimal::decimal32&;
+auto my_one () -> boost::decimal::decimal32&;
 auto my_inf () -> boost::decimal::decimal32&;
+auto my_nan () -> boost::decimal::decimal32&;
 auto my_pi  () -> boost::decimal::decimal32&;
 auto my_a   () -> boost::decimal::decimal32&;
 auto my_b   () -> boost::decimal::decimal32&;
@@ -120,7 +122,7 @@ namespace local
       const auto local_inf_lhs  = ::my_inf() * static_cast<decimal_type>(dist(gen));
       const auto local_inf_rhs  = ::my_inf() * static_cast<decimal_type>(dist(gen));
 
-      const auto local_one = decimal_type { 1, 0 };
+      const auto local_one = ::my_one();
 
       {
         const auto sum_inf_dec_inf_dec = local_inf_lhs + local_inf_rhs;
@@ -202,6 +204,36 @@ namespace local
 
         const auto result_div_01_is_ok = isinf(result_div_01) && (result_div_01 > 0);
         const auto result_div_02_is_ok = isinf(result_div_02) && (result_div_02 < 0);
+
+        const auto result_cmp_is_ok = (result_div_01_is_ok && result_div_02_is_ok);
+
+        BOOST_TEST(result_div_01_is_ok);
+        BOOST_TEST(result_div_02_is_ok);
+
+        result_is_ok = (result_cmp_is_ok && result_is_ok);
+      }
+
+      {
+        const auto result_div_01 = ( local_one / local_inf_rhs);
+        const auto result_div_02 = (-local_one / local_inf_rhs);
+
+        const auto result_div_01_is_ok = (fpclassify(result_div_01) == FP_ZERO) && (!signbit(result_div_01));
+        const auto result_div_02_is_ok = (fpclassify(result_div_02) == FP_ZERO) && signbit(result_div_02);
+
+        const auto result_cmp_is_ok = (result_div_01_is_ok && result_div_02_is_ok);
+
+        BOOST_TEST(result_div_01_is_ok);
+        BOOST_TEST(result_div_02_is_ok);
+
+        result_is_ok = (result_cmp_is_ok && result_is_ok);
+      }
+
+      {
+        const auto result_div_01 = (( ::my_nan() * static_cast<decimal_type>(dist(gen))) / local_one);
+        const auto result_div_02 = ((-::my_nan() * static_cast<decimal_type>(dist(gen))) / local_one);
+
+        const auto result_div_01_is_ok = isnan(result_div_01);
+        const auto result_div_02_is_ok = isnan(result_div_02);
 
         const auto result_cmp_is_ok = (result_div_01_is_ok && result_div_02_is_ok);
 
@@ -408,7 +440,9 @@ auto main() -> int
 }
 
 auto my_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_zero { 0, 0 }; return val_zero; }
+auto my_one () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_one  { 1, 0 }; return val_one; }
 auto my_inf () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_inf = std::numeric_limits<boost::decimal::decimal32>::infinity(); return val_inf; }
+auto my_nan () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_nan = std::numeric_limits<boost::decimal::decimal32>::quiet_NaN(); return val_nan; }
 auto my_pi  () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_pi  = boost::decimal::numbers::pi_v<boost::decimal::decimal32>; return val_pi; }
 auto my_a   () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_a { 1.234567e5L }; return val_a; }
 auto my_b   () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_b { 9.876543e-2L }; return val_b; }
