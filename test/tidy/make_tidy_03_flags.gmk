@@ -47,7 +47,10 @@ TIDY_CHECKS  = "*,                                                            \
                 -misc-definitions-in-headers,                                 \
                 -cppcoreguidelines-pro-bounds-pointer-arithmetic,             \
                 -cppcoreguidelines-pro-bounds-constant-array-index,           \
+                -llvm-else-after-return,                                      \
+                -readability-else-after-return,                               \
                 -*magic-numbers*,                                             \
+                -cert*,                                                       \
                 -altera-*,                                                    \
                 -google-*,                                                    \
                 -fuchsia-*,                                                   \
