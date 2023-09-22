@@ -47,12 +47,16 @@ TIDY_CHECKS  = "*,                                                            \
                 -misc-definitions-in-headers,                                 \
                 -cppcoreguidelines-pro-bounds-pointer-arithmetic,             \
                 -cppcoreguidelines-pro-bounds-constant-array-index,           \
+                -llvm-else-after-return,                                      \
+                -readability-else-after-return,                               \
+                -cppcoreguidelines-pro-bounds-array-to-pointer-decay,         \
+                -hicpp-no-array-decay,                                        \
                 -*magic-numbers*,                                             \
+                -cert*,                                                       \
                 -altera-*,                                                    \
                 -google-*,                                                    \
                 -fuchsia-*,                                                   \
                 -llvmlibc-*"
-
 
 HEADER_FILT := '!boost-root|!decimal/test|include/boost/decimal'
 

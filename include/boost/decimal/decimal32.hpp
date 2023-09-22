@@ -1922,7 +1922,7 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
     switch (lhs_fp)
     {
         case FP_INFINITE:
-            q = inf;
+            q = sign ? -inf : inf;
             r = zero;
             return;
         case FP_ZERO:
