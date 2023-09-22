@@ -171,14 +171,15 @@ namespace local
     return result_is_ok;
   }
 
-  #if (defined(__GNUC__) && !defined(__clang__))
-  #pragma GCC push_options
-  #pragma GCC optimize ("O0")
-  #endif
-
   auto test_log_edge() -> bool
   {
     using decimal_type = boost::decimal::decimal32;
+
+    std::mt19937_64 gen;
+
+    gen.seed(time_point<typename std::mt19937_64::result_type>());
+
+    std::uniform_real_distribution<float> dist(-3.14F, 3.14F);
 
     volatile auto result_is_ok = true;
 
@@ -238,7 +239,7 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_inf = log(::my_global_test_log_inf());
+      const auto log_inf = log(::my_global_test_log_inf() * static_cast<decimal_type>(dist(gen)));
 
       const volatile auto result_log_inf_is_ok = isinf(log_inf);
 
@@ -253,7 +254,7 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_inf_minus = log(-::my_global_test_log_inf());
+      const auto log_inf_minus = log(-::my_global_test_log_inf() * static_cast<decimal_type>(dist(gen)));
 
       const volatile auto result_log_inf_minus_is_ok = isnan(log_inf_minus);
 
@@ -268,7 +269,7 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_nan = log(std::numeric_limits<decimal_type>::quiet_NaN());
+      const auto log_nan = log(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
       const volatile auto result_log_nan_is_ok = isnan(::my_global_test_log_nan());
 
@@ -316,10 +317,6 @@ namespace local
 
     return result_is_ok;
   }
-
-  #if (defined(__GNUC__) && !defined(__clang__))
-  #pragma GCC pop_options
-  #endif
 }
 
 auto main() -> int
@@ -331,18 +328,7 @@ auto main() -> int
   return (result_is_ok ? 0 : -1);
 }
 
-#if (defined(__GNUC__) && !defined(__clang__))
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
-#endif
-
-auto my_global_test_log_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 dummy { }; static boost::decimal::decimal32 my_zero { 0, 0 }; return ((++::force_init > 0) && (::force_init < INT_MAX)) ? my_zero : dummy; }
-auto my_global_test_log_one () -> boost::decimal::decimal32& { static boost::decimal::decimal32 dummy { }; static boost::decimal::decimal32 my_one  { 1, 0 }; return ((++::force_init > 0) && (::force_init < INT_MAX)) ? my_one  : dummy; }
-auto my_global_test_log_inf () -> boost::decimal::decimal32& { static boost::decimal::decimal32 dummy { }; static boost::decimal::decimal32 my_inf  { std::numeric_limits<boost::decimal::decimal32>::infinity() };  return ((++::force_init > 0) && (::force_init < INT_MAX)) ? my_inf : dummy; }
-auto my_global_test_log_nan () -> boost::decimal::decimal32& { static boost::decimal::decimal32 dummy { }; static boost::decimal::decimal32 my_nan  { std::numeric_limits<boost::decimal::decimal32>::quiet_NaN() }; return ((++::force_init > 0) && (::force_init < INT_MAX)) ? my_nan : dummy; }
-
-#if (defined(__GNUC__) && !defined(__clang__))
-#pragma GCC pop_options
-#endif
-
-volatile int force_init { };
+auto my_global_test_log_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_zero { 0, 0 }; return my_zero; }
+auto my_global_test_log_one () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_one  { 1, 0 }; return my_one; }
+auto my_global_test_log_inf () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_inf  { std::numeric_limits<boost::decimal::decimal32>::infinity() };  return my_inf; }
+auto my_global_test_log_nan () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_nan  { std::numeric_limits<boost::decimal::decimal32>::quiet_NaN() }; return my_nan; }

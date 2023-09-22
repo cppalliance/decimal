@@ -9,7 +9,7 @@
 #include <cmath>
 #include <type_traits>
 
-#include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
+#include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/numbers.hpp>
 
@@ -25,9 +25,7 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 
     if (isnan(x))
     {
-        // The cover tool is wrong. Exclude the following line from coverage.
-
-        result = x; // LCOV_EXCL_LINE
+        result = x;
     }
     else if (isinf(x))
     {
