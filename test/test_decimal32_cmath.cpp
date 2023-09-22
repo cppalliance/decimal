@@ -490,10 +490,10 @@ void test_remquo()
     }
 
     int quo {};
-    BOOST_TEST(remquo(BOOST_DECIMAL_DEC_INFINITY, Dec(1), &quo) != BOOST_DECIMAL_DEC_NAN);
-    BOOST_TEST(remquo(BOOST_DECIMAL_DEC_NAN, Dec(1), &quo) != BOOST_DECIMAL_DEC_NAN);
-    BOOST_TEST(remquo(Dec(1), BOOST_DECIMAL_DEC_NAN, &quo) != BOOST_DECIMAL_DEC_NAN);
-    BOOST_TEST(remquo(Dec(1), Dec(0), &quo) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(isnan(remquo(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng)), Dec(1), &quo)));
+    BOOST_TEST(isnan(remquo(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)), Dec(1), &quo)));
+    BOOST_TEST(isnan(remquo(Dec(1), BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)), &quo)));
+    BOOST_TEST(isnan(remquo(Dec(1), Dec(0), &quo)));
 }
 
 template <typename Dec>
