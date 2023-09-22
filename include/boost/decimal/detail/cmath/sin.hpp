@@ -41,13 +41,10 @@ constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
             return detail::sin_impl(x90);
         case 1:
             return detail::cos_impl(x90);
-        case 3:
+        case 2:
             return detail::sin_impl(-x90);
-        case 4:
-            return -detail::cos_impl(x90);
         default:
-            assert(quo < 4);
-            return static_cast<T>(quo);
+            return -detail::cos_impl(x90);
     }
 }
 

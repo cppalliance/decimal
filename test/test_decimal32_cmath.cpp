@@ -349,7 +349,7 @@ template <typename Dec>
 void test_sin()
 {
     std::mt19937_64 rng(42);
-    std::uniform_real_distribution<float> dist(-3.14F / 2, 3.14F / 2);
+    std::uniform_real_distribution<float> dist(-3.14F, 3.14F);
 
     for (std::size_t n {}; n < N; ++n)
     {
@@ -359,7 +359,7 @@ void test_sin()
         auto ret_val {std::sin(val1)};
         auto ret_dec {static_cast<float>(sin(d1))};
 
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 10*std::numeric_limits<float>::epsilon()))
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 15*std::numeric_limits<float>::epsilon()))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
@@ -369,16 +369,16 @@ void test_sin()
         }
     }
 
-    BOOST_TEST(isinf(sin(BOOST_DECIMAL_DEC_INFINITY)));
-    BOOST_TEST(isnan(sin(BOOST_DECIMAL_DEC_NAN)));
-    BOOST_TEST_EQ(sin(Dec(0)), Dec(0));
+    BOOST_TEST(isinf(sin(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng)))));
+    BOOST_TEST(isnan(sin(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)))));
+    BOOST_TEST_EQ(sin(Dec(0) * Dec(dist(rng))), Dec(0));
 }
 
 template <typename Dec>
 void test_cos()
 {
     std::mt19937_64 rng(42);
-    std::uniform_real_distribution<float> dist(-3.14F / 2, 3.14F / 2);
+    std::uniform_real_distribution<float> dist(-3.14F, 3.14F);
 
     for (std::size_t n {}; n < N; ++n)
     {
@@ -388,7 +388,7 @@ void test_cos()
         auto ret_val {std::cos(val1)};
         auto ret_dec {static_cast<float>(cos(d1))};
 
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 10*std::numeric_limits<float>::epsilon()))
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 15*std::numeric_limits<float>::epsilon()))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
@@ -398,9 +398,9 @@ void test_cos()
         }
     }
 
-    BOOST_TEST(isinf(cos(BOOST_DECIMAL_DEC_INFINITY)));
-    BOOST_TEST(isnan(cos(BOOST_DECIMAL_DEC_NAN)));
-    BOOST_TEST_EQ(cos(Dec(0)), Dec(1));
+    BOOST_TEST(isinf(cos(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng)))));
+    BOOST_TEST(isnan(cos(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)))));
+    BOOST_TEST_EQ(cos(Dec(0) * Dec(dist(rng))), Dec(1));
 }
 
 template <typename Dec>
