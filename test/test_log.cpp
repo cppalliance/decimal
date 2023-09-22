@@ -179,7 +179,7 @@ namespace local
 
     gen.seed(time_point<typename std::mt19937_64::result_type>());
 
-    std::uniform_real_distribution<float> dist(-3.14F, 3.14F);
+    std::uniform_real_distribution<float> dist(1.0F, 2.0F);
 
     volatile auto result_is_ok = true;
 
@@ -187,7 +187,7 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_zero = log(::my_global_test_log_zero());
+      const auto log_zero = log(::my_global_test_log_zero() * static_cast<decimal_type>(dist(gen)));
 
       const volatile auto result_log_zero_is_ok = (isinf(log_zero) && (log_zero < ::my_global_test_log_zero()));
 
@@ -200,7 +200,7 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_zero_minus = log(-::my_global_test_log_zero());
+      const auto log_zero_minus = log(-::my_global_test_log_zero() * static_cast<decimal_type>(dist(gen)));
 
       const volatile auto result_log_zero_minus_is_ok = (isinf(log_zero_minus) && (log_zero_minus < ::my_global_test_log_zero()));
 

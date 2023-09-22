@@ -9,8 +9,18 @@
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 
+auto my_zero() -> boost::decimal::decimal32&;
+auto my_inf () -> boost::decimal::decimal32&;
+auto my_pi  () -> boost::decimal::decimal32&;
+auto my_a   () -> boost::decimal::decimal32&;
+auto my_b   () -> boost::decimal::decimal32&;
+
 namespace local
 {
+  std::mt19937_64 gen;
+
+  std::uniform_real_distribution<float> dist(1.01F, 1.04F);
+
   template<typename IntegralTimePointType,
            typename ClockType = std::chrono::high_resolution_clock>
   auto time_point() noexcept -> IntegralTimePointType
@@ -59,10 +69,13 @@ namespace local
 
     auto result_is_ok = true;
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
     {
-      const auto local_nan_to_construct_f  = decimal_type { std::numeric_limits<float>::quiet_NaN() };
-      const auto local_nan_to_construct_d  = decimal_type { std::numeric_limits<double>::quiet_NaN() };
-      const auto local_nan_to_construct_ld = decimal_type { std::numeric_limits<long double>::quiet_NaN() };
+      static_cast<void>(i);
+
+      const auto local_nan_to_construct_f  = decimal_type { std::numeric_limits<float>::quiet_NaN() * static_cast<float>(dist(gen)) };
+      const auto local_nan_to_construct_d  = decimal_type { std::numeric_limits<double>::quiet_NaN() * static_cast<double>(dist(gen)) };
+      const auto local_nan_to_construct_ld = decimal_type { std::numeric_limits<long double>::quiet_NaN() * static_cast<long double>(dist(gen)) };
 
       const auto result_nan_construct_is_ok =
         (
@@ -100,9 +113,12 @@ namespace local
       }
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
     {
-      const auto local_inf_lhs  = decimal_type { std::numeric_limits<float>::infinity() };
-      const auto local_inf_rhs  = decimal_type { std::numeric_limits<float>::infinity() };
+      static_cast<void>(i);
+
+      const auto local_inf_lhs  = ::my_inf() * static_cast<decimal_type>(dist(gen));
+      const auto local_inf_rhs  = ::my_inf() * static_cast<decimal_type>(dist(gen));
 
       const auto local_one = decimal_type { 1, 0 };
 
@@ -185,20 +201,19 @@ namespace local
         const auto result_div_02 = (local_inf_lhs / -local_one);
 
         const auto result_div_01_is_ok = isinf(result_div_01) && (result_div_01 > 0);
-        const auto result_div_02_is_ok = isinf(result_div_02) /*&& (result_div_02 < 0)*/; // TODO(mborland) Check if sign-checking is OK?
+        const auto result_div_02_is_ok = isinf(result_div_02) && (result_div_02 < 0);
 
         const auto result_cmp_is_ok = (result_div_01_is_ok && result_div_02_is_ok);
 
-        BOOST_TEST(result_cmp_is_ok);
+        BOOST_TEST(result_div_01_is_ok);
+        BOOST_TEST(result_div_02_is_ok);
 
         result_is_ok = (result_cmp_is_ok && result_is_ok);
       }
 
       {
-        const auto local_zero = decimal_type { 0, 0 };
-
-        const auto result_div_01 = (local_zero /  local_one);
-        const auto result_div_02 = (local_zero / -local_one);
+        const auto result_div_01 = ((::my_zero() * static_cast<decimal_type>(dist(gen))) /  local_one);
+        const auto result_div_02 = ((::my_zero() * static_cast<decimal_type>(dist(gen))) / -local_one);
 
         const auto result_div_01_is_ok = ((fpclassify(result_div_01) == FP_ZERO) && (!signbit(result_div_01)));
         const auto result_div_02_is_ok = ((fpclassify(result_div_02) == FP_ZERO) &&   signbit(result_div_02));
@@ -233,18 +248,6 @@ namespace local
     return result_is_ok;
   }
 
-  #if (defined(__GNUC__) && !defined(__clang__))
-  #pragma GCC push_options
-  #pragma GCC optimize ("O0")
-  #endif
-
-  namespace constants {
-
-  auto my_inf() -> const boost::decimal::decimal32& { static const boost::decimal::decimal32 val_inf = std::numeric_limits<boost::decimal::decimal32>::infinity(); return val_inf; }
-  auto my_pi () -> const boost::decimal::decimal32& { static const boost::decimal::decimal32 val_pi  = boost::decimal::numbers::pi_v<boost::decimal::decimal32>; return val_pi; }
-
-  }
-
   auto test_edges() -> bool
   {
     using decimal_type = boost::decimal::decimal32;
@@ -252,8 +255,8 @@ namespace local
     auto result_is_ok = true;
 
     {
-      const decimal_type a { 1.234567e5L };
-      const decimal_type b { 9.876543e-2L };
+      const decimal_type a = my_a();
+      const decimal_type b = my_b();
 
       const decimal_type c = a + b;
 
@@ -264,12 +267,23 @@ namespace local
       result_is_ok = (result_prec_add_is_ok && result_is_ok);
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(128)); ++i)
     {
-      std::random_device rd;
-      std::mt19937_64 gen(rd());
+      static_cast<void>(i);
 
-      gen.seed(static_cast<typename std::mt19937_64::result_type>(UINT64_C(0x12345678AA55)));
+      const decimal_type a = my_a() * static_cast<decimal_type>(dist(gen));
+      const decimal_type b = my_b() * static_cast<decimal_type>(dist(gen));
 
+      const decimal_type c = a + b;
+
+      const auto result_prec_add_vary_is_ok = (c > decimal_type(123456.709876543L));
+
+      BOOST_TEST(result_prec_add_vary_is_ok);
+
+      result_is_ok = (result_prec_add_vary_is_ok && result_is_ok);
+    }
+
+    {
       for(auto   index = static_cast<unsigned>(UINT8_C(0));
                  index < static_cast<unsigned>(UINT8_C(128));
                ++index)
@@ -323,12 +337,15 @@ namespace local
       result_is_ok = (result_sin_cos_tiny_is_ok && result_is_ok);
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
     {
-      const auto sin_inf = sin(std::numeric_limits<decimal_type>::infinity());
-      const auto sin_nan = sin(std::numeric_limits<decimal_type>::quiet_NaN());
+      static_cast<void>(i);
 
-      const auto cos_inf = cos(std::numeric_limits<decimal_type>::infinity());
-      const auto cos_nan = cos(std::numeric_limits<decimal_type>::quiet_NaN());
+      const auto sin_inf = sin(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto sin_nan = sin(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+
+      const auto cos_inf = cos(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto cos_nan = cos(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
       const auto result_sin_con_non_normal_is_ok =
         (
@@ -341,9 +358,12 @@ namespace local
       result_is_ok = (result_sin_con_non_normal_is_ok && result_is_ok);
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
     {
-      const auto ilogb_inf_inline   = ilogb(std::numeric_limits<decimal_type>::infinity());
-      const auto ilogb_inf_callable = ilogb(constants::my_inf());
+      static_cast<void>(i);
+
+      const auto ilogb_inf_inline   = ilogb(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto ilogb_inf_callable = ilogb(::my_inf() * static_cast<decimal_type>(dist(gen)));
 
       const volatile auto result_ilogb_inf_is_ok = ((ilogb_inf_inline == INT_MAX) && (ilogb_inf_callable == INT_MAX));
 
@@ -352,11 +372,14 @@ namespace local
       result_is_ok = (result_ilogb_inf_is_ok && result_is_ok);
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
     {
-      const auto ceil_pi_pos_inline   = ceil(boost::decimal::numbers::pi_v<decimal_type>);
-      const auto ceil_pi_neg_inline   = ceil(-boost::decimal::numbers::pi_v<decimal_type>);
-      const auto ceil_pi_pos_callable = ceil(2 * constants::my_pi());
-      const auto ceil_pi_neg_callable = ceil(-2 * constants::my_pi());
+      static_cast<void>(i);
+
+      const auto ceil_pi_pos_inline   = ceil(boost::decimal::numbers::pi_v<decimal_type> * static_cast<decimal_type>(dist(gen)));
+      const auto ceil_pi_neg_inline   = ceil(-boost::decimal::numbers::pi_v<decimal_type> * static_cast<decimal_type>(dist(gen)));
+      const auto ceil_pi_pos_callable = ceil(2 * ::my_pi() * static_cast<decimal_type>(dist(gen)));
+      const auto ceil_pi_neg_callable = ceil(-2 * ::my_pi() * static_cast<decimal_type>(dist(gen)));
 
       const volatile auto result_ceil_is_ok =
         (
@@ -371,17 +394,21 @@ namespace local
 
     return result_is_ok;
   }
-
-  #if (defined(__GNUC__) && !defined(__clang__))
-  #pragma GCC pop_options
-  #endif
 }
 
 auto main() -> int
 {
+  local::gen.seed(local::time_point<typename std::mt19937_64::result_type>());
+
   auto result_is_ok = (local::test_behave_over_under() && local::test_edges());
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 
   return (result_is_ok ? 0 : -1);
 }
+
+auto my_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_zero { 0, 0 }; return val_zero; }
+auto my_inf () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_inf = std::numeric_limits<boost::decimal::decimal32>::infinity(); return val_inf; }
+auto my_pi  () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_pi  = boost::decimal::numbers::pi_v<boost::decimal::decimal32>; return val_pi; }
+auto my_a   () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_a { 1.234567e5L }; return val_a; }
+auto my_b   () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_b { 9.876543e-2L }; return val_b; }
