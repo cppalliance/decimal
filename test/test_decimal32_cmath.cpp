@@ -448,10 +448,10 @@ void test_remainder()
         }
     }
 
-    BOOST_TEST(remainder(BOOST_DECIMAL_DEC_INFINITY, Dec(1)) != BOOST_DECIMAL_DEC_NAN);
-    BOOST_TEST(remainder(BOOST_DECIMAL_DEC_NAN, Dec(1)) != BOOST_DECIMAL_DEC_NAN);
-    BOOST_TEST(remainder(Dec(1), BOOST_DECIMAL_DEC_NAN) != BOOST_DECIMAL_DEC_NAN);
-    BOOST_TEST(remainder(Dec(1), Dec(0)) != BOOST_DECIMAL_DEC_NAN);
+    BOOST_TEST(isnan(remainder(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng)), Dec(1))));
+    BOOST_TEST(isnan(remainder(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)), Dec(1))));
+    BOOST_TEST(isnan(remainder(Dec(1), BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)))));
+    BOOST_TEST(isnan(remainder(Dec(1), Dec(0))));
 }
 
 template <typename Dec>
