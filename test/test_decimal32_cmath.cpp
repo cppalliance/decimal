@@ -19,10 +19,13 @@ using namespace boost::decimal;
 template <typename Dec>
 void test_fmax()
 {
-    BOOST_TEST_EQ(fmax(Dec(1), BOOST_DECIMAL_DEC_NAN), Dec(1));
-    BOOST_TEST_EQ(fmax(BOOST_DECIMAL_DEC_NAN, Dec(1)), Dec(1));
-    BOOST_TEST(isnan(fmax(BOOST_DECIMAL_DEC_NAN, BOOST_DECIMAL_DEC_NAN)));
-    BOOST_TEST_EQ(fmax(BOOST_DECIMAL_DEC_INFINITY, -BOOST_DECIMAL_DEC_INFINITY), BOOST_DECIMAL_DEC_INFINITY);
+    std::mt19937_64 rng;
+    std::uniform_int_distribution<int> dist(0, 10);
+
+    BOOST_TEST_EQ(fmax(Dec(1), BOOST_DECIMAL_DEC_NAN * Dec(dist(rng))), Dec(1));
+    BOOST_TEST_EQ(fmax(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)), Dec(1)), Dec(1));
+    BOOST_TEST(isnan(fmax(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)), BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)))));
+    BOOST_TEST_EQ(fmax(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng)), -BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng))), BOOST_DECIMAL_DEC_INFINITY);
 
     BOOST_TEST_EQ(fmax(Dec(1), Dec(0)), Dec(1));
     BOOST_TEST_EQ(fmax(Dec(-2), Dec(1)), Dec(1));
