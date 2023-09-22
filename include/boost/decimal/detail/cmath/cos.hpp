@@ -46,13 +46,10 @@ constexpr auto cos(T x) noexcept -> T
             return detail::cos_impl(x90);
         case 1:
             return -detail::sin_impl(x90);
-        case 3:
-            return detail::cos_impl(-x90);
-        case 4:
-            return detail::sin_impl(x90);
+        case 2:
+            return -detail::cos_impl(x90);
         default:
-            assert(quo < 4);
-            return static_cast<T>(quo);
+            return detail::sin_impl(x90);
     }
 }
 
