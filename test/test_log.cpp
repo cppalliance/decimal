@@ -31,8 +31,6 @@ extern auto my_global_test_log_one () -> boost::decimal::decimal32&;
 extern auto my_global_test_log_inf () -> boost::decimal::decimal32&;
 extern auto my_global_test_log_nan () -> boost::decimal::decimal32&;
 
-extern volatile int force_init;
-
 namespace local
 {
   template<typename IntegralTimePointType,

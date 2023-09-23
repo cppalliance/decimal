@@ -8,6 +8,7 @@
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/detail/cmath/cos.hpp>
+#include <boost/decimal/detail/cmath/exp.hpp>
 #include <boost/decimal/detail/cmath/fabs.hpp>
 #include <boost/decimal/detail/cmath/fdim.hpp>
 #include <boost/decimal/detail/cmath/fmax.hpp>
