@@ -28,7 +28,18 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
     }
     else if (fpc != FP_NORMAL)
     {
-        if ((fpc == FP_INFINITE) || (fpc == FP_NAN))
+        if (fpc == FP_INFINITE)
+        {
+            if (signbit(x))
+            {
+                result = T { 0, 0 };
+            }
+            else
+            {
+                result = x;
+            }
+        }
+        else if (fpc == FP_NAN)
         {
             result = x;
         }
@@ -41,10 +52,12 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
     {
         if (signbit(x))
         {
-            result = static_cast<T>(1.0L) / exp(-x);
+            result = T { 1, 0 } / exp(-x);
         }
         else
         {
+            // Scale the argument to 0 < x < log(2).
+
             int nf2 { };
 
             if (x > numbers::ln2_v<T>)
@@ -79,20 +92,20 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
             constexpr coefficient_array_type
                 coefficient_table
                 {
-                    T { UINT64_C(100000000000000000), -17 -  0 },// 3213692169066381945529176657E+01L), // x
-                    T { UINT64_C(500000000000000000), -18 -  0 },// 8389405741198241227273662223E+00L), // x^2
-                    T { UINT64_C(166666666666666404), -18 -  0 },// 5765593562709186076539985328E+00L), // x^3
-                    T { UINT64_C(416666666666666693), -18 -  1 },// 4614928838666442575683452206E-01L), // x^4
-                    T { UINT64_C(833333333333952184), -18 -  2 },// 1328202617206868796855583809E-02L), // x^5
-                    T { UINT64_C(138888888888895351), -18 -  2 },// 3176946682731620625302469979E-02L), // x^6
-                    T { UINT64_C(198412698348868919), -18 -  3 },// 6859793276462049624439889135E-03L), // x^7
-                    T { UINT64_C(248015873000149915), -18 -  4 },// 9369647648735612017495156006E-04L), // x^8
-                    T { UINT64_C(275573225878289825), -18 -  5 },// 2481007286813761544775538366E-05L), // x^9
-                    T { UINT64_C(275573204314797901), -18 -  6 },// 3276287368071846972098889744E-06L), // x^10
-                    T { UINT64_C(250511628686171938), -18 -  7 },// 8770371641094067075234027345E-07L), // x^11
-                    T { UINT64_C(208763259846366233), -18 -  8 },// 8337672597832718168295672334E-08L), // x^12
-                    T { UINT64_C(161938589229618039), -18 -  9 },// 0338553597911165126625722485E-09L), // x^13
-                    T { UINT64_C(115439921859822156), -18 - 10 },// 7485183048765404442959841646E-10L), // x^14
+                    T { UINT64_C(100000000000000000), -17 -  0 }, // x
+                    T { UINT64_C(500000000000000000), -18 -  0 }, // x^2
+                    T { UINT64_C(166666666666666404), -18 -  0 }, // x^3
+                    T { UINT64_C(416666666666666693), -18 -  1 }, // x^4
+                    T { UINT64_C(833333333333952184), -18 -  2 }, // x^5
+                    T { UINT64_C(138888888888895351), -18 -  2 }, // x^6
+                    T { UINT64_C(198412698348868919), -18 -  3 }, // x^7
+                    T { UINT64_C(248015873000149915), -18 -  4 }, // x^8
+                    T { UINT64_C(275573225878289825), -18 -  5 }, // x^9
+                    T { UINT64_C(275573204314797901), -18 -  6 }, // x^10
+                    T { UINT64_C(250511628686171938), -18 -  7 }, // x^11
+                    T { UINT64_C(208763259846366233), -18 -  8 }, // x^12
+                    T { UINT64_C(161938589229618039), -18 -  9 }, // x^13
+                    T { UINT64_C(115439921859822156), -18 - 10 }  // x^14
                 };
 
             constexpr T tol = std::numeric_limits<T>::epsilon() / 100;
@@ -108,7 +121,7 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 result = fma(result, x, *rit++);
             }
 
-            result = fma(result, x, static_cast<T>(1.0L));
+            result = fma(result, x, T { 1, 0 });
 
             if (nf2 > 0)
             {

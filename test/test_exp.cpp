@@ -146,13 +146,23 @@ namespace local
     }
 
     {
-      const auto exp_inf = exp(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto exp_inf_pos = exp(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
 
-      const auto result_exp_inf_is_ok = isinf(exp_inf);
+      const auto result_exp_inf_pos_is_ok = isinf(exp_inf_pos);
 
-      BOOST_TEST(result_exp_inf_is_ok);
+      BOOST_TEST(result_exp_inf_pos_is_ok);
 
-      result_is_ok = (result_exp_inf_is_ok && result_is_ok);
+      result_is_ok = (result_exp_inf_pos_is_ok && result_is_ok);
+    }
+
+    {
+      const auto exp_inf_neg = exp(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+
+      const auto result_exp_inf_neg_is_ok = (exp_inf_neg == ::my_zero());
+
+      BOOST_TEST(result_exp_inf_neg_is_ok);
+
+      result_is_ok = (result_exp_inf_neg_is_ok && result_is_ok);
     }
 
     {
