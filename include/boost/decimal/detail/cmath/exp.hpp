@@ -22,9 +22,12 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 
     T result { };
 
+    constexpr T zero { 0, 0 };
+    constexpr T one  { 1, 0 };
+
     if (fpc == FP_ZERO)
     {
-        result = static_cast<T>(1.0L);
+        result = one;
     }
     else if (fpc != FP_NORMAL)
     {
@@ -32,7 +35,7 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         {
             if (signbit(x))
             {
-                result = T { 0, 0 };
+                result = zero;
             }
             else
             {
@@ -45,14 +48,14 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         }
         else
         {
-            result = static_cast<T>(0.0L);
+            result = zero;
         }
     }
     else
     {
         if (signbit(x))
         {
-            result = T { 1, 0 } / exp(-x);
+            result = one / exp(-x);
         }
         else
         {
@@ -89,30 +92,29 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 
             using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(14))>;
 
+            // TODO(ckormanyos) Is a Pade approximation more precise or faster?
+            // And, ... how can you make it scalable if you go ahead and "Pade"-it?
+
             constexpr coefficient_array_type
                 coefficient_table
                 {
-                    T { UINT64_C(100000000000000000), -17 -  0 }, // x
-                    T { UINT64_C(500000000000000000), -18 -  0 }, // x^2
-                    T { UINT64_C(166666666666666404), -18 -  0 }, // x^3
-                    T { UINT64_C(416666666666666693), -18 -  1 }, // x^4
-                    T { UINT64_C(833333333333952184), -18 -  2 }, // x^5
-                    T { UINT64_C(138888888888895351), -18 -  2 }, // x^6
-                    T { UINT64_C(198412698348868919), -18 -  3 }, // x^7
-                    T { UINT64_C(248015873000149915), -18 -  4 }, // x^8
-                    T { UINT64_C(275573225878289825), -18 -  5 }, // x^9
-                    T { UINT64_C(275573204314797901), -18 -  6 }, // x^10
-                    T { UINT64_C(250511628686171938), -18 -  7 }, // x^11
-                    T { UINT64_C(208763259846366233), -18 -  8 }, // x^12
-                    T { UINT64_C(161938589229618039), -18 -  9 }, // x^13
-                    T { UINT64_C(115439921859822156), -18 - 10 }  // x^14
+                    T { UINT64_C(100000000000000000), -17 -  0 }, // * x
+                    T { UINT64_C(500000000000000000), -18 -  0 }, // * x^2
+                    T { UINT64_C(166666666666666404), -18 -  0 }, // * x^3
+                    T { UINT64_C(416666666666666693), -18 -  1 }, // * x^4
+                    T { UINT64_C(833333333333952184), -18 -  2 }, // * x^5
+                    T { UINT64_C(138888888888895351), -18 -  2 }, // * x^6
+                    T { UINT64_C(198412698348868919), -18 -  3 }, // * x^7
+                    T { UINT64_C(248015873000149915), -18 -  4 }, // * x^8
+                    T { UINT64_C(275573225878289825), -18 -  5 }, // * x^9
+                    T { UINT64_C(275573204314797901), -18 -  6 }, // * x^10
+                    T { UINT64_C(250511628686171938), -18 -  7 }, // * x^11
+                    T { UINT64_C(208763259846366233), -18 -  8 }, // * x^12
+                    T { UINT64_C(161938589229618039), -18 -  9 }, // * x^13
+                    T { UINT64_C(115439921859822156), -18 - 10 }  // * x^14
                 };
 
-            constexpr T tol = std::numeric_limits<T>::epsilon() / 100;
-
-            auto rit = coefficient_table.crbegin();
-
-            while (*rit < tol) { ++rit; }
+            auto rit = coefficient_table.crbegin() + static_cast<std::size_t>((sizeof(T) == 4U) ? 5U : 0U);
 
             result = *rit;
 
@@ -121,13 +123,22 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 result = fma(result, x, *rit++);
             }
 
-            result = fma(result, x, T { 1, 0 });
+            result = fma(result, x, one);
 
             if (nf2 > 0)
             {
-                constexpr T two { 2, 0 };
+                if (nf2 < 32)
+                {
+                    // TODO(mborland) At this place, operator*=(std::uint32_t) did not work for some reason?
 
-                result *= pow(two, nf2);
+                    result = result * static_cast<std::uint32_t>(1ULL << static_cast<unsigned>(nf2));
+                }
+                else
+                {
+                    constexpr T two { 2, 0 };
+
+                    result *= pow(two, nf2);
+                }
             }
         }
     }

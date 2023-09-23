@@ -68,7 +68,7 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_exp(const int tol_factor, const bool negate) -> bool
+  auto test_exp(const int tol_factor, const bool negate, const long double range_lo, const long double range_hi) -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
@@ -80,8 +80,8 @@ namespace local
     auto dis =
       std::uniform_real_distribution<float>
       {
-        static_cast<float>(0.03125L),
-        static_cast<float>(32.0L)
+        static_cast<float>(range_lo),
+        static_cast<float>(range_hi)
       };
 
     auto result_is_ok = true;
@@ -194,12 +194,37 @@ auto main() -> int
 {
   auto result_is_ok = true;
 
-  const auto result_exp_pos_is_ok = local::test_exp(96, false);
-  const auto result_exp_neg_is_ok = local::test_exp(96, true);
+  const auto result_exp_pos_is_ok = local::test_exp(96, false, 0.03125L, 32L);
+  const auto result_exp_neg_is_ok = local::test_exp(96, true,  0.03125L, 32L);
+
+  const auto result_exp_pos_narrow_is_ok = local::test_exp(16, false, 0.75L, 8.0L);
+  const auto result_exp_neg_narrow_is_ok = local::test_exp(16, true,  0.75L, 8.0L);
+
+  const auto result_exp_pos_wide_is_ok = local::test_exp(256, false, 0.03125L / 2L, 32L * 2L);
+  const auto result_exp_neg_wide_is_ok = local::test_exp(256, true,  0.03125L / 2L, 32L * 2L);
+
   const auto result_exp_edge_is_ok = local::test_exp_edge();
+
+  BOOST_TEST(result_exp_pos_is_ok);
+  BOOST_TEST(result_exp_neg_is_ok);
+
+  BOOST_TEST(result_exp_pos_narrow_is_ok);
+  BOOST_TEST(result_exp_neg_narrow_is_ok);
+
+  BOOST_TEST(result_exp_pos_wide_is_ok);
+  BOOST_TEST(result_exp_neg_wide_is_ok);
+
+  BOOST_TEST(result_exp_edge_is_ok);
 
   result_is_ok = (result_exp_pos_is_ok  && result_is_ok);
   result_is_ok = (result_exp_neg_is_ok  && result_is_ok);
+
+  result_is_ok = (result_exp_pos_narrow_is_ok  && result_is_ok);
+  result_is_ok = (result_exp_neg_narrow_is_ok  && result_is_ok);
+
+  result_is_ok = (result_exp_pos_wide_is_ok  && result_is_ok);
+  result_is_ok = (result_exp_neg_wide_is_ok  && result_is_ok);
+
   result_is_ok = (result_exp_edge_is_ok && result_is_ok);
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
