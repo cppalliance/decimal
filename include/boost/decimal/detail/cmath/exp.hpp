@@ -6,7 +6,7 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_EXP_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_EXP_HPP
 
-#include <cmath>
+#include <array>
 #include <type_traits>
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
@@ -18,11 +18,106 @@ namespace boost { namespace decimal {
 template<typename T>
 constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
 {
-    static_cast<void>(x);
+    const auto fpc = fpclassify(x);
 
-    constexpr T zero { 0, 0 };
+    T result { };
 
-    auto result = zero;
+    if (fpc == FP_ZERO)
+    {
+        result = static_cast<T>(1.0L);
+    }
+    else if (fpc != FP_NORMAL)
+    {
+        if ((fpc == FP_INFINITE) || (fpc == FP_NAN))
+        {
+            result = x;
+        }
+        else
+        {
+            result = static_cast<T>(0.0L);
+        }
+    }
+    else
+    {
+        if (signbit(x))
+        {
+            result = static_cast<T>(1.0L) / exp(-x);
+        }
+        else
+        {
+            int nf2 { };
+
+            if (x > numbers::ln2_v<T>)
+            {
+                nf2 = int(x / numbers::ln2_v<T>);
+
+                x -= (numbers::ln2_v<T> * nf2);
+            }
+
+            // Specifically derive a polynomial expansion for Exp[x] - 1 for this work.
+            //   Table[{x, Exp[x] - 1}, {x, -Log[2], Log[2], 1/60}]
+            //   N[%, 48]
+            //   Fit[%, {x, x^2, x^3, x^4, x^5, x^6, x^7, x^8, x^9, x^10, x^11, x^12, x^13, x^14}, x]
+
+            //   0.1000000000000000003213692169066381945529176657E+01 x
+            // + 0.4999999999999999998389405741198241227273662223E+00 x^2
+            // + 0.1666666666666664035765593562709186076539985328E+00 x^3
+            // + 0.4166666666666666934614928838666442575683452206E-01 x^4
+            // + 0.8333333333339521841328202617206868796855583809E-02 x^5
+            // + 0.1388888888888953513176946682731620625302469979E-02 x^6
+            // + 0.1984126983488689186859793276462049624439889135E-03 x^7
+            // + 0.2480158730001499149369647648735612017495156006E-04 x^8
+            // + 0.2755732258782898252481007286813761544775538366E-05 x^9
+            // + 0.2755732043147979013276287368071846972098889744E-06 x^10
+            // + 0.2505116286861719378770371641094067075234027345E-07 x^11
+            // + 0.2087632598463662328337672597832718168295672334E-08 x^12
+            // + 0.1619385892296180390338553597911165126625722485E-09 x^13
+            // + 0.1154399218598221557485183048765404442959841646E-10 x^14
+
+            using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(14))>;
+
+            constexpr coefficient_array_type
+                coefficient_table
+                {
+                    T { UINT64_C(100000000000000000), -17 -  0 },// 3213692169066381945529176657E+01L), // x
+                    T { UINT64_C(500000000000000000), -18 -  0 },// 8389405741198241227273662223E+00L), // x^2
+                    T { UINT64_C(166666666666666404), -18 -  0 },// 5765593562709186076539985328E+00L), // x^3
+                    T { UINT64_C(416666666666666693), -18 -  1 },// 4614928838666442575683452206E-01L), // x^4
+                    T { UINT64_C(833333333333952184), -18 -  2 },// 1328202617206868796855583809E-02L), // x^5
+                    T { UINT64_C(138888888888895351), -18 -  2 },// 3176946682731620625302469979E-02L), // x^6
+                    T { UINT64_C(198412698348868919), -18 -  3 },// 6859793276462049624439889135E-03L), // x^7
+                    T { UINT64_C(248015873000149915), -18 -  4 },// 9369647648735612017495156006E-04L), // x^8
+                    T { UINT64_C(275573225878289825), -18 -  5 },// 2481007286813761544775538366E-05L), // x^9
+                    T { UINT64_C(275573204314797901), -18 -  6 },// 3276287368071846972098889744E-06L), // x^10
+                    T { UINT64_C(250511628686171938), -18 -  7 },// 8770371641094067075234027345E-07L), // x^11
+                    T { UINT64_C(208763259846366233), -18 -  8 },// 8337672597832718168295672334E-08L), // x^12
+                    T { UINT64_C(161938589229618039), -18 -  9 },// 0338553597911165126625722485E-09L), // x^13
+                    T { UINT64_C(115439921859822156), -18 - 10 },// 7485183048765404442959841646E-10L), // x^14
+                };
+
+            constexpr T tol = std::numeric_limits<T>::epsilon() / 100;
+
+            auto rit = coefficient_table.crbegin();
+
+            while (*rit < tol) { ++rit; }
+
+            result = *rit;
+
+            while(rit != coefficient_table.crend())
+            {
+                result = fma(result, x, *rit++);
+            }
+
+            result = fma(result, x, static_cast<T>(1.0L));
+
+            if (nf2 > 0)
+            {
+                constexpr T two { 2, 0 };
+
+                result *= pow(two, nf2);
+            }
+        }
+    }
 
     return result;
 }
