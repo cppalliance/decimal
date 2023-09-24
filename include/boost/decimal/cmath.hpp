@@ -25,6 +25,7 @@
 #include <boost/decimal/detail/cmath/remainder.hpp>
 #include <boost/decimal/detail/cmath/remquo.hpp>
 #include <boost/decimal/detail/cmath/sin.hpp>
+#include <boost/decimal/detail/cmath/sinh.hpp>
 #include <boost/decimal/detail/cmath/trunc.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
