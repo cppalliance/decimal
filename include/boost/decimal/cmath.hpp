@@ -10,6 +10,7 @@
 #include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/cosh.hpp>
 #include <boost/decimal/detail/cmath/exp.hpp>
+#include <boost/decimal/detail/cmath/expm1.hpp>
 #include <boost/decimal/detail/cmath/fabs.hpp>
 #include <boost/decimal/detail/cmath/fdim.hpp>
 #include <boost/decimal/detail/cmath/fmax.hpp>

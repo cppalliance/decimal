@@ -2091,12 +2091,14 @@ constexpr auto decimal32::operator%=(boost::decimal::decimal32 rhs) noexcept -> 
     return *this;
 }
 
+// LCOV_EXCL_START
 auto debug_pattern(decimal32 rhs) noexcept -> void
 {
     std::cerr << "Sig: " << rhs.full_significand()
               << "\nExp: " << rhs.biased_exponent()
               << "\nNeg: " << rhs.isneg() << std::endl;
 }
+// LCOV_EXCL_STOP
 
 template <typename T>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal32::floating_conversion_impl() const noexcept -> T
