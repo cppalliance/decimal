@@ -106,11 +106,11 @@ namespace local
       const auto val_flt = sinh(x_flt);
       const auto val_dec = sinh(x_dec);
 
-      const auto result_log_is_ok = is_close_fraction(val_flt, static_cast<float>(val_dec), std::numeric_limits<float>::epsilon() * tol_factor);
+      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float>(val_dec), std::numeric_limits<float>::epsilon() * tol_factor);
 
-      result_is_ok = (result_log_is_ok && result_is_ok);
+      result_is_ok = (result_val_is_ok && result_is_ok);
 
-      if(!result_log_is_ok)
+      if(!result_val_is_ok)
       {
         std::cout << "x_flt  : " <<                    x_flt   << std::endl;
         std::cout << "val_flt: " << std::scientific << val_flt << std::endl;
@@ -135,7 +135,10 @@ namespace local
 
     auto result_is_ok = true;
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
     {
+      static_cast<void>(i);
+
       const auto val_nan = sinh(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
       const auto result_val_nan_is_ok = isnan(val_nan);
@@ -145,7 +148,10 @@ namespace local
       result_is_ok = (result_val_nan_is_ok && result_is_ok);
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
     {
+      static_cast<void>(i);
+
       const auto val_inf_pos = sinh(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
 
       const auto result_val_inf_pos_is_ok = isinf(val_inf_pos);
@@ -155,7 +161,10 @@ namespace local
       result_is_ok = (result_val_inf_pos_is_ok && result_is_ok);
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
     {
+      static_cast<void>(i);
+
       const auto val_inf_neg = sinh(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
 
       const auto result_val_inf_neg_is_ok = (isinf(val_inf_neg) && signbit(val_inf_neg));
@@ -165,7 +174,10 @@ namespace local
       result_is_ok = (result_val_inf_neg_is_ok && result_is_ok);
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
     {
+      static_cast<void>(i);
+
       const auto val_zero_pos = sinh(::my_zero());
 
       const auto result_val_zero_pos_is_ok = (val_zero_pos == ::my_zero());
@@ -175,7 +187,10 @@ namespace local
       result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
     {
+      static_cast<void>(i);
+
       const auto val_zero_neg = sinh(-::my_zero());
 
       const auto result_val_zero_neg_is_ok = (-val_zero_neg == ::my_zero());
