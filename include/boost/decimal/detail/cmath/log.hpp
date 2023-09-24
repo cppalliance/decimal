@@ -98,29 +98,20 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 one / UINT32_C(96468992)
             };
 
-        const auto s = (g - one) / (g + one);
-        const auto z = s + s;
+        const auto s   = (g - one) / (g + one);
+        const auto z   = s + s;
+        const auto zsq = z * z;
 
-              auto zn   = z;
-        const auto zsq  = z * z;
-              auto term = z;
+        auto rit = coefficient_table.crbegin() + static_cast<std::size_t>((sizeof(T) == 4U) ? 5U : 0U);
 
-        // Using a loop expansion with the above-tabulated coefficients
-        // is scalable from decimal32 up to decimal64.
-        for(const auto& coef : coefficient_table)
+        result = *rit;
+
+        while(rit != coefficient_table.crend())
         {
-            result += term;
-
-            term = (zn *= zsq) * coef;
-
-            constexpr auto iteration_ilogb_target = ilogb(std::numeric_limits<T>::epsilon()) - 1;
-
-            if(ilogb(term) < iteration_ilogb_target)
-            {
-                break;
-            }
+            result = fma(result, zsq, *rit++);
         }
 
+        result = z * fma(result, zsq, one);
 
         if (exp2val > 0)
         {
