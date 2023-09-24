@@ -68,7 +68,7 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_tanh(const int tol_factor, const bool negate, const long double range_lo, const long double range_hi) -> bool
+  auto test_expm1(const int tol_factor, const bool negate, const long double range_lo, const long double range_hi) -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
@@ -101,10 +101,10 @@ namespace local
       const auto x_flt = (negate ? -x_flt_begin : x_flt_begin);
       const auto x_dec = static_cast<decimal_type>(x_flt);
 
-      using std::tanh;
+      using std::expm1;
 
-      const auto val_flt = tanh(x_flt);
-      const auto val_dec = tanh(x_dec);
+      const auto val_flt = expm1(x_flt);
+      const auto val_dec = expm1(x_dec);
 
       const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float>(val_dec), std::numeric_limits<float>::epsilon() * tol_factor);
 
@@ -125,7 +125,7 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_tanh_edge() -> bool
+  auto test_expm1_edge() -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
@@ -139,7 +139,7 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_nan = tanh(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+      const auto val_nan = expm1(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
       const auto result_val_nan_is_ok = isnan(val_nan);
 
@@ -152,9 +152,9 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_inf_pos = tanh(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto val_inf_pos = expm1(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
 
-      const auto result_val_inf_pos_is_ok = (val_inf_pos == ::my_one());
+      const auto result_val_inf_pos_is_ok = isinf(val_inf_pos);
 
       BOOST_TEST(result_val_inf_pos_is_ok);
 
@@ -165,7 +165,7 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_inf_neg = tanh(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto val_inf_neg = expm1(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
 
       const auto result_val_inf_neg_is_ok = (-val_inf_neg == ::my_one());
 
@@ -178,7 +178,7 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_zero_pos = tanh(::my_zero());
+      const auto val_zero_pos = expm1(::my_zero());
 
       const auto result_val_zero_pos_is_ok = (val_zero_pos == ::my_zero());
 
@@ -191,7 +191,7 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_zero_neg = tanh(-::my_zero());
+      const auto val_zero_neg = expm1(-::my_zero());
 
       const auto result_val_zero_neg_is_ok = (-val_zero_neg == ::my_zero());
 
@@ -209,16 +209,16 @@ auto main() -> int
 {
   auto result_is_ok = true;
 
-  const auto result_pos_is_ok = local::test_tanh(96, false, 0.03125L, 32.0L);
-  const auto result_neg_is_ok = local::test_tanh(96, true,  0.03125L, 32.0L);
+  const auto result_pos_is_ok = local::test_expm1(96, false, 0.03125L, 32.0L);
+  const auto result_neg_is_ok = local::test_expm1(96, true,  0.03125L, 32.0L);
 
-  const auto result_pos_narrow_is_ok = local::test_tanh(24, false, 0.125L, 8.0L);
-  const auto result_neg_narrow_is_ok = local::test_tanh(24, true,  0.125L, 8.0L);
+  const auto result_pos_narrow_is_ok = local::test_expm1(24, false, 0.125L, 8.0L);
+  const auto result_neg_narrow_is_ok = local::test_expm1(24, true,  0.125L, 8.0L);
 
-  const auto result_pos_wide_is_ok = local::test_tanh(128, false, 0.015625L, 64.0L);
-  const auto result_neg_wide_is_ok = local::test_tanh(128, true,  0.015625L, 64.0L);
+  const auto result_pos_wide_is_ok = local::test_expm1(128, false, 0.015625L, 64.0L);
+  const auto result_neg_wide_is_ok = local::test_expm1(128, true,  0.015625L, 64.0L);
 
-  const auto result_edge_is_ok = local::test_tanh_edge();
+  const auto result_edge_is_ok = local::test_expm1_edge();
 
   BOOST_TEST(result_pos_is_ok);
   BOOST_TEST(result_neg_is_ok);

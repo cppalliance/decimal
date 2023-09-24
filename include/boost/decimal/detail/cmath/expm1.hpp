@@ -3,8 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_DECIMAL_DETAIL_CMATH_EXP_HPP
-#define BOOST_DECIMAL_DETAIL_CMATH_EXP_HPP
+#ifndef BOOST_DECIMAL_DETAIL_CMATH_EXPM1_HPP
+#define BOOST_DECIMAL_DETAIL_CMATH_EXPM1_HPP
 
 #include <array>
 #include <type_traits>
@@ -16,7 +16,7 @@
 namespace boost { namespace decimal {
 
 template<typename T>
-constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
+constexpr auto expm1(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
 {
     const auto fpc = fpclassify(x);
 
@@ -27,7 +27,7 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 
     if (fpc == FP_ZERO)
     {
-        result = one;
+        result = x;
     }
     else if (fpc != FP_NORMAL)
     {
@@ -35,7 +35,7 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         {
             if (signbit(x))
             {
-                result = zero;
+                result = -one;
             }
             else
             {
@@ -49,23 +49,19 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
     }
     else
     {
-        if (signbit(x))
+        if (abs(x) > numbers::ln2_v<T>)
         {
-            result = one / exp(-x);
+            if (signbit(x))
+            {
+                result = one / exp(-x) - one;
+            }
+            else
+            {
+                result = exp(x) - one;
+            }
         }
         else
         {
-            // Scale the argument to 0 < x < log(2).
-
-            int nf2 { };
-
-            if (x > numbers::ln2_v<T>)
-            {
-                nf2 = int(x / numbers::ln2_v<T>);
-
-                x -= (numbers::ln2_v<T> * nf2);
-            }
-
             // Specifically derive a polynomial expansion for Exp[x] - 1 for this work.
             //   Table[{x, Exp[x] - 1}, {x, -Log[2], Log[2], 1/60}]
             //   N[%, 48]
@@ -87,9 +83,6 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
             // + 0.1154399218598221557485183048765404442959841646E-10 x^14
 
             using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(14))>;
-
-            // TODO(ckormanyos) Is a Pade approximation more precise or faster?
-            // And, ... how can you make it scalable if you go ahead and "Pade"-it?
 
             constexpr coefficient_array_type
                 coefficient_table
@@ -119,23 +112,7 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 result = fma(result, x, *rit++);
             }
 
-            result = fma(result, x, one);
-
-            if (nf2 > 0)
-            {
-                if (nf2 < 32)
-                {
-                    // TODO(mborland) At this place, operator*=(std::uint32_t) did not work for some reason?
-
-                    result = result * static_cast<std::uint32_t>(1ULL << static_cast<unsigned>(nf2));
-                }
-                else
-                {
-                    constexpr T two { 2, 0 };
-
-                    result *= pow(two, nf2);
-                }
-            }
+            result *= x;
         }
     }
 
@@ -145,4 +122,4 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 } // namespace decimal
 } // namespace boost
 
-#endif // BOOST_DECIMAL_DETAIL_CMATH_EXP_HPP
+#endif // BOOST_DECIMAL_DETAIL_CMATH_EXPM1_HPP
