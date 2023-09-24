@@ -68,7 +68,7 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_exp(const int tol_factor, const bool negate, const long double range_lo, const long double range_hi) -> bool
+  auto test_sinh(const int tol_factor, const bool negate, const long double range_lo, const long double range_hi) -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
@@ -101,10 +101,10 @@ namespace local
       const auto x_flt = (negate ? -x_flt_begin : x_flt_begin);
       const auto x_dec = static_cast<decimal_type>(x_flt);
 
-      using std::exp;
+      using std::sinh;
 
-      const auto val_flt = exp(x_flt);
-      const auto val_dec = exp(x_dec);
+      const auto val_flt = sinh(x_flt);
+      const auto val_dec = sinh(x_dec);
 
       const auto result_log_is_ok = is_close_fraction(val_flt, static_cast<float>(val_dec), std::numeric_limits<float>::epsilon() * tol_factor);
 
@@ -125,7 +125,7 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_exp_edge() -> bool
+  auto test_sinh_edge() -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
@@ -136,7 +136,7 @@ namespace local
     auto result_is_ok = true;
 
     {
-      const auto val_nan = exp(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+      const auto val_nan = sinh(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
       const auto result_val_nan_is_ok = isnan(val_nan);
 
@@ -146,7 +146,7 @@ namespace local
     }
 
     {
-      const auto val_inf_pos = exp(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto val_inf_pos = sinh(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
 
       const auto result_val_inf_pos_is_ok = isinf(val_inf_pos);
 
@@ -156,9 +156,9 @@ namespace local
     }
 
     {
-      const auto val_inf_neg = exp(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto val_inf_neg = sinh(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
 
-      const auto result_val_inf_neg_is_ok = (val_inf_neg == ::my_zero());
+      const auto result_val_inf_neg_is_ok = (isinf(val_inf_neg) && signbit(val_inf_neg));
 
       BOOST_TEST(result_val_inf_neg_is_ok);
 
@@ -166,9 +166,9 @@ namespace local
     }
 
     {
-      const auto val_zero_pos = exp(::my_zero());
+      const auto val_zero_pos = sinh(::my_zero());
 
-      const auto result_val_zero_pos_is_ok = (val_zero_pos == ::my_one());
+      const auto result_val_zero_pos_is_ok = (val_zero_pos == ::my_zero());
 
       BOOST_TEST(result_val_zero_pos_is_ok);
 
@@ -176,9 +176,9 @@ namespace local
     }
 
     {
-      const auto val_zero_neg = exp(-::my_zero());
+      const auto val_zero_neg = sinh(-::my_zero());
 
-      const auto result_val_zero_neg_is_ok = (val_zero_neg == ::my_one());
+      const auto result_val_zero_neg_is_ok = (-val_zero_neg == ::my_zero());
 
       BOOST_TEST(result_val_zero_neg_is_ok);
 
@@ -194,16 +194,16 @@ auto main() -> int
 {
   auto result_is_ok = true;
 
-  const auto result_pos_is_ok = local::test_exp(96, false, 0.03125L, 32.0L);
-  const auto result_neg_is_ok = local::test_exp(96, true,  0.03125L, 32.0L);
+  const auto result_pos_is_ok = local::test_sinh(96, false, 0.03125L, 32.0L);
+  const auto result_neg_is_ok = local::test_sinh(96, true,  0.03125L, 32.0L);
 
-  const auto result_pos_narrow_is_ok = local::test_exp(24, false, 0.125L, 8.0L);
-  const auto result_neg_narrow_is_ok = local::test_exp(24, true,  0.125L, 8.0L);
+  const auto result_pos_narrow_is_ok = local::test_sinh(24, false, 0.125L, 8.0L);
+  const auto result_neg_narrow_is_ok = local::test_sinh(24, true,  0.125L, 8.0L);
 
-  const auto result_pos_wide_is_ok = local::test_exp(128, false, 0.015625L, 64.0L);
-  const auto result_neg_wide_is_ok = local::test_exp(128, true,  0.015625L, 64.0L);
+  const auto result_pos_wide_is_ok = local::test_sinh(128, false, 0.015625L, 64.0L);
+  const auto result_neg_wide_is_ok = local::test_sinh(128, true,  0.015625L, 64.0L);
 
-  const auto result_edge_is_ok = local::test_exp_edge();
+  const auto result_edge_is_ok = local::test_sinh_edge();
 
   BOOST_TEST(result_pos_is_ok);
   BOOST_TEST(result_neg_is_ok);
