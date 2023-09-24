@@ -57,24 +57,28 @@ constexpr auto sinh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
             {
                 using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(9))>;
 
-                // Series[Sinh[x], {x, 0, 19}]
-
                 constexpr auto coefficient_table =
                     coefficient_array_type
                     {
-                        //            (1),                 // * x
-                        one / UINT8_C (6),                 // * x^3
-                        one / UINT8_C (120),               // * x^5
-                        one / UINT16_C(5040),              // * x^7
-                        one / UINT32_C(362880),            // * x^9
-                        one / UINT32_C(39916800),          // * x^11
-                        one / UINT64_C(6227020800),        // * x^13
-                        one / UINT64_C(1307674368000),     // * x^15
-                        one / UINT64_C(355687428096000),   // * x^17
-                        one / UINT64_C(121645100408832000) // * x^19
+                        // Series[Sinh[x], {x, 0, 19}]
+                        //            (1),                      // * x
+                        one / UINT8_C (6),                      // * x^3
+                        one / UINT8_C (120),                    // * x^5
+                        one / UINT16_C(5'040),                  // * x^7
+                        one / UINT32_C(362'880),                // * x^9
+                        one / UINT32_C(39'916'800),             // * x^11
+                        one / UINT64_C(6'227'020'800),          // * x^13
+                        one / UINT64_C(1'307'674'368'000),      // * x^15
+                        one / UINT64_C(355'687'428'096'000),    // * x^17
+                        one / UINT64_C(121'645'100'408'832'000) // * x^19
                     };
 
-                auto rit = coefficient_table.crbegin() + static_cast<std::size_t>((sizeof(T) == 4U) ? 4U : 0U);
+                auto rit =
+                    coefficient_table.crbegin()
+                  + static_cast<std::size_t>
+                    (
+                      (sizeof(T) == static_cast<std::size_t>(UINT8_C(4))) ? 4U : 0U
+                    );
 
                 result = *rit;
 
