@@ -139,7 +139,7 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_nan = sinh(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+      const auto val_nan = tanh(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
       const auto result_val_nan_is_ok = isnan(val_nan);
 
@@ -152,9 +152,9 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_inf_pos = sinh(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto val_inf_pos = tanh(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
 
-      const auto result_val_inf_pos_is_ok = isinf(val_inf_pos);
+      const auto result_val_inf_pos_is_ok = (val_inf_pos == ::my_one());
 
       BOOST_TEST(result_val_inf_pos_is_ok);
 
@@ -165,9 +165,9 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_inf_neg = sinh(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto val_inf_neg = tanh(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
 
-      const auto result_val_inf_neg_is_ok = (isinf(val_inf_neg) && signbit(val_inf_neg));
+      const auto result_val_inf_neg_is_ok = (-val_inf_neg == ::my_one());
 
       BOOST_TEST(result_val_inf_neg_is_ok);
 
@@ -178,7 +178,7 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_zero_pos = sinh(::my_zero());
+      const auto val_zero_pos = tanh(::my_zero());
 
       const auto result_val_zero_pos_is_ok = (val_zero_pos == ::my_zero());
 
@@ -191,7 +191,7 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_zero_neg = sinh(-::my_zero());
+      const auto val_zero_neg = tanh(-::my_zero());
 
       const auto result_val_zero_neg_is_ok = (-val_zero_neg == ::my_zero());
 

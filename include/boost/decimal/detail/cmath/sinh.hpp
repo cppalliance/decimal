@@ -20,9 +20,9 @@ constexpr auto sinh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
 {
     const auto fpc = fpclassify(x);
 
-    T result { };
-
     constexpr T zero { 0, 0 };
+
+    auto result = zero;
 
     if (fpc == FP_ZERO)
     {
@@ -37,10 +37,6 @@ constexpr auto sinh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
         else if (fpc == FP_NAN)
         {
             result = x;
-        }
-        else
-        {
-            result = zero;
         }
     }
     else

@@ -20,9 +20,10 @@ constexpr auto tanh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
 {
     const auto fpc = fpclassify(x);
 
-    T result { };
-
     constexpr T zero { 0, 0 };
+    constexpr T one  { 1, 0 };
+
+    auto result = zero;
 
     if (fpc == FP_ZERO)
     {
@@ -32,15 +33,18 @@ constexpr auto tanh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
     {
         if (fpc == FP_INFINITE)
         {
-            result = x;
+            if (signbit(x))
+            {
+                result = -one;
+            }
+            else
+            {
+                result = one;
+            }
         }
         else if (fpc == FP_NAN)
         {
             result = x;
-        }
-        else
-        {
-            result = zero;
         }
     }
     else
@@ -52,7 +56,6 @@ constexpr auto tanh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
         else
         {
             constexpr T quarter { 25, -2 };
-            constexpr T one     {  1,  0 };
 
             if (x < quarter)
             {
