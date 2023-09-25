@@ -30,7 +30,7 @@ constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
     detail::fenv_round(sig, sign);
 }
 
-template<typename T, typename Int>
+template <typename T, typename Int>
 constexpr auto lrint_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, Int>
 {
     constexpr T zero {0, 0};
@@ -62,7 +62,7 @@ constexpr auto lrint_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal
 
     if (expptr > detail::precision)
     {
-        return static_cast<long>(num);
+        return static_cast<Int>(num);
     }
     else if (expptr < -detail::precision)
     {
