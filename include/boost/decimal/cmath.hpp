@@ -7,6 +7,7 @@
 
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/detail/cmath/frexp10.hpp>
 #include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/cosh.hpp>
 #include <boost/decimal/detail/cmath/exp.hpp>
@@ -39,6 +40,8 @@
 #include <boost/decimal/detail/cmath/fmod.hpp>
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/hypot.hpp>
+#include <boost/decimal/detail/cmath/rint.hpp>
+#include <boost/decimal/detail/cmath/nearbyint.hpp>
 #include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
