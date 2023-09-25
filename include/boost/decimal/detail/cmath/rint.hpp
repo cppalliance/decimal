@@ -30,6 +30,13 @@ constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
     detail::fenv_round(sig, sign);
 }
 
+// MSVC 14.1 warns of unary minus being applied to unsigned type from numeric_limits::min
+// 14.2 and on get it right
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4146)
+#endif
+
 template <typename T, typename Int>
 constexpr auto lrint_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, Int>
 {
@@ -79,6 +86,10 @@ constexpr auto lrint_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal
 
     return res;
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 } //namespace detail
 
