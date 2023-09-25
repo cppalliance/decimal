@@ -65,11 +65,13 @@ template <typename T>
 constexpr auto lrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long>
 {
     constexpr T zero {0, 0};
+    constexpr T lmax {std::numeric_limits<long>::max()};
+    constexpr T lmin {std::numeric_limits<long>::min()};
 
     if (isinf(num) || isnan(num))
     {
         // Implementation defined what to return here
-        return LONG_MIN;
+        return std::numeric_limits<long>::min();
     }
     else if (abs(num) == zero)
     {
@@ -79,6 +81,15 @@ constexpr auto lrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floa
     int expptr {};
     auto sig {frexp10(num, &expptr)}; // Always returns detail::precision digits
     const bool is_neg {num < 0};
+
+    if (num > lmax)
+    {
+        return std::numeric_limits<long>::max();
+    }
+    else if (num < lmin)
+    {
+        return std::numeric_limits<long>::min();
+    }
 
     if (expptr > detail::precision)
     {

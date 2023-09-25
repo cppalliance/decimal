@@ -733,7 +733,7 @@ template <typename Dec>
 void test_lrint()
 {
     std::mt19937_64 rng(42);
-    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
     for (std::size_t n {}; n < N; ++n)
     {
@@ -743,9 +743,8 @@ void test_lrint()
         auto ret_val {std::lrint(val1)};
         auto ret_dec {lrint(d1)};
 
-        // Difference in default rounding mode
-        // Float goes to even while decimal is to nearest from zero
-        if (ret_val < val1 && ret_dec - 1 == ret_val)
+        // Difference in significant figures
+        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
         {
             continue;
         }
