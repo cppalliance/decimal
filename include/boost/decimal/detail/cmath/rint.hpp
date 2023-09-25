@@ -61,17 +61,19 @@ constexpr auto rint(T num) noexcept -> std::enable_if_t<detail::is_decimal_float
     return {sig, 0, is_neg};
 }
 
-template <typename T>
-constexpr auto lrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long>
+namespace detail {
+
+template<typename T, typename Int>
+constexpr auto lrint_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, Int>
 {
     constexpr T zero {0, 0};
-    constexpr T lmax {std::numeric_limits<long>::max()};
-    constexpr T lmin {std::numeric_limits<long>::min()};
+    constexpr T lmax {std::numeric_limits<Int>::max()};
+    constexpr T lmin {std::numeric_limits<Int>::min()};
 
     if (isinf(num) || isnan(num))
     {
         // Implementation defined what to return here
-        return std::numeric_limits<long>::min();
+        return std::numeric_limits<Int>::min();
     }
     else if (abs(num) == zero)
     {
@@ -84,11 +86,11 @@ constexpr auto lrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floa
 
     if (num > lmax)
     {
-        return std::numeric_limits<long>::max();
+        return std::numeric_limits<Int>::max();
     }
     else if (num < lmin)
     {
-        return std::numeric_limits<long>::min();
+        return std::numeric_limits<Int>::min();
     }
 
     if (expptr > detail::precision)
@@ -109,6 +111,14 @@ constexpr auto lrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floa
     }
 
     return res;
+}
+
+}
+
+template <typename T>
+constexpr auto lrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long>
+{
+    return detail::lrint_impl<T, long>(num);
 }
 
 } //namespace decimal
