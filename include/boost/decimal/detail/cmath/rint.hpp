@@ -20,6 +20,17 @@
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
+template <typename T1, typename T2>
+constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
+{
+    sig /= detail::pow10<std::uint32_t>(std::abs(exp) - 1);
+    detail::fenv_round(sig, sign);
+}
+
+}
+
 // Rounds the number using the default rounding mode
 template <typename T>
 constexpr auto rint(T num) -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
@@ -44,8 +55,7 @@ constexpr auto rint(T num) -> std::enable_if_t<detail::is_decimal_floating_point
         return is_neg ? -zero : zero;
     }
 
-    sig /= detail::pow10<std::uint32_t>(std::abs(expptr) - 1);
-    detail::fenv_round(sig, is_neg);
+    detail::rint_impl(sig, expptr, is_neg);
 
     return {sig, 0, is_neg};
 }
