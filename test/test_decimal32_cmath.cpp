@@ -895,6 +895,96 @@ void test_llrint()
     BOOST_TEST_EQ(llrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
 }
 
+template <typename Dec>
+void test_nearbyint()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {static_cast<float>(std::nearbyint(val1))};
+        auto ret_dec {static_cast<float>(nearbyint(d1))};
+
+        // Difference in default rounding mode
+        // Float goes to even while decimal is to nearest from zero
+        if (ret_val < val1 && ret_dec - 1 == ret_val)
+        {
+            continue;
+        }
+
+        if (std::fabs(val1) > 9'999'999.0F)
+        {
+            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
+            {
+                std::cerr << "Val 1: " << val1
+                          << "\nDec 1: " << d1
+                          << "\nRet val: " << ret_val
+                          << "\nRet dec: " << ret_dec
+                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
+            }
+        }
+        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {static_cast<float>(std::nearbyint(val1))};
+        auto ret_dec {static_cast<float>(nearbyint(d1))};
+
+        // Difference in default rounding mode
+        // Float goes to even while decimal is to nearest from zero
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (std::fabs(val1) > 9'999'999.0F)
+        {
+            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
+            {
+                std::cerr << "Val 1: " << val1
+                          << "\nDec 1: " << d1
+                          << "\nRet val: " << ret_val
+                          << "\nRet dec: " << ret_dec
+                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
+            }
+        }
+        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(nearbyint(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng)))));
+    BOOST_TEST(isnan(nearbyint(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)))));
+    BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
+    BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, true));
+}
+
+
 int main()
 {
 
@@ -941,6 +1031,7 @@ int main()
     test_rint<decimal32>();
     test_lrint<decimal32>();
     test_llrint<decimal32>();
+    test_nearbyint<decimal32>();
 
     return boost::report_errors();
 }
