@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <limits>
 #include <cmath>
+#include <climits>
 
 namespace boost {
 namespace decimal {
@@ -33,7 +34,7 @@ constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
 
 // Rounds the number using the default rounding mode
 template <typename T>
-constexpr auto rint(T num) -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+constexpr auto rint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T zero {0, 0};
 
@@ -58,6 +59,45 @@ constexpr auto rint(T num) -> std::enable_if_t<detail::is_decimal_floating_point
     detail::rint_impl(sig, expptr, is_neg);
 
     return {sig, 0, is_neg};
+}
+
+template <typename T>
+constexpr auto lrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long>
+{
+    constexpr T zero {0, 0};
+
+    if (isinf(num) || isnan(num))
+    {
+        // Implementation defined what to return here
+        return LONG_MIN;
+    }
+    else if (abs(num) == zero)
+    {
+        return 0;
+    }
+
+    int expptr {};
+    auto sig {frexp10(num, &expptr)}; // Always returns detail::precision digits
+    const bool is_neg {num < 0};
+
+    if (expptr > detail::precision)
+    {
+        return static_cast<long>(num);
+    }
+    else if (expptr < -detail::precision)
+    {
+        return 0;
+    }
+
+    detail::rint_impl(sig, expptr, is_neg);
+
+    auto res {static_cast<long>(sig)};
+    if (is_neg)
+    {
+        res = -res;
+    }
+
+    return res;
 }
 
 } //namespace decimal

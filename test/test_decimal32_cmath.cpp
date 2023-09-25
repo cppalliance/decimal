@@ -729,6 +729,43 @@ void test_rint()
     BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, true));
 }
 
+template <typename Dec>
+void test_lrint()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::lrint(val1)};
+        auto ret_dec {lrint(d1)};
+
+        // Difference in default rounding mode
+        // Float goes to even while decimal is to nearest from zero
+        if (ret_val < val1 && ret_dec - 1 == ret_val)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    BOOST_TEST_EQ(lrint(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng))), LONG_MIN);
+    BOOST_TEST_EQ(lrint(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng))), LONG_MIN);
+    BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng))), 0);
+    BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
+    BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+}
+
 int main()
 {
 
@@ -773,6 +810,7 @@ int main()
     test_three_val_hypot<decimal32>();
 
     test_rint<decimal32>();
+    test_lrint<decimal32>();
 
     return boost::report_errors();
 }
