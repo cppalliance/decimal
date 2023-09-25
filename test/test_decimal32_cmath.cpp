@@ -765,6 +765,42 @@ void test_lrint()
     BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
 }
 
+template <typename Dec>
+void test_llrint()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::llrint(val1)};
+        auto ret_dec {llrint(d1)};
+
+        // Difference in significant figures
+        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    BOOST_TEST_EQ(llrint(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng))), LLONG_MIN);
+    BOOST_TEST_EQ(llrint(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng))), LLONG_MIN);
+    BOOST_TEST_EQ(llrint(Dec(0) * Dec(dist(rng))), 0);
+    BOOST_TEST_EQ(llrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
+    BOOST_TEST_EQ(llrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+}
+
 int main()
 {
 
@@ -810,6 +846,7 @@ int main()
 
     test_rint<decimal32>();
     test_lrint<decimal32>();
+    test_llrint<decimal32>();
 
     return boost::report_errors();
 }

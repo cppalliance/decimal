@@ -30,39 +30,6 @@ constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
     detail::fenv_round(sig, sign);
 }
 
-}
-
-// Rounds the number using the default rounding mode
-template <typename T>
-constexpr auto rint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
-{
-    constexpr T zero {0, 0};
-
-    if (isinf(num) || isnan(num) || abs(num) == zero)
-    {
-        return num;
-    }
-
-    int expptr {};
-    auto sig {frexp10(num, &expptr)}; // Always returns detail::precision digits
-    const bool is_neg {num < 0};
-
-    if (expptr > detail::precision)
-    {
-        return num;
-    }
-    else if (expptr < -detail::precision)
-    {
-        return is_neg ? -zero : zero;
-    }
-
-    detail::rint_impl(sig, expptr, is_neg);
-
-    return {sig, 0, is_neg};
-}
-
-namespace detail {
-
 template<typename T, typename Int>
 constexpr auto lrint_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, Int>
 {
@@ -113,12 +80,47 @@ constexpr auto lrint_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal
     return res;
 }
 
+} //namespace detail
+
+// Rounds the number using the default rounding mode
+template <typename T>
+constexpr auto rint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+{
+    constexpr T zero {0, 0};
+
+    if (isinf(num) || isnan(num) || abs(num) == zero)
+    {
+        return num;
+    }
+
+    int expptr {};
+    auto sig {frexp10(num, &expptr)}; // Always returns detail::precision digits
+    const bool is_neg {num < 0};
+
+    if (expptr > detail::precision)
+    {
+        return num;
+    }
+    else if (expptr < -detail::precision)
+    {
+        return is_neg ? -zero : zero;
+    }
+
+    detail::rint_impl(sig, expptr, is_neg);
+
+    return {sig, 0, is_neg};
 }
 
 template <typename T>
 constexpr auto lrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long>
 {
     return detail::lrint_impl<T, long>(num);
+}
+
+template <typename T>
+constexpr auto llrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long long>
+{
+    return detail::lrint_impl<T, long long>(num);
 }
 
 } //namespace decimal
