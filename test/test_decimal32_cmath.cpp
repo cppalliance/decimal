@@ -722,6 +722,46 @@ void test_rint()
         }
     }
 
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {static_cast<float>(std::rint(val1))};
+        auto ret_dec {static_cast<float>(rint(d1))};
+
+        // Difference in default rounding mode
+        // Float goes to even while decimal is to nearest from zero
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (std::fabs(val1) > 9'999'999.0F)
+        {
+            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
+            {
+                std::cerr << "Val 1: " << val1
+                          << "\nDec 1: " << d1
+                          << "\nRet val: " << ret_val
+                          << "\nRet dec: " << ret_dec
+                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
+            }
+        }
+        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
     BOOST_TEST(isinf(rint(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng)))));
     BOOST_TEST(isnan(rint(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)))));
     BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng))), Dec(0));
@@ -758,6 +798,33 @@ void test_lrint()
         }
     }
 
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::lrint(val1)};
+        auto ret_dec {lrint(d1)};
+
+        // Difference in significant figures
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
     BOOST_TEST_EQ(lrint(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng))), LONG_MIN);
     BOOST_TEST_EQ(lrint(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng))), LONG_MIN);
     BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng))), 0);
@@ -781,6 +848,33 @@ void test_llrint()
 
         // Difference in significant figures
         if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::llrint(val1)};
+        auto ret_dec {llrint(d1)};
+
+        // Difference in significant figures
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
         {
             continue;
         }
