@@ -29,17 +29,6 @@ constexpr auto log1p(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
     {
         result = x;
     }
-    else if (-x >= one)
-    {
-        if (-x == one)
-        {
-            result = -std::numeric_limits<T>::infinity();
-        }
-        else
-        {
-            result = std::numeric_limits<T>::quiet_NaN();
-        }
-    }
     else if (fpc != FP_NORMAL)
     {
         if (fpc == FP_INFINITE)
@@ -56,6 +45,17 @@ constexpr auto log1p(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
         else if (fpc == FP_NAN)
         {
             result = x;
+        }
+    }
+    else if (-x >= one)
+    {
+        if (-x == one)
+        {
+            result = -std::numeric_limits<T>::infinity();
+        }
+        else
+        {
+            result = std::numeric_limits<T>::quiet_NaN();
         }
     }
     else

@@ -29,6 +29,8 @@
 auto my_zero() -> boost::decimal::decimal32&;
 auto my_one () -> boost::decimal::decimal32&;
 
+auto my_make_nan(boost::decimal::decimal32 factor) -> boost::decimal::decimal32;
+
 namespace local
 {
   template<typename IntegralTimePointType,
@@ -140,13 +142,15 @@ namespace local
 
     auto result_is_ok = true;
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(64)); ++i)
     {
       static_cast<void>(i);
 
-      const auto val_nan = log1p(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+      const auto arg_nan = my_make_nan(static_cast<decimal_type>(dist(gen)));
 
-      const auto result_val_nan_is_ok = isnan(val_nan);
+      const auto val_nan = log1p(arg_nan);
+
+      const auto result_val_nan_is_ok = (isnan(arg_nan) && isnan(val_nan));
 
       BOOST_TEST(result_val_nan_is_ok);
 
@@ -266,3 +270,9 @@ auto main() -> int
 auto my_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_zero { 0, 0 }; return val_zero; }
 auto my_one () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_one  { 1, 0 }; return val_one; }
 
+auto my_make_nan(boost::decimal::decimal32 factor) -> boost::decimal::decimal32
+{
+  boost::decimal::decimal32 val_nan = std::numeric_limits<boost::decimal::decimal32>::quiet_NaN();
+
+  return val_nan * factor;
+}
