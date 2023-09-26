@@ -225,7 +225,7 @@ private:
 
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32;
-    friend auto to_bits(decimal32 rhs) noexcept -> std::uint32_t;
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal32 rhs) noexcept -> std::uint32_t;
     friend auto debug_pattern(decimal32 rhs) noexcept -> void;
 
     // Equality template between any integer type and decimal32
@@ -1752,10 +1752,9 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d) -> st
     return os;
 }
 
-auto to_bits(decimal32 rhs) noexcept -> std::uint32_t
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal32 rhs) noexcept -> std::uint32_t
 {
-    std::uint32_t bits;
-    std::memcpy(&bits, &rhs.bits_, sizeof(std::uint32_t));
+    const auto bits {detail::bit_cast<std::uint32_t>(rhs.bits_)};
     return bits;
 }
 
