@@ -14,6 +14,7 @@ namespace std {
 template <>
 struct hash<boost::decimal::decimal32>
 {
+    // Since the underlying type is a std::uint32_t we will rely on its hash function from the STL
     auto operator()(const boost::decimal::decimal32& v) const noexcept -> std::size_t
     {
         std::uint32_t bits;

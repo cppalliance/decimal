@@ -4,7 +4,7 @@
 
 #include "mini_to_chars.hpp"
 
-#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <bitset>
 #include <limits>
@@ -438,6 +438,14 @@ void spot_check_addition(T a, T b, T res)
     }
 }
 
+void test_hash()
+{
+    decimal32 one {1, 0};
+    decimal32 zero {0, 0};
+
+    BOOST_TEST_NE(std::hash<decimal32>{}(one), std::hash<decimal32>{}(zero));
+}
+
 int main()
 {
     test_comp();
@@ -465,6 +473,8 @@ int main()
     #ifdef BOOST_DECIMAL_HAS_FLOAT128
     test_construct_from_float<__float128>();
     #endif
+
+    test_hash();
 
     spot_check_addition(-1054191000, -920209700, -1974400700);
     spot_check_addition(353582500, -32044770, 321537730);
