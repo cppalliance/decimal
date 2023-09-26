@@ -25,11 +25,11 @@ constexpr auto ldexp(T v, int e2) noexcept -> T
     {
         if (v_fp == FP_NAN)
         {
-            ldexp_result = boost::decimal::from_bits(boost::decimal::detail::nan_mask);
+            ldexp_result = std::numeric_limits<T>::quiet_NaN();
         }
         else if (v_fp == FP_INFINITE)
         {
-            ldexp_result = boost::decimal::from_bits(boost::decimal::detail::inf_mask);
+            ldexp_result = std::numeric_limits<T>::infinity();
         }
     }
     else
