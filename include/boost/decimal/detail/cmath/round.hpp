@@ -44,6 +44,13 @@ constexpr auto round(T num) noexcept -> std::enable_if_t<detail::is_decimal_floa
 
 namespace detail {
 
+// MSVC 14.1 warns of unary minus being applied to unsigned type from numeric_limits::min
+// 14.2 and on get it right
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4146)
+#endif
+
 template <typename T, typename Int>
 constexpr auto int_round_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, Int>
 {
@@ -73,6 +80,10 @@ constexpr auto int_round_impl(T num) noexcept -> std::enable_if_t<detail::is_dec
 
     return static_cast<Int>(rounded_val);
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 } //namespace detail
 
