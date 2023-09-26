@@ -18,7 +18,7 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
 {
     // This implementation of frexp follows closely that of eval_frexp
     // in Boost.Multiprecision's cpp_dec_float template class.
-    constexpr T zero {0};
+    constexpr T zero { 0, 0 };
 
     auto result_frexp = zero;
 
@@ -45,21 +45,23 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
 
         if(b_neg) { result_frexp = -result_frexp; }
 
-        // N[1000/301, 44]
         auto t =
             static_cast<int>
             (
-                  static_cast<long double>(ilogb(result_frexp) - detail::bias)
-                * static_cast<long double>(3.3222591362126245847176079734219269102990033L)
+                  static_cast<std::int32_t>
+                  (
+                      static_cast<std::int32_t>(ilogb(result_frexp) - detail::bias) * INT32_C(1000)
+                  )
+                / INT32_C(301)
             );
 
-        constexpr T local_two {2};
+        constexpr T local_two { 2, 0 };
 
         result_frexp *= pow(local_two, -t);
 
         // TODO(ckormanyos): Handle underflow/overflow if (or when) needed.
 
-        constexpr T local_one {1};
+        constexpr T local_one { 1, 0 };
 
         while (result_frexp >= local_one)
         {
@@ -68,7 +70,7 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
           ++t;
         }
 
-        constexpr T local_half {5, -1};
+        constexpr T local_half { 5, -1 };
 
         while (result_frexp < local_half)
         {

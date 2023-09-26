@@ -212,11 +212,11 @@ auto main() -> int
   const auto result_pos_is_ok = local::test_exp(96, false, 0.03125L, 32.0L);
   const auto result_neg_is_ok = local::test_exp(96, true,  0.03125L, 32.0L);
 
-  const auto result_pos_narrow_is_ok = local::test_exp(24, false, 0.125L, 8.0L);
-  const auto result_neg_narrow_is_ok = local::test_exp(24, true,  0.125L, 8.0L);
+  const auto result_pos_narrow_is_ok = local::test_exp(16, false, 0.25L, 4.0L);
+  const auto result_neg_narrow_is_ok = local::test_exp(24, true,  0.25L, 4.0L);
 
-  const auto result_pos_wide_is_ok = local::test_exp(128, false, 0.015625L, 64.0L);
-  const auto result_neg_wide_is_ok = local::test_exp(128, true,  0.015625L, 64.0L);
+  const auto result_pos_wide_is_ok = local::test_exp(112, false, 0.0125L, 80.0L);
+  const auto result_neg_wide_is_ok = local::test_exp(112, true,  0.0125L, 80.0L);
 
   const auto result_edge_is_ok = local::test_exp_edge();
 
