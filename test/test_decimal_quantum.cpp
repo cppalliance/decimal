@@ -81,9 +81,9 @@ void test_quantexp()
     {
         const Dec val1 {1, i};
 
-        if (static_cast<std::uint32_t>(i) + detail::bias > detail::max_biased_exp)
+        if (static_cast<std::uint32_t>(i) + detail::bias > detail::d32_max_biased_exp)
         {
-            if (!BOOST_TEST_EQ(quantexp(val1), detail::max_biased_exp))
+            if (!BOOST_TEST_EQ(quantexp(val1), detail::d32_max_biased_exp))
             {
                 std::cerr << "Val: " << val1 << std::endl;
             }

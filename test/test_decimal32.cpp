@@ -389,11 +389,11 @@ void test_construct_from_integer()
     BOOST_TEST_EQ(rounded, decimal32(T(12345678)));
 
     // Check the edge cases for use of the combination field
-    constexpr decimal32 edge_20 (detail::no_combination);
-    BOOST_TEST_EQ(static_cast<T>(edge_20), detail::no_combination);
+    constexpr decimal32 edge_20 (detail::d32_no_combination);
+    BOOST_TEST_EQ(static_cast<T>(edge_20), detail::d32_no_combination);
 
-    constexpr decimal32 edge_23 (detail::big_combination);
-    BOOST_TEST_EQ(static_cast<T>(edge_23), detail::big_combination);
+    constexpr decimal32 edge_23 (detail::d32_big_combination);
+    BOOST_TEST_EQ(static_cast<T>(edge_23), detail::d32_big_combination);
 
     constexpr decimal32 max_sig (detail::max_significand);
     BOOST_TEST_EQ(static_cast<T>(max_sig), detail::max_significand);
