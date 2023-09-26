@@ -10,5 +10,6 @@
 #include <boost/decimal/cstdlib.hpp>
 #include <boost/decimal/fenv.hpp>
 #include <boost/decimal/literals.hpp>
+#include <boost/decimal/hash.hpp>
 
 #endif // BOOST_DECIMAL_HPP
