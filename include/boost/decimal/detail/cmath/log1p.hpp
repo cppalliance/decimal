@@ -29,13 +29,24 @@ constexpr auto log1p(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
     {
         result = x;
     }
+    else if (-x >= one)
+    {
+        if (-x == one)
+        {
+            result = -std::numeric_limits<T>::infinity();
+        }
+        else
+        {
+            result = std::numeric_limits<T>::quiet_NaN();
+        }
+    }
     else if (fpc != FP_NORMAL)
     {
         if (fpc == FP_INFINITE)
         {
             if (signbit(x))
             {
-                result = -one;
+                result = std::numeric_limits<T>::quiet_NaN();
             }
             else
             {
@@ -49,6 +60,53 @@ constexpr auto log1p(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
     }
     else
     {
+        if (x > T { 5, -1 })
+        {
+            result = log(x + one);
+        }
+        else
+        {
+            using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(21))>;
+
+            constexpr coefficient_array_type
+                coefficient_table
+                {
+                     // Series[Log[1+x], {x, 0, 15}]
+
+                     one,                 //             x
+                     T { -5, -1},         // (-1 /  2) * x^2
+                     one / UINT8_C(3),    // ( 1 /  3) * x^3
+                     T { -25, -2 },       // (-1 /  4) * x^4
+                     T { 2, -1 },         // ( 1 /  5) * x^5
+                    -one / UINT8_C(6),    // (-1 /  6) * x^6
+                     one / UINT8_C(7),    // ( 1 /  7) * x^7
+                     T { -125, -3 },      // (-1 /  8) * x^8
+                     one / UINT8_C(9),    // ( 1 /  9) * x^9
+                     T { -1, -1 },        // (-1 / 10) * x^10
+                     one / UINT8_C(11),   // ( 1 / 11) * x^11
+                    -one / UINT8_C(12),   // (-1 / 12) * x^12
+                     one / UINT8_C(13),   // ( 1 / 13) * x^13
+                    -one / UINT8_C(14),   // (-1 / 14) * x^14
+                     one / UINT8_C(15),   // ( 1 / 15) * x^15
+                    -one / UINT8_C(16),   // ( 1 / 16) * x^16
+                     one / UINT8_C(17),   // ( 1 / 17) * x^17
+                    -one / UINT8_C(18),   // ( 1 / 18) * x^18
+                     one / UINT8_C(19),   // ( 1 / 19) * x^19
+                     T { 5, -2 },         // ( 1 / 20) * x^20
+                     one / UINT8_C(21)    // ( 1 / 21) * x^21
+                };
+
+            auto rit = coefficient_table.crbegin() + static_cast<std::size_t>((sizeof(T) == 4U) ? 7U : 0U);
+
+            result = *rit;
+
+            while(rit != coefficient_table.crend())
+            {
+                result = fma(result, x, *rit++);
+            }
+
+            result *= x;
+        }
     }
 
     return result;
