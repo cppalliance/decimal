@@ -1161,6 +1161,86 @@ void test_llround()
     BOOST_TEST_EQ(llround(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
 }
 
+template <typename Dec>
+void test_nextafter()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        decimal32 d1 {val1};
+        decimal32 d2 {val2};
+
+        auto ret_val {std::nextafter(val1, val2)};
+        auto ret_dec {static_cast<float>(nextafter(d1, d2))};
+
+        if (ret_val == 0 || ret_dec == 0)
+        {
+            BOOST_TEST_EQ(ret_val, ret_dec);
+        }
+        else if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nDist: " << boost::math::float_distance(ret_val, ret_dec);
+        }
+    }
+
+    BOOST_TEST(isinf(nextafter(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng)), Dec(1))));
+    BOOST_TEST(isnan(nextafter(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)), Dec(1))));
+    BOOST_TEST(isnan(nextafter(Dec(1), BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)))));
+    BOOST_TEST(!isinf(nextafter(Dec(1), BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng)))));
+    BOOST_TEST_EQ(nextafter(Dec(1), Dec(1)), Dec(1));
+    BOOST_TEST_EQ(nextafter(Dec(0), Dec(1)), std::numeric_limits<Dec>::epsilon());
+    BOOST_TEST_EQ(nextafter(Dec(0), Dec(-1)), -std::numeric_limits<Dec>::epsilon());
+}
+
+template <typename Dec>
+void test_nexttoward()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        decimal32 d1 {val1};
+        decimal32 d2 {val2};
+
+        auto ret_val {std::nexttoward(val1, val2)};
+        auto ret_dec {static_cast<float>(nexttoward(d1, val2))};
+
+        if (ret_val == 0 || ret_dec == 0)
+        {
+            BOOST_TEST_EQ(ret_val, ret_dec);
+        }
+        else if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nDist: " << boost::math::float_distance(ret_val, ret_dec);
+        }
+    }
+
+    BOOST_TEST(isinf(nexttoward(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng)), 1)));
+    BOOST_TEST(isnan(nexttoward(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)), 1)));
+    BOOST_TEST_EQ(nexttoward(Dec(1), 1), Dec(1));
+    BOOST_TEST_EQ(nexttoward(Dec(0), 1), std::numeric_limits<Dec>::epsilon());
+    BOOST_TEST_EQ(nexttoward(Dec(0), -1), -std::numeric_limits<Dec>::epsilon());
+}
+
 int main()
 {
 
@@ -1212,6 +1292,9 @@ int main()
     test_round<decimal32>();
     test_lround<decimal32>();
     test_llround<decimal32>();
+
+    test_nextafter<decimal32>();
+    test_nexttoward<decimal32>();
 
     return boost::report_errors();
 }

@@ -44,6 +44,7 @@
 #include <boost/decimal/detail/cmath/rint.hpp>
 #include <boost/decimal/detail/cmath/nearbyint.hpp>
 #include <boost/decimal/detail/cmath/round.hpp>
+#include <boost/decimal/detail/cmath/next.hpp>
 #include <boost/decimal/numbers.hpp>
 
 namespace boost { namespace decimal {
