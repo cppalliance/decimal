@@ -22,59 +22,25 @@
 namespace boost {
 namespace decimal {
 
-namespace detail {
-
-template <typename T>
-constexpr auto float_next_imp(T val) noexcept -> T
-{
-    const auto fpclass {fpclassify(val)};
-
-    if (fpclass == FP_NAN || fpclass == FP_INFINITE)
-    {
-        return val;
-    }
-    else if (fpclass == FP_ZERO)
-    {
-        return std::numeric_limits<T>::epsilon();
-    }
-
-    return val + std::numeric_limits<T>::epsilon();
-}
-
-template <typename T>
-constexpr auto float_prior_imp(T val) noexcept -> T
-{
-    const auto fpclass {fpclassify(val)};
-
-    if (fpclass == FP_NAN || fpclass == FP_INFINITE)
-    {
-        return val;
-    }
-    else if (fpclass == FP_ZERO)
-    {
-        return -std::numeric_limits<T>::epsilon();
-    }
-
-    return val - std::numeric_limits<T>::epsilon();
-}
-
-} //namespace detail
-
 template <typename T1, typename T2>
 constexpr auto nextafter(T1 val, T2 direction) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<T1> || detail::is_decimal_floating_point_v<T2>),
                          detail::promote_args_t<T1, T2>>
 {
-    if (isnan(direction) || val == direction)
+    if (isnan(val) || isinf(val))
+    {
+        return val;
+    }
+    else if (isnan(direction) || val == direction)
     {
         return direction;
     }
     else if (val < direction)
     {
-        return detail::float_next_imp(val);
+        return val + std::numeric_limits<T1>::epsilon();
     }
 
-    return detail::float_prior_imp(val);
+    return val - std::numeric_limits<T1>::epsilon();
 }
 
 template <typename T>
