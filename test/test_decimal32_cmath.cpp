@@ -984,6 +984,182 @@ void test_nearbyint()
     BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, true));
 }
 
+template <typename Dec>
+void test_round()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {static_cast<float>(std::round(val1))};
+        auto ret_dec {static_cast<float>(round(d1))};
+
+        // Difference in default rounding mode
+        // Float goes to even while decimal is to nearest from zero
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (std::fabs(val1) > 9'999'999.0F)
+        {
+            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
+            {
+                std::cerr << "Val 1: " << val1
+                          << "\nDec 1: " << d1
+                          << "\nRet val: " << ret_val
+                          << "\nRet dec: " << ret_dec
+                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
+            }
+        }
+        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(round(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng)))));
+    BOOST_TEST(isnan(round(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng)))));
+    BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
+    BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, false));
+}
+
+template <typename Dec>
+void test_lround()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::lround(val1)};
+        auto ret_dec {lround(d1)};
+
+        // Difference in significant figures
+        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::lround(val1)};
+        auto ret_dec {lround(d1)};
+
+        // Difference in significant figures
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    BOOST_TEST_EQ(lround(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng))), LONG_MIN);
+    BOOST_TEST_EQ(lround(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng))), LONG_MIN);
+    BOOST_TEST_EQ(lround(Dec(0) * Dec(dist(rng))), 0);
+    BOOST_TEST_EQ(lround(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
+    BOOST_TEST_EQ(lround(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+}
+
+template <typename Dec>
+void test_llround()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::llround(val1)};
+        auto ret_dec {llround(d1)};
+
+        // Difference in significant figures
+        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::llround(val1)};
+        auto ret_dec {llround(d1)};
+
+        // Difference in significant figures
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    BOOST_TEST_EQ(llround(BOOST_DECIMAL_DEC_INFINITY * Dec(dist(rng))), LLONG_MIN);
+    BOOST_TEST_EQ(llround(BOOST_DECIMAL_DEC_NAN * Dec(dist(rng))), LLONG_MIN);
+    BOOST_TEST_EQ(llround(Dec(0) * Dec(dist(rng))), 0);
+    BOOST_TEST_EQ(llround(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
+    BOOST_TEST_EQ(llround(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+}
 
 int main()
 {
@@ -1032,6 +1208,10 @@ int main()
     test_lrint<decimal32>();
     test_llrint<decimal32>();
     test_nearbyint<decimal32>();
+
+    test_round<decimal32>();
+    test_lround<decimal32>();
+    test_llround<decimal32>();
 
     return boost::report_errors();
 }
