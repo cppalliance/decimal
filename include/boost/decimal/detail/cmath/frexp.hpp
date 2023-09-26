@@ -30,11 +30,11 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
 
         if (v_fp == FP_NAN)
         {
-            result_frexp = boost::decimal::from_bits(boost::decimal::detail::nan_mask);
+            result_frexp = boost::decimal::from_bits(boost::decimal::detail::d32_nan_mask);
         }
         else if (v_fp == FP_INFINITE)
         {
-            result_frexp = boost::decimal::from_bits(boost::decimal::detail::inf_mask);
+            result_frexp = boost::decimal::from_bits(boost::decimal::detail::d32_inf_mask);
         }
     }
     else
