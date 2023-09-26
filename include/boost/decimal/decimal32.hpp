@@ -17,6 +17,7 @@
 #include <type_traits>
 
 #include <boost/decimal/fwd.hpp>
+#include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 #include <boost/decimal/detail/config.hpp>
@@ -47,20 +48,6 @@ static constexpr auto snan_mask     = UINT32_C(0b0'11111'100000'0000000000'00000
 static constexpr auto comb_inf_mask = UINT32_C(0b11110);
 static constexpr auto comb_nan_mask = UINT32_C(0b11111);
 static constexpr auto exp_snan_mask = UINT32_C(0b100000);
-
-// Values from IEEE 754-2019 table 3.6
-BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto storage_width = 32;
-BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto precision = 7;
-BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto bias = 101;
-BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto emax = 96;
-BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto emin = -95;
-BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto etiny = -bias;
-BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto combination_field_width = 11;
-BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto trailing_significand_field_width = 20;
-
-// Other useful values
-static constexpr std::uint32_t max_significand = 9'999'999;
-BOOST_DECIMAL_ATTRIBUTE_UNUSED constexpr auto max_string_length = 15;
 
 // Masks to update the significand based on the combination field
 // In these first three 00, 01, or 10 are the leading 2 bits of the exp
