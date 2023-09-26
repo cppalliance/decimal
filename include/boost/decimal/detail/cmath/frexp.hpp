@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <type_traits>
+#include <limits>
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
@@ -30,11 +31,11 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
 
         if (v_fp == FP_NAN)
         {
-            result_frexp = boost::decimal::from_bits(boost::decimal::detail::d32_nan_mask);
+            result_frexp = std::numeric_limits<T>::quiet_NaN();
         }
         else if (v_fp == FP_INFINITE)
         {
-            result_frexp = boost::decimal::from_bits(boost::decimal::detail::d32_inf_mask);
+            result_frexp = std::numeric_limits<T>::infinity();
         }
     }
     else
