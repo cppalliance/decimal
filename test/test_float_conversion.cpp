@@ -55,10 +55,33 @@ void test_compute_float64()
     BOOST_TEST_EQ(compute_float64(100, UINT64_C(10000000000000000000), false, success), 10000000000000000000e100);
 }
 
+template <typename T>
+void test_generic_binary_to_decimal()
+{
+    using namespace boost::decimal::detail::ryu;
+
+    std::uint64_t* result;
+    result = (std::uint64_t*)malloc(4);
+    generic_computePow5(56, result);
+    BOOST_TEST_EQ(result[0], 0);
+    BOOST_TEST_EQ(result[1], 5206161169240293376);
+    BOOST_TEST_EQ(result[2], 4575641699882439235);
+    free(result);
+
+    BOOST_TEST(floating_point_to_fd128(T(0)).mantissa == 0);
+    BOOST_TEST(floating_point_to_fd128(std::numeric_limits<T>::infinity()).exponent == fd128_exceptional_exponent);
+    BOOST_TEST(floating_point_to_fd128(std::numeric_limits<T>::quiet_NaN()).exponent == fd128_exceptional_exponent);
+    BOOST_TEST(floating_point_to_fd128(-std::numeric_limits<T>::infinity()).exponent == fd128_exceptional_exponent);
+    BOOST_TEST(floating_point_to_fd128(-std::numeric_limits<T>::quiet_NaN()).exponent == fd128_exceptional_exponent);
+}
+
 int main()
 {
     test_compute_float32();
     test_compute_float64();
+    test_generic_binary_to_decimal<float>();
+    test_generic_binary_to_decimal<double>();
+    test_generic_binary_to_decimal<long double>();
 
     return boost::report_errors();
 }
