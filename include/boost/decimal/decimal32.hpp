@@ -723,7 +723,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
               << "\nStarting sig rhs: " << sig_rhs << std::endl;
     #endif
 
-    if (delta_exp + 1 > detail::precision)
+    if (delta_exp > detail::precision + 1)
     {
         // If the difference in exponents is more than the digits of accuracy
         // we return the larger of the two
