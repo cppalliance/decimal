@@ -16,12 +16,9 @@
 #include <cstdint>
 #include <cstring>
 
-#if defined(__GNUC__) && __GNUC__ < 5 && !defined(__clang__)
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-#endif
-
-namespace boost { namespace decimal { namespace detail {
+namespace boost {
+namespace decimal {
+namespace detail {
 
 constexpr auto is_integer_char(char c) noexcept -> bool
 {
@@ -372,9 +369,5 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
 } // namespace detail
 } // namespace decimal
 } // namespace boost
-
-#if defined(__GNUC__) && __GNUC__ < 5 && !defined(__clang__)
-# pragma GCC diagnostic pop
-#endif
 
 #endif // BOOST_DECIMAL_DETAIL_PARSER_HPP

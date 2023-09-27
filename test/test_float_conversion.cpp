@@ -83,6 +83,44 @@ void test_generic_binary_to_decimal()
     BOOST_TEST(floating_point_to_fd128(-std::numeric_limits<T>::quiet_NaN() * dist(gen)).exponent == fd128_exceptional_exponent);
 }
 
+void test_parser()
+{
+    using namespace boost::decimal::detail;
+
+    std::mt19937_64 gen;
+    std::uniform_int_distribution<std::uint64_t> dist (1, 2);
+
+    const char* pos_str = "+12345";
+    std::uint64_t sig {dist(gen)};
+    std::int32_t exp {};
+    bool sign {};
+
+    auto res = parser(pos_str, pos_str, sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc::invalid_argument);
+    res = parser(pos_str, pos_str + std::strlen(pos_str), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc::invalid_argument);
+
+    const char* nan_str = "nan";
+    res = parser(nan_str, nan_str + std::strlen(nan_str), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc::not_supported);
+
+    const char* no_trailing = "12345";
+    res = parser(no_trailing, no_trailing + std::strlen(no_trailing), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* all_zeros = "0.00000001";
+    res = parser(all_zeros, all_zeros + std::strlen(all_zeros), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* big_sig = "123456789012345678901234567890";
+    res = parser(big_sig, big_sig + std::strlen(big_sig), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* big_sig_with_frac = "123456789012345678901234567890.123";
+    res = parser(big_sig_with_frac, big_sig_with_frac + std::strlen(big_sig_with_frac), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+}
+
 int main()
 {
     test_compute_float32();
@@ -90,6 +128,8 @@ int main()
     test_generic_binary_to_decimal<float>();
     test_generic_binary_to_decimal<double>();
     test_generic_binary_to_decimal<long double>();
+
+    test_parser();
 
     return boost::report_errors();
 }
