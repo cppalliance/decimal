@@ -121,6 +121,37 @@ void test_parser()
     BOOST_TEST(res.ec == std::errc());
 }
 
+void test_from_chars()
+{
+    using namespace boost::decimal::detail;
+
+    std::mt19937_64 gen(42);
+    std::uniform_int_distribution<std::uint64_t> dist (1, 2);
+
+    const char* pos_str = "+12345";
+    std::uint64_t sig {dist(gen)};
+
+    auto res = from_chars_integer_impl<std::uint64_t, std::uint64_t>(pos_str, pos_str, sig, 10);
+    BOOST_TEST(res.ec == std::errc::invalid_argument);
+    res = from_chars_integer_impl<std::uint64_t, std::uint64_t>(pos_str, pos_str + std::strlen(pos_str), sig, 10);
+    BOOST_TEST(res.ec == std::errc::invalid_argument);
+
+    const char* neg_str = "-12345";
+    res = from_chars_integer_impl<std::uint64_t, std::uint64_t>(neg_str, neg_str + std::strlen(neg_str), sig, 10);
+    BOOST_TEST(res.ec == std::errc::invalid_argument);
+
+    auto signed_sig {static_cast<std::int64_t>(dist(gen))};
+    res = from_chars_integer_impl<std::int64_t, std::uint64_t>(neg_str, neg_str + 1, signed_sig, 10);
+    BOOST_TEST(res.ec == std::errc::invalid_argument);
+
+    res = from_chars_integer_impl<std::int64_t, std::uint64_t>(neg_str, neg_str + std::strlen(neg_str), signed_sig, 10);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* big_sig = "-123456789123456789123456789123456789";
+    res = from_chars_integer_impl<std::int64_t, std::uint64_t>(big_sig, big_sig + std::strlen(big_sig), signed_sig, 10);
+    BOOST_TEST(res.ec == std::errc::result_out_of_range);
+}
+
 int main()
 {
     test_compute_float32();
@@ -130,6 +161,8 @@ int main()
     test_generic_binary_to_decimal<long double>();
 
     test_parser();
+
+    test_from_chars();
 
     return boost::report_errors();
 }
