@@ -20,7 +20,10 @@
 #  include <boost/core/bit.hpp>
 #endif
 
-namespace boost { namespace decimal { namespace detail { namespace fast_float {
+namespace boost {
+namespace decimal {
+namespace detail {
+namespace fast_float {
 
 static constexpr double double_powers_of_ten[] = {
     1e0,  1e1,  1e2,  1e3,  1e4,  1e5,  1e6,  1e7,  1e8,  1e9,  1e10, 1e11,
