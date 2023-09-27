@@ -44,6 +44,7 @@ void test_constructor_rounding()
     BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
     BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'568, 1));
     BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'568, 1));
+    BOOST_TEST_EQ(decimal32(55'555'555, 0), decimal32(5'555'556, 1));
 
     // Toward zero
     boost::decimal::fesetround(rounding_mode::fe_dec_toward_zero);
@@ -60,6 +61,9 @@ void test_constructor_rounding()
     BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
     BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'568, 1));
     BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'567, 1));
+
+    // Edge case
+    BOOST_TEST_EQ(decimal32(99'999'999), decimal32(1, 8));
 }
 
 int main()
