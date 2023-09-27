@@ -32,3 +32,4 @@ run test_literals.cpp ;
 run test_decimal32_cmath.cpp ;
 run test_constants.cpp ;
 run test_promotion.cpp ;
+run test_float_conversion.cpp ;
