@@ -12,10 +12,10 @@ void test_compute_float32()
 {
     using boost::decimal::detail::fast_float::compute_float32;
 
-    std::mt19937_64 gen;
-    std::uniform_real_distribution<float> dist (1, 1);
+    std::mt19937_64 gen(42);
+    std::uniform_int_distribution<std::int64_t> dist (1, 1);
 
-    bool success;
+    bool success {};
 
     // Trivial verifcation
     BOOST_TEST_EQ(compute_float32(1 * dist(gen), 1, false, success), 1e1F);
@@ -38,10 +38,10 @@ void test_compute_float64()
 {
     using boost::decimal::detail::fast_float::compute_float64;
 
-    std::mt19937_64 gen;
-    std::uniform_real_distribution<double> dist (1, 1);
+    std::mt19937_64 gen(42);
+    std::uniform_int_distribution<std::int64_t> dist (1, 1);
 
-    bool success;
+    bool success {};
 
     // Trivial verifcation
     BOOST_TEST_EQ(compute_float64(1, dist(gen), false, success), 1e1);
@@ -49,11 +49,11 @@ void test_compute_float64()
     BOOST_TEST_EQ(compute_float64(308, dist(gen), false, success), 1e308);
 
     // out of range
-    BOOST_TEST_EQ(compute_float64(310, 5, false, success), HUGE_VALF * dist(gen));
-    BOOST_TEST_EQ(compute_float64(310, 5, true, success), -HUGE_VALF * dist(gen));
-    BOOST_TEST_EQ(compute_float64(1000, 5, false, success), HUGE_VALF * dist(gen));
-    BOOST_TEST_EQ(compute_float64(1000, 5, true, success), -HUGE_VALF * dist(gen));
-    BOOST_TEST_EQ(compute_float64(-325, 5, false, success), 0);
+    BOOST_TEST_EQ(compute_float64(310, 5 * dist(gen), false, success), HUGE_VALF);
+    BOOST_TEST_EQ(compute_float64(310, 5 * dist(gen), true, success), -HUGE_VALF);
+    BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), false, success), HUGE_VALF);
+    BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), true, success), -HUGE_VALF);
+    BOOST_TEST_EQ(compute_float64(-325, 5 * dist(gen), false, success), 0);
 
     // Composite
     BOOST_TEST_EQ(compute_float64(10 * dist(gen), 123456789, false, success), 123456789e10);
@@ -65,7 +65,7 @@ void test_compute_float64()
 template <typename T>
 void test_generic_binary_to_decimal()
 {
-    std::mt19937_64 gen;
+    std::mt19937_64 gen(42);
     std::uniform_real_distribution<T> dist (1, 2);
 
     using namespace boost::decimal::detail::ryu;
@@ -87,7 +87,7 @@ void test_parser()
 {
     using namespace boost::decimal::detail;
 
-    std::mt19937_64 gen;
+    std::mt19937_64 gen(42);
     std::uniform_int_distribution<std::uint64_t> dist (1, 2);
 
     const char* pos_str = "+12345";
