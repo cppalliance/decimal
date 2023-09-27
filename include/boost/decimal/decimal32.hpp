@@ -806,7 +806,7 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
     auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
 
-    if (delta_exp + 1 > detail::precision)
+    if (delta_exp > detail::precision + 1)
     {
         // If the difference in exponents is more than the digits of accuracy
         // we return the larger of the two
@@ -814,23 +814,6 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         // e.g. 1e20 - 1e-20 = 1e20
         return abs_lhs_bigger ? detail::decimal32_components{detail::shrink_significand(lhs_sig, lhs_exp), lhs_exp, false} :
                                 detail::decimal32_components{detail::shrink_significand(rhs_sig, rhs_exp), rhs_exp, true};
-    }
-    else if (delta_exp == detail::precision + 1)
-    {
-        // Only need to see if we need to add one to the
-        // significand of the bigger value
-        //
-        // e.g. 1.234567e5 - 9.876543e-2 = 1.234566e5
-
-        if (rhs_sig >= UINT32_C(5'000'000))
-        {
-            --lhs_sig;
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
-        else
-        {
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
     }
 
     // The two numbers can be subtracted together without special handling

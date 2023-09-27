@@ -253,7 +253,7 @@ void test_subtraction()
     // Case 2: Round the last digit of the significand
     constexpr decimal32 no_round {1234567, 5};
     constexpr decimal32 round {9876543, -2};
-    BOOST_TEST_EQ(no_round - round, no_round);
+    BOOST_TEST_EQ(no_round - round, decimal32(1234566, 5));
 
     // Case 3: Add away
     constexpr decimal32 one(1, 0);
@@ -274,9 +274,9 @@ void test_subtraction()
     constexpr decimal32 eleven(11, 0);
     BOOST_TEST_EQ(eleven - one, ten);
 
-    // Too great a difference for one to matter
+    constexpr decimal32 max(9'999'999, 0);
     constexpr decimal32 max_plus_one(10'000'000, 0);
-    BOOST_TEST_EQ(max_plus_one - one, max_plus_one);
+    BOOST_TEST_EQ(max_plus_one - one, max);
 
     // Non-finite values
     constexpr decimal32 qnan_val(std::numeric_limits<decimal32>::quiet_NaN());
