@@ -170,6 +170,11 @@ void test_non_finite_values()
     BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32>::infinity()), FP_INFINITE);
     BOOST_TEST_EQ(fpclassify(-std::numeric_limits<decimal32>::infinity()), FP_INFINITE);
     BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32>::denorm_min()), FP_SUBNORMAL);
+
+    BOOST_TEST(isnan(check_non_finite(one, std::numeric_limits<decimal32>::quiet_NaN())));
+    BOOST_TEST(isnan(check_non_finite(std::numeric_limits<decimal32>::quiet_NaN(), one)));
+    BOOST_TEST(isinf(check_non_finite(one, std::numeric_limits<decimal32>::infinity())));
+    BOOST_TEST(isinf(check_non_finite(std::numeric_limits<decimal32>::infinity(), one)));
 }
 
 void test_unary_arithmetic()
