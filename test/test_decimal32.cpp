@@ -8,6 +8,7 @@
 #include <boost/core/lightweight_test.hpp>
 #include <bitset>
 #include <limits>
+#include <random>
 #include <cmath>
 #include <cerrno>
 
@@ -446,6 +447,17 @@ void test_hash()
     BOOST_TEST_NE(std::hash<decimal32>{}(one), std::hash<decimal32>{}(zero));
 }
 
+void test_shrink_significand()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_int_distribution<std::uint64_t> dist(100'000'000'000, 100'000'000'000);
+    std::int32_t pow {};
+    std::uint64_t sig {dist(rng)};
+
+    detail::shrink_significand(sig, pow);
+    BOOST_TEST_EQ(pow, 3);
+}
+
 int main()
 {
     test_comp();
@@ -479,6 +491,8 @@ int main()
     spot_check_addition(-1054191000, -920209700, -1974400700);
     spot_check_addition(353582500, -32044770, 321537730);
     spot_check_addition(989629100, 58451350, 1048080000);
+
+    test_shrink_significand();
 
     return boost::report_errors();
 }
