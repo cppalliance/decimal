@@ -70,13 +70,11 @@ void test_generic_binary_to_decimal()
 
     using namespace boost::decimal::detail::ryu;
 
-    std::uint64_t* result;
-    result = (std::uint64_t*)malloc(4);
+    std::uint64_t result[5] {};
     generic_computePow5(56, result);
     BOOST_TEST_EQ(result[0], 0);
     BOOST_TEST_EQ(result[1], 5206161169240293376);
     BOOST_TEST_EQ(result[2], 4575641699882439235);
-    free(result);
 
     BOOST_TEST(floating_point_to_fd128(T(0) * dist(gen)).mantissa == 0);
     BOOST_TEST(floating_point_to_fd128(std::numeric_limits<T>::infinity() * dist(gen)).exponent == fd128_exceptional_exponent);
