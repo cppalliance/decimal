@@ -70,12 +70,6 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
     Unsigned_Integer result = 0;
     Unsigned_Integer overflow_value = 0;
     Unsigned_Integer max_digit = 0;
-    
-    // Check pre-conditions
-    if (!((first <= last) && (base >= 2 && base <= 36)))
-    {
-        return {first, std::errc::invalid_argument};
-    }
 
     const auto unsigned_base = static_cast<Unsigned_Integer>(base);
 
@@ -96,10 +90,6 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
             {
                 is_negative = true;
                 ++next;
-            }
-            else if (*next == '+')
-            {
-                return {next, std::errc::invalid_argument};
             }
         }
 
