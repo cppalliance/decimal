@@ -149,12 +149,15 @@ void test_floor()
 template <typename Dec>
 void test_ceil()
 {
-    BOOST_TEST(isnan(ceil(BOOST_DECIMAL_DEC_NAN)));
-    BOOST_TEST(isnan(ceil(-BOOST_DECIMAL_DEC_NAN)));
-    BOOST_TEST(isinf(ceil(BOOST_DECIMAL_DEC_INFINITY)));
-    BOOST_TEST(isinf(ceil(-BOOST_DECIMAL_DEC_INFINITY)));
-    BOOST_TEST_EQ(ceil(Dec(0, 0)), Dec(0, 0));
-    BOOST_TEST_EQ(ceil(Dec(-0, 0)), Dec(-0, 0));
+    std::mt19937_64 rng;
+    std::uniform_int_distribution<int> dist(0, 10);
+
+    BOOST_TEST(isnan(ceil(BOOST_DECIMAL_DEC_NAN * dist(rng))));
+    BOOST_TEST(isnan(ceil(-BOOST_DECIMAL_DEC_NAN * dist(rng))));
+    BOOST_TEST(isinf(ceil(BOOST_DECIMAL_DEC_INFINITY * dist(rng))));
+    BOOST_TEST(isinf(ceil(-BOOST_DECIMAL_DEC_INFINITY * dist(rng))));
+    BOOST_TEST_EQ(ceil(Dec(0, 0) * dist(rng)), Dec(0, 0));
+    BOOST_TEST_EQ(ceil(Dec(-0, 0) * dist(rng)), Dec(-0, 0));
 
     BOOST_TEST_EQ(ceil(Dec(27, -1)), Dec(3, 0));
     BOOST_TEST_EQ(ceil(Dec(-27, -1)), Dec(-2, 0));
