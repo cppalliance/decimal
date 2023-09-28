@@ -42,14 +42,14 @@ constexpr auto cos(T x) noexcept -> T
     auto x90 {remquo(x, numbers::pi_v<T>/T(2), &quo)};
     switch (quo)
     {
-        case 0:
-            return detail::cos_impl(x90);
         case 1:
             return -detail::sin_impl(x90);
         case 2:
             return -detail::cos_impl(x90);
-        default:
+        case 3:
             return detail::sin_impl(x90);
+        default:
+            return detail::cos_impl(x90);
     }
 }
 

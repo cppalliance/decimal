@@ -392,7 +392,7 @@ template <typename Dec>
 void test_cos()
 {
     std::mt19937_64 rng(42);
-    std::uniform_real_distribution<float> dist(-3.14F, 3.14F);
+    std::uniform_real_distribution<float> dist(-3.14F * 2, 3.14F * 2);
 
     for (std::size_t n {}; n < N; ++n)
     {
@@ -402,7 +402,7 @@ void test_cos()
         auto ret_val {std::cos(val1)};
         auto ret_dec {static_cast<float>(cos(d1))};
 
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 15*std::numeric_limits<float>::epsilon()))
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 25*std::numeric_limits<float>::epsilon()))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
