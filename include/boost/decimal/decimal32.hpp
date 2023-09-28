@@ -15,6 +15,7 @@
 #include <iostream>
 #include <limits>
 #include <type_traits>
+#include <sstream>
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/attributes.hpp>
@@ -2289,12 +2290,6 @@ constexpr auto strtod32(const char* str, char** endptr) noexcept -> decimal32
 
     const auto buffer_len {detail::strlen(str)};
 
-    if (buffer_len == 0)
-    {
-        errno = EINVAL;
-        return from_bits(boost::decimal::detail::d32_snan_mask);
-    }
-
     const auto r {detail::parser(str, str + buffer_len, sign, significand, expval)};
     decimal32 d;
 
@@ -2326,7 +2321,11 @@ constexpr auto strtod32(const char* str, char** endptr) noexcept -> decimal32
         d = decimal32(significand, expval, sign);
     }
 
-    *endptr = const_cast<char*>(str + (r.ptr - str));
+    if (endptr != nullptr)
+    {
+        *endptr = const_cast<char*>(str + (r.ptr - str));
+    }
+
     return d;
 }
 
@@ -2355,7 +2354,11 @@ constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decima
     char* short_endptr {};
     const auto return_val {strtod32(buffer, &short_endptr)};
 
-    *endptr = const_cast<wchar_t*>(str + (short_endptr - buffer));
+    if (endptr != nullptr)
+    {
+        *endptr = const_cast<wchar_t*>(str + (short_endptr - buffer));
+    }
+
     return return_val;
 }
 
