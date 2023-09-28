@@ -76,6 +76,18 @@ void test_ostream()
     std::stringstream snan;
     snan << std::numeric_limits<decimal32>::signaling_NaN();
     BOOST_TEST_CSTR_EQ(snan.str().c_str(), "nan(snan)");
+
+    std::stringstream neg_inf;
+    neg_inf << (-std::numeric_limits<decimal32>::infinity());
+    BOOST_TEST_CSTR_EQ(neg_inf.str().c_str(), "-inf");
+
+    std::stringstream neg_qnan;
+    neg_qnan << (-std::numeric_limits<decimal32>::quiet_NaN());
+    BOOST_TEST_CSTR_EQ(neg_qnan.str().c_str(), "-nan(ind)");
+
+    std::stringstream neg_snan;
+    neg_snan << (-std::numeric_limits<decimal32>::signaling_NaN());
+    BOOST_TEST_CSTR_EQ(neg_snan.str().c_str(), "-nan(snan)");
 }
 
 int main()
