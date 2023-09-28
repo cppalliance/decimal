@@ -142,6 +142,7 @@ template <typename Dec>
 void test_nonfinite_quantize()
 {
     const Dec one{1};
+    std::uniform_int_distribution<std::int64_t> dist(1'000'000, 9'999'999);
 
     BOOST_TEST(isnan(quantize(std::numeric_limits<Dec>::quiet_NaN(), one)));
     BOOST_TEST(isnan(quantize(one, std::numeric_limits<Dec>::quiet_NaN())));
@@ -149,7 +150,8 @@ void test_nonfinite_quantize()
     BOOST_TEST(isnan(quantize(one, std::numeric_limits<Dec>::signaling_NaN())));
     BOOST_TEST(isnan(quantize(std::numeric_limits<Dec>::infinity(), one)));
     BOOST_TEST(isnan(quantize(one, std::numeric_limits<Dec>::infinity())));
-    BOOST_TEST(isinf(quantize(std::numeric_limits<Dec>::infinity(), std::numeric_limits<Dec>::infinity())));
+    BOOST_TEST(isinf(quantize(std::numeric_limits<Dec>::infinity() * dist(rng),
+                              std::numeric_limits<Dec>::infinity() * dist(rng))));
 }
 
 int main()
