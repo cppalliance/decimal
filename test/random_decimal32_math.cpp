@@ -14,6 +14,12 @@ static constexpr auto N {1024U};
 // NOLINTNEXTLINE : Seed with a constant for repeatability
 static std::mt19937_64 rng(42); // NOSONAR : Global rng is not const
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4146)
+#endif
+
+
 template <typename T>
 void random_addition(T lower, T upper)
 {
@@ -265,6 +271,13 @@ void random_mixed_division(T lower, T upper)
                       << "\nInt res: " << val1 * val2 << std::endl;
         }
     }
+
+    // Edge cases
+    const decimal32 val1 {dist(rng)};
+    const decimal32 zero {0, 0};
+    BOOST_TEST(isnan(val1 / zero));
+    BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() / dist(rng)));
+    BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() / dist(rng)));
 }
 
 int main()
@@ -386,3 +399,8 @@ int main()
 
     return boost::report_errors();
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
+

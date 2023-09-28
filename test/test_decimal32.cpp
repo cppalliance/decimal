@@ -8,6 +8,7 @@
 #include <boost/core/lightweight_test.hpp>
 #include <bitset>
 #include <limits>
+#include <random>
 #include <cmath>
 #include <cerrno>
 
@@ -169,6 +170,14 @@ void test_non_finite_values()
     BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32>::infinity()), FP_INFINITE);
     BOOST_TEST_EQ(fpclassify(-std::numeric_limits<decimal32>::infinity()), FP_INFINITE);
     BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32>::denorm_min()), FP_SUBNORMAL);
+
+    std::mt19937_64 rng(42);
+    std::uniform_int_distribution<std::uint32_t> dist(1, 2);
+
+    BOOST_TEST(isnan(check_non_finite(one, std::numeric_limits<decimal32>::quiet_NaN() * dist(rng))));
+    BOOST_TEST(isnan(check_non_finite(std::numeric_limits<decimal32>::quiet_NaN() * dist(rng), one)));
+    BOOST_TEST(isinf(check_non_finite(one, std::numeric_limits<decimal32>::infinity() * dist(rng))));
+    BOOST_TEST(isinf(check_non_finite(std::numeric_limits<decimal32>::infinity() * dist(rng), one)));
 }
 
 void test_unary_arithmetic()
@@ -187,8 +196,8 @@ void test_addition()
     BOOST_TEST_EQ(small_num + big_num, big_num);
 
     // Case 2: Round the last digit of the significand
-    constexpr decimal32 full_length_num {10000000, 0};
-    constexpr decimal32 rounded_full_length_num(10000000, 0);
+    constexpr decimal32 full_length_num {1000000, 1};
+    constexpr decimal32 rounded_full_length_num(1000001, 1);
     constexpr decimal32 no_round(1, -1);
     constexpr decimal32 round(9, -1);
     BOOST_TEST_EQ(full_length_num + no_round, full_length_num);
@@ -247,7 +256,7 @@ void test_subtraction()
     // Case 2: Round the last digit of the significand
     constexpr decimal32 no_round {1234567, 5};
     constexpr decimal32 round {9876543, -2};
-    BOOST_TEST_EQ(no_round - round, no_round);
+    BOOST_TEST_EQ(no_round - round, decimal32(1234566, 5));
 
     // Case 3: Add away
     constexpr decimal32 one(1, 0);
@@ -268,9 +277,9 @@ void test_subtraction()
     constexpr decimal32 eleven(11, 0);
     BOOST_TEST_EQ(eleven - one, ten);
 
-    // Too great a difference for one to matter
+    constexpr decimal32 max(9'999'999, 0);
     constexpr decimal32 max_plus_one(10'000'000, 0);
-    BOOST_TEST_EQ(max_plus_one - one, max_plus_one);
+    BOOST_TEST_EQ(max_plus_one - one, max);
 
     // Non-finite values
     constexpr decimal32 qnan_val(std::numeric_limits<decimal32>::quiet_NaN());
@@ -446,6 +455,17 @@ void test_hash()
     BOOST_TEST_NE(std::hash<decimal32>{}(one), std::hash<decimal32>{}(zero));
 }
 
+void test_shrink_significand()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_int_distribution<std::uint64_t> dist(100'000'000'000, 100'000'000'000);
+    std::int32_t pow {};
+    std::uint64_t sig {dist(rng)};
+
+    detail::shrink_significand(sig, pow);
+    BOOST_TEST_EQ(pow, 3);
+}
+
 int main()
 {
     test_comp();
@@ -479,6 +499,8 @@ int main()
     spot_check_addition(-1054191000, -920209700, -1974400700);
     spot_check_addition(353582500, -32044770, 321537730);
     spot_check_addition(989629100, 58451350, 1048080000);
+
+    test_shrink_significand();
 
     return boost::report_errors();
 }

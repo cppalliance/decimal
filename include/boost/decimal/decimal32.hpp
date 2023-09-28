@@ -15,6 +15,7 @@
 #include <iostream>
 #include <limits>
 #include <type_traits>
+#include <sstream>
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/attributes.hpp>
@@ -105,14 +106,15 @@ template <typename Integer>
 constexpr auto shrink_significand(Integer sig, std::int32_t& exp) noexcept -> std::uint32_t
 {
     using Unsigned_Integer = detail::make_unsigned_t<Integer>;
+    constexpr auto max_digits {std::numeric_limits<std::uint32_t>::digits10};
 
     auto unsigned_sig {detail::make_positive_unsigned(sig)};
     const auto sig_dig {detail::num_digits(unsigned_sig)};
 
-    if (sig_dig > 9)
+    if (sig_dig > max_digits)
     {
-        unsigned_sig /= static_cast<Unsigned_Integer>(detail::powers_of_10[static_cast<std::size_t>(sig_dig - 9)]);
-        exp += sig_dig - 9;
+        unsigned_sig /= static_cast<Unsigned_Integer>(detail::powers_of_10[static_cast<std::size_t>(sig_dig - max_digits)]);
+        exp += sig_dig - max_digits;
     }
 
     return static_cast<std::uint32_t>(unsigned_sig);
@@ -722,7 +724,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
               << "\nStarting sig rhs: " << sig_rhs << std::endl;
     #endif
 
-    if (delta_exp + 1 > detail::precision)
+    if (delta_exp > detail::precision + 1)
     {
         // If the difference in exponents is more than the digits of accuracy
         // we return the larger of the two
@@ -805,7 +807,7 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
     auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
 
-    if (delta_exp + 1 > detail::precision)
+    if (delta_exp > detail::precision + 1)
     {
         // If the difference in exponents is more than the digits of accuracy
         // we return the larger of the two
@@ -813,23 +815,6 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         // e.g. 1e20 - 1e-20 = 1e20
         return abs_lhs_bigger ? detail::decimal32_components{detail::shrink_significand(lhs_sig, lhs_exp), lhs_exp, false} :
                                 detail::decimal32_components{detail::shrink_significand(rhs_sig, rhs_exp), rhs_exp, true};
-    }
-    else if (delta_exp == detail::precision + 1)
-    {
-        // Only need to see if we need to add one to the
-        // significand of the bigger value
-        //
-        // e.g. 1.234567e5 - 9.876543e-2 = 1.234566e5
-
-        if (rhs_sig >= UINT32_C(5'000'000))
-        {
-            --lhs_sig;
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
-        else
-        {
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
     }
 
     // The two numbers can be subtracted together without special handling
@@ -1561,8 +1546,6 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
 {
     using Conversion_Type = std::conditional_t<(std::numeric_limits<TargetType>::max() < 9'999'999), std::int32_t, TargetType>;
 
-    const auto this_is_neg {static_cast<bool>(this->bits_.sign)};
-
     constexpr decimal32 max_target_type { (std::numeric_limits<TargetType>::max)() };
     constexpr decimal32 min_target_type { (std::numeric_limits<TargetType>::min)()};
 
@@ -1576,16 +1559,7 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
         errno = ERANGE;
         return static_cast<TargetType>(0);
     }
-
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_unsigned<TargetType>::value)
-    {
-        if (this_is_neg)
-        {
-            errno = ERANGE;
-            return static_cast<TargetType>(0);
-        }
-    }
-
+    
     auto result = static_cast<Conversion_Type>(this->full_significand());
     int expval {static_cast<int>(this->unbiased_exponent()) - detail::bias};
     if (expval > 0)
@@ -1599,7 +1573,7 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
     {
-        result = this_is_neg ? detail::apply_sign(result) : result;
+        result = static_cast<bool>(this->bits_.sign) ? detail::apply_sign(result) : result;
     }
 
     return static_cast<TargetType>(result);
@@ -1987,13 +1961,10 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 
     const auto lhs_fp {fpclassify(lhs)};
 
-    if (lhs_fp == FP_NAN)
-    {
-        return nan;
-    }
-
     switch (lhs_fp)
     {
+        case FP_NAN:
+            return nan;
         case FP_INFINITE:
             return inf;
         case FP_ZERO:
@@ -2120,7 +2091,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal32::floating_conversion_impl() const n
         result = static_cast<T>(detail::fast_float::compute_float64(this->biased_exponent(), this->full_significand(), this->isneg(), success));
     }
 
-    if (!success)
+    if (BOOST_DECIMAL_UNLIKELY(!success))
     {
         errno = EINVAL;
         return 0;
@@ -2305,12 +2276,6 @@ constexpr auto strtod32(const char* str, char** endptr) noexcept -> decimal32
 
     const auto buffer_len {detail::strlen(str)};
 
-    if (buffer_len == 0)
-    {
-        errno = EINVAL;
-        return from_bits(boost::decimal::detail::d32_snan_mask);
-    }
-
     const auto r {detail::parser(str, str + buffer_len, sign, significand, expval)};
     decimal32 d;
 
@@ -2342,7 +2307,11 @@ constexpr auto strtod32(const char* str, char** endptr) noexcept -> decimal32
         d = decimal32(significand, expval, sign);
     }
 
-    *endptr = const_cast<char*>(str + (r.ptr - str));
+    if (endptr != nullptr)
+    {
+        *endptr = const_cast<char*>(str + (r.ptr - str));
+    }
+
     return d;
 }
 
@@ -2371,7 +2340,11 @@ constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decima
     char* short_endptr {};
     const auto return_val {strtod32(buffer, &short_endptr)};
 
-    *endptr = const_cast<wchar_t*>(str + (short_endptr - buffer));
+    if (endptr != nullptr)
+    {
+        *endptr = const_cast<wchar_t*>(str + (short_endptr - buffer));
+    }
+
     return return_val;
 }
 

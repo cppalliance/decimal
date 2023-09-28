@@ -15,6 +15,11 @@ using namespace boost::decimal;
 
 static constexpr std::size_t N = 1024; // Number of trials
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4146)
+#endif
+
 template <typename T>
 void test_conversion_to_integer()
 {
@@ -56,6 +61,18 @@ void test_conversion_to_integer()
 
     constexpr decimal32 one_e_8_2(1'000'000, 2);
     BOOST_TEST_EQ(static_cast<T>(one_e_8_2), static_cast<T>(100'000'000)) && BOOST_TEST_EQ(errno, 0);
+
+    // Edge case
+    std::mt19937_64 rng(42);
+    std::uniform_int_distribution<int> dist(-100, -20);
+    errno = 0;
+    BOOST_TEST_EQ(static_cast<unsigned>(decimal32(dist(rng))), static_cast<unsigned>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+
+    errno = 0;
+    BOOST_TEST_EQ(static_cast<unsigned long>(decimal32(dist(rng))), static_cast<unsigned long>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+
+    errno = 0;
+    BOOST_TEST_EQ(static_cast<unsigned long long>(decimal32(dist(rng))), static_cast<unsigned long long>(0)) && BOOST_TEST_EQ(errno, ERANGE);
 }
 
 template <typename T>
@@ -260,3 +277,7 @@ int main()
 
     return boost::report_errors();
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
