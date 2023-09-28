@@ -2104,7 +2104,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal32::floating_conversion_impl() const n
         result = static_cast<T>(detail::fast_float::compute_float64(this->biased_exponent(), this->full_significand(), this->isneg(), success));
     }
 
-    if (!success)
+    if (BOOST_DECIMAL_UNLIKELY(!success))
     {
         errno = EINVAL;
         return 0;
