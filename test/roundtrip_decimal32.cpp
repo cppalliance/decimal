@@ -60,8 +60,14 @@ void test_conversion_to_integer()
     // Edge case
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<int> dist(-100, -20);
-    const decimal32 neg_val {dist(rng)};
-    BOOST_TEST_EQ(static_cast<unsigned>(neg_val), static_cast<unsigned>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    errno = 0;
+    BOOST_TEST_EQ(static_cast<unsigned>(decimal32(dist(rng))), static_cast<unsigned>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+
+    errno = 0;
+    BOOST_TEST_EQ(static_cast<unsigned long>(decimal32(dist(rng))), static_cast<unsigned long>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+
+    errno = 0;
+    BOOST_TEST_EQ(static_cast<unsigned long long>(decimal32(dist(rng))), static_cast<unsigned long long>(0)) && BOOST_TEST_EQ(errno, ERANGE);
 }
 
 template <typename T>

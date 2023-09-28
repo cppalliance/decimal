@@ -1561,16 +1561,7 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
         errno = ERANGE;
         return static_cast<TargetType>(0);
     }
-
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_unsigned<TargetType>::value)
-    {
-        if (this_is_neg)
-        {
-            errno = ERANGE;
-            return static_cast<TargetType>(0);
-        }
-    }
-
+    
     auto result = static_cast<Conversion_Type>(this->full_significand());
     int expval {static_cast<int>(this->unbiased_exponent()) - detail::bias};
     if (expval > 0)
