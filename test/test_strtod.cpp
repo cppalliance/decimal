@@ -81,6 +81,9 @@ void test_strtod_edges()
     BOOST_TEST(isnan(boost::decimal::strtod(nullptr, nullptr))) && BOOST_TEST_EQ(errno, EINVAL);
 
     errno = 0;
+    BOOST_TEST(isnan(boost::decimal::wcstod(nullptr, nullptr))) && BOOST_TEST_EQ(errno, EINVAL);
+
+    errno = 0;
     const char* snan_str = "nan(snan)";
     BOOST_TEST(isnan(boost::decimal::strtod(snan_str, nullptr))) && BOOST_TEST_EQ(errno, 0);
 
