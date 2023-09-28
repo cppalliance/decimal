@@ -56,6 +56,9 @@ void test_conversion_to_integer()
 
     constexpr decimal32 one_e_8_2(1'000'000, 2);
     BOOST_TEST_EQ(static_cast<T>(one_e_8_2), static_cast<T>(100'000'000)) && BOOST_TEST_EQ(errno, 0);
+
+    // Edge case
+    BOOST_TEST_EQ(static_cast<unsigned>(-one), static_cast<unsigned>(0)) && BOOST_TEST_EQ(errno, ERANGE);
 }
 
 template <typename T>
