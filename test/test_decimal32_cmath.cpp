@@ -124,26 +124,29 @@ void test_isunordered()
 template <typename Dec>
 void test_floor()
 {
-    BOOST_TEST(isnan(floor(BOOST_DECIMAL_DEC_NAN)));
-    BOOST_TEST(isnan(floor(-BOOST_DECIMAL_DEC_NAN)));
-    BOOST_TEST(isinf(floor(BOOST_DECIMAL_DEC_INFINITY)));
-    BOOST_TEST(isinf(floor(-BOOST_DECIMAL_DEC_INFINITY)));
-    BOOST_TEST_EQ(floor(Dec(0, 0)), Dec(0, 0));
-    BOOST_TEST_EQ(floor(Dec(-0, 0)), Dec(-0, 0));
+    std::mt19937_64 rng;
+    std::uniform_int_distribution<int> dist(1, 1);
 
-    BOOST_TEST_EQ(floor(Dec(27, -1)), Dec(2, 0));
-    BOOST_TEST_EQ(floor(Dec(-27, -1)), Dec(-3, 0));
-    BOOST_TEST_EQ(floor(Dec(27777, -4)), Dec(2, 0));
-    BOOST_TEST_EQ(floor(Dec(-27777, -4)), Dec(-3, 0));
+    BOOST_TEST(isnan(floor(BOOST_DECIMAL_DEC_NAN * dist(rng))));
+    BOOST_TEST(isnan(floor(-BOOST_DECIMAL_DEC_NAN * dist(rng))));
+    BOOST_TEST(isinf(floor(BOOST_DECIMAL_DEC_INFINITY * dist(rng))));
+    BOOST_TEST(isinf(floor(-BOOST_DECIMAL_DEC_INFINITY * dist(rng))));
+    BOOST_TEST_EQ(floor(Dec(0, 0) * dist(rng)), Dec(0, 0));
+    BOOST_TEST_EQ(floor(Dec(-0, 0) * dist(rng)), Dec(-0, 0));
+
+    BOOST_TEST_EQ(floor(Dec(27, -1)), Dec(2, 0) * dist(rng));
+    BOOST_TEST_EQ(floor(Dec(-27, -1)), Dec(-3, 0) * dist(rng));
+    BOOST_TEST_EQ(floor(Dec(27777, -4)), Dec(2, 0) * dist(rng));
+    BOOST_TEST_EQ(floor(Dec(-27777, -4)), Dec(-3, 0) * dist(rng));
 
     // Bigger numbers
-    BOOST_TEST_EQ(floor(Dec(27777, -2)), Dec(277, 0));
-    BOOST_TEST_EQ(floor(Dec(-27777, -2)), Dec(-277, 0));
-    BOOST_TEST_EQ(floor(Dec(27777, -1)), Dec(2777, 0));
+    BOOST_TEST_EQ(floor(Dec(27777, -2)), Dec(277, 0) * dist(rng));
+    BOOST_TEST_EQ(floor(Dec(-27777, -2)), Dec(-277, 0) * dist(rng));
+    BOOST_TEST_EQ(floor(Dec(27777, -1)), Dec(2777, 0) * dist(rng));
 
     // Near zero
-    BOOST_TEST_EQ(floor(Dec(3, -1)), Dec(0, 0));
-    BOOST_TEST_EQ(floor(Dec(-3, -1)), Dec(-1, 0));
+    BOOST_TEST_EQ(floor(Dec(3, -1)), Dec(0, 0) * dist(rng));
+    BOOST_TEST_EQ(floor(Dec(-3, -1)), Dec(-1, 0) * dist(rng));
 }
 
 template <typename Dec>
