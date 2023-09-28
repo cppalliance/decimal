@@ -1546,8 +1546,6 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
 {
     using Conversion_Type = std::conditional_t<(std::numeric_limits<TargetType>::max() < 9'999'999), std::int32_t, TargetType>;
 
-    const auto this_is_neg {static_cast<bool>(this->bits_.sign)};
-
     constexpr decimal32 max_target_type { (std::numeric_limits<TargetType>::max)() };
     constexpr decimal32 min_target_type { (std::numeric_limits<TargetType>::min)()};
 
@@ -1575,7 +1573,7 @@ constexpr auto decimal32::to_integral() const noexcept -> TargetType
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
     {
-        result = this_is_neg ? detail::apply_sign(result) : result;
+        result = static_cast<bool>(this->bits_.sign) ? detail::apply_sign(result) : result;
     }
 
     return static_cast<TargetType>(result);
