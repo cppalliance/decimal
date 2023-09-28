@@ -58,7 +58,10 @@ void test_conversion_to_integer()
     BOOST_TEST_EQ(static_cast<T>(one_e_8_2), static_cast<T>(100'000'000)) && BOOST_TEST_EQ(errno, 0);
 
     // Edge case
-    BOOST_TEST_EQ(static_cast<unsigned>(-one), static_cast<unsigned>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    std::mt19937_64 rng(42);
+    std::uniform_int_distribution<int> dist(-100, -20);
+    const decimal32 neg_val {dist(rng)};
+    BOOST_TEST_EQ(static_cast<unsigned>(neg_val), static_cast<unsigned>(0)) && BOOST_TEST_EQ(errno, ERANGE);
 }
 
 template <typename T>
