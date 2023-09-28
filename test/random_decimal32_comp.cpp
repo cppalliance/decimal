@@ -35,6 +35,10 @@ void random_LT(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    // Edge cases
+    BOOST_TEST(decimal32(dist(rng)) < std::numeric_limits<decimal32>::infinity());
+    BOOST_TEST(!(decimal32(dist(rng)) < -std::numeric_limits<decimal32>::infinity()));
 }
 
 template <typename T>
