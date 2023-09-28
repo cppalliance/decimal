@@ -14,6 +14,12 @@ static constexpr auto N {1024U};
 // NOLINTNEXTLINE : Seed with a constant for repeatability
 static std::mt19937_64 rng(42); // NOSONAR : Global rng is not const
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4146)
+#endif
+
+
 template <typename T>
 void random_addition(T lower, T upper)
 {
@@ -393,3 +399,8 @@ int main()
 
     return boost::report_errors();
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
+
