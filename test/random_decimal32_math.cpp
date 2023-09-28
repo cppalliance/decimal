@@ -270,8 +270,8 @@ void random_mixed_division(T lower, T upper)
     const decimal32 val1 {dist(rng)};
     const decimal32 zero {0, 0};
     BOOST_TEST(isnan(val1 / zero));
-    BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() / val1));
-    BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() / val1));
+    BOOST_TEST(isnan((std::numeric_limits<decimal32>::quiet_NaN() * dist(rng)) / val1));
+    BOOST_TEST(isinf((std::numeric_limits<decimal32>::infinity() * dist(rng)) / val1));
 }
 
 int main()

@@ -1972,13 +1972,10 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 
     const auto lhs_fp {fpclassify(lhs)};
 
-    if (lhs_fp == FP_NAN)
-    {
-        return nan;
-    }
-
     switch (lhs_fp)
     {
+        case FP_NAN:
+            return nan;
         case FP_INFINITE:
             return inf;
         case FP_ZERO:
