@@ -1255,6 +1255,19 @@ void test_nexttoward()
     BOOST_TEST_EQ(nexttoward(Dec(0), -1), -std::numeric_limits<Dec>::epsilon());
 }
 
+template <typename T>
+void test_pow()
+{
+    std::mt19937_64 rng;
+    std::uniform_int_distribution<int> dist(1, 1);
+
+    const T two {2, 0};
+    BOOST_TEST_EQ(pow(two, dist(rng)), two);
+    BOOST_TEST_EQ(pow(two, 2 * dist(rng)), two * two);
+    BOOST_TEST_EQ(pow(two, 3 * dist(rng)), two * two * two);
+    BOOST_TEST_EQ(pow(two, 4 * dist(rng)), two * two * two * two);
+}
+
 int main()
 {
 
@@ -1309,6 +1322,8 @@ int main()
 
     test_nextafter<decimal32>();
     test_nexttoward<decimal32>();
+
+    test_pow<decimal32>();
 
     return boost::report_errors();
 }
