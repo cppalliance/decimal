@@ -20,7 +20,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto compute_float32(std::int64_t power, std::uint
     const double d = compute_float64(power, i, negative, success);
     float return_val {};
 
-    if (success)
+    if (BOOST_DECIMAL_LIKELY(success))
     {
         return_val = static_cast<float>(d);
 
@@ -36,12 +36,6 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto compute_float32(std::int64_t power, std::uint
             return_val = negative ? -HUGE_VALF : HUGE_VALF;
             success = true;
         }
-    }
-    else if (power > 38)
-    {
-
-        return_val = negative ? -HUGE_VALF : HUGE_VALF;
-        success = true;
     }
 
     return return_val;
