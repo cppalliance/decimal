@@ -123,6 +123,10 @@ void test_parser()
     const char* big_sig_with_frac = "123456789012345678901234567890.123";
     res = parser(big_sig_with_frac, big_sig_with_frac + std::strlen(big_sig_with_frac), sign, sig, exp);
     BOOST_TEST(res.ec == std::errc());
+
+    const char* big_exp = "12345.6789e+1000000";
+    res = parser(big_exp, big_exp + std::strlen(big_exp), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc::result_out_of_range);
 }
 
 void test_from_chars()
