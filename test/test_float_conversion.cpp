@@ -55,8 +55,8 @@ void test_compute_float64()
     BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), false, success), HUGE_VALF);
     BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), true, success), -HUGE_VALF);
     BOOST_TEST_EQ(compute_float64(-325, 5 * dist(gen), false, success), 0);
-    BOOST_TEST_EQ(compute_float64(dist(gen), 0, false, success), 0);
-    BOOST_TEST_EQ(compute_float64(dist(gen), 0, true, success), 0);
+    BOOST_TEST_EQ(compute_float64(dist(gen) * 50, 0, false, success), 0);
+    BOOST_TEST_EQ(compute_float64(dist(gen) * 50, 0, true, success), 0);
     BOOST_TEST_EQ(compute_float64(300, UINT64_MAX, false, success), 0 * dist(gen));
 
     // Composite
