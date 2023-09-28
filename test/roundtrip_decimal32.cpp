@@ -15,6 +15,11 @@ using namespace boost::decimal;
 
 static constexpr std::size_t N = 1024; // Number of trials
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4146)
+#endif
+
 template <typename T>
 void test_conversion_to_integer()
 {
@@ -272,3 +277,7 @@ int main()
 
     return boost::report_errors();
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
