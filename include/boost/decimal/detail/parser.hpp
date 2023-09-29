@@ -50,7 +50,7 @@ auto from_chars_dispatch(const char* first, const char* last, boost::uint128_typ
 template <typename Unsigned_Integer, typename Integer>
 constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent) noexcept -> from_chars_result
 {
-    if (first > last)
+    if (first >= last)
     {
         return {first, std::errc::invalid_argument};
     }
@@ -111,6 +111,11 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
 
     if (next == last || *next == exp_char || *next == -capital_exp_char)
     {
+        if (next == first)
+        {
+            return {first, std::errc::invalid_argument};
+        }
+        
         significand = 0;
         exponent = 0;
         return {next, std::errc()};
@@ -231,12 +236,6 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     }
     else if (*next == exp_char || *next == capital_exp_char)
     {
-        // Would be a number without a significand e.g. e+03
-        if (next == first)
-        {
-            return {next, std::errc::invalid_argument};
-        }
-
         ++next;
 
         exponent = static_cast<Integer>(i - 1);

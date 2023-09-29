@@ -127,6 +127,14 @@ void test_parser()
     const char* big_exp = "12345.6789e+1000000";
     res = parser(big_exp, big_exp + std::strlen(big_exp), sign, sig, exp);
     BOOST_TEST(res.ec == std::errc::result_out_of_range);
+
+    const char* zeros = "0.00000000";
+    res = parser(zeros, zeros + std::strlen(zeros), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* only_exp = "e+03";
+    res = parser(only_exp, only_exp + std::strlen(only_exp), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc::invalid_argument);
 }
 
 void test_from_chars()
