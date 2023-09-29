@@ -472,7 +472,7 @@ template <typename Dec>
 void test_remquo()
 {
     std::mt19937_64 rng(42);
-    std::uniform_real_distribution<float> dist(1e2F, 1e3F);
+    std::uniform_real_distribution<float> dist(-1e3F, 1e3F);
 
     for (std::size_t n {}; n < N; ++n)
     {
@@ -486,7 +486,7 @@ void test_remquo()
         auto ret_val {std::remquo(val1, val2, &flt_int)};
         auto ret_dec {static_cast<float>(remquo(d1, d2, &dec_int))};
 
-        if (!(BOOST_TEST(std::fabs(boost::math::float_distance(ret_val, ret_dec)) < 2000) &&
+        if ((!BOOST_TEST(std::fabs(ret_val - ret_dec) < 0.005) &&
              (BOOST_TEST(flt_int == dec_int))))
         {
             std::cerr << "Val 1: " << val1
