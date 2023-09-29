@@ -55,8 +55,8 @@ void test_compute_float64()
     BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), false, success), HUGE_VALF);
     BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), true, success), -HUGE_VALF);
     BOOST_TEST_EQ(compute_float64(-325, 5 * dist(gen), false, success), 0);
-    BOOST_TEST_EQ(compute_float64(dist(gen), 0, false, success), 0);
-    BOOST_TEST_EQ(compute_float64(dist(gen), 0, true, success), 0);
+    BOOST_TEST_EQ(compute_float64(dist(gen) * 50, 0, false, success), 0);
+    BOOST_TEST_EQ(compute_float64(dist(gen) * 50, 0, true, success), 0);
     BOOST_TEST_EQ(compute_float64(300, UINT64_MAX, false, success), 0 * dist(gen));
 
     // Composite
@@ -122,6 +122,38 @@ void test_parser()
 
     const char* big_sig_with_frac = "123456789012345678901234567890.123";
     res = parser(big_sig_with_frac, big_sig_with_frac + std::strlen(big_sig_with_frac), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* big_exp = "12345.6789e+1000000";
+    res = parser(big_exp, big_exp + std::strlen(big_exp), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc::result_out_of_range);
+
+    const char* zeros = "0.00000000";
+    res = parser(zeros, zeros + std::strlen(zeros), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* only_exp = "e+03";
+    res = parser(only_exp, only_exp + std::strlen(only_exp), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc::invalid_argument);
+
+    const char* fives = "5.555555555555555555555555555555e+05";
+    res = parser(fives, fives + std::strlen(fives), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* sixes = "6.6666666666666666666666666666666e+06";
+    res = parser(sixes, sixes + std::strlen(sixes), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* sevens = "7.777777777777777777777777777777e+07";
+    res = parser(sevens, sevens + std::strlen(sevens), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* eights = "8.888888888888888888888888888888e+08";
+    res = parser(eights, eights + std::strlen(eights), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* nines = "9.99999999999999999999999999999999e+09";
+    res = parser(nines, nines + std::strlen(nines), sign, sig, exp);
     BOOST_TEST(res.ec == std::errc());
 }
 
