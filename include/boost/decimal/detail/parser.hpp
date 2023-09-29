@@ -146,15 +146,8 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         std::size_t offset = i;
 
         from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
-        switch (r.ec)
-        {
-            case std::errc::invalid_argument:
-                return {first, std::errc::invalid_argument};
-            case std::errc::result_out_of_range:
-                return {next, std::errc::result_out_of_range};
-            default:
-                return {next, std::errc()};
-        }
+        assert(r.ec == std::errc());
+        return {next, r.ec};
     }
     else if (*next == '.')
     {
@@ -264,16 +257,8 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         // See GitHub issue #29: https://github.com/cppalliance/charconv/issues/29
         if (offset != 0)
         {
-            from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
-            switch (r.ec)
-            {
-                case std::errc::invalid_argument:
-                    return {first, std::errc::invalid_argument};
-                case std::errc::result_out_of_range:
-                    return {next, std::errc::result_out_of_range};
-                default:
-                    break;
-            }
+            BOOST_DECIMAL_ATTRIBUTE_UNUSED from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
+            assert(r.ec == std::errc());
 
             if (round)
             {
@@ -340,29 +325,22 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     }
 
     const auto r = from_chars(exponent_buffer, exponent_buffer + i, exponent);
+    assert(r.ec == std::errc());
 
     exponent += leading_zero_powers;
 
-    switch (r.ec)
+    if (fractional)
     {
-        case std::errc::invalid_argument:
-            return {first, std::errc::invalid_argument};
-        case std::errc::result_out_of_range:
-            return {next, std::errc::result_out_of_range};
-        default:
-            if (fractional)
-            {
-                // Need to take the offset from 1.xxx because compute_floatXXX assumes the significand is an integer
-                // so the exponent is off by the number of digits in the significand - 1
-                exponent -= static_cast<Integer>(significand_digits - dot_position);
-            }
-            else
-            {
-                exponent += extra_zeros;
-            }
-
-            return {next, std::errc()};
+        // Need to take the offset from 1.xxx because compute_floatXXX assumes the significand is an integer
+        // so the exponent is off by the number of digits in the significand - 1
+        exponent -= static_cast<Integer>(significand_digits - dot_position);
     }
+    else
+    {
+        exponent += extra_zeros;
+    }
+
+    return {next, r.ec};
 }
 
 } // namespace detail
