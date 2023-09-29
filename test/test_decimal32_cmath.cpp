@@ -438,7 +438,7 @@ template <typename Dec>
 void test_remainder()
 {
     std::mt19937_64 rng(42);
-    std::uniform_real_distribution<float> dist(1e2F, 1e3F);
+    std::uniform_real_distribution<float> dist(-1e3F, 1e3F);
 
     for (std::size_t n {}; n < N; ++n)
     {
@@ -450,7 +450,7 @@ void test_remainder()
         auto ret_val {std::remainder(val1, val2)};
         auto ret_dec {static_cast<float>(remainder(d1, d2))};
 
-        if (!BOOST_TEST(std::fabs(boost::math::float_distance(ret_val, ret_dec)) < 2000))
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 0.005))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
