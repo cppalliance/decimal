@@ -135,6 +135,26 @@ void test_parser()
     const char* only_exp = "e+03";
     res = parser(only_exp, only_exp + std::strlen(only_exp), sign, sig, exp);
     BOOST_TEST(res.ec == std::errc::invalid_argument);
+
+    const char* fives = "5.555555555555555555555555555555e+05";
+    res = parser(fives, fives + std::strlen(fives), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* sixes = "6.6666666666666666666666666666666e+06";
+    res = parser(sixes, sixes + std::strlen(sixes), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* sevens = "7.777777777777777777777777777777e+07";
+    res = parser(sevens, sevens + std::strlen(sevens), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* eights = "8.888888888888888888888888888888e+08";
+    res = parser(eights, eights + std::strlen(eights), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
+
+    const char* nines = "9.99999999999999999999999999999999e+09";
+    res = parser(nines, nines + std::strlen(nines), sign, sig, exp);
+    BOOST_TEST(res.ec == std::errc());
 }
 
 void test_from_chars()
