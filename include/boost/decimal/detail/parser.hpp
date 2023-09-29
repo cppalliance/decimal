@@ -236,7 +236,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         bool round = false;
         // If more digits are present than representable in the significand of the target type
         // we set the maximum
-        if (offset > significand_buffer_size)
+        if (offset == significand_buffer_size)
         {
             offset = significand_buffer_size - 1;
             i = significand_buffer_size;
