@@ -190,7 +190,7 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
         // If the coefficient fits directly we don't need to use the combination field
         bits_.significand = reduced_coeff;
     }
-    else if (reduced_coeff <= detail::d32_big_combination)
+    else if (reduced_coeff <= detail::d64_big_combination)
     {
         // Break the number into 3 bits for the combination field and 50 bits for the significand field
 
