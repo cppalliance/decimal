@@ -6,6 +6,8 @@
 #define BOOST_DECIMAL_HPP
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
+#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/cmath.hpp>
 #include <boost/decimal/cstdlib.hpp>
 #include <boost/decimal/fenv.hpp>

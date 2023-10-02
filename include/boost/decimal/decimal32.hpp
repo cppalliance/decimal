@@ -42,7 +42,7 @@ namespace boost { namespace decimal {
 
 namespace detail {
 
-// See section 3.5.2
+// See IEEE 754 section 3.5.2
 static constexpr auto d32_inf_mask      = UINT32_C(0b0'11110'000000'0000000000'0000000000);
 static constexpr auto d32_nan_mask      = UINT32_C(0b0'11111'000000'0000000000'0000000000);
 static constexpr auto d32_snan_mask     = UINT32_C(0b0'11111'100000'0000000000'0000000000);
