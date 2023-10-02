@@ -124,6 +124,10 @@ private:
 
     data_layout_ bits_ {};
 
+    // Debug bit pattern
+    friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
@@ -281,6 +285,24 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
             bits_.combination_field = detail::d64_comb_inf_mask;
         }
     }
+}
+
+constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
+{
+    decimal64 result;
+
+    result.bits_.exponent          = (bits & detail::d64_construct_sign_mask) >> 63U;
+    result.bits_.combination_field = (bits & detail::d64_construct_combination_mask) >> 58U;
+    result.bits_.exponent          = (bits & detail::d64_construct_exp_mask) >> 50U;
+    result.bits_.significand       =  bits & detail::d64_construct_significand_mask;
+
+    return result;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
+{
+    const auto bits {detail::bit_cast<std::uint64_t>(rhs.bits_)};
+    return bits;
 }
 
 } //namespace decimal
