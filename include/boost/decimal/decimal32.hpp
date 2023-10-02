@@ -482,7 +482,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     static_assert(detail::is_integral_v<T2>, "Exponent must be an integer");
 
     Unsigned_Integer unsigned_coeff {};
-    BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T>::is_signed)
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T>)
     {
         bits_.sign = coeff < 0 || sign;
         unsigned_coeff =
