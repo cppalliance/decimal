@@ -10,6 +10,7 @@
 namespace boost { namespace decimal {
 
 class decimal32;
+class decimal64;
 
 } // namespace decimal
 } // namespace boost
@@ -17,10 +18,17 @@ class decimal32;
 namespace std {
 
 template <>
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal32>;
 #else
 struct numeric_limits<boost::decimal::decimal32>;
+#endif
+
+template <>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal64>;
+#else
+struct numeric_limits<boost::decimal::decimal64>;
 #endif
 
 } // Namespace std
