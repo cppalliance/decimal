@@ -124,6 +124,11 @@ private:
 
     data_layout_ bits_ {};
 
+    // Returns the un-biased (quantum) exponent
+    constexpr auto unbiased_exponent() const noexcept -> std::uint64_t;
+
+    // Returns the biased exponent
+    constexpr auto biased_exponent() const noexcept -> std::int32_t;
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
@@ -285,6 +290,31 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
             bits_.combination_field = detail::d64_comb_inf_mask;
         }
     }
+}
+
+constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
+{
+    std::uint64_t expval {};
+
+    if ((bits_.combination_field & detail::d64_comb_11_mask) == 0b11000)
+    {
+        // bits 2 and 3 are the exp part of the combination field
+        expval |= (bits_.combination_field & detail::d64_comb_11_exp_bits) << 5;
+    }
+    else
+    {
+        // bits 0 and 1 are the exp part of the combination field
+        expval |= (bits_.combination_field & detail::d64_comb_11_mask) << 3;
+    }
+
+    expval |= bits_.exponent;
+
+    return expval;
+}
+
+constexpr auto decimal64::biased_exponent() const noexcept -> std::int32_t
+{
+    return static_cast<std::int32_t>(unbiased_exponent()) - detail::bias_v<decimal64>;
 }
 
 constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
