@@ -42,7 +42,7 @@ namespace boost { namespace decimal {
 
 namespace detail {
 
-// See section 3.5.2
+// See IEEE 754 section 3.5.2
 static constexpr auto d32_inf_mask      = UINT32_C(0b0'11110'000000'0000000000'0000000000);
 static constexpr auto d32_nan_mask      = UINT32_C(0b0'11111'000000'0000000000'0000000000);
 static constexpr auto d32_snan_mask     = UINT32_C(0b0'11111'100000'0000000000'0000000000);
@@ -86,8 +86,8 @@ static constexpr std::uint32_t d32_max_exp_no_combination = 0b111111;
 static constexpr std::uint32_t d32_exp_combination_field_mask = d32_max_exp_no_combination;
 static constexpr std::uint32_t d32_exp_one_combination = 0b1'111111;
 static constexpr std::uint32_t d32_max_biased_exp = 0b10'111111;
-static constexpr std::uint32_t d32_small_combination_field_mask = 0b0000'0000'0111'0000'0000'0000'0000'0000;
-static constexpr std::uint32_t d32_big_combination_field_mask = 0b0000'0000'0001'0000'0000'0000'0000'0000;
+static constexpr std::uint32_t d32_small_combination_field_mask = 0b0'00000'000111'0000000000'0000000000;
+static constexpr std::uint32_t d32_big_combination_field_mask = 0b0'00000'000001'0000000000'0000000000;
 
 // Constexpr construction from an uint32_t without having to memcpy
 static constexpr std::uint32_t d32_construct_sign_mask = 0b1'00000'000000'0000000000'0000000000;
@@ -482,7 +482,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     static_assert(detail::is_integral_v<T2>, "Exponent must be an integer");
 
     Unsigned_Integer unsigned_coeff {};
-    BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T>::is_signed)
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T>)
     {
         bits_.sign = coeff < 0 || sign;
         unsigned_coeff =
