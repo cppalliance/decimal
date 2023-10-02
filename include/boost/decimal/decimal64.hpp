@@ -127,7 +127,161 @@ private:
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
+
+    // 3.2.5 initialization from coefficient and exponent:
+    template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
+    constexpr decimal64(T1 coeff, T2 exp, bool sign = false) noexcept;
 };
+
+// 3.2.5 initialization from coefficient and exponent:
+template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool>>
+constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
+{
+    using Unsigned_Integer = detail::make_unsigned_t<T1>;
+
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T1>)
+    {
+        bits_.sign = coeff < 0 || sign;
+    }
+    else
+    {
+        bits_.sign = sign;
+    }
+
+    Unsigned_Integer unsigned_coeff = detail::make_positive_unsigned(coeff);
+
+    // If the coeff is not in range make it so
+    auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
+    const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal64>};
+    while (unsigned_coeff_digits > detail::precision_v<decimal64> + 1)
+    {
+        unsigned_coeff /= 10;
+        ++exp;
+        --unsigned_coeff_digits;
+    }
+
+    // Round as required
+    if (reduced)
+    {
+        exp += detail::fenv_round(unsigned_coeff, bits_.sign);
+    }
+
+    auto reduced_coeff {static_cast<std::uint64_t>(unsigned_coeff)};
+
+    // zero the combination field, so we can mask in the following values
+    bits_.combination_field = 0;
+    bits_.significand = 0;
+    bits_.exponent = 0;
+    bool big_combination {false};
+
+    if (reduced_coeff == 0)
+    {
+        bits_.significand = 0U;
+        bits_.combination_field = 0U;
+
+        exp = 0;
+    }
+    else if (reduced_coeff <= detail::d64_no_combination)
+    {
+        // If the coefficient fits directly we don't need to use the combination field
+        bits_.significand = reduced_coeff;
+    }
+    else if (reduced_coeff <= detail::d32_big_combination)
+    {
+        // Break the number into 3 bits for the combination field and 50 bits for the significand field
+
+        // Use the least significant 50 bits to set the significand
+        bits_.significand = reduced_coeff & detail::d64_no_combination;
+
+        // Now set the combination field (maximum of 3 bits)
+        auto remaining_bits {reduced_coeff & detail::d64_small_combination_field_mask};
+        remaining_bits >>= 50;
+
+        bits_.combination_field |= remaining_bits;
+    }
+    else
+    {
+        // Have to use the full combination field
+        bits_.combination_field |= detail::d64_comb_11_mask;
+        big_combination = true;
+
+        bits_.significand = reduced_coeff & detail::d64_no_combination;
+        const auto remaining_bit {reduced_coeff & detail::d64_big_combination_field_mask};
+
+        if (remaining_bit)
+        {
+            bits_.combination_field |= 1U;
+        }
+    }
+
+    // If the exponent fits we do not need to use the combination field
+    auto biased_exp {static_cast<std::uint64_t>(exp + detail::bias_v<decimal64>)};
+    const auto biased_exp_low_eight {biased_exp & detail::d64_exp_combination_field_mask};
+
+    if (biased_exp <= detail::d64_max_exp_no_combination)
+    {
+        bits_.exponent = biased_exp;
+    }
+    else if (biased_exp <= detail::d64_exp_one_combination)
+    {
+        if (big_combination)
+        {
+            bits_.combination_field |= detail::d64_comb_1101_mask;
+        }
+        else
+        {
+            bits_.combination_field |= detail::d64_comb_01_mask;
+        }
+
+        bits_.exponent = biased_exp_low_eight;
+    }
+    else if (biased_exp <= detail::d64_max_biased_exp)
+    {
+        if (big_combination)
+        {
+            bits_.combination_field |= detail::d64_comb_1110_mask;
+        }
+        else
+        {
+            bits_.combination_field |= detail::d64_comb_10_mask;
+        }
+
+        bits_.exponent = biased_exp_low_eight;
+    }
+    else
+    {
+        // The value is probably infinity
+
+        // If we can offset some extra power in the coefficient try to do so
+        const auto coeff_dig {detail::num_digits(reduced_coeff)};
+        if (coeff_dig < detail::precision_v<decimal64>)
+        {
+            for (auto i {coeff_dig}; i <= detail::precision_v<decimal64>; ++i)
+            {
+                reduced_coeff *= 10;
+                --biased_exp;
+                --exp;
+                if (biased_exp == detail::d64_max_biased_exp)
+                {
+                    break;
+                }
+            }
+
+            if (detail::num_digits(reduced_coeff) <= detail::precision_v<decimal64>)
+            {
+                *this = decimal64(reduced_coeff, exp, static_cast<bool>(bits_.sign));
+            }
+            else
+            {
+                bits_.combination_field = detail::d64_comb_inf_mask;
+            }
+        }
+        else
+        {
+            bits_.combination_field = detail::d64_comb_inf_mask;
+        }
+    }
+}
 
 } //namespace decimal
 } //namespace boost
