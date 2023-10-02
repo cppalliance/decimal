@@ -129,6 +129,10 @@ private:
 
     // Returns the biased exponent
     constexpr auto biased_exponent() const noexcept -> std::int32_t;
+
+    // Returns the significand complete with the bits implied from the combination field
+    constexpr auto full_significand() const noexcept -> std::uint64_t;
+
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
@@ -296,7 +300,7 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
 {
     std::uint64_t expval {};
 
-    if ((bits_.combination_field & detail::d64_comb_11_mask) == 0b11000)
+    if ((bits_.combination_field & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
     {
         // bits 2 and 3 are the exp part of the combination field
         expval |= (bits_.combination_field & detail::d64_comb_11_exp_bits) << 5;
@@ -315,6 +319,32 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
 constexpr auto decimal64::biased_exponent() const noexcept -> std::int32_t
 {
     return static_cast<std::int32_t>(unbiased_exponent()) - detail::bias_v<decimal64>;
+}
+
+constexpr auto decimal64::full_significand() const noexcept -> std::uint64_t
+{
+    std::uint64_t significand {};
+
+    if ((bits_.combination_field & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
+    {
+        // Only need the one bit of T because the other 3 are implied
+        if (bits_.combination_field & detail::d64_comb_11_significand_bits)
+        {
+            significand = 0b1001'0000000000'0000000000'0000000000'0000000000'0000000000;
+        }
+        else
+        {
+            significand = 0b1000'0000000000'0000000000'0000000000'0000000000'0000000000;
+        }
+    }
+    else
+    {
+        significand |= ((bits_.combination_field & UINT64_C(0b00111)) << 50);
+    }
+
+    significand |= bits_.significand;
+
+    return significand;
 }
 
 constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
