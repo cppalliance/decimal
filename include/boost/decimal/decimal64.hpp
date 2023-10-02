@@ -132,6 +132,7 @@ private:
 
     // Returns the significand complete with the bits implied from the combination field
     constexpr auto full_significand() const noexcept -> std::uint64_t;
+    constexpr auto isneg() const noexcept -> bool;
 
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;
@@ -345,6 +346,11 @@ constexpr auto decimal64::full_significand() const noexcept -> std::uint64_t
     significand |= bits_.significand;
 
     return significand;
+}
+
+constexpr auto decimal64::isneg() const noexcept -> bool
+{
+    return static_cast<bool>(bits_.sign);
 }
 
 constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
