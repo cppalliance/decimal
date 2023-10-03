@@ -136,11 +136,17 @@ private:
     constexpr auto full_significand() const noexcept -> std::uint64_t;
     constexpr auto isneg() const noexcept -> bool;
 
+    // Attempts conversion to integral type:
+    // If this is nan sets errno to EINVAL and returns 0
+    // If this is not representable sets errno to ERANGE and returns 0
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
+
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
 
-    // Equality template between any integer type and decimal32
+    // Equality template between any integer type and decimal64
     template <typename Decimal, typename Integer>
     friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
@@ -151,7 +157,7 @@ private:
     friend constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
 
-    // Template to compare operator< for any integer type and decimal32
+    // Template to compare operator< for any integer type and decimal64
     template <typename Decimal, typename Integer>
     friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
@@ -170,6 +176,18 @@ public:
     // 3.2.2.3 Conversion from integral type
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal64(Integer val) noexcept;
+
+    // 3.2.2.4 Conversion to integral type
+    explicit constexpr operator int() const noexcept;
+    explicit constexpr operator unsigned() const noexcept;
+    explicit constexpr operator long() const noexcept;
+    explicit constexpr operator unsigned long() const noexcept;
+    explicit constexpr operator long long() const noexcept;
+    explicit constexpr operator unsigned long long() const noexcept;
+    explicit constexpr operator std::int8_t() const noexcept;
+    explicit constexpr operator std::uint8_t() const noexcept;
+    explicit constexpr operator std::int16_t() const noexcept;
+    explicit constexpr operator std::uint16_t() const noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
@@ -404,6 +422,56 @@ template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, boo
 constexpr decimal64::decimal64(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
     *this = decimal64{val, 0};
+}
+
+constexpr decimal64::operator int() const noexcept
+{
+    return to_integral<decimal64, int>(*this);
+}
+
+constexpr decimal64::operator unsigned() const noexcept
+{
+    return to_integral<decimal64, unsigned>(*this);
+}
+
+constexpr decimal64::operator long() const noexcept
+{
+    return to_integral<decimal64, long>(*this);
+}
+
+constexpr decimal64::operator unsigned long() const noexcept
+{
+    return to_integral<decimal64, unsigned long>(*this);
+}
+
+constexpr decimal64::operator long long() const noexcept
+{
+    return to_integral<decimal64, long long>(*this);
+}
+
+constexpr decimal64::operator unsigned long long() const noexcept
+{
+    return to_integral<decimal64, unsigned long long>(*this);
+}
+
+constexpr decimal64::operator std::int8_t() const noexcept
+{
+    return to_integral<decimal64, std::int8_t>(*this);
+}
+
+constexpr decimal64::operator std::uint8_t() const noexcept
+{
+    return to_integral<decimal64, std::uint8_t>(*this);
+}
+
+constexpr decimal64::operator std::int16_t() const noexcept
+{
+    return to_integral<decimal64, std::int16_t>(*this);
+}
+
+constexpr decimal64::operator std::uint16_t() const noexcept
+{
+    return to_integral<decimal64, std::uint16_t>(*this);
 }
 
 constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
