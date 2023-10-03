@@ -34,6 +34,7 @@
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/comparison.hpp>
+#include <boost/decimal/detail/to_integral.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -169,8 +170,8 @@ private:
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
-    template <typename TargetType>
-    constexpr auto to_integral() const noexcept -> TargetType;
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
 
     friend constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
                                            detail::decimal32_components& q) noexcept -> void;
@@ -1420,103 +1421,54 @@ constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect param
     *this = decimal32{val, 0};
 }
 
-// MSVC 14.1 warns of unary minus being applied to unsigned type from numeric_limits::min
-// 14.2 and on get it right
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable: 4146)
-#endif
-
-template <typename TargetType>
-constexpr auto decimal32::to_integral() const noexcept -> TargetType
-{
-    using Conversion_Type = std::conditional_t<(std::numeric_limits<TargetType>::max() < 9'999'999), std::int32_t, TargetType>;
-
-    constexpr decimal32 max_target_type { (std::numeric_limits<TargetType>::max)() };
-    constexpr decimal32 min_target_type { (std::numeric_limits<TargetType>::min)()};
-
-    if (isnan(*this))
-    {
-        errno = EINVAL;
-        return static_cast<TargetType>(0);
-    }
-    if (isinf(*this) || *this > max_target_type || *this < min_target_type)
-    {
-        errno = ERANGE;
-        return static_cast<TargetType>(0);
-    }
-    
-    auto result = static_cast<Conversion_Type>(this->full_significand());
-    int expval {static_cast<int>(this->unbiased_exponent()) - detail::bias};
-    if (expval > 0)
-    {
-        result *= detail::pow10<Conversion_Type>(expval);
-    }
-    else if (expval < 0)
-    {
-        result /= detail::pow10<Conversion_Type>(detail::make_positive_unsigned(expval));
-    }
-
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
-    {
-        result = static_cast<bool>(this->bits_.sign) ? detail::apply_sign(result) : result;
-    }
-
-    return static_cast<TargetType>(result);
-}
-
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
-
 constexpr decimal32::operator int() const noexcept
 {
-    return to_integral<int>();
+    return to_integral<decimal32, int>(*this);
 }
 
 constexpr decimal32::operator unsigned() const noexcept
 {
-    return to_integral<unsigned>();
+    return to_integral<decimal32, unsigned>(*this);
 }
 
 constexpr decimal32::operator long() const noexcept
 {
-    return to_integral<long>();
+    return to_integral<decimal32, long>(*this);
 }
 
 constexpr decimal32::operator unsigned long() const noexcept
 {
-    return to_integral<unsigned long>();
+    return to_integral<decimal32, unsigned long>(*this);
 }
 
 constexpr decimal32::operator long long() const noexcept
 {
-    return to_integral<long long>();
+    return to_integral<decimal32, long long>(*this);
 }
 
 constexpr decimal32::operator unsigned long long() const noexcept
 {
-    return to_integral<unsigned long long>();
+    return to_integral<decimal32, unsigned long long>(*this);
 }
 
 constexpr decimal32::operator std::int8_t() const noexcept
 {
-    return to_integral<std::int8_t>();
+    return to_integral<decimal32, std::int8_t>(*this);
 }
 
 constexpr decimal32::operator std::uint8_t() const noexcept
 {
-    return to_integral<std::uint8_t>();
+    return to_integral<decimal32, std::uint8_t>(*this);
 }
 
 constexpr decimal32::operator std::int16_t() const noexcept
 {
-    return to_integral<std::int16_t>();
+    return to_integral<decimal32, std::int16_t>(*this);
 }
 
 constexpr decimal32::operator std::uint16_t() const noexcept
 {
-    return to_integral<std::uint16_t>();
+    return to_integral<decimal32, std::uint16_t>(*this);
 }
 
 template <typename charT, typename traits>
