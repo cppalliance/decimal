@@ -200,6 +200,10 @@ public:
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
 
+    // 3.2.7 unary arithmetic operators:
+    friend constexpr auto operator+(decimal64 rhs) noexcept -> decimal64;
+    friend constexpr auto operator-(decimal64 rhs) noexcept -> decimal64;
+
     // 3.2.9 Comparison operators:
     // Equality
     friend constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool;
@@ -584,6 +588,17 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs)
     }
 
     return (sig != 0) && isfinite(rhs);
+}
+
+constexpr auto operator+(decimal64 rhs) noexcept -> decimal64
+{
+    return rhs;
+}
+
+constexpr auto operator-(decimal64 rhs) noexcept-> decimal64
+{
+    rhs.bits_.sign ^= UINT64_C(1);
+    return rhs;
 }
 
 constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
