@@ -146,10 +146,13 @@ public:
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal64(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    // cmath functions that are easier as friends
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
+    friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -394,6 +397,20 @@ constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) no
 constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
     return isnan(rhs) && (rhs.bits_.exponent & detail::d64_exp_snan_mask) == detail::d64_exp_snan_mask;
+}
+
+constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
+{
+    // Check for de-normals
+    const auto sig {rhs.full_significand()};
+    const auto exp {rhs.unbiased_exponent()};
+
+    if (exp <= detail::precision_v<decimal64> - 1)
+    {
+        return false;
+    }
+
+    return (sig != 0) && isfinite(rhs);
 }
 
 } //namespace decimal
