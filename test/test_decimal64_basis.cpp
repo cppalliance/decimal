@@ -107,9 +107,49 @@ void test_binary_constructor()
 
 #endif
 
+void test_non_finite_values()
+{
+    const decimal64 one(0b1, 0);
+    const decimal64 neg_one(0b1, 0, true);
+    const decimal64 inf_val = boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask);
+    const decimal64 qnan_val = boost::decimal::from_bits(boost::decimal::detail::d64_nan_mask);
+    const decimal64 snan_val = boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask);
+
+    BOOST_TEST(!signbit(one));
+    BOOST_TEST(signbit(neg_one));
+    BOOST_TEST(!signbit(inf_val));
+    BOOST_TEST(!signbit(qnan_val));
+    BOOST_TEST(!signbit(snan_val));
+
+    BOOST_TEST(!isinf(one));
+    BOOST_TEST(!isinf(neg_one));
+    BOOST_TEST(isinf(inf_val));
+    BOOST_TEST(!isinf(qnan_val));
+    BOOST_TEST(!isinf(snan_val));
+
+    BOOST_TEST(!isnan(one));
+    BOOST_TEST(!isnan(neg_one));
+    BOOST_TEST(!isnan(inf_val));
+    BOOST_TEST(isnan(qnan_val));
+    BOOST_TEST(isnan(snan_val));
+
+    BOOST_TEST(!issignaling(one));
+    BOOST_TEST(!issignaling(neg_one));
+    BOOST_TEST(!issignaling(inf_val));
+    BOOST_TEST(!issignaling(qnan_val));
+    BOOST_TEST(issignaling(snan_val));
+
+    BOOST_TEST(isnormal(one));
+    BOOST_TEST(isnormal(neg_one));
+    BOOST_TEST(!isnormal(inf_val));
+    BOOST_TEST(!isnormal(qnan_val));
+    BOOST_TEST(!isnormal(snan_val));
+}
+
 int main()
 {
     test_binary_constructor();
+    test_non_finite_values();
 
     return boost::report_errors();
 }
