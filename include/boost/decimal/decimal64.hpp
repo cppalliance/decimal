@@ -312,9 +312,9 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     auto reduced_coeff {static_cast<std::uint64_t>(unsigned_coeff)};
 
     // zero the combination field, so we can mask in the following values
-    bits_.combination_field = 0;
-    bits_.significand = 0;
-    bits_.exponent = 0;
+    bits_.combination_field = UINT64_C(0);
+    bits_.significand = UINT64_C(0);
+    bits_.exponent = UINT64_C(0);
     bool big_combination {false};
 
     if (reduced_coeff == 0)
@@ -489,12 +489,12 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
     if ((bits_.combination_field & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
     {
         // bits 2 and 3 are the exp part of the combination field
-        expval |= (bits_.combination_field & detail::d64_comb_11_exp_bits) << 5;
+        expval |= (bits_.combination_field & detail::d64_comb_11_exp_bits) << 7;
     }
     else
     {
         // bits 0 and 1 are the exp part of the combination field
-        expval |= (bits_.combination_field & detail::d64_comb_11_mask) << 3;
+        expval |= (bits_.combination_field & detail::d64_comb_11_mask) << 5;
     }
 
     expval |= bits_.exponent;
@@ -821,7 +821,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64& d) -> st
     }
 
     // Print the significand into the buffer so that we can insert the decimal point
-    std::snprintf(buffer, sizeof(buffer), "%u", d.full_significand());
+    std::snprintf(buffer, sizeof(buffer), "%llu", d.full_significand());
     std::memmove(buffer + 2, buffer + 1, detail::precision_v<decimal64> - 1);
     std::memset(buffer + 1, '.', 1);
     os << buffer;
