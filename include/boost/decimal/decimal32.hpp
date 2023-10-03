@@ -192,8 +192,9 @@ private:
     friend auto debug_pattern(decimal32 rhs) noexcept -> void;
 
     // Equality template between any integer type and decimal32
-    template <typename Integer>
-    friend constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool;
+    template <typename Decimal, typename Integer>
+    friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
 
     // Compares the components of the lhs with rhs for equality
     // Can be any type broken down into a sig and an exp that will be normalized for fair comparison
@@ -202,8 +203,9 @@ private:
                                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
 
     // Template to compare operator< for any integer type and decimal32
-    template <typename Integer>
-    friend constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool;
+    template <typename Decimal, typename Integer>
+    friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
 
     // Implements less than using the components of lhs and rhs
     template <typename T1, typename T2>
@@ -1088,29 +1090,6 @@ constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool
 }
 
 template <typename Integer>
-constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool
-{
-    if (isnan(lhs) || isinf(lhs))
-    {
-        return false;
-    }
-
-    bool rhs_isneg {false};
-    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
-    {
-        if (rhs < 0)
-        {
-            rhs_isneg = true;
-        }
-    }
-
-    const auto rhs_significand {detail::make_positive_unsigned(rhs)};
-
-    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                            rhs_significand, INT32_C(0), rhs_isneg);
-}
-
-template <typename Integer>
 constexpr auto operator==(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return mixed_equality_impl(lhs, rhs);
@@ -1164,51 +1143,6 @@ constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool
 
     return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
-}
-
-template <typename Integer>
-constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool
-{
-    if (isnan(lhs))
-    {
-        return false;
-    }
-    else if (isinf(lhs))
-    {
-        return lhs.isneg();
-    }
-
-    bool lhs_sign {lhs.isneg()};
-    bool rhs_sign {false};
-
-    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
-    {
-        if (rhs < 0)
-        {
-            rhs_sign = true;
-        }
-
-        if (lhs_sign && !rhs_sign)
-        {
-            return true;
-        }
-        else if (!lhs_sign && rhs_sign)
-        {
-            return false;
-        }
-    }
-    else
-    {
-        if (lhs_sign)
-        {
-            return true;
-        }
-    }
-
-    const auto rhs_significand {detail::make_positive_unsigned(rhs)};
-
-    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs_sign,
-                           rhs_significand, INT32_C(0), rhs_sign);
 }
 
 template <typename Integer>
