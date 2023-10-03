@@ -340,10 +340,12 @@ public:
     friend constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
     template <typename Integer>
-    friend constexpr auto operator==(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+    friend constexpr auto operator==(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     template <typename Integer>
-    friend constexpr auto operator==(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+    friend constexpr auto operator==(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Inequality
     friend constexpr auto operator!=(decimal32 lhs, decimal32 rhs) noexcept -> bool;

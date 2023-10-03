@@ -139,6 +139,27 @@ private:
     friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
 
+    // Equality template between any integer type and decimal32
+    template <typename Decimal, typename Integer>
+    friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+
+    // Compares the components of the lhs with rhs for equality
+    // Can be any type broken down into a sig and an exp that will be normalized for fair comparison
+    template <typename T1, typename T2>
+    friend constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                           T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
+
+    // Template to compare operator< for any integer type and decimal32
+    template <typename Decimal, typename Integer>
+    friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+
+    // Implements less than using the components of lhs and rhs
+    template <typename T1, typename T2>
+    friend constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                          T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
@@ -153,6 +174,18 @@ public:
     friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
+
+    // 3.2.9 Comparison operators:
+    // Equality
+    friend constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator==(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator==(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -411,6 +444,32 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs)
     }
 
     return (sig != 0) && isfinite(rhs);
+}
+
+constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
+{
+    // Check for IEEE requirement that nan != nan
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+template <typename Integer>
+constexpr auto operator==(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return mixed_equality_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator==(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return mixed_equality_impl(rhs, lhs);
 }
 
 } //namespace decimal
