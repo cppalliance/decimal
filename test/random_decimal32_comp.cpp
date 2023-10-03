@@ -40,6 +40,7 @@ void random_LT(T lower, T upper)
     BOOST_TEST(decimal32(dist(rng)) < std::numeric_limits<decimal32>::infinity());
     BOOST_TEST(!(decimal32(dist(rng)) < -std::numeric_limits<decimal32>::infinity()));
     BOOST_TEST(!(decimal32(dist(rng)) < std::numeric_limits<decimal32>::quiet_NaN()));
+    BOOST_TEST(!(std::numeric_limits<decimal32>::quiet_NaN() < std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -117,6 +118,7 @@ void random_LE(T lower, T upper)
     BOOST_TEST(decimal32(dist(rng)) <= std::numeric_limits<decimal32>::infinity());
     BOOST_TEST(!(decimal32(dist(rng)) <= -std::numeric_limits<decimal32>::infinity()));
     BOOST_TEST(!(decimal32(dist(rng)) <= std::numeric_limits<decimal32>::quiet_NaN()));
+    BOOST_TEST(!(std::numeric_limits<decimal32>::quiet_NaN() <= std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -140,6 +142,10 @@ void random_mixed_LE(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    BOOST_TEST(dist(rng) <= std::numeric_limits<decimal32>::infinity());
+    BOOST_TEST(!(dist(rng) <= -std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(!(dist(rng) <= std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -163,6 +169,11 @@ void random_GT(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    BOOST_TEST(!(decimal32(dist(rng)) > std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST((decimal32(dist(rng)) > -std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(!(decimal32(dist(rng)) > std::numeric_limits<decimal32>::quiet_NaN()));
+    BOOST_TEST(!(std::numeric_limits<decimal32>::quiet_NaN() > std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -186,6 +197,10 @@ void random_mixed_GT(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    BOOST_TEST(!(dist(rng) > std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST((dist(rng) > -std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(!(dist(rng) > std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -209,6 +224,11 @@ void random_GE(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    BOOST_TEST(!(decimal32(dist(rng)) >= std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST((decimal32(dist(rng)) >= -std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(!(decimal32(dist(rng)) >= std::numeric_limits<decimal32>::quiet_NaN()));
+    BOOST_TEST(!(std::numeric_limits<decimal32>::quiet_NaN() >= std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -232,6 +252,10 @@ void random_mixed_GE(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    BOOST_TEST(!(dist(rng) >= std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST((dist(rng) >= -std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(!(dist(rng) >= std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -255,6 +279,8 @@ void random_EQ(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    BOOST_TEST(!(std::numeric_limits<decimal32>::quiet_NaN() == std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -328,6 +354,8 @@ void random_NE(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    BOOST_TEST((std::numeric_limits<decimal32>::quiet_NaN() != std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>

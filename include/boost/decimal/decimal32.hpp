@@ -395,10 +395,12 @@ public:
     friend constexpr auto operator>=(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
     template <typename Integer>
-    friend constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+    friend constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     template <typename Integer>
-    friend constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+    friend constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     friend constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::strong_ordering;
@@ -1207,29 +1209,54 @@ constexpr auto operator>(decimal32 lhs, decimal32 rhs) noexcept -> bool
 template <typename Integer>
 constexpr auto operator>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
+    if (isnan(lhs))
+    {
+        return false;
+    }
+
     return rhs < lhs;
 }
 
 template <typename Integer>
 constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
+    if (isnan(rhs))
+    {
+        return false;
+    }
+
     return rhs < lhs;
 }
 
 constexpr auto operator>=(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
     return !(lhs < rhs);
 }
 
 template <typename Integer>
 constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
+    if (isnan(lhs))
+    {
+        return false;
+    }
+
     return !(lhs < rhs);
 }
 
 template <typename Integer>
 constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
+    if (isnan(rhs))
+    {
+        return false;
+    }
+
     return !(lhs < rhs);
 }
 
