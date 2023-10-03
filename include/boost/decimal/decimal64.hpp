@@ -149,6 +149,7 @@ public:
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
+    friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -388,6 +389,11 @@ constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) no
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
     return ((rhs.bits_.combination_field & detail::d64_comb_inf_mask) == detail::d64_comb_inf_mask) && (!isnan(rhs));
+}
+
+constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
+{
+    return isnan(rhs) && (rhs.bits_.exponent & detail::d64_exp_snan_mask) == detail::d64_exp_snan_mask;
 }
 
 } //namespace decimal
