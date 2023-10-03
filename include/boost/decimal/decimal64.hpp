@@ -5,6 +5,7 @@
 #ifndef BOOST_DECIMAL_DECIMAL64_HPP
 #define BOOST_DECIMAL_DECIMAL64_HPP
 
+#include <cinttypes>
 #include <cassert>
 #include <cerrno>
 #include <climits>
@@ -33,6 +34,7 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/normalize.hpp>
+#include <boost/decimal/detail/to_integral.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -135,11 +137,17 @@ private:
     constexpr auto full_significand() const noexcept -> std::uint64_t;
     constexpr auto isneg() const noexcept -> bool;
 
+    // Attempts conversion to integral type:
+    // If this is nan sets errno to EINVAL and returns 0
+    // If this is not representable sets errno to ERANGE and returns 0
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
+
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
 
-    // Equality template between any integer type and decimal32
+    // Equality template between any integer type and decimal64
     template <typename Decimal, typename Integer>
     friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
@@ -150,7 +158,7 @@ private:
     friend constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
 
-    // Template to compare operator< for any integer type and decimal32
+    // Template to compare operator< for any integer type and decimal64
     template <typename Decimal, typename Integer>
     friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
@@ -164,6 +172,24 @@ public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
 
+    // TODO(mborland): 3.2.2.2 Conversion form floating-point type
+
+    // 3.2.2.3 Conversion from integral type
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+    explicit constexpr decimal64(Integer val) noexcept;
+
+    // 3.2.2.4 Conversion to integral type
+    explicit constexpr operator int() const noexcept;
+    explicit constexpr operator unsigned() const noexcept;
+    explicit constexpr operator long() const noexcept;
+    explicit constexpr operator unsigned long() const noexcept;
+    explicit constexpr operator long long() const noexcept;
+    explicit constexpr operator unsigned long long() const noexcept;
+    explicit constexpr operator std::int8_t() const noexcept;
+    explicit constexpr operator std::uint8_t() const noexcept;
+    explicit constexpr operator std::int16_t() const noexcept;
+    explicit constexpr operator std::uint16_t() const noexcept;
+
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal64(T1 coeff, T2 exp, bool sign = false) noexcept;
@@ -174,6 +200,10 @@ public:
     friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
+
+    // 3.2.7 unary arithmetic operators:
+    friend constexpr auto operator+(decimal64 rhs) noexcept -> decimal64;
+    friend constexpr auto operator-(decimal64 rhs) noexcept -> decimal64;
 
     // 3.2.9 Comparison operators:
     // Equality
@@ -241,6 +271,10 @@ public:
     template <typename Integer>
     friend constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // 3.2.11 Formatted output:
+    template <typename charT, typename traits>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64& d) -> std::basic_ostream<charT, traits>&;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -279,9 +313,9 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     auto reduced_coeff {static_cast<std::uint64_t>(unsigned_coeff)};
 
     // zero the combination field, so we can mask in the following values
-    bits_.combination_field = 0;
-    bits_.significand = 0;
-    bits_.exponent = 0;
+    bits_.combination_field = UINT64_C(0);
+    bits_.significand = UINT64_C(0);
+    bits_.exponent = UINT64_C(0);
     bool big_combination {false};
 
     if (reduced_coeff == 0)
@@ -393,6 +427,62 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     }
 }
 
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+constexpr decimal64::decimal64(Integer val) noexcept // NOLINT : Incorrect parameter is never used
+{
+    *this = decimal64{val, 0};
+}
+
+constexpr decimal64::operator int() const noexcept
+{
+    return to_integral<decimal64, int>(*this);
+}
+
+constexpr decimal64::operator unsigned() const noexcept
+{
+    return to_integral<decimal64, unsigned>(*this);
+}
+
+constexpr decimal64::operator long() const noexcept
+{
+    return to_integral<decimal64, long>(*this);
+}
+
+constexpr decimal64::operator unsigned long() const noexcept
+{
+    return to_integral<decimal64, unsigned long>(*this);
+}
+
+constexpr decimal64::operator long long() const noexcept
+{
+    return to_integral<decimal64, long long>(*this);
+}
+
+constexpr decimal64::operator unsigned long long() const noexcept
+{
+    return to_integral<decimal64, unsigned long long>(*this);
+}
+
+constexpr decimal64::operator std::int8_t() const noexcept
+{
+    return to_integral<decimal64, std::int8_t>(*this);
+}
+
+constexpr decimal64::operator std::uint8_t() const noexcept
+{
+    return to_integral<decimal64, std::uint8_t>(*this);
+}
+
+constexpr decimal64::operator std::int16_t() const noexcept
+{
+    return to_integral<decimal64, std::int16_t>(*this);
+}
+
+constexpr decimal64::operator std::uint16_t() const noexcept
+{
+    return to_integral<decimal64, std::uint16_t>(*this);
+}
+
 constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
 {
     std::uint64_t expval {};
@@ -400,12 +490,12 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
     if ((bits_.combination_field & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
     {
         // bits 2 and 3 are the exp part of the combination field
-        expval |= (bits_.combination_field & detail::d64_comb_11_exp_bits) << 5;
+        expval |= (bits_.combination_field & detail::d64_comb_11_exp_bits) << 7;
     }
     else
     {
         // bits 0 and 1 are the exp part of the combination field
-        expval |= (bits_.combination_field & detail::d64_comb_11_mask) << 3;
+        expval |= (bits_.combination_field & detail::d64_comb_11_mask) << 5;
     }
 
     expval |= bits_.exponent;
@@ -499,6 +589,17 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs)
     }
 
     return (sig != 0) && isfinite(rhs);
+}
+
+constexpr auto operator+(decimal64 rhs) noexcept -> decimal64
+{
+    return rhs;
+}
+
+constexpr auto operator-(decimal64 rhs) noexcept-> decimal64
+{
+    rhs.bits_.sign ^= UINT64_C(1);
+    return rhs;
 }
 
 constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
@@ -674,7 +775,110 @@ constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
     return !(lhs < rhs);
 }
 
+
+// TODO(mborland): can be made generic
+template <typename charT, typename traits>
+auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64& d) -> std::basic_ostream<charT, traits>&
+{
+    if (issignaling(d))
+    {
+        if (d.isneg())
+        {
+            os << "-";
+        }
+
+        os << "nan(snan)";
+        return os;
+    }
+    else if (isnan(d)) // only quiet NaNs left
+    {
+        if (d.isneg())
+        {
+            os << "-nan(ind)";
+        }
+        else
+        {
+            os << "nan";
+        }
+
+        return os;
+    }
+    else if (isinf(d))
+    {
+        if (d.isneg())
+        {
+            os << "-";
+        }
+
+        os << "inf";
+        return os;
+    }
+
+    char buffer[detail::precision_v<decimal64> + 2] {}; // Precision + decimal point + null terminator
+
+    if (d.bits_.sign == 1)
+    {
+        os << "-";
+    }
+
+    // Print the significand into the buffer so that we can insert the decimal point
+    std::snprintf(buffer, sizeof(buffer), "%" PRIu64, d.full_significand());
+    std::memmove(buffer + 2, buffer + 1, detail::precision_v<decimal64> - 1);
+    std::memset(buffer + 1, '.', 1);
+    os << buffer;
+
+    // Offset will adjust the exponent to compensate for adding the decimal point
+    const auto offset {detail::num_digits(d.full_significand()) - 1};
+    if (offset == 0)
+    {
+        os << "0";
+    }
+
+    os << "e";
+    auto print_exp {static_cast<int>(d.unbiased_exponent()) - detail::bias_v<decimal64> + offset};
+
+    if (print_exp < 0)
+    {
+        os << "-";
+        print_exp = -print_exp;
+    }
+    else
+    {
+        os << "+";
+    }
+
+    if (print_exp < 10)
+    {
+        os << "0";
+    }
+
+    os << print_exp;
+
+    return os;
+}
+
 } //namespace decimal
 } //namespace boost
+
+namespace std {
+
+template <>
+#ifdef BOOST_MSVC
+class numeric_limits<boost::decimal::decimal64>
+#else
+struct numeric_limits<boost::decimal::decimal64>
+#endif
+{
+#ifdef BOOST_MSVC
+public:
+#endif
+
+    // Member functions
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_nan_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask); }
+};
+
+} //namespace std
 
 #endif //BOOST_DECIMAL_DECIMAL64_HPP
