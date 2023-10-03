@@ -194,6 +194,22 @@ void test_less()
     BOOST_TEST(!(qnan_val < snan_val));
 }
 
+void test_le()
+{
+    const decimal64 one(0b1, 0);
+    const decimal64 neg_one(0b1, 0, true);
+    const decimal64 inf_val = boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask);
+    const decimal64 qnan_val = boost::decimal::from_bits(boost::decimal::detail::d64_nan_mask);
+    const decimal64 snan_val = boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask);
+
+    BOOST_TEST(neg_one <= one);
+    BOOST_TEST(one <= one);
+    BOOST_TEST(!(one <= qnan_val));
+    BOOST_TEST(!(inf_val <= qnan_val));
+    BOOST_TEST(!(qnan_val <= qnan_val));
+    BOOST_TEST(!(qnan_val <= snan_val));
+}
+
 int main()
 {
     test_binary_constructor();
@@ -201,6 +217,7 @@ int main()
     test_equality();
     test_inequality();
     test_less();
+    test_le();
 
     return boost::report_errors();
 }
