@@ -33,6 +33,7 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/normalize.hpp>
+#include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -196,17 +197,17 @@ private:
 
     // Compares the components of the lhs with rhs for equality
     // Can be any type broken down into a sig and an exp that will be normalized for fair comparison
-    template <typename T, typename T2>
-    friend constexpr auto equal_parts_impl(T lhs_sig, std::int32_t lhs_exp,
-                                           T2 rhs_sig, std::int32_t rhs_exp) noexcept -> bool;
+    template <typename T1, typename T2>
+    friend constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                           T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
 
     // Template to compare operator< for any integer type and decimal32
     template <typename Integer>
     friend constexpr auto less_impl(decimal32 lhs, Integer rhs) noexcept -> bool;
 
     // Implements less than using the components of lhs and rhs
-    template <typename T, typename T2>
-    friend constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+    template <typename T1, typename T2>
+    friend constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                           T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
 
     template <typename T, typename T2>
@@ -1075,15 +1076,6 @@ constexpr auto decimal32::operator-=(decimal32 rhs) noexcept -> decimal32&
     return *this;
 }
 
-template <typename T, typename T2>
-constexpr auto equal_parts_impl(T lhs_sig, std::int32_t lhs_exp, T2 rhs_sig, std::int32_t rhs_exp) noexcept -> bool
-{
-    detail::normalize(lhs_sig, lhs_exp);
-    detail::normalize(rhs_sig, rhs_exp);
-
-    return lhs_exp == rhs_exp && lhs_sig == rhs_sig;
-}
-
 constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     if (isnan(lhs) || isnan(rhs))
@@ -1091,13 +1083,8 @@ constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool
         return false;
     }
 
-    if (lhs.bits_.sign != rhs.bits_.sign)
-    {
-        return false;
-    }
-
-    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(),
-                            rhs.full_significand(), rhs.biased_exponent());
+    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
 template <typename Integer>
@@ -1108,25 +1095,19 @@ constexpr auto mixed_equality_impl(decimal32 lhs, Integer rhs) noexcept -> bool
         return false;
     }
 
+    bool rhs_isneg {false};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
     {
-        if (lhs.bits_.sign != static_cast<std::uint32_t>(rhs < 0))
+        if (rhs < 0)
         {
-            return false;
-        }
-    }
-    else
-    {
-        if (lhs.bits_.sign)
-        {
-            return false;
+            rhs_isneg = true;
         }
     }
 
     const auto rhs_significand {detail::make_positive_unsigned(rhs)};
 
-    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(),
-                            rhs_significand, INT32_C(0));
+    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                            rhs_significand, INT32_C(0), rhs_isneg);
 }
 
 template <typename Integer>
@@ -1156,60 +1137,6 @@ template <typename Integer>
 constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return !(lhs == rhs);
-}
-
-template <typename T, typename T2>
-constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                               T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool
-{
-    const bool both_neg {lhs_sign && rhs_sign};
-
-    // Normalize the significands and exponents
-    detail::normalize(lhs_sig, lhs_exp);
-    detail::normalize(rhs_sig, rhs_exp);
-
-    if (lhs_sig == 0 && rhs_sig != 0)
-    {
-        return (!rhs_sign);
-    }
-    else if (lhs_sig != 0 && rhs_sig == 0)
-    {
-        return lhs_sign;
-    }
-    else if (lhs_sig == 0 && rhs_sig == 0)
-    {
-        return false;
-    }
-    else if (both_neg)
-    {
-        if (lhs_exp > rhs_exp)
-        {
-            return true;
-        }
-        else if (lhs_exp < rhs_exp)
-        {
-            return false;
-        }
-        else
-        {
-            return (lhs_sig > rhs_sig);
-        }
-    }
-    else
-    {
-        if ((lhs_exp < rhs_exp) && (lhs_sig != static_cast<T>(0)))
-        {
-            return true;
-        }
-        else if (lhs_exp > rhs_exp)
-        {
-            return false;
-        }
-        else
-        {
-            return (lhs_sig < rhs_sig);
-        }
-    }
 }
 
 constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool
