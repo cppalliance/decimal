@@ -32,6 +32,7 @@
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/utilities.hpp>
+#include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -124,9 +125,40 @@ private:
 
     data_layout_ bits_ {};
 
+    // Returns the un-biased (quantum) exponent
+    constexpr auto unbiased_exponent() const noexcept -> std::uint64_t;
+
+    // Returns the biased exponent
+    constexpr auto biased_exponent() const noexcept -> std::int32_t;
+
+    // Returns the significand complete with the bits implied from the combination field
+    constexpr auto full_significand() const noexcept -> std::uint64_t;
+    constexpr auto isneg() const noexcept -> bool;
+
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
+
+    // Equality template between any integer type and decimal32
+    template <typename Decimal, typename Integer>
+    friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+
+    // Compares the components of the lhs with rhs for equality
+    // Can be any type broken down into a sig and an exp that will be normalized for fair comparison
+    template <typename T1, typename T2>
+    friend constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                           T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
+
+    // Template to compare operator< for any integer type and decimal32
+    template <typename Decimal, typename Integer>
+    friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+
+    // Implements less than using the components of lhs and rhs
+    template <typename T1, typename T2>
+    friend constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                          T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
 
 public:
     // 3.2.3.1 construct/copy/destroy
@@ -135,6 +167,80 @@ public:
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal64(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    // cmath functions that are easier as friends
+    friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
+    friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
+    friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
+    friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
+    friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
+
+    // 3.2.9 Comparison operators:
+    // Equality
+    friend constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator==(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator==(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Inequality
+    friend constexpr auto operator!=(decimal64 lhs, decimal64 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator!=(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator!=(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Less
+    friend constexpr auto operator<(decimal64 lhs, decimal64 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator<(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator<(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Less equal
+    friend constexpr auto operator<=(decimal64 lhs, decimal64 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator<=(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator<=(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Greater
+    friend constexpr auto operator>(decimal64 lhs, decimal64 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator>(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator>(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Greater equal
+    friend constexpr auto operator>=(decimal64 lhs, decimal64 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator>=(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -287,6 +393,62 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     }
 }
 
+constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
+{
+    std::uint64_t expval {};
+
+    if ((bits_.combination_field & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
+    {
+        // bits 2 and 3 are the exp part of the combination field
+        expval |= (bits_.combination_field & detail::d64_comb_11_exp_bits) << 5;
+    }
+    else
+    {
+        // bits 0 and 1 are the exp part of the combination field
+        expval |= (bits_.combination_field & detail::d64_comb_11_mask) << 3;
+    }
+
+    expval |= bits_.exponent;
+
+    return expval;
+}
+
+constexpr auto decimal64::biased_exponent() const noexcept -> std::int32_t
+{
+    return static_cast<std::int32_t>(unbiased_exponent()) - detail::bias_v<decimal64>;
+}
+
+constexpr auto decimal64::full_significand() const noexcept -> std::uint64_t
+{
+    std::uint64_t significand {};
+
+    if ((bits_.combination_field & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
+    {
+        // Only need the one bit of T because the other 3 are implied
+        if (bits_.combination_field & detail::d64_comb_11_significand_bits)
+        {
+            significand = 0b1001'0000000000'0000000000'0000000000'0000000000'0000000000;
+        }
+        else
+        {
+            significand = 0b1000'0000000000'0000000000'0000000000'0000000000'0000000000;
+        }
+    }
+    else
+    {
+        significand |= ((bits_.combination_field & UINT64_C(0b00111)) << 50);
+    }
+
+    significand |= bits_.significand;
+
+    return significand;
+}
+
+constexpr auto decimal64::isneg() const noexcept -> bool
+{
+    return static_cast<bool>(bits_.sign);
+}
+
 constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
 {
     decimal64 result;
@@ -303,6 +465,213 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint6
 {
     const auto bits {detail::bit_cast<std::uint64_t>(rhs.bits_)};
     return bits;
+}
+
+constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
+{
+    return static_cast<bool>(rhs.bits_.sign);
+}
+
+constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
+{
+    return (rhs.bits_.combination_field & detail::d64_comb_nan_mask) == detail::d64_comb_nan_mask;
+}
+
+constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
+{
+    return ((rhs.bits_.combination_field & detail::d64_comb_inf_mask) == detail::d64_comb_inf_mask) && (!isnan(rhs));
+}
+
+constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
+{
+    return isnan(rhs) && (rhs.bits_.exponent & detail::d64_exp_snan_mask) == detail::d64_exp_snan_mask;
+}
+
+constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
+{
+    // Check for de-normals
+    const auto sig {rhs.full_significand()};
+    const auto exp {rhs.unbiased_exponent()};
+
+    if (exp <= detail::precision_v<decimal64> - 1)
+    {
+        return false;
+    }
+
+    return (sig != 0) && isfinite(rhs);
+}
+
+constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
+{
+    // Check for IEEE requirement that nan != nan
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+template <typename Integer>
+constexpr auto operator==(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return mixed_equality_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator==(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return mixed_equality_impl(rhs, lhs);
+}
+
+constexpr auto operator!=(decimal64 lhs, decimal64 rhs) noexcept -> bool
+{
+    return !(lhs == rhs);
+}
+
+template <typename Integer>
+constexpr auto operator!=(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !(lhs == rhs);
+}
+
+template <typename Integer>
+constexpr auto operator!=(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !(lhs == rhs);
+}
+
+constexpr auto operator<(decimal64 lhs, decimal64 rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs) ||
+        (!lhs.isneg() && rhs.isneg()))
+    {
+        return false;
+    }
+    else if (lhs.isneg() && !rhs.isneg())
+    {
+        return true;
+    }
+    else if (isfinite(lhs) && isinf(rhs))
+    {
+        if (!rhs.isneg())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+template <typename Integer>
+constexpr auto operator<(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return less_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator<(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !less_impl(rhs, lhs) && lhs != rhs;
+}
+
+constexpr auto operator<=(decimal64 lhs, decimal64 rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(rhs < lhs);
+}
+
+template <typename Integer>
+constexpr auto operator<=(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    if (isnan(lhs))
+    {
+        return false;
+    }
+
+    return !(rhs < lhs);
+}
+
+template <typename Integer>
+constexpr auto operator<=(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    if (isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(rhs < lhs);
+}
+
+constexpr auto operator>(decimal64 lhs, decimal64 rhs) noexcept -> bool
+{
+    return rhs < lhs;
+}
+
+template <typename Integer>
+constexpr auto operator>(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return rhs < lhs;
+}
+
+template <typename Integer>
+constexpr auto operator>(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return rhs < lhs;
+}
+
+constexpr auto operator>=(decimal64 lhs, decimal64 rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
+}
+
+template <typename Integer>
+constexpr auto operator>=(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    if (isnan(lhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
+}
+
+template <typename Integer>
+constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    if (isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
 }
 
 } //namespace decimal

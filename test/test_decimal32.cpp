@@ -59,6 +59,11 @@ void test_comp()
     BOOST_TEST(!(small < std::numeric_limits<decimal32>::quiet_NaN()));
     BOOST_TEST(small != std::numeric_limits<decimal32>::quiet_NaN());
     BOOST_TEST(std::numeric_limits<decimal32>::quiet_NaN() != std::numeric_limits<decimal32>::quiet_NaN());
+
+    BOOST_TEST(small <= std::numeric_limits<decimal32>::infinity());
+    BOOST_TEST(small >= -std::numeric_limits<decimal32>::infinity());
+    BOOST_TEST(!(small <= std::numeric_limits<decimal32>::signaling_NaN()));
+    BOOST_TEST(!(small <= std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
