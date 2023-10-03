@@ -147,6 +147,7 @@ public:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal64(T1 coeff, T2 exp, bool sign = false) noexcept;
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
+    friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -376,6 +377,11 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint6
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
     return static_cast<bool>(rhs.bits_.sign);
+}
+
+constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
+{
+    return (rhs.bits_.combination_field & detail::d64_comb_nan_mask) == detail::d64_comb_nan_mask;
 }
 
 } //namespace decimal
