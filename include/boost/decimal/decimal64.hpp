@@ -844,4 +844,25 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64& d) -> st
 } //namespace decimal
 } //namespace boost
 
+namespace std {
+
+template <>
+#ifdef BOOST_MSVC
+class numeric_limits<boost::decimal::decimal64>
+#else
+struct numeric_limits<boost::decimal::decimal64>
+#endif
+{
+#ifdef BOOST_MSVC
+public:
+#endif
+
+    // Member functions
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_nan_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask); }
+};
+
+} //namespace std
+
 #endif //BOOST_DECIMAL_DECIMAL64_HPP
