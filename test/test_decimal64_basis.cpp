@@ -192,6 +192,7 @@ void test_less()
     BOOST_TEST(!(inf_val < qnan_val));
     BOOST_TEST(!(qnan_val < qnan_val));
     BOOST_TEST(!(qnan_val < snan_val));
+    BOOST_TEST(one < inf_val);
 }
 
 void test_le()
