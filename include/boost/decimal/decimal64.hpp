@@ -33,6 +33,7 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/normalize.hpp>
+#include <boost/decimal/detail/to_integral.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -163,6 +164,12 @@ private:
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
+
+    // TODO(mborland): 3.2.2.2 Conversion form floating-point type
+
+    // 3.2.2.3 Conversion from integral type
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+    explicit constexpr decimal64(Integer val) noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
@@ -391,6 +398,12 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
             bits_.combination_field = detail::d64_comb_inf_mask;
         }
     }
+}
+
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+constexpr decimal64::decimal64(Integer val) noexcept // NOLINT : Incorrect parameter is never used
+{
+    *this = decimal64{val, 0};
 }
 
 constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
