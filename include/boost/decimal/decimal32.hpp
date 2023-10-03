@@ -32,6 +32,7 @@
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/utilities.hpp>
+#include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -121,34 +122,6 @@ constexpr auto shrink_significand(Integer sig, std::int32_t& exp) noexcept -> st
 }
 
 } // namespace detail
-
-// Converts the significand to 7 digits to remove the effects of cohorts.
-template <typename T, typename T2>
-constexpr auto normalize(T& significand, T2& exp) noexcept -> void
-{
-    auto digits = detail::num_digits(significand);
-
-    if (digits < detail::precision)
-    {
-        while (digits < detail::precision)
-        {
-            significand *= 10;
-            --exp;
-            ++digits;
-        }
-    }
-    else if (digits > detail::precision)
-    {
-        while (digits > detail::precision + 1)
-        {
-            significand /= 10;
-            ++exp;
-            --digits;
-        }
-
-        exp += detail::fenv_round(significand, significand < 0);
-    }
-}
 
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
@@ -900,11 +873,11 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    normalize(sig_lhs, exp_lhs);
+    detail::normalize(sig_lhs, exp_lhs);
 
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.biased_exponent()};
-    normalize(sig_rhs, exp_rhs);
+    detail::normalize(sig_rhs, exp_rhs);
 
     const auto result {add_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
 
@@ -928,12 +901,12 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    normalize(sig_lhs, exp_lhs);
+    detail::normalize(sig_lhs, exp_lhs);
 
     auto lhs_components {detail::decimal32_components{sig_lhs, exp_lhs, lhs.isneg()}};
     auto sig_rhs {rhs};
     std::int32_t exp_rhs {0};
-    normalize(sig_rhs, exp_rhs);
+    detail::normalize(sig_rhs, exp_rhs);
     auto unsigned_sig_rhs = detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs);
     auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
@@ -1005,11 +978,11 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    normalize(sig_lhs, exp_lhs);
+    detail::normalize(sig_lhs, exp_lhs);
 
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.biased_exponent()};
-    normalize(sig_rhs, exp_rhs);
+    detail::normalize(sig_rhs, exp_rhs);
 
     const auto result {sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
                                 sig_rhs, exp_rhs, rhs.isneg(),
@@ -1035,12 +1008,12 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    normalize(sig_lhs, exp_lhs);
+    detail::normalize(sig_lhs, exp_lhs);
     auto lhs_components {detail::decimal32_components{sig_lhs, exp_lhs, lhs.isneg()}};
 
     auto sig_rhs {rhs};
     std::int32_t exp_rhs {0};
-    normalize(sig_rhs, exp_rhs);
+    detail::normalize(sig_rhs, exp_rhs);
     auto unsigned_sig_rhs = detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs);
     auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
@@ -1068,13 +1041,13 @@ constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
 
     auto sig_lhs {lhs};
     std::int32_t exp_lhs {0};
-    normalize(sig_lhs, exp_lhs);
+    detail::normalize(sig_lhs, exp_lhs);
     auto unsigned_sig_lhs = detail::shrink_significand(detail::make_positive_unsigned(sig_lhs), exp_lhs);
     auto lhs_components {detail::decimal32_components{unsigned_sig_lhs, exp_lhs, (rhs < 0)}};
 
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.biased_exponent()};
-    normalize(sig_rhs, exp_rhs);
+    detail::normalize(sig_rhs, exp_rhs);
     auto rhs_components {detail::decimal32_components{sig_rhs, exp_rhs, rhs.isneg()}};
 
     const auto result {sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
@@ -1105,8 +1078,8 @@ constexpr auto decimal32::operator-=(decimal32 rhs) noexcept -> decimal32&
 template <typename T, typename T2>
 constexpr auto equal_parts_impl(T lhs_sig, std::int32_t lhs_exp, T2 rhs_sig, std::int32_t rhs_exp) noexcept -> bool
 {
-    normalize(lhs_sig, lhs_exp);
-    normalize(rhs_sig, rhs_exp);
+    detail::normalize(lhs_sig, lhs_exp);
+    detail::normalize(rhs_sig, rhs_exp);
 
     return lhs_exp == rhs_exp && lhs_sig == rhs_sig;
 }
@@ -1192,8 +1165,8 @@ constexpr auto less_parts_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     const bool both_neg {lhs_sign && rhs_sign};
 
     // Normalize the significands and exponents
-    normalize(lhs_sig, lhs_exp);
-    normalize(rhs_sig, rhs_exp);
+    detail::normalize(lhs_sig, lhs_exp);
+    detail::normalize(rhs_sig, rhs_exp);
 
     if (lhs_sig == 0 && rhs_sig != 0)
     {
@@ -1775,11 +1748,11 @@ constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    normalize(sig_lhs, exp_lhs);
+    detail::normalize(sig_lhs, exp_lhs);
 
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.biased_exponent()};
-    normalize(sig_rhs, exp_rhs);
+    detail::normalize(sig_rhs, exp_rhs);
 
     const auto result {mul_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
 
@@ -1796,12 +1769,12 @@ constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    normalize(sig_lhs, exp_lhs);
+    detail::normalize(sig_lhs, exp_lhs);
     auto lhs_components {detail::decimal32_components{sig_lhs, exp_lhs, lhs.isneg()}};
 
     auto sig_rhs {rhs};
     std::int32_t exp_rhs {0};
-    normalize(sig_rhs, exp_rhs);
+    detail::normalize(sig_rhs, exp_rhs);
     auto unsigned_sig_rhs {detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs)};
     auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
@@ -1909,11 +1882,11 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    normalize(sig_lhs, exp_lhs);
+    detail::normalize(sig_lhs, exp_lhs);
 
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.biased_exponent()};
-    normalize(sig_rhs, exp_rhs);
+    detail::normalize(sig_rhs, exp_rhs);
 
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "sig lhs: " << sig_lhs
@@ -1975,7 +1948,7 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    normalize(sig_lhs, exp_lhs);
+    detail::normalize(sig_lhs, exp_lhs);
 
     detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
     std::int32_t exp_rhs {};
@@ -2015,7 +1988,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
 
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.biased_exponent()};
-    normalize(sig_rhs, exp_rhs);
+    detail::normalize(sig_rhs, exp_rhs);
 
     detail::decimal32_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
     detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
@@ -2369,7 +2342,7 @@ constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::uint32_t
 
     auto num_exp {num.biased_exponent()};
     auto num_sig {num.full_significand()};
-    normalize(num_sig, num_exp);
+    detail::normalize(num_sig, num_exp);
 
     *expptr = num_exp;
 
@@ -2414,11 +2387,11 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
 
     auto sig_lhs {x.full_significand()};
     auto exp_lhs {x.biased_exponent()};
-    normalize(sig_lhs, exp_lhs);
+    detail::normalize(sig_lhs, exp_lhs);
 
     auto sig_rhs {y.full_significand()};
     auto exp_rhs {y.biased_exponent()};
-    normalize(sig_rhs, exp_rhs);
+    detail::normalize(sig_rhs, exp_rhs);
 
     auto mul_result {mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
     const decimal32 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
@@ -2436,11 +2409,11 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
     }
     bool abs_lhs_bigger {abs(dec_result) > abs(z)};
 
-    normalize(mul_result.sig, mul_result.exp);
+    detail::normalize(mul_result.sig, mul_result.exp);
 
     auto sig_z {z.full_significand()};
     auto exp_z {z.biased_exponent()};
-    normalize(sig_z, exp_z);
+    detail::normalize(sig_z, exp_z);
     detail::decimal32_components z_components {sig_z, exp_z, z.isneg()};
 
     if (!lhs_bigger)
