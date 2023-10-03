@@ -230,6 +230,17 @@ public:
     template <typename Integer>
     friend constexpr auto operator>(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Greater equal
+    friend constexpr auto operator>=(decimal64 lhs, decimal64 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator>=(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -627,6 +638,40 @@ constexpr auto operator>(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return rhs < lhs;
+}
+
+constexpr auto operator>=(decimal64 lhs, decimal64 rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
+}
+
+template <typename Integer>
+constexpr auto operator>=(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    if (isnan(lhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
+}
+
+template <typename Integer>
+constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    if (isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
 }
 
 } //namespace decimal
