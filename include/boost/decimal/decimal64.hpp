@@ -5,6 +5,7 @@
 #ifndef BOOST_DECIMAL_DECIMAL64_HPP
 #define BOOST_DECIMAL_DECIMAL64_HPP
 
+#include <cinttypes>
 #include <cassert>
 #include <cerrno>
 #include <climits>
@@ -821,7 +822,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64& d) -> st
     }
 
     // Print the significand into the buffer so that we can insert the decimal point
-    std::snprintf(buffer, sizeof(buffer), "%llu", d.full_significand());
+    std::snprintf(buffer, sizeof(buffer), "%" PRIu64, d.full_significand());
     std::memmove(buffer + 2, buffer + 1, detail::precision_v<decimal64> - 1);
     std::memset(buffer + 1, '.', 1);
     os << buffer;
