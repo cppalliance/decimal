@@ -197,6 +197,17 @@ public:
     template <typename Integer>
     friend constexpr auto operator!=(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Less
+    friend constexpr auto operator<(decimal64 lhs, decimal64 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator<(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator<(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -500,6 +511,47 @@ constexpr auto operator!=(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return !(lhs == rhs);
+}
+
+constexpr auto operator<(decimal64 lhs, decimal64 rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs) ||
+        (!lhs.isneg() && rhs.isneg()))
+    {
+        return false;
+    }
+    else if (lhs.isneg() && !rhs.isneg())
+    {
+        return true;
+    }
+    else if (isfinite(lhs) && isinf(rhs))
+    {
+        if (!rhs.isneg())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+template <typename Integer>
+constexpr auto operator<(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return less_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator<(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !less_impl(rhs, lhs) && lhs != rhs;
 }
 
 } //namespace decimal
