@@ -146,6 +146,7 @@ public:
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal64(T1 coeff, T2 exp, bool sign = false) noexcept;
+    friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -370,6 +371,11 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint6
 {
     const auto bits {detail::bit_cast<std::uint64_t>(rhs.bits_)};
     return bits;
+}
+
+constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
+{
+    return static_cast<bool>(rhs.bits_.sign);
 }
 
 } //namespace decimal
