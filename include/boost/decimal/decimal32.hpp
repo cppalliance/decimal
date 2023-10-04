@@ -23,8 +23,6 @@
 #include <boost/decimal/detail/bit_cast.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
-#include <boost/decimal/detail/fast_float/compute_float32.hpp>
-#include <boost/decimal/detail/fast_float/compute_float64.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/parser.hpp>
@@ -35,6 +33,7 @@
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/to_integral.hpp>
+#include <boost/decimal/detail/to_float.hpp>
 #include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
@@ -174,6 +173,9 @@ private:
     template <typename Decimal, typename TargetType>
     friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
 
+    template <typename Decimal, typename TargetType>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
+
     friend constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
                                            detail::decimal32_components& q) noexcept -> void;
     friend constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
@@ -184,9 +186,6 @@ private:
 
     template<typename T>
     friend constexpr auto log10(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
-
-    template <typename T>
-    BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_conversion_impl() const noexcept -> T;
 
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32;
@@ -1839,87 +1838,44 @@ auto debug_pattern(decimal32 rhs) noexcept -> void
 }
 // LCOV_EXCL_STOP
 
-template <typename T>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal32::floating_conversion_impl() const noexcept -> T
-{
-    bool success {};
-
-    auto fp_class = fpclassify(*this);
-
-    switch (fp_class)
-    {
-        case FP_NAN:
-            if (issignaling(*this))
-            {
-                return std::numeric_limits<T>::signaling_NaN();
-            }
-            return std::numeric_limits<T>::quiet_NaN();
-        case FP_INFINITE:
-            return std::numeric_limits<T>::infinity();
-        case FP_ZERO:
-            return 0;
-        default:
-            static_cast<void>(success);
-    }
-
-    // The casts to result are redundant but in pre C++17 modes MSVC warns about implicit conversions
-    T result {};
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, float>::value)
-    {
-        result = static_cast<T>(detail::fast_float::compute_float32(this->biased_exponent(), this->full_significand(), this->isneg(), success));
-    }
-    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, double>::value)
-    {
-        result = static_cast<T>(detail::fast_float::compute_float64(this->biased_exponent(), this->full_significand(), this->isneg(), success));
-    }
-
-    if (BOOST_DECIMAL_UNLIKELY(!success))
-    {
-        errno = EINVAL;
-        return 0;
-    }
-
-    return result;
-}
-
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator float() const noexcept
 {
-    return this->floating_conversion_impl<float>();
+    return to_float<decimal32, float>(*this);
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator double() const noexcept
 {
-    return this->floating_conversion_impl<double>();
+    return to_float<decimal32, double>(*this);
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::operator long double() const noexcept
 {
     // Double already has more range and precision than a decimal32 will ever be able to provide
-    return static_cast<long double>(this->floating_conversion_impl<double>());
+    return static_cast<long double>(to_float<decimal32, double>(*this));
 }
 
 #ifdef BOOST_DECIMAL_HAS_FLOAT16
 constexpr decimal32::operator std::float16_t() const noexcept
 {
-    return static_cast<std::float16_t>(this->floating_conversion_impl<float>());
+    return static_cast<std::float16_t>(to_float<decimal32, float>(*this));
 }
 #endif
 #ifdef BOOST_DECIMAL_HAS_FLOAT32
 constexpr decimal32::operator std::float32_t() const noexcept
 {
-    return static_cast<std::float32_t>(this->floating_conversion_impl<float>());
+    return static_cast<std::float32_t>(to_float<decimal32, float>(*this));
 }
 #endif
 #ifdef BOOST_DECIMAL_HAS_FLOAT64
 constexpr decimal32::operator std::float64_t() const noexcept
 {
-    return static_cast<std::float64_t>(this->floating_conversion_impl<double>());
+    return static_cast<std::float64_t>(to_float<decimal32, double>(*this));
 }
 #endif
 #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
 constexpr decimal32::operator std::bfloat16_t() const noexcept
 {
-    return static_cast<std::bfloat16_t>(this->floating_conversion_impl<float>());
+    return static_cast<std::bfloat16_t>(to_float<decimal32, float>(*this));
 }
 #endif
 
