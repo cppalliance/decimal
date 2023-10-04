@@ -273,6 +273,16 @@ public:
     friend constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
+    // 3.2.10 Formatted input:
+    template <typename charT, typename traits, typename DecimalType>
+    friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>;
+
+    // 3.2.11 Formatted output:
+    template <typename charT, typename traits, typename DecimalType>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
+
     // Related to <cmath>
     template <typename T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept

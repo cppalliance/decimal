@@ -7,16 +7,20 @@
 
 #include <cerrno>
 #include <cstring>
+#include <cinttypes>
 #include <limits>
 #include <iostream>
 #include <type_traits>
 #include <system_error>
+#include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/parser.hpp>
+#include <boost/decimal/detail/attributes.hpp>
 
 namespace boost {
 namespace decimal {
 
+// 3.2.10 Formatted input:
 template <typename charT, typename traits, typename DecimalType>
 auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>
@@ -66,6 +70,94 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     }
 
     return is;
+}
+
+// 3.2.11 Formatted output
+template <typename charT, typename traits, typename DecimalType>
+auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>
+{
+    const bool d_isneg {signbit(d)};
+    
+    if (issignaling(d))
+    {
+        if (d_isneg)
+        {
+            os << "-";
+        }
+
+        os << "nan(snan)";
+        return os;
+    }
+    else if (isnan(d)) // only quiet NaNs left
+    {
+        if (d_isneg)
+        {
+            os << "-nan(ind)";
+        }
+        else
+        {
+            os << "nan";
+        }
+
+        return os;
+    }
+    else if (isinf(d))
+    {
+        if (d_isneg)
+        {
+            os << "-";
+        }
+
+        os << "inf";
+        return os;
+    }
+
+    char buffer[detail::precision_v<DecimalType> + 2] {}; // Precision + decimal point + null terminator
+
+    if (d.bits_.sign == 1)
+    {
+        os << "-";
+    }
+
+    constexpr auto format {std::is_same<DecimalType, decimal32>::value ? "%" PRIu32 : "%" PRIu64};
+    const auto exp {d.biased_exponent()};
+    const auto significand {d.full_significand()};
+
+    // Print the significand into the buffer so that we can insert the decimal point
+    std::snprintf(buffer, sizeof(buffer), format, significand);
+    std::memmove(buffer + 2, buffer + 1, detail::precision_v<DecimalType> - 1);
+    std::memset(buffer + 1, '.', 1);
+    os << buffer;
+
+    // Offset will adjust the exponent to compensate for adding the decimal point
+    const auto offset {detail::num_digits(significand) - 1};
+    if (offset == 0)
+    {
+        os << "0";
+    }
+
+    os << "e";
+    auto print_exp {exp + offset};
+
+    if (print_exp < 0)
+    {
+        os << "-";
+        print_exp = -print_exp;
+    }
+    else
+    {
+        os << "+";
+    }
+
+    if (print_exp < 10)
+    {
+        os << "0";
+    }
+
+    os << print_exp;
+
+    return os;
 }
 
 } //namespace decimal

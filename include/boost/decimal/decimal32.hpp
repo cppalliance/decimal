@@ -414,9 +414,15 @@ public:
     friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>;
     #endif
 
+    // 3.2.10 Formatted input:
+    template <typename charT, typename traits, typename DecimalType>
+    friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>;
+
     // 3.2.11 Formatted output:
-    template <typename charT, typename traits>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d) -> std::basic_ostream<charT, traits>&;
+    template <typename charT, typename traits, typename DecimalType>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
 
     // <cmath> extensions
     // 3.6.4 Same Quantum
@@ -1470,86 +1476,6 @@ constexpr decimal32::operator std::int16_t() const noexcept
 constexpr decimal32::operator std::uint16_t() const noexcept
 {
     return to_integral<decimal32, std::uint16_t>(*this);
-}
-
-template <typename charT, typename traits>
-auto operator<<(std::basic_ostream<charT, traits>& os, const decimal32& d) -> std::basic_ostream<charT, traits>&
-{
-    if (issignaling(d))
-    {
-        if (d.isneg())
-        {
-            os << "-";
-        }
-
-        os << "nan(snan)";
-        return os;
-    }
-    else if (isnan(d)) // only quiet NaNs left
-    {
-        if (d.isneg())
-        {
-            os << "-nan(ind)";
-        }
-        else
-        {
-            os << "nan";
-        }
-
-        return os;
-    }
-    else if (isinf(d))
-    {
-        if (d.isneg())
-        {
-            os << "-";
-        }
-
-        os << "inf";
-        return os;
-    }
-
-    char buffer[detail::precision + 2] {}; // Precision + decimal point + null terminator
-
-    if (d.bits_.sign == 1)
-    {
-        os << "-";
-    }
-
-    // Print the significand into the buffer so that we can insert the decimal point
-    std::snprintf(buffer, sizeof(buffer), "%u", d.full_significand());
-    std::memmove(buffer + 2, buffer + 1, detail::precision - 1);
-    std::memset(buffer + 1, '.', 1);
-    os << buffer;
-
-    // Offset will adjust the exponent to compensate for adding the decimal point
-    const auto offset {detail::num_digits(d.full_significand()) - 1};
-    if (offset == 0)
-    {
-        os << "0";
-    }
-
-    os << "e";
-    auto print_exp {static_cast<int>(d.unbiased_exponent()) - detail::bias + offset};
-
-    if (print_exp < 0)
-    {
-        os << "-";
-        print_exp = -print_exp;
-    }
-    else
-    {
-        os << "+";
-    }
-
-    if (print_exp < 10)
-    {
-        os << "0";
-    }
-
-    os << print_exp;
-
-    return os;
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal32 rhs) noexcept -> std::uint32_t
