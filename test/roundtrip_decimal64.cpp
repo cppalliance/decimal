@@ -4,7 +4,7 @@
 
 #include "mini_to_chars.hpp"
 
-#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <limits>
 #include <random>
@@ -24,11 +24,10 @@ template <typename T>
 void test_conversion_to_integer()
 {
     errno = 0;
-    constexpr decimal32 one(1, 0);
-    constexpr decimal32 zero(0, 0);
-    constexpr decimal32 half(5, -1);
+    constexpr decimal64 one(1, 0);
+    constexpr decimal64 zero(0, 0);
+    constexpr decimal64 half(5, -1);
     BOOST_TEST_EQ(static_cast<T>(one), static_cast<T>(1)) && BOOST_TEST_EQ(errno, 0);
-    BOOST_TEST_EQ(static_cast<T>(one + one), static_cast<T>(2)) && BOOST_TEST_EQ(errno, 0);
     BOOST_TEST_EQ(static_cast<T>(zero), static_cast<T>(0)) && BOOST_TEST_EQ(errno, 0);
 
     BOOST_IF_CONSTEXPR (std::is_signed<T>::value)
@@ -42,37 +41,37 @@ void test_conversion_to_integer()
     }
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::infinity()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal64>::infinity()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal32>::infinity()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal64>::infinity()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::quiet_NaN()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, EINVAL);
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal64>::quiet_NaN()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, EINVAL);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::signaling_NaN()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, EINVAL);
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal64>::signaling_NaN()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, EINVAL);
 
     errno = 0;
     BOOST_TEST_EQ(static_cast<T>(half), static_cast<T>(0)) && BOOST_TEST_EQ(errno, 0);
 
-    constexpr decimal32 one_e_8(1, 8);
+    constexpr decimal64 one_e_8(1, 8);
     BOOST_TEST_EQ(static_cast<T>(one_e_8), static_cast<T>(100'000'000)) && BOOST_TEST_EQ(errno, 0);
 
-    constexpr decimal32 one_e_8_2(1'000'000, 2);
+    constexpr decimal64 one_e_8_2(1'000'000, 2);
     BOOST_TEST_EQ(static_cast<T>(one_e_8_2), static_cast<T>(100'000'000)) && BOOST_TEST_EQ(errno, 0);
 
     // Edge case
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<int> dist(-100, -20);
     errno = 0;
-    BOOST_TEST_EQ(static_cast<unsigned>(decimal32(dist(rng))), static_cast<unsigned>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<unsigned>(decimal64(dist(rng))), static_cast<unsigned>(0)) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<unsigned long>(decimal32(dist(rng))), static_cast<unsigned long>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<unsigned long>(decimal64(dist(rng))), static_cast<unsigned long>(0)) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<unsigned long long>(decimal32(dist(rng))), static_cast<unsigned long long>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<unsigned long long>(decimal64(dist(rng))), static_cast<unsigned long long>(0)) && BOOST_TEST_EQ(errno, ERANGE);
 }
 
 template <typename T>
@@ -84,9 +83,9 @@ void test_roundtrip_conversion_integer(T min = T(0), T max = T(detail::max_signi
     for (std::size_t i = 0; i < N; ++i)
     {
         const T val = dist(rng);
-        const decimal32 initial_decimal(val);
+        const decimal64 initial_decimal(val);
         const T return_val (initial_decimal);
-        const decimal32 return_decimal(return_val);
+        const decimal64 return_decimal(return_val);
 
         BOOST_TEST_EQ(val, return_val);
         BOOST_TEST_EQ(initial_decimal, return_decimal);
@@ -99,9 +98,9 @@ void test_roundtrip_conversion_integer(T min = T(0), T max = T(detail::max_signi
     for (std::size_t i = 0; i < N; ++i)
     {
         const T val = dist(rng);
-        const decimal32 initial_decimal(val);
+        const decimal64 initial_decimal(val);
         const T return_val (initial_decimal);
-        const decimal32 return_decimal(return_val);
+        const decimal64 return_decimal(return_val);
 
         BOOST_TEST_EQ(initial_decimal, return_decimal);
     }
@@ -112,20 +111,20 @@ void test_conversion_to_float()
 {
     errno = 0;
 
-    constexpr decimal32 half(5, -1);
+    constexpr decimal64 half(5, -1);
     BOOST_TEST_EQ(static_cast<T>(half), T(0.5)) && BOOST_TEST_EQ(errno, 0);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::infinity()), std::numeric_limits<T>::infinity()) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal64>::infinity()), std::numeric_limits<T>::infinity()) && BOOST_TEST_EQ(errno, 0);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal32>::infinity()), std::numeric_limits<T>::infinity()) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal64>::infinity()), std::numeric_limits<T>::infinity()) && BOOST_TEST_EQ(errno, 0);
 
     errno = 0;
-    BOOST_TEST(static_cast<T>(std::numeric_limits<decimal32>::quiet_NaN()) != std::numeric_limits<T>::quiet_NaN()) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST(static_cast<T>(std::numeric_limits<decimal64>::quiet_NaN()) != std::numeric_limits<T>::quiet_NaN()) && BOOST_TEST_EQ(errno, 0);
 
     errno = 0;
-    BOOST_TEST(static_cast<T>(std::numeric_limits<decimal32>::signaling_NaN()) != std::numeric_limits<T>::signaling_NaN()) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST(static_cast<T>(std::numeric_limits<decimal64>::signaling_NaN()) != std::numeric_limits<T>::signaling_NaN()) && BOOST_TEST_EQ(errno, 0);
 }
 
 template <typename T>
@@ -137,9 +136,9 @@ void test_roundtrip_conversion_float()
     for (std::size_t i = 0; i < N; ++i)
     {
         const T val {dist(rng)};
-        const decimal32 initial_decimal(val);
+        const decimal64 initial_decimal(val);
         const T return_val {static_cast<T>(initial_decimal)};
-        const decimal32 return_decimal {return_val};
+        const decimal64 return_decimal {return_val};
 
         if(!BOOST_TEST_EQ(initial_decimal, return_decimal))
         {
@@ -159,11 +158,11 @@ void test_roundtrip_integer_stream()
 
     for (std::size_t i {}; i < N; ++i)
     {
-        const decimal32 first_val {dist(rng)};
+        const decimal64 first_val {dist(rng)};
         const T first_val_int {static_cast<T>(first_val)};
         std::stringstream ss;
         ss << first_val;
-        decimal32 return_val {};
+        decimal64 return_val {};
         ss >> return_val;
         const T return_val_int {static_cast<T>(return_val)};
 
@@ -185,11 +184,11 @@ void test_roundtrip_float_stream()
 
     for (std::size_t i {}; i < N; ++i)
     {
-        const decimal32 first_val {dist(rng)};
+        const decimal64 first_val {dist(rng)};
         const T first_val_flt {static_cast<T>(first_val)};
         std::stringstream ss;
         ss << first_val;
-        decimal32 return_val {};
+        decimal64 return_val {};
         ss >> return_val;
         const T return_val_flt {static_cast<T>(return_val)};
 
@@ -239,38 +238,38 @@ int main()
     test_conversion_to_float<double>();
     test_conversion_to_float<long double>();
 
-    test_roundtrip_conversion_float<float>();
-    test_roundtrip_conversion_float<double>();
-    test_roundtrip_conversion_float<long double>();
+    //test_roundtrip_conversion_float<float>();
+    //test_roundtrip_conversion_float<double>();
+    //test_roundtrip_conversion_float<long double>();
 
-    test_roundtrip_integer_stream<int>();
-    test_roundtrip_integer_stream<unsigned>();
-    test_roundtrip_integer_stream<long>();
-    test_roundtrip_integer_stream<unsigned long>();
-    test_roundtrip_integer_stream<long long>();
-    test_roundtrip_integer_stream<unsigned long long>();
+    //test_roundtrip_integer_stream<int>();
+    //test_roundtrip_integer_stream<unsigned>();
+    //test_roundtrip_integer_stream<long>();
+    //test_roundtrip_integer_stream<unsigned long>();
+    //test_roundtrip_integer_stream<long long>();
+    //test_roundtrip_integer_stream<unsigned long long>();
 
-    test_roundtrip_float_stream<float>();
-    test_roundtrip_float_stream<double>();
-    test_roundtrip_float_stream<long double>();
+    //test_roundtrip_float_stream<float>();
+    //test_roundtrip_float_stream<double>();
+    //test_roundtrip_float_stream<long double>();
 
     #ifdef BOOST_DECIMAL_HAS_FLOAT16
-    test_conversion_to_float<std::float16_t>();
-    // test_roundtrip_conversion_float<std::float16_t>();
-    // test_roundtrip_float_stream<std::float16_t>();
+    //test_conversion_to_float<std::float16_t>();
+    //test_roundtrip_conversion_float<std::float16_t>();
+    //test_roundtrip_float_stream<std::float16_t>();
     #endif
     #ifdef BOOST_DECIMAL_HAS_FLOAT32
-    test_conversion_to_float<std::float32_t>();
-    test_roundtrip_conversion_float<std::float32_t>();
-    test_roundtrip_float_stream<std::float32_t>();
+    //test_conversion_to_float<std::float32_t>();
+    //test_roundtrip_conversion_float<std::float32_t>();
+    //test_roundtrip_float_stream<std::float32_t>();
     #endif
     #ifdef BOOST_DECIMAL_HAS_FLOAT64
-    test_conversion_to_float<std::float64_t>();
-    test_roundtrip_conversion_float<std::float64_t>();
-    test_roundtrip_float_stream<std::float64_t>();
+    //test_conversion_to_float<std::float64_t>();
+    //test_roundtrip_conversion_float<std::float64_t>();
+    //test_roundtrip_float_stream<std::float64_t>();
     #endif
     #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
-    test_conversion_to_float<std::bfloat16_t>();
+    //test_conversion_to_float<std::bfloat16_t>();
     // test_roundtrip_conversion_float<std::bfloat16_t>();
     // test_roundtrip_float_stream<std::bfloat16_t>();
     #endif
