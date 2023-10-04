@@ -178,7 +178,9 @@ public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
 
-    // TODO(mborland): 3.2.2.2 Conversion form floating-point type
+    // 3.2.2.2 Conversion form floating-point type
+    template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal64(Float val) noexcept;
 
     // 3.2.3.3 Conversion from integral type
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
@@ -196,7 +198,7 @@ public:
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
 
-    // Conversion to floating point type
+    // 3.2.6 Conversion to floating-point type
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
@@ -323,6 +325,24 @@ public:
     -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
             std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t, std::uint64_t>>;
 };
+
+constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
+{
+    decimal64 result;
+
+    result.bits_.exponent          = (bits & detail::d64_construct_sign_mask) >> 63U;
+    result.bits_.combination_field = (bits & detail::d64_construct_combination_mask) >> 58U;
+    result.bits_.exponent          = (bits & detail::d64_construct_exp_mask) >> 50U;
+    result.bits_.significand       =  bits & detail::d64_construct_significand_mask;
+
+    return result;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
+{
+    const auto bits {detail::bit_cast<std::uint64_t>(rhs.bits_)};
+    return bits;
+}
 
 // 3.2.5 initialization from coefficient and exponent:
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool>>
@@ -470,6 +490,38 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
         else
         {
             bits_.combination_field = detail::d64_comb_inf_mask;
+        }
+    }
+}
+
+template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::decimal64(Float val) noexcept
+{
+    if (std::isnan(val))
+    {
+        *this = from_bits(detail::d64_nan_mask);
+    }
+    else if (std::isinf(val))
+    {
+        *this = from_bits(detail::d64_inf_mask);
+    }
+    else
+    {
+        const auto components {detail::ryu::floating_point_to_fd128(val)};
+
+        #ifdef BOOST_DECIMAL_DEBUG
+        std::cerr << "Mant: " << components.mantissa
+                  << "\nExp: " << components.exponent
+                  << "\nSign: " << components.sign << std::endl;
+        #endif
+
+        if (components.exponent > detail::emax_v<decimal64>)
+        {
+            *this = from_bits(detail::d64_inf_mask);
+        }
+        else
+        {
+            *this = decimal64 {components.mantissa, components.exponent, components.sign};
         }
     }
 }
@@ -625,24 +677,6 @@ constexpr auto decimal64::full_significand() const noexcept -> std::uint64_t
 constexpr auto decimal64::isneg() const noexcept -> bool
 {
     return static_cast<bool>(bits_.sign);
-}
-
-constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
-{
-    decimal64 result;
-
-    result.bits_.exponent          = (bits & detail::d64_construct_sign_mask) >> 63U;
-    result.bits_.combination_field = (bits & detail::d64_construct_combination_mask) >> 58U;
-    result.bits_.exponent          = (bits & detail::d64_construct_exp_mask) >> 50U;
-    result.bits_.significand       =  bits & detail::d64_construct_significand_mask;
-
-    return result;
-}
-
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
-{
-    const auto bits {detail::bit_cast<std::uint64_t>(rhs.bits_)};
-    return bits;
 }
 
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool

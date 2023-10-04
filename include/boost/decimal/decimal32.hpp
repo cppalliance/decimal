@@ -1409,11 +1409,11 @@ constexpr auto decimal32::edit_sign(bool sign) noexcept -> void
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 {
-    if (val != val)
+    if (std::isnan(val))
     {
         *this = boost::decimal::from_bits(boost::decimal::detail::d32_nan_mask);
     }
-    else if (val == std::numeric_limits<Float>::infinity() || -val == std::numeric_limits<Float>::infinity())
+    else if (std::isinf(val))
     {
         *this = boost::decimal::from_bits(boost::decimal::detail::d32_inf_mask);
     }
