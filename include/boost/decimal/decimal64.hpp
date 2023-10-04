@@ -36,6 +36,7 @@
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/to_integral.hpp>
 #include <boost/decimal/detail/io.hpp>
+#include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
