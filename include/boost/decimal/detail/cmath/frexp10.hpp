@@ -17,6 +17,12 @@ constexpr auto frexp10<decimal32>(decimal32 num, int* expptr) noexcept
     return frexp10d32(num, expptr);
 }
 
+template <>
+constexpr auto frexp10<decimal64>(decimal64 num, int* expptr) noexcept
+{
+    return frexp10d64(num, expptr);
+}
+
 } //namespace decimal
 } //namespace boost
 

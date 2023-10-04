@@ -273,13 +273,8 @@ public:
     friend constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
-    // 3.2.10 Formatted input:
-    template <typename charT, typename traits>
-    friend auto operator>>(std::basic_istream<charT, traits>& is, decimal64& d) -> std::basic_istream<charT, traits>&;
-
-    // 3.2.11 Formatted output:
-    template <typename charT, typename traits>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64& d) -> std::basic_ostream<charT, traits>&;
+    // Related to <cmath>
+    friend constexpr auto frexp10d64(decimal64 num, int* exp) noexcept -> std::uint64_t;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -780,86 +775,32 @@ constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
     return !(lhs < rhs);
 }
 
-
-// TODO(mborland): can be made generic
-template <typename charT, typename traits>
-auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64& d) -> std::basic_ostream<charT, traits>&
+// Returns the normalized significand and exponent to be cohort agnostic
+// Returns num in the range [1'000'000'000'000'000, 9'999'999'999'999'999]
+//
+// If the conversion can not be performed returns UINT64_MAX and exp = 0
+constexpr auto frexp10d64(decimal64 num, int* expptr) noexcept -> std::uint64_t
 {
-    if (issignaling(d))
-    {
-        if (d.isneg())
-        {
-            os << "-";
-        }
+    constexpr decimal64 zero {0, 0};
 
-        os << "nan(snan)";
-        return os;
+    if (num == zero)
+    {
+        *expptr = 0;
+        return 0;
     }
-    else if (isnan(d)) // only quiet NaNs left
+    else if (isinf(num) || isnan(num))
     {
-        if (d.isneg())
-        {
-            os << "-nan(ind)";
-        }
-        else
-        {
-            os << "nan";
-        }
-
-        return os;
-    }
-    else if (isinf(d))
-    {
-        if (d.isneg())
-        {
-            os << "-";
-        }
-
-        os << "inf";
-        return os;
+        *expptr = 0;
+        return (std::numeric_limits<std::uint64_t>::max)();
     }
 
-    char buffer[detail::precision_v<decimal64> + 2] {}; // Precision + decimal point + null terminator
+    auto num_exp {num.biased_exponent()};
+    auto num_sig {num.full_significand()};
+    detail::normalize(num_sig, num_exp);
 
-    if (d.bits_.sign == 1)
-    {
-        os << "-";
-    }
+    *expptr = num_exp;
 
-    // Print the significand into the buffer so that we can insert the decimal point
-    std::snprintf(buffer, sizeof(buffer), "%" PRIu64, d.full_significand());
-    std::memmove(buffer + 2, buffer + 1, detail::precision_v<decimal64> - 1);
-    std::memset(buffer + 1, '.', 1);
-    os << buffer;
-
-    // Offset will adjust the exponent to compensate for adding the decimal point
-    const auto offset {detail::num_digits(d.full_significand()) - 1};
-    if (offset == 0)
-    {
-        os << "0";
-    }
-
-    os << "e";
-    auto print_exp {static_cast<int>(d.unbiased_exponent()) - detail::bias_v<decimal64> + offset};
-
-    if (print_exp < 0)
-    {
-        os << "-";
-        print_exp = -print_exp;
-    }
-    else
-    {
-        os << "+";
-    }
-
-    if (print_exp < 10)
-    {
-        os << "0";
-    }
-
-    os << print_exp;
-
-    return os;
+    return num_sig;
 }
 
 } //namespace decimal
