@@ -35,6 +35,7 @@
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/to_integral.hpp>
+#include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -271,6 +272,10 @@ public:
     template <typename Integer>
     friend constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // 3.2.10 Formatted input:
+    template <typename charT, typename traits>
+    friend auto operator>>(std::basic_istream<charT, traits>& is, decimal64& d) -> std::basic_istream<charT, traits>&;
 
     // 3.2.11 Formatted output:
     template <typename charT, typename traits>

@@ -35,6 +35,7 @@
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/to_integral.hpp>
+#include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -412,10 +413,6 @@ public:
     template <typename Integer>
     friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>;
     #endif
-
-    // 3.2.10 Formatted input:
-    template <typename charT, typename traits>
-    friend auto operator>>(std::basic_istream<charT, traits>& is, decimal32& d) -> std::basic_istream<charT, traits>&;
 
     // 3.2.11 Formatted output:
     template <typename charT, typename traits>
@@ -1978,56 +1975,6 @@ constexpr decimal32::operator std::bfloat16_t() const noexcept
     return static_cast<std::bfloat16_t>(this->floating_conversion_impl<float>());
 }
 #endif
-
-template <typename charT, typename traits>
-auto operator>>(std::basic_istream<charT, traits>& is, decimal32& d) -> std::basic_istream<charT, traits>&
-{
-    char buffer[1024] {}; // What should be an unreasonably high maximum
-    is >> buffer;
-
-    bool sign {};
-    std::uint64_t significand {};
-    std::int32_t expval {};
-    const auto buffer_len {std::strlen(buffer)};
-
-    if (buffer_len == 0)
-    {
-        errno = EINVAL;
-        return is;
-    }
-
-    const auto r {detail::parser(buffer, buffer + buffer_len, sign, significand, expval)};
-
-    if (r.ec != std::errc{})
-    {
-        if (r.ec == std::errc::not_supported)
-        {
-            if (significand)
-            {
-                d = from_bits(boost::decimal::detail::d32_snan_mask);
-            }
-            else
-            {
-                d = from_bits(boost::decimal::detail::d32_nan_mask);
-            }
-        }
-        else if (r.ec == std::errc::value_too_large)
-        {
-            d = from_bits(boost::decimal::detail::d32_inf_mask);
-        }
-        else
-        {
-            d = from_bits(boost::decimal::detail::d32_snan_mask);
-            errno = static_cast<int>(r.ec);
-        }
-    }
-    else
-    {
-        d = decimal32(significand, expval, sign);
-    }
-
-    return is;
-}
 
 // 3.6.4
 // Effects: determines if the quantum exponents of x and y are the same.
