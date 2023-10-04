@@ -381,8 +381,6 @@ void random_mixed_NE(T lower, T upper)
     }
 }
 
-// TODO(mborland): Activate once implemented
-/*
 #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 template <typename T>
 void random_SPACESHIP(T lower, T upper)
@@ -405,6 +403,8 @@ void random_SPACESHIP(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+    BOOST_TEST((decimal64(dist(rng)) <=> std::numeric_limits<decimal64>::quiet_NaN()) == std::partial_ordering::unordered);
+    BOOST_TEST((std::numeric_limits<decimal64>::quiet_NaN() <=> std::numeric_limits<decimal64>::quiet_NaN()) == std::partial_ordering::unordered);
 }
 
 template <typename T>
@@ -428,9 +428,10 @@ void random_mixed_SPACESHIP(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+    BOOST_TEST((dist(rng) <=> std::numeric_limits<decimal64>::quiet_NaN()) == std::partial_ordering::unordered);
+    BOOST_TEST((std::numeric_limits<decimal64>::quiet_NaN() <=> std::numeric_limits<decimal64>::quiet_NaN()) == std::partial_ordering::unordered);
 }
 #endif
-*/
 
 int main()
 {
@@ -518,7 +519,6 @@ int main()
     random_mixed_NE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_NE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
 
-    /*
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     random_SPACESHIP(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_SPACESHIP(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
@@ -534,7 +534,6 @@ int main()
     random_mixed_SPACESHIP(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_SPACESHIP(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
     #endif
-    */
 
     return boost::report_errors();
 }

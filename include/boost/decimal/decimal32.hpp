@@ -405,13 +405,13 @@ public:
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
-    friend constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::strong_ordering;
+    friend constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::partial_ordering;
 
     template <typename Integer>
-    friend constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>;
+    friend constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
 
     template <typename Integer>
-    friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>;
+    friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
     #endif
 
     // 3.2.10 Formatted input:
@@ -1174,6 +1174,11 @@ constexpr auto operator<(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 template <typename Integer>
 constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
+    if (isnan(rhs))
+    {
+        return false;
+    }
+
     return !less_impl(rhs, lhs) && lhs != rhs;
 }
 
@@ -1270,48 +1275,60 @@ constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if
 
 #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 
-constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::strong_ordering
+constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::partial_ordering
 {
     if (lhs < rhs)
     {
-        return std::strong_ordering::less;
+        return std::partial_ordering::less;
     }
     else if (lhs > rhs)
     {
-        return std::strong_ordering::greater;
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
     }
 
-    return std::strong_ordering::equal;
+    return std::partial_ordering::unordered;
 }
 
 template <typename Integer>
-constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>
+constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>
 {
     if (lhs < rhs)
     {
-        return std::strong_ordering::less;
+        return std::partial_ordering::less;
     }
     else if (lhs > rhs)
     {
-        return std::strong_ordering::greater;
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
     }
 
-    return std::strong_ordering::equal;
+    return std::partial_ordering::unordered;
 }
 
 template <typename Integer>
-constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::strong_ordering>
+constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>
 {
     if (lhs < rhs)
     {
-        return std::strong_ordering::less;
+        return std::partial_ordering::less;
     }
     else if (lhs > rhs)
     {
-        return std::strong_ordering::greater;
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
     }
 
-    return std::strong_ordering::equal;
+    return std::partial_ordering::unordered;
 }
 
 #endif

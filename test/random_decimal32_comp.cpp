@@ -403,6 +403,9 @@ void random_SPACESHIP(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    BOOST_TEST((decimal32(dist(rng)) <=> std::numeric_limits<decimal32>::quiet_NaN()) == std::partial_ordering::unordered);
+    BOOST_TEST((std::numeric_limits<decimal32>::quiet_NaN() <=> std::numeric_limits<decimal32>::quiet_NaN()) == std::partial_ordering::unordered);
 }
 
 template <typename T>
@@ -426,6 +429,21 @@ void random_mixed_SPACESHIP(T lower, T upper)
                       << "\nDec 2: " << dec2 << std::endl;
         }
     }
+
+    if (!BOOST_TEST((dist(rng) <=> std::numeric_limits<decimal32>::quiet_NaN()) == std::partial_ordering::unordered))
+    {
+        const auto eval {dist(rng) <=> std::numeric_limits<decimal32>::quiet_NaN()};
+        if (eval == std::partial_ordering::less)
+            std::cerr << "Less" << std::endl;
+        else if (eval == std::partial_ordering::greater)
+            std::cerr << "Greater" << std::endl;
+        else if (eval == std::partial_ordering::equivalent)
+            std::cerr << "Equivalent" << std::endl;
+        else
+            std::cerr << "Unordered" << std::endl;
+    }
+
+    BOOST_TEST((std::numeric_limits<decimal32>::quiet_NaN() <=> std::numeric_limits<decimal32>::quiet_NaN()) == std::partial_ordering::unordered);
 }
 #endif
 
