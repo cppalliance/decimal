@@ -381,8 +381,6 @@ void random_mixed_NE(T lower, T upper)
     }
 }
 
-// TODO(mborland): Activate once implemented
-/*
 #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 template <typename T>
 void random_SPACESHIP(T lower, T upper)
@@ -434,7 +432,6 @@ void random_mixed_SPACESHIP(T lower, T upper)
     BOOST_TEST((std::numeric_limits<decimal64>::quiet_NaN() <=> std::numeric_limits<decimal64>::quiet_NaN()) == std::partial_ordering::unordered);
 }
 #endif
-*/
 
 int main()
 {
