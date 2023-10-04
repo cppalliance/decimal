@@ -497,11 +497,11 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::decimal64(Float val) noexcept
 {
-    if (std::isnan(val))
+    if (val != val)
     {
         *this = from_bits(detail::d64_nan_mask);
     }
-    else if (std::isinf(val))
+    else if (val == std::numeric_limits<Float>::infinity() || val == -std::numeric_limits<Float>::infinity())
     {
         *this = from_bits(detail::d64_inf_mask);
     }
