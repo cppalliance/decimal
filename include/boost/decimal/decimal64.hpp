@@ -35,6 +35,8 @@
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/to_integral.hpp>
+#include <boost/decimal/detail/io.hpp>
+#include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -272,9 +274,21 @@ public:
     friend constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
+    // 3.2.10 Formatted input:
+    template <typename charT, typename traits, typename DecimalType>
+    friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>;
+
     // 3.2.11 Formatted output:
-    template <typename charT, typename traits>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64& d) -> std::basic_ostream<charT, traits>&;
+    template <typename charT, typename traits, typename DecimalType>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
+
+    // Related to <cmath>
+    template <typename T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
+            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t, std::uint64_t>>;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -773,88 +787,6 @@ constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
     }
 
     return !(lhs < rhs);
-}
-
-
-// TODO(mborland): can be made generic
-template <typename charT, typename traits>
-auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64& d) -> std::basic_ostream<charT, traits>&
-{
-    if (issignaling(d))
-    {
-        if (d.isneg())
-        {
-            os << "-";
-        }
-
-        os << "nan(snan)";
-        return os;
-    }
-    else if (isnan(d)) // only quiet NaNs left
-    {
-        if (d.isneg())
-        {
-            os << "-nan(ind)";
-        }
-        else
-        {
-            os << "nan";
-        }
-
-        return os;
-    }
-    else if (isinf(d))
-    {
-        if (d.isneg())
-        {
-            os << "-";
-        }
-
-        os << "inf";
-        return os;
-    }
-
-    char buffer[detail::precision_v<decimal64> + 2] {}; // Precision + decimal point + null terminator
-
-    if (d.bits_.sign == 1)
-    {
-        os << "-";
-    }
-
-    // Print the significand into the buffer so that we can insert the decimal point
-    std::snprintf(buffer, sizeof(buffer), "%" PRIu64, d.full_significand());
-    std::memmove(buffer + 2, buffer + 1, detail::precision_v<decimal64> - 1);
-    std::memset(buffer + 1, '.', 1);
-    os << buffer;
-
-    // Offset will adjust the exponent to compensate for adding the decimal point
-    const auto offset {detail::num_digits(d.full_significand()) - 1};
-    if (offset == 0)
-    {
-        os << "0";
-    }
-
-    os << "e";
-    auto print_exp {static_cast<int>(d.unbiased_exponent()) - detail::bias_v<decimal64> + offset};
-
-    if (print_exp < 0)
-    {
-        os << "-";
-        print_exp = -print_exp;
-    }
-    else
-    {
-        os << "+";
-    }
-
-    if (print_exp < 10)
-    {
-        os << "0";
-    }
-
-    os << print_exp;
-
-    return os;
 }
 
 } //namespace decimal

@@ -35,3 +35,4 @@ run test_promotion.cpp ;
 run test_float_conversion.cpp ;
 run test_decimal64_basis.cpp ;
 run random_decimal64_comp.cpp ;
+run test_decimal64_stream.cpp ;
