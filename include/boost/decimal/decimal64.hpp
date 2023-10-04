@@ -35,6 +35,7 @@
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/to_integral.hpp>
+#include <boost/decimal/detail/to_float.hpp>
 #include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
@@ -145,6 +146,9 @@ private:
     template <typename Decimal, typename TargetType>
     friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
 
+    template <typename Decimal, typename TargetType>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
+
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
@@ -176,11 +180,11 @@ public:
 
     // TODO(mborland): 3.2.2.2 Conversion form floating-point type
 
-    // 3.2.2.3 Conversion from integral type
+    // 3.2.3.3 Conversion from integral type
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal64(Integer val) noexcept;
 
-    // 3.2.2.4 Conversion to integral type
+    // 3.2.3.4 Conversion to integral type
     explicit constexpr operator int() const noexcept;
     explicit constexpr operator unsigned() const noexcept;
     explicit constexpr operator long() const noexcept;
@@ -191,6 +195,24 @@ public:
     explicit constexpr operator std::uint8_t() const noexcept;
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
+
+    // Conversion to floating point type
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_FLOAT16
+    explicit constexpr operator std::float16_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT32
+    explicit constexpr operator std::float32_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT64
+    explicit constexpr operator std::float64_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+    explicit constexpr operator std::bfloat16_t() const noexcept;
+    #endif
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
@@ -507,6 +529,47 @@ constexpr decimal64::operator std::uint16_t() const noexcept
 {
     return to_integral<decimal64, std::uint16_t>(*this);
 }
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::operator float() const noexcept
+{
+    return to_float<decimal64, float>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::operator double() const noexcept
+{
+    return to_float<decimal64, double>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::operator long double() const noexcept
+{
+    // TODO(mborland): Don't have an exact way of converting to various long doubles
+    return static_cast<long double>(to_float<decimal64, double>(*this));
+}
+
+#ifdef BOOST_DECIMAL_HAS_FLOAT16
+constexpr decimal64::operator std::float16_t() const noexcept
+{
+    return static_cast<std::float16_t>(to_float<decimal64, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT32
+constexpr decimal64::operator std::float32_t() const noexcept
+{
+    return static_cast<std::float32_t>(to_float<decimal64, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT64
+constexpr decimal64::operator std::float64_t() const noexcept
+{
+    return static_cast<std::float64_t>(to_float<decimal64, double>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+constexpr decimal64::operator std::bfloat16_t() const noexcept
+{
+    return static_cast<std::bfloat16_t>(to_float<decimal64, float>(*this));
+}
+#endif
 
 constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
 {

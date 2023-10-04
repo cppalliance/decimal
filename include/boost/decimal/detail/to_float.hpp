@@ -53,6 +53,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType
                                                                              val.full_significand(),
                                                                              val.isneg(), success));
     }
+    // TODO(mborland): Implement conversion to long double
 
     if (BOOST_DECIMAL_UNLIKELY(!success))
     {
