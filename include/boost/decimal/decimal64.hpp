@@ -274,7 +274,10 @@ public:
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Related to <cmath>
-    friend constexpr auto frexp10d64(decimal64 num, int* exp) noexcept -> std::uint64_t;
+    template <typename T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
+            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t, std::uint64_t>>;
 };
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -773,34 +776,6 @@ constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
     }
 
     return !(lhs < rhs);
-}
-
-// Returns the normalized significand and exponent to be cohort agnostic
-// Returns num in the range [1'000'000'000'000'000, 9'999'999'999'999'999]
-//
-// If the conversion can not be performed returns UINT64_MAX and exp = 0
-constexpr auto frexp10d64(decimal64 num, int* expptr) noexcept -> std::uint64_t
-{
-    constexpr decimal64 zero {0, 0};
-
-    if (num == zero)
-    {
-        *expptr = 0;
-        return 0;
-    }
-    else if (isinf(num) || isnan(num))
-    {
-        *expptr = 0;
-        return (std::numeric_limits<std::uint64_t>::max)();
-    }
-
-    auto num_exp {num.biased_exponent()};
-    auto num_sig {num.full_significand()};
-    detail::normalize(num_sig, num_exp);
-
-    *expptr = num_exp;
-
-    return num_sig;
 }
 
 } //namespace decimal

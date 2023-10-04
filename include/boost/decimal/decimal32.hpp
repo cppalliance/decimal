@@ -439,7 +439,11 @@ public:
     friend constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32;
 
     // Related to <cmath>
-    friend constexpr auto frexp10d32(decimal32 num, int* exp) noexcept -> std::uint32_t;
+    template <typename T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
+            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t, std::uint64_t>>;
+
     friend constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32;
     friend constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32;
 
@@ -2131,34 +2135,6 @@ constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decima
     }
 
     return return_val;
-}
-
-// Returns the normalized significand and exponent to be cohort agnostic
-// Returns num in the range [1'000'000, 9'999'999]
-//
-// If the conversion can not be performed returns UINT32_MAX and exp = 0
-constexpr auto frexp10d32(decimal32 num, int* expptr) noexcept -> std::uint32_t
-{
-    constexpr decimal32 zero {0, 0};
-
-    if (num == zero)
-    {
-        *expptr = 0;
-        return 0;
-    }
-    else if (isinf(num) || isnan(num))
-    {
-        *expptr = 0;
-        return (std::numeric_limits<std::uint32_t>::max)();
-    }
-
-    auto num_exp {num.biased_exponent()};
-    auto num_sig {num.full_significand()};
-    detail::normalize(num_sig, num_exp);
-
-    *expptr = num_exp;
-
-    return num_sig;
 }
 
 constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32

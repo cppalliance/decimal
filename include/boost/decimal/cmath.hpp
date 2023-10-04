@@ -49,13 +49,6 @@
 
 namespace boost { namespace decimal {
 
-// Generic overloads
-
-constexpr auto frexp10(decimal32 num, int *expptr) noexcept -> std::uint32_t
-{
-    return frexp10d32(num, expptr);
-}
-
 constexpr auto scalbn(decimal32 num, int expval) noexcept -> decimal32
 {
     return scalbnd32(num, expval);

@@ -11,6 +11,7 @@
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
+#include <boost/decimal/detail/cmath/frexp10.hpp>
 #include <type_traits>
 #include <cmath>
 
@@ -35,8 +36,7 @@ constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
     }
 
     int exp_ptr {};
-    // TODO(mborland): Make frexp10 portable
-    auto new_sig {frexp10d32(val, &exp_ptr)};
+    auto new_sig {frexp10(val, &exp_ptr)};
     const auto abs_exp {detail::make_positive_unsigned(exp_ptr)};
     const bool is_neg {val < zero};
 
