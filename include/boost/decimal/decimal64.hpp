@@ -274,6 +274,17 @@ public:
     friend constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
+    // C++20 spaceship
+    #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+    friend constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::partial_ordering;
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering;
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering;
+    #endif
+
     // 3.2.10 Formatted input:
     template <typename charT, typename traits, typename DecimalType>
     friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
@@ -788,6 +799,66 @@ constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
 
     return !(lhs < rhs);
 }
+
+#ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+
+constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::partial_ordering
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+template <typename Integer>
+constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+template <typename Integer>
+constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+#endif
 
 } //namespace decimal
 } //namespace boost
