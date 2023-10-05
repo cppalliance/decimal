@@ -35,6 +35,7 @@
 #include <boost/decimal/detail/to_integral.hpp>
 #include <boost/decimal/detail/to_float.hpp>
 #include <boost/decimal/detail/io.hpp>
+#include <boost/decimal/detail/check_non_finite.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -680,32 +681,6 @@ constexpr auto operator-(decimal32 rhs) noexcept-> decimal32
     return rhs;
 }
 
-// Prioritizes checking for nans and then checks for infs
-constexpr auto check_non_finite(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
-{
-    constexpr decimal32 zero {0, 0};
-
-    if (isnan(lhs))
-    {
-        return lhs;
-    }
-    else if (isnan(rhs))
-    {
-        return rhs;
-    }
-
-    if (isinf(lhs))
-    {
-        return lhs;
-    }
-    else if (isinf(rhs))
-    {
-        return rhs;
-    }
-
-    return zero;
-}
-
 template <typename T, typename T2>
 constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                         T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components
@@ -870,7 +845,7 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     constexpr decimal32 zero {0, 0};
 
-    const auto res {check_non_finite(lhs, rhs)};
+    const auto res {detail::check_non_finite(lhs, rhs)};
     if (res != zero)
     {
         return res;
@@ -985,7 +960,7 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     constexpr decimal32 zero {0, 0};
 
-    const auto res {check_non_finite(lhs, rhs)};
+    const auto res {detail::check_non_finite(lhs, rhs)};
     if (res != zero)
     {
         return res;
@@ -1548,7 +1523,7 @@ constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     constexpr decimal32 zero {0, 0};
 
-    const auto res {check_non_finite(lhs, rhs)};
+    const auto res {detail::check_non_finite(lhs, rhs)};
     if (res != zero)
     {
         return res;
@@ -2066,7 +2041,7 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
     // First calculate x * y without rounding
     constexpr decimal32 zero {0, 0};
 
-    const auto res {check_non_finite(x, y)};
+    const auto res {detail::check_non_finite(x, y)};
     if (res != zero)
     {
         return res;
@@ -2083,7 +2058,7 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
     auto mul_result {mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
     const decimal32 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
 
-    const auto res_add {check_non_finite(dec_result, z)};
+    const auto res_add {detail::check_non_finite(dec_result, z)};
     if (res_add != zero)
     {
         return res_add;

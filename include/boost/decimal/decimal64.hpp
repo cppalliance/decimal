@@ -38,6 +38,7 @@
 #include <boost/decimal/detail/to_float.hpp>
 #include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/comparison.hpp>
+#include <boost/decimal/detail/check_non_finite.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -242,6 +243,15 @@ public:
     // 3.2.7 unary arithmetic operators:
     friend constexpr auto operator+(decimal64 rhs) noexcept -> decimal64;
     friend constexpr auto operator-(decimal64 rhs) noexcept -> decimal64;
+
+    // 3.2.8 Binary arithmetic operators
+    friend constexpr auto operator+(decimal64 lhs, decimal64 rhs) -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator+(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     // 3.2.9 Comparison operators:
     // Equality
@@ -736,6 +746,140 @@ constexpr auto operator-(decimal64 rhs) noexcept-> decimal64
     return rhs;
 }
 
+
+template<typename T1, typename T2>
+constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components
+{
+    const bool sign {lhs_sign};
+
+    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
+
+    if (delta_exp > detail::precision_v<decimal64> + 1)
+    {
+        // If the difference in exponents is more than the digits of accuracy
+        // we return the larger of the two
+        //
+        // e.g. 1e20 + 1e-20 = 1e20
+
+        return {lhs_sig, lhs_exp, lhs_sign};
+    }
+    else if (delta_exp == detail::precision_v<decimal64> + 1)
+    {
+        // Only need to see if we need to add one to the
+        // significand of the bigger value
+        //
+        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
+
+        if (rhs_sig >= UINT64_C(5'000'000'000'000'000))
+        {
+            ++lhs_sig;
+            return {lhs_sig, lhs_exp, lhs_sign};
+        }
+        else
+        {
+            return {lhs_sig, lhs_exp, lhs_sign};
+        }
+    }
+
+    // The two numbers can be added together without special handling
+    //
+    // If we can add to the lhs sig rather than dividing we can save some precision
+    // 64-bit sign int can have 19 digits, and our normalized significand has 16
+    if (delta_exp <= 3)
+    {
+        while (delta_exp > 0)
+        {
+            lhs_sig *= 10;
+            --delta_exp;
+            --lhs_exp;
+        }
+    }
+    else
+    {
+        lhs_sig *= 1000;
+        delta_exp -= 3;
+        lhs_exp -= 3;
+    }
+
+    while (delta_exp > 1)
+    {
+        rhs_sig /= 10;
+        --delta_exp;
+    }
+
+    if (delta_exp == 1)
+    {
+        detail::fenv_round(rhs_sig, rhs_sign);
+    }
+
+    // Both of the significands are well under 64-bits, so we can fit them into int64_t without issue
+    const auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig)};
+    const auto new_exp {lhs_exp};
+    const auto res_sig {detail::make_positive_unsigned(new_sig)};
+
+    return {res_sig, new_exp, sign};
+}
+
+
+constexpr auto operator+(decimal64 lhs, decimal64 rhs) -> decimal64
+{
+    constexpr decimal64 zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && rhs.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+
+    // Ensure that lhs is always the larger for ease of impl
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs, rhs);
+    }
+
+    /*
+     * TODO(mborland): Activate once operator- is implemented
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs - abs(rhs);
+    }
+    */
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize(lhs_sig, lhs_exp);
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    detail::normalize(rhs_sig, rhs_exp);
+
+    const auto result {d64_add_impl(lhs_sig, lhs_exp, lhs.isneg(),
+                                    rhs_sig, rhs_exp, rhs.isneg())};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+
+}
+
+template <typename Integer>
+constexpr auto operator+(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return rhs + lhs;
+}
+
 constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
 {
     // Check for IEEE requirement that nan != nan
@@ -888,80 +1032,6 @@ constexpr auto operator>=(decimal64 lhs, decimal64 rhs) noexcept -> bool
     }
 
     return !(lhs < rhs);
-}
-
-template<typename T1, typename T2>
-constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components
-{
-    const bool sign {lhs_sign};
-
-    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-
-    if (delta_exp > detail::precision_v<decimal64> + 1)
-    {
-        // If the difference in exponents is more than the digits of accuracy
-        // we return the larger of the two
-        //
-        // e.g. 1e20 + 1e-20 = 1e20
-
-        return {lhs_sig, lhs_exp, lhs_sign};
-    }
-    else if (delta_exp == detail::precision_v<decimal64> + 1)
-    {
-        // Only need to see if we need to add one to the
-        // significand of the bigger value
-        //
-        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
-
-        if (rhs_sig >= UINT64_C(5'000'000'000'000'000))
-        {
-            ++lhs_sig;
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
-        else
-        {
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
-    }
-
-    // The two numbers can be added together without special handling
-    //
-    // If we can add to the lhs sig rather than dividing we can save some precision
-    // 64-bit sign int can have 19 digits, and our normalized significand has 16
-    if (delta_exp <= 3)
-    {
-        while (delta_exp > 0)
-        {
-            lhs_sig *= 10;
-            --delta_exp;
-            --lhs_exp;
-        }
-    }
-    else
-    {
-        lhs_sig *= 1000;
-        delta_exp -= 3;
-        lhs_exp -= 3;
-    }
-
-    while (delta_exp > 1)
-    {
-        rhs_sig /= 10;
-        --delta_exp;
-    }
-
-    if (delta_exp == 1)
-    {
-        detail::fenv_round(rhs_sig, rhs_sign);
-    }
-
-    // Both of the significands are well under 64-bits, so we can fit them into int64_t without issue
-    const auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig)};
-    const auto new_exp {lhs_exp};
-    const auto res_sig {detail::make_positive_unsigned(new_sig)};
-
-    return {res_sig, new_exp, sign};
 }
 
 template <typename Integer>
