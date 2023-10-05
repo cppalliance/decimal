@@ -815,7 +815,7 @@ constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     }
 
     // Both of the significands are well under 64-bits, so we can fit them into int64_t without issue
-    const auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig)};
+    const auto new_sig {static_cast<std::uint64_t>(lhs_sig) + static_cast<std::uint64_t>(rhs_sig)};
     const auto new_exp {lhs_exp};
     const auto res_sig {detail::make_positive_unsigned(new_sig)};
 
@@ -855,11 +855,11 @@ constexpr auto operator+(decimal64 lhs, decimal64 rhs) -> decimal64
 
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize(lhs_sig, lhs_exp);
+    detail::normalize<decimal64>(lhs_sig, lhs_exp);
 
     auto rhs_sig {rhs.full_significand()};
     auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize(rhs_sig, rhs_exp);
+    detail::normalize<decimal64>(rhs_sig, rhs_exp);
 
     const auto result {d64_add_impl(lhs_sig, lhs_exp, lhs.isneg(),
                                     rhs_sig, rhs_exp, rhs.isneg())};
@@ -885,13 +885,13 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
+    detail::normalize<decimal64>(sig_lhs, exp_lhs);
 
     auto lhs_components {detail::decimal64_components{sig_lhs, exp_lhs, lhs.isneg()}};
     auto sig_rhs {rhs};
     std::int32_t exp_rhs {0};
-    detail::normalize(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs = detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    detail::normalize<decimal64>(sig_rhs, exp_rhs);
+    auto unsigned_sig_rhs = detail::shrink_significand<std::uint64_t>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
     auto rhs_components {detail::decimal64_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     if (!lhs_bigger)

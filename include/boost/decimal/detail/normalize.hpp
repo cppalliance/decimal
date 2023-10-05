@@ -15,7 +15,7 @@ namespace decimal {
 namespace detail {
 
 // Converts the significand to full precision to remove the effects of cohorts
-template <typename T1, typename T2, typename TargetDecimalType = decimal32>
+template <typename TargetDecimalType = decimal32, typename T1, typename T2>
 constexpr auto normalize(T1& significand, T2& exp) noexcept -> void
 {
     auto digits {num_digits(significand)};
