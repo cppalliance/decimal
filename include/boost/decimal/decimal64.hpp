@@ -39,6 +39,7 @@
 #include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
+#include <boost/decimal/detail/shrink_significand.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -870,7 +871,54 @@ template <typename Integer>
 constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return lhs;
+    }
 
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && (rhs < 0))
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+    bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize(sig_lhs, exp_lhs);
+
+    auto lhs_components {detail::decimal64_components{sig_lhs, exp_lhs, lhs.isneg()}};
+    auto sig_rhs {rhs};
+    std::int32_t exp_rhs {0};
+    detail::normalize(sig_rhs, exp_rhs);
+    auto unsigned_sig_rhs = detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    auto rhs_components {detail::decimal64_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs_components, rhs_components);
+        lhs_bigger = !lhs_bigger;
+        abs_lhs_bigger = !abs_lhs_bigger;
+    }
+
+    detail::decimal64_components result {};
+
+    if (!lhs_components.sign && rhs_components.sign)
+    {
+        /*
+         * TODO(mborland): Activate once sub_impl exists
+        result = sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                          rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                          abs_lhs_bigger);
+        */
+    }
+    else
+    {
+        result = d64_add_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                              rhs_components.sig, rhs_components.exp, rhs_components.sign);
+    }
+
+    return decimal64(result.sig, result.exp, result.sign);
 }
 
 template <typename Integer>

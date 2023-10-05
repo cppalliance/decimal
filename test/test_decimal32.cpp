@@ -179,10 +179,10 @@ void test_non_finite_values()
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<std::uint32_t> dist(1, 2);
 
-    BOOST_TEST(isnan(check_non_finite(one, std::numeric_limits<decimal32>::quiet_NaN() * dist(rng))));
-    BOOST_TEST(isnan(check_non_finite(std::numeric_limits<decimal32>::quiet_NaN() * dist(rng), one)));
-    BOOST_TEST(isinf(check_non_finite(one, std::numeric_limits<decimal32>::infinity() * dist(rng))));
-    BOOST_TEST(isinf(check_non_finite(std::numeric_limits<decimal32>::infinity() * dist(rng), one)));
+    BOOST_TEST(isnan(detail::check_non_finite(one, std::numeric_limits<decimal32>::quiet_NaN() * dist(rng))));
+    BOOST_TEST(isnan(detail::check_non_finite(std::numeric_limits<decimal32>::quiet_NaN() * dist(rng), one)));
+    BOOST_TEST(isinf(detail::check_non_finite(one, std::numeric_limits<decimal32>::infinity() * dist(rng))));
+    BOOST_TEST(isinf(detail::check_non_finite(std::numeric_limits<decimal32>::infinity() * dist(rng), one)));
 }
 
 void test_unary_arithmetic()

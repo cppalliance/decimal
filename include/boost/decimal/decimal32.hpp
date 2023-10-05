@@ -36,6 +36,7 @@
 #include <boost/decimal/detail/to_float.hpp>
 #include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
+#include <boost/decimal/detail/shrink_significand.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
@@ -105,24 +106,6 @@ struct decimal32_components
     std::int32_t exp;
     bool sign;
 };
-
-template <typename Integer>
-constexpr auto shrink_significand(Integer sig, std::int32_t& exp) noexcept -> std::uint32_t
-{
-    using Unsigned_Integer = detail::make_unsigned_t<Integer>;
-    constexpr auto max_digits {std::numeric_limits<std::uint32_t>::digits10};
-
-    auto unsigned_sig {detail::make_positive_unsigned(sig)};
-    const auto sig_dig {detail::num_digits(unsigned_sig)};
-
-    if (sig_dig > max_digits)
-    {
-        unsigned_sig /= static_cast<Unsigned_Integer>(detail::powers_of_10[static_cast<std::size_t>(sig_dig - max_digits)]);
-        exp += sig_dig - max_digits;
-    }
-
-    return static_cast<std::uint32_t>(unsigned_sig);
-}
 
 } // namespace detail
 
