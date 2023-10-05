@@ -107,6 +107,22 @@ void test_roundtrip_conversion_integer(T min = T(0), T max = T(detail::max_signi
 }
 
 template <typename T>
+void test_conversion_from_float()
+{
+    errno = 0;
+
+    auto half {static_cast<T>(0.5)};
+    decimal64 dec_half {5, -1};
+    BOOST_TEST_EQ(decimal64(half), dec_half) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST_EQ(decimal64(-half), -dec_half) && BOOST_TEST_EQ(errno, 0);
+
+    BOOST_TEST(isnan(decimal64(std::numeric_limits<T>::quiet_NaN())));
+    BOOST_TEST(isnan(decimal64(std::numeric_limits<T>::signaling_NaN())));
+    BOOST_TEST(isinf(decimal64(std::numeric_limits<T>::infinity())));
+    BOOST_TEST(isinf(decimal64(-std::numeric_limits<T>::infinity())));
+}
+
+template <typename T>
 void test_conversion_to_float()
 {
     errno = 0;
@@ -234,6 +250,10 @@ int main()
     test_roundtrip_conversion_integer<std::uint32_t>(0, 9'999'999);
     test_roundtrip_conversion_integer<std::int64_t>(-9'999'999, 9'999'999);
     test_roundtrip_conversion_integer<std::uint64_t>(0, 9'999'999);
+
+    test_conversion_from_float<float>();
+    test_conversion_from_float<double>();
+    test_conversion_from_float<long double>();
 
     test_conversion_to_float<float>();
     test_conversion_to_float<double>();
