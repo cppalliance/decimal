@@ -100,6 +100,13 @@ static constexpr std::uint64_t d64_construct_combination_mask = 0b0'11111'000000
 static constexpr std::uint64_t d64_construct_exp_mask = 0b0'00000'11111111'0000000000'0000000000'0000000000'0000000000'0000000000;
 static constexpr std::uint64_t d64_construct_significand_mask = d64_no_combination;
 
+struct decimal64_components
+{
+    std::uint64_t sig;
+    std::int32_t exp;
+    bool sign;
+};
+
 } //namespace detail
 
 class decimal64 final
@@ -173,6 +180,11 @@ private:
     template <typename T1, typename T2>
     friend constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                           T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
+
+    template <typename T1, typename T2>
+    friend constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                       T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept
+                                       -> detail::decimal64_components;
 
 public:
     // 3.2.3.1 construct/copy/destroy
@@ -876,6 +888,80 @@ constexpr auto operator>=(decimal64 lhs, decimal64 rhs) noexcept -> bool
     }
 
     return !(lhs < rhs);
+}
+
+template<typename T1, typename T2>
+constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components
+{
+    const bool sign {lhs_sign};
+
+    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
+
+    if (delta_exp > detail::precision_v<decimal64> + 1)
+    {
+        // If the difference in exponents is more than the digits of accuracy
+        // we return the larger of the two
+        //
+        // e.g. 1e20 + 1e-20 = 1e20
+
+        return {lhs_sig, lhs_exp, lhs_sign};
+    }
+    else if (delta_exp == detail::precision_v<decimal64> + 1)
+    {
+        // Only need to see if we need to add one to the
+        // significand of the bigger value
+        //
+        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
+
+        if (rhs_sig >= UINT64_C(5'000'000'000'000'000))
+        {
+            ++lhs_sig;
+            return {lhs_sig, lhs_exp, lhs_sign};
+        }
+        else
+        {
+            return {lhs_sig, lhs_exp, lhs_sign};
+        }
+    }
+
+    // The two numbers can be added together without special handling
+    //
+    // If we can add to the lhs sig rather than dividing we can save some precision
+    // 64-bit sign int can have 19 digits, and our normalized significand has 16
+    if (delta_exp <= 3)
+    {
+        while (delta_exp > 0)
+        {
+            lhs_sig *= 10;
+            --delta_exp;
+            --lhs_exp;
+        }
+    }
+    else
+    {
+        lhs_sig *= 1000;
+        delta_exp -= 3;
+        lhs_exp -= 3;
+    }
+
+    while (delta_exp > 1)
+    {
+        rhs_sig /= 10;
+        --delta_exp;
+    }
+
+    if (delta_exp == 1)
+    {
+        detail::fenv_round(rhs_sig, rhs_sign);
+    }
+
+    // Both of the significands are well under 64-bits, so we can fit them into int64_t without issue
+    const auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig)};
+    const auto new_exp {lhs_exp};
+    const auto res_sig {detail::make_positive_unsigned(new_sig)};
+
+    return {res_sig, new_exp, sign};
 }
 
 template <typename Integer>
