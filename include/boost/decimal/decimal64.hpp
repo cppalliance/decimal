@@ -241,7 +241,7 @@ public:
 
     template <typename Integer>
     friend constexpr auto operator==(Integer lhs, decimal64 rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Inequality
     friend constexpr auto operator!=(decimal64 lhs, decimal64 rhs) noexcept -> bool;

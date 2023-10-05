@@ -238,9 +238,9 @@ int main()
     test_conversion_to_float<double>();
     test_conversion_to_float<long double>();
 
-    //test_roundtrip_conversion_float<float>();
-    //test_roundtrip_conversion_float<double>();
-    //test_roundtrip_conversion_float<long double>();
+    test_roundtrip_conversion_float<float>();
+    test_roundtrip_conversion_float<double>();
+    test_roundtrip_conversion_float<long double>();
 
     //test_roundtrip_integer_stream<int>();
     //test_roundtrip_integer_stream<unsigned>();
@@ -254,22 +254,22 @@ int main()
     //test_roundtrip_float_stream<long double>();
 
     #ifdef BOOST_DECIMAL_HAS_FLOAT16
-    //test_conversion_to_float<std::float16_t>();
-    //test_roundtrip_conversion_float<std::float16_t>();
+    test_conversion_to_float<std::float16_t>();
+    test_roundtrip_conversion_float<std::float16_t>();
     //test_roundtrip_float_stream<std::float16_t>();
     #endif
     #ifdef BOOST_DECIMAL_HAS_FLOAT32
-    //test_conversion_to_float<std::float32_t>();
+    test_conversion_to_float<std::float32_t>();
     //test_roundtrip_conversion_float<std::float32_t>();
     //test_roundtrip_float_stream<std::float32_t>();
     #endif
     #ifdef BOOST_DECIMAL_HAS_FLOAT64
-    //test_conversion_to_float<std::float64_t>();
-    //test_roundtrip_conversion_float<std::float64_t>();
+    test_conversion_to_float<std::float64_t>();
+    test_roundtrip_conversion_float<std::float64_t>();
     //test_roundtrip_float_stream<std::float64_t>();
     #endif
     #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
-    //test_conversion_to_float<std::bfloat16_t>();
+    test_conversion_to_float<std::bfloat16_t>();
     // test_roundtrip_conversion_float<std::bfloat16_t>();
     // test_roundtrip_float_stream<std::bfloat16_t>();
     #endif
