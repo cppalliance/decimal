@@ -168,9 +168,10 @@ void test_roundtrip_integer_stream()
 
         if (!BOOST_TEST_EQ(first_val, return_val) || !BOOST_TEST_EQ(first_val_int, return_val_int))
         {
-            std::cerr << "Val: " << first_val
+            std::cerr << "    Val: " << first_val
                       << "\nInt Val: " << first_val_int
-                      << "\nRet: " << return_val
+                      << "\n SS Val: " << ss.str()
+                      << "\n    Ret: " << return_val
                       << "\nInt Ret: " << return_val_int << std::endl;
         }
     }
@@ -242,36 +243,36 @@ int main()
     test_roundtrip_conversion_float<double>();
     test_roundtrip_conversion_float<long double>();
 
-    //test_roundtrip_integer_stream<int>();
-    //test_roundtrip_integer_stream<unsigned>();
-    //test_roundtrip_integer_stream<long>();
-    //test_roundtrip_integer_stream<unsigned long>();
-    //test_roundtrip_integer_stream<long long>();
-    //test_roundtrip_integer_stream<unsigned long long>();
+    test_roundtrip_integer_stream<int>();
+    test_roundtrip_integer_stream<unsigned>();
+    test_roundtrip_integer_stream<long>();
+    test_roundtrip_integer_stream<unsigned long>();
+    test_roundtrip_integer_stream<long long>();
+    test_roundtrip_integer_stream<unsigned long long>();
 
-    //test_roundtrip_float_stream<float>();
-    //test_roundtrip_float_stream<double>();
-    //test_roundtrip_float_stream<long double>();
+    test_roundtrip_float_stream<float>();
+    test_roundtrip_float_stream<double>();
+    test_roundtrip_float_stream<long double>();
 
     #ifdef BOOST_DECIMAL_HAS_FLOAT16
     test_conversion_to_float<std::float16_t>();
-    test_roundtrip_conversion_float<std::float16_t>();
+    //test_roundtrip_conversion_float<std::float16_t>();
     //test_roundtrip_float_stream<std::float16_t>();
     #endif
     #ifdef BOOST_DECIMAL_HAS_FLOAT32
     test_conversion_to_float<std::float32_t>();
-    //test_roundtrip_conversion_float<std::float32_t>();
-    //test_roundtrip_float_stream<std::float32_t>();
+    test_roundtrip_conversion_float<std::float32_t>();
+    test_roundtrip_float_stream<std::float32_t>();
     #endif
     #ifdef BOOST_DECIMAL_HAS_FLOAT64
     test_conversion_to_float<std::float64_t>();
     test_roundtrip_conversion_float<std::float64_t>();
-    //test_roundtrip_float_stream<std::float64_t>();
+    test_roundtrip_float_stream<std::float64_t>();
     #endif
     #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
     test_conversion_to_float<std::bfloat16_t>();
-    // test_roundtrip_conversion_float<std::bfloat16_t>();
-    // test_roundtrip_float_stream<std::bfloat16_t>();
+    //test_roundtrip_conversion_float<std::bfloat16_t>();
+    //test_roundtrip_float_stream<std::bfloat16_t>();
     #endif
 
     return boost::report_errors();
