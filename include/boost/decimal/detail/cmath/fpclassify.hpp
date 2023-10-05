@@ -17,6 +17,8 @@ template <typename T>
 constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>
 {
+    constexpr T zero {0, 0};
+
     if (isinf(rhs))
     {
         return FP_INFINITE;
@@ -25,7 +27,7 @@ constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexc
     {
         return FP_NAN;
     }
-    else if (abs(rhs) == 0)
+    else if (abs(rhs) == zero)
     {
         return FP_ZERO;
     }
