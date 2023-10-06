@@ -80,8 +80,8 @@ int main()
     // Values that won't exceed the range of the significand
     // Only positive values
     random_addition(0, 5'000'000);
-    //random_addition(0L, 4'000'000'000'000'000L);
-    //random_addition(0LL, 4'000'000'000'000'000LL);
+    random_addition(0L, 4'000'000'000'000'000L);
+    random_addition(0LL, 4'000'000'000'000'000LL);
     //random_mixed_addition(0, 5'000'000);
     //random_mixed_addition(0L, 4'000'000'000'000'000L);
     //random_mixed_addition(0LL, 4'000'000'000'000'000LL);

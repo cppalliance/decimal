@@ -397,7 +397,7 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     // Round as required
     if (reduced)
     {
-        exp += detail::fenv_round(unsigned_coeff, bits_.sign);
+        exp += detail::fenv_round<decimal64>(unsigned_coeff, bits_.sign);
     }
 
     auto reduced_coeff {static_cast<std::uint64_t>(unsigned_coeff)};
@@ -811,13 +811,19 @@ constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (delta_exp == 1)
     {
-        detail::fenv_round(rhs_sig, rhs_sign);
+        detail::fenv_round<decimal64>(rhs_sig, rhs_sign);
     }
 
     // Both of the significands are well under 64-bits, so we can fit them into int64_t without issue
     const auto new_sig {static_cast<std::uint64_t>(lhs_sig) + static_cast<std::uint64_t>(rhs_sig)};
     const auto new_exp {lhs_exp};
     const auto res_sig {detail::make_positive_unsigned(new_sig)};
+
+    #ifdef BOOST_DECIMAL_DEBUG_ADD
+    std::cerr << "Sig: " << new_sig
+              << "\nExp: " << new_exp
+              << "\nNeg: " << sign << std::endl;
+    #endif
 
     return {res_sig, new_exp, sign};
 }
