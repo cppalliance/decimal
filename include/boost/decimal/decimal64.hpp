@@ -860,8 +860,8 @@ constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         // we return the larger of the two
         //
         // e.g. 1e20 - 1e-20 = 1e20
-        return abs_lhs_bigger ? detail::decimal64_components{detail::shrink_significand(lhs_sig, lhs_exp), lhs_exp, false} :
-                                detail::decimal64_components{detail::shrink_significand(rhs_sig, rhs_exp), rhs_exp, true};
+        return abs_lhs_bigger ? detail::decimal64_components{detail::shrink_significand<std::uint64_t>(lhs_sig, lhs_exp), lhs_exp, false} :
+                                detail::decimal64_components{detail::shrink_significand<std::uint64_t>(rhs_sig, rhs_exp), rhs_exp, true};
     }
 
     // The two numbers can be subtracted together without special handling
@@ -943,13 +943,10 @@ constexpr auto operator+(decimal64 lhs, decimal64 rhs) -> decimal64
         detail::swap(lhs, rhs);
     }
 
-    /*
-     * TODO(mborland): Activate once operator- is implemented
     if (!lhs.isneg() && rhs.isneg())
     {
         return lhs - abs(rhs);
     }
-    */
 
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
@@ -1050,11 +1047,11 @@ constexpr auto operator-(decimal64 lhs, decimal64 rhs) -> decimal64
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
+    detail::normalize<decimal64>(sig_lhs, exp_lhs);
 
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize(sig_rhs, exp_rhs);
+    detail::normalize<decimal64>(sig_rhs, exp_rhs);
 
     const auto result {d64_sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
                                     sig_rhs, exp_rhs, rhs.isneg(),
@@ -1081,12 +1078,12 @@ constexpr auto operator-(decimal64 lhs, Integer rhs) noexcept
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
+    detail::normalize<decimal64>(sig_lhs, exp_lhs);
     auto lhs_components {detail::decimal64_components{sig_lhs, exp_lhs, lhs.isneg()}};
 
     auto sig_rhs {static_cast<std::uint64_t>(detail::make_positive_unsigned(rhs))};
     std::int32_t exp_rhs {0};
-    detail::normalize(sig_rhs, exp_rhs);
+    detail::normalize<decimal64>(sig_rhs, exp_rhs);
     auto unsigned_sig_rhs = detail::shrink_significand<std::uint64_t>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
     auto rhs_components {detail::decimal64_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 

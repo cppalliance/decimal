@@ -170,7 +170,7 @@ int main()
 
     // Subtraction
     random_subtraction(0, 5'000'000);
-    //random_subtraction(0LL, 4'000'000'000'000'000LL);
+    random_subtraction(0LL, 4'000'000'000'000'000LL);
     random_mixed_subtraction(0, 5'000'000);
     //random_mixed_subtraction(0LL, 4'000'000'000'000'000LL);
 
