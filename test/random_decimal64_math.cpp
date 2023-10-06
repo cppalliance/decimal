@@ -44,6 +44,11 @@ void random_addition(T lower, T upper)
                       << "\nInt res: " << val1 + val2 << std::endl;
         }
     }
+
+    BOOST_TEST(isinf(std::numeric_limits<decimal64>::infinity() + decimal64{0,0}));
+    BOOST_TEST(isinf(decimal64{0,0} + std::numeric_limits<decimal64>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal64>::quiet_NaN() + decimal64{0,0}));
+    BOOST_TEST(isnan(decimal64{0,0} + std::numeric_limits<decimal64>::quiet_NaN()));
 }
 
 template <typename T>
@@ -73,6 +78,11 @@ void random_mixed_addition(T lower, T upper)
                       << "\nInt res: " << val1 + val2 << std::endl;
         }
     }
+
+    BOOST_TEST(isinf(std::numeric_limits<decimal64>::infinity() + dist(rng)));
+    BOOST_TEST(isinf(dist(rng) + std::numeric_limits<decimal64>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal64>::quiet_NaN() + dist(rng)));
+    BOOST_TEST(isnan(dist(rng) + std::numeric_limits<decimal64>::quiet_NaN()));
 }
 
 int main()
