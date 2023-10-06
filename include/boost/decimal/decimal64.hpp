@@ -254,10 +254,14 @@ public:
     friend constexpr auto operator+(decimal64 lhs, decimal64 rhs) -> decimal64;
 
     template <typename Integer>
-    friend constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+    friend constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     template <typename Integer>
-    friend constexpr auto operator+(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+    friend constexpr auto operator+(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator-(decimal64 lhs, decimal64 rhs) -> decimal64;
 
     // 3.2.9 Comparison operators:
     // Equality
@@ -1012,6 +1016,39 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
     }
 
     return decimal64(result.sig, result.exp, result.sign);
+}
+
+// NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
+constexpr auto operator-(decimal64 lhs, decimal64 rhs) -> decimal64
+{
+    constexpr decimal64 zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize(sig_rhs, exp_rhs);
+
+    const auto result {sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
+                                sig_rhs, exp_rhs, rhs.isneg(),
+                                abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
 }
 
 template <typename Integer>
