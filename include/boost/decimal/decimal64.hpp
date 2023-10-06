@@ -820,9 +820,9 @@ constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     const auto res_sig {detail::make_positive_unsigned(new_sig)};
 
     #ifdef BOOST_DECIMAL_DEBUG_ADD
-    std::cerr << "Sig: " << new_sig
-              << "\nExp: " << new_exp
-              << "\nNeg: " << sign << std::endl;
+    std::cerr << "Res Sig: " << new_sig
+              << "\nRes Exp: " << new_exp
+              << "\nRes Neg: " << sign << std::endl;
     #endif
 
     return {res_sig, new_exp, sign};
@@ -892,9 +892,9 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
     detail::normalize<decimal64>(sig_lhs, exp_lhs);
-
     auto lhs_components {detail::decimal64_components{sig_lhs, exp_lhs, lhs.isneg()}};
-    auto sig_rhs {rhs};
+
+    auto sig_rhs {static_cast<std::uint64_t>(detail::make_positive_unsigned(rhs))};
     std::int32_t exp_rhs {0};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
     auto unsigned_sig_rhs = detail::shrink_significand<std::uint64_t>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
@@ -908,6 +908,13 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
     }
 
     detail::decimal64_components result {};
+
+    #ifdef BOOST_DECIMAL_DEBUG_ADD
+    std::cerr << "Lhs sig: " << lhs_components.sig
+              << "\nLhs exp: " << lhs_components.exp
+              << "\nRhs sig: " << rhs_components.sig
+              << "\nRhs exp: " << rhs_components.exp << std::endl;
+    #endif
 
     if (!lhs_components.sign && rhs_components.sign)
     {
