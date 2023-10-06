@@ -81,8 +81,8 @@ int main()
     // Only positive values
     random_addition(0, 5'000'000);
     random_addition(0LL, 4'000'000'000'000'000LL);
-    //random_mixed_addition(0, 5'000'000);
-    //random_mixed_addition(0LL, 4'000'000'000'000'000LL);
+    random_mixed_addition(0, 5'000'000);
+    random_mixed_addition(0LL, 4'000'000'000'000'000LL);
 
     return boost::report_errors();
 }
