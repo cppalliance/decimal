@@ -10,7 +10,7 @@
 
 using namespace boost::decimal;
 
-static constexpr auto N {10U};
+static constexpr auto N {1024U};
 
 #ifdef _MSC_VER
 #  pragma warning(push)
