@@ -38,7 +38,7 @@ constexpr auto normalize(T1& significand, T2& exp) noexcept -> void
             --digits;
         }
 
-        exp += detail::fenv_round(significand, significand < 0);
+        exp += detail::fenv_round<TargetDecimalType>(significand, significand < 0);
     }
 }
 
