@@ -1101,7 +1101,7 @@ template <typename Integer>
 constexpr auto operator-(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
-    if (isinf(lhs) || isnan(rhs))
+    if (isinf(rhs) || isnan(rhs))
     {
         return rhs;
     }
