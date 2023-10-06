@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_FENV_ROUNDING_HPP
 
 #include <boost/decimal/fenv.hpp>
+#include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/config.hpp>
 
@@ -14,7 +15,7 @@ namespace boost { namespace decimal { namespace detail {
 #ifdef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
 
 // Rounds the value provided and returns an offset of exponent values as required
-template <typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
+template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
 constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 {
     const auto trailing_num {val % 10};
@@ -27,11 +28,7 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
         ++val;
     }
 
-    // If the significand was e.g. 99'999'999 rounding up
-    // would put it out of range again
-    constexpr auto max_sig_val = 9'999'999; // TODO(mborland): dynamic based on type
-
-    if (val > max_sig_val)
+    if (val > max_significand_v<TargetType>)
     {
         val /= 10;
         ++exp_delta;
@@ -42,7 +39,7 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 
 #else
 
-template <typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
+template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
 constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT(readability-function-cognitive-complexity)
 {
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
@@ -59,9 +56,8 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
 
         // If the significand was e.g. 99'999'999 rounding up
         // would put it out of range again
-        constexpr auto max_sig_val = 9'999'999; // TODO(mborland): dynamic based on type
 
-        if (val > max_sig_val)
+        if (val > max_significand_v<TargetType>)
         {
             val /= 10;
             ++exp_delta;
@@ -124,9 +120,8 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
 
         // If the significand was e.g. 99'999'999 rounding up
         // would put it out of range again
-        constexpr auto max_sig_val = 9'999'999; // TODO(mborland): dynamic based on type
 
-        if (val > max_sig_val)
+        if (val > max_significand_v<TargetType>)
         {
             val /= 10;
             ++exp;

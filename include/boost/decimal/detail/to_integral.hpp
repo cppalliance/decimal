@@ -28,7 +28,7 @@ namespace decimal {
 template <typename Decimal, typename TargetType>
 constexpr auto to_integral(Decimal val) noexcept -> TargetType
 {
-    using Conversion_Type = std::conditional_t<(std::numeric_limits<TargetType>::max() < 9'999'999), std::int32_t, TargetType>;
+    using Conversion_Type = std::conditional_t<std::numeric_limits<TargetType>::is_signed, std::int64_t, std::uint64_t>;
 
     constexpr Decimal max_target_type { (std::numeric_limits<TargetType>::max)() };
     constexpr Decimal min_target_type { (std::numeric_limits<TargetType>::min)() };
