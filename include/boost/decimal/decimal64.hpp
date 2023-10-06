@@ -1011,8 +1011,8 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
     if (!lhs_components.sign && rhs_components.sign)
     {
         result = d64_sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                          rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                          abs_lhs_bigger);
+                              rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                              abs_lhs_bigger);
     }
     else
     {
@@ -1025,7 +1025,7 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
 
 template <typename Integer>
 constexpr auto operator+(Integer lhs, decimal64 rhs) noexcept
--> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
     return rhs + lhs;
 }
