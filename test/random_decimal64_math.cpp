@@ -207,7 +207,7 @@ int main()
     spot_check_sub(945501, 80);
     spot_check_sub(562, 998980);
     spot_check_sub(-954783, 746);
-    spot_check_sub(513479119L, 972535711690L);
+    spot_check_sub(513479119LL, 972535711690LL);
 
     return boost::report_errors();
 }
