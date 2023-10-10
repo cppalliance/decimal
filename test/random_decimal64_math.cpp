@@ -158,33 +158,33 @@ int main()
     // Values that won't exceed the range of the significand
     // Only positive values
     random_addition(0, 5'000'000);
-    random_addition(0LL, 4'000'000'000'000'000LL);
+    random_addition(0LL, 4'000'000'000'000LL);
     random_mixed_addition(0, 5'000'000);
-    random_mixed_addition(0LL, 4'000'000'000'000'000LL);
+    random_mixed_addition(0LL, 4'000'000'000'000LL);
 
     // Only two negative values
     random_addition(-5'000'000, 0);
-    //random_addition(-4'000'000'000'000'000LL, 0LL);
+    //random_addition(-4'000'000'000'000LL, 0LL);
     random_mixed_addition(-5'000'000, 0);
-    //random_mixed_addition(4'000'000'000'000'000LL, 0LL);
+    //random_mixed_addition(4'000'000'000'000LL, 0LL);
 
     // Subtraction
     random_subtraction(0, 5'000'000);
-    random_subtraction(0LL, 4'000'000'000'000'000LL);
+    random_subtraction(0LL, 4'000'000'000'000LL);
     random_mixed_subtraction(0, 5'000'000);
-    //random_mixed_subtraction(0LL, 4'000'000'000'000'000LL);
+    //random_mixed_subtraction(0LL, 4'000'000'000'000LL);
 
     // Only two negative values
     random_subtraction(-5'000'000, 0);
-    //random_subtraction(-4'000'000'000'000'000LL, 0LL);
+    //random_subtraction(-4'000'000'000'000LL, 0LL);
     random_mixed_subtraction(-5'000'000, 0);
-    //random_mixed_subtraction(4'000'000'000'000'000LL, 0LL);
+    //random_mixed_subtraction(4'000'000'000'000LL, 0LL);
 
     // Mixed values
     random_subtraction(-5'000'000, 5'000'000);
-    //random_subtraction(-4'000'000'000'000'000LL, 4'000'000'000'000'000LL);
+    //random_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
     random_mixed_subtraction(-5'000'000, 5'000'000);
-    //random_mixed_subtraction(-4'000'000'000'000'000LL, 4'000'000'000'000'000LL);
+    //random_mixed_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
 
     return boost::report_errors();
 }
