@@ -172,13 +172,13 @@ int main()
     random_subtraction(0, 5'000'000);
     random_subtraction(0LL, 4'000'000'000'000LL);
     random_mixed_subtraction(0, 5'000'000);
-    //random_mixed_subtraction(0LL, 4'000'000'000'000LL);
+    random_mixed_subtraction(0LL, 4'000'000'000'000LL);
 
     // Only two negative values
     random_subtraction(-5'000'000, 0);
-    //random_subtraction(-4'000'000'000'000LL, 0LL);
+    random_subtraction(-4'000'000'000'000LL, 0LL);
     random_mixed_subtraction(-5'000'000, 0);
-    //random_mixed_subtraction(4'000'000'000'000LL, 0LL);
+    random_mixed_subtraction(-4'000'000'000'000LL, 0LL);
 
     // Mixed values
     random_subtraction(-5'000'000, 5'000'000);
