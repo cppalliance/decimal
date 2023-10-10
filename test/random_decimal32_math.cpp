@@ -46,6 +46,11 @@ void random_addition(T lower, T upper)
                       << "\nInt res: " << val1 + val2 << std::endl;
         }
     }
+
+    BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() + decimal32{0,0}));
+    BOOST_TEST(isinf(decimal32{0,0} + std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() + decimal32{0,0}));
+    BOOST_TEST(isnan(decimal32{0,0} + std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -74,6 +79,11 @@ void random_mixed_addition(T lower, T upper)
                       << "\nInt res: " << val1 + val2 << std::endl;
         }
     }
+
+    BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() + dist(rng)));
+    BOOST_TEST(isinf(dist(rng) + std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() + dist(rng)));
+    BOOST_TEST(isnan(dist(rng) + std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -131,6 +141,11 @@ void random_subtraction(T lower, T upper)
                       << "\nInt res: " << val1 - val2 << std::endl;
         }
     }
+
+    BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() - decimal32{0,0}));
+    BOOST_TEST(isinf(decimal32{0,0} - std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() - decimal32{0,0}));
+    BOOST_TEST(isnan(decimal32{0,0} - std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -181,6 +196,11 @@ void random_mixed_subtraction(T lower, T upper)
                       << "\nInt res: " << val1 - val2 << std::endl;
         }
     }
+
+    BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() - dist(rng)));
+    BOOST_TEST(isinf(dist(rng) - std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() - dist(rng)));
+    BOOST_TEST(isnan(dist(rng) - std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -209,6 +229,11 @@ void random_multiplication(T lower, T upper)
                       << "\nInt res: " << val1 * val2 << std::endl;
         }
     }
+
+    BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() * decimal32(dist(rng))));
+    BOOST_TEST(isinf(decimal32(dist(rng)) * std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() * decimal32(dist(rng))));
+    BOOST_TEST(isnan(decimal32(dist(rng)) * std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -237,6 +262,11 @@ void random_mixed_multiplication(T lower, T upper)
                       << "\nInt res: " << val1 * val2 << std::endl;
         }
     }
+
+    BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() * dist(rng)));
+    BOOST_TEST(isinf(dist(rng) * std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() * dist(rng)));
+    BOOST_TEST(isnan(dist(rng) * std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
@@ -265,6 +295,11 @@ void random_division(T lower, T upper)
                       << "\nInt res: " << val1 * val2 << std::endl;
         }
     }
+
+    BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() / decimal32(dist(rng))));
+    BOOST_TEST(!isinf(decimal32(dist(rng)) / std::numeric_limits<decimal32>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() / decimal32(dist(rng))));
+    BOOST_TEST(isnan(decimal32(dist(rng)) / std::numeric_limits<decimal32>::quiet_NaN()));
 }
 
 template <typename T>
