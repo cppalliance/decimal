@@ -1007,23 +1007,23 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
 template <typename Integer>
 constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
 {
-    if (isinf(lhs) || isnan(rhs))
+    if (isinf(rhs) || isnan(rhs))
     {
         return rhs;
     }
 
-    if (!(lhs < 0) && rhs.isneg())
+    if (lhs >= 0 && rhs.isneg())
     {
         return lhs + (-rhs);
     }
 
-    const bool abs_lhs_bigger {detail::make_positive_unsigned(lhs) > rhs};
+    const bool abs_lhs_bigger {detail::make_positive_unsigned(lhs) > abs(rhs)};
 
-    auto sig_lhs {lhs};
+    auto sig_lhs {detail::make_positive_unsigned(lhs)};
     std::int32_t exp_lhs {0};
     detail::normalize(sig_lhs, exp_lhs);
     auto unsigned_sig_lhs = detail::shrink_significand(detail::make_positive_unsigned(sig_lhs), exp_lhs);
-    auto lhs_components {detail::decimal32_components{unsigned_sig_lhs, exp_lhs, (rhs < 0)}};
+    auto lhs_components {detail::decimal32_components{unsigned_sig_lhs, exp_lhs, (lhs < 0)}};
 
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.biased_exponent()};
