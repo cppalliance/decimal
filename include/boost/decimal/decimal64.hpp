@@ -1372,16 +1372,52 @@ class numeric_limits<boost::decimal::decimal64>
 struct numeric_limits<boost::decimal::decimal64>
 #endif
 {
+
 #ifdef BOOST_MSVC
-public:
+    public:
 #endif
 
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_signed = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_integer = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_exact = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_infinity = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = true;
+
+    // These members were deprecated in C++23
+    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_present;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = true;
+    #endif
+
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_indeterminate;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_modulo = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  digits = 16;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  digits10 = digits;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  max_digits10 = digits;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  radix = 10;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  min_exponent = -382;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  min_exponent10 = min_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  max_exponent = 385;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  max_exponent10 = max_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = numeric_limits<std::uint64_t>::traps;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = true;
+
     // Member functions
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (min)        () -> boost::decimal::decimal64 { return {1, min_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (max)        () -> boost::decimal::decimal64 { return {9'999'999'999'999'999, max_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto lowest       () -> boost::decimal::decimal64 { return {-9'999'999'999'999'999, max_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto epsilon      () -> boost::decimal::decimal64 { return {1, -16}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto round_error  () -> boost::decimal::decimal64 { return epsilon(); }
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask); }
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_nan_mask); }
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::decimal64 { return {1, boost::decimal::detail::etiny_v<boost::decimal::decimal64>}; }
 };
 
-} //namespace std
+} // Namespace std
 
 #endif //BOOST_DECIMAL_DECIMAL64_HPP
