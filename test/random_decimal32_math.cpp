@@ -159,6 +159,28 @@ void random_mixed_subtraction(T lower, T upper)
                       << "\nInt res: " << val1 - val2 << std::endl;
         }
     }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const T trunc_val_1 {static_cast<T>(decimal32(val1))};
+        const decimal32 dec2 {val2};
+
+        const decimal32 res = trunc_val_1 - dec2;
+        const auto res_int = static_cast<T>(res);
+
+        if (!BOOST_TEST_EQ(res_int, val1 - val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << trunc_val_1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << val1 - val2 << std::endl;
+        }
+    }
 }
 
 template <typename T>
