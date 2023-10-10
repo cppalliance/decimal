@@ -12,6 +12,8 @@ using namespace boost::decimal;
 
 static constexpr auto N {1024U};
 
+static std::mt19937_64 rng(42);
+
 #ifdef _MSC_VER
 #  pragma warning(push)
 #  pragma warning(disable: 4146)
@@ -20,7 +22,6 @@ static constexpr auto N {1024U};
 template <typename T>
 void random_addition(T lower, T upper)
 {
-    std::mt19937_64 rng(42);
     std::uniform_int_distribution<T> dist(lower, upper);
 
     for (std::size_t i {}; i < N; ++i)
@@ -54,7 +55,6 @@ void random_addition(T lower, T upper)
 template <typename T>
 void random_mixed_addition(T lower, T upper)
 {
-    std::mt19937_64 rng(42);
     std::uniform_int_distribution<T> dist(lower, upper);
 
     for (std::size_t i {}; i < N; ++i)
@@ -88,7 +88,6 @@ void random_mixed_addition(T lower, T upper)
 template <typename T>
 void random_subtraction(T lower, T upper)
 {
-    std::mt19937_64 rng(42);
     std::uniform_int_distribution<T> dist(lower, upper);
 
     for (std::size_t i {}; i < N; ++i)
@@ -122,7 +121,6 @@ void random_subtraction(T lower, T upper)
 template <typename T>
 void random_mixed_subtraction(T lower, T upper)
 {
-    std::mt19937_64 rng(42);
     std::uniform_int_distribution<T> dist(lower, upper);
 
     for (std::size_t i {}; i < N; ++i)
@@ -153,6 +151,25 @@ void random_mixed_subtraction(T lower, T upper)
     BOOST_TEST(isnan(dist(rng) - std::numeric_limits<decimal64>::quiet_NaN()));
 }
 
+template <typename T>
+void spot_check_sub(T lhs, T rhs)
+{
+    const decimal64 dec1 {lhs};
+    const decimal64 dec2 {rhs};
+    const decimal64 res {dec1 - dec2};
+    const auto res_int {static_cast<T>(res)};
+
+    if (!BOOST_TEST_EQ(res_int, lhs - rhs))
+    {
+        std::cerr << "Val 1: " << lhs
+                  << "\nDec 1: " << dec1
+                  << "\nVal 2: " << rhs
+                  << "\nDec 2: " << dec2
+                  << "\nDec res: " << res
+                  << "\nInt res: " << lhs - rhs << std::endl;
+    }
+}
+
 int main()
 {
     // Values that won't exceed the range of the significand
@@ -164,9 +181,9 @@ int main()
 
     // Only two negative values
     random_addition(-5'000'000, 0);
-    //random_addition(-4'000'000'000'000LL, 0LL);
+    random_addition(-4'000'000'000'000LL, 0LL);
     random_mixed_addition(-5'000'000, 0);
-    //random_mixed_addition(4'000'000'000'000LL, 0LL);
+    random_mixed_addition(-4'000'000'000'000LL, 0LL);
 
     // Subtraction
     random_subtraction(0, 5'000'000);
@@ -185,6 +202,12 @@ int main()
     random_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
     random_mixed_subtraction(-5'000'000, 5'000'000);
     random_mixed_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
+
+    // Spot checked values
+    spot_check_sub(945501, 80);
+    spot_check_sub(562, 998980);
+    spot_check_sub(-954783, 746);
+    spot_check_sub(513479119L, 972535711690L);
 
     return boost::report_errors();
 }
