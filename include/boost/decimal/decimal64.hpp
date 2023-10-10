@@ -877,17 +877,11 @@ constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         --delta_exp;
         --exp_bigger;
     }
-    else if (delta_exp == 2)
+    else if (delta_exp >= 2)
     {
         sig_bigger *= 100;
         delta_exp -= 2;
         exp_bigger -= 2;
-    }
-    else if (delta_exp >= 3)
-    {
-        sig_bigger *= 1000;
-        delta_exp -= 3;
-        exp_bigger -= 3;
     }
 
     while (delta_exp > 1)
