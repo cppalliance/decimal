@@ -182,9 +182,9 @@ int main()
 
     // Mixed values
     random_subtraction(-5'000'000, 5'000'000);
-    //random_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
+    random_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
     random_mixed_subtraction(-5'000'000, 5'000'000);
-    //random_mixed_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
+    random_mixed_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
 
     return boost::report_errors();
 }
