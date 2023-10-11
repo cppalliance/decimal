@@ -19,38 +19,74 @@ template <typename T>
 constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T zero {0, 0};
+
+    T result { };
+
     if (isnan(val) || abs(val) == zero)
     {
-        return val;
+        result = val;
     }
     else if (isinf(val))
     {
         if (signbit(val))
         {
-            return std::numeric_limits<T>::quiet_NaN();
+            result = std::numeric_limits<T>::quiet_NaN();
         }
         else
         {
-            return val;
+            result = val;
         }
     }
-    else if (val < 0)
+    else if (val < zero)
     {
-        return std::numeric_limits<T>::quiet_NaN();
+        result = std::numeric_limits<T>::quiet_NaN();
+    }
+    else
+    {
+        constexpr T one { 1, 0 };
+
+        if (val < one)
+        {
+          return one / sqrt(one / val);
+        }
+        else if (val > one)
+        {
+            // TODO(ckormanyos)
+            // TODO(mborland)
+            // This implementation of square root, although it works, needs optimization.
+            // Also the number of Newton steps is only valid for decimal32 at the moment.
+
+            int exp2val { };
+
+            const auto man = frexp(val, &exp2val);
+
+            const auto corrected = (static_cast<unsigned>(exp2val) & 1U) != 0U;
+
+            if(!corrected)
+            {
+                result = ldexp(man / 2, exp2val / 2);
+            }
+            else
+            {
+                val *= T { 2, 0 };
+
+                result = ldexp(man, --exp2val / 2);
+            }
+
+            for(auto i = 0U; i < 5U; ++i)
+            {
+                result = (result + val / result) / 2;
+            }
+
+            if(corrected) { result /= numbers::sqrt2_v<T>; }
+        }
+        else
+        {
+            result = one;
+        }
     }
 
-    std::uint64_t i {};
-    while ((i * i) <= val)
-    {
-        ++i;
-    }
-
-    --i;
-    const decimal32 d {val - (i * i)};
-    const decimal32 p {d / (2 * i)};
-    const decimal32 a {i + p};
-
-    return a - (p * p) / (2 * a);
+    return result;
 }
 
 } //namespace decimal
