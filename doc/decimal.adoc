@@ -16,8 +16,10 @@ https://www.boost.org/LICENSE_1_0.txt
 :leveloffset: +1
 
 include::decimal/overview.adoc[]
+include::decimal/generic_decimal.adoc[]
 include::decimal/decimal32.adoc[]
-include::decimal/reference.adoc[]
+include::decimal/decimal64.adoc[]
+//include::decimal/reference.adoc[]
 include::decimal/design.adoc[]
 include::decimal/copyright.adoc[]
 
