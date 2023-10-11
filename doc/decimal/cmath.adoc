@@ -1,0 +1,180 @@
+////
+Copyright 2023 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#Cmath]
+= Special Functions
+:idprefix: cmath_
+
+== <cmath>
+
+The following functions from <cmath> are provided (all are constexpr):
+
+=== Basic Operations
+
+- https://en.cppreference.com/w/cpp/numeric/math/fabs[abs]
+- https://en.cppreference.com/w/cpp/numeric/math/fabs[fabs]
+- https://en.cppreference.com/w/cpp/numeric/math/fmod[fmod]
+- https://en.cppreference.com/w/cpp/numeric/math/remainder[remainder]
+- https://en.cppreference.com/w/cpp/numeric/math/remquo[remquo]
+- https://en.cppreference.com/w/cpp/numeric/math/fma[fma]
+- https://en.cppreference.com/w/cpp/numeric/math/fmax[fmax]
+- https://en.cppreference.com/w/cpp/numeric/math/fmin[fmin]
+- https://en.cppreference.com/w/cpp/numeric/math/fdim[fdim]
+
+=== Exponential Functions
+
+- https://en.cppreference.com/w/cpp/numeric/math/exp[exp]
+- https://en.cppreference.com/w/cpp/numeric/math/expm1[expm1]
+- https://en.cppreference.com/w/cpp/numeric/math/log[log]
+- https://en.cppreference.com/w/cpp/numeric/math/log10[log10]
+- https://en.cppreference.com/w/cpp/numeric/math/log1p[log1p]
+
+=== Power Functions
+
+- https://en.cppreference.com/w/cpp/numeric/math/pow[pow] *NOTE* only supports integer exponents at this time
+- https://en.cppreference.com/w/cpp/numeric/math/sqrt[sqrt]
+- https://en.cppreference.com/w/cpp/numeric/math/hypot[hypot] - Both 2 and 3 arg are supported
+
+=== Trigonometric Functions
+
+- https://en.cppreference.com/w/cpp/numeric/math/sin[sin]
+- https://en.cppreference.com/w/cpp/numeric/math/cos[cos]
+
+=== Hyperbolic Functions
+
+- None at this time
+
+=== Error and Gamma Functions
+
+- None at this time
+
+=== Nearest integer floating point operations
+
+- https://en.cppreference.com/w/cpp/numeric/math/ceil[ceil]
+- https://en.cppreference.com/w/cpp/numeric/math/floor[floor]
+- https://en.cppreference.com/w/cpp/numeric/math/trunc[trunc]
+- https://en.cppreference.com/w/cpp/numeric/math/round[round]
+- https://en.cppreference.com/w/cpp/numeric/math/round[lround]
+- https://en.cppreference.com/w/cpp/numeric/math/round[llround]
+- https://en.cppreference.com/w/cpp/numeric/math/nearbyint[nearbyint]
+- https://en.cppreference.com/w/cpp/numeric/math/rint[rint]
+https://en.cppreference.com/w/cpp/numeric/math/ring[lrint]
+- https://en.cppreference.com/w/cpp/numeric/math/llrint[llrint]
+
+=== Floating point manipulation functions
+
+- https://en.cppreference.com/w/cpp/numeric/math/frexp[frexp]
+- https://en.cppreference.com/w/cpp/numeric/math/ldexp[ldexp]
+- https://en.cppreference.com/w/cpp/numeric/math/modf[modf]
+- https://en.cppreference.com/w/cpp/numeric/math/scalbn[scalbn]
+- https://en.cppreference.com/w/cpp/numeric/math/scalbn[scalbln]
+- https://en.cppreference.com/w/cpp/numeric/math/logb[logb]
+- https://en.cppreference.com/w/cpp/numeric/math/nextafter[nextafter]
+- https://en.cppreference.com/w/cpp/numeric/math/nextafter[nexttowards]
+- https://en.cppreference.com/w/cpp/numeric/math/copysign[copysign]
+
+=== Classification and comparison
+
+- https://en.cppreference.com/w/cpp/numeric/math/fpclassify[fpclassify]
+- https://en.cppreference.com/w/cpp/numeric/math/isfinite[isfinite]
+- https://en.cppreference.com/w/cpp/numeric/math/isinf[isinf]
+- https://en.cppreference.com/w/cpp/numeric/math/isnan[isnan]
+- https://en.cppreference.com/w/cpp/numeric/math/isnormal[isnormal]
+- https://en.cppreference.com/w/cpp/numeric/math/signbit[signbit]
+- https://en.cppreference.com/w/cpp/numeric/math/isgreater[isgreater]
+- https://en.cppreference.com/w/cpp/numeric/math/isgreaterequal[isgreaterequal]
+- https://en.cppreference.com/w/cpp/numeric/math/isless[isless]
+- https://en.cppreference.com/w/cpp/numeric/math/islesequal[islessequal]
+- https://en.cppreference.com/w/cpp/numeric/math/islessgreater[islessgreater]
+- https://en.cppreference.com/w/cpp/numeric/math/isunordered[isunordered]
+
+== Non-standard Functions
+
+The following are convenience functions, or are prescribed in IEEE 754-2019 as required for decimal floating point types.
+
+=== issignaling
+
+[source, c++]
+----
+template <typename Decimal>
+constexpr bool issignaling(Decimal x) noexcept;
+----
+
+Effects: If x is an sNaN returns true, otherwise returns false.
+
+=== samequantum
+
+[source, c++]
+----
+
+template <typename Decimal>
+constexpr bool samequantum(Decimal x, Decimal y) noexcept;
+
+constexpr bool samequantumd32(decimal32 x, decimal32 y) noexcept;
+----
+
+Effects: Determines if the quantum (unbiased) exponents of x and y are the same.
+
+If both x and y are NaN, or infinity, they have the same quantum exponents.
+
+If exactly one operand is infinity or exactly one operand is NaN, they do not have the same quantum exponents.
+
+=== quantexp
+
+[source, c++]
+----
+
+template <typename Decimal>
+constexpr int quantexp(Decimal x) noexcept;
+
+constexpr bool quantexp32(decimal32 x) noexcept;
+----
+
+Effects: if x is finite, returns its quantum exponent.
+
+Otherwise, a domain error occurs and `INT_MIN` is returned.
+
+=== quantized
+
+[source, c++]
+----
+
+template <typename Decimal>
+constexpr Decimal quantized(Decimal x, Decimal y) noexcept;
+
+constexpr decimal32 quantized32(decimal32 x, decimal32 y) noexcept;
+
+----
+
+Returns: a number that is equal in value (except for any rounding) and sign to x, and which has an exponent set to be equal to the exponent of y.
+
+If the exponent is being increased, the value is correctly rounded according to the current rounding mode;
+
+If the result does not have the same value as x, the "inexact" floating-point exception is raised.
+
+If the exponent is being decreased and the significand of the result has more digits than the type would allow, the "invalid" floating-point exception is raised and the result is sNaN.
+
+If one or both operands are NaN the result is sNaN.
+
+Otherwise, if only one operand is infinity, the "invalid" floating-point exception is raised and the result is sNaN.
+
+If both operands are infinity, the result is infinity, with the same sign as x.
+
+The quantize functions do not signal underflow.
+
+=== frexp10
+
+[source, c++]
+----
+template <typename Decimal>
+constexpr auto frexp10(Decimal num, int* expptr) noexcept;
+
+constexpr std::uint32_t frexpd32(decimal32 num, int* expptr) noexcept;
+
+constexpr std::uint64_t frexpd64(decimal64 num, int* expptr) noexcept;
+----
+
+This function is very similar to https://en.cppreference.com/w/cpp/numeric/math/frexp[frexp], but returns the significand and an integral power of 10 since the `FLT_RADIX` of this type is 10. The significand is normalized to the number of digits of precision the type has (e.g. for decimal32 it is [1'000'000, 9'999'999]).
