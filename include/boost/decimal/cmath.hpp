@@ -12,7 +12,6 @@
 
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/detail/cmath/frexp10.hpp>
 #include <boost/decimal/detail/cmath/acosh.hpp>
 #include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/cosh.hpp>
@@ -23,6 +22,7 @@
 #include <boost/decimal/detail/cmath/fmax.hpp>
 #include <boost/decimal/detail/cmath/fmin.hpp>
 #include <boost/decimal/detail/cmath/frexp.hpp>
+#include <boost/decimal/detail/cmath/frexp10.hpp>
 #include <boost/decimal/detail/cmath/ilogb.hpp>
 #include <boost/decimal/detail/cmath/isgreater.hpp>
 #include <boost/decimal/detail/cmath/isless.hpp>
