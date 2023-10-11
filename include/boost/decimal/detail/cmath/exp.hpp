@@ -91,7 +91,12 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
             // TODO(ckormanyos) Is a Pade approximation more precise or faster?
             // And, ... how can you make it scalable if you go ahead and "Pade"-it?
 
-            BOOST_CXX14_CONSTEXPR coefficient_array_type
+            #if (defined(__clang__) && (__clang__ < 6))
+            const
+            #else
+            constexpr
+            #endif
+            coefficient_array_type
                 coefficient_table
                 {
                     one,                                               // * x

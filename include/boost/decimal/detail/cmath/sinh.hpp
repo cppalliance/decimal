@@ -53,7 +53,12 @@ constexpr auto sinh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
             {
                 using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(9))>;
 
-                BOOST_CXX14_CONSTEXPR auto coefficient_table =
+                #if (defined(__clang__) && (__clang__ < 6))
+                const
+                #else
+                constexpr
+                #endif
+                auto coefficient_table =
                     coefficient_array_type
                     {
                         // Series[Sinh[x], {x, 0, 19}]

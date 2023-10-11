@@ -52,20 +52,25 @@ constexpr auto cosh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
             {
                 using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(9))>;
 
-                BOOST_CXX14_CONSTEXPR auto coefficient_table =
+                #if (defined(__clang__) && (__clang__ < 6))
+                const
+                #else
+                constexpr
+                #endif
+                auto coefficient_table =
                     coefficient_array_type
                     {
                         // Series[Cosh[x], {x, 0, 18}]
-                        //            (1),                    // * 1
-                        one / UINT8_C (2),                    // * x^2
-                        one / UINT8_C (24),                   // * x^4
-                        one / UINT16_C(720),                  // * x^6
-                        one / UINT16_C(40'320),               // * x^8
-                        one / UINT32_C(3'628'800),            // * x^10
-                        one / UINT32_C(479'001'600),          // * x^12
-                        one / UINT64_C(87'178'291'200),       // * x^14
-                        one / UINT64_C(20'922'789'888'000),   // * x^16
-                        one / UINT64_C(6'402'373'705'728'000) // * x^18
+                        //            (1),                              // * 1
+                        one / T { UINT8_C (2), 0 },                     // * x^2
+                        one / T { UINT8_C (24), 0 },                    // * x^4
+                        one / T { UINT16_C(720), 0 },                   // * x^6
+                        one / T { UINT16_C(40'320), 0 },                // * x^8
+                        one / T { UINT32_C(3'628'800), 0 },             // * x^10
+                        one / T { UINT32_C(479'001'600), 0 },           // * x^12
+                        one / T { UINT64_C(87'178'291'200), 0 },        // * x^14
+                        one / T { UINT64_C(20'922'789'888'000), 0 },    // * x^16
+                        one / T { UINT64_C(6'402'373'705'728'000), 0 }, // * x^18
                     };
 
                 auto rit =
