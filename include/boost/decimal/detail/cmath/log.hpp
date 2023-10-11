@@ -91,16 +91,16 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 // Series[Log[(1 + (z/2))/(1 - (z/2))], {z, 0, 21}]
                 // Or at Wolfram Alpha: https://www.wolframalpha.com/input?i=Series%5BLog%5B%281+%2B+%28z%2F2%29%29%2F%281+-+%28z%2F2%29%29%5D%2C+%7Bz%2C+0%2C+21%7D%5D
 
-                one / UINT8_C(12),
-                one / UINT8_C(80),
-                one / UINT16_C(448),
-                one / UINT16_C(11264),
-                one / UINT16_C(53248),
-                one / UINT32_C(245760),
-                one / UINT32_C(1114112),
-                one / UINT32_C(4980736),
-                one / UINT32_C(22020096),
-                one / UINT32_C(96468992)
+                one / T { UINT8_C(12), 0 },
+                one / T { UINT8_C(80), 0 },
+                one / T { UINT16_C(448), 0 },
+                one / T { UINT16_C(11264), 0 },
+                one / T { UINT16_C(53248), 0 },
+                one / T { UINT32_C(245760), 0 },
+                one / T { UINT32_C(1114112), 0 },
+                one / T { UINT32_C(4980736), 0 },
+                one / T { UINT32_C(22020096), 0 },
+                one / T { UINT32_C(96468992), 0 }
             };
 
         const auto s   = (g - one) / (g + one);
