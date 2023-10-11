@@ -74,10 +74,15 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
             --exp2val;
         }
 
-        using coef_list_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(11))>;
+        using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(11))>;
 
-        constexpr auto coefficient_table =
-            coef_list_array_type
+        #if (defined(__clang__) && (__clang__ < 6))
+        const
+        #else
+        constexpr
+        #endif
+        auto coefficient_table =
+            coefficient_array_type
             {
                 // (1,) 12, 80, 448, 2304, 11264, 53248, 245760, 1114112, 4980736, 22020096, 96468992, ...
                 // See also Sloane's A058962 at: https://oeis.org/A058962
