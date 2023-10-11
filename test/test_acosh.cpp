@@ -225,15 +225,21 @@ auto main() -> int
 {
   auto result_is_ok = true;
 
-  const auto result_pos_is_ok = local::test_acosh(512, 5.0L, 1000.0L);
+  const auto result_small_is_ok  = local::test_acosh(128, 1.45L, 1.59L);
+  const auto result_medium_is_ok = local::test_acosh(384, 1.59L, 10.1L);
+  const auto result_large_is_ok  = local::test_acosh(48, 1.0E+01L, 1.0E+26L);
+
+  BOOST_TEST(result_small_is_ok);
+  BOOST_TEST(result_medium_is_ok);
+  BOOST_TEST(result_large_is_ok);
 
   const auto result_edge_is_ok = local::test_acosh_edge();
 
-  BOOST_TEST(result_pos_is_ok);
+  const auto result_ranges_is_ok = (result_small_is_ok && result_medium_is_ok && result_large_is_ok);
+
+  result_is_ok = (result_ranges_is_ok && result_is_ok);
 
   BOOST_TEST(result_edge_is_ok);
-
-  result_is_ok = (result_pos_is_ok  && result_is_ok);
 
   result_is_ok = (result_edge_is_ok && result_is_ok);
 
