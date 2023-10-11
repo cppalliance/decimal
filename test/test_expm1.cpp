@@ -14,6 +14,10 @@
   #endif
 #endif
 
+#if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && ((defined(UBSAN) && (UBSAN == 1)))
+  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
+#endif
+
 #include <chrono>
 #include <limits>
 #include <random>
