@@ -292,8 +292,6 @@ namespace local
 
       const decimal_type c = a + b;
 
-      const std::uint32_t dummy = *reinterpret_cast<const std::uint32_t*>(&c);
-
       const auto result_prec_add_is_ok = (c == static_cast<decimal_type>(123456.8L));
 
       BOOST_TEST(result_prec_add_is_ok);
