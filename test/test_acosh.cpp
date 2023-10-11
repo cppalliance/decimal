@@ -73,7 +73,7 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_acosh(const int tol_factor, const long double range_lo, const long double range_hi) -> bool
+  auto test_acosh(const std::int32_t tol_factor, const long double range_lo, const long double range_hi) -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
@@ -225,11 +225,20 @@ auto main() -> int
 {
   auto result_is_ok = true;
 
-  const auto result_tiny_is_ok  = local::test_acosh(2048, 1.001L, 1.1L);
-  const auto result_small_is_ok  = local::test_acosh(64, 1.1L, 1.59L);
-  const auto result_medium_is_ok = local::test_acosh(48, 1.59L, 10.1L);
-  const auto result_large_is_ok  = local::test_acosh(48, 1.0E+01L, 1.0E+26L);
+  const auto result_eps_is_ok =
+    local::test_acosh
+    (
+      static_cast<std::int32_t>(INT32_C(16) * INT32_C(262144)),
+      1.0L + static_cast<long double>(std::numeric_limits<boost::decimal::decimal32>::epsilon()) * 10.0L,
+      1.0L + static_cast<long double>(std::numeric_limits<boost::decimal::decimal32>::epsilon()) * 100.0L
+    );
 
+  const auto result_tiny_is_ok   = local::test_acosh(static_cast<std::int32_t>(INT32_C(4096)), 1.001L, 1.1L);
+  const auto result_small_is_ok  = local::test_acosh(static_cast<std::int32_t>(INT32_C(96)), 1.1L, 1.59L);
+  const auto result_medium_is_ok = local::test_acosh(static_cast<std::int32_t>(INT32_C(48)), 1.59L, 10.1L);
+  const auto result_large_is_ok  = local::test_acosh(static_cast<std::int32_t>(INT32_C(48)), 1.0E+01L, 1.0E+26L);
+
+  BOOST_TEST(result_eps_is_ok);
   BOOST_TEST(result_tiny_is_ok);
   BOOST_TEST(result_small_is_ok);
   BOOST_TEST(result_medium_is_ok);
@@ -237,7 +246,7 @@ auto main() -> int
 
   const auto result_edge_is_ok = local::test_acosh_edge();
 
-  const auto result_ranges_is_ok = (result_tiny_is_ok && result_small_is_ok && result_medium_is_ok && result_large_is_ok);
+  const auto result_ranges_is_ok = (result_eps_is_ok && result_tiny_is_ok && result_small_is_ok && result_medium_is_ok && result_large_is_ok);
 
   result_is_ok = (result_ranges_is_ok && result_is_ok);
 
