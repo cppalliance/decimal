@@ -14,7 +14,6 @@
 
 namespace boost { namespace decimal {
 
-// Bakhsali Approximation
 template <typename T>
 constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
@@ -45,16 +44,13 @@ constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
     {
         constexpr T one { 1, 0 };
 
-        if (val < one)
-        {
-          return one / sqrt(one / val);
-        }
-        else if (val > one)
+        const auto arg_is_gt_one = (val > one);
+
+        if (arg_is_gt_one || val < one)
         {
             // TODO(ckormanyos)
             // TODO(mborland)
             // This implementation of square root, although it works, needs optimization.
-            // Also the number of Newton steps is only valid for decimal32 at the moment.
 
             int exp2val { };
 
@@ -70,10 +66,12 @@ constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
             {
                 val *= T { 2, 0 };
 
-                result = ldexp(man, --exp2val / 2);
+                result = ldexp(man, arg_is_gt_one ? --exp2val / 2 : ++exp2val / 2);
             }
 
-            for(auto i = 0U; i < 5U; ++i)
+            constexpr auto newton_steps = static_cast<unsigned>((sizeof(T) == 4U) ? 5U : 6U);
+
+            for(auto i = 0U; i < newton_steps; ++i)
             {
                 result = (result + val / result) / 2;
             }
