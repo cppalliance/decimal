@@ -53,7 +53,6 @@ The following functions from <cmath> are provided (all are constexpr):
 
 === Nearest integer floating point operations
 
-- Nearest integer floating point operations
 - https://en.cppreference.com/w/cpp/numeric/math/ceil[ceil]
 - https://en.cppreference.com/w/cpp/numeric/math/floor[floor]
 - https://en.cppreference.com/w/cpp/numeric/math/trunc[trunc]
