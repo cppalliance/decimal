@@ -34,7 +34,7 @@ constexpr auto normalize(T1& significand, T2& exp) noexcept -> void
         while (digits > detail::precision_v<TargetDecimalType> + 1)
         {
             significand /= 10;
-            ++exp;
+            exp = static_cast<T2>(static_cast<unsigned>(exp) + 1U);
             --digits;
         }
 
