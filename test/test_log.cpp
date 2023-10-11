@@ -136,8 +136,6 @@ namespace local
 
     auto result_is_ok = true;
 
-    auto trials = static_cast<std::uint32_t>(UINT8_C(0));
-
     for(auto   ui_arg = static_cast<unsigned>(UINT8_C(106));
                ui_arg < static_cast<unsigned>(UINT8_C(205));
              ++ui_arg)
@@ -269,7 +267,7 @@ namespace local
 
       const auto log_nan = log(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
-      const volatile auto result_log_nan_is_ok = isnan(::my_global_test_log_nan());
+      const volatile auto result_log_nan_is_ok = isnan(log_nan);
 
       assert(isnan(log_nan));
 
