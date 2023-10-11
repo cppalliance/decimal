@@ -43,13 +43,15 @@ constexpr auto acosh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
         }
         else if (x > one)
         {
-            // Use (perts of) the implementation of acosh from Boost.Math.
+            // Use (parts of) the implementation of acosh from Boost.Math.
 
             constexpr T root_epsilon { 1, -((std::numeric_limits<T>::digits10 + 1) / 2) };
 
-            if ((x - one) >= root_epsilon)
+            const auto y = x - one;
+
+            if (y >= root_epsilon)
             {
-                if (x > one / root_epsilon)
+                if (x > (one / root_epsilon))
                 {
                     // http://functions.wolfram.com/ElementaryFunctions/ArcCosh/06/01/06/01/0001/
                     // approximation by laurent series in 1/x at 0+ order from -1 to 0
@@ -57,33 +59,32 @@ constexpr auto acosh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
                 }
                 else if (x < T { 15, -1 })
                 {
-                   // This is just a rearrangement of the standard form below
-                   // devised to minimise loss of precision when x ~ 1:
-                   const auto y = x - one;
+                    // This is just a rearrangement of the standard form below
+                    // devised to minimise loss of precision when x ~ 1:
 
-                   constexpr T two { 2, 0 };
+                    const auto two_y   = y + y;
 
-                   result = log1p(y + sqrt(y * y + two * y));
+                    result = log1p(y + sqrt((y * y) + two_y));
                 }
                 else
                 {
                     // http://functions.wolfram.com/ElementaryFunctions/ArcCosh/02/
-                    return(log( x + sqrt(x * x - one)));
+                    return(log(x + sqrt((x * x) - one)));
                 }
             }
             else
             {
                 // see http://functions.wolfram.com/ElementaryFunctions/ArcCosh/06/01/04/01/0001/
-                T y = x - 1;
-                
-                // approximation by taylor series in y at 0 up to order 2
-                T result = sqrt(2 * y) * (1 - y /12 + 3 * y * y / 160);
-                return result;
+
+                const auto two_y = y + y;
+
+                // approximation by Taylor series in y at 0 up to order 2
+                result = sqrt(two_y) * ((one - (y / 12)) + (((two_y + y) * y) / 160));
             }
         }
         else
         {
-            // This is acosh of 1.
+            // This branch handles acosh(1) = 0.
             result = T { 0, 0 };
         }
     }
