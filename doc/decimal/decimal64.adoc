@@ -23,6 +23,9 @@ Decimal64 is the 64-bit version of the decimal interchange format, and has the f
 ----
 #include <boost/decimal/decimal64.hpp>
 
+namespace boost {
+namespace decimal {
+
 // Paragraph numbers are from ISO/IEC DTR 24733
 
 // 3.2.3.1 construct/copy/destroy
@@ -58,5 +61,8 @@ explicit constexpr operator std::float16_t() const noexcept;
 explicit constexpr operator std::float32_t() const noexcept;
 explicit constexpr operator std::float64_t() const noexcept;
 explicit constexpr operator std::bfloat16_t() const noexcept;
+
+} //namespace decimal
+} //namespace boost
 
 ----
