@@ -51,6 +51,7 @@ constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
             // TODO(ckormanyos)
             // TODO(mborland)
             // This implementation of square root, although it works, needs optimization.
+            // Using base-2 frexp/ldexp might not be the best, rather use base-10?
 
             int exp2val { };
 
@@ -58,13 +59,16 @@ constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
 
             const auto corrected = (static_cast<unsigned>(exp2val) & 1U) != 0U;
 
+            // TODO(ckormanyos)
+            // Try to find a way to get a better (much better) initial guess.
+
             if(!corrected)
             {
                 result = ldexp(man / 2, exp2val / 2);
             }
             else
             {
-                val *= T { 2, 0 };
+                val = val * 2;
 
                 result = ldexp(man, arg_is_gt_one ? --exp2val / 2 : ++exp2val / 2);
             }
