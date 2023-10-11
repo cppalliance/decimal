@@ -1469,7 +1469,7 @@ constexpr auto mul_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
               << "\nexp rhs: " << exp_rhs;
     #endif
 
-    bool sign {!(lhs_sign == rhs_sign)};
+    bool sign {lhs_sign != rhs_sign};
 
     // Once we have the normalized significands and exponents all we have to do is
     // multiply the significands and add the exponents

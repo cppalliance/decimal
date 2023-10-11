@@ -193,6 +193,10 @@ private:
                                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
                                        bool abs_lhs_bigger) noexcept -> detail::decimal64_components;
 
+    template <typename T1, typename T2>
+    friend constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                       T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components;
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
@@ -913,6 +917,55 @@ constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     const auto res_sig {detail::make_positive_unsigned(new_sig)};
 
     return {res_sig, new_exp, new_sign};
+}
+
+template <typename T1, typename T2>
+constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components
+{
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    #else
+    using unsigned_int128_type = boost::decimal::detail::uint128;
+    #endif
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "sig lhs: " << sig_lhs
+              << "\nexp lhs: " << exp_lhs
+              << "\nsig rhs: " << sig_rhs
+              << "\nexp rhs: " << exp_rhs;
+    #endif
+
+    bool sign {lhs_sign != rhs_sign};
+
+    // Once we have the normalized significands and exponents all we have to do is
+    // multiply the significands and add the exponents
+
+    auto res_sig {static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)};
+    auto res_exp {lhs_exp + rhs_exp};
+
+    const auto sig_dig {detail::num_digits(res_sig)};
+
+    if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
+    {
+        res_sig /= detail::powers_of_10[sig_dig - std::numeric_limits<std::uint64_t>::digits10];
+        res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
+    }
+
+    const auto res_sig_64 {static_cast<std::uint64_t>(res_sig)};
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "\nres sig: " << res_sig_64
+              << "\nres exp: " << res_exp << std::endl;
+    #endif
+
+    // Always return positive zero
+    if (res_sig_64 == 0)
+    {
+        sign = false;
+    }
+
+    return {res_sig_64, res_exp, sign};
 }
 
 constexpr auto operator+(decimal64 lhs, decimal64 rhs) -> decimal64
