@@ -277,7 +277,7 @@ void random_division(T lower, T upper)
         if (isinf(res) && isinf(res_int))
         {
         }
-        if (!BOOST_TEST_EQ(res, res_int))
+        else if (!BOOST_TEST_EQ(res, res_int))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
