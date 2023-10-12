@@ -282,17 +282,20 @@ void random_division(T lower, T upper)
         const decimal32 dec1 {val1};
         const decimal32 dec2 {val2};
 
-        const decimal32 res {dec1 * dec2};
-        const decimal32 res_int {val1 * val2};
+        const decimal32 res {dec1 / dec2};
+        const decimal32 res_int {static_cast<float>(val1) / static_cast<float>(val2)};
 
-        if (!BOOST_TEST_EQ(res, res_int))
+        if (isinf(res) && isinf(res_int))
+        {
+        }
+        else if (!BOOST_TEST(abs(res - res_int) < decimal32(1, -3)))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
-                      << "\nInt res: " << val1 * val2 << std::endl;
+                      << "\nInt res: " << static_cast<float>(val1) / static_cast<float>(val2) << std::endl;
         }
     }
 
@@ -300,6 +303,7 @@ void random_division(T lower, T upper)
     BOOST_TEST(!isinf(decimal32(dist(rng)) / std::numeric_limits<decimal32>::infinity()));
     BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() / decimal32(dist(rng))));
     BOOST_TEST(isnan(decimal32(dist(rng)) / std::numeric_limits<decimal32>::quiet_NaN()));
+    BOOST_TEST(isinf(decimal32(dist(rng)) / decimal32(0)));
 }
 
 template <typename T>
@@ -315,26 +319,30 @@ void random_mixed_division(T lower, T upper)
         const decimal32 dec1 {val1};
         const T dec2 {static_cast<T>(decimal32(val2))};
 
-        const decimal32 res {dec1 * dec2};
-        const decimal32 res_int {val1 * val2};
+        const decimal32 res {dec1 / dec2};
+        const decimal32 res_int {static_cast<float>(val1) / static_cast<float>(val2)};
 
-        if (!BOOST_TEST_EQ(res, res_int))
+        if (isinf(res) && isinf(res_int))
+        {
+        }
+        else if (!BOOST_TEST(abs(res - res_int) < decimal32(1, -3)))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
-                      << "\nInt res: " << val1 * val2 << std::endl;
+                      << "\nInt res: " << static_cast<float>(val1) / static_cast<float>(val2) << std::endl;
         }
     }
 
     // Edge cases
     const decimal32 val1 {dist(rng)};
     const decimal32 zero {0, 0};
-    BOOST_TEST(isnan(val1 / zero));
+    BOOST_TEST(isinf(val1 / zero));
     BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() / dist(rng)));
     BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() / dist(rng)));
+    BOOST_TEST(isinf(decimal32(dist(rng)) / 0));
 }
 
 int main()
