@@ -197,6 +197,13 @@ private:
     friend constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components;
 
+    friend constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::decimal64_components rhs,
+                                               detail::decimal64_components& q) noexcept -> void;
+
+    friend constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal64& r) noexcept -> void;
+
+    friend constexpr auto mod_impl(decimal64 lhs, decimal64 rhs, const decimal64& q, decimal32& r) noexcept -> void;
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
@@ -976,6 +983,124 @@ constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     }
 
     return {res_sig_64, res_exp, sign};
+}
+
+constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::decimal64_components rhs,
+                                    detail::decimal64_components& q) noexcept -> void
+{
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    #else
+    using unsigned_int128_type = boost::decimal::detail::uint128;
+    #endif
+
+    bool sign {lhs.sign != rhs.sign};
+
+    // If rhs is greater than we need to offset the significands to get the correct values
+    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
+    const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.sig) * detail::powers_of_10[detail::precision_v<decimal64>]};
+    lhs.exp -= detail::precision_v<decimal64>;
+
+    auto res_sig {big_sig_lhs / static_cast<unsigned_int128_type>(rhs.sig)};
+    auto res_exp {lhs.exp - rhs.exp};
+
+    const auto sig_dig {detail::num_digits(res_sig)};
+
+    if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
+    {
+        res_sig /= detail::powers_of_10[sig_dig - std::numeric_limits<std::uint64_t>::digits10];
+        res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
+    }
+
+    const auto res_sig_64 {static_cast<std::uint64_t>(res_sig)};
+
+    if (res_sig_64 == 0)
+    {
+        sign = false;
+    }
+
+    // Let the constructor handle shrinking it back down and rounding correctly
+    q = detail::decimal64_components{res_sig_64, res_exp, sign};
+}
+
+constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal64& r) noexcept -> void
+{
+    // Check pre-conditions
+    constexpr decimal64 zero {0, 0};
+    constexpr decimal64 nan {boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask)};
+    constexpr decimal64 inf {boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask)};
+
+    const bool sign {lhs.isneg() != rhs.isneg()};
+
+    const auto lhs_fp {fpclassify(lhs)};
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+    {
+        q = nan;
+        r = nan;
+        return;
+    }
+
+    switch (lhs_fp)
+    {
+        case FP_INFINITE:
+            q = sign ? -inf : inf;
+            r = zero;
+            return;
+        case FP_ZERO:
+            q = sign ? -zero : zero;
+            r = sign ? -zero : zero;
+            return;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_ZERO:
+            q = nan;
+            r = nan;
+            return;
+        case FP_INFINITE:
+            q = sign ? -zero : zero;
+            r = lhs;
+            return;
+        default:
+            static_cast<void>(rhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize<decimal64>(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize<decimal64>(sig_rhs, exp_rhs);
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "sig lhs: " << sig_lhs
+              << "\nexp lhs: " << exp_lhs
+              << "\nsig rhs: " << sig_rhs
+              << "\nexp rhs: " << exp_rhs << std::endl;
+    #endif
+
+    detail::decimal64_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    detail::decimal64_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal64_components q_components {};
+
+    d64_generic_div_impl(lhs_components, rhs_components, q_components);
+
+    q = decimal64(q_components.sig, q_components.exp, q_components.sign);
+}
+
+constexpr auto d64_mod_impl(decimal64 lhs, decimal64 rhs, const decimal64& q, decimal64& r) noexcept -> void
+{
+    constexpr decimal64 zero {0, 0};
+
+    // https://en.cppreference.com/w/cpp/numeric/math/fmod
+    auto q_trunc {q > zero ? floor(q) : ceil(q)};
+    r = lhs - (decimal64(q_trunc) * rhs);
 }
 
 constexpr auto operator+(decimal64 lhs, decimal64 rhs) -> decimal64
