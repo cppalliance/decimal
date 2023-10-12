@@ -1069,8 +1069,8 @@ constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal6
     switch (rhs_fp)
     {
         case FP_ZERO:
-            q = nan;
-            r = nan;
+            q = inf;
+            r = zero;
             return;
         case FP_INFINITE:
             q = sign ? -zero : zero;
@@ -1408,6 +1408,11 @@ constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept -> std::enable_if_
             return sign ? -zero : zero;
         default:
             static_cast<void>(lhs);
+    }
+
+    if (rhs == 0)
+    {
+        return inf;
     }
 
     auto lhs_sig {lhs.full_significand()};

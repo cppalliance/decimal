@@ -271,8 +271,8 @@ void random_division(T lower, T upper)
         const decimal64 dec1 {val1};
         const decimal64 dec2 {val2};
 
-        const decimal64 res {dec1 * dec2};
-        const decimal64 res_int {val1 * val2};
+        const decimal64 res {dec1 / dec2};
+        const decimal64 res_int {static_cast<double>(val1) / static_cast<double>(val2)};
 
         if (!BOOST_TEST_EQ(res, res_int))
         {
@@ -281,7 +281,7 @@ void random_division(T lower, T upper)
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
-                      << "\nInt res: " << val1 * val2 << std::endl;
+                      << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
         }
     }
 
@@ -289,7 +289,7 @@ void random_division(T lower, T upper)
     BOOST_TEST(!isinf(decimal64(dist(rng)) / std::numeric_limits<decimal64>::infinity()));
     BOOST_TEST(isnan(std::numeric_limits<decimal64>::quiet_NaN() / decimal64(dist(rng))));
     BOOST_TEST(isnan(decimal64(dist(rng)) / std::numeric_limits<decimal64>::quiet_NaN()));
-    BOOST_TEST(isnan(decimal64(dist(rng)) / decimal64(0)));
+    BOOST_TEST(isinf(decimal64(dist(rng)) / decimal64(0)));
 }
 
 template <typename T>
@@ -305,8 +305,8 @@ void random_mixed_division(T lower, T upper)
         const decimal64 dec1 {val1};
         const T dec2 {static_cast<T>(decimal64(val2))};
 
-        const decimal64 res {dec1 * dec2};
-        const decimal64 res_int {val1 * val2};
+        const decimal64 res {dec1 / dec2};
+        const decimal64 res_int {static_cast<double>(val1) / static_cast<double>(val2)};
 
         if (!BOOST_TEST_EQ(res, res_int))
         {
@@ -315,17 +315,17 @@ void random_mixed_division(T lower, T upper)
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
-                      << "\nInt res: " << val1 * val2 << std::endl;
+                      << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
         }
     }
 
     // Edge cases
     const decimal64 val1 {dist(rng)};
     const decimal64 zero {0, 0};
-    BOOST_TEST(isnan(val1 / zero));
+    BOOST_TEST(isinf(val1 / zero));
     BOOST_TEST(isnan(std::numeric_limits<decimal64>::quiet_NaN() / dist(rng)));
     BOOST_TEST(isinf(std::numeric_limits<decimal64>::infinity() / dist(rng)));
-    BOOST_TEST_EQ(decimal64(dist(rng)) / 0, 0);
+    BOOST_TEST(isinf(decimal64(dist(rng)) / 0));
 }
 
 int main()
