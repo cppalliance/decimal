@@ -285,6 +285,9 @@ void random_division(T lower, T upper)
         const decimal32 res {dec1 / dec2};
         const decimal32 res_int {static_cast<float>(val1) / static_cast<float>(val2)};
 
+        if (isinf(res) && isinf(res_int))
+        {
+        }
         if (!BOOST_TEST(abs(res - res_int) < decimal32(1, -3)))
         {
             std::cerr << "Val 1: " << val1

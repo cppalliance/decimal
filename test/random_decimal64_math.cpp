@@ -274,6 +274,9 @@ void random_division(T lower, T upper)
         const decimal64 res {dec1 / dec2};
         const decimal64 res_int {static_cast<double>(val1) / static_cast<double>(val2)};
 
+        if (isinf(res) && isinf(res_int))
+        {
+        }
         if (!BOOST_TEST_EQ(res, res_int))
         {
             std::cerr << "Val 1: " << val1
