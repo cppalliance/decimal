@@ -302,6 +302,14 @@ public:
     friend constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
+    friend constexpr auto operator%(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    // 3.2.3.5 Increment and Decrement
+    constexpr auto operator++()    noexcept -> decimal64&;
+    constexpr auto operator++(int) noexcept -> decimal64;  // NOLINT : C++14 so constexpr implies const
+    constexpr auto operator--()    noexcept -> decimal64&;
+    constexpr auto operator--(int) noexcept -> decimal64;  // NOLINT : C++14 so constexpr implies const
+
     // 3.2.9 Comparison operators:
     // Equality
     friend constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool;
@@ -1468,6 +1476,40 @@ constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_
     d64_generic_div_impl(lhs_components, rhs_components, q_components);
 
     return decimal64(q_components.sig, q_components.exp, q_components.sign);
+}
+
+constexpr auto operator%(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    decimal64 q {};
+    decimal64 r {};
+    d64_div_impl(lhs, rhs, q, r);
+    d64_mod_impl(lhs, rhs, q, r);
+
+    return r;
+}
+
+constexpr auto decimal64::operator++() noexcept -> decimal64&
+{
+    constexpr decimal64 one{1, 0};
+    *this = *this + one;
+    return *this;
+}
+
+constexpr auto decimal64::operator++(int) noexcept -> decimal64
+{
+    return ++(*this);
+}
+
+constexpr auto decimal64::operator--() noexcept -> decimal64&
+{
+    constexpr decimal64 one{1, 0};
+    *this = *this - one;
+    return *this;
+}
+
+constexpr auto decimal64::operator--(int) noexcept -> decimal64
+{
+    return --(*this);
 }
 
 constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
