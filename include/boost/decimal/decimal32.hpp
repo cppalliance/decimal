@@ -276,34 +276,42 @@ public:
     friend constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     template <typename Integer>
-    friend constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     template <typename Integer>
-    friend constexpr auto operator+(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator+(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     friend constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     template <typename Integer>
-    friend constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     template <typename Integer>
-    friend constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     friend constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     template <typename Integer>
-    friend constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     template <typename Integer>
-    friend constexpr auto operator*(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator*(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     friend constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     template <typename Integer>
-    friend constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     template <typename Integer>
-    friend constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     friend constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
@@ -1469,7 +1477,7 @@ constexpr auto mul_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
               << "\nexp rhs: " << exp_rhs;
     #endif
 
-    bool sign {!(lhs_sign == rhs_sign)};
+    bool sign {lhs_sign != rhs_sign};
 
     // Once we have the normalized significands and exponents all we have to do is
     // multiply the significands and add the exponents
@@ -1570,17 +1578,17 @@ constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decima
     // If rhs is greater than we need to offset the significands to get the correct values
     // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
     const auto big_sig_lhs {static_cast<std::uint64_t>(lhs.sig) * detail::powers_of_10[detail::precision]};
-    lhs.exp -= 7;
+    lhs.exp -= detail::precision;
 
     auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(rhs.sig)};
     auto res_exp {lhs.exp - rhs.exp};
 
     const auto sig_dig {detail::num_digits(res_sig)};
 
-    if (sig_dig > 9)
+    if (sig_dig > std::numeric_limits<std::uint32_t>::digits10)
     {
-        res_sig /= detail::powers_of_10[sig_dig - 9];
-        res_exp += sig_dig - 9;
+        res_sig /= detail::powers_of_10[sig_dig - std::numeric_limits<std::uint32_t>::digits10];
+        res_exp += sig_dig - std::numeric_limits<std::uint32_t>::digits10;
     }
 
     const auto res_sig_32 {static_cast<std::uint32_t>(res_sig)};
@@ -1635,8 +1643,8 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
     switch (rhs_fp)
     {
         case FP_ZERO:
-            q = nan;
-            r = nan;
+            q = inf;
+            r = zero;
             return;
         case FP_INFINITE:
             q = sign ? -zero : zero;
@@ -1710,6 +1718,11 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
             return sign ? -zero : zero;
         default:
             static_cast<void>(lhs);
+    }
+
+    if (rhs == 0)
+    {
+        return sign ? -inf : inf;
     }
 
     auto sig_lhs {lhs.full_significand()};
