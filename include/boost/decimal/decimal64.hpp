@@ -202,7 +202,7 @@ private:
 
     friend constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal64& r) noexcept -> void;
 
-    friend constexpr auto mod_impl(decimal64 lhs, decimal64 rhs, const decimal64& q, decimal32& r) noexcept -> void;
+    friend constexpr auto mod_impl(decimal64 lhs, decimal64 rhs, const decimal64& q, decimal64& r) noexcept -> void;
 
 public:
     // 3.2.3.1 construct/copy/destroy
@@ -293,6 +293,14 @@ public:
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     friend constexpr auto operator/(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     // 3.2.9 Comparison operators:
     // Equality
@@ -1376,6 +1384,85 @@ constexpr auto operator/(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     d64_div_impl(lhs, rhs, q, r);
 
     return q;
+}
+
+template <typename Integer>
+constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    // Check pre-conditions
+    constexpr decimal64 zero {0, 0};
+    constexpr decimal64 nan {boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask)};
+    constexpr decimal64 inf {boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask)};
+
+    const bool sign {lhs.isneg() != (rhs < 0)};
+
+    const auto lhs_fp {fpclassify(lhs)};
+
+    switch (lhs_fp)
+    {
+        case FP_NAN:
+            return nan;
+        case FP_INFINITE:
+            return inf;
+        case FP_ZERO:
+            return sign ? -zero : zero;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+
+    detail::decimal64_components lhs_components {lhs_sig, lhs_exp, lhs.isneg()};
+
+    auto rhs_sig {static_cast<std::uint64_t>(detail::make_positive_unsigned(rhs))};
+    std::int32_t rhs_exp {};
+    detail::decimal64_components rhs_components {detail::shrink_significand<std::uint64_t>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
+    detail::decimal64_components q_components {};
+
+    d64_generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return decimal64(q_components.sig, q_components.exp, q_components.sign);
+}
+
+template <typename Integer>
+constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    // Check pre-conditions
+    constexpr decimal64 zero {0, 0};
+    constexpr decimal64 nan {boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask)};
+
+    const bool sign {(lhs < 0) != rhs.isneg()};
+
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (rhs_fp == FP_NAN)
+    {
+        return nan;
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_INFINITE:
+            return sign ? -zero : zero;
+        case FP_ZERO:
+            return nan;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    detail::normalize<decimal64>(rhs_sig, rhs_exp);
+
+    detail::decimal64_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
+    detail::decimal64_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
+    detail::decimal64_components q_components {};
+
+    d64_generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return decimal64(q_components.sig, q_components.exp, q_components.sign);
 }
 
 constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
