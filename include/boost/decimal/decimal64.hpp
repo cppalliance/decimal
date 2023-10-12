@@ -202,7 +202,7 @@ private:
 
     friend constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal64& r) noexcept -> void;
 
-    friend constexpr auto mod_impl(decimal64 lhs, decimal64 rhs, const decimal64& q, decimal64& r) noexcept -> void;
+    friend constexpr auto d64_mod_impl(decimal64 lhs, decimal64 rhs, const decimal64& q, decimal64& r) noexcept -> void;
 
 public:
     // 3.2.3.1 construct/copy/destroy
