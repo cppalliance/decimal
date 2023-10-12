@@ -276,34 +276,42 @@ public:
     friend constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     template <typename Integer>
-    friend constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     template <typename Integer>
-    friend constexpr auto operator+(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator+(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     friend constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     template <typename Integer>
-    friend constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     template <typename Integer>
-    friend constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     friend constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     template <typename Integer>
-    friend constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     template <typename Integer>
-    friend constexpr auto operator*(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator*(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     friend constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     template <typename Integer>
-    friend constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     template <typename Integer>
-    friend constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+    friend constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     friend constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
@@ -1469,7 +1477,7 @@ constexpr auto mul_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
               << "\nexp rhs: " << exp_rhs;
     #endif
 
-    bool sign {!(lhs_sign == rhs_sign)};
+    bool sign {lhs_sign != rhs_sign};
 
     // Once we have the normalized significands and exponents all we have to do is
     // multiply the significands and add the exponents
