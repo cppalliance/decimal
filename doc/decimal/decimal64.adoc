@@ -37,7 +37,7 @@ explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal64(Float val) noexcept;
 
 // 3.2.3.3 Conversion from integral type
 template <typename Integer>
-explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal64(Integer val) noexcept;
+explicit constexpr decimal64(Integer val) noexcept;
 
 // 3.2.3.4 Conversion to integral type
 explicit constexpr operator int() const noexcept;
