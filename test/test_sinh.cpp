@@ -3,26 +3,6 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#if defined(__clang__)
-  #if defined __has_feature
-  #if __has_feature(thread_sanitizer)
-  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
-  #endif
-  #endif
-#elif defined(__GNUC__)
-  #if defined(__SANITIZE_THREAD__)
-  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
-  #endif
-#elif defined(_MSC_VER)
-  #if defined(_DEBUG)
-  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
-  #endif
-#endif
-
-#if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && ((defined(UBSAN) && (UBSAN == 1)))
-  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
-#endif
-
 #include <chrono>
 #include <limits>
 #include <random>
