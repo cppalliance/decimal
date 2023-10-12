@@ -292,6 +292,8 @@ public:
     friend constexpr auto operator*(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
+    friend constexpr auto operator/(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
     // 3.2.9 Comparison operators:
     // Equality
     friend constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool;
@@ -1365,6 +1367,15 @@ constexpr auto operator*(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
     return rhs * lhs;
+}
+
+constexpr auto operator/(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    decimal64 q {};
+    decimal64 r {};
+    d64_div_impl(lhs, rhs, q, r);
+
+    return q;
 }
 
 constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
