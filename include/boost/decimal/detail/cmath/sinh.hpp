@@ -54,6 +54,11 @@ constexpr auto sinh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
                 using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(9))>;
 
                 #if (defined(__clang__) && (__clang__ < 6))
+                #  pragma GCC diagnostic push
+                #  pragma GCC diagnostic ignored "-Wmissing-braces"
+                #endif
+
+                #if (defined(__clang__) && (__clang__ < 6))
                 const
                 #else
                 constexpr
@@ -73,6 +78,10 @@ constexpr auto sinh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
                         one / UINT64_C(355'687'428'096'000),    // * x^17
                         one / UINT64_C(121'645'100'408'832'000) // * x^19
                     };
+
+                #if (defined(__clang__) && (__clang__ < 6))
+                #  pragma GCC diagnostic pop
+                #endif
 
                 auto rit =
                     coefficient_table.crbegin()

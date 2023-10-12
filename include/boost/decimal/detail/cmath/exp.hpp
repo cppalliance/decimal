@@ -91,8 +91,13 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
             // TODO(ckormanyos) Is a Pade approximation more precise or faster?
             // And, ... how can you make it scalable if you go ahead and "Pade"-it?
 
-            constexpr coefficient_array_type
-                coefficient_table
+            #if (defined(__clang__) && (__clang__ < 6))
+            #  pragma GCC diagnostic push
+            #  pragma GCC diagnostic ignored "-Wmissing-braces"
+            #endif
+
+            constexpr auto coefficient_table =
+                coefficient_array_type
                 {
                     T { 1,  0 },                                       // * x
                     T { 5, -1 },                                       // * x^2
@@ -109,6 +114,10 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                     T { UINT64_C(161'932'585'112'773'321), -18 -  9 }, // * x^13
                     T { UINT64_C(115'436'845'687'504'464), -18 - 10 }  // * x^14
                 };
+
+            #if (defined(__clang__) && (__clang__ < 6))
+            #  pragma GCC diagnostic pop
+            #endif
 
             auto rit = coefficient_table.crbegin() + static_cast<std::size_t>((sizeof(T) == 4U) ? 5U : 0U);
 

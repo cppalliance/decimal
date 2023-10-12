@@ -62,6 +62,11 @@ constexpr auto tanh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
                 using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(11))>;
 
                 #if (defined(__clang__) && (__clang__ < 6))
+                #  pragma GCC diagnostic push
+                #  pragma GCC diagnostic ignored "-Wmissing-braces"
+                #endif
+
+                #if (defined(__clang__) && (__clang__ < 6))
                 const
                 #else
                 constexpr
@@ -72,7 +77,7 @@ constexpr auto tanh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
                         // Series[Tanh[x], {x, 0, 23}]
 
                         //         (1),                                                         // * x
-                        -one                               / UINT8_C (3),                       // * x^3
+                        -one                                / UINT8_C (3),                      // * x^3
                          T { UINT8_C(2),                0 } / UINT8_C (15),                     // * x^5
                         -T { UINT8_C(17),               0 } / UINT16_C(315),                    // * x^7
                          T { UINT8_C(62),               0 } / UINT16_C(2'835),                  // * x^9
@@ -84,6 +89,10 @@ constexpr auto tanh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
                          T { UINT64_C(18'888'466'084),  0 } / UINT64_C(194'896'477'400'625),    // * x^21
                         -T { UINT64_C(113'927'491'862), 0 } / UINT64_C(2'900'518'163'668'125),  // * x^23
                     };
+
+                #if (defined(__clang__) && (__clang__ < 6))
+                #  pragma GCC diagnostic pop
+                #endif
 
                 auto rit =
                     coefficient_table.crbegin()

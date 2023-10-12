@@ -84,8 +84,13 @@ constexpr auto expm1(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
 
             using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(14))>;
 
-            constexpr coefficient_array_type
-                coefficient_table
+            #if (defined(__clang__) && (__clang__ < 6))
+            #  pragma GCC diagnostic push
+            #  pragma GCC diagnostic ignored "-Wmissing-braces"
+            #endif
+
+            constexpr auto coefficient_table =
+                coefficient_array_type
                 {
                     T { UINT64_C(100000000000000000), -17 -  0 }, // * x
                     T { UINT64_C(500000000000000000), -18 -  0 }, // * x^2
@@ -102,6 +107,10 @@ constexpr auto expm1(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
                     T { UINT64_C(161938589229618039), -18 -  9 }, // * x^13
                     T { UINT64_C(115439921859822156), -18 - 10 }  // * x^14
                 };
+
+            #if (defined(__clang__) && (__clang__ < 6))
+            #  pragma GCC diagnostic pop
+            #endif
 
             auto rit = coefficient_table.crbegin() + static_cast<std::size_t>((sizeof(T) == 4U) ? 5U : 0U);
 

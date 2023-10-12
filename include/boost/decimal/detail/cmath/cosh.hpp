@@ -52,6 +52,11 @@ constexpr auto cosh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
             {
                 using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(9))>;
 
+                #if (defined(__clang__) && (__clang__ < 6))
+                #  pragma GCC diagnostic push
+                #  pragma GCC diagnostic ignored "-Wmissing-braces"
+                #endif
+
                 constexpr auto coefficient_table =
                     coefficient_array_type
                     {
@@ -67,6 +72,10 @@ constexpr auto cosh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
                         T { UINT64_C(477947733238738530), - 18 - 13 }, // * x^16
                         T { UINT64_C(156192069685862265), - 18 - 15 }  // * x^18
                     };
+
+                #if (defined(__clang__) && (__clang__ < 6))
+                #  pragma GCC diagnostic pop
+                #endif
 
                 auto rit =
                     coefficient_table.crbegin()

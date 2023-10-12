@@ -76,6 +76,11 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 
         using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(11))>;
 
+        #if (defined(__clang__) && (__clang__ < 6))
+        #  pragma GCC diagnostic push
+        #  pragma GCC diagnostic ignored "-Wmissing-braces"
+        #endif
+
         constexpr auto coefficient_table =
             coefficient_array_type
             {
@@ -98,6 +103,10 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 T { UINT64_C(454130626860119048), -18 - 7 }, // * z^21
                 T { UINT64_C(103660251783288043), -18 - 7 }  // * z^23
             };
+
+        #if (defined(__clang__) && (__clang__ < 6))
+        #  pragma GCC diagnostic pop
+        #endif
 
         const auto s   = (g - one) / (g + one);
         const auto z   = s + s;

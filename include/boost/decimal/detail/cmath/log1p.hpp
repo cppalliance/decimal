@@ -68,8 +68,13 @@ constexpr auto log1p(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
         {
             using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(21))>;
 
-            constexpr coefficient_array_type
-                coefficient_table
+            #if (defined(__clang__) && (__clang__ < 6))
+            #  pragma GCC diagnostic push
+            #  pragma GCC diagnostic ignored "-Wmissing-braces"
+            #endif
+
+            constexpr auto coefficient_table =
+                coefficient_array_type
                 {
                      // Series[Log[1+x], {x, 0, 21}]
 
@@ -95,6 +100,10 @@ constexpr auto log1p(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
                      -T { 5, -2 },                                 // ( 1 / 20) * x^20
                       T { UINT64_C(476190476190476190), -18 - 1 }  // ( 1 / 21) * x^21
                 };
+
+            #if (defined(__clang__) && (__clang__ < 6))
+            #  pragma GCC diagnostic pop
+            #endif
 
             auto rit = coefficient_table.crbegin() + static_cast<std::size_t>((sizeof(T) == 4U) ? 7U : 0U);
 
