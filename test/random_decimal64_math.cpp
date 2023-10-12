@@ -225,6 +225,39 @@ void random_multiplication(T lower, T upper)
     BOOST_TEST(isnan(decimal64(dist(rng)) * std::numeric_limits<decimal64>::quiet_NaN()));
 }
 
+template <typename T>
+void random_mixed_multiplication(T lower, T upper)
+{
+    std::uniform_int_distribution<T> dist(lower, upper);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const decimal64 dec1 {val1};
+        const T dec2 {static_cast<T>(decimal64(val2))};
+
+        const decimal64 res {dec1 * dec2};
+        const decimal64 res_int {val1 * val2};
+
+        if (!BOOST_TEST_EQ(res, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << val1 * val2 << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(std::numeric_limits<decimal64>::infinity() * dist(rng)));
+    BOOST_TEST(isinf(dist(rng) * std::numeric_limits<decimal64>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal64>::quiet_NaN() * dist(rng)));
+    BOOST_TEST(isnan(dist(rng) * std::numeric_limits<decimal64>::quiet_NaN()));
+}
+
 int main()
 {
     // Values that won't exceed the range of the significand
@@ -265,16 +298,25 @@ int main()
     random_multiplication(0, 5'000);
     random_multiplication(0LL, 5'000LL);
     random_multiplication(0, sqrt_int_max);
+    random_mixed_multiplication(0, 5'000);
+    random_mixed_multiplication(0LL, 5'000LL);
+    random_mixed_multiplication(0, sqrt_int_max);
 
     // Negative
     random_multiplication(-5'000, 0);
     random_multiplication(-5'000LL, 0LL);
     random_multiplication(-sqrt_int_max, 0);
+    random_mixed_multiplication(-5'000, 0);
+    random_mixed_multiplication(-5'000LL, 0LL);
+    random_mixed_multiplication(-sqrt_int_max, 0);
 
     // Mixed
     random_multiplication(-5'000, 5'000);
     random_multiplication(-5'000LL, 5'000LL);
     random_multiplication(-sqrt_int_max, sqrt_int_max);
+    random_mixed_multiplication(-5'000, 5'000);
+    random_mixed_multiplication(-5'000LL, 5'000LL);
+    random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
 
     // Spot checked values
     spot_check_sub(945501, 80);
