@@ -61,24 +61,37 @@ constexpr auto tanh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
             {
                 using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(11))>;
 
-                constexpr auto coefficient_table =
+                #if (defined(__clang__) && (__clang__ < 6))
+                #  pragma clang diagnostic push
+                #  pragma clang diagnostic ignored "-Wmissing-braces"
+                #endif
+
+                #if (defined(__clang__) && (__clang__ < 6))
+                const
+                #else
+                constexpr
+                #endif
+                auto coefficient_table =
                     coefficient_array_type
                     {
                         // Series[Tanh[x], {x, 0, 23}]
-
-                        //         (1),                                                        // * x
-                        -one                              / UINT8_C (3),                       // * x^3
-                        T { INT8_C(2),                 0 } / UINT8_C (15),                     // * x^5
-                        T { INT8_C(-17),               0 } / UINT16_C(315),                    // * x^7
-                        T { UINT8_C(62),               0 } / UINT16_C(2'835),                  // * x^9
-                        T { INT16_C(-1'382),           0 } / UINT32_C(155'925),                // * x^11
-                        T { UINT16_C(21'844),          0 } / UINT32_C(6'081'075),              // * x^13
-                        T { INT32_C(-929'569),         0 } / UINT32_C(638'512'875),            // * x^15
-                        T { UINT32_C(6'404'582),       0 } / UINT64_C(10'854'718'875),         // * x^17
-                        T { INT32_C(-443'861'162),     0 } / UINT64_C(1'856'156'927'625),      // * x^19
-                        T { UINT64_C(18'888'466'084),  0 } / UINT64_C(194'896'477'400'625),    // * x^21
-                        T { INT64_C(-113'927'491'862), 0 } / UINT64_C(2'900'518'163'668'125),  // * x^23
+                        //         (1),                             // * x
+                        -T { 333333333333333333, - 18 - 0 },  // * x^3
+                         T { 133333333333333333, - 18 - 0 },  // * x^5
+                        -T { 539682539682539683, - 18 - 1 },  // * x^7
+                         T { 218694885361552028, - 18 - 1 },  // * x^9
+                        -T { 886323552990219657, - 18 - 2 },  // * x^11
+                         T { 359212803657248102, - 18 - 2 },  // * x^13
+                        -T { 145583438705131827, - 18 - 2 },  // * x^15
+                         T { 590027440945585981, - 18 - 3 },  // * x^17
+                        -T { 239129114243552481, - 18 - 3 },  // * x^19
+                         T { 969153795692945033, - 18 - 4 },  // * x^21
+                        -T { 392783238833168341, - 18 - 4 },  // * x^23
                     };
+
+                #if (defined(__clang__) && (__clang__ < 6))
+                #  pragma clang diagnostic pop
+                #endif
 
                 auto rit =
                     coefficient_table.crbegin()

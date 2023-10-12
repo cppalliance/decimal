@@ -53,21 +53,30 @@ constexpr auto sinh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
             {
                 using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(9))>;
 
+                #if (defined(__clang__) && (__clang__ < 6))
+                #  pragma clang diagnostic push
+                #  pragma clang diagnostic ignored "-Wmissing-braces"
+                #endif
+
                 constexpr auto coefficient_table =
                     coefficient_array_type
                     {
                         // Series[Sinh[x], {x, 0, 19}]
                         //            (1),                      // * x
-                        one / UINT8_C (6),                      // * x^3
-                        one / UINT8_C (120),                    // * x^5
-                        one / UINT16_C(5'040),                  // * x^7
-                        one / UINT32_C(362'880),                // * x^9
-                        one / UINT32_C(39'916'800),             // * x^11
-                        one / UINT64_C(6'227'020'800),          // * x^13
-                        one / UINT64_C(1'307'674'368'000),      // * x^15
-                        one / UINT64_C(355'687'428'096'000),    // * x^17
-                        one / UINT64_C(121'645'100'408'832'000) // * x^19
+                        T { UINT64_C(166666666666666667), -18  - 0 }, // * x^3
+                        T { UINT64_C(833333333333333333), -18  - 2 }, // * x^5
+                        T { UINT64_C(198412698412698413), -18  - 3 }, // * x^7
+                        T { UINT64_C(275573192239858907), -18  - 5 }, // * x^9
+                        T { UINT64_C(250521083854417188), -18  - 7 }, // * x^11
+                        T { UINT64_C(160590438368216146), -18  - 9 }, // * x^13
+                        T { UINT64_C(764716373181981648), -18 - 12 }, // * x^15
+                        T { UINT64_C(281145725434552076), -18 - 14 }, // * x^17
+                        T { UINT64_C(822063524662432972), -18 - 17 }, // * x^19
                     };
+
+                #if (defined(__clang__) && (__clang__ < 6))
+                #  pragma clang diagnostic pop
+                #endif
 
                 auto rit =
                     coefficient_table.crbegin()

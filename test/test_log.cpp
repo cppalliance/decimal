@@ -3,22 +3,6 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#if defined(__clang__)
-  #if defined __has_feature
-  #if __has_feature(thread_sanitizer)
-  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
-  #endif
-  #endif
-#elif defined(__GNUC__)
-  #if defined(__SANITIZE_THREAD__)
-  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
-  #endif
-#elif defined(_MSC_VER)
-  #if defined(_DEBUG)
-  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
-  #endif
-#endif
-
 #include <chrono>
 #include <limits>
 #include <random>
@@ -135,8 +119,6 @@ namespace local
     using decimal_type = boost::decimal::decimal32;
 
     auto result_is_ok = true;
-
-    auto trials = static_cast<std::uint32_t>(UINT8_C(0));
 
     for(auto   ui_arg = static_cast<unsigned>(UINT8_C(106));
                ui_arg < static_cast<unsigned>(UINT8_C(205));
@@ -269,7 +251,7 @@ namespace local
 
       const auto log_nan = log(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
-      const volatile auto result_log_nan_is_ok = isnan(::my_global_test_log_nan());
+      const volatile auto result_log_nan_is_ok = isnan(log_nan);
 
       assert(isnan(log_nan));
 

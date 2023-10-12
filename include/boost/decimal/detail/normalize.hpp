@@ -34,7 +34,18 @@ constexpr auto normalize(T1& significand, T2& exp) noexcept -> void
         while (digits > detail::precision_v<TargetDecimalType> + 1)
         {
             significand /= 10;
+
+            #if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
+            #  pragma GCC diagnostic push
+            #  pragma GCC diagnostic ignored "-Waggressive-loop-optimizations"
+            #endif
+
             ++exp;
+
+            #if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
+            #  pragma GCC diagnostic pop
+            #endif
+
             --digits;
         }
 
