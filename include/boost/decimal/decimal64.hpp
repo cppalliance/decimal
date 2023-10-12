@@ -1412,7 +1412,7 @@ constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept -> std::enable_if_
 
     if (rhs == 0)
     {
-        return inf;
+        return sign ? -inf : inf;
     }
 
     auto lhs_sig {lhs.full_significand()};

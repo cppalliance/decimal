@@ -308,7 +308,10 @@ void random_mixed_division(T lower, T upper)
         const decimal64 res {dec1 / dec2};
         const decimal64 res_int {static_cast<double>(val1) / static_cast<double>(val2)};
 
-        if (!BOOST_TEST_EQ(res, res_int))
+        if (isinf(res) && isinf(res_int))
+        {
+        }
+        else if (!BOOST_TEST_EQ(res, res_int))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1

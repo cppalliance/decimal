@@ -1643,8 +1643,8 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
     switch (rhs_fp)
     {
         case FP_ZERO:
-            q = nan;
-            r = nan;
+            q = inf;
+            r = zero;
             return;
         case FP_INFINITE:
             q = sign ? -zero : zero;
@@ -1718,6 +1718,11 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
             return sign ? -zero : zero;
         default:
             static_cast<void>(lhs);
+    }
+
+    if (rhs == 0)
+    {
+        return sign ? -inf : inf;
     }
 
     auto sig_lhs {lhs.full_significand()};
