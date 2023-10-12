@@ -275,6 +275,16 @@ public:
     friend constexpr auto operator-(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
+    friend constexpr auto operator*(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator*(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator*(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
     // 3.2.9 Comparison operators:
     // Equality
     friend constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool;
@@ -1171,6 +1181,30 @@ constexpr auto operator-(Integer lhs, decimal64 rhs) noexcept
     const auto result {d64_sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                     rhs_components.sig, rhs_components.exp, rhs_components.sign,
                                     abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto operator*(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    constexpr decimal64 zero {0, 0};
+
+    const auto non_finite {detail::check_non_finite(lhs, rhs)};
+    if (non_finite != zero)
+    {
+        return non_finite;
+    }
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    detail::normalize<decimal64>(rhs_sig, rhs_exp);
+
+    const auto result {d64_mul_impl(lhs_sig, lhs_exp, lhs.isneg(),
+                                    rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
 }
