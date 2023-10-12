@@ -5,11 +5,6 @@
 #ifndef BOOST_DECIMAL_DETAIL_NORMALIZE_HPP
 #define BOOST_DECIMAL_DETAIL_NORMALIZE_HPP
 
-#if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Waggressive-loop-optimizations"
-#endif
-
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
@@ -39,7 +34,18 @@ constexpr auto normalize(T1& significand, T2& exp) noexcept -> void
         while (digits > detail::precision_v<TargetDecimalType> + 1)
         {
             significand /= 10;
-            exp = static_cast<T2>(static_cast<std::make_unsigned_t<T2>>(exp) + static_cast<std::make_unsigned_t<T2>>(UINT8_C(1)));
+
+            #if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
+            #  pragma GCC diagnostic push
+            #  pragma GCC diagnostic ignored "-Waggressive-loop-optimizations"
+            #endif
+
+            ++exp;
+
+            #if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
+            #  pragma GCC diagnostic pop
+            #endif
+
             --digits;
         }
 
@@ -50,9 +56,5 @@ constexpr auto normalize(T1& significand, T2& exp) noexcept -> void
 } //namespace detail
 } //namespace decimal
 } //namespace boost
-
-#if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
-#  pragma GCC diagnostic pop
-#endif
 
 #endif //BOOST_DECIMAL_DETAIL_NORMALIZE_HPP

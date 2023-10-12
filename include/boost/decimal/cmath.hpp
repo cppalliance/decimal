@@ -5,11 +5,6 @@
 #ifndef BOOST_DECIMAL_CMATH_HPP
 #define BOOST_DECIMAL_CMATH_HPP
 
-#if (defined(__clang__) && (__clang__ < 6))
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wmissing-braces"
-#endif
-
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/detail/cmath/acosh.hpp>
@@ -92,9 +87,5 @@ constexpr auto quantize(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 
 } // namespace decimal
 } // namespace boost
-
-#if (defined(__clang__) && (__clang__ < 6))
-#  pragma GCC diagnostic pop
-#endif
 
 #endif // BOOST_DECIMAL_CMATH_HPP

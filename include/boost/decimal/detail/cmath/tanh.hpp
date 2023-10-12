@@ -71,8 +71,8 @@ constexpr auto tanh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
                     {
                         // Series[Tanh[x], {x, 0, 23}]
 
-                        //         (1),                                                        // * x
-                        -one                               / UINT8_C (3),                      // * x^3
+                        //         (1),                                                         // * x
+                        -one                               / UINT8_C (3),                       // * x^3
                          T { UINT8_C(2),                0 } / UINT8_C (15),                     // * x^5
                         -T { UINT8_C(17),               0 } / UINT16_C(315),                    // * x^7
                          T { UINT8_C(62),               0 } / UINT16_C(2'835),                  // * x^9

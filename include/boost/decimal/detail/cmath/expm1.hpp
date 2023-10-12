@@ -84,12 +84,7 @@ constexpr auto expm1(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
 
             using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(14))>;
 
-            #if (defined(__clang__) && (__clang__ < 6))
-            const
-            #else
-            constexpr
-            #endif
-            coefficient_array_type
+            constexpr coefficient_array_type
                 coefficient_table
                 {
                     T { UINT64_C(100000000000000000), -17 -  0 }, // * x

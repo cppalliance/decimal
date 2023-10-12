@@ -52,25 +52,20 @@ constexpr auto cosh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
             {
                 using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(9))>;
 
-                #if (defined(__clang__) && (__clang__ < 6))
-                const
-                #else
-                constexpr
-                #endif
-                auto coefficient_table =
+                constexpr auto coefficient_table =
                     coefficient_array_type
                     {
                         // Series[Cosh[x], {x, 0, 18}]
-                        //            (1),                              // * 1
-                        one / T { UINT8_C (2), 0 },                     // * x^2
-                        one / T { UINT8_C (24), 0 },                    // * x^4
-                        one / T { UINT16_C(720), 0 },                   // * x^6
-                        one / T { UINT16_C(40'320), 0 },                // * x^8
-                        one / T { UINT32_C(3'628'800), 0 },             // * x^10
-                        one / T { UINT32_C(479'001'600), 0 },           // * x^12
-                        one / T { UINT64_C(87'178'291'200), 0 },        // * x^14
-                        one / T { UINT64_C(20'922'789'888'000), 0 },    // * x^16
-                        one / T { UINT64_C(6'402'373'705'728'000), 0 }, // * x^18
+                        //            (1),                             // * 1
+                        T { 5, -1 },                                   // * x^2
+                        T { UINT64_C(416666666666666667), - 18 -  1 }, // * x^4
+                        T { UINT64_C(138888888888888889), - 18 -  2 }, // * x^6
+                        T { UINT64_C(248015873015873016), - 18 -  4 }, // * x^8
+                        T { UINT64_C(275573192239858907), - 18 -  6 }, // * x^10
+                        T { UINT64_C(208767569878680990), - 18 -  8 }, // * x^12
+                        T { UINT64_C(114707455977297247), - 18 - 10 }, // * x^14
+                        T { UINT64_C(477947733238738530), - 18 - 13 }, // * x^16
+                        T { UINT64_C(156192069685862265), - 18 - 15 }  // * x^18
                     };
 
                 auto rit =
