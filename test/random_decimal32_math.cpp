@@ -300,6 +300,7 @@ void random_division(T lower, T upper)
     BOOST_TEST(!isinf(decimal32(dist(rng)) / std::numeric_limits<decimal32>::infinity()));
     BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() / decimal32(dist(rng))));
     BOOST_TEST(isnan(decimal32(dist(rng)) / std::numeric_limits<decimal32>::quiet_NaN()));
+    BOOST_TEST(isnan(decimal32(dist(rng)) / decimal32(0)));
 }
 
 template <typename T>
@@ -335,6 +336,7 @@ void random_mixed_division(T lower, T upper)
     BOOST_TEST(isnan(val1 / zero));
     BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() / dist(rng)));
     BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() / dist(rng)));
+    BOOST_TEST_EQ(decimal32(dist(rng)) / 0, 0);
 }
 
 int main()
