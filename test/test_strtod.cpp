@@ -30,7 +30,7 @@ void roundtrip_strtod()
         ss << val;
         char* endptr {};
 
-        const T return_val {boost::decimal::strtod(ss.str().c_str(), &endptr)};
+        const T return_val {boost::decimal::strtod<T>(ss.str().c_str(), &endptr)};
         const auto len {std::strlen(ss.str().c_str())};
         const auto dist {endptr - ss.str().c_str()};
 
@@ -60,7 +60,7 @@ void roundtrip_wcstrtod()
         ss << val;
         wchar_t* endptr {};
 
-        const T return_val {boost::decimal::wcstod(ss.str().c_str(), &endptr)};
+        const T return_val {boost::decimal::wcstod<T>(ss.str().c_str(), &endptr)};
         const auto len {ss.str().size()};
         const auto dist {endptr - ss.str().c_str()};
 
@@ -78,26 +78,26 @@ template <typename T>
 void test_strtod_edges()
 {
     errno = 0;
-    BOOST_TEST(isnan(boost::decimal::strtod(nullptr, nullptr))) && BOOST_TEST_EQ(errno, EINVAL);
+    BOOST_TEST(isnan(boost::decimal::strtod<T>(nullptr, nullptr))) && BOOST_TEST_EQ(errno, EINVAL);
 
     errno = 0;
-    BOOST_TEST(isnan(boost::decimal::wcstod(nullptr, nullptr))) && BOOST_TEST_EQ(errno, EINVAL);
+    BOOST_TEST(isnan(boost::decimal::wcstod<T>(nullptr, nullptr))) && BOOST_TEST_EQ(errno, EINVAL);
 
     errno = 0;
     const char* snan_str = "nan(snan)";
-    BOOST_TEST(isnan(boost::decimal::strtod(snan_str, nullptr))) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST(isnan(boost::decimal::strtod<T>(snan_str, nullptr))) && BOOST_TEST_EQ(errno, 0);
 
     errno = 0;
     const char* qnan_str = "nan";
-    BOOST_TEST(isnan(boost::decimal::strtod(qnan_str, nullptr))) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST(isnan(boost::decimal::strtod<T>(qnan_str, nullptr))) && BOOST_TEST_EQ(errno, 0);
 
     errno = 0;
     const char* inf_str = "inf";
-    BOOST_TEST(isinf(boost::decimal::strtod(inf_str, nullptr))) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST(isinf(boost::decimal::strtod<T>(inf_str, nullptr))) && BOOST_TEST_EQ(errno, 0);
 
     errno = 0;
     const char* junk_str = "junk";
-    BOOST_TEST(isnan(boost::decimal::strtod(junk_str, nullptr))) && BOOST_TEST_EQ(errno, EINVAL);
+    BOOST_TEST(isnan(boost::decimal::strtod<T>(junk_str, nullptr))) && BOOST_TEST_EQ(errno, EINVAL);
 }
 
 int main()
@@ -105,6 +105,10 @@ int main()
     roundtrip_strtod<decimal32>();
     roundtrip_wcstrtod<decimal32>();
     test_strtod_edges<decimal32>();
+
+    roundtrip_strtod<decimal64>();
+    roundtrip_wcstrtod<decimal64>();
+    test_strtod_edges<decimal64>();
 
     return boost::report_errors();
 }

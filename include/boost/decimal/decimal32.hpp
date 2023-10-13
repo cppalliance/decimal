@@ -442,12 +442,6 @@ public:
     // 3.6.6 Quantize
     friend constexpr auto quantized32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
-    // 3.8.2 strtod
-    friend constexpr auto strtod32(const char* str, char** endptr) noexcept -> decimal32;
-
-    // 3.9.2 wcstod
-    friend constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept-> decimal32;
-
     // <cmath> functions that need to be friends
     friend constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32;
     friend constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32;
@@ -1972,92 +1966,6 @@ constexpr auto quantized32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     }
 
     return {lhs.full_significand(), rhs.biased_exponent(), lhs.isneg()};
-}
-
-constexpr auto strtod32(const char* str, char** endptr) noexcept -> decimal32
-{
-    if (str == nullptr)
-    {
-        errno = EINVAL;
-        return boost::decimal::from_bits(boost::decimal::detail::d32_snan_mask);
-    }
-
-    auto sign        = bool {};
-    auto significand = std::uint64_t {};
-    auto expval      = std::int32_t {};
-
-    const auto buffer_len {detail::strlen(str)};
-
-    const auto r {detail::parser(str, str + buffer_len, sign, significand, expval)};
-    decimal32 d;
-
-    if (r.ec != std::errc{})
-    {
-        if (r.ec == std::errc::not_supported)
-        {
-            if (significand)
-            {
-                d = from_bits(boost::decimal::detail::d32_snan_mask);
-            }
-            else
-            {
-                d = from_bits(boost::decimal::detail::d32_nan_mask);
-            }
-        }
-        else if (r.ec == std::errc::value_too_large)
-        {
-            d = from_bits(boost::decimal::detail::d32_inf_mask);
-        }
-        else
-        {
-            d = from_bits(boost::decimal::detail::d32_snan_mask);
-            errno = static_cast<int>(r.ec);
-        }
-    }
-    else
-    {
-        d = decimal32(significand, expval, sign);
-    }
-
-    if (endptr != nullptr)
-    {
-        *endptr = const_cast<char*>(str + (r.ptr - str));
-    }
-
-    return d;
-}
-
-constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decimal32
-{
-    char buffer[1024] {};
-    if (str == nullptr || detail::strlen(str) > sizeof(buffer))
-    {
-        errno = EINVAL;
-        return boost::decimal::from_bits(boost::decimal::detail::d32_snan_mask);
-    }
-
-    // Convert all the characters from wchar_t to char and use regular strtod32
-    for (std::size_t i {}; i < detail::strlen(str); ++i)
-    {
-        auto val {*(str + i)};
-        if (BOOST_DECIMAL_UNLIKELY(val > 255))
-        {
-            // Character can not be converted
-            break;
-        }
-
-        buffer[i] = static_cast<char>(val);
-    }
-
-    char* short_endptr {};
-    const auto return_val {strtod32(buffer, &short_endptr)};
-
-    if (endptr != nullptr)
-    {
-        *endptr = const_cast<wchar_t*>(str + (short_endptr - buffer));
-    }
-
-    return return_val;
 }
 
 constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32
