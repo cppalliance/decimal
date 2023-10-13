@@ -81,16 +81,16 @@ void test_quantexp()
     {
         const Dec val1 {1, i};
 
-        if (static_cast<std::uint32_t>(i) + detail::bias > detail::d32_max_biased_exp)
+        if (static_cast<std::uint32_t>(i) + detail::bias_v<Dec> > detail::max_biased_exp_v<Dec>)
         {
-            if (!BOOST_TEST_EQ(quantexp(val1), detail::d32_max_biased_exp))
+            if (!BOOST_TEST_EQ(quantexp(val1), detail::max_biased_exp_v<Dec>))
             {
                 std::cerr << "Val: " << val1 << std::endl;
             }
         }
         else
         {
-            if (!BOOST_TEST_EQ(quantexp(val1), i + detail::bias))
+            if (!BOOST_TEST_EQ(quantexp(val1), i + detail::bias_v<Dec>))
             {
                 std::cerr << "Val: " << val1
                           << "\nExp 1: " << i << std::endl;
@@ -162,6 +162,13 @@ int main()
     test_nonfinite_quantexp<decimal32>();
     test_quantize<decimal32>();
     test_nonfinite_quantize<decimal32>();
+
+    test_same_quantum<decimal64>();
+    test_nonfinite_samequantum<decimal64>();
+    test_quantexp<decimal64>();
+    test_nonfinite_quantexp<decimal64>();
+    test_quantize<decimal64>();
+    test_nonfinite_quantize<decimal64>();
 
     return boost::report_errors();
 }
