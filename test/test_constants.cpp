@@ -22,6 +22,7 @@ void test_constants()
     BOOST_TEST_EQ(Dec(2.302585092994045684), ln10_v<Dec>);
     BOOST_TEST_EQ(Dec(1.414213562373095049), sqrt2_v<Dec>);
     BOOST_TEST_EQ(Dec(1.732050807568877294), sqrt3_v<Dec>);
+    BOOST_TEST_EQ(Dec(0.707106781186547524), inv_sqrt2_v<Dec>);
     BOOST_TEST_EQ(Dec(0.5773502691896257645), inv_sqrt3_v<Dec>);
     BOOST_TEST_EQ(Dec(0.5772156649015328606), egamma_v<Dec>);
     BOOST_TEST_EQ(Dec(1.618033988749894848), phi_v<Dec>);
@@ -39,6 +40,7 @@ void test_defaults()
     BOOST_TEST_EQ(decimal32(2.302585092994045684), ln10);
     BOOST_TEST_EQ(decimal32(1.414213562373095049), sqrt2);
     BOOST_TEST_EQ(decimal32(1.732050807568877294), sqrt3);
+    BOOST_TEST_EQ(decimal32(0.707106781186547524), inv_sqrt2);
     BOOST_TEST_EQ(decimal32(0.5773502691896257645), inv_sqrt3);
     BOOST_TEST_EQ(decimal32(0.5772156649015328606), egamma);
     BOOST_TEST_EQ(decimal32(1.618033988749894848), phi);
@@ -47,6 +49,7 @@ void test_defaults()
 int main()
 {
     test_constants<decimal32>();
+    test_constants<decimal64>();
     test_defaults();
 
     return boost::report_errors();

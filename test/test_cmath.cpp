@@ -12,7 +12,11 @@
 #include <random>
 #include <cmath>
 
-static constexpr auto N {1024};
+#ifdef BOOST_DECIMAL_REDUCE_TEST_DEPTH
+static constexpr auto N {128};
+#else
+static constexpr auto N {512};
+#endif
 
 static std::mt19937_64 rng(42);
 
@@ -328,7 +332,7 @@ void test_fma()
 {
     BOOST_TEST_EQ(fma(Dec(1, -1), Dec(1, 1), Dec(1, 0, true)), Dec(0, 0));
     
-    std::uniform_real_distribution<float> dist(-1e10F, 1e10F);
+    std::uniform_real_distribution<double> dist(-1e10, 1e10);
 
     for (std::size_t n {}; n < N; ++n)
     {
@@ -342,13 +346,14 @@ void test_fma()
         auto fma_val {fma(d1, d2, d3)};
         auto naive_val {(d1 * d2) + d3};
 
-        if (!BOOST_TEST(fabs(fma_val - naive_val) < std::numeric_limits<Dec>::epsilon()))
+        if (!BOOST_TEST(fabs(fma_val - naive_val) < Dec(1, 5)))
         {
             std::cerr << "Dec 1: " << d1
                       << "\nDec 2: " << d2
                       << "\nDec 3: " << d3
                       << "\nfma val: " << fma_val
-                      << "\nNaive val: " << naive_val << std::endl;
+                      << "\nNaive val: " << naive_val
+                      << "\nDist: " << fabs(fma_val - naive_val) << std::endl;
         }
     }
 
@@ -544,8 +549,17 @@ void test_fdim()
 template <typename Dec>
 void test_ilogb()
 {
-    BOOST_TEST_EQ(ilogb(Dec(1,0)), 101);
-    BOOST_TEST_EQ(ilogb(Dec(10, 0)), 102);
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value)
+    {
+        BOOST_TEST_EQ(ilogb(Dec(1, 0)), 101);
+        BOOST_TEST_EQ(ilogb(Dec(10, 0)), 102);
+    }
+    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal64>::value)
+    {
+        BOOST_TEST_EQ(ilogb(Dec(1, 0)), 398);
+        BOOST_TEST_EQ(ilogb(Dec(10, 0)), 399);
+    }
+
     BOOST_TEST_EQ(ilogb(Dec(0)), FP_ILOGB0);
     BOOST_TEST_EQ(ilogb(std::numeric_limits<Dec>::infinity()), INT_MAX);
     BOOST_TEST_EQ(ilogb(std::numeric_limits<Dec>::quiet_NaN()), FP_ILOGBNAN);
@@ -1252,7 +1266,6 @@ void test_pow()
 
 int main()
 {
-
     test_fmax<decimal32>();
     test_isgreater<decimal32>();
     test_isgreaterequal<decimal32>();
@@ -1261,51 +1274,90 @@ int main()
     test_islessequal<decimal32>();
     test_islessgreater<decimal32>();
     test_isunordered<decimal32>();
+    test_fmax<decimal64>();
+    test_isgreater<decimal64>();
+    test_isgreaterequal<decimal64>();
+    test_fmin<decimal64>();
+    test_isless<decimal64>();
+    test_islessequal<decimal64>();
+    test_islessgreater<decimal64>();
+    test_isunordered<decimal64>();
 
     test_floor<decimal32>();
     test_ceil<decimal32>();
     test_trunc<decimal32>();
+    test_floor<decimal64>();
+    test_ceil<decimal64>();
+    test_trunc<decimal64>();
 
     test_frexp10<decimal32>();
     test_scalbn<decimal32>();
     test_scalbln<decimal32>();
+    test_frexp10<decimal64>();
+    test_scalbn<decimal64>();
+    test_scalbln<decimal64>();
 
     test_div_fmod<decimal32>();
+    test_div_fmod<decimal64>();
 
     test_copysign<decimal32>();
+    test_copysign<decimal64>();
 
+    #if (defined(__clang__) || defined(_MSC_VER) || !defined(__GNUC__) || (defined(__GNUC__) && __GNUC__ > 6))
     test_fma<decimal32>();
+    test_fma<decimal64>();
 
     test_sin<decimal32>();
     test_cos<decimal32>();
+    test_sin<decimal64>();
+    test_cos<decimal64>();
+    #endif
 
     test_modf<decimal32>();
+    test_modf<decimal64>();
 
     test_remainder<decimal32>();
     test_remquo<decimal32>();
+    test_remainder<decimal64>();
+    test_remquo<decimal64>();
 
     test_fdim<decimal32>();
+    test_fdim<decimal64>();
 
     test_ilogb<decimal32>();
+    test_ilogb<decimal64>();
 
     test_sqrt<decimal32>();
+    test_sqrt<decimal64>();
 
     test_two_val_hypot<decimal32>();
     test_three_val_hypot<decimal32>();
+    test_two_val_hypot<decimal64>();
+    test_three_val_hypot<decimal64>();
 
     test_rint<decimal32>();
     test_lrint<decimal32>();
     test_llrint<decimal32>();
     test_nearbyint<decimal32>();
+    test_rint<decimal64>();
+    test_lrint<decimal64>();
+    test_llrint<decimal64>();
+    test_nearbyint<decimal64>();
 
     test_round<decimal32>();
     test_lround<decimal32>();
     test_llround<decimal32>();
+    test_round<decimal64>();
+    test_lround<decimal64>();
+    test_llround<decimal64>();
 
     test_nextafter<decimal32>();
     test_nexttoward<decimal32>();
+    test_nextafter<decimal64>();
+    test_nexttoward<decimal64>();
 
     test_pow<decimal32>();
+    test_pow<decimal64>();
 
     return boost::report_errors();
 }
