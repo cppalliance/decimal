@@ -325,6 +325,31 @@ void random_mixed_division(T lower, T upper)
         }
     }
 
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const T dec1 {static_cast<T>(decimal64(val1))};
+        const decimal64 dec2 {val2};
+
+        const decimal64 res {dec1 / dec2};
+        const decimal64 res_int {static_cast<double>(val1) / static_cast<double>(val2)};
+
+        if (isinf(res) && isinf(res_int))
+        {
+        }
+        else if (!BOOST_TEST(abs(res - res_int) < decimal64(1, -1)))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
+        }
+    }
+
     // Edge cases
     const decimal64 val1 {dist(rng)};
     const decimal64 zero {0, 0};

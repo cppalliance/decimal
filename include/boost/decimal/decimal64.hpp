@@ -1469,6 +1469,7 @@ constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_
 {
     // Check pre-conditions
     constexpr decimal64 zero {0, 0};
+    constexpr decimal64 inf {boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask)};
     constexpr decimal64 nan {boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask)};
 
     const bool sign {(lhs < 0) != rhs.isneg()};
@@ -1485,7 +1486,7 @@ constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_
         case FP_INFINITE:
             return sign ? -zero : zero;
         case FP_ZERO:
-            return nan;
+            return sign ? -inf : inf;
         default:
             static_cast<void>(lhs);
     }
