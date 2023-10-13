@@ -168,9 +168,6 @@ private:
     template <typename T>
     friend constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>;
 
-    template<typename T>
-    friend constexpr auto log10(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
-
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32;
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal32 rhs) noexcept -> std::uint32_t;
