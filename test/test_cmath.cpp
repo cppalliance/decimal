@@ -12,7 +12,11 @@
 #include <random>
 #include <cmath>
 
+#ifdef BOOST_DECIMAL_REDUCE_TEST_DEPTH
+static constexpr auto N {128};
+#else
 static constexpr auto N {1024};
+#endif
 
 static std::mt19937_64 rng(42);
 
