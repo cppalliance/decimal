@@ -323,9 +323,29 @@ public:
 
     // 3.2.2.6 Compound assignment
     constexpr auto operator+=(decimal32 rhs) noexcept -> decimal32&;
+
+    template <typename Integer>
+    constexpr auto operator+=(Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+
     constexpr auto operator-=(decimal32 rhs) noexcept -> decimal32&;
+
+    template <typename Integer>
+    constexpr auto operator-=(Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+
     constexpr auto operator*=(decimal32 rhs) noexcept -> decimal32&;
+
+    template <typename Integer>
+    constexpr auto operator*=(Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+
     constexpr auto operator/=(decimal32 rhs) noexcept -> decimal32&;
+
+    template <typename Integer>
+    constexpr auto operator/=(Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+
     constexpr auto operator%=(decimal32 rhs) noexcept -> decimal32&;
 
     // 3.2.9 comparison operators:
@@ -946,6 +966,14 @@ constexpr auto decimal32::operator+=(decimal32 rhs) noexcept -> decimal32&
     return *this;
 }
 
+template <typename Integer>
+constexpr auto decimal32::operator+=(Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>
+{
+    *this = *this + rhs;
+    return *this;
+}
+
 // NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
 constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
@@ -1058,6 +1086,14 @@ constexpr auto decimal32::operator--(int) noexcept -> decimal32
 }
 
 constexpr auto decimal32::operator-=(decimal32 rhs) noexcept -> decimal32&
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal32::operator-=(Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>
 {
     *this = *this - rhs;
     return *this;
@@ -1570,6 +1606,14 @@ constexpr auto decimal32::operator*=(decimal32 rhs) noexcept -> decimal32&
     return *this;
 }
 
+template <typename Integer>
+constexpr auto decimal32::operator*=(Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>
+{
+    *this = *this * rhs;
+    return *this;
+}
+
 constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
                                 detail::decimal32_components& q) noexcept -> void
 {
@@ -1745,6 +1789,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
     // Check pre-conditions
     constexpr decimal32 zero {0, 0};
     constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::d32_snan_mask)};
+    constexpr decimal32 inf {boost::decimal::from_bits(boost::decimal::detail::d32_inf_mask)};
 
     const bool sign {(lhs < 0) != rhs.isneg()};
 
@@ -1760,7 +1805,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
         case FP_INFINITE:
             return sign ? -zero : zero;
         case FP_ZERO:
-            return nan;
+            return sign ? -inf : inf;
         default:
             static_cast<void>(lhs);
     }
@@ -1769,7 +1814,9 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    detail::decimal32_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
+    std::int32_t lhs_exp {};
+    auto lhs_sig {detail::make_positive_unsigned(detail::shrink_significand(lhs, lhs_exp))};
+    detail::decimal32_components lhs_components {lhs_sig, lhs_exp, lhs < 0};
     detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
     detail::decimal32_components q_components {};
 
@@ -1783,6 +1830,15 @@ constexpr auto decimal32::operator/=(decimal32 rhs) noexcept -> decimal32&
     *this = *this / rhs;
     return *this;
 }
+
+template <typename Integer>
+constexpr auto decimal32::operator/=(Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>
+{
+    *this = *this / rhs;
+    return *this;
+}
+
 
 constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
