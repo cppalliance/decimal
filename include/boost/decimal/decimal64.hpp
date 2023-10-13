@@ -145,9 +145,14 @@ private:
     // Returns the biased exponent
     constexpr auto biased_exponent() const noexcept -> std::int32_t;
 
+    // Allows direct editing of the exp
+    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
+    constexpr auto edit_exponent(T exp) noexcept -> void;
+
     // Returns the significand complete with the bits implied from the combination field
     constexpr auto full_significand() const noexcept -> std::uint64_t;
     constexpr auto isneg() const noexcept -> bool;
+    constexpr auto edit_sign(bool sign) noexcept -> void;
 
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
@@ -426,12 +431,6 @@ public:
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
 
-    // Related to <cmath>
-    template <typename T>
-    friend constexpr auto frexp10(T num, int* expptr) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
-            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t, std::uint64_t>>;
-
     // 3.6.4 Same Quantum
     friend constexpr auto samequantumd64(decimal64 lhs, decimal64 rhs) noexcept -> bool;
 
@@ -440,6 +439,17 @@ public:
 
     // 3.6.6 Quantize
     friend constexpr auto quantized64(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    // <cmath> functions that need to be friends
+    template <typename T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
+            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t, std::uint64_t>>;
+
+    friend constexpr auto copysignd64(decimal64 mag, decimal64 sgn) noexcept -> decimal64;
+    friend constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64;
+    friend constexpr auto scalbnd64(decimal64 num, int exp) noexcept -> decimal64;
+    friend constexpr auto scalblnd64(decimal64 num, long exp) noexcept -> decimal64;
 };
 
 constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
@@ -793,6 +803,17 @@ constexpr auto decimal64::full_significand() const noexcept -> std::uint64_t
 constexpr auto decimal64::isneg() const noexcept -> bool
 {
     return static_cast<bool>(bits_.sign);
+}
+
+template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
+constexpr auto decimal64::edit_exponent(T expval) noexcept -> void
+{
+    *this = decimal64(this->full_significand(), expval, this->isneg());
+}
+
+constexpr auto decimal64::edit_sign(bool sign) noexcept -> void
+{
+    this->bits_.sign = static_cast<std::uint64_t>(sign);
 }
 
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
@@ -1913,6 +1934,96 @@ constexpr auto quantized64(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     }
 
     return {lhs.full_significand(), rhs.biased_exponent(), lhs.isneg()};
+}
+
+constexpr auto scalblnd64(decimal64 num, long exp) noexcept -> decimal64
+{
+    constexpr decimal64 zero {0, 0};
+
+    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    {
+        return num;
+    }
+
+    num.edit_exponent(num.biased_exponent() + exp);
+
+    return num;
+}
+
+constexpr auto scalbnd64(decimal64 num, int expval) noexcept -> decimal64
+{
+    return scalblnd64(num, static_cast<long>(expval));
+}
+
+constexpr auto copysignd64(decimal64 mag, decimal64 sgn) noexcept -> decimal64
+{
+    mag.edit_sign(sgn.isneg());
+    return mag;
+}
+
+constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
+{
+    // First calculate x * y without rounding
+    constexpr decimal64 zero {0, 0};
+
+    const auto res {detail::check_non_finite(x, y)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    auto sig_lhs {x.full_significand()};
+    auto exp_lhs {x.biased_exponent()};
+    detail::normalize<decimal64>(sig_lhs, exp_lhs);
+
+    auto sig_rhs {y.full_significand()};
+    auto exp_rhs {y.biased_exponent()};
+    detail::normalize<decimal64>(sig_rhs, exp_rhs);
+
+    auto mul_result {d64_mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
+    const decimal64 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
+
+    const auto res_add {detail::check_non_finite(dec_result, z)};
+    if (res_add != zero)
+    {
+        return res_add;
+    }
+
+    bool lhs_bigger {dec_result > z};
+    if (dec_result.isneg() && z.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+    bool abs_lhs_bigger {abs(dec_result) > abs(z)};
+
+    detail::normalize<decimal64>(mul_result.sig, mul_result.exp);
+
+    auto sig_z {z.full_significand()};
+    auto exp_z {z.biased_exponent()};
+    detail::normalize<decimal64>(sig_z, exp_z);
+    detail::decimal64_components z_components {sig_z, exp_z, z.isneg()};
+
+    if (!lhs_bigger)
+    {
+        detail::swap(mul_result, z_components);
+        abs_lhs_bigger = !abs_lhs_bigger;
+    }
+
+    detail::decimal64_components result {};
+
+    if (!mul_result.sign && z_components.sign)
+    {
+        result = d64_sub_impl(mul_result.sig, mul_result.exp, mul_result.sign,
+                              z_components.sig, z_components.exp, z_components.sign,
+                              abs_lhs_bigger);
+    }
+    else
+    {
+        result = d64_add_impl(mul_result.sig, mul_result.exp, mul_result.sign,
+                              z_components.sig, z_components.exp, z_components.sign);
+    }
+
+    return {result.sig, result.exp, result.sign};
 }
 
 } //namespace decimal

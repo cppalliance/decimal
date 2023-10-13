@@ -56,9 +56,19 @@ constexpr auto scalbn(decimal32 num, int expval) noexcept -> decimal32
     return scalbnd32(num, expval);
 }
 
+constexpr auto scalbn(decimal64 num, int expval) noexcept -> decimal64
+{
+    return scalbnd64(num, expval);
+}
+
 constexpr auto scalbln(decimal32 num, long expval) noexcept -> decimal32
 {
     return scalblnd32(num, expval);
+}
+
+constexpr auto scalbln(decimal64 num, long expval) noexcept -> decimal64
+{
+    return scalblnd64(num, expval);
 }
 
 constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
@@ -66,9 +76,19 @@ constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
     return copysignd32(mag, sgn);
 }
 
+constexpr auto copysign(decimal64 mag, decimal64 sgn) noexcept -> decimal64
+{
+    return copysignd64(mag, sgn);
+}
+
 constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
     return fmad32(x, y, z);
+}
+
+constexpr auto fma(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
+{
+    return fmad64(x, y, z);
 }
 
 constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool
