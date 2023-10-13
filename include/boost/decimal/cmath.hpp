@@ -7,6 +7,7 @@
 
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/detail/cmath/acosh.hpp>
 #include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/cosh.hpp>
@@ -75,14 +76,29 @@ constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool
     return samequantumd32(lhs, rhs);
 }
 
+constexpr auto samequantum(decimal64 lhs, decimal64 rhs) noexcept -> bool
+{
+    return samequantumd64(lhs, rhs);
+}
+
 constexpr auto quantexp(decimal32 x) noexcept -> int
 {
     return quantexpd32(x);
 }
 
+constexpr auto quantexp(decimal64 x) noexcept -> int
+{
+    return quantexpd64(x);
+}
+
 constexpr auto quantize(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     return quantized32(lhs, rhs);
+}
+
+constexpr auto quantize(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    return quantized64(lhs, rhs);
 }
 
 } // namespace decimal
