@@ -1789,6 +1789,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
     // Check pre-conditions
     constexpr decimal32 zero {0, 0};
     constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::d32_snan_mask)};
+    constexpr decimal32 inf {boost::decimal::from_bits(boost::decimal::detail::d32_inf_mask)};
 
     const bool sign {(lhs < 0) != rhs.isneg()};
 
@@ -1804,7 +1805,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
         case FP_INFINITE:
             return sign ? -zero : zero;
         case FP_ZERO:
-            return nan;
+            return sign ? -inf : inf;
         default:
             static_cast<void>(lhs);
     }
@@ -1813,7 +1814,9 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    detail::decimal32_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
+    std::int32_t lhs_exp {};
+    auto lhs_sig {detail::make_positive_unsigned(detail::shrink_significand(lhs, lhs_exp))};
+    detail::decimal32_components lhs_components {lhs_sig, lhs_exp, lhs < 0};
     detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
     detail::decimal32_components q_components {};
 
