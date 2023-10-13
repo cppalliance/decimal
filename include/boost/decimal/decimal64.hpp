@@ -310,6 +310,31 @@ public:
     constexpr auto operator--()    noexcept -> decimal64&;
     constexpr auto operator--(int) noexcept -> decimal64;  // NOLINT : C++14 so constexpr implies const
 
+    // 3.2.3.6 Compound assignment
+    constexpr auto operator+=(decimal64 rhs) noexcept -> decimal64&;
+
+    template <typename Integer>
+    constexpr auto operator+=(Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
+
+    constexpr auto operator-=(decimal64 rhs) noexcept -> decimal64&;
+
+    template <typename Integer>
+    constexpr auto operator-=(Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
+
+    constexpr auto operator*=(decimal64 rhs) noexcept -> decimal64&;
+
+    template <typename Integer>
+    constexpr auto operator*=(Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
+
+    constexpr auto operator/=(decimal64 rhs) noexcept -> decimal64&;
+
+    template <typename Integer>
+    constexpr auto operator/=(Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
+
     // 3.2.9 Comparison operators:
     // Equality
     friend constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool;
@@ -1510,6 +1535,62 @@ constexpr auto decimal64::operator--() noexcept -> decimal64&
 constexpr auto decimal64::operator--(int) noexcept -> decimal64
 {
     return --(*this);
+}
+
+constexpr auto decimal64::operator+=(decimal64 rhs) noexcept -> decimal64&
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal64::operator+=(Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr auto decimal64::operator-=(decimal64 rhs) noexcept -> decimal64&
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal64::operator-=(Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+constexpr auto decimal64::operator*=(decimal64 rhs) noexcept -> decimal64&
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal64::operator*=(Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+constexpr auto decimal64::operator/=(decimal64 rhs) noexcept -> decimal64&
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal64::operator/=(Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>
+{
+    *this = *this / rhs;
+    return *this;
 }
 
 constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
