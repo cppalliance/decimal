@@ -27,6 +27,9 @@ template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec
 BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto bias_v = std::is_same<Dec, decimal32>::value ? 101 : 398;
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
+BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto max_biased_exp_v = std::is_same<Dec, decimal32>::value ? 191 : 767;
+
+template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto emax_v = std::is_same<Dec, decimal32>::value ? 96 : 384;
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
@@ -50,6 +53,7 @@ BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto max_string_length_v = std::
 BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto storage_width {storage_width_v<decimal32>};
 BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto precision {precision_v<decimal32>};
 BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto bias {bias_v<decimal32>};
+BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto max_biased_exp {max_biased_exp_v<decimal32>};
 BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto emax {emax_v<decimal32>};
 BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto emin {emin_v<decimal32>};
 BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto etiny {etiny_v<decimal32>};
