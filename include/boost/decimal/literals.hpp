@@ -45,6 +45,38 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _df(long double v) -> decimal32
     return decimal32{v};
 }
 
+constexpr auto operator  "" _DD(const char* str) -> decimal64
+{
+    char* endptr {};
+    return strtod64(str, &endptr);
+}
+
+constexpr auto operator  "" _dd(const char* str) -> decimal64
+{
+    char* endptr {};
+    return strtod64(str, &endptr);
+}
+
+constexpr auto operator  "" _DD(unsigned long long v) -> decimal64
+{
+    return decimal64{v};
+}
+
+constexpr auto operator  "" _dd(unsigned long long v) -> decimal64
+{
+    return decimal64{v};
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _DD(long double v) -> decimal64
+{
+    return decimal64{v};
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _dd(long double v) -> decimal64
+{
+    return decimal64{v};
+}
+
 } // namespace decimal
 } // namespace boost
 
