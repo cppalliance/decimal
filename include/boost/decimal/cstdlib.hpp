@@ -108,14 +108,16 @@ constexpr auto wcstod_impl(const wchar_t* str, wchar_t** endptr) noexcept -> Tar
 
 } //namespace detail
 
-constexpr auto strtod(const char* str, char** endptr) noexcept -> decimal64
+template <typename TargetDecimalType = decimal64>
+constexpr auto strtod(const char* str, char** endptr) noexcept -> TargetDecimalType
 {
-    return detail::strtod_impl<decimal64>(str, endptr);
+    return detail::strtod_impl<TargetDecimalType>(str, endptr);
 }
 
-constexpr auto wcstod(const wchar_t* str, wchar_t** endptr) noexcept -> decimal64
+template <typename TargetDecimalType = decimal64>
+constexpr auto wcstod(const wchar_t* str, wchar_t** endptr) noexcept -> TargetDecimalType
 {
-    return detail::wcstod_impl<decimal64>(str, endptr);
+    return detail::wcstod_impl<TargetDecimalType>(str, endptr);
 }
 
 constexpr auto strtod32(const char* str, char** endptr) noexcept -> decimal32
