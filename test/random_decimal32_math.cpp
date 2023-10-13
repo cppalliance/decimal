@@ -364,10 +364,12 @@ void random_mixed_division(T lower, T upper)
     // Edge cases
     const decimal32 val1 {dist(rng)};
     const decimal32 zero {0, 0};
-    BOOST_TEST(isinf(val1 / zero));
     BOOST_TEST(isnan(std::numeric_limits<decimal32>::quiet_NaN() / dist(rng)));
     BOOST_TEST(isinf(std::numeric_limits<decimal32>::infinity() / dist(rng)));
+    BOOST_TEST(isnan(dist(rng) / std::numeric_limits<decimal32>::quiet_NaN()));
+    BOOST_TEST_EQ(abs(dist(rng) / std::numeric_limits<decimal32>::infinity()), zero);
     BOOST_TEST(isinf(decimal32(dist(rng)) / 0));
+    BOOST_TEST(isinf(val1 / zero));
 }
 
 int main()
