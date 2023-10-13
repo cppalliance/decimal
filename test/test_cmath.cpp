@@ -1270,53 +1270,6 @@ int main()
     test_islessequal<decimal32>();
     test_islessgreater<decimal32>();
     test_isunordered<decimal32>();
-
-    test_floor<decimal32>();
-    test_ceil<decimal32>();
-    test_trunc<decimal32>();
-
-    test_frexp10<decimal32>();
-    test_scalbn<decimal32>();
-    test_scalbln<decimal32>();
-
-    test_div_fmod<decimal32>();
-
-    test_copysign<decimal32>();
-
-    test_fma<decimal32>();
-
-    test_sin<decimal32>();
-    test_cos<decimal32>();
-
-    test_modf<decimal32>();
-
-    test_remainder<decimal32>();
-    test_remquo<decimal32>();
-
-    test_fdim<decimal32>();
-
-    test_ilogb<decimal32>();
-
-    test_sqrt<decimal32>();
-
-    test_two_val_hypot<decimal32>();
-    test_three_val_hypot<decimal32>();
-
-    test_rint<decimal32>();
-    test_lrint<decimal32>();
-    test_llrint<decimal32>();
-    test_nearbyint<decimal32>();
-
-    test_round<decimal32>();
-    test_lround<decimal32>();
-    test_llround<decimal32>();
-
-    test_nextafter<decimal32>();
-    test_nexttoward<decimal32>();
-
-    test_pow<decimal32>();
-
-
     test_fmax<decimal64>();
     test_isgreater<decimal64>();
     test_isgreaterequal<decimal64>();
@@ -1326,49 +1279,78 @@ int main()
     test_islessgreater<decimal64>();
     test_isunordered<decimal64>();
 
+    test_floor<decimal32>();
+    test_ceil<decimal32>();
+    test_trunc<decimal32>();
     test_floor<decimal64>();
     test_ceil<decimal64>();
     test_trunc<decimal64>();
 
+    test_frexp10<decimal32>();
+    test_scalbn<decimal32>();
+    test_scalbln<decimal32>();
     test_frexp10<decimal64>();
     test_scalbn<decimal64>();
     test_scalbln<decimal64>();
 
+    test_div_fmod<decimal32>();
     test_div_fmod<decimal64>();
 
+    test_copysign<decimal32>();
     test_copysign<decimal64>();
 
+    test_fma<decimal32>();
     test_fma<decimal64>();
 
+    test_sin<decimal32>();
+    test_cos<decimal32>();
     test_sin<decimal64>();
     test_cos<decimal64>();
 
+    test_modf<decimal32>();
     test_modf<decimal64>();
 
+    test_remainder<decimal32>();
+    test_remquo<decimal32>();
     test_remainder<decimal64>();
     test_remquo<decimal64>();
 
+    test_fdim<decimal32>();
     test_fdim<decimal64>();
 
+    test_ilogb<decimal32>();
     test_ilogb<decimal64>();
 
+    test_sqrt<decimal32>();
     test_sqrt<decimal64>();
 
+    test_two_val_hypot<decimal32>();
+    test_three_val_hypot<decimal32>();
     test_two_val_hypot<decimal64>();
     test_three_val_hypot<decimal64>();
 
+    test_rint<decimal32>();
+    test_lrint<decimal32>();
+    test_llrint<decimal32>();
+    test_nearbyint<decimal32>();
     test_rint<decimal64>();
     test_lrint<decimal64>();
     test_llrint<decimal64>();
     test_nearbyint<decimal64>();
 
+    test_round<decimal32>();
+    test_lround<decimal32>();
+    test_llround<decimal32>();
     test_round<decimal64>();
     test_lround<decimal64>();
     test_llround<decimal64>();
 
+    test_nextafter<decimal32>();
+    test_nexttoward<decimal32>();
     test_nextafter<decimal64>();
     test_nexttoward<decimal64>();
 
+    test_pow<decimal32>();
     test_pow<decimal64>();
 
     return boost::report_errors();
