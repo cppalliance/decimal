@@ -18,7 +18,7 @@ namespace boost { namespace decimal {
 template <typename T>
 constexpr auto modf(T x, T* iptr) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
-    constexpr decimal32 zero {0, 0};
+    constexpr T zero {0, 0};
     const auto is_neg {x < zero};
 
     if (abs(x) == zero || isinf(x))
