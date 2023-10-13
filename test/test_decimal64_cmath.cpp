@@ -1,0 +1,1319 @@
+// Copyright 2023 Matt Borland
+// Distributed under the Boost Software License, Version 1.0.
+// https://www.boost.org/LICENSE_1_0.txt
+
+// Propogates up from boost.math
+#define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
+
+#include <boost/decimal.hpp>
+#include <boost/core/lightweight_test.hpp>
+#include <boost/math/special_functions/next.hpp>
+#include <iostream>
+#include <random>
+#include <cmath>
+
+static constexpr auto N {1024};
+
+static std::mt19937_64 rng(42);
+
+using namespace boost::decimal;
+
+template <typename Dec>
+void test_fmax()
+{
+    
+    std::uniform_int_distribution<int> dist(0, 10);
+
+    BOOST_TEST_EQ(fmax(Dec(1), std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng))), Dec(1));
+    BOOST_TEST_EQ(fmax(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)), Dec(1)), Dec(1));
+    BOOST_TEST(isnan(fmax(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)), std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
+    BOOST_TEST_EQ(fmax(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)), -std::numeric_limits<Dec>::infinity() * Dec(dist(rng))), std::numeric_limits<Dec>::infinity());
+
+    BOOST_TEST_EQ(fmax(Dec(1), Dec(0)), Dec(1));
+    BOOST_TEST_EQ(fmax(Dec(-2), Dec(1)), Dec(1));
+}
+
+template <typename Dec>
+void test_isgreater()
+{
+    BOOST_TEST_EQ(isgreater(Dec(1), std::numeric_limits<Dec>::quiet_NaN()), false);
+    BOOST_TEST_EQ(isgreater(std::numeric_limits<Dec>::quiet_NaN(), Dec(1)), false);
+    BOOST_TEST_EQ(isgreater(std::numeric_limits<Dec>::quiet_NaN(), std::numeric_limits<Dec>::quiet_NaN()), false);
+    BOOST_TEST_EQ(isgreater(std::numeric_limits<Dec>::infinity(), -std::numeric_limits<Dec>::infinity()), true);
+
+    BOOST_TEST_EQ(isgreater(Dec(1), Dec(0)), true);
+    BOOST_TEST_EQ(isgreater(Dec(-2), Dec(1)), false);
+    BOOST_TEST_EQ(isgreater(Dec(1), Dec(1)), false);
+}
+
+template <typename Dec>
+void test_isgreaterequal()
+{
+    BOOST_TEST_EQ(isgreaterequal(Dec(1), std::numeric_limits<Dec>::quiet_NaN()), false);
+    BOOST_TEST_EQ(isgreaterequal(std::numeric_limits<Dec>::quiet_NaN(), Dec(1)), false);
+    BOOST_TEST_EQ(isgreaterequal(std::numeric_limits<Dec>::quiet_NaN(), std::numeric_limits<Dec>::quiet_NaN()), false);
+    BOOST_TEST_EQ(isgreaterequal(std::numeric_limits<Dec>::infinity(), -std::numeric_limits<Dec>::infinity()), true);
+
+    BOOST_TEST_EQ(isgreaterequal(Dec(1), Dec(0)), true);
+    BOOST_TEST_EQ(isgreaterequal(Dec(-2), Dec(1)), false);
+    BOOST_TEST_EQ(isgreaterequal(Dec(1), Dec(1)), true);
+}
+
+template <typename Dec>
+void test_fmin()
+{
+    BOOST_TEST_EQ(fmin(Dec(1), std::numeric_limits<Dec>::quiet_NaN()), Dec(1));
+    BOOST_TEST_EQ(fmin(std::numeric_limits<Dec>::quiet_NaN(), Dec(1)), Dec(1));
+    BOOST_TEST(isnan(fmin(std::numeric_limits<Dec>::quiet_NaN(), std::numeric_limits<Dec>::quiet_NaN())));
+    BOOST_TEST_EQ(fmin(std::numeric_limits<Dec>::infinity(), -std::numeric_limits<Dec>::infinity()), -std::numeric_limits<Dec>::infinity());
+
+    BOOST_TEST_EQ(fmin(Dec(1), Dec(0)), Dec(0));
+    BOOST_TEST_EQ(fmin(Dec(-2), Dec(1)), Dec(-2));
+}
+
+template <typename Dec>
+void test_isless()
+{
+    BOOST_TEST_EQ(isless(Dec(1), std::numeric_limits<Dec>::quiet_NaN()), false);
+    BOOST_TEST_EQ(isless(std::numeric_limits<Dec>::quiet_NaN(), Dec(1)), false);
+    BOOST_TEST_EQ(isless(std::numeric_limits<Dec>::quiet_NaN(), std::numeric_limits<Dec>::quiet_NaN()), false);
+    BOOST_TEST_EQ(isless(std::numeric_limits<Dec>::infinity(), -std::numeric_limits<Dec>::infinity()), false);
+
+    BOOST_TEST_EQ(isless(Dec(1), Dec(0)), false);
+    BOOST_TEST_EQ(isless(Dec(-2), Dec(1)), true);
+    BOOST_TEST_EQ(isless(Dec(1), Dec(1)), false);
+}
+
+template <typename Dec>
+void test_islessequal()
+{
+    BOOST_TEST_EQ(islessequal(Dec(1), std::numeric_limits<Dec>::quiet_NaN()), false);
+    BOOST_TEST_EQ(islessequal(std::numeric_limits<Dec>::quiet_NaN(), Dec(1)), false);
+    BOOST_TEST_EQ(islessequal(std::numeric_limits<Dec>::quiet_NaN(), std::numeric_limits<Dec>::quiet_NaN()), false);
+    BOOST_TEST_EQ(islessequal(std::numeric_limits<Dec>::infinity(), -std::numeric_limits<Dec>::infinity()), false);
+
+    BOOST_TEST_EQ(islessequal(Dec(1), Dec(0)), false);
+    BOOST_TEST_EQ(islessequal(Dec(-2), Dec(1)), true);
+    BOOST_TEST_EQ(islessequal(Dec(1), Dec(1)), true);
+}
+
+template <typename Dec>
+void test_islessgreater()
+{
+    BOOST_TEST_EQ(islessgreater(Dec(1), std::numeric_limits<Dec>::quiet_NaN()), false);
+    BOOST_TEST_EQ(islessgreater(std::numeric_limits<Dec>::quiet_NaN(), Dec(1)), false);
+    BOOST_TEST_EQ(islessgreater(std::numeric_limits<Dec>::quiet_NaN(), std::numeric_limits<Dec>::quiet_NaN()), false);
+    BOOST_TEST_EQ(islessgreater(std::numeric_limits<Dec>::infinity(), -std::numeric_limits<Dec>::infinity()), true);
+
+    BOOST_TEST_EQ(islessgreater(Dec(1), Dec(0)), true);
+    BOOST_TEST_EQ(islessgreater(Dec(-2), Dec(1)), true);
+    BOOST_TEST_EQ(islessgreater(Dec(1), Dec(1)), false);
+}
+
+template <typename Dec>
+void test_isunordered()
+{
+    BOOST_TEST_EQ(isunordered(Dec(1), std::numeric_limits<Dec>::quiet_NaN()), true);
+    BOOST_TEST_EQ(isunordered(std::numeric_limits<Dec>::quiet_NaN(), Dec(1)), true);
+    BOOST_TEST_EQ(isunordered(std::numeric_limits<Dec>::quiet_NaN(), std::numeric_limits<Dec>::quiet_NaN()), true);
+    BOOST_TEST_EQ(isunordered(std::numeric_limits<Dec>::infinity(), -std::numeric_limits<Dec>::infinity()), false);
+
+    BOOST_TEST_EQ(isunordered(Dec(1), Dec(0)), false);
+    BOOST_TEST_EQ(isunordered(Dec(-2), Dec(1)), false);
+    BOOST_TEST_EQ(isunordered(Dec(1), Dec(1)), false);
+}
+
+template <typename Dec>
+void test_floor()
+{
+    
+    std::uniform_int_distribution<int> dist(1, 1);
+
+    BOOST_TEST(isnan(floor(std::numeric_limits<Dec>::quiet_NaN() * dist(rng))));
+    BOOST_TEST(isnan(floor(-std::numeric_limits<Dec>::quiet_NaN() * dist(rng))));
+    BOOST_TEST(isinf(floor(std::numeric_limits<Dec>::infinity() * dist(rng))));
+    BOOST_TEST(isinf(floor(-std::numeric_limits<Dec>::infinity() * dist(rng))));
+    BOOST_TEST_EQ(floor(Dec(0, 0) * dist(rng)), Dec(0, 0));
+    BOOST_TEST_EQ(floor(Dec(-0, 0) * dist(rng)), Dec(-0, 0));
+
+    BOOST_TEST_EQ(floor(Dec(27, -1) * dist(rng)), Dec(2, 0));
+    BOOST_TEST_EQ(floor(Dec(-27, -1) * dist(rng)), Dec(-3, 0));
+    BOOST_TEST_EQ(floor(Dec(27777, -4) * dist(rng)), Dec(2, 0));
+    BOOST_TEST_EQ(floor(Dec(-27777, -4) * dist(rng)), Dec(-3, 0));
+
+    // Bigger numbers
+    BOOST_TEST_EQ(floor(Dec(27777, -2) * dist(rng)), Dec(277, 0));
+    BOOST_TEST_EQ(floor(Dec(-27777, -2) * dist(rng)), Dec(-277, 0));
+    BOOST_TEST_EQ(floor(Dec(27777, -1) * dist(rng)), Dec(2777, 0));
+
+    // Near zero
+    BOOST_TEST_EQ(floor(Dec(3, -1) * dist(rng)), Dec(0, 0));
+    BOOST_TEST_EQ(floor(Dec(-3, -1) * dist(rng)), Dec(-1, 0));
+}
+
+template <typename Dec>
+void test_ceil()
+{
+    
+    std::uniform_int_distribution<int> dist(0, 10);
+
+    BOOST_TEST(isnan(ceil(std::numeric_limits<Dec>::quiet_NaN() * dist(rng))));
+    BOOST_TEST(isnan(ceil(-std::numeric_limits<Dec>::quiet_NaN() * dist(rng))));
+    BOOST_TEST(isinf(ceil(std::numeric_limits<Dec>::infinity() * dist(rng))));
+    BOOST_TEST(isinf(ceil(-std::numeric_limits<Dec>::infinity() * dist(rng))));
+    BOOST_TEST_EQ(ceil(Dec(0, 0) * dist(rng)), Dec(0, 0));
+    BOOST_TEST_EQ(ceil(Dec(-0, 0) * dist(rng)), Dec(-0, 0));
+
+    BOOST_TEST_EQ(ceil(Dec(27, -1)), Dec(3, 0));
+    BOOST_TEST_EQ(ceil(Dec(-27, -1)), Dec(-2, 0));
+    BOOST_TEST_EQ(ceil(Dec(27777, -4)), Dec(3, 0));
+    BOOST_TEST_EQ(ceil(Dec(-27777, -4)), Dec(-2, 0));
+
+    // Bigger numbers
+    BOOST_TEST_EQ(ceil(Dec(27777, -2)), Dec(278, 0));
+    BOOST_TEST_EQ(ceil(Dec(-27777, -2)), Dec(-277, 0));
+    BOOST_TEST_EQ(ceil(Dec(27777, -1)), Dec(2778, 0));
+
+    // Near zero
+    BOOST_TEST_EQ(ceil(Dec(3, -1)), Dec(1, 0));
+    BOOST_TEST_EQ(ceil(Dec(-3, -1)), Dec(0, 0));
+}
+
+template <typename Dec>
+void test_trunc()
+{
+    BOOST_TEST(isnan(trunc(std::numeric_limits<Dec>::quiet_NaN())));
+    BOOST_TEST(isnan(trunc(-std::numeric_limits<Dec>::quiet_NaN())));
+    BOOST_TEST(isinf(trunc(std::numeric_limits<Dec>::infinity())));
+    BOOST_TEST(isinf(trunc(-std::numeric_limits<Dec>::infinity())));
+    BOOST_TEST_EQ(trunc(Dec(0, 0)), Dec(0, 0));
+    BOOST_TEST_EQ(trunc(Dec(-0, 0)), Dec(-0, 0));
+
+    BOOST_TEST_EQ(trunc(Dec(27, -1)), Dec(2, 0));
+    BOOST_TEST_EQ(trunc(Dec(-27, -1)), Dec(-2, 0));
+    BOOST_TEST_EQ(trunc(Dec(27777, -4)), Dec(2, 0));
+    BOOST_TEST_EQ(trunc(Dec(-27777, -4)), Dec(-2, 0));
+}
+
+template <typename Dec>
+void test_frexp10()
+{
+    auto expval = int {};
+
+    BOOST_TEST_EQ(frexp10(Dec(0,0), &expval), 0);
+    BOOST_TEST_EQ(expval, 0);
+
+    expval = -1;
+    BOOST_TEST_EQ(frexp10(std::numeric_limits<Dec>::quiet_NaN(), &expval), -1);
+    BOOST_TEST_EQ(expval, 0);
+
+    expval = -1;
+    BOOST_TEST_EQ(frexp10(std::numeric_limits<Dec>::infinity(), &expval), -1);
+    BOOST_TEST_EQ(expval, 0);
+
+    BOOST_TEST_EQ(frexp10(Dec(10, 0), &expval), 1'000'000);
+    BOOST_TEST_EQ(expval, -5);
+
+    BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &expval), 1'000'000);
+    BOOST_TEST_EQ(expval, 5);
+
+    BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), 1'000'000);
+    BOOST_TEST_EQ(expval, 5);
+}
+
+template <typename Dec>
+void test_scalbn()
+{
+    BOOST_TEST(isinf(scalbn(std::numeric_limits<Dec>::infinity(), 1)));
+    BOOST_TEST(isnan(scalbn(std::numeric_limits<Dec>::quiet_NaN(), 1)));
+    BOOST_TEST_EQ(scalbn(Dec(0, 0), 1), Dec(0, 0));
+
+    Dec one {1, 0};
+    Dec ten {1, 1};
+    Dec hundred {1, 2};
+
+    BOOST_TEST_EQ(scalbn(one, 1), ten);
+    BOOST_TEST_EQ(scalbn(one, 2), hundred);
+    BOOST_TEST_EQ(scalbn(ten, 1), hundred);
+    BOOST_TEST_EQ(scalbn(hundred, -1), ten);
+    BOOST_TEST_EQ(scalbn(hundred, -2), one);
+    BOOST_TEST_EQ(scalbn(hundred, 0), hundred);
+    BOOST_TEST(isinf(scalbn(one, 10000)));
+}
+
+template <typename Dec>
+void test_scalbln()
+{
+    BOOST_TEST(isinf(scalbln(std::numeric_limits<Dec>::infinity(), 1)));
+    BOOST_TEST(isnan(scalbln(std::numeric_limits<Dec>::quiet_NaN(), 1)));
+    BOOST_TEST_EQ(scalbln(Dec(0, 0), 1), Dec(0, 0));
+
+    Dec one {1, 0};
+    Dec ten {1, 1};
+    Dec hundred {1, 2};
+
+    BOOST_TEST_EQ(scalbln(one, 1), ten);
+    BOOST_TEST_EQ(scalbln(one, 2), hundred);
+    BOOST_TEST_EQ(scalbln(ten, 1), hundred);
+    BOOST_TEST_EQ(scalbln(hundred, -1), ten);
+    BOOST_TEST_EQ(scalbln(hundred, -2), one);
+    BOOST_TEST_EQ(scalbln(hundred, 0), hundred);
+    BOOST_TEST(isinf(scalbln(one, 10000)));
+}
+
+template <typename Dec>
+void test_div_fmod()
+{
+    std::uniform_real_distribution<float> dist(0.0F, 1e30F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        Dec d1 {val1};
+        Dec d2 {val2};
+
+        auto float_div {val1 / val2};
+        auto decimal_div {static_cast<float>(d1 / d2)};
+        auto float_fmod {std::fmod(val1, val2)};
+        auto decimal_fmod {static_cast<float>(fmod(d1, d2))};
+
+        // Decimal types are all higher precision than float
+        if (!(BOOST_TEST(std::fabs(boost::math::float_distance(float_fmod, decimal_fmod)) < 1e7) &&
+              BOOST_TEST(std::fabs(boost::math::float_distance(float_div, decimal_div)) < 20)))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nVal div: " << float_div
+                      << "\nDec div: " << decimal_div
+                      << "\nDist: " << boost::math::float_distance(float_div, decimal_div)
+                      << "\nVal fmod: " << float_fmod
+                      << "\nDec fmod: " << decimal_fmod
+                      << "\nDist: " << boost::math::float_distance(float_fmod, decimal_fmod) << std::endl;
+        }
+    }
+}
+
+template <typename Dec>
+void test_copysign()
+{
+    std::uniform_real_distribution<float> dist(0.0F, 1e30F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        Dec d1 {val1};
+        Dec d2 {val2};
+
+        auto ret_val {std::copysign(val1, val2)};
+        auto ret_dec {static_cast<float>(copysign(d1, d2))};
+
+        if (!BOOST_TEST(std::fabs(boost::math::float_distance(ret_val, ret_dec)) < 20))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+}
+
+template <typename Dec>
+void test_fma()
+{
+    BOOST_TEST_EQ(fma(Dec(1, -1), Dec(1, 1), Dec(1, 0, true)), Dec(0, 0));
+    
+    std::uniform_real_distribution<float> dist(-1e10F, 1e10F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        const auto val3 {dist(rng)};
+        Dec d1 {val1};
+        Dec d2 {val2};
+        Dec d3 {val3};
+
+        auto fma_val {fma(d1, d2, d3)};
+        auto naive_val {(d1 * d2) + d3};
+
+        if (!BOOST_TEST(fabs(fma_val - naive_val) < std::numeric_limits<Dec>::epsilon()))
+        {
+            std::cerr << "Dec 1: " << d1
+                      << "\nDec 2: " << d2
+                      << "\nDec 3: " << d3
+                      << "\nfma val: " << fma_val
+                      << "\nNaive val: " << naive_val << std::endl;
+        }
+    }
+
+    // Edge cases
+    BOOST_TEST(isinf(fma(std::numeric_limits<Dec>::infinity(), Dec(dist(rng)), Dec(dist(rng)))));
+    BOOST_TEST(isnan(fma(std::numeric_limits<Dec>::quiet_NaN(), Dec(dist(rng)), Dec(dist(rng)))));
+    BOOST_TEST(isinf(fma(Dec(dist(rng)), std::numeric_limits<Dec>::infinity(), Dec(dist(rng)))));
+    BOOST_TEST(isnan(fma(Dec(dist(rng)), std::numeric_limits<Dec>::quiet_NaN(), Dec(dist(rng)))));
+    BOOST_TEST(isinf(fma(Dec(dist(rng)), Dec(dist(rng)), std::numeric_limits<Dec>::infinity())));
+    BOOST_TEST(isnan(fma(Dec(dist(rng)), Dec(dist(rng)), std::numeric_limits<Dec>::quiet_NaN())));
+}
+
+template <typename Dec>
+void test_sin()
+{
+    std::uniform_real_distribution<float> dist(-3.14F * 2, 3.14F * 2);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::sin(val1)};
+        auto ret_dec {static_cast<float>(sin(d1))};
+
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 30*std::numeric_limits<float>::epsilon()))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(sin(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
+    BOOST_TEST(isnan(sin(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
+    BOOST_TEST_EQ(sin(Dec(0) * Dec(dist(rng))), Dec(0));
+}
+
+template <typename Dec>
+void test_cos()
+{
+    std::uniform_real_distribution<float> dist(-3.14F * 2, 3.14F * 2);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::cos(val1)};
+        auto ret_dec {static_cast<float>(cos(d1))};
+
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 25*std::numeric_limits<float>::epsilon()))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(cos(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
+    BOOST_TEST(isnan(cos(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
+    BOOST_TEST_EQ(cos(Dec(0) * Dec(dist(rng))), Dec(1));
+}
+
+template <typename Dec>
+void test_modf()
+{
+    Dec ptr {};
+    BOOST_TEST_EQ(modf(Dec(123.45), &ptr), Dec(0.45));
+    BOOST_TEST_EQ(ptr, Dec(123));
+
+    BOOST_TEST_EQ(modf(std::numeric_limits<Dec>::infinity(), &ptr), Dec(0));
+    BOOST_TEST_EQ(ptr, std::numeric_limits<Dec>::infinity());
+
+    BOOST_TEST(modf(std::numeric_limits<Dec>::quiet_NaN(), &ptr) != std::numeric_limits<Dec>::quiet_NaN());
+    BOOST_TEST(ptr != std::numeric_limits<Dec>::quiet_NaN());
+}
+
+template <typename Dec>
+void test_remainder()
+{
+    std::uniform_real_distribution<float> dist(-1e3F, 1e3F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        Dec d1 {val1};
+        Dec d2 {val2};
+
+        auto ret_val {std::remainder(val1, val2)};
+        auto ret_dec {static_cast<float>(remainder(d1, d2))};
+
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 0.005))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nFloat dist: " << boost::math::float_distance(ret_val, ret_dec) << std::endl;
+        }
+    }
+
+    BOOST_TEST(isnan(remainder(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)), Dec(1))));
+    BOOST_TEST(isnan(remainder(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)), Dec(1))));
+    BOOST_TEST(isnan(remainder(Dec(1), std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
+    BOOST_TEST(isnan(remainder(Dec(1), Dec(0))));
+}
+
+template <typename Dec>
+void test_remquo()
+{
+    std::uniform_real_distribution<float> dist(-1e3F, 1e3F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        Dec d1 {val1};
+        Dec d2 {val2};
+        int flt_int {};
+        int dec_int {};
+
+        auto ret_val {std::remquo(val1, val2, &flt_int)};
+        auto ret_dec {static_cast<float>(remquo(d1, d2, &dec_int))};
+
+        if ((!BOOST_TEST(std::fabs(ret_val - ret_dec) < 0.005) &&
+             (BOOST_TEST(flt_int == dec_int))))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nInt val: " << flt_int
+                      << "\nInt quo: " << val1 / val2
+                      << "\nInt dec: " << dec_int
+                      << "\nDec quo: " << d1 / d2
+                      << "\nFloat dist: " << boost::math::float_distance(ret_val, ret_dec) << std::endl;
+        }
+    }
+
+    int quo {};
+    BOOST_TEST(isnan(remquo(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)), Dec(1), &quo)));
+    BOOST_TEST(isnan(remquo(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)), Dec(1), &quo)));
+    BOOST_TEST(isnan(remquo(Dec(1), std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)), &quo)));
+    BOOST_TEST(isnan(remquo(Dec(1), Dec(0), &quo)));
+}
+
+template <typename Dec>
+void test_fdim()
+{
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        Dec d1 {val1};
+        Dec d2 {val2};
+
+        auto ret_val {std::fdim(val1, val2)};
+        auto ret_dec {static_cast<float>(fdim(d1, d2))};
+
+        if (ret_val == 0 || ret_dec == 0)
+        {
+            BOOST_TEST_EQ(ret_val, ret_dec);
+        }
+        else if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(fdim(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)), Dec(1))));
+    BOOST_TEST(isnan(fdim(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)), Dec(1))));
+    BOOST_TEST(isnan(fdim(Dec(1), std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
+    BOOST_TEST_EQ(fdim(Dec(1), Dec(1)), Dec(0));
+}
+
+template <typename Dec>
+void test_ilogb()
+{
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value)
+    {
+        BOOST_TEST_EQ(ilogb(Dec(1, 0)), 101);
+        BOOST_TEST_EQ(ilogb(Dec(10, 0)), 102);
+    }
+    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal64>::value)
+    {
+        BOOST_TEST_EQ(ilogb(Dec(1, 0)), 398);
+        BOOST_TEST_EQ(ilogb(Dec(10, 0)), 399);
+    }
+
+    BOOST_TEST_EQ(ilogb(Dec(0)), FP_ILOGB0);
+    BOOST_TEST_EQ(ilogb(std::numeric_limits<Dec>::infinity()), INT_MAX);
+    BOOST_TEST_EQ(ilogb(std::numeric_limits<Dec>::quiet_NaN()), FP_ILOGBNAN);
+}
+
+template <typename Dec>
+void test_sqrt()
+{
+    std::uniform_real_distribution<float> dist(0.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::sqrt(val1)};
+        auto ret_dec {static_cast<float>(sqrt(d1))};
+
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    Dec inf {std::numeric_limits<Dec>::infinity() * static_cast<int>(dist(rng))};
+    Dec nan {std::numeric_limits<Dec>::quiet_NaN() * static_cast<int>(dist(rng))};
+    Dec zero {0 * static_cast<int>(dist(rng))};
+    Dec neg_num {-static_cast<int>(dist(rng))};
+    BOOST_TEST(isinf(sqrt(inf)));
+    BOOST_TEST(isnan(sqrt(-inf)));
+    BOOST_TEST(isnan(sqrt(nan)));
+    BOOST_TEST(isnan(sqrt(-nan)));
+    BOOST_TEST_EQ(sqrt(zero), zero);
+    BOOST_TEST(isnan(sqrt(neg_num)));
+}
+
+template <typename Dec>
+void test_two_val_hypot()
+{
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        Dec d1 {val1};
+        Dec d2 {val2};
+
+        auto ret_val {std::hypot(val1, val2)};
+        auto ret_dec {static_cast<float>(hypot(d1, d2))};
+
+        if (ret_val == 0 || ret_dec == 0)
+        {
+            BOOST_TEST_EQ(ret_val, ret_dec);
+        }
+        else if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    const auto big_val {dist(rng)};
+    BOOST_TEST_EQ(hypot(Dec(big_val), Dec(big_val * 1e20F)), Dec(big_val * 1e20F));
+
+    Dec inf {std::numeric_limits<Dec>::infinity() * static_cast<int>(dist(rng))};
+    Dec nan {std::numeric_limits<Dec>::quiet_NaN() * static_cast<int>(dist(rng))};
+    Dec zero {0 * static_cast<int>(dist(rng))};
+    BOOST_TEST_EQ(hypot(zero, Dec(1)), Dec(1));
+    BOOST_TEST_EQ(hypot(Dec(1), zero), Dec(1));
+    BOOST_TEST(isinf(hypot(inf, Dec(1))));
+    BOOST_TEST(isinf(hypot(Dec(1), inf)));
+    BOOST_TEST(isnan(hypot(nan, Dec(1))));
+    BOOST_TEST(isnan(hypot(Dec(1), nan)));
+}
+
+#if defined(__cpp_lib_hypot) && __cpp_lib_hypot >= 201603L
+
+template <typename Dec>
+void test_three_val_hypot()
+{
+    
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        const auto val3 {dist(rng)};
+        Dec d1 {val1};
+        Dec d2 {val2};
+        Dec d3 {val3};
+
+        auto ret_val {std::hypot(val1, val2, val3)};
+        auto ret_dec {static_cast<float>(hypot(d1, d2, d3))};
+
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nVal 3: " << val3
+                      << "\nDec 3: " << d3
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    Dec inf {std::numeric_limits<Dec>::infinity() * static_cast<int>(dist(rng))};
+    Dec nan {std::numeric_limits<Dec>::quiet_NaN() * static_cast<int>(dist(rng))};
+    Dec zero {0 * static_cast<int>(dist(rng))};
+    BOOST_TEST(isinf(hypot(inf, Dec(1), Dec(1))));
+    BOOST_TEST(isinf(hypot(Dec(1), inf, Dec(1))));
+    BOOST_TEST(isinf(hypot(Dec(1), Dec(1), inf)));
+    BOOST_TEST(isnan(hypot(nan, Dec(1), Dec(1))));
+    BOOST_TEST(isnan(hypot(Dec(1), nan, Dec(1))));
+    BOOST_TEST(isnan(hypot(Dec(1), Dec(1), nan)));
+}
+
+#else
+
+template <typename Dec>
+void test_three_val_hypot()
+{
+    // Empty because we can't test against it yet
+}
+
+#endif
+
+template <typename Dec>
+void test_rint()
+{
+    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {static_cast<float>(std::rint(val1))};
+        auto ret_dec {static_cast<float>(rint(d1))};
+
+        // Difference in default rounding mode
+        // Float goes to even while decimal is to nearest from zero
+        if (ret_val < val1 && ret_dec - 1 == ret_val)
+        {
+            continue;
+        }
+
+        if (std::fabs(val1) > 9'999'999.0F)
+        {
+            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
+            {
+                std::cerr << "Val 1: " << val1
+                          << "\nDec 1: " << d1
+                          << "\nRet val: " << ret_val
+                          << "\nRet dec: " << ret_dec
+                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
+            }
+        }
+        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {static_cast<float>(std::rint(val1))};
+        auto ret_dec {static_cast<float>(rint(d1))};
+
+        // Difference in default rounding mode
+        // Float goes to even while decimal is to nearest from zero
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (std::fabs(val1) > 9'999'999.0F)
+        {
+            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
+            {
+                std::cerr << "Val 1: " << val1
+                          << "\nDec 1: " << d1
+                          << "\nRet val: " << ret_val
+                          << "\nRet dec: " << ret_dec
+                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
+            }
+        }
+        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(rint(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
+    BOOST_TEST(isnan(rint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
+    BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
+    BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, true));
+}
+
+template <typename Dec>
+void test_lrint()
+{
+    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::lrint(val1)};
+        auto ret_dec {lrint(d1)};
+
+        // Difference in significant figures
+        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::lrint(val1)};
+        auto ret_dec {lrint(d1)};
+
+        // Difference in significant figures
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    BOOST_TEST_EQ(lrint(std::numeric_limits<Dec>::infinity() * Dec(dist(rng))), LONG_MIN);
+    BOOST_TEST_EQ(lrint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng))), LONG_MIN);
+    BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng))), 0);
+    BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
+    BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+}
+
+template <typename Dec>
+void test_llrint()
+{
+    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::llrint(val1)};
+        auto ret_dec {llrint(d1)};
+
+        // Difference in significant figures
+        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::llrint(val1)};
+        auto ret_dec {llrint(d1)};
+
+        // Difference in significant figures
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    BOOST_TEST_EQ(llrint(std::numeric_limits<Dec>::infinity() * Dec(dist(rng))), LLONG_MIN);
+    BOOST_TEST_EQ(llrint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng))), LLONG_MIN);
+    BOOST_TEST_EQ(llrint(Dec(0) * Dec(dist(rng))), 0);
+    BOOST_TEST_EQ(llrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
+    BOOST_TEST_EQ(llrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+}
+
+template <typename Dec>
+void test_nearbyint()
+{
+    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {static_cast<float>(std::nearbyint(val1))};
+        auto ret_dec {static_cast<float>(nearbyint(d1))};
+
+        // Difference in default rounding mode
+        // Float goes to even while decimal is to nearest from zero
+        if (ret_val < val1 && ret_dec - 1 == ret_val)
+        {
+            continue;
+        }
+
+        if (std::fabs(val1) > 9'999'999.0F)
+        {
+            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
+            {
+                std::cerr << "Val 1: " << val1
+                          << "\nDec 1: " << d1
+                          << "\nRet val: " << ret_val
+                          << "\nRet dec: " << ret_dec
+                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
+            }
+        }
+        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {static_cast<float>(std::nearbyint(val1))};
+        auto ret_dec {static_cast<float>(nearbyint(d1))};
+
+        // Difference in default rounding mode
+        // Float goes to even while decimal is to nearest from zero
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (std::fabs(val1) > 9'999'999.0F)
+        {
+            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
+            {
+                std::cerr << "Val 1: " << val1
+                          << "\nDec 1: " << d1
+                          << "\nRet val: " << ret_val
+                          << "\nRet dec: " << ret_dec
+                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
+            }
+        }
+        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(nearbyint(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
+    BOOST_TEST(isnan(nearbyint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
+    BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
+    BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, true));
+}
+
+template <typename Dec>
+void test_round()
+{
+    std::uniform_real_distribution<float> dist(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {static_cast<float>(std::round(val1))};
+        auto ret_dec {static_cast<float>(round(d1))};
+
+        // Difference in default rounding mode
+        // Float goes to even while decimal is to nearest from zero
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (std::fabs(val1) > 9'999'999.0F)
+        {
+            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
+            {
+                std::cerr << "Val 1: " << val1
+                          << "\nDec 1: " << d1
+                          << "\nRet val: " << ret_val
+                          << "\nRet dec: " << ret_dec
+                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
+            }
+        }
+        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+
+    BOOST_TEST(isinf(round(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
+    BOOST_TEST(isnan(round(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
+    BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
+    BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, false));
+}
+
+template <typename Dec>
+void test_lround()
+{
+    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::lround(val1)};
+        auto ret_dec {lround(d1)};
+
+        // Difference in significant figures
+        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::lround(val1)};
+        auto ret_dec {lround(d1)};
+
+        // Difference in significant figures
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    BOOST_TEST_EQ(lround(std::numeric_limits<Dec>::infinity() * Dec(dist(rng))), LONG_MIN);
+    BOOST_TEST_EQ(lround(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng))), LONG_MIN);
+    BOOST_TEST_EQ(lround(Dec(0) * Dec(dist(rng))), 0);
+    BOOST_TEST_EQ(lround(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
+    BOOST_TEST_EQ(lround(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+}
+
+template <typename Dec>
+void test_llround()
+{
+    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::llround(val1)};
+        auto ret_dec {llround(d1)};
+
+        // Difference in significant figures
+        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist2(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::llround(val1)};
+        auto ret_dec {llround(d1)};
+
+        // Difference in significant figures
+        float iptr {};
+        const auto frac {std::modf(val1, &iptr)};
+        if (std::abs(frac) <= 0.5F && std::abs(frac) >= 0.49F)
+        {
+            continue;
+        }
+
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec << std::endl;
+        }
+    }
+
+    BOOST_TEST_EQ(llround(std::numeric_limits<Dec>::infinity() * Dec(dist(rng))), LLONG_MIN);
+    BOOST_TEST_EQ(llround(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng))), LLONG_MIN);
+    BOOST_TEST_EQ(llround(Dec(0) * Dec(dist(rng))), 0);
+    BOOST_TEST_EQ(llround(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
+    BOOST_TEST_EQ(llround(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+}
+
+template <typename Dec>
+void test_nextafter()
+{
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        Dec d1 {val1};
+        Dec d2 {val2};
+
+        auto ret_val {std::nextafter(val1, val2)};
+        auto ret_dec {static_cast<float>(nextafter(d1, d2))};
+
+        if (ret_val == 0 || ret_dec == 0)
+        {
+            BOOST_TEST_EQ(ret_val, ret_dec);
+        }
+        else if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nDist: " << boost::math::float_distance(ret_val, ret_dec);
+        }
+    }
+
+    BOOST_TEST(isinf(nextafter(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)), Dec(1))));
+    BOOST_TEST(isnan(nextafter(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)), Dec(1))));
+    BOOST_TEST(isnan(nextafter(Dec(1), std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
+    BOOST_TEST(!isinf(nextafter(Dec(1), std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
+    BOOST_TEST_EQ(nextafter(Dec(1), Dec(1)), Dec(1));
+    BOOST_TEST_EQ(nextafter(Dec(0), Dec(1)), std::numeric_limits<Dec>::epsilon());
+    BOOST_TEST_EQ(nextafter(Dec(0), Dec(-1)), -std::numeric_limits<Dec>::epsilon());
+}
+
+template <typename Dec>
+void test_nexttoward()
+{
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    for (std::size_t n {}; n < N; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        Dec d1 {val1};
+        Dec d2 {val2};
+
+        auto ret_val {std::nexttoward(val1, val2)};
+        auto ret_dec {static_cast<float>(nexttoward(d1, val2))};
+
+        if (ret_val == 0 || ret_dec == 0)
+        {
+            BOOST_TEST_EQ(ret_val, ret_dec);
+        }
+        else if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nDist: " << boost::math::float_distance(ret_val, ret_dec);
+        }
+    }
+
+    BOOST_TEST(isinf(nexttoward(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)), 1)));
+    BOOST_TEST(isnan(nexttoward(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)), 1)));
+    BOOST_TEST_EQ(nexttoward(Dec(1), 1), Dec(1));
+    BOOST_TEST_EQ(nexttoward(Dec(0), 1), std::numeric_limits<Dec>::epsilon());
+    BOOST_TEST_EQ(nexttoward(Dec(0), -1), -std::numeric_limits<Dec>::epsilon());
+}
+
+template <typename T>
+void test_pow()
+{
+    std::uniform_int_distribution<int> dist(1, 1);
+
+    const T two {2, 0};
+    BOOST_TEST_EQ(pow(two, dist(rng)), two);
+    BOOST_TEST_EQ(pow(two, 2 * dist(rng)), two * two);
+    BOOST_TEST_EQ(pow(two, 3 * dist(rng)), two * two * two);
+    BOOST_TEST_EQ(pow(two, 4 * dist(rng)), two * two * two * two);
+}
+
+int main()
+{
+    test_fmax<decimal64>();
+    test_isgreater<decimal64>();
+    test_isgreaterequal<decimal64>();
+    test_fmin<decimal64>();
+    test_isless<decimal64>();
+    test_islessequal<decimal64>();
+    test_islessgreater<decimal64>();
+    test_isunordered<decimal64>();
+
+    test_floor<decimal64>();
+    test_ceil<decimal64>();
+    test_trunc<decimal64>();
+
+    test_frexp10<decimal64>();
+    test_scalbn<decimal64>();
+    test_scalbln<decimal64>();
+
+    test_div_fmod<decimal64>();
+
+    test_copysign<decimal64>();
+
+    test_fma<decimal64>();
+
+    test_sin<decimal64>();
+    test_cos<decimal64>();
+
+    test_modf<decimal64>();
+
+    test_remainder<decimal64>();
+    test_remquo<decimal64>();
+
+    test_fdim<decimal64>();
+
+    test_ilogb<decimal64>();
+
+    test_sqrt<decimal64>();
+
+    test_two_val_hypot<decimal64>();
+    test_three_val_hypot<decimal64>();
+
+    test_rint<decimal64>();
+    test_lrint<decimal64>();
+    test_llrint<decimal64>();
+    test_nearbyint<decimal64>();
+
+    test_round<decimal64>();
+    test_lround<decimal64>();
+    test_llround<decimal64>();
+
+    test_nextafter<decimal64>();
+    test_nexttoward<decimal64>();
+
+    test_pow<decimal64>();
+
+    return boost::report_errors();
+}
