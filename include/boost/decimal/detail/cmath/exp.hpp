@@ -66,8 +66,6 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 x -= (numbers::ln2_v<T> * nf2);
             }
 
-            //x /= T { 2, 0 };
-
             // PadeApproximant[Exp[x] - 1, {x, 0, {6, 6}}]
             // FullSimplify[%]
             //   (84 x (7920 + 240 x^2 + x^4))
@@ -81,13 +79,11 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 
             result = one + (top / bot);
 
-            //result *= result;
-
             if (nf2 > 0)
             {
                 if (nf2 < 64)
                 {
-                    result *= T { static_cast<std::uint64_t>(1ULL << static_cast<unsigned>(nf2)), 0 };
+                    result *= T { static_cast<std::uint64_t>(UINT64_C(1) << static_cast<unsigned>(nf2)), 0 };
                 }
                 else
                 {
