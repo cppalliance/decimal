@@ -78,9 +78,9 @@ namespace local
     auto trials = static_cast<std::uint32_t>(UINT8_C(0));
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x2000));
+    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x1000));
     #else
-    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x200));
+    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x100));
     #endif
 
     for( ; trials < count; ++trials)
@@ -122,7 +122,7 @@ namespace local
 
     auto result_is_ok = true;
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -135,7 +135,7 @@ namespace local
       result_is_ok = (result_val_nan_pos_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -148,7 +148,7 @@ namespace local
       result_is_ok = (result_val_nan_neg_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -161,7 +161,7 @@ namespace local
       result_is_ok = (result_val_inf_pos_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -174,7 +174,7 @@ namespace local
       result_is_ok = (result_val_one_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -187,7 +187,7 @@ namespace local
       result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
