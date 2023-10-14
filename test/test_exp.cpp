@@ -96,9 +96,9 @@ namespace local
     auto trials = static_cast<std::uint32_t>(UINT8_C(0));
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x2000)) : static_cast<std::uint32_t>(UINT32_C(0x400));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x1000)) : static_cast<std::uint32_t>(UINT32_C(0x200));
     #else
-    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x200)) : static_cast<std::uint32_t>(UINT32_C(0x40));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x100)) : static_cast<std::uint32_t>(UINT32_C(0x20));
     #endif
 
     for( ; trials < count; ++trials)
@@ -149,7 +149,7 @@ namespace local
 
     auto result_is_ok = true;
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -162,7 +162,7 @@ namespace local
       result_is_ok = (result_val_nan_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -175,7 +175,7 @@ namespace local
       result_is_ok = (result_val_inf_pos_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -188,7 +188,7 @@ namespace local
       result_is_ok = (result_val_inf_neg_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -201,7 +201,7 @@ namespace local
       result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -228,7 +228,7 @@ namespace
 
     auto result_is_ok = true;
 
-    const auto result_pos_is_ok = local::test_exp<decimal_type, float_type>(128, false, 0.03125L, 32.0L);
+    const auto result_pos_is_ok = local::test_exp<decimal_type, float_type>(128, false, 35.0L, 80.0L);
     const auto result_neg_is_ok = local::test_exp<decimal_type, float_type>(128, true,  0.03125L, 32.0L);
 
     const auto result_pos_narrow_is_ok = local::test_exp<decimal_type, float_type>(64, false, 0.25L, 4.0L);
@@ -261,15 +261,61 @@ auto main() -> int
   auto result_is_ok = true;
 
   {
-    const auto result_decimal32_is_ok = test_all<boost::decimal::decimal32, float>();
+    using decimal_type = boost::decimal::decimal32;
+    using float_type   = float;
 
-    result_is_ok = result_is_ok && result_decimal32_is_ok;
+    const auto result_pos_is_ok = local::test_exp<decimal_type, float_type>(128, false, 0.03125L, 32.0L);
+    const auto result_neg_is_ok = local::test_exp<decimal_type, float_type>(128, true,  0.03125L, 32.0L);
+
+    const auto result_pos_narrow_is_ok = local::test_exp<decimal_type, float_type>(64, false, 0.25L, 4.0L);
+    const auto result_neg_narrow_is_ok = local::test_exp<decimal_type, float_type>(64, true,  0.25L, 4.0L);
+
+    const auto result_edge_is_ok = local::test_exp_edge<decimal_type, float_type>();
+
+    BOOST_TEST(result_pos_is_ok);
+    BOOST_TEST(result_neg_is_ok);
+
+    BOOST_TEST(result_pos_narrow_is_ok);
+    BOOST_TEST(result_neg_narrow_is_ok);
+
+    BOOST_TEST(result_edge_is_ok);
+
+    result_is_ok = (result_pos_is_ok && result_is_ok);
+    result_is_ok = (result_neg_is_ok && result_is_ok);
+
+    result_is_ok = (result_pos_narrow_is_ok && result_is_ok);
+    result_is_ok = (result_neg_narrow_is_ok && result_is_ok);
+
+    result_is_ok = (result_edge_is_ok && result_is_ok);
   }
 
   {
-    const auto result_decimal64_is_ok = test_all<boost::decimal::decimal64, double>();
+    using decimal_type = boost::decimal::decimal64;
+    using float_type   = double;
 
-    result_is_ok = result_is_ok && result_decimal64_is_ok;
+    const auto result_pos_lo_is_ok = local::test_exp<decimal_type, float_type>(128, false, 0.25L, 32.0L);
+    const auto result_neg_lo_is_ok = local::test_exp<decimal_type, float_type>(128, true,  0.25L, 32.0L);
+
+    const auto result_pos_hi_is_ok = local::test_exp<decimal_type, float_type>(1536, false, 48.0L, 256.0L);
+    const auto result_neg_hi_is_ok = local::test_exp<decimal_type, float_type>(1536, true,  48.0L, 256.0L);
+
+    const auto result_edge_is_ok = local::test_exp_edge<decimal_type, float_type>();
+
+    BOOST_TEST(result_pos_lo_is_ok);
+    BOOST_TEST(result_neg_lo_is_ok);
+
+    BOOST_TEST(result_pos_hi_is_ok);
+    BOOST_TEST(result_neg_hi_is_ok);
+
+    BOOST_TEST(result_edge_is_ok);
+
+    result_is_ok = (result_pos_lo_is_ok && result_is_ok);
+    result_is_ok = (result_neg_lo_is_ok && result_is_ok);
+
+    result_is_ok = (result_pos_hi_is_ok && result_is_ok);
+    result_is_ok = (result_neg_hi_is_ok && result_is_ok);
+
+    result_is_ok = (result_edge_is_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);

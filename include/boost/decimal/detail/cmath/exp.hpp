@@ -79,7 +79,7 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
             const T top = T { UINT8_C(84), 0 } * x * ( T { UINT16_C(7920), 0 } + ( T { UINT8_C(240), 0 } + x2) * x2);
             const T bot = T { UINT32_C(665280), 0 } + x * (T { INT32_C(-332640), 0 } + x * (T { UINT32_C(75600), 0 } + x * (T { INT16_C(-10080), 0 } + x * (T { UINT16_C(840), 0 } + (T { INT8_C(-42), 0 } + x) * x))));
 
-            result = (bot + top) / bot;
+            result = one + (top / bot);
 
             //result *= result;
 
@@ -91,7 +91,7 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 }
                 else
                 {
-                    result *= ldexp(T { 2, 0 }, nf2);
+                    result *= pow(T { 2, 0 }, nf2);
                 }
             }
         }
