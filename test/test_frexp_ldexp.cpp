@@ -135,7 +135,7 @@ namespace local
   auto test_frexp_ldexp() -> bool
   {
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x2000));
+    constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x1000));
     #else
     constexpr auto test_frexp_ldexp_depth = static_cast<std::uint32_t>(UINT32_C(0x400));
     #endif

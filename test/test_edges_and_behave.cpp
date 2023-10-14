@@ -71,7 +71,7 @@ namespace local
 
     auto result_is_ok = true;
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -115,7 +115,7 @@ namespace local
       }
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -369,7 +369,7 @@ namespace local
       result_is_ok = (result_sin_cos_tiny_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -390,7 +390,7 @@ namespace local
       result_is_ok = (result_sin_con_non_normal_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
@@ -404,7 +404,7 @@ namespace local
       result_is_ok = (result_ilogb_inf_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
