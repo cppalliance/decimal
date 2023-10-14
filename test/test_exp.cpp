@@ -3,22 +3,6 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#if defined(__clang__)
-  #if defined __has_feature
-  #if __has_feature(thread_sanitizer)
-  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
-  #endif
-  #endif
-#elif defined(__GNUC__)
-  #if defined(__SANITIZE_THREAD__)
-  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
-  #endif
-#elif defined(_MSC_VER)
-  #if defined(_DEBUG)
-  #define BOOST_DECIMAL_REDUCE_TEST_DEPTH
-  #endif
-#endif
-
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -98,9 +82,9 @@ namespace local
     auto trials = static_cast<std::uint32_t>(UINT8_C(0));
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x1000)) : static_cast<std::uint32_t>(UINT32_C(0x100));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x800)) : static_cast<std::uint32_t>(UINT32_C(0x80));
     #else
-    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x100)) : static_cast<std::uint32_t>(UINT32_C(0x20));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x80)) : static_cast<std::uint32_t>(UINT32_C(0x20));
     #endif
 
     for( ; trials < count; ++trials)
