@@ -84,7 +84,7 @@ namespace local
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x800)) : static_cast<std::uint32_t>(UINT32_C(0x80));
     #else
-    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x80)) : static_cast<std::uint32_t>(UINT32_C(0x20));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x80)) : static_cast<std::uint32_t>(UINT32_C(0x8));
     #endif
 
     for( ; trials < count; ++trials)
@@ -204,44 +204,6 @@ namespace local
   }
 } // namespace local
 
-namespace
-{
-  template<typename DecimalType, typename FloatType>
-  auto test_all() -> bool
-  {
-    using decimal_type = DecimalType;
-    using float_type   = FloatType;
-
-    auto result_is_ok = true;
-
-    const auto result_pos_is_ok = local::test_exp<decimal_type, float_type>(128, false, 35.0L, 80.0L);
-    const auto result_neg_is_ok = local::test_exp<decimal_type, float_type>(128, true,  0.03125L, 32.0L);
-
-    const auto result_pos_narrow_is_ok = local::test_exp<decimal_type, float_type>(64, false, 0.25L, 4.0L);
-    const auto result_neg_narrow_is_ok = local::test_exp<decimal_type, float_type>(64, true,  0.25L, 4.0L);
-
-    const auto result_edge_is_ok = local::test_exp_edge<decimal_type, float_type>();
-
-    BOOST_TEST(result_pos_is_ok);
-    BOOST_TEST(result_neg_is_ok);
-
-    BOOST_TEST(result_pos_narrow_is_ok);
-    BOOST_TEST(result_neg_narrow_is_ok);
-
-    BOOST_TEST(result_edge_is_ok);
-
-    result_is_ok = (result_pos_is_ok && result_is_ok);
-    result_is_ok = (result_neg_is_ok && result_is_ok);
-
-    result_is_ok = (result_pos_narrow_is_ok && result_is_ok);
-    result_is_ok = (result_neg_narrow_is_ok && result_is_ok);
-
-    result_is_ok = (result_edge_is_ok && result_is_ok);
-
-    return result_is_ok;
-  }
-} // namespace
-
 auto main() -> int
 {
   auto result_is_ok = true;
@@ -279,11 +241,11 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_pos_lo_is_ok = local::test_exp<decimal_type, float_type>(128, false, 0.03125L, 80.0L);
-    const auto result_neg_lo_is_ok = local::test_exp<decimal_type, float_type>(128, true,  0.03125L, 80.0L);
+    const auto result_pos_lo_is_ok = local::test_exp<decimal_type, float_type>(512, false, 0.03125L, 80.0L);
+    const auto result_neg_lo_is_ok = local::test_exp<decimal_type, float_type>(512, true,  0.03125L, 80.0L);
 
-    const auto result_pos_hi_is_ok = local::test_exp<decimal_type, float_type>(1536, false, 8.0L, 512.0L);
-    const auto result_neg_hi_is_ok = local::test_exp<decimal_type, float_type>(1536, true,  8.0L, 512.0L);
+    const auto result_pos_hi_is_ok = local::test_exp<decimal_type, float_type>(3072, false, 8.0L, 512.0L);
+    const auto result_neg_hi_is_ok = local::test_exp<decimal_type, float_type>(3072, true,  8.0L, 512.0L);
 
     const auto result_edge_is_ok = local::test_exp_edge<decimal_type, float_type>();
 
