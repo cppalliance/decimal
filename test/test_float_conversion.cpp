@@ -98,10 +98,11 @@ void test_generic_binary_to_decimal()
         // 0x6A380BF1150D7F35
         // 0x6A3B71802C99CB39
 
-        std::array<std::uint64_t, 4> test_values {0x6A3A25E507BB83D9,
-                                                  0x6A3800D0288A63E9,
-                                                  0x6A380BF1150D7F35,
-                                                  0x6A3B71802C99CB39};
+        // https://bugs.llvm.org/show_bug.cgi?id=21629
+        std::array<std::uint64_t, 4> test_values = {{UINT64_C(0x6A3A25E507BB83D9),
+                                                     UINT64_C(0x6A3800D0288A63E9),
+                                                     UINT64_C(0x6A380BF1150D7F35),
+                                                     UINT64_C(0x6A3B71802C99CB39)}};
 
         for (const auto bit_values : test_values)
         {
