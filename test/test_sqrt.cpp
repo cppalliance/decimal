@@ -10,8 +10,8 @@
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 
-auto my_zero() -> boost::decimal::decimal32&;
-auto my_one () -> boost::decimal::decimal32&;
+template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_zero { 0, 0 }; return val_zero; }
+template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_one  { 1, 0 }; return val_one; }
 
 namespace local
 {
@@ -57,9 +57,11 @@ namespace local
     return result_is_ok;
   }
 
+  template<typename DecimalType, typename FloatType>
   auto test_sqrt(const std::int32_t tol_factor, const long double range_lo, const long double range_hi) -> bool
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = DecimalType;
+    using float_type   = FloatType;
 
     std::random_device rd;
     std::mt19937_64 gen(rd());
@@ -67,10 +69,10 @@ namespace local
     gen.seed(time_point<typename std::mt19937_64::result_type>());
 
     auto dis =
-      std::uniform_real_distribution<float>
+      std::uniform_real_distribution<float_type>
       {
-        static_cast<float>(range_lo),
-        static_cast<float>(range_hi)
+        static_cast<float_type>(range_lo),
+        static_cast<float_type>(range_hi)
       };
 
     auto result_is_ok = true;
@@ -78,9 +80,9 @@ namespace local
     auto trials = static_cast<std::uint32_t>(UINT8_C(0));
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x800));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x400)) : static_cast<std::uint32_t>(UINT32_C(0x40));
     #else
-    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x80));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x40)) : static_cast<std::uint32_t>(UINT32_C(0x4));
     #endif
 
     for( ; trials < count; ++trials)
@@ -93,15 +95,15 @@ namespace local
       const auto val_flt = sqrt(x_flt);
       const auto val_dec = sqrt(x_dec);
 
-      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float>(val_dec), std::numeric_limits<float>::epsilon() * tol_factor);
+      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
 
       result_is_ok = (result_val_is_ok && result_is_ok);
 
       if(!result_val_is_ok)
       {
-        std::cout << "x_flt  : " <<                    x_flt   << std::endl;
-        std::cout << "val_flt: " << std::scientific << val_flt << std::endl;
-        std::cout << "val_dec: " << std::scientific << val_dec << std::endl;
+        std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
+        std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
+        std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
       }
@@ -112,13 +114,15 @@ namespace local
     return result_is_ok;
   }
 
+  template<typename DecimalType, typename FloatType>
   auto test_sqrt_edge() -> bool
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = DecimalType;
+    using float_type   = FloatType;
 
     std::mt19937_64 gen;
 
-    std::uniform_real_distribution<float> dist(1.01F, 1.04F);
+    std::uniform_real_distribution<float_type> dist(1.01F, 1.04F);
 
     auto result_is_ok = true;
 
@@ -165,9 +169,9 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_one = sqrt(::my_one());
+      const auto val_one = sqrt(::my_one<decimal_type>());
 
-      const auto result_val_one_is_ok = (val_one == ::my_one());
+      const auto result_val_one_is_ok = (val_one == ::my_one<decimal_type>());
 
       BOOST_TEST(result_val_one_is_ok);
 
@@ -178,9 +182,9 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_zero_pos = sqrt(::my_zero());
+      const auto val_zero_pos = sqrt(::my_zero<decimal_type>());
 
-      const auto result_val_zero_pos_is_ok = ((val_zero_pos == ::my_zero()) && (!signbit(val_zero_pos)));
+      const auto result_val_zero_pos_is_ok = ((val_zero_pos == ::my_zero<decimal_type>()) && (!signbit(val_zero_pos)));
 
       BOOST_TEST(result_val_zero_pos_is_ok);
 
@@ -191,9 +195,9 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_zero_neg = sqrt(-::my_zero());
+      const auto val_zero_neg = sqrt(-::my_zero<decimal_type>());
 
-      const auto result_val_zero_neg_is_ok = ((val_zero_neg == -::my_zero()) && signbit(val_zero_neg));
+      const auto result_val_zero_neg_is_ok = ((val_zero_neg == -::my_zero<decimal_type>()) && signbit(val_zero_neg));
 
       BOOST_TEST(result_val_zero_neg_is_ok);
 
@@ -209,28 +213,53 @@ auto main() -> int
 {
   auto result_is_ok = true;
 
-  const auto result_small_is_ok  = local::test_sqrt(static_cast<std::int32_t>(INT32_C(16)), 1.0E-26L, 1.0E-01L);
-  const auto result_medium_is_ok = local::test_sqrt(static_cast<std::int32_t>(INT32_C(16)), 0.9E-01L, 1.1E+01L);
-  const auto result_large_is_ok  = local::test_sqrt(static_cast<std::int32_t>(INT32_C(16)), 1.0E+01L, 1.0E+26L);
+  {
+    using decimal_type = boost::decimal::decimal32;
+    using float_type   = float;
 
-  BOOST_TEST(result_small_is_ok);
-  BOOST_TEST(result_medium_is_ok);
-  BOOST_TEST(result_large_is_ok);
+    const auto result_small_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E-26L, 1.0E-01L);
+    const auto result_medium_is_ok = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 0.9E-01L, 1.1E+01L);
+    const auto result_large_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E+01L, 1.0E+26L);
 
-  const auto result_edge_is_ok = local::test_sqrt_edge();
+    BOOST_TEST(result_small_is_ok);
+    BOOST_TEST(result_medium_is_ok);
+    BOOST_TEST(result_large_is_ok);
 
-  const auto result_ranges_is_ok = (result_small_is_ok && result_medium_is_ok && result_large_is_ok);
+    const auto result_edge_is_ok = local::test_sqrt_edge<decimal_type, float_type>();
 
-  result_is_ok = (result_ranges_is_ok && result_is_ok);
+    const auto result_ranges_is_ok = (result_small_is_ok && result_medium_is_ok && result_large_is_ok);
 
-  BOOST_TEST(result_edge_is_ok);
+    result_is_ok = (result_ranges_is_ok && result_is_ok);
 
-  result_is_ok = (result_edge_is_ok && result_is_ok);
+    BOOST_TEST(result_edge_is_ok);
+
+    result_is_ok = (result_edge_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal64;
+    using float_type   = double;
+
+    const auto result_small_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E-26L, 1.0E-01L);
+    const auto result_medium_is_ok = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 0.9E-01L, 1.1E+01L);
+    const auto result_large_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E+01L, 1.0E+26L);
+
+    BOOST_TEST(result_small_is_ok);
+    BOOST_TEST(result_medium_is_ok);
+    BOOST_TEST(result_large_is_ok);
+
+    const auto result_edge_is_ok = local::test_sqrt_edge<decimal_type, float_type>();
+
+    const auto result_ranges_is_ok = (result_small_is_ok && result_medium_is_ok && result_large_is_ok);
+
+    result_is_ok = (result_ranges_is_ok && result_is_ok);
+
+    BOOST_TEST(result_edge_is_ok);
+
+    result_is_ok = (result_edge_is_ok && result_is_ok);
+  }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 
   return (result_is_ok ? 0 : -1);
 }
-
-auto my_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_zero { 0, 0 }; return val_zero; }
-auto my_one () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_one  { 1, 0 }; return val_one; }
