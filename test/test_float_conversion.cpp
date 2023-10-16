@@ -67,6 +67,11 @@ void test_compute_float64()
     BOOST_TEST_EQ(compute_float64(100 * dist(gen), UINT64_C(10000000000000000000), false, success), 10000000000000000000e100);
 }
 
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
+
 template <typename T>
 void test_generic_binary_to_decimal()
 {
@@ -131,6 +136,10 @@ void test_generic_binary_to_decimal()
         }
     }
 }
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic pop
+#endif
 
 void test_parser()
 {
