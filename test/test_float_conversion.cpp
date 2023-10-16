@@ -5,6 +5,7 @@
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <iostream>
+#include <iomanip>
 #include <random>
 #include <cmath>
 #include <climits>
@@ -66,6 +67,11 @@ void test_compute_float64()
     BOOST_TEST_EQ(compute_float64(100 * dist(gen), UINT64_C(10000000000000000000), false, success), 10000000000000000000e100);
 }
 
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
+
 template <typename T>
 void test_generic_binary_to_decimal()
 {
@@ -85,7 +91,55 @@ void test_generic_binary_to_decimal()
     BOOST_TEST(floating_point_to_fd128(std::numeric_limits<T>::quiet_NaN() * dist(gen)).exponent == fd128_exceptional_exponent);
     BOOST_TEST(floating_point_to_fd128(-std::numeric_limits<T>::infinity() * dist(gen)).exponent == fd128_exceptional_exponent);
     BOOST_TEST(floating_point_to_fd128(-std::numeric_limits<T>::quiet_NaN() * dist(gen)).exponent == fd128_exceptional_exponent);
+
+    // https://github.com/cppalliance/decimal/issues/242
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, double>::value)
+    {
+        // Consider the following integral patterns potentially stored
+        // in a given decimal64.
+
+        // 0x6A3A25E507BB83D9
+        // 0x6A3800D0288A63E9
+        // 0x6A380BF1150D7F35
+        // 0x6A3B71802C99CB39
+
+        // https://bugs.llvm.org/show_bug.cgi?id=21629
+        std::array<std::uint64_t, 4> test_values = {{UINT64_C(0x6A3A25E507BB83D9),
+                                                     UINT64_C(0x6A3800D0288A63E9),
+                                                     UINT64_C(0x6A380BF1150D7F35),
+                                                     UINT64_C(0x6A3B71802C99CB39)}};
+
+        for (const auto bit_values : test_values)
+        {
+            const std::uint64_t ui = bit_values;
+
+            // And we convert it via direct-memory access to a decimal64.
+
+            // In this particular example we assume that this number could
+            // be the result of some calculation, initialization or any other
+            // valid operations.
+
+            const boost::decimal::decimal64 dec = *reinterpret_cast<const boost::decimal::decimal64*>(&ui);
+
+            // Now let's convert this decimal64 value to built-in double.
+            // ISSUE: This cast seems to result in 0.
+            const auto dbl = static_cast<double>(dec);
+            const boost::decimal::decimal64 return_dec(dbl);
+
+            if (!BOOST_TEST(dec == return_dec))
+            {
+                std::cerr << std::scientific << std::setprecision(std::numeric_limits<double>::digits10)
+                          << "       Dec: " << dec
+                          << "\n       Dbl: " << dbl
+                          << "\nReturn Dec: " << return_dec << std::endl;
+            }
+        }
+    }
 }
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic pop
+#endif
 
 void test_parser()
 {

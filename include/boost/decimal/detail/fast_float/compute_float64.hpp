@@ -172,14 +172,6 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto compute_float64(std::int64_t power, std::uint
     std::uint64_t significand = high >> (upper_bit + 9);
     leading_zeros += static_cast<int>(1 ^ upper_bit);
 
-    // If we have lots of trailing zeros we may fall between two values
-    if (BOOST_DECIMAL_UNLIKELY((low == 0) && ((high & 0x1FF) == 0) && ((significand & 3) == 1)))
-    {
-        // if significand & 1 == 1 we might need to round up
-        success = false;
-        return 0;
-    }
-
     significand += significand & 1;
     significand >>= 1;
 
