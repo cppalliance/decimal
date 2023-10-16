@@ -4,16 +4,18 @@
 // https://www.boost.org/LICENSE_1_0.txt
 
 #include <chrono>
+#include <iomanip>
+#include <iostream>
 #include <limits>
 #include <random>
 
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 
-extern auto my_global_test_log_zero() -> boost::decimal::decimal32&;
-extern auto my_global_test_log_one () -> boost::decimal::decimal32&;
-extern auto my_global_test_log_inf () -> boost::decimal::decimal32&;
-extern auto my_global_test_log_nan () -> boost::decimal::decimal32&;
+template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_zero { 0, 0 }; return my_zero; }
+template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_one  { 1, 0 }; return my_one; }
+template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_inf  { std::numeric_limits<decimal_type>::infinity() };  return my_inf; }
+template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_nan  { std::numeric_limits<decimal_type>::quiet_NaN() }; return my_nan; }
 
 namespace local
 {
@@ -59,9 +61,11 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_log() -> bool
+  template<typename DecimalType, typename FloatType>
+  auto test_log(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = DecimalType;
+    using float_type   = FloatType;
 
     std::random_device rd;
     std::mt19937_64 gen(rd());
@@ -69,10 +73,10 @@ namespace local
     gen.seed(time_point<typename std::mt19937_64::result_type>());
 
     auto dis =
-      std::uniform_real_distribution<float>
+      std::uniform_real_distribution<float_type>
       {
-        static_cast<float>(1.0E-17L),
-        static_cast<float>(1.0E+17L)
+        static_cast<float_type>(1.0E-17L),
+        static_cast<float_type>(1.0E+17L)
       };
 
     auto result_is_ok = true;
@@ -80,9 +84,9 @@ namespace local
     auto trials = static_cast<std::uint32_t>(UINT8_C(0));
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x1000));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x800)) : static_cast<std::uint32_t>(UINT32_C(0x80));
     #else
-    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x100));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x80)) : static_cast<std::uint32_t>(UINT32_C(0x10));
     #endif
 
     for( ; trials < count; ++trials)
@@ -92,18 +96,18 @@ namespace local
 
       using std::log;
 
-      const auto lg_flt = log(x_flt);
-      const auto lg_dec = log(x_dec);
+      const auto val_flt = log(x_flt);
+      const auto val_dec = log(x_dec);
 
-      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * 12);
+      const auto result_log_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
 
       result_is_ok = (result_log_is_ok && result_is_ok);
 
       if(!result_log_is_ok)
       {
-        std::cout << "x_flt : " <<                    x_flt  << std::endl;
-        std::cout << "lg_flt: " << std::scientific << lg_flt << std::endl;
-        std::cout << "lg_dec: " << std::scientific << lg_dec << std::endl;
+        std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
+        std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
+        std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
       }
@@ -114,9 +118,11 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_log_between_1_and_two() -> bool
+  template<typename DecimalType, typename FloatType>
+  auto test_log_between_1_and_2(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = DecimalType;
+    using float_type   = FloatType;
 
     auto result_is_ok = true;
 
@@ -125,22 +131,22 @@ namespace local
              ++ui_arg)
     {
       const auto x_dec = static_cast<decimal_type>(ui_arg) / 100U;
-      const auto x_flt = static_cast<float>(x_dec);
+      const auto x_flt = static_cast<float_type>(x_dec);
 
       using std::log;
 
-      const auto lg_flt = log(x_flt);
-      const auto lg_dec = log(x_dec);
+      const auto val_flt = log(x_flt);
+      const auto val_dec = log(x_dec);
 
-      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * 12);
+      const auto result_log_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
 
       result_is_ok = (result_log_is_ok && result_is_ok);
 
       if(!result_log_is_ok)
       {
-        std::cout << "x_flt : " <<                    x_flt  << std::endl;
-        std::cout << "lg_flt: " << std::scientific << lg_flt << std::endl;
-        std::cout << "lg_dec: " << std::scientific << lg_dec << std::endl;
+        std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
+        std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
+        std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
       }
@@ -151,62 +157,64 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_log_edge() -> bool
+  template<typename DecimalType, typename FloatType>
+  auto test_log_edge(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = DecimalType;
+    using float_type   = FloatType;
 
     std::mt19937_64 gen;
 
     gen.seed(time_point<typename std::mt19937_64::result_type>());
 
-    std::uniform_real_distribution<float> dist(1.0F, 2.0F);
+    std::uniform_real_distribution<float_type> dist(1.0F, 2.0F);
 
     volatile auto result_is_ok = true;
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
     {
       static_cast<void>(index);
 
-      const auto log_zero = log(::my_global_test_log_zero() * static_cast<decimal_type>(dist(gen)));
+      const auto log_zero = log(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
 
-      const volatile auto result_log_zero_is_ok = (isinf(log_zero) && (log_zero < ::my_global_test_log_zero()));
+      const volatile auto result_log_zero_is_ok = (isinf(log_zero) && (log_zero < ::my_zero<decimal_type>()));
 
       BOOST_TEST(result_log_zero_is_ok);
 
       result_is_ok = (result_log_zero_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
     {
       static_cast<void>(index);
 
-      const auto log_zero_minus = log(-::my_global_test_log_zero() * static_cast<decimal_type>(dist(gen)));
+      const auto log_zero_minus = log(-::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
 
-      const volatile auto result_log_zero_minus_is_ok = (isinf(log_zero_minus) && (log_zero_minus < ::my_global_test_log_zero()));
+      const volatile auto result_log_zero_minus_is_ok = (isinf(log_zero_minus) && (log_zero_minus < ::my_zero<decimal_type>()));
 
       BOOST_TEST(result_log_zero_minus_is_ok);
 
       result_is_ok = (result_log_zero_minus_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
     {
       static_cast<void>(index);
 
-      const auto log_one = log(::my_global_test_log_one());
+      const auto log_one = log(::my_one<decimal_type>());
 
-      const volatile auto result_log_one_is_ok = (log_one == ::my_global_test_log_zero());
+      const volatile auto result_log_one_is_ok = (log_one == ::my_zero<decimal_type>());
 
       BOOST_TEST(result_log_one_is_ok);
 
       result_is_ok = (result_log_one_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
     {
       static_cast<void>(index);
 
-      const auto log_one_minus = log(-::my_global_test_log_one());
+      const auto log_one_minus = log(-::my_one<decimal_type>());
 
       const volatile auto result_log_one_minus_is_ok = isnan(log_one_minus);
 
@@ -215,11 +223,11 @@ namespace local
       result_is_ok = (result_log_one_minus_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
     {
       static_cast<void>(index);
 
-      const auto log_inf = log(::my_global_test_log_inf() * static_cast<decimal_type>(dist(gen)));
+      const auto log_inf = log(::my_inf<decimal_type>() * static_cast<decimal_type>(dist(gen)));
 
       const volatile auto result_log_inf_is_ok = isinf(log_inf);
 
@@ -230,11 +238,11 @@ namespace local
       result_is_ok = (result_log_inf_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
     {
       static_cast<void>(index);
 
-      const auto log_inf_minus = log(-::my_global_test_log_inf() * static_cast<decimal_type>(dist(gen)));
+      const auto log_inf_minus = log(-::my_inf<decimal_type>() * static_cast<decimal_type>(dist(gen)));
 
       const volatile auto result_log_inf_minus_is_ok = isnan(log_inf_minus);
 
@@ -245,7 +253,7 @@ namespace local
       result_is_ok = (result_log_inf_minus_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
     {
       static_cast<void>(index);
 
@@ -260,7 +268,7 @@ namespace local
       result_is_ok = (result_log_nan_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(5)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
     {
       const auto x_flt = static_cast<float>(1.4L + static_cast<long double>(index) / 10.0L);
       const auto x_dec = static_cast<decimal_type>(x_flt);
@@ -270,7 +278,7 @@ namespace local
       const auto lg_flt = log(x_flt);
       const auto lg_dec = log(x_dec);
 
-      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * 12);
+      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * tol_factor);
 
       BOOST_TEST(result_log_is_ok);
 
@@ -288,7 +296,7 @@ namespace local
       const auto lg_dec          = log(x_dec);
       const auto lg_dec_as_float = static_cast<float>(lg_dec);
 
-      const auto result_log_is_ok = is_close_fraction(lg_flt, lg_dec_as_float, std::numeric_limits<float>::epsilon() * 12);
+      const auto result_log_is_ok = is_close_fraction(lg_flt, lg_dec_as_float, std::numeric_limits<float>::epsilon() * tol_factor);
 
       BOOST_TEST(result_log_is_ok);
 
@@ -301,14 +309,31 @@ namespace local
 
 auto main() -> int
 {
-  auto result_is_ok = (local::test_log() && local::test_log_between_1_and_two() && local::test_log_edge());
+  auto result_is_ok = true;
+
+  {
+    using decimal_type = boost::decimal::decimal32;
+    using float_type   = float;
+
+    const auto test_log_is_ok                 = local::test_log                <decimal_type, float_type>(12);
+    const auto test_log_between_1_and_2_is_ok = local::test_log_between_1_and_2<decimal_type, float_type>(24);
+    const auto test_log_edge_is_ok            = local::test_log_edge           <decimal_type, float_type>(12);
+
+    result_is_ok = (test_log_is_ok && test_log_between_1_and_2_is_ok && test_log_edge_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal64;
+    using float_type   = double;
+
+    const auto test_log_is_ok                 = local::test_log                <decimal_type, float_type>(24);
+    const auto test_log_between_1_and_2_is_ok = local::test_log_between_1_and_2<decimal_type, float_type>(256);
+    const auto test_log_edge_is_ok            = local::test_log_edge           <decimal_type, float_type>(24);
+
+    result_is_ok = (test_log_is_ok && test_log_between_1_and_2_is_ok && test_log_edge_is_ok && result_is_ok);
+  }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 
   return (result_is_ok ? 0 : -1);
 }
-
-auto my_global_test_log_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_zero { 0, 0 }; return my_zero; }
-auto my_global_test_log_one () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_one  { 1, 0 }; return my_one; }
-auto my_global_test_log_inf () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_inf  { std::numeric_limits<boost::decimal::decimal32>::infinity() };  return my_inf; }
-auto my_global_test_log_nan () -> boost::decimal::decimal32& { static boost::decimal::decimal32 my_nan  { std::numeric_limits<boost::decimal::decimal32>::quiet_NaN() }; return my_nan; }

@@ -12,7 +12,11 @@
 
 using namespace boost::decimal;
 
-static constexpr auto N {1024U};
+#if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+static constexpr auto N = static_cast<std::size_t>(1024U); // Number of trials
+#else
+static constexpr auto N = static_cast<std::size_t>(1024U >> 4U); // Number of trials
+#endif
 
 template <typename T>
 void roundtrip_strtod()
