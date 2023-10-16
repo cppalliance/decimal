@@ -241,11 +241,11 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_pos_lo_is_ok = local::test_exp<decimal_type, float_type>(128, false, 0.03125L, 80.0L);
-    const auto result_neg_lo_is_ok = local::test_exp<decimal_type, float_type>(128, true,  0.03125L, 80.0L);
+    const auto result_pos_lo_is_ok = local::test_exp<decimal_type, float_type>(512, false, 0.03125L, 80.0L);
+    const auto result_neg_lo_is_ok = local::test_exp<decimal_type, float_type>(512, true,  0.03125L, 80.0L);
 
-    const auto result_pos_hi_is_ok = local::test_exp<decimal_type, float_type>(1536, false, 8.0L, 512.0L);
-    const auto result_neg_hi_is_ok = local::test_exp<decimal_type, float_type>(1536, true,  8.0L, 512.0L);
+    const auto result_pos_hi_is_ok = local::test_exp<decimal_type, float_type>(3072, false, 8.0L, 512.0L);
+    const auto result_neg_hi_is_ok = local::test_exp<decimal_type, float_type>(3072, true,  8.0L, 512.0L);
 
     const auto result_edge_is_ok = local::test_exp_edge<decimal_type, float_type>();
 
