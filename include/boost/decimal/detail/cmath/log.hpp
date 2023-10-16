@@ -91,6 +91,11 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 // Series[Log[(1 + (z/2))/(1 - (z/2))], {z, 0, 23}]
                 // Or at Wolfram Alpha: https://www.wolframalpha.com/input?i=Series%5BLog%5B%281+%2B+%28z%2F2%29%29%2F%281+-+%28z%2F2%29%29%5D%2C+%7Bz%2C+0%2C+21%7D%5D
 
+                // TODO(ckormanyos)
+                // Consider also Pade expansion of Log[1 + z/2].
+                //   PadeApproximant[Log[1 + z/2], {z, 6, 6}]
+                //   FullSimplify[%].
+
                 T { UINT64_C(833333333333333333), -18 - 1 }, // * z^3
                 T { UINT64_C(125000000000000000), -18 - 1 }, // * z^5
                 T { UINT64_C(223214285714285714), -18 - 2 }, // * z^7
