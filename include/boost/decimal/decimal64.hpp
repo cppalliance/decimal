@@ -165,7 +165,7 @@ private:
     template <typename Decimal, typename TargetType>
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
 
-    template <typename Decimal, typename TargetType>
+    template <typename TargetType, typename Decimal>
     friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
     // Debug bit pattern
@@ -180,7 +180,7 @@ private:
     template <typename Decimal1, typename Decimal2>
     friend constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
-                             detail::is_decimal_floating_point_v<Decimal2>), detail::promote_args_t<Decimal1, Decimal2>>;
+                             detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
     // Template to compare operator< for any integer type and decimal64
     template <typename Decimal, typename Integer>
@@ -353,14 +353,6 @@ public:
     template <typename Integer>
     friend constexpr auto operator==(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
-
-    template <typename Decimal>
-    friend constexpr auto operator==(decimal64 lhs, Decimal rhs) noexcept
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>;
-
-    template <typename Decimal>
-    friend constexpr auto operator==(Decimal lhs, decimal64 rhs) noexcept
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>;
 
     // Inequality
     friend constexpr auto operator!=(decimal64 lhs, decimal64 rhs) noexcept -> bool;
@@ -1658,20 +1650,6 @@ constexpr auto operator==(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return mixed_equality_impl(rhs, lhs);
-}
-
-template <typename Decimal>
-constexpr auto operator==(decimal64 lhs, Decimal rhs) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>
-{
-    return mixed_decimal_equality_impl(lhs, rhs);
-}
-
-template <typename Decimal>
-constexpr auto operator==(Decimal lhs, decimal64 rhs) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>
-{
-    return mixed_decimal_equality_impl(lhs, rhs);
 }
 
 constexpr auto operator!=(decimal64 lhs, decimal64 rhs) noexcept -> bool

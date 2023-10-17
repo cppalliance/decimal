@@ -55,15 +55,26 @@ constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
 template <typename Decimal1, typename Decimal2>
 constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
-                         detail::is_decimal_floating_point_v<Decimal2>), detail::promote_args_t<Decimal1, Decimal2>>
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
 {
     static_assert(!std::is_same<Decimal1, Decimal2>::value, "Equality of same type exists in simpler form");
     using Bigger_Decimal_Type = std::conditional_t<(sizeof(lhs) > sizeof(rhs)), Decimal1, Decimal2>;
+
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
 
     const auto new_lhs = to_decimal<Bigger_Decimal_Type>(lhs);
     const auto new_rhs = to_decimal<Bigger_Decimal_Type>(rhs);
 
     return new_lhs == new_rhs;
+}
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator==(Decimal1 lhs, Decimal2 rhs) noexcept -> bool
+{
+    return mixed_decimal_equality_impl(lhs, rhs);
 }
 
 template <typename T1, typename T2>
