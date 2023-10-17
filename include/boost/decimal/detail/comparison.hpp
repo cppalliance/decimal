@@ -237,6 +237,14 @@ constexpr auto operator<=(Decimal1 lhs, Decimal2 rhs) noexcept
     return !(rhs < lhs);
 }
 
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator>(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    return rhs < lhs;
+}
+
 } //namespace decimal
 } //namespace boost
 
