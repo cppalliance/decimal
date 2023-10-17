@@ -72,9 +72,19 @@ constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
 }
 
 template <typename Decimal1, typename Decimal2>
-constexpr auto operator==(Decimal1 lhs, Decimal2 rhs) noexcept -> bool
+constexpr auto operator==(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
 {
     return mixed_decimal_equality_impl(lhs, rhs);
+}
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    return !(mixed_decimal_equality_impl(lhs, rhs));
 }
 
 template <typename T1, typename T2>
