@@ -187,6 +187,43 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
                            rhs_significand, INT32_C(0), rhs_sign);
 }
 
+template <typename Decimal1, typename Decimal2>
+constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    if (isnan(lhs) || isnan(rhs) || (!lhs.isneg() && rhs.isneg()))
+    {
+        return false;
+    }
+    else if (lhs.isneg() && !rhs.isneg())
+    {
+        return true;
+    }
+    else if (isfinite(lhs) && isinf(rhs))
+    {
+        if (!signbit(rhs))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator<(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    return mixed_decimal_less_impl(lhs, rhs);
+}
+
 } //namespace decimal
 } //namespace boost
 

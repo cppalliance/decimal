@@ -185,7 +185,12 @@ private:
     // Template to compare operator< for any integer type and decimal64
     template <typename Decimal, typename Integer>
     friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
-    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+
+    template <typename Decimal1, typename Decimal2>
+    friend constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                             detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
     template <typename T1, typename T2>
     friend constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,

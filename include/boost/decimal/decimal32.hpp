@@ -193,6 +193,11 @@ private:
     friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
 
+    template <typename Decimal1, typename Decimal2>
+    friend constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                             detail::is_decimal_floating_point_v<Decimal2>), bool>;
+
     template <typename T, typename T2>
     friend constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                    T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components;
