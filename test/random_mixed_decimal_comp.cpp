@@ -357,10 +357,10 @@ void random_mixed_SPACESHIP()
                   << "\nDec32: " << Decimal1{guarantee} << std::endl;
     }
 
-    BOOST_TEST_EQ(std::numeric_limits<Decimal1>::quiet_NaN() <=> Decimal2(dist(rng)), std::partial_ordering::unordered);
-    BOOST_TEST_EQ(std::numeric_limits<Decimal2>::quiet_NaN() <=> Decimal1(dist(rng)), std::partial_ordering::unordered);
-    BOOST_TEST_EQ(std::numeric_limits<Decimal1>::infinity() <=> Decimal2(dist(rng)), std::partial_ordering::greater);
-    BOOST_TEST_EQ(std::numeric_limits<Decimal2>::infinity() <=> Decimal1(dist(rng)), std::partial_ordering::greater);
+    BOOST_TEST((std::numeric_limits<Decimal1>::quiet_NaN() <=> Decimal2(dist(rng))) == std::partial_ordering::unordered);
+    BOOST_TEST((std::numeric_limits<Decimal2>::quiet_NaN() <=> Decimal1(dist(rng))) == std::partial_ordering::unordered);
+    BOOST_TEST((std::numeric_limits<Decimal1>::infinity() <=> Decimal2(dist(rng))) == std::partial_ordering::greater);
+    BOOST_TEST((std::numeric_limits<Decimal2>::infinity() <=> Decimal1(dist(rng))) == std::partial_ordering::greater);
 }
 
 #endif
