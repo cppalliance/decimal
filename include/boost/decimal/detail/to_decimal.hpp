@@ -15,6 +15,8 @@
 namespace boost {
 namespace decimal {
 
+#ifndef BOOST_DECIMAL_NO_CXX17_IF_CONSTEXPR
+
 template <typename TargetType, typename Decimal>
 constexpr auto to_decimal(Decimal val) noexcept -> TargetType
 {
@@ -30,6 +32,16 @@ constexpr auto to_decimal(Decimal val) noexcept -> TargetType
 
     return return_val;
 }
+
+#else
+
+template <typename TargetType, typename Decimal>
+constexpr auto to_decimal(Decimal val) noexcept -> TargetType
+{
+    return TargetType{val.full_significand(), val.biased_exponent(), val.isneg()};
+}
+
+#endif
 
 } //namespace decimal
 } //namespace boost
