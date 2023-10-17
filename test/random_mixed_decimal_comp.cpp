@@ -161,6 +161,10 @@ void random_mixed_LT()
     BOOST_TEST_EQ(std::numeric_limits<Decimal2>::quiet_NaN() < Decimal1(dist(rng)), false);
     BOOST_TEST_EQ(std::numeric_limits<Decimal1>::infinity() < Decimal2(dist(rng)), false);
     BOOST_TEST_EQ(std::numeric_limits<Decimal2>::infinity() < Decimal1(dist(rng)), false);
+    BOOST_TEST_EQ(Decimal1(dist(rng)) < std::numeric_limits<Decimal2>::infinity(), true);
+    BOOST_TEST_EQ(Decimal2(dist(rng)) < std::numeric_limits<Decimal1>::infinity(), true);
+    BOOST_TEST_EQ(Decimal1(dist(rng)) < -std::numeric_limits<Decimal2>::infinity(), false);
+    BOOST_TEST_EQ(Decimal2(dist(rng)) < -std::numeric_limits<Decimal1>::infinity(), false);
 }
 
 template <typename Decimal1, typename Decimal2>
