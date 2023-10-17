@@ -18,6 +18,7 @@ static constexpr auto N = static_cast<std::size_t>(1024U >> 4U); // Number of tr
 // NOLINTNEXTLINE : Seed with a constant for repeatability
 static std::mt19937_64 rng(42); // NOSONAR : Global rng is not const
 
+template <typename Decimal1, typename Decimal2>
 void random_mixed_EQ()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
@@ -27,8 +28,8 @@ void random_mixed_EQ()
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
 
-        const decimal32 dec1 {val1};
-        const decimal64 dec2 {val2};
+        const Decimal1 dec1 {val1};
+        const Decimal2 dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
@@ -44,8 +45,8 @@ void random_mixed_EQ()
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
 
-        const decimal64 dec1 {val1};
-        const decimal32 dec2 {val2};
+        const Decimal2 dec1 {val1};
+        const Decimal1 dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
@@ -58,18 +59,19 @@ void random_mixed_EQ()
 
     // Edge cases
     const auto guarantee {dist(rng)};
-    if (!BOOST_TEST(decimal64{guarantee} == decimal32{guarantee}))
+    if (!BOOST_TEST(Decimal2{guarantee} == Decimal1{guarantee}))
     {
-        std::cerr << "Dec64: " << decimal64{guarantee}
-                  << "\nDec32: " << decimal32{guarantee} << std::endl;
+        std::cerr << "Dec64: " << Decimal2{guarantee}
+                  << "\nDec32: " << Decimal1{guarantee} << std::endl;
     }
 
-    BOOST_TEST_EQ(std::numeric_limits<decimal32>::quiet_NaN() == decimal64(dist(rng)), false);
-    BOOST_TEST_EQ(std::numeric_limits<decimal64>::quiet_NaN() == decimal32(dist(rng)), false);
-    BOOST_TEST_EQ(std::numeric_limits<decimal32>::infinity() == decimal64(dist(rng)), false);
-    BOOST_TEST_EQ(std::numeric_limits<decimal64>::infinity() == decimal32(dist(rng)), false);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal1>::quiet_NaN() == Decimal2(dist(rng)), false);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal2>::quiet_NaN() == Decimal1(dist(rng)), false);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal1>::infinity() == Decimal2(dist(rng)), false);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal2>::infinity() == Decimal1(dist(rng)), false);
 }
 
+template <typename Decimal1, typename Decimal2>
 void random_mixed_NE()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
@@ -79,8 +81,8 @@ void random_mixed_NE()
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
 
-        const decimal32 dec1 {val1};
-        const decimal64 dec2 {val2};
+        const Decimal1 dec1 {val1};
+        const Decimal2 dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 != dec2, val1 != val2))
         {
@@ -96,8 +98,8 @@ void random_mixed_NE()
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
 
-        const decimal64 dec1 {val1};
-        const decimal32 dec2 {val2};
+        const Decimal2 dec1 {val1};
+        const Decimal1 dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 != dec2, val1 != val2))
         {
@@ -109,12 +111,13 @@ void random_mixed_NE()
     }
 
     // Edge cases
-    BOOST_TEST(std::numeric_limits<decimal32>::quiet_NaN() != decimal64(dist(rng)));
-    BOOST_TEST(std::numeric_limits<decimal64>::quiet_NaN() != decimal32(dist(rng)));
-    BOOST_TEST(std::numeric_limits<decimal32>::infinity() != decimal64(dist(rng)));
-    BOOST_TEST(std::numeric_limits<decimal64>::infinity() != decimal32(dist(rng)));
+    BOOST_TEST(std::numeric_limits<Decimal1>::quiet_NaN() != Decimal2(dist(rng)));
+    BOOST_TEST(std::numeric_limits<Decimal2>::quiet_NaN() != Decimal1(dist(rng)));
+    BOOST_TEST(std::numeric_limits<Decimal1>::infinity() != Decimal2(dist(rng)));
+    BOOST_TEST(std::numeric_limits<Decimal2>::infinity() != Decimal1(dist(rng)));
 }
 
+template <typename Decimal1, typename Decimal2>
 void random_mixed_LT()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
@@ -124,8 +127,8 @@ void random_mixed_LT()
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
 
-        const decimal32 dec1 {val1};
-        const decimal64 dec2 {val2};
+        const Decimal1 dec1 {val1};
+        const Decimal2 dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
         {
@@ -141,8 +144,8 @@ void random_mixed_LT()
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
 
-        const decimal64 dec1 {val1};
-        const decimal32 dec2 {val2};
+        const Decimal2 dec1 {val1};
+        const Decimal1 dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
         {
@@ -154,17 +157,64 @@ void random_mixed_LT()
     }
 
     // Edge cases
-    BOOST_TEST_EQ(std::numeric_limits<decimal32>::quiet_NaN() < decimal64(dist(rng)), false);
-    BOOST_TEST_EQ(std::numeric_limits<decimal64>::quiet_NaN() < decimal32(dist(rng)), false);
-    BOOST_TEST_EQ(std::numeric_limits<decimal32>::infinity() < decimal64(dist(rng)), false);
-    BOOST_TEST_EQ(std::numeric_limits<decimal64>::infinity() < decimal32(dist(rng)), false);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal1>::quiet_NaN() < Decimal2(dist(rng)), false);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal2>::quiet_NaN() < Decimal1(dist(rng)), false);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal1>::infinity() < Decimal2(dist(rng)), false);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal2>::infinity() < Decimal1(dist(rng)), false);
+}
+
+template <typename Decimal1, typename Decimal2>
+void random_mixed_LE()
+{
+    std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const int val1 {dist(rng)};
+        const int val2 {dist(rng)};
+
+        const Decimal1 dec1 {val1};
+        const Decimal2 dec2 {val2};
+
+        if (!BOOST_TEST_EQ(dec1 <= dec2, val1 <= val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const int val1 {dist(rng)};
+        const int val2 {dist(rng)};
+
+        const Decimal2 dec1 {val1};
+        const Decimal1 dec2 {val2};
+
+        if (!BOOST_TEST_EQ(dec1 <= dec2, val1 <= val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+
+    // Edge cases
+    BOOST_TEST_EQ(std::numeric_limits<Decimal1>::quiet_NaN() <= Decimal2(dist(rng)), false);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal2>::quiet_NaN() <= Decimal1(dist(rng)), false);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal1>::infinity() <= Decimal2(dist(rng)), false);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal2>::infinity() <= Decimal1(dist(rng)), false);
 }
 
 int main()
 {
-    random_mixed_EQ();
-    random_mixed_NE();
-    random_mixed_LT();
+    random_mixed_EQ<decimal32, decimal64>();
+    random_mixed_NE<decimal32, decimal64>();
+    random_mixed_LT<decimal32, decimal64>();
+    random_mixed_LE<decimal32, decimal64>();
 
     return boost::report_errors();
 }
