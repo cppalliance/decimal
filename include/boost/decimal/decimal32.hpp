@@ -34,6 +34,8 @@
 #include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/to_integral.hpp>
 #include <boost/decimal/detail/to_float.hpp>
+#include <boost/decimal/detail/to_decimal.hpp>
+#include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
 #include <boost/decimal/detail/shrink_significand.hpp>
@@ -160,6 +162,9 @@ private:
     template <typename Decimal, typename TargetType>
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
 
+    template <typename TargetType, typename Decimal>
+    friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
+
     friend constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
                                            detail::decimal32_components& q) noexcept -> void;
     friend constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
@@ -178,21 +183,20 @@ private:
     friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
 
-    // Compares the components of the lhs with rhs for equality
-    // Can be any type broken down into a sig and an exp that will be normalized for fair comparison
-    template <typename T1, typename T2>
-    friend constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                           T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
+    template <typename Decimal1, typename Decimal2>
+    friend constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                             detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
     // Template to compare operator< for any integer type and decimal32
     template <typename Decimal, typename Integer>
     friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
 
-    // Implements less than using the components of lhs and rhs
-    template <typename T1, typename T2>
-    friend constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                          T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
+    template <typename Decimal1, typename Decimal2>
+    friend constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                             detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
     template <typename T, typename T2>
     friend constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
