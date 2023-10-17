@@ -11,6 +11,7 @@
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/to_decimal.hpp>
+#include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <cstdint>
 
 namespace boost {
@@ -200,7 +201,7 @@ constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
     {
         return true;
     }
-    else if (isfinite(lhs) && isinf(rhs))
+    else if (boost::decimal::isfinite(lhs) && isinf(rhs))
     {
         if (!signbit(rhs))
         {
