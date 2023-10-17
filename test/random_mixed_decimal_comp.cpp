@@ -327,7 +327,7 @@ void random_mixed_SPACESHIP()
         const Decimal1 dec1 {val1};
         const Decimal2 dec2 {val2};
 
-        if (!BOOST_TEST_EQ(dec1 <=> dec2, val1 <=> val2))
+        if (!BOOST_TEST((dec1 <=> dec2) == (val1 <=> val2)))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
@@ -344,7 +344,7 @@ void random_mixed_SPACESHIP()
         const Decimal2 dec1 {val1};
         const Decimal1 dec2 {val2};
 
-        if (!BOOST_TEST_EQ(dec1 <=> dec2, val1 <=> val2))
+        if (!BOOST_TEST((dec1 <=> dec2) == (val1 <=> val2)))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
