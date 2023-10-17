@@ -224,6 +224,9 @@ public:
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal64(Float val) noexcept;
 
+    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    constexpr decimal64(Decimal val) noexcept;
+
     // 3.2.3.3 Conversion from integral type
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal64(Integer val) noexcept;
@@ -654,6 +657,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::decimal64(Float val) noexcept
             *this = decimal64 {components.mantissa, components.exponent, components.sign};
         }
     }
+}
+
+template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal64::decimal64(Decimal val) noexcept
+{
+    *this = to_decimal<decimal64>(val);
 }
 
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>

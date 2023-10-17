@@ -219,6 +219,9 @@ public:
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
 
+    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr decimal32(Decimal val) noexcept;
+
     // 3.2.2.3 Conversion from integral type
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal32(Integer val) noexcept;
@@ -1433,6 +1436,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
             *this = decimal32 {components.mantissa, components.exponent, components.sign};
         }
     }
+}
+
+template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal32::decimal32(Decimal val) noexcept
+{
+    *this = to_decimal<decimal32>(val);
 }
 
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
