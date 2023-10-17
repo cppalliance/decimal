@@ -23,15 +23,6 @@ constexpr auto to_decimal(Decimal val) noexcept -> TargetType
     {
         return_val = val;
     }
-    else BOOST_DECIMAL_IF_CONSTEXPR (sizeof(Decimal) < sizeof(TargetType))
-    {
-        using target_basis_type = std::conditional_t<std::is_same<TargetType, decimal32>::value, std::uint32_t, std::uint64_t>;
-
-        return_val.bits_.significand = static_cast<target_basis_type>(val.full_significand());
-        return_val.bits_.exponent = static_cast<target_basis_type>(val.unbiased_exponent() - detail::bias_v<TargetType>);
-        return_val.bits_.combination_field = static_cast<target_basis_type>(0U);
-        return_val.bits_.sign = static_cast<target_basis_type>(val.isneg());
-    }
     else
     {
         return_val = TargetType{val.full_significand(), val.biased_exponent(), val.isneg()};
