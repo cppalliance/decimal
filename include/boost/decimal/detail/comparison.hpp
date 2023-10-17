@@ -9,6 +9,9 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/normalize.hpp>
+#include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/to_decimal.hpp>
+#include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <cstdint>
 
 namespace boost {
@@ -48,6 +51,41 @@ constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
 
     return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
                             rhs_significand, INT32_C(0), rhs_isneg);
+}
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    static_assert(!std::is_same<Decimal1, Decimal2>::value, "Equality of same type exists in simpler form");
+    using Bigger_Decimal_Type = std::conditional_t<(sizeof(lhs) > sizeof(rhs)), Decimal1, Decimal2>;
+
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    const auto new_lhs = to_decimal<Bigger_Decimal_Type>(lhs);
+    const auto new_rhs = to_decimal<Bigger_Decimal_Type>(rhs);
+
+    return new_lhs == new_rhs;
+}
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator==(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    return mixed_decimal_equality_impl(lhs, rhs);
+}
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    return !(mixed_decimal_equality_impl(lhs, rhs));
 }
 
 template <typename T1, typename T2>
@@ -149,6 +187,102 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
     return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs_sign,
                            rhs_significand, INT32_C(0), rhs_sign);
 }
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    if (isnan(lhs) || isnan(rhs) || (!lhs.isneg() && rhs.isneg()))
+    {
+        return false;
+    }
+    else if (lhs.isneg() && !rhs.isneg())
+    {
+        return true;
+    }
+    else if (boost::decimal::isfinite(lhs) && isinf(rhs))
+    {
+        if (!signbit(rhs))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator<(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    return mixed_decimal_less_impl(lhs, rhs);
+}
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator<=(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(rhs < lhs);
+}
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator>(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    return rhs < lhs;
+}
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator>=(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), bool>
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
+}
+
+#ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator<=>(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), std::partial_ordering>
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+#endif
 
 } //namespace decimal
 } //namespace boost
