@@ -258,6 +258,31 @@ constexpr auto operator>=(Decimal1 lhs, Decimal2 rhs) noexcept
     return !(lhs < rhs);
 }
 
+#ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto operator<=>(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), std::partial_ordering>
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+#endif
+
 } //namespace decimal
 } //namespace boost
 

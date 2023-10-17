@@ -308,6 +308,63 @@ void random_mixed_GE()
     BOOST_TEST_EQ(std::numeric_limits<Decimal2>::infinity() >= Decimal1(dist(rng)), true);
 }
 
+#ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+
+template <typename Decimal1, typename Decimal2>
+void random_mixed_SPACESHIP()
+{
+    std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const int val1 {dist(rng)};
+        const int val2 {dist(rng)};
+
+        const Decimal1 dec1 {val1};
+        const Decimal2 dec2 {val2};
+
+        if (!BOOST_TEST_EQ(dec1 <=> dec2, val1 <=> val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const int val1 {dist(rng)};
+        const int val2 {dist(rng)};
+
+        const Decimal2 dec1 {val1};
+        const Decimal1 dec2 {val2};
+
+        if (!BOOST_TEST_EQ(dec1 <=> dec2, val1 <=> val2))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2 << std::endl;
+        }
+    }
+
+    // Edge cases
+    const auto guarantee {dist(rng)};
+    if (!BOOST_TEST((Decimal2{guarantee} <=> Decimal1{guarantee}) == std::partial_ordering::equivalent))
+    {
+        std::cerr << "Dec64: " << Decimal2{guarantee}
+                  << "\nDec32: " << Decimal1{guarantee} << std::endl;
+    }
+
+    BOOST_TEST_EQ(std::numeric_limits<Decimal1>::quiet_NaN() <=> Decimal2(dist(rng)), std::partial_ordering::unordered);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal2>::quiet_NaN() <=> Decimal1(dist(rng)), std::partial_ordering::unordered);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal1>::infinity() <=> Decimal2(dist(rng)), std::partial_ordering::greater);
+    BOOST_TEST_EQ(std::numeric_limits<Decimal2>::infinity() <=> Decimal1(dist(rng)), std::partial_ordering::greater);
+}
+
+#endif
+
 int main()
 {
     random_mixed_EQ<decimal32, decimal64>();
@@ -316,6 +373,10 @@ int main()
     random_mixed_LE<decimal32, decimal64>();
     random_mixed_GT<decimal32, decimal64>();
     random_mixed_GE<decimal32, decimal64>();
+
+    #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+    random_mixed_SPACESHIP<decimal32, decimal64>();
+    #endif
 
     return boost::report_errors();
 }
