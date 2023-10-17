@@ -37,6 +37,7 @@
 #include <boost/decimal/detail/to_integral.hpp>
 #include <boost/decimal/detail/to_float.hpp>
 #include <boost/decimal/detail/to_decimal.hpp>
+#include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
@@ -176,21 +177,15 @@ private:
     friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
 
-    // Compares the components of the lhs with rhs for equality
-    // Can be any type broken down into a sig and an exp that will be normalized for fair comparison
-    template <typename T1, typename T2>
-    friend constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                           T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
+    template <typename Decimal1, typename Decimal2>
+    friend constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                             detail::is_decimal_floating_point_v<Decimal2>), detail::promote_args_t<Decimal1, Decimal2>>;
 
     // Template to compare operator< for any integer type and decimal64
     template <typename Decimal, typename Integer>
     friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
-
-    // Implements less than using the components of lhs and rhs
-    template <typename T1, typename T2>
-    friend constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                          T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool;
 
     template <typename T1, typename T2>
     friend constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
@@ -358,6 +353,14 @@ public:
     template <typename Integer>
     friend constexpr auto operator==(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Decimal>
+    friend constexpr auto operator==(decimal64 lhs, Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>;
+
+    template <typename Decimal>
+    friend constexpr auto operator==(Decimal lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>;
 
     // Inequality
     friend constexpr auto operator!=(decimal64 lhs, decimal64 rhs) noexcept -> bool;
@@ -1655,6 +1658,20 @@ constexpr auto operator==(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return mixed_equality_impl(rhs, lhs);
+}
+
+template <typename Decimal>
+constexpr auto operator==(decimal64 lhs, Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>
+{
+    return mixed_decimal_equality_impl(lhs, rhs);
+}
+
+template <typename Decimal>
+constexpr auto operator==(Decimal lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>
+{
+    return mixed_decimal_equality_impl(lhs, rhs);
 }
 
 constexpr auto operator!=(decimal64 lhs, decimal64 rhs) noexcept -> bool

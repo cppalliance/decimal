@@ -9,6 +9,8 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/normalize.hpp>
+#include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/to_decimal.hpp>
 #include <cstdint>
 
 namespace boost {
@@ -48,6 +50,20 @@ constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
 
     return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
                             rhs_significand, INT32_C(0), rhs_isneg);
+}
+
+template <typename Decimal1, typename Decimal2>
+constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+    -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                         detail::is_decimal_floating_point_v<Decimal2>), detail::promote_args_t<Decimal1, Decimal2>>
+{
+    static_assert(!std::is_same<Decimal1, Decimal2>::value, "Equality of same type exists in simpler form");
+    using Bigger_Decimal_Type = std::conditional_t<(sizeof(lhs) > sizeof(rhs)), Decimal1, Decimal2>;
+
+    const auto new_lhs = to_decimal<Bigger_Decimal_Type>(lhs);
+    const auto new_rhs = to_decimal<Bigger_Decimal_Type>(rhs);
+
+    return new_lhs == new_rhs;
 }
 
 template <typename T1, typename T2>
