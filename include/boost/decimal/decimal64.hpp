@@ -243,6 +243,9 @@ public:
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
 
+    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr operator Decimal() const noexcept;
+
     // 3.2.6 Conversion to floating-point type
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
@@ -719,6 +722,12 @@ constexpr decimal64::operator std::int16_t() const noexcept
 constexpr decimal64::operator std::uint16_t() const noexcept
 {
     return to_integral<decimal64, std::uint16_t>(*this);
+}
+
+template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal64::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::operator float() const noexcept

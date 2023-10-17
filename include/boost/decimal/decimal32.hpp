@@ -238,6 +238,9 @@ public:
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
 
+    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr operator Decimal() const noexcept;
+
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
     constexpr decimal32(T coeff, T2 exp, bool sign = false) noexcept;
@@ -1498,6 +1501,12 @@ constexpr decimal32::operator std::int16_t() const noexcept
 constexpr decimal32::operator std::uint16_t() const noexcept
 {
     return to_integral<decimal32, std::uint16_t>(*this);
+}
+
+template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal32::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal32 rhs) noexcept -> std::uint32_t
