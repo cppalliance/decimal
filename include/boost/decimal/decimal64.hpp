@@ -36,6 +36,7 @@
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/to_integral.hpp>
 #include <boost/decimal/detail/to_float.hpp>
+#include <boost/decimal/detail/to_decimal.hpp>
 #include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
@@ -162,6 +163,9 @@ private:
 
     template <typename Decimal, typename TargetType>
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
+
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;

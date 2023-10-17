@@ -34,6 +34,7 @@
 #include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/to_integral.hpp>
 #include <boost/decimal/detail/to_float.hpp>
+#include <boost/decimal/detail/to_decimal.hpp>
 #include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
 #include <boost/decimal/detail/shrink_significand.hpp>
@@ -159,6 +160,9 @@ private:
 
     template <typename Decimal, typename TargetType>
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
+
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
     friend constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
                                            detail::decimal32_components& q) noexcept -> void;
