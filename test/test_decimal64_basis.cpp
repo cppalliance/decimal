@@ -245,6 +245,14 @@ void test_ge()
     BOOST_TEST(!(qnan_val >= snan_val));
 }
 
+void test_memcpy()
+{
+    std::uint64_t bits {1};
+    decimal64 test {};
+    std::memcpy(&test, &bits, sizeof(std::uint64_t));
+    BOOST_TEST(to_bits(test) == bits);
+}
+
 int main()
 {
     test_binary_constructor();
@@ -257,6 +265,8 @@ int main()
     test_le();
     test_greater();
     test_ge();
+
+    test_memcpy();
 
     return boost::report_errors();
 }

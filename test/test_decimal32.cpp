@@ -471,6 +471,15 @@ void test_shrink_significand()
     BOOST_TEST_EQ(pow, 3);
 }
 
+void test_memcpy()
+{
+    std::uint32_t bits {1};
+    decimal32 test {};
+    std::memcpy(&test, &bits, sizeof(std::uint32_t));
+    BOOST_TEST(to_bits(test) == bits);
+}
+
+
 int main()
 {
     test_comp();
@@ -506,6 +515,8 @@ int main()
     spot_check_addition(989629100, 58451350, 1048080000);
 
     test_shrink_significand();
+
+    test_memcpy();
 
     return boost::report_errors();
 }
