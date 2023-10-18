@@ -15,6 +15,39 @@
 namespace boost {
 namespace decimal {
 
+#ifndef BOOST_DECIMAL_NO_CXX17_IF_CONSTEXPR
+
+template <typename TargetType, typename Decimal>
+constexpr auto to_decimal(Decimal val) noexcept -> TargetType
+{
+    if (isinf(val))
+    {
+        return val.isneg() ? -std::numeric_limits<TargetType>::infinity() :
+                              std::numeric_limits<TargetType>::infinity();
+    }
+    else if (issignaling(val))
+    {
+        return val.isneg() ? -std::numeric_limits<TargetType>::signaling_NaN() :
+                              std::numeric_limits<TargetType>::signaling_NaN();
+    }
+    else if (isnan(val))
+    {
+        return val.isneg() ? -std::numeric_limits<TargetType>::quiet_NaN() :
+                              std::numeric_limits<TargetType>::quiet_NaN();
+    }
+
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<TargetType, Decimal>::value)
+    {
+        return val;
+    }
+    else
+    {
+        return TargetType{val.full_significand(), val.biased_exponent(), val.isneg()};
+    }
+}
+
+#else
+
 template <typename TargetType, typename Decimal>
 constexpr auto to_decimal(Decimal val) noexcept -> TargetType
 {
@@ -36,6 +69,8 @@ constexpr auto to_decimal(Decimal val) noexcept -> TargetType
 
     return TargetType{val.full_significand(), val.biased_exponent(), val.isneg()};
 }
+
+#endif
 
 } //namespace decimal
 } //namespace boost
