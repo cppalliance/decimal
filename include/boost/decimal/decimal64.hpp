@@ -40,6 +40,7 @@
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/comparison.hpp>
+#include <boost/decimal/detail/mixed_decimal_arithmetic.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
 #include <boost/decimal/detail/shrink_significand.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
