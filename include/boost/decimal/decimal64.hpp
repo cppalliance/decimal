@@ -336,11 +336,19 @@ public:
     constexpr auto operator+=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
 
+    template <typename Decimal>
+    constexpr auto operator+=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>;
+
     constexpr auto operator-=(decimal64 rhs) noexcept -> decimal64&;
 
     template <typename Integer>
     constexpr auto operator-=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
+
+    template <typename Decimal>
+    constexpr auto operator-=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>;
 
     constexpr auto operator*=(decimal64 rhs) noexcept -> decimal64&;
 
@@ -348,11 +356,19 @@ public:
     constexpr auto operator*=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
 
+    template <typename Decimal>
+    constexpr auto operator*=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>;
+
     constexpr auto operator/=(decimal64 rhs) noexcept -> decimal64&;
 
     template <typename Integer>
     constexpr auto operator/=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
+
+    template <typename Decimal>
+    constexpr auto operator/=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>;
 
     // 3.2.9 Comparison operators:
     // Equality
@@ -1608,6 +1624,14 @@ constexpr auto decimal64::operator+=(Integer rhs) noexcept
     return *this;
 }
 
+template <typename Decimal>
+constexpr auto decimal64::operator+=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>
+{
+    *this = *this + rhs;
+    return *this;
+}
+
 constexpr auto decimal64::operator-=(decimal64 rhs) noexcept -> decimal64&
 {
     *this = *this - rhs;
@@ -1617,6 +1641,14 @@ constexpr auto decimal64::operator-=(decimal64 rhs) noexcept -> decimal64&
 template <typename Integer>
 constexpr auto decimal64::operator-=(Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+template <typename Decimal>
+constexpr auto decimal64::operator-=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>
 {
     *this = *this - rhs;
     return *this;
@@ -1636,6 +1668,14 @@ constexpr auto decimal64::operator*=(Integer rhs) noexcept
     return *this;
 }
 
+template <typename Decimal>
+constexpr auto decimal64::operator*=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>
+{
+    *this = *this * rhs;
+    return *this;
+}
+
 constexpr auto decimal64::operator/=(decimal64 rhs) noexcept -> decimal64&
 {
     *this = *this / rhs;
@@ -1645,6 +1685,14 @@ constexpr auto decimal64::operator/=(decimal64 rhs) noexcept -> decimal64&
 template <typename Integer>
 constexpr auto decimal64::operator/=(Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+template <typename Decimal>
+constexpr auto decimal64::operator/=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>
 {
     *this = *this / rhs;
     return *this;
