@@ -54,6 +54,8 @@ void random_mixed_addition(T lower, T upper)
     BOOST_TEST(isinf(Decimal2(dist(rng)) + std::numeric_limits<Decimal1>::infinity()));
     BOOST_TEST(isnan(std::numeric_limits<Decimal1>::quiet_NaN() + Decimal2(dist(rng))));
     BOOST_TEST(isnan(Decimal2(dist(rng)) + std::numeric_limits<Decimal1>::quiet_NaN()));
+    BOOST_TEST(isnan(std::numeric_limits<Decimal1>::signaling_NaN() + Decimal2(dist(rng))));
+    BOOST_TEST(isnan(Decimal2(dist(rng)) + std::numeric_limits<Decimal1>::signaling_NaN()));
 }
 
 template <typename Decimal1, typename Decimal2, typename T>
@@ -87,6 +89,8 @@ void random_mixed_subtraction(T lower, T upper)
     BOOST_TEST(isinf(Decimal2(dist(rng)) - std::numeric_limits<Decimal1>::infinity()));
     BOOST_TEST(isnan(std::numeric_limits<Decimal1>::quiet_NaN() - Decimal2(dist(rng))));
     BOOST_TEST(isnan(Decimal2(dist(rng)) - std::numeric_limits<Decimal1>::quiet_NaN()));
+    BOOST_TEST(isnan(std::numeric_limits<Decimal1>::signaling_NaN() - Decimal2(dist(rng))));
+    BOOST_TEST(isnan(Decimal2(dist(rng)) - std::numeric_limits<Decimal1>::signaling_NaN()));
 }
 
 template <typename Decimal1, typename Decimal2, typename T>
@@ -120,6 +124,8 @@ void random_mixed_multiplication(T lower, T upper)
     BOOST_TEST(isinf(Decimal2(dist(rng)) * std::numeric_limits<Decimal1>::infinity()));
     BOOST_TEST(isnan(std::numeric_limits<Decimal1>::quiet_NaN() * Decimal2(dist(rng))));
     BOOST_TEST(isnan(Decimal2(dist(rng)) * std::numeric_limits<Decimal1>::quiet_NaN()));
+    BOOST_TEST(isnan(std::numeric_limits<Decimal1>::signaling_NaN() * Decimal2(dist(rng))));
+    BOOST_TEST(isnan(Decimal2(dist(rng)) * std::numeric_limits<Decimal1>::signaling_NaN()));
 }
 
 template <typename Decimal1, typename Decimal2, typename T>
@@ -156,6 +162,8 @@ void random_mixed_division(T lower, T upper)
     BOOST_TEST(!isinf(Decimal2(dist(rng)) / std::numeric_limits<Decimal1>::infinity()));
     BOOST_TEST(isnan(std::numeric_limits<Decimal1>::quiet_NaN() / Decimal2(dist(rng))));
     BOOST_TEST(isnan(Decimal2(dist(rng)) / std::numeric_limits<Decimal1>::quiet_NaN()));
+    BOOST_TEST(isnan(std::numeric_limits<Decimal1>::signaling_NaN() / Decimal2(dist(rng))));
+    BOOST_TEST(isnan(Decimal2(dist(rng)) / std::numeric_limits<Decimal1>::signaling_NaN()));
     BOOST_TEST(isinf(Decimal2(dist(rng)) / Decimal1(0)));
 }
 
