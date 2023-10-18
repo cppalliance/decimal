@@ -224,6 +224,9 @@ public:
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal64(Float val) noexcept;
 
+    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    constexpr decimal64(Decimal val) noexcept;
+
     // 3.2.3.3 Conversion from integral type
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal64(Integer val) noexcept;
@@ -239,6 +242,9 @@ public:
     explicit constexpr operator std::uint8_t() const noexcept;
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
+
+    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr operator Decimal() const noexcept;
 
     // 3.2.6 Conversion to floating-point type
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
@@ -656,6 +662,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::decimal64(Float val) noexcept
     }
 }
 
+template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal64::decimal64(Decimal val) noexcept
+{
+    *this = to_decimal<decimal64>(val);
+}
+
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 constexpr decimal64::decimal64(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
@@ -710,6 +722,12 @@ constexpr decimal64::operator std::int16_t() const noexcept
 constexpr decimal64::operator std::uint16_t() const noexcept
 {
     return to_integral<decimal64, std::uint16_t>(*this);
+}
+
+template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal64::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::operator float() const noexcept
