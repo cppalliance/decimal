@@ -226,7 +226,7 @@ void test_roundtrip_float_stream()
 void test_roundtrip_conversion_decimal32()
 {
     std::mt19937_64 rng(42);
-    std::uniform_real_distribution<int> dist(-9'999'999, 9'999'999);
+    std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
     for (std::size_t i = 0; i < N; ++i)
     {
