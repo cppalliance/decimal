@@ -316,12 +316,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<long double>(long dou
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<long double>(long double val) noexcept -> floating_decimal_128
 {
-    #ifdef BOOST_DECIMAL_HAS_INT128
     auto bits = bit_cast<unsigned_128_type>(val);
-    #else
-    auto trivial_bits = bit_cast<trivial_uint128>(val);
-    unsigned_128_type bits {trivial_bits};
-    #endif
 
     #ifdef BOOST_DECIMAL_DEBUG_RYU
     // For some odd reason, this ends up with noise in the top 48 bits. We can
@@ -339,13 +334,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<long double>(long dou
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<long double>(long double val) noexcept -> floating_decimal_128
 {
-    #ifdef BOOST_DECIMAL_HAS_INT128
     auto bits = bit_cast<unsigned_128_type>(val);
-    #else
-    auto trivial_bits = bit_cast<trivial_uint128>(val);
-    unsigned_128_type bits {trivial_bits};
-    #endif
-
     return generic_binary_to_decimal(bits, 112, 15, false);
 }
 
@@ -356,13 +345,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<long double>(long dou
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<__float128>(__float128 val) noexcept -> floating_decimal_128
 {
-    #ifdef BOOST_DECIMAL_HAS_INT128
     auto bits = bit_cast<unsigned_128_type>(val);
-    #else
-    auto trivial_bits = bit_cast<trivial_uint128>(val);
-    unsigned_128_type bits {trivial_bits};
-    #endif
-
     return generic_binary_to_decimal(bits, 112, 15, false);
 }
 
@@ -417,13 +400,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<std::float64_t>(std::
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<std::float128_t>(std::float128_t d) noexcept -> floating_decimal_128
 {
-    #ifdef BOOST_DECIMAL_HAS_INT128
     auto bits = bit_cast<unsigned_128_type>(d);
-    #else
-    auto trivial_bits = bit_cast<trivial_uint128>(d);
-    unsigned_128_type bits {trivial_bits};
-    #endif
-
     return generic_binary_to_decimal(bits, 112, 15, false);
 }
 
