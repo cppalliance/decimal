@@ -336,11 +336,19 @@ public:
     constexpr auto operator+=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
 
+    template <typename Decimal>
+    constexpr auto operator+=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
+
     constexpr auto operator-=(decimal32 rhs) noexcept -> decimal32&;
 
     template <typename Integer>
     constexpr auto operator-=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+
+    template <typename Decimal>
+    constexpr auto operator-=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
 
     constexpr auto operator*=(decimal32 rhs) noexcept -> decimal32&;
 
@@ -348,11 +356,19 @@ public:
     constexpr auto operator*=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
 
+    template <typename Decimal>
+    constexpr auto operator*=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
+
     constexpr auto operator/=(decimal32 rhs) noexcept -> decimal32&;
 
     template <typename Integer>
     constexpr auto operator/=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+
+    template <typename Decimal>
+    constexpr auto operator/=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
 
     constexpr auto operator%=(decimal32 rhs) noexcept -> decimal32&;
 
@@ -976,6 +992,14 @@ constexpr auto decimal32::operator+=(Integer rhs) noexcept
     return *this;
 }
 
+template <typename Decimal>
+constexpr auto decimal32::operator+=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
+{
+    *this = *this + rhs;
+    return *this;
+}
+
 // NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
 constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
@@ -1088,6 +1112,14 @@ constexpr auto decimal32::operator--(int) noexcept -> decimal32
 }
 
 constexpr auto decimal32::operator-=(decimal32 rhs) noexcept -> decimal32&
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+template <typename Decimal>
+constexpr auto decimal32::operator-=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
 {
     *this = *this - rhs;
     return *this;
@@ -1628,6 +1660,14 @@ constexpr auto decimal32::operator*=(Integer rhs) noexcept
     return *this;
 }
 
+template <typename Decimal>
+constexpr auto decimal32::operator*=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
+{
+    *this = *this * rhs;
+    return *this;
+}
+
 constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
                                 detail::decimal32_components& q) noexcept -> void
 {
@@ -1853,6 +1893,13 @@ constexpr auto decimal32::operator/=(Integer rhs) noexcept
     return *this;
 }
 
+template <typename Decimal>
+constexpr auto decimal32::operator/=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
+{
+    *this = *this / rhs;
+    return *this;
+}
 
 constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
