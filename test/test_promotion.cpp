@@ -59,5 +59,36 @@ int main()
     static_assert(std::is_same<detail::promote_args_t<double, double, decimal32>, decimal32>::value, "False");
     static_assert(std::is_same<detail::promote_args_t<long double, double, decimal32>, decimal32>::value, "False");
 
+    static_assert(std::is_same<detail::promote_args_t<char, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<unsigned char, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<int, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<unsigned, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<long, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<unsigned long, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<long long, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<unsigned long long, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<float, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<double, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<long double, decimal64>, decimal64>::value, "False");
+
+    static_assert(std::is_same<detail::promote_args_t<char, double, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<unsigned char, double, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<int, double, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<unsigned, double, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<long, double, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<unsigned long, double, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<long long, double, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<unsigned long long, double, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<float, double, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<double, double, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<long double, double, decimal64>, decimal64>::value, "False");
+
+    static_assert(std::is_same<detail::promote_args_t<decimal32, decimal32>, decimal32>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal64, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal32, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal64, decimal32>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal32, decimal32, decimal64>, decimal64>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal32, decimal32, decimal32>, decimal32>::value, "False");
+
     return 0;
 }

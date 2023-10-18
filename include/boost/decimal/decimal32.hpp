@@ -32,6 +32,7 @@
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/comparison.hpp>
+#include <boost/decimal/detail/mixed_decimal_arithmetic.hpp>
 #include <boost/decimal/detail/to_integral.hpp>
 #include <boost/decimal/detail/to_float.hpp>
 #include <boost/decimal/detail/to_decimal.hpp>
@@ -219,6 +220,9 @@ public:
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
 
+    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr decimal32(Decimal val) noexcept;
+
     // 3.2.2.3 Conversion from integral type
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal32(Integer val) noexcept;
@@ -234,6 +238,9 @@ public:
     explicit constexpr operator std::uint8_t() const noexcept;
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
+
+    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr operator Decimal() const noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
@@ -329,11 +336,19 @@ public:
     constexpr auto operator+=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
 
+    template <typename Decimal>
+    constexpr auto operator+=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
+
     constexpr auto operator-=(decimal32 rhs) noexcept -> decimal32&;
 
     template <typename Integer>
     constexpr auto operator-=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+
+    template <typename Decimal>
+    constexpr auto operator-=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
 
     constexpr auto operator*=(decimal32 rhs) noexcept -> decimal32&;
 
@@ -341,11 +356,19 @@ public:
     constexpr auto operator*=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
 
+    template <typename Decimal>
+    constexpr auto operator*=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
+
     constexpr auto operator/=(decimal32 rhs) noexcept -> decimal32&;
 
     template <typename Integer>
     constexpr auto operator/=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+
+    template <typename Decimal>
+    constexpr auto operator/=(Decimal rhs) noexcept
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
 
     constexpr auto operator%=(decimal32 rhs) noexcept -> decimal32&;
 
@@ -969,6 +992,14 @@ constexpr auto decimal32::operator+=(Integer rhs) noexcept
     return *this;
 }
 
+template <typename Decimal>
+constexpr auto decimal32::operator+=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
+{
+    *this = *this + rhs;
+    return *this;
+}
+
 // NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
 constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
@@ -1081,6 +1112,14 @@ constexpr auto decimal32::operator--(int) noexcept -> decimal32
 }
 
 constexpr auto decimal32::operator-=(decimal32 rhs) noexcept -> decimal32&
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+template <typename Decimal>
+constexpr auto decimal32::operator-=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
 {
     *this = *this - rhs;
     return *this;
@@ -1435,6 +1474,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
     }
 }
 
+template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal32::decimal32(Decimal val) noexcept
+{
+    *this = to_decimal<decimal32>(val);
+}
+
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
@@ -1489,6 +1534,12 @@ constexpr decimal32::operator std::int16_t() const noexcept
 constexpr decimal32::operator std::uint16_t() const noexcept
 {
     return to_integral<decimal32, std::uint16_t>(*this);
+}
+
+template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal32::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal32 rhs) noexcept -> std::uint32_t
@@ -1604,6 +1655,14 @@ constexpr auto decimal32::operator*=(decimal32 rhs) noexcept -> decimal32&
 template <typename Integer>
 constexpr auto decimal32::operator*=(Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+template <typename Decimal>
+constexpr auto decimal32::operator*=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
 {
     *this = *this * rhs;
     return *this;
@@ -1834,6 +1893,13 @@ constexpr auto decimal32::operator/=(Integer rhs) noexcept
     return *this;
 }
 
+template <typename Decimal>
+constexpr auto decimal32::operator/=(Decimal rhs) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
+{
+    *this = *this / rhs;
+    return *this;
+}
 
 constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
