@@ -138,6 +138,8 @@ namespace local
   template<typename DecimalType, typename FloatType>
   auto test_pow_edge(const int tol_factor) -> bool
   {
+    static_cast<void>(tol_factor);
+
     using decimal_type = DecimalType;
     using float_type   = FloatType;
 
@@ -223,11 +225,11 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto test_pow_edge_is_ok = local::test_pow_edge<decimal_type, float_type>(512);
     const auto test_pow_pos_is_ok  = local::test_pow     <decimal_type, float_type>(512, false);
     const auto test_pow_neg_is_ok  = local::test_pow     <decimal_type, float_type>(512, true);
+    const auto test_pow_edge_is_ok = local::test_pow_edge<decimal_type, float_type>(512);
 
-    result_is_ok = (test_pow_pos_is_ok && test_pow_neg_is_ok && result_is_ok);
+    result_is_ok = (test_pow_pos_is_ok && test_pow_neg_is_ok && test_pow_edge_is_ok && result_is_ok);
   }
 
   {

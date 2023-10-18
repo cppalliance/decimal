@@ -91,7 +91,7 @@ constexpr auto pow(T x, T a) noexcept -> T
         {
             const auto a_log_x = a * log(x);
 
-            result = exp(a * log(x));
+            result = exp(a_log_x);
         }
     }
 
