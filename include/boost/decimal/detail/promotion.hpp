@@ -5,6 +5,7 @@
 #ifndef BOOST_DECIMAL_DETAIL_PROMOTION_HPP
 #define BOOST_DECIMAL_DETAIL_PROMOTION_HPP
 
+#include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <type_traits>
 #include <limits>
@@ -31,11 +32,10 @@ template<typename T1, typename T2>
 struct promote_2_args
 {
     using type = std::conditional_t<(is_decimal_floating_point_v<T1> && is_decimal_floating_point_v<T2>),
-                 std::conditional_t<(std::numeric_limits<T1>::digits > std::numeric_limits<T2>::digits), T1, T2>,
+                 std::conditional_t<(sizeof(T1) > sizeof(T2)), T1, T2>,
                  std::conditional_t<is_decimal_floating_point_v<T1>, T1,
                         std::conditional_t<is_decimal_floating_point_v<T2>, T2,
-                                std::conditional_t<(std::numeric_limits<promote_arg_t<T1>>::digits >
-                                                    std::numeric_limits<promote_arg_t<T2>>::digits),
+                                std::conditional_t<(sizeof(promote_arg_t<T1>) > sizeof(promote_arg_t<T2>)),
                                                     promote_arg_t<T1>, promote_arg_t<T2>>>>>;
 };
 

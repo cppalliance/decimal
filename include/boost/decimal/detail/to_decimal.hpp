@@ -20,17 +20,30 @@ namespace decimal {
 template <typename TargetType, typename Decimal>
 constexpr auto to_decimal(Decimal val) noexcept -> TargetType
 {
-    TargetType return_val {};
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Decimal, TargetType>::value)
+    if (isinf(val))
     {
-        return_val = val;
+        return val.isneg() ? -std::numeric_limits<TargetType>::infinity() :
+                              std::numeric_limits<TargetType>::infinity();
+    }
+    else if (issignaling(val))
+    {
+        return val.isneg() ? -std::numeric_limits<TargetType>::signaling_NaN() :
+                              std::numeric_limits<TargetType>::signaling_NaN();
+    }
+    else if (isnan(val))
+    {
+        return val.isneg() ? -std::numeric_limits<TargetType>::quiet_NaN() :
+                              std::numeric_limits<TargetType>::quiet_NaN();
+    }
+
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<TargetType, Decimal>::value)
+    {
+        return val;
     }
     else
     {
-        return_val = TargetType{val.full_significand(), val.biased_exponent(), val.isneg()};
+        return TargetType{val.full_significand(), val.biased_exponent(), val.isneg()};
     }
-
-    return return_val;
 }
 
 #else
@@ -38,6 +51,22 @@ constexpr auto to_decimal(Decimal val) noexcept -> TargetType
 template <typename TargetType, typename Decimal>
 constexpr auto to_decimal(Decimal val) noexcept -> TargetType
 {
+    if (isinf(val))
+    {
+        return val.isneg() ? -std::numeric_limits<TargetType>::infinity() :
+                              std::numeric_limits<TargetType>::infinity();
+    }
+    else if (issignaling(val))
+    {
+        return val.isneg() ? -std::numeric_limits<TargetType>::signaling_NaN() :
+                              std::numeric_limits<TargetType>::signaling_NaN();
+    }
+    else if (isnan(val))
+    {
+        return val.isneg() ? -std::numeric_limits<TargetType>::quiet_NaN() :
+                              std::numeric_limits<TargetType>::quiet_NaN();
+    }
+
     return TargetType{val.full_significand(), val.biased_exponent(), val.isneg()};
 }
 

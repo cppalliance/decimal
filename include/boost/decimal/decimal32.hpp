@@ -32,6 +32,7 @@
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/comparison.hpp>
+#include <boost/decimal/detail/mixed_decimal_arithmetic.hpp>
 #include <boost/decimal/detail/to_integral.hpp>
 #include <boost/decimal/detail/to_float.hpp>
 #include <boost/decimal/detail/to_decimal.hpp>
