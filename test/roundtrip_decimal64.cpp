@@ -4,7 +4,7 @@
 
 #include "mini_to_chars.hpp"
 
-#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <limits>
 #include <random>
@@ -223,6 +223,26 @@ void test_roundtrip_float_stream()
     }
 }
 
+void test_roundtrip_conversion_decimal32()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<int> dist(-9'999'999, 9'999'999);
+
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        const decimal64 val {dist(rng)};
+        const decimal32 short_dec(val);
+        const decimal64 return_decimal {short_dec};
+
+        if(!BOOST_TEST_EQ(val, return_decimal))
+        {
+            std::cerr << "       Val: " << val
+                      << "\n       Dec: " << short_dec
+                      << "\nReturn Dec: " << return_decimal << std::endl;
+        }
+    }
+}
+
 int main()
 {
     test_conversion_to_integer<int>();
@@ -298,6 +318,8 @@ int main()
     //test_roundtrip_conversion_float<std::bfloat16_t>();
     //test_roundtrip_float_stream<std::bfloat16_t>();
     #endif
+
+    test_roundtrip_conversion_decimal32();
 
     return boost::report_errors();
 }
