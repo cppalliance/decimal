@@ -75,7 +75,8 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
 }
 
 // GCC UBSAN warns of format truncation from the constexpr calculation of the format
-#ifdef __GNUC__
+// This warning was added in GCC 7.1
+#if __GNUC__ >= 7
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wformat-truncation"
 #endif
@@ -184,7 +185,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
     return os;
 }
 
-#ifdef __GNUC__
+#if __GNUC__ >= 7
 #  pragma GCC diagnostic pop
 #endif
 
