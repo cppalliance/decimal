@@ -494,6 +494,16 @@ public:
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator<<(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
     // <cmath> functions that need to be friends
     template <typename T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept
@@ -2069,6 +2079,32 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto operator<<(Integer lhs, decimal64 rhs) noexce
     const auto rhs_bits {to_bits(rhs)};
 
     return from_bits(static_cast<std::uint64_t>(lhs) << rhs_bits);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    const auto lhs_bits {to_bits(lhs)};
+    const auto rhs_bits {to_bits(rhs)};
+
+    return from_bits(lhs_bits >> rhs_bits);
+}
+
+template <typename Integer>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    const auto lhs_bits {to_bits(lhs)};
+
+    return from_bits(lhs_bits >> static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    const auto rhs_bits {to_bits(rhs)};
+
+    return from_bits(static_cast<std::uint64_t>(lhs) >> rhs_bits);
 }
 
 // 3.6.4
