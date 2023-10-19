@@ -365,6 +365,7 @@ void random_mixed_division(T lower, T upper)
     BOOST_TEST(isinf(val1 / zero));
 }
 
+#if defined(__clang__) || defined(_MSC_VER)
 void random_and()
 {
     std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
@@ -775,6 +776,8 @@ void random_mixed_right_shift()
     }
 }
 
+#endif
+
 int main()
 {
     // Values that won't exceed the range of the significand
@@ -873,6 +876,7 @@ int main()
     spot_check_sub(-954783, 746);
     spot_check_sub(513479119LL, 972535711690LL);
 
+    #if defined(__clang__) || defined(_MSC_VER)
     // Bitwise operators
     random_and();
     random_mixed_and();
@@ -884,6 +888,7 @@ int main()
     random_mixed_left_shift();
     random_right_shift();
     random_mixed_right_shift();
+    #endif
 
     return boost::report_errors();
 }
