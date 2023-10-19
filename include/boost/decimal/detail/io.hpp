@@ -74,6 +74,12 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     return is;
 }
 
+// GCC UBSAN warns of format truncation from the constexpr calculation of the format
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
+
 // 3.2.11 Formatted output
 template <typename charT, typename traits, typename DecimalType>
 auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
@@ -144,7 +150,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
 
     // Print the significand into the buffer so that we can insert the decimal point
     std::snprintf(buffer, sizeof(buffer), format, significand);
-    std::memmove(buffer + 2, buffer + 1, precision - 1);
+    std::memmove(buffer + 2, buffer + 1, static_cast<std::size_t>(precision - 1));
     std::memset(buffer + 1, '.', 1);
     os << buffer;
 
@@ -177,6 +183,10 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
 
     return os;
 }
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic pop
+#endif
 
 } //namespace decimal
 } //namespace boost
