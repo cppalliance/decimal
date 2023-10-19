@@ -443,6 +443,17 @@ public:
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
 
+    // Bitwise operators
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
     // <cmath> extensions
     // 3.6.4 Same Quantum
     friend constexpr auto samequantumd32(decimal32 lhs, decimal32 rhs) noexcept -> bool;
@@ -1972,6 +1983,32 @@ constexpr decimal32::operator std::bfloat16_t() const noexcept
     return static_cast<std::bfloat16_t>(to_float<decimal32, float>(*this));
 }
 #endif
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    const auto lhs_bits {to_bits(lhs)};
+    const auto rhs_bits {to_bits(rhs)};
+
+    return from_bits(lhs_bits & rhs_bits);
+}
+
+template <typename Integer>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal32 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    const auto lhs_bits {to_bits(lhs)};
+
+    return from_bits(lhs_bits & static_cast<std::uint32_t>(rhs));
+}
+
+template <typename Integer>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(Integer lhs, decimal32 rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    const auto rhs_bits {to_bits(rhs)};
+
+    return from_bits(static_cast<std::uint32_t>(lhs) & rhs_bits);
+}
 
 // 3.6.4
 // Effects: determines if the quantum exponents of x and y are the same.

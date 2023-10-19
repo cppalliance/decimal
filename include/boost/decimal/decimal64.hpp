@@ -453,6 +453,17 @@ public:
     // 3.6.6 Quantize
     friend constexpr auto quantized64(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
+    // Bit-wise operators
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
     // <cmath> functions that need to be friends
     template <typename T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept
@@ -1925,6 +1936,32 @@ constexpr auto operator<=>(Integer lhs, decimal64 rhs) noexcept -> std::enable_i
 }
 
 #endif
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    const auto lhs_bits {to_bits(lhs)};
+    const auto rhs_bits {to_bits(rhs)};
+
+    return from_bits(lhs_bits & rhs_bits);
+}
+
+template <typename Integer>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    const auto lhs_bits {to_bits(lhs)};
+
+    return from_bits(lhs_bits & static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    const auto rhs_bits {to_bits(rhs)};
+
+    return from_bits(static_cast<std::uint64_t>(lhs) & rhs_bits);
+}
 
 // 3.6.4
 // Effects: determines if the quantum exponents of x and y are the same.
