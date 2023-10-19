@@ -540,6 +540,88 @@ void random_mixed_or()
     }
 }
 
+void random_xor()
+{
+    std::uniform_int_distribution<std::uint32_t> dist(0, 9'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal32 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint32_t));
+        decimal32 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint32_t));
+
+        const decimal32 res {dec1 ^ dec2};
+        std::uint32_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint32_t));
+        const auto res_int {val1 ^ val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
+void random_mixed_xor()
+{
+    std::uniform_int_distribution<std::uint32_t> dist(0, 9'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal32 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint32_t));
+
+        const decimal32 res {dec1 ^ val2};
+        std::uint32_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint32_t));
+        const auto res_int {val1 ^ val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal32 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint32_t));
+
+        const decimal32 res {val1 ^ dec2};
+        std::uint32_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint32_t));
+        const auto res_int {val1 ^ val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
 int main()
 {
     // Values that won't exceed the range of the significand
@@ -662,6 +744,8 @@ int main()
     random_mixed_and();
     random_or();
     random_mixed_or();
+    random_xor();
+    random_mixed_xor();
 
     return boost::report_errors();
 }
