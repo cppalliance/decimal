@@ -33,8 +33,4 @@ struct numeric_limits<boost::decimal::decimal64>;
 
 } // Namespace std
 
-#define BOOST_DECIMAL_HUGE_VAL_D32 std::numeric_limits<boost::decimal::decimal32>::infinity()
-#define BOOST_DECIMAL_DEC_INFINITY std::numeric_limits<boost::decimal::decimal32>::infinity()
-#define BOOST_DECIMAL_DEC_NAN std::numeric_limits<boost::decimal::decimal32>::signaling_NaN()
-
 #endif // BOOST_DECIMAL_FWD_HPP
