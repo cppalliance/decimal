@@ -9,6 +9,7 @@
 #include <cstring>
 #include <cinttypes>
 #include <limits>
+#include <ios>
 #include <iostream>
 #include <type_traits>
 #include <system_error>
@@ -16,6 +17,7 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/attributes.hpp>
+#include <boost/decimal/detail/fenv_rounding.hpp>
 
 namespace boost {
 namespace decimal {
@@ -72,6 +74,13 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     return is;
 }
 
+// GCC UBSAN warns of format truncation from the constexpr calculation of the format
+// This warning was added in GCC 7.1
+#if __GNUC__ >= 7
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
+
 // 3.2.11 Formatted output
 template <typename charT, typename traits, typename DecimalType>
 auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
@@ -113,6 +122,8 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         return os;
     }
 
+    // const auto flags {os.flags()};
+    const auto precision {os.precision()};
     char buffer[detail::precision_v<DecimalType> + 2] {}; // Precision + decimal point + null terminator
 
     if (d.bits_.sign == 1)
@@ -121,12 +132,26 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
     }
 
     constexpr auto format {std::is_same<DecimalType, decimal32>::value ? "%" PRIu32 : "%" PRIu64};
-    const auto exp {d.biased_exponent()};
-    const auto significand {d.full_significand()};
+    auto exp {d.biased_exponent()};
+    auto significand {d.full_significand()};
+
+    auto significand_digits {detail::num_digits(significand)};
+    const bool reduced {significand_digits > precision};
+    while (significand_digits > precision + 1)
+    {
+        significand /= 10;
+        ++exp;
+        --significand_digits;
+    }
+
+    if (reduced)
+    {
+        exp += detail::fenv_round<DecimalType>(significand, d < 0);
+    }
 
     // Print the significand into the buffer so that we can insert the decimal point
     std::snprintf(buffer, sizeof(buffer), format, significand);
-    std::memmove(buffer + 2, buffer + 1, detail::precision_v<DecimalType> - 1);
+    std::memmove(buffer + 2, buffer + 1, static_cast<std::size_t>(precision - 1));
     std::memset(buffer + 1, '.', 1);
     os << buffer;
 
@@ -159,6 +184,10 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
 
     return os;
 }
+
+#if __GNUC__ >= 7
+#  pragma GCC diagnostic pop
+#endif
 
 } //namespace decimal
 } //namespace boost
