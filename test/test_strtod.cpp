@@ -6,6 +6,7 @@
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <random>
 #include <cwchar>
@@ -31,6 +32,7 @@ void roundtrip_strtod()
     {
         const T val {sig(rng), exp(rng)};
         std::stringstream ss;
+        ss << std::setprecision(std::numeric_limits<T>::digits10);
         ss << val;
         char* endptr {};
 
@@ -61,6 +63,7 @@ void roundtrip_wcstrtod()
     {
         const T val {sig(rng), exp(rng)};
         std::wstringstream ss;
+        ss << std::setprecision(std::numeric_limits<T>::digits10);
         ss << val;
         wchar_t* endptr {};
 

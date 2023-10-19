@@ -6,6 +6,7 @@
 #include <boost/decimal/decimal32.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 
 using namespace boost::decimal;
@@ -69,10 +70,16 @@ void test_istream()
 
 void test_ostream()
 {
-    decimal32 val {1234567, 0};
+    decimal32 val {123456, 0};
     std::stringstream out;
     out << val;
-    BOOST_TEST_CSTR_EQ(out.str().c_str(), "1.234567e+06");
+    BOOST_TEST_CSTR_EQ(out.str().c_str(), "1.23456e+05");
+
+    // Tests the default value of setprecision
+    decimal32 big_val {123456789, 0};
+    std::stringstream big_out;
+    big_out << big_val;
+    BOOST_TEST_CSTR_EQ(big_out.str().c_str(), "1.23457e+08");
 
     decimal32 zero {0, 0};
     std::stringstream zero_out;

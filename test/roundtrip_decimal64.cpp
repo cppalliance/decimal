@@ -9,6 +9,7 @@
 #include <limits>
 #include <random>
 #include <sstream>
+#include <iomanip>
 #include <cerrno>
 
 using namespace boost::decimal;
@@ -181,6 +182,7 @@ void test_roundtrip_integer_stream()
         const decimal64 first_val {dist(rng)};
         const T first_val_int {static_cast<T>(first_val)};
         std::stringstream ss;
+        ss << std::setprecision(std::numeric_limits<decimal64>::digits10);
         ss << first_val;
         decimal64 return_val {};
         ss >> return_val;
@@ -208,6 +210,7 @@ void test_roundtrip_float_stream()
         const decimal64 first_val {dist(rng)};
         const T first_val_flt {static_cast<T>(first_val)};
         std::stringstream ss;
+        ss << std::setprecision(std::numeric_limits<decimal64>::digits10);
         ss << first_val;
         decimal64 return_val {};
         ss >> return_val;
