@@ -376,6 +376,88 @@ void random_mixed_division(T lower, T upper)
     BOOST_TEST(isinf(val1 / zero));
 }
 
+void random_and()
+{
+    std::uniform_int_distribution<std::uint32_t> dist(0, 9'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal32 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint32_t));
+        decimal32 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint32_t));
+
+        const decimal32 res {dec1 & dec2};
+        std::uint32_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint32_t));
+        const auto res_int {val1 & val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
+void random_mixed_and()
+{
+    std::uniform_int_distribution<std::uint32_t> dist(0, 9'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal32 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint32_t));
+
+        const decimal32 res {dec1 & val2};
+        std::uint32_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint32_t));
+        const auto res_int {val1 & val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal32 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint32_t));
+
+        const decimal32 res {val1 & dec2};
+        std::uint32_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint32_t));
+        const auto res_int {val1 & val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
 int main()
 {
     // Values that won't exceed the range of the significand
@@ -492,6 +574,10 @@ int main()
     random_mixed_division(-5'000L, 5'000L);
     random_mixed_division(-5'000LL, 5'000LL);
     random_mixed_division(-sqrt_int_max, sqrt_int_max);
+
+    // Bitwise operators
+    random_and();
+    random_mixed_and();
 
     return boost::report_errors();
 }
