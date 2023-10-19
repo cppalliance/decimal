@@ -454,6 +454,16 @@ public:
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(Integer lhs, decimal32 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
     // <cmath> extensions
     // 3.6.4 Same Quantum
     friend constexpr auto samequantumd32(decimal32 lhs, decimal32 rhs) noexcept -> bool;
@@ -2003,11 +2013,37 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal32 lhs, Integer rhs) noexcep
 
 template <typename Integer>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(Integer lhs, decimal32 rhs) noexcept
--> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
 {
     const auto rhs_bits {to_bits(rhs)};
 
     return from_bits(static_cast<std::uint32_t>(lhs) & rhs_bits);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    const auto lhs_bits {to_bits(lhs)};
+    const auto rhs_bits {to_bits(rhs)};
+
+    return from_bits(lhs_bits | rhs_bits);
+}
+
+template <typename Integer>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(decimal32 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    const auto lhs_bits {to_bits(lhs)};
+
+    return from_bits(lhs_bits | static_cast<std::uint32_t>(rhs));
+}
+
+template <typename Integer>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(Integer lhs, decimal32 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    const auto rhs_bits {to_bits(rhs)};
+
+    return from_bits(static_cast<std::uint32_t>(lhs) | rhs_bits);
 }
 
 // 3.6.4
