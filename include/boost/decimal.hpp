@@ -13,5 +13,6 @@
 #include <boost/decimal/fenv.hpp>
 #include <boost/decimal/literals.hpp>
 #include <boost/decimal/hash.hpp>
+#include <boost/decimal/cfloat.hpp>
 
 #endif // BOOST_DECIMAL_HPP

@@ -49,6 +49,14 @@
 #include <boost/decimal/detail/cmath/next.hpp>
 #include <boost/decimal/numbers.hpp>
 
+// Macros from 3.6.2
+#define BOOST_DECIMAL_HUGE_VAL_D32 std::numeric_limits<boost::decimal::decimal32>::infinity()
+#define BOOST_DECIMAL_HUGE_VAL_D64 std::numeric_limits<boost::decimal::decimal64>::infinity()
+#define BOOST_DECIMAL_DEC_INFINITY std::numeric_limits<boost::decimal::decimal64>::infinity()
+#define BOOST_DECIMAL_DEC_NAN std::numeric_limits<boost::decimal::decimal64>::signaling_NaN()
+#define BOOST_DECIMAL_FP_FAST_FMAD32 1
+#define BOOST_DECIMAL_FP_FAST_FMAD64 1
+
 namespace boost { namespace decimal {
 
 constexpr auto scalbn(decimal32 num, int expval) noexcept -> decimal32
