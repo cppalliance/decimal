@@ -525,7 +525,6 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
 
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
-    bool big_combination {false};
 
     if (reduced_coeff == 0)
     {
@@ -553,9 +552,8 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     {
         // Have to use the full combination field
         bits_ |= detail::d32_comb_11_mask;
-        big_combination = true;
 
-        bits_ |= reduced_coeff & detail::d32_significand_mask;
+        bits_ |= (reduced_coeff & detail::d32_significand_mask);
         const auto remaining_bit {reduced_coeff & detail::d32_big_combination_field_mask};
 
         if (remaining_bit)
@@ -570,7 +568,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     const std::uint32_t biased_exp_low_six_bits {biased_exp_low_six << UINT32_C(20)};
 
     #ifdef BOOST_DECIMAL_DEBUG_D32_CONSTRUCTOR
-    if (biased_exp_low_six_bits > 0b111111)
+    if (biased_exp_low_six_bits > 0b111111'0000000000'0000000000)
     {
         return;
     }
@@ -582,29 +580,12 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
     else if (biased_exp <= detail::d32_exp_one_combination)
     {
-        if (big_combination)
-        {
-            bits_ |= detail::d32_comb_1101_mask;
-        }
-        else
-        {
-            bits_ |= detail::d32_comb_01_mask;
-        }
 
-        bits_ |= biased_exp_low_six_bits;
+        bits_ |= (detail::d32_comb_01_mask | biased_exp_low_six_bits);
     }
     else if (biased_exp <= detail::d32_max_biased_exp)
     {
-        if (big_combination)
-        {
-            bits_ |= detail::d32_comb_1110_mask;
-        }
-        else
-        {
-            bits_ |= detail::d32_comb_10_mask;
-        }
-
-        bits_ |= biased_exp_low_six_bits;
+        bits_ |= (detail::d32_comb_10_mask | biased_exp_low_six_bits);
     }
     else
     {
