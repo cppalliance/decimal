@@ -126,7 +126,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
     const auto precision {os.precision()};
     char buffer[detail::precision_v<DecimalType> + 2] {}; // Precision + decimal point + null terminator
 
-    if (d.bits_.sign == 1)
+    if (d.isneg() == 1)
     {
         os << "-";
     }
