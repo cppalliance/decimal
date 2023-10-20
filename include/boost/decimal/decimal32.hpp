@@ -73,6 +73,7 @@ static constexpr std::uint32_t d32_significand_mask = UINT32_C(0b0'00000'000000'
 
 static constexpr std::uint32_t d32_comb_01_mask = UINT32_C(0b0'01000'000000'0000000000'0000000000);
 static constexpr std::uint32_t d32_comb_10_mask = UINT32_C(0b0'10000'000000'0000000000'0000000000);
+static constexpr std::uint32_t d32_comb_00_01_10_significand_bits = UINT32_C(0b0'00111'000000'0000000000'0000000000);
 
 // This mask is used to determine if we use the masks above or below since 11 TTT is invalid
 static constexpr std::uint32_t d32_comb_11_mask = UINT32_C(0b0'11000'000000'0000000000'0000000000);
@@ -1381,10 +1382,10 @@ constexpr auto decimal32::full_significand() const noexcept -> std::uint32_t
 {
     std::uint32_t significand {};
 
-    if ((bits_.combination_field & detail::d32_comb_11_mask) == 0b11000)
+    if ((bits_ & detail::d32_comb_11_mask) == detail::d32_comb_11_mask)
     {
         // Only need the one bit of T because the other 3 are implied
-        if (bits_.combination_field & detail::d32_comb_11_significand_bits)
+        if (bits_ & detail::d32_comb_11_significand_bits)
         {
             significand = 0b1001'0000000000'0000000000;
         }
@@ -1395,10 +1396,10 @@ constexpr auto decimal32::full_significand() const noexcept -> std::uint32_t
     }
     else
     {
-        significand |= ((bits_.combination_field & 0b00111) << 20);
+        significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> 6;
     }
 
-    significand |= bits_.significand;
+    significand |= (bits_ & detail::d32_significand_mask);
 
     return significand;
 }
