@@ -636,11 +636,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
 constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32
 {
     decimal32 result;
-
-    result.bits_.exponent          = (bits & detail::d32_construct_sign_mask) >> 31U;
-    result.bits_.combination_field = (bits & detail::d32_construct_combination_mask) >> 26U;
-    result.bits_.exponent          = (bits & detail::d32_construct_exp_mask) >> 20U;
-    result.bits_.significand       =  bits & detail::d32_construct_significand_mask;
+    result.bits_ = bits;
 
     return result;
 }
