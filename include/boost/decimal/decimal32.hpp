@@ -66,7 +66,7 @@ static constexpr auto d32_exp_snan_mask = UINT32_C(0b0'10000'000000'0000000000'0
 // s 00 TTT (00)eeeeee (0TTT)[tttttttttt][tttttttttt]
 // s 01 TTT (01)eeeeee (0TTT)[tttttttttt][tttttttttt]
 // s 10 TTT (10)eeeeee (0TTT)[tttttttttt][tttttttttt]
-static constexpr std::uint32_t sign_mask = UINT32_C(0b1'00000'000000'0000000000'0000000000);
+static constexpr std::uint32_t d32_sign_mask = UINT32_C(0b1'00000'000000'0000000000'0000000000);
 
 static constexpr std::uint32_t d32_comb_01_mask = UINT32_C(0b0'01000'000000'0000000000'0000000000);
 static constexpr std::uint32_t d32_comb_10_mask = UINT32_C(0b0'10000'000000'0000000000'0000000000);
@@ -491,7 +491,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     {
         if (coeff < 0 || sign)
         {
-            bits_ |= detail::sign_mask;
+            bits_ |= detail::d32_sign_mask;
             isneg = true;
         }
         unsigned_coeff = coeff < static_cast<T>(0) ? static_cast<Unsigned_Integer>(detail::apply_sign(coeff)) :
@@ -501,7 +501,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     {
         if (sign)
         {
-            bits_ |= detail::sign_mask;
+            bits_ |= detail::d32_sign_mask;
             isneg = true;
         }
         unsigned_coeff = static_cast<Unsigned_Integer>(coeff);
@@ -643,7 +643,7 @@ constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32
 
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
-    return rhs.bits_.sign;
+    return rhs.bits_ & detail::d32_sign_mask;
 }
 
 constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
