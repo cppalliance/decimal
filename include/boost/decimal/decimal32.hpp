@@ -1412,7 +1412,7 @@ constexpr auto decimal32::edit_significand(T sig) noexcept -> void
 
 constexpr auto decimal32::isneg() const noexcept -> bool
 {
-    return static_cast<bool>(bits_.sign);
+    return static_cast<bool>(bits_ & detail::d32_sign_mask);
 }
 
 // Allows changing the sign even on nans and infs
