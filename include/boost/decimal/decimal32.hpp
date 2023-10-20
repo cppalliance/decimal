@@ -120,31 +120,7 @@ class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp
 {
 private:
 
-    using unsigned_layout_type = std::uint32_t;
-
-    // MSVC pragma that GCC and clang also support
-    #pragma pack(push, 1)
-    struct data_layout_
-    {
-        #ifdef BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
-
-        std::uint32_t significand : 20;
-        std::uint32_t exponent : 6;
-        std::uint32_t combination_field : 5;
-        std::uint32_t sign : 1;
-
-        #else
-
-        std::uint32_t sign : 1;
-        std::uint32_t combination_field : 5;
-        std::uint32_t exponent : 6;
-        std::uint32_t significand : 20;
-
-        #endif
-    };
-    #pragma pack(pop)
-
-    data_layout_ bits_{};
+    std::uint32_t bits_ {};
 
     // Returns the un-biased (quantum) exponent
     constexpr auto unbiased_exponent() const noexcept -> std::uint32_t;
@@ -508,19 +484,26 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     static_assert(detail::is_integral_v<T>, "Coefficient must be an integer");
     static_assert(detail::is_integral_v<T2>, "Exponent must be an integer");
 
+    bits_ = UINT32_C(0);
+    bool isneg {false};
     Unsigned_Integer unsigned_coeff {};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T>)
     {
-        bits_.sign = coeff < 0 || sign;
-        unsigned_coeff =
-            static_cast<Unsigned_Integer>
-            (
-                coeff < static_cast<T>(0) ? static_cast<Unsigned_Integer>(detail::apply_sign(coeff)) : static_cast<Unsigned_Integer>(coeff)
-            );
+        if (coeff < 0 || sign)
+        {
+            bits_ |= detail::sign_mask;
+            isneg = true;
+        }
+        unsigned_coeff = coeff < static_cast<T>(0) ? static_cast<Unsigned_Integer>(detail::apply_sign(coeff)) :
+                                                     static_cast<Unsigned_Integer>(coeff);
     }
     else
     {
-        bits_.sign = sign;
+        if (sign)
+        {
+            bits_ |= detail::sign_mask;
+            isneg = true;
+        }
         unsigned_coeff = static_cast<Unsigned_Integer>(coeff);
     }
 
@@ -537,88 +520,83 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     // Round as required
     if (reduced)
     {
-        exp += detail::fenv_round(unsigned_coeff, bits_.sign);
+        exp += detail::fenv_round(unsigned_coeff, isneg);
     }
 
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
-
-    // zero the combination field, so we can mask in the following
-    bits_.combination_field = 0;
-    bits_.significand = 0;
     bool big_combination {false};
 
     if (reduced_coeff == 0)
     {
-        bits_.significand = 0;
-        bits_.combination_field = 0;
-
         exp = 0;
     }
     else if (reduced_coeff <= detail::d32_no_combination)
     {
         // If the coefficient fits directly we don't need to use the combination field
-        bits_.significand = reduced_coeff;
+        // bits_.significand = reduced_coeff;
+        bits_ |= (reduced_coeff & detail::d32_no_combination);
     }
     else if (reduced_coeff <= detail::d32_big_combination)
     {
         // Break the number into 3 bits for the combination field and 20 bits for the significand field
 
         // Use the least significant 20 bits to set the significand
-        bits_.significand = reduced_coeff & detail::d32_no_combination;
+        bits_ |= (reduced_coeff & detail::d32_no_combination);
 
         // Now set the combination field (maximum of 3 bits)
-        auto remaining_bits {reduced_coeff & detail::d32_small_combination_field_mask};
-        remaining_bits >>= 20;
-
-        bits_.combination_field |= remaining_bits;
+        std::uint32_t remaining_bits {reduced_coeff & detail::d32_small_combination_field_mask};
+        remaining_bits <<= UINT32_C(6);
+        bits_ |= remaining_bits;
     }
     else
     {
         // Have to use the full combination field
-        bits_.combination_field |= detail::d32_comb_11_mask;
+        bits_ |= detail::d32_comb_11_mask;
         big_combination = true;
 
-        bits_.significand = reduced_coeff & detail::d32_no_combination;
+        bits_ |= reduced_coeff & detail::d32_no_combination;
         const auto remaining_bit {reduced_coeff & detail::d32_big_combination_field_mask};
 
         if (remaining_bit)
         {
-            bits_.combination_field |= 1U;
+            bits_ |= detail::d32_comb_11_significand_bits;
         }
     }
 
     // If the exponent fits we do not need to use the combination field
     std::uint32_t biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
     const std::uint32_t biased_exp_low_six {biased_exp & detail::d32_exp_combination_field_mask};
+    const std::uint32_t biased_exp_low_six_bits {biased_exp_low_six << UINT32_C(20)};
     if (biased_exp <= detail::d32_max_exp_no_combination)
     {
-        bits_.exponent = biased_exp;
+        std::uint32_t biased_exp_bits {biased_exp << UINT32_C(20)};
+        bits_ |= biased_exp_bits;
     }
     else if (biased_exp <= detail::d32_exp_one_combination)
     {
         if (big_combination)
         {
-            bits_.combination_field |= detail::d32_comb_1101_mask;
+            bits_ |= detail::d32_comb_1101_mask;
         }
         else
         {
-            bits_.combination_field |= detail::d32_comb_01_mask;
+            bits_ |= detail::d32_comb_01_mask;
         }
 
-        bits_.exponent = biased_exp_low_six;
+        bits_ |= biased_exp_low_six_bits;
     }
     else if (biased_exp <= detail::d32_max_biased_exp)
     {
         if (big_combination)
         {
-            bits_.combination_field |= detail::d32_comb_1110_mask;
+            bits_ |= detail::d32_comb_1110_mask;
         }
         else
         {
-            bits_.combination_field |= detail::d32_comb_10_mask;
+            bits_ |= detail::d32_comb_10_mask;
         }
 
-        bits_.exponent = biased_exp_low_six;
+        bits_ |= biased_exp_low_six_bits;
     }
     else
     {
@@ -641,16 +619,16 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
 
             if (detail::num_digits(reduced_coeff) <= detail::precision)
             {
-                *this = decimal32(reduced_coeff, exp, static_cast<bool>(bits_.sign));
+                *this = decimal32(reduced_coeff, exp, isneg);
             }
             else
             {
-                bits_.combination_field = detail::d32_comb_inf_mask;
+                bits_ |= detail::d32_comb_inf_mask;
             }
         }
         else
         {
-            bits_.combination_field = detail::d32_comb_inf_mask;
+            bits_ |= detail::d32_comb_inf_mask;
         }
     }
 }
