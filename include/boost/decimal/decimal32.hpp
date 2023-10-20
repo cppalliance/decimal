@@ -682,7 +682,7 @@ constexpr auto operator+(decimal32 rhs) noexcept -> decimal32
 
 constexpr auto operator-(decimal32 rhs) noexcept-> decimal32
 {
-    rhs.bits_.sign ^= 1U;
+    rhs.bits_ ^= detail::d32_sign_mask;
     return rhs;
 }
 
