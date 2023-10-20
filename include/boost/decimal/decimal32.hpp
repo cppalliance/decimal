@@ -648,7 +648,7 @@ constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) 
 
 constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
-    return (rhs.bits_.combination_field & detail::d32_comb_nan_mask) == detail::d32_comb_nan_mask;
+    return (rhs.bits_ & detail::d32_comb_nan_mask) == detail::d32_comb_nan_mask;
 }
 
 constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
