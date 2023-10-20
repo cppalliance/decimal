@@ -56,7 +56,7 @@ static constexpr auto d32_nan_mask      = UINT32_C(0b0'11111'000000'0000000000'0
 static constexpr auto d32_snan_mask     = UINT32_C(0b0'11111'100000'0000000000'0000000000);
 static constexpr auto d32_comb_inf_mask = UINT32_C(0b0'11110'000000'0000000000'0000000000);
 static constexpr auto d32_comb_nan_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
-static constexpr auto d32_exp_snan_mask = UINT32_C(0b0'10000'000000'0000000000'0000000000);
+static constexpr auto d32_exp_snan_mask = UINT32_C(0b0'00000'100000'0000000000'0000000000);
 
 // Masks to update the significand based on the combination field
 // In these first three 00, 01, or 10 are the leading 2 bits of the exp
@@ -648,12 +648,12 @@ constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) 
 
 constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
-    return (rhs.bits_ & detail::d32_comb_nan_mask) == detail::d32_comb_nan_mask;
+    return (rhs.bits_ & detail::d32_nan_mask) == detail::d32_nan_mask;
 }
 
 constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
-    return isnan(rhs) && (rhs.bits_.exponent & detail::d32_exp_snan_mask) == detail::d32_exp_snan_mask;
+    return (rhs.bits_ & detail::d32_snan_mask) == detail::d32_snan_mask;
 }
 
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
