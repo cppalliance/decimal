@@ -247,7 +247,10 @@ void test_addition()
 
     // Overflow
     constexpr decimal32 max_val((std::numeric_limits<decimal32>::max)());
-    BOOST_TEST(isinf(max_val + one));
+    if (!BOOST_TEST(isinf(max_val + one)))
+    {
+        std::cerr << std::bitset<32>(to_bits(max_val + one)) << std::endl;
+    }
 }
 
 void test_subtraction()
