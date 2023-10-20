@@ -658,7 +658,7 @@ constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 r
 
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
-    return ((rhs.bits_.combination_field & detail::d32_comb_inf_mask) == detail::d32_comb_inf_mask) && (!isnan(rhs));
+    return ((rhs.bits_ & detail::d32_nan_mask) == detail::d32_inf_mask);
 }
 
 constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
