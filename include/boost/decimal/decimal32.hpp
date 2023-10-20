@@ -565,13 +565,12 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
 
     // If the exponent fits we do not need to use the combination field
-    std::uint32_t biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
-    const std::uint32_t biased_exp_low_six {biased_exp & detail::d32_exp_combination_field_mask};
+    auto biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
+    const std::uint32_t biased_exp_low_six {biased_exp & detail::d32_max_exp_no_combination};
     const std::uint32_t biased_exp_low_six_bits {biased_exp_low_six << UINT32_C(20)};
     if (biased_exp <= detail::d32_max_exp_no_combination)
     {
-        std::uint32_t biased_exp_bits {biased_exp << UINT32_C(20)};
-        bits_ |= biased_exp_bits;
+        bits_ |= biased_exp_low_six_bits;
     }
     else if (biased_exp <= detail::d32_exp_one_combination)
     {
