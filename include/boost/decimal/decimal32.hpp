@@ -54,9 +54,9 @@ namespace detail {
 static constexpr auto d32_inf_mask      = UINT32_C(0b0'11110'000000'0000000000'0000000000);
 static constexpr auto d32_nan_mask      = UINT32_C(0b0'11111'000000'0000000000'0000000000);
 static constexpr auto d32_snan_mask     = UINT32_C(0b0'11111'100000'0000000000'0000000000);
-static constexpr auto d32_comb_inf_mask = UINT32_C(0b11110);
-static constexpr auto d32_comb_nan_mask = UINT32_C(0b11111);
-static constexpr auto d32_exp_snan_mask = UINT32_C(0b100000);
+static constexpr auto d32_comb_inf_mask = UINT32_C(0b0'11110'000000'0000000000'0000000000);
+static constexpr auto d32_comb_nan_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
+static constexpr auto d32_exp_snan_mask = UINT32_C(0b0'10000'000000'0000000000'0000000000);
 
 // Masks to update the significand based on the combination field
 // In these first three 00, 01, or 10 are the leading 2 bits of the exp
@@ -66,13 +66,15 @@ static constexpr auto d32_exp_snan_mask = UINT32_C(0b100000);
 // s 00 TTT (00)eeeeee (0TTT)[tttttttttt][tttttttttt]
 // s 01 TTT (01)eeeeee (0TTT)[tttttttttt][tttttttttt]
 // s 10 TTT (10)eeeeee (0TTT)[tttttttttt][tttttttttt]
-static constexpr std::uint32_t d32_comb_01_mask = 0b01000;
-static constexpr std::uint32_t d32_comb_10_mask = 0b10000;
+static constexpr std::uint32_t sign_mask = UINT32_C(0b1'00000'000000'0000000000'0000000000);
+
+static constexpr std::uint32_t d32_comb_01_mask = UINT32_C(0b0'01000'000000'0000000000'0000000000);
+static constexpr std::uint32_t d32_comb_10_mask = UINT32_C(0b0'10000'000000'0000000000'0000000000);
 
 // This mask is used to determine if we use the masks above or below since 11 TTT is invalid
-static constexpr std::uint32_t d32_comb_11_mask = 0b11000;
-static constexpr std::uint32_t d32_comb_11_exp_bits = 0b00110;
-static constexpr std::uint32_t d32_comb_11_significand_bits = 0b00001;
+static constexpr std::uint32_t d32_comb_11_mask = UINT32_C(0b0'11000'000000'0000000000'0000000000);
+static constexpr std::uint32_t d32_comb_11_exp_bits = UINT32_C(0b0'00110'000000'0000000000'0000000000);
+static constexpr std::uint32_t d32_comb_11_significand_bits = UINT32_C(0b0'00001'000000'0000000000'0000000000);
 
 // For these masks the first two bits of the combination field imply 100 T as the
 // leading bits of the significand and then bits 3 and 4 are the exp
@@ -82,26 +84,26 @@ static constexpr std::uint32_t d32_comb_11_significand_bits = 0b00001;
 // s 1101 T (01)eeeeee (100T)[tttttttttt][tttttttttt]
 // s 1110 T (10)eeeeee (100T)[tttttttttt][tttttttttt]
 // static constexpr std::uint32_t comb_1100_mask = 0b11000;
-static constexpr std::uint32_t d32_comb_1101_mask = 0b11010;
-static constexpr std::uint32_t d32_comb_1110_mask = 0b11100;
+static constexpr std::uint32_t d32_comb_1101_mask = UINT32_C(0b0'11010'000000'0000000000'0000000000);
+static constexpr std::uint32_t d32_comb_1110_mask = UINT32_C(0b0'11100'000000'0000000000'0000000000);
 
 // Powers of 2 used to determine the size of the significand
-static constexpr std::uint32_t d32_no_combination = 0b1111111111'1111111111;
-static constexpr std::uint32_t d32_big_combination = 0b0111'1111111111'1111111111;
+static constexpr std::uint32_t d32_no_combination = UINT32_C(0b1111111111'1111111111);
+static constexpr std::uint32_t d32_big_combination = UINT32_C(0b0111'1111111111'1111111111);
 
 // Exponent fields
-static constexpr std::uint32_t d32_max_exp_no_combination = 0b111111;
+static constexpr std::uint32_t d32_max_exp_no_combination = UINT32_C(0b111111);
 static constexpr std::uint32_t d32_exp_combination_field_mask = d32_max_exp_no_combination;
-static constexpr std::uint32_t d32_exp_one_combination = 0b1'111111;
-static constexpr std::uint32_t d32_max_biased_exp = 0b10'111111;
-static constexpr std::uint32_t d32_small_combination_field_mask = 0b0'00000'000111'0000000000'0000000000;
-static constexpr std::uint32_t d32_big_combination_field_mask = 0b0'00000'000001'0000000000'0000000000;
+static constexpr std::uint32_t d32_exp_one_combination = UINT32_C(0b1'111111);
+static constexpr std::uint32_t d32_max_biased_exp = UINT32_C(0b10'111111);
+static constexpr std::uint32_t d32_small_combination_field_mask = UINT32_C(0b0'00000'000111'0000000000'0000000000);
+static constexpr std::uint32_t d32_big_combination_field_mask = UINT32_C(0b0'00000'000001'0000000000'0000000000);
 
 // Constexpr construction from an uint32_t without having to memcpy
-static constexpr std::uint32_t d32_construct_sign_mask = 0b1'00000'000000'0000000000'0000000000;
-static constexpr std::uint32_t d32_construct_combination_mask = 0b0'11111'000000'0000000000'0000000000;
-static constexpr std::uint32_t d32_construct_exp_mask = 0b0'00000'111111'0000000000'0000000000;
-static constexpr std::uint32_t d32_construct_significand_mask = d32_no_combination;
+//static constexpr std::uint32_t d32_construct_sign_mask = UINT32_C(0b1'00000'000000'0000000000'0000000000);
+//static constexpr std::uint32_t d32_construct_combination_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
+//static constexpr std::uint32_t d32_construct_exp_mask = UINT32_C(0b0'00000'111111'0000000000'0000000000);
+//static constexpr std::uint32_t d32_construct_significand_mask = d32_no_combination;
 
 struct decimal32_components
 {
