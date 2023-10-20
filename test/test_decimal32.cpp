@@ -476,8 +476,6 @@ void test_shrink_significand()
 
 int main()
 {
-    test_comp();
-
     #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     test_binary_constructor();
     #endif
@@ -485,11 +483,6 @@ int main()
     test_decimal_constructor();
     test_non_finite_values();
     test_unary_arithmetic();
-
-    test_addition();
-    test_subtraction();
-    test_multiplicatiom();
-    test_div_mod();
 
     test_construct_from_integer<int>();
     test_construct_from_integer<long>();
@@ -501,6 +494,13 @@ int main()
     #ifdef BOOST_DECIMAL_HAS_FLOAT128
     test_construct_from_float<__float128>();
     #endif
+
+    test_comp();
+
+    test_addition();
+    test_subtraction();
+    test_multiplicatiom();
+    test_div_mod();
 
     test_hash();
 
