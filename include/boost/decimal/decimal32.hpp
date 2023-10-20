@@ -67,6 +67,9 @@ static constexpr auto d32_exp_snan_mask = UINT32_C(0b0'00000'100000'0000000000'0
 // s 01 TTT (01)eeeeee (0TTT)[tttttttttt][tttttttttt]
 // s 10 TTT (10)eeeeee (0TTT)[tttttttttt][tttttttttt]
 static constexpr std::uint32_t d32_sign_mask = UINT32_C(0b1'00000'000000'0000000000'0000000000);
+static constexpr std::uint32_t d32_combination_field_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
+static constexpr std::uint32_t d32_exponent_mask = UINT32_C(0b0'00000'111111'0000000000'0000000000);
+static constexpr std::uint32_t d32_significand_mask = UINT32_C(0b0'00000'000000'1111111111'1111111111);
 
 static constexpr std::uint32_t d32_comb_01_mask = UINT32_C(0b0'01000'000000'0000000000'0000000000);
 static constexpr std::uint32_t d32_comb_10_mask = UINT32_C(0b0'10000'000000'0000000000'0000000000);
@@ -534,14 +537,14 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     {
         // If the coefficient fits directly we don't need to use the combination field
         // bits_.significand = reduced_coeff;
-        bits_ |= (reduced_coeff & detail::d32_no_combination);
+        bits_ |= (reduced_coeff & detail::d32_significand_mask);
     }
     else if (reduced_coeff <= detail::d32_big_combination)
     {
         // Break the number into 3 bits for the combination field and 20 bits for the significand field
 
         // Use the least significant 20 bits to set the significand
-        bits_ |= (reduced_coeff & detail::d32_no_combination);
+        bits_ |= (reduced_coeff & detail::d32_significand_mask);
 
         // Now set the combination field (maximum of 3 bits)
         std::uint32_t remaining_bits {reduced_coeff & detail::d32_small_combination_field_mask};
@@ -554,7 +557,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         bits_ |= detail::d32_comb_11_mask;
         big_combination = true;
 
-        bits_ |= reduced_coeff & detail::d32_no_combination;
+        bits_ |= reduced_coeff & detail::d32_significand_mask;
         const auto remaining_bit {reduced_coeff & detail::d32_big_combination_field_mask};
 
         if (remaining_bit)
@@ -1348,18 +1351,17 @@ constexpr auto decimal32::unbiased_exponent() const noexcept -> std::uint32_t
 {
     std::uint32_t expval {};
 
-    if ((bits_.combination_field & detail::d32_comb_11_mask) == 0b11000)
+    if ((bits_ & detail::d32_comb_11_mask) == detail::d32_comb_11_mask)
     {
         // bits 2 and 3 are the exp part of the combination field
-        expval |= (bits_.combination_field & detail::d32_comb_11_exp_bits) << 5;
+        expval |= UINT32_C(0b11000000);
     }
-    else
+    else if ((bits_ & detail::d32_comb_11_mask) == detail::d32_comb_01_mask)
     {
-        // bits 0 and 1 are the exp part of the combination field
-        expval |= (bits_.combination_field & detail::d32_comb_11_mask) << 3;
+        expval |= UINT32_C(0b01000000);
     }
 
-    expval |= bits_.exponent;
+    expval |= (bits_ & detail::d32_exponent_mask) >> 20;
 
     return expval;
 }
