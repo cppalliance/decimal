@@ -490,7 +490,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
 
     bits_ = UINT32_C(0);
     bool isneg {false};
-    Unsigned_Integer unsigned_coeff {};
+    Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T>)
     {
         if (coeff < 0 || sign)
@@ -498,8 +498,6 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
             bits_ |= detail::d32_sign_mask;
             isneg = true;
         }
-        unsigned_coeff = coeff < static_cast<T>(0) ? static_cast<Unsigned_Integer>(detail::apply_sign(coeff)) :
-                                                     static_cast<Unsigned_Integer>(coeff);
     }
     else
     {
@@ -508,7 +506,6 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
             bits_ |= detail::d32_sign_mask;
             isneg = true;
         }
-        unsigned_coeff = static_cast<Unsigned_Integer>(coeff);
     }
 
     // If the coeff is not in range make it so
