@@ -1176,11 +1176,11 @@ constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if
 constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     if (isnan(lhs) || isnan(rhs) ||
-        (!lhs.bits_.sign && rhs.bits_.sign))
+        (!lhs.isneg() && rhs.isneg()))
     {
         return false;
     }
-    else if (lhs.bits_.sign && !rhs.bits_.sign)
+    else if (lhs.isneg() && !rhs.isneg())
     {
         return true;
     }
