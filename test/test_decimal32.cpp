@@ -410,7 +410,10 @@ void test_construct_from_integer()
     BOOST_TEST_EQ(static_cast<T>(edge_23), detail::d32_big_combination);
 
     constexpr decimal32 max_sig (detail::max_significand);
-    BOOST_TEST_EQ(static_cast<T>(max_sig), detail::max_significand);
+    if (!BOOST_TEST_EQ(static_cast<T>(max_sig), detail::max_significand))
+    {
+        std::cerr << "Bits: " << std::bitset<32>(to_bits(max_sig)) << std::endl;
+    }
 }
 
 template <typename T>
