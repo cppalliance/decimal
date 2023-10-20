@@ -1362,7 +1362,7 @@ constexpr auto decimal32::unbiased_exponent() const noexcept -> std::uint32_t
         expval |= UINT32_C(0b01000000);
     }
 
-    expval |= (bits_ & detail::d32_exponent_mask) >> 20;
+    expval |= (bits_ & detail::d32_exponent_mask) >> UINT32_C(20);
 
     return expval;
 }
@@ -1396,7 +1396,7 @@ constexpr auto decimal32::full_significand() const noexcept -> std::uint32_t
     }
     else
     {
-        significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> 6;
+        significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> UINT32_C(6);
     }
 
     significand |= (bits_ & detail::d32_significand_mask);
