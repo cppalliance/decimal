@@ -568,6 +568,14 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     auto biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
     const std::uint32_t biased_exp_low_six {biased_exp & detail::d32_max_exp_no_combination};
     const std::uint32_t biased_exp_low_six_bits {biased_exp_low_six << UINT32_C(20)};
+
+    #ifdef BOOST_DECIMAL_DEBUG_D32_CONSTRUCTOR
+    if (biased_exp_low_six_bits > 0b111111)
+    {
+        return;
+    }
+    #endif
+
     if (biased_exp <= detail::d32_max_exp_no_combination)
     {
         bits_ |= biased_exp_low_six_bits;
