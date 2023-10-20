@@ -1418,7 +1418,14 @@ constexpr auto decimal32::isneg() const noexcept -> bool
 // Allows changing the sign even on nans and infs
 constexpr auto decimal32::edit_sign(bool sign) noexcept -> void
 {
-    this->bits_.sign = static_cast<std::uint32_t>(sign);
+    if (sign)
+    {
+        bits_ |= detail::d32_sign_mask;
+    }
+    else
+    {
+        bits_ &= ~detail::d32_sign_mask;
+    }
 }
 
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
