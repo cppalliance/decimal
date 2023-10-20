@@ -694,9 +694,11 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
 
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "Starting sig lhs: " << sig_lhs
-              << "\nStarting sig rhs: " << sig_rhs << std::endl;
+    #ifdef BOOST_DECIMAL_DEBUG_ADD
+    std::cerr << "Starting sig lhs: " << lhs_sig
+              << "\nStarting exp lhs: " << lhs_exp
+              << "\nStarting sig rhs: " << rhs_sig
+              << "\nStarting exp rhs: " << rhs_exp << std::endl;
     #endif
 
     if (delta_exp > detail::precision + 1)
@@ -705,6 +707,12 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         // we return the larger of the two
         //
         // e.g. 1e20 + 1e-20 = 1e20
+
+        #ifdef BOOST_DECIMAL_DEBUG_ADD
+        std::cerr << "New sig: " << lhs_sig
+                  << "\nNew exp: " << lhs_exp
+                  << "\nNew neg: " << lhs_sign << std::endl;
+        #endif
 
         return {lhs_sig, lhs_exp, lhs_sign};
     }
@@ -718,12 +726,15 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         if (rhs_sig >= UINT32_C(5'000'000))
         {
             ++lhs_sig;
-            return {lhs_sig, lhs_exp, lhs_sign};
         }
-        else
-        {
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
+
+        #ifdef BOOST_DECIMAL_DEBUG_ADD
+        std::cerr << "New sig: " << lhs_sig
+                  << "\nNew exp: " << lhs_exp
+                  << "\nNew neg: " << lhs_sign << std::endl;
+        #endif
+
+        return {lhs_sig, lhs_exp, lhs_sign};
     }
 
     // The two numbers can be added together without special handling
@@ -764,9 +775,9 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     const auto new_exp {lhs_exp};
     const auto res_sig {detail::make_positive_unsigned(new_sig)};
 
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "Final sig lhs: " << sig_lhs
-              << "\nFinal sig rhs: " << sig_rhs
+    #ifdef BOOST_DECIMAL_DEBUG_ADD
+    std::cerr << "Final sig lhs: " << lhs_sig
+              << "\nFinal sig rhs: " << rhs_sig
               << "\nResult sig: " << new_sig << std::endl;
     #endif
 
