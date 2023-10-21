@@ -109,6 +109,8 @@ constexpr auto pow(T b, IntegralType p) noexcept -> std::enable_if_t<(detail::is
     }
     else
     {
+        using local_unsigned_integral_type = std::make_unsigned_t<IntegralType>;
+
         if (p == static_cast<local_integral_type>(UINT8_C(0)))
         {
             result = one;
@@ -117,8 +119,6 @@ constexpr auto pow(T b, IntegralType p) noexcept -> std::enable_if_t<(detail::is
         {
             if(p < static_cast<local_integral_type>(UINT8_C(0)))
             {
-                using local_unsigned_integral_type = std::make_unsigned_t<IntegralType>;
-
                 const auto up =
                     static_cast<local_unsigned_integral_type>
                     (
@@ -130,12 +130,12 @@ constexpr auto pow(T b, IntegralType p) noexcept -> std::enable_if_t<(detail::is
             }
             else
             {
-                result = detail::pow_impl(b, static_cast<std::make_unsigned_t<IntegralType>>( p));
+                result = detail::pow_impl(b, static_cast<local_unsigned_integral_type>(p));
             }
         }
         else
         {
-            result = detail::pow_impl(b, static_cast<std::make_unsigned_t<IntegralType>>( p));
+            result = detail::pow_impl(b, static_cast<local_unsigned_integral_type>(p));
         }
     }
 

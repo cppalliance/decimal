@@ -283,7 +283,7 @@ namespace local
   }
 
   template<typename DecimalType, typename FloatType>
-  auto test_pow_edge(const int tol_factor) -> bool
+  auto test_pow_edge() -> bool
   {
     const auto result_is_ok = true;
 
@@ -399,7 +399,6 @@ namespace local
     for(auto index = static_cast<int>(INT8_C(-11)); index <= static_cast<int>(INT8_C(-3)); index += static_cast<int>(INT8_C(2)))
     {
       const auto dec_zero_neg = pow(-::my_zero<decimal_type>(), decimal_type(index));
-      const auto flt_zero_neg = pow(static_cast<float_type>(-0.0L), static_cast<float_type>(index));
 
       const auto result_val_zero_neg_is_ok = (isinf(dec_zero_neg) && (!signbit(dec_zero_neg)));
 
@@ -609,7 +608,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto test_pow_edge_is_ok   = local::test_pow_edge  <decimal_type, float_type>(512);
+    const auto test_pow_edge_is_ok   = local::test_pow_edge  <decimal_type, float_type>();
     const auto test_pow_n_edge_is_ok = local::test_pow_n_edge<decimal_type, float_type>(512);
     const auto test_pow_pos_is_ok    = local::test_pow       <decimal_type, float_type>(512, false);
     const auto test_pow_neg_is_ok    = local::test_pow       <decimal_type, float_type>(512, true);
