@@ -30,8 +30,6 @@ constexpr auto pow(T b, IntegralType p) noexcept -> std::enable_if_t<(detail::is
 
     if (fpc_x == FP_ZERO)
     {
-        const auto p_is_neg = (p < static_cast<local_integral_type>(0));
-
         if(p < static_cast<local_integral_type>(0))
         {
             // pow(  +0, exp), where exp is a negative odd integer, returns +infinity.
@@ -111,21 +109,33 @@ constexpr auto pow(T b, IntegralType p) noexcept -> std::enable_if_t<(detail::is
     }
     else
     {
-        if (p < static_cast<local_integral_type>(UINT8_C(0)))
+        if (p == static_cast<local_integral_type>(UINT8_C(0)))
         {
-            using local_unsigned_integral_type = std::make_unsigned_t<IntegralType>;
-
-            const auto up = static_cast<local_unsigned_integral_type>(~p) + static_cast<local_unsigned_integral_type>(UINT8_C(1));
-
-            result = one / detail::pow_impl(b, up);
+            result = one;
         }
-        else if (p > static_cast<local_integral_type>(UINT8_C(0)))
+        else BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<local_integral_type>::value)
         {
-            result = detail::pow_impl(b, static_cast<std::make_unsigned_t<IntegralType>>( p));
+            if(p < static_cast<local_integral_type>(UINT8_C(0)))
+            {
+                using local_unsigned_integral_type = std::make_unsigned_t<IntegralType>;
+
+                const auto up =
+                    static_cast<local_unsigned_integral_type>
+                    (
+                          static_cast<local_unsigned_integral_type>(~p)
+                        + static_cast<local_unsigned_integral_type>(UINT8_C(1))
+                    );
+
+                result = one / detail::pow_impl(b, up);
+            }
+            else
+            {
+                result = detail::pow_impl(b, static_cast<std::make_unsigned_t<IntegralType>>( p));
+            }
         }
         else
         {
-            result = one;
+            result = detail::pow_impl(b, static_cast<std::make_unsigned_t<IntegralType>>( p));
         }
     }
 
