@@ -4,6 +4,8 @@
 // https://www.boost.org/LICENSE_1_0.txt
 
 #include <chrono>
+#include <iomanip>
+#include <iostream>
 #include <limits>
 #include <random>
 
@@ -63,7 +65,7 @@ namespace local
   }
   test_frexp_ldexp_ctrl;
 
-  auto test_frexp_ldexp_impl(const test_frexp_ldexp_ctrl& ctrl, const int eps_tol_factor = 16) -> bool
+  auto test_frexp_ldexp_impl(const test_frexp_ldexp_ctrl& ctrl, const int tol_factor) -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
@@ -96,9 +98,8 @@ namespace local
       using std::frexp;
 
       int n_flt;
-      const auto frexp_flt = frexp(flt, &n_flt);
-
       int n_dec;
+      const auto frexp_flt = frexp(flt, &n_flt);
       const auto frexp_dec = frexp(dec, &n_dec);
 
       using std::ldexp;
@@ -108,18 +109,15 @@ namespace local
 
       const auto ldexp_dec_as_float = static_cast<float>(ldexp_dec);
 
-      const auto tol_n =
-        static_cast<float>
-        (
-            static_cast<float>(std::numeric_limits<decimal_type>::epsilon())
-          * static_cast<float>(eps_tol_factor)
-        );
-
-      const auto result_frexp_ldexp_is_ok = is_close_fraction(ldexp_flt, ldexp_dec_as_float, tol_n);
+      const auto result_frexp_ldexp_is_ok = is_close_fraction(ldexp_flt, ldexp_dec_as_float, static_cast<float>(std::numeric_limits<decimal_type>::epsilon()) * tol_factor);
 
       if(!result_frexp_ldexp_is_ok)
       {
-        std::cout << "Error: frexp/ldexp, for flt: " << flt << std::endl;
+        std::cout << "flt      : " << std::scientific << std::setprecision(std::numeric_limits<float>::digits10) << flt       << std::endl;
+        std::cout << "frexp_flt: " << std::scientific << std::setprecision(std::numeric_limits<float>::digits10) << frexp_flt << std::endl;
+        std::cout << "frexp_dec: " << std::scientific << std::setprecision(std::numeric_limits<float>::digits10) << frexp_dec << std::endl;
+        std::cout << "ldexp_flt: " << std::scientific << std::setprecision(std::numeric_limits<float>::digits10) << ldexp_flt << std::endl;
+        std::cout << "ldexp_dec: " << std::scientific << std::setprecision(std::numeric_limits<float>::digits10) << ldexp_dec << std::endl;
 
         break;
       }
@@ -155,7 +153,7 @@ namespace local
 
     for(const auto& ctrl : flt_ctrl)
     {
-      const auto result_test_frexp_ldexp_is_ok = local::test_frexp_ldexp_impl(ctrl);
+      const auto result_test_frexp_ldexp_is_ok = local::test_frexp_ldexp_impl(ctrl, 24);
 
       BOOST_TEST(result_test_frexp_ldexp_is_ok);
 

@@ -225,12 +225,12 @@ namespace local
 
       BOOST_TEST(result_is_ok);
 
-      for(int p = -11; p <= -3; ++p)
+      for(auto p = -11; p <= -3; ++p)
       {
         using std::pow;
 
         const auto val_flt = pow(inv_pi_flt, static_cast<float_type>  (p));
-        const auto val_dec = pow(inv_pi_dec, static_cast<decimal_type>(p));
+        const auto val_dec = pow(inv_pi_dec, p);
 
         const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
 
@@ -255,12 +255,12 @@ namespace local
       const auto neg_pi_flt = -static_cast<float_type>(atan(static_cast<float_type>(1.0L)) * static_cast<float_type>(4.0L));
       const auto neg_pi_dec = -boost::decimal::numbers::pi_v<decimal_type>;
 
-      for(int p = 3; p < 12; ++p)
+      for(auto p = 3U; p < 12U; ++p)
       {
         using std::pow;
 
         const auto val_flt = pow(neg_pi_flt, static_cast<float_type>  (p));
-        const auto val_dec = pow(neg_pi_dec, static_cast<decimal_type>(p));
+        const auto val_dec = pow(neg_pi_dec, p);
 
         const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
 

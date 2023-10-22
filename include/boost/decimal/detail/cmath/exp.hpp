@@ -10,6 +10,7 @@
 #include <type_traits>
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
+#include <boost/decimal/detail/cmath/impl/pow_impl.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/numbers.hpp>
 
@@ -87,7 +88,7 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 }
                 else
                 {
-                    result *= pow(T { 2, 0 }, nf2);
+                    result *= detail::pow2<T>(nf2);
                 }
             }
         }

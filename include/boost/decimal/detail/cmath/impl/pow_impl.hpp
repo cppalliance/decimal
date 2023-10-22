@@ -17,28 +17,39 @@ namespace boost { namespace decimal { namespace detail {
 template<typename T, typename UnsignedIntegralType>
 constexpr auto pow_impl(T b, UnsignedIntegralType p) noexcept -> std::enable_if_t<(detail::is_decimal_floating_point_v<T> && std::is_integral<UnsignedIntegralType>::value && std::is_unsigned<UnsignedIntegralType>::value), T> // NOLINT(misc-no-recursion)
 {
-    // Calculate (b ^ p).
-
     using local_unsigned_integral_type = UnsignedIntegralType;
 
     constexpr T one { 1, 0 };
 
     T result { };
 
-    if     (p == static_cast<local_unsigned_integral_type>(UINT8_C(0))) { result = one; }
-    else if(p == static_cast<local_unsigned_integral_type>(UINT8_C(1))) { result = b; }
-    else if(p == static_cast<local_unsigned_integral_type>(UINT8_C(2))) { result = b; result *= b; }
-    else if(p == static_cast<local_unsigned_integral_type>(UINT8_C(3))) { result = b; result *= b; result *= b; }
-    else if(p == static_cast<local_unsigned_integral_type>(UINT8_C(4))) { result = b; result *= b; result *= result; }
+    if (p < static_cast<local_unsigned_integral_type>(UINT8_C(5)))
+    {
+        switch (p)
+        {
+            case static_cast<local_unsigned_integral_type>(UINT8_C(4)):
+                result = b; result *= result; result *= result; break;
+            case static_cast<local_unsigned_integral_type>(UINT8_C(3)):
+                result = b; result *= result; result *= b; break;
+            case static_cast<local_unsigned_integral_type>(UINT8_C(2)):
+                result = b; result *= result; break;
+            case static_cast<local_unsigned_integral_type>(UINT8_C(1)):
+                result = b; break;
+            case static_cast<local_unsigned_integral_type>(UINT8_C(0)):
+            default:
+                result = one; break;
+      }
+    }
     else
     {
+        // Calculate (b ^ p) using the ladder method for powers.
+
         result = one;
 
         T y(b);
 
         auto p_local = static_cast<local_unsigned_integral_type>(p);
 
-        // Use the so-called ladder method for the power calculation.
         for(;;)
         {
             const auto do_power_multiply =
@@ -58,6 +69,51 @@ constexpr auto pow_impl(T b, UnsignedIntegralType p) noexcept -> std::enable_if_
 
             y *= y;
         }
+    }
+
+    return result;
+}
+
+template<typename T>
+constexpr auto pow2(int e2) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+{
+    constexpr T one { 1, 0 };
+
+    T result { };
+
+    if(e2 > 0)
+    {
+        if(e2 < 64)
+        {
+            result = T { static_cast<std::uint64_t>(UINT64_C(1) << e2), 0 };
+        }
+        else
+        {
+            constexpr T two { 2, 0 };
+
+            result = detail::pow_impl(two, static_cast<unsigned>(e2));
+        }
+    }
+    else if(e2 < 0)
+    {
+        const auto e2_neg = static_cast<unsigned>(static_cast<unsigned>(~e2) + 1U);
+
+        if(e2 > -64)
+        {
+            const T local_p2 { static_cast<std::uint64_t>(UINT64_C(1) << e2_neg), 0 };
+
+            result = one / local_p2;
+        }
+        else
+        {
+            constexpr T half {5, -1};
+
+            result = detail::pow_impl(half, e2_neg);
+        }
+    }
+    else
+    {
+        result = one;
     }
 
     return result;
