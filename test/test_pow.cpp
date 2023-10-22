@@ -439,8 +439,6 @@ namespace local
       result_is_ok = (result_pow_is_ok && result_is_ok);
     }
 
-    using std::isnan;
-
     for(auto index = 0U; index < 4U; ++index)
     {
       using std::fpclassify;
@@ -576,6 +574,37 @@ namespace local
           && (isinf(dec_neg_pos)                              == isinf(flt_neg_pos))
           && (     (dec_pos_neg == ::my_zero<decimal_type>()) ==      (flt_pos_neg == static_cast<float_type>(0.0L)))
           && (isinf(dec_pos_pos)                              == isinf(flt_pos_pos))
+        );
+
+      BOOST_TEST(result_pow_is_ok);
+
+      result_is_ok = (result_pow_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 4U; ++index)
+    {
+      static_cast<void>(index);
+
+      const auto flt_a = dist_a(gen);
+
+      const auto dec_neg_nan = pow(-std::numeric_limits<decimal_type>::infinity(), std::numeric_limits<decimal_type>::quiet_NaN());
+      const auto dec_pos_nan = pow( std::numeric_limits<decimal_type>::infinity(), std::numeric_limits<decimal_type>::quiet_NaN());
+      const auto dec_nan_neg = pow( std::numeric_limits<decimal_type>::quiet_NaN(), -static_cast<decimal_type>(flt_a));
+      const auto dec_nan_pos = pow( std::numeric_limits<decimal_type>::quiet_NaN(),  static_cast<decimal_type>(flt_a));
+
+      const auto flt_neg_nan = pow(-std::numeric_limits<float_type>::infinity(), std::numeric_limits<float_type>::quiet_NaN());
+      const auto flt_pos_nan = pow( std::numeric_limits<float_type>::infinity(), std::numeric_limits<float_type>::quiet_NaN());
+      const auto flt_nan_neg = pow( std::numeric_limits<float_type>::quiet_NaN(), -flt_a);
+      const auto flt_nan_pos = pow( std::numeric_limits<float_type>::quiet_NaN(),  flt_a);
+
+      using std::isnan;
+
+      const auto result_pow_is_ok =
+        (
+             (isnan(dec_neg_nan) == isnan(flt_neg_nan))
+          && (isnan(dec_pos_nan) == isnan(flt_pos_nan))
+          && (isnan(dec_nan_neg) == isnan(flt_nan_neg))
+          && (isnan(dec_nan_pos) == isnan(flt_nan_pos))
         );
 
       BOOST_TEST(result_pow_is_ok);
