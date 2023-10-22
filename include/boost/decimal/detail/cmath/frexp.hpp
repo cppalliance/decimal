@@ -57,7 +57,7 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
                 / INT32_C(301)
             );
 
-        result_frexp *= detail::pow2<T>(-t);
+        result_frexp *= detail::pow_2_impl<T>(-t);
 
         // TODO(ckormanyos): Handle underflow/overflow if (or when) needed.
 

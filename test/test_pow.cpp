@@ -144,9 +144,9 @@ namespace local
     auto result_is_ok = true;
 
     {
-      using std::atan;
+      using std::acos;
 
-      const auto near_pi_flt = static_cast<float_type>(atan(static_cast<float_type>(1.0L)) * static_cast<float_type>(4.0L));
+      const auto near_pi_flt = acos(static_cast<float_type>(-1.0L));
       const auto near_pi_dec = boost::decimal::numbers::pi_v<decimal_type>;
 
       for(int p = 3; p < 12; ++p)
@@ -196,11 +196,13 @@ namespace local
       BOOST_TEST(result_is_ok);
     }
 
-    {
-      using std::atan;
+    constexpr decimal_type one { 1, 0 };
 
-      const auto inv_pi_flt = static_cast<float_type>(1.0L) / static_cast<float_type>(atan(static_cast<float_type>(1.0L)) * static_cast<float_type>(4.0L));
-      const auto inv_pi_dec = decimal_type { 1, 0 } / boost::decimal::numbers::pi_v<decimal_type>;
+    {
+      using std::acos;
+
+      const auto inv_pi_flt = static_cast<float_type>(1.0L) / acos(static_cast<float_type>(-1.0L));
+      const auto inv_pi_dec = one / boost::decimal::numbers::pi_v<decimal_type>;
 
       for(int p = 3; p < 12; ++p)
       {
@@ -250,9 +252,9 @@ namespace local
     }
 
     {
-      using std::atan;
+      using std::acos;
 
-      const auto neg_pi_flt = -static_cast<float_type>(atan(static_cast<float_type>(1.0L)) * static_cast<float_type>(4.0L));
+      const auto neg_pi_flt = -acos(static_cast<float_type>(-1.0L));
       const auto neg_pi_dec = -boost::decimal::numbers::pi_v<decimal_type>;
 
       for(auto p = 3U; p < 12U; ++p)
@@ -285,7 +287,301 @@ namespace local
   template<typename DecimalType, typename FloatType>
   auto test_pow_edge() -> bool
   {
-    const auto result_is_ok = true;
+    using decimal_type = DecimalType;
+    using float_type   = FloatType;
+
+    std::mt19937_64 gen;
+
+    gen.seed(time_point<typename std::mt19937_64::result_type>());
+
+    std::uniform_real_distribution<float_type>
+      dist
+      (
+        static_cast<float_type>(1.01L),
+        static_cast<float_type>(1.04L)
+      );
+
+    auto dist_x =
+      std::uniform_real_distribution<float_type>
+      {
+        static_cast<float_type>(1.0E-1L),
+        static_cast<float_type>(1.0E+1L)
+      };
+
+    auto dist_a =
+      std::uniform_real_distribution<float_type>
+      {
+        static_cast<float_type>(0.0123L),
+        static_cast<float_type>(12.3L)
+      };
+
+    constexpr decimal_type one { 1, 0 };
+
+    auto result_is_ok = true;
+
+    using std::pow;
+
+    for(auto index = 0U; index < 4U; ++index)
+    {
+      static_cast<void>(index);
+
+      const auto flt_near_one = dist(gen);
+
+      const auto dec_pos_pos = pow( std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one),  ::my_zero<decimal_type>());
+      const auto dec_pos_neg = pow( std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one), -::my_zero<decimal_type>());
+      const auto dec_neg_pos = pow(-std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one),  ::my_zero<decimal_type>());
+      const auto dec_neg_neg = pow(-std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one), -::my_zero<decimal_type>());
+
+      const auto flt_pos_pos = pow( std::numeric_limits<float_type>::quiet_NaN() * flt_near_one,  static_cast<float_type>(0.0L));
+      const auto flt_pos_neg = pow( std::numeric_limits<float_type>::quiet_NaN() * flt_near_one, -static_cast<float_type>(0.0L));
+      const auto flt_neg_pos = pow(-std::numeric_limits<float_type>::quiet_NaN() * flt_near_one,  static_cast<float_type>(0.0L));
+      const auto flt_neg_neg = pow(-std::numeric_limits<float_type>::quiet_NaN() * flt_near_one, -static_cast<float_type>(0.0L));
+
+      const auto result_pow_is_ok =
+        (
+             ((dec_pos_pos == one) == (flt_pos_pos == static_cast<float_type>(1.0L)))
+          && ((dec_pos_neg == one) == (flt_pos_neg == static_cast<float_type>(1.0L)))
+          && ((dec_neg_pos == one) == (flt_neg_pos == static_cast<float_type>(1.0L)))
+          && ((dec_neg_neg == one) == (flt_neg_neg == static_cast<float_type>(1.0L)))
+        );
+
+      BOOST_TEST(result_pow_is_ok);
+
+      result_is_ok = (result_pow_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 4U; ++index)
+    {
+      static_cast<void>(index);
+
+      const auto flt_near_one = dist(gen);
+
+      const auto dec_pos_pos = pow( std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(flt_near_one),  ::my_zero<decimal_type>());
+      const auto dec_pos_neg = pow( std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(flt_near_one), -::my_zero<decimal_type>());
+      const auto dec_neg_pos = pow(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(flt_near_one),  ::my_zero<decimal_type>());
+      const auto dec_neg_neg = pow(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(flt_near_one), -::my_zero<decimal_type>());
+
+      const auto flt_pos_pos = pow( std::numeric_limits<float_type>::infinity() * flt_near_one,  static_cast<float_type>(0.0L));
+      const auto flt_pos_neg = pow( std::numeric_limits<float_type>::infinity() * flt_near_one, -static_cast<float_type>(0.0L));
+      const auto flt_neg_pos = pow(-std::numeric_limits<float_type>::infinity() * flt_near_one,  static_cast<float_type>(0.0L));
+      const auto flt_neg_neg = pow(-std::numeric_limits<float_type>::infinity() * flt_near_one, -static_cast<float_type>(0.0L));
+
+      const auto result_pow_is_ok =
+        (
+             ((dec_pos_pos == one) == (flt_pos_pos == static_cast<float_type>(1.0L)))
+          && ((dec_pos_neg == one) == (flt_pos_neg == static_cast<float_type>(1.0L)))
+          && ((dec_neg_pos == one) == (flt_neg_pos == static_cast<float_type>(1.0L)))
+          && ((dec_neg_neg == one) == (flt_neg_neg == static_cast<float_type>(1.0L)))
+        );
+
+      BOOST_TEST(result_pow_is_ok);
+
+      result_is_ok = (result_pow_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 4U; ++index)
+    {
+      static_cast<void>(index);
+
+      const auto flt_x = dist_x(gen);
+
+      const auto dec_pos_pos = pow(static_cast<decimal_type>( flt_x),  ::my_zero<decimal_type>());
+      const auto dec_pos_neg = pow(static_cast<decimal_type>( flt_x), -::my_zero<decimal_type>());
+      const auto dec_neg_pos = pow(static_cast<decimal_type>(-flt_x),  ::my_zero<decimal_type>());
+      const auto dec_neg_neg = pow(static_cast<decimal_type>(-flt_x), -::my_zero<decimal_type>());
+
+      const auto flt_pos_pos = pow( flt_x,  static_cast<float_type>(0.0L));
+      const auto flt_pos_neg = pow( flt_x, -static_cast<float_type>(0.0L));
+      const auto flt_neg_pos = pow(-flt_x,  static_cast<float_type>(0.0L));
+      const auto flt_neg_neg = pow(-flt_x, -static_cast<float_type>(0.0L));
+
+      const auto result_pow_is_ok =
+        (
+             ((dec_pos_pos == one) == (flt_pos_pos == static_cast<float_type>(1.0L)))
+          && ((dec_pos_neg == one) == (flt_pos_neg == static_cast<float_type>(1.0L)))
+          && ((dec_neg_pos == one) == (flt_neg_pos == static_cast<float_type>(1.0L)))
+          && ((dec_neg_neg == one) == (flt_neg_neg == static_cast<float_type>(1.0L)))
+        );
+
+      BOOST_TEST(result_pow_is_ok);
+
+      result_is_ok = (result_pow_is_ok && result_is_ok);
+    }
+
+    using std::isinf;
+
+    for(auto index = 0U; index < 4U; ++index)
+    {
+      static_cast<void>(index);
+
+      const float_type flt_a = dist_a(gen);
+
+      const auto dec_nrm_pos = pow(::my_zero<decimal_type>(),  static_cast<decimal_type>(flt_a));
+      const auto dec_nrm_neg = pow(::my_zero<decimal_type>(), -static_cast<decimal_type>(flt_a));
+      const auto dec_inf_pos = pow(::my_zero<decimal_type>(),  std::numeric_limits<decimal_type>::infinity());
+      const auto dec_inf_neg = pow(::my_zero<decimal_type>(), -std::numeric_limits<decimal_type>::infinity());
+
+      const auto flt_nrm_pos = pow(static_cast<float_type>(0.0L),  flt_a);
+      const auto flt_nrm_neg = pow(static_cast<float_type>(0.0L), -flt_a);
+      const auto flt_inf_pos = pow(static_cast<float_type>(0.0L),  std::numeric_limits<float_type>::infinity());
+      const auto flt_inf_neg = pow(static_cast<float_type>(0.0L), -std::numeric_limits<float_type>::infinity());
+
+      const auto result_pow_is_ok =
+        (
+             (     (dec_nrm_pos  == ::my_zero<decimal_type>()) ==      (flt_nrm_pos == static_cast<float_type>(0.0L)))
+          && (isinf(dec_nrm_neg)                               == isinf(flt_nrm_neg))
+          && (     (dec_inf_pos  == ::my_zero<decimal_type>()) ==      (flt_inf_pos == static_cast<float_type>(0.0L)))
+          && (isinf(dec_inf_neg)                               == isinf(flt_inf_neg))
+        );
+
+      BOOST_TEST(result_pow_is_ok);
+
+      result_is_ok = (result_pow_is_ok && result_is_ok);
+    }
+
+    using std::isnan;
+
+    for(auto index = 0U; index < 4U; ++index)
+    {
+      using std::fpclassify;
+
+      static_cast<void>(index);
+
+      const auto flt_a = dist_a(gen);
+
+      const auto dec_pos_pos = pow( ::my_zero<decimal_type>(), std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_a));
+      const auto dec_neg_pos = pow(-::my_zero<decimal_type>(), std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_a));
+
+      const auto flt_pos_pos = pow( static_cast<float_type>(0.0L), std::numeric_limits<float_type>::quiet_NaN() * flt_a);
+      const auto flt_neg_pos = pow(-static_cast<float_type>(0.0L), std::numeric_limits<float_type>::quiet_NaN() * flt_a);
+
+      const auto result_pow_is_ok =
+        (
+             ((fpclassify(dec_pos_pos) == FP_NAN) == (fpclassify(flt_pos_pos) == FP_NAN))
+          && ((fpclassify(dec_neg_pos) == FP_NAN) == (fpclassify(flt_neg_pos) == FP_NAN))
+        );
+
+      BOOST_TEST(result_pow_is_ok);
+
+      result_is_ok = (result_pow_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 4U; ++index)
+    {
+      static_cast<void>(index);
+
+      const auto flt_x = dist_x(gen);
+
+      const auto dec_pos_pos = pow( static_cast<decimal_type>(flt_x),  ::my_zero<decimal_type>());
+      const auto dec_pos_neg = pow( static_cast<decimal_type>(flt_x), -::my_zero<decimal_type>());
+      const auto dec_neg_pos = pow(-static_cast<decimal_type>(flt_x),  ::my_zero<decimal_type>());
+      const auto dec_neg_neg = pow(-static_cast<decimal_type>(flt_x), -::my_zero<decimal_type>());
+
+      const auto flt_pos_pos = pow( flt_x,  static_cast<float_type>(0.0L));
+      const auto flt_pos_neg = pow( flt_x, -static_cast<float_type>(0.0L));
+      const auto flt_neg_pos = pow(-flt_x,  static_cast<float_type>(0.0L));
+      const auto flt_neg_neg = pow(-flt_x, -static_cast<float_type>(0.0L));
+
+      const auto result_pow_is_ok =
+        (
+             ((dec_pos_pos == one) == (flt_pos_pos == static_cast<float_type>(1.0L)))
+          && ((dec_pos_neg == one) == (flt_pos_neg == static_cast<float_type>(1.0L)))
+          && ((dec_neg_pos == one) == (flt_neg_pos == static_cast<float_type>(1.0L)))
+          && ((dec_neg_neg == one) == (flt_neg_neg == static_cast<float_type>(1.0L)))
+        );
+
+      BOOST_TEST(result_pow_is_ok);
+
+      result_is_ok = (result_pow_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 4U; ++index)
+    {
+      static_cast<void>(index);
+
+      const auto flt_near_one = dist(gen);
+
+      const auto flt_lt1 = static_cast<float_type>(1.0L) / flt_near_one;
+      const auto flt_gt1 = static_cast<float_type>(1.0L) * flt_near_one;
+
+      const auto dec_neg_lt1 = pow(static_cast<decimal_type>(flt_gt1), -std::numeric_limits<decimal_type>::infinity());
+      const auto dec_pos_lt1 = pow(static_cast<decimal_type>(flt_lt1),  std::numeric_limits<decimal_type>::infinity());
+      const auto dec_neg_gt1 = pow(static_cast<decimal_type>(flt_gt1), -std::numeric_limits<decimal_type>::infinity());
+      const auto dec_pos_gt1 = pow(static_cast<decimal_type>(flt_lt1),  std::numeric_limits<decimal_type>::infinity());
+
+      const auto flt_neg_lt1 = pow(flt_gt1, -std::numeric_limits<float_type>::infinity());
+      const auto flt_pos_lt1 = pow(flt_lt1,  std::numeric_limits<float_type>::infinity());
+      const auto flt_neg_gt1 = pow(flt_gt1, -std::numeric_limits<float_type>::infinity());
+      const auto flt_pos_gt1 = pow(flt_lt1,  std::numeric_limits<float_type>::infinity());
+
+      const auto result_pow_is_ok =
+        (
+             (isinf(dec_neg_lt1) ==                          isinf(flt_neg_lt1))
+          && (     (dec_pos_lt1  == ::my_zero<decimal_type>()) == (flt_pos_lt1 == static_cast<float_type>(0.0L)))
+          && (     (dec_neg_gt1  == ::my_zero<decimal_type>()) == (flt_neg_gt1 == static_cast<float_type>(0.0L)))
+          && (isinf(dec_pos_gt1) ==                          isinf(flt_pos_gt1))
+        );
+
+      BOOST_TEST(result_pow_is_ok);
+
+      result_is_ok = (result_pow_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 4U; ++index)
+    {
+      static_cast<void>(index);
+
+      const auto flt_a = dist_a(gen);
+
+      const auto dec_neg_neg = pow(-std::numeric_limits<decimal_type>::infinity(), -static_cast<decimal_type>(flt_a));
+      const auto dec_neg_pos = pow(-std::numeric_limits<decimal_type>::infinity(),  static_cast<decimal_type>(flt_a));
+      const auto dec_pos_neg = pow( std::numeric_limits<decimal_type>::infinity(), -static_cast<decimal_type>(flt_a));
+      const auto dec_pos_pos = pow( std::numeric_limits<decimal_type>::infinity(),  static_cast<decimal_type>(flt_a));
+
+      const auto flt_neg_neg = pow(-std::numeric_limits<float_type>::infinity(), -flt_a);
+      const auto flt_neg_pos = pow(-std::numeric_limits<float_type>::infinity(),  flt_a);
+      const auto flt_pos_neg = pow( std::numeric_limits<float_type>::infinity(), -flt_a);
+      const auto flt_pos_pos = pow( std::numeric_limits<float_type>::infinity(),  flt_a);
+
+      const auto result_pow_is_ok =
+        (
+             (     (dec_neg_neg == ::my_zero<decimal_type>()) ==      (flt_neg_neg == static_cast<float_type>(0.0L)))
+          && (isinf(dec_neg_pos)                              == isinf(flt_neg_pos))
+          && (     (dec_pos_neg == ::my_zero<decimal_type>()) ==      (flt_pos_neg == static_cast<float_type>(0.0L)))
+          && (isinf(dec_pos_pos)                              == isinf(flt_pos_pos))
+        );
+
+      BOOST_TEST(result_pow_is_ok);
+
+      result_is_ok = (result_pow_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 4U; ++index)
+    {
+      static_cast<void>(index);
+
+      const auto dec_neg_neg = pow(-std::numeric_limits<decimal_type>::infinity(), -std::numeric_limits<decimal_type>::infinity());
+      const auto dec_neg_pos = pow(-std::numeric_limits<decimal_type>::infinity(),  std::numeric_limits<decimal_type>::infinity());
+      const auto dec_pos_neg = pow( std::numeric_limits<decimal_type>::infinity(), -std::numeric_limits<decimal_type>::infinity());
+      const auto dec_pos_pos = pow( std::numeric_limits<decimal_type>::infinity(),  std::numeric_limits<decimal_type>::infinity());
+
+      const auto flt_neg_neg = pow(-std::numeric_limits<float_type>::infinity(), -std::numeric_limits<float_type>::infinity());
+      const auto flt_neg_pos = pow(-std::numeric_limits<float_type>::infinity(),  std::numeric_limits<float_type>::infinity());
+      const auto flt_pos_neg = pow( std::numeric_limits<float_type>::infinity(), -std::numeric_limits<float_type>::infinity());
+      const auto flt_pos_pos = pow( std::numeric_limits<float_type>::infinity(),  std::numeric_limits<float_type>::infinity());
+
+      const auto result_pow_is_ok =
+        (
+             (     (dec_neg_neg == ::my_zero<decimal_type>()) ==      (flt_neg_neg == static_cast<float_type>(0.0L)))
+          && (isinf(dec_neg_pos)                              == isinf(flt_neg_pos))
+          && (     (dec_pos_neg == ::my_zero<decimal_type>()) ==      (flt_pos_neg == static_cast<float_type>(0.0L)))
+          && (isinf(dec_pos_pos)                              == isinf(flt_pos_pos))
+        );
+
+      BOOST_TEST(result_pow_is_ok);
+
+      result_is_ok = (result_pow_is_ok && result_is_ok);
+    }
 
     return result_is_ok;
   }

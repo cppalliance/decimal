@@ -103,7 +103,7 @@ constexpr auto pow(T b, IntegralType p) noexcept -> std::enable_if_t<(detail::is
             }
         }
     }
-    else if (fpc_x == FP_NAN)
+    else if (fpc_x != FP_NORMAL)
     {
         result = ((p == static_cast<local_integral_type>(UINT8_C(0))) ? one : std::numeric_limits<T>::quiet_NaN());
     }
@@ -126,16 +126,16 @@ constexpr auto pow(T b, IntegralType p) noexcept -> std::enable_if_t<(detail::is
                         + static_cast<local_unsigned_integral_type>(UINT8_C(1))
                     );
 
-                result = one / detail::pow_impl(b, up);
+                result = one / detail::pow_n_impl(b, up);
             }
             else
             {
-                result = detail::pow_impl(b, static_cast<local_unsigned_integral_type>(p));
+                result = detail::pow_n_impl(b, static_cast<local_unsigned_integral_type>(p));
             }
         }
         else
         {
-            result = detail::pow_impl(b, static_cast<local_unsigned_integral_type>(p));
+            result = detail::pow_n_impl(b, static_cast<local_unsigned_integral_type>(p));
         }
     }
 
@@ -157,35 +157,47 @@ constexpr auto pow(T x, T a) noexcept -> std::enable_if_t<detail::is_decimal_flo
     }
     else
     {
+        constexpr T one  { 1, 0 };
+
         const auto fpc_x = fpclassify(x);
         const auto fpc_a = fpclassify(a);
 
-        // For non-normal arguments and special cases, see:
-        //   https://en.cppreference.com/w/cpp/numeric/math/pow
-        // TODO(ckormanyos) Not yet finished.
-
-        if (fpc_x == FP_ZERO)
+        if (fpc_a == FP_ZERO)
         {
-            if (fpc_a == FP_NORMAL)
-            {
-                const auto x_is_neg = signbit(x);
+            // pow(base, +/-0) returns 1 for any base, even when base is NaN.
 
-                if      ((!x_is_neg))                  { result =  std::numeric_limits<T>::infinity(); }
-                else if (  x_is_neg )                  { result = -std::numeric_limits<T>::infinity(); }
-                else if (  x_is_neg)                   { result =  std::numeric_limits<T>::infinity(); }
-                else if ((!x_is_neg))                  { result =  zero; }
-                else if (  x_is_neg )                  { result = -zero; }
-                else if ((!x_is_neg) && (!signbit(a))) { result =  zero; }
-            }
-            else if (fpc_a == FP_INFINITE)
+            result = one;
+        }
+        else if (fpc_x == FP_ZERO)
+        {
+            if ((fpc_a == FP_NORMAL) || (fpc_a == FP_INFINITE))
             {
+                // pow(+/-0, exp), where exp is negative and finite, returns +infinity.
+                // pow(+/-0, exp), where exp is positive non-integer, returns +0.
+
+                // pow(+/-0, -infinity) returns +infinity.
+                // pow(+/-0, +infinity) returns +0.
+
                 result = (signbit(a) ? std::numeric_limits<T>::infinity() : zero);
+            }
+            else if (fpc_a == FP_NAN)
+            {
+                result = std::numeric_limits<T>::quiet_NaN();
             }
         }
         else if (fpc_x == FP_INFINITE)
         {
-            // TBD: Infinite |base| still needed.
-            result = zero;
+            if ((fpc_a == FP_NORMAL) || (fpc_a == FP_INFINITE))
+            {
+                // pow(+infinity, exp) returns +0 for any negative exp.
+                // pow(-infinity, exp) returns +infinity for any positive exp.
+
+                result = (signbit(a) ? zero : std::numeric_limits<T>::infinity());
+            }
+            else if (fpc_a == FP_NAN)
+            {
+                result = std::numeric_limits<T>::quiet_NaN();
+            }
         }
         else if (fpc_x != FP_NORMAL)
         {
@@ -193,8 +205,6 @@ constexpr auto pow(T x, T a) noexcept -> std::enable_if_t<detail::is_decimal_flo
         }
         else
         {
-            constexpr T one  { 1, 0 };
-
             using std::abs;
 
             if (fpc_a == FP_ZERO)

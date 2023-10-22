@@ -41,7 +41,7 @@ constexpr auto ldexp(T v, int e2) noexcept -> T
 
         if(e2 != 0)
         {
-            result *= detail::pow2<T>(e2);
+            result *= detail::pow_2_impl<T>(e2);
         }
     }
 

@@ -15,7 +15,7 @@
 namespace boost { namespace decimal { namespace detail {
 
 template<typename T, typename UnsignedIntegralType>
-constexpr auto pow_impl(T b, UnsignedIntegralType p) noexcept -> std::enable_if_t<(detail::is_decimal_floating_point_v<T> && std::is_integral<UnsignedIntegralType>::value && std::is_unsigned<UnsignedIntegralType>::value), T> // NOLINT(misc-no-recursion)
+constexpr auto pow_n_impl(T b, UnsignedIntegralType p) noexcept -> std::enable_if_t<(detail::is_decimal_floating_point_v<T> && std::is_integral<UnsignedIntegralType>::value && std::is_unsigned<UnsignedIntegralType>::value), T> // NOLINT(misc-no-recursion)
 {
     using local_unsigned_integral_type = UnsignedIntegralType;
 
@@ -75,7 +75,7 @@ constexpr auto pow_impl(T b, UnsignedIntegralType p) noexcept -> std::enable_if_
 }
 
 template<typename T>
-constexpr auto pow2(int e2) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+constexpr auto pow_2_impl(int e2) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T one { 1, 0 };
 
@@ -91,7 +91,7 @@ constexpr auto pow2(int e2) noexcept -> std::enable_if_t<detail::is_decimal_floa
         {
             constexpr T two { 2, 0 };
 
-            result = detail::pow_impl(two, static_cast<unsigned>(e2));
+            result = detail::pow_n_impl(two, static_cast<unsigned>(e2));
         }
     }
     else if(e2 < 0)
@@ -108,7 +108,7 @@ constexpr auto pow2(int e2) noexcept -> std::enable_if_t<detail::is_decimal_floa
         {
             constexpr T half {5, -1};
 
-            result = detail::pow_impl(half, e2_neg);
+            result = detail::pow_n_impl(half, e2_neg);
         }
     }
     else

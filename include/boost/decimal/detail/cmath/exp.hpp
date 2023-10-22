@@ -88,7 +88,7 @@ constexpr auto exp(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
                 }
                 else
                 {
-                    result *= detail::pow2<T>(nf2);
+                    result *= detail::pow_2_impl<T>(nf2);
                 }
             }
         }
