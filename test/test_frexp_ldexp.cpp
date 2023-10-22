@@ -153,7 +153,7 @@ namespace local
 
     for(const auto& ctrl : flt_ctrl)
     {
-      const auto result_test_frexp_ldexp_is_ok = local::test_frexp_ldexp_impl(ctrl, 24);
+      const auto result_test_frexp_ldexp_is_ok = local::test_frexp_ldexp_impl(ctrl, 16);
 
       BOOST_TEST(result_test_frexp_ldexp_is_ok);
 
