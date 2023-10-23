@@ -1364,12 +1364,18 @@ constexpr auto decimal32::unbiased_exponent() const noexcept -> std::uint32_t
 {
     std::uint32_t expval {};
 
-    if ((bits_ & detail::d32_comb_11_mask) == detail::d32_comb_11_mask)
+    const auto exp_comb_bits {(bits_ & detail::d32_comb_11_mask)};
+
+    if (exp_comb_bits == detail::d32_comb_11_mask)
     {
         // bits 2 and 3 are the exp part of the combination field
         expval = (bits_ & detail::d32_comb_11_exp_bits) >> (detail::d32_significand_bits + 1);
     }
-    else if ((bits_ & detail::d32_comb_11_mask) == detail::d32_comb_01_mask)
+    else if (exp_comb_bits == detail::d32_comb_10_mask)
+    {
+        expval = UINT32_C(0b10000000);
+    }
+    else if (exp_comb_bits == detail::d32_comb_01_mask)
     {
         expval = UINT32_C(0b01000000);
     }
