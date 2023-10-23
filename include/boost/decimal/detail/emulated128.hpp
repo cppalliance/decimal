@@ -28,36 +28,25 @@ namespace boost { namespace decimal { namespace detail {
 // so we avoid using those built-ins. That said, they are still useful for
 // implementing 64-bit x 64-bit -> 128-bit multiplication.
 
-// Memcpy-able temp class for uint128
-struct trivial_uint128
-{
-    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
-    std::uint64_t low;
-    std::uint64_t high;
-    #else
-    std::uint64_t high;
-    std::uint64_t low;
-    #endif
-};
-
 // Macro replacement lists can not be enclosed in parentheses
 struct uint128
 {
-    std::uint64_t high;
-    std::uint64_t low;
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+    std::uint64_t high {};
+    std::uint64_t low {};
+    #else
+    std::uint64_t low {};
+    std::uint64_t high {};
+    #endif
 
     // Constructors
-    constexpr uint128() noexcept : high {}, low {} {}
+    constexpr uint128() noexcept = default;
 
     constexpr uint128(const uint128& v) noexcept = default;
 
     constexpr uint128(uint128&& v) noexcept = default;
 
     constexpr uint128(std::uint64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
-
-    constexpr uint128(const trivial_uint128& v) noexcept : high {v.high}, low {v.low} {} // NOLINT
-
-    constexpr uint128(trivial_uint128&& v) noexcept : high {v.high}, low {v.low} {} // NOLINT
 
     #define SIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : high {v < 0 ? UINT64_MAX : UINT64_C(0)}, low {static_cast<std::uint64_t>(v)} {} // NOLINT
     #define UNSIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : high {}, low {static_cast<std::uint64_t>(v)} {} // NOLINT
@@ -109,8 +98,6 @@ struct uint128
     constexpr auto operator=(const boost::int128_type&  v) noexcept -> uint128& { *this = uint128(v); return *this; }
     constexpr auto operator=(const boost::uint128_type& v) noexcept -> uint128& { *this = uint128(v); return *this; }
     #endif
-
-    constexpr auto operator=(const trivial_uint128& v) noexcept -> uint128& { this->low = v.low; this->high = v.high; return *this; }
 
     constexpr auto operator=(const uint128&) noexcept -> uint128&;
 
