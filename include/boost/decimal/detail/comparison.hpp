@@ -17,12 +17,20 @@
 namespace boost {
 namespace decimal {
 
-template <typename T1, typename T2>
+template <typename DecimalType = decimal32, typename T1, typename T2>
 constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                 T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool
 {
-    detail::normalize(lhs_sig, lhs_exp);
-    detail::normalize(rhs_sig, rhs_exp);
+    detail::normalize<DecimalType>(lhs_sig, lhs_exp);
+    detail::normalize<DecimalType>(rhs_sig, rhs_exp);
+
+    #ifdef BOOST_DECIMAL_DEBUG_EQUAL
+    std::cerr << "Normalized Values"
+              << "\nlhs_sig: " << lhs_sig
+              << "\nlhs_exp: " << lhs_exp
+              << "\nrhs_sig: " << rhs_sig
+              << "\nrhs_exp: " << rhs_exp << std::endl;
+    #endif
 
     return lhs_sign == rhs_sign &&
            lhs_exp == rhs_exp &&
@@ -49,8 +57,8 @@ constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
 
     const auto rhs_significand {detail::make_positive_unsigned(rhs)};
 
-    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                            rhs_significand, INT32_C(0), rhs_isneg);
+    return equal_parts_impl<Decimal>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                                     rhs_significand, INT32_C(0), rhs_isneg);
 }
 
 template <typename Decimal1, typename Decimal2>
@@ -88,15 +96,15 @@ constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
     return !(mixed_decimal_equality_impl(lhs, rhs));
 }
 
-template <typename T1, typename T2>
+template <typename DecimalType = decimal32, typename T1, typename T2>
 constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool
 {
     const bool both_neg {lhs_sign && rhs_sign};
 
     // Normalize the significands and exponents
-    detail::normalize(lhs_sig, lhs_exp);
-    detail::normalize(rhs_sig, rhs_exp);
+    detail::normalize<DecimalType>(lhs_sig, lhs_exp);
+    detail::normalize<DecimalType>(rhs_sig, rhs_exp);
 
     if (lhs_sig == 0 && rhs_sig != 0)
     {
@@ -184,8 +192,8 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
 
     const auto rhs_significand {detail::make_positive_unsigned(rhs)};
 
-    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs_sign,
-                           rhs_significand, INT32_C(0), rhs_sign);
+    return less_parts_impl<Decimal>(lhs.full_significand(), lhs.biased_exponent(), lhs_sign,
+                                    rhs_significand, INT32_C(0), rhs_sign);
 }
 
 template <typename Decimal1, typename Decimal2>
@@ -193,6 +201,8 @@ constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
 {
+    using Bigger_Decimal_Type = std::conditional_t<(sizeof(lhs) > sizeof(rhs)), Decimal1, Decimal2>;
+
     if (isnan(lhs) || isnan(rhs) || (!lhs.isneg() && rhs.isneg()))
     {
         return false;
@@ -213,8 +223,8 @@ constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
         }
     }
 
-    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+    return less_parts_impl<Bigger_Decimal_Type>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                                                rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
 template <typename Decimal1, typename Decimal2>
