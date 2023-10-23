@@ -213,10 +213,18 @@ constexpr auto pow(T x, T a) noexcept -> std::enable_if_t<detail::is_decimal_flo
             }
             else if (fpc_a == FP_INFINITE)
             {
-                const auto abs_base = abs(x);
-
-                if      (abs_base < one) { result = (signbit(a) ? std::numeric_limits<T>::infinity() : zero); }
-                else if (abs_base > one) { result = (signbit(a) ? zero : std::numeric_limits<T>::infinity()); }
+                if (abs(x) < one)
+                {
+                    result = (signbit(a) ? std::numeric_limits<T>::infinity() : zero);
+                }
+                else if (abs(x) > one)
+                {
+                    result = (signbit(a) ? zero : std::numeric_limits<T>::infinity());
+                }
+                else
+                {
+                    result = one;
+                }
             }
             else if (fpc_a == FP_ZERO)
             {
