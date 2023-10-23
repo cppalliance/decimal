@@ -247,7 +247,10 @@ void test_addition()
 
     // Overflow
     constexpr decimal32 max_val((std::numeric_limits<decimal32>::max)());
-    BOOST_TEST(isinf(max_val + one));
+    if (!BOOST_TEST(isinf(max_val + one)))
+    {
+        std::cerr << std::bitset<32>(to_bits(max_val + one)) << std::endl;
+    }
 }
 
 void test_subtraction()
@@ -410,7 +413,10 @@ void test_construct_from_integer()
     BOOST_TEST_EQ(static_cast<T>(edge_23), detail::d32_big_combination);
 
     constexpr decimal32 max_sig (detail::max_significand);
-    BOOST_TEST_EQ(static_cast<T>(max_sig), detail::max_significand);
+    if (!BOOST_TEST_EQ(static_cast<T>(max_sig), detail::max_significand))
+    {
+        std::cerr << "Bits: " << std::bitset<32>(to_bits(max_sig)) << std::endl;
+    }
 }
 
 template <typename T>
@@ -473,8 +479,6 @@ void test_shrink_significand()
 
 int main()
 {
-    test_comp();
-
     #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     test_binary_constructor();
     #endif
@@ -482,11 +486,6 @@ int main()
     test_decimal_constructor();
     test_non_finite_values();
     test_unary_arithmetic();
-
-    test_addition();
-    test_subtraction();
-    test_multiplicatiom();
-    test_div_mod();
 
     test_construct_from_integer<int>();
     test_construct_from_integer<long>();
@@ -498,6 +497,13 @@ int main()
     #ifdef BOOST_DECIMAL_HAS_FLOAT128
     test_construct_from_float<__float128>();
     #endif
+
+    test_comp();
+
+    test_addition();
+    test_subtraction();
+    test_multiplicatiom();
+    test_div_mod();
 
     test_hash();
 
