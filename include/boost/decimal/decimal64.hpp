@@ -69,13 +69,20 @@ static constexpr auto d64_exp_snan_mask = UINT64_C(0b0'00000'10000000'0000000000
 // s 00 TTT (00)eeeeeeee (0TTT)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
 // s 01 TTT (01)eeeeeeee (0TTT)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
 // s 10 TTT (10)eeeeeeee (0TTT)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
-static constexpr std::uint64_t d64_comb_01_mask = 0b01000;
-static constexpr std::uint64_t d64_comb_10_mask = 0b10000;
+static constexpr std::uint64_t d64_sign_mask = UINT64_C(0b1'00000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_combination_field_mask = UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_exponent_mask = UINT64_C(0b0'00000'11111111'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_significand_mask = UINT64_C(0b0'00000'00000000'1111111111'1111111111'1111111111'1111111111'1111111111);
+static constexpr std::uint64_t d64_significand_bits = UINT64_C(50);
+static constexpr std::uint64_t d64_exponent_bits = UINT64_C(8);
+
+static constexpr std::uint64_t d64_comb_01_mask = UINT64_C(0b0'01000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_comb_10_mask = UINT64_C(0b0'10000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 
 // This mask is used to determine if we use the masks above or below since 11 TTT is invalid
-static constexpr std::uint64_t d64_comb_11_mask = 0b11000;
-static constexpr std::uint64_t d64_comb_11_exp_bits = 0b00110;
-static constexpr std::uint64_t d64_comb_11_significand_bits = 0b00001;
+static constexpr std::uint64_t d64_comb_11_mask = UINT64_C(0b0'11000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_comb_11_exp_bits = UINT64_C(0b0'00110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_comb_11_significand_bits = UINT64_C(0b0'00001'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 
 // For these masks the first two bits of the combination field imply 100 T as the
 // leading bits of the significand and then bits 3 and 4 are the exp
@@ -84,8 +91,8 @@ static constexpr std::uint64_t d64_comb_11_significand_bits = 0b00001;
 // s 1100 T (00)eeeeeeee (100T)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
 // s 1101 T (01)eeeeeeee (100T)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
 // s 1110 T (10)eeeeeeee (100T)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
-static constexpr std::uint64_t d64_comb_1101_mask = 0b11010;
-static constexpr std::uint64_t d64_comb_1110_mask = 0b11100;
+static constexpr std::uint64_t d64_comb_1101_mask = UINT64_C(0b0'11010'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_comb_1110_mask = UINT64_C(0b0'11100'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 
 // Powers of 2 used to determine the size of the significand
 static constexpr std::uint64_t d64_no_combination = 0b1111111111'1111111111'1111111111'1111111111'1111111111;
