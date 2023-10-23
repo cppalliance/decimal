@@ -42,6 +42,7 @@ run test_expm1.cpp ;
 run test_fenv.cpp ;
 run test_float_conversion.cpp ;
 run test_frexp_ldexp.cpp ;
+run test_git_issue_271.cpp ;
 run test_literals.cpp ;
 run test_log.cpp ;
 run test_log1p.cpp ;
