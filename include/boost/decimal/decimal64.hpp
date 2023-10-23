@@ -467,11 +467,7 @@ public:
 constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
 {
     decimal64 result;
-
-    result.bits_.exponent          = (bits & detail::d64_construct_sign_mask) >> 63U;
-    result.bits_.combination_field = (bits & detail::d64_construct_combination_mask) >> 58U;
-    result.bits_.exponent          = (bits & detail::d64_construct_exp_mask) >> 50U;
-    result.bits_.significand       =  bits & detail::d64_construct_significand_mask;
+    result.bits_ = bits;
 
     return result;
 }
