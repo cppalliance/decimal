@@ -23,6 +23,11 @@
 
 namespace boost { namespace decimal { namespace detail {
 
+#if __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 // Compilers might support built-in 128-bit integer types. However, it seems that
 // emulating them with a pair of 64-bit integers actually produces a better code,
 // so we avoid using those built-ins. That said, they are still useful for
@@ -521,6 +526,10 @@ private:
 
     constexpr friend auto div_impl(uint128 lhs, uint128 rhs, uint128 &quotient, uint128 &remainder) noexcept -> void;
 };
+
+#if __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
 
 constexpr auto operator-(uint128 val) noexcept -> uint128
 {
