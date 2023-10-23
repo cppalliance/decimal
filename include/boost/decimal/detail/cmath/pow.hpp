@@ -1,4 +1,5 @@
 // Copyright 2023 Matt Borland
+// Copyright 2023 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -205,30 +206,20 @@ constexpr auto pow(T x, T a) noexcept -> std::enable_if_t<detail::is_decimal_flo
         }
         else
         {
-            using std::abs;
-
             if (fpc_a == FP_ZERO)
             {
                 result = one;
             }
             else if (fpc_a == FP_INFINITE)
             {
-                if (abs(x) < one)
-                {
-                    result = (signbit(a) ? std::numeric_limits<T>::infinity() : zero);
-                }
-                else if (abs(x) > one)
-                {
-                    result = (signbit(a) ? zero : std::numeric_limits<T>::infinity());
-                }
-                else
-                {
-                    result = one;
-                }
-            }
-            else if (fpc_a == FP_ZERO)
-            {
-                result = one;
+                using std::abs;
+
+                result =
+                    (
+                          (abs(x) < one) ? (signbit(a) ? std::numeric_limits<T>::infinity() : zero)
+                        : (abs(x) > one) ? (signbit(a) ? zero : std::numeric_limits<T>::infinity())
+                        : one
+                    );
             }
             else
             {
