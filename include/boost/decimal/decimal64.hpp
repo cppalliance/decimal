@@ -156,7 +156,7 @@ private:
 
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
+    friend constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
 
     // Equality template between any integer type and decimal64
     template <typename Decimal, typename Integer>
@@ -472,10 +472,9 @@ constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
     return result;
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
+constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
 {
-    const auto bits {detail::bit_cast<std::uint64_t>(rhs.bits_)};
-    return bits;
+    return rhs.bits_;
 }
 
 // 3.2.5 initialization from coefficient and exponent:
