@@ -21,11 +21,17 @@
 #  include <boost/core/bit.hpp>
 #endif
 
-namespace boost { namespace decimal { namespace detail {
+namespace boost {
+namespace decimal {
+namespace detail {
 
 #if __GNUC__ >= 8
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
+#if !defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__)
+#  pragma GCC diagnostic ignored "-Wreorder"
 #endif
 
 // Compilers might support built-in 128-bit integer types. However, it seems that
@@ -527,7 +533,7 @@ private:
     constexpr friend auto div_impl(uint128 lhs, uint128 rhs, uint128 &quotient, uint128 &remainder) noexcept -> void;
 };
 
-#if __GNUC__ >= 8
+#if (__GNUC__ >= 8) || (!defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__))
 #  pragma GCC diagnostic pop
 #endif
 

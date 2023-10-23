@@ -9,7 +9,9 @@
 #include <type_traits>
 #include <cstring>
 
-namespace boost { namespace decimal { namespace detail {
+namespace boost {
+namespace decimal {
+namespace detail {
 
 #if defined(__GNUC__) && !defined(__clang__)
 #  pragma GCC diagnostic push
