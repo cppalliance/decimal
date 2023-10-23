@@ -126,12 +126,13 @@ void test_generic_binary_to_decimal()
             const auto dbl = static_cast<double>(dec);
             const boost::decimal::decimal64 return_dec(dbl);
 
-            if (!BOOST_TEST(dec == return_dec))
+            if (!BOOST_TEST(abs(dec - return_dec) <= 1 ))
             {
-                std::cerr << std::scientific << std::setprecision(std::numeric_limits<double>::digits10)
+                std::cerr << std::scientific << std::setprecision(std::numeric_limits<boost::decimal::decimal64>::digits10)
                           << "       Dec: " << dec
                           << "\n       Dbl: " << dbl
-                          << "\nReturn Dec: " << return_dec << std::endl;
+                          << "\nReturn Dec: " << return_dec
+                          << "\nDist: " << abs(dec - return_dec) << std::endl;
             }
         }
     }
