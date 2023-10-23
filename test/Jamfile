@@ -46,6 +46,7 @@ run test_git_issue_271.cpp ;
 run test_literals.cpp ;
 run test_log.cpp ;
 run test_log1p.cpp ;
+run test_pow.cpp ;
 run test_promotion.cpp ;
 run test_sinh.cpp ;
 run test_sqrt.cpp ;

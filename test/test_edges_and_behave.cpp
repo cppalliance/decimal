@@ -57,7 +57,7 @@ namespace local
     }
     else
     {
-      const auto delta = fabs(1 - fabs(a / b));
+      const auto delta = fabs(1 - (a / b));
 
       result_is_ok = (delta < tol);
     }
@@ -379,15 +379,15 @@ namespace local
       const auto cos_inf = cos(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
       const auto cos_nan = cos(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
-      const auto result_sin_con_non_normal_is_ok =
+      const auto result_sin_cos_non_normal_is_ok =
         (
              (isinf(sin_inf) && isnan(sin_nan))
           && (isinf(cos_inf) && isnan(cos_nan))
         );
 
-      BOOST_TEST(result_sin_con_non_normal_is_ok);
+      BOOST_TEST(result_sin_cos_non_normal_is_ok);
 
-      result_is_ok = (result_sin_con_non_normal_is_ok && result_is_ok);
+      result_is_ok = (result_sin_cos_non_normal_is_ok && result_is_ok);
     }
 
     for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
@@ -422,6 +422,19 @@ namespace local
       BOOST_TEST(result_ceil_is_ok);
 
       result_is_ok = (result_ceil_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto ilogb_inf = ilogb(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+
+      const auto result_ilogb_inf_is_ok = (ilogb_inf == INT_MAX);
+
+      BOOST_TEST(result_ilogb_inf_is_ok);
+
+      result_is_ok = (result_ilogb_inf_is_ok && result_is_ok);
     }
 
     return result_is_ok;

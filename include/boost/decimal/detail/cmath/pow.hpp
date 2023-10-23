@@ -5,56 +5,237 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_POW_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_POW_HPP
 
+#include <algorithm>
 #include <cmath>
 #include <type_traits>
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
+#include <boost/decimal/detail/cmath/impl/pow_impl.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 
 namespace boost { namespace decimal {
-
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto pow(T b, int p) noexcept -> T
+template<typename T, typename IntegralType>
+constexpr auto pow(T b, IntegralType p) noexcept -> std::enable_if_t<(detail::is_decimal_floating_point_v<T> && std::is_integral<IntegralType>::value), T> // NOLINT(misc-no-recursion)
 {
-    // Calculate (b ^ p).
+    using local_integral_type = IntegralType;
 
-    using local_numeric_type = T;
+    constexpr T zero { 0, 0 };
+    constexpr T one  { 1, 0 };
 
-    local_numeric_type result;
+    T result { };
 
-    if     (p <  INT64_C(0)) { result = local_numeric_type(1) / pow(b, -p); }
-    else if(p == INT64_C(0)) { result = local_numeric_type(static_cast<unsigned>(UINT8_C(1))); }
-    else if(p == INT64_C(1)) { result = b; }
-    else if(p == INT64_C(2)) { result = b; result *= b; }
-    else if(p == INT64_C(3)) { result = b; result *= b; result *= b; }
-    else if(p == INT64_C(4)) { result = b; result *= b; result *= result; }
+    const auto fpc_x = fpclassify(b);
+
+    const auto p_is_integer_odd = (static_cast<local_integral_type>(p & 1) != static_cast<local_integral_type>(0));
+
+    if (fpc_x == FP_ZERO)
+    {
+        if(p < static_cast<local_integral_type>(0))
+        {
+            // pow(  +0, exp), where exp is a negative odd integer, returns +infinity.
+            // pow(  -0, exp), where exp is a negative odd integer, returns +infinity.
+            // pow(+/-0, exp), where exp is a negative even integer, returns +infinity.
+
+            result = std::numeric_limits<T>::infinity();
+        }
+        else if (p > static_cast<local_integral_type>(0))
+        {
+            // pow(  +0, exp), where exp is a positive odd integer, returns +0.
+            // pow(  -0, exp), where exp is a positive odd integer, returns -0.
+            // pow(+/-0, exp), where exp is a positive even integer, returns +0.
+
+            if (p_is_integer_odd)
+            {
+                result = (signbit(b) ? -zero : zero);
+            }
+            else
+            {
+                result = zero;
+            }
+        }
+        else
+        {
+            // pow(base, +/-0) returns 1 for any base, even when base is NaN.
+
+            result = one;
+        }
+    }
+    else if (fpc_x == FP_INFINITE)
+    {
+        if (signbit(b))
+        {
+            if (p < static_cast<local_integral_type>(0))
+            {
+                // pow(-infinity, exp) returns -0 if exp is a negative odd integer.
+                // pow(-infinity, exp) returns +0 if exp is a negative even integer.
+
+                result = (p_is_integer_odd ? -zero : zero);
+            }
+            else if (p > static_cast<local_integral_type>(0))
+            {
+                // pow(-infinity, exp) returns -infinity if exp is a positive odd integer.
+                // pow(-infinity, exp) returns +infinity if exp is a positive even integer.
+
+                result = (p_is_integer_odd ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::infinity());
+            }
+            else
+            {
+                result = one;
+            }
+        }
+        else
+        {
+            if (p < static_cast<local_integral_type>(0))
+            {
+                // pow(+infinity, exp) returns +0 for any negative exp.
+
+                result = zero;
+            }
+            else if (p > static_cast<local_integral_type>(0))
+            {
+                // pow(+infinity, exp) returns +infinity for any positive exp.
+
+                result = std::numeric_limits<T>::infinity();
+            }
+            else
+            {
+                result = one;
+            }
+        }
+    }
+    else if (fpc_x != FP_NORMAL)
+    {
+        result = ((p == static_cast<local_integral_type>(UINT8_C(0))) ? one : std::numeric_limits<T>::quiet_NaN());
+    }
     else
     {
-        result = local_numeric_type(static_cast<unsigned>(UINT8_C(1)));
+        using local_unsigned_integral_type = std::make_unsigned_t<IntegralType>;
 
-        local_numeric_type y(b);
-
-        auto p_local = static_cast<std::uint64_t>(p);
-
-        // Use the so-called ladder method for the power calculation.
-        for(;;)
+        if (p == static_cast<local_integral_type>(UINT8_C(0)))
         {
-            const auto do_power_multiply =
-              (static_cast<std::uint_fast8_t>(p_local & static_cast<unsigned>(UINT8_C(1))) != static_cast<std::uint_fast8_t>(UINT8_C(0)));
-
-            if(do_power_multiply)
+            result = one;
+        }
+        else BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<local_integral_type>::value)
+        {
+            if(p < static_cast<local_integral_type>(UINT8_C(0)))
             {
-              result *= y;
+                const auto up =
+                    static_cast<local_unsigned_integral_type>
+                    (
+                          static_cast<local_unsigned_integral_type>(~p)
+                        + static_cast<local_unsigned_integral_type>(UINT8_C(1))
+                    );
+
+                result = one / detail::pow_n_impl(b, up);
             }
-
-            p_local >>= static_cast<unsigned>(UINT8_C(1));
-
-            if(p_local == static_cast<std::uint64_t>(UINT8_C(0)))
+            else
             {
-                break;
+                result = detail::pow_n_impl(b, static_cast<local_unsigned_integral_type>(p));
             }
+        }
+        else
+        {
+            result = detail::pow_n_impl(b, static_cast<local_unsigned_integral_type>(p));
+        }
+    }
 
-            y *= y;
+    return result;
+}
+
+template<typename T>
+constexpr auto pow(T x, T a) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+{
+    constexpr T zero { 0, 0 };
+
+    auto result = zero;
+
+    const auto na = static_cast<int>(a);
+
+    if ((na == a) || ((na == 0) && (na == abs(a))))
+    {
+        result = pow(x, na);
+    }
+    else
+    {
+        constexpr T one  { 1, 0 };
+
+        const auto fpc_x = fpclassify(x);
+        const auto fpc_a = fpclassify(a);
+
+        if (fpc_a == FP_ZERO)
+        {
+            // pow(base, +/-0) returns 1 for any base, even when base is NaN.
+
+            result = one;
+        }
+        else if (fpc_x == FP_ZERO)
+        {
+            if ((fpc_a == FP_NORMAL) || (fpc_a == FP_INFINITE))
+            {
+                // pow(+/-0, exp), where exp is negative and finite, returns +infinity.
+                // pow(+/-0, exp), where exp is positive non-integer, returns +0.
+
+                // pow(+/-0, -infinity) returns +infinity.
+                // pow(+/-0, +infinity) returns +0.
+
+                result = (signbit(a) ? std::numeric_limits<T>::infinity() : zero);
+            }
+            else if (fpc_a == FP_NAN)
+            {
+                result = std::numeric_limits<T>::quiet_NaN();
+            }
+        }
+        else if (fpc_x == FP_INFINITE)
+        {
+            if ((fpc_a == FP_NORMAL) || (fpc_a == FP_INFINITE))
+            {
+                // pow(+infinity, exp) returns +0 for any negative exp.
+                // pow(-infinity, exp) returns +infinity for any positive exp.
+
+                result = (signbit(a) ? zero : std::numeric_limits<T>::infinity());
+            }
+            else if (fpc_a == FP_NAN)
+            {
+                result = std::numeric_limits<T>::quiet_NaN();
+            }
+        }
+        else if (fpc_x != FP_NORMAL)
+        {
+            result = x;
+        }
+        else
+        {
+            using std::abs;
+
+            if (fpc_a == FP_ZERO)
+            {
+                result = one;
+            }
+            else if (fpc_a == FP_INFINITE)
+            {
+                if (abs(x) < one)
+                {
+                    result = (signbit(a) ? std::numeric_limits<T>::infinity() : zero);
+                }
+                else if (abs(x) > one)
+                {
+                    result = (signbit(a) ? zero : std::numeric_limits<T>::infinity());
+                }
+                else
+                {
+                    result = one;
+                }
+            }
+            else if (fpc_a == FP_ZERO)
+            {
+                result = one;
+            }
+            else
+            {
+                const auto a_log_x = a * log(x);
+
+                result = exp(a_log_x);
+            }
         }
     }
 

@@ -10,6 +10,7 @@
 #include <limits>
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
+#include <boost/decimal/detail/cmath/impl/pow_impl.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 
 namespace boost { namespace decimal {
@@ -56,13 +57,12 @@ constexpr auto frexp(T v, int* expon) noexcept -> T
                 / INT32_C(301)
             );
 
-        constexpr T local_two { 2, 0 };
-
-        result_frexp *= pow(local_two, -t);
+        result_frexp *= detail::pow_2_impl<T>(-t);
 
         // TODO(ckormanyos): Handle underflow/overflow if (or when) needed.
 
         constexpr T local_one { 1, 0 };
+        constexpr T local_two { 2, 0 };
 
         while (result_frexp >= local_one)
         {

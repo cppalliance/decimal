@@ -18,15 +18,17 @@ namespace boost { namespace decimal {
 template <typename T>
 constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>
 {
-    if (d == 0)
+    const auto fpc_d = fpclassify(d);
+
+    if (fpc_d == FP_ZERO)
     {
         return FP_ILOGB0;
     }
-    else if (isinf(d))
+    else if (fpc_d == FP_INFINITE)
     {
         return INT_MAX;
     }
-    else if (isnan(d))
+    else if (fpc_d == FP_NAN)
     {
         return FP_ILOGBNAN;
     }

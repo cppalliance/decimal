@@ -49,7 +49,7 @@ namespace local
     }
     else
     {
-      const auto delta = fabs(1 - fabs(a / b));
+      const auto delta = fabs(1 - (a / b));
 
       result_is_ok = (delta < tol);
     }
