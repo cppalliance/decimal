@@ -836,7 +836,14 @@ constexpr auto decimal64::edit_exponent(T expval) noexcept -> void
 
 constexpr auto decimal64::edit_sign(bool sign) noexcept -> void
 {
-    this->bits_.sign = static_cast<std::uint64_t>(sign);
+    if (sign)
+    {
+        bits_ |= detail::d64_sign_mask;
+    }
+    else
+    {
+        bits_ &= ~detail::d64_sign_mask;
+    }
 }
 
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
