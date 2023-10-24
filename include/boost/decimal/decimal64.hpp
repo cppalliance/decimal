@@ -887,10 +887,9 @@ constexpr auto operator+(decimal64 rhs) noexcept -> decimal64
 
 constexpr auto operator-(decimal64 rhs) noexcept-> decimal64
 {
-    rhs.bits_.sign ^= UINT64_C(1);
+    rhs.bits_ ^= detail::d64_sign_mask;
     return rhs;
 }
-
 
 template<typename T1, typename T2>
 constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
