@@ -454,57 +454,57 @@ public:
     friend constexpr auto quantized64(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
     // Bit-wise operators
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+    friend constexpr auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
     template <typename Integer>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal64 lhs, Integer rhs) noexcept
+    friend constexpr auto operator&(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     template <typename Integer>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(Integer lhs, decimal64 rhs) noexcept
+    friend constexpr auto operator&(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+    friend constexpr auto operator|(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
     template <typename Integer>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(decimal64 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
-
-    template <typename Integer>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(Integer lhs, decimal64 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
-
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator^(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
-
-    template <typename Integer>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator^(decimal64 lhs, Integer rhs) noexcept
+    friend constexpr auto operator|(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     template <typename Integer>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator^(Integer lhs, decimal64 rhs) noexcept
+    friend constexpr auto operator|(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator<<(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+    friend constexpr auto operator^(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
     template <typename Integer>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator<<(decimal64 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
-
-    template <typename Integer>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator<<(Integer lhs, decimal64 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
-
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
-
-    template <typename Integer>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(decimal64 lhs, Integer rhs) noexcept
+    friend constexpr auto operator^(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     template <typename Integer>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(Integer lhs, decimal64 rhs) noexcept
+    friend constexpr auto operator^(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator~(decimal64 lhs) noexcept -> decimal64;
+    friend constexpr auto operator<<(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator<<(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator<<(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator>>(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator>>(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator~(decimal64 lhs) noexcept -> decimal64;
 
     // <cmath> functions that need to be friends
     template <typename T>
@@ -1979,140 +1979,104 @@ constexpr auto operator<=>(Integer lhs, decimal64 rhs) noexcept -> std::enable_i
 
 #endif
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+constexpr auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
 {
-    const auto lhs_bits {to_bits(lhs)};
-    const auto rhs_bits {to_bits(rhs)};
-
-    return from_bits(lhs_bits & rhs_bits);
+    return from_bits(lhs.bits_ & rhs.bits_);
 }
 
 template <typename Integer>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(decimal64 lhs, Integer rhs) noexcept
+constexpr auto operator&(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
-    const auto lhs_bits {to_bits(lhs)};
-
-    return from_bits(lhs_bits & static_cast<std::uint64_t>(rhs));
+    return from_bits(lhs.bits_ & static_cast<std::uint64_t>(rhs));
 }
 
 template <typename Integer>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator&(Integer lhs, decimal64 rhs) noexcept
+constexpr auto operator&(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
-    const auto rhs_bits {to_bits(rhs)};
-
-    return from_bits(static_cast<std::uint64_t>(lhs) & rhs_bits);
+    return from_bits(static_cast<std::uint64_t>(lhs) & rhs.bits_);
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+constexpr auto operator|(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
 {
-    const auto lhs_bits {to_bits(lhs)};
-    const auto rhs_bits {to_bits(rhs)};
-
-    return from_bits(lhs_bits | rhs_bits);
+    return from_bits(lhs.bits_ | rhs.bits_);
 }
 
 template <typename Integer>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(decimal64 lhs, Integer rhs) noexcept
+constexpr auto operator|(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
-    const auto lhs_bits {to_bits(lhs)};
-
-    return from_bits(lhs_bits | static_cast<std::uint64_t>(rhs));
+    return from_bits(lhs.bits_ | static_cast<std::uint64_t>(rhs));
 }
 
 template <typename Integer>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator|(Integer lhs, decimal64 rhs) noexcept
+constexpr auto operator|(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
-    const auto rhs_bits {to_bits(rhs)};
-
-    return from_bits(static_cast<std::uint64_t>(lhs) | rhs_bits);
+    return from_bits(static_cast<std::uint64_t>(lhs) | rhs.bits_);
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator^(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+constexpr auto operator^(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
 {
-    const auto lhs_bits {to_bits(lhs)};
-    const auto rhs_bits {to_bits(rhs)};
-
-    return from_bits(lhs_bits ^ rhs_bits);
+    return from_bits(lhs.bits_ ^ rhs.bits_);
 }
 
 template <typename Integer>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator^(decimal64 lhs, Integer rhs) noexcept
+constexpr auto operator^(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
-    const auto lhs_bits {to_bits(lhs)};
-
-    return from_bits(lhs_bits ^ static_cast<std::uint64_t>(rhs));
+    return from_bits(lhs.bits_ ^ static_cast<std::uint64_t>(rhs));
 }
 
 template <typename Integer>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator^(Integer lhs, decimal64 rhs) noexcept
+constexpr auto operator^(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
-    const auto rhs_bits {to_bits(rhs)};
-
-    return from_bits(static_cast<std::uint64_t>(lhs) ^ rhs_bits);
+    return from_bits(static_cast<std::uint64_t>(lhs) ^ rhs.bits_);
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator<<(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+constexpr auto operator<<(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
 {
-    const auto lhs_bits {to_bits(lhs)};
-    const auto rhs_bits {to_bits(rhs)};
-
-    return from_bits(lhs_bits << rhs_bits);
+    return from_bits(lhs.bits_ << rhs.bits_);
 }
 
 template <typename Integer>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator<<(decimal64 lhs, Integer rhs) noexcept
+constexpr auto operator<<(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
-    const auto lhs_bits {to_bits(lhs)};
-
-    return from_bits(lhs_bits << static_cast<std::uint64_t>(rhs));
+    return from_bits(lhs.bits_ << static_cast<std::uint64_t>(rhs));
 }
 
 template <typename Integer>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator<<(Integer lhs, decimal64 rhs) noexcept
+constexpr auto operator<<(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
-    const auto rhs_bits {to_bits(rhs)};
-
-    return from_bits(static_cast<std::uint64_t>(lhs) << rhs_bits);
+    return from_bits(static_cast<std::uint64_t>(lhs) << rhs.bits_);
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+constexpr auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
 {
-    const auto lhs_bits {to_bits(lhs)};
-    const auto rhs_bits {to_bits(rhs)};
-
-    return from_bits(lhs_bits >> rhs_bits);
+    return from_bits(lhs.bits_ >> rhs.bits_);
 }
 
 template <typename Integer>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(decimal64 lhs, Integer rhs) noexcept
+constexpr auto operator>>(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
-    const auto lhs_bits {to_bits(lhs)};
-
-    return from_bits(lhs_bits >> static_cast<std::uint64_t>(rhs));
+    return from_bits(lhs.bits_ >> static_cast<std::uint64_t>(rhs));
 }
 
 template <typename Integer>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(Integer lhs, decimal64 rhs) noexcept
+constexpr auto operator>>(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
-    const auto rhs_bits {to_bits(rhs)};
-
-    return from_bits(static_cast<std::uint64_t>(lhs) >> rhs_bits);
+    return from_bits(static_cast<std::uint64_t>(lhs) >> rhs.bits_);
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator~(decimal64 lhs) noexcept -> decimal64
+constexpr auto operator~(decimal64 lhs) noexcept -> decimal64
 {
-    const auto lhs_bits {to_bits(lhs)};
-    return from_bits(~lhs_bits);
+    return from_bits(~lhs.bits_);
 }
 
 // 3.6.4
