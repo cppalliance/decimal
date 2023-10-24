@@ -111,7 +111,19 @@ static constexpr uint128 d128_small_combination_field_mask {UINT64_C(0b111'00000
 static constexpr uint128 d128_big_combination_field_mask {UINT64_C(0b1'0000000000'0000000000'0000000000'0000000000'000000),
                                                           UINT64_C(0)};
 
-}
+struct decimal128_components
+{
+    uint128 sig;
+    std::int32_t exp;
+    bool sign;
+};
+
+} //namespace detail
+
+class decimal128 final
+{
+
+};
 
 } //namespace decimal
 } //namespace boost
