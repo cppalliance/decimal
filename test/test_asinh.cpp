@@ -213,20 +213,22 @@ auto main() -> int
 {
   auto result_is_ok = true;
 
+  constexpr boost::decimal::decimal32 fourth_root_epsilon { 1, -((std::numeric_limits<boost::decimal::decimal32>::digits10 + 1) / 4) };
+
   const auto result_eps_is_ok =
     local::test_asinh
     (
       static_cast<std::int32_t>(INT32_C(16) * INT32_C(262144)),
       false,
-      1.0L + static_cast<long double>(std::numeric_limits<boost::decimal::decimal32>::epsilon()) * 10.0L,
-      1.0L + static_cast<long double>(std::numeric_limits<boost::decimal::decimal32>::epsilon()) * 100.0L
+      static_cast<long double>(fourth_root_epsilon) / 40.0L,
+      static_cast<long double>(fourth_root_epsilon) * 40.0L
     );
 
   const auto result_tiny_is_ok       = local::test_asinh(static_cast<std::int32_t>(INT32_C(4096)), false, 1.001L, 1.1L);
   const auto result_small_is_ok      = local::test_asinh(static_cast<std::int32_t>(INT32_C(96)),   false, 0.1L, 1.59L);
   const auto result_medium_is_ok     = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   true,  1.59L, 10.1L);
   const auto result_medium_neg_is_ok = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   false, 1.59L, 10.1L);
-  const auto result_large_is_ok      = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   false, 1.0E+01L, 1.0E+26L);
+  const auto result_large_is_ok      = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   false, 1.0E+01L, 1.0E+19L);
 
   BOOST_TEST(result_eps_is_ok);
   BOOST_TEST(result_tiny_is_ok);

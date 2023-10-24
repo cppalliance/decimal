@@ -437,6 +437,51 @@ namespace local
       result_is_ok = (result_ilogb_inf_is_ok && result_is_ok);
     }
 
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto exp2_val_zero_pos = exp2( my_zero() * static_cast<decimal_type>(dist(gen)));
+      const auto exp2_val_zero_neg = exp2(-my_zero());
+
+      const volatile auto result_pos_is_ok = ((fpclassify(exp2_val_zero_pos) == FP_NORMAL) && (exp2_val_zero_pos == ::my_one()));
+      const volatile auto result_neg_is_ok = ((fpclassify(exp2_val_zero_neg) == FP_NORMAL) && (exp2_val_zero_neg == ::my_one()));
+
+      BOOST_TEST(result_pos_is_ok);
+      BOOST_TEST(result_neg_is_ok);
+
+      result_is_ok = (result_pos_is_ok && result_neg_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto exp2_val_inf_pos = exp2( std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto exp2_val_inf_neg = exp2(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+
+      const volatile auto result_pos_is_ok = ((fpclassify(exp2_val_inf_pos) == FP_INFINITE) && (!signbit(exp2_val_inf_pos)));
+      const volatile auto result_neg_is_ok = ((fpclassify(exp2_val_inf_neg) == FP_ZERO)     && (!signbit(exp2_val_inf_neg)));
+
+      BOOST_TEST(result_pos_is_ok);
+      BOOST_TEST(result_neg_is_ok);
+
+      result_is_ok = (result_pos_is_ok && result_neg_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto exp2_val_nan = exp2(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+
+      const volatile auto result_nan_is_ok = isnan(exp2_val_nan);
+
+      BOOST_TEST(result_nan_is_ok);
+
+      result_is_ok = (result_nan_is_ok && result_is_ok);
+    }
+
     return result_is_ok;
   }
 }

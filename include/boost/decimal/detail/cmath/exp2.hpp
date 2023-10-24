@@ -15,6 +15,7 @@ template <typename T>
 constexpr auto exp2(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T two {2, 0};
+
     return pow(two, num);
 }
 

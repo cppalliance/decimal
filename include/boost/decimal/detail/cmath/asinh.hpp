@@ -37,7 +37,7 @@ constexpr auto asinh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
         }
         else if (x > zero)
         {
-            constexpr T fourth_root_epsilon { 1, -((std::numeric_limits<T>::digits10 + 3) / 4) };
+            constexpr T fourth_root_epsilon { 1, -((std::numeric_limits<T>::digits10 + 1) / 4) };
 
             const auto xsq = x * x;
 

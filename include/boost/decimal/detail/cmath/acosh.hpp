@@ -28,10 +28,6 @@ constexpr auto acosh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
         {
             result = x;
         }
-        else if (fpc == FP_NAN)
-        {
-            result = x;
-        }
         else if (fpc == FP_ZERO)
         {
             result = -std::numeric_limits<T>::quiet_NaN();
