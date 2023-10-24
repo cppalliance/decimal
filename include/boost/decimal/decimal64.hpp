@@ -57,9 +57,9 @@ namespace detail {
 static constexpr auto d64_inf_mask = UINT64_C(0b0'11110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 static constexpr auto d64_nan_mask = UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 static constexpr auto d64_snan_mask = UINT64_C(0b0'11111'10000000'0000000000'0000000000'0000000000'0000000000'0000000000);
-static constexpr auto d64_comb_inf_mask = UINT64_C(0b11110);
-static constexpr auto d64_comb_nan_mask = UINT64_C(0b11111);
-static constexpr auto d64_exp_snan_mask = UINT64_C(0b10000000);
+static constexpr auto d64_comb_inf_mask = UINT64_C(0b0'11110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr auto d64_comb_nan_mask = UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr auto d64_exp_snan_mask = UINT64_C(0b0'00000'10000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 
 // Masks to update the significand based on the combination field
 // In these first three 00, 01, or 10 are the leading 2 bits of the exp
@@ -69,13 +69,21 @@ static constexpr auto d64_exp_snan_mask = UINT64_C(0b10000000);
 // s 00 TTT (00)eeeeeeee (0TTT)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
 // s 01 TTT (01)eeeeeeee (0TTT)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
 // s 10 TTT (10)eeeeeeee (0TTT)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
-static constexpr std::uint64_t d64_comb_01_mask = 0b01000;
-static constexpr std::uint64_t d64_comb_10_mask = 0b10000;
+static constexpr std::uint64_t d64_sign_mask = UINT64_C(0b1'00000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_combination_field_mask = UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_exponent_mask = UINT64_C(0b0'00000'11111111'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_significand_mask = UINT64_C(0b0'00000'00000000'1111111111'1111111111'1111111111'1111111111'1111111111);
+static constexpr std::uint64_t d64_significand_bits = UINT64_C(50);
+static constexpr std::uint64_t d64_exponent_bits = UINT64_C(8);
+
+static constexpr std::uint64_t d64_comb_01_mask = UINT64_C(0b0'01000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_comb_10_mask = UINT64_C(0b0'10000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_comb_00_01_10_significand_bits = UINT64_C(0b0'00111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 
 // This mask is used to determine if we use the masks above or below since 11 TTT is invalid
-static constexpr std::uint64_t d64_comb_11_mask = 0b11000;
-static constexpr std::uint64_t d64_comb_11_exp_bits = 0b00110;
-static constexpr std::uint64_t d64_comb_11_significand_bits = 0b00001;
+static constexpr std::uint64_t d64_comb_11_mask = UINT64_C(0b0'11000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_comb_11_exp_bits = UINT64_C(0b0'00110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_comb_11_significand_bits = UINT64_C(0b0'00001'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 
 // For these masks the first two bits of the combination field imply 100 T as the
 // leading bits of the significand and then bits 3 and 4 are the exp
@@ -84,8 +92,8 @@ static constexpr std::uint64_t d64_comb_11_significand_bits = 0b00001;
 // s 1100 T (00)eeeeeeee (100T)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
 // s 1101 T (01)eeeeeeee (100T)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
 // s 1110 T (10)eeeeeeee (100T)[tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
-static constexpr std::uint64_t d64_comb_1101_mask = 0b11010;
-static constexpr std::uint64_t d64_comb_1110_mask = 0b11100;
+static constexpr std::uint64_t d64_comb_1101_mask = UINT64_C(0b0'11010'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_comb_1110_mask = UINT64_C(0b0'11100'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 
 // Powers of 2 used to determine the size of the significand
 static constexpr std::uint64_t d64_no_combination = 0b1111111111'1111111111'1111111111'1111111111'1111111111;
@@ -114,33 +122,16 @@ struct decimal64_components
 
 } //namespace detail
 
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 class decimal64 final
 {
 private:
-    #pragma pack(push, 1)
 
-    struct data_layout_
-    {
-        #ifdef BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
-
-        std::uint64_t significand : 50;
-        std::uint64_t exponent : 8;
-        std::uint64_t combination_field : 5;
-        std::uint64_t sign : 1;
-
-        #else
-
-        std::uint64_t sign : 1;
-        std::uint64_t combination_field : 5;
-        std::uint64_t exponent : 8;
-        std::uint64_t significand : 50;
-
-        #endif
-    };
-
-    #pragma pack(pop)
-
-    data_layout_ bits_ {};
+    std::uint64_t bits_ {};
 
     // Returns the un-biased (quantum) exponent
     constexpr auto unbiased_exponent() const noexcept -> std::uint64_t;
@@ -171,7 +162,7 @@ private:
 
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64;
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
+    friend constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
 
     // Equality template between any integer type and decimal64
     template <typename Decimal, typename Integer>
@@ -467,6 +458,59 @@ public:
     // 3.6.6 Quantize
     friend constexpr auto quantized64(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
+    // Bit-wise operators
+    friend constexpr auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator&(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator&(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator|(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator|(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator|(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator^(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator^(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator^(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator<<(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator<<(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator<<(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator>>(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator>>(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator~(decimal64 lhs) noexcept -> decimal64;
+
     // <cmath> functions that need to be friends
     template <typename T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept
@@ -479,22 +523,21 @@ public:
     friend constexpr auto scalblnd64(decimal64 num, long exp) noexcept -> decimal64;
 };
 
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
+
 constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
 {
     decimal64 result;
-
-    result.bits_.exponent          = (bits & detail::d64_construct_sign_mask) >> 63U;
-    result.bits_.combination_field = (bits & detail::d64_construct_combination_mask) >> 58U;
-    result.bits_.exponent          = (bits & detail::d64_construct_exp_mask) >> 50U;
-    result.bits_.significand       =  bits & detail::d64_construct_significand_mask;
+    result.bits_ = bits;
 
     return result;
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
+constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
 {
-    const auto bits {detail::bit_cast<std::uint64_t>(rhs.bits_)};
-    return bits;
+    return rhs.bits_;
 }
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -503,16 +546,25 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
 {
     using Unsigned_Integer = detail::make_unsigned_t<T1>;
 
+    bits_ = UINT64_C(0);
+    bool isneg {false};
+    Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T1>)
     {
-        bits_.sign = coeff < 0 || sign;
+        if (coeff < 0 || sign)
+        {
+            bits_ |= detail::d64_sign_mask;
+            isneg = true;
+        }
     }
     else
     {
-        bits_.sign = sign;
+        if (sign)
+        {
+            bits_ |= detail::d64_sign_mask;
+            isneg = true;
+        }
     }
-
-    Unsigned_Integer unsigned_coeff = detail::make_positive_unsigned(coeff);
 
     // If the coeff is not in range make it so
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
@@ -527,90 +579,77 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     // Round as required
     if (reduced)
     {
-        exp += detail::fenv_round<decimal64>(unsigned_coeff, bits_.sign);
+        exp += detail::fenv_round<decimal64>(unsigned_coeff, isneg);
     }
 
     auto reduced_coeff {static_cast<std::uint64_t>(unsigned_coeff)};
-
-    // zero the combination field, so we can mask in the following values
-    bits_.combination_field = UINT64_C(0);
-    bits_.significand = UINT64_C(0);
-    bits_.exponent = UINT64_C(0);
     bool big_combination {false};
 
     if (reduced_coeff == 0)
     {
-        bits_.significand = 0U;
-        bits_.combination_field = 0U;
-
         exp = 0;
     }
     else if (reduced_coeff <= detail::d64_no_combination)
     {
         // If the coefficient fits directly we don't need to use the combination field
-        bits_.significand = reduced_coeff;
+        bits_ |= (reduced_coeff & detail::d64_significand_mask);
     }
     else if (reduced_coeff <= detail::d64_big_combination)
     {
         // Break the number into 3 bits for the combination field and 50 bits for the significand field
 
         // Use the least significant 50 bits to set the significand
-        bits_.significand = reduced_coeff & detail::d64_no_combination;
+        bits_ |= (reduced_coeff & detail::d64_significand_mask);
 
         // Now set the combination field (maximum of 3 bits)
-        auto remaining_bits {reduced_coeff & detail::d64_small_combination_field_mask};
-        remaining_bits >>= 50;
-
-        bits_.combination_field |= remaining_bits;
+        std::uint64_t remaining_bits {reduced_coeff & detail::d64_small_combination_field_mask};
+        remaining_bits <<= detail::d64_exponent_bits;
+        bits_ |= remaining_bits;
     }
     else
     {
         // Have to use the full combination field
-        bits_.combination_field |= detail::d64_comb_11_mask;
+        bits_ |= detail::d64_comb_11_mask;
         big_combination = true;
 
-        bits_.significand = reduced_coeff & detail::d64_no_combination;
+        bits_ |= (reduced_coeff & detail::d64_significand_mask);
         const auto remaining_bit {reduced_coeff & detail::d64_big_combination_field_mask};
 
         if (remaining_bit)
         {
-            bits_.combination_field |= 1U;
+            bits_ |= detail::d64_comb_11_significand_bits;
         }
     }
 
     // If the exponent fits we do not need to use the combination field
     auto biased_exp {static_cast<std::uint64_t>(exp + detail::bias_v<decimal64>)};
-    const auto biased_exp_low_eight {biased_exp & detail::d64_exp_combination_field_mask};
+    const std::uint64_t biased_exp_low_eight_bits {(biased_exp & detail::d64_max_exp_no_combination) << detail::d64_significand_bits};
 
     if (biased_exp <= detail::d64_max_exp_no_combination)
     {
-        bits_.exponent = biased_exp;
+        bits_ |= biased_exp_low_eight_bits;
     }
     else if (biased_exp <= detail::d64_exp_one_combination)
     {
         if (big_combination)
         {
-            bits_.combination_field |= detail::d64_comb_1101_mask;
+            bits_ |= (detail::d64_comb_1101_mask | biased_exp_low_eight_bits);
         }
         else
         {
-            bits_.combination_field |= detail::d64_comb_01_mask;
+            bits_ |= (detail::d64_comb_01_mask | biased_exp_low_eight_bits);
         }
-
-        bits_.exponent = biased_exp_low_eight;
     }
     else if (biased_exp <= detail::d64_max_biased_exp)
     {
         if (big_combination)
         {
-            bits_.combination_field |= detail::d64_comb_1110_mask;
+            bits_ |= (detail::d64_comb_1110_mask | biased_exp_low_eight_bits);
         }
         else
         {
-            bits_.combination_field |= detail::d64_comb_10_mask;
+            bits_ |= (detail::d64_comb_10_mask | biased_exp_low_eight_bits);
         }
-
-        bits_.exponent = biased_exp_low_eight;
     }
     else
     {
@@ -633,16 +672,16 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
 
             if (detail::num_digits(reduced_coeff) <= detail::precision_v<decimal64>)
             {
-                *this = decimal64(reduced_coeff, exp, static_cast<bool>(bits_.sign));
+                *this = decimal64(reduced_coeff, exp, isneg);
             }
             else
             {
-                bits_.combination_field = detail::d64_comb_inf_mask;
+                bits_ = detail::d64_comb_inf_mask;
             }
         }
         else
         {
-            bits_.combination_field = detail::d64_comb_inf_mask;
+            bits_ = detail::d64_comb_inf_mask;
         }
     }
 }
@@ -792,18 +831,23 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
 {
     std::uint64_t expval {};
 
-    if ((bits_.combination_field & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
+    const auto exp_comb_bits {(bits_ & detail::d64_comb_11_mask)};
+
+    if (exp_comb_bits == detail::d64_comb_11_mask)
     {
         // bits 2 and 3 are the exp part of the combination field
-        expval |= (bits_.combination_field & detail::d64_comb_11_exp_bits) << 7;
+        expval = (bits_ & detail::d64_comb_11_exp_bits) >> (detail::d64_significand_bits + 1);
     }
-    else
+    else if (exp_comb_bits == detail::d64_comb_10_mask)
     {
-        // bits 0 and 1 are the exp part of the combination field
-        expval |= (bits_.combination_field & detail::d64_comb_11_mask) << 5;
+        expval = UINT64_C(0b1000000000);
+    }
+    else if (exp_comb_bits == detail::d64_comb_01_mask)
+    {
+        expval = UINT64_C(0b0100000000);
     }
 
-    expval |= bits_.exponent;
+    expval |= (bits_ & detail::d64_exponent_mask) >> detail::d64_significand_bits;
 
     return expval;
 }
@@ -817,31 +861,33 @@ constexpr auto decimal64::full_significand() const noexcept -> std::uint64_t
 {
     std::uint64_t significand {};
 
-    if ((bits_.combination_field & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
+    if ((bits_ & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
     {
         // Only need the one bit of T because the other 3 are implied
-        if (bits_.combination_field & detail::d64_comb_11_significand_bits)
+        if ((bits_ & detail::d64_comb_11_significand_bits) == detail::d64_comb_11_significand_bits)
         {
-            significand = 0b1001'0000000000'0000000000'0000000000'0000000000'0000000000;
+            significand = UINT64_C(0b1001'0000000000'0000000000'0000000000'0000000000'0000000000);
         }
         else
         {
-            significand = 0b1000'0000000000'0000000000'0000000000'0000000000'0000000000;
+            significand = UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000);
         }
     }
     else
     {
-        significand |= ((bits_.combination_field & UINT64_C(0b00111)) << 50);
+        // Last three bits in the combination field, so we need to shift past the exp field
+        // which is next
+        significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
     }
 
-    significand |= bits_.significand;
+    significand |= (bits_ & detail::d64_significand_mask);
 
     return significand;
 }
 
 constexpr auto decimal64::isneg() const noexcept -> bool
 {
-    return static_cast<bool>(bits_.sign);
+    return static_cast<bool>(bits_ & detail::d64_sign_mask);
 }
 
 template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
@@ -852,27 +898,34 @@ constexpr auto decimal64::edit_exponent(T expval) noexcept -> void
 
 constexpr auto decimal64::edit_sign(bool sign) noexcept -> void
 {
-    this->bits_.sign = static_cast<std::uint64_t>(sign);
+    if (sign)
+    {
+        bits_ |= detail::d64_sign_mask;
+    }
+    else
+    {
+        bits_ &= ~detail::d64_sign_mask;
+    }
 }
 
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
-    return static_cast<bool>(rhs.bits_.sign);
+    return rhs.bits_ & detail::d64_sign_mask;
 }
 
 constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
-    return (rhs.bits_.combination_field & detail::d64_comb_nan_mask) == detail::d64_comb_nan_mask;
+    return (rhs.bits_ & detail::d64_nan_mask) == detail::d64_nan_mask;
 }
 
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
-    return ((rhs.bits_.combination_field & detail::d64_comb_inf_mask) == detail::d64_comb_inf_mask) && (!isnan(rhs));
+    return ((rhs.bits_ & detail::d64_nan_mask) == detail::d64_inf_mask);
 }
 
 constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
-    return isnan(rhs) && (rhs.bits_.exponent & detail::d64_exp_snan_mask) == detail::d64_exp_snan_mask;
+    return (rhs.bits_ & detail::d64_snan_mask) == detail::d64_snan_mask;
 }
 
 constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
@@ -896,10 +949,9 @@ constexpr auto operator+(decimal64 rhs) noexcept -> decimal64
 
 constexpr auto operator-(decimal64 rhs) noexcept-> decimal64
 {
-    rhs.bits_.sign ^= UINT64_C(1);
+    rhs.bits_ ^= detail::d64_sign_mask;
     return rhs;
 }
-
 
 template<typename T1, typename T2>
 constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
@@ -1935,6 +1987,106 @@ constexpr auto operator<=>(Integer lhs, decimal64 rhs) noexcept -> std::enable_i
 }
 
 #endif
+
+constexpr auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    return from_bits(lhs.bits_ & rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator&(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(lhs.bits_ & static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator&(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(static_cast<std::uint64_t>(lhs) & rhs.bits_);
+}
+
+constexpr auto operator|(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    return from_bits(lhs.bits_ | rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator|(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(lhs.bits_ | static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator|(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(static_cast<std::uint64_t>(lhs) | rhs.bits_);
+}
+
+constexpr auto operator^(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    return from_bits(lhs.bits_ ^ rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator^(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(lhs.bits_ ^ static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator^(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(static_cast<std::uint64_t>(lhs) ^ rhs.bits_);
+}
+
+constexpr auto operator<<(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    return from_bits(lhs.bits_ << rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator<<(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(lhs.bits_ << static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator<<(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(static_cast<std::uint64_t>(lhs) << rhs.bits_);
+}
+
+constexpr auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    return from_bits(lhs.bits_ >> rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator>>(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(lhs.bits_ >> static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator>>(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(static_cast<std::uint64_t>(lhs) >> rhs.bits_);
+}
+
+constexpr auto operator~(decimal64 lhs) noexcept -> decimal64
+{
+    return from_bits(~lhs.bits_);
+}
 
 // 3.6.4
 // Effects: determines if the quantum exponents of x and y are the same.

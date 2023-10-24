@@ -48,6 +48,7 @@
 #include <boost/decimal/detail/cmath/nearbyint.hpp>
 #include <boost/decimal/detail/cmath/round.hpp>
 #include <boost/decimal/detail/cmath/next.hpp>
+#include <boost/decimal/detail/cmath/exp2.hpp>
 #include <boost/decimal/numbers.hpp>
 
 // Macros from 3.6.2

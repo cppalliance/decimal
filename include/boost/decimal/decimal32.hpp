@@ -120,6 +120,12 @@ struct decimal32_components
 
 } // namespace detail
 
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
+
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
 class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
@@ -443,6 +449,59 @@ public:
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
 
+    // Bitwise operators
+    friend constexpr auto operator&(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend constexpr auto operator&(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend constexpr auto operator&(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    friend constexpr auto operator|(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend constexpr auto operator|(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend constexpr auto operator|(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    friend constexpr auto operator^(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend constexpr auto operator^(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend constexpr auto operator^(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    friend constexpr auto operator<<(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend constexpr auto operator<<(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend constexpr auto operator<<(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    friend constexpr auto operator>>(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
+
+    template <typename Integer>
+    friend constexpr auto operator>>(decimal32 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    template <typename Integer>
+    friend constexpr auto operator>>(Integer lhs, decimal32 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+
+    friend constexpr auto operator~(decimal32 lhs) noexcept -> decimal32;
+
     // <cmath> extensions
     // 3.6.4 Same Quantum
     friend constexpr auto samequantumd32(decimal32 lhs, decimal32 rhs) noexcept -> bool;
@@ -481,6 +540,10 @@ private:
     // Replaces the current sign with the one provided
     constexpr auto edit_sign(bool sign) noexcept -> void;
 };
+
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
 
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
 constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)
@@ -1414,7 +1477,7 @@ constexpr auto decimal32::full_significand() const noexcept -> std::uint32_t
     }
     else
     {
-        // Last three bits in the combination filed so we need to shift past the exp field
+        // Last three bits in the combination field, so we need to shift past the exp field
         // which is next
         significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
     }
@@ -1972,6 +2035,106 @@ constexpr decimal32::operator std::bfloat16_t() const noexcept
     return static_cast<std::bfloat16_t>(to_float<decimal32, float>(*this));
 }
 #endif
+
+constexpr auto operator&(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    return from_bits(lhs.bits_ & rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator&(decimal32 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return from_bits(lhs.bits_ & static_cast<std::uint32_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator&(Integer lhs, decimal32 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return from_bits(static_cast<std::uint32_t>(lhs) & rhs.bits_);
+}
+
+constexpr auto operator|(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    return from_bits(lhs.bits_ | rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator|(decimal32 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return from_bits(lhs.bits_ | static_cast<std::uint32_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator|(Integer lhs, decimal32 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return from_bits(static_cast<std::uint32_t>(lhs) | rhs.bits_);
+}
+
+constexpr auto operator^(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    return from_bits(lhs.bits_ ^ rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator^(decimal32 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return from_bits(lhs.bits_ ^ static_cast<std::uint32_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator^(Integer lhs, decimal32 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return from_bits(static_cast<std::uint32_t>(lhs) ^ rhs.bits_);
+}
+
+constexpr auto operator<<(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    return from_bits(lhs.bits_ << rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator<<(decimal32 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return from_bits(lhs.bits_ << static_cast<std::uint32_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator<<(Integer lhs, decimal32 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return from_bits(static_cast<std::uint32_t>(lhs) << rhs.bits_);
+}
+
+constexpr auto operator>>(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+{
+    return from_bits(lhs.bits_ >> rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator>>(decimal32 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return from_bits(lhs.bits_ >> static_cast<std::uint32_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator>>(Integer lhs, decimal32 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+{
+    return from_bits(static_cast<std::uint32_t>(lhs) >> rhs.bits_);
+}
+
+constexpr auto operator~(decimal32 lhs) noexcept -> decimal32
+{
+    return from_bits(~lhs.bits_);
+}
 
 // 3.6.4
 // Effects: determines if the quantum exponents of x and y are the same.

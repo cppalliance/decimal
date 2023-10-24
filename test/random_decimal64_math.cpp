@@ -23,6 +23,12 @@ static std::mt19937_64 rng(42);
 #  pragma warning(disable: 4146)
 #endif
 
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
+
 template <typename T>
 void random_addition(T lower, T upper)
 {
@@ -365,6 +371,416 @@ void random_mixed_division(T lower, T upper)
     BOOST_TEST(isinf(val1 / zero));
 }
 
+void random_and()
+{
+    std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint64_t));
+        decimal64 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint64_t));
+
+        const decimal64 res {dec1 & dec2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 & val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
+void random_mixed_and()
+{
+    std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint64_t));
+
+        const decimal64 res {dec1 & val2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 & val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint64_t));
+
+        const decimal64 res {val1 & dec2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 & val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
+void random_or()
+{
+    std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint64_t));
+        decimal64 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint64_t));
+
+        const decimal64 res {dec1 | dec2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 | val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
+void random_mixed_or()
+{
+    std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint64_t));
+
+        const decimal64 res {dec1 | val2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 | val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint64_t));
+
+        const decimal64 res {val1 | dec2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 | val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
+void random_xor()
+{
+    std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint64_t));
+        decimal64 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint64_t));
+
+        const decimal64 res {dec1 ^ dec2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 ^ val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
+void random_mixed_xor()
+{
+    std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint64_t));
+
+        const decimal64 res {dec1 ^ val2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 ^ val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint64_t));
+
+        const decimal64 res {val1 ^ dec2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 ^ val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
+void random_left_shift()
+{
+    std::uniform_int_distribution<std::uint64_t> dist(0, 10);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint64_t));
+        decimal64 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint64_t));
+
+        const decimal64 res {dec1 << dec2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 << val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
+void random_mixed_left_shift()
+{
+    std::uniform_int_distribution<std::uint64_t> dist(0, 10);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint64_t));
+
+        const decimal64 res {dec1 << val2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 << val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint64_t));
+
+        const decimal64 res {val1 << dec2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 << val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
+void random_right_shift()
+{
+    std::uniform_int_distribution<std::uint64_t> dist(0, 10);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint64_t));
+        decimal64 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint64_t));
+
+        const decimal64 res {dec1 >> dec2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 >> val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
+void random_mixed_right_shift()
+{
+    std::uniform_int_distribution<std::uint64_t> dist(0, 10);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec1 {};
+        std::memcpy(&dec1, &val1, sizeof(std::uint64_t));
+
+        const decimal64 res {dec1 >> val2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 >> val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+
+        decimal64 dec2 {};
+        std::memcpy(&dec2, &val2, sizeof(std::uint64_t));
+
+        const decimal64 res {val1 >> dec2};
+        std::uint64_t dec_int {};
+        std::memcpy(&dec_int, &res, sizeof(std::uint64_t));
+        const auto res_int {val1 >> val2};
+
+        if (!BOOST_TEST_EQ(dec_int, res_int))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << res_int << std::endl;
+        }
+    }
+}
+
 int main()
 {
     // Values that won't exceed the range of the significand
@@ -463,9 +879,26 @@ int main()
     spot_check_sub(-954783, 746);
     spot_check_sub(513479119LL, 972535711690LL);
 
+    // Bitwise operators
+    random_and();
+    random_mixed_and();
+    random_or();
+    random_mixed_or();
+    random_xor();
+    random_mixed_xor();
+    random_left_shift();
+    random_mixed_left_shift();
+    random_right_shift();
+    random_mixed_right_shift();
+
     return boost::report_errors();
 }
 
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #endif
+
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
+
