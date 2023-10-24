@@ -16,6 +16,10 @@ namespace local
 {
   auto test_tgamma(const std::int32_t tol_factor, const long double range_lo, const long double range_hi) -> bool
   {
+    static_cast<void>(tol_factor);
+    static_cast<void>(range_lo);
+    static_cast<void>(range_hi);
+
     auto result_is_ok = true;
 
     BOOST_TEST(result_is_ok);
