@@ -848,7 +848,7 @@ constexpr auto decimal64::edit_sign(bool sign) noexcept -> void
 
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
-    return static_cast<bool>(rhs.bits_.sign);
+    return rhs.bits_ & detail::d64_sign_mask;
 }
 
 constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
