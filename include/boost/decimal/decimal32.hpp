@@ -120,6 +120,12 @@ struct decimal32_components
 
 } // namespace detail
 
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
+
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
 class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
@@ -534,6 +540,10 @@ private:
     // Replaces the current sign with the one provided
     constexpr auto edit_sign(bool sign) noexcept -> void;
 };
+
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
 
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
 constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)

@@ -23,6 +23,11 @@ static std::mt19937_64 rng(42); // NOSONAR : Global rng is not const
 #  pragma warning(disable: 4146)
 #endif
 
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 
 template <typename T>
 void random_addition(T lower, T upper)
@@ -921,4 +926,9 @@ int main()
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #endif
+
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
+
 

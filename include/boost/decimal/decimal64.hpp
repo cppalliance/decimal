@@ -122,6 +122,11 @@ struct decimal64_components
 
 } //namespace detail
 
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 class decimal64 final
 {
 private:
@@ -517,6 +522,10 @@ public:
     friend constexpr auto scalbnd64(decimal64 num, int exp) noexcept -> decimal64;
     friend constexpr auto scalblnd64(decimal64 num, long exp) noexcept -> decimal64;
 };
+
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
 
 constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
 {
