@@ -78,7 +78,7 @@ static constexpr std::uint64_t d64_exponent_bits = UINT64_C(8);
 
 static constexpr std::uint64_t d64_comb_01_mask = UINT64_C(0b0'01000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 static constexpr std::uint64_t d64_comb_10_mask = UINT64_C(0b0'10000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
-static constexpr std::uint64_t d64_comb_00_01_10_significand_bits = UINT64_C(0b0'00111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)
+static constexpr std::uint64_t d64_comb_00_01_10_significand_bits = UINT64_C(0b0'00111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 
 // This mask is used to determine if we use the masks above or below since 11 TTT is invalid
 static constexpr std::uint64_t d64_comb_11_mask = UINT64_C(0b0'11000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
@@ -858,12 +858,12 @@ constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) no
 
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
-    return ((rhs.bits_ & detail::d32_nan_mask) == detail::d32_inf_mask);
+    return ((rhs.bits_ & detail::d64_nan_mask) == detail::d64_inf_mask);
 }
 
 constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
-    return (rhs.bits_ & detail::d32_snan_mask) == detail::d32_snan_mask;
+    return (rhs.bits_ & detail::d64_snan_mask) == detail::d64_snan_mask;
 }
 
 constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
