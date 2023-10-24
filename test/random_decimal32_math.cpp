@@ -376,8 +376,6 @@ void random_mixed_division(T lower, T upper)
     BOOST_TEST(isinf(val1 / zero));
 }
 
-#if defined(__clang__) || defined(_MSC_VER)
-
 void random_and()
 {
     std::uniform_int_distribution<std::uint32_t> dist(0, 9'999'999);
@@ -787,8 +785,6 @@ void random_mixed_right_shift()
         }
     }
 }
-
-#endif
 
 int main()
 {
