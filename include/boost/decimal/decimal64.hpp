@@ -122,6 +122,11 @@ struct decimal64_components
 
 } //namespace detail
 
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 class decimal64 final
 {
 private:
@@ -453,6 +458,59 @@ public:
     // 3.6.6 Quantize
     friend constexpr auto quantized64(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
+    // Bit-wise operators
+    friend constexpr auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator&(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator&(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator|(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator|(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator|(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator^(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator^(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator^(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator<<(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator<<(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator<<(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
+
+    template <typename Integer>
+    friend constexpr auto operator>>(decimal64 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    template <typename Integer>
+    friend constexpr auto operator>>(Integer lhs, decimal64 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
+
+    friend constexpr auto operator~(decimal64 lhs) noexcept -> decimal64;
+
     // <cmath> functions that need to be friends
     template <typename T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept
@@ -464,6 +522,10 @@ public:
     friend constexpr auto scalbnd64(decimal64 num, int exp) noexcept -> decimal64;
     friend constexpr auto scalblnd64(decimal64 num, long exp) noexcept -> decimal64;
 };
+
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
 
 constexpr auto from_bits(std::uint64_t bits) noexcept -> decimal64
 {
@@ -1925,6 +1987,106 @@ constexpr auto operator<=>(Integer lhs, decimal64 rhs) noexcept -> std::enable_i
 }
 
 #endif
+
+constexpr auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    return from_bits(lhs.bits_ & rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator&(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(lhs.bits_ & static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator&(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(static_cast<std::uint64_t>(lhs) & rhs.bits_);
+}
+
+constexpr auto operator|(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    return from_bits(lhs.bits_ | rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator|(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(lhs.bits_ | static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator|(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(static_cast<std::uint64_t>(lhs) | rhs.bits_);
+}
+
+constexpr auto operator^(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    return from_bits(lhs.bits_ ^ rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator^(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(lhs.bits_ ^ static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator^(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(static_cast<std::uint64_t>(lhs) ^ rhs.bits_);
+}
+
+constexpr auto operator<<(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    return from_bits(lhs.bits_ << rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator<<(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(lhs.bits_ << static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator<<(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(static_cast<std::uint64_t>(lhs) << rhs.bits_);
+}
+
+constexpr auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+{
+    return from_bits(lhs.bits_ >> rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator>>(decimal64 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(lhs.bits_ >> static_cast<std::uint64_t>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator>>(Integer lhs, decimal64 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
+{
+    return from_bits(static_cast<std::uint64_t>(lhs) >> rhs.bits_);
+}
+
+constexpr auto operator~(decimal64 lhs) noexcept -> decimal64
+{
+    return from_bits(~lhs.bits_);
+}
 
 // 3.6.4
 // Effects: determines if the quantum exponents of x and y are the same.
