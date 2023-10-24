@@ -21,46 +21,59 @@
 #  include <boost/core/bit.hpp>
 #endif
 
-namespace boost { namespace decimal { namespace detail {
+namespace boost {
+namespace decimal {
+namespace detail {
+
+#if __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
+#if !defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__)
+#  pragma GCC diagnostic ignored "-Wreorder"
+#endif
 
 // Compilers might support built-in 128-bit integer types. However, it seems that
 // emulating them with a pair of 64-bit integers actually produces a better code,
 // so we avoid using those built-ins. That said, they are still useful for
 // implementing 64-bit x 64-bit -> 128-bit multiplication.
 
-// Memcpy-able temp class for uint128
-struct trivial_uint128
-{
-    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
-    std::uint64_t low;
-    std::uint64_t high;
-    #else
-    std::uint64_t high;
-    std::uint64_t low;
-    #endif
-};
-
 // Macro replacement lists can not be enclosed in parentheses
 struct uint128
 {
-    std::uint64_t high;
-    std::uint64_t low;
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+    std::uint64_t low {};
+    std::uint64_t high {};
+    #else
+    std::uint64_t high {};
+    std::uint64_t low {};
+    #endif
 
     // Constructors
-    constexpr uint128() noexcept : high {}, low {} {}
+    constexpr uint128() noexcept = default;
 
     constexpr uint128(const uint128& v) noexcept = default;
 
     constexpr uint128(uint128&& v) noexcept = default;
 
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+    constexpr uint128(std::uint64_t high_, std::uint64_t low_) noexcept : low {low_}, high {high_} {}
+    #else
     constexpr uint128(std::uint64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
+    #endif
 
-    constexpr uint128(const trivial_uint128& v) noexcept : high {v.high}, low {v.low} {} // NOLINT
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
 
-    constexpr uint128(trivial_uint128&& v) noexcept : high {v.high}, low {v.low} {} // NOLINT
+    #define SIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : low {static_cast<std::uint64_t>(v)}, high {v < 0 ? UINT64_MAX : UINT64_C(0)} {}// NOLINT
+    #define UNSIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : low {static_cast<std::uint64_t>(v)}, high {} {} // NOLINT
 
-    #define SIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : high {v < 0 ? UINT64_MAX : UINT64_C(0)}, low {static_cast<std::uint64_t>(v)} {} // NOLINT
+    #else
+
+    #define SIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : high {v < 0 ? UINT64_MAX : UINT64_C(0)}, low {static_cast<std::uint64_t>(v)} {}// NOLINT
     #define UNSIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : high {}, low {static_cast<std::uint64_t>(v)} {} // NOLINT
+
+    #endif
 
     SIGNED_CONSTRUCTOR(char)                    // NOLINT
     SIGNED_CONSTRUCTOR(signed char)             // NOLINT
@@ -76,13 +89,27 @@ struct uint128
     UNSIGNED_CONSTRUCTOR(unsigned long long)    // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr uint128(boost::int128_type v) noexcept :  // NOLINT : Allow implicit conversions
-        high {static_cast<std::uint64_t>(v >> 64)},
+    #  if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+
+    constexpr uint128(boost::int128_type v) noexcept :  // NOLINT : Allow implicit conversions,
+         low {static_cast<std::uint64_t>(static_cast<boost::uint128_type>(v) & ~UINT64_C(0))},
+         high {static_cast<std::uint64_t>(v >> 64)} {}
+
+    constexpr uint128(boost::uint128_type v) noexcept : // NOLINT : Allow implicit conversions
+        low {static_cast<std::uint64_t>(v & ~UINT64_C(0))},
+        high {static_cast<std::uint64_t>(v >> 64)} {}
+
+    #  else
+
+    constexpr uint128(boost::int128_type v) noexcept :  // NOLINT : Allow implicit conversions,
+         high {static_cast<std::uint64_t>(v >> 64)},
          low {static_cast<std::uint64_t>(static_cast<boost::uint128_type>(v) & ~UINT64_C(0))} {}
 
     constexpr uint128(boost::uint128_type v) noexcept : // NOLINT : Allow implicit conversions
         high {static_cast<std::uint64_t>(v >> 64)},
-         low {static_cast<std::uint64_t>(v & ~UINT64_C(0))} {}
+        low {static_cast<std::uint64_t>(v & ~UINT64_C(0))}{}
+        
+    #  endif
     #endif
 
     #undef SIGNED_CONSTRUCTOR
@@ -109,8 +136,6 @@ struct uint128
     constexpr auto operator=(const boost::int128_type&  v) noexcept -> uint128& { *this = uint128(v); return *this; }
     constexpr auto operator=(const boost::uint128_type& v) noexcept -> uint128& { *this = uint128(v); return *this; }
     #endif
-
-    constexpr auto operator=(const trivial_uint128& v) noexcept -> uint128& { this->low = v.low; this->high = v.high; return *this; }
 
     constexpr auto operator=(const uint128&) noexcept -> uint128&;
 
@@ -534,6 +559,10 @@ private:
 
     constexpr friend auto div_impl(uint128 lhs, uint128 rhs, uint128 &quotient, uint128 &remainder) noexcept -> void;
 };
+
+#if (__GNUC__ >= 8) || (!defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__))
+#  pragma GCC diagnostic pop
+#endif
 
 constexpr auto operator-(uint128 val) noexcept -> uint128
 {
@@ -959,7 +988,7 @@ struct numeric_limits<boost::decimal::detail::uint128>
     BOOST_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = false;
 
     // These members were deprecated in C++23
-    #if __cplusplus <= 202002L || _MSVC_LANG <= 202002L
+    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
     BOOST_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
     BOOST_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = false;
     #endif

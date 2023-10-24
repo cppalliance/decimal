@@ -9,18 +9,23 @@
 #include <type_traits>
 #include <cstring>
 
-namespace boost { namespace decimal { namespace detail {
+namespace boost {
+namespace decimal {
+namespace detail {
+
+#if defined(__GNUC__) && !defined(__clang__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Warray-bounds"
+#  if __GNUC__ >= 8
+#    pragma GCC diagnostic ignored "-Wclass-memaccess"
+#  endif
+#endif
 
 #ifdef BOOST_DECIMAL_HAS_CONSTEXPR_BITCAST
 
 using std::bit_cast;
 
 #else
-
-#if defined(__GNUC__) && !defined(__clang__)
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
 
 template<class To, class From>
 auto bit_cast(const From& src) noexcept -> To
