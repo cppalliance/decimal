@@ -101,7 +101,6 @@ static constexpr std::uint64_t d64_big_combination = 0b111'1111111111'1111111111
 
 // Exponent fields
 static constexpr std::uint64_t d64_max_exp_no_combination = 0b11111111;
-static constexpr std::uint64_t d64_exp_combination_field_mask = d64_max_exp_no_combination;
 static constexpr std::uint64_t d64_exp_one_combination = 0b1'11111111;
 static constexpr std::uint64_t d64_max_biased_exp = 0b10'11111111;
 static constexpr std::uint64_t d64_small_combination_field_mask = 0b111'0000000000'0000000000'0000000000'0000000000'0000000000;
