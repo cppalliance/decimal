@@ -487,7 +487,7 @@ public:
     friend constexpr auto operator>>(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
     template <typename Integer>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto operator>>(decimal32 lhs, Integer rhs) noexcept
+    friend constexpr auto operator>>(decimal32 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
 
     template <typename Integer>
