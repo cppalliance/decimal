@@ -52,6 +52,16 @@ namespace decimal {
 
 namespace detail {
 
+// See IEEE 754 section 3.5.2
+static constexpr uint128 d128_inf_mask {d64_inf_mask, UINT64_C(0)};
+static constexpr uint128 d128_nan_mask {d64_nan_mask, UINT64_C(0)};
+static constexpr uint128 d128_snan_mask {d64_snan_mask, UINT64_C(0)};
+static constexpr uint128 d128_comb_inf_mask {d64_comb_inf_mask, UINT64_C(0)};
+static constexpr uint128 d128_comb_nan_mask {d64_comb_nan_mask, UINT64_C(0)};
+static constexpr uint128 d128_exp_snan_mask {d64_exp_snan_mask, UINT64_C(0)};
+
+
+
 }
 
 } //namespace decimal

@@ -53,7 +53,7 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-// See IEEE 754 dection 3.5.2
+// See IEEE 754 section 3.5.2
 static constexpr auto d64_inf_mask = UINT64_C(0b0'11110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 static constexpr auto d64_nan_mask = UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 static constexpr auto d64_snan_mask = UINT64_C(0b0'11111'10000000'0000000000'0000000000'0000000000'0000000000'0000000000);
