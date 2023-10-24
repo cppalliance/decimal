@@ -1265,6 +1265,19 @@ void test_pow()
     BOOST_TEST_EQ(pow(two, 4 * dist(rng)), two * two * two * two);
 }
 
+template <typename T>
+void test_exp2()
+{
+    std::uniform_int_distribution<int> dist(1, 1);
+
+    const T two {2, 0};
+    BOOST_TEST_EQ(exp2(two), two * two * dist(rng));
+    BOOST_TEST_EQ(exp2(T(0 * dist(rng))), T(dist(rng)));
+    BOOST_TEST(isnan(exp2(std::numeric_limits<T>::quiet_NaN())));
+    BOOST_TEST(isinf(exp2(std::numeric_limits<T>::infinity())));
+    BOOST_TEST_EQ(exp2(-std::numeric_limits<T>::infinity()), T(0 * dist(rng)));
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -1359,6 +1372,9 @@ int main()
 
     test_pow<decimal32>();
     test_pow<decimal64>();
+
+    test_exp2<decimal32>();
+    test_exp2<decimal64>();
 
     return boost::report_errors();
 }
