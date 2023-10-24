@@ -63,12 +63,16 @@ struct uint128
     constexpr uint128(std::uint64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
     #endif
 
-    #ifdef BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+
     #define SIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : low {static_cast<std::uint64_t>(v)}, high {v < 0 ? UINT64_MAX : UINT64_C(0)} {}// NOLINT
     #define UNSIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : low {static_cast<std::uint64_t>(v)}, high {} {} // NOLINT
+
     #else
+
     #define SIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : high {v < 0 ? UINT64_MAX : UINT64_C(0)}, low {static_cast<std::uint64_t>(v)} {}// NOLINT
     #define UNSIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : high {}, low {static_cast<std::uint64_t>(v)} {} // NOLINT
+
     #endif
 
     SIGNED_CONSTRUCTOR(char)                    // NOLINT
