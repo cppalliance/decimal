@@ -135,6 +135,15 @@ class decimal128 final
 private:
     detail::uint128 bits_ {};
 
+    #ifdef BOOST_DECIMAL_HAS_INT128
+
+    friend constexpr auto from_bits(uint128_type rhs) noexcept -> decimal128;
+    friend constexpr auto to_bits(decimal128 rhs) noexcept -> uint128_type;
+
+    #endif
+
+    friend constexpr auto from_bits(detail::uint128 rhs) noexcept -> decimal128;
+
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
@@ -143,6 +152,31 @@ public:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal128(T1 coeff, T2 exp, bool sign = false) noexcept;
 };
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr auto from_bits(uint128_type rhs) noexcept -> decimal128
+{
+    decimal128 result;
+    result.bits_ = rhs;
+
+    return result;
+}
+
+constexpr auto to_bits(decimal128 rhs) noexcept -> uint128_type
+{
+    return static_cast<uint128_type>(rhs.bits_);
+}
+
+#endif
+
+constexpr auto from_bits(detail::uint128 rhs) noexcept -> decimal128
+{
+    decimal128 result;
+    result.bits_ = rhs;
+
+    return result;
+}
 
 // TODO(mborland): Rather than doing bitwise operations on the whole uint128 we should
 // be able to only operate on the affected word
