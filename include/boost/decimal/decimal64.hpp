@@ -78,6 +78,7 @@ static constexpr std::uint64_t d64_exponent_bits = UINT64_C(8);
 
 static constexpr std::uint64_t d64_comb_01_mask = UINT64_C(0b0'01000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
 static constexpr std::uint64_t d64_comb_10_mask = UINT64_C(0b0'10000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
+static constexpr std::uint64_t d64_comb_00_01_10_significand_bits = UINT64_C(0b0'00111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)
 
 // This mask is used to determine if we use the masks above or below since 11 TTT is invalid
 static constexpr std::uint64_t d64_comb_11_mask = UINT64_C(0b0'11000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000);
@@ -798,24 +799,26 @@ constexpr auto decimal64::full_significand() const noexcept -> std::uint64_t
 {
     std::uint64_t significand {};
 
-    if ((bits_.combination_field & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
+    if ((bits_ & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
     {
         // Only need the one bit of T because the other 3 are implied
-        if (bits_.combination_field & detail::d64_comb_11_significand_bits)
+        if ((bits_ & detail::d64_comb_11_significand_bits) == detail::d64_comb_11_significand_bits)
         {
-            significand = 0b1001'0000000000'0000000000'0000000000'0000000000'0000000000;
+            significand = UINT64_C(0b1001'0000000000'0000000000'0000000000'0000000000'0000000000);
         }
         else
         {
-            significand = 0b1000'0000000000'0000000000'0000000000'0000000000'0000000000;
+            significand = UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000);
         }
     }
     else
     {
-        significand |= ((bits_.combination_field & UINT64_C(0b00111)) << 50);
+        // Last three bits in the combination field, so we need to shift past the exp field
+        // which is next
+        significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
     }
 
-    significand |= bits_.significand;
+    significand |= (bits_ & detail::d64_significand_mask);
 
     return significand;
 }

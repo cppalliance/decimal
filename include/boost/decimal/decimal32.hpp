@@ -1414,7 +1414,7 @@ constexpr auto decimal32::full_significand() const noexcept -> std::uint32_t
     }
     else
     {
-        // Last three bits in the combination filed so we need to shift past the exp field
+        // Last three bits in the combination field, so we need to shift past the exp field
         // which is next
         significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
     }
