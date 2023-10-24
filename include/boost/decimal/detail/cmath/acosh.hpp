@@ -20,7 +20,7 @@ constexpr auto acosh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
 {
     const auto fpc = fpclassify(x);
 
-    auto result = -std::numeric_limits<T>::quiet_NaN();
+    T result { };
 
     if (fpc != FP_NORMAL)
     {
@@ -32,6 +32,14 @@ constexpr auto acosh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
         {
             result = x;
         }
+        else if (fpc == FP_ZERO)
+        {
+            result = -std::numeric_limits<T>::quiet_NaN();
+        }
+        else
+        {
+            result = x;
+        }
     }
     else
     {
@@ -39,7 +47,9 @@ constexpr auto acosh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
 
         if (x < one)
         {
-            // In this case, acosh(x) for x < 1 retains the initial value of -NaN.
+            // In this case, acosh(x) for x < 1 is -NaN.
+
+            result = -std::numeric_limits<T>::quiet_NaN();
         }
         else if (x > one)
         {
@@ -62,7 +72,7 @@ constexpr auto acosh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
                     // This is just a rearrangement of the standard form below
                     // devised to minimise loss of precision when x ~ 1:
 
-                    const auto two_y   = y + y;
+                    const auto two_y = y + y;
 
                     result = log1p(y + sqrt((y * y) + two_y));
                 }
