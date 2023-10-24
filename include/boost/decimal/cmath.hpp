@@ -48,6 +48,7 @@
 #include <boost/decimal/detail/cmath/sinh.hpp>
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/tanh.hpp>
+#include <boost/decimal/detail/cmath/tgamma.hpp>
 #include <boost/decimal/detail/cmath/trunc.hpp>
 #include <boost/decimal/numbers.hpp>
 
