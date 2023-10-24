@@ -158,6 +158,39 @@ constexpr auto num_digits(std::uint64_t x) noexcept -> int
     return 1;
 }
 
+#ifdef BOOST_MSVC
+# pragma warning(push)
+# pragma warning(disable: 4307) // MSVC 14.1 warns of intergral constant overflow
+#endif
+
+constexpr int num_digits(uint128 x) noexcept
+{
+    if (x.high == 0)
+    {
+        return num_digits(x.low);
+    }
+
+    constexpr uint128 digits_39 = static_cast<uint128>(UINT64_C(10000000000000000000)) *
+                                  static_cast<uint128>(UINT64_C(10000000000000000000));
+    uint128 current_power_of_10 = digits_39;
+
+    for (int i = 39; i > 0; --i)
+    {
+        if (x >= current_power_of_10)
+        {
+            return i;
+        }
+
+        current_power_of_10 /= 10U;
+    }
+
+    return 1;
+}
+
+#ifdef BOOST_MSVC
+# pragma warning(pop)
+#endif
+
 #ifdef BOOST_DECIMAL_HAS_INT128
 // Assume that if someone is using 128 bit ints they are favoring the top end of the range
 // Max value is 340,282,366,920,938,463,463,374,607,431,768,211,455 (39 digits)
