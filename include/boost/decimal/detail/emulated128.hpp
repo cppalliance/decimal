@@ -57,10 +57,19 @@ struct uint128
 
     constexpr uint128(uint128&& v) noexcept = default;
 
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     constexpr uint128(std::uint64_t high_, std::uint64_t low_) noexcept : low {low_}, high {high_} {}
+    #else
+    constexpr uint128(std::uint64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
+    #endif
 
+    #ifdef BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     #define SIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : low {static_cast<std::uint64_t>(v)}, high {v < 0 ? UINT64_MAX : UINT64_C(0)} {}// NOLINT
     #define UNSIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : low {static_cast<std::uint64_t>(v)}, high {} {} // NOLINT
+    #else
+    #define SIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : high {v < 0 ? UINT64_MAX : UINT64_C(0)}, low {static_cast<std::uint64_t>(v)} {}// NOLINT
+    #define UNSIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : high {}, low {static_cast<std::uint64_t>(v)} {} // NOLINT
+    #endif
 
     SIGNED_CONSTRUCTOR(char)                    // NOLINT
     SIGNED_CONSTRUCTOR(signed char)             // NOLINT
@@ -76,13 +85,27 @@ struct uint128
     UNSIGNED_CONSTRUCTOR(unsigned long long)    // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
+    #  if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+
     constexpr uint128(boost::int128_type v) noexcept :  // NOLINT : Allow implicit conversions,
          low {static_cast<std::uint64_t>(static_cast<boost::uint128_type>(v) & ~UINT64_C(0))},
          high {static_cast<std::uint64_t>(v >> 64)} {}
 
     constexpr uint128(boost::uint128_type v) noexcept : // NOLINT : Allow implicit conversions
-            low {static_cast<std::uint64_t>(v & ~UINT64_C(0))},
-            high {static_cast<std::uint64_t>(v >> 64)} {}
+        low {static_cast<std::uint64_t>(v & ~UINT64_C(0))},
+        high {static_cast<std::uint64_t>(v >> 64)} {}
+
+    #  else
+
+    constexpr uint128(boost::int128_type v) noexcept :  // NOLINT : Allow implicit conversions,
+         high {static_cast<std::uint64_t>(v >> 64)},
+         low {static_cast<std::uint64_t>(static_cast<boost::uint128_type>(v) & ~UINT64_C(0))} {}
+
+    constexpr uint128(boost::uint128_type v) noexcept : // NOLINT : Allow implicit conversions
+        high {static_cast<std::uint64_t>(v >> 64)},
+        low {static_cast<std::uint64_t>(v & ~UINT64_C(0))}{}
+        
+    #  endif
     #endif
 
     #undef SIGNED_CONSTRUCTOR
