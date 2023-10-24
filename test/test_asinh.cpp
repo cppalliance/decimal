@@ -59,7 +59,7 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_tanh(const int tol_factor, const bool negate, const long double range_lo, const long double range_hi) -> bool
+  auto test_asinh(const std::int32_t tol_factor, const bool negate, const long double range_lo, const long double range_hi) -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
@@ -92,10 +92,10 @@ namespace local
       const auto x_flt = (negate ? -x_flt_begin : x_flt_begin);
       const auto x_dec = static_cast<decimal_type>(x_flt);
 
-      using std::tanh;
+      using std::asinh;
 
-      const auto val_flt = tanh(x_flt);
-      const auto val_dec = tanh(x_dec);
+      const auto val_flt = asinh(x_flt);
+      const auto val_dec = asinh(x_dec);
 
       const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float>(val_dec), std::numeric_limits<float>::epsilon() * tol_factor);
 
@@ -116,7 +116,7 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_tanh_edge() -> bool
+  auto test_asinh_edge() -> bool
   {
     using decimal_type = boost::decimal::decimal32;
 
@@ -130,22 +130,35 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_nan = tanh(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+      const auto val_nan_pos = asinh(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
-      const auto result_val_nan_is_ok = isnan(val_nan);
+      const auto result_val_nan_pos_is_ok = isnan(val_nan_pos) && (!signbit(val_nan_pos));
 
-      BOOST_TEST(result_val_nan_is_ok);
+      BOOST_TEST(result_val_nan_pos_is_ok);
 
-      result_is_ok = (result_val_nan_is_ok && result_is_ok);
+      result_is_ok = (result_val_nan_pos_is_ok && result_is_ok);
     }
 
     for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
       static_cast<void>(i);
 
-      const auto val_inf_pos = tanh(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto val_nan_neg = asinh(-std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
-      const auto result_val_inf_pos_is_ok = (val_inf_pos == ::my_one());
+      const auto result_val_nan_neg_is_ok = isnan(val_nan_neg) && (signbit(val_nan_neg));
+
+      BOOST_TEST(result_val_nan_neg_is_ok);
+
+      result_is_ok = (result_val_nan_neg_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_inf_pos = asinh(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+
+      const auto result_val_inf_pos_is_ok = (isinf(val_inf_pos) && (!signbit(val_inf_pos)));
 
       BOOST_TEST(result_val_inf_pos_is_ok);
 
@@ -156,9 +169,9 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_inf_neg = tanh(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const auto val_inf_neg = asinh(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
 
-      const auto result_val_inf_neg_is_ok = (-val_inf_neg == ::my_one());
+      const auto result_val_inf_neg_is_ok = (isinf(val_inf_neg) && signbit(val_inf_neg));
 
       BOOST_TEST(result_val_inf_neg_is_ok);
 
@@ -169,9 +182,9 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_zero_pos = tanh(::my_zero());
+      const auto val_zero_pos = asinh(::my_zero());
 
-      const auto result_val_zero_pos_is_ok = (val_zero_pos == ::my_zero());
+      const auto result_val_zero_pos_is_ok = ((fpclassify(val_zero_pos) == FP_ZERO) && (!signbit(val_zero_pos)));
 
       BOOST_TEST(result_val_zero_pos_is_ok);
 
@@ -182,9 +195,9 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_zero_neg = tanh(-::my_zero());
+      const auto val_zero_neg = asinh(-::my_zero());
 
-      const auto result_val_zero_neg_is_ok = (-val_zero_neg == ::my_zero());
+      const auto result_val_zero_neg_is_ok = ((fpclassify(val_zero_neg) == FP_ZERO) && signbit(val_zero_neg));
 
       BOOST_TEST(result_val_zero_neg_is_ok);
 
@@ -200,38 +213,43 @@ auto main() -> int
 {
   auto result_is_ok = true;
 
-  const auto result_pos_is_ok = local::test_tanh(96, false, 0.03125L, 32.0L);
-  const auto result_neg_is_ok = local::test_tanh(96, true,  0.03125L, 32.0L);
+  constexpr boost::decimal::decimal32 fourth_root_epsilon { 1, -((std::numeric_limits<boost::decimal::decimal32>::digits10 + 1) / 4) };
 
-  const auto result_pos_narrow_is_ok = local::test_tanh(24, false, 0.125L, 8.0L);
-  const auto result_neg_narrow_is_ok = local::test_tanh(24, true,  0.125L, 8.0L);
+  const auto result_eps_is_ok =
+    local::test_asinh
+    (
+      static_cast<std::int32_t>(INT32_C(16) * INT32_C(262144)),
+      false,
+      static_cast<long double>(fourth_root_epsilon) / 40.0L,
+      static_cast<long double>(fourth_root_epsilon) * 40.0L
+    );
 
-  const auto result_pos_wide_is_ok = local::test_tanh(128, false, 0.015625L, 64.0L);
-  const auto result_neg_wide_is_ok = local::test_tanh(128, true,  0.015625L, 64.0L);
+  const auto result_tiny_is_ok       = local::test_asinh(static_cast<std::int32_t>(INT32_C(4096)), false, 1.001L, 1.1L);
+  const auto result_small_is_ok      = local::test_asinh(static_cast<std::int32_t>(INT32_C(96)),   false, 0.1L, 1.59L);
+  const auto result_medium_is_ok     = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   true,  1.59L, 10.1L);
+  const auto result_medium_neg_is_ok = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   false, 1.59L, 10.1L);
+  const auto result_large_is_ok      = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   false, 1.0E+01L, 1.0E+19L);
 
-  const auto result_edge_is_ok = local::test_tanh_edge();
+  BOOST_TEST(result_eps_is_ok);
+  BOOST_TEST(result_tiny_is_ok);
+  BOOST_TEST(result_small_is_ok);
+  BOOST_TEST(result_medium_is_ok);
+  BOOST_TEST(result_medium_neg_is_ok);
+  BOOST_TEST(result_large_is_ok);
 
-  BOOST_TEST(result_pos_is_ok);
-  BOOST_TEST(result_neg_is_ok);
+  const auto result_edge_is_ok  = local::test_asinh_edge();
 
-  BOOST_TEST(result_pos_narrow_is_ok);
-  BOOST_TEST(result_neg_narrow_is_ok);
-
-  BOOST_TEST(result_pos_wide_is_ok);
-  BOOST_TEST(result_neg_wide_is_ok);
-
-  BOOST_TEST(result_edge_is_ok);
-
-  result_is_ok = (result_pos_is_ok  && result_is_ok);
-  result_is_ok = (result_neg_is_ok  && result_is_ok);
-
-  result_is_ok = (result_pos_narrow_is_ok  && result_is_ok);
-  result_is_ok = (result_neg_narrow_is_ok  && result_is_ok);
-
-  result_is_ok = (result_pos_wide_is_ok  && result_is_ok);
-  result_is_ok = (result_neg_wide_is_ok  && result_is_ok);
-
-  result_is_ok = (result_edge_is_ok && result_is_ok);
+  result_is_ok =
+  (
+       result_eps_is_ok
+    && result_tiny_is_ok
+    && result_small_is_ok
+    && result_medium_is_ok
+    && result_medium_neg_is_ok
+    && result_large_is_ok
+    && result_edge_is_ok
+    && result_is_ok
+  );
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 

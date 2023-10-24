@@ -27,6 +27,7 @@ run random_mixed_decimal_math.cpp ;
 run roundtrip_decimal32.cpp ;
 run roundtrip_decimal64.cpp ;
 run test_acosh.cpp ;
+run test_asinh.cpp ;
 run test_cmath.cpp ;
 run test_constants.cpp ;
 run test_cosh.cpp ;
