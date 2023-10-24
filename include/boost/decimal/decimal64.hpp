@@ -768,18 +768,23 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
 {
     std::uint64_t expval {};
 
-    if ((bits_.combination_field & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
+    const auto exp_comb_bits {(bits_ & detail::d64_comb_11_mask)};
+
+    if (exp_comb_bits == detail::d64_comb_11_mask)
     {
         // bits 2 and 3 are the exp part of the combination field
-        expval |= (bits_.combination_field & detail::d64_comb_11_exp_bits) << 7;
+        expval = (bits_ & detail::d64_comb_11_exp_bits) >> (detail::d64_significand_bits + 1);
     }
-    else
+    else if (exp_comb_bits == detail::d64_comb_10_mask)
     {
-        // bits 0 and 1 are the exp part of the combination field
-        expval |= (bits_.combination_field & detail::d64_comb_11_mask) << 5;
+        expval = UINT64_C(0b1000000000);
+    }
+    else if (exp_comb_bits == detail::d64_comb_01_mask)
+    {
+        expval = UINT64_C(0b0100000000);
     }
 
-    expval |= bits_.exponent;
+    expval |= (bits_ & detail::d64_exponent_mask) >> detail::d64_significand_bits;
 
     return expval;
 }
