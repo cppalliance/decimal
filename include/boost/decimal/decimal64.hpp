@@ -825,7 +825,7 @@ constexpr auto decimal64::full_significand() const noexcept -> std::uint64_t
 
 constexpr auto decimal64::isneg() const noexcept -> bool
 {
-    return static_cast<bool>(bits_.sign);
+    return static_cast<bool>(bits_ & detail::d64_sign_mask);
 }
 
 template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
