@@ -9,6 +9,7 @@
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/detail/cmath/acosh.hpp>
+#include <boost/decimal/detail/cmath/asinh.hpp>
 #include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/cosh.hpp>
 #include <boost/decimal/detail/cmath/exp.hpp>
