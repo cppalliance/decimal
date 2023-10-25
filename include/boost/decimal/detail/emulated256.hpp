@@ -5,6 +5,8 @@
 #ifndef BOOST_CHARCONV_DETAIL_EMULATED256_HPP
 #define BOOST_CHARCONV_DETAIL_EMULATED256_HPP
 
+#if 0
+
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <cstdint>
@@ -417,5 +419,7 @@ struct numeric_limits<boost::decimal::detail::uint256>
 };
 
 } // Namespace std
+
+#endif
 
 #endif // BOOST_CHARCONV_DETAIL_EMULATED256_HPP
