@@ -16,8 +16,11 @@ namespace detail {
 
 struct uint256
 {
-    uint128 high;
-    uint128 low;
+    uint128 high {};
+    uint128 low {};
+
+    constexpr uint256() = default;
+    constexpr uint256& operator=(const uint256& rhs) = default;
 
     explicit operator uint128() const noexcept
     { 
