@@ -34,7 +34,7 @@ struct numeric_limits<boost::decimal::decimal64>;
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal64>;
+class numeric_limits<boost::decimal::decimal128>;
 #else
 struct numeric_limits<boost::decimal::decimal128>;
 #endif
