@@ -152,6 +152,13 @@ public:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal128(T1 coeff, T2 exp, bool sign = false) noexcept;
 
+    // cmath functions that are easier as friends
+    friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
+    friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
+    friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
+    friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
+    // friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
+
     friend std::string bit_string(decimal128 rhs) noexcept;
 };
 
@@ -335,6 +342,26 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
             bits_ = detail::d128_comb_inf_mask;
         }
     }
+}
+
+constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
+{
+    return rhs.bits_.high & detail::d128_sign_mask.high;
+}
+
+constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
+{
+    return (rhs.bits_.high & detail::d128_nan_mask.high) == detail::d128_nan_mask.high;
+}
+
+constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
+{
+    return ((rhs.bits_.high & detail::d128_nan_mask.high) == detail::d128_inf_mask.high);
+}
+
+constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
+{
+    return (rhs.bits_.high & detail::d128_snan_mask.high) == detail::d128_snan_mask.high;
 }
 
 } //namespace decimal
