@@ -137,8 +137,8 @@ private:
 
     #ifdef BOOST_DECIMAL_HAS_INT128
 
-    friend constexpr auto from_bits(uint128_type rhs) noexcept -> decimal128;
-    friend constexpr auto to_bits(decimal128 rhs) noexcept -> uint128_type;
+    friend constexpr auto from_bits(detail::uint128_t rhs) noexcept -> decimal128;
+    friend constexpr auto to_bits(decimal128 rhs) noexcept -> detail::uint128_t;
 
     #endif
 
@@ -155,7 +155,7 @@ public:
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-constexpr auto from_bits(uint128_type rhs) noexcept -> decimal128
+constexpr auto from_bits(detail::uint128_t rhs) noexcept -> decimal128
 {
     decimal128 result;
     result.bits_ = rhs;
@@ -163,9 +163,9 @@ constexpr auto from_bits(uint128_type rhs) noexcept -> decimal128
     return result;
 }
 
-constexpr auto to_bits(decimal128 rhs) noexcept -> uint128_type
+constexpr auto to_bits(decimal128 rhs) noexcept -> detail::uint128_t
 {
-    return static_cast<uint128_type>(rhs.bits_);
+    return static_cast<detail::uint128_t>(rhs.bits_);
 }
 
 #endif
