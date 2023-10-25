@@ -151,7 +151,16 @@ public:
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal128(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    friend std::string bit_string(decimal128 rhs) noexcept;
 };
+
+std::string bit_string(decimal128 rhs) noexcept
+{
+    std::stringstream ss;
+    ss << std::hex << rhs.bits_;
+    return ss.str();
+}
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
@@ -194,7 +203,7 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     {
         if (coeff < 0 || sign)
         {
-            bits_ |= detail::d128_sign_mask;
+            bits_.high = detail::d128_sign_mask.high;
             isneg = true;
         }
     }
@@ -202,7 +211,7 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     {
         if (sign)
         {
-            bits_ |= detail::d128_sign_mask;
+            bits_.high = detail::d128_sign_mask.high;
             isneg = true;
         }
     }
