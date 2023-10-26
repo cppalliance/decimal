@@ -144,6 +144,10 @@ private:
 
     friend constexpr auto from_bits(detail::uint128 rhs) noexcept -> decimal128;
 
+    constexpr auto unbiased_exponent() const noexcept -> std::uint64_t;
+    constexpr auto biased_exponent() const noexcept -> std::int32_t;
+    constexpr auto full_significand() const noexcept -> detail::uint128;
+
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
@@ -157,7 +161,7 @@ public:
     friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
     friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
-    // friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
+    friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
 
     friend std::string bit_string(decimal128 rhs) noexcept;
 };
@@ -192,6 +196,64 @@ constexpr auto from_bits(detail::uint128 rhs) noexcept -> decimal128
     result.bits_ = rhs;
 
     return result;
+}
+
+constexpr auto decimal128::unbiased_exponent() const noexcept -> std::uint64_t
+{
+    std::uint64_t expval {};
+    constexpr std::uint64_t high_word_significand_bits {detail::d128_significand_bits - 64U};
+
+    const auto exp_comb_bits {(bits_.high & detail::d128_comb_11_mask.high)};
+
+    if (exp_comb_bits == detail::d128_comb_11_mask.high)
+    {
+        expval = (bits_.high & detail::d128_comb_11_mask.high) >> (high_word_significand_bits + 1);
+    }
+    else if (exp_comb_bits == detail::d128_comb_10_mask.high)
+    {
+        expval = UINT64_C(0b10000000000000);
+    }
+    else if (exp_comb_bits == detail::d128_comb_01_mask.high)
+    {
+        expval = UINT64_C(0b01000000000000);
+    }
+
+    expval |= (bits_.high & detail::d128_exponent_mask.high) >> high_word_significand_bits;
+
+    return expval;
+}
+
+constexpr auto decimal128::biased_exponent() const noexcept -> std::int32_t
+{
+    return static_cast<std::int32_t>(unbiased_exponent()) - detail::bias_v<decimal128>;
+}
+
+constexpr auto decimal128::full_significand() const noexcept -> detail::uint128
+{
+    detail::uint128 significand {0, 0};
+
+    if ((bits_.high & detail::d128_comb_11_mask.high) == detail::d128_comb_11_mask.high)
+    {
+        // Only need the one bit of T because the other 3 are implied 0s
+        if ((bits_.high & detail::d128_comb_11_significand_bits.high) == detail::d128_comb_11_significand_bits.high)
+        {
+            significand = detail::uint128{0b10010000000000000000000000000000000000000000000000,0};
+        }
+        else
+        {
+            significand = detail::uint128{0b10000000000000000000000000000000000000000000000000,0};
+        }
+    }
+    else
+    {
+        // Last three bits in the combination field, so we need to shift past the exp field
+        // which is next. Only need to operate on the high bits
+        significand.high |= (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
+    }
+
+    significand |= (bits_ & detail::d128_significand_mask);
+
+    return significand;
 }
 
 // TODO(mborland): Rather than doing bitwise operations on the whole uint128 we should
@@ -362,6 +424,20 @@ constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) n
 constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
     return (rhs.bits_.high & detail::d128_snan_mask.high) == detail::d128_snan_mask.high;
+}
+
+constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
+{
+    // Check for de-normals
+    const auto sig {rhs.full_significand()};
+    const auto exp {rhs.unbiased_exponent()};
+
+    if (exp <= detail::precision_v<decimal128> - 1)
+    {
+        return false;
+    }
+
+    return (sig != 0) && isfinite(rhs);
 }
 
 } //namespace decimal
