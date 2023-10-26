@@ -161,7 +161,7 @@ public:
     friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
     friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
-    // friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
+    friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
 
     friend std::string bit_string(decimal128 rhs) noexcept;
 };
@@ -424,6 +424,20 @@ constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) n
 constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
     return (rhs.bits_.high & detail::d128_snan_mask.high) == detail::d128_snan_mask.high;
+}
+
+constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
+{
+    // Check for de-normals
+    const auto sig {rhs.full_significand()};
+    const auto exp {rhs.unbiased_exponent()};
+
+    if (exp <= detail::precision_v<decimal128> - 1)
+    {
+        return false;
+    }
+
+    return (sig != 0) && isfinite(rhs);
 }
 
 } //namespace decimal
