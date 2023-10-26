@@ -144,6 +144,8 @@ private:
 
     friend constexpr auto from_bits(detail::uint128 rhs) noexcept -> decimal128;
 
+    constexpr auto unbiased_exponent() const noexcept -> std::uint64_t;
+
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
@@ -192,6 +194,31 @@ constexpr auto from_bits(detail::uint128 rhs) noexcept -> decimal128
     result.bits_ = rhs;
 
     return result;
+}
+
+constexpr auto decimal128::unbiased_exponent() const noexcept -> std::uint64_t
+{
+    std::uint64_t expval {};
+    constexpr std::uint64_t high_word_significand_bits {detail::d128_significand_bits - 64U};
+
+    const auto exp_comb_bits {(bits_.high & detail::d128_comb_11_mask.high)};
+
+    if (exp_comb_bits == detail::d128_comb_11_mask.high)
+    {
+        expval = (bits_.high & detail::d64_comb_11_exp_bits) >> (high_word_significand_bits + 1);
+    }
+    else if (exp_comb_bits == detail::d64_comb_10_mask)
+    {
+        expval = UINT64_C(0b10000000000000);
+    }
+    else if (exp_comb_bits == detail::d64_comb_01_mask)
+    {
+        expval = UINT64_C(0b01000000000000);
+    }
+
+    expval |- (bits_.high & detail::d64_exponent_mask) >> high_word_significand_bits;
+
+    return expval;
 }
 
 // TODO(mborland): Rather than doing bitwise operations on the whole uint128 we should
