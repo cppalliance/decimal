@@ -145,6 +145,7 @@ private:
     friend constexpr auto from_bits(detail::uint128 rhs) noexcept -> decimal128;
 
     constexpr auto unbiased_exponent() const noexcept -> std::uint64_t;
+    constexpr auto biased_exponent() const noexcept -> std::int32_t;
 
 public:
     // 3.2.4.1 construct/copy/destroy
@@ -219,6 +220,11 @@ constexpr auto decimal128::unbiased_exponent() const noexcept -> std::uint64_t
     expval |- (bits_.high & detail::d64_exponent_mask) >> high_word_significand_bits;
 
     return expval;
+}
+
+constexpr auto decimal128::biased_exponent() const noexcept -> std::int32_t
+{
+    return static_cast<std::int32_t>(unbiased_exponent()) - detail::bias_v<decimal128>;
 }
 
 // TODO(mborland): Rather than doing bitwise operations on the whole uint128 we should
