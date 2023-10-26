@@ -100,6 +100,12 @@ void test_non_finite_values()
     BOOST_TEST(!issignaling(inf_val));
     BOOST_TEST(!issignaling(qnan_val));
     BOOST_TEST(issignaling(snan_val));
+
+    BOOST_TEST(isnormal(one));
+    BOOST_TEST(isnormal(neg_one));
+    BOOST_TEST(!isnormal(inf_val));
+    BOOST_TEST(!isnormal(qnan_val));
+    BOOST_TEST(!isnormal(snan_val));
 }
 
 int main()
