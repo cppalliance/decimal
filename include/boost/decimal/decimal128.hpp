@@ -147,6 +147,7 @@ private:
     constexpr auto unbiased_exponent() const noexcept -> std::uint64_t;
     constexpr auto biased_exponent() const noexcept -> std::int32_t;
     constexpr auto full_significand() const noexcept -> detail::uint128;
+    constexpr auto isneg() const noexcept -> bool;
 
 public:
     // 3.2.4.1 construct/copy/destroy
@@ -254,6 +255,11 @@ constexpr auto decimal128::full_significand() const noexcept -> detail::uint128
     significand |= (bits_ & detail::d128_significand_mask);
 
     return significand;
+}
+
+constexpr auto decimal128::isneg() const noexcept -> bool
+{
+    return static_cast<bool>(bits_.high & detail::d128_sign_mask.high);
 }
 
 // TODO(mborland): Rather than doing bitwise operations on the whole uint128 we should
