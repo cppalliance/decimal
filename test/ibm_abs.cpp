@@ -49,9 +49,9 @@ template <typename T>
 void overflow_underflow_subnormals()
 {
     #if (BOOST_DECIMAL_LDBL_BITS > 64)
-    BOOST_TEST(isinf(abs(9.999e+9999L)));
-    BOOST_TEST_EQ(abs(T(0.1e-9999L)), T(0.0L));
-    BOOST_TEST_EQ(abs(T(-0.1e-9999L)), T(0.0L));
+    BOOST_TEST(isinf(abs(T(9.999e+999L))));
+    BOOST_TEST_EQ(abs(T(0.1e-999L)), T(0.0L));
+    BOOST_TEST_EQ(abs(T(-0.1e-999L)), T(0.0L));
     #endif
 }
 
