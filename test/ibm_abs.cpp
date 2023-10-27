@@ -48,10 +48,19 @@ void test()
 template <typename T>
 void overflow_underflow_subnormals()
 {
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, boost::decimal::decimal32>::value)
+    {
+        BOOST_TEST(isinf(abs(T(9.999e+99))));
+        BOOST_TEST_EQ(abs(T(0.1e-99)), T(0.0));
+        BOOST_TEST_EQ(abs(T(-0.1e-99)), T(0.0));
+    }
     #if (BOOST_DECIMAL_LDBL_BITS > 64)
-    BOOST_TEST(isinf(abs(T(9.999e+999L))));
-    BOOST_TEST_EQ(abs(T(0.1e-999L)), T(0.0L));
-    BOOST_TEST_EQ(abs(T(-0.1e-999L)), T(0.0L));
+    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, boost::decimal::decimal64>::value)
+    {
+        BOOST_TEST(isinf(abs(T(9.999e+999L))));
+        BOOST_TEST_EQ(abs(T(0.1e-999L)), T(0.0L));
+        BOOST_TEST_EQ(abs(T(-0.1e-999L)), T(0.0L));
+    }
     #endif
 }
 
