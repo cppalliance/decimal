@@ -153,6 +153,9 @@ public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
 
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+    constexpr decimal128(Integer val) noexcept;
+
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal128(T1 coeff, T2 exp, bool sign = false) noexcept;
@@ -410,6 +413,12 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
             bits_ = detail::d128_comb_inf_mask;
         }
     }
+}
+
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+constexpr decimal128::decimal128(Integer val) noexcept // NOLINT : Incorrect parameter is never used
+{
+    *this = decimal128{val, 0};
 }
 
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
