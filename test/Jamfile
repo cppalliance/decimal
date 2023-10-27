@@ -18,6 +18,7 @@ project : requirements
   ;
 
 run ibm_abs.cpp ;
+run ibm_add.cpp ;
 run quick.cpp ;
 run random_decimal32_comp.cpp ;
 run random_decimal32_math.cpp ;
