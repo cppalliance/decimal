@@ -167,6 +167,10 @@ public:
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
     friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
 
+    // 3.2.7 unary arithmetic operators:
+    friend constexpr auto operator+(decimal128 rhs) noexcept -> decimal128;
+    friend constexpr auto operator-(decimal128 rhs) noexcept -> decimal128;
+
     friend std::string bit_string(decimal128 rhs) noexcept;
 };
 
@@ -453,6 +457,17 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs
     }
 
     return (sig != 0) && isfinite(rhs);
+}
+
+constexpr auto operator+(decimal128 rhs) noexcept -> decimal128
+{
+    return rhs;
+}
+
+constexpr auto operator-(decimal128 rhs) noexcept-> decimal128
+{
+    rhs.bits_.high ^= detail::d128_sign_mask.high;
+    return rhs;
 }
 
 } //namespace decimal
