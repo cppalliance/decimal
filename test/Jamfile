@@ -35,6 +35,7 @@ run test_decimal32.cpp ;
 run test_decimal32_stream.cpp ;
 run test_decimal64_basis.cpp ;
 run test_decimal64_stream.cpp ;
+run test_decimal128_basis.cpp ;
 run test_decimal_quantum.cpp ;
 run test_edges_and_behave.cpp ;
 run test_edit_members.cpp ;
