@@ -147,10 +147,14 @@ private:
     constexpr auto unbiased_exponent() const noexcept -> std::uint64_t;
     constexpr auto biased_exponent() const noexcept -> std::int32_t;
     constexpr auto full_significand() const noexcept -> detail::uint128;
+    constexpr auto isneg() const noexcept -> bool;
 
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
+
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+    constexpr decimal128(Integer val) noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
@@ -162,6 +166,10 @@ public:
     friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
     friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
+
+    // 3.2.7 unary arithmetic operators:
+    friend constexpr auto operator+(decimal128 rhs) noexcept -> decimal128;
+    friend constexpr auto operator-(decimal128 rhs) noexcept -> decimal128;
 
     friend std::string bit_string(decimal128 rhs) noexcept;
 };
@@ -254,6 +262,11 @@ constexpr auto decimal128::full_significand() const noexcept -> detail::uint128
     significand |= (bits_ & detail::d128_significand_mask);
 
     return significand;
+}
+
+constexpr auto decimal128::isneg() const noexcept -> bool
+{
+    return static_cast<bool>(bits_.high & detail::d128_sign_mask.high);
 }
 
 // TODO(mborland): Rather than doing bitwise operations on the whole uint128 we should
@@ -413,6 +426,12 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     }
 }
 
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+constexpr decimal128::decimal128(Integer val) noexcept // NOLINT : Incorrect parameter is never used
+{
+    *this = decimal128{val, 0};
+}
+
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
     return rhs.bits_.high & detail::d128_sign_mask.high;
@@ -447,7 +466,70 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs
     return (sig != 0) && isfinite(rhs);
 }
 
+constexpr auto operator+(decimal128 rhs) noexcept -> decimal128
+{
+    return rhs;
+}
+
+constexpr auto operator-(decimal128 rhs) noexcept-> decimal128
+{
+    rhs.bits_.high ^= detail::d128_sign_mask.high;
+    return rhs;
+}
+
 } //namespace decimal
 } //namespace boost
+
+namespace std {
+
+template<>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal128>
+#else
+struct numeric_limits<boost::decimal::decimal128>
+#endif
+{
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_signed = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_integer = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_exact = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_infinity = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = true;
+
+    // These members were deprecated in C++23
+    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_present;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = true;
+    #endif
+
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_indeterminate;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_modulo = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  digits = 34;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  digits10 = digits;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  max_digits10 = digits;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  radix = 10;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  min_exponent = -6142;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  min_exponent10 = min_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  max_exponent = 6145;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  max_exponent10 = max_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = numeric_limits<std::uint64_t>::traps;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = true;
+
+    // Member functions
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (min)        () -> boost::decimal::decimal128 { return {1, min_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (max)        () -> boost::decimal::decimal128 { return {boost::decimal::detail::uint128{UINT64_C(999'999'999'999'999), UINT64_C(9'999'999'999'999'999'999)}, max_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto lowest       () -> boost::decimal::decimal128 { return {boost::decimal::detail::uint128{UINT64_C(999'999'999'999'999), UINT64_C(9'999'999'999'999'999'999)}, max_exponent, true}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto epsilon      () -> boost::decimal::decimal128 { return {1, -34}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto round_error  () -> boost::decimal::decimal128 { return epsilon(); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::decimal128 { return boost::decimal::from_bits(boost::decimal::detail::d128_inf_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::decimal128 { return boost::decimal::from_bits(boost::decimal::detail::d128_nan_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::decimal128 { return boost::decimal::from_bits(boost::decimal::detail::d128_snan_mask); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::decimal128 { return {1, boost::decimal::detail::etiny_v<boost::decimal::decimal128>}; }
+};
+
+} //namespace std
 
 #endif //BOOST_DECIMAL_DECIMAL128_HPP
