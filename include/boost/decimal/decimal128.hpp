@@ -149,6 +149,26 @@ private:
     constexpr auto full_significand() const noexcept -> detail::uint128;
     constexpr auto isneg() const noexcept -> bool;
 
+    // Equality template between any integer type and decimal64
+    template <typename Decimal, typename Integer>
+    friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+
+    template <typename Decimal1, typename Decimal2>
+    friend constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                             detail::is_decimal_floating_point_v<Decimal2>), bool>;
+
+    // Template to compare operator< for any integer type and decimal64
+    template <typename Decimal, typename Integer>
+    friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+
+    template <typename Decimal1, typename Decimal2>
+    friend constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                             detail::is_decimal_floating_point_v<Decimal2>), bool>;
+
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
