@@ -149,7 +149,13 @@ private:
     constexpr auto full_significand() const noexcept -> detail::uint128;
     constexpr auto isneg() const noexcept -> bool;
 
-    // Equality template between any integer type and decimal64
+    // Attempts conversion to integral type:
+    // If this is nan sets errno to EINVAL and returns 0
+    // If this is not representable sets errno to ERANGE and returns 0
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
+
+    // Equality template between any integer type and decimal128
     template <typename Decimal, typename Integer>
     friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
@@ -159,7 +165,7 @@ private:
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
-    // Template to compare operator< for any integer type and decimal64
+    // Template to compare operator< for any integer type and decimal128
     template <typename Decimal, typename Integer>
     friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
@@ -179,6 +185,18 @@ public:
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal128(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    // 3.2.4.4 Conversion to integral type
+    explicit constexpr operator int() const noexcept;
+    explicit constexpr operator unsigned() const noexcept;
+    explicit constexpr operator long() const noexcept;
+    explicit constexpr operator unsigned long() const noexcept;
+    explicit constexpr operator long long() const noexcept;
+    explicit constexpr operator unsigned long long() const noexcept;
+    explicit constexpr operator std::int8_t() const noexcept;
+    explicit constexpr operator std::uint8_t() const noexcept;
+    explicit constexpr operator std::int16_t() const noexcept;
+    explicit constexpr operator std::uint16_t() const noexcept;
 
     // cmath functions that are easier as friends
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
@@ -539,6 +557,56 @@ template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, boo
 constexpr decimal128::decimal128(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
     *this = decimal128{val, 0};
+}
+
+constexpr decimal128::operator int() const noexcept
+{
+    return to_integral<decimal128, int>(*this);
+}
+
+constexpr decimal128::operator unsigned() const noexcept
+{
+    return to_integral<decimal128, unsigned>(*this);
+}
+
+constexpr decimal128::operator long() const noexcept
+{
+    return to_integral<decimal128, long>(*this);
+}
+
+constexpr decimal128::operator unsigned long() const noexcept
+{
+    return to_integral<decimal128, unsigned long>(*this);
+}
+
+constexpr decimal128::operator long long() const noexcept
+{
+    return to_integral<decimal128, long long>(*this);
+}
+
+constexpr decimal128::operator unsigned long long() const noexcept
+{
+    return to_integral<decimal128, unsigned long long>(*this);
+}
+
+constexpr decimal128::operator std::int8_t() const noexcept
+{
+    return to_integral<decimal128, std::int8_t>(*this);
+}
+
+constexpr decimal128::operator std::uint8_t() const noexcept
+{
+    return to_integral<decimal128, std::uint8_t>(*this);
+}
+
+constexpr decimal128::operator std::int16_t() const noexcept
+{
+    return to_integral<decimal128, std::int16_t>(*this);
+}
+
+constexpr decimal128::operator std::uint16_t() const noexcept
+{
+    return to_integral<decimal128, std::uint16_t>(*this);
 }
 
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
