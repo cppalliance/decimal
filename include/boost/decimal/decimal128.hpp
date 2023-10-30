@@ -860,6 +860,11 @@ class numeric_limits<boost::decimal::decimal128>
 struct numeric_limits<boost::decimal::decimal128>
 #endif
 {
+
+#ifdef _MSC_VER
+    public:
+#endif
+
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_signed = true;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_integer = false;
