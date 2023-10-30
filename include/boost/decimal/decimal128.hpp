@@ -178,6 +178,8 @@ private:
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
+    constexpr decimal128& operator=(const decimal128& rhs) noexcept = default;
+    constexpr decimal128(const decimal128& rhs) noexcept = default;
 
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal128(Integer val) noexcept;
