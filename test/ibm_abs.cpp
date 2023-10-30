@@ -50,9 +50,9 @@ void overflow_underflow_subnormals()
 {
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, boost::decimal::decimal32>::value)
     {
-        BOOST_TEST(isinf(abs(T(9.999e+99))));
-        BOOST_TEST_EQ(abs(T(0.1e-99)), T(0.0));
-        BOOST_TEST_EQ(abs(T(-0.1e-99)), T(0.0));
+        BOOST_TEST(isinf(abs(T(9.999e+200))));
+        BOOST_TEST_EQ(abs(T(0.1e-200)), T(0.0));
+        BOOST_TEST_EQ(abs(T(-0.1e-200)), T(0.0));
     }
     #if (BOOST_DECIMAL_LDBL_BITS > 64)
     else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, boost::decimal::decimal64>::value)

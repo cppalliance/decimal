@@ -396,7 +396,14 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
             }
             else
             {
-                bits_ = detail::d128_comb_inf_mask;
+                if (exp < 0)
+                {
+                    *this = decimal128(0, 0, isneg);
+                }
+                else
+                {
+                    bits_ = detail::d128_comb_inf_mask;
+                }
             }
         }
         else
