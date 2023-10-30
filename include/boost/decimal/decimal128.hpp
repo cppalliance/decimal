@@ -153,8 +153,8 @@ public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
 
-    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
-    constexpr decimal128(Integer val) noexcept;
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+    explicit constexpr decimal128(Integer val) noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
@@ -170,6 +170,84 @@ public:
     // 3.2.7 unary arithmetic operators:
     friend constexpr auto operator+(decimal128 rhs) noexcept -> decimal128;
     friend constexpr auto operator-(decimal128 rhs) noexcept -> decimal128;
+
+    // 3.2.9 Comparison operators:
+    // Equality
+    friend constexpr auto operator==(decimal128 lhs, decimal128 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator==(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator==(Integer lhs, decimal128 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Inequality
+    friend constexpr auto operator!=(decimal128 lhs, decimal128 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator!=(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator!=(Integer lhs, decimal128 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Less
+    friend constexpr auto operator<(decimal128 lhs, decimal128 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator<(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator<(Integer lhs, decimal128 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Less equal
+    friend constexpr auto operator<=(decimal128 lhs, decimal128 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator<=(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator<=(Integer lhs, decimal128 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Greater
+    friend constexpr auto operator>(decimal128 lhs, decimal128 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator>(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator>(Integer lhs, decimal128 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // Greater equal
+    friend constexpr auto operator>=(decimal128 lhs, decimal128 rhs) noexcept -> bool;
+
+    template <typename Integer>
+    friend constexpr auto operator>=(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    template <typename Integer>
+    friend constexpr auto operator>=(Integer lhs, decimal128 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+
+    // C++20 spaceship
+    #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+    friend constexpr auto operator<=>(decimal128 lhs, decimal128 rhs) noexcept -> std::partial_ordering;
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(decimal128 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(Integer lhs, decimal128 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
+    #endif
 
     friend std::string bit_string(decimal128 rhs) noexcept;
 };
@@ -476,6 +554,245 @@ constexpr auto operator-(decimal128 rhs) noexcept-> decimal128
     rhs.bits_.high ^= detail::d128_sign_mask.high;
     return rhs;
 }
+
+
+constexpr auto operator==(decimal128 lhs, decimal128 rhs) noexcept -> bool
+{
+    // Check for IEEE requirement that nan != nan
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return equal_parts_impl<decimal128>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                                        rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+template <typename Integer>
+constexpr auto operator==(decimal128 lhs, Integer rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return mixed_equality_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator==(Integer lhs, decimal128 rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return mixed_equality_impl(rhs, lhs);
+}
+
+constexpr auto operator!=(decimal128 lhs, decimal128 rhs) noexcept -> bool
+{
+    return !(lhs == rhs);
+}
+
+template <typename Integer>
+constexpr auto operator!=(decimal128 lhs, Integer rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !(lhs == rhs);
+}
+
+template <typename Integer>
+constexpr auto operator!=(Integer lhs, decimal128 rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return !(lhs == rhs);
+}
+
+constexpr auto operator<(decimal128 lhs, decimal128 rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs) ||
+        (!lhs.isneg() && rhs.isneg()))
+    {
+        return false;
+    }
+    else if (lhs.isneg() && !rhs.isneg())
+    {
+        return true;
+    }
+    else if (isfinite(lhs) && isinf(rhs))
+    {
+        if (!rhs.isneg())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return less_parts_impl<decimal128>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                                       rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+template <typename Integer>
+constexpr auto operator<(decimal128 lhs, Integer rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return less_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator<(Integer lhs, decimal128 rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    if (isnan(rhs))
+    {
+        return false;
+    }
+
+    return !less_impl(rhs, lhs) && lhs != rhs;
+}
+
+constexpr auto operator<=(decimal128 lhs, decimal128 rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(rhs < lhs);
+}
+
+template <typename Integer>
+constexpr auto operator<=(decimal128 lhs, Integer rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    if (isnan(lhs))
+    {
+        return false;
+    }
+
+    return !(rhs < lhs);
+}
+
+template <typename Integer>
+constexpr auto operator<=(Integer lhs, decimal128 rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    if (isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(rhs < lhs);
+}
+
+constexpr auto operator>(decimal128 lhs, decimal128 rhs) noexcept -> bool
+{
+    return rhs < lhs;
+}
+
+template <typename Integer>
+constexpr auto operator>(decimal128 lhs, Integer rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return rhs < lhs;
+}
+
+template <typename Integer>
+constexpr auto operator>(Integer lhs, decimal128 rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    return rhs < lhs;
+}
+
+constexpr auto operator>=(decimal128 lhs, decimal128 rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
+}
+
+template <typename Integer>
+constexpr auto operator>=(decimal128 lhs, Integer rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    if (isnan(lhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
+}
+
+template <typename Integer>
+constexpr auto operator>=(Integer lhs, decimal128 rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+{
+    if (isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
+}
+
+#ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+
+constexpr auto operator<=>(decimal128 lhs, decimal128 rhs) noexcept -> std::partial_ordering
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+template <typename Integer>
+constexpr auto operator<=>(decimal128 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+template <typename Integer>
+constexpr auto operator<=>(Integer lhs, decimal128 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+#endif
 
 } //namespace decimal
 } //namespace boost
