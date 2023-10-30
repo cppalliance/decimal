@@ -123,8 +123,13 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
     }
 
     // const auto flags {os.flags()};
-    const auto precision {os.precision()};
-    char buffer[detail::precision_v<DecimalType> + 2] {}; // Precision + decimal point + null terminator
+    auto precision {os.precision()};
+    if (precision > std::numeric_limits<DecimalType>::digits10)
+    {
+        precision = std::numeric_limits<DecimalType>::digits10;
+    }
+
+    char buffer[detail::precision_v<DecimalType> + 3] {}; // Sign + Precision + decimal point + null terminator
 
     if (d.isneg() == 1)
     {

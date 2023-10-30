@@ -675,7 +675,14 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
             }
             else
             {
-                bits_ = detail::d64_comb_inf_mask;
+                if (exp < 0)
+                {
+                    *this = decimal64(0, 0, isneg);
+                }
+                else
+                {
+                    bits_ = detail::d64_comb_inf_mask;
+                }
             }
         }
         else

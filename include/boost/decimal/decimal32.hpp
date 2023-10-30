@@ -691,7 +691,14 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
             }
             else
             {
-                bits_ = detail::d32_comb_inf_mask;
+                if (exp < 0)
+                {
+                    *this = decimal32(0, 0, isneg);
+                }
+                else
+                {
+                    bits_ = detail::d32_comb_inf_mask;
+                }
             }
         }
         else
