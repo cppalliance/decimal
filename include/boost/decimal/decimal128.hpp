@@ -270,14 +270,15 @@ public:
     #endif
 
     // 3.2.10 Formatted input:
-    template <typename charT, typename traits, typename DecimalType>
-    friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>;
+    /*
+    template <typename charT, typename traits>
+    friend auto operator>>(std::basic_istream<charT, traits>& is, decimal128& d) -> std::basic_istream<charT, traits>&;
+    */
 
     // 3.2.11 Formatted output:
-    template <typename charT, typename traits, typename DecimalType>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
+    template <typename charT, typename traits>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128& d)
+        -> std::basic_ostream<charT, traits>&;
 
     friend std::string bit_string(decimal128 rhs) noexcept;
 };
@@ -823,6 +824,29 @@ constexpr auto operator<=>(Integer lhs, decimal128 rhs) noexcept -> std::enable_
 }
 
 #endif
+
+template <typename charT, typename traits>
+auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128& d) -> std::basic_ostream<charT, traits>&
+{
+    if (d.isneg())
+    {
+        os << "-";
+    }
+
+    os << d.full_significand();
+    os << "e";
+
+    if (d.biased_exponent() < 0)
+    {
+        os << "-" << d.biased_exponent();
+    }
+    else
+    {
+        os << "+" << d.biased_exponent();
+    }
+
+    return os;
+}
 
 } //namespace decimal
 } //namespace boost
