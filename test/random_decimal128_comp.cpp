@@ -47,7 +47,6 @@ void random_LT(T lower, T upper)
     BOOST_TEST(!(std::numeric_limits<decimal128>::quiet_NaN() < std::numeric_limits<decimal128>::quiet_NaN()));
 }
 
-/*
 template <typename T>
 void random_mixed_LT(T lower, T upper)
 {
@@ -97,7 +96,6 @@ void random_mixed_LT(T lower, T upper)
     BOOST_TEST_EQ(-std::numeric_limits<decimal128>::infinity() < T(1), true);
     BOOST_TEST_EQ(std::numeric_limits<decimal128>::quiet_NaN() < T(1), false);
 }
-*/
 
 template <typename T>
 void random_LE(T lower, T upper)
@@ -127,7 +125,6 @@ void random_LE(T lower, T upper)
     BOOST_TEST(!(std::numeric_limits<decimal128>::quiet_NaN() <= std::numeric_limits<decimal128>::quiet_NaN()));
 }
 
-/*
 template <typename T>
 void random_mixed_LE(T lower, T upper)
 {
@@ -154,7 +151,6 @@ void random_mixed_LE(T lower, T upper)
     BOOST_TEST(!(dist(rng) <= -std::numeric_limits<decimal128>::infinity()));
     BOOST_TEST(!(dist(rng) <= std::numeric_limits<decimal128>::quiet_NaN()));
 }
-*/
 
 template <typename T>
 void random_GT(T lower, T upper)
@@ -184,7 +180,6 @@ void random_GT(T lower, T upper)
     BOOST_TEST(!(std::numeric_limits<decimal128>::quiet_NaN() > std::numeric_limits<decimal128>::quiet_NaN()));
 }
 
-/*
 template <typename T>
 void random_mixed_GT(T lower, T upper)
 {
@@ -211,7 +206,7 @@ void random_mixed_GT(T lower, T upper)
     BOOST_TEST((dist(rng) > -std::numeric_limits<decimal128>::infinity()));
     BOOST_TEST(!(dist(rng) > std::numeric_limits<decimal128>::quiet_NaN()));
 }
-*/
+
 template <typename T>
 void random_GE(T lower, T upper)
 {
@@ -239,7 +234,7 @@ void random_GE(T lower, T upper)
     BOOST_TEST(!(decimal128(dist(rng)) >= std::numeric_limits<decimal128>::quiet_NaN()));
     BOOST_TEST(!(std::numeric_limits<decimal128>::quiet_NaN() >= std::numeric_limits<decimal128>::quiet_NaN()));
 }
-/*
+
 template <typename T>
 void random_mixed_GE(T lower, T upper)
 {
@@ -266,7 +261,7 @@ void random_mixed_GE(T lower, T upper)
     BOOST_TEST((dist(rng) >= -std::numeric_limits<decimal128>::infinity()));
     BOOST_TEST(!(dist(rng) >= std::numeric_limits<decimal128>::quiet_NaN()));
 }
-*/
+
 template <typename T>
 void random_EQ(T lower, T upper)
 {
@@ -291,7 +286,7 @@ void random_EQ(T lower, T upper)
 
     BOOST_TEST(!(std::numeric_limits<decimal128>::quiet_NaN() == std::numeric_limits<decimal128>::quiet_NaN()));
 }
-/*
+
 template <typename T>
 void random_mixed_EQ(T lower, T upper)
 {
@@ -341,7 +336,7 @@ void random_mixed_EQ(T lower, T upper)
     BOOST_TEST_EQ(std::numeric_limits<decimal128>::quiet_NaN() == T(1), false);
     BOOST_TEST_EQ(std::numeric_limits<decimal128>::infinity() == T(1), false);
 }
-*/
+
 template <typename T>
 void random_NE(T lower, T upper)
 {
@@ -366,7 +361,7 @@ void random_NE(T lower, T upper)
 
     BOOST_TEST((std::numeric_limits<decimal128>::quiet_NaN() != std::numeric_limits<decimal128>::quiet_NaN()));
 }
-/*
+
 template <typename T>
 void random_mixed_NE(T lower, T upper)
 {
@@ -389,7 +384,7 @@ void random_mixed_NE(T lower, T upper)
         }
     }
 }
-*/
+
 #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 template <typename T>
 void random_SPACESHIP(T lower, T upper)
@@ -415,7 +410,7 @@ void random_SPACESHIP(T lower, T upper)
     BOOST_TEST((decimal128(dist(rng)) <=> std::numeric_limits<decimal128>::quiet_NaN()) == std::partial_ordering::unordered);
     BOOST_TEST((std::numeric_limits<decimal128>::quiet_NaN() <=> std::numeric_limits<decimal128>::quiet_NaN()) == std::partial_ordering::unordered);
 }
-/*
+
 template <typename T>
 void random_mixed_SPACESHIP(T lower, T upper)
 {
@@ -440,7 +435,7 @@ void random_mixed_SPACESHIP(T lower, T upper)
     BOOST_TEST((dist(rng) <=> std::numeric_limits<decimal128>::quiet_NaN()) == std::partial_ordering::unordered);
     BOOST_TEST((std::numeric_limits<decimal128>::quiet_NaN() <=> std::numeric_limits<decimal128>::quiet_NaN()) == std::partial_ordering::unordered);
 }
- */
+
 #endif
 
 int main()
@@ -451,84 +446,84 @@ int main()
     random_LT(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_LT(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_LT(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-/*
+
     random_mixed_LT(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_mixed_LT(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_mixed_LT(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_mixed_LT(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_LT(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_LT(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-*/
+
     random_LE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_LE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_LE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_LE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_LE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_LE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-/*
+
     random_mixed_LE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_mixed_LE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_mixed_LE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_mixed_LE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_LE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_LE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-*/
+
     random_GT(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_GT(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_GT(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_GT(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_GT(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_GT(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-/*
+
     random_mixed_GT(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_mixed_GT(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_mixed_GT(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_mixed_GT(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_GT(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_GT(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-*/
+
     random_GE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_GE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_GE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_GE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_GE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_GE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-/*
+
     random_mixed_GE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_mixed_GE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_mixed_GE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_mixed_GE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_GE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_GE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-*/
+
     random_EQ(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_EQ(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_EQ(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_EQ(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_EQ(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_EQ(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-/*
+
     random_mixed_EQ(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_mixed_EQ(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_mixed_EQ(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_mixed_EQ(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_EQ(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_EQ(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-*/
+
     random_NE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_NE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_NE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_NE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_NE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_NE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-/*
+
     random_mixed_NE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_mixed_NE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_mixed_NE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_mixed_NE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_NE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_NE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-*/
+
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     random_SPACESHIP(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_SPACESHIP(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
@@ -536,14 +531,14 @@ int main()
     random_SPACESHIP(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_SPACESHIP(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_SPACESHIP(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-/*
+
     random_mixed_SPACESHIP(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_mixed_SPACESHIP(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_mixed_SPACESHIP(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_mixed_SPACESHIP(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_SPACESHIP(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_SPACESHIP(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-*/
+
     #endif
 
     return boost::report_errors();
