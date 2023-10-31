@@ -199,20 +199,6 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     ),
 
     linux_pipeline(
-        "Linux 18.04 Clang 4.0",
-        "cppalliance/droneubuntu1804:1",
-        { TOOLSET: 'clang', COMPILER: 'clang++-4.0', CXXSTD: '03,11,14' },
-        "clang-4.0",
-    ),
-
-    linux_pipeline(
-        "Linux 18.04 Clang 5.0",
-        "cppalliance/droneubuntu1804:1",
-        { TOOLSET: 'clang', COMPILER: 'clang++-5.0', CXXSTD: '03,11,14,1z' },
-        "clang-5.0",
-    ),
-
-    linux_pipeline(
         "Linux 18.04 Clang 6.0",
         "cppalliance/droneubuntu1804:1",
         { TOOLSET: 'clang', COMPILER: 'clang++-6.0', CXXSTD: '03,11,14,17' },
