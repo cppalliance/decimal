@@ -121,8 +121,8 @@ namespace local
     // Table[N[Gamma[-23/100 - n], 32], {n, 1, 7, 1}]
     using ctrl_as_long_double_array_type = std::array<long double, static_cast<std::size_t>(UINT8_C(7))>;
 
-    constexpr ctrl_as_long_double_array_type
-      ctrl_values
+    constexpr auto ctrl_values =
+      ctrl_as_long_double_array_type
       {
         static_cast<long double>(+4.2406941452013198921659716327521L),
         static_cast<long double>(-1.9016565673548519695811531985435L),
@@ -172,20 +172,21 @@ namespace local
   auto test_tgamma_small_ui32() -> bool
   {
     // Table[Gamma[n], {n, 1, 9, 1}]
-    using ctrl_as_long_double_array_type = std::array<long double, static_cast<std::size_t>(UINT8_C(7))>;
+    using data_as_uint_pair_array_type = std::array<std::pair<unsigned, unsigned>, static_cast<std::size_t>(UINT8_C(9))>;
 
-    std::array<std::pair<unsigned, unsigned>, static_cast<std::size_t>(UINT8_C(9))> values
-    {
-      std::pair<unsigned, unsigned> { 1U,     1 },
-      std::pair<unsigned, unsigned> { 2U,     1 },
-      std::pair<unsigned, unsigned> { 3U,     2 },
-      std::pair<unsigned, unsigned> { 4U,     6 },
-      std::pair<unsigned, unsigned> { 5U,    24 },
-      std::pair<unsigned, unsigned> { 6U,   120 },
-      std::pair<unsigned, unsigned> { 7U,   720 },
-      std::pair<unsigned, unsigned> { 8U,  5040 },
-      std::pair<unsigned, unsigned> { 9U, 40320 }
-    };
+    constexpr auto values =
+      data_as_uint_pair_array_type
+      {
+        std::pair<unsigned, unsigned> { 1U,     1 },
+        std::pair<unsigned, unsigned> { 2U,     1 },
+        std::pair<unsigned, unsigned> { 3U,     2 },
+        std::pair<unsigned, unsigned> { 4U,     6 },
+        std::pair<unsigned, unsigned> { 5U,    24 },
+        std::pair<unsigned, unsigned> { 6U,   120 },
+        std::pair<unsigned, unsigned> { 7U,   720 },
+        std::pair<unsigned, unsigned> { 8U,  5040 },
+        std::pair<unsigned, unsigned> { 9U, 40320 }
+      };
 
     auto result_is_ok = true;
 
