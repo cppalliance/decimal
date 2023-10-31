@@ -158,6 +158,9 @@ private:
     template <typename Decimal, typename TargetType>
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
 
+    template <typename TargetType, typename Decimal>
+    friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
+
     // Equality template between any integer type and decimal128
     template <typename Decimal, typename Integer>
     friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
@@ -668,6 +671,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::operator long double() const noexcept
 {
     // TODO(mborland): Don't have an exact way of converting to various long doubles
     return static_cast<long double>(to_float<decimal128, double>(*this));
+}
+
+template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal128::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
 }
 
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
