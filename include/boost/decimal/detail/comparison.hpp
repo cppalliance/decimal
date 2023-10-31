@@ -22,7 +22,8 @@ template <typename DecimalType = decimal32, typename T1, typename T2>
 constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                 T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool
 {
-    using sig_type = std::conditional_t<std::is_same<DecimalType, decimal32>::value, std::uint32_t, std::uint64_t>;
+    using sig_type = std::conditional_t<std::is_same<DecimalType, decimal32>::value, std::uint32_t,
+                        std::conditional_t<std::is_same<DecimalType, decimal64>::value, std::uint64_t , detail::uint128>>;
 
     auto new_lhs_sig {detail::shrink_significand<sig_type>(lhs_sig, lhs_exp)};
     auto new_rhs_sig {detail::shrink_significand<sig_type>(rhs_sig, rhs_exp)};
@@ -109,7 +110,8 @@ constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     const bool both_neg {lhs_sign && rhs_sign};
 
     // Normalize the significands and exponents
-    using sig_type = std::conditional_t<std::is_same<DecimalType, decimal32>::value, std::uint32_t, std::uint64_t>;
+    using sig_type = std::conditional_t<std::is_same<DecimalType, decimal32>::value, std::uint32_t,
+            std::conditional_t<std::is_same<DecimalType, decimal64>::value, std::uint64_t , detail::uint128>>;
 
     auto new_lhs_sig {detail::shrink_significand<sig_type>(lhs_sig, lhs_exp)};
     auto new_rhs_sig {detail::shrink_significand<sig_type>(rhs_sig, rhs_exp)};

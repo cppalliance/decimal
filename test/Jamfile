@@ -24,6 +24,7 @@ run random_decimal32_comp.cpp ;
 run random_decimal32_math.cpp ;
 run random_decimal64_comp.cpp ;
 run random_decimal64_math.cpp ;
+run random_decimal128_comp.cpp ;
 run random_mixed_decimal_comp.cpp ;
 run random_mixed_decimal_math.cpp ;
 run roundtrip_decimal32.cpp ;
