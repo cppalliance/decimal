@@ -393,6 +393,23 @@ void test_sin()
     BOOST_TEST(isinf(sin(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
     BOOST_TEST(isnan(sin(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
     BOOST_TEST_EQ(sin(Dec(0) * Dec(dist(rng))), Dec(0));
+
+    // Check the phases of large positive/negative arguments.
+    using std::atan;
+
+    for(auto x = 0.1F; x < 20.0F; x += 2.0F * atan(1.0F))
+    {
+      using std::sin;
+
+      BOOST_TEST_EQ((sin(boost::decimal::decimal32 { x }) < 0), (sin(x) < 0));
+    }
+
+    for(auto x = 0.1F; x < 20.0F; x += 2.0F * atan(1.0F))
+    {
+      using std::sin;
+
+      BOOST_TEST_EQ((sin(boost::decimal::decimal32 { -x }) < 0), (sin(-x) < 0));
+    }
 }
 
 template <typename Dec>

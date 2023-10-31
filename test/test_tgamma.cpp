@@ -116,6 +116,59 @@ namespace local
     return result_is_ok;
   }
 
+  auto test_tgamma_neg32(const int tol_factor) -> bool
+  {
+    // Table[N[Gamma[-23/100 - n], 32], {n, 1, 7, 1}]
+    using ctrl_as_long_double_array_type = std::array<long double, static_cast<std::size_t>(UINT8_C(7))>;
+
+    constexpr ctrl_as_long_double_array_type
+      ctrl_values
+      {
+        static_cast<long double>(+4.2406941452013198921659716327521L),
+        static_cast<long double>(-1.9016565673548519695811531985435L),
+        static_cast<long double>(+0.58874816326775602773410315744382L),
+        static_cast<long double>(-0.13918396294746005383784944620421L),
+        static_cast<long double>(+0.026612612418252400351405247840194L),
+        static_cast<long double>(-0.0042716873865573676326493174703360L),
+        static_cast<long double>(+0.00059082813092079773618939384098700L)
+      };
+
+    auto result_is_ok = true;
+
+    using decimal_type = boost::decimal::decimal32;
+    using float_type = float;
+
+    for(auto   n = static_cast<std::size_t>(UINT8_C(0));
+               n < std::tuple_size<ctrl_as_long_double_array_type>::value;
+             ++n)
+    {
+      const auto ld_arg = static_cast<long double>(-0.23L - static_cast<long double>(n + 1U));
+
+      const auto x_dec = static_cast<boost::decimal::decimal32>(ld_arg);
+      const auto x_flt = static_cast<float>(ld_arg);
+
+      const auto val_flt = static_cast<float>(ctrl_values[n]);
+      const auto val_dec = tgamma(x_dec);
+
+      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), static_cast<float_type>(std::numeric_limits<decimal_type>::epsilon()) * tol_factor);
+
+      result_is_ok = (result_val_is_ok && result_is_ok);
+
+      if(!result_val_is_ok)
+      {
+        std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
+        std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
+        std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
+
+        break;
+      }
+    }
+
+    BOOST_TEST(result_is_ok);
+
+    return result_is_ok;
+  }
+
   auto test_tgamma_edge() -> bool
   {
     auto result_is_ok = true;
@@ -151,6 +204,14 @@ auto main() -> int
     BOOST_TEST(result_tgamma_is_ok);
 
     result_is_ok = (result_tgamma_is_ok && result_is_ok);
+  }
+
+  {
+    const auto result_neg32_is_ok = local::test_tgamma_neg32(512);
+
+    BOOST_TEST(result_neg32_is_ok);
+
+    result_is_ok = (result_neg32_is_ok && result_is_ok);
   }
 
   {

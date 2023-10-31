@@ -51,7 +51,9 @@ constexpr auto tgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
         if (signbit(x))
         {
             // Reflection for negative argument.
-            result = -numbers::pi_v<T> / (x * tgamma(-x) * sin(numbers::pi_v<T> * x));
+            const auto ga = tgamma(-x);
+
+            result = -numbers::pi_v<T> / (x * ga * sin(numbers::pi_v<T> * x));
         }
         else
         {
