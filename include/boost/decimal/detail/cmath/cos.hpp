@@ -23,34 +23,50 @@ constexpr auto cos(T x) noexcept -> T
     constexpr T zero {0, 0};
     constexpr T one {1, 0};
 
+    T result { };
+
     // First check non-finite values and small angles
     if (isinf(x) || isnan(x))
     {
-        return x;
+        result = x;
     }
     else if (abs(x) < std::numeric_limits<T>::epsilon())
     {
-        return one;
+        result = one;
+    }
+    else if (x < zero)
+    {
+        result = cos(-x);
+    }
+    else
+    {
+        // Perform argument reduction and subsequent computation of the result.
+
+        // Given x = k * (pi/2) + r, compute n = (k % 4).
+
+        // | n |  sin(x) |  cos(x) |  sin(x)/cos(x) |
+        // |----------------------------------------|
+        // | 0 |  sin(r) |  cos(r) |  sin(r)/cos(r) |
+        // | 1 |  cos(r) | -sin(r) | -cos(r)/sin(r) |
+        // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
+        // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
+
+        constexpr auto my_pi_half = numbers::pi_v<T> / 2;
+
+        int k {};
+        auto r { remquo(x, my_pi_half, &k) };
+
+        const auto n = static_cast<unsigned>(k % 4U);
+
+        result = (((n == 1U) || (n == 3U)) ? detail::sin_impl(r) : detail::cos_impl(r));
+
+        if ((n == 1U) || (n == 2U))
+        {
+          result = -result;
+        }
     }
 
-    if (x < zero)
-    {
-        return cos(-x);
-    }
-
-    int quo {};
-    auto x90 {remquo(x, numbers::pi_v<T>/T(2), &quo)};
-    switch (quo)
-    {
-        case 1:
-            return -detail::sin_impl(x90);
-        case 2:
-            return -detail::cos_impl(x90);
-        case 3:
-            return detail::sin_impl(x90);
-        default:
-            return detail::cos_impl(x90);
-    }
+    return result;
 }
 
 } // namespace decimal

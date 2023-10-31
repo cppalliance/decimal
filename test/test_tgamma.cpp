@@ -169,11 +169,136 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_tgamma_edge() -> bool
+  auto test_tgamma_small_ui32() -> bool
   {
+    // Table[Gamma[n], {n, 1, 9, 1}]
+    using ctrl_as_long_double_array_type = std::array<long double, static_cast<std::size_t>(UINT8_C(7))>;
+
+    std::array<std::pair<unsigned, unsigned>, static_cast<std::size_t>(UINT8_C(9))> values
+    {
+      std::pair<unsigned, unsigned> { 1U,     1 },
+      std::pair<unsigned, unsigned> { 2U,     1 },
+      std::pair<unsigned, unsigned> { 3U,     2 },
+      std::pair<unsigned, unsigned> { 4U,     6 },
+      std::pair<unsigned, unsigned> { 5U,    24 },
+      std::pair<unsigned, unsigned> { 6U,   120 },
+      std::pair<unsigned, unsigned> { 7U,   720 },
+      std::pair<unsigned, unsigned> { 8U,  5040 },
+      std::pair<unsigned, unsigned> { 9U, 40320 }
+    };
+
     auto result_is_ok = true;
 
+    for(auto& pr : values)
+    {
+      const auto tg = tgamma( boost::decimal::decimal32 { pr.first, 0 } );
+
+      const auto result_tg_is_ok = ((static_cast<unsigned>(tg) == pr.second) && (static_cast<unsigned>(tg) == tg));
+
+      result_is_ok = (result_tg_is_ok && result_is_ok);
+    }
+
     BOOST_TEST(result_is_ok);
+
+    return result_is_ok;
+  }
+
+  template<typename DecimalType, typename FloatType>
+  auto test_tgamma_edge() -> bool
+  {
+    using decimal_type = DecimalType;
+    using float_type   = FloatType;
+
+    std::mt19937_64 gen;
+
+    std::uniform_real_distribution<float_type>
+      dist
+      (
+        static_cast<float_type>(1.01L),
+        static_cast<float_type>(1.04L)
+      );
+
+    auto result_is_ok = true;
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_nan = tgamma(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+
+      const auto result_val_nan_is_ok = isnan(val_nan);
+
+      BOOST_TEST(result_val_nan_is_ok);
+
+      result_is_ok = (result_val_nan_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_inf_pos = tgamma(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+
+      const auto result_val_inf_pos_is_ok = isinf(val_inf_pos);
+
+      BOOST_TEST(result_val_inf_pos_is_ok);
+
+      result_is_ok = (result_val_inf_pos_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_inf_neg = tgamma(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+
+      const auto result_val_inf_neg_is_ok = isnan(val_inf_neg);
+
+      BOOST_TEST(result_val_inf_neg_is_ok);
+
+      result_is_ok = (result_val_inf_neg_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_zero_pos = tgamma(::my_zero<decimal_type>());
+
+      const auto result_val_zero_pos_is_ok = (isinf(val_zero_pos) && (!signbit(val_zero_pos)));
+
+      BOOST_TEST(result_val_zero_pos_is_ok);
+
+      result_is_ok = (result_val_zero_pos_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_zero_neg = tgamma(-::my_zero<decimal_type>());
+
+      const auto result_val_zero_neg_is_ok = (isinf(val_zero_neg) && signbit(val_zero_neg));
+
+      BOOST_TEST(result_val_zero_neg_is_ok);
+
+      result_is_ok = (result_val_zero_neg_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(6)); ++i)
+    {
+      const auto n_neg = static_cast<int>(-static_cast<int>(i) - 1);
+
+      const auto val_neg_int = tgamma( decimal_type { n_neg, 0 } );
+
+      const auto is_odd = ((n_neg & 1) != 0);
+
+      const auto result_val_neg_int_is_ok = (is_odd ? isnan(val_neg_int) : (fpclassify(val_neg_int) == FP_NORMAL));
+
+      BOOST_TEST(result_val_neg_int_is_ok);
+
+      result_is_ok = (result_val_neg_int_is_ok && result_is_ok);
+    }
 
     return result_is_ok;
   }
@@ -215,7 +340,18 @@ auto main() -> int
   }
 
   {
-    const auto result_edge_is_ok = local::test_tgamma_edge();
+    const auto result_ui32_is_ok = local::test_tgamma_small_ui32();
+
+    BOOST_TEST(result_ui32_is_ok);
+
+    result_is_ok = (result_ui32_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal32;
+    using float_type   = float;
+
+    const auto result_edge_is_ok = local::test_tgamma_edge<decimal_type, float_type>();
 
     BOOST_TEST(result_edge_is_ok);
 

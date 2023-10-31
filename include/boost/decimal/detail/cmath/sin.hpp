@@ -35,7 +35,7 @@ constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
     }
     else
     {
-        // Perform argument reduction and subsequent scaling of the result.
+        // Perform argument reduction and subsequent computation of the result.
 
         // Given x = k * (pi/2) + r, compute n = (k % 4).
 
@@ -60,7 +60,6 @@ constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
           result = -result;
         }
     }
-
 
     return result;
 }
