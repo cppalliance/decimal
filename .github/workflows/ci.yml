@@ -115,20 +115,6 @@ jobs:
 
           # Linux, clang
           - toolset: clang
-            compiler: clang++-4.0
-            cxxstd: "03,11,14"
-            os: ubuntu-latest
-            container: ubuntu:18.04
-            install:
-              - clang-4.0
-          - toolset: clang
-            compiler: clang++-5.0
-            cxxstd: "03,11,14,1z"
-            os: ubuntu-latest
-            container: ubuntu:18.04
-            install:
-              - clang-5.0
-          - toolset: clang
             compiler: clang++-6.0
             cxxstd: "03,11,14,17"
             os: ubuntu-latest
