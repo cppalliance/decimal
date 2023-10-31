@@ -49,11 +49,9 @@ constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         constexpr auto my_pi_half = numbers::pi_v<T> / 2;
 
         int k {};
-        auto x90 { remquo(x, my_pi_half, &k) };
+        auto r { remquo(x, my_pi_half, &k) };
 
         const auto n = static_cast<unsigned>(k % 4U);
-
-        const auto r = x - (my_pi_half * k);
 
         result = (((n == 1U) || (n == 3U)) ? detail::cos_impl(r) : detail::sin_impl(r));
 
