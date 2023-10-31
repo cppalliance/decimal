@@ -46,7 +46,11 @@ constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
         // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
 
-        BOOST_DECIMAL_CXX20_CONSTEXPR auto my_pi_half = numbers::pi_v<T> / 2;
+        #if (defined(_MSC_VER) && (_MSC_VER < 1920))
+        const auto my_pi_half = numbers::pi_v<T> / 2;
+        #else
+        constexpr auto my_pi_half = numbers::pi_v<T> / 2;
+        #endif
 
         int k {};
         auto r { remquo(x, my_pi_half, &k) };
