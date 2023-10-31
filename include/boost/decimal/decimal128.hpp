@@ -181,6 +181,9 @@ public:
     constexpr decimal128& operator=(const decimal128& rhs) noexcept = default;
     constexpr decimal128(const decimal128& rhs) noexcept = default;
 
+    template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal128(Float val) noexcept;
+
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal128(Integer val) noexcept;
 
@@ -551,6 +554,38 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
         else
         {
             bits_ = detail::d128_comb_inf_mask;
+        }
+    }
+}
+
+template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::decimal128(Float val) noexcept
+{
+    if (val != val)
+    {
+        *this = from_bits(detail::d128_nan_mask);
+    }
+    else if (val == std::numeric_limits<Float>::infinity() || val == -std::numeric_limits<Float>::infinity())
+    {
+        *this = from_bits(detail::d128_inf_mask);
+    }
+    else
+    {
+        const auto components {detail::ryu::floating_point_to_fd128(val)};
+
+        #ifdef BOOST_DECIMAL_DEBUG
+        std::cerr << "Mant: " << components.mantissa
+                  << "\nExp: " << components.exponent
+                  << "\nSign: " << components.sign << std::endl;
+        #endif
+
+        if (components.exponent > detail::emax_v<decimal128>)
+        {
+            *this = from_bits(detail::d128_inf_mask);
+        }
+        else
+        {
+            *this = decimal128 {components.mantissa, components.exponent, components.sign};
         }
     }
 }
