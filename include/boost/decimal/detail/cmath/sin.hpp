@@ -24,12 +24,14 @@ constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
 
     T result { };
 
-    // First check non-finite values and small angles
-    if (abs(x) < std::numeric_limits<T>::epsilon() || isinf(x) || isnan(x))
+    const auto fpc = fpclassify(x);
+
+    // First check non-finite values and small angles.
+    if (fabs(x) < std::numeric_limits<T>::epsilon() || (fpc == FP_INFINITE) || (fpc == FP_NAN))
     {
         result = x;
     }
-    else if (x < zero)
+    else if (signbit(x))
     {
         result = -sin(-x);
     }
