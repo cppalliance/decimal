@@ -12,8 +12,8 @@
 
 namespace boost { namespace decimal { namespace detail {
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto cos_impl(T x) noexcept -> T
+template<typename T>
+constexpr auto cos_impl(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T zero {0, 0};
     if (x < zero)
