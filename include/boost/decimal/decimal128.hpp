@@ -214,6 +214,22 @@ public:
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
 
+    #ifdef BOOST_DECIMAL_HAS_FLOAT16
+    explicit constexpr operator std::float16_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT32
+    explicit constexpr operator std::float32_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT64
+    explicit constexpr operator std::float64_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+    explicit constexpr operator std::bfloat16_t() const noexcept;
+    #endif
+
+    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr operator Decimal() const noexcept;
+
     // cmath functions that are easier as friends
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
     friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
@@ -672,6 +688,31 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::operator long double() const noexcept
     // TODO(mborland): Don't have an exact way of converting to various long doubles
     return static_cast<long double>(to_float<decimal128, double>(*this));
 }
+
+#ifdef BOOST_DECIMAL_HAS_FLOAT16
+constexpr decimal128::operator std::float16_t() const noexcept
+{
+    return static_cast<std::float16_t>(to_float<decimal128, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT32
+constexpr decimal128::operator std::float32_t() const noexcept
+{
+    return static_cast<std::float32_t>(to_float<decimal128, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT64
+constexpr decimal128::operator std::float64_t() const noexcept
+{
+    return static_cast<std::float64_t>(to_float<decimal128, double>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+constexpr decimal128::operator std::bfloat16_t() const noexcept
+{
+    return static_cast<std::bfloat16_t>(to_float<decimal128, float>(*this));
+}
+#endif
 
 template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
 constexpr decimal128::operator Decimal() const noexcept
