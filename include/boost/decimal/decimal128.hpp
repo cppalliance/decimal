@@ -155,6 +155,9 @@ private:
     template <typename Decimal, typename TargetType>
     friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
 
+    template <typename Decimal, typename TargetType>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
+
     // Equality template between any integer type and decimal128
     template <typename Decimal, typename Integer>
     friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
@@ -202,6 +205,11 @@ public:
     explicit constexpr operator std::uint8_t() const noexcept;
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
+
+    // 3.2.6 Conversion to floating-point type
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
 
     // cmath functions that are easier as friends
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool;
@@ -644,6 +652,22 @@ constexpr decimal128::operator std::int16_t() const noexcept
 constexpr decimal128::operator std::uint16_t() const noexcept
 {
     return to_integral<decimal128, std::uint16_t>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::operator float() const noexcept
+{
+    return to_float<decimal128, float>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::operator double() const noexcept
+{
+    return to_float<decimal128, double>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::operator long double() const noexcept
+{
+    // TODO(mborland): Don't have an exact way of converting to various long doubles
+    return static_cast<long double>(to_float<decimal128, double>(*this));
 }
 
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
