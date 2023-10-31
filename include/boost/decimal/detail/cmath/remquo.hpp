@@ -13,8 +13,8 @@
 
 namespace boost { namespace decimal {
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto remquo(T x, T y, int* quo) noexcept -> T
+template<typename T>
+constexpr auto remquo(T x, T y, int* quo) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T zero {0, 0};
     constexpr T half {5, -1};
