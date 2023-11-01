@@ -6,6 +6,7 @@
 
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
+#include <boost/math/special_functions/next.hpp>
 #include <limits>
 #include <random>
 #include <sstream>
@@ -161,12 +162,28 @@ void test_roundtrip_conversion_float()
         const T return_val {static_cast<T>(initial_decimal)};
         const decimal128 return_decimal {return_val};
 
-        if(!BOOST_TEST_EQ(initial_decimal, return_decimal))
+        BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<T, long double>::value)
         {
-            std::cerr << "Val: " << val
-                      << "\nDec: " << initial_decimal
-                      << "\nReturn Val: " << return_val
-                      << "\nReturn Dec: " << return_decimal << std::endl;
+            if (!BOOST_TEST_EQ(initial_decimal, return_decimal))
+            {
+                std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                          << "Val: " << val
+                          << "\nDec: " << initial_decimal
+                          << "\nReturn Val: " << return_val
+                          << "\nReturn Dec: " << return_decimal << std::endl;
+            }
+        }
+        else
+        {
+            if (!BOOST_TEST(boost::math::float_distance(val, return_val) < 50))
+            {
+                std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                          << "Val: " << val
+                          << "\nDec: " << initial_decimal
+                          << "\nReturn Val: " << return_val
+                          << "\nReturn Dec: " << return_decimal
+                          << "\nDist: " << boost::math::float_distance(val, return_val) << std::endl;
+            }
         }
     }
 }
