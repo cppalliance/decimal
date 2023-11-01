@@ -267,10 +267,40 @@ void test_roundtrip_float_stream()
 
         if (!BOOST_TEST_EQ(first_val, return_val) || !BOOST_TEST_EQ(first_val_flt, return_val_flt))
         {
-            std::cerr << "Val: " << first_val
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Val: " << first_val
                       << "\nInt Val: " << first_val_flt
                       << "\nRet: " << return_val
                       << "\nInt Ret: " << return_val_flt << std::endl;
+        }
+    }
+}
+
+template <>
+void test_roundtrip_float_stream<long double>()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<long double> dist((std::numeric_limits<long double>::min)(),
+                                                     (std::numeric_limits<long double>::max)());
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const decimal128 first_val {dist(rng)};
+        const long double first_val_flt {static_cast<long double>(first_val)};
+        std::stringstream ss;
+        ss << std::setprecision(std::numeric_limits<decimal128>::digits10);
+        ss << first_val;
+        decimal128 return_val {};
+        ss >> return_val;
+        const auto return_val_flt {static_cast<long double>(return_val)};
+
+        if (!BOOST_TEST(boost::math::float_distance(first_val_flt, return_val_flt) < 50))
+        {
+            std::cerr << std::setprecision(std::numeric_limits<long double>::digits10)
+                      << "    Dec: " << first_val
+                      << "\n    Val: " << first_val_flt
+                      << "\nRet Dec: " << return_val
+                      << "\nRet Val: " << return_val_flt << std::endl;
         }
     }
 }

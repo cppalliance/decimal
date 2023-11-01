@@ -27,7 +27,8 @@ template <typename charT, typename traits, typename DecimalType>
 auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>
 {
-    using significand_type = std::conditional_t<std::is_same<DecimalType, decimal128>::value, detail::uint128, std::uint64_t>;
+    using significand_type = std::conditional_t<(std::is_same<DecimalType, decimal128>::value &&
+                                                 BOOST_DECIMAL_LDBL_BITS == 128), detail::uint128, std::uint64_t>;
 
     char buffer[1024] {}; // What should be an unreasonably high maximum
     is >> buffer;
@@ -144,7 +145,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         precision = std::numeric_limits<DecimalType>::digits10;
     }
 
-    char buffer[detail::precision_v<DecimalType> + 3] {}; // Sign + Precision + decimal point + null terminator
+    char buffer[detail::precision_v<DecimalType> + 6] {}; // Sign + Precision + decimal point + e + sign + null terminator
 
     if (d.isneg() == 1)
     {
