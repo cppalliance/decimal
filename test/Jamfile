@@ -57,5 +57,6 @@ run test_promotion.cpp ;
 run test_sinh.cpp ;
 run test_sqrt.cpp ;
 run test_strtod.cpp ;
+run test_tan.cpp ;
 run test_tanh.cpp ;
 run test_tgamma.cpp ;
