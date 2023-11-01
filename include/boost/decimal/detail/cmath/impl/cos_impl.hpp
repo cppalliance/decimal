@@ -15,11 +15,9 @@ namespace boost { namespace decimal { namespace detail {
 template<typename T>
 constexpr auto cos_impl(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
-    constexpr T zero {0, 0};
-    if (x < zero)
-    {
-        return cos_impl(-x);
-    }
+    T result { };
+
+    x = abs(x);
 
     // Constants calculated for [0, pi/4]
     constexpr T a0 {UINT64_C(22805960529562646), -21};
@@ -32,17 +30,17 @@ constexpr auto cos_impl(T x) noexcept -> std::enable_if_t<detail::is_decimal_flo
     constexpr T a7 {UINT64_C(18421494272283811), -26};
     constexpr T a8 {UINT64_C(99999999999908662), -17};
 
-    T u {a0};
-    u = fma(u, x, a1);
-    u = fma(u, x, a2);
-    u = fma(u, x, a3);
-    u = fma(u, x, a4);
-    u = fma(u, x, a5);
-    u = fma(u, x, a6);
-    u = fma(u, x, a7);
-    u = fma(u, x, a8);
+    result = a0;
+    result = fma(result, x, a1);
+    result = fma(result, x, a2);
+    result = fma(result, x, a3);
+    result = fma(result, x, a4);
+    result = fma(result, x, a5);
+    result = fma(result, x, a6);
+    result = fma(result, x, a7);
+    result = fma(result, x, a8);
 
-    return u;
+    return result;
 }
 
 } // namespace detail

@@ -1,4 +1,5 @@
 // Copyright 2023 Matt Borland
+// Copyright 2023 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -18,7 +19,7 @@
 namespace boost { namespace decimal {
 
 template<typename T>
-constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
 {
     T result { };
 
@@ -52,16 +53,26 @@ constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         constexpr auto my_pi_half = numbers::pi_v<T> / 2;
         #endif
 
-        int k {};
+        int k { };
         auto r { remquo(x, my_pi_half, &k) };
 
         const auto n = static_cast<unsigned>(k % 4U);
 
-        result = (((n == 1U) || (n == 3U)) ? detail::cos_impl(r) : detail::sin_impl(r));
-
-        if (n > 1U)
+        switch(n)
         {
-          result = -result;
+            case 3U:
+                result = -detail::cos_impl(r);
+                break;
+            case 2U:
+                result = -detail::sin_impl(r);
+                break;
+            case 1U:
+                result = detail::cos_impl(r);
+                break;
+            case 0U:
+            default:
+                result = detail::sin_impl(r);
+                break;
         }
     }
 
