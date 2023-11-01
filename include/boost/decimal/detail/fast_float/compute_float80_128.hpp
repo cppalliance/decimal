@@ -57,7 +57,7 @@ constexpr auto fast_path(const std::int64_t q, const Unsigned_Integer &w, bool n
 }
 
 template <typename Unsigned_Integer>
-constexpr auto compute_float80(const std::int64_t q, const Unsigned_Integer &w,
+constexpr auto compute_float80(std::int64_t q, const Unsigned_Integer &w,
                                const bool negative, bool &success) noexcept -> long double
 {
     // GLIBC uses 2^-16444 but MPFR uses 2^-16445 as the smallest subnormal value for 80 bit
@@ -93,6 +93,11 @@ constexpr auto compute_float80(const std::int64_t q, const Unsigned_Integer &w,
     // We take the best guess
     success = true;
     auto ld {static_cast<long double>(w)};
+    const auto sig_num_dig {detail::num_digits(w)};
+    if (sig_num_dig > std::numeric_limits<long double>::digits10)
+    {
+        q += sig_num_dig - std::numeric_limits<long double>::digits10 - 1;
+    }
 
     // Calculate (b ^ p) using the ladder method for powers.
 
