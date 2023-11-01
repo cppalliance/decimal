@@ -110,6 +110,7 @@ void test_non_finite_values()
 
 void test_float_constructor()
 {
+    #if BOOST_DECIMAL_LDBL_BITS > 64
     const decimal128 val(8.45150093187788174e+4929L);
     const decimal128 computed_val {845150093187788174, 4912};
     BOOST_TEST_EQ(val, computed_val);
@@ -117,6 +118,7 @@ void test_float_constructor()
     const decimal128 val2(6.277323608720053612e+4909L);
     const decimal128 computed_val2 {6277323608720053612, 4891};
     BOOST_TEST_EQ(val2, computed_val2);
+    #endif
 }
 
 int main()
