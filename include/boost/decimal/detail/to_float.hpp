@@ -61,10 +61,10 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType
         #if BOOST_DECIMAL_LDBL_BITS == 64
         result = static_cast<TargetType>(detail::fast_float::compute_float64(exp, new_sig, val.isneg(), success));
         #else
-        result = static_cast<TargetType>(detail::fast_float::compute_float80(exp, sig, val.isneg(), success));
+        result = static_cast<TargetType>(detail::fast_float::compute_float80(exp, new_sig, val.isneg(), success));
         #endif
     }
-    // TODO(mborland): Add conversion for __float128
+    // TODO(mborland): Add conversion for __float128 and 128 bit long doubles
 
     if (BOOST_DECIMAL_UNLIKELY(!success))
     {
