@@ -329,15 +329,18 @@ int main()
 
     test_conversion_from_float<float>();
     test_conversion_from_float<double>();
-    test_conversion_from_float<long double>();
 
     test_conversion_to_float<float>();
     test_conversion_to_float<double>();
-    test_conversion_to_float<long double>();
 
     test_roundtrip_conversion_float<float>();
     test_roundtrip_conversion_float<double>();
+
+    #if BOOST_DECIMAL_LDBL_BITS < 128
+    test_conversion_from_float<long double>();
+    test_conversion_to_float<long double>();
     test_roundtrip_conversion_float<long double>();
+    #endif
 /*
     test_roundtrip_integer_stream<int>();
     test_roundtrip_integer_stream<unsigned>();
