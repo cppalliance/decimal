@@ -83,6 +83,19 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
 #  pragma GCC diagnostic ignored "-Wformat-truncation"
 #endif
 
+template <typename DecimalType, typename Integer, std::enable_if_t<!std::is_same<DecimalType, decimal128>::value, bool> = true>
+void print_buffer(char* buffer, std::size_t buffer_size, const char* format, Integer significand)
+{
+    std::snprintf(buffer, buffer_size, format, significand);
+}
+
+template <typename DecimalType, typename Integer, std::enable_if_t<std::is_same<DecimalType, decimal128>::value, bool> = true>
+void print_buffer(char* buffer, std::size_t buffer_size, const char* format, Integer significand)
+{
+    std::snprintf(buffer, buffer_size, format, significand.high);
+    std::snprintf(buffer, buffer_size, format, significand.low);
+}
+
 // 3.2.11 Formatted output
 template <typename charT, typename traits, typename DecimalType>
 auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
@@ -157,7 +170,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
     }
 
     // Print the significand into the buffer so that we can insert the decimal point
-    std::snprintf(buffer, sizeof(buffer), format, significand);
+    print_buffer<DecimalType>(buffer, sizeof(buffer), format, significand);
     std::memmove(buffer + 2, buffer + 1, static_cast<std::size_t>(precision - 1));
     std::memset(buffer + 1, '.', 1);
     os << buffer;
