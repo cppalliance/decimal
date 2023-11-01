@@ -320,10 +320,9 @@ public:
     #endif
 
     // 3.2.10 Formatted input:
-    /*
-    template <typename charT, typename traits>
-    friend auto operator>>(std::basic_istream<charT, traits>& is, decimal128& d) -> std::basic_istream<charT, traits>&;
-    */
+    template <typename charT, typename traits, typename DecimalType>
+    friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>;
 
     // 3.2.11 Formatted output:
     template <typename charT, typename traits>
