@@ -28,7 +28,7 @@ static constexpr std::array<long double, 56> powers_of_ten_ld = {
         1e49L, 1e50L, 1e51L, 1e52L, 1e53L, 1e54L, 1e55L
 };
 
-template<typename ResultType, typename Unsigned_Integer>
+template <typename Unsigned_Integer>
 constexpr auto fast_path(const std::int64_t q, const Unsigned_Integer &w, bool negative) noexcept -> long double
 {
     // The general idea is as follows.
@@ -37,7 +37,7 @@ constexpr auto fast_path(const std::int64_t q, const Unsigned_Integer &w, bool n
     // because of this s*p and s/p will produce
     // correctly rounded values
 
-    auto ld = static_cast<ResultType>(w);
+    auto ld = static_cast<long double>(w);
 
     if (q < 0)
     {
@@ -56,7 +56,7 @@ constexpr auto fast_path(const std::int64_t q, const Unsigned_Integer &w, bool n
     return ld;
 }
 
-template<typename Unsigned_Integer>
+template <typename Unsigned_Integer>
 constexpr auto compute_float80(const std::int64_t q, const Unsigned_Integer &w,
                                const bool negative, bool &success) noexcept -> long double
 {
@@ -76,7 +76,7 @@ constexpr auto compute_float80(const std::int64_t q, const Unsigned_Integer &w,
     if (clinger_min_exp <= q && q <= clinger_max_exp && w <= static_cast<Unsigned_Integer>(1) << 113)
     {
         success = true;
-        return fast_path(q, w, negative, powers_of_ten_ld);
+        return fast_path(q, w, negative);
     }
 
     if (w == 0 || q < smallest_power)
@@ -97,7 +97,7 @@ constexpr auto compute_float80(const std::int64_t q, const Unsigned_Integer &w,
     // Calculate (b ^ p) using the ladder method for powers.
 
     long double result {1};
-    long double y {1};
+    long double y {10};
 
     std::uint64_t p_local = detail::make_positive_unsigned(q);
 

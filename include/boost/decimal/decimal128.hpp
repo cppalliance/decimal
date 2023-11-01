@@ -685,8 +685,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::operator double() const noexcept
 
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::operator long double() const noexcept
 {
-    // TODO(mborland): Don't have an exact way of converting to various long doubles
-    return static_cast<long double>(to_float<decimal128, double>(*this));
+    return to_float<decimal128, long double>(*this);
 }
 
 #ifdef BOOST_DECIMAL_HAS_FLOAT16
