@@ -153,7 +153,7 @@ template <typename T>
 void test_roundtrip_conversion_float()
 {
     std::mt19937_64 rng(42);
-    std::uniform_real_distribution<T> dist(0, (std::numeric_limits<T>::max)());
+    std::uniform_real_distribution<T> dist(T(0), (std::numeric_limits<T>::max)());
 
     for (std::size_t i = 0; i < N; ++i)
     {
@@ -162,28 +162,60 @@ void test_roundtrip_conversion_float()
         const T return_val {static_cast<T>(initial_decimal)};
         const decimal128 return_decimal {return_val};
 
-        BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<T, long double>::value)
+        if (!BOOST_TEST_EQ(initial_decimal, return_decimal))
         {
-            if (!BOOST_TEST_EQ(initial_decimal, return_decimal))
-            {
-                std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
-                          << "Val: " << val
-                          << "\nDec: " << initial_decimal
-                          << "\nReturn Val: " << return_val
-                          << "\nReturn Dec: " << return_decimal << std::endl;
-            }
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Val: " << val
+                      << "\nDec: " << initial_decimal
+                      << "\nReturn Val: " << return_val
+                      << "\nReturn Dec: " << return_decimal << std::endl;
         }
-        else
+    }
+}
+
+template <>
+void test_roundtrip_conversion_float<long double>()
+{
+    std::mt19937_64 rng(42);
+
+    // First test clingers fast path
+    std::uniform_real_distribution<long double> dist(0.0L, 1e55L);
+
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        const long double val {dist(rng)};
+        const decimal128 initial_decimal(val);
+        const auto return_val {static_cast<long double>(initial_decimal)};
+        const decimal128 return_decimal {return_val};
+
+        if (!BOOST_TEST(boost::math::float_distance(val, return_val) < 50))
         {
-            if (!BOOST_TEST(boost::math::float_distance(val, return_val) < 50))
-            {
-                std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
-                          << "Val: " << val
-                          << "\nDec: " << initial_decimal
-                          << "\nReturn Val: " << return_val
-                          << "\nReturn Dec: " << return_decimal
-                          << "\nDist: " << boost::math::float_distance(val, return_val) << std::endl;
-            }
+            std::cerr << std::setprecision(std::numeric_limits<long double>::digits10 + 1)
+                      << "Val: " << val
+                      << "\nDec: " << initial_decimal
+                      << "\nReturn Val: " << return_val
+                      << "\nReturn Dec: " << return_decimal
+                      << "\nDist: " << boost::math::float_distance(val, return_val) << std::endl;
+        }
+    }
+
+    // Then the rest of the domain
+    std::uniform_real_distribution<long double> dist2(0.0L, LDBL_MAX);
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        const long double val {dist2(rng)};
+        const decimal128 initial_decimal(val);
+        const auto return_val {static_cast<long double>(initial_decimal)};
+        const decimal128 return_decimal {return_val};
+
+        if (!BOOST_TEST(boost::math::float_distance(val, return_val) < 50))
+        {
+            std::cerr << std::setprecision(std::numeric_limits<long double>::digits10 + 1)
+                      << "Val: " << val
+                      << "\nDec: " << initial_decimal
+                      << "\nReturn Val: " << return_val
+                      << "\nReturn Dec: " << return_decimal
+                      << "\nDist: " << boost::math::float_distance(val, return_val) << std::endl;
         }
     }
 }
