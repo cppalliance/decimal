@@ -73,7 +73,10 @@ constexpr auto compute_float80(std::int64_t q, const Unsigned_Integer &w,
     constexpr auto clinger_max_exp {BOOST_DECIMAL_LDBL_BITS == 80 ? 27 : 48};   // NOLINT : Only changes by platform
     constexpr auto clinger_min_exp {BOOST_DECIMAL_LDBL_BITS == 80 ? -34 : -55}; // NOLINT
 
-    if (clinger_min_exp <= q && q <= clinger_max_exp && w <= static_cast<Unsigned_Integer>(1) << (sizeof(Unsigned_Integer) * CHAR_BIT - 10))
+    // A seemingly unnecessary calculation to get 110 as the value for 128-bit types but needed for pre-C++17
+    constexpr std::uint32_t shift_length {sizeof(Unsigned_Integer) * CHAR_BIT - 10};
+
+    if (clinger_min_exp <= q && q <= clinger_max_exp && w <= static_cast<Unsigned_Integer>(1) << shift_length)
     {
         success = true;
         return fast_path(q, w, negative);
