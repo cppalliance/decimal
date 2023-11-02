@@ -57,7 +57,7 @@
 #  else
 #    define BOOST_DECIMAL_HAS_MSVC_32BIT_INTRINSICS
 #  endif
-#elif (defined(__x86_64__) || defined(__i386__))
+#elif defined(__x86_64__)
 #  include <x86intrin.h>
 #  define BOOST_DECIMAL_HAS_X86_INTRINSICS
 #elif defined(__ARM_NEON__)
