@@ -182,7 +182,7 @@ private:
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
     template <typename T1, typename T2>
-    constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign
+    constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                  T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept
                                  -> detail::decimal128_components;
 public:
