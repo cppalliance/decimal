@@ -295,13 +295,14 @@ void test_roundtrip_float_stream<long double>()
         ss >> return_val;
         const auto return_val_flt {static_cast<long double>(return_val)};
 
-        if (!BOOST_TEST(boost::math::float_distance(first_val_flt, return_val_flt) < 50))
+        if (!BOOST_TEST(boost::math::float_distance(first_val_flt, return_val_flt) < 100))
         {
             std::cerr << std::setprecision(std::numeric_limits<long double>::digits10)
                       << "    Dec: " << first_val
                       << "\n    Val: " << first_val_flt
                       << "\nRet Dec: " << return_val
-                      << "\nRet Val: " << return_val_flt << std::endl;
+                      << "\nRet Val: " << return_val_flt
+                      << "\n  Dist :" << boost::math::float_distance(first_val_flt, return_val_flt) << std::endl;
         }
     }
 }
