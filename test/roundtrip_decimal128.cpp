@@ -239,7 +239,8 @@ void test_roundtrip_integer_stream()
 
         if (!BOOST_TEST_EQ(first_val, return_val) || !BOOST_TEST_EQ(first_val_int, return_val_int))
         {
-            std::cerr << "    Val: " << first_val
+            std::cerr << std::setprecision(std::numeric_limits<decimal128>::digits10)
+                      << "    Val: " << first_val
                       << "\nInt Val: " << first_val_int
                       << "\n SS Val: " << ss.str()
                       << "\n    Ret: " << return_val
