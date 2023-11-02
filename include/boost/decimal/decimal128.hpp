@@ -181,8 +181,9 @@ private:
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
-    constexpr auto d128_add_impl(const detail::decimal128_components& lhs,
-                                 const detail::decimal128_components& rhs) noexcept
+    template <typename T1, typename T2>
+    constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign
+                                 T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept
                                  -> detail::decimal128_components;
 public:
     // 3.2.4.1 construct/copy/destroy
@@ -1008,12 +1009,13 @@ constexpr auto operator<=>(Integer lhs, decimal128 rhs) noexcept -> std::enable_
 
 #endif
 
-constexpr auto d128_add_impl(detail::decimal128_components lhs,
-                             detail::decimal128_components rhs) noexcept -> detail::decimal128_components
+template <typename T1, typename T2>
+constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                             T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal128_components
 {
-    const bool sign {lhs.sign};
+    const bool sign {lhs_sign};
 
-    auto delta_exp {lhs.exp > rhs.exp ? lhs.exp - rhs.exp : rhs.exp - lhs.exp};
+    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
 
     if (delta_exp > detail::precision_v<decimal128> + 1)
     {
@@ -1022,7 +1024,7 @@ constexpr auto d128_add_impl(detail::decimal128_components lhs,
         //
         // e.g. 1e20 + 1e-20 = 1e20
 
-        return lhs;
+        return {lhs_sig, lhs_exp, lhs_sign};
     }
     else if (delta_exp == detail::precision_v<decimal128> + 1)
     {
@@ -1031,13 +1033,18 @@ constexpr auto d128_add_impl(detail::decimal128_components lhs,
         //
         // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
 
-        if (rhs.sig >= detail::uint128{500'000'000'000'000,0})
+        BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T2>::digits10 > std::numeric_limits<std::uint64_t>::digits10)
         {
-            return {lhs.sig + 1, lhs.exp, lhs.sign};
+            if (rhs_sig >= detail::uint128 {500'000'000'000'000, 0})
+            {
+                ++lhs_sig;
+            }
+
+            return {lhs_sig, lhs_exp, lhs_sign};
         }
         else
         {
-            return rhs;
+            return {lhs_sig, lhs_exp, lhs_sign};
         }
     }
 
@@ -1050,32 +1057,35 @@ constexpr auto d128_add_impl(detail::decimal128_components lhs,
     {
         while (delta_exp > 0)
         {
-            lhs.sig *= 10;
+            lhs_sig *= 10;
             --delta_exp;
-            --lhs.exp;
+            --lhs_exp;
         }
     }
     else
     {
-        lhs.sig *= 1000;
+        lhs_sig *= 1000;
         delta_exp -= 3;
-        lhs.exp -= 3;
+        lhs_exp -= 3;
     }
 
     while (delta_exp > 1)
     {
-        rhs.sig /= 10;
+        rhs_sig /= 10;
         --delta_exp;
     }
 
     if (delta_exp == 1)
     {
-        detail::fenv_round<decimal128>(rhs.sig, rhs.sign);
+        detail::fenv_round<decimal128>(rhs_sig, rhs_sign);
     }
 
-    // Both of the significands are well under 64-bits, so we can fit them into int64_t without issue
-    const auto new_sig {lhs.sig + rhs.sig};
-    const auto new_exp {lhs.exp};
+    // Convert both of the significands to unsigned types, so we can use intrinsics
+    // in the uint128 implementation
+    const auto unsigned_lhs_sig {detail::make_positive_unsigned(lhs_sig)};
+    const auto unsigned_rhs_sig {detail::make_positive_unsigned(rhs_sig)};
+    const auto new_sig {static_cast<detail::uint128>(unsigned_lhs_sig + unsigned_rhs_sig)};
+    const auto new_exp {lhs_exp};
 
     #ifdef BOOST_DECIMAL_DEBUG_ADD
     std::cerr << "Res Sig: " << new_sig
@@ -1121,8 +1131,8 @@ constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal128>(rhs_sig, rhs_exp);
 
-    const auto result {d128_add_impl({lhs_sig, lhs_exp, lhs.isneg()},
-                                     {rhs_sig, rhs_exp, rhs.isneg()})};
+    const auto result {d128_add_impl(lhs_sig, lhs_exp, lhs.isneg(),
+                                     rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
 }
