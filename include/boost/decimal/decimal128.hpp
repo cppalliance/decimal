@@ -1009,6 +1009,31 @@ constexpr auto operator<=>(Integer lhs, decimal128 rhs) noexcept -> std::enable_
 
 #endif
 
+#ifdef BOOST_DECIMAL_DEBUG_ADD_128
+static char* mini_to_chars( char (&buffer)[ 64 ], boost::decimal::detail::uint128_t v )
+{
+    char* p = buffer + 64;
+    *--p = '\0';
+
+    do
+    {
+        *--p = "0123456789"[ v % 10 ];
+        v /= 10;
+    }
+    while ( v != 0 );
+
+    return p;
+}
+
+std::ostream& operator<<( std::ostream& os, boost::decimal::detail::uint128_t v )
+{
+    char buffer[ 64 ];
+
+    os << mini_to_chars( buffer, v );
+    return os;
+}
+#endif
+
 template <typename T1, typename T2>
 constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                              T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal128_components
@@ -1087,8 +1112,8 @@ constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     const auto new_sig {static_cast<detail::uint128>(unsigned_lhs_sig + unsigned_rhs_sig)};
     const auto new_exp {lhs_exp};
 
-    #ifdef BOOST_DECIMAL_DEBUG_ADD
-    std::cerr << "Res Sig: " << new_sig
+    #ifdef BOOST_DECIMAL_DEBUG_ADD_128
+    std::cerr << "Res Sig: " << static_cast<detail::uint128_t>(new_sig)
               << "\nRes Exp: " << new_exp
               << "\nRes Neg: " << sign << std::endl;
     #endif
@@ -1131,6 +1156,13 @@ constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal128>(rhs_sig, rhs_exp);
 
+    #ifdef BOOST_DECIMAL_DEBUG_ADD_128
+    std::cerr << "\nlhs sig: " << static_cast<detail::uint128_t>(lhs_sig)
+              << "\nlhs exp: " << lhs_exp
+              << "\nrhs sig: " << static_cast<detail::uint128_t>(rhs_sig)
+              << "\nrhs exp: " << rhs_exp << std::endl;
+    #endif
+
     const auto result {d128_add_impl(lhs_sig, lhs_exp, lhs.isneg(),
                                      rhs_sig, rhs_exp, rhs.isneg())};
 
@@ -1150,7 +1182,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128& d) -> s
 
     if (d.biased_exponent() < 0)
     {
-        os << "-" << d.biased_exponent();
+        os << d.biased_exponent();
     }
     else
     {
