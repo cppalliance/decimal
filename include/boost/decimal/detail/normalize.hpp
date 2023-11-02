@@ -59,12 +59,12 @@ template <typename TargetDecimalType = decimal32, typename T1, typename T2,
 constexpr auto normalize(T1& significand, T2& exp) noexcept
 {
     auto digits {num_digits(significand)};
-    std::cerr << "Digits: " << digits << std::endl;
 
     if (digits < std::numeric_limits<std::uint64_t>::digits10)
     {
         significand.high = significand.low;
         significand.low = UINT64_C(0);
+        digits += 19;
     }
 
     if (digits < detail::precision_v<decimal128>)
