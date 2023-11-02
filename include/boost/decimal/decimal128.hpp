@@ -1177,7 +1177,11 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128& d) -> s
         os << "-";
     }
 
+    #ifdef BOOST_DECIMAL_DEBUG_ADD_128
+    os << static_cast<detail::uint128_t>(d.full_significand());
+    #else
     os << d.full_significand();
+    #endif
     os << "e";
 
     if (d.biased_exponent() < 0)
