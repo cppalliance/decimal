@@ -759,7 +759,7 @@ constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
     return result;
 }
 
-// TODO(mborland): this can be optimized with SIMD
+// TODO(mborland): Can be replaced by intrinsics at runtime
 constexpr auto multiply_64_64(std::uint64_t a, std::uint64_t b) -> uint128
 {
     std::uint64_t a_low = a & UINT32_MAX;
