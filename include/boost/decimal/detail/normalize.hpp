@@ -18,38 +18,85 @@ namespace detail {
 template <typename TargetDecimalType = decimal32, typename T1, typename T2>
 constexpr auto normalize(T1& significand, T2& exp) noexcept -> void
 {
-    auto digits {num_digits(significand)};
-
-    if (digits < detail::precision_v<TargetDecimalType>)
+    BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<TargetDecimalType, decimal128>::value)
     {
-        while (digits < detail::precision_v<TargetDecimalType>)
+        auto digits {num_digits(significand)};
+
+        if (digits < detail::precision_v<TargetDecimalType>)
         {
-            significand *= 10;
-            --exp;
-            ++digits;
+            while (digits < detail::precision_v<TargetDecimalType>)
+            {
+                significand *= 10;
+                --exp;
+                ++digits;
+            }
+        }
+        else if (digits > detail::precision_v<TargetDecimalType>)
+        {
+            while (digits > detail::precision_v<TargetDecimalType> + 1)
+            {
+                significand /= 10;
+
+                #if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
+                #  pragma GCC diagnostic push
+                #  pragma GCC diagnostic ignored "-Waggressive-loop-optimizations"
+                #endif
+
+                ++exp;
+
+                #if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
+                #  pragma GCC diagnostic pop
+                #endif
+
+                --digits;
+            }
+
+            exp += detail::fenv_round<TargetDecimalType>(significand, significand < 0);
         }
     }
-    else if (digits > detail::precision_v<TargetDecimalType>)
+    else
     {
-        while (digits > detail::precision_v<TargetDecimalType> + 1)
+        auto digits {num_digits(significand)};
+        std::cerr << "Digits: " << digits << std::endl;
+
+        if (digits < std::numeric_limits<std::uint64_t>::digits10)
         {
-            significand /= 10;
-
-            #if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
-            #  pragma GCC diagnostic push
-            #  pragma GCC diagnostic ignored "-Waggressive-loop-optimizations"
-            #endif
-
-            ++exp;
-
-            #if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
-            #  pragma GCC diagnostic pop
-            #endif
-
-            --digits;
+            significand.high = significand.low;
+            significand.low = UINT64_C(0);
         }
 
-        exp += detail::fenv_round<TargetDecimalType>(significand, significand < 0);
+        if (digits < detail::precision_v<decimal128>)
+        {
+            while (digits < detail::precision_v<decimal128>)
+            {
+                significand *= UINT64_C(10);
+                --exp;
+                ++digits;
+            }
+        }
+
+        else if (digits > detail::precision_v<TargetDecimalType>)
+        {
+            while (digits > detail::precision_v<TargetDecimalType> + 1)
+            {
+                significand /= 10;
+
+                #if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
+                #  pragma GCC diagnostic push
+                #  pragma GCC diagnostic ignored "-Waggressive-loop-optimizations"
+                #endif
+
+                ++exp;
+
+                #if ((defined(__GNUC__) && (__GNUC__ > 12)) && !defined(__clang__))
+                #  pragma GCC diagnostic pop
+                #endif
+
+                --digits;
+            }
+
+            exp += detail::fenv_round<TargetDecimalType>(significand, significand < 0);
+        }
     }
 }
 
