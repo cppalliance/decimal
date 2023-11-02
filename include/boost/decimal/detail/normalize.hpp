@@ -60,13 +60,6 @@ constexpr auto normalize(T1& significand, T2& exp) noexcept
 {
     auto digits {num_digits(significand)};
 
-    if (digits < std::numeric_limits<std::uint64_t>::digits10)
-    {
-        significand.high = significand.low;
-        significand.low = UINT64_C(0);
-        digits += 19;
-    }
-
     if (digits < detail::precision_v<decimal128>)
     {
         while (digits < detail::precision_v<decimal128>)

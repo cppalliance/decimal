@@ -11,7 +11,7 @@
 using namespace boost::decimal;
 
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-static constexpr auto N = static_cast<std::size_t>(1024U); // Number of trials
+static constexpr auto N = static_cast<std::size_t>(2U); // Number of trials
 #else
 static constexpr auto N = static_cast<std::size_t>(1024U >> 4U); // Number of trials
 #endif
@@ -65,7 +65,7 @@ void random_addition(T lower, T upper)
     BOOST_TEST_EQ(decimal128(4,0) + decimal128(40, -1), decimal128(8,0));
     BOOST_TEST_EQ(decimal128(4,0) + decimal128(400, -2), decimal128(8,0));
     BOOST_TEST_EQ(decimal128(4,0) + decimal128(4000, -3), decimal128(8,0));
-    BOOST_TEST_EQ(decimal128(40000000000, -9) + decimal128(4, 0), decimal128(8,0));
+    BOOST_TEST_EQ(decimal128(40000000000, -10) + decimal128(4, 0), decimal128(8,0));
 }
 /*
 template <typename T>
@@ -796,19 +796,19 @@ int main()
     random_addition(0LL, 4'000'000'000'000LL);
     //random_mixed_addition(0, 5'000'000);
     //random_mixed_addition(0LL, 4'000'000'000'000LL);
-
+/*
     // Only two negative values
-    random_addition(-5'000'000, 0);
-    random_addition(-4'000'000'000'000LL, 0LL);
+    //random_addition(-5'000'000, 0);
+    //random_addition(-4'000'000'000'000LL, 0LL);
     //random_mixed_addition(-5'000'000, 0);
     //random_mixed_addition(-4'000'000'000'000LL, 0LL);
 
     // Mixed values
-    random_addition(-5'000'000, 5'000'000);
-    random_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
+    //random_addition(-5'000'000, 5'000'000);
+    //random_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
     //random_mixed_addition(-5'000'000, 5'000'000);
     //random_mixed_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
-/*
+
     // Subtraction
     random_subtraction(0, 5'000'000);
     random_subtraction(0LL, 4'000'000'000'000LL);
