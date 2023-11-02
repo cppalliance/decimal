@@ -1031,7 +1031,7 @@ constexpr auto d128_add_impl(detail::decimal128_components lhs,
         //
         // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
 
-        if (rhs.sig >= UINT64_C(5'000'000'000'000'000))
+        if (rhs.sig >= detail::uint128{500'000'000'000'000,0})
         {
             return {lhs.sig + 1, lhs.exp, lhs.sign};
         }
