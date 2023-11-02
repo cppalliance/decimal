@@ -60,6 +60,12 @@ void random_addition(T lower, T upper)
     BOOST_TEST(isinf(decimal128{0,0} + std::numeric_limits<decimal128>::infinity()));
     BOOST_TEST(isnan(std::numeric_limits<decimal128>::quiet_NaN() + decimal128{0,0}));
     BOOST_TEST(isnan(decimal128{0,0} + std::numeric_limits<decimal128>::quiet_NaN()));
+
+    // Cohorts
+    BOOST_TEST_EQ(decimal128(4,0) + decimal128(40, -1), decimal128(8,0));
+    BOOST_TEST_EQ(decimal128(4,0) + decimal128(400, -2), decimal128(8,0));
+    BOOST_TEST_EQ(decimal128(4,0) + decimal128(4000, -3), decimal128(8,0));
+    BOOST_TEST_EQ(decimal128(40000000000, -9) + decimal128(4, 0), decimal128(8,0));
 }
 /*
 template <typename T>
