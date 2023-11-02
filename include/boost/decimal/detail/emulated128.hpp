@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <limits>
 #include <iosfwd>
+#include <iomanip>
 #include <ostream>
 #include <cstdint>
 #include <cassert>
