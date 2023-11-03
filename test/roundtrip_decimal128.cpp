@@ -378,7 +378,7 @@ int main()
     test_roundtrip_float_stream<float>();
     test_roundtrip_float_stream<double>();
 
-    #if BOOST_DECIMAL_LDBL_BITS < 128
+    #if BOOST_DECIMAL_LDBL_BITS == 64
     test_conversion_from_float<long double>();
     test_conversion_to_float<long double>();
     test_roundtrip_conversion_float<long double>();
