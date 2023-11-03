@@ -122,8 +122,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     }
 
     // Next we get the significand
-    // Size the significand to digits10 + 1 + null terminator
-    constexpr std::size_t significand_buffer_size = std::numeric_limits<Unsigned_Integer>::digits10 + 2;
+    constexpr std::size_t significand_buffer_size = std::numeric_limits<Unsigned_Integer>::digits;
     char significand_buffer[significand_buffer_size] {};
     std::size_t i = 0;
     std::size_t dot_position = 0;
@@ -258,6 +257,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         // See GitHub issue #29: https://github.com/cppalliance/charconv/issues/29
         if (offset != 0)
         {
+            std::cerr << "Buf: " << significand_buffer << std::endl;
             BOOST_DECIMAL_ATTRIBUTE_UNUSED from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
             assert(r.ec == std::errc());
 
