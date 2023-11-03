@@ -153,7 +153,7 @@ private:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
     template <typename Decimal, typename TargetType>
-    friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
+    friend constexpr auto to_integral_128(Decimal val) noexcept -> TargetType;
 
     template <typename Decimal, typename TargetType>
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
@@ -624,52 +624,52 @@ constexpr decimal128::decimal128(Integer val) noexcept // NOLINT : Incorrect par
 
 constexpr decimal128::operator int() const noexcept
 {
-    return to_integral<decimal128, int>(*this);
+    return to_integral_128<decimal128, int>(*this);
 }
 
 constexpr decimal128::operator unsigned() const noexcept
 {
-    return to_integral<decimal128, unsigned>(*this);
+    return to_integral_128<decimal128, unsigned>(*this);
 }
 
 constexpr decimal128::operator long() const noexcept
 {
-    return to_integral<decimal128, long>(*this);
+    return to_integral_128<decimal128, long>(*this);
 }
 
 constexpr decimal128::operator unsigned long() const noexcept
 {
-    return to_integral<decimal128, unsigned long>(*this);
+    return to_integral_128<decimal128, unsigned long>(*this);
 }
 
 constexpr decimal128::operator long long() const noexcept
 {
-    return to_integral<decimal128, long long>(*this);
+    return to_integral_128<decimal128, long long>(*this);
 }
 
 constexpr decimal128::operator unsigned long long() const noexcept
 {
-    return to_integral<decimal128, unsigned long long>(*this);
+    return to_integral_128<decimal128, unsigned long long>(*this);
 }
 
 constexpr decimal128::operator std::int8_t() const noexcept
 {
-    return to_integral<decimal128, std::int8_t>(*this);
+    return to_integral_128<decimal128, std::int8_t>(*this);
 }
 
 constexpr decimal128::operator std::uint8_t() const noexcept
 {
-    return to_integral<decimal128, std::uint8_t>(*this);
+    return to_integral_128<decimal128, std::uint8_t>(*this);
 }
 
 constexpr decimal128::operator std::int16_t() const noexcept
 {
-    return to_integral<decimal128, std::int16_t>(*this);
+    return to_integral_128<decimal128, std::int16_t>(*this);
 }
 
 constexpr decimal128::operator std::uint16_t() const noexcept
 {
-    return to_integral<decimal128, std::uint16_t>(*this);
+    return to_integral_128<decimal128, std::uint16_t>(*this);
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::operator float() const noexcept
