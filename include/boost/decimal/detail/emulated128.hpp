@@ -565,6 +565,34 @@ private:
     constexpr friend auto div_impl(uint128 lhs, uint128 rhs, uint128 &quotient, uint128 &remainder) noexcept -> void;
 };
 
+struct int128
+{
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+    std::uint64_t low {};
+    std::int64_t high {};
+    #else
+    std::int64_t high {};
+    std::uint64_t low {};
+    #endif
+
+    // Constructors
+    constexpr int128() noexcept = default;
+
+    constexpr int128(const int128& v) noexcept = default;
+
+    constexpr int128(int128&& v) noexcept = default;
+
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+    constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : low {low_}, high {high_} {}
+    #else
+    constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
+    #endif
+
+    explicit constexpr operator uint128() const noexcept;
+
+    friend constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128;
+};
+
 #if (__GNUC__ >= 8) || (!defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__))
 #  pragma GCC diagnostic pop
 #endif
@@ -1029,6 +1057,18 @@ auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basi
     os << emulated128_to_buffer(buffer, val);
 
     return os;
+}
+
+constexpr int128::operator uint128() const noexcept
+{
+    return {static_cast<std::uint64_t>(this->high), this->low};
+}
+
+constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128
+{
+    const auto new_low {lhs.low + rhs.low};
+    const auto new_high {lhs.high + rhs.high + (new_low < lhs.low)};
+    return int128(new_high, new_low);
 }
 
 } // namespace detail
