@@ -63,7 +63,7 @@ void random_addition(T lower, T upper)
 
     // Cohorts
     // GCC-6 using 32-bit is wrong
-    #if !(defined(__GNUC__) && __GNUC__ == 6 && !defined(BOOST_DECIMAL_HAS_INT128))
+    #if !(defined(__GNUC__) && __GNUC__ == 6)
     BOOST_TEST_EQ(decimal128(4,0) + decimal128(40, -1), decimal128(8,0));
     BOOST_TEST_EQ(decimal128(4,0) + decimal128(400, -2), decimal128(8,0));
     BOOST_TEST_EQ(decimal128(4,0) + decimal128(4000, -3), decimal128(8,0));
