@@ -1220,12 +1220,10 @@ constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
         detail::swap(lhs, rhs);
     }
 
-    /*
     if (!lhs.isneg() && rhs.isneg())
     {
         return lhs - abs(rhs);
     }
-    */
     
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
@@ -1274,9 +1272,9 @@ constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
 
-    const auto result {d64_sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
-                                    sig_rhs, exp_rhs, rhs.isneg(),
-                                    abs_lhs_bigger)};
+    const auto result {d128_sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
+                                     sig_rhs, exp_rhs, rhs.isneg(),
+                                     abs_lhs_bigger)};
 
     return {result.sig, result.exp, result.sign};
 }
