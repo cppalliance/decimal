@@ -993,15 +993,29 @@ constexpr auto umul96_lower64(std::uint32_t x, std::uint64_t y) noexcept -> std:
     return x * y;
 }
 
+auto base_10_conversion(char (&buffer)[ 64 ], uint128 v)
+{
+    char* p = buffer + 64;
+    *--p = '\0';
+
+    do
+    {
+        *--p = "0123456789"[ static_cast<std::size_t>(v % 10) ];
+        v /= 10;
+    }
+    while ( v != 0 );
+
+    return p;
+}
+
+
 template <class charT, class traits>
 auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&
 {
-    if (val.high > 0)
-    {
-        os << val.high;
-    }
+    char buffer[64];
 
-    os << val.low;
+    os << base_10_conversion(buffer, val);
+
     return os;
 }
 
