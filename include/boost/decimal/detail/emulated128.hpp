@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <limits>
 #include <iosfwd>
+#include <iomanip>
 #include <ostream>
 #include <cstdint>
 #include <cassert>
@@ -541,7 +542,11 @@ struct uint128
 
     constexpr friend auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
+    constexpr friend auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128;
+
     constexpr auto operator*=(uint128 v) noexcept -> uint128&;
+
+    constexpr auto operator*=(std::uint64_t v) noexcept -> uint128&;
 
     constexpr friend auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
@@ -740,6 +745,7 @@ constexpr auto uint128::operator--(int) noexcept -> uint128
 {
     return --(*this);
 }
+
 constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     const auto a = static_cast<std::uint64_t>(lhs.low >> 32);
@@ -753,7 +759,7 @@ constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
     return result;
 }
 
-// TODO(mborland): this can be optimized with SIMD
+// TODO(mborland): Can be replaced by intrinsics at runtime
 constexpr auto multiply_64_64(std::uint64_t a, std::uint64_t b) -> uint128
 {
     std::uint64_t a_low = a & UINT32_MAX;
@@ -791,6 +797,12 @@ constexpr auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
 }
 
 constexpr auto uint128::operator*=(uint128 v) noexcept -> uint128&
+{
+    *this = *this * v;
+    return *this;
+}
+
+constexpr auto uint128::operator*=(std::uint64_t v) noexcept -> uint128&
 {
     *this = *this * v;
     return *this;

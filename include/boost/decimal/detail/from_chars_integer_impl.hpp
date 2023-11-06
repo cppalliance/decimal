@@ -45,7 +45,7 @@ constexpr auto digit_from_char(char val) noexcept -> unsigned char
     return uchar_values[static_cast<unsigned char>(val)];
 }
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 # pragma warning(push)
 # pragma warning(disable: 4146) // unary minus operator applied to unsigned type, result still unsigned
 # pragma warning(disable: 4189) // 'is_negative': local variable is initialized but not referenced
@@ -222,7 +222,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
     return {next, std::errc()};
 }
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 # pragma warning(pop)
 #elif defined(__clang__) && defined(__APPLE__)
 # pragma clang diagnostic pop

@@ -334,11 +334,20 @@ void pow_10()
     detail::uint128_t builtin_128 {10};
 
     BOOST_TEST_EQ(our_128, builtin_128);
-    for (int i = 1; i < 30; ++i)
+    for (int i = 1; i < 38; ++i)
     {
         our_128 *= detail::uint128(10);
         our_128_64_bit_mul *= UINT64_C(10);
         builtin_128 *= 10;
+        BOOST_TEST_EQ(our_128, builtin_128);
+        BOOST_TEST_EQ(our_128, our_128_64_bit_mul);
+    }
+
+    for (int i = 1; i < 38; ++i)
+    {
+        our_128 /= detail::uint128(10);
+        our_128_64_bit_mul /= UINT64_C(10);
+        builtin_128 /= 10;
         BOOST_TEST_EQ(our_128, builtin_128);
         BOOST_TEST_EQ(our_128, our_128_64_bit_mul);
     }

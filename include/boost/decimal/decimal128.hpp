@@ -181,6 +181,10 @@ private:
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
+    template <typename T1, typename T2>
+    constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                 T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept
+                                 -> detail::decimal128_components;
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
@@ -240,6 +244,9 @@ public:
     // 3.2.7 unary arithmetic operators:
     friend constexpr auto operator+(decimal128 rhs) noexcept -> decimal128;
     friend constexpr auto operator-(decimal128 rhs) noexcept -> decimal128;
+
+    // 3.2.8 Binary arithmetic operators
+    friend constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
     // 3.2.9 Comparison operators:
     // Equality
@@ -1001,6 +1008,178 @@ constexpr auto operator<=>(Integer lhs, decimal128 rhs) noexcept -> std::enable_
 }
 
 #endif
+
+#ifdef BOOST_DECIMAL_DEBUG_ADD_128
+static char* mini_to_chars( char (&buffer)[ 64 ], boost::decimal::detail::uint128_t v )
+{
+    char* p = buffer + 64;
+    *--p = '\0';
+
+    do
+    {
+        *--p = "0123456789"[ v % 10 ];
+        v /= 10;
+    }
+    while ( v != 0 );
+
+    return p;
+}
+
+std::ostream& operator<<( std::ostream& os, boost::decimal::detail::uint128_t v )
+{
+    char buffer[ 64 ];
+
+    os << mini_to_chars( buffer, v );
+    return os;
+}
+#endif
+
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4127) // If constexpr macro only works for C++17 and above
+#endif
+
+template <typename T1, typename T2>
+constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                             T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal128_components
+{
+    const bool sign {lhs_sign};
+
+    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
+
+    if (delta_exp > detail::precision_v<decimal128> + 1)
+    {
+        // If the difference in exponents is more than the digits of accuracy
+        // we return the larger of the two
+        //
+        // e.g. 1e20 + 1e-20 = 1e20
+
+        return {lhs_sig, lhs_exp, lhs_sign};
+    }
+    else if (delta_exp == detail::precision_v<decimal128> + 1)
+    {
+        // Only need to see if we need to add one to the
+        // significand of the bigger value
+        //
+        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
+
+        BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T2>::digits10 > std::numeric_limits<std::uint64_t>::digits10)
+        {
+            if (rhs_sig >= detail::uint128 {500'000'000'000'000, 0})
+            {
+                ++lhs_sig;
+            }
+
+            return {lhs_sig, lhs_exp, lhs_sign};
+        }
+        else
+        {
+            return {lhs_sig, lhs_exp, lhs_sign};
+        }
+    }
+
+    // The two numbers can be added together without special handling
+    //
+    // If we can add to the lhs sig rather than dividing we can save some precision
+    // 64-bit sign int can have 19 digits, and our normalized significand has 16
+
+    if (delta_exp <= 3)
+    {
+        while (delta_exp > 0)
+        {
+            lhs_sig *= 10;
+            --delta_exp;
+            --lhs_exp;
+        }
+    }
+    else
+    {
+        lhs_sig *= 1000;
+        delta_exp -= 3;
+        lhs_exp -= 3;
+    }
+
+    while (delta_exp > 1)
+    {
+        rhs_sig /= 10;
+        --delta_exp;
+    }
+
+    if (delta_exp == 1)
+    {
+        detail::fenv_round<decimal128>(rhs_sig, rhs_sign);
+    }
+
+    // Convert both of the significands to unsigned types, so we can use intrinsics
+    // in the uint128 implementation
+    const auto unsigned_lhs_sig {detail::make_positive_unsigned(lhs_sig)};
+    const auto unsigned_rhs_sig {detail::make_positive_unsigned(rhs_sig)};
+    const auto new_sig {static_cast<detail::uint128>(unsigned_lhs_sig + unsigned_rhs_sig)};
+    const auto new_exp {lhs_exp};
+
+    #ifdef BOOST_DECIMAL_DEBUG_ADD_128
+    std::cerr << "Res Sig: " << static_cast<detail::uint128_t>(new_sig)
+              << "\nRes Exp: " << new_exp
+              << "\nRes Neg: " << sign << std::endl;
+    #endif
+
+    return {new_sig, new_exp, sign};
+}
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
+
+
+constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+{
+    constexpr decimal128 zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && rhs.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+
+    // Ensure that lhs is always the larger for ease of impl
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs, rhs);
+    }
+
+    /*
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs - abs(rhs);
+    }
+    */
+    
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal128>(lhs_sig, lhs_exp);
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    detail::normalize<decimal128>(rhs_sig, rhs_exp);
+
+    #ifdef BOOST_DECIMAL_DEBUG_ADD_128
+    std::cerr << "\nlhs sig: " << static_cast<detail::uint128_t>(lhs_sig)
+              << "\nlhs exp: " << lhs_exp
+              << "\nrhs sig: " << static_cast<detail::uint128_t>(rhs_sig)
+              << "\nrhs exp: " << rhs_exp << std::endl;
+    #endif
+
+    const auto result {d128_add_impl(lhs_sig, lhs_exp, lhs.isneg(),
+                                     rhs_sig, rhs_exp, rhs.isneg())};
+
+    return {result.sig, result.exp, result.sign};
+}
 
 } //namespace decimal
 } //namespace boost
