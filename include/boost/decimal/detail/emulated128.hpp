@@ -602,6 +602,13 @@ struct int128
 
     friend constexpr auto operator-(int128 rhs) noexcept -> int128;
 
+    constexpr auto operator<(int128 rhs) const noexcept -> bool;
+    constexpr auto operator>(int128 rhs) const noexcept -> bool;
+    constexpr auto operator=(int128 rhs) const noexcept -> bool;
+    constexpr auto operator<=(int128 rhs) const noexcept -> bool;
+    constexpr auto operator>=(int128 rhs) const noexcept -> bool;
+    constexpr auto operator==(int128 rhs) const noexcept -> bool;
+    constexpr auto operator!=(int128 rhs) const noexcept -> bool;
     constexpr auto operator<(std::int64_t rhs) const noexcept -> bool;
     constexpr auto operator==(std::int64_t rhs) const noexcept -> bool;
     constexpr auto operator>(std::int64_t rhs) const noexcept -> bool;
@@ -1083,6 +1090,44 @@ constexpr int128::operator uint128() const noexcept
 constexpr auto operator-(int128 rhs) noexcept -> int128
 {
     return {-rhs.high, rhs.low};
+}
+
+constexpr auto int128::operator<(int128 rhs) const noexcept -> bool
+{
+    if (high == rhs.high)
+    {
+        return low < rhs.low;
+    }
+
+    return high < rhs.high;
+}
+
+// Greater-than operator
+constexpr auto int128::operator>(int128 rhs) const noexcept -> bool
+{
+    return rhs < *this;
+}
+
+// Less-than or equal-to operator
+constexpr auto int128::operator<=(int128 rhs) const noexcept -> bool
+{
+    return !(*this > rhs);
+}
+
+// Greater-than or equal-to operator
+constexpr auto int128::operator>=(int128 rhs) const noexcept -> bool
+{
+    return !(*this < rhs);
+}
+
+constexpr auto int128::operator==(int128 rhs) const noexcept -> bool
+{
+    return this->high == rhs.high && this->low == rhs.low;
+}
+
+constexpr auto int128::operator!=(int128 rhs) const noexcept -> bool
+{
+    return !(*this == rhs);
 }
 
 constexpr auto int128::operator==(std::int64_t rhs) const noexcept -> bool
