@@ -753,6 +753,43 @@ constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
     return result;
 }
 
+// TODO(mborland): this can be optimized with SIMD
+constexpr auto multiply_64_64(std::uint64_t a, std::uint64_t b) -> uint128
+{
+    std::uint64_t a_low = a & UINT32_MAX;
+    std::uint64_t a_high = a >> 32;
+    std::uint64_t b_low = b & UINT32_MAX;
+    std::uint64_t b_high = b >> 32;
+
+    std::uint64_t low_product = a_low * b_low;
+    std::uint64_t mid_product1 = a_high * b_low;
+    std::uint64_t mid_product2 = a_low * b_high;
+    std::uint64_t high_product = a_high * b_high;
+
+    std::uint64_t mid_sum = (low_product >> 32) + (mid_product1 & UINT32_MAX) + mid_product2;
+    std::uint64_t high = high_product + (mid_product1 >> 32) + (mid_sum >> 32);
+    std::uint64_t low = (mid_sum << 32) | (low_product & UINT32_MAX);
+
+    return {high, low};
+}
+
+constexpr auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
+{
+    auto low = multiply_64_64(lhs.low, rhs);
+    auto high = multiply_64_64(lhs.high, rhs);
+
+    uint128 result;
+    result.low = low.low;
+    result.high = low.high + high.low;
+    if (result.high < low.high)
+    {
+        high.high += 1; // Handle overflow
+    }
+    result.high += high.high;
+
+    return result;
+}
+
 constexpr auto uint128::operator*=(uint128 v) noexcept -> uint128&
 {
     *this = *this * v;
@@ -956,15 +993,29 @@ constexpr auto umul96_lower64(std::uint32_t x, std::uint64_t y) noexcept -> std:
     return x * y;
 }
 
+auto emulated128_to_buffer(char (&buffer)[ 64 ], uint128 v)
+{
+    char* p = buffer + 64;
+    *--p = '\0';
+
+    do
+    {
+        *--p = "0123456789"[ static_cast<std::size_t>(v % 10) ];
+        v /= 10;
+    }
+    while ( v != 0 );
+
+    return p;
+}
+
+
 template <class charT, class traits>
 auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&
 {
-    if (val.high > 0)
-    {
-        os << val.high;
-    }
+    char buffer[64];
 
-    os << val.low;
+    os << emulated128_to_buffer(buffer, val);
+
     return os;
 }
 

@@ -27,11 +27,13 @@ template <typename charT, typename traits, typename DecimalType>
 auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>
 {
+    using significand_type = std::conditional_t<std::is_same<DecimalType, decimal128>::value, detail::uint128, std::uint64_t>;
+
     char buffer[1024] {}; // What should be an unreasonably high maximum
     is >> buffer;
 
     bool sign {};
-    std::uint64_t significand {};
+    significand_type significand {};
     std::int32_t expval {};
     const auto buffer_len {std::strlen(buffer)};
 
@@ -81,6 +83,24 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
 #  pragma GCC diagnostic ignored "-Wformat-truncation"
 #endif
 
+template <typename DecimalType, typename Integer, std::enable_if_t<!std::is_same<DecimalType, decimal128>::value, bool> = true>
+void print_buffer(char* buffer, std::size_t buffer_size, const char* format, Integer significand)
+{
+    std::snprintf(buffer, buffer_size, format, significand);
+}
+
+template <typename DecimalType, typename Integer, std::enable_if_t<std::is_same<DecimalType, decimal128>::value, bool> = true>
+void print_buffer(char* buffer, std::size_t buffer_size, const char*, Integer significand)
+{
+    char local_buffer [64];
+    const auto p {detail::emulated128_to_buffer(local_buffer, significand)};
+    const auto print_size {static_cast<std::size_t>(local_buffer + 64 - p)};
+    if (print_size <= buffer_size)
+    {
+        std::memcpy(buffer, p, print_size);
+    }
+}
+
 // 3.2.11 Formatted output
 template <typename charT, typename traits, typename DecimalType>
 auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
@@ -129,7 +149,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         precision = std::numeric_limits<DecimalType>::digits10;
     }
 
-    char buffer[detail::precision_v<DecimalType> + 3] {}; // Sign + Precision + decimal point + null terminator
+    char buffer[detail::precision_v<DecimalType> + 6] {}; // Sign + Precision + decimal point + e + sign + null terminator
 
     if (d.isneg() == 1)
     {
@@ -155,7 +175,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
     }
 
     // Print the significand into the buffer so that we can insert the decimal point
-    std::snprintf(buffer, sizeof(buffer), format, significand);
+    print_buffer<DecimalType>(buffer, sizeof(buffer), format, significand);
     std::memmove(buffer + 2, buffer + 1, static_cast<std::size_t>(precision - 1));
     std::memset(buffer + 1, '.', 1);
     os << buffer;

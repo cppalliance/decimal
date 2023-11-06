@@ -27,6 +27,8 @@ constexpr auto pow10(T n) noexcept -> T
     {
         assert(n >= 0);
     }
+    assert(n <= 19);
+
     return static_cast<T>(powers_of_10[static_cast<std::size_t>(n)]);
 }
 

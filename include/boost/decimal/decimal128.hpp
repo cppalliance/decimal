@@ -153,7 +153,7 @@ private:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
     template <typename Decimal, typename TargetType>
-    friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
+    friend constexpr auto to_integral_128(Decimal val) noexcept -> TargetType;
 
     template <typename Decimal, typename TargetType>
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
@@ -320,15 +320,14 @@ public:
     #endif
 
     // 3.2.10 Formatted input:
-    /*
-    template <typename charT, typename traits>
-    friend auto operator>>(std::basic_istream<charT, traits>& is, decimal128& d) -> std::basic_istream<charT, traits>&;
-    */
+    template <typename charT, typename traits, typename DecimalType>
+    friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>;
 
     // 3.2.11 Formatted output:
-    template <typename charT, typename traits>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128& d)
-        -> std::basic_ostream<charT, traits>&;
+    template <typename charT, typename traits, typename DecimalType>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
+        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
 
     friend std::string bit_string(decimal128 rhs) noexcept;
 };
@@ -336,7 +335,7 @@ public:
 std::string bit_string(decimal128 rhs) noexcept
 {
     std::stringstream ss;
-    ss << std::hex << rhs.bits_;
+    ss << std::hex << rhs.bits_.high << rhs.bits_.low;
     return ss.str();
 }
 
@@ -625,52 +624,52 @@ constexpr decimal128::decimal128(Integer val) noexcept // NOLINT : Incorrect par
 
 constexpr decimal128::operator int() const noexcept
 {
-    return to_integral<decimal128, int>(*this);
+    return to_integral_128<decimal128, int>(*this);
 }
 
 constexpr decimal128::operator unsigned() const noexcept
 {
-    return to_integral<decimal128, unsigned>(*this);
+    return to_integral_128<decimal128, unsigned>(*this);
 }
 
 constexpr decimal128::operator long() const noexcept
 {
-    return to_integral<decimal128, long>(*this);
+    return to_integral_128<decimal128, long>(*this);
 }
 
 constexpr decimal128::operator unsigned long() const noexcept
 {
-    return to_integral<decimal128, unsigned long>(*this);
+    return to_integral_128<decimal128, unsigned long>(*this);
 }
 
 constexpr decimal128::operator long long() const noexcept
 {
-    return to_integral<decimal128, long long>(*this);
+    return to_integral_128<decimal128, long long>(*this);
 }
 
 constexpr decimal128::operator unsigned long long() const noexcept
 {
-    return to_integral<decimal128, unsigned long long>(*this);
+    return to_integral_128<decimal128, unsigned long long>(*this);
 }
 
 constexpr decimal128::operator std::int8_t() const noexcept
 {
-    return to_integral<decimal128, std::int8_t>(*this);
+    return to_integral_128<decimal128, std::int8_t>(*this);
 }
 
 constexpr decimal128::operator std::uint8_t() const noexcept
 {
-    return to_integral<decimal128, std::uint8_t>(*this);
+    return to_integral_128<decimal128, std::uint8_t>(*this);
 }
 
 constexpr decimal128::operator std::int16_t() const noexcept
 {
-    return to_integral<decimal128, std::int16_t>(*this);
+    return to_integral_128<decimal128, std::int16_t>(*this);
 }
 
 constexpr decimal128::operator std::uint16_t() const noexcept
 {
-    return to_integral<decimal128, std::uint16_t>(*this);
+    return to_integral_128<decimal128, std::uint16_t>(*this);
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::operator float() const noexcept
@@ -1002,29 +1001,6 @@ constexpr auto operator<=>(Integer lhs, decimal128 rhs) noexcept -> std::enable_
 }
 
 #endif
-
-template <typename charT, typename traits>
-auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128& d) -> std::basic_ostream<charT, traits>&
-{
-    if (d.isneg())
-    {
-        os << "-";
-    }
-
-    os << d.full_significand();
-    os << "e";
-
-    if (d.biased_exponent() < 0)
-    {
-        os << "-" << d.biased_exponent();
-    }
-    else
-    {
-        os << "+" << d.biased_exponent();
-    }
-
-    return os;
-}
 
 } //namespace decimal
 } //namespace boost

@@ -327,6 +327,44 @@ void random_mixed_xor()
     }
 }
 
+void pow_10()
+{
+    detail::uint128 our_128 {10};
+    detail::uint128 our_128_64_bit_mul {10};
+    detail::uint128_t builtin_128 {10};
+
+    BOOST_TEST_EQ(our_128, builtin_128);
+    for (int i = 1; i < 30; ++i)
+    {
+        our_128 *= detail::uint128(10);
+        our_128_64_bit_mul *= UINT64_C(10);
+        builtin_128 *= 10;
+        BOOST_TEST_EQ(our_128, builtin_128);
+        BOOST_TEST_EQ(our_128, our_128_64_bit_mul);
+    }
+}
+
+void stream()
+{
+    detail::uint128 our_128 {10};
+    detail::uint128_t builtin_128 {10};
+
+    BOOST_TEST_EQ(our_128, builtin_128);
+    for (int i = 1; i < 30; ++i)
+    {
+        our_128 *= detail::uint128(10);
+        builtin_128 *= 10;
+
+        std::stringstream ss1;
+        ss1 << our_128;
+        std::stringstream ss2;
+        ss2 << builtin_128;
+
+        BOOST_TEST_EQ(ss1.str(), ss2.str());
+    }
+}
+
+
 int main()
 {
     random_mixed_addition();
@@ -344,6 +382,10 @@ int main()
     random_mixed_and();
     random_mixed_or();
     random_mixed_xor();
+
+    pow_10();
+
+    stream();
 
     return boost::report_errors();
 }
