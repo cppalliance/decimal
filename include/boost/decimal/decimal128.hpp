@@ -1248,6 +1248,39 @@ constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     return {result.sig, result.exp, result.sign};
 }
 
+// NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
+constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+{
+    constexpr decimal128 zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize<decimal128>(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize<decimal128>(sig_rhs, exp_rhs);
+
+    const auto result {d64_sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
+                                    sig_rhs, exp_rhs, rhs.isneg(),
+                                    abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
 } //namespace decimal
 } //namespace boost
 
