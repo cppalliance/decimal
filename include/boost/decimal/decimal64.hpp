@@ -271,7 +271,7 @@ public:
     friend constexpr auto operator-(decimal64 rhs) noexcept -> decimal64;
 
     // 3.2.8 Binary arithmetic operators
-    friend constexpr auto operator+(decimal64 lhs, decimal64 rhs) -> decimal64;
+    friend constexpr auto operator+(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
     template <typename Integer>
     friend constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
@@ -281,7 +281,7 @@ public:
     friend constexpr auto operator+(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    friend constexpr auto operator-(decimal64 lhs, decimal64 rhs) -> decimal64;
+    friend constexpr auto operator-(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
     template <typename Integer>
     friend constexpr auto operator-(decimal64 lhs, Integer rhs) noexcept
@@ -1276,7 +1276,7 @@ constexpr auto d64_mod_impl(decimal64 lhs, decimal64 rhs, const decimal64& q, de
     r = lhs - (decimal64(q_trunc) * rhs);
 }
 
-constexpr auto operator+(decimal64 lhs, decimal64 rhs) -> decimal64
+constexpr auto operator+(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
 {
     constexpr decimal64 zero {0, 0};
 
@@ -1383,7 +1383,7 @@ constexpr auto operator+(Integer lhs, decimal64 rhs) noexcept
 }
 
 // NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
-constexpr auto operator-(decimal64 lhs, decimal64 rhs) -> decimal64
+constexpr auto operator-(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
 {
     constexpr decimal64 zero {0, 0};
 
