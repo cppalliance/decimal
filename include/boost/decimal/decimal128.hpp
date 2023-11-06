@@ -335,7 +335,7 @@ public:
 std::string bit_string(decimal128 rhs) noexcept
 {
     std::stringstream ss;
-    ss << std::hex << rhs.bits_;
+    ss << std::hex << rhs.bits_.high << rhs.bits_.low;
     return ss.str();
 }
 
