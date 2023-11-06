@@ -587,6 +587,16 @@ struct int128
     #else
     constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
     #endif
+    constexpr int128(const uint128& v) noexcept : low {v.low}, high {static_cast<std::int64_t>(v.high)} {}
+
+    explicit constexpr int128(std::uint64_t v) noexcept : low {v}, high {} {}
+    explicit constexpr int128(std::uint32_t v) noexcept : low {v}, high {} {}
+    explicit constexpr int128(std::uint16_t v) noexcept : low {v}, high {} {}
+    explicit constexpr int128(std::uint8_t v) noexcept : low {v}, high {} {}
+    explicit constexpr int128(std::int64_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    explicit constexpr int128(std::int32_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    explicit constexpr int128(std::int16_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    explicit constexpr int128(std::int8_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
 
     explicit constexpr operator uint128() const noexcept;
 
