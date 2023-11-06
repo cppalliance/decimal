@@ -592,6 +592,10 @@ struct int128
 
     friend constexpr auto operator-(int128 rhs) noexcept -> int128;
 
+    constexpr auto operator<(std::int64_t rhs) const noexcept -> bool;
+    constexpr auto operator==(std::int64_t rhs) const noexcept -> bool;
+    constexpr auto operator>(std::int64_t rhs) const noexcept -> bool;
+
     friend constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128;
 };
 
@@ -1069,6 +1073,43 @@ constexpr int128::operator uint128() const noexcept
 constexpr auto operator-(int128 rhs) noexcept -> int128
 {
     return {-rhs.high, rhs.low};
+}
+
+constexpr auto int128::operator==(std::int64_t rhs) const noexcept -> bool
+{
+    if (high == 0 && low == static_cast<std::uint64_t>(rhs))
+    {
+        return true;
+    }
+    else if (high == -1 && rhs < 0 && low == static_cast<std::uint64_t>(rhs))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+constexpr auto int128::operator<(std::int64_t rhs) const noexcept -> bool
+{
+    if (high < 0 && rhs >= 0)
+    {
+        return true;
+    }
+    else if (high == 0 && rhs >= 0 && low < static_cast<std::uint64_t>(rhs))
+    {
+        return true;
+    }
+    else if (high == -1 && rhs < 0 && low < static_cast<std::uint64_t>(rhs))
+    {
+        return false;  // both are negative, so actually larger
+    }
+
+    return false;
+}
+
+constexpr auto int128::operator>(std::int64_t rhs) const noexcept -> bool
+{
+    return !(*this == rhs) && !(*this < rhs);
 }
 
 constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128
