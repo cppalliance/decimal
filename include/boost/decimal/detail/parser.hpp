@@ -122,7 +122,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     }
 
     // Next we get the significand
-    constexpr std::size_t significand_buffer_size = std::numeric_limits<Unsigned_Integer>::digits;
+    constexpr std::size_t significand_buffer_size = std::numeric_limits<Unsigned_Integer>::digits10;
     char significand_buffer[significand_buffer_size] {};
     std::size_t i = 0;
     std::size_t dot_position = 0;
