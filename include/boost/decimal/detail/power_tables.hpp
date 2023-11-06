@@ -32,6 +32,23 @@ constexpr auto pow10(T n) noexcept -> T
     return static_cast<T>(powers_of_10[static_cast<std::size_t>(n)]);
 }
 
+template <>
+constexpr auto pow10(detail::uint128 n) noexcept -> detail::uint128
+{
+    detail::uint128 res {1};
+    if (n <= 19)
+    {
+        res = powers_of_10[static_cast<std::size_t>(n)];
+    }
+    else
+    {
+        res = powers_of_10[static_cast<std::size_t>(19)];
+        res *= powers_of_10[static_cast<std::size_t>(n - 19)];
+    }
+
+    return res;
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost

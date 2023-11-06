@@ -84,11 +84,11 @@ constexpr auto to_integral_128(Decimal val) noexcept -> TargetType
     auto expval {val.biased_exponent()};
     if (expval > 0)
     {
-        sig *= detail::pow10<std::uint64_t>(expval);
+        sig *= detail::pow10<detail::uint128>(expval);
     }
     else if (expval < 0)
     {
-        sig /= detail::pow10<std::uint64_t>(detail::make_positive_unsigned(expval));
+        sig /= detail::pow10<detail::uint128>(detail::make_positive_unsigned(expval));
     }
 
     auto result {static_cast<TargetType>(sig)};
