@@ -590,6 +590,8 @@ struct int128
 
     explicit constexpr operator uint128() const noexcept;
 
+    friend constexpr auto operator-(int128 rhs) noexcept -> int128;
+
     friend constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128;
 };
 
@@ -1062,6 +1064,11 @@ auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basi
 constexpr int128::operator uint128() const noexcept
 {
     return {static_cast<std::uint64_t>(this->high), this->low};
+}
+
+constexpr auto operator-(int128 rhs) noexcept -> int128
+{
+    return {-rhs.high, rhs.low};
 }
 
 constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128
