@@ -1143,11 +1143,13 @@ constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
         detail::swap(lhs, rhs);
     }
 
+    /*
     if (!lhs.isneg() && rhs.isneg())
     {
         return lhs - abs(rhs);
     }
-
+    */
+    
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
     detail::normalize<decimal128>(lhs_sig, lhs_exp);
@@ -1167,33 +1169,6 @@ constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
                                      rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
-}
-
-template <typename charT, typename traits>
-auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128& d) -> std::basic_ostream<charT, traits>&
-{
-    if (d.isneg())
-    {
-        os << "-";
-    }
-
-    #ifdef BOOST_DECIMAL_DEBUG_ADD_128
-    os << static_cast<detail::uint128_t>(d.full_significand());
-    #else
-    os << d.full_significand();
-    #endif
-    os << "e";
-
-    if (d.biased_exponent() < 0)
-    {
-        os << d.biased_exponent();
-    }
-    else
-    {
-        os << "+" << d.biased_exponent();
-    }
-
-    return os;
 }
 
 } //namespace decimal
