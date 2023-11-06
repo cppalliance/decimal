@@ -993,7 +993,7 @@ constexpr auto umul96_lower64(std::uint32_t x, std::uint64_t y) noexcept -> std:
     return x * y;
 }
 
-auto base_10_conversion(char (&buffer)[ 64 ], uint128 v)
+auto emulated128_to_buffer(char (&buffer)[ 64 ], uint128 v)
 {
     char* p = buffer + 64;
     *--p = '\0';
@@ -1014,7 +1014,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basi
 {
     char buffer[64];
 
-    os << base_10_conversion(buffer, val);
+    os << emulated128_to_buffer(buffer, val);
 
     return os;
 }

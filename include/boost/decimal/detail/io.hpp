@@ -36,7 +36,7 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     significand_type significand {};
     std::int32_t expval {};
     const auto buffer_len {std::strlen(buffer)};
-    std::cerr << "buffer: " << buffer << std::endl;
+
     if (buffer_len == 0)
     {
         errno = EINVAL;
@@ -90,10 +90,15 @@ void print_buffer(char* buffer, std::size_t buffer_size, const char* format, Int
 }
 
 template <typename DecimalType, typename Integer, std::enable_if_t<std::is_same<DecimalType, decimal128>::value, bool> = true>
-void print_buffer(char* buffer, std::size_t buffer_size, const char* format, Integer significand)
+void print_buffer(char* buffer, std::size_t buffer_size, const char*, Integer significand)
 {
-    std::snprintf(buffer, buffer_size, format, significand.high);
-    std::snprintf(buffer, buffer_size, format, significand.low);
+    char local_buffer [64];
+    const auto p {detail::emulated128_to_buffer(local_buffer, significand)};
+    const auto print_size {static_cast<std::size_t>(local_buffer + 64 - p)};
+    if (print_size <= buffer_size)
+    {
+        std::memcpy(buffer, p, print_size);
+    }
 }
 
 // 3.2.11 Formatted output
