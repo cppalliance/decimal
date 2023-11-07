@@ -1134,8 +1134,6 @@ constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                              bool abs_lhs_bigger) noexcept -> detail::decimal128_components
 {
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-    auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
-    auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
 
     if (delta_exp > detail::precision_v<decimal128> + 1)
     {
@@ -1149,9 +1147,9 @@ constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     // The two numbers can be subtracted together without special handling
 
-    auto& sig_bigger {abs_lhs_bigger ? signed_sig_lhs : signed_sig_rhs};
+    auto& sig_bigger {abs_lhs_bigger ? lhs_sig : rhs_sig};
     auto& exp_bigger {abs_lhs_bigger ? lhs_exp : rhs_exp};
-    auto& sig_smaller {abs_lhs_bigger ? signed_sig_rhs : signed_sig_lhs};
+    auto& sig_smaller {abs_lhs_bigger ? rhs_sig : lhs_sig};
     auto& smaller_sign {abs_lhs_bigger ? rhs_sign : lhs_sign};
 
     if (delta_exp == 1)
@@ -1178,6 +1176,9 @@ constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         detail::fenv_round<decimal128>(sig_smaller, smaller_sign);
     }
 
+    auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
+    auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
+    
     // Both of the significands are less than 9'999'999'999'999'999, so we can safely
     // cast them to signed 64-bit ints to calculate the new significand
     detail::int128 new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
