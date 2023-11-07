@@ -583,11 +583,7 @@ struct int128
 
     #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : low {low_}, high {high_} {}
-    #else
-    constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
-    #endif
     constexpr int128(const uint128& v) noexcept : low {v.low}, high {static_cast<std::int64_t>(v.high)} {}
-
     explicit constexpr int128(std::uint64_t v) noexcept : low {v}, high {} {}
     explicit constexpr int128(std::uint32_t v) noexcept : low {v}, high {} {}
     explicit constexpr int128(std::uint16_t v) noexcept : low {v}, high {} {}
@@ -596,6 +592,18 @@ struct int128
     explicit constexpr int128(std::int32_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
     explicit constexpr int128(std::int16_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
     explicit constexpr int128(std::int8_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    #else
+    constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
+    constexpr int128(const uint128& v) noexcept : high {static_cast<std::int64_t>(v.high)}, low {v.low} {}
+    explicit constexpr int128(std::uint64_t v) noexcept : high {}, low {v} {}
+    explicit constexpr int128(std::uint32_t v) noexcept : high {}, low {v} {}
+    explicit constexpr int128(std::uint16_t v) noexcept : high {}, low {v} {}
+    explicit constexpr int128(std::uint8_t v) noexcept : high {}, low {v} {}
+    explicit constexpr int128(std::int64_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    explicit constexpr int128(std::int32_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    explicit constexpr int128(std::int16_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    explicit constexpr int128(std::int8_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    #endif
 
     explicit constexpr operator uint128() const noexcept;
 
