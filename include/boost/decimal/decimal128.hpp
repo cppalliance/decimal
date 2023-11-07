@@ -1176,12 +1176,23 @@ constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         detail::fenv_round<decimal128>(sig_smaller, smaller_sign);
     }
 
-    auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
-    auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
-    
+    //auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
+    //auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
+    auto signed_sig_lhs {static_cast<detail::int128_t>(lhs_sig)};
+    if (lhs_sign)
+    {
+        signed_sig_lhs = -signed_sig_lhs;
+    }
+    auto signed_sig_rhs {static_cast<detail::int128_t>(rhs_sig)};
+    if (rhs_sign)
+    {
+        signed_sig_rhs = -signed_sig_rhs;
+    }
+
     // Both of the significands are less than 9'999'999'999'999'999, so we can safely
     // cast them to signed 64-bit ints to calculate the new significand
-    detail::int128 new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
+    //detail::int128 new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
+    detail::int128_t new_sig {};
 
     if (rhs_sign && !lhs_sign)
     {
@@ -1193,7 +1204,7 @@ constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     }
 
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
-    const auto new_sign {new_sig.high < 0};
+    const auto new_sign {new_sig < 0};
     const auto res_sig {detail::make_positive_unsigned(new_sig)};
 
     return {res_sig, new_exp, new_sign};
