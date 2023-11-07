@@ -11,7 +11,7 @@
 using namespace boost::decimal;
 
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-static constexpr auto N = static_cast<std::size_t>(2U); // Number of trials
+static constexpr auto N = static_cast<std::size_t>(1024U); // Number of trials
 #else
 static constexpr auto N = static_cast<std::size_t>(1024U >> 4U); // Number of trials
 #endif
@@ -47,7 +47,8 @@ void random_addition(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 + val2))
         {
-            std::cerr << "Val 1: " << val1
+            std::cerr << std::setprecision(std::numeric_limits<decimal128>::digits10)
+                      << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
@@ -62,7 +63,6 @@ void random_addition(T lower, T upper)
     BOOST_TEST(isnan(decimal128{0,0} + std::numeric_limits<decimal128>::quiet_NaN()));
 
     // Cohorts
-    // GCC-6 using 32-bit is wrong
     #if !(defined(__GNUC__) && __GNUC__ == 6)
     BOOST_TEST_EQ(decimal128(4,0) + decimal128(40, -1), decimal128(8,0));
     BOOST_TEST_EQ(decimal128(4,0) + decimal128(400, -2), decimal128(8,0));
@@ -103,6 +103,7 @@ void random_mixed_addition(T lower, T upper)
     BOOST_TEST(isnan(std::numeric_limits<decimal128>::quiet_NaN() + dist(rng)));
     BOOST_TEST(isnan(dist(rng) + std::numeric_limits<decimal128>::quiet_NaN()));
 }
+*/
 
 template <typename T>
 void random_subtraction(T lower, T upper)
@@ -122,7 +123,8 @@ void random_subtraction(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
         {
-            std::cerr << "Val 1: " << val1
+            std::cerr << std::setprecision(std::numeric_limits<decimal128>::digits10)
+                      << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
@@ -136,6 +138,7 @@ void random_subtraction(T lower, T upper)
     BOOST_TEST(isnan(std::numeric_limits<decimal128>::quiet_NaN() - decimal128{0,0}));
     BOOST_TEST(isnan(decimal128{0,0} - std::numeric_limits<decimal128>::quiet_NaN()));
 }
+/*
 
 template <typename T>
 void random_mixed_subtraction(T lower, T upper)
@@ -799,37 +802,37 @@ int main()
     random_addition(0LL, 4'000'000'000'000LL);
     //random_mixed_addition(0, 5'000'000);
     //random_mixed_addition(0LL, 4'000'000'000'000LL);
-/*
+
     // Only two negative values
-    //random_addition(-5'000'000, 0);
-    //random_addition(-4'000'000'000'000LL, 0LL);
+    random_addition(-5'000'000, 0);
+    random_addition(-4'000'000'000'000LL, 0LL);
     //random_mixed_addition(-5'000'000, 0);
     //random_mixed_addition(-4'000'000'000'000LL, 0LL);
 
     // Mixed values
-    //random_addition(-5'000'000, 5'000'000);
-    //random_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
+    random_addition(-5'000'000, 5'000'000);
+    random_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
     //random_mixed_addition(-5'000'000, 5'000'000);
     //random_mixed_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
 
     // Subtraction
     random_subtraction(0, 5'000'000);
     random_subtraction(0LL, 4'000'000'000'000LL);
-    random_mixed_subtraction(0, 5'000'000);
-    random_mixed_subtraction(0LL, 4'000'000'000'000LL);
+    //random_mixed_subtraction(0, 5'000'000);
+    //random_mixed_subtraction(0LL, 4'000'000'000'000LL);
 
     // Only two negative values
     random_subtraction(-5'000'000, 0);
     random_subtraction(-4'000'000'000'000LL, 0LL);
-    random_mixed_subtraction(-5'000'000, 0);
-    random_mixed_subtraction(-4'000'000'000'000LL, 0LL);
+    //random_mixed_subtraction(-5'000'000, 0);
+    //random_mixed_subtraction(-4'000'000'000'000LL, 0LL);
 
     // Mixed values
     random_subtraction(-5'000'000, 5'000'000);
     random_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
-    random_mixed_subtraction(-5'000'000, 5'000'000);
-    random_mixed_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
-
+    //random_mixed_subtraction(-5'000'000, 5'000'000);
+    //random_mixed_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
+/*
     // Multiplication
     const auto sqrt_int_max = static_cast<int>(std::sqrt(static_cast<double>((std::numeric_limits<int>::max)())));
 

@@ -18,39 +18,39 @@
 namespace boost { namespace decimal { namespace detail {
 
 template <typename Integer, typename Unsigned_Integer = detail::make_unsigned_t<Integer>,
-          std::enable_if_t<std::numeric_limits<Integer>::is_signed, bool> = true>
+          std::enable_if_t<detail::is_signed_v<Integer>, bool> = true>
 constexpr auto apply_sign(Integer val) noexcept -> Unsigned_Integer
 {
     return static_cast<Unsigned_Integer>(-(static_cast<Unsigned_Integer>(val)));
 }
 
-template <typename Unsigned_Integer, std::enable_if_t<!std::numeric_limits<Unsigned_Integer>::is_signed, bool> = true>
+template <typename Unsigned_Integer, std::enable_if_t<!detail::is_signed_v<Unsigned_Integer>, bool> = true>
 constexpr auto apply_sign(Unsigned_Integer val) noexcept -> Unsigned_Integer
 {
     return val;
 }
 
 template <typename Integer, typename Unsigned_Integer = detail::make_unsigned_t<Integer>,
-        std::enable_if_t<std::numeric_limits<Integer>::is_signed, bool> = true>
+          std::enable_if_t<detail::is_signed_v<Integer>, bool> = true>
 constexpr auto make_positive_unsigned(Integer val) noexcept -> Unsigned_Integer
 {
     return static_cast<Unsigned_Integer>(val < static_cast<Integer>(0) ? apply_sign(val) : val);
 }
 
-template <typename Unsigned_Integer, std::enable_if_t<!std::numeric_limits<Unsigned_Integer>::is_signed, bool> = true>
+template <typename Unsigned_Integer, std::enable_if_t<!detail::is_signed_v<Unsigned_Integer>, bool> = true>
 constexpr auto make_positive_unsigned(Unsigned_Integer val) noexcept -> Unsigned_Integer
 {
     return val;
 }
 
-template <typename Integer, std::enable_if_t<std::numeric_limits<Integer>::is_signed, bool> = true>
+template <typename Integer, std::enable_if_t<detail::is_signed_v<Integer>, bool> = true>
 constexpr auto make_signed_value(Integer val, bool sign) noexcept -> Integer
 {
     return sign ? -val : val;
 }
 
 template <typename Unsigned_Integer, typename Integer = detail::make_signed_t<Unsigned_Integer>,
-          std::enable_if_t<!std::numeric_limits<Unsigned_Integer>::is_signed, bool> = true>
+          std::enable_if_t<!detail::is_signed_v<Unsigned_Integer>, bool> = true>
 constexpr auto make_signed_value(Unsigned_Integer val, bool sign) noexcept -> Integer
 {
     const auto signed_val {static_cast<Integer>(val)};

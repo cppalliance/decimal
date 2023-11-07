@@ -556,13 +556,74 @@ struct uint128
 
     constexpr auto operator%=(uint128 v) noexcept -> uint128&;
 
-    template <class charT, class traits>
+    template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&;
 
 private:
     constexpr friend auto high_bit(uint128 v) noexcept -> int;
 
     constexpr friend auto div_impl(uint128 lhs, uint128 rhs, uint128 &quotient, uint128 &remainder) noexcept -> void;
+};
+
+struct int128
+{
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+    std::uint64_t low {};
+    std::int64_t high {};
+    #else
+    std::int64_t high {};
+    std::uint64_t low {};
+    #endif
+
+    // Constructors
+    constexpr int128() noexcept = default;
+    constexpr int128(const int128& v) noexcept = default;
+    constexpr int128(int128&& v) noexcept = default;
+    constexpr int128& operator=(const int128& v) = default;
+
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
+    constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : low {low_}, high {high_} {}
+    constexpr int128(const uint128& v) noexcept : low {v.low}, high {static_cast<std::int64_t>(v.high)} {}
+    explicit constexpr int128(std::uint64_t v) noexcept : low {v}, high {} {}
+    explicit constexpr int128(std::uint32_t v) noexcept : low {v}, high {} {}
+    explicit constexpr int128(std::uint16_t v) noexcept : low {v}, high {} {}
+    explicit constexpr int128(std::uint8_t v) noexcept : low {v}, high {} {}
+    explicit constexpr int128(std::int64_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    explicit constexpr int128(std::int32_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    explicit constexpr int128(std::int16_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    explicit constexpr int128(std::int8_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    #else
+    constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
+    constexpr int128(const uint128& v) noexcept : high {static_cast<std::int64_t>(v.high)}, low {v.low} {}
+    explicit constexpr int128(std::uint64_t v) noexcept : high {}, low {v} {}
+    explicit constexpr int128(std::uint32_t v) noexcept : high {}, low {v} {}
+    explicit constexpr int128(std::uint16_t v) noexcept : high {}, low {v} {}
+    explicit constexpr int128(std::uint8_t v) noexcept : high {}, low {v} {}
+    explicit constexpr int128(std::int64_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    explicit constexpr int128(std::int32_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    explicit constexpr int128(std::int16_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    explicit constexpr int128(std::int8_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    #endif
+
+    explicit constexpr operator uint128() const noexcept;
+
+    friend constexpr auto operator-(int128 rhs) noexcept -> int128;
+
+    constexpr auto operator<(int128 rhs) const noexcept -> bool;
+    constexpr auto operator>(int128 rhs) const noexcept -> bool;
+    constexpr auto operator<=(int128 rhs) const noexcept -> bool;
+    constexpr auto operator>=(int128 rhs) const noexcept -> bool;
+    constexpr auto operator==(int128 rhs) const noexcept -> bool;
+    constexpr auto operator!=(int128 rhs) const noexcept -> bool;
+    constexpr auto operator<(std::int64_t rhs) const noexcept -> bool;
+    constexpr auto operator==(std::int64_t rhs) const noexcept -> bool;
+    constexpr auto operator>(std::int64_t rhs) const noexcept -> bool;
+
+    friend constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128;
+    friend constexpr auto operator-(int128 lhs, int128 rhs) noexcept -> int128;
+
+    template <typename charT, typename traits>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std::basic_ostream<charT, traits>&;
 };
 
 #if (__GNUC__ >= 8) || (!defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__))
@@ -1021,7 +1082,7 @@ auto emulated128_to_buffer(char (&buffer)[ 64 ], uint128 v)
 }
 
 
-template <class charT, class traits>
+template <typename charT, typename traits>
 auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&
 {
     char buffer[64];
@@ -1029,6 +1090,128 @@ auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basi
     os << emulated128_to_buffer(buffer, val);
 
     return os;
+}
+
+template <typename charT, typename traits>
+auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std::basic_ostream<charT, traits>&
+{
+    char buffer[64];
+    char* p;
+
+    if (val >= int128(0))
+    {
+        p = emulated128_to_buffer(buffer, static_cast<uint128>(val));
+    }
+    else
+    {
+        p = emulated128_to_buffer(buffer, static_cast<uint128>(-val));
+        *--p = '-';
+    }
+
+    os << p;
+    return os;
+}
+
+constexpr int128::operator uint128() const noexcept
+{
+    return {static_cast<std::uint64_t>(this->high), this->low};
+}
+
+constexpr auto operator-(int128 rhs) noexcept -> int128
+{
+    const auto new_low {~rhs.low + 1};
+    const auto carry {static_cast<std::int64_t>(new_low == 0)};
+    const auto new_high {~rhs.high + carry};
+    return int128{new_high, new_low};
+}
+
+constexpr auto int128::operator<(int128 rhs) const noexcept -> bool
+{
+    if (high == rhs.high)
+    {
+        return low < rhs.low;
+    }
+
+    return high < rhs.high;
+}
+
+// Greater-than operator
+constexpr auto int128::operator>(int128 rhs) const noexcept -> bool
+{
+    return rhs < *this;
+}
+
+// Less-than or equal-to operator
+constexpr auto int128::operator<=(int128 rhs) const noexcept -> bool
+{
+    return !(*this > rhs);
+}
+
+// Greater-than or equal-to operator
+constexpr auto int128::operator>=(int128 rhs) const noexcept -> bool
+{
+    return !(*this < rhs);
+}
+
+constexpr auto int128::operator==(int128 rhs) const noexcept -> bool
+{
+    return this->high == rhs.high && this->low == rhs.low;
+}
+
+constexpr auto int128::operator!=(int128 rhs) const noexcept -> bool
+{
+    return !(*this == rhs);
+}
+
+constexpr auto int128::operator==(std::int64_t rhs) const noexcept -> bool
+{
+    if (high == 0 && low == static_cast<std::uint64_t>(rhs))
+    {
+        return true;
+    }
+    else if (high == -1 && rhs < 0 && low == static_cast<std::uint64_t>(rhs))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+constexpr auto int128::operator<(std::int64_t rhs) const noexcept -> bool
+{
+    if (high < 0 && rhs >= 0)
+    {
+        return true;
+    }
+    else if (high == 0 && rhs >= 0 && low < static_cast<std::uint64_t>(rhs))
+    {
+        return true;
+    }
+    else if (high == -1 && rhs < 0 && low < static_cast<std::uint64_t>(rhs))
+    {
+        return false;  // both are negative, so actually larger
+    }
+
+    return false;
+}
+
+constexpr auto int128::operator>(std::int64_t rhs) const noexcept -> bool
+{
+    return !(*this == rhs) && !(*this < rhs);
+}
+
+constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128
+{
+    const auto new_low {lhs.low + rhs.low};
+    const auto new_high {lhs.high + rhs.high + (new_low < lhs.low)};
+    return int128{new_high, new_low};
+}
+
+constexpr auto operator-(int128 lhs, int128 rhs) noexcept -> int128
+{
+    const auto new_low {lhs.low - rhs.low};
+    const auto new_high {lhs.high - rhs.high - (lhs.low < rhs.low ? 1 : 0)};
+    return int128{new_high, new_low};
 }
 
 } // namespace detail
