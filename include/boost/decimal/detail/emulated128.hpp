@@ -1111,7 +1111,10 @@ constexpr int128::operator uint128() const noexcept
 
 constexpr auto operator-(int128 rhs) noexcept -> int128
 {
-    return {-rhs.high, rhs.low};
+    const auto new_low {~rhs.low + 1};
+    const auto carry {static_cast<std::int64_t>(new_low == 0)};
+    const auto new_high {~rhs.high + carry};
+    return int128{new_high, new_low};
 }
 
 constexpr auto int128::operator<(int128 rhs) const noexcept -> bool
