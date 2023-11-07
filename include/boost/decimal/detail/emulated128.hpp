@@ -556,7 +556,7 @@ struct uint128
 
     constexpr auto operator%=(uint128 v) noexcept -> uint128&;
 
-    template <class charT, class traits>
+    template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&;
 
 private:
@@ -613,6 +613,9 @@ struct int128
 
     friend constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128;
     friend constexpr auto operator-(int128 lhs, int128 rhs) noexcept -> int128;
+
+    template <typename charT, typename traits>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std::basic_ostream<charT, traits>&;
 };
 
 #if (__GNUC__ >= 8) || (!defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__))
@@ -1071,13 +1074,33 @@ auto emulated128_to_buffer(char (&buffer)[ 64 ], uint128 v)
 }
 
 
-template <class charT, class traits>
+template <typename charT, typename traits>
 auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&
 {
     char buffer[64];
 
     os << emulated128_to_buffer(buffer, val);
 
+    return os;
+}
+
+template <typename charT, typename traits>
+auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std::basic_ostream<charT, traits>&
+{
+    char buffer[64];
+    char* p;
+
+    if (val >= int128(0))
+    {
+        p = emulated128_to_buffer(buffer, static_cast<uint128>(val));
+    }
+    else
+    {
+        p = emulated128_to_buffer(buffer, static_cast<uint128>(-val));
+        *--p = '-';
+    }
+
+    os << p;
     return os;
 }
 
