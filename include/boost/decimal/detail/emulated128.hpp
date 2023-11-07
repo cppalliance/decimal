@@ -577,10 +577,9 @@ struct int128
 
     // Constructors
     constexpr int128() noexcept = default;
-
     constexpr int128(const int128& v) noexcept = default;
-
     constexpr int128(int128&& v) noexcept = default;
+    constexpr int128& operator=(const int128& v) = default;
 
     #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : low {low_}, high {high_} {}
@@ -604,7 +603,6 @@ struct int128
 
     constexpr auto operator<(int128 rhs) const noexcept -> bool;
     constexpr auto operator>(int128 rhs) const noexcept -> bool;
-    constexpr auto operator=(int128 rhs) const noexcept -> bool;
     constexpr auto operator<=(int128 rhs) const noexcept -> bool;
     constexpr auto operator>=(int128 rhs) const noexcept -> bool;
     constexpr auto operator==(int128 rhs) const noexcept -> bool;
@@ -614,6 +612,7 @@ struct int128
     constexpr auto operator>(std::int64_t rhs) const noexcept -> bool;
 
     friend constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128;
+    friend constexpr auto operator-(int128 lhs, int128 rhs) noexcept -> int128;
 };
 
 #if (__GNUC__ >= 8) || (!defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__))
@@ -1171,7 +1170,14 @@ constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128
 {
     const auto new_low {lhs.low + rhs.low};
     const auto new_high {lhs.high + rhs.high + (new_low < lhs.low)};
-    return int128(new_high, new_low);
+    return int128{new_high, new_low};
+}
+
+constexpr auto operator-(int128 lhs, int128 rhs) noexcept -> int128
+{
+    const auto new_low {lhs.low - rhs.low};
+    const auto new_high {lhs.high - rhs.high - (lhs.low < rhs.low ? 1 : 0)};
+    return int128{new_high, new_low};
 }
 
 } // namespace detail
