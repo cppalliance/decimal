@@ -47,7 +47,8 @@ void random_addition(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 + val2))
         {
-            std::cerr << "Val 1: " << val1
+            std::cerr << std::setprecision(std::numeric_limits<decimal128>::digits10)
+                      << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
@@ -120,7 +121,8 @@ void random_subtraction(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
         {
-            std::cerr << "Val 1: " << val1
+            std::cerr << std::setprecision(std::numeric_limits<decimal128>::digits10)
+                      << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
