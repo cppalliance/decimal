@@ -386,6 +386,8 @@ constexpr uint256 umul512_high256(const uint256 &x, const uint256 &y) noexcept
 template <typename charT, typename traits>
 auto operator<<(std::basic_ostream<charT, traits>& os, uint256 val) -> std::basic_ostream<charT, traits>&
 {
+    constexpr uint256 zero {0, 0};
+
     char buffer[128];
     char* p = buffer + 128;
     *--p = '/0';
@@ -393,9 +395,9 @@ auto operator<<(std::basic_ostream<charT, traits>& os, uint256 val) -> std::basi
     do
     {
         *--p = "0123456789"[static_cast<std::size_t>(val % UINT64_C(10))];
-        v /= UINT64_C(10);
-    } while (v != UINT64_C(0))
-        
+        val /= UINT64_C(10);
+    } while (val != zero);
+
     os << p;
 }
 
