@@ -607,12 +607,23 @@ pre.rouge .gs {
 </li>
 </ul>
 </li>
+<li><a href="#Cstdlib">Cstdlib Support</a>
+<ul class="sectlevel2">
+<li><a href="#cstdlib_cstdlib">&lt;cstdlib&gt;</a></li>
+</ul>
+</li>
+<li><a href="#cfenv">cfenv support</a>
+<ul class="sectlevel2">
+<li><a href="#cfenv_cfenv">&lt;cfenv&gt;</a></li>
+</ul>
+</li>
 <li><a href="#design">Design Decisions</a>
 <ul class="sectlevel2">
 <li><a href="#design_c14_requirement">C++14 Requirement</a>
 <ul class="sectlevel3">
 <li><a href="#design_constexpr_support">Constexpr Support</a></li>
-<li><a href="#design_boost_math_integration">Boost.Math Integration</a></li>
+<li><a href="#design_boost_math_integration_planned_feature">Boost.Math Integration (Planned Feature)</a></li>
+<li><a href="#design_no_binary_floating_point_operations">No Binary Floating Point Operations</a></li>
 </ul>
 </li>
 </ul>
@@ -695,24 +706,24 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 
 <span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">+</span><span class="p">(</span><span class="n">LHS</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">decimal32</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">+</span><span class="p">(</span><span class="n">LHS</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">decimal64</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
-<span class="k">constexpr</span> <span class="n">decimal32</span> <span class="k">operator</span><span class="o">+</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
-<span class="k">constexpr</span> <span class="n">decimal64</span> <span class="k">operator</span><span class="o">+</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">+</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">+</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
 <span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">-</span><span class="p">(</span><span class="n">LHS</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">decimal32</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">-</span><span class="p">(</span><span class="n">LHS</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">decimal64</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="k">constexpr</span> <span class="n">decimal32</span> <span class="k">operator</span><span class="o">-</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
-<span class="k">constexpr</span> <span class="n">decimal64</span> <span class="k">operator</span><span class="o">-</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">-</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">-</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
 <span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">*</span><span class="p">(</span><span class="n">LHS</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">decimal32</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">*</span><span class="p">(</span><span class="n">LHS</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">decimal64</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
-<span class="k">constexpr</span> <span class="n">decimal32</span> <span class="k">operator</span><span class="o">*</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
-<span class="k">constexpr</span> <span class="n">decimal64</span> <span class="k">operator</span><span class="o">*</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">*</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">*</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
 <span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">/</span><span class="p">(</span><span class="n">LHS</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">decimal32</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">/</span><span class="p">(</span><span class="n">LHS</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">decimal64</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
-<span class="k">constexpr</span> <span class="n">decimal32</span> <span class="k">operator</span><span class="o">/</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
-<span class="k">constexpr</span> <span class="n">decimal64</span> <span class="k">operator</span><span class="o">/</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">/</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="cm">/* see 3.2.8 */</span> <span class="k">operator</span><span class="o">/</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">RHS</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
 <span class="c1">// 3.2.9 comparison operators:</span>
 
@@ -748,23 +759,23 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">partial_ordering</span> <span class="k">operator</span><span class="o">&lt;=&gt;</span><span class="p">(</span><span class="n">LHS</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">decimal64</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
 <span class="c1">// 3.2.10 Formatted input:</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">charT</span><span class="p">,</span> <span class="k">class</span> <span class="nc">traits</span><span class="p">&gt;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">charT</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">traits</span><span class="p">&gt;</span>
 <span class="n">std</span><span class="o">::</span><span class="n">basic_istream</span><span class="o">&lt;</span><span class="n">charT</span><span class="p">,</span> <span class="n">traits</span><span class="o">&gt;&amp;</span>
 <span class="k">operator</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">basic_istream</span><span class="o">&lt;</span><span class="n">charT</span><span class="p">,</span> <span class="n">traits</span><span class="o">&gt;&amp;</span> <span class="n">is</span><span class="p">,</span>
 <span class="n">decimal32</span><span class="o">&amp;</span> <span class="n">d</span><span class="p">);</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">charT</span><span class="p">,</span> <span class="k">class</span> <span class="nc">traits</span><span class="p">&gt;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">charT</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">traits</span><span class="p">&gt;</span>
 <span class="n">std</span><span class="o">::</span><span class="n">basic_istream</span><span class="o">&lt;</span><span class="n">charT</span><span class="p">,</span> <span class="n">traits</span><span class="o">&gt;&amp;</span>
 <span class="k">operator</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">basic_istream</span><span class="o">&lt;</span><span class="n">charT</span><span class="p">,</span> <span class="n">traits</span><span class="o">&gt;</span> <span class="o">&amp;</span> <span class="n">is</span><span class="p">,</span>
 <span class="n">decimal64</span><span class="o">&amp;</span> <span class="n">d</span><span class="p">);</span>
 
 <span class="c1">// 3.2.11 Formatted output:</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">charT</span><span class="p">,</span> <span class="k">class</span> <span class="nc">traits</span><span class="p">&gt;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">charT</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">traits</span><span class="p">&gt;</span>
 <span class="n">std</span><span class="o">::</span><span class="n">basic_ostream</span><span class="o">&lt;</span><span class="n">charT</span><span class="p">,</span> <span class="n">traits</span><span class="o">&gt;&amp;</span>
 <span class="k">operator</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">basic_ostream</span><span class="o">&lt;</span><span class="n">charT</span><span class="p">,</span> <span class="n">traits</span><span class="o">&gt;&amp;</span> <span class="n">os</span><span class="p">,</span>
 <span class="n">decimal32</span> <span class="n">d</span><span class="p">);</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">charT</span><span class="p">,</span> <span class="k">class</span> <span class="nc">traits</span><span class="p">&gt;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">charT</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">traits</span><span class="p">&gt;</span>
 <span class="n">std</span><span class="o">::</span><span class="n">basic_ostream</span><span class="o">&lt;</span><span class="n">charT</span><span class="p">,</span> <span class="n">traits</span><span class="o">&gt;&amp;</span>
 <span class="k">operator</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">basic_ostream</span><span class="o">&lt;</span><span class="n">charT</span><span class="p">,</span> <span class="n">traits</span><span class="o">&gt;&amp;</span> <span class="n">os</span><span class="p">,</span>
 <span class="n">decimal64</span> <span class="n">d</span><span class="p">);</span>
@@ -837,7 +848,10 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Integer</span><span class="p">&gt;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="n">decimal32</span><span class="p">(</span><span class="n">Integer</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="c1">// 3.2.3.4 Conversion to integral type</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Integral1</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">Integral2</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">decimal32</span><span class="p">(</span><span class="n">Integral1</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">Integral2</span> <span class="n">exp</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">sign</span> <span class="o">=</span> <span class="nb">false</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// 3.2.2.4 Conversion to integral type</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">int</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">unsigned</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">long</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
@@ -856,7 +870,6 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="n">decimal32</span>  <span class="k">operator</span><span class="o">--</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
 
 <span class="c1">// 3.2.2.6 compound assignment:</span>
-<span class="c1">// NOTE only decimal32 and integer types are currently supported as RHS</span>
 <span class="n">decimal32</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">+=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
 <span class="n">decimal32</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">-=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
 <span class="n">decimal32</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
@@ -872,6 +885,18 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">float32_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">float64_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">bfloat16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal64</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// Literals</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DF</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_df</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
+
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DF</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dF</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
+
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DF</span><span class="p">(</span><span class="kt">long</span> <span class="kt">double</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dF</span><span class="p">(</span><span class="kt">long</span> <span class="kt">double</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
 
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
@@ -930,6 +955,9 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Integer</span><span class="p">&gt;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="n">decimal64</span><span class="p">(</span><span class="n">Integer</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Integral1</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">Integral2</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">decimal64</span><span class="p">(</span><span class="n">Integral1</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">Integral2</span> <span class="n">exp</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">sign</span> <span class="o">=</span> <span class="nb">false</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
 <span class="c1">// 3.2.3.4 Conversion to integral type</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">int</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">unsigned</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
@@ -942,6 +970,18 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="kt">int16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 
+<span class="c1">// 3.2.3.5 increment and decrement operators:</span>
+<span class="n">decimal64</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">++</span><span class="p">();</span>
+<span class="n">decimal64</span>  <span class="k">operator</span><span class="o">++</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+<span class="n">decimal64</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">--</span><span class="p">();</span>
+<span class="n">decimal64</span>  <span class="k">operator</span><span class="o">--</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+
+<span class="c1">// 3.2.3.6 compound assignment:</span>
+<span class="n">decimal64</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">+=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+<span class="n">decimal64</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">-=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+<span class="n">decimal64</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+<span class="n">decimal64</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">/=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+
 <span class="c1">// 3.2.6 Conversion to floating-point type</span>
 <span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">operator</span> <span class="kt">float</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">operator</span> <span class="kt">double</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
@@ -952,6 +992,16 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">float32_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">float64_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">bfloat16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal32</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// Literals</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DD</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dd</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DD</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dd</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DD</span><span class="p">(</span><span class="kt">long</span> <span class="kt">double</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dd</span><span class="p">(</span><span class="kt">long</span> <span class="kt">double</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
 
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
@@ -1157,7 +1207,7 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://en.cppreference.com/w/cpp/numeric/math/pow">pow</a> <strong>NOTE</strong> only supports integer exponents at this time</p>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/pow">pow</a></p>
 </li>
 <li>
 <p><a href="https://en.cppreference.com/w/cpp/numeric/math/sqrt">sqrt</a></p>
@@ -1178,6 +1228,9 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <li>
 <p><a href="https://en.cppreference.com/w/cpp/numeric/math/cos">cos</a></p>
 </li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/tan">tan</a></p>
+</li>
 </ul>
 </div>
 </div>
@@ -1186,7 +1239,10 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <div class="ulist">
 <ul>
 <li>
-<p>None at this time</p>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/asinh">asinh</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/acosh">acosh</a></p>
 </li>
 </ul>
 </div>
@@ -1227,8 +1283,10 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <p><a href="https://en.cppreference.com/w/cpp/numeric/math/nearbyint">nearbyint</a></p>
 </li>
 <li>
-<p><a href="https://en.cppreference.com/w/cpp/numeric/math/rint">rint</a>
-<a href="https://en.cppreference.com/w/cpp/numeric/math/ring">lrint</a></p>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/rint">rint</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/lrint">lrint</a></p>
 </li>
 <li>
 <p><a href="https://en.cppreference.com/w/cpp/numeric/math/llrint">llrint</a></p>
@@ -1338,7 +1396,8 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <pre class="rouge highlight"><code data-lang="c++"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
 <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">samequantum</span><span class="p">(</span><span class="n">Decimal</span> <span class="n">x</span><span class="p">,</span> <span class="n">Decimal</span> <span class="n">y</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">samequantumd32</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">x</span><span class="p">,</span> <span class="n">decimal32</span> <span class="n">y</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span></code></pre>
+<span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">samequantumd32</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">x</span><span class="p">,</span> <span class="n">decimal32</span> <span class="n">y</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">samequantumd64</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">x</span><span class="p">,</span> <span class="n">decimal64</span> <span class="n">y</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1358,7 +1417,8 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <pre class="rouge highlight"><code data-lang="c++"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
 <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">quantexp</span><span class="p">(</span><span class="n">Decimal</span> <span class="n">x</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">quantexp32</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">x</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span></code></pre>
+<span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">quantexp32</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">x</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">quantexp64</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">x</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1375,7 +1435,8 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <pre class="rouge highlight"><code data-lang="c++"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
 <span class="k">constexpr</span> <span class="n">Decimal</span> <span class="n">quantized</span><span class="p">(</span><span class="n">Decimal</span> <span class="n">x</span><span class="p">,</span> <span class="n">Decimal</span> <span class="n">y</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="k">constexpr</span> <span class="n">decimal32</span> <span class="n">quantized32</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">x</span><span class="p">,</span> <span class="n">decimal32</span> <span class="n">y</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span></code></pre>
+<span class="k">constexpr</span> <span class="n">decimal32</span> <span class="n">quantized32</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">x</span><span class="p">,</span> <span class="n">decimal32</span> <span class="n">y</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="n">decimal64</span> <span class="n">quantized32</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">x</span><span class="p">,</span> <span class="n">decimal64</span> <span class="n">y</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1411,12 +1472,104 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">frexp10</span><span class="p">(</span><span class="n">Decimal</span> <span class="n">num</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">expptr</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
 <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">frexpd32</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">num</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">expptr</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
-
 <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">frexpd64</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">num</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">expptr</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>This function is very similar to <a href="https://en.cppreference.com/w/cpp/numeric/math/frexp">frexp</a>, but returns the significand and an integral power of 10 since the <code>FLT_RADIX</code> of this type is 10. The significand is normalized to the number of digits of precision the type has (e.g. for decimal32 it is [1'000'000, 9'999'999]).</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="Cstdlib">Cstdlib Support</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="cstdlib_cstdlib">&lt;cstdlib&gt;</h3>
+<div class="paragraph">
+<p>The following functions from &lt;cstdlib&gt; are provided:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="k">constexpr</span> <span class="n">decimal32</span> <span class="n">strtod32</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">endptr</span><span class="p">)</span>
+<span class="k">constexpr</span> <span class="n">decimal32</span> <span class="n">wcstod32</span><span class="p">(</span><span class="k">const</span> <span class="kt">wchar_t</span><span class="o">*</span> <span class="n">str</span><span class="p">,</span> <span class="kt">wchar_t</span><span class="o">**</span> <span class="n">endptr</span><span class="p">)</span>
+
+<span class="k">constexpr</span> <span class="n">decimal64</span> <span class="n">strtod64</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">endptr</span><span class="p">)</span> <span class="k">noexcept</span>
+<span class="k">constexpr</span> <span class="n">decimal64</span> <span class="n">wcstod64</span><span class="p">(</span><span class="k">const</span> <span class="kt">wchar_t</span><span class="o">*</span> <span class="n">str</span><span class="p">,</span> <span class="kt">wchar_t</span><span class="o">**</span> <span class="n">endptr</span><span class="p">)</span> <span class="k">noexcept</span>
+
+<span class="p">}</span> <span class="c1">//namespace decimal</span>
+<span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cfenv">cfenv support</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="cfenv_cfenv">&lt;cfenv&gt;</h3>
+<div class="paragraph">
+<p>As opposed to binary floating point types IEEE 754 defined 5 rounding modes instead of 4. They are:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Downward</p>
+</li>
+<li>
+<p>To nearest</p>
+</li>
+<li>
+<p>To nearest from zero</p>
+</li>
+<li>
+<p>Toward zero</p>
+</li>
+<li>
+<p>Upward</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The default rounding mode is to nearest from zero.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The rounding mode can only be changed at runtime. All constexpr calculations will use the default.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="k">enum</span> <span class="k">class</span> <span class="nc">rounding_mode</span> <span class="o">:</span> <span class="kt">unsigned</span>
+<span class="p">{</span>
+    <span class="n">fe_dec_downward</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">fe_dec_to_nearest</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">fe_dec_to_nearest_from_zero</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">fe_dec_toward_zero</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">fe_dec_upward</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">fe_dec_default</span> <span class="o">=</span> <span class="n">fe_dec_to_nearest_from_zero</span>
+<span class="p">};</span>
+
+<span class="n">rounding_mode</span> <span class="n">fegetround</span><span class="p">()</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="n">rounding_mode</span> <span class="n">fesetround</span><span class="p">(</span><span class="n">rounding_mode</span> <span class="n">round</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="p">}</span> <span class="c1">//namespace decimal</span>
+<span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
 </div>
 </div>
@@ -1435,10 +1588,18 @@ This allows Boost.Decimal to better emulate the functionality a built-in type wo
 </div>
 </div>
 <div class="sect3">
-<h4 id="design_boost_math_integration">Boost.Math Integration</h4>
+<h4 id="design_boost_math_integration_planned_feature">Boost.Math Integration (Planned Feature)</h4>
 <div class="paragraph">
 <p>Boost.Math requires C++14 as the minimum language standard for the library.
 By meeting this requirement, and Boost.Math&#8217;s conceptual requirements for a user-defined type we are able to provide the statistics, interpolation, quadrature, etc. out of the box.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="design_no_binary_floating_point_operations">No Binary Floating Point Operations</h4>
+<div class="paragraph">
+<p>The library deliberately does not contain any operations between a binary floating point type and the decimal floating point types.
+The rationale is similar to that of the library in the first place in that you may end up with surprising results.
+Conversion operators and constructors are available for all decimal types should the user want to explicit cast one side of the operation to conduct the operation.</p>
 </div>
 </div>
 </div>
@@ -1456,7 +1617,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-10-12 09:35:41 +0200
+Last updated 2023-11-08 09:03:30 +0100
 </div>
 </div>
 <style>
