@@ -35,24 +35,24 @@ constexpr decimal64 operator-(decimal64 rhs) noexcept;
 
 constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal32 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal64 rhs) noexcept;
-constexpr decimal32 operator+(decimal32 lhs, RHS rhs) noexcept;
-constexpr decimal64 operator+(decimal64 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator+(decimal32 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator+(decimal64 lhs, RHS rhs) noexcept;
 
 constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal32 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal64 rhs) noexcept;
 
-constexpr decimal32 operator-(decimal32 lhs, RHS rhs) noexcept;
-constexpr decimal64 operator-(decimal64 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator-(decimal32 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator-(decimal64 lhs, RHS rhs) noexcept;
 
 constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal32 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal64 rhs) noexcept;
-constexpr decimal32 operator*(decimal32 lhs, RHS rhs) noexcept;
-constexpr decimal64 operator*(decimal64 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator*(decimal32 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator*(decimal64 lhs, RHS rhs) noexcept;
 
 constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal32 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal64 rhs) noexcept;
-constexpr decimal32 operator/(decimal32 lhs, RHS rhs) noexcept;
-constexpr decimal64 operator/(decimal64 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator/(decimal32 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator/(decimal64 lhs, RHS rhs) noexcept;
 
 // 3.2.9 comparison operators:
 
@@ -88,23 +88,23 @@ constexpr std::partial_ordering operator<=>(LHS lhs, decimal32 rhs) noexcept;
 constexpr std::partial_ordering operator<=>(LHS lhs, decimal64 rhs) noexcept;
 
 // 3.2.10 Formatted input:
-template <class charT, class traits>
+template <typename charT, typename traits>
 std::basic_istream<charT, traits>&
 operator>>(std::basic_istream<charT, traits>& is,
 decimal32& d);
 
-template <class charT, class traits>
+template <typename charT, typename traits>
 std::basic_istream<charT, traits>&
 operator>>(std::basic_istream<charT, traits> & is,
 decimal64& d);
 
 // 3.2.11 Formatted output:
-template <class charT, class traits>
+template <typename charT, typename traits>
 std::basic_ostream<charT, traits>&
 operator<<(std::basic_ostream<charT, traits>& os,
 decimal32 d);
 
-template <class charT, class traits>
+template <typename charT, typename traits>
 std::basic_ostream<charT, traits>&
 operator<<(std::basic_ostream<charT, traits>& os,
 decimal64 d);

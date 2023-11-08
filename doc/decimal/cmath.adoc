@@ -34,7 +34,7 @@ The following functions from <cmath> are provided (all are constexpr):
 
 === Power Functions
 
-- https://en.cppreference.com/w/cpp/numeric/math/pow[pow] *NOTE* only supports integer exponents at this time
+- https://en.cppreference.com/w/cpp/numeric/math/pow[pow]
 - https://en.cppreference.com/w/cpp/numeric/math/sqrt[sqrt]
 - https://en.cppreference.com/w/cpp/numeric/math/hypot[hypot] - Both 2 and 3 arg are supported
 
@@ -42,10 +42,12 @@ The following functions from <cmath> are provided (all are constexpr):
 
 - https://en.cppreference.com/w/cpp/numeric/math/sin[sin]
 - https://en.cppreference.com/w/cpp/numeric/math/cos[cos]
+- https://en.cppreference.com/w/cpp/numeric/math/tan[tan]
 
 === Hyperbolic Functions
 
-- None at this time
+- https://en.cppreference.com/w/cpp/numeric/math/asinh[asinh]
+- https://en.cppreference.com/w/cpp/numeric/math/acosh[acosh]
 
 === Error and Gamma Functions
 
@@ -61,7 +63,7 @@ The following functions from <cmath> are provided (all are constexpr):
 - https://en.cppreference.com/w/cpp/numeric/math/round[llround]
 - https://en.cppreference.com/w/cpp/numeric/math/nearbyint[nearbyint]
 - https://en.cppreference.com/w/cpp/numeric/math/rint[rint]
-https://en.cppreference.com/w/cpp/numeric/math/ring[lrint]
+- https://en.cppreference.com/w/cpp/numeric/math/lrint[lrint]
 - https://en.cppreference.com/w/cpp/numeric/math/llrint[llrint]
 
 === Floating point manipulation functions
@@ -114,6 +116,7 @@ template <typename Decimal>
 constexpr bool samequantum(Decimal x, Decimal y) noexcept;
 
 constexpr bool samequantumd32(decimal32 x, decimal32 y) noexcept;
+constexpr bool samequantumd64(decimal64 x, decimal64 y) noexcept;
 ----
 
 Effects: Determines if the quantum (unbiased) exponents of x and y are the same.
@@ -131,6 +134,7 @@ template <typename Decimal>
 constexpr int quantexp(Decimal x) noexcept;
 
 constexpr bool quantexp32(decimal32 x) noexcept;
+constexpr bool quantexp64(decimal64 x) noexcept;
 ----
 
 Effects: if x is finite, returns its quantum exponent.
@@ -146,7 +150,7 @@ template <typename Decimal>
 constexpr Decimal quantized(Decimal x, Decimal y) noexcept;
 
 constexpr decimal32 quantized32(decimal32 x, decimal32 y) noexcept;
-
+constexpr decimal64 quantized32(decimal64 x, decimal64 y) noexcept;
 ----
 
 Returns: a number that is equal in value (except for any rounding) and sign to x, and which has an exponent set to be equal to the exponent of y.
@@ -173,7 +177,6 @@ template <typename Decimal>
 constexpr auto frexp10(Decimal num, int* expptr) noexcept;
 
 constexpr std::uint32_t frexpd32(decimal32 num, int* expptr) noexcept;
-
 constexpr std::uint64_t frexpd64(decimal64 num, int* expptr) noexcept;
 ----
 
