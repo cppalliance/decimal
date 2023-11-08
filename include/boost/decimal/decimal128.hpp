@@ -1219,8 +1219,11 @@ constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     // Once we have the normalized significands and exponents all we have to do is
     // multiply the significands and add the exponents
-    auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
+    auto res_sig {static_cast<detail::uint256>(lhs_sig) * static_cast<detail::uint256>(rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
+
+    std::cerr << "Res sig: " << res_sig
+              << "\nBits: " << res_sig.high.high << res_sig.high.low << res_sig.low.high << res_sig.low.low << std::endl;
 
     auto sig_dig {detail::num_digits(res_sig)};
 

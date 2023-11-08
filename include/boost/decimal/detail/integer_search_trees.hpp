@@ -202,7 +202,7 @@ constexpr int num_digits(const uint256& x) noexcept
 
     uint256 current_power_of_10 = max_digits;
 
-    for (int i = 78; i > 0; --i)
+    for (int i = 76; i > 0; --i)
     {
         if (x >= current_power_of_10)
         {

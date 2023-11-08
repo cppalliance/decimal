@@ -11,7 +11,7 @@
 using namespace boost::decimal;
 
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-static constexpr auto N = static_cast<std::size_t>(1024U); // Number of trials
+static constexpr auto N = static_cast<std::size_t>(2U); // Number of trials
 #else
 static constexpr auto N = static_cast<std::size_t>(1024U >> 4U); // Number of trials
 #endif

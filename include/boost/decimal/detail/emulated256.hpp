@@ -22,6 +22,8 @@ struct uint256
     constexpr uint256() = default;
     constexpr uint256& operator=(const uint256& rhs) = default;
     constexpr uint256(const uint256& rhs) = default;
+    constexpr uint256(const uint128& rhs) : high {}, low {rhs} {}
+    constexpr uint256(const uint128& high_, const uint128& low_) : high {high_}, low {low_} {}
 
     explicit operator uint128() const noexcept
     { 
@@ -79,6 +81,8 @@ struct uint256
     friend constexpr uint256 operator+(uint256 lhs, uint256 rhs) noexcept;
 
     friend constexpr uint256 operator+(uint256 lhs, uint128 rhs) noexcept;
+
+    friend constexpr uint256 operator*(uint256 lhs, uint256 rhs) noexcept;
 
     friend constexpr uint256 operator-(uint256 lhs, uint256 rhs) noexcept;
 
@@ -197,6 +201,37 @@ constexpr uint256 operator+(uint256 lhs, uint256 rhs) noexcept
     }
 
     return temp;
+}
+
+constexpr uint256 operator*(uint256 lhs, uint256 rhs) noexcept
+{
+    uint256 result{};
+
+    uint128 products[4];
+
+    // Multiply the low parts.
+    uint128 product_low = static_cast<uint128>(lhs.low.low) * rhs.low.low;
+    products[0] = {uint64_t(product_low >> 64), uint64_t(product_low)};
+
+    // Multiply the mixed parts.
+    uint128 product_mid_low = (uint128)lhs.low.high * rhs.low.low;
+    uint128 product_mid_high = (uint128)lhs.low.low * rhs.low.high;
+    products[1] = {uint64_t((product_mid_low >> 64) + (product_mid_high >> 64)), uint64_t(product_mid_low + product_mid_high)};
+
+    // Multiply the high parts.
+    uint128 product_high = (uint128)lhs.low.high * rhs.low.high;
+    products[2] = {uint64_t(product_high >> 64), uint64_t(product_high)};
+
+    // Add the products, taking care of the carries.
+    bool carry = false;
+    result.low.add_with_carry(products[0], carry);
+    result.low.add_with_carry(uint128(products[1].low) << 64, carry);
+    result.high.add_with_carry(uint128(products[1].high, products[1].low) >> 64, carry);
+    result.high.add_with_carry(products[2], carry);
+
+    // Note: This does not handle overflow beyond 256 bits.
+
+    return result;
 }
 
 constexpr uint256 operator+(uint256 lhs, uint128 rhs) noexcept
