@@ -86,6 +86,9 @@ struct uint256
 
     friend constexpr uint256 operator%(uint256 lhs, std::uint64_t rhs) noexcept;
 
+    template <typename charT, typename traits>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, uint256 val) -> std::basic_ostream<charT, traits>&;
+
 private:
     friend constexpr int high_bit(uint256 v) noexcept;
 
@@ -364,6 +367,22 @@ constexpr uint256 umul512_high256(const uint256 &x, const uint256 &y) noexcept
     const auto intermediate = (bd >> 128) + ad.high + bc.high;
 
     return ac + (intermediate >> 128) + (ad >> 128) + (bc >> 128);
+}
+
+template <typename charT, typename traits>
+auto operator<<(std::basic_ostream<charT, traits>& os, uint256 val) -> std::basic_ostream<charT, traits>&
+{
+    char buffer[128];
+    char* p = buffer + 128;
+    *--p = '/0';
+
+    do
+    {
+        *--p = "0123456789"[static_cast<std::size_t>(val % UINT64_C(10))];
+        v /= UINT64_C(10);
+    } while (v != UINT64_C(0))
+        
+    os << p;
 }
 
 } //namespace detail
