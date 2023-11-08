@@ -5,8 +5,6 @@
 #ifndef BOOST_CHARCONV_DETAIL_EMULATED256_HPP
 #define BOOST_CHARCONV_DETAIL_EMULATED256_HPP
 
-#if 0
-
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <cstdint>
@@ -23,6 +21,7 @@ struct uint256
 
     constexpr uint256() = default;
     constexpr uint256& operator=(const uint256& rhs) = default;
+    constexpr uint256(const uint256& rhs) = default;
 
     explicit operator uint128() const noexcept
     { 
@@ -419,7 +418,5 @@ struct numeric_limits<boost::decimal::detail::uint256>
 };
 
 } // Namespace std
-
-#endif
 
 #endif // BOOST_CHARCONV_DETAIL_EMULATED256_HPP
