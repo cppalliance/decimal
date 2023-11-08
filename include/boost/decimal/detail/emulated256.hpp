@@ -28,6 +28,12 @@ struct uint256
         return this->low; 
     }
 
+    explicit operator std::size_t() const noexcept
+    {
+        return static_cast<std::size_t>(this->low);
+    }
+
+
     friend constexpr uint256 operator>>(uint256 lhs, int amount) noexcept;
 
     constexpr uint256 &operator>>=(int amount) noexcept
