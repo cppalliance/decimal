@@ -88,6 +88,8 @@ struct uint256
 
     friend constexpr uint256 operator/(uint256 lhs, std::uint64_t rhs) noexcept;
 
+    constexpr uint256& operator/=(std::uint64_t rhs) noexcept;
+
     friend constexpr uint256 operator%(uint256 lhs, uint256 rhs) noexcept;
 
     friend constexpr uint256 operator%(uint256 lhs, std::uint64_t rhs) noexcept;
@@ -246,6 +248,12 @@ constexpr uint256 operator/(uint256 lhs, std::uint64_t rhs) noexcept
     div_impl(lhs, big_rhs, quotient, remainder);
 
     return quotient;
+}
+
+constexpr uint256& uint256::operator/=(std::uint64_t rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
 }
 
 constexpr uint256 operator%(uint256 lhs, uint256 rhs) noexcept
