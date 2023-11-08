@@ -190,6 +190,11 @@ private:
     constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                  T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
                                  bool abs_lhs_bigger) noexcept -> detail::decimal128_components;
+
+    template <typename T1, typename T2>
+    constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                 T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal128_components;
+
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
@@ -1202,6 +1207,33 @@ constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     const auto res_sig {detail::make_positive_unsigned(new_sig)};
 
     return {res_sig, new_exp, new_sign};
+}
+
+template <typename T1, typename T2>
+constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                             T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal128_components
+{
+    bool sign {lhs_sign != rhs_sign};
+
+    // Once we have the normalized significands and exponents all we have to do is
+    // multiply the significands and add the exponents
+    auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
+    auto res_exp {lhs_exp + rhs_exp};
+
+    const auto sig_dig {detail::num_digits(res_sig)};
+
+    while (sig_dig > std::numeric_limits<detail::uint128>::digits10)
+    {
+        res_sig /= UINT64_C(10);
+        ++res_exp;
+    }
+
+    if (res_sig.low == 0)
+    {
+        sign = false;
+    }
+
+    return {res_sig.low, res_exp, sign};
 }
 
 #ifdef _MSC_VER
