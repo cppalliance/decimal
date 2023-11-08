@@ -292,8 +292,6 @@ constexpr int high_bit(uint256 v) noexcept
 
 constexpr void div_impl(uint256 lhs, uint256 rhs, uint256 &quotient, uint256 &remainder) noexcept
 {
-    uint256 one {0, 1};
-
     if (rhs > lhs)
     {
         quotient = {0, 0};
@@ -305,29 +303,24 @@ constexpr void div_impl(uint256 lhs, uint256 rhs, uint256 &quotient, uint256 &re
         remainder = {0, 0};
     }
 
-    uint256 denom = rhs;
     quotient = {0, 0};
 
-    std::int32_t shift = high_bit(lhs) - high_bit(rhs);
-    if (shift < 0)
+    for (int i = 255; i >= 0; --i)
     {
-        shift = 32 - shift;
-    }
-    denom <<= shift;
-
-    for (std::int32_t i = 0; i <= shift; ++i)
-    {
+        // Shift quotient to the left by 1 bit
         quotient <<= 1;
-        if (lhs >= denom)
+        // Shift remainder to the left by 1 bit
+        remainder.high <<= 1;
+        remainder.low = (remainder.low << 1) | (remainder.high >> 127);
+        remainder.high = remainder.high << 1;
+
+        if (remainder >= rhs)
         {
-            lhs -= denom;
-            quotient |= one;
+            remainder = remainder - rhs;
+            // Set the current bit of quotient
+            quotient.low.low |= 1;
         }
-
-        denom >>= 1;
     }
-
-    remainder = lhs;
 }
 
 // Get the 256-bit result of multiplication of two 128-bit unsigned integers
@@ -383,22 +376,31 @@ constexpr uint256 umul512_high256(const uint256 &x, const uint256 &y) noexcept
     return ac + (intermediate >> 128) + (ad >> 128) + (bc >> 128);
 }
 
-template <typename charT, typename traits>
-auto operator<<(std::basic_ostream<charT, traits>& os, uint256 val) -> std::basic_ostream<charT, traits>&
+auto emulated256_to_buffer(char (&buffer)[ 128 ], uint256 v)
 {
     constexpr uint256 zero {0, 0};
 
-    char buffer[128];
     char* p = buffer + 128;
     *--p = '\0';
 
     do
     {
-        *--p = "0123456789"[static_cast<std::size_t>(val % UINT64_C(10))];
-        val /= UINT64_C(10);
-    } while (val != zero);
+        *--p = "0123456789"[ static_cast<std::size_t>(v % UINT64_C(10)) ];
+        v /= UINT64_C(10);
+    }
+    while ( v != zero );
 
-    os << p;
+    return p;
+}
+
+template <typename charT, typename traits>
+auto operator<<(std::basic_ostream<charT, traits>& os, uint256 val) -> std::basic_ostream<charT, traits>&
+{
+    char buffer[128];
+
+    os << emulated256_to_buffer(buffer, val);
+
+    return os;
 }
 
 } //namespace detail
