@@ -213,6 +213,7 @@ void spot_check_sub(T lhs, T rhs)
                   << "\nInt res: " << lhs - rhs << std::endl;
     }
 }
+*/
 
 template <typename T>
 void random_multiplication(T lower, T upper)
@@ -247,6 +248,7 @@ void random_multiplication(T lower, T upper)
     BOOST_TEST(isnan(decimal128(dist(rng)) * std::numeric_limits<decimal128>::quiet_NaN()));
 }
 
+/*
 template <typename T>
 void random_mixed_multiplication(T lower, T upper)
 {
@@ -832,7 +834,7 @@ int main()
     random_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
     //random_mixed_subtraction(-5'000'000, 5'000'000);
     //random_mixed_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
-/*
+
     // Multiplication
     const auto sqrt_int_max = static_cast<int>(std::sqrt(static_cast<double>((std::numeric_limits<int>::max)())));
 
@@ -840,26 +842,26 @@ int main()
     random_multiplication(0, 5'000);
     random_multiplication(0LL, 5'000LL);
     random_multiplication(0, sqrt_int_max);
-    random_mixed_multiplication(0, 5'000);
-    random_mixed_multiplication(0LL, 5'000LL);
-    random_mixed_multiplication(0, sqrt_int_max);
+    //random_mixed_multiplication(0, 5'000);
+    //random_mixed_multiplication(0LL, 5'000LL);
+    //random_mixed_multiplication(0, sqrt_int_max);
 
     // Negative
     random_multiplication(-5'000, 0);
     random_multiplication(-5'000LL, 0LL);
     random_multiplication(-sqrt_int_max, 0);
-    random_mixed_multiplication(-5'000, 0);
-    random_mixed_multiplication(-5'000LL, 0LL);
-    random_mixed_multiplication(-sqrt_int_max, 0);
+    //random_mixed_multiplication(-5'000, 0);
+    //random_mixed_multiplication(-5'000LL, 0LL);
+    //random_mixed_multiplication(-sqrt_int_max, 0);
 
     // Mixed
     random_multiplication(-5'000, 5'000);
     random_multiplication(-5'000LL, 5'000LL);
     random_multiplication(-sqrt_int_max, sqrt_int_max);
-    random_mixed_multiplication(-5'000, 5'000);
-    random_mixed_multiplication(-5'000LL, 5'000LL);
-    random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
-
+    //random_mixed_multiplication(-5'000, 5'000);
+    //random_mixed_multiplication(-5'000LL, 5'000LL);
+    //random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
+/*
     // Division
 
     // Positive

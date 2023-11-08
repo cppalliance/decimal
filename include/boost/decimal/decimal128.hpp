@@ -1222,12 +1222,13 @@ constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
-    const auto sig_dig {detail::num_digits(res_sig)};
+    auto sig_dig {detail::num_digits(res_sig)};
 
     while (sig_dig > std::numeric_limits<detail::uint128>::digits10)
     {
         res_sig /= UINT64_C(10);
         ++res_exp;
+        --sig_dig;
     }
 
     if (res_sig.low == 0)

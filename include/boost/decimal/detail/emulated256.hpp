@@ -390,7 +390,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, uint256 val) -> std::basi
 
     char buffer[128];
     char* p = buffer + 128;
-    *--p = '/0';
+    *--p = '\0';
 
     do
     {
