@@ -39,7 +39,10 @@ explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
 template <typename Integer>
 explicit constexpr decimal32(Integer val) noexcept;
 
-// 3.2.3.4 Conversion to integral type
+template <typename Integral1, typename Integral2>
+constexpr decimal32(Integral1 coeff, Integral2 exp, bool sign = false) noexcept;
+
+// 3.2.2.4 Conversion to integral type
 explicit constexpr operator int() const noexcept;
 explicit constexpr operator unsigned() const noexcept;
 explicit constexpr operator long() const noexcept;
@@ -58,7 +61,6 @@ decimal32& operator--();
 decimal32  operator--(int);
 
 // 3.2.2.6 compound assignment:
-// NOTE only decimal32 and integer types are currently supported as RHS
 decimal32& operator+=(RHS rhs);
 decimal32& operator-=(RHS rhs);
 decimal32& operator*=(RHS rhs);
@@ -74,6 +76,8 @@ explicit constexpr operator std::float16_t() const noexcept;
 explicit constexpr operator std::float32_t() const noexcept;
 explicit constexpr operator std::float64_t() const noexcept;
 explicit constexpr operator std::bfloat16_t() const noexcept;
+
+explicit constexpr operator decimal64() const noexcept;
 
 } //namespace decimal
 } //namespace boost
