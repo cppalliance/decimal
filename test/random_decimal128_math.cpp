@@ -228,16 +228,18 @@ void random_multiplication(T lower, T upper)
         const decimal128 dec1 {val1};
         const decimal128 dec2 {val2};
 
-        const decimal128 res {dec1 * dec2};
-        const decimal128 res_int {val1 * val2};
+        const decimal128 res = dec1 * dec2;
+        const auto res_int = static_cast<T>(res);
 
-        if (!BOOST_TEST_EQ(res, res_int))
+        if (!BOOST_TEST_EQ(res_int, val1 * val2))
         {
-            std::cerr << "Val 1: " << val1
+            std::cerr << std::setprecision(std::numeric_limits<decimal128>::digits10)
+                      << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
+                      << "\nDec int: " << res_int
                       << "\nInt res: " << val1 * val2 << std::endl;
         }
     }
