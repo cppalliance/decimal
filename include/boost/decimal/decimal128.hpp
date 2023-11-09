@@ -1345,11 +1345,6 @@ constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     const auto result {d128_mul_impl(lhs_sig, lhs_exp, lhs.isneg(),
                                      rhs_sig, rhs_exp, rhs.isneg())};
 
-    std::cerr << "Res: "
-              << "\nSig: " << result.sig
-              << "\nExp: " << result.exp
-              << "\nNeg: " << result.sign << std::endl;
-
     return {result.sig, result.exp, result.sign};
 }
 

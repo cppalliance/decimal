@@ -561,7 +561,7 @@ struct uint128
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&;
 
-    void add_with_carry(const uint128& other, bool& carry)
+    constexpr void add_with_carry(const uint128& other, bool& carry)
     {
         auto previous_low = static_cast<std::uint64_t>(low);
 
