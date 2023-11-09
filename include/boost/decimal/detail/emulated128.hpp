@@ -550,6 +550,8 @@ struct uint128
 
     constexpr friend auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
+    constexpr friend auto operator/(uint128 lhs, std::uint64_t rhs) noexcept -> uint128;
+
     constexpr auto operator/=(uint128 v) noexcept -> uint128&;
 
     constexpr friend auto operator%(uint128 lhs, uint128 rhs) noexcept -> uint128;
@@ -950,6 +952,15 @@ constexpr auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128
     uint128 quotient {0, 0};
     uint128 remainder {0, 0};
     div_impl(lhs, rhs, quotient, remainder);
+
+    return quotient;
+}
+
+constexpr auto operator/(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
+{
+    uint128 quotient {0, 0};
+    uint128 remainder {0, 0};
+    div_impl(lhs, uint128(rhs), quotient, remainder);
 
     return quotient;
 }

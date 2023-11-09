@@ -230,7 +230,7 @@ static constexpr auto generic_binary_to_decimal(
     uint8_t lastRemovedDigit = 0;
     unsigned_128_type output {};
 
-    while (vp / 10 > vm / 10)
+    while (vp / UINT64_C(10) > vm / UINT64_C(10))
     {
         vmIsTrailingZeros &= vm % 10 == 0;
         vrIsTrailingZeros &= lastRemovedDigit == 0;
