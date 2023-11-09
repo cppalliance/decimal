@@ -1219,17 +1219,16 @@ constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     // Once we have the normalized significands and exponents all we have to do is
     // multiply the significands and add the exponents
-    auto res_sig {static_cast<detail::uint256_t>(lhs_sig) * static_cast<detail::uint256_t>(rhs_sig)};
+    auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
     auto sig_dig {detail::num_digits(res_sig)};
 
-    // TODO(mborland): This is super expensive. Take a power of 10 division once instead
-    while (sig_dig > std::numeric_limits<detail::uint128>::digits10)
+    if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
     {
-        res_sig /= UINT64_C(10);
-        ++res_exp;
-        --sig_dig;
+        const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
+        res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
+        res_exp += digit_delta;
     }
 
     if (res_sig == 0)
