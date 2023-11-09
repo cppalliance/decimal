@@ -14,6 +14,7 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
+#include <boost/decimal/detail/emulated256.hpp>
 
 namespace boost { namespace decimal { namespace detail {
 
@@ -182,6 +183,33 @@ constexpr int num_digits(uint128 x) noexcept
         }
 
         current_power_of_10 /= 10U;
+    }
+
+    return 1;
+}
+
+constexpr int num_digits(const uint256_t& x) noexcept
+{
+    if (x.high == 0)
+    {
+        return num_digits(x.low);
+    }
+
+    constexpr uint256_t max_digits = umul256({static_cast<uint128>(UINT64_C(10000000000000000000)) *
+                                              static_cast<uint128>(UINT64_C(10000000000000000000))},
+                                              {static_cast<uint128>(UINT64_C(10000000000000000000)) *
+                                               static_cast<uint128>(UINT64_C(10000000000000000000))});
+
+    uint256_t current_power_of_10 = max_digits;
+
+    for (int i = 78; i > 0; --i)
+    {
+        if (x >= current_power_of_10)
+        {
+            return i;
+        }
+
+        current_power_of_10 /= UINT64_C(10);
     }
 
     return 1;

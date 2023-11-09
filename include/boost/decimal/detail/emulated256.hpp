@@ -5,10 +5,9 @@
 #ifndef BOOST_CHARCONV_DETAIL_EMULATED256_HPP
 #define BOOST_CHARCONV_DETAIL_EMULATED256_HPP
 
-#if 0
-
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+#include <tuple>
 #include <cstdint>
 #include <cmath>
 
@@ -16,84 +15,102 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-struct uint256
+struct uint256_t
 {
     uint128 high {};
     uint128 low {};
 
-    constexpr uint256() = default;
-    constexpr uint256& operator=(const uint256& rhs) = default;
+    constexpr uint256_t() = default;
+    constexpr uint256_t& operator=(const uint256_t& rhs) = default;
+    constexpr uint256_t(const uint256_t& rhs) = default;
+    explicit constexpr uint256_t(const uint128& rhs) : high {}, low {rhs} {}
+    constexpr uint256_t(const uint128& high_, const uint128& low_) : high {high_}, low {low_} {}
 
     explicit operator uint128() const noexcept
     { 
         return this->low; 
     }
 
-    friend constexpr uint256 operator>>(uint256 lhs, int amount) noexcept;
+    explicit operator std::size_t() const noexcept
+    {
+        return static_cast<std::size_t>(this->low);
+    }
 
-    constexpr uint256 &operator>>=(int amount) noexcept
+
+    friend constexpr uint256_t operator>>(uint256_t lhs, int amount) noexcept;
+
+    constexpr uint256_t &operator>>=(int amount) noexcept
     {
         *this = *this >> amount;
         return *this;
     }
 
-    friend constexpr uint256 operator<<(uint256 lhs, int amount) noexcept;
+    friend constexpr uint256_t operator<<(uint256_t lhs, int amount) noexcept;
 
-    constexpr uint256 &operator<<=(int amount) noexcept
+    constexpr uint256_t &operator<<=(int amount) noexcept
     {
         *this = *this << amount;
         return *this;
     }
 
-    friend constexpr uint256 operator|(uint256 lhs, uint256 rhs) noexcept;
+    friend constexpr uint256_t operator|(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    constexpr uint256 &operator|=(uint256 v) noexcept
+    constexpr uint256_t &operator|=(uint256_t v) noexcept
     {
         *this = *this | v;
         return *this;
     }
 
-    friend constexpr uint256 operator&(uint256 lhs, uint256 rhs) noexcept;
+    friend constexpr uint256_t operator&(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256 operator&(uint256 lhs, uint128 rhs) noexcept;
+    friend constexpr uint256_t operator&(uint256_t lhs, uint128 rhs) noexcept;
 
-    friend constexpr bool operator==(uint256 lhs, uint256 rhs) noexcept;
+    friend constexpr bool operator==(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator==(uint256 lhs, std::uint64_t rhs) noexcept;
+    friend constexpr bool operator==(uint256_t lhs, std::uint64_t rhs) noexcept;
 
-    friend constexpr bool operator!=(uint256 lhs, uint256 rhs) noexcept;
+    friend constexpr bool operator!=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator<(uint256 lhs, uint256 rhs) noexcept;
+    friend constexpr bool operator<(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator<=(uint256 lhs, uint256 rhs) noexcept;
+    friend constexpr bool operator<=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator>(uint256 lhs, uint256 rhs) noexcept;
+    friend constexpr bool operator>(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator>=(uint256 lhs, uint256 rhs) noexcept;
+    friend constexpr bool operator>=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256 operator+(uint256 lhs, uint256 rhs) noexcept;
+    friend constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256 operator+(uint256 lhs, uint128 rhs) noexcept;
+    friend constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept;
 
-    friend constexpr uint256 operator-(uint256 lhs, uint256 rhs) noexcept;
+    friend constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    constexpr uint256 &operator-=(uint256 v) noexcept;
+    friend constexpr uint256_t operator-(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256 operator/(uint256 lhs, uint256 rhs) noexcept;
+    constexpr uint256_t &operator-=(uint256_t v) noexcept;
 
-    friend constexpr uint256 operator/(uint256 lhs, std::uint64_t rhs) noexcept;
+    friend constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256 operator%(uint256 lhs, uint256 rhs) noexcept;
+    friend constexpr uint256_t operator/(uint256_t lhs, std::uint64_t rhs) noexcept;
 
-    friend constexpr uint256 operator%(uint256 lhs, std::uint64_t rhs) noexcept;
+    constexpr uint256_t& operator/=(std::uint64_t rhs) noexcept;
+
+    constexpr uint256_t& operator/=(const uint256_t& rhs) noexcept;
+
+    friend constexpr uint256_t operator%(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+
+    friend constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept;
+
+    template <typename charT, typename traits>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, uint256_t val) -> std::basic_ostream<charT, traits>&;
 
 private:
-    friend constexpr int high_bit(uint256 v) noexcept;
+    friend constexpr int high_bit(uint256_t v) noexcept;
 
-    friend constexpr void div_impl(uint256 lhs, uint256 rhs, uint256 &quotient, uint256 &remainder) noexcept;
+    friend constexpr void div_impl(const uint256_t& lhs, const uint256_t& rhs, uint256_t &quotient, uint256_t &remainder) noexcept;
 };
 
-constexpr uint256 operator>>(uint256 lhs, int amount) noexcept
+constexpr uint256_t operator>>(uint256_t lhs, int amount) noexcept
 {
     if (amount >= 128)
     {
@@ -107,7 +124,7 @@ constexpr uint256 operator>>(uint256 lhs, int amount) noexcept
     return {lhs.high >> amount, (lhs.low >> amount) | (lhs.high << (128 - amount))};
 }
 
-constexpr uint256 operator<<(uint256 lhs, int amount) noexcept
+constexpr uint256_t operator<<(uint256_t lhs, int amount) noexcept
 {
     if (amount >= 128)
     {
@@ -121,37 +138,37 @@ constexpr uint256 operator<<(uint256 lhs, int amount) noexcept
     return {(lhs.high << amount) | (lhs.low >> (128 - amount)), lhs.low << amount};
 }
 
-constexpr uint256 operator|(uint256 lhs, uint256 rhs) noexcept
+constexpr uint256_t operator|(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return {lhs.high | rhs.high, lhs.low | rhs.low};
 }
 
-constexpr uint256 operator&(uint256 lhs, uint256 rhs) noexcept
+constexpr uint256_t operator&(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return {lhs.high & rhs.high, lhs.low & rhs.low};
 }
 
-constexpr uint256 operator&(uint256 lhs, uint128 rhs) noexcept
+constexpr uint256_t operator&(uint256_t lhs, uint128 rhs) noexcept
 {
     return {lhs.high, lhs.low & rhs.low};
 }
 
-constexpr bool operator==(uint256 lhs, uint256 rhs) noexcept
+constexpr bool operator==(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return lhs.high == rhs.high && lhs.low == rhs.low;
 }
 
-constexpr bool operator==(uint256 lhs, std::uint64_t rhs) noexcept
+constexpr bool operator==(uint256_t lhs, std::uint64_t rhs) noexcept
 {
     return lhs.high == 0 && rhs != 0 && lhs.low == rhs;
 }
 
-constexpr bool operator!=(uint256 lhs, uint256 rhs) noexcept
+constexpr bool operator!=(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return !(lhs.high == rhs.high && lhs.low == rhs.low);
 }
 
-constexpr bool operator<(uint256 lhs, uint256 rhs) noexcept
+constexpr bool operator<(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     if (lhs.high == rhs.high)
     {
@@ -161,24 +178,24 @@ constexpr bool operator<(uint256 lhs, uint256 rhs) noexcept
     return lhs.high < rhs.high;
 }
 
-constexpr bool operator<=(uint256 lhs, uint256 rhs) noexcept
+constexpr bool operator<=(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return !(rhs < lhs);
 }
 
-constexpr bool operator>(uint256 lhs, uint256 rhs) noexcept
+constexpr bool operator>(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return rhs < lhs;
 }
 
-constexpr bool operator>=(uint256 lhs, uint256 rhs) noexcept
+constexpr bool operator>=(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return !(lhs < rhs);
 }
 
-constexpr uint256 operator+(uint256 lhs, uint256 rhs) noexcept
+constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
-    const uint256 temp = {lhs.high + rhs.high, lhs.low + rhs.low};
+    const uint256_t temp = {lhs.high + rhs.high, lhs.low + rhs.low};
 
     // Need to carry a bit into hrs
     if (temp.low < lhs.low)
@@ -189,9 +206,40 @@ constexpr uint256 operator+(uint256 lhs, uint256 rhs) noexcept
     return temp;
 }
 
-constexpr uint256 operator+(uint256 lhs, uint128 rhs) noexcept
+constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
-    const uint256 temp = {lhs.high, lhs.low + rhs};
+    uint256_t result{};
+
+    uint128 products[4];
+
+    // Multiply the low parts.
+    uint128 product_low = static_cast<uint128>(lhs.low.low) * rhs.low.low;
+    products[0] = {uint64_t(product_low >> 64), uint64_t(product_low)};
+
+    // Multiply the mixed parts.
+    uint128 product_mid_low = static_cast<uint128>(lhs.low.high) * rhs.low.low;
+    uint128 product_mid_high = static_cast<uint128>(lhs.low.low) * rhs.low.high;
+    products[1] = {uint64_t((product_mid_low >> 64) + (product_mid_high >> 64)), uint64_t(product_mid_low + product_mid_high)};
+
+    // Multiply the high parts.
+    uint128 product_high = static_cast<uint128>(lhs.low.high) * rhs.low.high;
+    products[2] = {uint64_t(product_high >> 64), uint64_t(product_high)};
+
+    // Add the products, taking care of the carries.
+    bool carry = false;
+    result.low.add_with_carry(products[0], carry);
+    result.low.add_with_carry(uint128(products[1].low) << 64, carry);
+    result.high.add_with_carry(uint128(products[1].high, products[1].low) >> 64, carry);
+    result.high.add_with_carry(products[2], carry);
+
+    // Note: This does not handle overflow beyond 256 bits.
+
+    return result;
+}
+
+constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept
+{
+    const uint256_t temp = {lhs.high, lhs.low + rhs};
 
     if (temp.low < lhs.low)
     {
@@ -201,9 +249,9 @@ constexpr uint256 operator+(uint256 lhs, uint128 rhs) noexcept
     return temp;
 }
 
-constexpr uint256 operator-(uint256 lhs, uint256 rhs) noexcept
+constexpr uint256_t operator-(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
-    const uint256 temp {lhs.high - rhs.high, lhs.low - rhs.low};
+    const uint256_t temp {lhs.high - rhs.high, lhs.low - rhs.low};
 
     // Check for carry
     if (lhs.low < rhs.low)
@@ -214,53 +262,13 @@ constexpr uint256 operator-(uint256 lhs, uint256 rhs) noexcept
     return temp;
 }
 
-constexpr uint256 &uint256::operator-=(uint256 v) noexcept
+constexpr uint256_t &uint256_t::operator-=(uint256_t v) noexcept
 {
     *this = *this - v;
     return *this;
 }
 
-constexpr uint256 operator/(uint256 lhs, uint256 rhs) noexcept
-{
-    uint256 quotient;
-    uint256 remainder;
-    div_impl(lhs, rhs, quotient, remainder);
-
-    return quotient;
-}
-
-constexpr uint256 operator/(uint256 lhs, std::uint64_t rhs) noexcept
-{
-    uint256 quotient;
-    uint256 remainder;
-    uint256 big_rhs = {0, rhs};
-
-    div_impl(lhs, big_rhs, quotient, remainder);
-
-    return quotient;
-}
-
-constexpr uint256 operator%(uint256 lhs, uint256 rhs) noexcept
-{
-    uint256 quotient;
-    uint256 remainder;
-    div_impl(lhs, rhs, quotient, remainder);
-
-    return remainder;
-}
-
-constexpr uint256 operator%(uint256 lhs, std::uint64_t rhs) noexcept
-{
-    uint256 quotient;
-    uint256 remainder;
-    uint256 big_rhs = {0, rhs};
-
-    div_impl(lhs, big_rhs, quotient, remainder);
-
-    return remainder;
-}
-
-constexpr int high_bit(uint256 v) noexcept
+constexpr int high_bit(uint256_t v) noexcept
 {
     if (v.high != 0)
     {
@@ -274,48 +282,143 @@ constexpr int high_bit(uint256 v) noexcept
     return 0;
 }
 
-constexpr void div_impl(uint256 lhs, uint256 rhs, uint256 &quotient, uint256 &remainder) noexcept
+// Function to compare two uint256_t numbers (returns -1, 0, or 1)
+constexpr int compare(const uint256_t& a, const uint256_t& b)
 {
-    uint256 one {0, 1};
-
-    if (rhs > lhs)
+    if (a.high < b.high || (a.high == b.high && a.low < b.low))
     {
-        quotient = {0, 0};
-        remainder = {0, 0};
+        return -1;
     }
-    else if (lhs == rhs)
+    else if (a.high == b.high && a.low == b.low)
     {
-        quotient = {0, 1};
-        remainder = {0, 0};
+        return 0;
     }
 
-    uint256 denom = rhs;
-    quotient = {0, 0};
+    return 1;
+}
 
-    std::int32_t shift = high_bit(lhs) - high_bit(rhs);
-    if (shift < 0)
+// The following are all needed for the division algorithm
+// Function to subtract two uint256_t numbers
+constexpr uint256_t subtract(const uint256_t& a, const uint256_t& b)
+{
+    uint256_t result;
+    result.low = a.low - b.low;
+    result.high = a.high - b.high;
+    if (a.low < b.low)
     {
-        shift = 32 - shift;
+        result.high--;
     }
-    denom <<= shift;
 
-    for (std::int32_t i = 0; i <= shift; ++i)
+    return result;
+}
+
+// Function to left shift a uint256_t by one bit
+constexpr uint256_t left_shift(const uint256_t& a)
+{
+    uint256_t result;
+    result.high = (a.high << 1) | (a.low >> (sizeof(uint128) * 8 - 1));
+    result.low = a.low << 1;
+    return result;
+}
+
+// Function to set a specific bit of a uint256_t
+constexpr void set_bit(uint256_t& a, int bit)
+{
+    if (bit >= 0 && bit < 128)
     {
-        quotient <<= 1;
-        if (lhs >= denom)
+        a.low |= (uint128(1) << bit);
+    }
+    else if (bit >= 128 && bit < 256)
+    {
+        a.high |= (uint128(1) << (bit - 128));
+    }
+}
+
+// The division algorithm
+constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const uint256_t& divisor)
+{
+    // Check for division by zero
+    if (divisor.high == 0 && divisor.low == 0)
+    {
+        return {{0,0}, {0,0}};
+    }
+    else if (divisor > dividend)
+    {
+        return {{0,0}, dividend};
+    }
+
+    uint256_t quotient = {0, 0};
+    uint256_t remainder = {0, 0};
+
+    for (int i = 255; i >= 0; --i)
+    {
+        remainder = left_shift(remainder);
+
+        // Set the current bit of the dividend
+        if (i >= 128)
         {
-            lhs -= denom;
-            quotient |= one;
+            if ((dividend.high >> (i - 128)) & 1)
+            {
+                set_bit(remainder, 0);
+            }
+        }
+        else
+        {
+            if ((dividend.low >> i) & 1)
+            {
+                set_bit(remainder, 0);
+            }
         }
 
-        denom >>= 1;
+        // If remainder >= divisor, subtract it and set the bit in the quotient
+        if (compare(remainder, divisor) >= 0)
+        {
+            remainder = subtract(remainder, divisor);
+            set_bit(quotient, i);
+        }
     }
 
-    remainder = lhs;
+    return {quotient, remainder};
+}
+
+constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept
+{
+    const auto res {divide(lhs, rhs)};
+    return std::get<0>(res);
+}
+
+constexpr uint256_t operator/(uint256_t lhs, std::uint64_t rhs) noexcept
+{
+    const auto res {divide(lhs, uint256_t(rhs))};
+    return std::get<0>(res);
+}
+
+constexpr uint256_t& uint256_t::operator/=(std::uint64_t rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+constexpr uint256_t& uint256_t::operator/=(const uint256_t& rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+constexpr uint256_t operator%(const uint256_t& lhs, const uint256_t& rhs) noexcept
+{
+    const auto res {divide(lhs, rhs)};
+    return std::get<1>(res);
+}
+
+constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept
+{
+    const auto res {divide(lhs, uint256_t(rhs))};
+    return std::get<1>(res);
 }
 
 // Get the 256-bit result of multiplication of two 128-bit unsigned integers
-constexpr uint256 umul256_impl(std::uint64_t a, std::uint64_t b, std::uint64_t c, std::uint64_t d) noexcept
+constexpr uint256_t umul256_impl(std::uint64_t a, std::uint64_t b, std::uint64_t c, std::uint64_t d) noexcept
 {
     const auto ac = umul128(a, c);
     const auto bc = umul128(b, c);
@@ -329,7 +432,7 @@ constexpr uint256 umul256_impl(std::uint64_t a, std::uint64_t b, std::uint64_t c
 }
 
 template<typename T>
-constexpr uint256 umul256(const T &x, const uint128 &y) noexcept
+constexpr uint256_t umul256(const T &x, const uint128 &y) noexcept
 {
     static_assert(sizeof(T) == 16 && (!std::numeric_limits<T>::is_signed
             #ifdef BOOST_CHARCONV_HAS_INT128
@@ -344,13 +447,13 @@ constexpr uint256 umul256(const T &x, const uint128 &y) noexcept
     return umul256_impl(a, b, y.high, y.low);
 }
 
-constexpr uint256 umul256(const uint128 &x, const uint128 &y) noexcept
+constexpr uint256_t umul256(const uint128 &x, const uint128 &y) noexcept
 {
     return umul256_impl(x.high, x.low, y.high, y.low);
 }
 
 // Returns only the high 256 bits of a 256x256 multiplication
-constexpr uint256 umul512_high256(const uint256 &x, const uint256 &y) noexcept
+constexpr uint256_t umul512_high256(const uint256_t &x, const uint256_t &y) noexcept
 {
     const auto a = x.high;
     const auto b = x.low;
@@ -367,6 +470,33 @@ constexpr uint256 umul512_high256(const uint256 &x, const uint256 &y) noexcept
     return ac + (intermediate >> 128) + (ad >> 128) + (bc >> 128);
 }
 
+auto emulated256_to_buffer(char (&buffer)[ 128 ], uint256_t v)
+{
+    constexpr uint256_t zero {0, 0};
+
+    char* p = buffer + 128;
+    *--p = '\0';
+
+    do
+    {
+        *--p = "0123456789"[ static_cast<std::size_t>(v % UINT64_C(10)) ];
+        v /= UINT64_C(10);
+    }
+    while ( v != zero );
+
+    return p;
+}
+
+template <typename charT, typename traits>
+auto operator<<(std::basic_ostream<charT, traits>& os, uint256_t val) -> std::basic_ostream<charT, traits>&
+{
+    char buffer[128];
+
+    os << emulated256_to_buffer(buffer, val);
+
+    return os;
+}
+
 } //namespace detail
 } //namespace decimal
 } //namespace boost
@@ -374,7 +504,7 @@ constexpr uint256 umul512_high256(const uint256 &x, const uint256 &y) noexcept
 namespace std {
 
 template <>
-struct numeric_limits<boost::decimal::detail::uint256>
+struct numeric_limits<boost::decimal::detail::uint256_t>
 {
     // Member constants
     static constexpr bool is_specialized = true;
@@ -407,19 +537,17 @@ struct numeric_limits<boost::decimal::detail::uint256>
     static constexpr bool tinyness_before = false;
 
     // Member functions
-    static constexpr boost::decimal::detail::uint256 (min)() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256 lowest() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256 (max)() { return {{UINT64_MAX, UINT64_MAX}, {UINT64_MAX, UINT64_MAX}}; }
-    static constexpr boost::decimal::detail::uint256 epsilon() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256 round_error() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256 infinity() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256 quiet_NaN() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256 signaling_NaN() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256 denorm_min() { return {0, 0}; }
+    static constexpr boost::decimal::detail::uint256_t (min)() { return {0, 0}; }
+    static constexpr boost::decimal::detail::uint256_t lowest() { return {0, 0}; }
+    static constexpr boost::decimal::detail::uint256_t (max)() { return {{UINT64_MAX, UINT64_MAX}, {UINT64_MAX, UINT64_MAX}}; }
+    static constexpr boost::decimal::detail::uint256_t epsilon() { return {0, 0}; }
+    static constexpr boost::decimal::detail::uint256_t round_error() { return {0, 0}; }
+    static constexpr boost::decimal::detail::uint256_t infinity() { return {0, 0}; }
+    static constexpr boost::decimal::detail::uint256_t quiet_NaN() { return {0, 0}; }
+    static constexpr boost::decimal::detail::uint256_t signaling_NaN() { return {0, 0}; }
+    static constexpr boost::decimal::detail::uint256_t denorm_min() { return {0, 0}; }
 };
 
 } // Namespace std
-
-#endif
 
 #endif // BOOST_CHARCONV_DETAIL_EMULATED256_HPP

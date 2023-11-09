@@ -190,6 +190,11 @@ private:
     constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                  T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
                                  bool abs_lhs_bigger) noexcept -> detail::decimal128_components;
+
+    template <typename T1, typename T2>
+    constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                 T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal128_components;
+
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
@@ -254,6 +259,8 @@ public:
     friend constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
     friend constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
+
+    friend constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
     // 3.2.9 Comparison operators:
     // Equality
@@ -1204,6 +1211,34 @@ constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {res_sig, new_exp, new_sign};
 }
 
+template <typename T1, typename T2>
+constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                             T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal128_components
+{
+    bool sign {lhs_sign != rhs_sign};
+
+    // Once we have the normalized significands and exponents all we have to do is
+    // multiply the significands and add the exponents
+    auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
+    auto res_exp {lhs_exp + rhs_exp};
+
+    auto sig_dig {detail::num_digits(res_sig)};
+
+    if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
+    {
+        const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
+        res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
+        res_exp += digit_delta;
+    }
+
+    if (res_sig == 0)
+    {
+        sign = false;
+    }
+
+    return {res_sig.low, res_exp, sign};
+}
+
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #endif
@@ -1285,6 +1320,30 @@ constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     const auto result {d128_sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
                                      sig_rhs, exp_rhs, rhs.isneg(),
                                      abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+{
+    constexpr decimal128 zero {0, 0};
+
+    const auto non_finite {detail::check_non_finite(lhs, rhs)};
+    if (non_finite != zero)
+    {
+        return non_finite;
+    }
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal128>(lhs_sig, lhs_exp);
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    detail::normalize<decimal128>(rhs_sig, rhs_exp);
+
+    const auto result {d128_mul_impl(lhs_sig, lhs_exp, lhs.isneg(),
+                                     rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
 }

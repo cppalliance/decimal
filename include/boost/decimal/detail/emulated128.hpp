@@ -550,14 +550,30 @@ struct uint128
 
     constexpr friend auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
+    constexpr friend auto operator/(uint128 lhs, std::uint64_t rhs) noexcept -> uint128;
+
     constexpr auto operator/=(uint128 v) noexcept -> uint128&;
 
     constexpr friend auto operator%(uint128 lhs, uint128 rhs) noexcept -> uint128;
+
+    constexpr friend auto operator%(uint128 lhs, std::uint64_t rhs) noexcept -> uint128;
 
     constexpr auto operator%=(uint128 v) noexcept -> uint128&;
 
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&;
+
+    constexpr void add_with_carry(const uint128& other, bool& carry)
+    {
+        auto previous_low = static_cast<std::uint64_t>(low);
+
+        low += other.low;
+        carry = low < previous_low;
+
+        auto previous_high = static_cast<std::uint64_t>(high);
+        high += other.high + (carry ? 1 : 0);
+        carry = high < previous_high || (carry && high == previous_high);
+    }
 
 private:
     constexpr friend auto high_bit(uint128 v) noexcept -> int;
@@ -940,6 +956,15 @@ constexpr auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128
     return quotient;
 }
 
+constexpr auto operator/(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
+{
+    uint128 quotient {0, 0};
+    uint128 remainder {0, 0};
+    div_impl(lhs, uint128(rhs), quotient, remainder);
+
+    return quotient;
+}
+
 constexpr auto uint128::operator/=(uint128 v) noexcept -> uint128&
 {
     *this = *this / v;
@@ -951,6 +976,15 @@ constexpr auto operator%(uint128 lhs, uint128 rhs) noexcept -> uint128
     uint128 quotient {0, 0};
     uint128 remainder {0, 0};
     div_impl(lhs, rhs, quotient, remainder);
+
+    return remainder;
+}
+
+constexpr auto operator%(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
+{
+    uint128 quotient {0, 0};
+    uint128 remainder {0, 0};
+    div_impl(lhs, uint128(rhs), quotient, remainder);
 
     return remainder;
 }
