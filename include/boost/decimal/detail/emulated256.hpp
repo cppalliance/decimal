@@ -53,7 +53,7 @@ struct uint256_t
         return *this;
     }
 
-    friend constexpr uint256_t operator|(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr uint256_t operator|(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
     constexpr uint256_t &operator|=(uint256_t v) noexcept
     {
@@ -61,35 +61,35 @@ struct uint256_t
         return *this;
     }
 
-    friend constexpr uint256_t operator&(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr uint256_t operator&(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
     friend constexpr uint256_t operator&(uint256_t lhs, uint128 rhs) noexcept;
 
-    friend constexpr bool operator==(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr bool operator==(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
     friend constexpr bool operator==(uint256_t lhs, std::uint64_t rhs) noexcept;
 
-    friend constexpr bool operator!=(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr bool operator!=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator<(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr bool operator<(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator<=(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr bool operator<=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator>(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr bool operator>(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator>=(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr bool operator>=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator+(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
     friend constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept;
 
-    friend constexpr uint256_t operator*(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator-(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr uint256_t operator-(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
     constexpr uint256_t &operator-=(uint256_t v) noexcept;
 
-    friend constexpr uint256_t operator/(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
     friend constexpr uint256_t operator/(uint256_t lhs, std::uint64_t rhs) noexcept;
 
@@ -97,7 +97,7 @@ struct uint256_t
 
     constexpr uint256_t& operator/=(const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator%(uint256_t lhs, uint256_t rhs) noexcept;
+    friend constexpr uint256_t operator%(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
     friend constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept;
 
@@ -107,7 +107,7 @@ struct uint256_t
 private:
     friend constexpr int high_bit(uint256_t v) noexcept;
 
-    friend constexpr void div_impl(uint256_t lhs, uint256_t rhs, uint256_t &quotient, uint256_t &remainder) noexcept;
+    friend constexpr void div_impl(const uint256_t& lhs, const uint256_t& rhs, uint256_t &quotient, uint256_t &remainder) noexcept;
 };
 
 constexpr uint256_t operator>>(uint256_t lhs, int amount) noexcept
@@ -138,12 +138,12 @@ constexpr uint256_t operator<<(uint256_t lhs, int amount) noexcept
     return {(lhs.high << amount) | (lhs.low >> (128 - amount)), lhs.low << amount};
 }
 
-constexpr uint256_t operator|(uint256_t lhs, uint256_t rhs) noexcept
+constexpr uint256_t operator|(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return {lhs.high | rhs.high, lhs.low | rhs.low};
 }
 
-constexpr uint256_t operator&(uint256_t lhs, uint256_t rhs) noexcept
+constexpr uint256_t operator&(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return {lhs.high & rhs.high, lhs.low & rhs.low};
 }
@@ -153,7 +153,7 @@ constexpr uint256_t operator&(uint256_t lhs, uint128 rhs) noexcept
     return {lhs.high, lhs.low & rhs.low};
 }
 
-constexpr bool operator==(uint256_t lhs, uint256_t rhs) noexcept
+constexpr bool operator==(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return lhs.high == rhs.high && lhs.low == rhs.low;
 }
@@ -163,12 +163,12 @@ constexpr bool operator==(uint256_t lhs, std::uint64_t rhs) noexcept
     return lhs.high == 0 && rhs != 0 && lhs.low == rhs;
 }
 
-constexpr bool operator!=(uint256_t lhs, uint256_t rhs) noexcept
+constexpr bool operator!=(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return !(lhs.high == rhs.high && lhs.low == rhs.low);
 }
 
-constexpr bool operator<(uint256_t lhs, uint256_t rhs) noexcept
+constexpr bool operator<(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     if (lhs.high == rhs.high)
     {
@@ -178,22 +178,22 @@ constexpr bool operator<(uint256_t lhs, uint256_t rhs) noexcept
     return lhs.high < rhs.high;
 }
 
-constexpr bool operator<=(uint256_t lhs, uint256_t rhs) noexcept
+constexpr bool operator<=(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return !(rhs < lhs);
 }
 
-constexpr bool operator>(uint256_t lhs, uint256_t rhs) noexcept
+constexpr bool operator>(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return rhs < lhs;
 }
 
-constexpr bool operator>=(uint256_t lhs, uint256_t rhs) noexcept
+constexpr bool operator>=(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return !(lhs < rhs);
 }
 
-constexpr uint256_t operator+(uint256_t lhs, uint256_t rhs) noexcept
+constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     const uint256_t temp = {lhs.high + rhs.high, lhs.low + rhs.low};
 
@@ -206,7 +206,7 @@ constexpr uint256_t operator+(uint256_t lhs, uint256_t rhs) noexcept
     return temp;
 }
 
-constexpr uint256_t operator*(uint256_t lhs, uint256_t rhs) noexcept
+constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     uint256_t result{};
 
@@ -249,7 +249,7 @@ constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept
     return temp;
 }
 
-constexpr uint256_t operator-(uint256_t lhs, uint256_t rhs) noexcept
+constexpr uint256_t operator-(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     const uint256_t temp {lhs.high - rhs.high, lhs.low - rhs.low};
 
@@ -381,7 +381,7 @@ constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, con
     return {quotient, remainder};
 }
 
-constexpr uint256_t operator/(uint256_t lhs, uint256_t rhs) noexcept
+constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     const auto res {divide(lhs, rhs)};
     return std::get<0>(res);
@@ -405,7 +405,7 @@ constexpr uint256_t& uint256_t::operator/=(const uint256_t& rhs) noexcept
     return *this;
 }
 
-constexpr uint256_t operator%(uint256_t lhs, uint256_t rhs) noexcept
+constexpr uint256_t operator%(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     const auto res {divide(lhs, rhs)};
     return std::get<1>(res);
