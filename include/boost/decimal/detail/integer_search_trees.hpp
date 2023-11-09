@@ -188,21 +188,21 @@ constexpr int num_digits(uint128 x) noexcept
     return 1;
 }
 
-constexpr int num_digits(const uint256& x) noexcept
+constexpr int num_digits(const uint256_t& x) noexcept
 {
     if (x.high == 0)
     {
         return num_digits(x.low);
     }
 
-    constexpr uint256 max_digits = umul256({static_cast<uint128>(UINT64_C(10000000000000000000)) *
-                                           static_cast<uint128>(UINT64_C(10000000000000000000))},
-                                           {static_cast<uint128>(UINT64_C(10000000000000000000)) *
-                                           static_cast<uint128>(UINT64_C(10000000000000000000))});
+    constexpr uint256_t max_digits = umul256({static_cast<uint128>(UINT64_C(10000000000000000000)) *
+                                              static_cast<uint128>(UINT64_C(10000000000000000000))},
+                                              {static_cast<uint128>(UINT64_C(10000000000000000000)) *
+                                               static_cast<uint128>(UINT64_C(10000000000000000000))});
 
-    uint256 current_power_of_10 = max_digits;
+    uint256_t current_power_of_10 = max_digits;
 
-    for (int i = 76; i > 0; --i)
+    for (int i = 78; i > 0; --i)
     {
         if (x >= current_power_of_10)
         {
