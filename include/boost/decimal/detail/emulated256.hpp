@@ -217,12 +217,12 @@ constexpr uint256_t operator*(uint256_t lhs, uint256_t rhs) noexcept
     products[0] = {uint64_t(product_low >> 64), uint64_t(product_low)};
 
     // Multiply the mixed parts.
-    uint128 product_mid_low = (uint128)lhs.low.high * rhs.low.low;
-    uint128 product_mid_high = (uint128)lhs.low.low * rhs.low.high;
+    uint128 product_mid_low = static_cast<uint128>(lhs.low.high) * rhs.low.low;
+    uint128 product_mid_high = static_cast<uint128>(lhs.low.low) * rhs.low.high;
     products[1] = {uint64_t((product_mid_low >> 64) + (product_mid_high >> 64)), uint64_t(product_mid_low + product_mid_high)};
 
     // Multiply the high parts.
-    uint128 product_high = (uint128)lhs.low.high * rhs.low.high;
+    uint128 product_high = static_cast<uint128>(lhs.low.high) * rhs.low.high;
     products[2] = {uint64_t(product_high >> 64), uint64_t(product_high)};
 
     // Add the products, taking care of the carries.
@@ -283,29 +283,38 @@ constexpr int high_bit(uint256_t v) noexcept
 }
 
 // Function to compare two uint256_t numbers (returns -1, 0, or 1)
-constexpr int compare(const uint256_t& a, const uint256_t& b) {
-    if (a.high < b.high || (a.high == b.high && a.low < b.low)) {
+constexpr int compare(const uint256_t& a, const uint256_t& b)
+{
+    if (a.high < b.high || (a.high == b.high && a.low < b.low))
+    {
         return -1;
-    } else if (a.high == b.high && a.low == b.low) {
-        return 0;
-    } else {
-        return 1;
     }
+    else if (a.high == b.high && a.low == b.low)
+    {
+        return 0;
+    }
+
+    return 1;
 }
 
+// The following are all needed for the division algorithm
 // Function to subtract two uint256_t numbers
-constexpr uint256_t subtract(const uint256_t& a, const uint256_t& b) {
+constexpr uint256_t subtract(const uint256_t& a, const uint256_t& b)
+{
     uint256_t result;
     result.low = a.low - b.low;
     result.high = a.high - b.high;
-    if (a.low < b.low) { // borrow from the high part
+    if (a.low < b.low)
+    {
         result.high--;
     }
+
     return result;
 }
 
 // Function to left shift a uint256_t by one bit
-constexpr uint256_t left_shift(const uint256_t& a) {
+constexpr uint256_t left_shift(const uint256_t& a)
+{
     uint256_t result;
     result.high = (a.high << 1) | (a.low >> (sizeof(uint128_t) * 8 - 1));
     result.low = a.low << 1;
@@ -313,40 +322,57 @@ constexpr uint256_t left_shift(const uint256_t& a) {
 }
 
 // Function to set a specific bit of a uint256_t
-constexpr void set_bit(uint256_t& a, int bit) {
-    if (bit >= 0 && bit < 128) {
+constexpr void set_bit(uint256_t& a, int bit)
+{
+    if (bit >= 0 && bit < 128)
+    {
         a.low |= (uint128_t(1) << bit);
-    } else if (bit >= 128 && bit < 256) {
+    }
+    else if (bit >= 128 && bit < 256)
+    {
         a.high |= (uint128_t(1) << (bit - 128));
     }
 }
 
 // The division algorithm
-constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const uint256_t& divisor) {
+constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const uint256_t& divisor)
+{
     // Check for division by zero
-    if (divisor.high == 0 && divisor.low == 0) {
+    if (divisor.high == 0 && divisor.low == 0)
+    {
         return {{0,0}, {0,0}};
+    }
+    else if (divisor > dividend)
+    {
+        return {{0,0}, dividend};
     }
 
     uint256_t quotient = {0, 0};
     uint256_t remainder = {0, 0};
 
-    for (int i = 255; i >= 0; --i) {
+    for (int i = 255; i >= 0; --i)
+    {
         remainder = left_shift(remainder);
 
         // Set the current bit of the dividend
-        if (i >= 128) {
-            if ((dividend.high >> (i - 128)) & 1) {
+        if (i >= 128)
+        {
+            if ((dividend.high >> (i - 128)) & 1)
+            {
                 set_bit(remainder, 0);
             }
-        } else {
-            if ((dividend.low >> i) & 1) {
+        }
+        else
+        {
+            if ((dividend.low >> i) & 1)
+            {
                 set_bit(remainder, 0);
             }
         }
 
         // If remainder >= divisor, subtract it and set the bit in the quotient
-        if (compare(remainder, divisor) >= 0) {
+        if (compare(remainder, divisor) >= 0)
+        {
             remainder = subtract(remainder, divisor);
             set_bit(quotient, i);
         }
