@@ -23,7 +23,7 @@ struct uint256_t
     constexpr uint256_t() = default;
     constexpr uint256_t& operator=(const uint256_t& rhs) = default;
     constexpr uint256_t(const uint256_t& rhs) = default;
-    constexpr uint256_t(const uint128& rhs) : high {}, low {rhs} {}
+    explicit constexpr uint256_t(const uint128& rhs) : high {}, low {rhs} {}
     constexpr uint256_t(const uint128& high_, const uint128& low_) : high {high_}, low {low_} {}
 
     explicit operator uint128() const noexcept
