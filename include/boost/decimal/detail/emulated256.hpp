@@ -316,7 +316,7 @@ constexpr uint256_t subtract(const uint256_t& a, const uint256_t& b)
 constexpr uint256_t left_shift(const uint256_t& a)
 {
     uint256_t result;
-    result.high = (a.high << 1) | (a.low >> (sizeof(uint128_t) * 8 - 1));
+    result.high = (a.high << 1) | (a.low >> (sizeof(uint128) * 8 - 1));
     result.low = a.low << 1;
     return result;
 }
@@ -326,11 +326,11 @@ constexpr void set_bit(uint256_t& a, int bit)
 {
     if (bit >= 0 && bit < 128)
     {
-        a.low |= (uint128_t(1) << bit);
+        a.low |= (uint128(1) << bit);
     }
     else if (bit >= 128 && bit < 256)
     {
-        a.high |= (uint128_t(1) << (bit - 128));
+        a.high |= (uint128(1) << (bit - 128));
     }
 }
 
