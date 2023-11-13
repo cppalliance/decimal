@@ -269,6 +269,7 @@ public:
 
     friend constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
+    friend constexpr auto operator/(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
     // 3.2.9 Comparison operators:
     // Equality
     friend constexpr auto operator==(decimal128 lhs, decimal128 rhs) noexcept -> bool;
@@ -1470,6 +1471,14 @@ constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     return {result.sig, result.exp, result.sign};
 }
 
+constexpr auto operator/(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+{
+    decimal128 q {};
+    decimal128 r {};
+    d128_div_impl(lhs, rhs, q, r);
+
+    return q;
+}
 } //namespace decimal
 } //namespace boost
 
