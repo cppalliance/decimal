@@ -270,6 +270,14 @@ public:
     // 3.2.8 Binary arithmetic operators
     friend constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
+    template <typename Integer>
+    friend constexpr auto operator+(decimal128 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
+
+    template <typename Integer>
+    friend constexpr auto operator+(Integer lhs, decimal128 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
+
     friend constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
     friend constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
@@ -1420,6 +1428,71 @@ constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
                                      rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator+(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return lhs;
+    }
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && (rhs < 0))
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+    bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize<decimal128>(sig_lhs, exp_lhs);
+    auto lhs_components {detail::decimal128_components{sig_lhs, exp_lhs, lhs.isneg()}};
+
+    auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    std::int32_t exp_rhs {0};
+    detail::normalize<decimal128>(sig_rhs, exp_rhs);
+    auto unsigned_sig_rhs = detail::make_positive_unsigned(sig_rhs);
+    auto rhs_components {detail::decimal128_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs_components, rhs_components);
+        lhs_bigger = !lhs_bigger;
+        abs_lhs_bigger = !abs_lhs_bigger;
+    }
+
+    detail::decimal128_components result {};
+
+    #ifdef BOOST_DECIMAL_DEBUG_ADD
+    std::cerr << "Lhs sig: " << lhs_components.sig
+              << "\nLhs exp: " << lhs_components.exp
+              << "\nRhs sig: " << rhs_components.sig
+              << "\nRhs exp: " << rhs_components.exp << std::endl;
+    #endif
+
+    if (!lhs_components.sign && rhs_components.sign)
+    {
+        result = d128_sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                               rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                               abs_lhs_bigger);
+    }
+    else
+    {
+        result = d128_add_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                               rhs_components.sig, rhs_components.exp, rhs_components.sign);
+    }
+
+    return decimal128(result.sig, result.exp, result.sign);
+}
+
+template <typename Integer>
+constexpr auto operator+(Integer lhs, decimal128 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    return rhs + lhs;
 }
 
 // NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
