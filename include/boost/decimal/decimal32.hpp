@@ -520,7 +520,8 @@ public:
     template <typename T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
-            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t, std::uint64_t>>;
+            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
+                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>;
 
     friend constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32;
     friend constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32;

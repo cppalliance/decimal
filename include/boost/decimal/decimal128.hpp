@@ -358,6 +358,13 @@ public:
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
 
     friend std::string bit_string(decimal128 rhs) noexcept;
+
+    // <cmath> functions that need to be friends
+    template <typename T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
+            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
+                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>;
 };
 
 std::string bit_string(decimal128 rhs) noexcept
