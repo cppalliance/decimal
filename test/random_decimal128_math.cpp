@@ -283,7 +283,7 @@ void random_mixed_multiplication(T lower, T upper)
     BOOST_TEST(isnan(std::numeric_limits<decimal128>::quiet_NaN() * dist(rng)));
     BOOST_TEST(isnan(dist(rng) * std::numeric_limits<decimal128>::quiet_NaN()));
 }
-
+*/
 template <typename T>
 void random_division(T lower, T upper)
 {
@@ -320,7 +320,7 @@ void random_division(T lower, T upper)
     BOOST_TEST(isnan(decimal128(dist(rng)) / std::numeric_limits<decimal128>::quiet_NaN()));
     BOOST_TEST(isinf(decimal128(dist(rng)) / decimal128(0)));
 }
-
+/*
 template <typename T>
 void random_mixed_division(T lower, T upper)
 {
@@ -863,39 +863,33 @@ int main()
     //random_mixed_multiplication(-5'000, 5'000);
     //random_mixed_multiplication(-5'000LL, 5'000LL);
     //random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
-/*
+
     // Division
 
     // Positive
     random_division(0, 5'000);
     random_division(0LL, 5'000LL);
     random_division(0, sqrt_int_max);
-    random_mixed_division(0, 5'000);
-    random_mixed_division(0LL, 5'000LL);
-    random_mixed_division(0, sqrt_int_max);
+    //random_mixed_division(0, 5'000);
+    //random_mixed_division(0LL, 5'000LL);
+    //random_mixed_division(0, sqrt_int_max);
 
     // Negative
     random_division(-5'000, 0);
     random_division(-5'000LL, 0LL);
     random_division(-sqrt_int_max, 0);
-    random_mixed_division(-5'000, 0);
-    random_mixed_division(-5'000LL, 0LL);
-    random_mixed_division(-sqrt_int_max, 0);
+    //random_mixed_division(-5'000, 0);
+    //random_mixed_division(-5'000LL, 0LL);
+    //random_mixed_division(-sqrt_int_max, 0);
 
     // Mixed
     random_division(-5'000, 5'000);
     random_division(-5'000LL, 5'000LL);
     random_division(-sqrt_int_max, sqrt_int_max);
-    random_mixed_division(-5'000, 5'000);
-    random_mixed_division(-5'000LL, 5'000LL);
-    random_mixed_division(-sqrt_int_max, sqrt_int_max);
-
-    // Spot checked values
-    spot_check_sub(945501, 80);
-    spot_check_sub(562, 998980);
-    spot_check_sub(-954783, 746);
-    spot_check_sub(513479119LL, 972535711690LL);
-
+    //random_mixed_division(-5'000, 5'000);
+    //random_mixed_division(-5'000LL, 5'000LL);
+    //random_mixed_division(-sqrt_int_max, sqrt_int_max);
+/*
     // Bitwise operators
     random_and();
     random_mixed_and();
@@ -908,6 +902,7 @@ int main()
     random_right_shift();
     random_mixed_right_shift();
 */
+
     return boost::report_errors();
 }
 

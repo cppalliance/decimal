@@ -12,6 +12,7 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
 #include <type_traits>
 #include <cmath>
 
@@ -21,6 +22,9 @@ template <typename T>
 constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
+    using DivType = std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
+                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>;
+
     constexpr T zero {0, 0};
     constexpr T neg_one {1, 0, true};
     const auto fp {fpclassify(val)};
@@ -61,7 +65,7 @@ constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
         decimal_digits--;
     }
 
-    new_sig /= detail::pow10<std::uint32_t>(decimal_digits);
+    new_sig /= detail::pow10<DivType>(decimal_digits);
     if (is_neg && round)
     {
         ++new_sig;

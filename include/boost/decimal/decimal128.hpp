@@ -123,9 +123,14 @@ static constexpr uint128 d128_big_combination_field_mask {UINT64_C(0b1'000000000
 
 struct decimal128_components
 {
-    uint128 sig;
-    std::int32_t exp;
-    bool sign;
+    uint128 sig {};
+    std::int32_t exp {};
+    bool sign {};
+
+    constexpr decimal128_components() = default;
+    constexpr decimal128_components(const decimal128_components& rhs) = default;
+    constexpr decimal128_components& operator=(const decimal128_components& rhs) = default;
+    constexpr decimal128_components(uint128 sig_, std::int32_t exp_, bool sign_) : sig{sig_}, exp{exp_}, sign{sign_} {}
 };
 
 } //namespace detail
@@ -195,6 +200,13 @@ private:
     constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                  T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal128_components;
 
+    friend constexpr auto d128_generic_div_imp(detail::decimal128_components lhs, detail::decimal128_components rhs,
+                                               detail::decimal128_components& q) noexcept -> void;
+
+    friend constexpr auto d128_div_impl(decimal128 lhs, decimal128 rhs, decimal128& q, decimal128& r) noexcept -> void;
+
+    friend constexpr auto d128_mod_impl(decimal128 lhs, decimal128 rhs, const decimal128& q, decimal128& r) noexcept -> void;
+
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
@@ -261,6 +273,10 @@ public:
     friend constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
     friend constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
+
+    friend constexpr auto operator/(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
+
+    friend constexpr auto operator%(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
     // 3.2.9 Comparison operators:
     // Equality
@@ -351,6 +367,13 @@ public:
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
 
     friend std::string bit_string(decimal128 rhs) noexcept;
+
+    // <cmath> functions that need to be friends
+    template <typename T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
+            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
+                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>;
 };
 
 std::string bit_string(decimal128 rhs) noexcept
@@ -1222,7 +1245,7 @@ constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
-    auto sig_dig {detail::num_digits(res_sig)};
+    const auto sig_dig {detail::num_digits(res_sig)};
 
     if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
     {
@@ -1239,9 +1262,117 @@ constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {res_sig.low, res_exp, sign};
 }
 
+constexpr auto d128_generic_div_impl(detail::decimal128_components lhs, detail::decimal128_components rhs,
+                                     detail::decimal128_components& q) noexcept -> void
+{
+    bool sign {lhs.sign != rhs.sign};
+
+    const auto big_sig_lhs {detail::uint256_t(lhs.sig) * detail::uint256_t(pow10(detail::uint128(detail::precision_v<decimal128>)))};
+    lhs.exp -= detail::precision_v<decimal128>;
+
+    auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
+    auto res_exp {lhs.exp - rhs.exp};
+
+    const auto sig_dig {detail::num_digits(res_sig)};
+
+    if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
+    {
+        const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
+        res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
+        res_exp += digit_delta;
+    }
+
+    if (res_sig == 0)
+    {
+        sign = false;
+    }
+
+    // Let the constructor handle shrinking it back down and rounding correctly
+    q = detail::decimal128_components{res_sig.low, res_exp, sign};
+}
+
+constexpr auto d128_div_impl(decimal128 lhs, decimal128 rhs, decimal128& q, decimal128& r) noexcept -> void
+{
+    // Check pre-conditions
+    constexpr decimal128 zero {0, 0};
+    constexpr decimal128 nan {boost::decimal::from_bits(boost::decimal::detail::d128_snan_mask)};
+    constexpr decimal128 inf {boost::decimal::from_bits(boost::decimal::detail::d128_inf_mask)};
+
+    const bool sign {lhs.isneg() != rhs.isneg()};
+
+    const auto lhs_fp {fpclassify(lhs)};
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+    {
+        q = nan;
+        r = nan;
+        return;
+    }
+
+    switch (lhs_fp)
+    {
+        case FP_INFINITE:
+            q = sign ? -inf : inf;
+            r = zero;
+            return;
+        case FP_ZERO:
+            q = sign ? -zero : zero;
+            r = sign ? -zero : zero;
+            return;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_ZERO:
+            q = inf;
+            r = zero;
+            return;
+        case FP_INFINITE:
+            q = sign ? -zero : zero;
+            r = lhs;
+            return;
+        default:
+            static_cast<void>(rhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize<decimal128>(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize<decimal128>(sig_rhs, exp_rhs);
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "sig lhs: " << sig_lhs
+              << "\nexp lhs: " << exp_lhs
+              << "\nsig rhs: " << sig_rhs
+              << "\nexp rhs: " << exp_rhs << std::endl;
+    #endif
+
+    detail::decimal128_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    detail::decimal128_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal128_components q_components {};
+
+    d128_generic_div_impl(lhs_components, rhs_components, q_components);
+
+    q = decimal128(q_components.sig, q_components.exp, q_components.sign);
+}
+
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #endif
+
+constexpr auto d128_mod_impl(decimal128 lhs, decimal128 rhs, const decimal128& q, decimal128& r) noexcept -> void
+{
+    constexpr decimal128 zero {0, 0};
+
+    auto q_trunc {q > zero ? floor(q) : ceil(q)};
+    r = lhs - (decimal128(q_trunc) * rhs);
+}
 
 constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
 {
@@ -1346,6 +1477,25 @@ constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
                                      rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto operator/(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+{
+    decimal128 q {};
+    decimal128 r {};
+    d128_div_impl(lhs, rhs, q, r);
+
+    return q;
+}
+
+constexpr auto operator%(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+{
+    decimal128 q {};
+    decimal128 r {};
+    d128_div_impl(lhs, rhs, q, r);
+    d128_mod_impl(lhs, rhs, q, r);
+
+    return r;
 }
 
 } //namespace decimal
