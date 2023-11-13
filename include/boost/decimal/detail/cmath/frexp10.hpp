@@ -10,6 +10,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/normalize.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
 
 namespace boost {
 namespace decimal {
@@ -21,9 +22,11 @@ namespace decimal {
 template <typename T>
 constexpr auto frexp10(T num, int* expptr) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
-            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t, std::uint64_t>>
+           std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
+                std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>
 {
-    using ReturnType = std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t, std::uint64_t>;
+    using ReturnType = std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
+                           std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>;
 
     constexpr T zero {0, 0};
 
