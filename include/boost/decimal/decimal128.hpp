@@ -1357,6 +1357,14 @@ constexpr auto d128_div_impl(decimal128 lhs, decimal128 rhs, decimal128& q, deci
 #  pragma warning(pop)
 #endif
 
+constexpr auto d128_mod_impl(decimal128 lhs, decimal128 rhs, const decimal128& q, decimal128& r) noexcept -> void
+{
+    constexpr decimal128 zero {0, 0};
+
+    auto q_trunc {q > zero ? floor(q) : ceil(q)};
+    r = lhs - (decimal128(q_trunc) * rhs);
+}
+
 constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
 {
     constexpr decimal128 zero {0, 0};
