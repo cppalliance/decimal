@@ -91,7 +91,7 @@ struct IEEEl2bits
 
 struct IEEEl2bits
 {
-#if BOOST_CHARCONV_ENDIAN_LITTLE_BYTE
+#if (defined(BOOST_CHARCONV_ENDIAN_LITTLE_BYTE) && (BOOST_CHARCONV_ENDIAN_LITTLE_BYTE != 0))
     std::uint32_t mantissa_l : 32;
     std::uint32_t mantissa_h : 20;
     std::uint32_t exponent : 11;
@@ -112,7 +112,7 @@ struct IEEEl2bits
 
 struct IEEEbinary128
 {
-#if BOOST_CHARCONV_ENDIAN_LITTLE_BYTE
+#if (defined(BOOST_CHARCONV_ENDIAN_LITTLE_BYTE) && (BOOST_CHARCONV_ENDIAN_LITTLE_BYTE != 0))
     std::uint64_t mantissa_l : 64;
     std::uint64_t mantissa_h : 48;
     std::uint32_t exponent : 15;

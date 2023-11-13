@@ -10,7 +10,9 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
+#ifndef BOOST_DECIMAL_HAS_STDBIT
 #include <boost/core/bit.hpp>
+#endif
 #include <cstdint>
 #include <cfloat>
 #include <cstring>

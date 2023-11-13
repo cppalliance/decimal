@@ -12,7 +12,9 @@
 #include <cstdint>
 #include <cstring>
 #include <cwchar>
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 #include <iostream>
+#endif
 #include <limits>
 #include <type_traits>
 #include <sstream>

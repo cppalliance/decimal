@@ -27,7 +27,7 @@
 #endif // Determine endianness
 
 #if __has_include(<bit>)
-#  if __cplusplus >= 201806L || _MSVC_LANG >= 201806L
+#  if __cplusplus >= 201806L || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201806L))
 #    include <bit>
 #    define BOOST_DECIMAL_HAS_STDBIT
 #    if defined(__cpp_lib_bit_cast) && (__cpp_lib_bit_cast >= 201806L)

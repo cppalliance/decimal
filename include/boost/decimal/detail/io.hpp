@@ -5,14 +5,17 @@
 #ifndef BOOST_DECIMAL_DETAIL_IO_HPP
 #define BOOST_DECIMAL_DETAIL_IO_HPP
 
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
+
 #include <cerrno>
 #include <cstring>
 #include <cinttypes>
 #include <limits>
 #include <ios>
 #include <iostream>
-#include <type_traits>
 #include <system_error>
+#include <type_traits>
+
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/parser.hpp>
@@ -216,5 +219,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
 
 } //namespace decimal
 } //namespace boost
+
+#endif // BOOST_DECIMAL_DISABLE_IOSTREAM
 
 #endif //BOOST_DECIMAL_DETAIL_IO_HPP

@@ -12,10 +12,11 @@
 #include <cstdint>
 #include <cstring>
 #include <cwchar>
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 #include <iostream>
+#endif
 #include <limits>
 #include <type_traits>
-#include <sstream>
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/attributes.hpp>
@@ -1996,9 +1997,13 @@ constexpr auto decimal32::operator%=(boost::decimal::decimal32 rhs) noexcept -> 
 // LCOV_EXCL_START
 auto debug_pattern(decimal32 rhs) noexcept -> void
 {
+    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     std::cerr << "Sig: " << rhs.full_significand()
               << "\nExp: " << rhs.biased_exponent()
               << "\nNeg: " << rhs.isneg() << std::endl;
+    #else
+    static_cast<void>(rhs);
+    #endif
 }
 // LCOV_EXCL_STOP
 
