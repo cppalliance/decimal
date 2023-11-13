@@ -123,9 +123,14 @@ static constexpr uint128 d128_big_combination_field_mask {UINT64_C(0b1'000000000
 
 struct decimal128_components
 {
-    uint128 sig;
-    std::int32_t exp;
-    bool sign;
+    uint128 sig {};
+    std::int32_t exp {};
+    bool sign {};
+
+    constexpr decimal128_components() = default;
+    constexpr decimal128_components(const decimal128_components& rhs) = default;
+    constexpr decimal128_components& operator=(const decimal128_components& rhs) = default;
+    constexpr decimal128_components(uint128 sig_, std::int32_t exp_, bool sign_) : sig{sig_}, exp{exp_}, sign{sign_} {}
 };
 
 } //namespace detail
