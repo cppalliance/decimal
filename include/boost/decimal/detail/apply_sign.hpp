@@ -34,7 +34,7 @@ template <typename Integer, typename Unsigned_Integer = detail::make_unsigned_t<
           std::enable_if_t<detail::is_signed_v<Integer>, bool> = true>
 constexpr auto make_positive_unsigned(Integer val) noexcept -> Unsigned_Integer
 {
-    return static_cast<Unsigned_Integer>(val < static_cast<Integer>(0) ? apply_sign(val) : val);
+    return static_cast<Unsigned_Integer>(val < static_cast<Integer>(static_cast<std::int8_t>(INT8_C(0))) ? apply_sign(val) : val);
 }
 
 template <typename Unsigned_Integer, std::enable_if_t<!detail::is_signed_v<Unsigned_Integer>, bool> = true>
