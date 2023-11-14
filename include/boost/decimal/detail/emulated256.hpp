@@ -101,8 +101,10 @@ struct uint256_t
 
     friend constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept;
 
+    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, uint256_t val) -> std::basic_ostream<charT, traits>&;
+    #endif
 
 private:
     friend constexpr int high_bit(uint256_t v) noexcept;
@@ -487,6 +489,7 @@ auto emulated256_to_buffer(char (&buffer)[ 128 ], uint256_t v)
     return p;
 }
 
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 template <typename charT, typename traits>
 auto operator<<(std::basic_ostream<charT, traits>& os, uint256_t val) -> std::basic_ostream<charT, traits>&
 {
@@ -496,6 +499,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, uint256_t val) -> std::ba
 
     return os;
 }
+#endif
 
 } //namespace detail
 } //namespace decimal

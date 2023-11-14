@@ -5,14 +5,13 @@
 #ifndef BOOST_DECIMAL_DECIMAL32_HPP
 #define BOOST_DECIMAL_DECIMAL32_HPP
 
-#include <cassert>
 #include <cerrno>
 #include <climits>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
-#include <cwchar>
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
+#include <cwchar>
 #include <iostream>
 #endif
 #include <limits>
@@ -227,8 +226,10 @@ public:
     explicit constexpr operator unsigned long long() const noexcept;
     explicit constexpr operator std::int8_t() const noexcept;
     explicit constexpr operator std::uint8_t() const noexcept;
+    #if !defined(__AVR__)
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
+    #endif
 
     template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
     explicit constexpr operator Decimal() const noexcept;
@@ -440,6 +441,7 @@ public:
     friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
     #endif
 
+    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     // 3.2.10 Formatted input:
     template <typename charT, typename traits, typename DecimalType>
     friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
@@ -449,6 +451,7 @@ public:
     template <typename charT, typename traits, typename DecimalType>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
+    #endif
 
     // Bitwise operators
     friend constexpr auto operator&(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;

@@ -5,7 +5,6 @@
 #ifndef BOOST_DECIMAL_DECIMAL128_HPP
 #define BOOST_DECIMAL_DECIMAL128_HPP
 
-#include <cassert>
 #include <cerrno>
 #include <climits>
 #include <cmath>

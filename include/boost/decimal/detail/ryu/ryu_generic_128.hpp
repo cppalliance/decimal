@@ -12,7 +12,7 @@
 #include <boost/decimal/detail/bit_layouts.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 #include <cinttypes>
-#include <cstdio>
+//#include <cstdio>
 #include <cstdint>
 
 #ifdef BOOST_DECIMAL_DEBUG_RYU

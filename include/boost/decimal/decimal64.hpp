@@ -5,20 +5,18 @@
 #ifndef BOOST_DECIMAL_DECIMAL64_HPP
 #define BOOST_DECIMAL_DECIMAL64_HPP
 
-#include <cinttypes>
-#include <cassert>
 #include <cerrno>
+#include <cinttypes>
 #include <climits>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
-#include <cwchar>
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
+#include <cwchar>
 #include <iostream>
 #endif
 #include <limits>
 #include <type_traits>
-#include <sstream>
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/attributes.hpp>
@@ -440,6 +438,7 @@ public:
     friend constexpr auto operator<=>(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
     #endif
 
+    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     // 3.2.10 Formatted input:
     template <typename charT, typename traits, typename DecimalType>
     friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
@@ -449,6 +448,7 @@ public:
     template <typename charT, typename traits, typename DecimalType>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
+    #endif
 
     // 3.6.4 Same Quantum
     friend constexpr auto samequantumd64(decimal64 lhs, decimal64 rhs) noexcept -> bool;

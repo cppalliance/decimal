@@ -10,14 +10,15 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/countl.hpp>
-#include <type_traits>
-#include <limits>
-#include <iosfwd>
-#include <iomanip>
-#include <ostream>
-#include <cstdint>
-#include <cassert>
 #include <cmath>
+#include <cstdint>
+#include <limits>
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
+#include <iomanip>
+#include <iosfwd>
+#include <ostream>
+#endif
+#include <type_traits>
 
 namespace boost {
 namespace decimal {
@@ -557,8 +558,10 @@ struct uint128
 
     constexpr auto operator%=(uint128 v) noexcept -> uint128&;
 
+    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&;
+    #endif
 
     constexpr void add_with_carry(const uint128& other, bool& carry)
     {
@@ -635,8 +638,10 @@ struct int128
     friend constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128;
     friend constexpr auto operator-(int128 lhs, int128 rhs) noexcept -> int128;
 
+    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std::basic_ostream<charT, traits>&;
+    #endif
 };
 
 #if (__GNUC__ >= 8) || (!defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__))
@@ -1112,7 +1117,7 @@ auto emulated128_to_buffer(char (&buffer)[ 64 ], uint128 v)
     return p;
 }
 
-
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 template <typename charT, typename traits>
 auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&
 {
@@ -1142,6 +1147,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std::basic
     os << p;
     return os;
 }
+#endif
 
 constexpr int128::operator uint128() const noexcept
 {

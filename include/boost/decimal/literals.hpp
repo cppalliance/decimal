@@ -9,7 +9,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <type_traits>
-#include <string>
+#include <cstring>
 
 namespace boost { namespace decimal {
 

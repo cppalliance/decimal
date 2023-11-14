@@ -7,7 +7,7 @@
 
 #include <array>
 #include <cstdint>
-#include <cassert>
+
 #include <boost/decimal/detail/type_traits.hpp>
 
 namespace boost { namespace decimal { namespace detail {
@@ -23,12 +23,6 @@ static constexpr std::array<std::uint64_t, 20> powers_of_10 =
 template <typename T>
 constexpr auto pow10(T n) noexcept -> T
 {
-    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T>)
-    {
-        assert(n >= 0);
-    }
-    assert(n <= 19);
-
     return static_cast<T>(powers_of_10[static_cast<std::size_t>(n)]);
 }
 
