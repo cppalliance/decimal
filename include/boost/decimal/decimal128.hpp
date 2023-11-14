@@ -310,6 +310,12 @@ public:
 
     friend constexpr auto operator%(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
+    // 3.2.4.5 Increment and Decrement
+    constexpr auto operator++()    noexcept -> decimal128&;
+    constexpr auto operator++(int) noexcept -> decimal128;  // NOLINT : C++14 so constexpr implies const
+    constexpr auto operator--()    noexcept -> decimal128&;
+    constexpr auto operator--(int) noexcept -> decimal128;  // NOLINT : C++14 so constexpr implies const
+
     // 3.2.9 Comparison operators:
     // Equality
     friend constexpr auto operator==(decimal128 lhs, decimal128 rhs) noexcept -> bool;
@@ -1780,6 +1786,30 @@ constexpr auto operator%(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     d128_mod_impl(lhs, rhs, q, r);
 
     return r;
+}
+
+constexpr auto decimal128::operator++() noexcept -> decimal128&
+{
+    constexpr decimal128 one{1, 0};
+    *this = *this + one;
+    return *this;
+}
+
+constexpr auto decimal128::operator++(int) noexcept -> decimal128
+{
+    return ++(*this);
+}
+
+constexpr auto decimal128::operator--() noexcept -> decimal128&
+{
+    constexpr decimal128 one{1, 0};
+    *this = *this - one;
+    return *this;
+}
+
+constexpr auto decimal128::operator--(int) noexcept -> decimal128
+{
+    return --(*this);
 }
 
 } //namespace decimal
