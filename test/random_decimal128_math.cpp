@@ -247,7 +247,6 @@ void random_multiplication(T lower, T upper)
     BOOST_TEST(isnan(decimal128(dist(rng)) * std::numeric_limits<decimal128>::quiet_NaN()));
 }
 
-/*
 template <typename T>
 void random_mixed_multiplication(T lower, T upper)
 {
@@ -262,9 +261,9 @@ void random_mixed_multiplication(T lower, T upper)
         const T dec2 {static_cast<T>(decimal128(val2))};
 
         const decimal128 res {dec1 * dec2};
-        const decimal128 res_int {val1 * val2};
+        const T res_int {static_cast<T>(res)};
 
-        if (!BOOST_TEST_EQ(res, res_int))
+        if (!BOOST_TEST_EQ(res_int, val1 * val2))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
@@ -280,7 +279,7 @@ void random_mixed_multiplication(T lower, T upper)
     BOOST_TEST(isnan(std::numeric_limits<decimal128>::quiet_NaN() * dist(rng)));
     BOOST_TEST(isnan(dist(rng) * std::numeric_limits<decimal128>::quiet_NaN()));
 }
-*/
+
 template <typename T>
 void random_division(T lower, T upper)
 {
@@ -317,7 +316,7 @@ void random_division(T lower, T upper)
     BOOST_TEST(isnan(decimal128(dist(rng)) / std::numeric_limits<decimal128>::quiet_NaN()));
     BOOST_TEST(isinf(decimal128(dist(rng)) / decimal128(0)));
 }
-/*
+
 template <typename T>
 void random_mixed_division(T lower, T upper)
 {
@@ -384,6 +383,7 @@ void random_mixed_division(T lower, T upper)
     BOOST_TEST(isinf(val1 / zero));
 }
 
+/*
 void random_and()
 {
     std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
@@ -841,25 +841,25 @@ int main()
     random_multiplication(0, 5'000);
     random_multiplication(0LL, 5'000LL);
     random_multiplication(0, sqrt_int_max);
-    //random_mixed_multiplication(0, 5'000);
-    //random_mixed_multiplication(0LL, 5'000LL);
-    //random_mixed_multiplication(0, sqrt_int_max);
+    random_mixed_multiplication(0, 5'000);
+    random_mixed_multiplication(0LL, 5'000LL);
+    random_mixed_multiplication(0, sqrt_int_max);
 
     // Negative
     random_multiplication(-5'000, 0);
     random_multiplication(-5'000LL, 0LL);
     random_multiplication(-sqrt_int_max, 0);
-    //random_mixed_multiplication(-5'000, 0);
-    //random_mixed_multiplication(-5'000LL, 0LL);
-    //random_mixed_multiplication(-sqrt_int_max, 0);
+    random_mixed_multiplication(-5'000, 0);
+    random_mixed_multiplication(-5'000LL, 0LL);
+    random_mixed_multiplication(-sqrt_int_max, 0);
 
     // Mixed
     random_multiplication(-5'000, 5'000);
     random_multiplication(-5'000LL, 5'000LL);
     random_multiplication(-sqrt_int_max, sqrt_int_max);
-    //random_mixed_multiplication(-5'000, 5'000);
-    //random_mixed_multiplication(-5'000LL, 5'000LL);
-    //random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
+    random_mixed_multiplication(-5'000, 5'000);
+    random_mixed_multiplication(-5'000LL, 5'000LL);
+    random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
 
     // Division
 
@@ -875,17 +875,17 @@ int main()
     random_division(-5'000, 0);
     random_division(-5'000LL, 0LL);
     random_division(-sqrt_int_max, 0);
-    //random_mixed_division(-5'000, 0);
-    //random_mixed_division(-5'000LL, 0LL);
-    //random_mixed_division(-sqrt_int_max, 0);
+    random_mixed_division(-5'000, 0);
+    random_mixed_division(-5'000LL, 0LL);
+    random_mixed_division(-sqrt_int_max, 0);
 
     // Mixed
     random_division(-5'000, 5'000);
     random_division(-5'000LL, 5'000LL);
     random_division(-sqrt_int_max, sqrt_int_max);
-    //random_mixed_division(-5'000, 5'000);
-    //random_mixed_division(-5'000LL, 5'000LL);
-    //random_mixed_division(-sqrt_int_max, sqrt_int_max);
+    random_mixed_division(-5'000, 5'000);
+    random_mixed_division(-5'000LL, 5'000LL);
+    random_mixed_division(-sqrt_int_max, sqrt_int_max);
 /*
     // Bitwise operators
     random_and();
