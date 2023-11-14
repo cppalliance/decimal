@@ -5,6 +5,12 @@
 #ifndef BOOST_DECIMAL_DETAIL_CONFIG_HPP
 #define BOOST_DECIMAL_DETAIL_CONFIG_HPP
 
+#ifdef __has_include
+#  if !__has_include(<boost/config.hpp>)
+#    define BOOST_DECIMAL_STANDALONE
+#  endif
+#endif
+
 #ifndef BOOST_DECIMAL_STANDALONE
 #  include <boost/config.hpp>
 #endif
