@@ -5,19 +5,6 @@
 #ifndef BOOST_DECIMAL_DECIMAL128_HPP
 #define BOOST_DECIMAL_DECIMAL128_HPP
 
-#include <cerrno>
-#include <climits>
-#include <cmath>
-#include <cstdint>
-#include <cstring>
-#include <cwchar>
-#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
-#include <iostream>
-#endif
-#include <limits>
-#include <type_traits>
-#include <sstream>
-
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
@@ -47,6 +34,19 @@
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
+
+#include <cerrno>
+#include <climits>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <cwchar>
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
+#include <iostream>
+#endif
+#include <limits>
+#include <type_traits>
+#include <sstream>
 
 namespace boost {
 namespace decimal {

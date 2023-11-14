@@ -56,6 +56,28 @@
 #endif
 
 // Include intrinsics if available
+// This section allows us to disable any of the following independently.
+//   Use #define BOOST_DECIMAL_DISABLE_CASSERT to disable uses of assert.
+//   Use #define BOOST_DECIMAL_DISABLE_IOSTREAM to disable uses of I/O streaming.
+//   Use #define BOOST_DECIMAL_DISABLE_CLIB to disable uses of both assert as well as I/O streaming (and all oother heavyweight C-LIB artifacts).
+
+#ifndef BOOST_DECIMAL_DISABLE_CASSERT
+#  define BOOST_DECIMAL_ASSERT(x) assert(x)
+#else
+#  define BOOST_DECIMAL_ASSERT(x)
+#endif
+
+#ifdef BOOST_DECIMAL_DISABLE_CLIB
+#  ifndef BOOST_DECIMAL_DISABLE_IOSTREAM
+#    define BOOST_DECIMAL_DISABLE_IOSTREAM
+#  endif
+#  ifndef BOOST_DECIMAL_DISABLE_CASSERT
+#    undef BOOST_DECIMAL_ASSERT
+#    define BOOST_DECIMAL_ASSERT(x)
+#  endif
+#endif
+
+// Include intrinsics if available
 #if defined(BOOST_MSVC) || defined(_MSC_VER)
 #  include <intrin.h>
 #  if defined(_WIN64)

@@ -5,6 +5,12 @@
 #ifndef BOOST_DECIMAL_DETAIL_IO_HPP
 #define BOOST_DECIMAL_DETAIL_IO_HPP
 
+#include <boost/decimal/fwd.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/parser.hpp>
+#include <boost/decimal/detail/attributes.hpp>
+#include <boost/decimal/detail/fenv_rounding.hpp>
+
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 
 #include <cerrno>
@@ -15,12 +21,6 @@
 #include <iostream>
 #include <system_error>
 #include <type_traits>
-
-#include <boost/decimal/fwd.hpp>
-#include <boost/decimal/detail/type_traits.hpp>
-#include <boost/decimal/detail/parser.hpp>
-#include <boost/decimal/detail/attributes.hpp>
-#include <boost/decimal/detail/fenv_rounding.hpp>
 
 namespace boost {
 namespace decimal {
