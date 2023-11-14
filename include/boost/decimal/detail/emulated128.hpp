@@ -3,12 +3,13 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 //
-// If the architecture (e.g. Apple ARM) does not have __int128 we need to emulate it
+// If the architecture (e.g. 32-bit x86) does not have __int128 we need to emulate it
 
 #ifndef BOOST_DECIMAL_DETAIL_EMULATED128_HPP
 #define BOOST_DECIMAL_DETAIL_EMULATED128_HPP
 
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/countl.hpp>
 #include <type_traits>
 #include <limits>
 #include <iosfwd>
@@ -17,10 +18,6 @@
 #include <cstdint>
 #include <cassert>
 #include <cmath>
-
-#ifndef BOOST_DECIMAL_HAS_STDBIT
-#  include <boost/core/bit.hpp>
-#endif
 
 namespace boost {
 namespace decimal {
@@ -892,7 +889,7 @@ constexpr auto high_bit(uint128 v) noexcept -> int
         #ifdef BOOST_DECIMAL_HAS_STDBIT
         return 127 - std::countl_zero(v.high);
         #else
-        return 127 - boost::core::countl_zero(v.high);
+        return 127 - countl_zero(v.high);
         #endif
     }
     else if (v.low != 0)
@@ -900,7 +897,7 @@ constexpr auto high_bit(uint128 v) noexcept -> int
         #ifdef BOOST_DECIMAL_HAS_STDBIT
         return 63 - std::countl_zero(v.low);
         #else
-        return 63 - boost::core::countl_zero(v.low);
+        return 63 - countl_zero(v.low);
         #endif
     }
 

@@ -10,15 +10,11 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
-#include <boost/core/bit.hpp>
+#include <boost/decimal/detail/countl.hpp>
 #include <cstdint>
 #include <cfloat>
 #include <cstring>
 #include <cmath>
-
-#ifndef BOOST_DECIMAL_HAS_STDBIT
-#  include <boost/core/bit.hpp>
-#endif
 
 namespace boost {
 namespace decimal {
@@ -112,7 +108,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto compute_float64(std::int64_t power, std::uint
     #ifdef BOOST_DECIMAL_HAS_STDBIT
     int leading_zeros = std::countl_zero(i);
     #else
-    int leading_zeros = boost::core::countl_zero(i);
+    int leading_zeros = countl_zero(i);
     #endif
 
     i <<= static_cast<std::uint64_t>(leading_zeros);
