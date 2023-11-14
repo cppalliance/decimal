@@ -131,7 +131,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto compute_float64(std::int64_t power, std::uint
     // We expect this next branch to be rarely taken (say 1% of the time).
     // When (upper & 0x1FF) == 0x1FF, it can be common for
     // lower + i < lower to be true (proba. much higher than 1%).
-    if (BOOST_UNLIKELY((high & 0x1FF) == 0x1FF) && (low + i < low))
+    if (BOOST_DECIMAL_UNLIKELY((high & 0x1FF) == 0x1FF) && (low + i < low))
     {
         const std::uint64_t factor_significand_low = significand_128[power - smallest_power];
         product = umul128(i, factor_significand_low);

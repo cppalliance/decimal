@@ -75,7 +75,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
 
     // Strip sign if the type is signed
     // Negative sign will be appended at the end of parsing
-    BOOST_ATTRIBUTE_UNUSED bool is_negative = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED bool is_negative = false;
     auto next = first;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
