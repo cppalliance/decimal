@@ -281,9 +281,33 @@ public:
 
     friend constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
+    template <typename Integer>
+    friend constexpr auto operator-(decimal128 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
+
+    template <typename Integer>
+    friend constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
+
     friend constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
+    template <typename Integer>
+    friend constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
+
+    template <typename Integer>
+    friend constexpr auto operator*(Integer lhs, decimal128 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
+
     friend constexpr auto operator/(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
+
+    template <typename Integer>
+    friend constexpr auto operator/(decimal128 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
+
+    template <typename Integer>
+    friend constexpr auto operator/(Integer lhs, decimal128 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
 
     friend constexpr auto operator%(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
@@ -1529,6 +1553,74 @@ constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     return {result.sig, result.exp, result.sign};
 }
 
+template <typename Integer>
+constexpr auto operator-(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    if (isinf(lhs) || isnan(lhs))
+    {
+        return lhs;
+    }
+
+    if (!lhs.isneg() && (rhs < 0))
+    {
+        return lhs + detail::make_positive_unsigned(rhs);
+    }
+
+    const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize<decimal128>(sig_lhs, exp_lhs);
+    auto lhs_components {detail::decimal128_components{sig_lhs, exp_lhs, lhs.isneg()}};
+
+    auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    std::int32_t exp_rhs {0};
+    detail::normalize<decimal128>(sig_rhs, exp_rhs);
+    auto unsigned_sig_rhs {detail::make_positive_unsigned(sig_rhs)};
+    auto rhs_components {detail::decimal128_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+
+    const auto result {d128_sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                     rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                                     abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    if (isinf(rhs) || isnan(rhs))
+    {
+        return rhs;
+    }
+
+    if (lhs >= 0 && rhs.isneg())
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool abs_lhs_bigger {detail::make_positive_unsigned(lhs) > abs(rhs)};
+
+    auto sig_lhs {static_cast<detail::uint128>(detail::make_positive_unsigned(lhs))};
+    std::int32_t exp_lhs {0};
+    detail::normalize<decimal128>(sig_lhs, exp_lhs);
+    auto unsigned_sig_lhs {detail::make_positive_unsigned(sig_lhs)};
+    auto lhs_components {detail::decimal128_components{unsigned_sig_lhs, exp_lhs, (lhs < 0)}};
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize<decimal128>(sig_rhs, exp_rhs);
+    auto rhs_components {detail::decimal128_components{sig_rhs, exp_rhs, rhs.isneg()}};
+
+    const auto result {d128_sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                     rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                                     abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
 constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
 {
     constexpr decimal128 zero {0, 0};
@@ -1553,6 +1645,39 @@ constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     return {result.sig, result.exp, result.sign};
 }
 
+template <typename Integer>
+constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return lhs;
+    }
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal128>(lhs_sig, lhs_exp);
+    auto lhs_components {detail::decimal128_components{lhs_sig, lhs_exp, lhs.isneg()}};
+
+    auto rhs_sig {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    std::int32_t rhs_exp {0};
+    detail::normalize<decimal128>(rhs_sig, rhs_exp);
+    auto unsigned_sig_rhs {detail::make_positive_unsigned(rhs_sig)};
+    auto rhs_components {detail::decimal128_components{unsigned_sig_rhs, rhs_exp, (rhs < 0)}};
+
+    const auto result {d128_mul_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                     rhs_components.sig, rhs_components.exp, rhs_components.sign)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator*(Integer lhs, decimal128 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    return rhs * lhs;
+}
+
 constexpr auto operator/(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
 {
     decimal128 q {};
@@ -1560,6 +1685,92 @@ constexpr auto operator/(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     d128_div_impl(lhs, rhs, q, r);
 
     return q;
+}
+
+template <typename Integer>
+constexpr auto operator/(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    // Check pre-conditions
+    constexpr decimal128 zero {0, 0};
+    constexpr decimal128 nan {boost::decimal::from_bits(boost::decimal::detail::d128_snan_mask)};
+    constexpr decimal128 inf {boost::decimal::from_bits(boost::decimal::detail::d128_inf_mask)};
+
+    const bool sign {lhs.isneg() != (rhs < 0)};
+
+    const auto lhs_fp {fpclassify(lhs)};
+
+    switch (lhs_fp)
+    {
+        case FP_NAN:
+            return nan;
+        case FP_INFINITE:
+            return inf;
+        case FP_ZERO:
+            return sign ? -zero : zero;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    if (rhs == 0)
+    {
+        return sign ? -inf : inf;
+    }
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal128>(lhs_sig, lhs_exp);
+
+    detail::decimal128_components lhs_components {lhs_sig, lhs_exp, lhs.isneg()};
+
+    auto rhs_sig {detail::make_positive_unsigned(rhs)};
+    std::int32_t rhs_exp {};
+    detail::decimal128_components rhs_components {rhs_sig, rhs_exp, rhs < 0};
+    detail::decimal128_components q_components {};
+
+    d128_generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return decimal128(q_components.sig, q_components.exp, q_components.sign);
+}
+
+template <typename Integer>
+constexpr auto operator/(Integer lhs, decimal128 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    // Check pre-conditions
+    constexpr decimal128 zero {0, 0};
+    constexpr decimal128 inf {boost::decimal::from_bits(boost::decimal::detail::d128_inf_mask)};
+    constexpr decimal128 nan {boost::decimal::from_bits(boost::decimal::detail::d128_snan_mask)};
+
+    const bool sign {(lhs < 0) != rhs.isneg()};
+
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (rhs_fp == FP_NAN)
+    {
+        return nan;
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_INFINITE:
+            return sign ? -zero : zero;
+        case FP_ZERO:
+            return sign ? -inf : inf;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    detail::normalize<decimal128>(rhs_sig, rhs_exp);
+
+    detail::decimal128_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
+    detail::decimal128_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
+    detail::decimal128_components q_components {};
+
+    d128_generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return decimal128(q_components.sig, q_components.exp, q_components.sign);
 }
 
 constexpr auto operator%(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
