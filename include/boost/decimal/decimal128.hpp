@@ -290,6 +290,14 @@ public:
 
     friend constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
+    template <typename Integer>
+    friend constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
+
+    template <typename Integer>
+    friend constexpr auto operator*(Integer lhs, decimal128 rhs) noexcept
+        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
+
     friend constexpr auto operator/(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
     friend constexpr auto operator%(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
@@ -1626,6 +1634,39 @@ constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
                                      rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return lhs;
+    }
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal128>(lhs_sig, lhs_exp);
+    auto lhs_components {detail::decimal128_components{lhs_sig, lhs_exp, lhs.isneg()}};
+
+    auto rhs_sig {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    std::int32_t rhs_exp {0};
+    detail::normalize<decimal128>(rhs_sig, rhs_exp);
+    auto unsigned_sig_rhs {detail::make_positive_unsigned(rhs_sig)};
+    auto rhs_components {detail::decimal128_components{unsigned_sig_rhs, rhs_exp, (rhs < 0)}};
+
+    const auto result {d128_mul_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                     rhs_components.sig, rhs_components.exp, rhs_components.sign)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator*(Integer lhs, decimal128 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    return rhs * lhs;
 }
 
 constexpr auto operator/(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
