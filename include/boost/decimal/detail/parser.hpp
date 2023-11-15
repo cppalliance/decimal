@@ -10,9 +10,6 @@
 #include <boost/decimal/detail/from_chars_integer_impl.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 
-#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
-#include <cassert>
-#endif
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
@@ -151,9 +148,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
 
         from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
 
-        #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
-        assert(r.ec == std::errc());
-        #endif
+        BOOST_DECIMAL_ASSERT(r.ec == std::errc());
 
         return {next, r.ec};
     }
@@ -267,11 +262,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         {
             BOOST_DECIMAL_ATTRIBUTE_UNUSED from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
 
-            #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
-            assert(r.ec == std::errc());
-            #else
-            static_cast<void>(r);
-            #endif
+            BOOST_DECIMAL_ASSERT(r.ec == std::errc());
 
             if (round)
             {
@@ -339,9 +330,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
 
     const auto r = from_chars(exponent_buffer, exponent_buffer + i, exponent);
 
-    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
-    assert(r.ec == std::errc());
-    #endif
+    BOOST_DECIMAL_ASSERT(r.ec == std::errc());
 
     exponent += leading_zero_powers;
 

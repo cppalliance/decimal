@@ -9,9 +9,6 @@
 #include <boost/decimal/detail/type_traits.hpp>
 
 #include <array>
-#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
-#include <cassert>
-#endif
 #include <cstdint>
 
 namespace boost { namespace decimal { namespace detail {
@@ -27,13 +24,11 @@ static constexpr std::array<std::uint64_t, 20> powers_of_10 =
 template <typename T>
 constexpr auto pow10(T n) noexcept -> T
 {
-    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T>)
     {
-        assert(n >= 0);
+        BOOST_DECIMAL_ASSERT(n >= 0);
     }
-    assert(n <= 19);
-    #endif
+    BOOST_DECIMAL_ASSERT(n <= 19);
 
     return static_cast<T>(powers_of_10[static_cast<std::size_t>(n)]);
 }
