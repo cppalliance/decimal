@@ -38,5 +38,4 @@ test/cover/coverage_unfiltered.info
 test/tidy/err/
 test/tidy/tmp/
 cmake-build-debug/
-build/
 test/metal/bin/
