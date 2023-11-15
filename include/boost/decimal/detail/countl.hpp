@@ -6,9 +6,13 @@
 #ifndef BOOST_DECIMAL_DETAIL_COUNTL_HPP
 #define BOOST_DECIMAL_DETAIL_COUNTL_HPP
 
+#include <boost/decimal/detail/config.hpp>
+
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+#include <cassert>
+#endif
 #include <cstdint>
 #include <limits>
-#include <boost/decimal/detail/config.hpp>
 
 namespace boost {
 namespace decimal {
@@ -63,6 +67,10 @@ static constexpr int index64[64] = {
 constexpr auto bit_scan_reverse(std::uint64_t bb) noexcept -> int
 {
     constexpr auto debruijn64 {UINT64_C(0x03f79d71b4cb0a89)};
+
+    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+    assert (bb != 0);
+    #endif
 
     bb |= bb >> 1;
     bb |= bb >> 2;

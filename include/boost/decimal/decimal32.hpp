@@ -226,10 +226,8 @@ public:
     explicit constexpr operator unsigned long long() const noexcept;
     explicit constexpr operator std::int8_t() const noexcept;
     explicit constexpr operator std::uint8_t() const noexcept;
-    #if !defined(__AVR__)
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
-    #endif
 
     template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
     explicit constexpr operator Decimal() const noexcept;

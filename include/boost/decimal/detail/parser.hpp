@@ -9,11 +9,16 @@
 #include <boost/decimal/detail/from_chars_result.hpp>
 #include <boost/decimal/detail/from_chars_integer_impl.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
-#include <type_traits>
-#include <limits>
+
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+#include <cassert>
+#endif
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
+#include <limits>
+#include <system_error>
+#include <type_traits>
 
 namespace boost {
 namespace decimal {
@@ -146,6 +151,10 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
 
         from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
 
+        #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+        assert(r.ec == std::errc());
+        #endif
+
         return {next, r.ec};
     }
     else if (*next == '.')
@@ -258,7 +267,11 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         {
             BOOST_DECIMAL_ATTRIBUTE_UNUSED from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
 
+            #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+            assert(r.ec == std::errc());
+            #else
             static_cast<void>(r);
+            #endif
 
             if (round)
             {
@@ -325,6 +338,10 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     }
 
     const auto r = from_chars(exponent_buffer, exponent_buffer + i, exponent);
+
+    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+    assert(r.ec == std::errc());
+    #endif
 
     exponent += leading_zero_powers;
 
