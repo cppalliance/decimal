@@ -16,9 +16,9 @@ OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
 /* The beginning and end of the program ROM area */
-/* Set up a ROM area with a size of 64K */
+/* Set up a ROM area with a size of 32K */
 _rom_begin = 0x08000000;
-_rom_end   = 0x08010000;
+_rom_end   = 0x08008000;
 
 /* The beginning and end (i.e., the top) of the stack */
 /* Set up a stack with a size of 4K */
@@ -29,7 +29,7 @@ __initial_stack_pointer = 0x20008000 - 4;
 
 MEMORY
 {
-  ROM(rx)  : ORIGIN = 0x08000000, LENGTH = 64K
+  ROM(rx)  : ORIGIN = 0x08000000, LENGTH = 32K
   RAM(rwx) : ORIGIN = 0x20000000, LENGTH = 0x7000
 }
 

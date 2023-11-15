@@ -5,6 +5,10 @@
 #ifndef BOOST_DECIMAL_DETAIL_FROM_CHARS_RESULT_HPP
 #define BOOST_DECIMAL_DETAIL_FROM_CHARS_RESULT_HPP
 
+#include <boost/decimal/detail/config.hpp>
+
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+
 #include <system_error>
 
 namespace boost { namespace decimal {
@@ -36,5 +40,7 @@ using from_chars_result = from_chars_result_t<char>;
 
 } // namespace decimal
 } // namespace boost
+
+#endif // !BOOST_DECIMAL_DISABLE_CLIB
 
 #endif // BOOST_DECIMAL_DETAIL_FROM_CHARS_RESULT_HPP

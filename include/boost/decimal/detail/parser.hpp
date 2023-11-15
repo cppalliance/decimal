@@ -14,7 +14,9 @@
 #include <cstdint>
 #include <cstring>
 #include <limits>
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 #include <system_error>
+#endif
 #include <type_traits>
 
 namespace boost {
@@ -31,6 +33,7 @@ constexpr auto is_delimiter(char c) noexcept -> bool
     return !is_integer_char(c) && c != 'e' && c != 'E';
 }
 
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 constexpr auto from_chars_dispatch(const char* first, const char* last, std::uint64_t& value, int base) noexcept -> from_chars_result
 {
     return boost::decimal::detail::from_chars(first, last, value, base);
@@ -40,6 +43,7 @@ constexpr auto from_chars_dispatch(const char* first, const char* last, uint128&
 {
     return boost::decimal::detail::from_chars128(first, last, value, base);
 }
+#endif
 
 #ifdef BOOST_CHARCONV_HAS_INT128
 auto from_chars_dispatch(const char* first, const char* last, boost::uint128_type& value, int base) noexcept -> from_chars_result
@@ -48,6 +52,7 @@ auto from_chars_dispatch(const char* first, const char* last, boost::uint128_typ
 }
 #endif
 
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 template <typename Unsigned_Integer, typename Integer>
 constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent) noexcept -> from_chars_result
 {
@@ -347,6 +352,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
 
     return {next, r.ec};
 }
+#endif
 
 } // namespace detail
 } // namespace decimal
