@@ -1,0 +1,20 @@
+////
+Copyright 2023 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#configuration]
+= Configuration Macros
+:idprefix: config_
+
+The following configuration macros are available:
+
+- `BOOST_DECIMAL_STANDALONE`: Allows the library to be used without any boost dependencies.
+If `<boost/config.hpp>` (the only depedency) is not present on your system it is automatically defined
+
+- `BOOST_DECIMAL_DISABLE_CASSERT`: Disables the use of `<cassert>` and all run-time assertions.
+
+- `BOOST_DECIMAL_DISABLE_IOSTREAM`: Disables the use of I/O streaming and removes all associated headers (e.g. `<iostream>`, `<iosfwd>`, `<cwchar>`, etc.)
+
+- `BOOST_DECIMAL_DISABLE_CLIB`: Defines both of the above macros. In testing this reduces ROM usage by ~50%.
