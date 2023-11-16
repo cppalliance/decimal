@@ -464,7 +464,7 @@ void random_mixed_and()
         }
     }
 }
-/*
+
 void random_or()
 {
     std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
@@ -546,7 +546,7 @@ void random_mixed_or()
         }
     }
 }
-
+/*
 void random_xor()
 {
     std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
@@ -889,9 +889,9 @@ int main()
     // Bitwise operators
     random_and();
     random_mixed_and();
-    /*
     random_or();
     random_mixed_or();
+    /*
     random_xor();
     random_mixed_xor();
     random_left_shift();
