@@ -498,6 +498,8 @@ public:
     friend constexpr auto operator>>(Integer lhs, decimal128 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
 
+    friend constexpr auto operator~(decimal128 rhs) noexcept -> decimal128;
+
     // <cmath> functions that need to be friends
     template <typename T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept
@@ -2085,6 +2087,11 @@ constexpr auto operator>>(Integer lhs, decimal128 rhs) noexcept
 -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
 {
     return from_bits(static_cast<detail::uint128>(lhs) >> static_cast<std::uint64_t>(rhs.bits_));
+}
+
+constexpr auto operator~(decimal128 lhs) noexcept -> decimal128
+{
+    return from_bits(~lhs.bits_);
 }
 
 } //namespace decimal
