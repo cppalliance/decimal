@@ -7,6 +7,7 @@
 
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/decimal128.hpp>
 #include <functional>
 #include <cstring>
 
@@ -37,6 +38,28 @@ struct hash<boost::decimal::decimal64>
         return std::hash<std::uint64_t>{}(bits);
     }
 };
+
+#if __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
+template <>
+struct hash<boost::decimal::decimal128>
+{
+    // Take the xor of the two words and hash that
+    auto operator()(const boost::decimal::decimal128& v) const noexcept -> std::size_t
+    {
+        boost::decimal::detail::uint128 bits;
+        std::memcpy(&bits, &v, sizeof(boost::decimal::detail::uint128));
+
+        return std::hash<std::uint64_t>{}(bits.high ^ bits.low);
+    }
+};
+
+#if __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
 
 }
 
