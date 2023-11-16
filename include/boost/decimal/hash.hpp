@@ -39,6 +39,11 @@ struct hash<boost::decimal::decimal64>
     }
 };
 
+#if __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 template <>
 struct hash<boost::decimal::decimal128>
 {
@@ -51,6 +56,10 @@ struct hash<boost::decimal::decimal128>
         return std::hash<std::uint64_t>{}(bits.high ^ bits.low);
     }
 };
+
+#if __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
 
 }
 
