@@ -13,12 +13,13 @@
 #include <cmath>
 #include <cstdint>
 #include <limits>
+#include <type_traits>
+
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 #include <iomanip>
 #include <iosfwd>
 #include <ostream>
 #endif
-#include <type_traits>
 
 namespace boost {
 namespace decimal {

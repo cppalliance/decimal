@@ -40,15 +40,14 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <limits>
+#include <type_traits>
+
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 #include <cwchar>
 #include <iostream>
-#endif
-#include <limits>
-#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 #include <sstream>
 #endif
-#include <type_traits>
 
 namespace boost {
 namespace decimal {
