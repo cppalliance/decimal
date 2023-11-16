@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_CHARCONV_DETAIL_EMULATED256_HPP
-#define BOOST_CHARCONV_DETAIL_EMULATED256_HPP
+#ifndef BOOST_DECIMAL_DETAIL_EMULATED256_HPP
+#define BOOST_DECIMAL_DETAIL_EMULATED256_HPP
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
@@ -437,7 +437,7 @@ template<typename T>
 constexpr uint256_t umul256(const T &x, const uint128 &y) noexcept
 {
     static_assert(sizeof(T) == 16 && (!std::numeric_limits<T>::is_signed
-            #ifdef BOOST_CHARCONV_HAS_INT128
+            #ifdef BOOST_DECIMAL_HAS_INT128
             // May not have numeric_limits specialization without gnu mode
                                       || std::is_same<T, boost::uint128_type>::value
             #endif
@@ -554,4 +554,4 @@ struct numeric_limits<boost::decimal::detail::uint256_t>
 
 } // Namespace std
 
-#endif // BOOST_CHARCONV_DETAIL_EMULATED256_HPP
+#endif // BOOST_DECIMAL_DETAIL_EMULATED256_HPP
