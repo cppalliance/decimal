@@ -886,6 +886,7 @@ int main()
     random_mixed_division(-sqrt_int_max, sqrt_int_max);
 
     // Bitwise operators
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     random_and();
     random_mixed_and();
     random_or();
@@ -897,6 +898,7 @@ int main()
     random_mixed_left_shift();
     random_right_shift();
     random_mixed_right_shift();
+    #endif
 
     return boost::report_errors();
 }
