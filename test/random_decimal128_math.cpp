@@ -546,7 +546,7 @@ void random_mixed_or()
         }
     }
 }
-/*
+
 void random_xor()
 {
     std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
@@ -628,7 +628,7 @@ void random_mixed_xor()
         }
     }
 }
-
+/*
 void random_left_shift()
 {
     std::uniform_int_distribution<std::uint64_t> dist(0, 10);
@@ -891,9 +891,9 @@ int main()
     random_mixed_and();
     random_or();
     random_mixed_or();
-    /*
     random_xor();
     random_mixed_xor();
+    /*
     random_left_shift();
     random_mixed_left_shift();
     random_right_shift();
