@@ -383,7 +383,6 @@ void random_mixed_division(T lower, T upper)
     BOOST_TEST(isinf(val1 / zero));
 }
 
-/*
 void random_and()
 {
     std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
@@ -793,7 +792,6 @@ void random_mixed_right_shift()
         }
     }
 }
-*/
 
 int main()
 {
@@ -867,9 +865,9 @@ int main()
     random_division(0, 5'000);
     random_division(0LL, 5'000LL);
     random_division(0, sqrt_int_max);
-    //random_mixed_division(0, 5'000);
-    //random_mixed_division(0LL, 5'000LL);
-    //random_mixed_division(0, sqrt_int_max);
+    random_mixed_division(0, 5'000);
+    random_mixed_division(0LL, 5'000LL);
+    random_mixed_division(0, sqrt_int_max);
 
     // Negative
     random_division(-5'000, 0);
@@ -886,19 +884,21 @@ int main()
     random_mixed_division(-5'000, 5'000);
     random_mixed_division(-5'000LL, 5'000LL);
     random_mixed_division(-sqrt_int_max, sqrt_int_max);
-/*
+
     // Bitwise operators
+    #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     random_and();
     random_mixed_and();
     random_or();
     random_mixed_or();
     random_xor();
     random_mixed_xor();
+
     random_left_shift();
     random_mixed_left_shift();
     random_right_shift();
     random_mixed_right_shift();
-*/
+    #endif
 
     return boost::report_errors();
 }

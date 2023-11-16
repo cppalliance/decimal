@@ -137,7 +137,7 @@ struct uint128
     constexpr auto operator=(const boost::uint128_type& v) noexcept -> uint128& { *this = uint128(v); return *this; }
     #endif
 
-    constexpr auto operator=(const uint128&) noexcept -> uint128&;
+    constexpr uint128& operator=(const uint128&) noexcept = default;
 
     #undef SIGNED_ASSIGNMENT_OPERATOR
     #undef UNSIGNED_ASSIGNMENT_OPERATOR
@@ -657,13 +657,6 @@ constexpr auto operator-(uint128 val) noexcept -> uint128
 constexpr auto operator+(uint128 val) noexcept -> uint128
 {
     return val;
-}
-
-constexpr auto uint128::operator=(const uint128& v) noexcept -> uint128&
-{
-    low = v.low;
-    high = v.high;
-    return *this;
 }
 
 constexpr auto operator==(uint128 lhs, uint128 rhs) noexcept -> bool
