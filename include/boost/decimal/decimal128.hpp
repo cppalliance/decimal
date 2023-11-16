@@ -447,6 +447,17 @@ public:
 
     friend std::string bit_string(decimal128 rhs) noexcept;
 
+    // Bit-wise operators
+    friend constexpr auto operator&(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
+
+    template <typename Integer>
+    friend constexpr auto operator&(decimal128 lhs, Integer rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
+
+    template <typename Integer>
+    friend constexpr auto operator&(Integer lhs, decimal128 rhs) noexcept
+    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>;
+
     // <cmath> functions that need to be friends
     template <typename T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept
@@ -1939,6 +1950,25 @@ constexpr auto decimal128::operator/=(Decimal rhs) noexcept
 {
     *this = *this / rhs;
     return *this;
+}
+
+constexpr auto operator&(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+{
+    return from_bits(lhs.bits_ & rhs.bits_);
+}
+
+template <typename Integer>
+constexpr auto operator&(decimal128 lhs, Integer rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    return from_bits(lhs.bits_ & static_cast<detail::uint128>(rhs));
+}
+
+template <typename Integer>
+constexpr auto operator&(Integer lhs, decimal128 rhs) noexcept
+-> std::enable_if_t<detail::is_integral_v<Integer>, decimal128>
+{
+    return from_bits(static_cast<detail::uint128>(lhs) & rhs.bits_);
 }
 
 } //namespace decimal
