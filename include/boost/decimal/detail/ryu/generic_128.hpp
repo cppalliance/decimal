@@ -536,4 +536,4 @@ static constexpr auto log10Pow5(const int32_t e) noexcept -> std::uint32_t
 
 }}}} // Namespaces
 
-#endif // BOOST_CHARCONV_DETAIL_RYU_GENERIC_128_HPP
+#endif // BOOST_DECIMAL_DETAIL_RYU_GENERIC_128_HPP

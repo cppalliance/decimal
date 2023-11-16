@@ -39,7 +39,7 @@ struct ieee754_binary64
 
 struct IEEEl2bits
 {
-#if BOOST_CHARCONV_ENDIAN_LITTLE_BYTE
+#if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     std::uint32_t mantissa_l : 32;
     std::uint32_t mantissa_h : 32;
     std::uint32_t exponent : 15;
@@ -71,7 +71,7 @@ struct ieee754_binary80
 
 struct IEEEl2bits
 {
-#if BOOST_CHARCONV_ENDIAN_LITTLE_BYTE
+#if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     std::uint64_t mantissa_l : 64;
     std::uint64_t mantissa_h : 48;
     std::uint32_t exponent : 15;
@@ -91,7 +91,7 @@ struct IEEEl2bits
 
 struct IEEEl2bits
 {
-#if (defined(BOOST_CHARCONV_ENDIAN_LITTLE_BYTE) && (BOOST_CHARCONV_ENDIAN_LITTLE_BYTE != 0))
+#if (defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && (BOOST_DECIMAL_ENDIAN_LITTLE_BYTE != 0))
     std::uint32_t mantissa_l : 32;
     std::uint32_t mantissa_h : 20;
     std::uint32_t exponent : 11;
@@ -112,7 +112,7 @@ struct IEEEl2bits
 
 struct IEEEbinary128
 {
-#if (defined(BOOST_CHARCONV_ENDIAN_LITTLE_BYTE) && (BOOST_CHARCONV_ENDIAN_LITTLE_BYTE != 0))
+#if (defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && (BOOST_DECIMAL_ENDIAN_LITTLE_BYTE != 0))
     std::uint64_t mantissa_l : 64;
     std::uint64_t mantissa_h : 48;
     std::uint32_t exponent : 15;

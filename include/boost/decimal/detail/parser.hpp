@@ -45,7 +45,7 @@ constexpr auto from_chars_dispatch(const char* first, const char* last, uint128&
 }
 #endif
 
-#ifdef BOOST_CHARCONV_HAS_INT128
+#ifdef BOOST_DECIMAL_HAS_INT128
 auto from_chars_dispatch(const char* first, const char* last, boost::uint128_type& value, int base) noexcept -> from_chars_result
 {
     return boost::decimal::detail::from_chars128(first, last, value, base);
