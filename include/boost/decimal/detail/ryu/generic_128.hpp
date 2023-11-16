@@ -9,6 +9,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+
 #include <cstdint>
 
 #define BOOST_DECIMAL_POW5_TABLE_SIZE 56
@@ -360,7 +361,8 @@ UINT64_C(0x0040000400105555), UINT64_C(0x0000000000000001),
 // Returns e == 0 ? 1 : ceil(log_2(5^e)); requires 0 <= e <= 32768.
 static constexpr auto pow5bits(const std::uint32_t e) noexcept -> std::uint32_t
 {
-    assert(e <= 1 << 15);
+    BOOST_DECIMAL_ASSERT(e <= 1 << 15);
+
     return static_cast<std::uint32_t>(((e * UINT64_C(163391164108059)) >> 46) + 1);
 }
 
@@ -370,8 +372,9 @@ auto mul_128_256_shift(
         const std::uint32_t shift, const std::uint32_t corr,
         std::uint64_t* const result) noexcept -> void
 {
-    assert(shift > 0);
-    assert(shift < 256);
+    BOOST_DECIMAL_ASSERT(shift > 0);
+    BOOST_DECIMAL_ASSERT(shift < 256);
+
     const unsigned_128_type b00 = ((unsigned_128_type) a[0]) * b[0]; // 0
     const unsigned_128_type b01 = ((unsigned_128_type) a[0]) * b[1]; // 64
     const unsigned_128_type b02 = ((unsigned_128_type) a[0]) * b[2]; // 128
@@ -501,7 +504,8 @@ static constexpr auto multipleOfPowerOf2(const unsigned_128_type value, const st
 static constexpr
 auto mulShift(const unsigned_128_type m, const std::uint64_t* const mul, const int32_t j) noexcept -> unsigned_128_type
 {
-    assert(j > 128);
+    BOOST_DECIMAL_ASSERT(j > 128);
+
     std::uint64_t a[2] {};
     a[0] = (std::uint64_t) m;
     a[1] = (std::uint64_t) (m >> 64);
@@ -514,8 +518,9 @@ auto mulShift(const unsigned_128_type m, const std::uint64_t* const mul, const i
 static constexpr auto log10Pow2(const int32_t e) noexcept -> std::uint32_t
 {
     // The first value this approximation fails for is 2^1651 which is just greater than 10^297.
-    assert(e >= 0);
-    assert(e <= 1 << 15);
+    BOOST_DECIMAL_ASSERT(e >= 0);
+    BOOST_DECIMAL_ASSERT(e <= 1 << 15);
+
     return (std::uint32_t) ((((std::uint64_t) e) * UINT64_C(169464822037455)) >> 49);
 }
 
@@ -523,11 +528,12 @@ static constexpr auto log10Pow2(const int32_t e) noexcept -> std::uint32_t
 static constexpr auto log10Pow5(const int32_t e) noexcept -> std::uint32_t
 {
     // The first value this approximation fails for is 5^2621 which is just greater than 10^1832.
-    assert(e >= 0);
-    assert(e <= 1 << 15);
+    BOOST_DECIMAL_ASSERT(e >= 0);
+    BOOST_DECIMAL_ASSERT(e <= 1 << 15);
+
     return (std::uint32_t) ((((std::uint64_t) e) * UINT64_C(196742565691928)) >> 48);
 }
 
 }}}} // Namespaces
 
-#endif // BOOST_CHARCONV_DETAIL_RYU_GENERIC_128_HPP
+#endif // BOOST_DECIMAL_DETAIL_RYU_GENERIC_128_HPP

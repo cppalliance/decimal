@@ -5,18 +5,6 @@
 #ifndef BOOST_DECIMAL_DECIMAL32_HPP
 #define BOOST_DECIMAL_DECIMAL32_HPP
 
-#include <cassert>
-#include <cerrno>
-#include <climits>
-#include <cmath>
-#include <cstdint>
-#include <cstring>
-#include <cwchar>
-#include <iostream>
-#include <limits>
-#include <type_traits>
-#include <sstream>
-
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
@@ -45,6 +33,19 @@
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
+
+#include <cerrno>
+#include <climits>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <type_traits>
+
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
+#include <cwchar>
+#include <iostream>
+#endif
 
 namespace boost { namespace decimal {
 
@@ -439,6 +440,7 @@ public:
     friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
     #endif
 
+    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     // 3.2.10 Formatted input:
     template <typename charT, typename traits, typename DecimalType>
     friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
@@ -448,6 +450,7 @@ public:
     template <typename charT, typename traits, typename DecimalType>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
+    #endif
 
     // Bitwise operators
     friend constexpr auto operator&(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
@@ -1997,9 +2000,13 @@ constexpr auto decimal32::operator%=(boost::decimal::decimal32 rhs) noexcept -> 
 // LCOV_EXCL_START
 auto debug_pattern(decimal32 rhs) noexcept -> void
 {
+    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     std::cerr << "Sig: " << rhs.full_significand()
               << "\nExp: " << rhs.biased_exponent()
               << "\nNeg: " << rhs.isneg() << std::endl;
+    #else
+    static_cast<void>(rhs);
+    #endif
 }
 // LCOV_EXCL_STOP
 

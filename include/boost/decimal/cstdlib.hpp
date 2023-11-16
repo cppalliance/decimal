@@ -5,11 +5,15 @@
 #ifndef BOOST_DECIMAL_CSTDLIB_HPP
 #define BOOST_DECIMAL_CSTDLIB_HPP
 
-#include <cstdint>
-#include <limits>
 #include <boost/decimal/fwd.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/utilities.hpp>
+
+#include <cstdint>
+#include <limits>
+
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
 namespace boost {
 namespace decimal {
@@ -142,5 +146,7 @@ constexpr auto wcstod64(const wchar_t* str, wchar_t** endptr) noexcept -> decima
 
 } // namespace decimal
 } // namespace boost
+
+#endif
 
 #endif // BOOST_DECIMAL_CSTDLIB_HPP

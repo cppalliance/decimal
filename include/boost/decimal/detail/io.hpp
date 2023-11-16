@@ -5,19 +5,23 @@
 #ifndef BOOST_DECIMAL_DETAIL_IO_HPP
 #define BOOST_DECIMAL_DETAIL_IO_HPP
 
+#include <boost/decimal/fwd.hpp>
+#include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/parser.hpp>
+#include <boost/decimal/detail/attributes.hpp>
+#include <boost/decimal/detail/fenv_rounding.hpp>
+
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+
 #include <cerrno>
 #include <cstring>
 #include <cinttypes>
 #include <limits>
 #include <ios>
 #include <iostream>
-#include <type_traits>
 #include <system_error>
-#include <boost/decimal/fwd.hpp>
-#include <boost/decimal/detail/type_traits.hpp>
-#include <boost/decimal/detail/parser.hpp>
-#include <boost/decimal/detail/attributes.hpp>
-#include <boost/decimal/detail/fenv_rounding.hpp>
+#include <type_traits>
 
 namespace boost {
 namespace decimal {
@@ -216,5 +220,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
 
 } //namespace decimal
 } //namespace boost
+
+#endif // BOOST_DECIMAL_DISABLE_CLIB
 
 #endif //BOOST_DECIMAL_DETAIL_IO_HPP

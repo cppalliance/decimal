@@ -10,14 +10,16 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/countl.hpp>
-#include <type_traits>
-#include <limits>
-#include <iosfwd>
-#include <iomanip>
-#include <ostream>
-#include <cstdint>
-#include <cassert>
 #include <cmath>
+#include <cstdint>
+#include <limits>
+#include <type_traits>
+
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
+#include <iomanip>
+#include <iosfwd>
+#include <ostream>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -557,8 +559,10 @@ struct uint128
 
     constexpr auto operator%=(uint128 v) noexcept -> uint128&;
 
+    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&;
+    #endif
 
     constexpr void add_with_carry(const uint128& other, bool& carry)
     {
@@ -635,8 +639,10 @@ struct int128
     friend constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128;
     friend constexpr auto operator-(int128 lhs, int128 rhs) noexcept -> int128;
 
+    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std::basic_ostream<charT, traits>&;
+    #endif
 };
 
 #if (__GNUC__ >= 8) || (!defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__))
@@ -1105,7 +1111,7 @@ auto emulated128_to_buffer(char (&buffer)[ 64 ], uint128 v)
     return p;
 }
 
-
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 template <typename charT, typename traits>
 auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&
 {
@@ -1135,6 +1141,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std::basic
     os << p;
     return os;
 }
+#endif
 
 constexpr int128::operator uint128() const noexcept
 {
@@ -1249,45 +1256,45 @@ template <>
 struct numeric_limits<boost::decimal::detail::uint128>
 {
     // Member constants
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_signed = false;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_integer = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_exact = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_infinity = false;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = false;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_signed = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_integer = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_exact = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_infinity = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = false;
 
     // These members were deprecated in C++23
     #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
-    BOOST_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = false;
     #endif
 
-    BOOST_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_toward_zero;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = false;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool is_modulo = true;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int digits = 128;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int digits10 = 38;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int max_digits10 = 0;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int radix = 2;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int min_exponent = 0;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int min_exponent10 = 0;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int max_exponent = 0;
-    BOOST_ATTRIBUTE_UNUSED static constexpr int max_exponent10 = 0;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
-    BOOST_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_toward_zero;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_modulo = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits = 128;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits10 = 38;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_digits10 = 0;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int radix = 2;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent = 0;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent10 = 0;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent = 0;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent10 = 0;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = false;
 
     // Member functions
-    BOOST_ATTRIBUTE_UNUSED static constexpr auto (min)        () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr auto lowest       () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr auto (max)        () -> boost::decimal::detail::uint128 { return {UINT64_MAX, UINT64_MAX}; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr auto epsilon      () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr auto round_error  () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (min)        () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto lowest       () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (max)        () -> boost::decimal::detail::uint128 { return {UINT64_MAX, UINT64_MAX}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto epsilon      () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto round_error  () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::detail::uint128 { return 0; }
 };
 
 } // namespace std

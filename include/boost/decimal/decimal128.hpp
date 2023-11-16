@@ -5,18 +5,6 @@
 #ifndef BOOST_DECIMAL_DECIMAL128_HPP
 #define BOOST_DECIMAL_DECIMAL128_HPP
 
-#include <cassert>
-#include <cerrno>
-#include <climits>
-#include <cmath>
-#include <cstdint>
-#include <cstring>
-#include <cwchar>
-#include <iostream>
-#include <limits>
-#include <type_traits>
-#include <sstream>
-
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
@@ -46,6 +34,20 @@
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
+
+#include <cerrno>
+#include <climits>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <type_traits>
+
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
+#include <cwchar>
+#include <iostream>
+#include <sstream>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -435,6 +437,7 @@ public:
     friend constexpr auto operator<=>(Integer lhs, decimal128 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
     #endif
 
+    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     // 3.2.10 Formatted input:
     template <typename charT, typename traits, typename DecimalType>
     friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
@@ -446,6 +449,7 @@ public:
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
 
     friend std::string bit_string(decimal128 rhs) noexcept;
+    #endif
 
     // Bit-wise operators
     friend constexpr auto operator&(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
@@ -508,12 +512,14 @@ public:
                     std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>;
 };
 
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 std::string bit_string(decimal128 rhs) noexcept
 {
     std::stringstream ss;
     ss << std::hex << rhs.bits_.high << rhs.bits_.low;
     return ss.str();
 }
+#endif
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
@@ -1194,6 +1200,7 @@ static char* mini_to_chars( char (&buffer)[ 64 ], boost::decimal::detail::uint12
     return p;
 }
 
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 std::ostream& operator<<( std::ostream& os, boost::decimal::detail::uint128_t v )
 {
     char buffer[ 64 ];
@@ -1201,6 +1208,7 @@ std::ostream& operator<<( std::ostream& os, boost::decimal::detail::uint128_t v 
     os << mini_to_chars( buffer, v );
     return os;
 }
+#endif
 #endif
 
 #ifdef _MSC_VER

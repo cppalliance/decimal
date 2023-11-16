@@ -231,8 +231,6 @@ namespace local
 
       const volatile auto result_log_inf_is_ok = isinf(log_inf);
 
-      assert(isinf(log_inf));
-
       BOOST_TEST(result_log_inf_is_ok);
 
       result_is_ok = (result_log_inf_is_ok && result_is_ok);
@@ -246,8 +244,6 @@ namespace local
 
       const volatile auto result_log_inf_minus_is_ok = isnan(log_inf_minus);
 
-      assert(isnan(log_inf_minus));
-
       BOOST_TEST(result_log_inf_minus_is_ok);
 
       result_is_ok = (result_log_inf_minus_is_ok && result_is_ok);
@@ -260,8 +256,6 @@ namespace local
       const auto log_nan = log(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
 
       const volatile auto result_log_nan_is_ok = isnan(log_nan);
-
-      assert(isnan(log_nan));
 
       BOOST_TEST(result_log_nan_is_ok);
 

@@ -9,6 +9,9 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/from_chars_result.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+
 #include <system_error>
 #include <type_traits>
 #include <limits>
@@ -75,7 +78,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
 
     // Strip sign if the type is signed
     // Negative sign will be appended at the end of parsing
-    BOOST_ATTRIBUTE_UNUSED bool is_negative = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED bool is_negative = false;
     auto next = first;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
@@ -255,5 +258,7 @@ constexpr auto from_chars128(const char* first, const char* last, uint128& value
 } // namespace detail
 } // namespace decimal
 } // namespace boost
+
+#endif
 
 #endif // BOOST_DECIMAL_DETAIL_FROM_CHARS_INTEGER_IMPL_HPP

@@ -9,12 +9,15 @@
 #include <boost/decimal/detail/from_chars_result.hpp>
 #include <boost/decimal/detail/from_chars_integer_impl.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
-#include <system_error>
-#include <type_traits>
-#include <limits>
+
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
+#include <limits>
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+#include <system_error>
+#endif
+#include <type_traits>
 
 namespace boost {
 namespace decimal {
@@ -30,6 +33,7 @@ constexpr auto is_delimiter(char c) noexcept -> bool
     return !is_integer_char(c) && c != 'e' && c != 'E';
 }
 
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 constexpr auto from_chars_dispatch(const char* first, const char* last, std::uint64_t& value, int base) noexcept -> from_chars_result
 {
     return boost::decimal::detail::from_chars(first, last, value, base);
@@ -39,14 +43,16 @@ constexpr auto from_chars_dispatch(const char* first, const char* last, uint128&
 {
     return boost::decimal::detail::from_chars128(first, last, value, base);
 }
+#endif
 
-#ifdef BOOST_CHARCONV_HAS_INT128
+#ifdef BOOST_DECIMAL_HAS_INT128
 auto from_chars_dispatch(const char* first, const char* last, boost::uint128_type& value, int base) noexcept -> from_chars_result
 {
     return boost::decimal::detail::from_chars128(first, last, value, base);
 }
 #endif
 
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 template <typename Unsigned_Integer, typename Integer>
 constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent) noexcept -> from_chars_result
 {
@@ -146,7 +152,9 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         std::size_t offset = i;
 
         from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
-        assert(r.ec == std::errc());
+
+        BOOST_DECIMAL_ASSERT(r.ec == std::errc());
+
         return {next, r.ec};
     }
     else if (*next == '.')
@@ -258,7 +266,8 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         if (offset != 0)
         {
             BOOST_DECIMAL_ATTRIBUTE_UNUSED from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
-            assert(r.ec == std::errc());
+
+            BOOST_DECIMAL_ASSERT(r.ec == std::errc());
 
             if (round)
             {
@@ -325,7 +334,8 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     }
 
     const auto r = from_chars(exponent_buffer, exponent_buffer + i, exponent);
-    assert(r.ec == std::errc());
+
+    BOOST_DECIMAL_ASSERT(r.ec == std::errc());
 
     exponent += leading_zero_powers;
 
@@ -342,6 +352,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
 
     return {next, r.ec};
 }
+#endif
 
 } // namespace detail
 } // namespace decimal

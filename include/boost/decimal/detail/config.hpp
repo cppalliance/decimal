@@ -33,7 +33,7 @@
 #endif // Determine endianness
 
 #if __has_include(<bit>)
-#  if __cplusplus >= 201806L || _MSVC_LANG >= 201806L
+#  if __cplusplus >= 201806L || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201806L))
 #    include <bit>
 #    define BOOST_DECIMAL_HAS_STDBIT
 #    if defined(__cpp_lib_bit_cast) && (__cpp_lib_bit_cast >= 201806L)
@@ -53,6 +53,32 @@
 
 #ifndef BOOST_DECIMAL_CXX20_CONSTEXPR
 #  define BOOST_DECIMAL_CXX20_CONSTEXPR
+#endif
+
+// Include intrinsics if available
+// This section allows us to disable any of the following independently.
+//   Use #define BOOST_DECIMAL_DISABLE_CASSERT to disable uses of assert.
+//   Use #define BOOST_DECIMAL_DISABLE_IOSTREAM to disable uses of I/O streaming.
+//   Use #define BOOST_DECIMAL_DISABLE_CLIB to disable uses of both assert as well as I/O streaming (and all oother heavyweight C-LIB artifacts).
+
+#if (!defined(BOOST_DECIMAL_DISABLE_CASSERT) && !defined(BOOST_DECIMAL_DISABLE_CLIB))
+#include <cassert>
+#endif
+
+#ifndef BOOST_DECIMAL_DISABLE_CASSERT
+#  define BOOST_DECIMAL_ASSERT(x) assert(x)
+#else
+#  define BOOST_DECIMAL_ASSERT(x)
+#endif
+
+#ifdef BOOST_DECIMAL_DISABLE_CLIB
+#  ifndef BOOST_DECIMAL_DISABLE_IOSTREAM
+#    define BOOST_DECIMAL_DISABLE_IOSTREAM
+#  endif
+#  ifndef BOOST_DECIMAL_DISABLE_CASSERT
+#    undef BOOST_DECIMAL_ASSERT
+#    define BOOST_DECIMAL_ASSERT(x)
+#  endif
 #endif
 
 // Include intrinsics if available

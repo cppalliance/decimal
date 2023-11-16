@@ -8,8 +8,11 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+
 #include <type_traits>
-#include <string>
+#include <cstring>
 
 namespace boost { namespace decimal {
 
@@ -79,5 +82,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _dd(long double v) -> decimal64
 
 } // namespace decimal
 } // namespace boost
+
+#endif
 
 #endif // BOOST_DECIMAL_LITERALS_HPP

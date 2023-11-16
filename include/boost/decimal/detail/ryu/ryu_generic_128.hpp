@@ -11,12 +11,14 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/bit_layouts.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
+
 #include <cinttypes>
-#include <cstdio>
 #include <cstdint>
 
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 #ifdef BOOST_DECIMAL_DEBUG_RYU
 #  include <iostream>
+#endif
 #endif
 
 namespace boost { namespace decimal { namespace detail { namespace ryu {

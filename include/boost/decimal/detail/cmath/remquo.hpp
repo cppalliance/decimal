@@ -43,7 +43,7 @@ constexpr auto remquo(T x, T y, int* quo) noexcept -> std::enable_if_t<detail::i
     // Apple clang and MSVC use the last byte.
     // Everyone else uses 3 bits.
     // Standard only specifies at least 3, so they are both correct
-    #if defined(__APPLE__) || (_MSC_VER)
+    #if defined(__APPLE__) || defined(_MSC_VER)
     *quo = static_cast<int>(usig & 0b1111);
     #else
     *quo = static_cast<int>(usig & 0b111);
