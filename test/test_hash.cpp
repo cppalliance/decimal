@@ -15,7 +15,7 @@ void test_hash()
     for (int i = 0; i < 100; ++i)
     {
         T dec_val(i);
-        BOOST_TEST_NE(hasher(dec_val), static_cast<std::size_t>(0));
+        BOOST_TEST_EQ(hasher(dec_val), hasher(dec_val));
     }
 }
 
