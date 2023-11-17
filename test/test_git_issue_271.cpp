@@ -48,8 +48,7 @@ void random_test()
 {
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
-
-    std::random_device rd;
+    
     std::mt19937_64 gen(42);
 
     auto dist_a =
