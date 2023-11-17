@@ -228,6 +228,9 @@ public:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal128(T1 coeff, T2 exp, bool sign = false) noexcept;
 
+    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
+    constexpr decimal128(bool coeff, T exp, bool sign = false) noexcept;
+
     // 3.2.4.4 Conversion to integral type
     explicit constexpr operator int() const noexcept;
     explicit constexpr operator unsigned() const noexcept;
@@ -811,6 +814,12 @@ template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v
 constexpr decimal128::decimal128(Decimal val) noexcept
 {
     *this = to_decimal<decimal128>(val);
+}
+
+template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
+constexpr decimal128::decimal128(bool coeff, T exp, bool sign) noexcept
+{
+    *this = decimal128(static_cast<std::int32_t>(coeff), exp, sign);
 }
 
 constexpr decimal128::operator int() const noexcept

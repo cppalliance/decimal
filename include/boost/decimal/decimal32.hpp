@@ -237,6 +237,9 @@ public:
     template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
     constexpr decimal32(T coeff, T2 exp, bool sign = false) noexcept;
 
+    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
+    constexpr decimal32(bool coeff, T exp, bool sign = false) noexcept;
+
     constexpr decimal32(const decimal32& val) noexcept = default;
     constexpr decimal32(decimal32&& val) noexcept = default;
     constexpr auto operator=(const decimal32& val) noexcept -> decimal32& = default;
@@ -1564,6 +1567,12 @@ template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, boo
 constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
     *this = decimal32{val, 0};
+}
+
+template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
+constexpr decimal32::decimal32(bool coeff, T exp, bool sign) noexcept
+{
+    *this = decimal32(static_cast<std::int32_t>(coeff), exp, sign);
 }
 
 constexpr decimal32::operator int() const noexcept
