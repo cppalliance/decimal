@@ -1365,6 +1365,9 @@ int main()
     test_floor<decimal64>();
     test_ceil<decimal64>();
     test_trunc<decimal64>();
+    test_floor<decimal128>();
+    test_ceil<decimal128>();
+    test_trunc<decimal128>();
 
     test_frexp10<decimal32>();
     test_scalbn<decimal32>();
