@@ -47,10 +47,24 @@ void test_decimal64_literals()
     #endif
 }
 
+void test_decimal128_literals()
+{
+    BOOST_TEST_EQ(decimal128(0), 0_DL);
+    BOOST_TEST_EQ(decimal128(3), 3_DL);
+    BOOST_TEST_EQ(decimal128(3.1), 3.1_DL);
+    BOOST_TEST_EQ(decimal128(3, 1), 3e1_DL);
+
+    BOOST_TEST_EQ(decimal128(0), 0_dl);
+    BOOST_TEST_EQ(decimal128(3), 3_dl);
+    BOOST_TEST_EQ(decimal128(3.1), 3.1_dl);
+    BOOST_TEST_EQ(decimal128(3, 1), 3e1_dl);
+}
+
 int main()
 {
     test_decimal32_literals();
     test_decimal64_literals();
+    test_decimal128_literals();
 
     return boost::report_errors();
 }
