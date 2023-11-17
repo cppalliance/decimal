@@ -11,6 +11,7 @@
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/acosh.hpp>
 #include <boost/decimal/detail/cmath/asinh.hpp>
+#include <boost/decimal/detail/cmath/atanh.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
 #include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/cosh.hpp>

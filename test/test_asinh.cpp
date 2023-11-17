@@ -226,8 +226,8 @@ auto main() -> int
 
   const auto result_tiny_is_ok       = local::test_asinh(static_cast<std::int32_t>(INT32_C(4096)), false, 1.001L, 1.1L);
   const auto result_small_is_ok      = local::test_asinh(static_cast<std::int32_t>(INT32_C(96)),   false, 0.1L, 1.59L);
-  const auto result_medium_is_ok     = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   true,  1.59L, 10.1L);
-  const auto result_medium_neg_is_ok = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   false, 1.59L, 10.1L);
+  const auto result_medium_is_ok     = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   false, 1.59L, 10.1L);
+  const auto result_medium_neg_is_ok = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   true,  1.59L, 10.1L);
   const auto result_large_is_ok      = local::test_asinh(static_cast<std::int32_t>(INT32_C(48)),   false, 1.0E+01L, 1.0E+19L);
 
   BOOST_TEST(result_eps_is_ok);
