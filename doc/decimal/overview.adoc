@@ -24,8 +24,8 @@ These are referred to as cohorts which binary does not have as there is only one
 
 == Supported Compilers
 
-* GCC 6 or later
-* Clang 5 or later
+* GCC 7 or later
+* Clang 6 or later
 * Visual Studio 2017 or later
 
 Tested on https://github.com/cppalliance/decimal/actions[Github Actions] and https://drone.cpp.al/cppalliance/decimal[Drone].
