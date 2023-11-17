@@ -1350,6 +1350,14 @@ int main()
     test_islessequal<decimal64>();
     test_islessgreater<decimal64>();
     test_isunordered<decimal64>();
+    test_fmax<decimal128>();
+    test_isgreater<decimal128>();
+    test_isgreaterequal<decimal128>();
+    test_fmin<decimal128>();
+    test_isless<decimal128>();
+    test_islessequal<decimal128>();
+    test_islessgreater<decimal128>();
+    test_isunordered<decimal128>();
 
     test_floor<decimal32>();
     test_ceil<decimal32>();
