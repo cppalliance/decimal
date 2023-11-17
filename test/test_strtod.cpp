@@ -28,7 +28,8 @@ void roundtrip_strtod()
     std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<T>::min_exponent10 + 19,
                                                     std::numeric_limits<T>::max_exponent10 - 19);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val {sig(rng), exp(rng)};
         std::stringstream ss;
@@ -59,7 +60,8 @@ void roundtrip_wcstrtod()
     std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<T>::min_exponent10 + 19,
                                                     std::numeric_limits<T>::max_exponent10 - 19);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val {sig(rng), exp(rng)};
         std::wstringstream ss;
@@ -117,5 +119,9 @@ int main()
     roundtrip_wcstrtod<decimal64>();
     test_strtod_edges<decimal64>();
 
+    roundtrip_strtod<decimal128>();
+    roundtrip_wcstrtod<decimal128>();
+    test_strtod_edges<decimal128>();
+    
     return boost::report_errors();
 }
