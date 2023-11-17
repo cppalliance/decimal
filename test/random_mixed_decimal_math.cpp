@@ -28,7 +28,8 @@ void random_mixed_addition(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {(std::is_same<Decimal2, decimal128>::value || std::is_same<Decimal1, decimal128>::value) ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
@@ -63,7 +64,8 @@ void random_mixed_subtraction(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {(std::is_same<Decimal2, decimal128>::value || std::is_same<Decimal1, decimal128>::value) ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
@@ -98,7 +100,8 @@ void random_mixed_multiplication(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {(std::is_same<Decimal2, decimal128>::value || std::is_same<Decimal1, decimal128>::value) ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
@@ -133,7 +136,8 @@ void random_mixed_division(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {(std::is_same<Decimal2, decimal128>::value || std::is_same<Decimal1, decimal128>::value) ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
@@ -228,6 +232,126 @@ int main()
     random_mixed_division<decimal32, decimal64>(-5'000LL, 5'000LL);
     random_mixed_division<decimal64, decimal32>(-5'000, 5'000);
     random_mixed_division<decimal64, decimal32>(-5'000LL, 5'000LL);
+
+    random_mixed_addition<decimal32, decimal128>(0, 5'000'000);
+    random_mixed_addition<decimal32, decimal128>(0LL, 5'000'000LL);
+    random_mixed_addition<decimal128, decimal32>(0, 5'000'000);
+    random_mixed_addition<decimal128, decimal32>(0LL, 5'000'000LL);
+
+    random_mixed_addition<decimal32, decimal128>(-5'000'000, 0);
+    random_mixed_addition<decimal32, decimal128>(-5'000'000LL, 0LL);
+    random_mixed_addition<decimal128, decimal32>(-5'000'000, 0);
+    random_mixed_addition<decimal128, decimal32>(-5'000'000LL, 0LL);
+
+    random_mixed_addition<decimal32, decimal128>(-5'000'000, 5'000'000);
+    random_mixed_addition<decimal32, decimal128>(-5'000'000LL, 5'000'000LL);
+    random_mixed_addition<decimal128, decimal32>(-5'000'000, 5'000'000);
+    random_mixed_addition<decimal128, decimal32>(-5'000'000LL, 5'000'000LL);
+
+    random_mixed_subtraction<decimal32, decimal128>(0, 5'000'000);
+    random_mixed_subtraction<decimal32, decimal128>(0LL, 5'000'000LL);
+    random_mixed_subtraction<decimal128, decimal32>(0, 5'000'000);
+    random_mixed_subtraction<decimal128, decimal32>(0LL, 5'000'000LL);
+
+    random_mixed_subtraction<decimal32, decimal128>(-5'000'000, 0);
+    random_mixed_subtraction<decimal32, decimal128>(-5'000'000LL, 0LL);
+    random_mixed_subtraction<decimal128, decimal32>(-5'000'000, 0);
+    random_mixed_subtraction<decimal128, decimal32>(-5'000'000LL, 0LL);
+
+    random_mixed_subtraction<decimal32, decimal128>(-5'000'000, 5'000'000);
+    random_mixed_subtraction<decimal32, decimal128>(-5'000'000LL, 5'000'000LL);
+    random_mixed_subtraction<decimal128, decimal32>(-5'000'000, 5'000'000);
+    random_mixed_subtraction<decimal128, decimal32>(-5'000'000LL, 5'000'000LL);
+
+    random_mixed_multiplication<decimal32, decimal128>(0, 5'000);
+    random_mixed_multiplication<decimal32, decimal128>(0LL, 5'000LL);
+    random_mixed_multiplication<decimal128, decimal32>(0, 5'000);
+    random_mixed_multiplication<decimal128, decimal32>(0LL, 5'000LL);
+
+    random_mixed_multiplication<decimal32, decimal128>(-5'000, 0);
+    random_mixed_multiplication<decimal32, decimal128>(-5'000LL, 0LL);
+    random_mixed_multiplication<decimal128, decimal32>(-5'000, 0);
+    random_mixed_multiplication<decimal128, decimal32>(-5'000LL, 0LL);
+
+    random_mixed_multiplication<decimal32, decimal128>(-5'000, 5'000);
+    random_mixed_multiplication<decimal32, decimal128>(-5'000LL, 5'000LL);
+    random_mixed_multiplication<decimal128, decimal32>(-5'000, 5'000);
+    random_mixed_multiplication<decimal128, decimal32>(-5'000LL, 5'000LL);
+
+    random_mixed_division<decimal32, decimal128>(0, 5'000);
+    random_mixed_division<decimal32, decimal128>(0LL, 5'000LL);
+    random_mixed_division<decimal128, decimal32>(0, 5'000);
+    random_mixed_division<decimal128, decimal32>(0LL, 5'000LL);
+
+    random_mixed_division<decimal32, decimal128>(-5'000, 0);
+    random_mixed_division<decimal32, decimal128>(-5'000LL, 0LL);
+    random_mixed_division<decimal128, decimal32>(-5'000, 0);
+    random_mixed_division<decimal128, decimal32>(-5'000LL, 0LL);
+
+    random_mixed_division<decimal32, decimal128>(-5'000, 5'000);
+    random_mixed_division<decimal32, decimal128>(-5'000LL, 5'000LL);
+    random_mixed_division<decimal128, decimal32>(-5'000, 5'000);
+    random_mixed_division<decimal128, decimal32>(-5'000LL, 5'000LL);
+    
+    random_mixed_addition<decimal64, decimal128>(0, 5'000'000);
+    random_mixed_addition<decimal64, decimal128>(0LL, 5'000'000LL);
+    random_mixed_addition<decimal128, decimal64>(0, 5'000'000);
+    random_mixed_addition<decimal128, decimal64>(0LL, 5'000'000LL);
+
+    random_mixed_addition<decimal64, decimal128>(-5'000'000, 0);
+    random_mixed_addition<decimal64, decimal128>(-5'000'000LL, 0LL);
+    random_mixed_addition<decimal128, decimal64>(-5'000'000, 0);
+    random_mixed_addition<decimal128, decimal64>(-5'000'000LL, 0LL);
+
+    random_mixed_addition<decimal64, decimal128>(-5'000'000, 5'000'000);
+    random_mixed_addition<decimal64, decimal128>(-5'000'000LL, 5'000'000LL);
+    random_mixed_addition<decimal128, decimal64>(-5'000'000, 5'000'000);
+    random_mixed_addition<decimal128, decimal64>(-5'000'000LL, 5'000'000LL);
+
+    random_mixed_subtraction<decimal64, decimal128>(0, 5'000'000);
+    random_mixed_subtraction<decimal64, decimal128>(0LL, 5'000'000LL);
+    random_mixed_subtraction<decimal128, decimal64>(0, 5'000'000);
+    random_mixed_subtraction<decimal128, decimal64>(0LL, 5'000'000LL);
+
+    random_mixed_subtraction<decimal64, decimal128>(-5'000'000, 0);
+    random_mixed_subtraction<decimal64, decimal128>(-5'000'000LL, 0LL);
+    random_mixed_subtraction<decimal128, decimal64>(-5'000'000, 0);
+    random_mixed_subtraction<decimal128, decimal64>(-5'000'000LL, 0LL);
+
+    random_mixed_subtraction<decimal64, decimal128>(-5'000'000, 5'000'000);
+    random_mixed_subtraction<decimal64, decimal128>(-5'000'000LL, 5'000'000LL);
+    random_mixed_subtraction<decimal128, decimal64>(-5'000'000, 5'000'000);
+    random_mixed_subtraction<decimal128, decimal64>(-5'000'000LL, 5'000'000LL);
+
+    random_mixed_multiplication<decimal64, decimal128>(0, 5'000);
+    random_mixed_multiplication<decimal64, decimal128>(0LL, 5'000LL);
+    random_mixed_multiplication<decimal128, decimal64>(0, 5'000);
+    random_mixed_multiplication<decimal128, decimal64>(0LL, 5'000LL);
+
+    random_mixed_multiplication<decimal64, decimal128>(-5'000, 0);
+    random_mixed_multiplication<decimal64, decimal128>(-5'000LL, 0LL);
+    random_mixed_multiplication<decimal128, decimal64>(-5'000, 0);
+    random_mixed_multiplication<decimal128, decimal64>(-5'000LL, 0LL);
+
+    random_mixed_multiplication<decimal64, decimal128>(-5'000, 5'000);
+    random_mixed_multiplication<decimal64, decimal128>(-5'000LL, 5'000LL);
+    random_mixed_multiplication<decimal128, decimal64>(-5'000, 5'000);
+    random_mixed_multiplication<decimal128, decimal64>(-5'000LL, 5'000LL);
+
+    random_mixed_division<decimal64, decimal128>(0, 5'000);
+    random_mixed_division<decimal64, decimal128>(0LL, 5'000LL);
+    random_mixed_division<decimal128, decimal64>(0, 5'000);
+    random_mixed_division<decimal128, decimal64>(0LL, 5'000LL);
+
+    random_mixed_division<decimal64, decimal128>(-5'000, 0);
+    random_mixed_division<decimal64, decimal128>(-5'000LL, 0LL);
+    random_mixed_division<decimal128, decimal64>(-5'000, 0);
+    random_mixed_division<decimal128, decimal64>(-5'000LL, 0LL);
+
+    random_mixed_division<decimal64, decimal128>(-5'000, 5'000);
+    random_mixed_division<decimal64, decimal128>(-5'000LL, 5'000LL);
+    random_mixed_division<decimal128, decimal64>(-5'000, 5'000);
+    random_mixed_division<decimal128, decimal64>(-5'000LL, 5'000LL);
 
     return boost::report_errors();
 }
