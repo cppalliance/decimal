@@ -9,6 +9,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/utilities.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
 
 #include <cstdint>
 #include <limits>
@@ -24,15 +25,17 @@ namespace detail {
 template <typename TargetDecimalType>
 constexpr auto strtod_impl(const char* str, char** endptr) noexcept -> TargetDecimalType
 {
+    using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, detail::uint128, std::uint64_t>;
+
     if (str == nullptr)
     {
         errno = EINVAL;
         return std::numeric_limits<TargetDecimalType>::signaling_NaN();
     }
 
-    auto sign        = bool {};
-    auto significand = std::uint64_t {};
-    auto expval      = std::int32_t {};
+    bool sign {};
+    significand_type significand {};
+    std::int32_t expval {};
 
     const auto buffer_len {detail::strlen(str)};
 
@@ -142,6 +145,16 @@ constexpr auto strtod64(const char* str, char** endptr) noexcept -> decimal64
 constexpr auto wcstod64(const wchar_t* str, wchar_t** endptr) noexcept -> decimal64
 {
     return detail::wcstod_impl<decimal64>(str, endptr);
+}
+
+constexpr auto strtod128(const char* str, char** endptr) noexcept -> decimal128
+{
+    return detail::strtod_impl<decimal128>(str, endptr);
+}
+
+constexpr auto wcstod128(const wchar_t* str, wchar_t** endptr) noexcept -> decimal128
+{
+    return detail::wcstod_impl<decimal128>(str, endptr);
 }
 
 } // namespace decimal
