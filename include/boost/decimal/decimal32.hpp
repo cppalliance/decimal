@@ -219,6 +219,7 @@ public:
     explicit constexpr decimal32(Integer val) noexcept;
 
     // 3.2.2.4 Conversion to integral type
+    explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
     explicit constexpr operator unsigned() const noexcept;
     explicit constexpr operator long() const noexcept;
@@ -1574,6 +1575,12 @@ template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
 constexpr decimal32::decimal32(bool coeff, T exp, bool sign) noexcept
 {
     *this = decimal32(static_cast<std::int32_t>(coeff), exp, sign);
+}
+
+constexpr decimal32::operator bool() const noexcept
+{
+    constexpr decimal32 zero {0, 0};
+    return *this != zero;
 }
 
 constexpr decimal32::operator int() const noexcept

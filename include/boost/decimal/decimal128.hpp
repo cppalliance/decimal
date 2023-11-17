@@ -232,6 +232,7 @@ public:
     constexpr decimal128(bool coeff, T exp, bool sign = false) noexcept;
 
     // 3.2.4.4 Conversion to integral type
+    explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
     explicit constexpr operator unsigned() const noexcept;
     explicit constexpr operator long() const noexcept;
@@ -821,6 +822,12 @@ template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
 constexpr decimal128::decimal128(bool coeff, T exp, bool sign) noexcept
 {
     *this = decimal128(static_cast<std::int32_t>(coeff), exp, sign);
+}
+
+constexpr decimal128::operator bool() const noexcept
+{
+    constexpr decimal128 zero {0, 0};
+    return *this != zero;
 }
 
 constexpr decimal128::operator int() const noexcept
