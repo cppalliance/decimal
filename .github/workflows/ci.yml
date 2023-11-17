@@ -33,13 +33,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - toolset: gcc-6
-            cxxstd: "03,11,14,1z"
-            address_model: 32,64
-            os: ubuntu-latest
-            container: ubuntu:18.04
-            install:
-              - g++-6-multilib
           - toolset: gcc-7
             cxxstd: "03,11,14,17"
             address_model: 32,64
