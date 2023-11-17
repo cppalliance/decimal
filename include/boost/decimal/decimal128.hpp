@@ -156,6 +156,11 @@ private:
     constexpr auto full_significand() const noexcept -> detail::uint128;
     constexpr auto isneg() const noexcept -> bool;
 
+    // Allows direct editing of the exp
+    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
+    constexpr auto edit_exponent(T exp) noexcept -> void;
+    constexpr auto edit_sign(bool sign) noexcept -> void;
+
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
@@ -616,6 +621,24 @@ constexpr auto decimal128::full_significand() const noexcept -> detail::uint128
 constexpr auto decimal128::isneg() const noexcept -> bool
 {
     return static_cast<bool>(bits_.high & detail::d128_sign_mask.high);
+}
+
+template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
+constexpr auto decimal128::edit_exponent(T expval) noexcept -> void
+{
+    *this = decimal128(this->full_significand(), expval, this->isneg());
+}
+
+constexpr auto decimal128::edit_sign(bool sign) noexcept -> void
+{
+    if (sign)
+    {
+        bits_.high |= detail::d128_sign_mask.high;
+    }
+    else
+    {
+        bits_.high &= ~detail::d128_sign_mask.high;
+    }
 }
 
 // TODO(mborland): Rather than doing bitwise operations on the whole uint128 we should
