@@ -23,7 +23,8 @@ void random_mixed_EQ()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -40,7 +41,7 @@ void random_mixed_EQ()
         }
     }
 
-    for (std::size_t i {}; i < N; ++i)
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -76,7 +77,8 @@ void random_mixed_NE()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -93,7 +95,7 @@ void random_mixed_NE()
         }
     }
 
-    for (std::size_t i {}; i < N; ++i)
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -122,7 +124,8 @@ void random_mixed_LT()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -139,7 +142,7 @@ void random_mixed_LT()
         }
     }
 
-    for (std::size_t i {}; i < N; ++i)
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -172,7 +175,8 @@ void random_mixed_LE()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -189,7 +193,7 @@ void random_mixed_LE()
         }
     }
 
-    for (std::size_t i {}; i < N; ++i)
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -218,7 +222,8 @@ void random_mixed_GT()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -235,7 +240,7 @@ void random_mixed_GT()
         }
     }
 
-    for (std::size_t i {}; i < N; ++i)
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -264,7 +269,8 @@ void random_mixed_GE()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -281,7 +287,7 @@ void random_mixed_GE()
         }
     }
 
-    for (std::size_t i {}; i < N; ++i)
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -319,7 +325,8 @@ void random_mixed_SPACESHIP()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -336,7 +343,7 @@ void random_mixed_SPACESHIP()
         }
     }
 
-    for (std::size_t i {}; i < N; ++i)
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -374,7 +381,8 @@ void random_conversion_EQ()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -391,7 +399,7 @@ void random_conversion_EQ()
         }
     }
 
-    for (std::size_t i {}; i < N; ++i)
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
         const int val2 {dist(rng)};
@@ -433,8 +441,29 @@ int main()
 
     random_conversion_EQ<decimal32, decimal64>();
 
+    random_mixed_EQ<decimal32, decimal128>();
+    random_mixed_NE<decimal32, decimal128>();
+    random_mixed_LT<decimal32, decimal128>();
+    random_mixed_LE<decimal32, decimal128>();
+    random_mixed_GT<decimal32, decimal128>();
+    random_mixed_GE<decimal32, decimal128>();
+
+    random_conversion_EQ<decimal32, decimal128>();
+
+    random_mixed_EQ<decimal64, decimal128>();
+    random_mixed_NE<decimal64, decimal128>();
+    random_mixed_LT<decimal64, decimal128>();
+    random_mixed_LE<decimal64, decimal128>();
+    random_mixed_GT<decimal64, decimal128>();
+    random_mixed_GE<decimal64, decimal128>();
+
+    random_conversion_EQ<decimal64, decimal128>();
+
+
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     random_mixed_SPACESHIP<decimal32, decimal64>();
+    random_mixed_SPACESHIP<decimal32, decimal128>();
+    random_mixed_SPACESHIP<decimal64, decimal128>();
     #endif
 
     return boost::report_errors();
