@@ -73,6 +73,11 @@ constexpr auto scalbn(decimal64 num, int expval) noexcept -> decimal64
     return scalbnd64(num, expval);
 }
 
+constexpr auto scalbn(decimal128 num, int expval) noexcept -> decimal128
+{
+    return scalbnd128(num, expval);
+}
+
 constexpr auto scalbln(decimal32 num, long expval) noexcept -> decimal32
 {
     return scalblnd32(num, expval);
@@ -83,6 +88,11 @@ constexpr auto scalbln(decimal64 num, long expval) noexcept -> decimal64
     return scalblnd64(num, expval);
 }
 
+constexpr auto scalbln(decimal128 num, long expval) noexcept -> decimal128
+{
+    return scalblnd128(num, expval);
+}
+
 constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 {
     return copysignd32(mag, sgn);
@@ -91,6 +101,11 @@ constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 constexpr auto copysign(decimal64 mag, decimal64 sgn) noexcept -> decimal64
 {
     return copysignd64(mag, sgn);
+}
+
+constexpr auto copysign(decimal128 mag, decimal128 sgn) noexcept -> decimal128
+{
+    return copysignd128(mag, sgn);
 }
 
 constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32

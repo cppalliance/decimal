@@ -524,6 +524,10 @@ public:
     -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
             std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
                     std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>;
+
+    friend constexpr auto copysignd128(decimal128 mag, decimal128 sgn) noexcept -> decimal128;
+    friend constexpr auto scalblnd128(decimal128 num, long exp) noexcept -> decimal128;
+    friend constexpr auto scalbnd128(decimal128 num, int exp) noexcept -> decimal128;
 };
 
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
@@ -2203,6 +2207,31 @@ constexpr auto operator>>(Integer lhs, decimal128 rhs) noexcept
 constexpr auto operator~(decimal128 lhs) noexcept -> decimal128
 {
     return from_bits(~lhs.bits_);
+}
+
+constexpr auto copysignd128(decimal128 mag, decimal128 sgn) noexcept -> decimal128
+{
+    mag.edit_sign(sgn.isneg());
+    return mag;
+}
+
+constexpr auto scalblnd128(decimal128 num, long exp) noexcept -> decimal128
+{
+    constexpr decimal128 zero {0, 0};
+
+    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    {
+        return num;
+    }
+
+    num.edit_exponent(num.biased_exponent() + exp);
+
+    return num;
+}
+
+constexpr auto scalbnd128(decimal128 num, int expval) noexcept -> decimal128
+{
+    return scalblnd128(num, static_cast<long>(expval));
 }
 
 } //namespace decimal
