@@ -223,6 +223,9 @@ public:
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal128(Float val) noexcept;
 
+    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    constexpr decimal128(Decimal val) noexcept;
+
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal128(Integer val) noexcept;
 
@@ -230,7 +233,11 @@ public:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal128(T1 coeff, T2 exp, bool sign = false) noexcept;
 
+    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
+    constexpr decimal128(bool coeff, T exp, bool sign = false) noexcept;
+
     // 3.2.4.4 Conversion to integral type
+    explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
     explicit constexpr operator unsigned() const noexcept;
     explicit constexpr operator long() const noexcept;
@@ -837,7 +844,26 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::decimal128(Float val) noexcept
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 constexpr decimal128::decimal128(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
-    *this = decimal128{val, 0};
+    using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
+    *this = decimal128{static_cast<ConversionType>(val), 0};
+}
+
+template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal128::decimal128(Decimal val) noexcept
+{
+    *this = to_decimal<decimal128>(val);
+}
+
+template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
+constexpr decimal128::decimal128(bool coeff, T exp, bool sign) noexcept
+{
+    *this = decimal128(static_cast<std::int32_t>(coeff), exp, sign);
+}
+
+constexpr decimal128::operator bool() const noexcept
+{
+    constexpr decimal128 zero {0, 0};
+    return *this != zero;
 }
 
 constexpr decimal128::operator int() const noexcept
