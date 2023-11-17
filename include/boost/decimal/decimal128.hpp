@@ -451,6 +451,15 @@ public:
     friend std::string bit_string(decimal128 rhs) noexcept;
     #endif
 
+    // 3.6.4 Same Quantum
+    friend constexpr auto samequantumd128(decimal128 lhs, decimal128 rhs) noexcept -> bool;
+
+    // 3.6.5 Quantum exponent
+    friend constexpr auto quantexpd128(decimal128 x) noexcept -> int;
+
+    // 3.6.6 Quantize
+    friend constexpr auto quantized128(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
+
     // Bit-wise operators
     friend constexpr auto operator&(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
 
@@ -2000,6 +2009,77 @@ constexpr auto decimal128::operator/=(Decimal rhs) noexcept
 {
     *this = *this / rhs;
     return *this;
+}
+
+// 3.6.4
+// Effects: determines if the quantum exponents of x and y are the same.
+// If both x and y are NaN, or infinity, they have the same quantum exponents;
+// if exactly one operand is infinity or exactly one operand is NaN, they do not have the same quantum exponents.
+// The samequantum functions raise no exception.
+constexpr auto samequantumd128(decimal128 lhs, decimal128 rhs) noexcept -> bool
+{
+    const auto lhs_fp {fpclassify(lhs)};
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if ((lhs_fp == FP_NAN && rhs_fp == FP_NAN) || (lhs_fp == FP_INFINITE && rhs_fp == FP_INFINITE))
+    {
+        return true;
+    }
+    if ((lhs_fp == FP_NAN || rhs_fp == FP_INFINITE) || (rhs_fp == FP_NAN || lhs_fp == FP_INFINITE))
+    {
+        return false;
+    }
+
+    return lhs.unbiased_exponent() == rhs.unbiased_exponent();
+}
+
+// 3.6.5
+// Effects: if x is finite, returns its quantum exponent.
+// Otherwise, a domain error occurs and INT_MIN is returned.
+constexpr auto quantexpd128(decimal128 x) noexcept -> int
+{
+    if (!isfinite(x))
+    {
+        return INT_MIN;
+    }
+
+    return static_cast<int>(x.unbiased_exponent());
+}
+
+// 3.6.6
+// Returns: a number that is equal in value (except for any rounding) and sign to x,
+// and which has an exponent set to be equal to the exponent of y.
+// If the exponent is being increased, the value is correctly rounded according to the current rounding mode;
+// if the result does not have the same value as x, the "inexact" floating-point exception is raised.
+// If the exponent is being decreased and the significand of the result has more digits than the type would allow,
+// the "invalid" floating-point exception is raised and the result is NaN.
+// If one or both operands are NaN the result is NaN.
+// Otherwise, if only one operand is infinity, the "invalid" floating-point exception is raised and the result is NaN.
+// If both operands are infinity, the result is DEC_INFINITY, with the same sign as x, converted to the type of x.
+// The quantize functions do not signal underflow.
+constexpr auto quantized128(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+{
+    // Return the correct type of nan
+    if (isnan(lhs))
+    {
+        return lhs;
+    }
+    else if (isnan(rhs))
+    {
+        return rhs;
+    }
+
+    // If one is infinity then return a signaling NAN
+    if (isinf(lhs) != isinf(rhs))
+    {
+        return boost::decimal::from_bits(boost::decimal::detail::d128_snan_mask);
+    }
+    else if (isinf(lhs) && isinf(rhs))
+    {
+        return lhs;
+    }
+
+    return {lhs.full_significand(), rhs.biased_exponent(), lhs.isneg()};
 }
 
 constexpr auto operator&(decimal128 lhs, decimal128 rhs) noexcept -> decimal128

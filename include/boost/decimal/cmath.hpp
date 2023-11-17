@@ -113,6 +113,11 @@ constexpr auto samequantum(decimal64 lhs, decimal64 rhs) noexcept -> bool
     return samequantumd64(lhs, rhs);
 }
 
+constexpr auto samequantum(decimal128 lhs, decimal128 rhs) noexcept -> bool
+{
+    return samequantumd128(lhs, rhs);
+}
+
 constexpr auto quantexp(decimal32 x) noexcept -> int
 {
     return quantexpd32(x);
@@ -123,6 +128,11 @@ constexpr auto quantexp(decimal64 x) noexcept -> int
     return quantexpd64(x);
 }
 
+constexpr auto quantexp(decimal128 x) noexcept -> int
+{
+    return quantexpd128(x);
+}
+
 constexpr auto quantize(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     return quantized32(lhs, rhs);
@@ -131,6 +141,11 @@ constexpr auto quantize(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 constexpr auto quantize(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
 {
     return quantized64(lhs, rhs);
+}
+
+constexpr auto quantize(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+{
+    return quantized128(lhs, rhs);
 }
 
 } // namespace decimal
