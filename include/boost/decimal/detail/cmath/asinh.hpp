@@ -26,7 +26,7 @@ constexpr auto asinh(T x) noexcept -> std::enable_if_t<detail::is_decimal_floati
     }
     else
     {
-        // Use (parts of) the implementation of acosh from Boost.Math.
+        // Use (parts of) the implementation of asinh from Boost.Math.
 
         constexpr T zero { 0, 0 };
         constexpr T one  { 1, 0 };
