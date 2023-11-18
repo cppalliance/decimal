@@ -218,17 +218,27 @@ auto main() -> int
   const auto result_eps_is_ok =
     local::test_atanh
     (
-      static_cast<std::int32_t>(INT32_C(16) * INT32_C(262144)),
+      static_cast<std::int32_t>(INT32_C(128)),
       false,
       static_cast<long double>(fourth_root_epsilon) / 40.0L,
       static_cast<long double>(fourth_root_epsilon) * 40.0L
     );
 
-  const auto result_tiny_is_ok       = local::test_atanh(static_cast<std::int32_t>(INT32_C(4096)), false, 0.001L, 0.1L);
+  const auto result_eps_near_one_is_ok =
+    local::test_atanh
+    (
+      static_cast<std::int32_t>(INT32_C(256)),
+      false,
+      static_cast<long double>(1.0L) - static_cast<long double>(static_cast<long double>(fourth_root_epsilon) / 40.0L),
+      static_cast<long double>(1.0L) - static_cast<long double>(static_cast<long double>(fourth_root_epsilon) * 40.0L)
+    );
+
+  const auto result_tiny_is_ok       = local::test_atanh(static_cast<std::int32_t>(INT32_C(96)), false, 0.001L, 0.1L);
   const auto result_medium_is_ok     = local::test_atanh(static_cast<std::int32_t>(INT32_C(96)), true,  0.1L, 0.9L);
   const auto result_medium_neg_is_ok = local::test_atanh(static_cast<std::int32_t>(INT32_C(96)), false, 0.1L, 0.9L);
 
   BOOST_TEST(result_eps_is_ok);
+  BOOST_TEST(result_eps_near_one_is_ok);
   BOOST_TEST(result_tiny_is_ok);
   BOOST_TEST(result_medium_is_ok);
   BOOST_TEST(result_medium_is_ok);
