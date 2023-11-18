@@ -224,6 +224,7 @@ public:
     explicit constexpr decimal64(Integer val) noexcept;
 
     // 3.2.3.4 Conversion to integral type
+    explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
     explicit constexpr operator unsigned() const noexcept;
     explicit constexpr operator long() const noexcept;
@@ -259,6 +260,9 @@ public:
     // 3.2.5 initialization from coefficient and exponent:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool> = true>
     constexpr decimal64(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
+    constexpr decimal64(bool coeff, T exp, bool sign = false) noexcept;
 
     // cmath functions that are easier as friends
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
@@ -737,7 +741,20 @@ constexpr decimal64::decimal64(Decimal val) noexcept
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 constexpr decimal64::decimal64(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
-    *this = decimal64{val, 0};
+    using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
+    *this = decimal64{static_cast<ConversionType>(val), 0};
+}
+
+template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
+constexpr decimal64::decimal64(bool coeff, T exp, bool sign) noexcept
+{
+    *this = decimal64(static_cast<std::int32_t>(coeff), exp, sign);
+}
+
+constexpr decimal64::operator bool() const noexcept
+{
+    constexpr decimal64 zero {0, 0};
+    return *this != zero;
 }
 
 constexpr decimal64::operator int() const noexcept

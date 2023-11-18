@@ -271,7 +271,8 @@ void test_div_fmod()
 {
     std::uniform_real_distribution<float> dist(0.0F, 1e30F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         const auto val2 {dist(rng)};
@@ -306,7 +307,8 @@ void test_copysign()
 {
     std::uniform_real_distribution<float> dist(0.0F, 1e30F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         const auto val2 {dist(rng)};
@@ -335,7 +337,8 @@ void test_fma()
 
     std::uniform_real_distribution<double> dist(-1e10, 1e10);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         const auto val2 {dist(rng)};
@@ -372,7 +375,8 @@ void test_sin()
 {
     std::uniform_real_distribution<float> dist(-3.14F * 2, 3.14F * 2);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         Dec d1 {val1};
@@ -417,7 +421,8 @@ void test_cos()
 {
     std::uniform_real_distribution<float> dist(-3.14F * 2, 3.14F * 2);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         Dec d1 {val1};
@@ -476,7 +481,8 @@ void test_remainder()
 {
     std::uniform_real_distribution<float> dist(-1e3F, 1e3F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         const auto val2 {dist(rng)};
@@ -509,7 +515,8 @@ void test_remquo()
 {
     std::uniform_real_distribution<float> dist(-1e3F, 1e3F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         const auto val2 {dist(rng)};
@@ -550,7 +557,8 @@ void test_fdim()
 {
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         const auto val2 {dist(rng)};
@@ -605,7 +613,8 @@ void test_sqrt()
 {
     std::uniform_real_distribution<float> dist(0.0F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         Dec d1 {val1};
@@ -640,7 +649,8 @@ void test_two_val_hypot()
 {
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         const auto val2 {dist(rng)};
@@ -688,7 +698,8 @@ void test_three_val_hypot()
     
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         const auto val2 {dist(rng)};
@@ -740,7 +751,8 @@ void test_rint()
 {
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         Dec d1 {val1};
@@ -778,7 +790,7 @@ void test_rint()
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist2(rng)};
         Dec d1 {val1};
@@ -828,7 +840,8 @@ void test_lrint()
 {
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         Dec d1 {val1};
@@ -853,7 +866,7 @@ void test_lrint()
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist2(rng)};
         Dec d1 {val1};
@@ -890,7 +903,8 @@ void test_llrint()
 {
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         Dec d1 {val1};
@@ -915,7 +929,7 @@ void test_llrint()
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist2(rng)};
         Dec d1 {val1};
@@ -952,7 +966,8 @@ void test_nearbyint()
 {
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         Dec d1 {val1};
@@ -990,7 +1005,7 @@ void test_nearbyint()
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist2(rng)};
         Dec d1 {val1};
@@ -1040,7 +1055,8 @@ void test_round()
 {
     std::uniform_real_distribution<float> dist(-1e5F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         Dec d1 {val1};
@@ -1090,7 +1106,8 @@ void test_lround()
 {
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         Dec d1 {val1};
@@ -1115,7 +1132,7 @@ void test_lround()
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist2(rng)};
         Dec d1 {val1};
@@ -1152,7 +1169,8 @@ void test_llround()
 {
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         Dec d1 {val1};
@@ -1177,7 +1195,7 @@ void test_llround()
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist2(rng)};
         Dec d1 {val1};
@@ -1214,7 +1232,8 @@ void test_nextafter()
 {
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         const auto val2 {dist(rng)};
@@ -1254,7 +1273,8 @@ void test_nexttoward()
 {
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    for (std::size_t n {}; n < N; ++n)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
         const auto val2 {dist(rng)};
@@ -1330,6 +1350,14 @@ int main()
     test_islessequal<decimal64>();
     test_islessgreater<decimal64>();
     test_isunordered<decimal64>();
+    test_fmax<decimal128>();
+    test_isgreater<decimal128>();
+    test_isgreaterequal<decimal128>();
+    test_fmin<decimal128>();
+    test_isless<decimal128>();
+    test_islessequal<decimal128>();
+    test_islessgreater<decimal128>();
+    test_isunordered<decimal128>();
 
     test_floor<decimal32>();
     test_ceil<decimal32>();
@@ -1337,6 +1365,9 @@ int main()
     test_floor<decimal64>();
     test_ceil<decimal64>();
     test_trunc<decimal64>();
+    test_floor<decimal128>();
+    test_ceil<decimal128>();
+    test_trunc<decimal128>();
 
     test_frexp10<decimal32>();
     test_scalbn<decimal32>();

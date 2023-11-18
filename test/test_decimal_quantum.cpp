@@ -49,7 +49,8 @@ void test_same_quantum()
     std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<Dec>::min_exponent10 + 19,
                                                     std::numeric_limits<Dec>::max_exponent10 - 19);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         auto exp1 {exp(rng)};
         auto exp2 {exp(rng)};
@@ -121,7 +122,8 @@ void test_quantize()
     std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<Dec>::min_exponent10 + 19,
                                                     std::numeric_limits<Dec>::max_exponent10 - 19);
 
-    for (std::size_t i {}; i < N; ++i)
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t i {}; i < max_iter; ++i)
     {
         const auto sig1 {sig(rng)};
         const auto sig2 {sig(rng)};
@@ -173,6 +175,13 @@ int main()
     test_nonfinite_quantexp<decimal64>();
     test_quantize<decimal64>();
     test_nonfinite_quantize<decimal64>();
+
+    test_same_quantum<decimal128>();
+    test_nonfinite_samequantum<decimal128>();
+    test_quantexp<decimal128>();
+    test_nonfinite_quantexp<decimal128>();
+    test_quantize<decimal128>();
+    test_nonfinite_quantize<decimal128>();
 
     return boost::report_errors();
 }

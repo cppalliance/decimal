@@ -80,6 +80,38 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _dd(long double v) -> decimal64
     return decimal64{v};
 }
 
+constexpr auto operator  "" _DL(const char* str) -> decimal128
+{
+    char* endptr {};
+    return strtod128(str, &endptr);
+}
+
+constexpr auto operator  "" _dl(const char* str) -> decimal128
+{
+    char* endptr {};
+    return strtod128(str, &endptr);
+}
+
+constexpr auto operator  "" _DL(unsigned long long v) -> decimal128
+{
+    return decimal128{v};
+}
+
+constexpr auto operator  "" _dl(unsigned long long v) -> decimal128
+{
+    return decimal128{v};
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _DL(long double v) -> decimal128
+{
+    return decimal128{v};
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _dl(long double v) -> decimal128
+{
+    return decimal128{v};
+}
+
 } // namespace decimal
 } // namespace boost
 
