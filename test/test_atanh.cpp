@@ -118,9 +118,91 @@ namespace local
 
   auto test_atanh_edge() -> bool
   {
+    using decimal_type = boost::decimal::decimal32;
+
+    std::mt19937_64 gen;
+
+    std::uniform_real_distribution<float> dist(1.01F, 1.04F);
+
     auto result_is_ok = true;
 
-    BOOST_TEST(result_is_ok);
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_nan = atanh(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+
+      const auto result_val_nan_is_ok = isnan(val_nan);
+
+      BOOST_TEST(result_val_nan_is_ok);
+
+      result_is_ok = (result_val_nan_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_inf_pos = atanh(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+
+      const auto result_val_inf_pos_is_ok = (isinf(val_inf_pos) && (!signbit(val_inf_pos)));
+
+      BOOST_TEST(result_val_inf_pos_is_ok);
+
+      result_is_ok = (result_val_inf_pos_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_inf_neg = atanh(-std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+
+      const auto result_val_inf_neg_is_ok = (isinf(val_inf_neg) && signbit(val_inf_neg));
+
+      BOOST_TEST(result_val_inf_neg_is_ok);
+
+      result_is_ok = (result_val_inf_neg_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_one_pos = atanh(::my_one());
+
+      const auto result_val_one_pos_is_ok = (isinf(val_one_pos) && (!signbit(val_one_pos)));
+
+      BOOST_TEST(result_val_one_pos_is_ok);
+
+      result_is_ok = (result_val_one_pos_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_one_neg = atanh(-::my_one());
+
+      const auto result_val_one_neg_is_ok = (isinf(val_one_neg) && signbit(val_one_neg));
+
+      BOOST_TEST(result_val_one_neg_is_ok);
+
+      result_is_ok = (result_val_one_neg_is_ok && result_is_ok);
+    }
+
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    {
+      static_cast<void>(i);
+
+      const auto val_zero = atanh(::my_zero());
+
+      const auto result_val_zero_is_ok = (fpclassify(val_zero) == FP_ZERO);
+
+      BOOST_TEST(result_val_zero_is_ok);
+
+      result_is_ok = (result_val_zero_is_ok && result_is_ok);
+    }
 
     return result_is_ok;
   }
@@ -131,16 +213,33 @@ auto main() -> int
 {
   auto result_is_ok = true;
 
+  constexpr boost::decimal::decimal32 fourth_root_epsilon { 1, -((std::numeric_limits<boost::decimal::decimal32>::digits10 + 1) / 4) };
+
+  const auto result_eps_is_ok =
+    local::test_atanh
+    (
+      static_cast<std::int32_t>(INT32_C(16) * INT32_C(262144)),
+      false,
+      static_cast<long double>(fourth_root_epsilon) / 40.0L,
+      static_cast<long double>(fourth_root_epsilon) * 40.0L
+    );
+
+  const auto result_tiny_is_ok       = local::test_atanh(static_cast<std::int32_t>(INT32_C(4096)), false, 0.001L, 0.1L);
   const auto result_medium_is_ok     = local::test_atanh(static_cast<std::int32_t>(INT32_C(96)), true,  0.1L, 0.9L);
   const auto result_medium_neg_is_ok = local::test_atanh(static_cast<std::int32_t>(INT32_C(96)), false, 0.1L, 0.9L);
 
+  BOOST_TEST(result_eps_is_ok);
+  BOOST_TEST(result_tiny_is_ok);
+  BOOST_TEST(result_medium_is_ok);
   BOOST_TEST(result_medium_is_ok);
 
   const auto result_edge_is_ok  = local::test_atanh_edge();
 
   result_is_ok =
   (
-       result_medium_is_ok
+       result_eps_is_ok
+    && result_tiny_is_ok
+    && result_medium_is_ok
     && result_medium_neg_is_ok
     && result_edge_is_ok
     && result_is_ok
