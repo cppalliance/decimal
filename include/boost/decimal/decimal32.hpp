@@ -231,6 +231,11 @@ public:
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
 
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    explicit constexpr operator detail::int128_t() const noexcept;
+    explicit constexpr operator detail::uint128_t() const noexcept;
+    #endif
+
     template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
@@ -1632,6 +1637,20 @@ constexpr decimal32::operator std::uint16_t() const noexcept
 {
     return to_integral<decimal32, std::uint16_t>(*this);
 }
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr decimal32::operator detail::int128_t() const noexcept
+{
+    return to_integral<decimal32, detail::int128_t>(*this);
+}
+
+constexpr decimal32::operator detail::uint128_t() const noexcept
+{
+    return to_integral<decimal32, detail::uint128_t>(*this);
+}
+
+#endif
 
 template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
 constexpr decimal32::operator Decimal() const noexcept
