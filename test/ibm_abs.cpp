@@ -79,12 +79,15 @@ int main()
 {
     test<boost::decimal::decimal32>();
     test<boost::decimal::decimal64>();
+    test<boost::decimal::decimal128>();
 
     overflow_underflow_subnormals<boost::decimal::decimal32>();
     overflow_underflow_subnormals<boost::decimal::decimal64>();
+    overflow_underflow_subnormals<boost::decimal::decimal128>();
 
     non_finitie_values<boost::decimal::decimal32>();
     non_finitie_values<boost::decimal::decimal64>();
+    non_finitie_values<boost::decimal::decimal128>();
 
     return boost::report_errors();
 }
