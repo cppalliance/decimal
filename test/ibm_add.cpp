@@ -50,9 +50,11 @@ int main()
 {
     test<boost::decimal::decimal32>();
     test<boost::decimal::decimal64>();
+    test<boost::decimal::decimal128>();
 
     test_inexact<boost::decimal::decimal32>();
     test_inexact<boost::decimal::decimal64>();
+    test_inexact<boost::decimal::decimal128>();
 
     return boost::report_errors();
 }
