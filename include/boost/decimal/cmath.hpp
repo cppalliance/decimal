@@ -61,6 +61,7 @@
 #define BOOST_DECIMAL_DEC_NAN std::numeric_limits<boost::decimal::decimal64>::signaling_NaN()
 #define BOOST_DECIMAL_FP_FAST_FMAD32 1
 #define BOOST_DECIMAL_FP_FAST_FMAD64 1
+#define BOOST_DECIMAL_FP_FAST_FMAD128 1
 
 namespace boost { namespace decimal {
 
@@ -117,6 +118,11 @@ constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 constexpr auto fma(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
 {
     return fmad64(x, y, z);
+}
+
+constexpr auto fma(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
+{
+    return fmad128(x, y, z);
 }
 
 constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool
