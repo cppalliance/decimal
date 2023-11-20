@@ -161,8 +161,8 @@ struct uint128
     explicit constexpr operator bool() const noexcept { return high || low; }
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    explicit constexpr operator boost::int128_type()  const noexcept { return (static_cast<boost::int128_type>(high) << 64) + low; }
-    explicit constexpr operator boost::uint128_type() const noexcept { return (static_cast<boost::uint128_type>(high) << 64) + low; }
+    explicit constexpr operator int128_t() noexcept { return (static_cast<int128_t>(high) << 64) + low; }
+    explicit constexpr operator uint128_t() const noexcept { return (static_cast<uint128_t>(high) << 64) + low; }
     #endif
 
     #ifdef BOOST_DECIMAL_HAS_FLOAT128
