@@ -420,17 +420,35 @@ constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept
 }
 
 // Get the 256-bit result of multiplication of two 128-bit unsigned integers
-constexpr uint256_t umul256_impl(std::uint64_t a, std::uint64_t b, std::uint64_t c, std::uint64_t d) noexcept
+constexpr uint256_t umul256_impl(std::uint64_t a_high, std::uint64_t a_low, std::uint64_t b_high, std::uint64_t b_low) noexcept
 {
-    const auto ac = umul128(a, c);
-    const auto bc = umul128(b, c);
-    const auto ad = umul128(a, d);
-    const auto bd = umul128(b, d);
+    const auto low_product {static_cast<uint128>(a_low) * b_low};
+    const auto mid_product1 {static_cast<uint128>(a_low) * b_high};
+    const auto mid_product2 {static_cast<uint128>(a_high) * b_low};
+    const auto high_product {static_cast<uint128>(a_high) * b_high};
 
-    const auto intermediate = (bd >> 64) + static_cast<std::uint64_t>(ad) + static_cast<std::uint64_t>(bc);
+    uint128 carry {};
 
-    return {ac + (intermediate >> 64) + (ad >> 64) + (bc >> 64),
-            (intermediate << 64) + static_cast<std::uint64_t>(bd)};
+    const auto mid_combined {mid_product1 + mid_product2};
+    if (mid_combined < mid_product1)
+    {
+        carry = 1;
+    }
+
+    const auto mid_combined_high {mid_combined >> 64};
+    const auto mid_combined_low {mid_combined << 64};
+
+    const auto low_sum {low_product + mid_combined_low};
+    if (low_sum < low_product)
+    {
+        carry += 1;
+    }
+
+    uint256_t result {};
+    result.low = low_sum;
+    result.high = high_product + mid_combined_high + carry;
+
+    return result;
 }
 
 template<typename T>
