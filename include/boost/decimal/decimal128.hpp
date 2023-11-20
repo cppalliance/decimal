@@ -535,6 +535,7 @@ public:
     friend constexpr auto copysignd128(decimal128 mag, decimal128 sgn) noexcept -> decimal128;
     friend constexpr auto scalblnd128(decimal128 num, long exp) noexcept -> decimal128;
     friend constexpr auto scalbnd128(decimal128 num, int exp) noexcept -> decimal128;
+    friend constexpr auto fmad128(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128;
 };
 
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
@@ -1802,11 +1803,21 @@ constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
 
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal128>(lhs_sig, lhs_exp);
+
+    while (lhs_sig % 10 == 0 && lhs_sig != 0)
+    {
+        lhs_sig /= 10;
+        ++lhs_exp;
+    }
 
     auto rhs_sig {rhs.full_significand()};
     auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize<decimal128>(rhs_sig, rhs_exp);
+
+    while (rhs_sig % 10 == 0 && rhs_sig != 0)
+    {
+        rhs_sig /= 10;
+        ++rhs_exp;
+    }
 
     const auto result {d128_mul_impl(lhs_sig, lhs_exp, lhs.isneg(),
                                      rhs_sig, rhs_exp, rhs.isneg())};
@@ -1825,12 +1836,20 @@ constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
 
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal128>(lhs_sig, lhs_exp);
+    while (lhs_sig % 10 == 0 && lhs_sig != 0)
+    {
+        lhs_sig /= 10;
+        ++lhs_exp;
+    }
     auto lhs_components {detail::decimal128_components{lhs_sig, lhs_exp, lhs.isneg()}};
 
     auto rhs_sig {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
     std::int32_t rhs_exp {0};
-    detail::normalize<decimal128>(rhs_sig, rhs_exp);
+    while (rhs_sig % 10 == 0 && rhs_sig != 0)
+    {
+        rhs_sig /= 10;
+        ++rhs_exp;
+    }
     auto unsigned_sig_rhs {detail::make_positive_unsigned(rhs_sig)};
     auto rhs_components {detail::decimal128_components{unsigned_sig_rhs, rhs_exp, (rhs < 0)}};
 
@@ -2258,6 +2277,81 @@ constexpr auto scalblnd128(decimal128 num, long exp) noexcept -> decimal128
 constexpr auto scalbnd128(decimal128 num, int expval) noexcept -> decimal128
 {
     return scalblnd128(num, static_cast<long>(expval));
+}
+
+constexpr auto fmad128(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
+{
+    // First calculate x * y without rounding
+    constexpr decimal128 zero {0, 0};
+
+    const auto res {detail::check_non_finite(x, y)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    auto sig_lhs {x.full_significand()};
+    auto exp_lhs {x.biased_exponent()};
+
+    while (sig_lhs % 10 == 0 && sig_lhs != 0)
+    {
+        sig_lhs /= 10;
+        ++exp_lhs;
+    }
+
+    auto sig_rhs {y.full_significand()};
+    auto exp_rhs {y.biased_exponent()};
+
+    while (sig_rhs % 10 == 0 && sig_rhs != 0)
+    {
+        sig_rhs /= 10;
+        ++exp_rhs;
+    }
+
+    auto mul_result {d128_mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
+    const decimal128 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
+
+    const auto res_add {detail::check_non_finite(dec_result, z)};
+    if (res_add != zero)
+    {
+        return res_add;
+    }
+
+    bool lhs_bigger {dec_result > z};
+    if (dec_result.isneg() && z.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+    bool abs_lhs_bigger {abs(dec_result) > abs(z)};
+
+    detail::normalize<decimal128>(mul_result.sig, mul_result.exp);
+
+    auto sig_z {z.full_significand()};
+    auto exp_z {z.biased_exponent()};
+    detail::normalize<decimal128>(sig_z, exp_z);
+    detail::decimal128_components z_components {sig_z, exp_z, z.isneg()};
+
+    if (!lhs_bigger)
+    {
+        detail::swap(mul_result, z_components);
+        abs_lhs_bigger = !abs_lhs_bigger;
+    }
+
+    detail::decimal128_components result {};
+
+    if (!mul_result.sign && z_components.sign)
+    {
+        result = d128_sub_impl(mul_result.sig, mul_result.exp, mul_result.sign,
+                               z_components.sig, z_components.exp, z_components.sign,
+                               abs_lhs_bigger);
+    }
+    else
+    {
+        result = d128_add_impl(mul_result.sig, mul_result.exp, mul_result.sign,
+                               z_components.sig, z_components.exp, z_components.sign);
+    }
+
+    return {result.sig, result.exp, result.sign};
 }
 
 } //namespace decimal

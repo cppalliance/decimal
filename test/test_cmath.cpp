@@ -333,6 +333,14 @@ void test_copysign()
 template <typename Dec>
 void test_fma()
 {
+    if (!BOOST_TEST_EQ(Dec(1, -1) * Dec(1, 1), Dec(1, 0)))
+    {
+        std::cerr << std::setprecision(std::numeric_limits<Dec>::digits10)
+                  << "   Mul: " << Dec(1, -1) * Dec(1, 1)
+                  << "\nActual: " << Dec(1, 0) << std::endl;
+    }
+
+    BOOST_TEST_EQ(Dec(1, 0) + Dec(1, 0, true), Dec(0, 0));
     BOOST_TEST_EQ(fma(Dec(1, -1), Dec(1, 1), Dec(1, 0, true)), Dec(0, 0));
 
     std::uniform_real_distribution<double> dist(-1e10, 1e10);
@@ -1382,15 +1390,14 @@ int main()
     test_copysign<decimal32>();
     test_copysign<decimal64>();
 
-    #if (defined(__clang__) || defined(_MSC_VER) || !defined(__GNUC__) || (defined(__GNUC__) && __GNUC__ > 6))
     test_fma<decimal32>();
     test_fma<decimal64>();
+    test_fma<decimal128>();
 
     test_sin<decimal32>();
     test_cos<decimal32>();
     test_sin<decimal64>();
     test_cos<decimal64>();
-    #endif
 
     test_modf<decimal32>();
     test_modf<decimal64>();
