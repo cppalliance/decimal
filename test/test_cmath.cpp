@@ -1340,6 +1340,14 @@ void test_exp2()
     BOOST_TEST_EQ(exp2(-std::numeric_limits<T>::infinity()), T(0 * dist(rng)));
 }
 
+template <typename T>
+void test_nan()
+{
+    BOOST_TEST(!isnan(nan<T>("1") & std::numeric_limits<T>::quiet_NaN()));
+    BOOST_TEST(!isnan(nan<T>("2") & std::numeric_limits<T>::quiet_NaN()));
+    BOOST_TEST(!isnan(nan<T>("-1") & std::numeric_limits<T>::quiet_NaN()));
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -1447,6 +1455,10 @@ int main()
 
     test_exp2<decimal32>();
     test_exp2<decimal64>();
+
+    test_nan<decimal32>();
+    test_nan<decimal64>();
+    test_nan<decimal128>();
 
     return boost::report_errors();
 }
