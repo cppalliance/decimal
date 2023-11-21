@@ -11,6 +11,8 @@
 #include <boost/decimal/cstdlib.hpp>
 #include <limits>
 
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+
 namespace boost {
 namespace decimal {
 
@@ -49,5 +51,7 @@ constexpr auto nand128(const char* arg) noexcept -> decimal128
 
 } //namespace decimal
 } //namespace boost
+
+#endif //#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
 #endif //BOOST_DECIMAL_DETAIL_CMATH_NAN_HPP
