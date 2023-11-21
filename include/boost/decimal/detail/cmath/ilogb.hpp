@@ -11,9 +11,8 @@
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
 
-namespace boost { namespace decimal {
-
-// TODO(mborland): Allow conversion between decimal types via a promotion system
+namespace boost {
+namespace decimal {
 
 template <typename T>
 constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>
