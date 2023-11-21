@@ -52,6 +52,7 @@
 #include <boost/decimal/detail/cmath/tanh.hpp>
 #include <boost/decimal/detail/cmath/tgamma.hpp>
 #include <boost/decimal/detail/cmath/trunc.hpp>
+#include <boost/decimal/detail/cmath/nan.hpp>
 #include <boost/decimal/numbers.hpp>
 
 // Macros from 3.6.2

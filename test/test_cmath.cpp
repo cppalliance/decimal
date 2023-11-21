@@ -1340,6 +1340,16 @@ void test_exp2()
     BOOST_TEST_EQ(exp2(-std::numeric_limits<T>::infinity()), T(0 * dist(rng)));
 }
 
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+template <typename T>
+void test_nan()
+{
+    BOOST_TEST(!isnan(nan<T>("1") & std::numeric_limits<T>::quiet_NaN()));
+    BOOST_TEST(!isnan(nan<T>("2") & std::numeric_limits<T>::quiet_NaN()));
+    BOOST_TEST(!isnan(nan<T>("-1") & std::numeric_limits<T>::quiet_NaN()));
+}
+#endif
+
 int main()
 {
     test_fmax<decimal32>();
@@ -1447,6 +1457,12 @@ int main()
 
     test_exp2<decimal32>();
     test_exp2<decimal64>();
+
+    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+    test_nan<decimal32>();
+    test_nan<decimal64>();
+    test_nan<decimal128>();
+    #endif
 
     return boost::report_errors();
 }
