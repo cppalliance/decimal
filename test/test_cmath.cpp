@@ -610,10 +610,39 @@ void test_ilogb()
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), 398);
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), 399);
     }
+    else
+    {
+        BOOST_TEST_EQ(ilogb(Dec(1, 0)), 6176);
+        BOOST_TEST_EQ(ilogb(Dec(10, 0)), 6177);
+    }
 
     BOOST_TEST_EQ(ilogb(Dec(0)), FP_ILOGB0);
     BOOST_TEST_EQ(ilogb(std::numeric_limits<Dec>::infinity()), INT_MAX);
     BOOST_TEST_EQ(ilogb(std::numeric_limits<Dec>::quiet_NaN()), FP_ILOGBNAN);
+}
+
+template <typename Dec>
+void test_logb()
+{
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value)
+    {
+        BOOST_TEST_EQ(ilogb(Dec(1, 0)), Dec(101));
+        BOOST_TEST_EQ(ilogb(Dec(10, 0)), Dec(102));
+    }
+    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal64>::value)
+    {
+        BOOST_TEST_EQ(ilogb(Dec(1, 0)), Dec(398));
+        BOOST_TEST_EQ(ilogb(Dec(10, 0)), Dec(399));
+    }
+    else
+    {
+        BOOST_TEST_EQ(ilogb(Dec(1, 0)), 6176);
+        BOOST_TEST_EQ(ilogb(Dec(10, 0)), 6177);
+    }
+
+    BOOST_TEST_EQ(logb(Dec(0)), -std::numeric_limits<Dec>::infinity());
+    BOOST_TEST_EQ(logb(std::numeric_limits<Dec>::infinity()), std::numeric_limits<Dec>::infinity());
+    BOOST_TEST(isnan(logb(std::numeric_limits<Dec>::quiet_NaN())));
 }
 
 template <typename Dec>
@@ -1422,6 +1451,11 @@ int main()
 
     test_ilogb<decimal32>();
     test_ilogb<decimal64>();
+    test_ilogb<decimal128>();
+
+    test_logb<decimal32>();
+    test_logb<decimal64>();
+    test_logb<decimal128>();
 
     test_sqrt<decimal32>();
     test_sqrt<decimal64>();
