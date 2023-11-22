@@ -36,6 +36,10 @@ void test_fmax()
 
     BOOST_TEST_EQ(fmax(Dec(1), Dec(0)), Dec(1));
     BOOST_TEST_EQ(fmax(Dec(-2), Dec(1)), Dec(1));
+
+    // Mixed types
+    BOOST_TEST_EQ(fmax(decimal128(1), Dec(0)), decimal128(1));
+    BOOST_TEST_EQ(fmax(decimal128(-2), Dec(1)), decimal128(1));
 }
 
 template <typename Dec>
@@ -74,6 +78,10 @@ void test_fmin()
 
     BOOST_TEST_EQ(fmin(Dec(1), Dec(0)), Dec(0));
     BOOST_TEST_EQ(fmin(Dec(-2), Dec(1)), Dec(-2));
+
+    // Mixed types
+    BOOST_TEST_EQ(fmin(decimal128(1), Dec(0)), decimal128(0));
+    BOOST_TEST_EQ(fmin(decimal128(-2), Dec(1)), decimal128(-2));
 }
 
 template <typename Dec>

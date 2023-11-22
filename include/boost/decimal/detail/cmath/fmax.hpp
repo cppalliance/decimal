@@ -18,17 +18,19 @@ namespace decimal {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
 constexpr auto fmax(T1 lhs, T2 rhs) noexcept
 {
+    using promoted_type = detail::promote_args_t<T1, T2>;
+
     if (isnan(lhs) && !isnan(rhs))
     {
-        return rhs;
+        return static_cast<promoted_type>(rhs);
     }
     else if ((!isnan(lhs) && isnan(rhs)) ||
              (isnan(lhs) && isnan(rhs)))
     {
-        return lhs;
+        return static_cast<promoted_type>(lhs);
     }
 
-    return lhs > rhs ? lhs : rhs;
+    return lhs > rhs ? static_cast<promoted_type>(lhs) : static_cast<promoted_type>(rhs);
 }
 
 } // namespace decimal
