@@ -36,6 +36,10 @@ void test_fmax()
 
     BOOST_TEST_EQ(fmax(Dec(1), Dec(0)), Dec(1));
     BOOST_TEST_EQ(fmax(Dec(-2), Dec(1)), Dec(1));
+
+    // Mixed types
+    BOOST_TEST_EQ(fmax(decimal128(1), Dec(0)), decimal128(1));
+    BOOST_TEST_EQ(fmax(decimal128(-2), Dec(1)), decimal128(1));
 }
 
 template <typename Dec>
@@ -74,6 +78,10 @@ void test_fmin()
 
     BOOST_TEST_EQ(fmin(Dec(1), Dec(0)), Dec(0));
     BOOST_TEST_EQ(fmin(Dec(-2), Dec(1)), Dec(-2));
+
+    // Mixed types
+    BOOST_TEST_EQ(fmin(decimal128(1), Dec(0)), decimal128(0));
+    BOOST_TEST_EQ(fmin(decimal128(-2), Dec(1)), decimal128(-2));
 }
 
 template <typename Dec>
@@ -686,7 +694,7 @@ void test_two_val_hypot()
 {
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -727,6 +735,39 @@ void test_two_val_hypot()
     BOOST_TEST(isnan(hypot(Dec(1), nan)));
 }
 
+template <typename Dec1, typename Dec2>
+void test_mixed_two_val_hypot()
+{
+    std::uniform_real_distribution<float> dist(1.0F, 1e5F);
+
+    constexpr auto max_iter {std::is_same<Dec2, decimal128>::value ? 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
+    {
+        const auto val1 {dist(rng)};
+        const auto val2 {dist(rng)};
+        Dec1 d1 {val1};
+        Dec2 d2 {val2};
+
+        auto ret_val {std::hypot(val1, val2)};
+        auto ret_dec {static_cast<float>(hypot(d1, d2))};
+
+        if (ret_val == 0 || ret_dec == 0)
+        {
+            BOOST_TEST_EQ(ret_val, ret_dec);
+        }
+        else if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << d2
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+        }
+    }
+}
+
 #if defined(__cpp_lib_hypot) && __cpp_lib_hypot >= 201603L
 
 template <typename Dec>
@@ -735,7 +776,7 @@ void test_three_val_hypot()
     
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -1464,6 +1505,14 @@ int main()
     test_three_val_hypot<decimal32>();
     test_two_val_hypot<decimal64>();
     test_three_val_hypot<decimal64>();
+
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+    test_two_val_hypot<decimal128>();
+    test_three_val_hypot<decimal128>();
+    test_mixed_two_val_hypot<decimal64, decimal128>();
+    #endif
+
+    test_mixed_two_val_hypot<decimal32, decimal64>();
 
     test_rint<decimal32>();
     test_lrint<decimal32>();
