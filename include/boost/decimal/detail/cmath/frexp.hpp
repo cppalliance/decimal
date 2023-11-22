@@ -12,11 +12,13 @@
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/cmath/impl/pow_impl.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 
-namespace boost { namespace decimal {
+namespace boost {
+namespace decimal {
 
-template<typename T, std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool> = true>
-constexpr auto frexp(T v, int* expon) noexcept -> T
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto frexp(T v, int* expon) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     // This implementation of frexp follows closely that of eval_frexp
     // in Boost.Multiprecision's cpp_dec_float template class.

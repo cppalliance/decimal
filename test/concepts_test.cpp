@@ -10,6 +10,7 @@ void test()
 {
     T res = T(1.0) + 1.0;
     BOOST_TEST_EQ(res, T(2.0));
+    BOOST_TEST(boost::decimal::abs(1.0));
 }
 
 

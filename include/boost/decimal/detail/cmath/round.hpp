@@ -7,6 +7,7 @@
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/cmath/modf.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <type_traits>
@@ -16,7 +17,7 @@
 namespace boost {
 namespace decimal {
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto round(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T zero {0, 0};
@@ -51,7 +52,7 @@ namespace detail {
 #  pragma warning(disable: 4146)
 #endif
 
-template <typename T, typename Int>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T, BOOST_DECIMAL_INTEGRAL Int>
 constexpr auto int_round_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, Int>
 {
     constexpr T zero {0, 0};
@@ -87,13 +88,13 @@ constexpr auto int_round_impl(T num) noexcept -> std::enable_if_t<detail::is_dec
 
 } //namespace detail
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto lround(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long>
 {
     return detail::int_round_impl<T, long>(num);
 }
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto llround(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long long>
 {
     return detail::int_round_impl<T, long long>(num);

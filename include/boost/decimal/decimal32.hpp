@@ -162,10 +162,10 @@ private:
     friend constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
     friend constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, const decimal32& q, decimal32& r) noexcept -> void;
 
-    template <typename T>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>;
 
-    template <typename T>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto logb(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
 
     // Debug bit pattern
@@ -532,7 +532,7 @@ public:
     friend constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32;
 
     // Related to <cmath>
-    template <typename T>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
             std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,

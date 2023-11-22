@@ -205,10 +205,10 @@ private:
 
     friend constexpr auto d64_mod_impl(decimal64 lhs, decimal64 rhs, const decimal64& q, decimal64& r) noexcept -> void;
 
-    template <typename T>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>;
 
-    template <typename T>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto logb(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
 
 public:
@@ -527,7 +527,7 @@ public:
     friend constexpr auto operator~(decimal64 lhs) noexcept -> decimal64;
 
     // <cmath> functions that need to be friends
-    template <typename T>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
             std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,

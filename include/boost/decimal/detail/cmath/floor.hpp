@@ -13,12 +13,14 @@
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <type_traits>
 #include <cmath>
 
-namespace boost { namespace decimal {
+namespace boost {
+namespace decimal {
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
