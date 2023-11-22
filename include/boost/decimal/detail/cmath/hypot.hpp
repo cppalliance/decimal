@@ -40,21 +40,21 @@ constexpr auto hypot(T1 x, T2 y) noexcept
         return std::numeric_limits<promoted_type>::infinity();
     }
 
-    x = abs(x);
-    y = abs(y);
+    auto new_x {static_cast<promoted_type>(abs(x))};
+    auto new_y {static_cast<promoted_type>(abs(y))};
 
-    if (y > x)
+    if (new_y > new_x)
     {
-        detail::swap(x, y);
+        detail::swap(new_x, new_y);
     }
 
-    if (x * std::numeric_limits<promoted_type>::epsilon() >= y)
+    if (new_x * std::numeric_limits<promoted_type>::epsilon() >= new_y)
     {
-        return x;
+        return new_x;
     }
 
-    const promoted_type rat {y / x};
-    return x * sqrt(1 + rat * rat);
+    const auto rat {new_y / new_x};
+    return new_x * sqrt(1 + rat * rat);
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
