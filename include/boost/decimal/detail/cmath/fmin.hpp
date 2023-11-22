@@ -14,8 +14,8 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto fmin(T lhs, T rhs) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
+constexpr auto fmin(T1 lhs, T2 rhs) noexcept
 {
     if (isnan(lhs) && !isnan(rhs))
     {
