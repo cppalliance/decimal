@@ -11,13 +11,14 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/attributes.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 
 namespace boost {
 namespace decimal {
 
 #ifndef BOOST_DECIMAL_NO_CXX17_IF_CONSTEXPR
 
-template <typename TargetType, typename Decimal>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
 constexpr auto to_decimal(Decimal val) noexcept -> TargetType
 {
     if (isinf(val))
@@ -48,7 +49,7 @@ constexpr auto to_decimal(Decimal val) noexcept -> TargetType
 
 #else
 
-template <typename TargetType, typename Decimal>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
 constexpr auto to_decimal(Decimal val) noexcept -> TargetType
 {
     if (isinf(val))

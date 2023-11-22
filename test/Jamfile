@@ -17,6 +17,7 @@ project : requirements
   [ requires cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction cxx14_variable_templates cxx14_constexpr ]
   ;
 
+compile-fail concepts_test.cpp ;
 run ibm_abs.cpp ;
 run ibm_add.cpp ;
 run quick.cpp ;

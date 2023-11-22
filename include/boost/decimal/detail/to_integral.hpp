@@ -11,6 +11,7 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 
 namespace boost {
 namespace decimal {
@@ -25,7 +26,7 @@ namespace decimal {
 // Attempts conversion to integral type:
 // If this is nan sets errno to EINVAL and returns 0
 // If this is not representable sets errno to ERANGE and returns 0
-template <typename Decimal, typename TargetType>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL TargetType>
 constexpr auto to_integral(Decimal val) noexcept -> TargetType
 {
     using Conversion_Type = std::conditional_t<std::numeric_limits<TargetType>::is_signed, std::int64_t, std::uint64_t>;
@@ -63,7 +64,7 @@ constexpr auto to_integral(Decimal val) noexcept -> TargetType
     return static_cast<TargetType>(result);
 }
 
-template <typename Decimal, typename TargetType>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL TargetType>
 constexpr auto to_integral_128(Decimal val) noexcept -> TargetType
 {
     constexpr Decimal max_target_type { (std::numeric_limits<TargetType>::max)() };

@@ -151,13 +151,13 @@ private:
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
-    template <typename Decimal, typename TargetType>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL TargetType>
     friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
 
-    template <typename Decimal, typename TargetType>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_REAL TargetType>
     friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
 
-    template <typename TargetType, typename Decimal>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
     // Debug bit pattern
@@ -165,21 +165,21 @@ private:
     friend constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t;
 
     // Equality template between any integer type and decimal64
-    template <typename Decimal, typename Integer>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
 
-    template <typename Decimal1, typename Decimal2>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
     friend constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
     // Template to compare operator< for any integer type and decimal64
-    template <typename Decimal, typename Integer>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
 
-    template <typename Decimal1, typename Decimal2>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
     friend constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
@@ -219,11 +219,11 @@ public:
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal64(Float val) noexcept;
 
-    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
     constexpr decimal64(Decimal val) noexcept;
 
     // 3.2.3.3 Conversion from integral type
-    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+    template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal64(Integer val) noexcept;
 
     // 3.2.3.4 Conversion to integral type
@@ -245,7 +245,7 @@ public:
     #endif
 
 
-    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
     // 3.2.6 Conversion to floating-point type
@@ -287,41 +287,41 @@ public:
     // 3.2.8 Binary arithmetic operators
     friend constexpr auto operator+(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator+(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     friend constexpr auto operator-(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator-(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator-(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     friend constexpr auto operator*(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator*(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator*(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     friend constexpr auto operator/(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
@@ -336,41 +336,41 @@ public:
     // 3.2.3.6 Compound assignment
     constexpr auto operator+=(decimal64 rhs) noexcept -> decimal64&;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     constexpr auto operator+=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
 
-    template <typename Decimal>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     constexpr auto operator+=(Decimal rhs) noexcept
         -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>;
 
     constexpr auto operator-=(decimal64 rhs) noexcept -> decimal64&;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     constexpr auto operator-=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
 
-    template <typename Decimal>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     constexpr auto operator-=(Decimal rhs) noexcept
         -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>;
 
     constexpr auto operator*=(decimal64 rhs) noexcept -> decimal64&;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     constexpr auto operator*=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
 
-    template <typename Decimal>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     constexpr auto operator*=(Decimal rhs) noexcept
         -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>;
 
     constexpr auto operator/=(decimal64 rhs) noexcept -> decimal64&;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     constexpr auto operator/=(Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>;
 
-    template <typename Decimal>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     constexpr auto operator/=(Decimal rhs) noexcept
         -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>;
 
@@ -378,66 +378,66 @@ public:
     // Equality
     friend constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator==(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator==(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Inequality
     friend constexpr auto operator!=(decimal64 lhs, decimal64 rhs) noexcept -> bool;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator!=(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator!=(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Less
     friend constexpr auto operator<(decimal64 lhs, decimal64 rhs) noexcept -> bool;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator<(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator<(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Less equal
     friend constexpr auto operator<=(decimal64 lhs, decimal64 rhs) noexcept -> bool;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator<=(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator<=(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Greater
     friend constexpr auto operator>(decimal64 lhs, decimal64 rhs) noexcept -> bool;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator>(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator>(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
     // Greater equal
     friend constexpr auto operator>=(decimal64 lhs, decimal64 rhs) noexcept -> bool;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator>=(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
 
@@ -445,21 +445,21 @@ public:
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     friend constexpr auto operator<=>(decimal64 lhs, decimal64 rhs) noexcept -> std::partial_ordering;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator<=>(decimal64 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator<=>(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
     #endif
 
     #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     // 3.2.10 Formatted input:
-    template <typename charT, typename traits, typename DecimalType>
+    template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>;
 
     // 3.2.11 Formatted output:
-    template <typename charT, typename traits, typename DecimalType>
+    template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
     #endif
@@ -476,51 +476,51 @@ public:
     // Bit-wise operators
     friend constexpr auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator&(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator&(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     friend constexpr auto operator|(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator|(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator|(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     friend constexpr auto operator^(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator^(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator^(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     friend constexpr auto operator<<(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator<<(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator<<(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
     friend constexpr auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator>>(decimal64 lhs, Integer rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
-    template <typename Integer>
+    template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator>>(Integer lhs, decimal64 rhs) noexcept
         -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>;
 
@@ -741,13 +741,13 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::decimal64(Float val) noexcept
     }
 }
 
-template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
 constexpr decimal64::decimal64(Decimal val) noexcept
 {
     *this = to_decimal<decimal64>(val);
 }
 
-template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 constexpr decimal64::decimal64(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
     using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
@@ -831,7 +831,7 @@ constexpr decimal64::operator detail::uint128_t() const noexcept
 #endif
 
 
-template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
 constexpr decimal64::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);
@@ -1362,7 +1362,7 @@ constexpr auto operator+(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     return {result.sig, result.exp, result.sign};
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
@@ -1420,7 +1420,7 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
     return decimal64(result.sig, result.exp, result.sign);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator+(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
@@ -1460,7 +1460,7 @@ constexpr auto operator-(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     return {result.sig, result.exp, result.sign};
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator-(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
@@ -1494,7 +1494,7 @@ constexpr auto operator-(decimal64 lhs, Integer rhs) noexcept
     return {result.sig, result.exp, result.sign};
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator-(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
@@ -1552,7 +1552,7 @@ constexpr auto operator*(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     return {result.sig, result.exp, result.sign};
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator*(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
@@ -1578,7 +1578,7 @@ constexpr auto operator*(decimal64 lhs, Integer rhs) noexcept
     return {result.sig, result.exp, result.sign};
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator*(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
@@ -1594,7 +1594,7 @@ constexpr auto operator/(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     return q;
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
     // Check pre-conditions
@@ -1639,7 +1639,7 @@ constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept -> std::enable_if_
     return decimal64(q_components.sig, q_components.exp, q_components.sign);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
     // Check pre-conditions
@@ -1719,7 +1719,7 @@ constexpr auto decimal64::operator+=(decimal64 rhs) noexcept -> decimal64&
     return *this;
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto decimal64::operator+=(Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>
 {
@@ -1727,7 +1727,7 @@ constexpr auto decimal64::operator+=(Integer rhs) noexcept
     return *this;
 }
 
-template <typename Decimal>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
 constexpr auto decimal64::operator+=(Decimal rhs) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>
 {
@@ -1741,7 +1741,7 @@ constexpr auto decimal64::operator-=(decimal64 rhs) noexcept -> decimal64&
     return *this;
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto decimal64::operator-=(Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>
 {
@@ -1749,7 +1749,7 @@ constexpr auto decimal64::operator-=(Integer rhs) noexcept
     return *this;
 }
 
-template <typename Decimal>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
 constexpr auto decimal64::operator-=(Decimal rhs) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>
 {
@@ -1763,7 +1763,7 @@ constexpr auto decimal64::operator*=(decimal64 rhs) noexcept -> decimal64&
     return *this;
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto decimal64::operator*=(Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>
 {
@@ -1771,7 +1771,7 @@ constexpr auto decimal64::operator*=(Integer rhs) noexcept
     return *this;
 }
 
-template <typename Decimal>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
 constexpr auto decimal64::operator*=(Decimal rhs) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>
 {
@@ -1785,7 +1785,7 @@ constexpr auto decimal64::operator/=(decimal64 rhs) noexcept -> decimal64&
     return *this;
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto decimal64::operator/=(Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64&>
 {
@@ -1793,7 +1793,7 @@ constexpr auto decimal64::operator/=(Integer rhs) noexcept
     return *this;
 }
 
-template <typename Decimal>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
 constexpr auto decimal64::operator/=(Decimal rhs) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>
 {
@@ -1813,14 +1813,14 @@ constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
                                        rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator==(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return mixed_equality_impl(lhs, rhs);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator==(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
@@ -1832,14 +1832,14 @@ constexpr auto operator!=(decimal64 lhs, decimal64 rhs) noexcept -> bool
     return !(lhs == rhs);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator!=(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return !(lhs == rhs);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator!=(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
@@ -1873,14 +1873,14 @@ constexpr auto operator<(decimal64 lhs, decimal64 rhs) noexcept -> bool
                                       rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator<(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return less_impl(lhs, rhs);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator<(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
@@ -1902,7 +1902,7 @@ constexpr auto operator<=(decimal64 lhs, decimal64 rhs) noexcept -> bool
     return !(rhs < lhs);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator<=(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
@@ -1914,7 +1914,7 @@ constexpr auto operator<=(decimal64 lhs, Integer rhs) noexcept
     return !(rhs < lhs);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator<=(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
@@ -1931,14 +1931,14 @@ constexpr auto operator>(decimal64 lhs, decimal64 rhs) noexcept -> bool
     return rhs < lhs;
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator>(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
     return rhs < lhs;
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator>(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
@@ -1955,7 +1955,7 @@ constexpr auto operator>=(decimal64 lhs, decimal64 rhs) noexcept -> bool
     return !(lhs < rhs);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator>=(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
@@ -1967,7 +1967,7 @@ constexpr auto operator>=(decimal64 lhs, Integer rhs) noexcept
     return !(lhs < rhs);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator>=(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
 {
@@ -1999,7 +1999,7 @@ constexpr auto operator<=>(decimal64 lhs, decimal64 rhs) noexcept -> std::partia
     return std::partial_ordering::unordered;
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator<=>(decimal64 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>
 {
     if (lhs < rhs)
@@ -2018,7 +2018,7 @@ constexpr auto operator<=>(decimal64 lhs, Integer rhs) noexcept -> std::enable_i
     return std::partial_ordering::unordered;
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator<=>(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>
 {
     if (lhs < rhs)
@@ -2044,14 +2044,14 @@ constexpr auto operator&(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     return from_bits(lhs.bits_ & rhs.bits_);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator&(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
     return from_bits(lhs.bits_ & static_cast<std::uint64_t>(rhs));
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator&(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
@@ -2063,14 +2063,14 @@ constexpr auto operator|(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     return from_bits(lhs.bits_ | rhs.bits_);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator|(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
     return from_bits(lhs.bits_ | static_cast<std::uint64_t>(rhs));
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator|(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
@@ -2082,14 +2082,14 @@ constexpr auto operator^(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     return from_bits(lhs.bits_ ^ rhs.bits_);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator^(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
     return from_bits(lhs.bits_ ^ static_cast<std::uint64_t>(rhs));
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator^(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
@@ -2101,14 +2101,14 @@ constexpr auto operator<<(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     return from_bits(lhs.bits_ << rhs.bits_);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator<<(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
     return from_bits(lhs.bits_ << static_cast<std::uint64_t>(rhs));
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator<<(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
@@ -2120,14 +2120,14 @@ constexpr auto operator>>(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     return from_bits(lhs.bits_ >> rhs.bits_);
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator>>(decimal64 lhs, Integer rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {
     return from_bits(lhs.bits_ >> static_cast<std::uint64_t>(rhs));
 }
 
-template <typename Integer>
+template <BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto operator>>(Integer lhs, decimal64 rhs) noexcept
     -> std::enable_if_t<detail::is_integral_v<Integer>, decimal64>
 {

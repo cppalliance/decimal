@@ -85,7 +85,7 @@ BOOST_DECIMAL_HAS_MEMBER_FUNCTION(imag)
 } // Namespace detail
 
 template <typename T>
-concept integral = std::is_integral_v<T>;
+concept integral = boost::decimal::detail::is_integral_v<T>;
 
 template <typename T>
 concept signed_integral = integral<T> && std::is_signed_v<T>;
@@ -94,7 +94,7 @@ template <typename T>
 concept unsigned_integral = integral<T> && std::is_unsigned_v<T>;
 
 template <typename T>
-concept real = std::is_floating_point_v<T>;
+concept real = boost::decimal::detail::is_floating_point_v<T>;
 
 template <typename T>
 concept complex = std::is_same_v<T, std::complex<float>>
@@ -197,7 +197,7 @@ concept random_access_container = is_container<T> &&
                                   boost::decimal::concepts::random_access_iterator<typename T::iterator>;
 
 template <typename T>
-concept decimal_floating_point_type = detail::is_decimal_floating_point_v<T>;
+concept decimal_floating_point_type = boost::decimal::detail::is_decimal_floating_point_v<T>;
 
 } // boost::decimal::concepts
 

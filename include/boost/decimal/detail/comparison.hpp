@@ -13,12 +13,13 @@
 #include <boost/decimal/detail/to_decimal.hpp>
 #include <boost/decimal/detail/shrink_significand.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <cstdint>
 
 namespace boost {
 namespace decimal {
 
-template <typename DecimalType = decimal32, typename T1, typename T2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, typename T1, typename T2>
 constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                 T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool
 {
@@ -44,7 +45,7 @@ constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
            new_lhs_sig == new_rhs_sig;
 }
 
-template <typename Decimal, typename Integer>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>
 {
@@ -68,7 +69,7 @@ constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
                                      rhs_significand, INT32_C(0), rhs_isneg);
 }
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
@@ -87,7 +88,7 @@ constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
     return new_lhs == new_rhs;
 }
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto operator==(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
@@ -95,7 +96,7 @@ constexpr auto operator==(Decimal1 lhs, Decimal2 rhs) noexcept
     return mixed_decimal_equality_impl(lhs, rhs);
 }
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
@@ -103,7 +104,7 @@ constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
     return !(mixed_decimal_equality_impl(lhs, rhs));
 }
 
-template <typename DecimalType = decimal32, typename T1, typename T2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, typename T1, typename T2>
 constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool
 {
@@ -163,7 +164,7 @@ constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     }
 }
 
-template <typename Decimal, typename Integer>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
 constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>
 {
@@ -209,7 +210,7 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
                                     rhs_significand, INT32_C(0), rhs_sign);
 }
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
@@ -240,7 +241,7 @@ constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
                                                 rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto operator<(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
@@ -248,7 +249,7 @@ constexpr auto operator<(Decimal1 lhs, Decimal2 rhs) noexcept
     return mixed_decimal_less_impl(lhs, rhs);
 }
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto operator<=(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
@@ -261,7 +262,7 @@ constexpr auto operator<=(Decimal1 lhs, Decimal2 rhs) noexcept
     return !(rhs < lhs);
 }
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto operator>(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
@@ -269,7 +270,7 @@ constexpr auto operator>(Decimal1 lhs, Decimal2 rhs) noexcept
     return rhs < lhs;
 }
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto operator>=(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
@@ -284,7 +285,7 @@ constexpr auto operator>=(Decimal1 lhs, Decimal2 rhs) noexcept
 
 #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto operator<=>(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), std::partial_ordering>
