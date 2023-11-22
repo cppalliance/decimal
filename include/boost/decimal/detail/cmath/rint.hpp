@@ -7,6 +7,7 @@
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
@@ -23,7 +24,7 @@ namespace decimal {
 
 namespace detail {
 
-template <typename T1, typename T2>
+template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
 {
     sig /= detail::pow10<std::uint32_t>(std::abs(exp) - 1);
@@ -37,7 +38,7 @@ constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
 #  pragma warning(disable: 4146)
 #endif
 
-template <typename T, typename Int>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T, BOOST_DECIMAL_INTEGRAL Int>
 constexpr auto lrint_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, Int>
 {
     constexpr T zero {0, 0};
@@ -94,7 +95,7 @@ constexpr auto lrint_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal
 } //namespace detail
 
 // Rounds the number using the default rounding mode
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto rint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T zero {0, 0};
@@ -122,13 +123,13 @@ constexpr auto rint(T num) noexcept -> std::enable_if_t<detail::is_decimal_float
     return {sig, 0, is_neg};
 }
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto lrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long>
 {
     return detail::lrint_impl<T, long>(num);
 }
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto llrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long long>
 {
     return detail::lrint_impl<T, long long>(num);

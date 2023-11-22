@@ -9,12 +9,13 @@
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <type_traits>
 
 namespace boost {
 namespace decimal {
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto operator+(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>),
@@ -24,7 +25,7 @@ constexpr auto operator+(Decimal1 lhs, Decimal2 rhs) noexcept
     return static_cast<Promoted_Type>(lhs) + static_cast<Promoted_Type>(rhs);
 }
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto operator-(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>),
@@ -34,7 +35,7 @@ constexpr auto operator-(Decimal1 lhs, Decimal2 rhs) noexcept
     return static_cast<Promoted_Type>(lhs) - static_cast<Promoted_Type>(rhs);
 }
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto operator*(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>),
@@ -44,7 +45,7 @@ constexpr auto operator*(Decimal1 lhs, Decimal2 rhs) noexcept
     return static_cast<Promoted_Type>(lhs) * static_cast<Promoted_Type>(rhs);
 }
 
-template <typename Decimal1, typename Decimal2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
 constexpr auto operator/(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>),

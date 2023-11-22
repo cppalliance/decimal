@@ -27,7 +27,7 @@ namespace boost {
 namespace decimal {
 
 // 3.2.10 Formatted input:
-template <typename charT, typename traits, typename DecimalType>
+template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
 auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>
 {
@@ -106,7 +106,7 @@ void print_buffer(char* buffer, std::size_t buffer_size, const char*, Integer si
 }
 
 // 3.2.11 Formatted output
-template <typename charT, typename traits, typename DecimalType>
+template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
 auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
     -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>
 {

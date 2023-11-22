@@ -6,12 +6,13 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_EXP2_HPP
 
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/cmath/pow.hpp>
 
 namespace boost {
 namespace decimal {
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto exp2(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T two {2, 0};

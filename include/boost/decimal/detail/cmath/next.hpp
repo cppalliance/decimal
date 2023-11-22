@@ -10,6 +10,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/cmath/modf.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/round.hpp>
@@ -22,7 +23,7 @@
 namespace boost {
 namespace decimal {
 
-template <typename T1, typename T2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
 constexpr auto nextafter(T1 val, T2 direction) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<T1> || detail::is_decimal_floating_point_v<T2>),
                          detail::promote_args_t<T1, T2>>
@@ -43,7 +44,7 @@ constexpr auto nextafter(T1 val, T2 direction) noexcept
     return val - std::numeric_limits<T1>::epsilon();
 }
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto nexttoward(T val, long double direction) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {

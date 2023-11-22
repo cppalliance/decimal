@@ -11,12 +11,14 @@
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/fmax.hpp>
 #include <boost/decimal/detail/utilities.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <type_traits>
 #include <cmath>
 
-namespace boost { namespace decimal {
+namespace boost {
+namespace decimal {
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto hypot(T x, T y) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T zero {0, 0};
@@ -60,7 +62,7 @@ constexpr auto hypot(T x, T y) noexcept -> std::enable_if_t<detail::is_decimal_f
     return x * sqrt(1 + rat * rat);
 }
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto hypot(T x, T y, T z) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     if (isinf(x) || isinf(y) || isinf(z))

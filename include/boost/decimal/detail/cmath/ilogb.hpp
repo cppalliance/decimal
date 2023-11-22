@@ -10,11 +10,12 @@
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 
 namespace boost {
 namespace decimal {
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>
 {
     const auto fpc_d = fpclassify(d);

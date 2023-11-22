@@ -14,11 +14,12 @@
 #include <boost/decimal/detail/fast_float/compute_float32.hpp>
 #include <boost/decimal/detail/fast_float/compute_float64.hpp>
 #include <boost/decimal/detail/fast_float/compute_float80_128.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 
 namespace boost {
 namespace decimal {
 
-template <typename Decimal, typename TargetType>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_REAL TargetType>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType
 {
     bool success {};

@@ -8,6 +8,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/cstdlib.hpp>
 #include <limits>
 
@@ -18,7 +19,7 @@ namespace decimal {
 
 namespace detail {
 
-template <typename TargetDecimalType>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 constexpr auto nan_impl(const char* arg) noexcept -> TargetDecimalType
 {
     char* endptr {};

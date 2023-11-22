@@ -7,13 +7,15 @@
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <type_traits>
 #include <limits>
 #include <cmath>
 
-namespace boost { namespace decimal {
+namespace boost {
+namespace decimal {
 
-template<typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto remquo(T x, T y, int* quo) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T zero {0, 0};

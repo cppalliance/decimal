@@ -7,13 +7,14 @@
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/cmath/rint.hpp>
 #include <type_traits>
 
 namespace boost {
 namespace decimal {
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto nearbyint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     return rint(num);
