@@ -1,4 +1,5 @@
 // Copyright 2023 Matt Borland
+// Copyright 2023 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -75,14 +76,17 @@ constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
                 result = ldexp(man, arg_is_gt_one ? --exp2val / 2 : ++exp2val / 2);
             }
 
-            constexpr auto newton_steps = static_cast<unsigned>((sizeof(T) == 4U) ? 5U : 6U);
+            constexpr auto newton_steps = (sizeof(T) == 4U) ? 5U : 6U;
 
             for(auto i = 0U; i < newton_steps; ++i)
             {
                 result = (result + val / result) / 2;
             }
 
-            if(corrected) { result /= numbers::sqrt2_v<T>; }
+            if (corrected)
+            {
+                result /= numbers::sqrt2_v<T>;
+            }
         }
         else
         {
