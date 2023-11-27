@@ -71,16 +71,17 @@ constexpr auto cbrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
             }
             else
             {
-                val = val * 3;
-
                 result = ldexp(man, arg_is_gt_one ? --exp2val / 3 : ++exp2val / 3);
             }
 
-            constexpr auto newton_steps = (sizeof(T) == 4U) ? 5U : 6U;
+            constexpr auto newton_steps = (sizeof(T) == 4U) ? 5U :
+                                          (sizeof(T) == 8U) ? 6U : 10U;
 
             for (auto i = 0U; i < newton_steps; ++i)
             {
-                result = (result + val / result) / 3;
+                const auto sqruared_res {result * result};
+                const auto cubed_res {result * sqruared_res};
+                result -= (cubed_res - 3) / (3 * sqruared_res);
             }
 
             if (corrected)

@@ -76,7 +76,8 @@ constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
                 result = ldexp(man, arg_is_gt_one ? --exp2val / 2 : ++exp2val / 2);
             }
 
-            constexpr auto newton_steps = (sizeof(T) == 4U) ? 5U : 6U;
+            constexpr auto newton_steps = (sizeof(T) == 4U) ? 5U :
+                                          (sizeof(T) == 8U) ? 6U : 10U;
 
             for(auto i = 0U; i < newton_steps; ++i)
             {
