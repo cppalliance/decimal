@@ -656,7 +656,8 @@ void test_logb()
 template <typename Dec>
 void test_sqrt()
 {
-    std::uniform_real_distribution<float> dist(0.0F, 1e5F);
+    using comp_type = std::conditional_t<std::is_same<Dec, decimal32>::value, float, double>;
+    std::uniform_real_distribution<comp_type> dist(0, 1e5);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
@@ -665,7 +666,7 @@ void test_sqrt()
         Dec d1 {val1};
 
         auto ret_val {std::sqrt(val1)};
-        auto ret_dec {static_cast<float>(sqrt(d1))};
+        auto ret_dec {static_cast<comp_type>(sqrt(d1))};
 
         if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
         {
@@ -692,7 +693,8 @@ void test_sqrt()
 template <typename Dec>
 void test_cbrt()
 {
-    std::uniform_real_distribution<float> dist(0.0F, 1e5F);
+    using comp_type = std::conditional_t<std::is_same<Dec, decimal32>::value, float, double>;
+    std::uniform_real_distribution<comp_type> dist(0, 1e5);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
@@ -701,15 +703,15 @@ void test_cbrt()
         Dec d1 {val1};
 
         auto ret_val {std::cbrt(val1)};
-        auto ret_dec {static_cast<float>(cbrt(d1))};
+        auto ret_dec {static_cast<comp_type>(cbrt(d1))};
 
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
+        if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
-                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+                      << "\nEps: " << boost::math::float_distance(ret_val, ret_dec) << std::endl;
         }
     }
 
