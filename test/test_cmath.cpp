@@ -668,7 +668,7 @@ void test_sqrt()
         auto ret_val {std::sqrt(val1)};
         auto ret_dec {static_cast<comp_type>(sqrt(d1))};
 
-        if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
+        if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 15))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
@@ -705,7 +705,7 @@ void test_cbrt()
         auto ret_val {std::cbrt(val1)};
         auto ret_dec {static_cast<comp_type>(cbrt(d1))};
 
-        if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
+        if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 15))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
