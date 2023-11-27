@@ -3,8 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_DECIMAL_DETAIL_CMATH_SQRT_HPP
-#define BOOST_DECIMAL_DETAIL_CMATH_SQRT_HPP
+#ifndef BOOST_DECIMAL_DETAIL_CMATH_CBRT_HPP
+#define BOOST_DECIMAL_DETAIL_CMATH_CBRT_HPP
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
@@ -18,7 +18,7 @@ namespace boost {
 namespace decimal {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+constexpr auto cbrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T zero {0, 0};
 
@@ -53,7 +53,7 @@ constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
         {
             // TODO(ckormanyos)
             // TODO(mborland)
-            // This implementation of square root, although it works, needs optimization.
+            // This implementation of cube root, although it works, needs optimization.
             // Using base-2 frexp/ldexp might not be the best, rather use base-10?
 
             int exp2val { };
@@ -65,28 +65,28 @@ constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
             // TODO(ckormanyos)
             // Try to find a way to get a better (much better) initial guess.
 
-            if(!corrected)
+            if (!corrected)
             {
-                result = ldexp(man / 2, exp2val / 2);
+                result = ldexp(man / 3, exp2val / 3);
             }
             else
             {
-                val = val * 2;
-
-                result = ldexp(man, arg_is_gt_one ? --exp2val / 2 : ++exp2val / 2);
+                result = ldexp(man, arg_is_gt_one ? --exp2val / 3 : ++exp2val / 3);
             }
 
             constexpr auto newton_steps = (sizeof(T) == 4U) ? 5U :
                                           (sizeof(T) == 8U) ? 6U : 10U;
 
-            for(auto i = 0U; i < newton_steps; ++i)
+            for (auto i = 0U; i < newton_steps; ++i)
             {
-                result = (result + val / result) / 2;
+                const auto sqruared_res {result * result};
+                const auto cubed_res {result * sqruared_res};
+                result -= (cubed_res - 3) / (3 * sqruared_res);
             }
 
             if (corrected)
             {
-                result /= numbers::sqrt2_v<T>;
+                result /= numbers::sqrt3_v<T>;
             }
         }
         else
@@ -101,5 +101,4 @@ constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
 } //namespace decimal
 } //namespace boost
 
-#endif //BOOST_DECIMAL_DETAIL_CMATH_SQRT_HPP
-
+#endif //BOOST_DECIMAL_DETAIL_CMATH_CBRT_HPP

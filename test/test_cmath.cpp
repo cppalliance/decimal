@@ -656,7 +656,8 @@ void test_logb()
 template <typename Dec>
 void test_sqrt()
 {
-    std::uniform_real_distribution<float> dist(0.0F, 1e5F);
+    using comp_type = std::conditional_t<std::is_same<Dec, decimal32>::value, float, double>;
+    std::uniform_real_distribution<comp_type> dist(0, 1e5);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
@@ -665,15 +666,15 @@ void test_sqrt()
         Dec d1 {val1};
 
         auto ret_val {std::sqrt(val1)};
-        auto ret_dec {static_cast<float>(sqrt(d1))};
+        auto ret_dec {static_cast<comp_type>(sqrt(d1))};
 
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
+        if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 15))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
-                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+                      << "\nEps: " << boost::math::float_distance(ret_val, ret_dec) << std::endl;
         }
     }
 
@@ -687,6 +688,43 @@ void test_sqrt()
     BOOST_TEST(isnan(sqrt(-nan)));
     BOOST_TEST_EQ(sqrt(zero), zero);
     BOOST_TEST(isnan(sqrt(neg_num)));
+}
+
+template <typename Dec>
+void test_cbrt()
+{
+    using comp_type = std::conditional_t<std::is_same<Dec, decimal32>::value, float, double>;
+    std::uniform_real_distribution<comp_type> dist(0, 1e5);
+
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::cbrt(val1)};
+        auto ret_dec {static_cast<comp_type>(cbrt(d1))};
+
+        if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 15))
+        {
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << boost::math::float_distance(ret_val, ret_dec) << std::endl;
+        }
+    }
+
+    Dec inf {std::numeric_limits<Dec>::infinity() * static_cast<int>(dist(rng))};
+    Dec nan {std::numeric_limits<Dec>::quiet_NaN() * static_cast<int>(dist(rng))};
+    Dec zero {0 * static_cast<int>(dist(rng))};
+    Dec neg_num {-static_cast<int>(dist(rng))};
+    BOOST_TEST(isinf(cbrt(inf)));
+    BOOST_TEST(isnan(cbrt(-inf)));
+    BOOST_TEST(isnan(cbrt(nan)));
+    BOOST_TEST(isnan(cbrt(-nan)));
+    BOOST_TEST_EQ(cbrt(zero), zero);
+    BOOST_TEST(isnan(cbrt(neg_num)));
 }
 
 template <typename Dec>
@@ -1500,6 +1538,9 @@ int main()
 
     test_sqrt<decimal32>();
     test_sqrt<decimal64>();
+
+    test_cbrt<decimal32>();
+    test_cbrt<decimal64>();
 
     test_two_val_hypot<decimal32>();
     test_three_val_hypot<decimal32>();
