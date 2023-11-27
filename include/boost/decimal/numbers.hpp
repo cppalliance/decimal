@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_NUMBERS_HPP
 
 #include <boost/decimal/fwd.hpp>
+#include <boost/decimal/literals.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <cstdint>
@@ -15,44 +16,86 @@ namespace boost { namespace decimal { namespace numbers {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec e_v = Dec{UINT64_C(2718281828459045235), -18};
 
+template <>
+static constexpr decimal128 e_v<decimal128> = "2.718281828459045235360287471352662"_DL;
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec log2e_v = Dec{UINT64_C(1442695040888963407), -18};
+
+template <>
+static constexpr decimal128 log2e_v<decimal128> = "1.4426950408889634073599246810018921"_DL;
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec log10e_v = Dec{UINT64_C(4342944819032518277), -19};
 
+template <>
+static constexpr decimal128 log10e_v<decimal128> = "0.43429448190325182765112891891660508"_DL;
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec pi_v = Dec{UINT64_C(3141592653589793238), -18};
+
+template <>
+static constexpr decimal128 pi_v<decimal128> = "3.1415926535897932384626433832795029"_DL;
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec inv_pi_v = Dec{UINT64_C(3183098861837906715), -19};
 
+template <>
+static constexpr decimal128 inv_pi_v<decimal128> = "0.31830988618379067153776752674502872"_DL;
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec inv_sqrtpi_v = Dec{UINT64_C(5641895835477562869), -19};
+
+template <>
+static constexpr decimal128 inv_sqrtpi_v<decimal128> = "0.56418958354775628694807945156077259"_DL;
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec ln2_v = Dec{UINT64_C(6931471805599453094), -19};
 
+template <>
+static constexpr decimal128 ln2_v<decimal128> = "0.69314718055994530941723212145817657"_DL;
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec ln10_v = Dec{UINT64_C(2302585092994045684), -18};
+
+template <>
+static constexpr decimal128 ln10_v<decimal128> = "2.3025850929940456840179914546843642"_DL;
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec sqrt2_v = Dec{UINT64_C(1414213562373095049), -18};
 
+template <>
+static constexpr decimal128 sqrt2_v<decimal128> = "1.4142135623730950488016887242096981"_DL;
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec sqrt3_v = Dec{UINT64_C(1732050807568877294), -18};
+
+template <>
+static constexpr decimal128 sqrt3_v<decimal128> = "1.7320508075688772935274463415058724"_DL;
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec inv_sqrt2_v = Dec{UINT64_C(7071067811865475244), -19};
 
+template <>
+static constexpr decimal128 inv_sqrt2_v<decimal128> = "0.70710678118654752440084436210484904"_DL;
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec inv_sqrt3_v = Dec{UINT64_C(5773502691896257645), -19};
+
+template <>
+static constexpr decimal128 inv_sqrt3_v<decimal128> = "0.57735026918962576450914878050195746"_DL;
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec egamma_v = Dec{UINT64_C(5772156649015328606), -19};
 
+template <>
+static constexpr decimal128 egamma_v<decimal128> = "0.57721566490153286060651209008240243"_DL;
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec phi_v = Dec{UINT64_C(1618033988749894848), -18};
+
+template <>
+static constexpr decimal128 phi_v<decimal128> = "1.6180339887498948482045868343656381"_DL;
 
 static constexpr auto e {e_v<decimal64>};
 static constexpr auto log2e {log2e_v<decimal64>};
