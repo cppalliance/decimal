@@ -28,28 +28,35 @@ void test_constants()
     BOOST_TEST_EQ(Dec(1.618033988749894848), phi_v<Dec>);
 }
 
+template <>
+void test_constants<decimal128>()
+{
+    BOOST_TEST_EQ("2.718281828459045235360287471352662"_DL, e_v<decimal128>);
+}
+
 void test_defaults()
 {
-    BOOST_TEST_EQ(decimal32(2.718281828459045235), e);
-    BOOST_TEST_EQ(decimal32(1.442695040888963407), log2e);
-    BOOST_TEST_EQ(decimal32(0.4342944819032518277), log10e);
-    BOOST_TEST_EQ(decimal32(3.141592653589793238), pi);
-    BOOST_TEST_EQ(decimal32(0.3183098861837906715), inv_pi);
-    BOOST_TEST_EQ(decimal32(0.5641895835477562869), inv_sqrtpi);
-    BOOST_TEST_EQ(decimal32(0.6931471805599453094), ln2);
-    BOOST_TEST_EQ(decimal32(2.302585092994045684), ln10);
-    BOOST_TEST_EQ(decimal32(1.414213562373095049), sqrt2);
-    BOOST_TEST_EQ(decimal32(1.732050807568877294), sqrt3);
-    BOOST_TEST_EQ(decimal32(0.707106781186547524), inv_sqrt2);
-    BOOST_TEST_EQ(decimal32(0.5773502691896257645), inv_sqrt3);
-    BOOST_TEST_EQ(decimal32(0.5772156649015328606), egamma);
-    BOOST_TEST_EQ(decimal32(1.618033988749894848), phi);
+    BOOST_TEST_EQ(decimal64(2.718281828459045235), e);
+    BOOST_TEST_EQ(decimal64(1.442695040888963407), log2e);
+    BOOST_TEST_EQ(decimal64(0.4342944819032518277), log10e);
+    BOOST_TEST_EQ(decimal64(3.141592653589793238), pi);
+    BOOST_TEST_EQ(decimal64(0.3183098861837906715), inv_pi);
+    BOOST_TEST_EQ(decimal64(0.5641895835477562869), inv_sqrtpi);
+    BOOST_TEST_EQ(decimal64(0.6931471805599453094), ln2);
+    BOOST_TEST_EQ(decimal64(2.302585092994045684), ln10);
+    BOOST_TEST_EQ(decimal64(1.414213562373095049), sqrt2);
+    BOOST_TEST_EQ(decimal64(1.732050807568877294), sqrt3);
+    BOOST_TEST(abs(decimal64(0.707106781186547524) - inv_sqrt2_v<decimal64>) <= std::numeric_limits<decimal64>::epsilon());
+    BOOST_TEST(abs(decimal64(0.5773502691896257645) - inv_sqrt3_v<decimal64>) <= std::numeric_limits<decimal64>::epsilon());
+    BOOST_TEST_EQ(decimal64(0.5772156649015328606), egamma);
+    BOOST_TEST_EQ(decimal64(1.618033988749894848), phi);
 }
 
 int main()
 {
     test_constants<decimal32>();
     test_constants<decimal64>();
+    test_constants<decimal128>();
     test_defaults();
 
     return boost::report_errors();
