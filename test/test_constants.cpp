@@ -45,6 +45,21 @@ void test_constants<decimal128>()
     BOOST_TEST_EQ("0.57735026918962576450914878050195746"_DL, inv_sqrt3_v<decimal128>);
     BOOST_TEST_EQ("0.57721566490153286060651209008240243"_DL, egamma_v<decimal128>);
     BOOST_TEST_EQ("1.6180339887498948482045868343656381"_DL, phi_v<decimal128>);
+
+    BOOST_TEST_EQ(static_cast<decimal64>(e_v<decimal128>), e_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(log2e_v<decimal128>), log2e_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(log10e_v<decimal128>), log10e_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(pi_v<decimal128>), pi_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(inv_pi_v<decimal128>), inv_pi_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(inv_sqrtpi_v<decimal128>), inv_sqrtpi_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(ln2_v<decimal128>), ln2_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(ln10_v<decimal128>), ln10_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(sqrt2_v<decimal128>), sqrt2_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(sqrt3_v<decimal128>), sqrt3_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(inv_sqrt2_v<decimal128>), inv_sqrt2_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(inv_sqrt3_v<decimal128>), inv_sqrt3_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(egamma_v<decimal128>), egamma_v<decimal64>);
+    BOOST_TEST_EQ(static_cast<decimal64>(phi_v<decimal128>), phi_v<decimal64>);
 }
 
 void test_defaults()
