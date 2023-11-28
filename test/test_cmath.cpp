@@ -224,14 +224,28 @@ void test_frexp10()
     BOOST_TEST_EQ(frexp10(std::numeric_limits<Dec>::infinity(), &expval), -1);
     BOOST_TEST_EQ(expval, 0);
 
-    BOOST_TEST_EQ(frexp10(Dec(10, 0), &expval), 1'000'000);
-    BOOST_TEST_EQ(expval, -5);
+    BOOST_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value)
+    {
+        BOOST_TEST_EQ(frexp10(Dec(10, 0), &expval), 1'000'000);
+        BOOST_TEST_EQ(expval, -5);
 
-    BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &expval), 1'000'000);
-    BOOST_TEST_EQ(expval, 5);
+        BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &expval), 1'000'000);
+        BOOST_TEST_EQ(expval, 5);
 
-    BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), 1'000'000);
-    BOOST_TEST_EQ(expval, 5);
+        BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), 1'000'000);
+        BOOST_TEST_EQ(expval, 5);
+    }
+    else BOOST_IF_CONSTEXPR (std::is_same<Dec, decimal64>::value)
+    {
+        BOOST_TEST_EQ(frexp10(Dec(10, 0), &expval), 1000000000000000);
+        BOOST_TEST_EQ(expval, -14);
+
+        BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &expval), 1000000000000000);
+        BOOST_TEST_EQ(expval, -4);
+
+        BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), 1000000000000000);
+        BOOST_TEST_EQ(expval, -4);
+    }
 }
 
 template <typename Dec>
