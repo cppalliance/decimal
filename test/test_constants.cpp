@@ -28,6 +28,16 @@ void test_constants()
     BOOST_TEST_EQ(Dec(1.618033988749894848), phi_v<Dec>);
 }
 
+template <typename T>
+void print_value(T value, const char* str)
+{
+    int ptr;
+    const auto sig_val = frexp10(value, &ptr);
+    std::cerr << std::setprecision(std::numeric_limits<T>::digits10) << str << ": " << value
+              << "\nSig: " << sig_val.high << " " << sig_val.low
+              << "\nExp: " << ptr << "\n" << std::endl;
+}
+
 template <>
 void test_constants<decimal128>()
 {
@@ -86,6 +96,24 @@ int main()
     test_constants<decimal64>();
     test_constants<decimal128>();
     test_defaults();
+
+    #ifdef BOOST_DECIMAL_GENERATE_CONSTANT_SIGS
+    print_value("2.718281828459045235360287471352662"_DL, "e");
+    print_value("1.4426950408889634073599246810018921"_DL, "log2");
+    print_value("0.43429448190325182765112891891660508"_DL, "log10");
+    print_value("3.1415926535897932384626433832795029"_DL, "pi");
+    print_value("0.31830988618379067153776752674502872"_DL, "inv_pi");
+    print_value("0.56418958354775628694807945156077259"_DL, "inv_sqrt_pi");
+    print_value("0.69314718055994530941723212145817657"_DL, "ln2");
+    print_value("2.3025850929940456840179914546843642"_DL, "ln10");
+    print_value("1.4142135623730950488016887242096981"_DL, "sqrt(2)");
+    print_value("1.7320508075688772935274463415058724"_DL, "sqrt(3)");
+    print_value("0.70710678118654752440084436210484904"_DL, "1/sqrt(2)");
+    print_value("0.57735026918962576450914878050195746"_DL, "1/sqrt(3)");
+    print_value("0.57721566490153286060651209008240243"_DL, "egamma");
+    print_value("1.6180339887498948482045868343656381"_DL, "phi");
+    return 1;
+    #endif
 
     return boost::report_errors();
 }
