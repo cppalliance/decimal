@@ -44,7 +44,7 @@ constexpr auto frexp10(T num, int* expptr) noexcept
 
     auto num_exp {num.biased_exponent()};
     auto num_sig {num.full_significand()};
-    detail::normalize(num_sig, num_exp);
+    detail::normalize<T>(num_sig, num_exp);
 
     *expptr = num_exp;
 
