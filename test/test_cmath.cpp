@@ -224,14 +224,28 @@ void test_frexp10()
     BOOST_TEST_EQ(frexp10(std::numeric_limits<Dec>::infinity(), &expval), -1);
     BOOST_TEST_EQ(expval, 0);
 
-    BOOST_TEST_EQ(frexp10(Dec(10, 0), &expval), 1'000'000);
-    BOOST_TEST_EQ(expval, -5);
+    BOOST_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value)
+    {
+        BOOST_TEST_EQ(frexp10(Dec(10, 0), &expval), 1'000'000);
+        BOOST_TEST_EQ(expval, -5);
 
-    BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &expval), 1'000'000);
-    BOOST_TEST_EQ(expval, 5);
+        BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &expval), 1'000'000);
+        BOOST_TEST_EQ(expval, 5);
 
-    BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), 1'000'000);
-    BOOST_TEST_EQ(expval, 5);
+        BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), 1'000'000);
+        BOOST_TEST_EQ(expval, 5);
+    }
+    else BOOST_IF_CONSTEXPR (std::is_same<Dec, decimal64>::value)
+    {
+        BOOST_TEST_EQ(frexp10(Dec(10, 0), &expval), 1000000000000000);
+        BOOST_TEST_EQ(expval, -14);
+
+        BOOST_TEST_EQ(frexp10(Dec(1'000'000, 5), &expval), 1000000000000000);
+        BOOST_TEST_EQ(expval, -4);
+
+        BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), 1000000000000000);
+        BOOST_TEST_EQ(expval, -4);
+    }
 }
 
 template <typename Dec>
@@ -868,6 +882,7 @@ void test_rint()
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -887,7 +902,8 @@ void test_rint()
         {
             if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
             {
-                std::cerr << "Val 1: " << val1
+                std::cerr << std::setprecision(std::numeric_limits<Dec>::digits10)
+                          << "Val 1: " << val1
                           << "\nDec 1: " << d1
                           << "\nRet val: " << ret_val
                           << "\nRet dec: " << ret_dec

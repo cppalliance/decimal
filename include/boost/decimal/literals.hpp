@@ -8,6 +8,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/cstdlib.hpp>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
@@ -23,6 +24,18 @@ constexpr auto operator  "" _DF(const char* str) -> decimal32
 }
 
 constexpr auto operator  "" _df(const char* str) -> decimal32
+{
+    char* endptr {};
+    return strtod32(str, &endptr);
+}
+
+constexpr auto operator  "" _DF(const char* str, std::size_t) -> decimal32
+{
+    char* endptr {};
+    return strtod32(str, &endptr);
+}
+
+constexpr auto operator  "" _df(const char* str, std::size_t) -> decimal32
 {
     char* endptr {};
     return strtod32(str, &endptr);
@@ -60,6 +73,18 @@ constexpr auto operator  "" _dd(const char* str) -> decimal64
     return strtod64(str, &endptr);
 }
 
+constexpr auto operator  "" _DD(const char* str, std::size_t) -> decimal64
+{
+    char* endptr {};
+    return strtod64(str, &endptr);
+}
+
+constexpr auto operator  "" _dd(const char* str, std::size_t) -> decimal64
+{
+    char* endptr {};
+    return strtod64(str, &endptr);
+}
+
 constexpr auto operator  "" _DD(unsigned long long v) -> decimal64
 {
     return decimal64{v};
@@ -87,6 +112,18 @@ constexpr auto operator  "" _DL(const char* str) -> decimal128
 }
 
 constexpr auto operator  "" _dl(const char* str) -> decimal128
+{
+    char* endptr {};
+    return strtod128(str, &endptr);
+}
+
+constexpr auto operator  "" _DL(const char* str, std::size_t) -> decimal128
+{
+    char* endptr {};
+    return strtod128(str, &endptr);
+}
+
+constexpr auto operator  "" _dl(const char* str, std::size_t) -> decimal128
 {
     char* endptr {};
     return strtod128(str, &endptr);
