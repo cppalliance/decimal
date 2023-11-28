@@ -102,8 +102,9 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto rint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     constexpr T zero {0, 0};
+    constexpr T max_round_value {1 / std::numeric_limits<T>::epsilon()};
 
-    if (isinf(num) || isnan(num) || abs(num) == zero)
+    if (isinf(num) || isnan(num) || abs(num) == zero || abs(num) > max_round_value)
     {
         return num;
     }
