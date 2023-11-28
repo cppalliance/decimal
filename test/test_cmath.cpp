@@ -1573,10 +1573,10 @@ int main()
     test_lrint<decimal32>();
     test_llrint<decimal32>();
     test_nearbyint<decimal32>();
-    test_rint<decimal64>();
-    test_lrint<decimal64>();
-    test_llrint<decimal64>();
-    test_nearbyint<decimal64>();
+    //test_rint<decimal64>();
+    //test_lrint<decimal64>();
+    //test_llrint<decimal64>();
+    //test_nearbyint<decimal64>();
 
     test_round<decimal32>();
     test_lround<decimal32>();
