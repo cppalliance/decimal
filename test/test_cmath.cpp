@@ -882,7 +882,7 @@ void test_rint()
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
-    /*
+
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -902,7 +902,8 @@ void test_rint()
         {
             if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
             {
-                std::cerr << "Val 1: " << val1
+                std::cerr << std::setprecision(std::numeric_limits<Dec>::digits10)
+                          << "Val 1: " << val1
                           << "\nDec 1: " << d1
                           << "\nRet val: " << ret_val
                           << "\nRet dec: " << ret_dec
@@ -918,7 +919,7 @@ void test_rint()
                       << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
         }
     }
-    */
+
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
     for (std::size_t n {}; n < max_iter; ++n)
@@ -1577,7 +1578,7 @@ int main()
     test_rint<decimal64>();
     test_lrint<decimal64>();
     test_llrint<decimal64>();
-    //test_nearbyint<decimal64>();
+    test_nearbyint<decimal64>();
 
     test_round<decimal32>();
     test_lround<decimal32>();
