@@ -39,7 +39,7 @@ public:
         xx = neg_z_squared * 2;
     }
 
-    constexpr auto operator()() -> T
+    constexpr auto operator()() noexcept -> T
     {
         auto r {result};
         result *= tk / xx;
@@ -65,9 +65,9 @@ private:
 public:
     using result_type = T;
 
-    explicit constexpr erf_series_near_zero(const T& z) : term {z}, zz {-z * z} {}
+    explicit constexpr erf_series_near_zero(const T &z) : term {z}, zz {-z * z} {}
 
-    constexpr auto operator()() -> T
+    constexpr auto operator()() noexcept -> T
     {
         auto result {term / (2 * k + 1)};
         term *= zz / ++k;
@@ -75,7 +75,18 @@ public:
     }
 };
 
+template <typename T>
+constexpr auto erf_series_near_zero_sum(const T &x) noexcept -> T
+{
+    //
+    // We need Kahan summation here, otherwise the errors grow fairly quickly.
+    // This method is *much* faster than the alternatives even so.
+    //
+    constexpr T two_div_root_pi {2 / sqrt(numbers::pi_v<T>)};
 
+    erf_series_near_zero<T> sum{x};
+    return two_div_root_pi * tools::kahan_sum_series(sum, std::numeric_limits<T>::digits);
+}
 
 }
 

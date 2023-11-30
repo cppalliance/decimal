@@ -6,6 +6,11 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_IMPL_KAHAN_SUM
 #define BOOST_DECIMAL_DETAIL_CMATH_IMPL_KAHAN_SUM
 
+namespace boost {
+namespace decimal {
+namespace tools {
+
+
 //
 // Algorithm kahan_sum_series invokes Functor func until the N'th
 // term is too small to have any effect on the total, the terms
@@ -21,7 +26,7 @@
 template <typename Functor>
 constexpr typename Functor::result_type kahan_sum_series(Functor& func, int bits) noexcept
 {
-    typedef typename Functor::result_type result_type;
+    using result_type = typename Functor::result_type;
 
     result_type factor = pow(result_type(2), result_type(bits));
     result_type result = func();
@@ -38,9 +43,13 @@ constexpr typename Functor::result_type kahan_sum_series(Functor& func, int bits
         carry = t - result;
         carry -= y;
         result = t;
-    } while(fabs(result) < fabs(factor * next_term));
+    } while (fabs(result) < fabs(factor * next_term));
 
     return result;
 }
+
+} //namespace tools
+} //namespace decimal
+} //namespace boost
 
 #endif //BOOST_DECIMAL_DETAIL_CMATH_IMPL_KAHAN_SUM
