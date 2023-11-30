@@ -6,6 +6,7 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_ERF_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_ERF_HPP
 
+#include <boost/decimal/detail/cmath/impl/kahan_sum.hpp>
 #include <boost/decimal/detail/cmath/exp.hpp>
 #include <boost/decimal/detail/cmath/fabs.hpp>
 #include <boost/decimal/numbers.hpp>
@@ -64,7 +65,7 @@ private:
 public:
     using result_type = T;
 
-    constexpr erf_series_near_zero(const T& z) : term {z}, zz {-z * z} {}
+    explicit constexpr erf_series_near_zero(const T& z) : term {z}, zz {-z * z} {}
 
     constexpr auto operator()() -> T
     {
@@ -73,6 +74,8 @@ public:
         return result;
     }
 };
+
+
 
 }
 
