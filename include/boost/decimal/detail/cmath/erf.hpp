@@ -7,8 +7,11 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_ERF_HPP
 
 #include <boost/decimal/detail/cmath/impl/kahan_sum.hpp>
+#include <boost/decimal/detail/cmath/impl/evaluate_polynomial.hpp>
 #include <boost/decimal/detail/cmath/exp.hpp>
 #include <boost/decimal/detail/cmath/fabs.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/numbers.hpp>
 #include <limits>
 
@@ -20,7 +23,7 @@ namespace detail {
 //
 // Asymptotic series for large z:
 //
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 class erf_asympt_series_t
 {
 private:
@@ -54,7 +57,7 @@ public:
 
 };
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 class erf_series_near_zero
 {
 private:
@@ -75,7 +78,7 @@ public:
     }
 };
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto erf_series_near_zero_sum(const T &x) noexcept -> T
 {
     //
@@ -88,6 +91,112 @@ constexpr auto erf_series_near_zero_sum(const T &x) noexcept -> T
     return two_div_root_pi * tools::kahan_sum_series(sum, std::numeric_limits<T>::digits);
 }
 
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto erf_impl(T z, bool invert) noexcept -> T
+{
+    constexpr T zero {0, 0};
+
+    if (z < zero)
+    {
+        if (!invert)
+        {
+            return -erf_impl(-z, invert);
+        }
+        else if (z < T{5, -1, true})
+        {
+            return 2 - erf_impl(-z, invert);
+        }
+        else
+        {
+            return 1 + erf_impl(-z, false);
+        }
+    }
+
+    T result {};
+
+    //
+    // Big bunch of selection statements now to pick which
+    // implementation to use, try to put most likely options
+    // first:
+    //
+    if (z < T{5, -1})
+    {
+        //
+        // We're going to calculate erf:
+        //
+        if (z == zero)
+        {
+            result = zero;
+        }
+        else if (z < T{1, -10})
+        {
+            constexpr T c {UINT64_C(3379167095512573896), -21};
+            result = z * T{UINT64_C(1125), -3} + z * c;
+        }
+        else
+        {
+            // Max Error found at long double precision =   1.623299e-20
+            // Maximum Deviation Found:                     4.326e-22
+            // Expected Error Term:                         -4.326e-22
+            // Maximum Relative Change in Control Points:   1.474e-04
+            constexpr T Y {UINT64_C(1044948577880859375), -18};
+            constexpr T P[] = {
+                {UINT64_C(8343058921465319889), -20},
+                {UINT64_C(3380972830755654136), -19},
+                {UINT64_C(5096027344060672046), -20},
+                {UINT64_C(9049063461585377944), -21},
+                {UINT64_C(4894686514647986692), -22},
+                {UINT64_C(2003056263661518778), -23}
+            };
+            constexpr T Q[] = {
+                {UINT64_C(1), 0},
+                {UINT64_C(4558173005158751724), -19},
+                {UINT64_C(9165373543562417920), -20},
+                {UINT64_C(1027226526759100312), -20},
+                {UINT64_C(6505117526878515487), -22},
+                {UINT64_C(1895325191056554967), -23}
+            };
+
+            result = z * (Y + tools::evaluate_polynomial(P, T(z * z)) / tools::evaluate_polynomial(Q, T(z * z)));
+        }
+    }
+    else if (invert ? (z < 110) : (z < T{66, -1}))
+    {
+        //
+        // We'll be calculating erfc:
+        //
+    }
+    else
+    {
+        //
+        // Any value of z larger than 110 will underflow to zero:
+        //
+        result = 0;
+        invert = !invert;
+    }
+
+    if (invert)
+    {
+        result = 1 - result;
+    }
+
+    return result;
+}
+
+} //namespace detail
+
+// TODO(mborland): Add special handling for decimal128
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto erf(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+{
+    return detail::erf_impl(z, false);
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto erfc(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+{
+    return detail::erf_impl(z, true);
 }
 
 } //namespace decimal
