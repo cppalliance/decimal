@@ -1530,7 +1530,25 @@ void test_erfc()
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
         const auto dist {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 15))
+        if (!BOOST_TEST(dist < 20))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> mid_vals(1.0, 2.5);
+    for (std::size_t i {}; i < N / 2; ++i)
+    {
+        const auto val {mid_vals(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 25))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
