@@ -257,7 +257,7 @@ constexpr auto erf_impl(T z, bool invert) noexcept -> T
                 T{UINT64_C(8041494641903097998), -23}
             };
 
-            constexpr T three_and_half {15, -1};
+            constexpr T three_and_half {35, -1};
             result = Y + tools::evaluate_polynomial(P, T(z - three_and_half)) / tools::evaluate_polynomial(Q, T(z - three_and_half));
         }
         else
@@ -300,7 +300,7 @@ constexpr auto erf_impl(T z, bool invert) noexcept -> T
         hi = ldexp(hi, expon - 32);
         auto lo {z - hi};
         auto sq {z * z};
-        auto err_sqr {((hi * hi - sq) + 2 * hi * lo) + lo * lo};
+        auto err_sqr {((hi * hi - sq) + T{2, 0} * hi * lo) + lo * lo};
 
         result *= exp(-sq) * exp(-err_sqr) / z;
     }
@@ -315,7 +315,7 @@ constexpr auto erf_impl(T z, bool invert) noexcept -> T
 
     if (invert)
     {
-        result = 1 - result;
+        result = T{1, 0} - result;
     }
 
     return result;
@@ -347,7 +347,7 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto erfc(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     // Edge cases
-    const auto fp {fpclassify((z))};
+    const auto fp {fpclassify(z)};
 
     if (fp == FP_NAN)
     {
