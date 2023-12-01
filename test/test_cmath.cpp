@@ -1517,6 +1517,27 @@ void test_erfc()
     BOOST_TEST_EQ(erfc(std::numeric_limits<T>::infinity() * dist(rng)), T{0});
     BOOST_TEST_EQ(erfc(-std::numeric_limits<T>::infinity() * dist(rng)), T{2});
 
+    // Small values
+    using float_type = std::conditional_t<std::is_same<T, decimal32>::value, float, double>;
+
+    std::uniform_real_distribution<float_type> small_vals(-0.001, 0.5);
+    for (std::size_t i {}; i < N / 2; ++i)
+    {
+        const auto val {small_vals(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 15))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
     // Underflow case
     BOOST_TEST_EQ(erfc(T{120}), T{0} * dist(rng));
 }
