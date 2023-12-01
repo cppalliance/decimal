@@ -1480,6 +1480,7 @@ void test_erf()
     std::uniform_int_distribution<int> dist(1, 1);
 
     BOOST_TEST(isnan(erf(std::numeric_limits<T>::quiet_NaN()) * dist(rng)));
+    BOOST_TEST(isnan(erf(T(0 * dist(rng)))));
     BOOST_TEST_EQ(erf(std::numeric_limits<T>::infinity() * dist(rng)), T{1});
     BOOST_TEST_EQ(erf(-std::numeric_limits<T>::infinity() * dist(rng)), T{-1});
 
@@ -1494,13 +1495,13 @@ void test_erf()
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1512,13 +1513,13 @@ void test_erf()
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1530,13 +1531,13 @@ void test_erf()
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1548,13 +1549,13 @@ void test_erf()
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1566,13 +1567,13 @@ void test_erf()
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1584,13 +1585,13 @@ void test_erf()
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1603,14 +1604,14 @@ void test_erf()
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "  Val: " << val
                       << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1638,13 +1639,13 @@ void test_erfc()
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1656,13 +1657,13 @@ void test_erfc()
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1674,13 +1675,13 @@ void test_erfc()
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1692,13 +1693,13 @@ void test_erfc()
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 50))
+        if (!BOOST_TEST(distance < 50))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1710,14 +1711,14 @@ void test_erfc()
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "  Val: " << val
                       << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1729,14 +1730,14 @@ void test_erfc()
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "  Val: " << val
                       << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1749,14 +1750,14 @@ void test_erfc()
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "  Val: " << val
                       << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
@@ -1768,14 +1769,14 @@ void test_erfc()
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
-        const auto dist {boost::math::float_distance(float_res, dec_res)};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 30))
+        if (!BOOST_TEST(distance < 30))
         {
             std::cerr << "  Val: " << val
                       << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
-                      << "\n Dist: " << dist << std::endl;
+                      << "\n Dist: " << distance << std::endl;
         }
     }
 
