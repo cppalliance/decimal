@@ -236,6 +236,63 @@ constexpr auto erf_impl(T z, bool invert) noexcept -> T
             // Expected Error Term:                         -1.106e-20
             // Maximum Relative Change in Control Points:   1.709e-04
             // Max Error found at long double precision =   1.446908e-20
+
+            constexpr T Y {UINT64_C(5405750274658203125), -19};
+            constexpr std::array<T, 7> P = {
+                T{UINT64_C(2952767165309728403), -21},
+                T{UINT64_C(1418532458954956041), -20},
+                T{UINT64_C(1049595846264322939), -20},
+                T{UINT64_C(3439637959761000776), -21},
+                T{UINT64_C(5906544119487763790), -22},
+                T{UINT64_C(5234353806361740087), -23},
+                T{UINT64_C(1898960430503312573), -24}
+            };
+            constexpr std::array<T, 7> Q = {
+                T{UINT64_C(1), 0},
+                T{UINT64_C(1193521601852856426), -18},
+                T{UINT64_C(6032569643634543929), -19},
+                T{UINT64_C(1654111424585405858), -19},
+                T{UINT64_C(2597298709462031665), -20},
+                T{UINT64_C(2216575682928936992), -21},
+                T{UINT64_C(8041494641903097998), -23}
+            };
+
+            constexpr T three_and_half {15, -1};
+            result = Y + tools::evaluate_polynomial(P, T(z - three_and_half)) / tools::evaluate_polynomial(Q, T(z - three_and_half));
+        }
+        else
+        {
+            // Max Error found at long double precision =   7.961166e-21
+            // Maximum Deviation Found:                     6.677e-21
+            // Expected Error Term:                         6.676e-21
+            // Maximum Relative Change in Control Points:   2.319e-05
+
+            constexpr T Y {UINT64_C(5582551956176757812), -19};
+
+            constexpr std::array<T, 9> P = {
+                T{UINT64_C(5934387930080502141), -21},
+                T{UINT64_C(2806662310090897139), -20},
+                T{UINT64_C(1415978352045830500), -19, true},
+                T{UINT64_C(9780882011543005488), -19, true},
+                T{UINT64_C(5473515277960120494), -18, true},
+                T{UINT64_C(1386773046602453266), -17, true},
+                T{UINT64_C(2712749487205398217), -17, true},
+                T{UINT64_C(2925451527470094615), -17, true},
+                T{UINT64_C(1688657744997996769), -17, true}
+            };
+            constexpr std::array<T, 9> Q = {
+                T{UINT64_C(1), 0},
+                T{UINT64_C(4729489111866453945), -18},
+                T{UINT64_C(2367505431476957492), -17},
+                T{UINT64_C(6000215173356931867), -17},
+                T{UINT64_C(1317662516451495229), -16},
+                T{UINT64_C(1781679249712834825), -16},
+                T{UINT64_C(1824993905059152227), -16},
+                T{UINT64_C(1043652514795785780), -16},
+                T{UINT64_C(3083655118912242917), -17}
+            };
+
+            result = Y + tools::evaluate_polynomial(P, T(1 / z)) / tools::evaluate_polynomial(Q, T(1 / z));
         }
 
         int expon {};
