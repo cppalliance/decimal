@@ -18,9 +18,9 @@ namespace tools {
 // the loop expanded versions above:
 //
 template <typename T, typename U>
-constexpr U evaluate_polynomial(const T* poly, U const& z, std::size_t count) noexcept
+constexpr U evaluate_polynomial(const T& poly, const U& z) noexcept
 {
-    BOOST_DECIMAL_ASSERT(count > 0);
+    const auto count {poly.size()};
     auto sum = static_cast<U>(poly[count - 1]);
     for(int i = static_cast<int>(count) - 2; i >= 0; --i)
     {

@@ -14,6 +14,7 @@
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/numbers.hpp>
 #include <limits>
+#include <array>
 
 namespace boost {
 namespace decimal {
@@ -140,21 +141,21 @@ constexpr auto erf_impl(T z, bool invert) noexcept -> T
             // Expected Error Term:                         -4.326e-22
             // Maximum Relative Change in Control Points:   1.474e-04
             constexpr T Y {UINT64_C(1044948577880859375), -18};
-            constexpr T P[] = {
-                {UINT64_C(8343058921465319889), -20},
-                {UINT64_C(3380972830755654136), -19},
-                {UINT64_C(5096027344060672046), -20},
-                {UINT64_C(9049063461585377944), -21},
-                {UINT64_C(4894686514647986692), -22},
-                {UINT64_C(2003056263661518778), -23}
+            constexpr std::array<T, 6> P = {
+                T{UINT64_C(8343058921465319889), -20},
+                T{UINT64_C(3380972830755654136), -19},
+                T{UINT64_C(5096027344060672046), -20},
+                T{UINT64_C(9049063461585377944), -21},
+                T{UINT64_C(4894686514647986692), -22},
+                T{UINT64_C(2003056263661518778), -23}
             };
-            constexpr T Q[] = {
-                {UINT64_C(1), 0},
-                {UINT64_C(4558173005158751724), -19},
-                {UINT64_C(9165373543562417920), -20},
-                {UINT64_C(1027226526759100312), -20},
-                {UINT64_C(6505117526878515487), -22},
-                {UINT64_C(1895325191056554967), -23}
+            constexpr std::array<T, 6> Q = {
+                T{UINT64_C(1), 0},
+                T{UINT64_C(4558173005158751724), -19},
+                T{UINT64_C(9165373543562417920), -20},
+                T{UINT64_C(1027226526759100312), -20},
+                T{UINT64_C(6505117526878515487), -22},
+                T{UINT64_C(1895325191056554967), -23}
             };
 
             result = z * (Y + tools::evaluate_polynomial(P, T(z * z)) / tools::evaluate_polynomial(Q, T(z * z)));
@@ -171,7 +172,7 @@ constexpr auto erf_impl(T z, bool invert) noexcept -> T
         //
         // Any value of z larger than 110 will underflow to zero:
         //
-        result = 0;
+        result = zero;
         invert = !invert;
     }
 
@@ -190,12 +191,36 @@ constexpr auto erf_impl(T z, bool invert) noexcept -> T
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto erf(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
+    // Edge cases
+    const auto fp {fpclassify(z)};
+
+    if (fp == FP_ZERO || fp == FP_NAN)
+    {
+        return z;
+    }
+    else if (fp == FP_INFINITE)
+    {
+        return z < T{0} ? T{-1} : T{1};
+    }
+
     return detail::erf_impl(z, false);
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto erfc(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
+    // Edge cases
+    const auto fp {fpclassify((z))};
+
+    if (fp == FP_NAN)
+    {
+        return z;
+    }
+    else if (fp == FP_INFINITE)
+    {
+        return z < T{0} ? T{2} : T{0};
+    }
+
     return detail::erf_impl(z, true);
 }
 

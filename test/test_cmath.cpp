@@ -1474,6 +1474,26 @@ void test_nan()
 }
 #endif
 
+template <typename T>
+void test_erf()
+{
+    std::uniform_int_distribution<int> dist(1, 1);
+
+    BOOST_TEST(isnan(erf(std::numeric_limits<T>::quiet_NaN()) * dist(rng)));
+    BOOST_TEST_EQ(erf(std::numeric_limits<T>::infinity() * dist(rng)), T{1});
+    BOOST_TEST_EQ(erf(-std::numeric_limits<T>::infinity() * dist(rng)), T{-1});
+}
+
+template <typename T>
+void test_erfc()
+{
+    std::uniform_int_distribution<int> dist(1, 1);
+
+    BOOST_TEST(isnan(erfc(std::numeric_limits<T>::quiet_NaN() * dist(rng))));
+    BOOST_TEST_EQ(erfc(std::numeric_limits<T>::infinity() * dist(rng)), T{0});
+    BOOST_TEST_EQ(erfc(-std::numeric_limits<T>::infinity() * dist(rng)), T{2});
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -1603,6 +1623,10 @@ int main()
     test_nan<decimal64>();
     test_nan<decimal128>();
     #endif
+
+    test_erf<decimal32>();
+
+    test_erfc<decimal32>();
 
     return boost::report_errors();
 }
