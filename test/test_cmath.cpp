@@ -1740,6 +1740,45 @@ void test_erfc()
         }
     }
 
+    // Negative values
+    std::uniform_real_distribution<float_type> negative_first_path(-2, -0.5);
+    for (std::size_t i {}; i < N / 8; ++i)
+    {
+        const auto val {negative_first_path(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 30))
+        {
+            std::cerr << "  Val: " << val
+                      << "\nFloat: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> negative_second_path(-0.5, 0.0);
+    for (std::size_t i {}; i < N / 8; ++i)
+    {
+        const auto val {negative_first_path(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 30))
+        {
+            std::cerr << "  Val: " << val
+                      << "\nFloat: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
     // Underflow case
     BOOST_TEST_EQ(erfc(T{120}), T{0} * dist(rng));
 }
@@ -1877,7 +1916,7 @@ int main()
     test_erf<decimal32>();
     test_erf<decimal64>();
 
-    // test_erfc<decimal32>();
+    test_erfc<decimal32>();
     // test_erfc<decimal64>();
 
     return boost::report_errors();
