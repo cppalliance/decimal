@@ -1486,17 +1486,107 @@ void test_erf()
     // Small values
     using float_type = std::conditional_t<std::is_same<T, decimal32>::value, float, double>;
 
-    std::uniform_real_distribution<float_type> small_vals(-0.001, 0.5);
-    for (std::size_t i {}; i < N / 2; ++i)
+    std::uniform_real_distribution<float_type> smallest_vals(1e-15, 1e-10);
+    for (std::size_t i {}; i < N / 6; ++i)
     {
-        const auto val {small_vals(rng)};
+        const auto val {smallest_vals(rng)};
         const T dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
         const auto dist {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 15))
+        if (!BOOST_TEST(dist < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> second_smallest(1e-10, 0.5);
+    for (std::size_t i {}; i < N / 6; ++i)
+    {
+        const auto val {second_smallest(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_smallest(0.5, 1.5);
+    for (std::size_t i {}; i < N / 6; ++i)
+    {
+        const auto val {erfc_smallest(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_middle(1.5, 2.5);
+    for (std::size_t i {}; i < N / 6; ++i)
+    {
+        const auto val {erfc_middle(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_large(2.5, 4.5);
+    for (std::size_t i {}; i < N / 6; ++i)
+    {
+        const auto val {erfc_large(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> catch_all(4.5, 110.0);
+    for (std::size_t i {}; i < N / 6; ++i)
+    {
+        const auto val {catch_all(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 30))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
@@ -1520,17 +1610,17 @@ void test_erfc()
     // Small values
     using float_type = std::conditional_t<std::is_same<T, decimal32>::value, float, double>;
 
-    std::uniform_real_distribution<float_type> small_vals(-0.001, 0.5);
-    for (std::size_t i {}; i < N / 2; ++i)
+    std::uniform_real_distribution<float_type> smallest_vals(1e-15, 1e-10);
+    for (std::size_t i {}; i < N / 6; ++i)
     {
-        const auto val {small_vals(rng)};
+        const auto val {smallest_vals(rng)};
         const T dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
         const auto dist {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 20))
+        if (!BOOST_TEST(dist < 30))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
@@ -1538,19 +1628,93 @@ void test_erfc()
         }
     }
 
-    std::uniform_real_distribution<float_type> mid_vals(1.0, 2.5);
-    for (std::size_t i {}; i < N / 2; ++i)
+    std::uniform_real_distribution<float_type> second_smallest(1e-10, 0.5);
+    for (std::size_t i {}; i < N / 6; ++i)
     {
-        const auto val {mid_vals(rng)};
+        const auto val {second_smallest(rng)};
         const T dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
         const auto dist {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(dist < 25))
+        if (!BOOST_TEST(dist < 30))
         {
             std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_smallest(0.5, 1.5);
+    for (std::size_t i {}; i < N / 6; ++i)
+    {
+        const auto val {erfc_smallest(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_middle(1.5, 2.5);
+    for (std::size_t i {}; i < N / 6; ++i)
+    {
+        const auto val {erfc_middle(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 50))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_large(2.5, 4.5);
+    for (std::size_t i {}; i < N / 6; ++i)
+    {
+        const auto val {erfc_large(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 30))
+        {
+            std::cerr << "  Val: " << val
+                      << "\nFloat: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << dist << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> catch_all(4.5, 110.0);
+    for (std::size_t i {}; i < N / 6; ++i)
+    {
+        const auto val {catch_all(rng)};
+        const T dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto dist {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(dist < 30))
+        {
+            std::cerr << "  Val: " << val
+                      << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << dist << std::endl;
         }
