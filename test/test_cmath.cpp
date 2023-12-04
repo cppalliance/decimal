@@ -1916,9 +1916,11 @@ int main()
 
     test_erf<decimal32>();
     test_erf<decimal64>();
+    test_erf<decimal128>();
 
     test_erfc<decimal32>();
     test_erfc<decimal64>();
+    test_erfc<decimal128>();
 
     return boost::report_errors();
 }

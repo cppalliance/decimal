@@ -321,9 +321,86 @@ constexpr auto erf_impl(T z, bool invert) noexcept -> T
     return result;
 }
 
-} //namespace detail
+template <>
+constexpr auto erf_impl<decimal128>(decimal128 z, bool invert) noexcept -> decimal128
+{
+    constexpr decimal128 zero {0, 0};
+    constexpr decimal128 half {5, -1};
 
-// TODO(mborland): Add special handling for decimal128
+    if (z < zero)
+    {
+        if (!invert)
+        {
+            return -erf_impl(-z, invert);
+        }
+        else if (z < -half)
+        {
+            return 2 - erf_impl(-z, invert);
+        }
+        else
+        {
+            return 1 + erf_impl(-z, false);
+        }
+    }
+
+    decimal128 result {};
+
+    //
+    // Big bunch of selection statements now to pick which
+    // implementation to use, try to put most likely options
+    // first:
+    //
+    if (z < half)
+    {
+        //
+        // We're going to calculate erf:
+        //
+        if (z == zero)
+        {
+            result = zero;
+        }
+        else if (z < decimal128{1, -20})
+        {
+            constexpr decimal128 c {detail::uint128{UINT64_C(183185015307313), UINT64_C(4316214765445777362)}, -36};
+            result = z * decimal128{UINT64_C(1125), -3} + z * c;
+        }
+        else
+        {
+            // Max Error found at long double precision =   2.342380e-35
+            // Maximum Deviation Found:                     6.124e-36
+            // Expected Error Term:                         -6.124e-36
+            // Maximum Relative Change in Control Points:   3.492e-10
+            constexpr decimal128 Y {UINT64_C(10841522216796875), -16};
+            constexpr std::array<decimal128, 8> P = {
+                decimal128{detail::uint128{UINT64_C(239754751511176), UINT64_C(15346977608939294094)}, -35},
+                decimal128{detail::uint128{UINT64_C(192712955706190), UINT64_C(2786476198819993080)}, -34, true},
+                decimal128{detail::uint128{UINT64_C(315600174339923), UINT64_C(3061015393610667132)}, -35, true},
+                decimal128{detail::uint128{UINT64_C(61091917605891), UINT64_C(1019303663574361383)}, -35, true},
+                decimal128{detail::uint128{UINT64_C(436787460032112), UINT64_C(1788731756814597798)}, -37, true},
+                decimal128{detail::uint128{UINT64_C(306994537534154), UINT64_C(5857517254794866796)}, -38, true},
+                decimal128{detail::uint128{UINT64_C(91970165438019), UINT64_C(5861580289485811316)}, -39, true},
+                decimal128{detail::uint128{UINT64_C(186725770436288), UINT64_C(13306862545778890572)}, -41, true}
+            };
+            constexpr std::array<decimal128, 8> Q = {
+                decimal128{UINT64_C(1)},
+                decimal128{detail::uint128{UINT64_C(252912975277071), UINT64_C(16234303672316163784)}, -34},
+                decimal128{detail::uint128{UINT64_C(54212866299291), UINT64_C(9947708872772716820)}, -34},
+                decimal128{detail::uint128{UINT64_C(69574086016095), UINT64_C(17436381122513081906)}, -35},
+                decimal128{detail::uint128{UINT64_C(58086374505287), UINT64_C(2736284848178772790)}, -36},
+                decimal128{detail::uint128{UINT64_C(317762509029661), UINT64_C(14901341870138001204)}, -38},
+                decimal128{detail::uint128{UINT64_C(106376826023067), UINT64_C(57314722672041808)}, -39},
+                decimal128{detail::uint128{UINT64_C(169888257966113), UINT64_C(17571764770326690292)}, -41}
+            };
+
+            const auto z_squared {z * z};
+            result = z * (Y + tools::evaluate_polynomial(P, z_squared) / tools::evaluate_polynomial(Q, z_squared));
+        }
+    }
+
+    return result;
+}
+
+} //namespace detail
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto erf(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
