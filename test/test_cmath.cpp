@@ -1914,6 +1914,8 @@ int main()
     test_nan<decimal128>();
     #endif
 
+    // TOOO(mborland): specialize decimal128 to test extra ranges
+    // TODO(mborland): Move erf testing to its own file
     test_erf<decimal32>();
     test_erf<decimal64>();
     test_erf<decimal128>();
