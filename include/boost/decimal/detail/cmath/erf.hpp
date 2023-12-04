@@ -438,6 +438,38 @@ constexpr auto erf_impl<decimal128>(decimal128 z, bool invert) noexcept -> decim
 
             result = Y + tools::evaluate_polynomial(P, z - half) / tools::evaluate_polynomial(Q, z - half);
         }
+        else if (z < decimal128{15, -1})
+        {
+            // Max Error found at long double precision =   2.215785e-35
+            // Maximum Deviation Found:                     1.539e-35
+            // Expected Error Term:                         1.538e-35
+            // Maximum Relative Change in Control Points:   6.104e-05
+            constexpr decimal128 Y {detail::uint128{UINT64_C(247512601803296), UINT64_C(15871045498809073664)}, -34};
+            constexpr std::array<decimal128, 10> P = {
+                decimal128{detail::uint128{UINT64_C(157190807096733), UINT64_C(3137315625382477952)}, -35, true},
+                decimal128{detail::uint128{UINT64_C(470641968793799), UINT64_C(4414359042974488606)}, -35},
+                decimal128{detail::uint128{UINT64_C(91817523159857), UINT64_C(7399250419088684648)}, -34},
+                decimal128{detail::uint128{UINT64_C(72372915581218), UINT64_C(10309284290091665052)}, -34},
+                decimal128{detail::uint128{UINT64_C(334719143293246), UINT64_C(12410907560623277594)}, -35},
+                decimal128{detail::uint128{UINT64_C(100623987889980), UINT64_C(3812727289885689320)}, -35},
+                decimal128{detail::uint128{UINT64_C(201634177286597), UINT64_C(799217504105204558)}, -36},
+                decimal128{detail::uint128{UINT64_C(262985005296582), UINT64_C(13926270613440862488)}, -37},
+                decimal128{detail::uint128{UINT64_C(204098189489188), UINT64_C(7062163629122386192)}, -38},
+                decimal128{detail::uint128{UINT64_C(72189464720907), UINT64_C(6671367611770889188)}, -39}
+            };
+            constexpr std::array<decimal128, 10> Q = {
+                decimal128{1},
+                decimal128{detail::uint128{UINT64_C(126293469034752), UINT64_C(6450544005567922118)}, -33},
+                decimal128{detail::uint128{UINT64_C(133533437898934), UINT64_C(4515443098870771936)}, -33},
+                decimal128{detail::uint128{UINT64_C(84192571838248), UINT64_C(9806577921514899802)}, -33},
+                decimal128{detail::uint128{UINT64_C(349261792374621), UINT64_C(8697853943046476554)}, -34},
+                decimal128{detail::uint128{UINT64_C(98992586623193), UINT64_C(17173790472898309662)}, -34},
+                decimal128{detail::uint128{UINT64_C(191996836870529), UINT64_C(4384468307423291196)}, -35},
+                decimal128{detail::uint128{UINT64_C(246146619886387), UINT64_C(5406971225063089448)}, -36},
+                decimal128{detail::uint128{UINT64_C(189665960731903), UINT64_C(5272013552808781312)}, -37},
+                decimal128{detail::uint128{UINT64_C(67084640707228), UINT64_C(2876771981794530406)}, -38}
+            };
+        }
 
         decimal128 hi {};
         decimal128 lo;
