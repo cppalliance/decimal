@@ -768,7 +768,7 @@ void test_erfc<decimal128>()
     }
 
     // Underflow case
-    BOOST_TEST_EQ(erfc(T{120}), T{0} * dist(rng));
+    BOOST_TEST_EQ(erfc(decimal128{120}), decimal128{0} * dist(rng));
 }
 
 int main()
