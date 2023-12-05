@@ -180,7 +180,216 @@ void test_erf()
 template <>
 void test_erf<decimal128>()
 {
+    std::uniform_int_distribution<int> dist(1, 1);
 
+    BOOST_TEST(isnan(erf(std::numeric_limits<decimal128>::quiet_NaN()) * dist(rng)));
+    BOOST_TEST_EQ(erf(decimal128(0 * dist(rng))), decimal128{0});
+    BOOST_TEST_EQ(erf(std::numeric_limits<decimal128>::infinity() * dist(rng)), decimal128{1});
+    BOOST_TEST_EQ(erf(-std::numeric_limits<decimal128>::infinity() * dist(rng)), decimal128{-1});
+
+    // Small values
+    using float_type = long double;
+
+    std::uniform_real_distribution<float_type> smallest_vals(1e-25, 1e-20);
+    for (std::size_t i {}; i < 5; ++i)
+    {
+        const auto val {smallest_vals(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> second_smallest(1e-20, 0.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {second_smallest(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_smallest(0.5, 1.0);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_smallest(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_two(1.0, 1.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_two(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_three(1.5, 2.25);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_three(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_four(2.25, 3.0);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_four(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_five(3.0, 3.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_five(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_six(3.5, 5.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_six(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_seven(5.5, 7.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_seven(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_eight(7.5, 11.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_eight(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_large(11.5, 15.0);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_large(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erf(val)};
+        const auto dec_res {static_cast<float_type>(erf(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    // Underflow case
+    BOOST_TEST_EQ(erf(decimal128{120}), decimal128{1} * dist(rng));
 }
 
 template <typename T>
@@ -351,7 +560,215 @@ void test_erfc()
 template <>
 void test_erfc<decimal128>()
 {
+    std::uniform_int_distribution<int> dist(1, 1);
 
+    BOOST_TEST(isnan(erfc(std::numeric_limits<decimal128>::quiet_NaN() * dist(rng))));
+    BOOST_TEST_EQ(erfc(std::numeric_limits<decimal128>::infinity() * dist(rng)), decimal128{0});
+    BOOST_TEST_EQ(erfc(-std::numeric_limits<decimal128>::infinity() * dist(rng)), decimal128{2});
+
+    // Small values
+    using float_type = long double;
+
+    std::uniform_real_distribution<float_type> smallest_vals(1e-25, 1e-20);
+    for (std::size_t i {}; i < 5; ++i)
+    {
+        const auto val {smallest_vals(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> second_smallest(1e-20, 0.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {second_smallest(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_smallest(0.5, 1.0);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_smallest(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_two(1.0, 1.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_two(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_three(1.5, 2.25);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_three(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_four(2.25, 3.0);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_four(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_five(3.0, 3.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_five(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_six(3.5, 5.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_six(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_seven(5.5, 7.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_seven(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_eight(7.5, 11.5);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_eight(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 100))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    std::uniform_real_distribution<float_type> erfc_large(11.5, 15.0);
+    for (std::size_t i {}; i < 3; ++i)
+    {
+        const auto val {erfc_large(rng)};
+        const decimal128 dec_val {val};
+
+        const auto float_res {std::erfc(val)};
+        const auto dec_res {static_cast<float_type>(erfc(dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(distance < 30))
+        {
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+        }
+    }
+
+    // Underflow case
+    BOOST_TEST_EQ(erfc(T{120}), T{0} * dist(rng));
 }
 
 int main()
@@ -611,11 +1028,14 @@ int main()
 
     test_erf<decimal32>();
     test_erf<decimal64>();
-    //test_erf<decimal128>();
 
     test_erfc<decimal32>();
     test_erfc<decimal64>();
-    //test_erfc<decimal128>();
+
+    #ifndef BOOST_DECIMAL_REDUCE_TEST_DEPTH
+    test_erf<decimal128>();
+    test_erfc<decimal128>();
+    #endif
 
     return boost::report_errors();
 }
