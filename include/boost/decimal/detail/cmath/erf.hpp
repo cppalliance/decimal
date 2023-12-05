@@ -735,6 +735,19 @@ constexpr auto erf_impl<decimal128>(decimal128 z, bool invert) noexcept -> decim
         auto err_sqr = ((hi * hi - sq) + 2 * hi * lo) + lo * lo;
         result *= exp(-sq) * exp(-err_sqr) / z;
     }
+    else
+    {
+        //
+        // Any value of z larger than 110 will underflow to zero:
+        //
+        result = zero;
+        invert = !invert;
+    }
+
+    if (invert)
+    {
+        result = one - result;
+    }
 
     return result;
 }
