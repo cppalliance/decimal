@@ -19,8 +19,6 @@
 #include <limits>
 #include <array>
 
-#include "../../../../../../iostreams/include/boost/iostreams/filter/zlib.hpp"
-
 namespace boost {
 namespace decimal {
 
