@@ -38,7 +38,7 @@ private:
 public:
     using result_type = T;
 
-    constexpr erf_asympt_series_t(T z)
+    explicit constexpr erf_asympt_series_t(T z)
     {
         const auto neg_z_squared {-z * z};
         result = -exp(neg_z_squared) / sqrt(numbers::pi_v<T>);
