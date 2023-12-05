@@ -47,6 +47,7 @@ run test_decimal_quantum.cpp ;
 run test_edges_and_behave.cpp ;
 run test_edit_members.cpp ;
 run test_emulated128.cpp ;
+run test_erf.cpp ;
 run test_exp.cpp ;
 run test_expm1.cpp ;
 run test_fenv.cpp ;
