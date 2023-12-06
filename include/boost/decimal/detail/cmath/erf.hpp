@@ -293,7 +293,8 @@ constexpr auto erf_impl(T z, bool invert) noexcept -> T
                 T{UINT64_C(3083655118912242917), -17}
             };
 
-            result = Y + tools::evaluate_polynomial(P, T(1 / z)) / tools::evaluate_polynomial(Q, T(1 / z));
+            const auto inv_z {1 / z};
+            result = Y + tools::evaluate_polynomial(P, inv_z) / tools::evaluate_polynomial(Q, inv_z);
         }
 
         int expon {};
