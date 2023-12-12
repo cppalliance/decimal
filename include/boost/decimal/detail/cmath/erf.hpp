@@ -517,7 +517,7 @@ constexpr auto erf_impl<decimal128>(decimal128 z, bool invert) noexcept -> decim
             // Expected Error Term:                         3.575e-36
             // Maximum Relative Change in Control Points:   7.103e-05
             // Max Error found at long double precision =   5.794737e-36
-            constexpr decimal128 Y {uint128{UINT64_C(286754050062812), UINT64_C(9099170110843895808)}};
+            constexpr decimal128 Y {uint128{UINT64_C(286754050062812), UINT64_C(9099170110843895808)}, -34};
             constexpr std::array<decimal128, 10> P = {
                 decimal128{uint128{UINT64_C(489057861995043), UINT64_C(13133699014237994112)}, -36, true},
                 decimal128{uint128{UINT64_C(78716949829450), UINT64_C(16506161309933484600)}, -35},
