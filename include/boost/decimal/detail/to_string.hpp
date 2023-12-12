@@ -13,6 +13,7 @@
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/cmath/frexp10.hpp>
 
 #include <cerrno>
 #include <cstring>
@@ -102,14 +103,16 @@ auto to_string(DecimalType value) -> std::string
 
     char buffer[detail::precision_v<DecimalType> + 6] {}; // Sign + Precision + decimal point + e + sign + null terminator
 
-    if (value.isneg() == 1)
+    const bool isneg {value < 0};
+    if (isneg)
     {
         res += "-";
     }
 
     constexpr auto format {std::is_same<DecimalType, decimal32>::value ? "%" PRIu32 : "%" PRIu64};
-    auto exp {value.biased_exponent()};
-    auto significand {value.full_significand()};
+
+    int exp {};
+    auto significand = frexp10(value, &exp);
 
     auto significand_digits {detail::num_digits(significand)};
     const bool reduced {significand_digits > precision};
@@ -122,7 +125,7 @@ auto to_string(DecimalType value) -> std::string
 
     if (reduced)
     {
-        exp += detail::fenv_round<DecimalType>(significand, d < 0);
+        exp += detail::fenv_round<DecimalType>(significand, isneg);
     }
 
     // Print the significand into the buffer so that we can insert the decimal point
@@ -138,25 +141,45 @@ auto to_string(DecimalType value) -> std::string
         res += "0";
     }
 
-    res += "e";
+    auto end_it {res.end()};
+    --end_it;
+    while (*end_it == '0')
+    {
+        --end_it;
+    }
+    if (*end_it == '.')
+    {
+        --end_it;
+    }
+    ++end_it;
+
+    if (end_it != res.end())
+    {
+        res.erase(end_it, res.end());
+    }
+
     auto print_exp {exp + offset};
-
-    if (print_exp < 0)
+    if (print_exp != 0)
     {
-        res += "-";
-        print_exp = -print_exp;
-    }
-    else
-    {
-        res += "+";
-    }
+        res += "e";
 
-    if (print_exp < 10)
-    {
-        res += "0";
-    }
+        if (print_exp < 0)
+        {
+            res += "-";
+            print_exp = -print_exp;
+        }
+        else
+        {
+            res += "+";
+        }
 
-    res += std::to_string(print_exp);
+        if (print_exp < 10)
+        {
+            res += "0";
+        }
+
+        res += std::to_string(print_exp);
+    }
 
     return res;
 }
