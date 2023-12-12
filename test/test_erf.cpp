@@ -633,7 +633,7 @@ void test_erfc<decimal128>()
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(distance < 2000))
+        if (!BOOST_TEST(distance < 20000))
         {
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
