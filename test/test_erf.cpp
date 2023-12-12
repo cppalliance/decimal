@@ -22,6 +22,11 @@ static std::mt19937_64 rng(42);
 
 using namespace boost::decimal;
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable : 4305)
+#endif
+
 template <typename T>
 void print_value(T value, const char* str)
 {
@@ -1040,3 +1045,7 @@ int main()
 
     return boost::report_errors();
 }
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
