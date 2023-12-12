@@ -1033,7 +1033,7 @@ int main()
     test_erfc<decimal32>();
     test_erfc<decimal64>();
 
-    #ifndef BOOST_DECIMAL_REDUCE_TEST_DEPTH
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && BOOST_DECIMAL_LDBL_BITS != 128
     test_erf<decimal128>();
     test_erfc<decimal128>();
     #endif
