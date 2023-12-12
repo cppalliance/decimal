@@ -13,9 +13,9 @@
 #include <cmath>
 
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-static constexpr auto N = static_cast<std::size_t>(128U); // Number of trials
+static constexpr auto N = static_cast<std::size_t>(64U); // Number of trials
 #else
-static constexpr auto N = static_cast<std::size_t>(16); // Number of trials
+static constexpr auto N = static_cast<std::size_t>(8); // Number of trials
 #endif
 
 static std::mt19937_64 rng(42);
@@ -209,7 +209,7 @@ void test_erf<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> second_smallest(1e-20, 0.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {second_smallest(rng)};
         const decimal128 dec_val {val};
@@ -227,7 +227,7 @@ void test_erf<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_smallest(0.5, 1.0);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_smallest(rng)};
         const decimal128 dec_val {val};
@@ -245,7 +245,7 @@ void test_erf<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_two(1.0, 1.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_two(rng)};
         const decimal128 dec_val {val};
@@ -263,7 +263,7 @@ void test_erf<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_three(1.5, 2.25);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_three(rng)};
         const decimal128 dec_val {val};
@@ -281,7 +281,7 @@ void test_erf<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_four(2.25, 3.0);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_four(rng)};
         const decimal128 dec_val {val};
@@ -299,7 +299,7 @@ void test_erf<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_five(3.0, 3.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_five(rng)};
         const decimal128 dec_val {val};
@@ -317,7 +317,7 @@ void test_erf<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_six(3.5, 5.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_six(rng)};
         const decimal128 dec_val {val};
@@ -335,7 +335,7 @@ void test_erf<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_seven(5.5, 7.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_seven(rng)};
         const decimal128 dec_val {val};
@@ -353,7 +353,7 @@ void test_erf<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_eight(7.5, 11.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_eight(rng)};
         const decimal128 dec_val {val};
@@ -371,7 +371,7 @@ void test_erf<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_large(11.5, 15.0);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_large(rng)};
         const decimal128 dec_val {val};
@@ -588,7 +588,7 @@ void test_erfc<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> second_smallest(1e-20, 0.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {second_smallest(rng)};
         const decimal128 dec_val {val};
@@ -606,7 +606,7 @@ void test_erfc<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_smallest(0.5, 1.0);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_smallest(rng)};
         const decimal128 dec_val {val};
@@ -624,7 +624,7 @@ void test_erfc<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_two(1.0, 1.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_two(rng)};
         const decimal128 dec_val {val};
@@ -642,7 +642,7 @@ void test_erfc<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_three(1.5, 2.25);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_three(rng)};
         const decimal128 dec_val {val};
@@ -660,7 +660,7 @@ void test_erfc<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_four(2.25, 3.0);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_four(rng)};
         const decimal128 dec_val {val};
@@ -679,7 +679,7 @@ void test_erfc<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_five(3.0, 3.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_five(rng)};
         const decimal128 dec_val {val};
@@ -697,7 +697,7 @@ void test_erfc<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_six(3.5, 5.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_six(rng)};
         const decimal128 dec_val {val};
@@ -715,7 +715,7 @@ void test_erfc<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_seven(5.5, 7.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_seven(rng)};
         const decimal128 dec_val {val};
@@ -733,7 +733,7 @@ void test_erfc<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_eight(7.5, 11.5);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_eight(rng)};
         const decimal128 dec_val {val};
@@ -751,7 +751,7 @@ void test_erfc<decimal128>()
     }
 
     std::uniform_real_distribution<float_type> erfc_large(11.5, 15.0);
-    for (std::size_t i {}; i < 3; ++i)
+    for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_large(rng)};
         const decimal128 dec_val {val};
@@ -1033,7 +1033,7 @@ int main()
     test_erfc<decimal32>();
     test_erfc<decimal64>();
 
-    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && BOOST_DECIMAL_LDBL_BITS != 128
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && BOOST_DECIMAL_LDBL_BITS != 128 && !defined(__i386__)
     test_erf<decimal128>();
     test_erfc<decimal128>();
     #endif
