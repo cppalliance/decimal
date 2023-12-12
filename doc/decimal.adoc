@@ -4,7 +4,7 @@ Distributed under the Boost Software License, Version 1.0.
 https://www.boost.org/LICENSE_1_0.txt
 ////
 
-# Decimal: IEEE 754 Decimal Floating Point Numbers
+= Decimal: IEEE 754 Decimal Floating Point Numbers
 :toc: left
 :toclevels: 4
 :idprefix:
@@ -24,6 +24,7 @@ include::decimal/cmath.adoc[]
 include::decimal/cstdlib.adoc[]
 include::decimal/cfenv.adoc[]
 include::decimal/config.adoc[]
+include::decimal/examples.adoc[]
 //include::decimal/reference.adoc[]
 include::decimal/design.adoc[]
 include::decimal/copyright.adoc[]
