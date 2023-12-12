@@ -15,6 +15,8 @@
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
 
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+
 #include <cerrno>
 #include <cstring>
 #include <cinttypes>
@@ -23,6 +25,7 @@
 #include <iostream>
 #include <system_error>
 #include <type_traits>
+#include <string>
 
 namespace boost {
 namespace decimal {
@@ -190,5 +193,7 @@ auto to_string(DecimalType value) -> std::string
 
 } //namespace decimal
 } //namespace boost
+
+#endif
 
 #endif //BOOST_DECIMAL_DETAIL_TO_STRING
