@@ -337,7 +337,7 @@ constexpr void set_bit(uint256_t& a, int bit)
 }
 
 // The division algorithm
-constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const uint256_t& divisor)
+constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const uint256_t& divisor) noexcept
 {
     // Check for division by zero
     if (divisor.high == 0 && divisor.low == 0)
@@ -383,6 +383,30 @@ constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, con
     return {quotient, remainder};
 }
 
+constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const std::uint64_t& divisor) noexcept
+{
+    uint256_t quotient {{0,0}, {0, 0}};
+    std::uint64_t remainder {};
+
+    uint128 current {static_cast<uint128>(remainder) << 64 | dividend.high.high};
+    quotient.high.high = static_cast<std::uint64_t>(current / divisor);
+    remainder = static_cast<std::uint64_t>(current % divisor);
+
+    current = static_cast<uint128>(remainder) << 64 | dividend.high.low;
+    quotient.high.low = static_cast<std::uint64_t>(current / divisor);
+    remainder = static_cast<std::uint64_t>(current % divisor);
+
+    current = static_cast<uint128>(remainder) << 64 | dividend.low.high;
+    quotient.low.high = static_cast<std::uint64_t>(current / divisor);
+    remainder = static_cast<std::uint64_t>(current % divisor);
+
+    current = static_cast<uint128>(remainder) << 64 | dividend.low.low;
+    quotient.low.low = static_cast<std::uint64_t>(current / divisor);
+    remainder = static_cast<std::uint64_t>(current % divisor);
+
+    return {quotient, static_cast<uint256_t>(remainder)};
+}
+
 constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     const auto res {divide(lhs, rhs)};
@@ -391,7 +415,7 @@ constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexce
 
 constexpr uint256_t operator/(uint256_t lhs, std::uint64_t rhs) noexcept
 {
-    const auto res {divide(lhs, uint256_t(rhs))};
+    const auto res {divide(lhs, rhs)};
     return std::get<0>(res);
 }
 
