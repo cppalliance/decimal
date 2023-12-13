@@ -112,7 +112,6 @@ int main()
     print_value("0.57735026918962576450914878050195746"_DL, "1/sqrt(3)");
     print_value("0.57721566490153286060651209008240243"_DL, "egamma");
     print_value("1.6180339887498948482045868343656381"_DL, "phi");
-    return 1;
     #endif
 
     return boost::report_errors();
