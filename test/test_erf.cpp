@@ -12,6 +12,11 @@
 #include <random>
 #include <cmath>
 
+// Needed to reduce CI runtime
+#ifdef _MSC_VER
+#  define BOOST_DECIMAL_REDUCE_TEST_DEPTH
+#endif
+
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
 static constexpr auto N = static_cast<std::size_t>(64U); // Number of trials
 #else
