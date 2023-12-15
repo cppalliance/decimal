@@ -126,6 +126,14 @@ void test_atan()
                       << "\nEps: " << distance << std::endl;
         }
     }
+
+    // Edge cases
+    std::uniform_int_distribution<int> one(1,1);
+    BOOST_TEST_EQ(atan(std::numeric_limits<Dec>::infinity() * Dec(one(rng))), numbers::pi_v<Dec>/2);
+    BOOST_TEST_EQ(atan(-std::numeric_limits<Dec>::infinity() * Dec(one(rng))), -numbers::pi_v<Dec>/2);
+    BOOST_TEST(isnan(atan(std::numeric_limits<Dec>::quiet_NaN() * Dec(one(rng)))));
+    BOOST_TEST_EQ(atan(Dec(0) * Dec(one(rng))), Dec(0));
+    BOOST_TEST_EQ(atan(std::numeric_limits<Dec>::epsilon() * Dec(one(rng))), std::numeric_limits<Dec>::epsilon() * Dec(one(rng)));
 }
 
 int main()

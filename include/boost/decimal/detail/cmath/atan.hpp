@@ -75,7 +75,7 @@ constexpr auto atan(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
     const auto absx {fabs(x)};
     T result {};
 
-    if (absx < std::numeric_limits<T>::epsilon())
+    if (absx <= std::numeric_limits<T>::epsilon())
     {
         return x;
     }
