@@ -15,5 +15,6 @@
 #include <boost/decimal/literals.hpp>
 #include <boost/decimal/hash.hpp>
 #include <boost/decimal/cfloat.hpp>
+#include <boost/decimal/format.hpp>
 
 #endif // BOOST_DECIMAL_HPP
