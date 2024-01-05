@@ -21,8 +21,6 @@ namespace decimal {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto acos(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
-    const auto isneg {signbit(x)};
-
     if (isnan(x))
     {
         return x;
@@ -36,7 +34,7 @@ constexpr auto acos(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
     {
         result = std::numeric_limits<T>::signaling_NaN();
     }
-    else if (x < T{5, 1, true})
+    else if (x < T{5, -1, true})
     {
         result = numbers::pi_v<T> - 2 * detail::asin_impl(sqrt((1 - absx) / 2));
     }
@@ -44,11 +42,7 @@ constexpr auto acos(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
     {
         result = half_pi + detail::asin_impl(absx);
     }
-    else if (x <= std::numeric_limits<T>::epsilon())
-    {
-        result = T{1} - x * x / 2;
-    }
-    else if (x < T{5, 1})
+    else if (x < T{5, -1})
     {
         result = half_pi - detail::asin_impl(x);
     }
