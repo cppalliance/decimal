@@ -35,7 +35,7 @@ constexpr auto asin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
 
     if (absx <= std::numeric_limits<T>::epsilon())
     {
-        result = x;
+        result = absx;
     }
     else if (absx <= T{5, -1})
     {
