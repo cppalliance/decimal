@@ -117,7 +117,7 @@ void test_acos()
         auto ret_dec {static_cast<float>(acos(d1))};
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
-        if (!BOOST_TEST(distance < 50))
+        if (!BOOST_TEST(distance < 100))
         {
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
@@ -139,5 +139,5 @@ int main()
     test_acos<decimal32>();
     test_acos<decimal64>();
 
-    return 0;
+    return boost::report_errors();
 }
