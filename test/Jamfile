@@ -33,6 +33,7 @@ run roundtrip_decimal32.cpp ;
 run roundtrip_decimal64.cpp ;
 run roundtrip_decimal128.cpp ;
 run test_acosh.cpp ;
+run test_asin.cpp ;
 run test_asinh.cpp ;
 run test_atan.cpp ;
 run test_atanh.cpp ;
