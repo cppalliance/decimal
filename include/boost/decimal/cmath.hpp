@@ -57,6 +57,7 @@
 #include <boost/decimal/detail/cmath/cbrt.hpp>
 #include <boost/decimal/detail/cmath/erf.hpp>
 #include <boost/decimal/detail/cmath/atan.hpp>
+#include <boost/decimal/detail/cmath/asin.hpp>
 #include <boost/decimal/numbers.hpp>
 
 // Macros from 3.6.2
