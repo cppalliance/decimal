@@ -47,12 +47,14 @@ void random_addition(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 + val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 + val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -80,12 +82,14 @@ void random_mixed_addition(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 + val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << trunc_val_2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 + val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -113,12 +117,14 @@ void random_subtraction(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 - val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -146,12 +152,14 @@ void random_mixed_subtraction(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << trunc_val_2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 - val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -168,12 +176,14 @@ void random_mixed_subtraction(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << trunc_val_1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 - val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -193,12 +203,14 @@ void spot_check_sub(T lhs, T rhs)
 
     if (!BOOST_TEST_EQ(res_int, lhs - rhs))
     {
+        // LCOV_EXCL_START
         std::cerr << "Val 1: " << lhs
                   << "\nDec 1: " << dec1
                   << "\nVal 2: " << rhs
                   << "\nDec 2: " << dec2
                   << "\nDec res: " << res
                   << "\nInt res: " << lhs - rhs << std::endl;
+        // LCOV_EXCL_STOP
     }
 }
 
@@ -220,12 +232,14 @@ void random_multiplication(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 * val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -253,12 +267,14 @@ void random_mixed_multiplication(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 * val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -289,12 +305,14 @@ void random_division(T lower, T upper)
         }
         else if (!BOOST_TEST_EQ(static_cast<float>(res), static_cast<float>(res_int)))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -326,12 +344,14 @@ void random_mixed_division(T lower, T upper)
         }
         else if (!BOOST_TEST_EQ(static_cast<float>(res), static_cast<float>(res_int)))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -351,12 +371,14 @@ void random_mixed_division(T lower, T upper)
         }
         else if (!BOOST_TEST(abs(res - res_int) < decimal64(1, -1)))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -392,12 +414,14 @@ void random_and()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -421,11 +445,13 @@ void random_mixed_and()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -444,11 +470,13 @@ void random_mixed_and()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_START
         }
     }
 }
@@ -474,12 +502,14 @@ void random_or()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -503,11 +533,13 @@ void random_mixed_or()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -526,11 +558,13 @@ void random_mixed_or()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -556,12 +590,14 @@ void random_xor()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -585,11 +621,13 @@ void random_mixed_xor()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -608,11 +646,13 @@ void random_mixed_xor()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -638,12 +678,14 @@ void random_left_shift()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -667,11 +709,13 @@ void random_mixed_left_shift()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -690,11 +734,13 @@ void random_mixed_left_shift()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -720,12 +766,14 @@ void random_right_shift()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -749,11 +797,13 @@ void random_mixed_right_shift()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -772,11 +822,13 @@ void random_mixed_right_shift()
 
         if (!BOOST_TEST_EQ(dec_int, res_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }

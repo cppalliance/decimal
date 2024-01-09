@@ -43,10 +43,12 @@ void roundtrip_strtod()
 
         if (!BOOST_TEST_EQ(val, return_val) && BOOST_TEST_EQ(len, dist))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val
                       << "\nVal 2: " << return_val
                       << "\nStrlen: " << len
                       << "\n  Dist: " << dist << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -75,10 +77,12 @@ void roundtrip_wcstrtod()
 
         if (!BOOST_TEST_EQ(val, return_val) && BOOST_TEST_EQ(len, dist))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val
                       << "\nVal 2: " << return_val
                       << "\nStrlen: " << len
                       << "\n  Dist: " << dist << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
