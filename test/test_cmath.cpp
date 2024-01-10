@@ -1021,7 +1021,7 @@ void test_lrint()
         if (ret_dec == ret_val + 1)
         {
             float iptr;
-            const auto frac = modf(val1, &iptr);
+            const auto frac = std::modf(val1, &iptr);
             if (std::fabs(frac - 0.5F) < 0.01F)
             {
                 continue;
