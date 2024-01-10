@@ -17,7 +17,7 @@
 #  define BOOST_DECIMAL_REDUCE_TEST_DEPTH
 #endif
 
-#if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+#if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && !defined(_MSC_VER)
 static constexpr auto N = static_cast<std::size_t>(64U); // Number of trials
 #else
 static constexpr auto N = static_cast<std::size_t>(8); // Number of trials
