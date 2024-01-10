@@ -1006,7 +1006,7 @@ void test_rint()
 template <typename Dec>
 void test_lrint()
 {
-    std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
+    std::uniform_real_distribution<float> dist(-1e5F, 1e5F);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
@@ -1017,10 +1017,22 @@ void test_lrint()
         auto ret_val {std::lrint(val1)};
         auto ret_dec {lrint(d1)};
 
-        // Difference in significant figures
-        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
+        // Difference in rounding mode at 0.5
+        if (ret_dec == ret_val + 1)
         {
-            continue;
+            float iptr;
+            const auto frac = modf(val1, &iptr);
+            if (std::fabs(frac - 0.5F) < 0.01F)
+            {
+                continue;
+            }
+            else
+            {
+                // LCOV_EXCL_START
+                std::cerr << "Frac: " << frac
+                          << "\nDist: " << std::fabs(frac - 0.5F) / std::numeric_limits<float>::epsilon() << std::endl;
+                // LCOV_EXCL_STOP
+            }
         }
 
         if (!BOOST_TEST_EQ(ret_val, ret_dec))
