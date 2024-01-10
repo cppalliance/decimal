@@ -1006,6 +1006,8 @@ void test_rint()
 template <typename Dec>
 void test_lrint()
 {
+    using std::abs;
+
     std::uniform_real_distribution<float> dist(-1e5F, 1e5F);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
@@ -1018,11 +1020,11 @@ void test_lrint()
         auto ret_dec {lrint(d1)};
 
         // Difference in rounding mode at 0.5
-        if (ret_dec == ret_val + 1)
+        if (abs(ret_dec) == abs(ret_val) + 1)
         {
             float iptr;
             const auto frac = std::modf(val1, &iptr);
-            if (std::fabs(frac - 0.5F) < 0.01F)
+            if (abs(abs(frac) - 0.5F) < 0.01F)
             {
                 continue;
             }
