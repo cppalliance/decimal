@@ -31,6 +31,7 @@ void simple_test()
     // Is floor or ceil truncating at 32-bits?
     if (!BOOST_TEST(floor_check0) || !BOOST_TEST(floor_check1))
     {
+        // LCOV_EXCL_START
         std::cout << "floor_check0: " << std::boolalpha << floor_check0 << std::endl;
         std::cout << "floor_check1: " << std::boolalpha << floor_check1 << std::endl;
 
@@ -41,6 +42,7 @@ void simple_test()
                   << "\nfloor(a_dec1):" << floor(a_dec1) << std::endl;
 
         std::cout.flags(flg);
+        // LCOV_EXCL_STOP
     }
 }
 
@@ -72,10 +74,12 @@ void random_test()
         // Is floor or ceil truncating at 32-bits?
         if (!BOOST_TEST(floor_check))
         {
+            // LCOV_EXCL_START
             std::cout << "a_dec0: " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << a_dec
                       << ", floor_check: " << std::boolalpha << floor_check << std::endl;
 
             std::cout.flags(flg);
+            // LCOV_EXCL_STOP
         }
     }
 }

@@ -163,10 +163,12 @@ void test_roundtrip_conversion_float()
 
         if(!BOOST_TEST_EQ(initial_decimal, return_decimal))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val: " << val
                       << "\nDec: " << initial_decimal
                       << "\nReturn Val: " << return_val
                       << "\nReturn Dec: " << return_decimal << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -190,11 +192,13 @@ void test_roundtrip_integer_stream()
 
         if (!BOOST_TEST_EQ(first_val, return_val) || !BOOST_TEST_EQ(first_val_int, return_val_int))
         {
+            // LCOV_EXCL_START
             std::cerr << "    Val: " << first_val
                       << "\nInt Val: " << first_val_int
                       << "\n SS Val: " << ss.str()
                       << "\n    Ret: " << return_val
                       << "\nInt Ret: " << return_val_int << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -218,10 +222,12 @@ void test_roundtrip_float_stream()
 
         if (!BOOST_TEST_EQ(first_val, return_val) || !BOOST_TEST_EQ(first_val_flt, return_val_flt))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val: " << first_val
                       << "\nInt Val: " << first_val_flt
                       << "\nRet: " << return_val
                       << "\nInt Ret: " << return_val_flt << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -239,9 +245,11 @@ void test_roundtrip_conversion_decimal32()
 
         if(!BOOST_TEST_EQ(val, return_decimal))
         {
+            // LCOV_EXCL_START
             std::cerr << "       Val: " << val
                       << "\n       Dec: " << short_dec
                       << "\nReturn Dec: " << return_decimal << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }

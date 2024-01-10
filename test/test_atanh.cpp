@@ -103,11 +103,13 @@ namespace local
 
       if(!result_val_is_ok)
       {
+          // LCOV_EXCL_START
         std::cout << "x_flt  : " <<                    x_flt   << std::endl;
         std::cout << "val_flt: " << std::scientific << val_flt << std::endl;
         std::cout << "val_dec: " << std::scientific << val_dec << std::endl;
 
         break;
+          // LCOV_EXCL_STOP
       }
     }
 

@@ -38,12 +38,14 @@ void random_mixed_addition()
 
         if (!BOOST_TEST_EQ(res_int, val1 + val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 + val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -65,12 +67,14 @@ void random_mixed_subtraction()
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 - val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -92,12 +96,14 @@ void random_mixed_multiplication()
 
         if (!BOOST_TEST_EQ(res_int, val1 * val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 * val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -119,12 +125,14 @@ void random_mixed_division()
 
         if (!BOOST_TEST_EQ(res_int, val1 / val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 / val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -143,10 +151,12 @@ void random_mixed_LT()
 
         if (!BOOST_TEST_EQ(emulated1 < emulated2, val1 < val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -165,10 +175,12 @@ void random_mixed_LE()
 
         if (!BOOST_TEST_EQ(emulated1 <= emulated2, val1 <= val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -187,10 +199,12 @@ void random_mixed_GT()
 
         if (!BOOST_TEST_EQ(emulated1 > emulated2, val1 > val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -209,10 +223,12 @@ void random_mixed_GE()
 
         if (!BOOST_TEST_EQ(emulated1 >= emulated2, val1 >= val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -231,10 +247,12 @@ void random_mixed_EQ()
 
         if (!BOOST_TEST_EQ(emulated1 == emulated2, val1 == val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -253,10 +271,12 @@ void random_mixed_NE()
 
         if (!BOOST_TEST_EQ(emulated1 != emulated2, val1 != val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -275,10 +295,12 @@ void random_mixed_and()
 
         if (!BOOST_TEST_EQ(emulated1 & emulated2, val1 & val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -297,10 +319,12 @@ void random_mixed_or()
 
         if (!BOOST_TEST_EQ(emulated1 | emulated2, val1 | val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -319,10 +343,12 @@ void random_mixed_xor()
 
         if (!BOOST_TEST_EQ(emulated1 ^ emulated2, val1 ^ val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << emulated1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << emulated2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }

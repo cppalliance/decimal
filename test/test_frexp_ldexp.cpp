@@ -113,6 +113,7 @@ namespace local
 
       if(!result_frexp_ldexp_is_ok)
       {
+          // LCOV_EXCL_START
         std::cout << "flt      : " << std::scientific << std::setprecision(std::numeric_limits<float>::digits10) << flt       << std::endl;
         std::cout << "frexp_flt: " << std::scientific << std::setprecision(std::numeric_limits<float>::digits10) << frexp_flt << std::endl;
         std::cout << "frexp_dec: " << std::scientific << std::setprecision(std::numeric_limits<float>::digits10) << frexp_dec << std::endl;
@@ -120,6 +121,7 @@ namespace local
         std::cout << "ldexp_dec: " << std::scientific << std::setprecision(std::numeric_limits<float>::digits10) << ldexp_dec << std::endl;
 
         break;
+          // LCOV_EXCL_STOP
       }
 
       result_is_ok = (result_frexp_ldexp_is_ok && result_is_ok);

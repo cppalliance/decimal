@@ -34,10 +34,12 @@ void random_mixed_EQ()
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -51,10 +53,12 @@ void random_mixed_EQ()
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -62,8 +66,10 @@ void random_mixed_EQ()
     const auto guarantee {dist(rng)};
     if (!BOOST_TEST(Decimal2{guarantee} == Decimal1{guarantee}))
     {
+        // LCOV_EXCL_START
         std::cerr << "Dec64: " << Decimal2{guarantee}
                   << "\nDec32: " << Decimal1{guarantee} << std::endl;
+        // LCOV_EXCL_STOP
     }
 
     BOOST_TEST_EQ(std::numeric_limits<Decimal1>::quiet_NaN() == Decimal2(dist(rng)), false);
@@ -88,10 +94,12 @@ void random_mixed_NE()
 
         if (!BOOST_TEST_EQ(dec1 != dec2, val1 != val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -105,10 +113,12 @@ void random_mixed_NE()
 
         if (!BOOST_TEST_EQ(dec1 != dec2, val1 != val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -135,10 +145,12 @@ void random_mixed_LT()
 
         if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -152,10 +164,12 @@ void random_mixed_LT()
 
         if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -186,10 +200,12 @@ void random_mixed_LE()
 
         if (!BOOST_TEST_EQ(dec1 <= dec2, val1 <= val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -203,10 +219,12 @@ void random_mixed_LE()
 
         if (!BOOST_TEST_EQ(dec1 <= dec2, val1 <= val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -233,10 +251,12 @@ void random_mixed_GT()
 
         if (!BOOST_TEST_EQ(dec1 > dec2, val1 > val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -250,10 +270,12 @@ void random_mixed_GT()
 
         if (!BOOST_TEST_EQ(dec1 > dec2, val1 > val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -280,10 +302,12 @@ void random_mixed_GE()
 
         if (!BOOST_TEST_EQ(dec1 >= dec2, val1 >= val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -297,10 +321,12 @@ void random_mixed_GE()
 
         if (!BOOST_TEST_EQ(dec1 >= dec2, val1 >= val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -308,8 +334,10 @@ void random_mixed_GE()
     const auto guarantee {dist(rng)};
     if (!BOOST_TEST(Decimal2{guarantee} >= Decimal1{guarantee}))
     {
+        // LCOV_EXCL_START
         std::cerr << "Dec64: " << Decimal2{guarantee}
                   << "\nDec32: " << Decimal1{guarantee} << std::endl;
+        // LCOV_EXCL_STOP
     }
 
     BOOST_TEST_EQ(std::numeric_limits<Decimal1>::quiet_NaN() >= Decimal2(dist(rng)), false);
@@ -336,10 +364,12 @@ void random_mixed_SPACESHIP()
 
         if (!BOOST_TEST((dec1 <=> dec2) == (val1 <=> val2)))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -353,10 +383,12 @@ void random_mixed_SPACESHIP()
 
         if (!BOOST_TEST((dec1 <=> dec2) == (val1 <=> val2)))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -364,8 +396,10 @@ void random_mixed_SPACESHIP()
     const auto guarantee {dist(rng)};
     if (!BOOST_TEST((Decimal2{guarantee} <=> Decimal1{guarantee}) == std::partial_ordering::equivalent))
     {
+        // LCOV_EXCL_START
         std::cerr << "Dec64: " << Decimal2{guarantee}
                   << "\nDec32: " << Decimal1{guarantee} << std::endl;
+        // LCOV_EXCL_STOP
     }
 
     BOOST_TEST((std::numeric_limits<Decimal1>::quiet_NaN() <=> Decimal2(dist(rng))) == std::partial_ordering::unordered);
@@ -392,10 +426,12 @@ void random_conversion_EQ()
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -409,10 +445,12 @@ void random_conversion_EQ()
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -420,8 +458,10 @@ void random_conversion_EQ()
     const auto guarantee {dist(rng)};
     if (!BOOST_TEST(Decimal1(Decimal2{guarantee}) == Decimal1{guarantee}))
     {
+        // LCOV_EXCL_START
         std::cerr << "Dec from Dec: " << Decimal1(Decimal2{guarantee})
                   << "\n       Dec32: " << Decimal1{guarantee} << std::endl;
+        // LCOV_EXCL_STOP
     }
 
     BOOST_TEST_EQ(std::numeric_limits<Decimal1>::quiet_NaN() == Decimal2(dist(rng)), false);

@@ -103,11 +103,13 @@ namespace local
 
       if(!result_val_is_ok)
       {
+          // LCOV_EXCL_START
         std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
         std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
         std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
+          // LCOV_EXCL_STOP
       }
     }
 
@@ -156,11 +158,13 @@ namespace local
 
       if(!result_val_is_ok)
       {
+          // LCOV_EXCL_START
         std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
         std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
         std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
+          // LCOV_EXCL_STOP
       }
     }
 

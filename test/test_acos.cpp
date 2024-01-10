@@ -39,11 +39,13 @@ void test_acos()
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
         if (!BOOST_TEST(distance < 50))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
                       << "\nEps: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -59,11 +61,13 @@ void test_acos()
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
         if (!BOOST_TEST(distance < 50))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
                       << "\nEps: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -79,11 +83,13 @@ void test_acos()
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
         if (!BOOST_TEST(distance < 50))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
                       << "\nEps: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -99,11 +105,13 @@ void test_acos()
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
         if (!BOOST_TEST(distance < 50))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
                       << "\nEps: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -119,11 +127,13 @@ void test_acos()
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
         if (!BOOST_TEST(distance < 100))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
                       << "\nEps: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 

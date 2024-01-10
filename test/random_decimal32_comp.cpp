@@ -33,10 +33,12 @@ void random_LT(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -62,10 +64,12 @@ void random_mixed_LT(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -80,10 +84,12 @@ void random_mixed_LT(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -112,10 +118,12 @@ void random_LE(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 <= dec2, val1 <= val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -140,10 +148,12 @@ void random_mixed_LE(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 <= dec2, val1 <= val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -167,10 +177,12 @@ void random_GT(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 > dec2, val1 > val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -195,10 +207,12 @@ void random_mixed_GT(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 > dec2, val1 > val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -222,10 +236,12 @@ void random_GE(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 >= dec2, val1 >= val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -250,10 +266,12 @@ void random_mixed_GE(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 >= dec2, val1 >= val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -277,10 +295,12 @@ void random_EQ(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -302,10 +322,12 @@ void random_mixed_EQ(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -319,10 +341,12 @@ void random_mixed_EQ(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -352,10 +376,12 @@ void random_NE(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 != dec2, val1 != val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -377,10 +403,12 @@ void random_mixed_NE(T lower, T upper)
 
         if (!BOOST_TEST_EQ(dec1 != dec2, val1 != val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -401,10 +429,12 @@ void random_SPACESHIP(T lower, T upper)
 
         if (!BOOST_TEST((dec1 <=> dec2) == (val1 <=> val2)))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -427,15 +457,18 @@ void random_mixed_SPACESHIP(T lower, T upper)
 
         if (!BOOST_TEST((dec1 <=> dec2) == (val1 <=> val2)))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
     if (!BOOST_TEST((dist(rng) <=> std::numeric_limits<decimal32>::quiet_NaN()) == std::partial_ordering::unordered))
     {
+        // LCOV_EXCL_START
         const auto eval {dist(rng) <=> std::numeric_limits<decimal32>::quiet_NaN()};
         if (eval == std::partial_ordering::less)
             std::cerr << "Less" << std::endl;
@@ -445,6 +478,7 @@ void random_mixed_SPACESHIP(T lower, T upper)
             std::cerr << "Equivalent" << std::endl;
         else
             std::cerr << "Unordered" << std::endl;
+        // LCOV_EXCL_STOP
     }
 
     BOOST_TEST((std::numeric_limits<decimal32>::quiet_NaN() <=> std::numeric_limits<decimal32>::quiet_NaN()) == std::partial_ordering::unordered);

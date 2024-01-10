@@ -17,7 +17,7 @@
 #  define BOOST_DECIMAL_REDUCE_TEST_DEPTH
 #endif
 
-#if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+#if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && !defined(_MSC_VER)
 static constexpr auto N = static_cast<std::size_t>(64U); // Number of trials
 #else
 static constexpr auto N = static_cast<std::size_t>(8); // Number of trials
@@ -67,9 +67,11 @@ void test_erf()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -85,9 +87,11 @@ void test_erf()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -103,9 +107,11 @@ void test_erf()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -121,9 +127,11 @@ void test_erf()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -139,9 +147,11 @@ void test_erf()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -157,9 +167,11 @@ void test_erf()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -176,10 +188,12 @@ void test_erf()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "  Val: " << val
                       << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -212,9 +226,11 @@ void test_erf<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -230,9 +246,11 @@ void test_erf<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -248,9 +266,11 @@ void test_erf<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -266,9 +286,11 @@ void test_erf<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -284,9 +306,11 @@ void test_erf<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -302,9 +326,11 @@ void test_erf<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -320,9 +346,11 @@ void test_erf<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -338,9 +366,11 @@ void test_erf<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -356,9 +386,11 @@ void test_erf<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -374,9 +406,11 @@ void test_erf<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -392,9 +426,11 @@ void test_erf<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -426,9 +462,11 @@ void test_erfc()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -444,9 +482,11 @@ void test_erfc()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -462,9 +502,11 @@ void test_erfc()
 
         if (!BOOST_TEST(distance < 50))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -480,9 +522,11 @@ void test_erfc()
 
         if (!BOOST_TEST(distance < 50))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -498,10 +542,12 @@ void test_erfc()
 
         if (!BOOST_TEST(distance < 150))
         {
+            // LCOV_EXCL_START
             std::cerr << "  Val: " << val
                       << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -517,10 +563,12 @@ void test_erfc()
 
         if (!BOOST_TEST(distance < 1e15))
         {
+            // LCOV_EXCL_START
             std::cerr << "  Val: " << val
                       << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -537,10 +585,12 @@ void test_erfc()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "  Val: " << val
                       << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -556,10 +606,12 @@ void test_erfc()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "  Val: " << val
                       << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -591,9 +643,11 @@ void test_erfc<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -609,9 +663,11 @@ void test_erfc<decimal128>()
 
         if (!BOOST_TEST(distance < 30))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -627,9 +683,11 @@ void test_erfc<decimal128>()
 
         if (!BOOST_TEST(distance < 20000))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -645,9 +703,11 @@ void test_erfc<decimal128>()
 
         if (!BOOST_TEST(distance < 20000))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -663,9 +723,11 @@ void test_erfc<decimal128>()
 
         if (!BOOST_TEST(distance < 20000))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -681,10 +743,12 @@ void test_erfc<decimal128>()
 
         if (!BOOST_TEST(distance < 25000))
         {
+            // LCOV_EXCL_START
             std::cerr << "  Val: " << val
                       << "\nFloat: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -700,9 +764,11 @@ void test_erfc<decimal128>()
 
         if (!BOOST_TEST(distance < 20000))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -718,9 +784,11 @@ void test_erfc<decimal128>()
 
         if (!BOOST_TEST(distance < 20000))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -736,9 +804,11 @@ void test_erfc<decimal128>()
 
         if (!BOOST_TEST(distance < 20000))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -754,9 +824,11 @@ void test_erfc<decimal128>()
 
         if (!BOOST_TEST(distance < 2000))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -772,9 +844,11 @@ void test_erfc<decimal128>()
 
         if (!BOOST_TEST(distance < 1e16))
         {
+            // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_START
         }
     }
 
