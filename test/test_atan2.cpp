@@ -29,7 +29,7 @@ void test()
 
     for (std::size_t n {}; n < max_iter; ++n)
     {
-        std::uniform_real_distribution<float> vals(0.0F, 3.14F);
+        std::uniform_real_distribution<float> vals(-3.14F, 3.14F);
         const auto val1 {vals(rng)};
         const auto val2 {vals(rng)};
         Dec d1 {val1};
