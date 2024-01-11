@@ -22,6 +22,25 @@ static std::mt19937_64 rng(42);
 
 using namespace boost::decimal;
 
+template <typename Dec = decimal32>
+void spot_test(float val)
+{
+    const auto ret_val {std::atan(val)};
+    const auto ret_dec {static_cast<float>(atan(Dec{val}))};
+
+    const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
+    if (!BOOST_TEST(distance < 100))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "Val 1: " << val
+                  << "\nDec 1: " << Dec{val}
+                  << "\nRet val: " << ret_val
+                  << "\nRet dec: " << ret_dec
+                  << "\nEps: " << distance << std::endl;
+        // LCOV_EXCL_STOP
+    }
+}
+
 template <typename Dec>
 void test_atan()
 {
@@ -150,6 +169,9 @@ int main()
 {
     test_atan<decimal32>();
     test_atan<decimal64>();
+
+    spot_test(0.344559F);
+    spot_test(0.181179F);
 
     return boost::report_errors();
 }
