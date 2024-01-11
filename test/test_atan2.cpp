@@ -39,15 +39,16 @@ void test()
         auto ret_dec {static_cast<float>(atan2(d1, d2))};
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
-        if (!BOOST_TEST(distance < 1e5))
+        const auto tol {std::fabs(val1 / val2) < 24.0F ? 1000 : 1e5};
+        if (!BOOST_TEST(distance < tol))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nVal 2: " << val2
-                      << "\nfabs(y/x): " << std::fabs(val2 / val1)
+                      << "\nfabs(y/x): " << std::fabs(val1 / val2)
                       << "\nDec 1: " << d1
                       << "\nDec 2: " << d2
-                      << "\nfabs(y/x): " << fabs(d2 / d1)
+                      << "\nfabs(y/x): " << fabs(d1 / d2)
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
                       << "\nEps: " << distance << std::endl;
@@ -78,10 +79,36 @@ void test()
     BOOST_TEST_EQ(atan2(Dec(2), Dec(1)), atan(Dec(2)));
 }
 
+template <typename Dec = decimal32>
+void spot_test(float val1, float val2)
+{
+    const auto ret_val {std::atan2(val1, val2)};
+
+    Dec d_val1 {val1};
+    Dec d_val2 {val2};
+    const auto ret_dec {static_cast<float>(atan2(d_val1, d_val2))};
+
+    const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
+    if (!BOOST_TEST(distance < 1000))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "Val 1: " << val1
+                  << "\nVal 2: " << val2
+                  << "\nDec 1: " << Dec{val1}
+                  << "\nDec 2: " << Dec {val2}
+                  << "\nRet val: " << ret_val
+                  << "\nRet dec: " << ret_dec
+                  << "\nEps: " << distance << std::endl;
+        // LCOV_EXCL_STOP
+    }
+}
+
 int main()
 {
     test<decimal32>();
     test<decimal64>();
+
+    spot_test(2.36174F, 0.427896F);
 
     return boost::report_errors();
 }
