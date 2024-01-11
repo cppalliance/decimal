@@ -57,6 +57,25 @@ void test()
 
     // Edge cases
     std::uniform_int_distribution<int> one(1,1);
+
+    BOOST_TEST(isnan(atan2(Dec{one(rng)}, std::numeric_limits<Dec>::quiet_NaN())));
+    BOOST_TEST(isnan(atan2(std::numeric_limits<Dec>::quiet_NaN(), Dec{one(rng)})));
+    BOOST_TEST_EQ(atan2(Dec{0 * one(rng)}, -Dec(1)), numbers::pi_v<Dec>);
+    BOOST_TEST_EQ(atan2(Dec{0 * -one(rng)}, -Dec(1)), numbers::pi_v<Dec>);
+    BOOST_TEST_EQ(atan2(Dec{0 * one(rng)}, Dec(1)), Dec{0 * one(rng)});
+    BOOST_TEST_EQ(atan2(std::numeric_limits<Dec>::infinity(), Dec{one(rng)}), numbers::pi_v<Dec> / 2);
+    BOOST_TEST_EQ(atan2(-std::numeric_limits<Dec>::infinity(), Dec{one(rng)}), -numbers::pi_v<Dec> / 2);
+    BOOST_TEST_EQ(atan2(std::numeric_limits<Dec>::infinity(), -std::numeric_limits<Dec>::infinity()), -3 * one(rng) * numbers::pi_v<Dec> / 4);
+    BOOST_TEST_EQ(atan2(-std::numeric_limits<Dec>::infinity(), -std::numeric_limits<Dec>::infinity()), -3 * one(rng) * numbers::pi_v<Dec> / 4);
+    BOOST_TEST_EQ(atan2(std::numeric_limits<Dec>::infinity(), std::numeric_limits<Dec>::infinity()), one(rng) * numbers::pi_v<Dec> / 4);
+    BOOST_TEST_EQ(atan2(-std::numeric_limits<Dec>::infinity(), std::numeric_limits<Dec>::infinity()), one(rng) * numbers::pi_v<Dec> / 4);
+    BOOST_TEST_EQ(atan2(-Dec(1), Dec{0 * one(rng)}), -numbers::pi_v<Dec> / 2);
+    BOOST_TEST_EQ(atan2(Dec(1), Dec{0 * one(rng)}), numbers::pi_v<Dec> / 2);
+    BOOST_TEST_EQ(atan2(-Dec{one(rng)}, -std::numeric_limits<Dec>::infinity()), -numbers::pi_v<Dec>);
+    BOOST_TEST_EQ(atan2(Dec{one(rng)}, -std::numeric_limits<Dec>::infinity()), numbers::pi_v<Dec>);
+    BOOST_TEST_EQ(atan2(-Dec{one(rng)}, std::numeric_limits<Dec>::infinity()), -Dec{0 * one(rng)});
+    BOOST_TEST_EQ(atan2(Dec{one(rng)}, std::numeric_limits<Dec>::infinity()), -Dec{0 * one(rng)});
+    BOOST_TEST_EQ(atan2(Dec(2), Dec(1)), atan(Dec(2)));
 }
 
 int main()
