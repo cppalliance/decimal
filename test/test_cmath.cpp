@@ -1570,7 +1570,7 @@ void test_log2()
         auto ret_val {std::log2(val1)};
         auto ret_dec {static_cast<float>(log2(d1))};
 
-        if (!std::isfinite(ret_val) && !isfinite(ret_dec))
+        if (!std::isfinite(ret_val) && !std::isfinite(ret_dec))
         {
             continue;
         }
@@ -1603,7 +1603,7 @@ void test_log10()
         auto ret_val {std::log10(val1)};
         auto ret_dec {static_cast<float>(log10(d1))};
 
-        if (!std::isfinite(ret_val) && !isfinite(ret_dec))
+        if (!std::isfinite(ret_val) && !std::isfinite(ret_dec))
         {
             continue;
         }
