@@ -26,6 +26,7 @@ template <typename Dec>
 void test_asin()
 {
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    constexpr auto tol {std::is_same<Dec, decimal128>::value ? 25000 : 50};
 
     for (std::size_t n {}; n < max_iter; ++n)
     {
@@ -37,7 +38,7 @@ void test_asin()
         auto ret_dec {static_cast<float>(asin(d1))};
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
-        if (!BOOST_TEST(distance < 50))
+        if (!BOOST_TEST(distance < tol))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -59,7 +60,7 @@ void test_asin()
         auto ret_dec {static_cast<float>(asin(d1))};
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
-        if (!BOOST_TEST(distance < 50))
+        if (!BOOST_TEST(distance < tol))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -81,7 +82,7 @@ void test_asin()
         auto ret_dec {static_cast<float>(asin(d1))};
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
-        if (!BOOST_TEST(distance < 50))
+        if (!BOOST_TEST(distance < tol))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -115,6 +116,10 @@ int main()
 {
     test_asin<decimal32>();
     test_asin<decimal64>();
+
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+    test_asin<decimal128>();
+    #endif
 
     #ifdef BOOST_DECIMAL_GENERATE_CONSTANT_SIGS
     print_value("0.2638070997559249856723985171001241"_DL, "a0");
