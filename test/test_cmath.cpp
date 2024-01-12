@@ -1556,6 +1556,72 @@ void test_nan()
 }
 #endif
 
+template <typename Dec>
+void test_log2()
+{
+    std::uniform_real_distribution<float> dist(-0.5F, 0.5F);
+
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::log2(val1)};
+        auto ret_dec {static_cast<float>(log2(d1))};
+
+        if (!std::isfinite(ret_val) && !isfinite(ret_dec))
+        {
+            continue;
+        }
+
+        const auto dist {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
+        if (!BOOST_TEST(dist < 100))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nDist: " << dist << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+template <typename Dec>
+void test_log10()
+{
+    std::uniform_real_distribution<float> dist(-0.5F, 0.5F);
+
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::log10(val1)};
+        auto ret_dec {static_cast<float>(log10(d1))};
+
+        if (!std::isfinite(ret_val) && !isfinite(ret_dec))
+        {
+            continue;
+        }
+
+        const auto dist {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
+        if (!BOOST_TEST(dist < 100))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nDist: " << dist << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -1685,6 +1751,12 @@ int main()
     test_nan<decimal64>();
     test_nan<decimal128>();
     #endif
+
+    test_log2<decimal32>();
+    test_log2<decimal64>();
+
+    test_log10<decimal32>();
+    test_log10<decimal64>();
 
     return boost::report_errors();
 }
