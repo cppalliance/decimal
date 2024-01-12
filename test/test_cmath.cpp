@@ -1758,5 +1758,10 @@ int main()
     test_log10<decimal32>();
     test_log10<decimal64>();
 
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+    test_log2<decimal128>();
+    test_log10<decimal128>();
+    #endif
+
     return boost::report_errors();
 }
