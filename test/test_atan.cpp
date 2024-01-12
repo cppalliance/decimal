@@ -22,6 +22,25 @@ static std::mt19937_64 rng(42);
 
 using namespace boost::decimal;
 
+template <typename Dec = decimal32>
+void spot_test(float val)
+{
+    const auto ret_val {std::atan(val)};
+    const auto ret_dec {static_cast<float>(atan(Dec{val}))};
+
+    const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
+    if (!BOOST_TEST(distance < 100))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "Val 1: " << val
+                  << "\nDec 1: " << Dec{val}
+                  << "\nRet val: " << ret_val
+                  << "\nRet dec: " << ret_dec
+                  << "\nEps: " << distance << std::endl;
+        // LCOV_EXCL_STOP
+    }
+}
+
 template <typename Dec>
 void test_atan()
 {
@@ -117,6 +136,72 @@ void test_atan()
 
     for (std::size_t n {}; n < max_iter; ++n)
     {
+        std::uniform_real_distribution<float> less_than_6(2.4375F, 6.0F);
+        const auto val1 {less_than_6(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::atan(val1)};
+        auto ret_dec {static_cast<float>(atan(d1))};
+
+        const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
+        if (!BOOST_TEST(distance < 1000))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << distance << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+
+    for (std::size_t n {}; n < max_iter; ++n)
+    {
+        std::uniform_real_distribution<float> less_than_12(6.0F, 12.0F);
+        const auto val1 {less_than_12(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::atan(val1)};
+        auto ret_dec {static_cast<float>(atan(d1))};
+
+        const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
+        if (!BOOST_TEST(distance < 1000))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << distance << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+
+    for (std::size_t n {}; n < max_iter; ++n)
+    {
+        std::uniform_real_distribution<float> less_than_24(12.0F, 24.0F);
+        const auto val1 {less_than_24(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::atan(val1)};
+        auto ret_dec {static_cast<float>(atan(d1))};
+
+        const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
+        if (!BOOST_TEST(distance < 1000))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nEps: " << distance << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+
+    for (std::size_t n {}; n < max_iter; ++n)
+    {
         std::uniform_real_distribution<float> big_vals(2.4375F, 100.0F);
         const auto val1 {big_vals(rng)};
         Dec d1 {val1};
@@ -150,6 +235,9 @@ int main()
 {
     test_atan<decimal32>();
     test_atan<decimal64>();
+
+    spot_test(0.344559F);
+    spot_test(0.181179F);
 
     return boost::report_errors();
 }

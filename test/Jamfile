@@ -37,6 +37,7 @@ run test_acosh.cpp ;
 run test_asin.cpp ;
 run test_asinh.cpp ;
 run test_atan.cpp ;
+run test_atan2.cpp ;
 run test_atanh.cpp ;
 run test_cmath.cpp ;
 run test_constants.cpp ;

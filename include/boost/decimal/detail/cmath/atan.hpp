@@ -26,17 +26,120 @@ constexpr auto atan_impl(T x) noexcept
     T result {};
 
     // 10th degree remez polynomial calculated from 0, 0.4375
-    constexpr T a0 {UINT64_C(61037779951304161), -18, true};
-    constexpr T a1 {UINT64_C(10723099589331457), -17};
-    constexpr T a2 {UINT64_C(22515613909953665), -18};
-    constexpr T a3 {UINT64_C(15540713402718176), -17, true};
-    constexpr T a4 {UINT64_C(35999727706986597), -19};
-    constexpr T a5 {UINT64_C(19938867353282852), -17};
-    constexpr T a6 {UINT64_C(62252075283915644), -22};
-    constexpr T a7 {UINT64_C(33333695504913247), -17, true};
-    constexpr T a8 {UINT64_C(10680927642397763), -24};
-    constexpr T a9 {UINT64_C(99999999877886492), -17};
+    // Estimated max error: 2.3032664387910605e-12
+    constexpr T a0  {UINT64_C(61037779951304161), -18, true};
+    constexpr T a1  {UINT64_C(10723099589331457), -17};
+    constexpr T a2  {UINT64_C(22515613909953665), -18};
+    constexpr T a3  {UINT64_C(15540713402718176), -17, true};
+    constexpr T a4  {UINT64_C(35999727706986597), -19};
+    constexpr T a5  {UINT64_C(19938867353282852), -17};
+    constexpr T a6  {UINT64_C(62252075283915644), -22};
+    constexpr T a7  {UINT64_C(33333695504913247), -17, true};
+    constexpr T a8  {UINT64_C(10680927642397763), -24};
+    constexpr T a9  {UINT64_C(99999999877886492), -17};
     constexpr T a10 {UINT64_C(23032664387910606), -29};
+
+    result = a0;
+    result = fma(result, x, a1);
+    result = fma(result, x, a2);
+    result = fma(result, x, a3);
+    result = fma(result, x, a4);
+    result = fma(result, x, a5);
+    result = fma(result, x, a6);
+    result = fma(result, x, a7);
+    result = fma(result, x, a8);
+    result = fma(result, x, a9);
+    result = fma(result, x, a10);
+
+    return result;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto atan_med_impl(T x) noexcept
+{
+    T result {};
+
+    // 10th degree remez polynomial from 2.4375, 6
+    // Estimated max error: 2.6239664084435361e-9
+    constexpr T a0  {UINT64_C(35895331641408534), -24, true};
+    constexpr T a1  {UINT64_C(1734850544519432), -21};
+    constexpr T a2  {UINT64_C(38064221484608425), -21, true};
+    constexpr T a3  {UINT64_C(50135011697517902), -20};
+    constexpr T a4  {UINT64_C(44154446962804779), -19, true};
+    constexpr T a5  {UINT64_C(27400572833763747), -18};
+    constexpr T a6  {UINT64_C(12289830364128736), -17, true};
+    constexpr T a7  {UINT64_C(40157034119189716), -17};
+    constexpr T a8  {UINT64_C(94842703533437844), -17, true};
+    constexpr T a9  {UINT64_C(15738722141839421), -16};
+    constexpr T a10 {UINT64_C(1425850153011925), -16, true};
+
+    result = a0;
+    result = fma(result, x, a1);
+    result = fma(result, x, a2);
+    result = fma(result, x, a3);
+    result = fma(result, x, a4);
+    result = fma(result, x, a5);
+    result = fma(result, x, a6);
+    result = fma(result, x, a7);
+    result = fma(result, x, a8);
+    result = fma(result, x, a9);
+    result = fma(result, x, a10);
+
+    return result;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto atan_large_impl(T x) noexcept
+{
+    T result {};
+
+    // 10th degree remez polynomial from 6, 12
+    // Estimated max error: 6.2743529396040705e-10
+    constexpr T a0  {UINT64_C(33711825733904967), -27, true};
+    constexpr T a1  {UINT64_C(33373728162443893), -25};
+    constexpr T a2  {UINT64_C(14947421096171872), -23, true};
+    constexpr T a3  {UINT64_C(39987662607208282), -22};
+    constexpr T a4  {UINT64_C(7102051362837618), -20, true};
+    constexpr T a5  {UINT64_C(87975481286276403), -20};
+    constexpr T a6  {UINT64_C(77627729565466572), -19, true};
+    constexpr T a7  {UINT64_C(48865382040050205), -18};
+    constexpr T a8  {UINT64_C(21563130284459425), -17, true};
+    constexpr T a9  {UINT64_C(63862756812924015), -17};
+    constexpr T a10 {UINT64_C(41486607456081259), -17};
+
+    result = a0;
+    result = fma(result, x, a1);
+    result = fma(result, x, a2);
+    result = fma(result, x, a3);
+    result = fma(result, x, a4);
+    result = fma(result, x, a5);
+    result = fma(result, x, a6);
+    result = fma(result, x, a7);
+    result = fma(result, x, a8);
+    result = fma(result, x, a9);
+    result = fma(result, x, a10);
+
+    return result;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto atan_huge_impl(T x) noexcept
+{
+    T result {};
+
+    // 10th degree remez polynomial from 12, 24
+    // Estimated max error: 4.1947468509456082e-10
+    constexpr T a0  {UINT64_C(21000582873393547), -30, true};
+    constexpr T a1  {UINT64_C(41414963913943078), -28};
+    constexpr T a2  {UINT64_C(36923801494687764), -26, true};
+    constexpr T a3  {UINT64_C(19644631420406287), -24};
+    constexpr T a4  {UINT64_C(69300227486259428), -23, true};
+    constexpr T a5  {UINT64_C(17021586749644597), -21};
+    constexpr T a6  {UINT64_C(29708833721842521), -20, true};
+    constexpr T a7  {UINT64_C(36858037393285633), -19};
+    constexpr T a8  {UINT64_C(31874262996720311), -18, true};
+    constexpr T a9  {UINT64_C(18322547884211479), -17};
+    constexpr T a10 {UINT64_C(9387703660037886), -16};
 
     result = a0;
     result = fma(result, x, a1);
@@ -97,6 +200,18 @@ constexpr auto atan(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
     {
         constexpr T atan_three_halves {UINT64_C(9827937232473290679), -19};
         result = atan_three_halves + detail::atan_impl((x - T{15, -1}) / (1 + T{15, -1} * x));
+    }
+    else if (absx <= T{6})
+    {
+        result = detail::atan_med_impl(x);
+    }
+    else if (absx <= T{12})
+    {
+        result = detail::atan_large_impl(x);
+    }
+    else if (absx <= T{24})
+    {
+        result = detail::atan_huge_impl(x);
     }
     else
     {
