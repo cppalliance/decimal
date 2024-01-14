@@ -84,7 +84,7 @@ constexpr auto tgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
                     {
                         // Use a Taylor series expansion for the reciprocal of the gamma function.
                         // N[Series[1/Gamma[z], {z, 0, 26}], 32]
-                        //         (1),                                 // * x
+                        //         (1),                                // * x
                          T { UINT64_C(577215664901532861), -18 -  0 }, // * z^2
                         -T { UINT64_C(655878071520253881), -18 -  0 }, // * z^3
                         -T { UINT64_C(420026350340952355), -18 -  1 }, // * z^4

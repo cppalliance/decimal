@@ -65,7 +65,53 @@ namespace local
     using decimal_type = DecimalType;
     using float_type   = FloatType;
 
-    bool result_is_ok { true };
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+
+    gen.seed(time_point<typename std::mt19937_64::result_type>());
+
+    auto dis =
+      std::uniform_real_distribution<float_type>
+      {
+        static_cast<float_type>(range_lo),
+        static_cast<float_type>(range_hi)
+      };
+
+    auto result_is_ok = true;
+
+    auto trials = static_cast<std::uint32_t>(UINT8_C(0));
+
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x400)) : static_cast<std::uint32_t>(UINT32_C(0x40));
+    #else
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x40)) : static_cast<std::uint32_t>(UINT32_C(0x4));
+    #endif
+
+    for( ; trials < count; ++trials)
+    {
+      const auto x_flt = dis(gen);
+      const auto x_dec = static_cast<decimal_type>(x_flt);
+
+      using std::lgamma;
+
+      const auto val_flt = lgamma(x_flt);
+      const auto val_dec = lgamma(x_dec);
+
+      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), static_cast<float_type>(std::numeric_limits<decimal_type>::epsilon()) * tol_factor);
+
+      result_is_ok = (result_val_is_ok && result_is_ok);
+
+      if(!result_val_is_ok)
+      {
+          // LCOV_EXCL_START
+        std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
+        std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
+        std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
+
+        break;
+          // LCOV_EXCL_STOP
+      }
+    }
 
     BOOST_TEST(result_is_ok);
 
@@ -81,11 +127,22 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto result_tgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(256, 0.1L, 21.7L);
+    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(256, 0.1L, 0.9L);
 
-    BOOST_TEST(result_tgamma_is_ok);
+    BOOST_TEST(result_lgamma_is_ok);
 
-    result_is_ok = (result_tgamma_is_ok && result_is_ok);
+    result_is_ok = (result_lgamma_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal32;
+    using float_type   = float;
+
+    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(256, 2.1L, 23.4L);
+
+    BOOST_TEST(result_lgamma_is_ok);
+
+    result_is_ok = (result_lgamma_is_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
