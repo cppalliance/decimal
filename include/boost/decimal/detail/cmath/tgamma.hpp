@@ -165,4 +165,4 @@ constexpr auto tgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
 } // namespace decimal
 } // namespace boost
 
-#endif // BOOST_DECIMAL_DETAIL_CMATH_ASINH_HPP
+#endif // BOOST_DECIMAL_DETAIL_CMATH_TGAMMA_HPP
