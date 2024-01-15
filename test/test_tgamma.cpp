@@ -307,7 +307,6 @@ namespace local
 
     return result_is_ok;
   }
-
 } // namespace local
 
 auto main() -> int
