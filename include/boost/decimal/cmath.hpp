@@ -38,6 +38,7 @@
 #include <boost/decimal/detail/cmath/log.hpp>
 #include <boost/decimal/detail/cmath/log1p.hpp>
 #include <boost/decimal/detail/cmath/log10.hpp>
+#include <boost/decimal/detail/cmath/log2.hpp>
 #include <boost/decimal/detail/cmath/modf.hpp>
 #include <boost/decimal/detail/cmath/nearbyint.hpp>
 #include <boost/decimal/detail/cmath/next.hpp>
