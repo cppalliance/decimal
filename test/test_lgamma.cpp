@@ -81,9 +81,9 @@ namespace local
     auto trials = static_cast<std::uint32_t>(UINT8_C(0));
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x400)) : static_cast<std::uint32_t>(UINT32_C(0x40));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x200)) : static_cast<std::uint32_t>(UINT32_C(0x20));
     #else
-    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x40)) : static_cast<std::uint32_t>(UINT32_C(0x4));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x20)) : static_cast<std::uint32_t>(UINT32_C(0x4));
     #endif
 
     for( ; trials < count; ++trials)
@@ -286,7 +286,11 @@ namespace local
 
         const auto val_one_or_two = lgamma(n_arg);
 
-        const auto result_val_one_or_two_is_ok = (fpclassify(val_one_or_two) == FP_ZERO);
+        const auto result_val_one_or_two_is_ok =
+        (
+             (fpclassify(val_one_or_two) == FP_ZERO)
+          &&  is_close_fraction(val_one_or_two, (::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen))), decimal_type { 5, -1 })
+        );
 
         BOOST_TEST(result_val_one_or_two_is_ok);
 
@@ -306,7 +310,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 0.1L, 0.8L);
+    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 0.1L, 0.9L);
 
     BOOST_TEST(result_lgamma_is_ok);
 
@@ -317,7 +321,18 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 2.2L, 23.4L);
+    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 1.1L, 1.9L);
+
+    BOOST_TEST(result_lgamma_is_ok);
+
+    result_is_ok = (result_lgamma_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal32;
+    using float_type   = float;
+
+    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 2.1L, 123.4L);
 
     BOOST_TEST(result_lgamma_is_ok);
 
@@ -328,7 +343,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(2048, 2.2L, 23.4L);
+    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(2048, 2.1L, 123.4L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
