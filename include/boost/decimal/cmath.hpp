@@ -34,6 +34,7 @@
 #include <boost/decimal/detail/cmath/isless.hpp>
 #include <boost/decimal/detail/cmath/isunordered.hpp>
 #include <boost/decimal/detail/cmath/ldexp.hpp>
+#include <boost/decimal/detail/cmath/lgamma.hpp>
 #include <boost/decimal/detail/cmath/log.hpp>
 #include <boost/decimal/detail/cmath/log1p.hpp>
 #include <boost/decimal/detail/cmath/log10.hpp>

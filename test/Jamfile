@@ -1,5 +1,5 @@
 # Copyright 2022 Peter Dimov
-# Copyright 2023 Matt Borland
+# Copyright 2023 - 2024 Matt Borland
 # Distributed under the Boost Software License, Version 1.0.
 # https://www.boost.org/LICENSE_1_0.txt
 
@@ -61,6 +61,7 @@ run test_git_issue_266.cpp ;
 run test_git_issue_271.cpp ;
 run test_hash.cpp ;
 run test_literals.cpp ;
+run test_lgamma.cpp ;
 run test_log.cpp ;
 run test_log1p.cpp ;
 run test_pow.cpp ;
