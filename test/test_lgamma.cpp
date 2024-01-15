@@ -127,7 +127,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(256, 0.1L, 0.9L);
+    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 0.1L, 0.8L);
 
     BOOST_TEST(result_lgamma_is_ok);
 
@@ -138,7 +138,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(256, 2.1L, 23.4L);
+    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 2.2L, 23.4L);
 
     BOOST_TEST(result_lgamma_is_ok);
 

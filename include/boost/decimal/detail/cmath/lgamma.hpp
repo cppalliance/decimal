@@ -11,25 +11,15 @@
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/cmath/log.hpp>
+#include <boost/decimal/detail/cmath/sin.hpp>
+#include <boost/decimal/detail/cmath/sqrt.hpp>
+#include <boost/decimal/detail/cmath/tgamma.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/numbers.hpp>
 
 namespace boost {
 namespace decimal {
-
-// Begin: Forward declarations
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
-
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto sin(T val) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
-
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
-
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto tgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
-// End: Forward declarations
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto lgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
