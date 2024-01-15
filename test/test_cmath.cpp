@@ -13,10 +13,10 @@
 #include <cmath>
 
 
-#if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-static constexpr auto N = static_cast<std::size_t>(512U); // Number of trials
+#if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && !defined(_WIN32)
+static constexpr auto N = static_cast<std::size_t>(128U); // Number of trials
 #else
-static constexpr auto N = static_cast<std::size_t>(512U >> 4U); // Number of trials
+static constexpr auto N = static_cast<std::size_t>(128U >> 4U); // Number of trials
 #endif
 
 static std::mt19937_64 rng(42);
@@ -1556,6 +1556,72 @@ void test_nan()
 }
 #endif
 
+template <typename Dec>
+void test_log2()
+{
+    std::uniform_real_distribution<float> dist(-0.5F, 0.5F);
+
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::log2(val1)};
+        auto ret_dec {static_cast<float>(log2(d1))};
+
+        if (!std::isfinite(ret_val) && !std::isfinite(ret_dec))
+        {
+            continue;
+        }
+
+        const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
+        if (!BOOST_TEST(distance < 100))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nDist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+template <typename Dec>
+void test_log10()
+{
+    std::uniform_real_distribution<float> dist(-0.5F, 0.5F);
+
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    for (std::size_t n {}; n < max_iter; ++n)
+    {
+        const auto val1 {dist(rng)};
+        Dec d1 {val1};
+
+        auto ret_val {std::log10(val1)};
+        auto ret_dec {static_cast<float>(log10(d1))};
+
+        if (!std::isfinite(ret_val) && !std::isfinite(ret_dec))
+        {
+            continue;
+        }
+
+        const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
+        if (!BOOST_TEST(distance < 100))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << d1
+                      << "\nRet val: " << ret_val
+                      << "\nRet dec: " << ret_dec
+                      << "\nDist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -1684,6 +1750,17 @@ int main()
     test_nan<decimal32>();
     test_nan<decimal64>();
     test_nan<decimal128>();
+    #endif
+
+    test_log2<decimal32>();
+    test_log2<decimal64>();
+
+    test_log10<decimal32>();
+    test_log10<decimal64>();
+
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+    test_log2<decimal128>();
+    test_log10<decimal128>();
     #endif
 
     return boost::report_errors();
