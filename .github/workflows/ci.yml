@@ -217,7 +217,7 @@ jobs:
             cxxstd: "03,11,14,17,20,2b"
             os: macos-12
 
-    timeout-minutes: 240
+    timeout-minutes: 120
     runs-on: ${{matrix.os}}
     container: ${{matrix.container}}
 

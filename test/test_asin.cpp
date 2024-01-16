@@ -26,6 +26,7 @@ template <typename Dec>
 void test_asin()
 {
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    constexpr auto tol {std::is_same<Dec, decimal128>::value ? 25000 : 50};
 
     for (std::size_t n {}; n < max_iter; ++n)
     {
@@ -37,7 +38,7 @@ void test_asin()
         auto ret_dec {static_cast<float>(asin(d1))};
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
-        if (!BOOST_TEST(distance < 50))
+        if (!BOOST_TEST(distance < tol))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -59,7 +60,7 @@ void test_asin()
         auto ret_dec {static_cast<float>(asin(d1))};
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
-        if (!BOOST_TEST(distance < 50))
+        if (!BOOST_TEST(distance < tol))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -81,7 +82,7 @@ void test_asin()
         auto ret_dec {static_cast<float>(asin(d1))};
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
-        if (!BOOST_TEST(distance < 50))
+        if (!BOOST_TEST(distance < tol))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -101,10 +102,40 @@ void test_asin()
     BOOST_TEST_EQ(asin(std::numeric_limits<Dec>::epsilon() * Dec(one(rng))), std::numeric_limits<Dec>::epsilon() * Dec(one(rng)));
 }
 
+template <typename T>
+void print_value(T value, const char* str)
+{
+    int ptr;
+    const auto sig_val = frexp10(value, &ptr);
+    std::cerr << std::setprecision(std::numeric_limits<T>::digits10) << str << ": " << value
+              << "\nSig: " << sig_val.high << " " << sig_val.low
+              << "\nExp: " << ptr << "\n" << std::endl;
+}
+
 int main()
 {
     test_asin<decimal32>();
     test_asin<decimal64>();
+
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+    //test_asin<decimal128>();
+    #endif
+
+    #ifdef BOOST_DECIMAL_GENERATE_CONSTANT_SIGS
+    print_value("0.2638070997559249856723985171001241"_DL, "a0");
+    print_value("-0.434913932128320201763937904114753451"_DL, "a1");
+    print_value("0.305590847861021053826474613710909921"_DL, "a2");
+    print_value("-0.13977130653211100015879395629540542"_DL, "a3");
+    print_value("0.054573213517731915574990756064112231"_DL, "a4");
+    print_value("0.064051743877986184818706014119123069"_DL, "a5");
+    print_value("0.0011606701725692841523963098473051048"_DL, "a6");
+    print_value("0.16650989049586517768081355278405235"_DL, "a7");
+    print_value("2.5906093603606160032693191317527350e-06"_DL, "a8");
+    print_value("0.99999996600620587094099811028495259"_DL, "a9");
+    print_value("7.3651618060008750986002928690410142e-11"_DL, "a10");
+
+    throw;
+    #endif
 
     return boost::report_errors();
 }
