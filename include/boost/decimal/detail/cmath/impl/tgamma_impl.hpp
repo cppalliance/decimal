@@ -24,8 +24,10 @@ struct tgamma_table_imp { };
 template <>
 struct tgamma_table_imp<::boost::decimal::decimal32>
 {
+private:
     static constexpr auto my_size = static_cast<std::size_t>(UINT8_C(15));
 
+public:
     using my_array_type = std::array<::boost::decimal::decimal32, my_size>;
 
     static constexpr my_array_type table =
@@ -52,8 +54,10 @@ struct tgamma_table_imp<::boost::decimal::decimal32>
 template <>
 struct tgamma_table_imp<::boost::decimal::decimal64>
 {
+private:
     static constexpr auto my_size = static_cast<std::size_t>(UINT8_C(26));
 
+public:
     using my_array_type = std::array<::boost::decimal::decimal64, my_size>;
 
     static constexpr my_array_type table =
@@ -87,6 +91,16 @@ struct tgamma_table_imp<::boost::decimal::decimal64>
         +::boost::decimal::decimal64 { UINT64_C(1'186'692'254'751'600'333), - 19 - 17 }, // * z^27
     }};
 };
+
+#if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
+
+constexpr std::size_t tgamma_table_imp<::boost::decimal::decimal32>::my_size;
+constexpr tgamma_table_imp<::boost::decimal::decimal32>::my_array_type tgamma_table_imp<::boost::decimal::decimal32>::table;
+
+constexpr std::size_t tgamma_table_imp<::boost::decimal::decimal64>::my_size;
+constexpr tgamma_table_imp<::boost::decimal::decimal64>::my_array_type tgamma_table_imp<::boost::decimal::decimal64>::table;
+
+#endif
 
 } //namespace tgamma_detail
 

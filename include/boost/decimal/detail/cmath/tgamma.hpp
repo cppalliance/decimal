@@ -12,6 +12,8 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/numbers.hpp>
 
+#include <iterator>
+
 namespace boost {
 namespace decimal {
 
@@ -93,11 +95,11 @@ constexpr auto tgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
                 using local_tgamma_table_type = detail::tgamma_table_struct_type<T>;
 
                 // Perform the Taylor series expansion.
-                auto rit = local_tgamma_table_type::table.crbegin();
+                auto rit = std::crbegin(local_tgamma_table_type::table);
 
                 result = *rit;
 
-                while(rit != local_tgamma_table_type::table.crend())
+                while(rit != std::crend(local_tgamma_table_type::table))
                 {
                     result = fma(result, z, *rit++);
                 }
