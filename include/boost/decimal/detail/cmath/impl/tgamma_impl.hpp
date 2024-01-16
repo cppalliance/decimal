@@ -25,11 +25,9 @@ template <>
 struct tgamma_table_imp<::boost::decimal::decimal32>
 {
 private:
-    static constexpr auto my_size = static_cast<std::size_t>(UINT8_C(15));
+    using my_array_type = std::array<::boost::decimal::decimal32, static_cast<std::size_t>(UINT8_C(15))>;
 
 public:
-    using my_array_type = std::array<::boost::decimal::decimal32, my_size>;
-
     static constexpr my_array_type table =
     {{
         // N[Series[1/Gamma[z], {z, 0, 16}], 24]
@@ -55,11 +53,9 @@ template <>
 struct tgamma_table_imp<::boost::decimal::decimal64>
 {
 private:
-    static constexpr auto my_size = static_cast<std::size_t>(UINT8_C(26));
+    using my_array_type = std::array<::boost::decimal::decimal64, static_cast<std::size_t>(UINT8_C(26))>;
 
 public:
-    using my_array_type = std::array<::boost::decimal::decimal64, my_size>;
-
     static constexpr my_array_type table =
     {{
         // N[Series[1/Gamma[z], {z, 0, 27}], 24]
@@ -94,10 +90,7 @@ public:
 
 #if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
 
-constexpr std::size_t tgamma_table_imp<::boost::decimal::decimal32>::my_size;
 constexpr tgamma_table_imp<::boost::decimal::decimal32>::my_array_type tgamma_table_imp<::boost::decimal::decimal32>::table;
-
-constexpr std::size_t tgamma_table_imp<::boost::decimal::decimal64>::my_size;
 constexpr tgamma_table_imp<::boost::decimal::decimal64>::my_array_type tgamma_table_imp<::boost::decimal::decimal64>::table;
 
 #endif
