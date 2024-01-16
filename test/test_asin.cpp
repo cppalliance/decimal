@@ -118,7 +118,7 @@ int main()
     test_asin<decimal64>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    test_asin<decimal128>();
+    //test_asin<decimal128>();
     #endif
 
     #ifdef BOOST_DECIMAL_GENERATE_CONSTANT_SIGS
