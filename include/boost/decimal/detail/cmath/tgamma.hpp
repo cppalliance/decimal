@@ -21,20 +21,20 @@ namespace detail {
 namespace tgamma {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-static constexpr auto coefs_size = static_cast<std::size_t>(UINT8_C(0));
+constexpr auto coefs_size = static_cast<std::size_t>(UINT8_C(0));
 
 template <>
-static constexpr auto coefs_size<::boost::decimal::decimal32> = static_cast<std::size_t>(UINT8_C(13));
+constexpr auto coefs_size<::boost::decimal::decimal32> = static_cast<std::size_t>(UINT8_C(13));
 
 template <>
-static constexpr auto coefs_size<::boost::decimal::decimal64> = static_cast<std::size_t>(UINT8_C(25));
+constexpr auto coefs_size<::boost::decimal::decimal64> = static_cast<std::size_t>(UINT8_C(25));
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T,
           const std::size_t CoefsSize = coefs_size<T>>
-static constexpr std::array<T, CoefsSize> coefs_array_table = {{ T { } }};
+constexpr std::array<T, CoefsSize> coefs_array_table = {{ T { } }};
 
 template <>
-static constexpr std::array<::boost::decimal::decimal32, coefs_size<::boost::decimal::decimal32>> coefs_array_table<::boost::decimal::decimal32, coefs_size<::boost::decimal::decimal32>> =
+constexpr std::array<::boost::decimal::decimal32, coefs_size<::boost::decimal::decimal32>> coefs_array_table<::boost::decimal::decimal32, coefs_size<::boost::decimal::decimal32>> =
 {{
     // N[Series[1/Gamma[z], {z, 0, 14}], 24]
     +::boost::decimal::decimal32 { UINT64_C(5'772'156'649'015'328'606), - 19 - 0 }, // * z^2
@@ -53,7 +53,7 @@ static constexpr std::array<::boost::decimal::decimal32, coefs_size<::boost::dec
 }};
 
 template <>
-static constexpr std::array<::boost::decimal::decimal64, coefs_size<::boost::decimal::decimal64>> coefs_array_table<::boost::decimal::decimal64, coefs_size<::boost::decimal::decimal64>> =
+constexpr std::array<::boost::decimal::decimal64, coefs_size<::boost::decimal::decimal64>> coefs_array_table<::boost::decimal::decimal64, coefs_size<::boost::decimal::decimal64>> =
 {{
     // N[Series[1/Gamma[z], {z, 0, 26}], 24]
     +::boost::decimal::decimal64 { UINT64_C(5'772'156'649'015'328'606), -19 - 0  }, // * z^2
