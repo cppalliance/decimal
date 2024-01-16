@@ -1,5 +1,5 @@
-// Copyright 2023 Matt Borland
-// Copyright 2023 Christopher Kormanyos
+// Copyright 2023 - 2024 Matt Borland
+// Copyright 2023 - 2024 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -317,7 +317,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(256, 0.1L, 21.7L);
+    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(512, 0.01L, 23.4L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
@@ -328,7 +328,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(1024, 0.1L, 21.7L);
+    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(1024, 0.01L, 78.9L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
