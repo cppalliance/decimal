@@ -8,6 +8,8 @@
 #ifndef UINTWIDE_T_2018_10_02_H // NOLINT(llvm-header-guard)
 #define UINTWIDE_T_2018_10_02_H
 
+#define WIDE_INTEGER_NAMESPACE boost::decimal
+
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
@@ -134,8 +136,8 @@
 #endif
 
 #if defined(WIDE_INTEGER_NAMESPACE)
-  #define WIDE_INTEGER_NAMESPACE_BEGIN namespace WIDE_INTEGER_NAMESPACE {   // NOLINT(cppcoreguidelines-macro-usage)
-  #define WIDE_INTEGER_NAMESPACE_END } // namespace WIDE_INTEGER_NAMESPACE  // NOLINT(cppcoreguidelines-macro-usage)
+  #define WIDE_INTEGER_NAMESPACE_BEGIN namespace boost { namespace decimal {     // NOLINT(cppcoreguidelines-macro-usage)
+  #define WIDE_INTEGER_NAMESPACE_END } } // namespace WIDE_INTEGER_NAMESPACE  // NOLINT(cppcoreguidelines-macro-usage)
 #else
   #define WIDE_INTEGER_NAMESPACE_BEGIN
   #define WIDE_INTEGER_NAMESPACE_END
@@ -2237,6 +2239,8 @@ public:
   using reverse_iterator       = typename representation_type::reverse_iterator;
   using const_reverse_iterator = typename representation_type::const_reverse_iterator;
 
+  using allocator_type         = typename representation_type::allocator_type;
+
   // Define a class-local type that has double the width of *this.
   using double_width_type = uintwide_t<static_cast<size_t>(Width2 * static_cast<size_t>(UINT8_C(2))), limb_type, AllocatorType, IsSigned>;
 
@@ -3530,7 +3534,7 @@ public:
   }
 
 #if !defined(WIDE_INTEGER_DISABLE_PRIVATE_CLASS_DATA_MEMBERS)
-private:
+//private:
 #endif
   representation_type
     values // NOLINT(readability-identifier-naming)
@@ -3541,7 +3545,7 @@ private:
     };
 
 #if defined(WIDE_INTEGER_DISABLE_PRIVATE_CLASS_DATA_MEMBERS)
-private:
+//private:
 #endif
   friend auto ::test_uintwide_t_edge::test_various_isolated_edge_cases() -> bool;
 
