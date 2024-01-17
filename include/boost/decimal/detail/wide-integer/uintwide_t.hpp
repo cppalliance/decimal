@@ -95,6 +95,10 @@
 
 // 201703L
 
+#define WIDE_INTEGER_CONSTEXPR constexpr                // NOLINT(cppcoreguidelines-macro-usage)
+#define WIDE_INTEGER_CONSTEXPR_IS_COMPILE_TIME_CONST 1  // NOLINT(cppcoreguidelines-macro-usage)
+
+#if 0
 #if defined(_MSVC_LANG)
   #if (_MSVC_LANG >= 201402L)
   #define WIDE_INTEGER_CONSTEXPR constexpr                // NOLINT(cppcoreguidelines-macro-usage)
@@ -119,6 +123,7 @@
     #define WIDE_INTEGER_CONSTEXPR_IS_COMPILE_TIME_CONST 0  // NOLINT(cppcoreguidelines-macro-usage)
     #endif
   #endif
+#endif
 #endif
 
 #if defined(WIDE_INTEGER_DISABLE_WIDE_INTEGER_CONSTEXPR)
