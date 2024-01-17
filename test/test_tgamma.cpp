@@ -328,7 +328,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(1024, 0.01L, 78.9L);
+    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(2048, 0.01L, 78.9L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
