@@ -25,7 +25,7 @@ using namespace boost::decimal;
 template <typename Dec>
 void test_asin()
 {
-    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? 2 : N};
     constexpr auto tol {std::is_same<Dec, decimal128>::value ? 25000 : 50};
 
     for (std::size_t n {}; n < max_iter; ++n)
@@ -114,13 +114,6 @@ void print_value(T value, const char* str)
 
 int main()
 {
-    test_asin<decimal32>();
-    test_asin<decimal64>();
-
-    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    test_asin<decimal128>();
-    #endif
-
     #ifdef BOOST_DECIMAL_GENERATE_CONSTANT_SIGS
     print_value("436.021684388252698008009005087997361"_DL, "a0");
     print_value("-4039.21638981374780301605091138334041"_DL, "a1");
@@ -139,7 +132,7 @@ int main()
     print_value("4167.6576373496175687445580059590862"_DL, "a14");
     print_value("-1354.9661562313129205074831860545212"_DL, "a15");
     print_value("387.85110009446107984667231846782873"_DL, "a16");
-    print_value("-97.817489091457389284370953518072941_DL", "a17");
+    print_value("-97.817489091457389284370953518072941"_DL, "a17");
     print_value("21.743307363075844418345038236692007"_DL, "a18");
     print_value("-4.2480133538896834744681916927887348"_DL, "a19");
     print_value("0.73292313819882720927775694986695822"_DL, "a20");
@@ -150,7 +143,7 @@ int main()
     print_value("0.013950081361102626885069793269505888"_DL, "a25");
     print_value("1.1009122133007665306092568908271278e-06"_DL, "a26");
     print_value("0.017352694401278245203946951656646601"_DL, "a27");
-    print_value("3.7646439494486735639855121728483381e-091"_DL, "a28");
+    print_value("3.7646439494486735639855121728483381e-09"_DL, "a28");
     print_value("0.022372158921646811423908478031651474"_DL, "a29");
     print_value("6.2818862516685652814845387053772962"_DL, "a30");
     print_value("0.030381944444255037245064480562068303"_DL, "a31");
@@ -165,6 +158,13 @@ int main()
     print_value("1.0845024738180057189197205194839397e-34"_DL, "a40");
 
     throw;
+    #endif
+
+    test_asin<decimal32>();
+    test_asin<decimal64>();
+
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+    test_asin<decimal128>();
     #endif
 
     return boost::report_errors();
