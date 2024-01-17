@@ -358,7 +358,7 @@ constexpr auto uint256_to_wide_integer(const uint256_t& src) -> wide_integer_uin
     return dst;
 }
 
-constexpr auto wide_integer_to_uint256(const wide_integer_uint128& src) -> uint256_t
+constexpr auto wide_integer_to_uint256(const wide_integer_uint256& src) -> uint256_t
 {
     uint256_t dst { };
 
