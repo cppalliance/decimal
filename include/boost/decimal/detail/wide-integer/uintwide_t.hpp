@@ -1,5 +1,13 @@
+// Copyright 2023 - 2024 Matt Borland
+// Copyright 1999 - 2024 Christopher Kormanyos
+// Distributed under the Boost Software License, Version 1.0.
+// https://www.boost.org/LICENSE_1_0.txt
+//
+
+// This file has been taken from (and significantly reduced from):
+//
 ///////////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 1999 - 2023.                 //
+//  Copyright Christopher Kormanyos 1999 - 2024.                 //
 //  Distributed under the Boost Software License,                //
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt          //
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)             //
@@ -15,19 +23,7 @@
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #endif
 
-#if ((__cplusplus < 202100L) || (defined(__GNUC__) && defined(__AVR__)))
-#include <ciso646>
-#else
-#include <version>
-#endif
-
-#if (defined(__cpp_lib_to_chars) && (__cpp_lib_to_chars >= 201611L))
-#include <charconv>
-#endif
 #include <cinttypes>
-#if !defined(WIDE_INTEGER_DISABLE_FLOAT_INTEROP)
-#include <cmath>
-#endif
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -528,11 +524,7 @@ struct uint_type_helper
 private:
   static constexpr auto bit_count   () -> size_t { return BitCount; }
   static constexpr auto bit_count_lo() -> size_t { return static_cast<size_t>(UINT8_C(8)); }
-  #if defined(WIDE_INTEGER_HAS_LIMB_TYPE_UINT64)
-  static constexpr auto bit_count_hi() -> size_t { return static_cast<size_t>(UINT8_C(128)); }
-  #else
   static constexpr auto bit_count_hi() -> size_t { return static_cast<size_t>(UINT8_C(64)); }
-  #endif
 
   static_assert((   ((bit_count() >= bit_count_lo()) && (BitCount <= bit_count_hi())) // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
                  && (verify_power_of_two<bit_count()>::conditional_value)),
@@ -549,16 +541,6 @@ template<const size_t BitCount> struct uint_type_helper<BitCount, std::enable_if
 template<const size_t BitCount> struct uint_type_helper<BitCount, std::enable_if_t<(BitCount >= static_cast<size_t>(UINT8_C( 9))) && (BitCount <= static_cast<size_t>(UINT8_C( 16)))>> { using exact_unsigned_type = std::uint16_t;     using exact_signed_type = std::int16_t;    using fast_unsigned_type = std::uint_fast16_t; using fast_signed_type = std::int_fast16_t; };
 template<const size_t BitCount> struct uint_type_helper<BitCount, std::enable_if_t<(BitCount >= static_cast<size_t>(UINT8_C(17))) && (BitCount <= static_cast<size_t>(UINT8_C( 32)))>> { using exact_unsigned_type = std::uint32_t;     using exact_signed_type = std::int32_t;    using fast_unsigned_type = std::uint_fast32_t; using fast_signed_type = std::int_fast32_t; };
 template<const size_t BitCount> struct uint_type_helper<BitCount, std::enable_if_t<(BitCount >= static_cast<size_t>(UINT8_C(33))) && (BitCount <= static_cast<size_t>(UINT8_C( 64)))>> { using exact_unsigned_type = std::uint64_t;     using exact_signed_type = std::int64_t;    using fast_unsigned_type = std::uint_fast64_t; using fast_signed_type = std::int_fast64_t; };
-#if defined(WIDE_INTEGER_HAS_LIMB_TYPE_UINT64)
-#if (defined(__GNUC__) && !defined(__clang__))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-#endif
-template<const size_t BitCount> struct uint_type_helper<BitCount, std::enable_if_t<(BitCount >= static_cast<size_t>(UINT8_C(65))) && (BitCount <= static_cast<size_t>(UINT8_C(128)))>> { using exact_unsigned_type = unsigned __int128; using exact_signed_type = signed __int128; using fast_unsigned_type = unsigned __int128;  using fast_signed_type = signed __int128;   };
-#if (defined(__GNUC__) && !defined(__clang__))
-#pragma GCC diagnostic pop
-#endif
-#endif
 
 using unsigned_fast_type = typename uint_type_helper<static_cast<size_t>(std::numeric_limits<size_t   >::digits + 0)>::fast_unsigned_type;
 using   signed_fast_type = typename uint_type_helper<static_cast<size_t>(std::numeric_limits<ptrdiff_t>::digits + 1)>::fast_signed_type;
@@ -731,17 +713,12 @@ constexpr auto make_lo(const UnsignedLargeType& u) -> UnsignedShortType
   using local_ularge_type = UnsignedLargeType;
 
   // Compile-time checks.
-  #if defined(WIDE_INTEGER_HAS_LIMB_TYPE_UINT64)
-  static_assert(((sizeof(local_ushort_type) * 2U) == sizeof(local_ularge_type)),
-                 "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
-  #else
   static_assert((    ( std::numeric_limits<local_ushort_type>::is_integer)
                  &&  ( std::numeric_limits<local_ularge_type>::is_integer)
                  &&  (!std::numeric_limits<local_ushort_type>::is_signed)
                  &&  (!std::numeric_limits<local_ularge_type>::is_signed)
                  &&  ((sizeof(local_ushort_type) * 2U) == sizeof(local_ularge_type))),
                  "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
-  #endif
 
   return static_cast<local_ushort_type>(u);
 }
@@ -758,17 +735,12 @@ constexpr auto make_hi(const UnsignedLargeType& u) -> UnsignedShortType
   using local_ularge_type = UnsignedLargeType;
 
   // Compile-time checks.
-  #if defined(WIDE_INTEGER_HAS_LIMB_TYPE_UINT64)
-  static_assert(((sizeof(local_ushort_type) * 2U) == sizeof(local_ularge_type)),
-                 "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
-  #else
   static_assert((    ( std::numeric_limits<local_ushort_type>::is_integer)
                  &&  ( std::numeric_limits<local_ularge_type>::is_integer)
                  &&  (!std::numeric_limits<local_ushort_type>::is_signed)
                  &&  (!std::numeric_limits<local_ularge_type>::is_signed)
                  &&  ((sizeof(local_ushort_type) * 2U) == sizeof(local_ularge_type))),
                  "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
-  #endif
 
   return static_cast<local_ushort_type>(u >> static_cast<local_ushort_type>(std::numeric_limits<local_ushort_type>::digits));
 }
@@ -785,17 +757,12 @@ constexpr auto make_large(const UnsignedShortType& lo, const UnsignedShortType& 
   using local_ularge_type = UnsignedLargeType;
 
   // Compile-time checks.
-  #if defined(WIDE_INTEGER_HAS_LIMB_TYPE_UINT64)
-  static_assert(((sizeof(local_ushort_type) * 2U) == sizeof(local_ularge_type)),
-                 "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
-  #else
   static_assert((    ( std::numeric_limits<local_ushort_type>::is_integer)
                  &&  ( std::numeric_limits<local_ularge_type>::is_integer)
                  &&  (!std::numeric_limits<local_ushort_type>::is_signed)
                  &&  (!std::numeric_limits<local_ularge_type>::is_signed)
                  &&  ((sizeof(local_ushort_type) * 2U) == sizeof(local_ularge_type))),
                  "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
-  #endif
 
   return
     static_cast<local_ularge_type>
@@ -877,17 +844,12 @@ public:
   using ularge_type = double_limb_type;
 
   // More compile-time checks.
-  #if defined(WIDE_INTEGER_HAS_LIMB_TYPE_UINT64)
-  static_assert(((sizeof(limb_type) * 2U) == sizeof(double_limb_type)),
-                 "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
-  #else
   static_assert((    ( std::numeric_limits<limb_type>::is_integer)
                  &&  ( std::numeric_limits<double_limb_type>::is_integer)
                  &&  (!std::numeric_limits<limb_type>::is_signed)
                  &&  (!std::numeric_limits<double_limb_type>::is_signed)
                  &&  ((sizeof(limb_type) * 2U) == sizeof(double_limb_type))),
                  "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
-  #endif
 
   // Helper constants for the digit characteristics.
   static constexpr size_t my_width2 = Width2;
@@ -897,16 +859,6 @@ public:
     static_cast<size_t>
     (
       Width2 / static_cast<size_t>(std::numeric_limits<limb_type>::digits)
-    );
-
-  static constexpr size_t number_of_limbs_karatsuba_threshold =
-    static_cast<size_t>
-    (
-      static_cast<unsigned>
-      (
-          static_cast<unsigned>(UINT8_C(128))
-        + static_cast<unsigned>(UINT8_C(1))
-      )
     );
 
   // Verify that the Width2 template parameter (mirrored with my_width2):
@@ -944,7 +896,7 @@ public:
                                 &&  std::is_unsigned   <UnsignedIntegralType>::value
                                 && (std::numeric_limits<UnsignedIntegralType>::digits <= std::numeric_limits<limb_type>::digits))>* = nullptr) // NOLINT(hicpp-named-parameter,readability-named-parameter)
   {
-    values.front() = v;
+    values.front() = static_cast<limb_type>(v);
   }
 
   constexpr uintwide_t(const uintwide_t& other) = default;
@@ -966,23 +918,6 @@ public:
                          WIDE_INTEGER_CONSTEXPR auto  representation()       ->       representation_type& { return values; }
   WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto  representation() const -> const representation_type& { return values; }
   WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto crepresentation() const -> const representation_type& { return values; }
-
-  WIDE_INTEGER_CONSTEXPR auto mul_by_limb(const limb_type v) -> uintwide_t&
-  {
-    if(v == static_cast<limb_type>(UINT8_C(0)))
-    {
-      detail::fill_unsafe(values.begin(), values.end(), static_cast<typename representation_type::value_type>(UINT8_C(0)));
-    }
-    else if(v > static_cast<limb_type>(UINT8_C(1)))
-    {
-      static_cast<void>(eval_multiply_1d(values.begin(),
-                                         values.cbegin(),
-                                         v,
-                                         number_of_limbs));
-    }
-
-    return *this;
-  }
 
   WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto compare(const uintwide_t<Width2, LimbType, AllocatorType, IsSigned>& other) const -> std::int_fast8_t
   {
@@ -1048,34 +983,6 @@ public:
     }
   }
 
-  WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto is_zero() const -> bool
-  {
-    auto it = values.cbegin(); // NOLINT(llvm-qualified-auto,readability-qualified-auto)
-
-    while((it != values.cend()) && (*it == static_cast<limb_type>(UINT8_C(0)))) // NOLINT(altera-id-dependent-backward-branch)
-    {
-      ++it;
-    }
-
-    return (it == values.cend());
-  }
-
-  template<const bool RePhraseIsSigned = IsSigned>
-  static constexpr auto is_neg(const uintwide_t<Width2, LimbType, AllocatorType, RePhraseIsSigned>&, // NOLINT(hicpp-named-parameter,readability-named-parameter)
-                               std::enable_if_t<(!RePhraseIsSigned), int>* = nullptr) -> bool        // NOLINT(hicpp-named-parameter,readability-named-parameter)
-  {
-    return false;
-  }
-
-  template<const bool RePhraseIsSigned = IsSigned>
-  static constexpr auto is_neg(const uintwide_t<Width2, LimbType, AllocatorType, RePhraseIsSigned>& a,
-                               std::enable_if_t<RePhraseIsSigned, int>* p_nullparam = nullptr) -> bool
-  {
-    static_cast<void>(p_nullparam);
-
-    return (static_cast<std::uint_fast8_t>(static_cast<std::uint_fast8_t>(a.values.back() >> static_cast<size_t>(std::numeric_limits<typename uintwide_t<Width2, LimbType, AllocatorType, RePhraseIsSigned>::limb_type>::digits - 1)) & 1U) != 0U);
-  }
-
 #if !defined(WIDE_INTEGER_DISABLE_PRIVATE_CLASS_DATA_MEMBERS)
 //private:
 #endif
@@ -1123,39 +1030,6 @@ public:
     }
 
     return n_return;
-  }
-
-  template<const size_t OtherWidth2>
-  static WIDE_INTEGER_CONSTEXPR auto eval_mul_unary(      uintwide_t<OtherWidth2, LimbType, AllocatorType, IsSigned>& u,
-                                                    const uintwide_t<OtherWidth2, LimbType, AllocatorType, IsSigned>& v,
-                                                    std::enable_if_t<((OtherWidth2 / std::numeric_limits<LimbType>::digits) < number_of_limbs_karatsuba_threshold)>* p_nullparam = nullptr) -> void
-  {
-    static_cast<void>(p_nullparam == nullptr);
-
-    // Unary multiplication function using schoolbook multiplication,
-    // but we only need to retain the low half of the n*n algorithm.
-    // In other words, this is an n*n->n bit multiplication.
-    using local_other_wide_integer_type = uintwide_t<OtherWidth2, LimbType, AllocatorType, IsSigned>;
-
-    const auto local_other_number_of_limbs = local_other_wide_integer_type::number_of_limbs;
-
-    using local_other_representation_type = typename local_other_wide_integer_type::representation_type;
-
-    local_other_representation_type result
-    {
-      static_cast<typename representation_type::size_type>(local_other_number_of_limbs),
-      static_cast<typename representation_type::value_type>(UINT8_C(0)),
-      typename representation_type::allocator_type()
-    };
-
-    eval_multiply_n_by_n_to_lo_part(result.begin(),
-                                    u.values.cbegin(),
-                                    v.values.cbegin(),
-                                    local_other_number_of_limbs);
-
-    detail::copy_unsafe(result.cbegin(),
-                        detail::advance_and_point(result.cbegin(), local_other_number_of_limbs),
-                        u.values.begin());
   }
 
   template<typename ResultIterator,
@@ -1639,8 +1513,8 @@ public:
 };
 
 // Define some convenient unsigned wide integer types.
-using uint128_t   = uintwide_t<static_cast<size_t>(UINT32_C(  128)), std::uint32_t>;
-using uint256_t   = uintwide_t<static_cast<size_t>(UINT32_C(  256)), std::uint32_t>;
+using uint128_t = uintwide_t<static_cast<size_t>(UINT32_C(128)), std::uint32_t>;
+using uint256_t = uintwide_t<static_cast<size_t>(UINT32_C(256)), std::uint32_t>;
 
 #if(__cplusplus >= 201703L)
 } // namespace math::wide_integer

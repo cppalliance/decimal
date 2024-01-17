@@ -930,20 +930,20 @@ constexpr auto wide_integer_to_uint128(const wide_integer_uint128& src) -> uint1
     dst.low =
         static_cast<std::uint64_t>
         (
-                                           src.representation()[static_cast<std::size_t>(UINT8_C(0))]
+                                           src.crepresentation()[static_cast<std::size_t>(UINT8_C(0))]
             | static_cast<std::uint64_t>
               (
-                static_cast<std::uint64_t>(src.representation()[static_cast<std::size_t>(UINT8_C(1))]) << static_cast<unsigned>(UINT8_C(32))
+                static_cast<std::uint64_t>(src.crepresentation()[static_cast<std::size_t>(UINT8_C(1))]) << static_cast<unsigned>(UINT8_C(32))
               )
         );
 
     dst.high =
         static_cast<std::uint64_t>
         (
-                                           src.representation()[static_cast<std::size_t>(UINT8_C(2))]
+                                           src.crepresentation()[static_cast<std::size_t>(UINT8_C(2))]
             | static_cast<std::uint64_t>
               (
-                static_cast<std::uint64_t>(src.representation()[static_cast<std::size_t>(UINT8_C(3))]) << static_cast<unsigned>(UINT8_C(32))
+                static_cast<std::uint64_t>(src.crepresentation()[static_cast<std::size_t>(UINT8_C(3))]) << static_cast<unsigned>(UINT8_C(32))
               )
         );
 
