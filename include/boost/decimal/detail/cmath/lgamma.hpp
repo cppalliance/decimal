@@ -70,8 +70,8 @@ constexpr auto lgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
         }
         else
         {
-            constexpr T half { 5, -1 };
-            constexpr T eight{ 8, 0 };
+            constexpr T half         { 5, -1 };
+            constexpr T asymp_cutoff { 8, 0 };
 
             if (x < half)
             {
@@ -139,7 +139,7 @@ constexpr auto lgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
 
                 result -= log(x);
             }
-            else if (x < eight)
+            else if (x < asymp_cutoff)
             {
                 result = log(tgamma(x));
             }

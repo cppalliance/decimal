@@ -59,6 +59,40 @@ namespace local
   }
 
   template<typename DecimalType, typename FloatType>
+  auto test_special_issue385(const int tol_factor) -> bool
+  {
+    using decimal_type = DecimalType;
+    using float_type   = FloatType;
+
+    auto result_is_ok = true;
+
+    const auto x_flt = static_cast<float_type>(2.108116045866610L);
+    const auto x_dec = static_cast<decimal_type>(x_flt);
+
+    using std::lgamma;
+
+    const auto val_flt = lgamma(x_flt);
+    const auto val_dec = lgamma(x_dec);
+
+    const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), static_cast<float_type>(std::numeric_limits<decimal_type>::epsilon()) * tol_factor);
+
+    result_is_ok = (result_val_is_ok && result_is_ok);
+
+    if(!result_val_is_ok)
+    {
+      // LCOV_EXCL_START
+      std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
+      std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
+      std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
+      // LCOV_EXCL_STOP
+    }
+
+    BOOST_TEST(result_is_ok);
+
+    return result_is_ok;
+  }
+
+  template<typename DecimalType, typename FloatType>
   auto test_lgamma(const int tol_factor, const long double range_lo, const long double range_hi) -> bool
   {
     using decimal_type = DecimalType;
@@ -102,13 +136,13 @@ namespace local
 
       if(!result_val_is_ok)
       {
-          // LCOV_EXCL_START
+        // LCOV_EXCL_START
         std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
         std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
         std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
-          // LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
       }
     }
 
@@ -307,6 +341,17 @@ auto main() -> int
   auto result_is_ok = true;
 
   {
+    using decimal_type = boost::decimal::decimal64;
+    using float_type   = double;
+
+    const auto result_special_issue385_is_ok   = local::test_special_issue385<decimal_type, float_type>(4096);
+
+    BOOST_TEST(result_special_issue385_is_ok);
+
+    result_is_ok = (result_special_issue385_is_ok && result_is_ok);
+  }
+
+  {
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
@@ -343,7 +388,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(2048, 2.1L, 123.4L);
+    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(4096, 2.1L, 123.4L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
