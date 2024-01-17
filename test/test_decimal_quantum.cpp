@@ -63,16 +63,20 @@ void test_same_quantum()
         {
             if (!BOOST_TEST(samequantum(val1, val2)))
             {
+                // LCOV_EXCL_START
                 std::cerr << "Val 1: " << val1
                           << "\nVal 2: " << val2 << std::endl;
+                // LCOV_EXCL_STOP
             }
         }
         else
         {
             if (!BOOST_TEST(!samequantum(val1, val2)))
             {
+                // LCOV_EXCL_START
                 std::cerr << "Val 1: " << val1
                           << "\nVal 2: " << val2 << std::endl;
+                // LCOV_EXCL_STOP
             }
         }
     }
@@ -90,15 +94,19 @@ void test_quantexp()
         {
             if (!BOOST_TEST_EQ(quantexp(val1), detail::max_biased_exp_v<Dec>))
             {
+                // LCOV_EXCL_START
                 std::cerr << "Val: " << val1 << std::endl;
+                // LCOV_EXCL_STOP
             }
         }
         else
         {
             if (!BOOST_TEST_EQ(quantexp(val1), i + detail::bias_v<Dec>))
             {
+                // LCOV_EXCL_START
                 std::cerr << "Val: " << val1
                           << "\nExp 1: " << i << std::endl;
+                // LCOV_EXCL_STOP
             }
         }
     }

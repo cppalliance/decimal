@@ -34,9 +34,11 @@
 #include <boost/decimal/detail/cmath/isless.hpp>
 #include <boost/decimal/detail/cmath/isunordered.hpp>
 #include <boost/decimal/detail/cmath/ldexp.hpp>
+#include <boost/decimal/detail/cmath/lgamma.hpp>
 #include <boost/decimal/detail/cmath/log.hpp>
 #include <boost/decimal/detail/cmath/log1p.hpp>
 #include <boost/decimal/detail/cmath/log10.hpp>
+#include <boost/decimal/detail/cmath/log2.hpp>
 #include <boost/decimal/detail/cmath/modf.hpp>
 #include <boost/decimal/detail/cmath/nearbyint.hpp>
 #include <boost/decimal/detail/cmath/next.hpp>
@@ -55,6 +57,12 @@
 #include <boost/decimal/detail/cmath/nan.hpp>
 #include <boost/decimal/detail/cmath/logb.hpp>
 #include <boost/decimal/detail/cmath/cbrt.hpp>
+#include <boost/decimal/detail/cmath/erf.hpp>
+#include <boost/decimal/detail/cmath/atan.hpp>
+#include <boost/decimal/detail/cmath/asin.hpp>
+#include <boost/decimal/detail/cmath/acos.hpp>
+#include <boost/decimal/detail/cmath/atan2.hpp>
+#include <boost/decimal/detail/cmath/fma.hpp>
 #include <boost/decimal/numbers.hpp>
 
 // Macros from 3.6.2
@@ -111,21 +119,6 @@ constexpr auto copysign(decimal64 mag, decimal64 sgn) noexcept -> decimal64
 constexpr auto copysign(decimal128 mag, decimal128 sgn) noexcept -> decimal128
 {
     return copysignd128(mag, sgn);
-}
-
-constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
-{
-    return fmad32(x, y, z);
-}
-
-constexpr auto fma(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
-{
-    return fmad64(x, y, z);
-}
-
-constexpr auto fma(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
-{
-    return fmad128(x, y, z);
 }
 
 constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool

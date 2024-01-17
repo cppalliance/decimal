@@ -42,12 +42,14 @@ void random_mixed_addition(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 + val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 + val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -78,12 +80,14 @@ void random_mixed_subtraction(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 - val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -114,12 +118,14 @@ void random_mixed_multiplication(T lower, T upper)
 
         if (!BOOST_TEST_EQ(res_int, val1 * val2))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << val1 * val2 << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -153,12 +159,14 @@ void random_mixed_division(T lower, T upper)
         }
         else if (!BOOST_TEST_EQ(static_cast<float>(res), static_cast<float>(res_int)))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << dec1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 

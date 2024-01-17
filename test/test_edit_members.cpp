@@ -38,8 +38,10 @@ void test_edit_exp()
 
         if (!BOOST_TEST_EQ(val, new_val))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val
                       << "\nVal 2: " << new_val << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -63,8 +65,10 @@ void test_edit_sig()
 
         if (!BOOST_TEST_EQ(val, new_val))
         {
+            // LCOV_EXCL_START
             std::cerr << "Val 1: " << val
                       << "\nVal 2: " << new_val << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }

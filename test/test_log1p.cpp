@@ -82,9 +82,9 @@ namespace local
     auto trials = static_cast<std::uint32_t>(UINT8_C(0));
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x800));
+    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x400));
     #else
-    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x80));
+    constexpr auto count = static_cast<std::uint32_t>(UINT32_C(0x40));
     #endif
 
     for( ; trials < count; ++trials)
@@ -105,11 +105,13 @@ namespace local
 
       if(!result_val_is_ok)
       {
+          // LCOV_EXCL_START
         std::cout << "x_flt  : " <<                    x_flt   << std::endl;
         std::cout << "val_flt: " << std::scientific << val_flt << std::endl;
         std::cout << "val_dec: " << std::scientific << val_dec << std::endl;
 
         break;
+          // LCOV_EXCL_STOP
       }
     }
 

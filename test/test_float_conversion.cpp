@@ -128,11 +128,13 @@ void test_generic_binary_to_decimal()
 
             if (!BOOST_TEST(abs(dec - return_dec) <= 1 ))
             {
+                // LCOV_EXCL_START
                 std::cerr << std::scientific << std::setprecision(std::numeric_limits<boost::decimal::decimal64>::digits10)
                           << "       Dec: " << dec
                           << "\n       Dbl: " << dbl
                           << "\nReturn Dec: " << return_dec
                           << "\nDist: " << abs(dec - return_dec) << std::endl;
+                // LCOV_EXCL_STOP
             }
         }
     }

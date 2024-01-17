@@ -249,7 +249,9 @@ void test_addition()
     constexpr decimal32 max_val((std::numeric_limits<decimal32>::max)());
     if (!BOOST_TEST(isinf(max_val + one)))
     {
+        // LCOV_EXCL_START
         std::cerr << std::bitset<32>(to_bits(max_val + one)) << std::endl;
+        // LCOV_EXCL_STOP
     }
 }
 
@@ -415,7 +417,9 @@ void test_construct_from_integer()
     constexpr decimal32 max_sig (detail::max_significand);
     if (!BOOST_TEST_EQ(static_cast<T>(max_sig), detail::max_significand))
     {
+        // LCOV_EXCL_START
         std::cerr << "Bits: " << std::bitset<32>(to_bits(max_sig)) << std::endl;
+        // LCOV_EXCL_STOP
     }
 }
 
@@ -453,8 +457,10 @@ void spot_check_addition(T a, T b, T res)
 
     if (!BOOST_TEST_EQ(dec_a + dec_b, dec_res))
     {
+        // LCOV_EXCL_START
         std::cerr << "A + B: " << a + b
                   << "\nIn dec: " << decimal32(a + b) << std::endl;
+        // LCOV_EXCL_STOP
     }
 }
 
