@@ -284,39 +284,10 @@ constexpr auto copy_backward_unsafe(InputIterator first, InputIterator last, Des
   return dest;
 }
 
-namespace distance_detail
-{
-  template<class It>
-  constexpr auto do_distance(It first, It last, iterator_detail::input_iterator_tag) -> typename iterator_detail::iterator_traits<It>::difference_type // NOLINT(hicpp-named-parameter,readability-named-parameter)
-  {
-    typename iterator_detail::iterator_traits<It>::difference_type result = 0;
-
-    while (first != last)
-    {
-      ++first;
-      ++result;
-    }
-
-    return result;
-  }
-
-  template<class It>
-  constexpr auto do_distance(It first, It last, std::random_access_iterator_tag) -> typename iterator_detail::iterator_traits<It>::difference_type // NOLINT(hicpp-named-parameter,readability-named-parameter)
-  {
-    return last - first;
-  }
-} // namespace distance_detail
-
 template<class It>
 constexpr auto distance_unsafe(It first, It last) -> typename iterator_detail::iterator_traits<It>::difference_type
 {
-  return
-    detail::distance_detail::do_distance
-    (
-      first,
-      last,
-      typename detail::iterator_detail::iterator_traits<It>::iterator_category()
-    );
+  return last - first;
 }
 
 template<class InputIt1, class InputIt2>
