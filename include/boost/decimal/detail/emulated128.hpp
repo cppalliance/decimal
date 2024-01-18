@@ -959,7 +959,7 @@ constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& re
 
     wide_integer_uint128 rem_wide { };
 
-    lhs_wide.eval_divide_knuth(rhs_wide, &rem_wide);
+    lhs_wide.eval_divide_knuth(rhs_wide, rem_wide);
 
     remainder = wide_integer_to_uint128(rem_wide);
     quotient  = wide_integer_to_uint128(lhs_wide);

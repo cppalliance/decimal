@@ -415,7 +415,7 @@ constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& lhs, const ui
 
     wide_integer_uint256 rem_wide { };
 
-    lhs_wide.eval_divide_knuth(rhs_wide, &rem_wide);
+    lhs_wide.eval_divide_knuth(rhs_wide, rem_wide);
 
     const auto remainder = wide_integer_to_uint256(rem_wide);
     const auto quotient  = wide_integer_to_uint256(lhs_wide);

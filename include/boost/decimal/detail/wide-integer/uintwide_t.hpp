@@ -928,13 +928,13 @@ public:
 
   WIDE_INTEGER_CONSTEXPR auto eval_divide_by_single_limb(const limb_type          short_denominator,
                                                          const unsigned_fast_type u_offset,
-                                                               uintwide_t*        remainder) -> void
+                                                               uintwide_t&        remainder) -> void
   {
     // The denominator has one single limb.
     // Use a one-dimensional division algorithm.
 
-    auto long_numerator = double_limb_type { };
-    auto hi_part        = static_cast<limb_type>(UINT8_C(0));
+    double_limb_type long_numerator = static_cast<double_limb_type>(UINT8_C(0));
+    limb_type        hi_part        = static_cast<limb_type>       (UINT8_C(0));
 
     {
       auto ri =
@@ -970,7 +970,6 @@ public:
       }
     }
 
-    if(remainder != nullptr)
     {
       long_numerator =
         static_cast<double_limb_type>
@@ -979,7 +978,7 @@ public:
          + static_cast<double_limb_type>(static_cast<double_limb_type>(long_numerator - static_cast<double_limb_type>(static_cast<double_limb_type>(short_denominator) * hi_part)) << static_cast<unsigned>(std::numeric_limits<limb_type>::digits))
         );
 
-      *remainder = static_cast<limb_type>(long_numerator >> static_cast<unsigned>(std::numeric_limits<limb_type>::digits));
+      remainder = static_cast<limb_type>(long_numerator >> static_cast<unsigned>(std::numeric_limits<limb_type>::digits));
     }
   }
 
@@ -1176,7 +1175,7 @@ public:
   }
 
   WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth(const uintwide_t& other,
-                                                      uintwide_t* remainder = nullptr) -> void
+                                                      uintwide_t& remainder) -> void
   {
     // Use Knuth's long division algorithm.
     // The loop-ordering of indices in Knuth's original
@@ -1214,19 +1213,12 @@ public:
       // The denominator is zero. Set to zero and return.
       detail::fill_unsafe(values.begin(), values.end(), static_cast<limb_type>(UINT8_C(0)));
 
-      if(remainder != nullptr)
-      {
-        detail::fill_unsafe(remainder->values.begin(), remainder->values.end(), static_cast<limb_type>(UINT8_C(0)));
-      }
+      detail::fill_unsafe(remainder.values.begin(), remainder.values.end(), static_cast<limb_type>(UINT8_C(0)));
     }
     else if(u_offset == static_cast<local_uint_index_type>(number_of_limbs))
     {
       // The numerator is zero. Do nothing and return.
-
-      if(remainder != nullptr)
-      {
-        *remainder = uintwide_t(static_cast<std::uint8_t>(UINT8_C(0)));
-      }
+      remainder = uintwide_t(static_cast<std::uint8_t>(UINT8_C(0)));
     }
     else
     {
@@ -1239,10 +1231,7 @@ public:
       {
         // If the denominator is larger than the numerator,
         // then the result of the division is zero.
-        if(remainder != nullptr)
-        {
-          *remainder = *this;
-        }
+        remainder = *this;
 
         operator=(static_cast<std::uint8_t>(UINT8_C(0)));
       }
@@ -1252,10 +1241,7 @@ public:
         // then the result of the division is one.
         operator=(static_cast<std::uint8_t>(UINT8_C(1)));
 
-        if(remainder != nullptr)
-        {
-          *remainder = uintwide_t(static_cast<std::uint8_t>(UINT8_C(0)));
-        }
+        remainder = uintwide_t(static_cast<std::uint8_t>(UINT8_C(0)));
       }
       else
       {
@@ -1267,7 +1253,7 @@ public:
   WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth_core(const unsigned_fast_type u_offset, // NOLINT(readability-function-cognitive-complexity)
                                                      const unsigned_fast_type v_offset,
                                                      const uintwide_t& other,
-                                                           uintwide_t* remainder) -> void
+                                                           uintwide_t& remainder) -> void
   {
     using local_uint_index_type = unsigned_fast_type;
 
@@ -1462,16 +1448,15 @@ public:
         detail::fill_unsafe(detail::advance_and_point(values.begin(), m_plus_one), values.end(), static_cast<limb_type>(UINT8_C(0)));
       }
 
-      if(remainder != nullptr)
       {
         auto rl_it_fwd = // NOLINT(llvm-qualified-auto,readability-qualified-auto)
-          detail::advance_and_point(remainder->values.begin(), static_cast<signed_fast_type>(n));
+          detail::advance_and_point(remainder.values.begin(), static_cast<signed_fast_type>(n));
 
         if(d == static_cast<limb_type>(UINT8_C(1)))
         {
           detail::copy_unsafe(uu.cbegin(),
                               detail::advance_and_point(uu.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(number_of_limbs - v_offset))),
-                              remainder->values.begin());
+                              remainder.values.begin());
         }
         else
         {
@@ -1489,7 +1474,7 @@ public:
               )
             );
 
-          for( ; rl_it_rev != remainder->values.rend(); ++rl_it_rev, --ul) // NOLINT(altera-id-dependent-backward-branch)
+          for( ; rl_it_rev != remainder.values.rend(); ++rl_it_rev, --ul) // NOLINT(altera-id-dependent-backward-branch)
           {
             const auto t =
               static_cast<double_limb_type>
@@ -1506,7 +1491,7 @@ public:
           }
         }
 
-        detail::fill_unsafe(rl_it_fwd, remainder->values.end(), static_cast<limb_type>(UINT8_C(0)));
+        detail::fill_unsafe(rl_it_fwd, remainder.values.end(), static_cast<limb_type>(UINT8_C(0)));
       }
     }
   }
