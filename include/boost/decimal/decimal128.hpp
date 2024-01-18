@@ -29,7 +29,6 @@
 #include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
 #include <boost/decimal/detail/shrink_significand.hpp>
-#include <boost/decimal/detail/wide-integer/uintwide_t.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
