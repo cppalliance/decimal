@@ -67,19 +67,27 @@ constexpr auto atan2(T y, T x) noexcept
     }
     else if (fpcy == FP_INFINITE && isfinitex)
     {
-        result = signy ? -detail::atan2_detail::pi_constants<T>::pi_over_two : detail::atan2_detail::pi_constants<T>::pi_over_two;
+        result = detail::atan2_detail::pi_constants<T>::pi_over_two;
+
+        if (signy) { result = -result; }
     }
     else if (fpcy == FP_INFINITE && fpcx == FP_INFINITE && signx)
     {
-        result = signy ? -detail::atan2_detail::pi_constants<T>::three_pi_over_four : detail::atan2_detail::pi_constants<T>::three_pi_over_four;
+        result = detail::atan2_detail::pi_constants<T>::three_pi_over_four;
+
+        if (signy) { result = -result; }
     }
     else if (fpcy == FP_INFINITE && fpcx == FP_INFINITE && !signx)
     {
-        result = signy ? -detail::atan2_detail::pi_constants<T>::pi_over_four : detail::atan2_detail::pi_constants<T>::pi_over_four;
+        result = detail::atan2_detail::pi_constants<T>::pi_over_four;
+
+        if (signy) { result = -result; }
     }
     else if (fpcx == FP_ZERO)
     {
-        result = signy ? -detail::atan2_detail::pi_constants<T>::pi_over_two : detail::atan2_detail::pi_constants<T>::pi_over_two;
+        result = detail::atan2_detail::pi_constants<T>::pi_over_two;
+
+        if (signy) { result = -result; }
     }
     else if (fpcx == FP_INFINITE && signx && isfinitey)
     {
@@ -87,7 +95,9 @@ constexpr auto atan2(T y, T x) noexcept
     }
     else if (fpcx == FP_INFINITE && !signx && isfinitey)
     {
-        result = signy ? -T(0) : T(0);
+        constexpr T zero { 0, 0 };
+
+        result = signy ? -zero : zero;
     }
     else
     {
