@@ -18,11 +18,6 @@
 
 #define WIDE_INTEGER_NAMESPACE boost::decimal
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-declarations"
-#endif
-
 #include <cinttypes>
 #include <cstddef>
 #include <cstdint>
@@ -66,8 +61,6 @@
   #endif
 #endif
 
-// 201703L
-
 #define WIDE_INTEGER_CONSTEXPR constexpr                // NOLINT(cppcoreguidelines-macro-usage)
 #define WIDE_INTEGER_CONSTEXPR_IS_COMPILE_TIME_CONST 1  // NOLINT(cppcoreguidelines-macro-usage)
 
@@ -85,11 +78,9 @@
 
 WIDE_INTEGER_NAMESPACE_BEGIN
 
-#if(__cplusplus >= 201703L)
-namespace math::wide_integer::detail {
-#else
-namespace math { namespace wide_integer { namespace detail { // NOLINT(modernize-concat-nested-namespaces)
-#endif
+namespace math { namespace wide_integer {
+
+namespace detail {
 
 namespace iterator_detail {
 
@@ -475,26 +466,6 @@ class tuple_element<I, array<T, N> >
 
 } // namespace array_detail
 
-#if(__cplusplus >= 201703L)
-} // namespace math::wide_integer::detail
-#else
-} // namespace detail
-} // namespace wide_integer
-} // namespace math
-#endif
-
-WIDE_INTEGER_NAMESPACE_END
-
-WIDE_INTEGER_NAMESPACE_BEGIN
-
-#if(__cplusplus >= 201703L)
-namespace math::wide_integer {
-#else
-namespace math { namespace wide_integer { // NOLINT(modernize-concat-nested-namespaces)
-#endif
-
-namespace detail {
-
 using size_t    = std::uint32_t;
 using ptrdiff_t = std::int32_t;
 
@@ -545,143 +516,9 @@ template<const size_t BitCount> struct uint_type_helper<BitCount, std::enable_if
 using unsigned_fast_type = typename uint_type_helper<static_cast<size_t>(std::numeric_limits<size_t   >::digits + 0)>::fast_unsigned_type;
 using   signed_fast_type = typename uint_type_helper<static_cast<size_t>(std::numeric_limits<ptrdiff_t>::digits + 1)>::fast_signed_type;
 
-} // namespace detail
-
-using detail::size_t;
-using detail::ptrdiff_t;
-using detail::unsigned_fast_type;
-using detail::signed_fast_type;
-
-// Forward declaration of the uintwide_t template class.
-template<const size_t Width2,
-         typename LimbType = std::uint32_t,
-         typename AllocatorType = void,
-         const bool IsSigned = false>
-class uintwide_t;
-
-#if(__cplusplus >= 201703L)
-} // namespace math::wide_integer
-#else
-} // namespace wide_integer
-} // namespace math
-#endif
-
-WIDE_INTEGER_NAMESPACE_END
-
-WIDE_INTEGER_NAMESPACE_BEGIN
-
-#if(__cplusplus >= 201703L)
-namespace math::wide_integer::detail {
-#else
-namespace math { namespace wide_integer { namespace detail { // NOLINT(modernize-concat-nested-namespaces)
-#endif
-
-struct allocator_dummy_unsafe
-{
-  constexpr allocator_dummy_unsafe() = default;
-};
-
-template<typename MyType,
-         const size_t MySize>
-class fixed_static_array final : public detail::array_detail::array<MyType, static_cast<std::size_t>(MySize)>
-{
-private:
-  using base_class_type = detail::array_detail::array<MyType, static_cast<std::size_t>(MySize)>;
-
-public:
-  using size_type      = size_t;
-  using value_type     = typename base_class_type::value_type;
-  using allocator_type = allocator_dummy_unsafe;
-
-  static constexpr auto static_size() -> size_type { return MySize; }
-
-  constexpr fixed_static_array() = default;
-
-  explicit WIDE_INTEGER_CONSTEXPR fixed_static_array(const size_type      size_in,
-                                                     const value_type&    value_in = value_type(),
-                                                           allocator_type alloc_in = allocator_type())
-  {
-    static_cast<void>(alloc_in);
-
-    if(size_in < static_size())
-    {
-      detail::fill_unsafe(base_class_type::begin(),     base_class_type::begin() + size_in, value_in);
-      detail::fill_unsafe(base_class_type::begin() + size_in, base_class_type::end(),       value_type());
-    }
-    else
-    {
-      // Exclude this line from code coverage, even though explicit
-      // test cases (search for "result_overshift_is_ok") are known
-      // to cover this line.
-      detail::fill_unsafe(base_class_type::begin(), base_class_type::end(), value_in); // LCOV_EXCL_LINE
-    }
-  }
-
-  WIDE_INTEGER_CONSTEXPR fixed_static_array(const fixed_static_array&) = default;
-  WIDE_INTEGER_CONSTEXPR fixed_static_array(fixed_static_array&&) noexcept = default;
-
-  WIDE_INTEGER_CONSTEXPR fixed_static_array(std::initializer_list<typename base_class_type::value_type> lst)
-  {
-    const auto size_to_copy =
-      (detail::min_unsafe)(static_cast<size_type>(lst.size()), MySize);
-
-    if(size_to_copy < static_cast<size_type>(base_class_type::size()))
-    {
-      detail::copy_unsafe(lst.begin(),
-                          lst.begin() + size_to_copy,
-                          base_class_type::begin());
-
-      detail::fill_unsafe(base_class_type::begin() + size_to_copy,
-                          base_class_type::end(),
-                          static_cast<typename base_class_type::value_type>(UINT8_C(0)));
-    }
-    else
-    {
-      detail::copy_unsafe(lst.begin(),
-                          lst.begin() + size_to_copy,
-                          base_class_type::begin());
-    }
-  }
-
-  //WIDE_INTEGER_CONSTEXPR
-  ~fixed_static_array() = default;
-
-  WIDE_INTEGER_CONSTEXPR auto operator=(const fixed_static_array& other_array) -> fixed_static_array& = default;
-  WIDE_INTEGER_CONSTEXPR auto operator=(fixed_static_array&& other_array) noexcept -> fixed_static_array& = default;
-
-  WIDE_INTEGER_CONSTEXPR auto operator[](const size_type i)       -> typename base_class_type::reference       { return base_class_type::operator[](static_cast<typename base_class_type::size_type>(i)); }
-  WIDE_INTEGER_CONSTEXPR auto operator[](const size_type i) const -> typename base_class_type::const_reference { return base_class_type::operator[](static_cast<typename base_class_type::size_type>(i)); }
-};
-
-template<const size_t Width2> struct verify_power_of_two_times_granularity_one_sixty_fourth // NOLINT(altera-struct-pack-align)
-{
-  // List of numbers used to identify the form 2^n times 1...63.
-  static constexpr auto conditional_value =
-     (   verify_power_of_two<static_cast<size_t>(Width2 /  1U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 /  3U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 /  5U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 /  7U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 /  9U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 11U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 13U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 15U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 17U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 19U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 21U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 23U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 25U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 27U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 29U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 31U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 33U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 35U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 37U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 39U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 41U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 43U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 45U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 47U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 49U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 51U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 53U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 55U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 57U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 59U)>::conditional_value
-      || verify_power_of_two<static_cast<size_t>(Width2 / 61U)>::conditional_value || verify_power_of_two<static_cast<size_t>(Width2 / 63U)>::conditional_value);
-};
-
 template<typename InputIterator,
          typename IntegralType>
-#if !defined(WIDE_INTEGER_DISABLE_WIDE_INTEGER_CONSTEXPR)
 constexpr auto advance_and_point(InputIterator it, IntegralType n) -> InputIterator
-#else
-WIDE_INTEGER_CONSTEXPR auto advance_and_point(InputIterator it, IntegralType n) -> InputIterator
-#endif
 {
   using local_signed_integral_type =
     std::conditional_t<std::is_signed<IntegralType>::value,
@@ -690,15 +527,7 @@ WIDE_INTEGER_CONSTEXPR auto advance_and_point(InputIterator it, IntegralType n) 
 
   using local_difference_type = typename detail::iterator_detail::iterator_traits<InputIterator>::difference_type;
 
-  #if !defined(WIDE_INTEGER_DISABLE_WIDE_INTEGER_CONSTEXPR)
   return it + static_cast<local_difference_type>(static_cast<local_signed_integral_type>(n));
-  #else
-  auto my_it = it;
-
-  std::advance(my_it, static_cast<local_difference_type>(static_cast<local_signed_integral_type>(n)));
-
-  return my_it;
-  #endif
 }
 
 template<typename UnsignedShortType,
@@ -775,65 +604,19 @@ constexpr auto make_large(const UnsignedShortType& lo, const UnsignedShortType& 
     );
 }
 
-template<typename UnsignedIntegralType>
-constexpr auto negate(UnsignedIntegralType u) -> std::enable_if_t<(   std::is_integral<UnsignedIntegralType>::value
-                                                                   && std::is_unsigned<UnsignedIntegralType>::value), UnsignedIntegralType>
-{
-  using local_unsigned_integral_type = UnsignedIntegralType;
-
-  return
-    static_cast<local_unsigned_integral_type>
-    (
-        static_cast<local_unsigned_integral_type>(~u)
-      + static_cast<local_unsigned_integral_type>(UINT8_C(1))
-    );
-}
-
-template<typename SignedIntegralType>
-constexpr auto negate(SignedIntegralType n) -> std::enable_if_t<(   std::is_integral<SignedIntegralType>::value
-                                                                 && std::is_signed<SignedIntegralType>::value), SignedIntegralType>
-{
-  using local_signed_integral_type = SignedIntegralType;
-
-  using local_unsigned_integral_type =
-    typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<local_signed_integral_type>::digits + 1)>::exact_unsigned_type;
-
-  return
-    static_cast<local_signed_integral_type>
-    (
-      negate(static_cast<local_unsigned_integral_type>(n))
-    );
-}
-
-#if(__cplusplus >= 201703L)
-} // namespace math::wide_integer::detail
-#else
 } // namespace detail
-} // namespace wide_integer
-} // namespace math
-#endif
 
-#if(__cplusplus >= 201703L)
-namespace math::wide_integer {
-#else
-namespace math { namespace wide_integer { // NOLINT(modernize-concat-nested-namespaces)
-#endif
+using detail::size_t;
+using detail::ptrdiff_t;
+using detail::unsigned_fast_type;
+using detail::signed_fast_type;
 
-template<const size_t Width2,
-         typename LimbType,
-         typename AllocatorType,
-         const bool IsSigned>
+template<const size_t Width2>
 class uintwide_t
 {
 public:
-  template<const size_t OtherWidth2,
-           typename OtherLimbType,
-           typename OtherAllocatorType,
-           const bool OtherIsSigned>
-  friend class uintwide_t;
-
   // Class-local type definitions.
-  using limb_type = LimbType;
+  using limb_type = std::uint32_t;
 
   using double_limb_type =
     typename detail::uint_type_helper<static_cast<size_t>(static_cast<int>(std::numeric_limits<limb_type>::digits * static_cast<int>(INT8_C(2))))>::exact_unsigned_type;
@@ -861,28 +644,14 @@ public:
       Width2 / static_cast<size_t>(std::numeric_limits<limb_type>::digits)
     );
 
-  // Verify that the Width2 template parameter (mirrored with my_width2):
-  //   * Is equal to 2^n times 1...63.
-  //   * And that there are at least 16, 24 or 32 binary digits, or more.
-  //   * And that the number of binary digits is an exact multiple of the number of limbs.
-  static_assert(    detail::verify_power_of_two_times_granularity_one_sixty_fourth<my_width2>::conditional_value
-                && (my_width2 >= static_cast<size_t>(UINT8_C(16)))
-                && (my_width2 == static_cast<size_t>(number_of_limbs * static_cast<size_t>(std::numeric_limits<limb_type>::digits))),
-                "Error: Width2 must be 2^n times 1...63 (with n >= 3), while being 16, 24, 32 or larger, and exactly divisible by limb count");
-
   // The type of the internal data representation.
-  using representation_type = detail::fixed_static_array <limb_type, number_of_limbs>;
+  using representation_type = detail::array_detail::array<limb_type, static_cast<std::size_t>(number_of_limbs)>;
 
   // The iterator types of the internal data representation.
   using iterator               = typename representation_type::iterator;
   using const_iterator         = typename representation_type::const_iterator;
   using reverse_iterator       = typename representation_type::reverse_iterator;
   using const_reverse_iterator = typename representation_type::const_reverse_iterator;
-
-  using allocator_type         = typename representation_type::allocator_type;
-
-  // Define a class-local type that has double the width of *this.
-  using double_width_type = uintwide_t<static_cast<size_t>(Width2 * static_cast<size_t>(UINT8_C(2))), limb_type, AllocatorType, IsSigned>;
 
   // Default constructor.
   constexpr uintwide_t() = default;
@@ -892,38 +661,112 @@ public:
   template<typename UnsignedIntegralType>
   WIDE_INTEGER_CONSTEXPR
   uintwide_t(const UnsignedIntegralType v, // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
-              std::enable_if_t<(    std::is_integral   <UnsignedIntegralType>::value
-                                &&  std::is_unsigned   <UnsignedIntegralType>::value
-                                && (std::numeric_limits<UnsignedIntegralType>::digits <= std::numeric_limits<limb_type>::digits))>* = nullptr) // NOLINT(hicpp-named-parameter,readability-named-parameter)
+             std::enable_if_t<(    std::is_integral   <UnsignedIntegralType>::value
+                               &&  std::is_unsigned   <UnsignedIntegralType>::value
+                               && (std::numeric_limits<UnsignedIntegralType>::digits <= std::numeric_limits<limb_type>::digits))>* = nullptr) // NOLINT(hicpp-named-parameter,readability-named-parameter)
   {
     values.front() = static_cast<limb_type>(v);
   }
 
+  // Copy constructor.
   constexpr uintwide_t(const uintwide_t& other) = default;
 
-  // Move constructor.
+  // Move copy constructor.
   constexpr uintwide_t(uintwide_t&&) noexcept = default;
 
   // Default destructor.
-  //WIDE_INTEGER_CONSTEXPR
   ~uintwide_t() = default;
 
   // Assignment operator.
   WIDE_INTEGER_CONSTEXPR auto operator=(const uintwide_t&) -> uintwide_t& = default;
 
-  // Trivial move assignment operator.
-  WIDE_INTEGER_CONSTEXPR auto operator=(uintwide_t&& other) noexcept -> uintwide_t& = default;
+  // Move assignment operator.
+  WIDE_INTEGER_CONSTEXPR auto operator=(uintwide_t&&) noexcept -> uintwide_t& = default;
 
   // Provide a user interface to the internal data representation.
                          WIDE_INTEGER_CONSTEXPR auto  representation()       ->       representation_type& { return values; }
   WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto  representation() const -> const representation_type& { return values; }
   WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto crepresentation() const -> const representation_type& { return values; }
 
-  WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto compare(const uintwide_t<Width2, LimbType, AllocatorType, IsSigned>& other) const -> std::int_fast8_t
+  WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth(const uintwide_t& other,
+                                                      uintwide_t& remainder) -> void
   {
-    return compare_ranges(values.cbegin(),
-                          other.values.cbegin(),
-                          uintwide_t<Width2, LimbType, AllocatorType, IsSigned>::number_of_limbs);
+    using local_uint_index_type = unsigned_fast_type;
+
+    local_uint_index_type u_offset { };
+    local_uint_index_type v_offset { };
+
+    auto crit_u =       values.crbegin();
+    auto crit_v = other.values.crbegin();
+
+    while(crit_u != values.crend() && (*crit_u == static_cast<limb_type>(UINT8_C(0)))) // NOLINT(altera-id-dependent-backward-branch)
+    {
+      ++crit_u;
+      ++u_offset;
+    }
+
+    while(crit_v != other.values.crend() && (*crit_v == static_cast<limb_type>(UINT8_C(0)))) // NOLINT(altera-id-dependent-backward-branch)
+    {
+      ++crit_v;
+      ++v_offset;
+    }
+
+    if(v_offset == static_cast<local_uint_index_type>(number_of_limbs))
+    {
+      // The denominator is zero. Set to zero and return.
+      detail::fill_unsafe(values.begin(), values.end(), static_cast<limb_type>(UINT8_C(0)));
+
+      detail::fill_unsafe(remainder.values.begin(), remainder.values.end(), static_cast<limb_type>(UINT8_C(0)));
+    }
+    else if(u_offset == static_cast<local_uint_index_type>(number_of_limbs))
+    {
+      // The numerator is zero. Do nothing and return.
+      remainder = uintwide_t(static_cast<std::uint8_t>(UINT8_C(0)));
+    }
+    else
+    {
+      const auto result_of_compare_left_with_right = compare(other);
+
+      const auto left_is_less_than_right = (result_of_compare_left_with_right == INT8_C(-1));
+      const auto left_is_equal_to_right  = (result_of_compare_left_with_right == INT8_C( 0));
+
+      if(left_is_less_than_right)
+      {
+        // If the denominator is larger than the numerator,
+        // then the result of the division is zero.
+        remainder = *this;
+
+        operator=(static_cast<std::uint8_t>(UINT8_C(0)));
+      }
+      else if(left_is_equal_to_right)
+      {
+        // If the denominator is equal to the numerator,
+        // then the result of the division is one.
+        operator=(static_cast<std::uint8_t>(UINT8_C(1)));
+
+        remainder = uintwide_t(static_cast<std::uint8_t>(UINT8_C(0)));
+      }
+      else if(static_cast<local_uint_index_type>(v_offset + static_cast<local_uint_index_type>(1U)) == static_cast<local_uint_index_type>(number_of_limbs))
+      {
+        // The denominator has one single limb.
+        // Use a one-dimensional division algorithm.
+        const auto short_denominator = *other.values.cbegin();
+
+        eval_divide_by_single_limb(short_denominator, u_offset, remainder);
+      }
+      else
+      {
+        eval_divide_knuth_core(u_offset, v_offset, other, remainder);
+      }
+    }
+  }
+
+private:
+  representation_type values { };
+
+  WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto compare(const uintwide_t& other) const -> std::int_fast8_t
+  {
+    return compare_ranges(values.cbegin(), other.values.cbegin(), number_of_limbs);
   }
 
   WIDE_INTEGER_CONSTEXPR auto eval_divide_by_single_limb(const limb_type          short_denominator,
@@ -982,20 +825,6 @@ public:
     }
   }
 
-#if !defined(WIDE_INTEGER_DISABLE_PRIVATE_CLASS_DATA_MEMBERS)
-//private:
-#endif
-  representation_type
-    values // NOLINT(readability-identifier-naming)
-    {
-      static_cast<typename representation_type::size_type>(number_of_limbs),
-      static_cast<typename representation_type::value_type>(UINT8_C(0)),
-      typename representation_type::allocator_type()
-    };
-
-#if defined(WIDE_INTEGER_DISABLE_PRIVATE_CLASS_DATA_MEMBERS)
-//private:
-#endif
   template<typename InputIteratorLeftType,
             typename InputIteratorRightType>
   static WIDE_INTEGER_CONSTEXPR auto compare_ranges(      InputIteratorLeftType  a,
@@ -1174,8 +1003,10 @@ public:
     return static_cast<local_limb_type>(carry);
   }
 
-  WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth(const uintwide_t& other,
-                                                      uintwide_t& remainder) -> void
+  WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth_core(const unsigned_fast_type u_offset, // NOLINT(readability-function-cognitive-complexity)
+                                                     const unsigned_fast_type v_offset,
+                                                     const uintwide_t& other,
+                                                           uintwide_t& remainder) -> void
   {
     // Use Knuth's long division algorithm.
     // The loop-ordering of indices in Knuth's original
@@ -1190,360 +1021,234 @@ public:
 
     using local_uint_index_type = unsigned_fast_type;
 
-    local_uint_index_type u_offset { };
-    local_uint_index_type v_offset { };
+    // Compute the normalization factor d.
+    const auto d =
+      static_cast<limb_type>
+      (
+          static_cast<double_limb_type>(static_cast<double_limb_type>(UINT8_C(1)) << static_cast<unsigned>(std::numeric_limits<limb_type>::digits))
+        / static_cast<double_limb_type>(static_cast<double_limb_type>(*detail::advance_and_point(other.values.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(number_of_limbs - 1U) - v_offset))) + static_cast<limb_type>(1U))
+      );
 
-    auto crit_u =       values.crbegin();
-    auto crit_v = other.values.crbegin();
+    // Step D1(b), normalize u -> u * d = uu.
+    // Step D1(c): normalize v -> v * d = vv.
 
-    while(crit_u != values.crend() && (*crit_u == static_cast<limb_type>(UINT8_C(0)))) // NOLINT(altera-id-dependent-backward-branch)
+    using uu_array_type = detail::array_detail::array<limb_type, static_cast<size_t>(number_of_limbs + static_cast<size_t>(UINT8_C(1)))>;
+
+    uu_array_type uu { };
+
+    representation_type vv { };
+
+    if(d > static_cast<limb_type>(UINT8_C(1)))
     {
-      ++crit_u;
-      ++u_offset;
-    }
-
-    while(crit_v != other.values.crend() && (*crit_v == static_cast<limb_type>(UINT8_C(0)))) // NOLINT(altera-id-dependent-backward-branch)
-    {
-      ++crit_v;
-      ++v_offset;
-    }
-
-    if(v_offset == static_cast<local_uint_index_type>(number_of_limbs))
-    {
-      // The denominator is zero. Set to zero and return.
-      detail::fill_unsafe(values.begin(), values.end(), static_cast<limb_type>(UINT8_C(0)));
-
-      detail::fill_unsafe(remainder.values.begin(), remainder.values.end(), static_cast<limb_type>(UINT8_C(0)));
-    }
-    else if(u_offset == static_cast<local_uint_index_type>(number_of_limbs))
-    {
-      // The numerator is zero. Do nothing and return.
-      remainder = uintwide_t(static_cast<std::uint8_t>(UINT8_C(0)));
-    }
-    else
-    {
-      const auto result_of_compare_left_with_right = compare(other);
-
-      const auto left_is_less_than_right = (result_of_compare_left_with_right == INT8_C(-1));
-      const auto left_is_equal_to_right  = (result_of_compare_left_with_right == INT8_C( 0));
-
-      if(left_is_less_than_right)
       {
-        // If the denominator is larger than the numerator,
-        // then the result of the division is zero.
-        remainder = *this;
+        const auto num_limbs_minus_u_ofs =
+          static_cast<size_t>
+          (
+            static_cast<local_uint_index_type>(number_of_limbs) - u_offset
+          );
 
-        operator=(static_cast<std::uint8_t>(UINT8_C(0)));
-      }
-      else if(left_is_equal_to_right)
-      {
-        // If the denominator is equal to the numerator,
-        // then the result of the division is one.
-        operator=(static_cast<std::uint8_t>(UINT8_C(1)));
-
-        remainder = uintwide_t(static_cast<std::uint8_t>(UINT8_C(0)));
-      }
-      else
-      {
-        eval_divide_knuth_core(u_offset, v_offset, other, remainder);
-      }
-    }
-  }
-
-  WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth_core(const unsigned_fast_type u_offset, // NOLINT(readability-function-cognitive-complexity)
-                                                     const unsigned_fast_type v_offset,
-                                                     const uintwide_t& other,
-                                                           uintwide_t& remainder) -> void
-  {
-    using local_uint_index_type = unsigned_fast_type;
-
-    if(static_cast<local_uint_index_type>(v_offset + static_cast<local_uint_index_type>(1U)) == static_cast<local_uint_index_type>(number_of_limbs))
-    {
-      // The denominator has one single limb.
-      // Use a one-dimensional division algorithm.
-      const limb_type short_denominator = *other.values.cbegin();
-
-      eval_divide_by_single_limb(short_denominator, u_offset, remainder);
-    }
-    else
-    {
-      // We will now use the Knuth long division algorithm.
-
-      // Compute the normalization factor d.
-      const auto d =
-        static_cast<limb_type>
-        (
-            static_cast<double_limb_type>(static_cast<double_limb_type>(UINT8_C(1)) << static_cast<unsigned>(std::numeric_limits<limb_type>::digits))
-          / static_cast<double_limb_type>(static_cast<double_limb_type>(*detail::advance_and_point(other.values.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(number_of_limbs - 1U) - v_offset))) + static_cast<limb_type>(1U))
-        );
-
-      // Step D1(b), normalize u -> u * d = uu.
-      // Step D1(c): normalize v -> v * d = vv.
-
-      using uu_array_type = detail::fixed_static_array <limb_type, static_cast<size_t>(number_of_limbs + static_cast<size_t>(UINT8_C(1)))>;
-
-      uu_array_type uu { };
-
-      representation_type
-        vv
-        {
-          static_cast<typename representation_type::size_type>(number_of_limbs),
-          static_cast<typename representation_type::value_type>(UINT8_C(0)),
-          typename representation_type::allocator_type() // LCOV_EXCL_LINE
-        };
-
-      if(d > static_cast<limb_type>(UINT8_C(1)))
-      {
-        {
-          const auto num_limbs_minus_u_ofs =
-            static_cast<size_t>
-            (
-              static_cast<local_uint_index_type>(number_of_limbs) - u_offset
-            );
-
-          const auto u_carry =
-            eval_multiply_1d
-            (
-              uu.begin(),
-              values.cbegin(),
-              d,
-              static_cast<unsigned_fast_type>(num_limbs_minus_u_ofs)
-            );
-
-          *(uu.begin() + num_limbs_minus_u_ofs) = u_carry;
-        }
-
-        static_cast<void>
-        (
+        const auto u_carry =
           eval_multiply_1d
           (
-            vv.begin(),
-            other.values.cbegin(),
+            uu.begin(),
+            values.cbegin(),
             d,
-            static_cast<unsigned_fast_type>(number_of_limbs - v_offset)
-          )
+            static_cast<unsigned_fast_type>(num_limbs_minus_u_ofs)
+          );
+
+        *(uu.begin() + num_limbs_minus_u_ofs) = u_carry;
+      }
+
+      static_cast<void>
+      (
+        eval_multiply_1d
+        (
+          vv.begin(),
+          other.values.cbegin(),
+          d,
+          static_cast<unsigned_fast_type>(number_of_limbs - v_offset)
+        )
+      );
+    }
+    else
+    {
+      detail::copy_unsafe(values.cbegin(), values.cend(), uu.begin());
+
+      *(uu.begin() + static_cast<size_t>(static_cast<local_uint_index_type>(number_of_limbs) - u_offset)) = static_cast<limb_type>(UINT8_C(0));
+
+      vv = other.values;
+    }
+
+    // Step D2: Initialize j.
+    // Step D7: Loop on j from m to 0.
+
+    const auto n   = static_cast<local_uint_index_type>                                   (number_of_limbs - v_offset);
+    const auto m   = static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(number_of_limbs - u_offset) - n);
+    const auto vj0 = static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(n - static_cast<local_uint_index_type>(UINT8_C(1))));
+
+    auto vv_at_vj0_it = detail::advance_and_point(vv.cbegin(), static_cast<size_t>(vj0)); // NOLINT(llvm-qualified-auto,readability-qualified-auto)
+
+    const auto vv_at_vj0           = *vv_at_vj0_it--;
+    const auto vv_at_vj0_minus_one = *vv_at_vj0_it;
+
+    auto values_at_m_minus_j_it = detail::advance_and_point(values.begin(), static_cast<size_t>(m)); // NOLINT(llvm-qualified-auto,readability-qualified-auto)
+
+    for(auto j = static_cast<local_uint_index_type>(UINT8_C(0)); j <= m; ++j) // NOLINT(altera-id-dependent-backward-branch)
+    {
+      // Step D3 [Calculate q_hat].
+      //   if u[j] == v[j0]
+      //     set q_hat = b - 1
+      //   else
+      //     set q_hat = (u[j] * b + u[j + 1]) / v[1]
+
+      const auto uj     = static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(number_of_limbs + 1U) - 1U) - u_offset) - j);
+      const auto u_j_j1 = static_cast<double_limb_type>(static_cast<double_limb_type>(static_cast<double_limb_type>(*(uu.cbegin() + static_cast<size_t>(uj))) << static_cast<unsigned>(std::numeric_limits<limb_type>::digits)) + *(uu.cbegin() + static_cast<size_t>(uj - 1U)));
+
+      auto q_hat =
+        static_cast<limb_type>
+        (
+          (*(uu.cbegin() + static_cast<size_t>(uj)) == vv_at_vj0)
+            ? (std::numeric_limits<limb_type>::max)()
+            : static_cast<limb_type>(u_j_j1 / vv_at_vj0)
         );
+
+      // Decrease q_hat if necessary.
+      // This means that q_hat must be decreased if the
+      // expression [(u[uj] * b + u[uj - 1] - q_hat * v[vj0 - 1]) * b]
+      // exceeds the range of uintwide_t.
+
+      for(auto t = static_cast<double_limb_type>(u_j_j1 - static_cast<double_limb_type>(q_hat * static_cast<double_limb_type>(vv_at_vj0)));
+                  ;
+                    --q_hat, t = static_cast<double_limb_type>(t + vv_at_vj0))
+      {
+        if(   (detail::make_hi<limb_type>(t) != static_cast<limb_type>(UINT8_C(0)))
+            || (   static_cast<double_limb_type>(static_cast<double_limb_type>(vv_at_vj0_minus_one) * q_hat)
+                <= static_cast<double_limb_type>(static_cast<double_limb_type>(t << static_cast<unsigned>(std::numeric_limits<limb_type>::digits)) + *detail::advance_and_point(uu.cbegin(), static_cast<size_t>(uj - 2U)))))
+        {
+          break;
+        }
+      }
+
+      {
+        // Step D4: Multiply and subtract.
+        // Replace u[j, ... j + n] by u[j, ... j + n] - q_hat * v[1, ... n].
+
+        // Set nv = q_hat * (v[1, ... n]).
+        uu_array_type nv { };
+
+        *(nv.begin() + static_cast<size_t>(n)) = eval_multiply_1d(nv.begin(), vv.cbegin(), q_hat, n);
+
+        const auto has_borrow =
+          eval_subtract_n
+          (
+            detail::advance_and_point(uu.begin(),  static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
+            detail::advance_and_point(uu.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
+            nv.cbegin(),
+            static_cast<unsigned_fast_type>
+            (
+              static_cast<local_uint_index_type>(n + static_cast<local_uint_index_type>(UINT8_C(1)))
+            )
+          );
+
+        // Step D5: Test the remainder.
+        // Set the result value: Set result.m_data[m - j] = q_hat.
+        // Use the condition (u[j] < 0), in other words if the borrow
+        // is non-zero, then step D6 needs to be carried out.
+
+        if(has_borrow)
+        {
+          --q_hat;
+
+          // Step D6: Add back.
+          // Add v[1, ... n] back to u[j, ... j + n],
+          // and decrease the result by 1.
+
+          static_cast<void>
+          (
+            eval_add_n(uu.begin() + static_cast<size_t>(static_cast<local_uint_index_type>(uj - n)),
+                        detail::advance_and_point(uu.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
+                        vv.cbegin(),
+                        static_cast<unsigned_fast_type>(n))
+          );
+        }
+      }
+
+      // Get the result data.
+      *values_at_m_minus_j_it = static_cast<limb_type>(q_hat);
+
+      if(j < m)
+      {
+        --values_at_m_minus_j_it;
+      }
+    }
+
+    // Clear the data elements that have not
+    // been computed in the division algorithm.
+    {
+      const auto m_plus_one =
+        static_cast<local_uint_index_type>
+        (
+          static_cast<local_uint_index_type>(m) + static_cast<local_uint_index_type>(UINT8_C(1))
+        );
+
+      detail::fill_unsafe(detail::advance_and_point(values.begin(), m_plus_one), values.end(), static_cast<limb_type>(UINT8_C(0)));
+    }
+
+    {
+      auto rl_it_fwd = // NOLINT(llvm-qualified-auto,readability-qualified-auto)
+        detail::advance_and_point(remainder.values.begin(), static_cast<signed_fast_type>(n));
+
+      if(d == static_cast<limb_type>(UINT8_C(1)))
+      {
+        detail::copy_unsafe(uu.cbegin(),
+                            detail::advance_and_point(uu.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(number_of_limbs - v_offset))),
+                            remainder.values.begin());
       }
       else
       {
-        detail::copy_unsafe(values.cbegin(), values.cend(), uu.begin());
+        auto previous_u = static_cast<limb_type>(UINT8_C(0));
 
-        *(uu.begin() + static_cast<size_t>(static_cast<local_uint_index_type>(number_of_limbs) - u_offset)) = static_cast<limb_type>(UINT8_C(0));
+        auto rl_it_rev = static_cast<reverse_iterator>(rl_it_fwd);
 
-        vv = other.values;
-      }
-
-      // Step D2: Initialize j.
-      // Step D7: Loop on j from m to 0.
-
-      const auto n   = static_cast<local_uint_index_type>                                   (number_of_limbs - v_offset);
-      const auto m   = static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(number_of_limbs - u_offset) - n);
-      const auto vj0 = static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(n - static_cast<local_uint_index_type>(UINT8_C(1))));
-
-      auto vv_at_vj0_it = detail::advance_and_point(vv.cbegin(), static_cast<size_t>(vj0)); // NOLINT(llvm-qualified-auto,readability-qualified-auto)
-
-      const auto vv_at_vj0           = *vv_at_vj0_it--;
-      const auto vv_at_vj0_minus_one = *vv_at_vj0_it;
-
-      auto values_at_m_minus_j_it = detail::advance_and_point(values.begin(), static_cast<size_t>(m)); // NOLINT(llvm-qualified-auto,readability-qualified-auto)
-
-      for(auto j = static_cast<local_uint_index_type>(UINT8_C(0)); j <= m; ++j) // NOLINT(altera-id-dependent-backward-branch)
-      {
-        // Step D3 [Calculate q_hat].
-        //   if u[j] == v[j0]
-        //     set q_hat = b - 1
-        //   else
-        //     set q_hat = (u[j] * b + u[j + 1]) / v[1]
-
-        const auto uj     = static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(number_of_limbs + 1U) - 1U) - u_offset) - j);
-        const auto u_j_j1 = static_cast<double_limb_type>(static_cast<double_limb_type>(static_cast<double_limb_type>(*(uu.cbegin() + static_cast<size_t>(uj))) << static_cast<unsigned>(std::numeric_limits<limb_type>::digits)) + *(uu.cbegin() + static_cast<size_t>(uj - 1U)));
-
-        auto q_hat =
-          static_cast<limb_type>
+        auto ul =
+          static_cast<signed_fast_type>
           (
-            (*(uu.cbegin() + static_cast<size_t>(uj)) == vv_at_vj0)
-              ? (std::numeric_limits<limb_type>::max)()
-              : static_cast<limb_type>(u_j_j1 / vv_at_vj0)
+            static_cast<size_t>
+            (
+                number_of_limbs
+              - static_cast<size_t>(v_offset + static_cast<size_t>(UINT8_C(1)))
+            )
           );
 
-        // Decrease q_hat if necessary.
-        // This means that q_hat must be decreased if the
-        // expression [(u[uj] * b + u[uj - 1] - q_hat * v[vj0 - 1]) * b]
-        // exceeds the range of uintwide_t.
-
-        for(auto t = static_cast<double_limb_type>(u_j_j1 - static_cast<double_limb_type>(q_hat * static_cast<double_limb_type>(vv_at_vj0)));
-                   ;
-                     --q_hat, t = static_cast<double_limb_type>(t + vv_at_vj0))
+        for( ; rl_it_rev != remainder.values.rend(); ++rl_it_rev, --ul) // NOLINT(altera-id-dependent-backward-branch)
         {
-          if(   (detail::make_hi<limb_type>(t) != static_cast<limb_type>(UINT8_C(0)))
-             || (   static_cast<double_limb_type>(static_cast<double_limb_type>(vv_at_vj0_minus_one) * q_hat)
-                 <= static_cast<double_limb_type>(static_cast<double_limb_type>(t << static_cast<unsigned>(std::numeric_limits<limb_type>::digits)) + *detail::advance_and_point(uu.cbegin(), static_cast<size_t>(uj - 2U)))))
-          {
-            break;
-          }
-        }
-
-        {
-          // Step D4: Multiply and subtract.
-          // Replace u[j, ... j + n] by u[j, ... j + n] - q_hat * v[1, ... n].
-
-          // Set nv = q_hat * (v[1, ... n]).
-          uu_array_type nv { };
-
-          *(nv.begin() + static_cast<size_t>(n)) = eval_multiply_1d(nv.begin(), vv.cbegin(), q_hat, n);
-
-          const auto has_borrow =
-            eval_subtract_n
+          const auto t =
+            static_cast<double_limb_type>
             (
-              detail::advance_and_point(uu.begin(),  static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
-              detail::advance_and_point(uu.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
-              nv.cbegin(),
-              static_cast<unsigned_fast_type>
-              (
-                static_cast<local_uint_index_type>(n + static_cast<local_uint_index_type>(UINT8_C(1)))
-              )
+                *(uu.cbegin() + static_cast<size_t>(ul))
+              + static_cast<double_limb_type>
+                (
+                  static_cast<double_limb_type>(previous_u) << static_cast<unsigned>(std::numeric_limits<limb_type>::digits)
+                )
             );
 
-          // Step D5: Test the remainder.
-          // Set the result value: Set result.m_data[m - j] = q_hat.
-          // Use the condition (u[j] < 0), in other words if the borrow
-          // is non-zero, then step D6 needs to be carried out.
-
-          if(has_borrow)
-          {
-            --q_hat;
-
-            // Step D6: Add back.
-            // Add v[1, ... n] back to u[j, ... j + n],
-            // and decrease the result by 1.
-
-            static_cast<void>
-            (
-              eval_add_n(uu.begin() + static_cast<size_t>(static_cast<local_uint_index_type>(uj - n)),
-                         detail::advance_and_point(uu.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
-                         vv.cbegin(),
-                         static_cast<unsigned_fast_type>(n))
-            );
-          }
-        }
-
-        // Get the result data.
-        *values_at_m_minus_j_it = static_cast<limb_type>(q_hat);
-
-        if(j < m)
-        {
-          --values_at_m_minus_j_it;
+          *rl_it_rev = static_cast<limb_type>(static_cast<double_limb_type>(t / d));
+          previous_u = static_cast<limb_type>(static_cast<double_limb_type>(t - static_cast<double_limb_type>(static_cast<double_limb_type>(d) * *rl_it_rev)));
         }
       }
 
-      // Clear the data elements that have not
-      // been computed in the division algorithm.
-      {
-        const auto m_plus_one =
-          static_cast<local_uint_index_type>
-          (
-            static_cast<local_uint_index_type>(m) + static_cast<local_uint_index_type>(UINT8_C(1))
-          );
-
-        detail::fill_unsafe(detail::advance_and_point(values.begin(), m_plus_one), values.end(), static_cast<limb_type>(UINT8_C(0)));
-      }
-
-      {
-        auto rl_it_fwd = // NOLINT(llvm-qualified-auto,readability-qualified-auto)
-          detail::advance_and_point(remainder.values.begin(), static_cast<signed_fast_type>(n));
-
-        if(d == static_cast<limb_type>(UINT8_C(1)))
-        {
-          detail::copy_unsafe(uu.cbegin(),
-                              detail::advance_and_point(uu.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(number_of_limbs - v_offset))),
-                              remainder.values.begin());
-        }
-        else
-        {
-          auto previous_u = static_cast<limb_type>(UINT8_C(0));
-
-          auto rl_it_rev = static_cast<reverse_iterator>(rl_it_fwd);
-
-          auto ul =
-            static_cast<signed_fast_type>
-            (
-              static_cast<size_t>
-              (
-                  number_of_limbs
-                - static_cast<size_t>(v_offset + static_cast<size_t>(UINT8_C(1)))
-              )
-            );
-
-          for( ; rl_it_rev != remainder.values.rend(); ++rl_it_rev, --ul) // NOLINT(altera-id-dependent-backward-branch)
-          {
-            const auto t =
-              static_cast<double_limb_type>
-              (
-                  *(uu.cbegin() + static_cast<size_t>(ul))
-                + static_cast<double_limb_type>
-                  (
-                    static_cast<double_limb_type>(previous_u) << static_cast<unsigned>(std::numeric_limits<limb_type>::digits)
-                  )
-              );
-
-            *rl_it_rev = static_cast<limb_type>(static_cast<double_limb_type>(t / d));
-            previous_u = static_cast<limb_type>(static_cast<double_limb_type>(t - static_cast<double_limb_type>(static_cast<double_limb_type>(d) * *rl_it_rev)));
-          }
-        }
-
-        detail::fill_unsafe(rl_it_fwd, remainder.values.end(), static_cast<limb_type>(UINT8_C(0)));
-      }
+      detail::fill_unsafe(rl_it_fwd, remainder.values.end(), static_cast<limb_type>(UINT8_C(0)));
     }
   }
 };
 
 // Define some convenient unsigned wide integer types.
-using uint128_t = uintwide_t<static_cast<size_t>(UINT32_C(128)), std::uint32_t>;
-using uint256_t = uintwide_t<static_cast<size_t>(UINT32_C(256)), std::uint32_t>;
+using uint128_t = uintwide_t<static_cast<size_t>(UINT32_C(128))>;
+using uint256_t = uintwide_t<static_cast<size_t>(UINT32_C(256))>;
 
-#if(__cplusplus >= 201703L)
-} // namespace math::wide_integer
-#else
 } // namespace wide_integer
 } // namespace math
-#endif
 
 WIDE_INTEGER_NAMESPACE_END
-
-WIDE_INTEGER_NAMESPACE_BEGIN
-
-#if(__cplusplus >= 201703L)
-namespace math::wide_integer {
-#else
-namespace math { namespace wide_integer { // NOLINT(modernize-concat-nested-namespaces)
-#endif
-
-#if(__cplusplus >= 201703L)
-} // namespace math::wide_integer
-#else
-} // namespace wide_integer
-} // namespace math
-#endif
-
-// Implement various number-theoretical tools.
-
-#if(__cplusplus >= 201703L)
-namespace math::wide_integer {
-#else
-namespace math { namespace wide_integer { // NOLINT(modernize-concat-nested-namespaces)
-#endif
-
-#if(__cplusplus >= 201703L)
-} // namespace math::wide_integer
-#else
-} // namespace wide_integer
-} // namespace math
-#endif
-
-WIDE_INTEGER_NAMESPACE_END
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 #endif // UINTWIDE_T_2018_10_02_H
