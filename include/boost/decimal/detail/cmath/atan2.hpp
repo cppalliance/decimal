@@ -26,12 +26,10 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 struct pi_constants
 {
     static constexpr T pi_over_two        = numbers::pi_v<T> / 2;
-    static constexpr T pi_over_four       = numbers::pi_v<T> / 4;
-    static constexpr T three_pi_over_four = (3 * numbers::pi_v<T>) / 4;
+    static constexpr T three_pi_over_four = 3 * numbers::pi_over_four_v<T>;
 };
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T> constexpr T pi_constants<T>::pi_over_two;
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T> constexpr T pi_constants<T>::pi_over_four;
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T> constexpr T pi_constants<T>::three_pi_over_four;
 
 } // namespace atan2_detail
@@ -79,7 +77,7 @@ constexpr auto atan2(T y, T x) noexcept
     }
     else if (fpcy == FP_INFINITE && fpcx == FP_INFINITE && !signx)
     {
-        result = detail::atan2_detail::pi_constants<T>::pi_over_four;
+        result = numbers::pi_over_four_v<T>;
 
         if (signy) { result = -result; }
     }

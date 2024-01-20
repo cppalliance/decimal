@@ -20,13 +20,21 @@ static constexpr auto N = static_cast<std::size_t>(128U); // Number of trials
 static constexpr auto N = static_cast<std::size_t>(128U >> 4U); // Number of trials
 #endif
 
-static std::mt19937_64 rng(42);
+namespace local_test_atan2
+{
+    std::mt19937_64 rng(42);
+
+    std::uniform_int_distribution<int> one(1,1);
+}
 
 using namespace boost::decimal;
 
 template <typename Dec>
 void test()
 {
+    using local_test_atan2::rng;
+    using local_test_atan2::one;
+
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
 
     for (std::size_t n {}; n < max_iter; ++n)
@@ -59,7 +67,6 @@ void test()
     }
 
     // Edge cases
-    std::uniform_int_distribution<int> one(1,1);
 
     BOOST_TEST(isnan(atan2(Dec{one(rng)}, std::numeric_limits<Dec>::quiet_NaN())));
     BOOST_TEST(isnan(atan2(std::numeric_limits<Dec>::quiet_NaN(), Dec{one(rng)})));
@@ -73,12 +80,12 @@ void test()
 
     const auto one_rng_pos   = one(rng);
     const auto atan2_inf_pos = atan2(std::numeric_limits<Dec>::infinity(), std::numeric_limits<Dec>::infinity());
-    const auto ctrl_inf_pos  = one_rng_pos * numbers::pi_v<Dec> / 4;
+    const auto ctrl_inf_pos  = one_rng_pos * numbers::pi_over_four_v<Dec>;
     BOOST_TEST_EQ(atan2_inf_pos, ctrl_inf_pos);
 
     const auto one_rng_neg = -one(rng);
     const auto atan2_inf_neg = atan2(-std::numeric_limits<Dec>::infinity(), std::numeric_limits<Dec>::infinity());
-    const auto ctrl_inf_neg  = one_rng_neg * numbers::pi_v<Dec> / 4;
+    const auto ctrl_inf_neg  = one_rng_neg * numbers::pi_over_four_v<Dec>;
     BOOST_TEST_EQ(atan2_inf_neg, ctrl_inf_neg);
 
     if(sizeof(Dec) >= 8U)
