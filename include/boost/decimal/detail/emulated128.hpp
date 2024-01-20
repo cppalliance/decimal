@@ -954,29 +954,25 @@ constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& re
 {
     if ((rhs.high == UINT64_C(0)) && (rhs.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))))
     {
-        quotient.high  = UINT64_C(0);
-        quotient.low   = UINT64_C(0);
-
         const auto rhs32 = static_cast<std::uint32_t>(rhs.low);
 
         auto current = static_cast<std::uint64_t>(lhs.high >> 32U);
         quotient.high = static_cast<std::uint64_t>(static_cast<std::uint64_t>(static_cast<std::uint32_t>(current / rhs32)) << 32U);
-        auto remainder32 = static_cast<std::uint32_t>(current % rhs32);
+        remainder.low = static_cast<std::uint64_t>(current % rhs32);
 
-        current = static_cast<std::uint64_t>(static_cast<std::uint64_t>(remainder32) << 32U) | static_cast<std::uint32_t>(lhs.high);
+        current = static_cast<std::uint64_t>(remainder.low << 32U) | static_cast<std::uint32_t>(lhs.high);
         quotient.high |= static_cast<std::uint32_t>(current / rhs32);
-        remainder32 = static_cast<std::uint32_t>(current % rhs32);
+        remainder.low = static_cast<std::uint64_t>(current % rhs32);
 
-        current = static_cast<std::uint64_t>(static_cast<std::uint64_t>(remainder32) << 32U) | static_cast<std::uint32_t>(lhs.low >> 32U);
-        quotient.low= static_cast<std::uint64_t>(static_cast<std::uint64_t>(static_cast<std::uint32_t>(current / rhs32)) << 32U);
-        remainder32 = static_cast<std::uint32_t>(current % rhs32);
+        current = static_cast<std::uint64_t>(remainder.low << 32U) | static_cast<std::uint32_t>(lhs.low >> 32U);
+        quotient.low = static_cast<std::uint64_t>(static_cast<std::uint64_t>(static_cast<std::uint32_t>(current / rhs32)) << 32U);
+        remainder.low = static_cast<std::uint64_t>(current % rhs32);
 
-        current = static_cast<std::uint64_t>(static_cast<std::uint64_t>(remainder32) << 32U) | static_cast<std::uint32_t>(lhs.low);
+        current = static_cast<std::uint64_t>(remainder.low << 32U) | static_cast<std::uint32_t>(lhs.low);
         quotient.low |= static_cast<std::uint32_t>(current / rhs32);
-        remainder32 = static_cast<std::uint32_t>(current % rhs32);
+        remainder.low = static_cast<std::uint32_t>(current % rhs32);
 
         remainder.high = UINT64_C(0);
-        remainder.low  = static_cast<std::uint64_t>(remainder32);
     }
     else
     {
