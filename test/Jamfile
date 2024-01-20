@@ -1,5 +1,6 @@
 # Copyright 2022 Peter Dimov
 # Copyright 2023 - 2024 Matt Borland
+# Copyright 2023 - 2024 Christopher Kormanyos
 # Distributed under the Boost Software License, Version 1.0.
 # https://www.boost.org/LICENSE_1_0.txt
 
@@ -8,9 +9,11 @@ import ../../config/checks/config : requires ;
 
 project : requirements
 
-  <toolset>msvc:<warnings-as-errors>off
-  <toolset>clang:<warnings-as-errors>off
-  <toolset>gcc:<warnings-as-errors>off
+  <warnings>pedantic
+
+  <toolset>msvc:<warnings-as-errors>on
+  <toolset>clang:<warnings-as-errors>on
+  <toolset>gcc:<warnings-as-errors>on
 
   [ requires cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction cxx14_variable_templates cxx14_constexpr ]
   ;
