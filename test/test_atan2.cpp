@@ -5,12 +5,13 @@
 // Propagates up from boost.math
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
-#include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
+#include <boost/decimal.hpp>
 #include <boost/math/special_functions/next.hpp>
+
+#include <cmath>
 #include <iostream>
 #include <random>
-#include <cmath>
 
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
 static constexpr auto N = static_cast<std::size_t>(128U); // Number of trials
@@ -68,8 +69,8 @@ void test()
     BOOST_TEST_EQ(atan2(-std::numeric_limits<Dec>::infinity(), Dec{one(rng)}), -numbers::pi_v<Dec> / 2);
     BOOST_TEST_EQ(atan2(std::numeric_limits<Dec>::infinity(), -std::numeric_limits<Dec>::infinity()), 3 * one(rng) * numbers::pi_v<Dec> / 4);
     BOOST_TEST_EQ(atan2(-std::numeric_limits<Dec>::infinity(), -std::numeric_limits<Dec>::infinity()), -3 * one(rng) * numbers::pi_v<Dec> / 4);
-    BOOST_TEST_EQ(atan2(std::numeric_limits<Dec>::infinity(), std::numeric_limits<Dec>::infinity()), one(rng) * numbers::pi_v<Dec> / 4);
-    BOOST_TEST_EQ(atan2(-std::numeric_limits<Dec>::infinity(), std::numeric_limits<Dec>::infinity()), -one(rng) * numbers::pi_v<Dec> / 4);
+    BOOST_TEST_EQ(atan2(std::numeric_limits<Dec>::infinity(), std::numeric_limits<Dec>::infinity()), one(rng) * numbers::pi_over_four_v<Dec>);
+    BOOST_TEST_EQ(atan2(-std::numeric_limits<Dec>::infinity(), std::numeric_limits<Dec>::infinity()), -one(rng) * numbers::pi_over_four_v<Dec>);
     BOOST_TEST_EQ(atan2(-Dec(1), Dec{0 * one(rng)}), -numbers::pi_v<Dec> / 2);
     BOOST_TEST_EQ(atan2(Dec(1), Dec{0 * one(rng)}), numbers::pi_v<Dec> / 2);
     BOOST_TEST_EQ(atan2(-Dec{one(rng)}, -std::numeric_limits<Dec>::infinity()), -numbers::pi_v<Dec>);

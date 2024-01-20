@@ -43,6 +43,17 @@ constexpr decimal128 pi_v<decimal128> = decimal128{detail::uint128{UINT64_C(1703
                                                                    UINT64_C(13456286628489437068)}, -33};
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
+static constexpr Dec pi_over_four_v = Dec{UINT64_C(7853981633974483096), -19};
+
+// For extraction of the 128-bit approximate value of pi/4, see also: https://godbolt.org/z/fcjjGP7bY
+// See also:
+//   N[Pi/4, 37]
+//   0.7853981633974483096156608458198757210
+template <>
+constexpr decimal128 pi_over_four_v<decimal128> = decimal128{detail::uint128{UINT64_C(42576519751081932),
+                                                                             UINT64_C(6764235707220873609)}, -38};
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 static constexpr Dec inv_pi_v = Dec{UINT64_C(3183098861837906715), -19};
 
 template <>

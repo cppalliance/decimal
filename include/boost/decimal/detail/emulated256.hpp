@@ -7,9 +7,11 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
-#include <tuple>
+#include <boost/decimal/detail/wide-integer/uintwide_t.hpp>
+
 #include <cstdint>
 #include <cmath>
+#include <tuple>
 
 namespace boost {
 namespace decimal {
@@ -108,8 +110,6 @@ struct uint256_t
 
 private:
     friend constexpr int high_bit(uint256_t v) noexcept;
-
-    friend constexpr void div_impl(const uint256_t& lhs, const uint256_t& rhs, uint256_t &quotient, uint256_t &remainder) noexcept;
 };
 
 constexpr uint256_t operator>>(uint256_t lhs, int amount) noexcept
@@ -336,49 +336,89 @@ constexpr void set_bit(uint256_t& a, int bit)
     }
 }
 
-// The division algorithm
-constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const uint256_t& divisor) noexcept
+using wide_integer_uint256 = ::boost::decimal::math::wide_integer::uint256_t;
+
+constexpr auto uint256_to_wide_integer(const uint256_t& src) -> wide_integer_uint256
 {
-    // Check for division by zero
-    if (divisor.high == 0 && divisor.low == 0)
-    {
-        return {{0,0}, {0,0}};
-    }
-    else if (divisor > dividend)
-    {
-        return {{0,0}, dividend};
-    }
+    wide_integer_uint256 dst { };
 
-    uint256_t quotient = {0, 0};
-    uint256_t remainder = {0, 0};
+    using local_limb_type = typename wide_integer_uint256::limb_type;
 
-    for (int i = 255; i >= 0; --i)
-    {
-        remainder = left_shift(remainder);
+    static_assert(sizeof(local_limb_type) == static_cast<std::size_t>(UINT8_C(4)) && std::is_same<local_limb_type, std::uint32_t>::value, "Error: Configuration of external wide-integer limbs not OK");
 
-        // Set the current bit of the dividend
-        if (i >= 128)
-        {
-            if ((dividend.high >> (i - 128)) & 1)
-            {
-                set_bit(remainder, 0);
-            }
-        }
-        else
-        {
-            if ((dividend.low >> i) & 1)
-            {
-                set_bit(remainder, 0);
-            }
-        }
+    dst.representation()[static_cast<std::size_t>(UINT8_C(0))] = static_cast<local_limb_type>(src.low.low);
+    dst.representation()[static_cast<std::size_t>(UINT8_C(1))] = static_cast<local_limb_type>(src.low.low >> static_cast<unsigned>(UINT8_C(32)));
+    dst.representation()[static_cast<std::size_t>(UINT8_C(2))] = static_cast<local_limb_type>(src.low.high);
+    dst.representation()[static_cast<std::size_t>(UINT8_C(3))] = static_cast<local_limb_type>(src.low.high >> static_cast<unsigned>(UINT8_C(32)));
+    dst.representation()[static_cast<std::size_t>(UINT8_C(4))] = static_cast<local_limb_type>(src.high.low);
+    dst.representation()[static_cast<std::size_t>(UINT8_C(5))] = static_cast<local_limb_type>(src.high.low >> static_cast<unsigned>(UINT8_C(32)));
+    dst.representation()[static_cast<std::size_t>(UINT8_C(6))] = static_cast<local_limb_type>(src.high.high);
+    dst.representation()[static_cast<std::size_t>(UINT8_C(7))] = static_cast<local_limb_type>(src.high.high >> static_cast<unsigned>(UINT8_C(32)));
 
-        // If remainder >= divisor, subtract it and set the bit in the quotient
-        if (compare(remainder, divisor) >= 0)
-        {
-            remainder = subtract(remainder, divisor);
-            set_bit(quotient, i);
-        }
-    }
+    return dst;
+}
+
+constexpr auto wide_integer_to_uint256(const wide_integer_uint256& src) -> uint256_t
+{
+    uint256_t dst { };
+
+    dst.low.low =
+        static_cast<std::uint64_t>
+        (
+                                           src.crepresentation()[static_cast<std::size_t>(UINT8_C(0))]
+            | static_cast<std::uint64_t>
+              (
+                static_cast<std::uint64_t>(src.crepresentation()[static_cast<std::size_t>(UINT8_C(1))]) << static_cast<unsigned>(UINT8_C(32))
+              )
+        );
+
+    dst.low.high =
+        static_cast<std::uint64_t>
+        (
+                                           src.crepresentation()[static_cast<std::size_t>(UINT8_C(2))]
+            | static_cast<std::uint64_t>
+              (
+                static_cast<std::uint64_t>(src.crepresentation()[static_cast<std::size_t>(UINT8_C(3))]) << static_cast<unsigned>(UINT8_C(32))
+              )
+        );
+
+    dst.high.low =
+        static_cast<std::uint64_t>
+        (
+                                           src.crepresentation()[static_cast<std::size_t>(UINT8_C(4))]
+            | static_cast<std::uint64_t>
+              (
+                static_cast<std::uint64_t>(src.crepresentation()[static_cast<std::size_t>(UINT8_C(5))]) << static_cast<unsigned>(UINT8_C(32))
+              )
+        );
+
+    dst.high.high =
+        static_cast<std::uint64_t>
+        (
+                                           src.crepresentation()[static_cast<std::size_t>(UINT8_C(6))]
+            | static_cast<std::uint64_t>
+              (
+                static_cast<std::uint64_t>(src.crepresentation()[static_cast<std::size_t>(UINT8_C(7))]) << static_cast<unsigned>(UINT8_C(32))
+              )
+        );
+
+    return dst;
+}
+
+// The division algorithm
+constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& lhs, const uint256_t& rhs) noexcept
+{
+    // Mash-Up: Use Knuth long-division from wide-integer (requires limb-conversions on input/output).
+
+          auto lhs_wide = uint256_to_wide_integer(lhs);
+    const auto rhs_wide = uint256_to_wide_integer(rhs);
+
+    wide_integer_uint256 rem_wide { };
+
+    lhs_wide.eval_divide_knuth(rhs_wide, rem_wide);
+
+    const auto remainder = wide_integer_to_uint256(rem_wide);
+    const auto quotient  = wide_integer_to_uint256(lhs_wide);
 
     return {quotient, remainder};
 }

@@ -10,6 +10,8 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/countl.hpp>
+#include <boost/decimal/detail/wide-integer/uintwide_t.hpp>
+
 #include <cmath>
 #include <cstdint>
 #include <limits>
@@ -903,44 +905,89 @@ constexpr auto high_bit(uint128 v) noexcept -> int
     return 0;
 }
 
-// See: https://stackoverflow.com/questions/5386377/division-without-using
+using wide_integer_uint128 = ::boost::decimal::math::wide_integer::uint128_t;
+
+constexpr auto uint128_to_wide_integer(const uint128& src) -> wide_integer_uint128
+{
+    wide_integer_uint128 dst { };
+
+    using local_limb_type = typename wide_integer_uint128::limb_type;
+
+    static_assert(sizeof(local_limb_type) == static_cast<std::size_t>(UINT8_C(4)) && std::is_same<local_limb_type, std::uint32_t>::value, "Error: Configuration of external wide-integer limbs not OK");
+
+    dst.representation()[static_cast<std::size_t>(UINT8_C(0))] = static_cast<local_limb_type>(src.low);
+    dst.representation()[static_cast<std::size_t>(UINT8_C(1))] = static_cast<local_limb_type>(src.low >> static_cast<unsigned>(UINT8_C(32)));
+    dst.representation()[static_cast<std::size_t>(UINT8_C(2))] = static_cast<local_limb_type>(src.high);
+    dst.representation()[static_cast<std::size_t>(UINT8_C(3))] = static_cast<local_limb_type>(src.high >> static_cast<unsigned>(UINT8_C(32)));
+
+    return dst;
+}
+
+constexpr auto wide_integer_to_uint128(const wide_integer_uint128& src) -> uint128
+{
+    uint128 dst { };
+
+    dst.low =
+        static_cast<std::uint64_t>
+        (
+                                           src.crepresentation()[static_cast<std::size_t>(UINT8_C(0))]
+            | static_cast<std::uint64_t>
+              (
+                static_cast<std::uint64_t>(src.crepresentation()[static_cast<std::size_t>(UINT8_C(1))]) << static_cast<unsigned>(UINT8_C(32))
+              )
+        );
+
+    dst.high =
+        static_cast<std::uint64_t>
+        (
+                                           src.crepresentation()[static_cast<std::size_t>(UINT8_C(2))]
+            | static_cast<std::uint64_t>
+              (
+                static_cast<std::uint64_t>(src.crepresentation()[static_cast<std::size_t>(UINT8_C(3))]) << static_cast<unsigned>(UINT8_C(32))
+              )
+        );
+
+    return dst;
+}
+
 constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& remainder) noexcept -> void
 {
-    constexpr uint128 one {0, 1};
-
-    if (rhs > lhs)
+    if ((rhs.high == UINT64_C(0)) && (rhs.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))))
     {
-        quotient = 0U;
-        remainder = 0U;
+        const auto rhs32 = static_cast<std::uint32_t>(rhs.low);
+
+        auto current = static_cast<std::uint64_t>(lhs.high >> 32U);
+        quotient.high = static_cast<std::uint64_t>(static_cast<std::uint64_t>(static_cast<std::uint32_t>(current / rhs32)) << 32U);
+        remainder.low = static_cast<std::uint64_t>(current % rhs32);
+
+        current = static_cast<std::uint64_t>(remainder.low << 32U) | static_cast<std::uint32_t>(lhs.high);
+        quotient.high |= static_cast<std::uint32_t>(current / rhs32);
+        remainder.low = static_cast<std::uint64_t>(current % rhs32);
+
+        current = static_cast<std::uint64_t>(remainder.low << 32U) | static_cast<std::uint32_t>(lhs.low >> 32U);
+        quotient.low = static_cast<std::uint64_t>(static_cast<std::uint64_t>(static_cast<std::uint32_t>(current / rhs32)) << 32U);
+        remainder.low = static_cast<std::uint64_t>(current % rhs32);
+
+        current = static_cast<std::uint64_t>(remainder.low << 32U) | static_cast<std::uint32_t>(lhs.low);
+        quotient.low |= static_cast<std::uint32_t>(current / rhs32);
+        remainder.low = static_cast<std::uint32_t>(current % rhs32);
+
+        remainder.high = UINT64_C(0);
     }
-    else if (lhs == rhs)
+    else
     {
-        quotient = 1U;
-        remainder = 0U;
+        // Mash-Up: Use Knuth long-division from wide-integer (requires limb-conversions on input/output).
+
+              auto lhs_wide = uint128_to_wide_integer(lhs);
+        const auto rhs_wide = uint128_to_wide_integer(rhs);
+
+        wide_integer_uint128 rem_wide { };
+
+        lhs_wide.eval_divide_knuth(rhs_wide, rem_wide);
+
+        remainder = wide_integer_to_uint128(rem_wide);
+        quotient  = wide_integer_to_uint128(lhs_wide);
     }
-
-    uint128 denom = rhs;
-    quotient = 0U;
-
-    std::int32_t shift = high_bit(lhs) - high_bit(rhs);
-    if (shift < 0)
-    {
-        shift = 32 - shift;
-    }
-    denom <<= shift;
-
-    for (int i = 0; i <= shift; ++i)
-    {
-        quotient <<= 1;
-        if (lhs >= denom)
-        {
-            lhs -= denom;
-            quotient |= one;
-        }
-        denom >>= 1;
-    }
-
-    remainder = lhs;
 }
 
 constexpr auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128
