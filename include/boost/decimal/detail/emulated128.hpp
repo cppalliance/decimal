@@ -952,17 +952,46 @@ constexpr auto wide_integer_to_uint128(const wide_integer_uint128& src) -> uint1
 
 constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& remainder) noexcept -> void
 {
-    // Mash-Up: Use Knuth long-division from wide-integer (requires limb-conversions on input/output).
+    if ((rhs.high == UINT64_C(0)) && (rhs.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))))
+    {
+        quotient.high  = UINT64_C(0);
+        quotient.low   = UINT64_C(0);
 
-          auto lhs_wide = uint128_to_wide_integer(lhs);
-    const auto rhs_wide = uint128_to_wide_integer(rhs);
+        const auto rhs32 = static_cast<std::uint32_t>(rhs.low);
 
-    wide_integer_uint128 rem_wide { };
+        auto current = static_cast<std::uint64_t>(lhs.high >> 32U);
+        quotient.high = static_cast<std::uint64_t>(static_cast<std::uint64_t>(static_cast<std::uint32_t>(current / rhs32)) << 32U);
+        auto remainder32 = static_cast<std::uint32_t>(current % rhs32);
 
-    lhs_wide.eval_divide_knuth(rhs_wide, rem_wide);
+        current = static_cast<std::uint64_t>(static_cast<std::uint64_t>(remainder32) << 32U) | static_cast<std::uint32_t>(lhs.high);
+        quotient.high |= static_cast<std::uint32_t>(current / rhs32);
+        remainder32 = static_cast<std::uint32_t>(current % rhs32);
 
-    remainder = wide_integer_to_uint128(rem_wide);
-    quotient  = wide_integer_to_uint128(lhs_wide);
+        current = static_cast<std::uint64_t>(static_cast<std::uint64_t>(remainder32) << 32U) | static_cast<std::uint32_t>(lhs.low >> 32U);
+        quotient.low= static_cast<std::uint64_t>(static_cast<std::uint64_t>(static_cast<std::uint32_t>(current / rhs32)) << 32U);
+        remainder32 = static_cast<std::uint32_t>(current % rhs32);
+
+        current = static_cast<std::uint64_t>(static_cast<std::uint64_t>(remainder32) << 32U) | static_cast<std::uint32_t>(lhs.low);
+        quotient.low |= static_cast<std::uint32_t>(current / rhs32);
+        remainder32 = static_cast<std::uint32_t>(current % rhs32);
+
+        remainder.high = UINT64_C(0);
+        remainder.low  = static_cast<std::uint64_t>(remainder32);
+    }
+    else
+    {
+        // Mash-Up: Use Knuth long-division from wide-integer (requires limb-conversions on input/output).
+
+              auto lhs_wide = uint128_to_wide_integer(lhs);
+        const auto rhs_wide = uint128_to_wide_integer(rhs);
+
+        wide_integer_uint128 rem_wide { };
+
+        lhs_wide.eval_divide_knuth(rhs_wide, rem_wide);
+
+        remainder = wide_integer_to_uint128(rem_wide);
+        quotient  = wide_integer_to_uint128(lhs_wide);
+    }
 }
 
 constexpr auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128
