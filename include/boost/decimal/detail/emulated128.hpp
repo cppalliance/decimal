@@ -803,11 +803,11 @@ constexpr auto uint128::operator-=(uint128 v) noexcept -> uint128&
 
 constexpr auto uint128::operator--() noexcept -> uint128&
 {
-	if (this->low == 0)
-	{
+    if (this->low == 0)
+    {
         this->low = UINT64_MAX;
         --this->high;
-	}
+    }
     else // NOLINT
     {
         --this->low;
@@ -952,7 +952,7 @@ constexpr auto wide_integer_to_uint128(const wide_integer_uint128& src) -> uint1
 
 constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& remainder) noexcept -> void
 {
-    if ((rhs.high == UINT64_C(0)) && (rhs.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))))
+    if ((rhs.high == UINT64_C(0)) && (rhs.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))) && (rhs.low > (static_cast<std::uint64_t>(UINT64_C(0x0)))))
     {
         const auto rhs32 = static_cast<std::uint32_t>(rhs.low);
 
@@ -978,12 +978,11 @@ constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& re
     {
         // Mash-Up: Use Knuth long-division from wide-integer (requires limb-conversions on input/output).
 
-              auto lhs_wide = uint128_to_wide_integer(lhs);
-        const auto rhs_wide = uint128_to_wide_integer(rhs);
+        auto lhs_wide = uint128_to_wide_integer(lhs);
 
         wide_integer_uint128 rem_wide { };
 
-        lhs_wide.eval_divide_knuth(rhs_wide, rem_wide);
+        lhs_wide.eval_divide_knuth(uint128_to_wide_integer(rhs), rem_wide);
 
         remainder = wide_integer_to_uint128(rem_wide);
         quotient  = wide_integer_to_uint128(lhs_wide);

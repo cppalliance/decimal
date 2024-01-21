@@ -405,46 +405,58 @@ constexpr auto wide_integer_to_uint256(const wide_integer_uint256& src) -> uint2
     return dst;
 }
 
+// Forward declaration of specialized division 256-bits / 64-bits.
+constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const std::uint64_t& divisor) noexcept;
+
 // The division algorithm
 constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
-    // Mash-Up: Use Knuth long-division from wide-integer (requires limb-conversions on input/output).
+    if ((rhs.high.high == UINT64_C(0)) && (rhs.high.low == UINT64_C(0)) && (rhs.low.high == UINT64_C(0)) && (rhs.low.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))) && (rhs.low.low > (static_cast<std::uint64_t>(UINT64_C(0)))))
+    {
+        return divide(lhs, rhs.low.low);
+    }
+    else
+    {
+        // Mash-Up: Use Knuth long-division from wide-integer (requires limb-conversions on input/output).
 
-          auto lhs_wide = uint256_to_wide_integer(lhs);
-    const auto rhs_wide = uint256_to_wide_integer(rhs);
+        auto lhs_wide = uint256_to_wide_integer(lhs);
 
-    wide_integer_uint256 rem_wide { };
+        wide_integer_uint256 rem_wide { };
 
-    lhs_wide.eval_divide_knuth(rhs_wide, rem_wide);
+        lhs_wide.eval_divide_knuth(uint256_to_wide_integer(rhs), rem_wide);
 
-    const auto remainder = wide_integer_to_uint256(rem_wide);
-    const auto quotient  = wide_integer_to_uint256(lhs_wide);
-
-    return {quotient, remainder};
+        return
+        {
+            wide_integer_to_uint256(lhs_wide),
+            wide_integer_to_uint256(rem_wide)
+        };
+    }
 }
 
 constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const std::uint64_t& divisor) noexcept
 {
-    uint256_t quotient {{0,0}, {0, 0}};
-    std::uint64_t remainder {};
+    uint256_t quotient { { 0U, 0U }, { 0U, 0U }};
 
-    uint128 current {static_cast<uint128>(remainder) << 64 | dividend.high.high};
+    uint128 current = dividend.high.high;
     quotient.high.high = static_cast<std::uint64_t>(current / divisor);
-    remainder = static_cast<std::uint64_t>(current % divisor);
+    auto remainder = static_cast<std::uint64_t>(current % divisor);
 
-    current = static_cast<uint128>(remainder) << 64 | dividend.high.low;
+    current = static_cast<uint128>(remainder) << 64U | dividend.high.low;
     quotient.high.low = static_cast<std::uint64_t>(current / divisor);
     remainder = static_cast<std::uint64_t>(current % divisor);
 
-    current = static_cast<uint128>(remainder) << 64 | dividend.low.high;
+    current = static_cast<uint128>(remainder) << 64U | dividend.low.high;
     quotient.low.high = static_cast<std::uint64_t>(current / divisor);
     remainder = static_cast<std::uint64_t>(current % divisor);
 
-    current = static_cast<uint128>(remainder) << 64 | dividend.low.low;
+    current = static_cast<uint128>(remainder) << 64U | dividend.low.low;
     quotient.low.low = static_cast<std::uint64_t>(current / divisor);
-    remainder = static_cast<std::uint64_t>(current % divisor);
 
-    return {quotient, static_cast<uint256_t>(remainder)};
+    return
+    {
+        quotient,
+        static_cast<uint256_t>(static_cast<std::uint64_t>(current % divisor))
+    };
 }
 
 constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept
