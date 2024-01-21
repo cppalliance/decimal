@@ -8,7 +8,6 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-
 // Propagates up from boost.math
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 

@@ -29,6 +29,8 @@ endif
 CXXFLAGS     = -march=native                                                   \
                -mtune=native                                                   \
                -O1                                                             \
+               -Wextra                                                         \
+               -Wall                                                           \
                -fno-inline-functions                                           \
                -fprofile-arcs                                                  \
                -ftest-coverage
