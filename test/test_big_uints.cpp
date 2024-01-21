@@ -2,6 +2,13 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+// Silence pedantic warnings propagated up from boost.multiprecision
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#endif
+
+
 // Propagates up from boost.math
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
@@ -187,3 +194,7 @@ int main()
 
   return boost::report_errors();
 }
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
