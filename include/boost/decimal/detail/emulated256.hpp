@@ -411,7 +411,7 @@ constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, con
 // The division algorithm
 constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
-    if ((rhs.high.high == UINT64_C(0)) && (rhs.high.low == UINT64_C(0)) && (rhs.low.high == UINT64_C(0)) && (rhs.low.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))))
+    if ((rhs.high.high == UINT64_C(0)) && (rhs.high.low == UINT64_C(0)) && (rhs.low.high == UINT64_C(0)) && (rhs.low.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))) && (rhs.low.low > (static_cast<std::uint64_t>(UINT64_C(0)))))
     {
         return divide(lhs, rhs.low.low);
     }

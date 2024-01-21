@@ -152,6 +152,8 @@ auto test_spot_uint256_t() -> void
       boost_ctrl_uint_type("0x718E8C8F6DBB6F76597BD68B19ACF237")
     }};
 
+    // Run the cureated test divisions. Verify the answers, and get
+    // at least 3 hits on the hard-toreach lines.
     for(auto   index = static_cast<std::size_t>(UINT8_C(0));
                index < std::tuple_size<dec_intern_array_type>::value;
              ++index)
@@ -160,6 +162,18 @@ auto test_spot_uint256_t() -> void
       const auto boost_ctrl_div = boost_ctrl_top_list[index] / boost_ctrl_bot_list[index];
 
       BOOST_TEST(local::declexical_cast(dec_intern_div) == local::declexical_cast(boost_ctrl_div));
+    }
+
+    // And while we are at it, ... ensure that a/a = 1 for these random numerators.
+    for(auto   index = static_cast<std::size_t>(UINT8_C(0));
+               index < std::tuple_size<dec_intern_array_type>::value;
+             ++index)
+    {
+      const auto dec_intern_div_unity = dec_intern_top_list[index] / dec_intern_top_list[index];
+      const auto boost_ctrl_div_unity = boost_ctrl_top_list[index] / boost_ctrl_top_list[index];
+
+      BOOST_TEST(local::declexical_cast(dec_intern_div_unity) == local::declexical_cast(boost_ctrl_div_unity));
+      BOOST_TEST(dec_intern_div_unity == 1);
     }
   }
 }

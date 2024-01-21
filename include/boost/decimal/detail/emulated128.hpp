@@ -952,7 +952,7 @@ constexpr auto wide_integer_to_uint128(const wide_integer_uint128& src) -> uint1
 
 constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& remainder) noexcept -> void
 {
-    if ((rhs.high == UINT64_C(0)) && (rhs.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))))
+    if ((rhs.high == UINT64_C(0)) && (rhs.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))) && (rhs.low > (static_cast<std::uint64_t>(UINT64_C(0x0)))))
     {
         const auto rhs32 = static_cast<std::uint32_t>(rhs.low);
 

@@ -41,6 +41,7 @@ jobs:
           git submodule update --init libs/config
           git submodule update --init libs/core
           git submodule update --init libs/math
+          git submodule update --init libs/multiprecision
           git submodule update --init libs/predef
           git submodule update --init libs/static_assert
           git submodule update --init libs/test
