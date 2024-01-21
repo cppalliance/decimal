@@ -4,7 +4,7 @@
 // https://www.boost.org/LICENSE_1_0.txt
 //
 
-// This file has been taken from (and significantly reduced from):
+// This header file has been taken from (and significantly reduced/simplified from):
 //
 ///////////////////////////////////////////////////////////////////
 //  Copyright Christopher Kormanyos 1999 - 2024.                 //
@@ -202,13 +202,6 @@ private:
 
 } // namespace iterator_detail
 
-// Use a local, constexpr, unsafe implementation of the abs-function.
-template<typename ArithmeticType>
-constexpr auto abs_unsafe(ArithmeticType val) -> ArithmeticType
-{
-  return ((val > static_cast<int>(INT8_C(0))) ? val : -val);
-}
-
 // Use a local, constexpr, unsafe implementation of the fill-function.
 template<typename DestinationIterator,
          typename ValueType>
@@ -220,20 +213,6 @@ constexpr auto fill_unsafe(DestinationIterator first, DestinationIterator last, 
 
     *first++ = static_cast<local_destination_value_type>(val);
   }
-}
-
-// Use a local, constexpr, unsafe implementation of the max-function.
-template<typename ArithmeticType>
-constexpr auto max_unsafe(const ArithmeticType& left, const ArithmeticType& right) -> ArithmeticType
-{
-  return ((left < right) ? right : left);
-}
-
-// Use a local, constexpr, unsafe implementation of the max-function.
-template<typename ArithmeticType>
-constexpr auto min_unsafe(const ArithmeticType& left, const ArithmeticType& right) -> ArithmeticType
-{
-  return ((right < left) ? right : left);
 }
 
 // Use a local, constexpr, unsafe implementation of the copy-function.
@@ -256,67 +235,10 @@ constexpr auto copy_unsafe(InputIterator first, InputIterator last, DestinationI
   return dest;
 }
 
-// Use a local, constexpr, unsafe implementation of the copy-backward-function.
-template<typename InputIterator,
-         typename DestinationIterator>
-constexpr auto copy_backward_unsafe(InputIterator first, InputIterator last, DestinationIterator dest) -> DestinationIterator
-{
-  using local_destination_value_type = typename iterator_detail::iterator_traits<DestinationIterator>::value_type;
-
-  while(first != last)
-  {
-    *(--dest) = static_cast<local_destination_value_type>(*(--last));
-  }
-
-  return dest;
-}
-
-template<class It>
-constexpr auto distance_unsafe(It first, It last) -> typename iterator_detail::iterator_traits<It>::difference_type
-{
-  return last - first;
-}
-
-template<class InputIt1, class InputIt2>
-constexpr auto equal_unsafe(InputIt1 first1, InputIt1 last1, InputIt2 first2) -> bool
-{
-  for( ; first1 != last1; ++first1, ++first2)
-  {
-    if(!(*first1 == *first2))
-    {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-template<typename IteratorType>
-constexpr auto iter_swap_unsafe(IteratorType a, IteratorType b) -> void
-{
-  // Non-standard behavior:
-  // The (dereferenced) left/right value-types are the same.
-
-  using local_value_type = typename iterator_detail::iterator_traits<IteratorType>::value_type;
-
-  swap_unsafe(static_cast<local_value_type&&>(*a), static_cast<local_value_type&&>(*b));
-}
-
-template<class ForwardIt1, class ForwardIt2>
-constexpr auto swap_ranges_unsafe(ForwardIt1 first1, ForwardIt1 last1, ForwardIt2 first2) -> ForwardIt2
-{
-  for( ; first1 != last1; ++first1, ++first2)
-  {
-    iter_swap_unsafe(first1, first2);
-  }
-
-  return first2;
-}
-
 namespace array_detail {
 
 template<typename T, std::size_t N>
-class array
+class array_unsafe
 {
 public:
   // Standard container-local type definitions.
@@ -370,19 +292,13 @@ public:
   WIDE_INTEGER_NODISCARD static constexpr auto empty()    -> bool      { return false; }
   WIDE_INTEGER_NODISCARD static constexpr auto max_size() -> size_type { return N; }
 
-  template<typename T2>
-  constexpr auto swap(array<T2, N>& y) noexcept -> void
-  {
-    swap_ranges_unsafe(begin(), end(), y.begin());
-  }
-
   WIDE_INTEGER_NODISCARD constexpr auto data() const -> const_pointer { return elems; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
   WIDE_INTEGER_NODISCARD constexpr auto data()       -> pointer       { return elems; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
 
   WIDE_INTEGER_NODISCARD constexpr auto c_array() -> pointer { return elems; }
 
   template<typename T2>
-  constexpr auto operator=(const array<T2, N>& y) -> array&
+  constexpr auto operator=(const array_unsafe<T2, N>& y) -> array_unsafe&
   {
     copy_unsafe(y.begin(), y.end(), begin());
 
@@ -398,70 +314,6 @@ public:
   {
     assign(value);
   }
-};
-
-template<typename T, size_t N>
-constexpr auto operator==(const array<T, N>& left, const array<T, N>& right) -> bool
-{
-  return equal_unsafe(left.begin(), left.end(), right.begin());
-}
-
-template<typename T, size_t N>
-constexpr auto operator<(const array<T, N>& left, const array<T, N>& right) -> bool
-{
-  return lexicographical_compare_unsafe(left.begin(),
-                                        left.end(),
-                                        right.begin(),
-                                        right.end());
-}
-
-template<typename T, size_t N>
-constexpr auto operator!=(const array<T, N>& left, const array<T, N>& right) -> bool
-{
-  return (!(left == right));
-}
-
-template<typename T, size_t N>
-constexpr auto operator>(const array<T, N>& left, const array<T, N>& right) -> bool
-{
-  return (right < left);
-}
-
-template<typename T, size_t N>
-constexpr auto operator>=(const array<T, N>& left, const array<T, N>& right) -> bool
-{
-  return (!(left < right));
-}
-
-template<typename T, size_t N>
-constexpr auto operator<=(const array<T, N>& left, const array<T, N>& right) -> bool
-{
-  return (!(right < left));
-}
-
-template<typename T, size_t N >
-constexpr auto swap(array<T, N>& x, array<T, N>& y) noexcept -> void
-{
-  swap_ranges_unsafe(x.begin(), x.end(), y.begin());
-}
-
-template<typename T>
-class tuple_size;
-
-template<typename T, typename std::size_t N>
-class tuple_size<array<T, N>> : public std::integral_constant<std::size_t, N> { };
-
-template<const std::size_t N, typename T>
-class tuple_element;
-
-template<const std::size_t I,
-          typename T,
-          const std::size_t N>
-class tuple_element<I, array<T, N> >
-{
-  static_assert(I < N, "Sorry, tuple_element index is out of bounds.");
-
-  using type = T;
 };
 
 } // namespace array_detail
@@ -645,7 +497,7 @@ public:
     );
 
   // The type of the internal data representation.
-  using representation_type = detail::array_detail::array<limb_type, static_cast<std::size_t>(number_of_limbs)>;
+  using representation_type = detail::array_detail::array_unsafe<limb_type, static_cast<std::size_t>(number_of_limbs)>;
 
   // The iterator types of the internal data representation.
   using iterator               = typename representation_type::iterator;
@@ -653,39 +505,8 @@ public:
   using reverse_iterator       = typename representation_type::reverse_iterator;
   using const_reverse_iterator = typename representation_type::const_reverse_iterator;
 
-  // Default constructor.
-  constexpr uintwide_t() = default;
-
-  // Constructors from built-in unsigned integral types that
-  // are less wide than limb_type or exactly as wide as limb_type.
-  template<typename UnsignedIntegralType>
-  WIDE_INTEGER_CONSTEXPR
-  uintwide_t(const UnsignedIntegralType v, // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
-             std::enable_if_t<(    std::is_integral   <UnsignedIntegralType>::value
-                               &&  std::is_unsigned   <UnsignedIntegralType>::value
-                               && (std::numeric_limits<UnsignedIntegralType>::digits <= std::numeric_limits<limb_type>::digits))>* = nullptr) // NOLINT(hicpp-named-parameter,readability-named-parameter)
-  {
-    values.front() = static_cast<limb_type>(v);
-  }
-
-  // Copy constructor.
-  constexpr uintwide_t(const uintwide_t& other) = default;
-
-  // Move copy constructor.
-  constexpr uintwide_t(uintwide_t&&) noexcept = default;
-
-  // Default destructor.
-  ~uintwide_t() = default;
-
-  // Assignment operator.
-  WIDE_INTEGER_CONSTEXPR auto operator=(const uintwide_t&) -> uintwide_t& = default;
-
-  // Move assignment operator.
-  WIDE_INTEGER_CONSTEXPR auto operator=(uintwide_t&&) noexcept -> uintwide_t& = default;
-
   // Provide a user interface to the internal data representation.
                          WIDE_INTEGER_CONSTEXPR auto  representation()       ->       representation_type& { return values; }
-  WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto  representation() const -> const representation_type& { return values; }
   WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto crepresentation() const -> const representation_type& { return values; }
 
   WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth(const uintwide_t& other,
@@ -720,8 +541,9 @@ public:
     }
     else if(u_offset == static_cast<local_uint_index_type>(number_of_limbs))
     {
-      // The numerator is zero. Do nothing and return.
-      remainder = uintwide_t(static_cast<std::uint8_t>(UINT8_C(0)));
+      // The numerator is zero.
+      // Do nothing other than set the remainder to zero and return.
+      detail::fill_unsafe(remainder.values.begin(), remainder.values.end(), static_cast<limb_type>(UINT8_C(0)));
     }
     else
     {
@@ -736,23 +558,20 @@ public:
         // then the result of the division is zero.
         remainder = *this;
 
-        operator=(static_cast<std::uint8_t>(UINT8_C(0)));
+        // Set the result to zero.
+        detail::fill_unsafe(values.begin(), values.end(), static_cast<limb_type>(UINT8_C(0)));
       }
       else if(left_is_equal_to_right)
       {
         // If the denominator is equal to the numerator,
         // then the result of the division is one.
-        operator=(static_cast<std::uint8_t>(UINT8_C(1)));
 
-        remainder = uintwide_t(static_cast<std::uint8_t>(UINT8_C(0)));
-      }
-      else if(static_cast<local_uint_index_type>(v_offset + static_cast<local_uint_index_type>(1U)) == static_cast<local_uint_index_type>(number_of_limbs))
-      {
-        // The denominator has one single limb.
-        // Use a one-dimensional division algorithm.
-        const auto short_denominator = *other.values.cbegin();
+        // Set the result to one.
+        detail::fill_unsafe(values.begin() + static_cast<size_t>(UINT8_C(1)), values.end(), static_cast<limb_type>(UINT8_C(0)));
+        values.front() = static_cast<limb_type>(UINT8_C(1));
 
-        eval_divide_by_single_limb(short_denominator, u_offset, remainder);
+        // Set the remainder to zero.
+        detail::fill_unsafe(remainder.values.begin(), remainder.values.end(), static_cast<limb_type>(UINT8_C(0)));
       }
       else
       {
@@ -769,64 +588,8 @@ private:
     return compare_ranges(values.cbegin(), other.values.cbegin(), number_of_limbs);
   }
 
-  WIDE_INTEGER_CONSTEXPR auto eval_divide_by_single_limb(const limb_type          short_denominator,
-                                                         const unsigned_fast_type u_offset,
-                                                               uintwide_t&        remainder) -> void
-  {
-    // The denominator has one single limb.
-    // Use a one-dimensional division algorithm.
-
-    double_limb_type long_numerator = static_cast<double_limb_type>(UINT8_C(0));
-    limb_type        hi_part        = static_cast<limb_type>       (UINT8_C(0));
-
-    {
-      auto ri =
-        static_cast<reverse_iterator>
-        (
-          detail::advance_and_point
-          (
-            values.begin(),
-            static_cast<size_t>(number_of_limbs - static_cast<size_t>(u_offset))
-          )
-        );
-
-      for( ; ri != values.rend(); ++ri) // NOLINT(altera-id-dependent-backward-branch)
-      {
-        long_numerator =
-          static_cast<double_limb_type>
-          (
-             *ri
-           + static_cast<double_limb_type>
-             (
-                  static_cast<double_limb_type>
-                  (
-                      long_numerator
-                    - static_cast<double_limb_type>(static_cast<double_limb_type>(short_denominator) * hi_part)
-                  )
-               << static_cast<unsigned>(std::numeric_limits<limb_type>::digits)
-             )
-          );
-
-        *ri = detail::make_lo<limb_type>(static_cast<double_limb_type>(long_numerator / short_denominator));
-
-        hi_part = *ri;
-      }
-    }
-
-    {
-      long_numerator =
-        static_cast<double_limb_type>
-        (
-           static_cast<double_limb_type>(*values.cbegin())
-         + static_cast<double_limb_type>(static_cast<double_limb_type>(long_numerator - static_cast<double_limb_type>(static_cast<double_limb_type>(short_denominator) * hi_part)) << static_cast<unsigned>(std::numeric_limits<limb_type>::digits))
-        );
-
-      remainder = static_cast<limb_type>(long_numerator >> static_cast<unsigned>(std::numeric_limits<limb_type>::digits));
-    }
-  }
-
   template<typename InputIteratorLeftType,
-            typename InputIteratorRightType>
+           typename InputIteratorRightType>
   static WIDE_INTEGER_CONSTEXPR auto compare_ranges(      InputIteratorLeftType  a,
                                                           InputIteratorRightType b,
                                                     const unsigned_fast_type     count) -> std::int_fast8_t
@@ -1032,7 +795,7 @@ private:
     // Step D1(b), normalize u -> u * d = uu.
     // Step D1(c): normalize v -> v * d = vv.
 
-    using uu_array_type = detail::array_detail::array<limb_type, static_cast<size_t>(number_of_limbs + static_cast<size_t>(UINT8_C(1)))>;
+    using uu_array_type = detail::array_detail::array_unsafe<limb_type, static_cast<size_t>(number_of_limbs + static_cast<size_t>(UINT8_C(1)))>;
 
     uu_array_type uu { };
 
