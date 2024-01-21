@@ -892,49 +892,49 @@ private:
         }
       }
 
+      // Step D4: Multiply and subtract.
+      // Replace u[j, ... j + n] by u[j, ... j + n] - q_hat * v[1, ... n].
+
+      // Set nv = q_hat * (v[1, ... n]).
+      uu_array_type nv { };
+
+      *(nv.begin() + static_cast<size_t>(n)) = eval_multiply_1d(nv.begin(), vv.cbegin(), q_hat, n);
+
+      const auto has_borrow =
+        eval_subtract_n
+        (
+          detail::advance_and_point(uu.begin(),  static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
+          detail::advance_and_point(uu.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
+          nv.cbegin(),
+          static_cast<unsigned_fast_type>
+          (
+            static_cast<local_uint_index_type>(n + static_cast<local_uint_index_type>(UINT8_C(1)))
+          )
+        );
+
+      // Step D5: Test the remainder.
+      // Set the result value: Set result.m_data[m - j] = q_hat.
+      // Use the condition (u[j] < 0), in other words if the borrow
+      // is non-zero, then step D6 needs to be carried out.
+
+      limb_type add_result { };
+
+      if(has_borrow)
       {
-        // Step D4: Multiply and subtract.
-        // Replace u[j, ... j + n] by u[j, ... j + n] - q_hat * v[1, ... n].
+        --q_hat;
 
-        // Set nv = q_hat * (v[1, ... n]).
-        uu_array_type nv { };
+        // Step D6: Add back.
+        // Add v[1, ... n] back to u[j, ... j + n],
+        // and decrease the result by 1.
 
-        *(nv.begin() + static_cast<size_t>(n)) = eval_multiply_1d(nv.begin(), vv.cbegin(), q_hat, n);
-
-        const auto has_borrow =
-          eval_subtract_n
-          (
-            detail::advance_and_point(uu.begin(),  static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
-            detail::advance_and_point(uu.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
-            nv.cbegin(),
-            static_cast<unsigned_fast_type>
-            (
-              static_cast<local_uint_index_type>(n + static_cast<local_uint_index_type>(UINT8_C(1)))
-            )
-          );
-
-        // Step D5: Test the remainder.
-        // Set the result value: Set result.m_data[m - j] = q_hat.
-        // Use the condition (u[j] < 0), in other words if the borrow
-        // is non-zero, then step D6 needs to be carried out.
-
-        if(has_borrow)
-        {
-          --q_hat;
-
-          // Step D6: Add back.
-          // Add v[1, ... n] back to u[j, ... j + n],
-          // and decrease the result by 1.
-
-          static_cast<void>
-          (
-            eval_add_n(uu.begin() + static_cast<size_t>(static_cast<local_uint_index_type>(uj - n)),
-                        detail::advance_and_point(uu.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
-                        vv.cbegin(),
-                        static_cast<unsigned_fast_type>(n))
-          );
-        }
+        add_result =
+          eval_add_n(uu.begin() + static_cast<size_t>(static_cast<local_uint_index_type>(uj - n)),
+                     detail::advance_and_point(uu.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(uj - n))),
+                     vv.cbegin(),
+                     static_cast<unsigned_fast_type>(n));
       }
+
+      static_cast<void>(add_result);
 
       // Get the result data.
       *values_at_m_minus_j_it = static_cast<limb_type>(q_hat);
