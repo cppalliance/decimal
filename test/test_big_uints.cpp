@@ -2,6 +2,21 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#if defined(__MINGW32__)
+
+// TODO(ckormanyos) disable -Werror in BJAM specifically for this file, as it gets
+// a hard-coded, non-removable warning (-Werror) propagated up from Multiprecision.
+#include <boost/core/lightweight_test.hpp>
+
+int main()
+{
+  BOOST_TEST(true);
+
+  return boost::report_errors();
+}
+
+#else
+
 // Propagates up from boost.math
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
@@ -187,3 +202,5 @@ int main()
 
   return boost::report_errors();
 }
+
+#endif
