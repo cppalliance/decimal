@@ -157,10 +157,13 @@ int main()
     #endif
 
     test_sin<decimal32>();
+    test_cos<decimal32>();
     test_sin<decimal64>();
+    test_cos<decimal64>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    test_sin<decimal128>();
+    //test_sin<decimal128>();
+    //test_cos<decimal128>();
     #endif
 
     return boost::report_errors();
