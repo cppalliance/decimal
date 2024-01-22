@@ -16,7 +16,7 @@
 #ifndef UINTWIDE_T_2018_10_02_H // NOLINT(llvm-header-guard)
 #define UINTWIDE_T_2018_10_02_H
 
-#define WIDE_INTEGER_NAMESPACE boost::decimal
+#define BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE boost::decimal
 
 #include <cinttypes>
 #include <cstddef>
@@ -29,54 +29,54 @@
 
 #if (defined(_MSC_VER) && (!defined(__GNUC__) && !defined(__clang__)))
   #if (_MSC_VER >= 1900) && defined(_HAS_CXX20) && (_HAS_CXX20 != 0)
-    #define WIDE_INTEGER_NODISCARD [[nodiscard]]           // NOLINT(cppcoreguidelines-macro-usage)
+    #define BOOST_DECIMAL_WIDE_INTEGER_NODISCARD [[nodiscard]]           // NOLINT(cppcoreguidelines-macro-usage)
   #else
-    #define WIDE_INTEGER_NODISCARD
+    #define BOOST_DECIMAL_WIDE_INTEGER_NODISCARD
   #endif
 #else
   #if (defined(__cplusplus) && (__cplusplus >= 201402L))
     #if defined(__AVR__) && (!defined(__GNUC__) || (defined(__GNUC__) && (__cplusplus >= 202002L)))
-    #define WIDE_INTEGER_NODISCARD [[nodiscard]]           // NOLINT(cppcoreguidelines-macro-usage)
+    #define BOOST_DECIMAL_WIDE_INTEGER_NODISCARD [[nodiscard]]           // NOLINT(cppcoreguidelines-macro-usage)
     #elif (defined(__cpp_lib_constexpr_algorithms) && (__cpp_lib_constexpr_algorithms >= 201806))
       #if defined(__clang__)
         #if (__clang_major__ > 9)
-        #define WIDE_INTEGER_NODISCARD [[nodiscard]]           // NOLINT(cppcoreguidelines-macro-usage)
+        #define BOOST_DECIMAL_WIDE_INTEGER_NODISCARD [[nodiscard]]           // NOLINT(cppcoreguidelines-macro-usage)
         #else
-        #define WIDE_INTEGER_NODISCARD
+        #define BOOST_DECIMAL_WIDE_INTEGER_NODISCARD
         #endif
       #else
-      #define WIDE_INTEGER_NODISCARD [[nodiscard]]           // NOLINT(cppcoreguidelines-macro-usage)
+      #define BOOST_DECIMAL_WIDE_INTEGER_NODISCARD [[nodiscard]]           // NOLINT(cppcoreguidelines-macro-usage)
       #endif
     #elif (defined(__clang__) && (__clang_major__ >= 10)) && (defined(__cplusplus) && (__cplusplus > 201703L))
       #if defined(__x86_64__)
-      #define WIDE_INTEGER_NODISCARD [[nodiscard]]           // NOLINT(cppcoreguidelines-macro-usage)
+      #define BOOST_DECIMAL_WIDE_INTEGER_NODISCARD [[nodiscard]]           // NOLINT(cppcoreguidelines-macro-usage)
       #else
-      #define WIDE_INTEGER_NODISCARD
+      #define BOOST_DECIMAL_WIDE_INTEGER_NODISCARD
       #endif
     #else
-    #define WIDE_INTEGER_NODISCARD
+    #define BOOST_DECIMAL_WIDE_INTEGER_NODISCARD
     #endif
   #else
-    #define WIDE_INTEGER_NODISCARD
+    #define BOOST_DECIMAL_WIDE_INTEGER_NODISCARD
   #endif
 #endif
 
-#define WIDE_INTEGER_CONSTEXPR constexpr                // NOLINT(cppcoreguidelines-macro-usage)
-#define WIDE_INTEGER_CONSTEXPR_IS_COMPILE_TIME_CONST 1  // NOLINT(cppcoreguidelines-macro-usage)
+#define BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR constexpr                // NOLINT(cppcoreguidelines-macro-usage)
+#define BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR_IS_COMPILE_TIME_CONST 1  // NOLINT(cppcoreguidelines-macro-usage)
 
-#if defined(WIDE_INTEGER_NAMESPACE_BEGIN) || defined(WIDE_INTEGER_NAMESPACE_END)
+#if defined(BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE_BEGIN) || defined(BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE_END)
   #error internal pre-processor macro already defined
 #endif
 
-#if defined(WIDE_INTEGER_NAMESPACE)
-  #define WIDE_INTEGER_NAMESPACE_BEGIN namespace boost { namespace decimal {     // NOLINT(cppcoreguidelines-macro-usage)
-  #define WIDE_INTEGER_NAMESPACE_END } } // namespace WIDE_INTEGER_NAMESPACE  // NOLINT(cppcoreguidelines-macro-usage)
+#if defined(BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE)
+  #define BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE_BEGIN namespace boost { namespace decimal {     // NOLINT(cppcoreguidelines-macro-usage)
+  #define BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE_END } } // namespace BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE  // NOLINT(cppcoreguidelines-macro-usage)
 #else
-  #define WIDE_INTEGER_NAMESPACE_BEGIN
-  #define WIDE_INTEGER_NAMESPACE_END
+  #define BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE_BEGIN
+  #define BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE_END
 #endif
 
-WIDE_INTEGER_NAMESPACE_BEGIN
+BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE_BEGIN
 
 namespace math { namespace wide_integer {
 
@@ -160,7 +160,7 @@ public:
   template<typename other>
   constexpr reverse_iterator(const reverse_iterator<other>& u) : current(u.current) { } // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
 
-  WIDE_INTEGER_NODISCARD constexpr auto base() const -> iterator_type { return current; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto base() const -> iterator_type { return current; }
 
   constexpr auto operator* () const -> reference { iterator_type tmp = current; return *--tmp; }
   constexpr auto operator->() const -> pointer   { return &(operator*()); }
@@ -258,44 +258,44 @@ public:
 
   static constexpr size_type static_size = N;
 
-  WIDE_INTEGER_NODISCARD constexpr auto begin() -> iterator { return elems; }                 // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  WIDE_INTEGER_NODISCARD constexpr auto end  () -> iterator { return elems + N; }             // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto begin() -> iterator { return elems; }                 // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto end  () -> iterator { return elems + N; }             // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  WIDE_INTEGER_NODISCARD constexpr auto begin() const -> const_iterator { return elems; }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  WIDE_INTEGER_NODISCARD constexpr auto end  () const -> const_iterator { return elems + N; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto begin() const -> const_iterator { return elems; }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto end  () const -> const_iterator { return elems + N; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  WIDE_INTEGER_NODISCARD constexpr auto cbegin() const -> const_iterator { return elems; }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  WIDE_INTEGER_NODISCARD constexpr auto cend  () const -> const_iterator { return elems + N; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto cbegin() const -> const_iterator { return elems; }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto cend  () const -> const_iterator { return elems + N; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  WIDE_INTEGER_NODISCARD constexpr auto rbegin() -> reverse_iterator { return reverse_iterator(elems + N); }                    // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  WIDE_INTEGER_NODISCARD constexpr auto rend  () -> reverse_iterator { return reverse_iterator(elems); }                        // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto rbegin() -> reverse_iterator { return reverse_iterator(elems + N); }                    // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto rend  () -> reverse_iterator { return reverse_iterator(elems); }                        // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  WIDE_INTEGER_NODISCARD constexpr auto rbegin() const -> const_reverse_iterator { return const_reverse_iterator(elems + N); }  // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  WIDE_INTEGER_NODISCARD constexpr auto rend  () const -> const_reverse_iterator { return const_reverse_iterator(elems); }      // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto rbegin() const -> const_reverse_iterator { return const_reverse_iterator(elems + N); }  // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto rend  () const -> const_reverse_iterator { return const_reverse_iterator(elems); }      // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  WIDE_INTEGER_NODISCARD constexpr auto crbegin() const -> const_reverse_iterator { return const_reverse_iterator(elems + N); } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  WIDE_INTEGER_NODISCARD constexpr auto crend  () const -> const_reverse_iterator { return const_reverse_iterator(elems); }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto crbegin() const -> const_reverse_iterator { return const_reverse_iterator(elems + N); } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto crend  () const -> const_reverse_iterator { return const_reverse_iterator(elems); }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  WIDE_INTEGER_NODISCARD constexpr auto operator[](const size_type i)       -> reference       { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-  WIDE_INTEGER_NODISCARD constexpr auto operator[](const size_type i) const -> const_reference { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto operator[](const size_type i)       -> reference       { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto operator[](const size_type i) const -> const_reference { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-  WIDE_INTEGER_NODISCARD constexpr auto at(const size_type i)       -> reference       { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-  WIDE_INTEGER_NODISCARD constexpr auto at(const size_type i) const -> const_reference { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto at(const size_type i)       -> reference       { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto at(const size_type i) const -> const_reference { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-  WIDE_INTEGER_NODISCARD constexpr auto front()       -> reference       { return elems[static_cast<size_type>(UINT8_C(0))]; }
-  WIDE_INTEGER_NODISCARD constexpr auto front() const -> const_reference { return elems[static_cast<size_type>(UINT8_C(0))]; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto front()       -> reference       { return elems[static_cast<size_type>(UINT8_C(0))]; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto front() const -> const_reference { return elems[static_cast<size_type>(UINT8_C(0))]; }
 
-  WIDE_INTEGER_NODISCARD constexpr auto back()       -> reference       { return elems[static_cast<size_type>(N - static_cast<size_type>(UINT8_C(1)))]; }
-  WIDE_INTEGER_NODISCARD constexpr auto back() const -> const_reference { return elems[static_cast<size_type>(N - static_cast<size_type>(UINT8_C(1)))]; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto back()       -> reference       { return elems[static_cast<size_type>(N - static_cast<size_type>(UINT8_C(1)))]; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto back() const -> const_reference { return elems[static_cast<size_type>(N - static_cast<size_type>(UINT8_C(1)))]; }
 
-  WIDE_INTEGER_NODISCARD static constexpr auto size()     -> size_type { return N; }
-  WIDE_INTEGER_NODISCARD static constexpr auto empty()    -> bool      { return false; }
-  WIDE_INTEGER_NODISCARD static constexpr auto max_size() -> size_type { return N; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD static constexpr auto size()     -> size_type { return N; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD static constexpr auto empty()    -> bool      { return false; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD static constexpr auto max_size() -> size_type { return N; }
 
-  WIDE_INTEGER_NODISCARD constexpr auto data() const -> const_pointer { return elems; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
-  WIDE_INTEGER_NODISCARD constexpr auto data()       -> pointer       { return elems; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto data() const -> const_pointer { return elems; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto data()       -> pointer       { return elems; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
 
-  WIDE_INTEGER_NODISCARD constexpr auto c_array() -> pointer { return elems; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto c_array() -> pointer { return elems; }
 
   template<typename T2>
   constexpr auto operator=(const array_unsafe<T2, N>& y) -> array_unsafe&
@@ -506,10 +506,10 @@ public:
   using const_reverse_iterator = typename representation_type::const_reverse_iterator;
 
   // Provide a user interface to the internal data representation.
-                         WIDE_INTEGER_CONSTEXPR auto  representation()       ->       representation_type& { return values; }
-  WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto crepresentation() const -> const representation_type& { return values; }
+                         BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto  representation()       ->       representation_type& { return values; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto crepresentation() const -> const representation_type& { return values; }
 
-  WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth(const uintwide_t& other,
+  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth(const uintwide_t& other,
                                                       uintwide_t& remainder) -> void
   {
     using local_uint_index_type = unsigned_fast_type;
@@ -583,14 +583,14 @@ public:
 private:
   representation_type values { };
 
-  WIDE_INTEGER_NODISCARD WIDE_INTEGER_CONSTEXPR auto compare(const uintwide_t& other) const -> std::int_fast8_t
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto compare(const uintwide_t& other) const -> std::int_fast8_t
   {
     return compare_ranges(values.cbegin(), other.values.cbegin(), number_of_limbs);
   }
 
   template<typename InputIteratorLeftType,
            typename InputIteratorRightType>
-  static WIDE_INTEGER_CONSTEXPR auto compare_ranges(      InputIteratorLeftType  a,
+  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto compare_ranges(      InputIteratorLeftType  a,
                                                           InputIteratorRightType b,
                                                     const unsigned_fast_type     count) -> std::int_fast8_t
   {
@@ -626,7 +626,7 @@ private:
   template<typename ResultIterator,
            typename InputIteratorLeft,
            typename InputIteratorRight>
-  static WIDE_INTEGER_CONSTEXPR auto eval_add_n(      ResultIterator     r,
+  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_add_n(      ResultIterator     r,
                                                       InputIteratorLeft  u,
                                                       InputIteratorRight v,
                                                 const unsigned_fast_type count,
@@ -668,7 +668,7 @@ private:
   template<typename ResultIterator,
            typename InputIteratorLeft,
            typename InputIteratorRight>
-  static WIDE_INTEGER_CONSTEXPR auto eval_subtract_n(      ResultIterator     r,
+  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_subtract_n(      ResultIterator     r,
                                                            InputIteratorLeft  u,
                                                            InputIteratorRight v,
                                                      const unsigned_fast_type count,
@@ -720,7 +720,7 @@ private:
 
   template<typename ResultIterator,
            typename InputIteratorLeft>
-  static WIDE_INTEGER_CONSTEXPR auto eval_multiply_1d(      ResultIterator                                                                   r,
+  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_multiply_1d(      ResultIterator                                                                   r,
                                                             InputIteratorLeft                                                                a,
                                                       const typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type b,
                                                       const unsigned_fast_type                                                               count) -> limb_type
@@ -766,7 +766,7 @@ private:
     return static_cast<local_limb_type>(carry);
   }
 
-  WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth_core(const unsigned_fast_type u_offset, // NOLINT(readability-function-cognitive-complexity)
+  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth_core(const unsigned_fast_type u_offset, // NOLINT(readability-function-cognitive-complexity)
                                                      const unsigned_fast_type v_offset,
                                                      const uintwide_t& other,
                                                            uintwide_t& remainder) -> void
@@ -1012,6 +1012,6 @@ using uint256_t = uintwide_t<static_cast<size_t>(UINT32_C(256))>;
 } // namespace wide_integer
 } // namespace math
 
-WIDE_INTEGER_NAMESPACE_END
+BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE_END
 
 #endif // UINTWIDE_T_2018_10_02_H
