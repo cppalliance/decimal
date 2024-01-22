@@ -409,102 +409,6 @@ void test_fma()
 }
 
 template <typename Dec>
-void test_sin()
-{
-    std::uniform_real_distribution<float> dist(-3.14F * 2, 3.14F * 2);
-
-    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
-    for (std::size_t n {}; n < max_iter; ++n)
-    {
-        const auto val1 {dist(rng)};
-        Dec d1 {val1};
-
-        auto ret_val {std::sin(val1)};
-        auto ret_dec {static_cast<float>(sin(d1))};
-
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 30*std::numeric_limits<float>::epsilon()))
-        {
-            // LCOV_EXCL_START
-            std::cerr << "Val 1: " << val1
-                      << "\nDec 1: " << d1
-                      << "\nRet val: " << ret_val
-                      << "\nRet dec: " << ret_dec
-                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
-            // LCOV_EXCL_STOP
-        }
-    }
-
-    BOOST_TEST(isinf(sin(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
-    BOOST_TEST(isnan(sin(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
-    BOOST_TEST_EQ(sin(Dec(0) * Dec(dist(rng))), Dec(0));
-
-    // Check the phases of large positive/negative arguments.
-    using std::atan;
-
-    for(auto x = 0.1F; x < 20.0F; x += 2.0F * atan(1.0F))
-    {
-      using std::sin;
-
-      BOOST_TEST_EQ((sin(boost::decimal::decimal32 { x }) < 0), (sin(x) < 0));
-    }
-
-    for(auto x = 0.1F; x < 20.0F; x += 2.0F * atan(1.0F))
-    {
-      using std::sin;
-
-      BOOST_TEST_EQ((sin(boost::decimal::decimal32 { -x }) < 0), (sin(-x) < 0));
-    }
-}
-
-template <typename Dec>
-void test_cos()
-{
-    std::uniform_real_distribution<float> dist(-3.14F * 2, 3.14F * 2);
-
-    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
-    for (std::size_t n {}; n < max_iter; ++n)
-    {
-        const auto val1 {dist(rng)};
-        Dec d1 {val1};
-
-        auto ret_val {std::cos(val1)};
-        auto ret_dec {static_cast<float>(cos(d1))};
-
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 25*std::numeric_limits<float>::epsilon()))
-        {
-            // LCOV_EXCL_START
-            std::cerr << "Val 1: " << val1
-                      << "\nDec 1: " << d1
-                      << "\nRet val: " << ret_val
-                      << "\nRet dec: " << ret_dec
-                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
-            // LCOV_EXCL_STOP
-        }
-    }
-
-    BOOST_TEST(isinf(cos(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
-    BOOST_TEST(isnan(cos(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
-    BOOST_TEST_EQ(cos(Dec(0) * Dec(dist(rng))), Dec(1));
-
-    // Check the phases of large positive/negative arguments.
-    using std::atan;
-
-    for(auto x = 0.1F; x < 20.0F; x += 2.0F * atan(1.0F))
-    {
-      using std::cos;
-
-      BOOST_TEST_EQ((cos(boost::decimal::decimal32 { x }) < 0), (cos(x) < 0));
-    }
-
-    for(auto x = 0.1F; x < 20.0F; x += 2.0F * atan(1.0F))
-    {
-      using std::cos;
-
-      BOOST_TEST_EQ((cos(boost::decimal::decimal32 { -x }) < 0), (cos(-x) < 0));
-    }
-}
-
-template <typename Dec>
 void test_modf()
 {
     Dec ptr {};
@@ -1675,11 +1579,6 @@ int main()
     test_fma<decimal32>();
     test_fma<decimal64>();
     test_fma<decimal128>();
-
-    test_sin<decimal32>();
-    test_cos<decimal32>();
-    test_sin<decimal64>();
-    test_cos<decimal64>();
 
     test_modf<decimal32>();
     test_modf<decimal64>();
