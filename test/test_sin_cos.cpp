@@ -12,6 +12,12 @@
 #include <random>
 #include <cmath>
 
+#if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+static constexpr auto N = static_cast<std::size_t>(128U); // Number of trials
+#else
+static constexpr auto N = static_cast<std::size_t>(128U >> 4U); // Number of trials
+#endif
+
 static std::mt19937_64 rng(42);
 
 using namespace boost::decimal;
