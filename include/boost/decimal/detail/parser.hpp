@@ -56,7 +56,7 @@ auto from_chars_dispatch(const char* first, const char* last, boost::uint128_typ
 template <typename Unsigned_Integer, typename Integer>
 constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent) noexcept -> from_chars_result
 {
-    if (first >= last)
+    if (first > last)
     {
         return {first, std::errc::invalid_argument};
     }
@@ -80,33 +80,61 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     }
 
     // Handle non-finite values
-    if (*next == 'i' || *next == 'I')
+    // Stl allows for string like "iNf" to return inf
+    //
+    // This is nested ifs rather than a big one-liner to ensure that once we hit an invalid character
+    // or an end of buffer we return the correct value of next
+    if (next != last && (*next == 'i' || *next == 'I'))
     {
-        significand = 0;
-        exponent = 0;
-        return {next, std::errc::value_too_large};
+        ++next;
+        if (next != last && (*next == 'n' || *next == 'N'))
+        {
+            ++next;
+            if (next != last && (*next == 'f' || *next == 'F'))
+            {
+                significand = 0;
+                return {next, std::errc::value_too_large};
+            }
+        }
+
+        return {next, std::errc::invalid_argument};
     }
-    if (*next == 'n' || *next == 'N')
+    else if (next != last && (*next == 'n' || *next == 'N'))
     {
-        const auto dist = last - next;
+        ++next;
+        if (next != last && (*next == 'a' || *next == 'A'))
+        {
+            ++next;
+            if (next != last && (*next == 'n' || *next == 'N'))
+            {
+                ++next;
+                if (next != last && (*next == '('))
+                {
+                    ++next;
+                    if (next != last && (*next == 's' || *next == 'S'))
+                    {
+                        significand = 1;
+                        return {next, std::errc::not_supported};
+                    }
+                    else if (next != last && (*next == 'i' || *next == 'I'))
+                    {
+                        significand = 0;
+                        return {next, std::errc::not_supported};
+                    }
+                }
+                else
+                {
+                    significand = 0;
+                    return {next, std::errc::not_supported};
+                }
+            }
+        }
 
-        if (dist > 4 && *(next + 4) == 's')
-        {
-            significand = 1;
-            exponent = 0;
-            return {next, std::errc::not_supported};
-        }
-        else
-        {
-            significand = 0;
-            exponent = 0;
-            return {next, std::errc::not_supported};
-        }
+        return {next, std::errc::invalid_argument};
     }
-
 
     // Ignore leading zeros (e.g. 00005 or -002.3e+5)
-    while (*next == '0' && next != last)
+    while (next != last && *next == '0')
     {
         ++next;
     }
@@ -117,11 +145,6 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
 
     if (next == last || *next == exp_char || *next == -capital_exp_char)
     {
-        if (next == first)
-        {
-            return {first, std::errc::invalid_argument};
-        }
-        
         significand = 0;
         exponent = 0;
         return {next, std::errc()};
@@ -137,7 +160,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     const auto char_validation_func = is_integer_char;
     const int base = 10;
 
-    while (char_validation_func(*next) && next != last && i < significand_buffer_size)
+    while (next != last && char_validation_func(*next) && i < significand_buffer_size)
     {
         all_zeros = false;
         significand_buffer[i] = *next;
@@ -152,10 +175,15 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         std::size_t offset = i;
 
         from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
-
-        BOOST_DECIMAL_ASSERT(r.ec == std::errc());
-
-        return {next, r.ec};
+        switch (r.ec)
+        {
+            case std::errc::invalid_argument:
+                return {first, std::errc::invalid_argument};
+            case std::errc::result_out_of_range:
+                return {next, std::errc::result_out_of_range};
+            default:
+                return {next, std::errc()};
+        }
     }
     else if (*next == '.')
     {
@@ -173,7 +201,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         // so that we get the useful parts of the fraction
         if (all_zeros)
         {
-            while (*next == '0' && next != last)
+            while (next != last && *next == '0')
             {
                 ++next;
                 --leading_zero_powers;
@@ -185,27 +213,27 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
             }
         }
 
-        while (char_validation_func(*next) && next != last && i < significand_buffer_size)
+        while (next != last && char_validation_func(*next) && i < significand_buffer_size)
         {
             significand_buffer[i] = *next;
             ++next;
             ++i;
         }
     }
-    
+
     if (i == significand_buffer_size)
     {
         // We can not process any more significant figures into the significand so skip to the end
         // or the exponent part and capture the additional orders of magnitude for the exponent
         bool found_dot = false;
-        while ((char_validation_func(*next) || *next == '.') && next != last)
+        while (next != last && (char_validation_func(*next) || *next == '.'))
         {
             ++next;
             if (!fractional && !found_dot)
             {
                 ++extra_zeros;
             }
-            if (*next == '.')
+            if (next != last && *next == '.')
             {
                 found_dot = true;
             }
@@ -216,14 +244,14 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     {
         if (dot_position != 0 || fractional)
         {
-            exponent = static_cast<Integer>(dot_position - i) + extra_zeros + leading_zero_powers;
+            exponent = static_cast<Integer>(dot_position) - static_cast<Integer>(i) + extra_zeros + leading_zero_powers;
         }
         else
         {
             exponent = extra_zeros + leading_zero_powers;
         }
         std::size_t offset = i;
-        
+
         from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
         switch (r.ec)
         {
@@ -237,6 +265,12 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     }
     else if (*next == exp_char || *next == capital_exp_char)
     {
+        // Would be a number without a significand e.g. e+03
+        if (next == first)
+        {
+            return {next, std::errc::invalid_argument};
+        }
+
         ++next;
 
         exponent = static_cast<Integer>(i - 1);
@@ -244,7 +278,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         bool round = false;
         // If more digits are present than representable in the significand of the target type
         // we set the maximum
-        if (offset == significand_buffer_size)
+        if (offset > significand_buffer_size)
         {
             offset = significand_buffer_size - 1;
             i = significand_buffer_size;
@@ -257,7 +291,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
                 round = true;
             }
         }
-        
+
         // If the significand is 0 from chars will return std::errc::invalid_argument because there is nothing in the buffer,
         // but it is a valid value. We need to continue parsing to get the correct value of ptr even
         // though we know we could bail now.
@@ -265,9 +299,16 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         // See GitHub issue #29: https://github.com/cppalliance/charconv/issues/29
         if (offset != 0)
         {
-            BOOST_DECIMAL_ATTRIBUTE_UNUSED from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
-
-            BOOST_DECIMAL_ASSERT(r.ec == std::errc());
+            from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
+            switch (r.ec)
+            {
+                case std::errc::invalid_argument:
+                    return {first, std::errc::invalid_argument};
+                case std::errc::result_out_of_range:
+                    return {next, std::errc::result_out_of_range};
+                default:
+                    break;
+            }
 
             if (round)
             {
@@ -287,25 +328,25 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     i = 0;
 
     // Get the sign first
-    if (*next == '-')
+    if (next != last && *next == '-')
     {
         exponent_buffer[i] = *next;
         ++next;
         ++i;
     }
-    else if (*next == '+')
+    else if (next != last && *next == '+')
     {
         ++next;
     }
 
     // Next strip any leading zeros
-    while (*next == '0')
+    while (next != last && *next == '0')
     {
         ++next;
     }
 
     // Process the significant values
-    while (is_integer_char(*next) && next != last && i < exponent_buffer_size)
+    while (next != last && is_integer_char(*next) && i < exponent_buffer_size)
     {
         exponent_buffer[i] = *next;
         ++next;
