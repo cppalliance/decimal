@@ -5,16 +5,6 @@
 #ifndef BOOST_DECIMAL_DETAIL_CONFIG_HPP
 #define BOOST_DECIMAL_DETAIL_CONFIG_HPP
 
-#ifdef __has_include
-#  if !__has_include(<boost/config.hpp>)
-#    define BOOST_DECIMAL_STANDALONE
-#  endif
-#endif
-
-#ifndef BOOST_DECIMAL_STANDALONE
-#  include <boost/config.hpp>
-#endif
-
 // Determine endianness
 #if defined(_WIN32)
 
@@ -160,14 +150,10 @@ typedef unsigned __int128 uint128_t;
 
 #define BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION
 
-#ifndef BOOST_DECIMAL_STANDALONE
-#  define BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_ATTRIBUTE_UNUSED
-#else
-#  if defined(___GNUC__) || defined(__clang__)
+#if defined(___GNUC__) || defined(__clang__)
 #    define BOOST_DECIMAL_ATTRIBUTE_UNUSED __attribute__((__unused__))
-#  else
+#else
 #    define BOOST_DECIMAL_ATTRIBUTE_UNUSED
-#  endif
 #endif
 
 #if !defined(__cpp_if_constexpr) || (__cpp_if_constexpr < 201606L)
