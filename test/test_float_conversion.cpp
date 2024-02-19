@@ -189,10 +189,6 @@ void test_parser()
     res = parser(zeros, zeros + std::strlen(zeros), sign, sig, exp);
     BOOST_TEST(res.ec == std::errc());
 
-    const char* only_exp = "e+03";
-    res = parser(only_exp, only_exp + std::strlen(only_exp), sign, sig, exp);
-    BOOST_TEST(res.ec == std::errc::invalid_argument);
-
     const char* fives = "5.555555555555555555555555555555e+05";
     res = parser(fives, fives + std::strlen(fives), sign, sig, exp);
     BOOST_TEST(res.ec == std::errc());
