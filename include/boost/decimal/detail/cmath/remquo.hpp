@@ -8,6 +8,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
 #include <type_traits>
 #include <limits>
 #include <cmath>
@@ -18,6 +19,9 @@ namespace decimal {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto remquo(T x, T y, int* quo) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
+    using signed_significand_type = std::conditional_t<std::is_same<T, decimal128>::value, detail::int128, std::int64_t>;
+    using unsigned_significand_type = std::conditional_t<std::is_same<T, decimal128>::value, detail::uint128, std::uint64_t>;
+
     constexpr T zero {0, 0};
     constexpr T half {5, -1};
 
@@ -39,8 +43,8 @@ constexpr auto remquo(T x, T y, int* quo) noexcept -> std::enable_if_t<detail::i
     auto div {x / y};
     T n {};
     const T frac {modf(div, &n)};
-    auto sig {static_cast<std::int64_t>(n)};
-    auto usig {static_cast<std::uint64_t>(sig < 0 ? -sig : sig)};
+    auto sig {static_cast<signed_significand_type>(n)};
+    auto usig {static_cast<unsigned_significand_type>(sig < 0 ? -sig : sig)};
 
     // Apple clang and MSVC use the last byte.
     // Everyone else uses 3 bits.

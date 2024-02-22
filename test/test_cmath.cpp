@@ -1587,6 +1587,8 @@ int main()
     test_remquo<decimal32>();
     test_remainder<decimal64>();
     test_remquo<decimal64>();
+    test_remainder<decimal128>();
+    test_remquo<decimal128>();
 
     test_fdim<decimal32>();
     test_fdim<decimal64>();

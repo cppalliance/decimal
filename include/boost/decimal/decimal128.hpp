@@ -255,6 +255,9 @@ public:
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
 
+    explicit constexpr operator detail::int128() const noexcept;
+    explicit constexpr operator detail::uint128() const noexcept;
+
     #ifdef BOOST_DECIMAL_HAS_INT128
     explicit constexpr operator detail::int128_t() const noexcept;
     explicit constexpr operator detail::uint128_t() const noexcept;
@@ -926,6 +929,16 @@ constexpr decimal128::operator std::int16_t() const noexcept
 constexpr decimal128::operator std::uint16_t() const noexcept
 {
     return to_integral_128<decimal128, std::uint16_t>(*this);
+}
+
+constexpr decimal128::operator detail::int128() const noexcept
+{
+    return to_integral_128<decimal128, detail::int128>(*this);
+}
+
+constexpr decimal128::operator detail::uint128() const noexcept
+{
+    return to_integral_128<decimal128, detail::uint128>(*this);
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
