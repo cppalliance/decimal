@@ -159,7 +159,7 @@ constexpr auto num_digits(std::uint64_t x) noexcept -> int
     return 1;
 }
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 # pragma warning(push)
 # pragma warning(disable: 4307) // MSVC 14.1 warns of intergral constant overflow
 #endif
@@ -215,7 +215,7 @@ constexpr int num_digits(const uint256_t& x) noexcept
     return 1;
 }
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 # pragma warning(pop)
 #endif
 

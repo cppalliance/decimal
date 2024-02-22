@@ -72,7 +72,7 @@
 #endif
 
 // Include intrinsics if available
-#if defined(BOOST_MSVC) || defined(_MSC_VER)
+#if defined(_MSC_VER)
 #  include <intrin.h>
 #  if defined(_WIN64)
 #    define BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS

@@ -2306,14 +2306,14 @@ constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal
 namespace std {
 
 template <>
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal64>
 #else
 struct numeric_limits<boost::decimal::decimal64>
 #endif
 {
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
     public:
 #endif
 
