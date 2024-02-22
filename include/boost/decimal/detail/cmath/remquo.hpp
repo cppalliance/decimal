@@ -19,7 +19,7 @@ namespace decimal {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto remquo(T x, T y, int* quo) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
-    using signed_significand_type = std::conditional_t<std::is_same<T, decimal128>::value, detail::int128, std::uint64_t>;
+    using signed_significand_type = std::conditional_t<std::is_same<T, decimal128>::value, detail::int128, std::int64_t>;
     using unsigned_significand_type = std::conditional_t<std::is_same<T, decimal128>::value, detail::uint128, std::uint64_t>;
 
     constexpr T zero {0, 0};
