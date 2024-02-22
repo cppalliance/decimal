@@ -78,11 +78,12 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
 
     // Strip sign if the type is signed
     // Negative sign will be appended at the end of parsing
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED bool is_negative = false;
+    bool is_negative = false;
+    static_cast<void>(is_negative);
     auto next = first;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value || std::is_signed<Integer>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, int128_t>::value || std::is_signed<Integer>::value)
     #else
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<Integer>::value)
     #endif
@@ -97,7 +98,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
         }
 
         #ifdef BOOST_DECIMAL_HAS_INT128
-        BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value)
+        BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, int128_t>::value)
         {
             overflow_value = BOOST_DECIMAL_INT128_MAX;
             max_digit = BOOST_DECIMAL_INT128_MAX;
@@ -123,7 +124,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
         }
         
         #ifdef BOOST_DECIMAL_HAS_INT128
-        BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, boost::uint128_type>::value)
+        BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, uint128_t>::value)
         {
             overflow_value = BOOST_DECIMAL_UINT128_MAX;
             max_digit = BOOST_DECIMAL_UINT128_MAX;
@@ -137,7 +138,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
     }
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, int128_t>::value)
     {
         overflow_value /= unsigned_base;
         max_digit %= unsigned_base;
@@ -211,7 +212,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
 
     value = static_cast<Integer>(result);
     #ifdef BOOST_DECIMAL_HAS_INT128
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, boost::int128_type>::value || std::is_signed<Integer>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, int128_t>::value || std::is_signed<Integer>::value)
     #else
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<Integer>::value)
     #endif

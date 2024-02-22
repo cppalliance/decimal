@@ -533,7 +533,7 @@ constexpr uint256_t umul256(const T &x, const uint128 &y) noexcept
     static_assert(sizeof(T) == 16 && (!std::numeric_limits<T>::is_signed
             #ifdef BOOST_DECIMAL_HAS_INT128
             // May not have numeric_limits specialization without gnu mode
-                                      || std::is_same<T, boost::uint128_type>::value
+                                      || std::is_same<T, uint128_t>::value
             #endif
     ), "This function is only for 128-bit unsigned types");
 

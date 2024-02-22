@@ -14,11 +14,6 @@ add_library(Boost::decimal ALIAS boost_decimal)
 
 target_include_directories(boost_decimal INTERFACE include)
 
-target_link_libraries(boost_decimal
-        INTERFACE
-        Boost::config
-        )
-
 target_compile_features(boost_decimal INTERFACE cxx_std_14)
 
 if(BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")

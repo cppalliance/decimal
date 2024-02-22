@@ -305,7 +305,7 @@ void test_subtraction()
     BOOST_TEST(isnan(qnan_val - inf_val));
 
     // Why does MSVC 14.1 warn about unary minus but nothing else does?
-    #ifdef BOOST_MSVC
+    #ifdef _MSC_VER
     #  pragma warning(push)
     #  pragma warning(disable: 4146)
     #endif
@@ -314,7 +314,7 @@ void test_subtraction()
     constexpr decimal32 lowest_val(std::numeric_limits<decimal32>::lowest());
     BOOST_TEST(isinf(lowest_val - one));
 
-    #ifdef BOOST_MSVC
+    #ifdef _MSC_VER
     #  pragma warning(pop)
     #endif
 }
