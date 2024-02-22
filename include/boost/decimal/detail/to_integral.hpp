@@ -73,12 +73,12 @@ constexpr auto to_integral_128(Decimal val) noexcept -> TargetType
     if (isnan(val))
     {
         errno = EINVAL;
-        return static_cast<TargetType>(0);
+        return static_cast<TargetType>(UINT64_C(0));
     }
     if (isinf(val) || val > max_target_type || val < min_target_type)
     {
         errno = ERANGE;
-        return static_cast<TargetType>(0);
+        return static_cast<TargetType>(UINT64_C(0));
     }
 
     auto sig {val.full_significand()};
