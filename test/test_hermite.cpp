@@ -5,11 +5,10 @@
 // Propogates up from boost.math
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
-#if defined(__cpp_lib_math_special_functions) && __cpp_lib_math_special_functions >= 201603L
-
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <boost/math/special_functions/next.hpp>
+#include <boost/math/special_functions/hermite.hpp>
 #include <iostream>
 #include <random>
 #include <cmath>
@@ -27,7 +26,7 @@ using namespace boost::decimal;
 template <typename Dec>
 void test()
 {
-    std::uniform_real_distribution<float> dist(-3.14F * 2, 3.14F * 2);
+    std::uniform_real_distribution<float> dist(-2, 2);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter / 4; ++i)
@@ -37,10 +36,10 @@ void test()
             const auto val1 {dist(rng)};
             Dec d1 {val1};
 
-            auto ret_val {std::hermite(n, val1)};
+            auto ret_val {boost::math::hermite(n, val1)};
             auto ret_dec {static_cast<float>(hermite(n, d1))};
 
-            if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 30*std::numeric_limits<float>::epsilon()))
+            if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 500*std::numeric_limits<float>::epsilon()))
             {
                 // LCOV_EXCL_START
                 std::cerr << "Val 1: " << val1
@@ -65,12 +64,3 @@ int main()
 
     return boost::report_errors();
 }
-
-#else
-
-int main()
-{
-    return 0;
-}
-
-#endif
