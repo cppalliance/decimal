@@ -64,6 +64,7 @@ run test_frexp_ldexp.cpp ;
 run test_git_issue_266.cpp ;
 run test_git_issue_271.cpp ;
 run test_hash.cpp ;
+run test_hermite.cpp ;
 run test_literals.cpp ;
 run test_lgamma.cpp ;
 run test_log.cpp ;
