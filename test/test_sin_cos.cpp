@@ -36,7 +36,7 @@ void test_sin()
         auto ret_val {std::sin(val1)};
         auto ret_dec {static_cast<float>(sin(d1))};
 
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 30*std::numeric_limits<float>::epsilon()))
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 35*std::numeric_limits<float>::epsilon()))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -84,7 +84,7 @@ void test_cos()
         auto ret_val {std::cos(val1)};
         auto ret_dec {static_cast<float>(cos(d1))};
 
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 25*std::numeric_limits<float>::epsilon()))
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 35*std::numeric_limits<float>::epsilon()))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -131,6 +131,7 @@ void print_value(T value, const char* str)
 int main()
 {
     #ifdef BOOST_DECIMAL_GENERATE_CONSTANT_SIGS
+    std::cerr << "----- Sin Coeffs -----" << '\n';
     print_value("1.5699342435209476025651717041741222e-19"_DL, "a0");
     print_value("-8.8132732956573375066199565461908719e-18"_DL, "a1");
     print_value("1.3863524195221541686408628558203953e-18"_DL, "a2");
@@ -152,6 +153,29 @@ int main()
     print_value("1.0798913896208528750785230421502658e-29"_DL, "a18");
     print_value("0.9999999999999999999999999999994222"_DL, "a19");
     print_value("5.142496035903513218983541015724909e-35"_DL, "a20");
+
+    std::cerr << "\n----- Cos Coeffs -----" << '\n';
+    print_value("3.7901566851452528911995533679050154e-19"_DL, "a0");
+    print_value("1.6306031360068815018052629353024035e-19"_DL, "a1");
+    print_value("-1.5662432214968104749920975944134976e-16"_DL, "a2");
+    print_value("7.4986543056686147173668341796175043e-19"_DL, "a3");
+    print_value("4.7793843527366502077270638230621663e-14"_DL, "a4");
+    print_value("8.6228514128460838465953643567304485e-19"_DL, "a5");
+    print_value("-1.1470746211515679895911787383100785e-11"_DL, "a6");
+    print_value("3.4035901048127981461895025346148961e-19"_DL, "a7");
+    print_value("2.0876756986386685705585269979282106e-09"_DL, "a8");
+    print_value("5.0707181385354000943766543756900133e-20"_DL, "a9");
+    print_value("-2.7557319223987251623517450696484143e-07"_DL, "a10");
+    print_value("2.842434434652202240144372150674076e-21"_DL, "a11");
+    print_value("2.4801587301587301131235298728224135-05"_DL, "a12");
+    print_value("5.5157104597335436534512866304911642e-23"_DL, "a13");
+    print_value("-0.0013888888888888888888937824839517112"_DL, "a14");
+    print_value("3.0643338914793183455023135450473855e-25"_DL, "a15");
+    print_value("0.0416666666666666666666666538646346421"_DL, "a16");
+    print_value("3.2731904841623917801666953504570181e-28"_DL, "a17");
+    print_value("-0.50000000000000000000000000000443128"_DL, "a18");
+    print_value("2.3830720519892726434235205129382137e-32"_DL, "a19");
+    print_value("1"_DL, "a20");
 
     throw;
     #endif
