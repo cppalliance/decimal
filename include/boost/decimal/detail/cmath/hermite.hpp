@@ -22,10 +22,10 @@ template <typename T1, typename T2, typename T3>
 constexpr auto hermite_next(unsigned n, T1 x, T2 Hn, T3 Hnm1)
 {
     using promoted_type = promote_args_t<T1, T2, T3>;
-    return 2 * static_cast<promoted_type>(x) * static_cast<promoted_type>(Hn) - 2 * n * promoted_type(Hnm1);
+    return 2 * static_cast<promoted_type>(x) * static_cast<promoted_type>(Hn) - 2 * n * static_cast<promoted_type>(Hnm1);
 }
 
-}
+} //namespace detail
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto hermite(unsigned n, T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
