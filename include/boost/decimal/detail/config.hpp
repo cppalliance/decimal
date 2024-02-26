@@ -57,8 +57,10 @@
 
 #ifndef BOOST_DECIMAL_DISABLE_CASSERT
 #  define BOOST_DECIMAL_ASSERT(x) assert(x)
+#  define BOOST_DECIMAL_ASSERT_MSG(expr, msg) assert((expr)&&(msg))
 #else
 #  define BOOST_DECIMAL_ASSERT(x)
+#  define BOOST_DECIMAL_ASSERT_MSG(expr, msg)
 #endif
 
 #ifdef BOOST_DECIMAL_DISABLE_CLIB

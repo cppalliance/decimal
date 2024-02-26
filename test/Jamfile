@@ -9,6 +9,8 @@ import ../../config/checks/config : requires ;
 
 project : requirements
 
+  <library>/boost/charconv//boost_charconv
+
   <toolset>gcc:<cxxflags>-Wall
   <toolset>gcc:<cxxflags>-Wextra
   <toolset>msvc:<warnings>all
@@ -62,6 +64,7 @@ run test_expm1.cpp ;
 run test_fenv.cpp ;
 run test_float_conversion.cpp ;
 run test_frexp_ldexp.cpp ;
+run test_from_chars.cpp ;
 run test_git_issue_266.cpp ;
 run test_git_issue_271.cpp ;
 run test_hash.cpp ;

@@ -35,7 +35,10 @@ struct from_chars_result_t
     {
         return !(lhs == rhs); // NOLINT : Expression can not be simplified since this is the definition
     }
+
+    constexpr explicit operator bool() const noexcept { return ec == std::errc{}; }
 };
+
 using from_chars_result = from_chars_result_t<char>;
 
 } // namespace decimal
