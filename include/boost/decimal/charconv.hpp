@@ -77,18 +77,21 @@ constexpr auto from_chars_general_impl(const char* first, const char* last, Targ
 constexpr auto from_chars(const char* first, const char* last, decimal32& value, chars_format fmt = chars_format::general) noexcept
 {
     BOOST_DECIMAL_ASSERT_MSG(fmt != chars_format::hex, "Hex is not yet implemented");
+    static_cast<void>(fmt);
     return detail::from_chars_general_impl(first, last, value);
 }
 
 constexpr auto from_chars(const char* first, const char* last, decimal64& value, chars_format fmt = chars_format::general) noexcept
 {
     BOOST_DECIMAL_ASSERT_MSG(fmt != chars_format::hex, "Hex is not yet implemented");
+    static_cast<void>(fmt);
     return detail::from_chars_general_impl(first, last, value);
 }
 
 constexpr auto from_chars(const char* first, const char* last, decimal128& value, chars_format fmt = chars_format::general) noexcept
 {
     BOOST_DECIMAL_ASSERT_MSG(fmt != chars_format::hex, "Hex is not yet implemented");
+    static_cast<void>(fmt);
     return detail::from_chars_general_impl(first, last, value);
 }
 
