@@ -64,6 +64,7 @@
 #include <boost/decimal/detail/cmath/atan2.hpp>
 #include <boost/decimal/detail/cmath/fma.hpp>
 #include <boost/decimal/detail/cmath/hermite.hpp>
+#include <boost/decimal/detail/cmath/laguerre.hpp>
 #include <boost/decimal/numbers.hpp>
 
 // Macros from 3.6.2
