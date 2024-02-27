@@ -15,6 +15,7 @@
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/to_chars_result.hpp>
 #include <boost/decimal/detail/to_chars_integer_impl.hpp>
+#include <boost/decimal/detail/buffer_sizing.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
 #include <cstdint>
 
@@ -209,6 +210,13 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     }
 
     return {r.ptr, std::errc()};
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, int precision = -1)
+{
+    // TODO(mborland): Add precision support
+    static_cast<void>(precision);
 }
 
 } //namespace detail
