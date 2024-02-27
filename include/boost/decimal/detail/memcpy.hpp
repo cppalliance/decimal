@@ -89,6 +89,35 @@ BOOST_DECIMAL_CONSTEXPR char* memset(char* dest, int ch, std::size_t count)
     }
 }
 
+BOOST_DECIMAL_CONSTEXPR char* memmove(char* dest, const char* src, std::size_t count)
+{
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(count))
+    {
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            *(dest + i) = *(src + i);
+        }
+
+        return dest;
+    }
+    else
+    {
+        // Workaround for GCC-11 because it does not honor GCC diagnostic ignored
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
+        // Hopefully the optimizer turns this into memset
+        #if defined(__GNUC__) && __GNUC__ == 11
+            for (std::size_t i = 0; i < count; ++i)
+            {
+                *(dest + i) = *(src + i);
+            }
+
+            return dest;
+        #else
+            return static_cast<char*>(std::memmove(dest, src, count));
+        #endif
+    }
+}
+
 #else // No consteval detection
 
 #define BOOST_DECIMAL_CONSTEXPR inline
@@ -101,6 +130,11 @@ BOOST_DECIMAL_CONSTEXPR void* memcpy(void* dest, const void* src, std::size_t co
 BOOST_DECIMAL_CONSTEXPR void* memset(void* dest, int ch, std::size_t count)
 {
     return std::memset(dest, ch, count);
+}
+
+BOOST_DECIMAL_CONSTEXPR void* memmove(void* dest, const void* src, std::size_t count)
+{
+    return std::memmove(dest, src, count);
 }
 
 #endif
