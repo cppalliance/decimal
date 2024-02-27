@@ -213,10 +213,124 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, int precision = -1)
+BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt = chars_format::general, int precision = -1) -> to_chars_result
 {
-    // TODO(mborland): Add precision support
-    static_cast<void>(precision);
+    auto buffer_size = last - first;
+    auto real_precision = get_real_precision<TargetDecimalType>(precision);
+
+    // Dummy check the bounds
+    if (buffer_size < real_precision || first >= last)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    auto abs_value = abs(value);
+    const bool is_neg = value < 0;
+    int exponent {};
+    auto significand = frexp10(abs_value, &exponent);
+
+    if (is_neg < 0)
+    {
+        *first++ = '-';
+        --buffer_size;
+    }
+
+    int num_dig = 0;
+    if (precision != -1)
+    {
+        num_dig = num_digits(significand);
+        while (num_dig > precision + 2)
+        {
+            significand /= 10;
+            ++exponent;
+            --num_dig;
+        }
+
+        if (num_dig == precision + 2)
+        {
+            const auto trailing_dig = significand % 10;
+            significand /= 10;
+            ++exponent;
+            --num_dig;
+
+            if (trailing_dig >= 5)
+            {
+                ++significand;
+            }
+        }
+
+        // In general formatting we remove trailing 0s
+        if (fmt == chars_format::general)
+        {
+            while (significand % 10 == 0)
+            {
+                significand /= 10;
+                ++exponent;
+                --num_dig;
+            }
+        }
+    }
+
+    // Make sure the result will fit in the buffer
+    const std::ptrdiff_t total_length = total_buffer_length(num_dig, exponent, is_neg);
+    if (total_length > buffer_size)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, uint128, std::uint64_t>;
+    auto r = to_chars_integer_impl<uint_type, uint_type>(first, last, significand, 10);
+
+    if (BOOST_DECIMAL_UNLIKELY(!r))
+    {
+        return r;
+    }
+
+    // Bounds check again
+    if (abs_value >= 1)
+    {
+        if (exponent < 0 && -exponent < buffer_size)
+        {
+            boost::decimal::detail::memmove(r.ptr + exponent + 1, r.ptr + exponent,
+                                            static_cast<std::size_t>(-exponent));
+            boost::decimal::detail::memset(r.ptr + exponent, '.', 1);
+            ++r.ptr;
+        }
+
+        while (fmod(abs_value, 10) == 0)
+        {
+            *r.ptr++ = '0';
+            abs_value /= 10;
+        }
+    }
+    else
+    {
+        #ifdef BOOST_DECIMAL_DEBUG_FIXED
+        std::cerr << std::setprecision(std::numeric_limits<Real>::digits10) << "Value: " << value
+                  << "\n  Buf: " << first
+                  << "\n  sig: " << significand
+                  << "\n  exp: " << exponent << std::endl;
+        #endif
+
+        const auto offset_bytes = static_cast<std::size_t>(-exponent - num_dig);
+
+        boost::decimal::detail::memmove(first + 2 + static_cast<std::size_t>(is_neg) + offset_bytes,
+                                        first + static_cast<std::size_t>(is_neg),
+                                        static_cast<std::size_t>(-exponent) - offset_bytes);
+
+        boost::decimal::detail::memcpy(first + static_cast<std::size_t>(is_neg), "0.", 2U);
+        first += 2;
+        r.ptr += 2;
+
+        while (num_dig < -exponent)
+        {
+            *first++ = '0';
+            ++num_dig;
+            ++r.ptr;
+        }
+    }
+
+    return {r.ptr, std::errc()};
 }
 
 } //namespace detail
