@@ -385,10 +385,10 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
     constexpr auto min_fractional_value = TargetDecimalType{1, -4};
     constexpr auto max_value = static_cast<TargetDecimalType>((std::numeric_limits<Unsigned_Integer>::max()));
 
-    // Unspecified precision so we always go with shortest representation
+    // Unspecified precision so we always go with the shortest representation
     if (precision == -1)
     {
-        if (fmt == boost::decimal::chars_format::general || fmt == boost::decimal::chars_format::fixed)
+        if (fmt == chars_format::general || fmt == chars_format::fixed)
         {
             if (abs_value >= 1 && abs_value < max_fractional_value)
             {
@@ -399,7 +399,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
                 return to_chars_scientific_impl(first, last, value, fmt, precision);
             }
         }
-        else if (fmt == boost::decimal::chars_format::scientific)
+        else if (fmt == chars_format::scientific)
         {
             return to_chars_scientific_impl(first, last, value, fmt, precision);
         }
@@ -407,9 +407,9 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
     else
     {
         // In this range with general formatting, fixed formatting is the shortest
-        if (fmt == boost::decimal::chars_format::general && abs_value >= min_fractional_value && abs_value < max_fractional_value)
+        if (fmt == chars_format::general && abs_value >= min_fractional_value && abs_value < max_fractional_value)
         {
-            fmt = boost::decimal::chars_format::fixed;
+            fmt = chars_format::fixed;
         }
 
         if (fmt == chars_format::fixed)
