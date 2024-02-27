@@ -261,7 +261,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     int exponent {};
     auto significand = frexp10(abs_value, &exponent);
 
-    if (is_neg < 0)
+    if (is_neg)
     {
         *first++ = '-';
         --buffer_size;
