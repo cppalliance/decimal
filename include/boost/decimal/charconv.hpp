@@ -110,7 +110,7 @@ constexpr auto from_chars(const char* first, const char* last, decimal128& value
 namespace detail {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, int precision = -1) -> to_chars_result
+BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
 {
     // TODO(mborland): Add precision support
     static_cast<void>(precision);
@@ -185,6 +185,17 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     *(first + 1) = '.';
     first = r.ptr;
 
+    // Strip trailing zeros in general mode
+    if (fmt == chars_format::general)
+    {
+        --first;
+        while (*first == '0')
+        {
+            --first;
+        }
+        ++first;
+    }
+
     // Insert the exponent character
     *first++ = 'e';
     const int abs_exp {std::abs(exp)};
@@ -213,7 +224,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt = chars_format::general, int precision = -1) -> to_chars_result
+BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
 {
     auto buffer_size = last - first;
     auto real_precision = get_real_precision<TargetDecimalType>(precision);
@@ -331,6 +342,70 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     return {r.ptr, std::errc()};
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecimalType value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
+{
+    using Unsigned_Integer = std::conditional_t<std::is_same<TargetDecimalType, decimal32>::value, std::uint32_t,
+                             std::conditional_t<std::is_same<TargetDecimalType, decimal64>::value, std::uint64_t, uint128>>;
+
+    // Sanity check our bounds
+    if (first >= last)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    auto abs_value = abs(value);
+    constexpr auto max_fractional_value = std::is_same<TargetDecimalType, decimal32>::value ? TargetDecimalType{1, 7} :
+                                          std::is_same<TargetDecimalType, decimal64>::value ? TargetDecimalType{1, 16} :
+                                                                                              TargetDecimalType{1, 34};
+
+    constexpr auto min_fractional_value = TargetDecimalType{1, -4};
+    constexpr auto max_value = static_cast<TargetDecimalType>((std::numeric_limits<Unsigned_Integer>::max()));
+
+    // Unspecified precision so we always go with shortest representation
+    if (precision == -1)
+    {
+        if (fmt == boost::decimal::chars_format::general || fmt == boost::decimal::chars_format::fixed)
+        {
+            if (abs_value >= 1 && abs_value < max_fractional_value)
+            {
+                return to_chars_fixed_impl(first, last, value, fmt, precision);
+            }
+            else
+            {
+                return to_chars_scientific_impl(first, last, value, fmt, precision);
+            }
+        }
+        else if (fmt == boost::decimal::chars_format::scientific)
+        {
+            return to_chars_scientific_impl(first, last, value, fmt, precision);
+        }
+    }
+    else
+    {
+        // In this range with general formatting, fixed formatting is the shortest
+        if (fmt == boost::decimal::chars_format::general && abs_value >= min_fractional_value && abs_value < max_fractional_value)
+        {
+            fmt = boost::decimal::chars_format::fixed;
+        }
+
+        if (fmt == chars_format::fixed)
+        {
+            return to_chars_fixed_impl(first, last, value, fmt, precision);
+        }
+        else
+        {
+            return to_chars_scientific_impl(first, last, value, fmt, precision);
+        }
+    }
+
+    // TODO(mborland): Insert hex formatting here
+    // LCOV_EXCL_START
+    BOOST_DECIMAL_ASSERT_MSG(fmt != chars_format::hex, "Hex format has not been implemented yet");
+    return {first, std::errc()};
+    // LCOV_EXCL_STOP
 }
 
 } //namespace detail
