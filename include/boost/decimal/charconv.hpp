@@ -13,12 +13,17 @@
 #include <boost/decimal/detail/from_chars_result.hpp>
 #include <boost/decimal/detail/chars_format.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/to_chars_result.hpp>
 #include <cstdint>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
 namespace boost {
 namespace decimal {
+
+// ---------------------------------------------------------------------------------------------------------------------
+// from_chars and implementation
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace detail {
 
@@ -94,6 +99,10 @@ constexpr auto from_chars(const char* first, const char* last, decimal128& value
     static_cast<void>(fmt);
     return detail::from_chars_general_impl(first, last, value);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// to_chars and implementation
+// ---------------------------------------------------------------------------------------------------------------------
 
 } //namespace decimal
 } //namespace boost
