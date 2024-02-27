@@ -110,26 +110,11 @@ constexpr auto from_chars(const char* first, const char* last, decimal128& value
 namespace detail {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
+BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const TargetDecimalType& value, int fp) noexcept -> to_chars_result
 {
-    // TODO(mborland): Add precision support
-    static_cast<void>(precision);
+    const auto buffer_len = last - first;
 
-    // Sanity check our bounds
-    if (first >= last)
-    {
-        return {last, std::errc::value_too_large};
-    }
-
-    auto buffer_len = last - first;
-
-    if (signbit(value))
-    {
-        --buffer_len;
-        *first++ = '-';
-    }
-
-    switch (fpclassify(value))
+    switch (fp)
     {
         case FP_INFINITE:
             if (buffer_len >= 3)
@@ -163,7 +148,37 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
                 return {last, std::errc::value_too_large};
             }
         default:
-            static_cast<void>(precision);
+            // LCOV_EXCL_START
+            BOOST_DECIMAL_ASSERT_MSG(fp != 0, "Unreachable return");
+            return {first, std::errc::not_supported};
+            // LCOV_EXCL_STOP
+    }
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
+{
+    // TODO(mborland): Add precision support
+    static_cast<void>(precision);
+
+    // Sanity check our bounds
+    if (first >= last)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    auto buffer_len = last - first;
+
+    if (signbit(value))
+    {
+        --buffer_len;
+        *first++ = '-';
+    }
+
+    const auto fp = fpclassify(value);
+    if (fp != FP_NORMAL)
+    {
+        return to_chars_nonfinite(first, last, value, fp);
     }
 
     int exp {};
@@ -233,6 +248,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     if (buffer_size < real_precision || first >= last)
     {
         return {last, std::errc::value_too_large};
+    }
+
+    const auto fp = fpclassify(value);
+    if (fp != FP_NORMAL)
+    {
+        return to_chars_nonfinite(first, last, value, fp);
     }
 
     auto abs_value = abs(value);
