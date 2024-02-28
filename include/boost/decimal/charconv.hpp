@@ -167,11 +167,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
         return {last, std::errc::value_too_large};
     }
 
-    auto buffer_len = last - first;
-
     if (signbit(value))
     {
-        --buffer_len;
         *first++ = '-';
     }
 
@@ -329,7 +326,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             ++r.ptr;
         }
 
-        while (fmod(abs_value, 10) == 0)
+        while (fmod(abs_value, static_cast<TargetDecimalType>(10)) == 0)
         {
             *r.ptr++ = '0';
             abs_value /= 10;
@@ -368,9 +365,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecimalType value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
 {
-    using Unsigned_Integer = std::conditional_t<std::is_same<TargetDecimalType, decimal32>::value, std::uint32_t,
-                             std::conditional_t<std::is_same<TargetDecimalType, decimal64>::value, std::uint64_t, uint128>>;
-
     // Sanity check our bounds
     if (first >= last)
     {
@@ -383,7 +377,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
                                                                                               TargetDecimalType{1, 34};
 
     constexpr auto min_fractional_value = TargetDecimalType{1, -4};
-    constexpr auto max_value = static_cast<TargetDecimalType>((std::numeric_limits<Unsigned_Integer>::max()));
 
     // Unspecified precision so we always go with the shortest representation
     if (precision == -1)
