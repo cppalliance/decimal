@@ -85,7 +85,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
             while (unsigned_value != 0)
             {
                 *end-- = static_cast<char>(zero + (unsigned_value & 1U)); // 1<<1 - 1
-                unsigned_value >>= static_cast<Unsigned_Integer>(1);
+                unsigned_value >>= 1U;
             }
             break;
 
@@ -93,7 +93,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
             while (unsigned_value != 0)
             {
                 *end-- = static_cast<char>(zero + (unsigned_value & 3U)); // 1<<2 - 1
-                unsigned_value >>= static_cast<Unsigned_Integer>(2);
+                unsigned_value >>= 2U;
             }
             break;
 
@@ -101,30 +101,30 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
             while (unsigned_value != 0)
             {
                 *end-- = static_cast<char>(zero + (unsigned_value & 7U)); // 1<<3 - 1
-                unsigned_value >>= static_cast<Unsigned_Integer>(3);
+                unsigned_value >>= 3U;
             }
             break;
 
         case 16:
             while (unsigned_value != 0)
             {
-                *end-- = digit_table[unsigned_value & 15U]; // 1<<4 - 1
-                unsigned_value >>= static_cast<Unsigned_Integer>(4);
+                *end-- = digit_table[static_cast<std::size_t>(unsigned_value & 15U)]; // 1<<4 - 1
+                unsigned_value >>= 4U;
             }
             break;
 
         case 32:
             while (unsigned_value != 0)
             {
-                *end-- = digit_table[unsigned_value & 31U]; // 1<<5 - 1
-                unsigned_value >>= static_cast<Unsigned_Integer>(5);
+                *end-- = digit_table[static_cast<std::size_t>(unsigned_value & 31U)]; // 1<<5 - 1
+                unsigned_value >>= 5U;
             }
             break;
 
         default:
             while (unsigned_value != 0)
             {
-                *end-- = digit_table[unsigned_value % unsigned_base];
+                *end-- = digit_table[static_cast<std::size_t>(unsigned_value % unsigned_base)];
                 unsigned_value /= unsigned_base;
             }
             break;
