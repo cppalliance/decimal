@@ -194,6 +194,27 @@ void test_precision()
     test_value(T(1.1), chars_format::fixed, 50, "1.10000000000000000000000000000000000000000000000000");
 }
 
+template <typename T>
+void test_buffer_overflow()
+{
+    constexpr double max_value = 1e10;
+    std::uniform_real_distribution<double> dist(-max_value, max_value);
+
+    const auto formats = {chars_format::general, chars_format::scientific, chars_format::fixed};
+
+    for (const auto format : formats)
+    {
+        for (std::size_t i {}; i < 10; ++i)
+        {
+            char buffer[4];
+            T test_value {dist(rng)};
+
+            const auto r = to_chars(buffer, buffer + sizeof(buffer), test_value, format);
+            BOOST_TEST(!r);
+        }
+    }
+}
+
 int main()
 {
     test_non_finite_values<decimal32>();
@@ -211,12 +232,16 @@ int main()
     test_precision<decimal32>();
     test_precision<decimal64>();
 
+    test_buffer_overflow<decimal32>();
+    test_buffer_overflow<decimal64>();
+
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_non_finite_values<decimal128>();
     test_small_values<decimal128>();
     test_large_values<decimal128>();
     test_fixed_format<decimal128>();
     test_precision<decimal128>();
+    test_buffer_overflow<decimal128>();
     #endif
 
     return boost::report_errors();
