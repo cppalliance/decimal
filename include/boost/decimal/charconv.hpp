@@ -287,15 +287,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
         if (num_dig == precision + 2)
         {
-            const auto trailing_dig = significand % 10;
-            significand /= 10;
-            ++exponent;
             --num_dig;
-
-            if (trailing_dig >= 5)
-            {
-                ++significand;
-            }
+            exponent += fenv_round(significand);
         }
 
         // In general formatting we remove trailing 0s
