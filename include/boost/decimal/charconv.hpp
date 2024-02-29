@@ -195,7 +195,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
                 fenv_round(significand);
             }
         }
-        else if (significand_digits < precision)
+        else if (significand_digits < precision && fmt != chars_format::general)
         {
             append_zeros = true;
         }
