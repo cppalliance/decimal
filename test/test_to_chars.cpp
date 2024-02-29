@@ -159,6 +159,41 @@ void test_fixed_format()
     }
 }
 
+template <typename T>
+void test_value(T val, chars_format fmt, int precision, const char* result)
+{
+    char buffer[256] {};
+    auto r = to_chars(buffer, buffer + sizeof(buffer), val, fmt, precision);
+    *r.ptr = '\0';
+    BOOST_TEST(r);
+    BOOST_TEST_CSTR_EQ(result, buffer);
+}
+
+template <typename T>
+void test_precision()
+{
+    test_value(T(1.1), chars_format::scientific, 1, "1.1e+00");
+    test_value(T(1.1), chars_format::fixed, 1, "1.1");
+
+    test_value(T(1.1), chars_format::scientific, 2, "1.10e+00");
+    test_value(T(1.1), chars_format::fixed, 2, "1.10");
+
+    test_value(T(1.1), chars_format::scientific, 3, "1.100e+00");
+    test_value(T(1.1), chars_format::fixed, 3, "1.100");
+
+    test_value(T(1.1), chars_format::scientific, 4, "1.1000e+00");
+    test_value(T(1.1), chars_format::fixed, 4, "1.1000");
+
+    test_value(T(1.1), chars_format::scientific, 5, "1.10000e+00");
+    test_value(T(1.1), chars_format::fixed, 5, "1.10000");
+
+    test_value(T(1.1), chars_format::scientific, 6, "1.100000e+00");
+    test_value(T(1.1), chars_format::fixed, 6, "1.100000");
+
+    test_value(T(1.1), chars_format::scientific, 50, "1.10000000000000000000000000000000000000000000000000e+00");
+    test_value(T(1.1), chars_format::fixed, 50, "1.10000000000000000000000000000000000000000000000000");
+}
+
 int main()
 {
     test_non_finite_values<decimal32>();
@@ -173,11 +208,15 @@ int main()
     test_fixed_format<decimal32>();
     test_fixed_format<decimal64>();
 
+    test_precision<decimal32>();
+    test_precision<decimal64>();
+
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_non_finite_values<decimal128>();
     test_small_values<decimal128>();
     test_large_values<decimal128>();
     test_fixed_format<decimal128>();
+    test_precision<decimal128>();
     #endif
 
     return boost::report_errors();
