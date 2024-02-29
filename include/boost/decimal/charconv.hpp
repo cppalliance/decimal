@@ -182,6 +182,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     auto significand {frexp10(value, &exp)};
 
     using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, uint128, std::uint64_t>;
+    exp += num_digits(significand) - 1;
 
     // Offset the value of first by 1 so that we can copy the leading digit and insert a decimal point
     auto r = to_chars_integer_impl<uint_type, uint_type>(first + 1, last, significand, 10);
@@ -257,6 +258,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     const bool is_neg = value < 0;
     int exponent {};
     auto significand = frexp10(abs_value, &exponent);
+    exponent += num_digits(significand) - 1;
 
     if (is_neg)
     {
