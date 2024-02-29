@@ -118,6 +118,47 @@ void test_large_values()
     }
 }
 
+template <typename T>
+void test_fixed_format()
+{
+    constexpr double max_value = 1e10;
+    std::uniform_real_distribution<double> dist(-max_value, max_value);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        char buffer[256];
+
+        const auto val {dist(rng)};
+        const T dec_val {val};
+
+        auto to_r = to_chars(buffer, buffer + sizeof(buffer), dec_val, chars_format::fixed);
+        *to_r.ptr = '\0';
+        BOOST_TEST(to_r);
+
+        T ret_val;
+        auto from_r = from_chars(buffer, buffer + std::strlen(buffer), ret_val, chars_format::fixed);
+        if (!BOOST_TEST(from_r))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Value: " << dec_val
+                      << "\nBuffer: " << buffer
+                      << "\nError: " << static_cast<int>(from_r.ec) << std::endl;
+
+            continue;
+            // LCOV_EXCL_STOP
+        }
+
+        if (!BOOST_TEST_EQ(dec_val, ret_val))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Value: " << dec_val
+                      << "\nBuffer: " << buffer
+                      << "\nRet val:" << ret_val << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
 int main()
 {
     test_non_finite_values<decimal32>();
@@ -129,10 +170,14 @@ int main()
     test_large_values<decimal32>();
     test_large_values<decimal64>();
 
+    test_fixed_format<decimal32>();
+    test_fixed_format<decimal64>();
+
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_non_finite_values<decimal128>();
     test_small_values<decimal128>();
     test_large_values<decimal128>();
+    test_fixed_format<decimal128>();
     #endif
 
     return boost::report_errors();

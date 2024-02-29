@@ -252,7 +252,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     const bool is_neg = value < 0;
     int exponent {};
     auto significand = frexp10(abs_value, &exponent);
-    exponent += num_digits(significand) - 1;
 
     if (is_neg)
     {
