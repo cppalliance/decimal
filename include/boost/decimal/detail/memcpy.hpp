@@ -73,19 +73,7 @@ BOOST_DECIMAL_CONSTEXPR char* memset(char* dest, int ch, std::size_t count)
     }
     else
     {
-        // Workaround for GCC-11 because it does not honor GCC diagnostic ignored
-        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
-        // Hopefully the optimizer turns this into memset
-        #if defined(__GNUC__) && __GNUC__ == 11
-            for (std::size_t i = 0; i < count; ++i)
-            {
-                *(dest + i) = static_cast<char>(ch);
-            }
-
-            return dest;
-        #else
-            return static_cast<char*>(std::memset(dest, ch, count));
-        #endif
+        return static_cast<char*>(std::memset(dest, ch, count));
     }
 }
 
@@ -102,19 +90,7 @@ BOOST_DECIMAL_CONSTEXPR char* memmove(char* dest, const char* src, std::size_t c
     }
     else
     {
-        // Workaround for GCC-11 because it does not honor GCC diagnostic ignored
-        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
-        // Hopefully the optimizer turns this into memset
-        #if defined(__GNUC__) && __GNUC__ == 11
-            for (std::size_t i = 0; i < count; ++i)
-            {
-                *(dest + i) = *(src + i);
-            }
-
-            return dest;
-        #else
-            return static_cast<char*>(std::memmove(dest, src, count));
-        #endif
+        return static_cast<char*>(std::memmove(dest, src, count));
     }
 }
 
