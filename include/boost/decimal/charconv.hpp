@@ -122,16 +122,16 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
                 boost::decimal::detail::memcpy(first, "inf", 3U);
                 return {first + 3U, std::errc()};
             }
-            else
-            {
-                return {last, std::errc::value_too_large};
-            }
+
+            return {last, std::errc::value_too_large};
         case FP_ZERO:
             if (buffer_len >= 7)
             {
                 boost::decimal::detail::memcpy(first, "0.0e+00", 7U);
                 return {first + 7U, std::errc()};
             }
+
+            return {last, std::errc::value_too_large};
         case FP_NAN:
             if (issignaling(value) && buffer_len >= 9)
             {
@@ -143,10 +143,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
                 boost::decimal::detail::memcpy(first, "nan", 3U);
                 return {first + 3U, std::errc()};
             }
-            else
-            {
-                return {last, std::errc::value_too_large};
-            }
+
+            return {last, std::errc::value_too_large};
         default:
             // LCOV_EXCL_START
             BOOST_DECIMAL_ASSERT_MSG(fp != 0, "Unreachable return");
