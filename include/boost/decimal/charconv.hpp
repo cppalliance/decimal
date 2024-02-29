@@ -161,12 +161,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     // TODO(mborland): Add precision support
     static_cast<void>(precision);
 
-    // Sanity check our bounds
-    if (first >= last)
-    {
-        return {last, std::errc::value_too_large};
-    }
-
     if (signbit(value))
     {
         *first++ = '-';
@@ -243,7 +237,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     auto real_precision = get_real_precision<TargetDecimalType>(precision);
 
     // Dummy check the bounds
-    if (buffer_size < real_precision || first >= last)
+    if (buffer_size < real_precision)
     {
         return {last, std::errc::value_too_large};
     }
