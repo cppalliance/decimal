@@ -83,4 +83,5 @@ run test_strtod.cpp ;
 run test_tan.cpp ;
 run test_tanh.cpp ;
 run test_tgamma.cpp ;
+run test_to_chars.cpp ;
 run test_to_string.cpp ;
