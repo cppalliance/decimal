@@ -290,20 +290,28 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     int num_dig = 0;
+    bool append_zeros = false;
     if (precision != -1)
     {
         num_dig = num_digits(significand);
-        while (num_dig > precision + 2)
+        if (num_dig >= precision + 2)
         {
-            significand /= 10;
-            ++exponent;
-            --num_dig;
-        }
+            while (num_dig > precision + 2)
+            {
+                significand /= 10;
+                ++exponent;
+                --num_dig;
+            }
 
-        if (num_dig == precision + 2)
+            if (num_dig == precision + 2)
+            {
+                --num_dig;
+                exponent += fenv_round(significand);
+            }
+        }
+        else if (num_dig < precision)
         {
-            --num_dig;
-            exponent += fenv_round(significand);
+            append_zeros = true;
         }
 
         // In general formatting we remove trailing 0s
@@ -315,6 +323,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
                 ++exponent;
                 --num_dig;
             }
+
+            append_zeros = false;
         }
     }
 
@@ -375,6 +385,13 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             ++num_dig;
             ++r.ptr;
         }
+    }
+
+    if (append_zeros)
+    {
+        const auto zeros_inserted = static_cast<std::size_t>(precision - num_dig + 1);
+        boost::decimal::detail::memset(r.ptr, '0', zeros_inserted);
+        r.ptr += zeros_inserted;
     }
 
     return {r.ptr, std::errc()};
