@@ -5,13 +5,9 @@
 #include "mini_to_chars.hpp"
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
-#include <boost/math/special_functions/next.hpp>
-#include <boost/charconv.hpp>
 #include <iostream>
 #include <iomanip>
-#include <sstream>
 #include <random>
-#include <cwchar>
 
 using namespace boost::decimal;
 
@@ -69,7 +65,8 @@ void test_small_values()
         if (!BOOST_TEST_EQ(dec_val, ret_val))
         {
             // LCOV_EXCL_START
-            std::cerr << "Value: " << dec_val
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Value: " << dec_val
                       << "\nBuffer: " << buffer
                       << "\nRet val:" << ret_val << std::endl;
             // LCOV_EXCL_STOP
@@ -99,7 +96,8 @@ void test_large_values()
         if (!BOOST_TEST(from_r))
         {
             // LCOV_EXCL_START
-            std::cerr << "Value: " << dec_val
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Value: " << dec_val
                       << "\nBuffer: " << buffer
                       << "\nError: " << static_cast<int>(from_r.ec) << std::endl;
 
@@ -110,7 +108,8 @@ void test_large_values()
         if (!BOOST_TEST_EQ(dec_val, ret_val))
         {
             // LCOV_EXCL_START
-            std::cerr << "Value: " << dec_val
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Value: " << dec_val
                       << "\nBuffer: " << buffer
                       << "\nRet val:" << ret_val << std::endl;
             // LCOV_EXCL_STOP
@@ -140,7 +139,8 @@ void test_fixed_format()
         if (!BOOST_TEST(from_r))
         {
             // LCOV_EXCL_START
-            std::cerr << "Value: " << dec_val
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Value: " << dec_val
                       << "\nBuffer: " << buffer
                       << "\nError: " << static_cast<int>(from_r.ec) << std::endl;
 
@@ -151,7 +151,8 @@ void test_fixed_format()
         if (!BOOST_TEST_EQ(dec_val, ret_val))
         {
             // LCOV_EXCL_START
-            std::cerr << "Value: " << dec_val
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Value: " << dec_val
                       << "\nBuffer: " << buffer
                       << "\nRet val:" << ret_val << std::endl;
             // LCOV_EXCL_STOP
@@ -172,26 +173,26 @@ void test_value(T val, chars_format fmt, int precision, const char* result)
 template <typename T>
 void test_precision()
 {
-    test_value(T(1.1), chars_format::scientific, 1, "1.1e+00");
-    test_value(T(1.1), chars_format::fixed, 1, "1.1");
+    test_value(T{11, -1}, chars_format::scientific, 1, "1.1e+00");
+    test_value(T{11, -1}, chars_format::fixed, 1, "1.1");
 
-    test_value(T(1.1), chars_format::scientific, 2, "1.10e+00");
-    test_value(T(1.1), chars_format::fixed, 2, "1.10");
+    test_value(T{11, -1}, chars_format::scientific, 2, "1.10e+00");
+    test_value(T{11, -1}, chars_format::fixed, 2, "1.10");
 
-    test_value(T(1.1), chars_format::scientific, 3, "1.100e+00");
-    test_value(T(1.1), chars_format::fixed, 3, "1.100");
+    test_value(T{11, -1}, chars_format::scientific, 3, "1.100e+00");
+    test_value(T{11, -1}, chars_format::fixed, 3, "1.100");
 
-    test_value(T(1.1), chars_format::scientific, 4, "1.1000e+00");
-    test_value(T(1.1), chars_format::fixed, 4, "1.1000");
+    test_value(T{11, -1}, chars_format::scientific, 4, "1.1000e+00");
+    test_value(T{11, -1}, chars_format::fixed, 4, "1.1000");
 
-    test_value(T(1.1), chars_format::scientific, 5, "1.10000e+00");
-    test_value(T(1.1), chars_format::fixed, 5, "1.10000");
+    test_value(T{11, -1}, chars_format::scientific, 5, "1.10000e+00");
+    test_value(T{11, -1}, chars_format::fixed, 5, "1.10000");
 
-    test_value(T(1.1), chars_format::scientific, 6, "1.100000e+00");
-    test_value(T(1.1), chars_format::fixed, 6, "1.100000");
+    test_value(T{11, -1}, chars_format::scientific, 6, "1.100000e+00");
+    test_value(T{11, -1}, chars_format::fixed, 6, "1.100000");
 
-    test_value(T(1.1), chars_format::scientific, 50, "1.10000000000000000000000000000000000000000000000000e+00");
-    test_value(T(1.1), chars_format::fixed, 50, "1.10000000000000000000000000000000000000000000000000");
+    test_value(T{11, -1}, chars_format::scientific, 50, "1.10000000000000000000000000000000000000000000000000e+00");
+    test_value(T{11, -1}, chars_format::fixed, 50, "1.10000000000000000000000000000000000000000000000000");
 }
 
 template <typename T>
