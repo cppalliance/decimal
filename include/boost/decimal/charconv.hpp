@@ -175,21 +175,29 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, uint128, std::uint64_t>;
     auto significand_digits = num_digits(significand);
     exp += significand_digits - 1;
+    bool append_zeros = false;
 
     if (precision != -1)
     {
-        // If the precision is specified we need to make sure the result is rounded correctly
-        // using the current fenv rounding mode
-
-        while (significand_digits > precision + 2)
+        if (significand_digits > precision)
         {
-            significand /= 10;
-            --significand_digits;
+            // If the precision is specified we need to make sure the result is rounded correctly
+            // using the current fenv rounding mode
+
+            while (significand_digits > precision + 2)
+            {
+                significand /= 10;
+                --significand_digits;
+            }
+
+            if (significand_digits > precision + 1)
+            {
+                fenv_round(significand);
+            }
         }
-
-        if (significand_digits > precision + 1)
+        else if (significand_digits < precision)
         {
-            fenv_round(significand);
+            append_zeros = true;
         }
     }
 
@@ -200,6 +208,13 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     if (BOOST_DECIMAL_UNLIKELY(!r))
     {
         return r; // LCOV_EXCL_LINE
+    }
+
+    if (append_zeros)
+    {
+        const auto zeros_inserted {static_cast<std::size_t>(precision - significand_digits + 1)};
+        boost::decimal::detail::memset(r.ptr, '0', zeros_inserted);
+        r.ptr += zeros_inserted;
     }
 
     // Insert our decimal point
