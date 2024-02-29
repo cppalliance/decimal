@@ -158,9 +158,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
 {
-    // TODO(mborland): Add precision support
-    static_cast<void>(precision);
-
     if (signbit(value))
     {
         *first++ = '-';
@@ -176,7 +173,25 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     auto significand {frexp10(value, &exp)};
 
     using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, uint128, std::uint64_t>;
-    exp += num_digits(significand) - 1;
+    auto significand_digits = num_digits(significand);
+    exp += significand_digits - 1;
+
+    if (precision != -1)
+    {
+        // If the precision is specified we need to make sure the result is rounded correctly
+        // using the current fenv rounding mode
+
+        while (significand_digits > precision + 2)
+        {
+            significand /= 10;
+            --significand_digits;
+        }
+
+        if (significand_digits > precision + 1)
+        {
+            fenv_round(significand);
+        }
+    }
 
     // Offset the value of first by 1 so that we can copy the leading digit and insert a decimal point
     auto r = to_chars_integer_impl<uint_type, uint_type>(first + 1, last, significand, 10);
