@@ -213,6 +213,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     if (append_zeros)
     {
         const auto zeros_inserted {static_cast<std::size_t>(precision - significand_digits + 1)};
+
+        if (r.ptr + zeros_inserted > last)
+        {
+            return {last, std::errc::value_too_large};
+        }
+
         boost::decimal::detail::memset(r.ptr, '0', zeros_inserted);
         r.ptr += zeros_inserted;
     }
@@ -390,6 +396,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     if (append_zeros)
     {
         const auto zeros_inserted = static_cast<std::size_t>(precision - num_dig + 1);
+
+        if (r.ptr + zeros_inserted > last)
+        {
+            return {last, std::errc::value_too_large};
+        }
+
         boost::decimal::detail::memset(r.ptr, '0', zeros_inserted);
         r.ptr += zeros_inserted;
     }
