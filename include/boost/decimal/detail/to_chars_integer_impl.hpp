@@ -72,7 +72,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
         unsigned_value = static_cast<Unsigned_Integer>(value);
     }
 
-    constexpr Unsigned_Integer zero = 48U; // Char for '0'
     constexpr auto buffer_size = sizeof(Unsigned_Integer) * CHAR_BIT;
     char buffer[buffer_size] {};
     const char* buffer_end = buffer + buffer_size;
@@ -81,30 +80,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
     // Work from LSB to MSB
     switch (base)
     {
-        case 2:
-            while (unsigned_value != 0)
-            {
-                *end-- = static_cast<char>(zero + (unsigned_value & 1U)); // 1<<1 - 1
-                unsigned_value >>= 1U;
-            }
-            break;
-
-        case 4:
-            while (unsigned_value != 0)
-            {
-                *end-- = static_cast<char>(zero + (unsigned_value & 3U)); // 1<<2 - 1
-                unsigned_value >>= 2U;
-            }
-            break;
-
-        case 8:
-            while (unsigned_value != 0)
-            {
-                *end-- = static_cast<char>(zero + (unsigned_value & 7U)); // 1<<3 - 1
-                unsigned_value >>= 3U;
-            }
-            break;
-
+        // TODO(mborland): Don't need until hex support is added to charconv
+        // LCOV_EXCL_START
         case 16:
             while (unsigned_value != 0)
             {
@@ -112,14 +89,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
                 unsigned_value >>= 4U;
             }
             break;
-
-        case 32:
-            while (unsigned_value != 0)
-            {
-                *end-- = digit_table[static_cast<std::size_t>(unsigned_value & 31U)]; // 1<<5 - 1
-                unsigned_value >>= 5U;
-            }
-            break;
+        // LCOV_EXCL_STOP
 
         default:
             while (unsigned_value != 0)

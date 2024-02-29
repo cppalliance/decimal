@@ -34,12 +34,14 @@ void test_value(T val, const char* result)
 template <typename T>
 void test_non_finite_values()
 {
-    test_value(std::numeric_limits<T>::quiet_NaN(), "nan");
-    test_value(-std::numeric_limits<T>::quiet_NaN(), "-nan");
-    test_value(std::numeric_limits<T>::signaling_NaN(), "nan(snan)");
-    test_value(-std::numeric_limits<T>::signaling_NaN(), "-nan(snan)");
-    test_value(std::numeric_limits<T>::infinity(), "inf");
-    test_value(-std::numeric_limits<T>::infinity(), "-inf");
+    std::uniform_real_distribution<float> dist(-1.0, 1.0);
+
+    test_value(std::numeric_limits<T>::quiet_NaN() * T{dist(rng)}, "nan");
+    test_value(-std::numeric_limits<T>::quiet_NaN() * T{dist(rng)}, "-nan");
+    test_value(std::numeric_limits<T>::signaling_NaN() * T{dist(rng)}, "nan(snan)");
+    test_value(-std::numeric_limits<T>::signaling_NaN() * T{dist(rng)}, "-nan(snan)");
+    test_value(std::numeric_limits<T>::infinity() * T{dist(rng)}, "inf");
+    test_value(-std::numeric_limits<T>::infinity() * T{dist(rng)}, "-inf");
 }
 
 template <typename T>
@@ -72,6 +74,8 @@ void test_small_values()
             // LCOV_EXCL_STOP
         }
     }
+    
+    test_value(T{0}, "0.0e+00");
 }
 
 template <typename T>
@@ -193,6 +197,8 @@ void test_precision()
 
     test_value(T{11, -1}, chars_format::scientific, 50, "1.10000000000000000000000000000000000000000000000000e+00");
     test_value(T{11, -1}, chars_format::fixed, 50, "1.10000000000000000000000000000000000000000000000000");
+
+    test_value(T{11, -1}, chars_format::general, 50, "1.1");
 }
 
 template <typename T>
