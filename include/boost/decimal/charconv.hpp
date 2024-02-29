@@ -313,7 +313,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
                 exponent += fenv_round(significand);
             }
         }
-        else if (num_dig < precision)
+        else if (num_dig < precision && fmt != chars_format::general)
         {
             append_zeros = true;
         }
@@ -327,8 +327,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
                 ++exponent;
                 --num_dig;
             }
-
-            append_zeros = false;
         }
     }
 
@@ -447,7 +445,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
         // In this range with general formatting, fixed formatting is the shortest
         if (fmt == chars_format::general && abs_value >= min_fractional_value && abs_value < max_fractional_value)
         {
-            fmt = chars_format::fixed;
+            return to_chars_fixed_impl(first, last, value, fmt, precision);
         }
 
         if (fmt == chars_format::fixed)
