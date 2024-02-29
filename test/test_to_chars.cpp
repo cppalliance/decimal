@@ -46,10 +46,44 @@ void test_non_finite_values()
     test_value(-std::numeric_limits<T>::infinity(), "-inf");
 }
 
+template <typename T>
+void test_small_values()
+{
+    std::uniform_real_distribution<double> dist(-1.0, 1.0);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        char buffer[256];
+
+        const auto val {dist(rng)};
+        const T dec_val {val};
+
+        auto to_r = to_chars(buffer, buffer + sizeof(buffer), dec_val);
+        *to_r.ptr = '\0';
+        BOOST_TEST(to_r);
+
+        T ret_val;
+        auto from_r = from_chars(buffer, buffer + std::strlen(buffer), ret_val);
+        BOOST_TEST(from_r);
+
+        if (!BOOST_TEST_EQ(dec_val, ret_val))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Value: " << dec_val
+                      << "\nBuffer: " << buffer
+                      << "\nRet val:" << ret_val << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
 int main()
 {
     test_non_finite_values<decimal32>();
     test_non_finite_values<decimal64>();
+
+    test_small_values<decimal32>();
+    test_small_values<decimal64>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_non_finite_values<decimal128>();
