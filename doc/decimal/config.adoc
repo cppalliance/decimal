@@ -10,9 +10,6 @@ https://www.boost.org/LICENSE_1_0.txt
 
 The following configuration macros are available:
 
-- `BOOST_DECIMAL_STANDALONE`: Allows the library to be used without any boost dependencies.
-If `<boost/config.hpp>` (the only depedency) is not present on your system it is automatically defined
-
 - `BOOST_DECIMAL_DISABLE_CASSERT`: Disables the use of `<cassert>` and all run-time assertions.
 
 - `BOOST_DECIMAL_DISABLE_IOSTREAM`: Disables the use of I/O streaming and removes all associated headers (e.g. `<iostream>`, `<iosfwd>`, `<cwchar>`, etc.)

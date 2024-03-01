@@ -11,7 +11,7 @@ https://www.boost.org/LICENSE_1_0.txt
 == Description
 
 Boost.Decimal is an implementation of IEEE 754 Decimal Floating Point numbers.
-The library is header-only and requires C++14.
+The library is header-only, has no dependencies, and requires C++14.
 
 == Motivation
 
@@ -24,9 +24,11 @@ These are referred to as cohorts which binary does not have as there is only one
 
 == Supported Compilers
 
-* GCC 7 or later
-* Clang 6 or later
-* Visual Studio 2017 or later
+Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon), and Windows with the following compilers:
+
+* GCC 7 and later
+* Clang 6 and later
+* Visual Studio 2017 and later
 
 Tested on https://github.com/cppalliance/decimal/actions[Github Actions] and https://drone.cpp.al/cppalliance/decimal[Drone].
 Coverage can be found on https://app.codecov.io/gh/cppalliance/decimal[Codecov].

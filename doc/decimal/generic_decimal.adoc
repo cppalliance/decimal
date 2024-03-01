@@ -21,71 +21,97 @@ namespace decimal {
 // 3.2.2 class decimal32:
 class decimal32;
 
-// 3.2.3 class dec
+// 3.2.3 class decimal64:
 class decimal64;
 
-// 3.2.7 unary arithmetic operators:
-constexpr decimal32 operator+(decimal32 rhs) noexcept;
-constexpr decimal64 operator+(decimal64 rhs) noexcept;
+// 3.2.4 class decimal128:
+class decimal128;
 
-constexpr decimal32 operator-(decimal32 rhs) noexcept;
-constexpr decimal64 operator-(decimal64 rhs) noexcept;
+// 3.2.7 unary arithmetic operators:
+constexpr decimal32  operator+(decimal32 rhs) noexcept;
+constexpr decimal64  operator+(decimal64 rhs) noexcept;
+constexpr decimal128 operator+(decimal128 rhs) noexcept;
+
+constexpr decimal32  operator-(decimal32 rhs) noexcept;
+constexpr decimal64  operator-(decimal64 rhs) noexcept;
+constexpr decimal128 operator-(decimal128 rhs) noexcept;
 
 // 3.2.8 binary arithmetic operators:
 
 constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal32 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal64 rhs) noexcept;
+constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal128 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator+(decimal32 lhs, RHS rhs) noexcept;
 constexpr /* see 3.2.8 */ operator+(decimal64 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator+(decimal128 lhs, RHS rhs) noexcept;
 
 constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal32 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal64 rhs) noexcept;
-
+constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal128 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator-(decimal32 lhs, RHS rhs) noexcept;
 constexpr /* see 3.2.8 */ operator-(decimal64 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator-(decimal128 lhs, RHS rhs) noexcept;
 
 constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal32 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal64 rhs) noexcept;
+constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal128 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator*(decimal32 lhs, RHS rhs) noexcept;
 constexpr /* see 3.2.8 */ operator*(decimal64 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator*(decimal128 lhs, RHS rhs) noexcept;
 
 constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal32 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal64 rhs) noexcept;
+constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal128 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator/(decimal32 lhs, RHS rhs) noexcept;
 constexpr /* see 3.2.8 */ operator/(decimal64 lhs, RHS rhs) noexcept;
+constexpr /* see 3.2.8 */ operator/(decimal128 lhs, RHS rhs) noexcept;
 
 // 3.2.9 comparison operators:
 
 constexpr bool operator==(LHS lhs, decimal32 rhs) noexcept;
 constexpr bool operator==(LHS lhs, decimal64 rhs) noexcept;
+constexpr bool operator==(LHS lhs, decimal128 rhs) noexcept;
 constexpr bool operator==(decimal32 lhs, RHS rhs) noexcept;
 constexpr bool operator==(decimal64 lhs, RHS rhs) noexcept;
+constexpr bool operator==(decimal128 lhs, RHS rhs) noexcept;
 constexpr bool operator!=(LHS lhs, decimal32 rhs) noexcept;
 constexpr bool operator!=(LHS lhs, decimal64 rhs) noexcept;
+constexpr bool operator!=(LHS lhs, decimal128 rhs) noexcept;
 constexpr bool operator!=(decimal32 lhs, RHS rhs) noexcept;
 constexpr bool operator!=(decimal64 lhs, RHS rhs) noexcept;
+constexpr bool operator!=(decimal128 lhs, RHS rhs) noexcept;
 constexpr bool operator<(LHS lhs, decimal32 rhs) noexcept;
 constexpr bool operator<(LHS lhs, decimal64 rhs) noexcept;
+constexpr bool operator<(LHS lhs, decimal128 rhs) noexcept;
 constexpr bool operator<(decimal32 lhs, RHS rhs) noexcept;
 constexpr bool operator<(decimal64 lhs, RHS rhs) noexcept;
+constexpr bool operator<(decimal128 lhs, RHS rhs) noexcept;
 constexpr bool operator<=(LHS lhs, decimal32 rhs) noexcept;
 constexpr bool operator<=(LHS lhs, decimal64 rhs) noexcept;
+constexpr bool operator<=(LHS lhs, decimal128 rhs) noexcept;
 constexpr bool operator<=(decimal32 lhs, RHS rhs) noexcept;
 constexpr bool operator<=(decimal64 lhs, RHS rhs) noexcept;
+constexpr bool operator<=(decimal128 lhs, RHS rhs) noexcept;
 constexpr bool operator>(LHS lhs, decimal32 rhs) noexcept;
 constexpr bool operator>(LHS lhs, decimal64 rhs) noexcept;
+constexpr bool operator>(LHS lhs, decimal128 rhs) noexcept;
 constexpr bool operator>(decimal32 lhs, RHS rhs) noexcept;
 constexpr bool operator>(decimal64 lhs, RHS rhs) noexcept;
+constexpr bool operator>(decimal128 lhs, RHS rhs) noexcept;
 constexpr bool operator>=(LHS lhs, decimal32 rhs) noexcept;
 constexpr bool operator>=(LHS lhs, decimal64 rhs) noexcept;
+constexpr bool operator>=(LHS lhs, decimal128 rhs) noexcept;
 constexpr bool operator>=(decimal32 lhs, RHS rhs) noexcept;
 constexpr bool operator>=(decimal64 lhs, RHS rhs) noexcept;
+constexpr bool operator>=(decimal128 lhs, RHS rhs) noexcept;
 
 // If C++20 is available
 constexpr std::partial_ordering operator<=>(decimal32 lhs, RHS rhs) noexcept;
 constexpr std::partial_ordering operator<=>(decimal64 lhs, RHS rhs) noexcept;
+constexpr std::partial_ordering operator<=>(decimal128 lhs, RHS rhs) noexcept;
 constexpr std::partial_ordering operator<=>(LHS lhs, decimal32 rhs) noexcept;
 constexpr std::partial_ordering operator<=>(LHS lhs, decimal64 rhs) noexcept;
+constexpr std::partial_ordering operator<=>(LHS lhs, decimal128 rhs) noexcept;
 
 // 3.2.10 Formatted input:
 template <typename charT, typename traits>
@@ -98,6 +124,11 @@ std::basic_istream<charT, traits>&
 operator>>(std::basic_istream<charT, traits> & is,
 decimal64& d);
 
+template <typename charT, typename traits>
+std::basic_istream<charT, traits>&
+operator>>(std::basic_istream<charT, traits> & is,
+decimal128& d);
+
 // 3.2.11 Formatted output:
 template <typename charT, typename traits>
 std::basic_ostream<charT, traits>&
@@ -108,6 +139,11 @@ template <typename charT, typename traits>
 std::basic_ostream<charT, traits>&
 operator<<(std::basic_ostream<charT, traits>& os,
 decimal64 d);
+
+template <typename charT, typename traits>
+std::basic_ostream<charT, traits>&
+operator<<(std::basic_ostream<charT, traits>& os,
+decimal128 d);
 
 } //namespace decimal
 } //namespace boost
