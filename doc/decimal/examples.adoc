@@ -32,3 +32,27 @@ int main()
     return 0;
 }
 ----
+
+== Promotion
+
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <type_traits>
+
+int main()
+{
+    using namespace boost::decimal;
+
+    decimal32 x {1}; // Constructs from an integer
+    decimal64 y {2};
+
+    auto sum {x + y};
+
+    assert(std::is_same<decimal64, decltype(sum)>::value);
+
+    return 0;
+}
+----
+
+
