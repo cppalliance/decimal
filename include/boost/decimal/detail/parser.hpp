@@ -9,6 +9,7 @@
 #include <boost/decimal/detail/from_chars_result.hpp>
 #include <boost/decimal/detail/from_chars_integer_impl.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
+#include <boost/decimal/detail/chars_format.hpp>
 
 #include <cerrno>
 #include <cstdint>
@@ -28,9 +29,19 @@ constexpr auto is_integer_char(char c) noexcept -> bool
     return (c >= '0') && (c <= '9');
 }
 
-constexpr auto is_delimiter(char c) noexcept -> bool
+constexpr auto is_hex_char(char c) noexcept -> bool
 {
-    return !is_integer_char(c) && c != 'e' && c != 'E';
+    return is_integer_char(c) || (((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F')));
+}
+
+constexpr auto is_delimiter(char c, chars_format fmt) noexcept -> bool
+{
+    if (fmt != chars_format::hex)
+    {
+        return !is_integer_char(c) && c != 'e' && c != 'E';
+    }
+
+    return !is_hex_char(c) && c != 'p' && c != 'P';
 }
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
@@ -54,7 +65,7 @@ auto from_chars_dispatch(const char* first, const char* last, uint128_t& value, 
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 template <typename Unsigned_Integer, typename Integer>
-constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent) noexcept -> from_chars_result
+constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent, chars_format fmt = chars_format::general) noexcept -> from_chars_result
 {
     if (first > last)
     {
@@ -140,8 +151,8 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     }
 
     // If the number is 0 we can abort now
-    constexpr char exp_char {'e'};
-    constexpr char capital_exp_char {'E'};
+    const char exp_char {fmt != chars_format::hex ? 'e' : 'p'};
+    const char capital_exp_char {fmt != chars_format::hex ? 'E' : 'P'};
 
     if (next == last || *next == exp_char || *next == -capital_exp_char)
     {
@@ -157,8 +168,8 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     std::size_t dot_position = 0;
     Integer extra_zeros = 0;
     Integer leading_zero_powers = 0;
-    const auto char_validation_func = is_integer_char;
-    const int base = 10;
+    const auto char_validation_func = (fmt != chars_format::hex) ? is_integer_char : is_hex_char;
+    const int base = (fmt != chars_format::hex) ? 10 : 16;
 
     while (next != last && char_validation_func(*next) && i < significand_buffer_size)
     {
@@ -171,6 +182,12 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     bool fractional = false;
     if (next == last)
     {
+        // if fmt is chars_format::scientific the e is required
+        if (fmt == chars_format::scientific)
+        {
+            return {first, std::errc::invalid_argument};
+        }
+
         exponent = 0;
         std::size_t offset = i;
 
@@ -240,8 +257,13 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         }
     }
 
-    if (next == last || is_delimiter(*next))
+    if (next == last || is_delimiter(*next, fmt))
     {
+        if (fmt == chars_format::scientific)
+        {
+            return {first, std::errc::invalid_argument};
+        }
+
         if (dot_position != 0 || fractional)
         {
             exponent = static_cast<Integer>(dot_position) - static_cast<Integer>(i) + extra_zeros + leading_zero_powers;

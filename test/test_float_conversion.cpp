@@ -210,6 +210,69 @@ void test_parser()
     BOOST_TEST(res.ec == std::errc());
 }
 
+void test_hex_integer()
+{
+    std::uint64_t significand {};
+    std::int64_t  exponent {};
+    bool sign {};
+
+    const char* val1 = "2a";
+    auto r1 = boost::decimal::detail::parser(val1, val1 + std::strlen(val1), sign, significand, exponent, boost::decimal::chars_format::hex);
+    BOOST_TEST(r1.ec == std::errc());
+    BOOST_TEST_EQ(sign, false);
+    BOOST_TEST_EQ(significand, UINT64_C(42));
+    BOOST_TEST_EQ(exponent, 0);
+
+    significand = 0;
+    exponent = 0;
+    sign = false;
+
+    const char* val2 = "-1a3b5c7d9";
+    auto r2 = boost::decimal::detail::parser(val2, val2 + std::strlen(val2), sign, significand, exponent, boost::decimal::chars_format::hex);
+    BOOST_TEST(r2.ec == std::errc());
+    BOOST_TEST_EQ(sign, true);
+    BOOST_TEST_EQ(exponent, 0);
+    BOOST_TEST_EQ(significand, UINT64_C(7041566681));
+
+    auto r3 = boost::decimal::detail::parser(val2, val2 + std::strlen(val2), sign, significand, exponent, boost::decimal::chars_format::scientific);
+    BOOST_TEST(r3.ec == std::errc::invalid_argument);
+}
+
+void test_hex_scientific()
+{
+    std::uint64_t significand {};
+    std::int64_t  exponent {};
+    bool sign {};
+
+    const char* val1 = "2ap+5";
+    auto r1 = boost::decimal::detail::parser(val1, val1 + std::strlen(val1), sign, significand, exponent, boost::decimal::chars_format::hex);
+    BOOST_TEST(r1.ec == std::errc());
+    BOOST_TEST_EQ(sign, false);
+    BOOST_TEST_EQ(significand, UINT64_C(42));
+    BOOST_TEST_EQ(exponent, 5);
+
+    significand = 0;
+    exponent = 0;
+    sign = false;
+
+    const char* val2 = "-1.3a2bp-10";
+    auto r2 = boost::decimal::detail::parser(val2, val2 + std::strlen(val2), sign, significand, exponent, boost::decimal::chars_format::hex);
+    BOOST_TEST(r2.ec == std::errc());
+    BOOST_TEST_EQ(sign, true);
+    BOOST_TEST_EQ(exponent, -14);
+    BOOST_TEST_EQ(significand, UINT64_C(80427));
+
+    auto r3 = boost::decimal::detail::parser(val2, val2 + std::strlen(val2), sign, significand, exponent, boost::decimal::chars_format::scientific);
+    BOOST_TEST(r3.ec == std::errc::invalid_argument);
+
+    const char* val4 = "-1.3A2BP-10";
+    auto r4 = boost::decimal::detail::parser(val4, val4 + std::strlen(val4), sign, significand, exponent, boost::decimal::chars_format::hex);
+    BOOST_TEST(r4.ec == std::errc());
+    BOOST_TEST_EQ(sign, true);
+    BOOST_TEST_EQ(exponent, -14);
+    BOOST_TEST_EQ(significand, UINT64_C(80427));
+}
+
 void test_from_chars()
 {
     using namespace boost::decimal::detail;
@@ -250,6 +313,8 @@ int main()
     test_generic_binary_to_decimal<long double>();
 
     test_parser();
+    test_hex_integer();
+    test_hex_scientific();
 
     test_from_chars();
 
