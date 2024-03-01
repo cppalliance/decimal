@@ -437,7 +437,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
              .nav-footer{text-align: center; margin-top: auto;}
              .nav-footer > p > a {white-space: nowrap;}</style>
 </head>
-<body id="Decimal" class="article toc2 toc-left">
+<body id="decimal32" class="article toc2 toc-left">
 <div id="header">
 <h1>Decimal: IEEE 754 Decimal Floating Point Numbers</h1>
 <div id="toc" class="toc2">
@@ -445,13 +445,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p><span class="toc-root"><a href="decimal.html">Decimal: IEEE 754 Decimal Floating Point Numbers</a></span></p><ul class="sectlevel1">
 <li><a href="overview.html">Overview</a>
 </li>
-<li><a href="Decimal.html"><span class="toc-current">Decimal</span></a>
+<li><a href="Decimal.html">Decimal</a>
+</li>
+<li><a href="decimal32.html"><span class="toc-current">Decimal32</span></a>
 <ul class="sectlevel2">
-<li><a href="Decimal.html#decimal_3_2_8_note">3.2.8 Note</a>
+<li><a href="decimal32.html#decimal32_description">Description</a>
 </li>
 </ul>
-</li>
-<li><a href="decimal32.html">Decimal32</a>
 </li>
 <li><a href="decimal64.html">Decimal64</a>
 </li>
@@ -480,165 +480,118 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="Decimal">Decimal</h2>
+<h2 id="decimal32">Decimal32</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="decimal32_description">Description</h3>
 <div class="paragraph">
-<p>Synopsis of header <code>&lt;boost/decimal.hpp&gt;</code></p>
+<p>Decimal32 is the 32-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Storage width - 32 bits</p>
+</li>
+<li>
+<p>Precision - 7 decimal digits (not bits like binary)</p>
+</li>
+<li>
+<p>Max exponent - 96</p>
+</li>
+<li>
+<p>Max Value - 9.999999e96</p>
+</li>
+<li>
+<p>Smallest normalized value - 1.000000e-95</p>
+</li>
+<li>
+<p>Smallest subnormal - 1e-101</p>
+</li>
+</ul>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++">// Paragraph numbers are from ISO/IEC DTR 24733
+<pre class="rouge highlight"><code data-lang="c++">#include &lt;boost/decimal/decimal32.hpp&gt;
 
 namespace boost {
 namespace decimal {
 
-// 3.2.2 class decimal32:
-class decimal32;
+// Paragraph numbers are from ISO/IEC DTR 24733
 
-// 3.2.3 class decimal64:
-class decimal64;
+// 3.2.2.1 construct/copy/destroy
+constexpr decimal32() noexcept = default;
 
-// 3.2.4 class decimal128:
-class decimal128;
+// 3.2.2.2 Conversion form floating-point type
+template &lt;typename Float&gt;
+explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
 
-// 3.2.7 unary arithmetic operators:
-constexpr decimal32  operator+(decimal32 rhs) noexcept;
-constexpr decimal64  operator+(decimal64 rhs) noexcept;
-constexpr decimal128 operator+(decimal128 rhs) noexcept;
+// 3.2.2.3 Conversion from integral type
+template &lt;typename Integer&gt;
+explicit constexpr decimal32(Integer val) noexcept;
 
-constexpr decimal32  operator-(decimal32 rhs) noexcept;
-constexpr decimal64  operator-(decimal64 rhs) noexcept;
-constexpr decimal128 operator-(decimal128 rhs) noexcept;
+template &lt;typename Integral1, typename Integral2&gt;
+constexpr decimal32(Integral1 coeff, Integral2 exp, bool sign = false) noexcept;
 
-// 3.2.8 binary arithmetic operators:
+template &lt;typename Integral&gt;
+constexpr decimal32&amp; operator=(const Integeral&amp; RHS) noexcept;
 
-constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(decimal128 lhs, RHS rhs) noexcept;
+// 3.2.2.4 Conversion to integral type
+explicit constexpr operator int() const noexcept;
+explicit constexpr operator unsigned() const noexcept;
+explicit constexpr operator long() const noexcept;
+explicit constexpr operator unsigned long() const noexcept;
+explicit constexpr operator long long() const noexcept;
+explicit constexpr operator unsigned long long() const noexcept;
+explicit constexpr operator std::int8_t() const noexcept;
+explicit constexpr operator std::uint8_t() const noexcept;
+explicit constexpr operator std::int16_t() const noexcept;
+explicit constexpr operator std::uint16_t() const noexcept;
 
-constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(decimal128 lhs, RHS rhs) noexcept;
+// 3.2.2.5 increment and decrement operators:
+decimal32&amp; operator++();
+decimal32  operator++(int);
+decimal32&amp; operator--();
+decimal32  operator--(int);
 
-constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(decimal128 lhs, RHS rhs) noexcept;
+// 3.2.2.6 compound assignment:
+decimal32&amp; operator+=(RHS rhs);
+decimal32&amp; operator-=(RHS rhs);
+decimal32&amp; operator*=(RHS rhs);
+decimal32&amp; operator/=(RHS rhs);
 
-constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(decimal128 lhs, RHS rhs) noexcept;
+// 3.2.6 Conversion to floating-point type
+explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
+explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
+explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
 
-// 3.2.9 comparison operators:
+// The following are available assuming a C++23 compiler that provides the header &lt;stdfloat&gt;
+explicit constexpr operator std::float16_t() const noexcept;
+explicit constexpr operator std::float32_t() const noexcept;
+explicit constexpr operator std::float64_t() const noexcept;
+explicit constexpr operator std::bfloat16_t() const noexcept;
 
-constexpr bool operator==(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator==(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator==(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator==(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator==(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator==(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator!=(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator!=(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator!=(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator!=(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator!=(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator!=(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&lt;(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&lt;(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&lt;(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;=(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&lt;=(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&lt;=(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&lt;=(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;=(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;=(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&gt;(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&gt;(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&gt;(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;=(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&gt;=(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&gt;=(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&gt;=(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;=(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;=(decimal128 lhs, RHS rhs) noexcept;
+explicit constexpr operator decimal64() const noexcept;
+explicit constexpr operator decimal128() const noexcept;
 
-// If C++20 is available
-constexpr std::partial_ordering operator&lt;=&gt;(decimal32 lhs, RHS rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(decimal64 lhs, RHS rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(decimal128 lhs, RHS rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(LHS lhs, decimal32 rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(LHS lhs, decimal64 rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(LHS lhs, decimal128 rhs) noexcept;
+// Literals
+constexpr auto operator  "" _DF(const char* str) -&gt; decimal32
+constexpr auto operator  "" _df(const char* str) -&gt; decimal32
 
-// 3.2.10 Formatted input:
-template &lt;typename charT, typename traits&gt;
-std::basic_istream&lt;charT, traits&gt;&amp;
-operator&gt;&gt;(std::basic_istream&lt;charT, traits&gt;&amp; is,
-decimal32&amp; d);
+constexpr auto operator  "" _DF(unsigned long long v) -&gt; decimal32
+constexpr auto operator  "" _dF(unsigned long long v) -&gt; decimal32
 
-template &lt;typename charT, typename traits&gt;
-std::basic_istream&lt;charT, traits&gt;&amp;
-operator&gt;&gt;(std::basic_istream&lt;charT, traits&gt; &amp; is,
-decimal64&amp; d);
-
-template &lt;typename charT, typename traits&gt;
-std::basic_istream&lt;charT, traits&gt;&amp;
-operator&gt;&gt;(std::basic_istream&lt;charT, traits&gt; &amp; is,
-decimal128&amp; d);
-
-// 3.2.11 Formatted output:
-template &lt;typename charT, typename traits&gt;
-std::basic_ostream&lt;charT, traits&gt;&amp;
-operator&lt;&lt;(std::basic_ostream&lt;charT, traits&gt;&amp; os,
-decimal32 d);
-
-template &lt;typename charT, typename traits&gt;
-std::basic_ostream&lt;charT, traits&gt;&amp;
-operator&lt;&lt;(std::basic_ostream&lt;charT, traits&gt;&amp; os,
-decimal64 d);
-
-template &lt;typename charT, typename traits&gt;
-std::basic_ostream&lt;charT, traits&gt;&amp;
-operator&lt;&lt;(std::basic_ostream&lt;charT, traits&gt;&amp; os,
-decimal128 d);
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _DF(long double v) -&gt; decimal32
+BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _dF(long double v) -&gt; decimal32
 
 } //namespace decimal
 } //namespace boost</code></pre>
 </div>
 </div>
-<div class="sect2">
-<h3 id="decimal_3_2_8_note">3.2.8 Note</h3>
-<div class="paragraph">
-<p>In the event of binary arithmetic between a non-decimal type and a decimal type the arithmetic will occur between the native types, and the result will be returned as the same type as the decimal operand. (e.g. decimal32 * uint64_t &#8594; decimal32)</p>
-</div>
-<div class="paragraph">
-<p>In the event of binary arithmetic between two decimal types the result will be the higher precision type of the two (e.g. decimal64 + decimal32 &#8594; decimal64)</p>
-</div>
-<div class="paragraph">
-<p><strong>NOTE</strong>: Only two of the same decimal type or decimal type and an integer are supported</p>
-</div>
 </div>
 </div>
 </div>
 <div class="paragraph nav-footer">
-<p>← Previous: <a href="overview.html">Overview</a> | ↑ Up: <a href="decimal.html">Decimal: IEEE 754 Decimal Floating Point Numbers</a> | Next: <a href="decimal32.html">Decimal32</a> →</p>
+<p>← Previous: <a href="Decimal.html">Decimal</a> | ↑ Up: <a href="decimal.html">Decimal: IEEE 754 Decimal Floating Point Numbers</a> | Next: <a href="decimal64.html">Decimal64</a> →</p>
 </div>
 </div>
 <div id="footer">

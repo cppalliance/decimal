@@ -437,7 +437,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
              .nav-footer{text-align: center; margin-top: auto;}
              .nav-footer > p > a {white-space: nowrap;}</style>
 </head>
-<body id="Decimal" class="article toc2 toc-left">
+<body id="Cmath" class="article toc2 toc-left">
 <div id="header">
 <h1>Decimal: IEEE 754 Decimal Floating Point Numbers</h1>
 <div id="toc" class="toc2">
@@ -445,11 +445,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p><span class="toc-root"><a href="decimal.html">Decimal: IEEE 754 Decimal Floating Point Numbers</a></span></p><ul class="sectlevel1">
 <li><a href="overview.html">Overview</a>
 </li>
-<li><a href="Decimal.html"><span class="toc-current">Decimal</span></a>
-<ul class="sectlevel2">
-<li><a href="Decimal.html#decimal_3_2_8_note">3.2.8 Note</a>
-</li>
-</ul>
+<li><a href="Decimal.html">Decimal</a>
 </li>
 <li><a href="decimal32.html">Decimal32</a>
 </li>
@@ -459,7 +455,53 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="Numbers.html">Numeric Constants</a>
 </li>
-<li><a href="Cmath.html">Special Functions</a>
+<li><a href="Cmath.html"><span class="toc-current">Special Functions</span></a>
+<ul class="sectlevel2">
+<li><a href="Cmath.html#cmath_cmath">&lt;cmath&gt;</a>
+<ul class="sectlevel3">
+<li><a href="Cmath.html#cmath_basic_operations">Basic Operations</a>
+</li>
+<li><a href="Cmath.html#cmath_exponential_functions">Exponential Functions</a>
+</li>
+<li><a href="Cmath.html#cmath_power_functions">Power Functions</a>
+</li>
+<li><a href="Cmath.html#cmath_trigonometric_functions">Trigonometric Functions</a>
+</li>
+<li><a href="Cmath.html#cmath_hyperbolic_functions">Hyperbolic Functions</a>
+</li>
+<li><a href="Cmath.html#cmath_error_and_gamma_functions">Error and Gamma Functions</a>
+</li>
+<li><a href="Cmath.html#cmath_nearest_integer_floating_point_operations">Nearest integer floating point operations</a>
+</li>
+<li><a href="Cmath.html#cmath_floating_point_manipulation_functions">Floating point manipulation functions</a>
+</li>
+<li><a href="Cmath.html#cmath_classification_and_comparison">Classification and comparison</a>
+</li>
+<li><a href="Cmath.html#cmath_summary">Summary</a>
+</li>
+</ul>
+</li>
+<li><a href="Cmath.html#cmath_c17_mathematical_special_functions">C++17 Mathematical Special Functions</a>
+<ul class="sectlevel3">
+<li><a href="Cmath.html#cmath_summary_2">Summary</a>
+</li>
+</ul>
+</li>
+<li><a href="Cmath.html#cmath_non_standard_functions">Non-standard Functions</a>
+<ul class="sectlevel3">
+<li><a href="Cmath.html#cmath_issignaling">issignaling</a>
+</li>
+<li><a href="Cmath.html#cmath_samequantum">samequantum</a>
+</li>
+<li><a href="Cmath.html#cmath_quantexp">quantexp</a>
+</li>
+<li><a href="Cmath.html#cmath_quantized">quantized</a>
+</li>
+<li><a href="Cmath.html#cmath_frexp10">frexp10</a>
+</li>
+</ul>
+</li>
+</ul>
 </li>
 <li><a href="Cstdlib.html">Cstdlib Support</a>
 </li>
@@ -480,165 +522,671 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="Decimal">Decimal</h2>
+<h2 id="Cmath">Special Functions</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="cmath_cmath">&lt;cmath&gt;</h3>
 <div class="paragraph">
-<p>Synopsis of header <code>&lt;boost/decimal.hpp&gt;</code></p>
+<p>Decimal contains all functions from <code>&lt;cmath&gt;</code> and they have the same handling as built-in floating point types.
+They are also all constexpr with C++14 unlike the built-in floating point types which require either C++23 or 26.</p>
 </div>
+<div class="sect3">
+<h4 id="cmath_basic_operations">Basic Operations</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/fabs">abs</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/fabs">fabs</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/fmod">fmod</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/remainder">remainder</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/remquo">remquo</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/fma">fma</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/fmax">fmax</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/fmin">fmin</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/fdim">fdim</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/nan">nan</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_exponential_functions">Exponential Functions</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/exp">exp</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/exp2">exp2</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/expm1">expm1</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/log">log</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/log10">log10</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/log2">log2</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/log1p">log1p</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_power_functions">Power Functions</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/pow">pow</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/sqrt">sqrt</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/cbrt">cbrt</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/hypot">hypot</a> - Both 2 and 3 arg are supported</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_trigonometric_functions">Trigonometric Functions</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/sin">sin</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/cos">cos</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/tan">tan</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/asin">asin</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/acos">acos</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/atan">atan</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/atan2">atan2</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_hyperbolic_functions">Hyperbolic Functions</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/sinh">sinh</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/cosh">cosh</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/tanh">tanh</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/asinh">asinh</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/acosh">acosh</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/atanh">atanh</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_error_and_gamma_functions">Error and Gamma Functions</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/erf">erf</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/erfc">erfc</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/tgamma">tgamma</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/lgamma">lgamma</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_nearest_integer_floating_point_operations">Nearest integer floating point operations</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/ceil">ceil</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/floor">floor</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/trunc">trunc</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/round">round</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/round">lround</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/round">llround</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/nearbyint">nearbyint</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/rint">rint</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/lrint">lrint</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/llrint">llrint</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_floating_point_manipulation_functions">Floating point manipulation functions</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/frexp">frexp</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/ldexp">ldexp</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/modf">modf</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/scalbn">scalbn</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/scalbn">scalbln</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/ilogb">ilogb</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/logb">logb</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/nextafter">nextafter</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/nextafter">nexttowards</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/copysign">copysign</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_classification_and_comparison">Classification and comparison</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/fpclassify">fpclassify</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/isfinite">isfinite</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/isinf">isinf</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/isnan">isnan</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/isnormal">isnormal</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/signbit">signbit</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/isgreater">isgreater</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/isgreaterequal">isgreaterequal</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/isless">isless</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/islesequal">islessequal</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/islessgreater">islessgreater</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/math/isunordered">isunordered</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_summary">Summary</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++">// Paragraph numbers are from ISO/IEC DTR 24733
-
-namespace boost {
+<pre class="rouge highlight"><code data-lang="c++">namespace boost {
 namespace decimal {
 
-// 3.2.2 class decimal32:
-class decimal32;
+template &lt;typename DecimalType&gt;
+constexpr DecimalType abs(DecimalType x) noexcept;
 
-// 3.2.3 class decimal64:
-class decimal64;
+template &lt;typename DecimalType&gt;
+constexpr DecimalType fabs(DecimalType x) noexcept;
 
-// 3.2.4 class decimal128:
-class decimal128;
+template &lt;typename DecimalType&gt;
+constexpr DecimalType abs(DecimalType x) noexcept;
 
-// 3.2.7 unary arithmetic operators:
-constexpr decimal32  operator+(decimal32 rhs) noexcept;
-constexpr decimal64  operator+(decimal64 rhs) noexcept;
-constexpr decimal128 operator+(decimal128 rhs) noexcept;
+template &lt;typename DecimalType&gt;
+constexpr DecimalType fmod(DecimalType x, DecimalType y) noexcept;
 
-constexpr decimal32  operator-(decimal32 rhs) noexcept;
-constexpr decimal64  operator-(decimal64 rhs) noexcept;
-constexpr decimal128 operator-(decimal128 rhs) noexcept;
+template &lt;typename DecimalType&gt;
+constexpr DecimalType remainder(DecimalType x, DecimalType y) noexcept;
 
-// 3.2.8 binary arithmetic operators:
+template &lt;typename DecimalType&gt;
+constexpr DecimalType remquo(DecimalType x, DecimalType y, int* quo) noexcept;
 
-constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(decimal128 lhs, RHS rhs) noexcept;
+template &lt;typename DecimalType&gt;
+constexpr DecimalType fma(DecimalType x, DecimalType y, DecimalType z) noexcept;
 
-constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(decimal128 lhs, RHS rhs) noexcept;
+template &lt;typename DecimalType&gt;
+constexpr DecimalType fmax(DecimalType x, DecimalType y, int* quo) noexcept;
 
-constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(decimal128 lhs, RHS rhs) noexcept;
+template &lt;typename DecimalType&gt;
+constexpr DecimalType fmin(DecimalType x, DecimalType y, int* quo) noexcept;
 
-constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(decimal128 lhs, RHS rhs) noexcept;
+template &lt;typename DecimalType&gt;
+constexpr DecimalType fdim(DecimalType x, DecimalType y, int* quo) noexcept;
 
-// 3.2.9 comparison operators:
+constexpr decimal32 nand32(const char* arg) noexcept;
+constexpr decimal64 nand64(const char* arg) noexcept;
+constexpr decimal128 nand128(const char* arg) noexcept;
 
-constexpr bool operator==(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator==(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator==(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator==(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator==(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator==(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator!=(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator!=(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator!=(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator!=(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator!=(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator!=(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&lt;(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&lt;(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&lt;(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;=(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&lt;=(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&lt;=(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&lt;=(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;=(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;=(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&gt;(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&gt;(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&gt;(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;=(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&gt;=(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&gt;=(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&gt;=(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;=(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;=(decimal128 lhs, RHS rhs) noexcept;
+template &lt;typename DecimalType&gt;
+constexpr DecimalType exp(DecimalType x) noexcept;
 
-// If C++20 is available
-constexpr std::partial_ordering operator&lt;=&gt;(decimal32 lhs, RHS rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(decimal64 lhs, RHS rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(decimal128 lhs, RHS rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(LHS lhs, decimal32 rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(LHS lhs, decimal64 rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(LHS lhs, decimal128 rhs) noexcept;
+template &lt;typename DecimalType&gt;
+constexpr DecimalType exp2(DecimalType x) noexcept;
 
-// 3.2.10 Formatted input:
-template &lt;typename charT, typename traits&gt;
-std::basic_istream&lt;charT, traits&gt;&amp;
-operator&gt;&gt;(std::basic_istream&lt;charT, traits&gt;&amp; is,
-decimal32&amp; d);
+template &lt;typename DecimalType&gt;
+constexpr DecimalType expm1(DecimalType x) noexcept;
 
-template &lt;typename charT, typename traits&gt;
-std::basic_istream&lt;charT, traits&gt;&amp;
-operator&gt;&gt;(std::basic_istream&lt;charT, traits&gt; &amp; is,
-decimal64&amp; d);
+template &lt;typename DecimalType&gt;
+constexpr DecimalType log(DecimalType x) noexcept;
 
-template &lt;typename charT, typename traits&gt;
-std::basic_istream&lt;charT, traits&gt;&amp;
-operator&gt;&gt;(std::basic_istream&lt;charT, traits&gt; &amp; is,
-decimal128&amp; d);
+template &lt;typename DecimalType&gt;
+constexpr DecimalType log10(DecimalType x) noexcept;
 
-// 3.2.11 Formatted output:
-template &lt;typename charT, typename traits&gt;
-std::basic_ostream&lt;charT, traits&gt;&amp;
-operator&lt;&lt;(std::basic_ostream&lt;charT, traits&gt;&amp; os,
-decimal32 d);
+template &lt;typename DecimalType&gt;
+constexpr DecimalType log2(DecimalType x) noexcept;
 
-template &lt;typename charT, typename traits&gt;
-std::basic_ostream&lt;charT, traits&gt;&amp;
-operator&lt;&lt;(std::basic_ostream&lt;charT, traits&gt;&amp; os,
-decimal64 d);
+template &lt;typename DecimalType&gt;
+constexpr DecimalType log1p(DecimalType x) noexcept;
 
-template &lt;typename charT, typename traits&gt;
-std::basic_ostream&lt;charT, traits&gt;&amp;
-operator&lt;&lt;(std::basic_ostream&lt;charT, traits&gt;&amp; os,
-decimal128 d);
+template &lt;typename DecimalType&gt;
+constexpr DecimalType pow(DecimalType x, DecimalType y) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType sqrt(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType cbrt(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType hypot(DecimalType x, DecimalType y) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType hypot(DecimalType x, DecimalType y, DecimalType z) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType sin(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType cos(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType tan(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType asin(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType acos(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType atan(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType atan2(DecimalType x, DecimalType y) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType sinh(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType cosh(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType tanh(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType asinh(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType acosh(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType atanh(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType erf(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType erfc(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType tgamma(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType lgamma(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType ceil(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType floor(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType trunc(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType round(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr long lround(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr long long llround(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType nearbyint(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType rint(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr long lrint(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr long long llrint(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType frexp(DecimalType x, int* exp) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType ldexp(DecimalType x, int exp) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType modf(DecimalType x, DecimalType* iptr) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType scalbn(DecimalType x, int exp) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType scalbln(DecimalType x, long exp) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr int ilogb(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType logb(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType nextafter(DecimalType from, DecimalType to) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType nexttoward(DecimalType from, long double to) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType copysign(DecimalType mag, DecimalType sgn) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr int fpclassify(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr bool isfinite(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr bool isinf(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr bool isnan(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr bool isnormal(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr bool signbit(DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr bool isgreater(DecimalType x, DecimalType y) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr bool isgreaterequal(DecimalType x, DecimalType y) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr bool isless(DecimalType x, DecimalType y) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr bool islessgreater(DecimalType x, DecimalType y) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr bool isunordered(DecimalType x, DecimalType y) noexcept;
 
 } //namespace decimal
 } //namespace boost</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="sect2">
-<h3 id="decimal_3_2_8_note">3.2.8 Note</h3>
+<h3 id="cmath_c17_mathematical_special_functions">C++17 Mathematical Special Functions</h3>
 <div class="paragraph">
-<p>In the event of binary arithmetic between a non-decimal type and a decimal type the arithmetic will occur between the native types, and the result will be returned as the same type as the decimal operand. (e.g. decimal32 * uint64_t &#8594; decimal32)</p>
+<p>The following functions have been implemented for decimal types:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/special_functions/assoc_laguerre">assoc_laguerre</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/special_functions/hermite">hermite</a></p>
+</li>
+<li>
+<p><a href="https://en.cppreference.com/w/cpp/numeric/special_functions/laguerre">laguerre</a></p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="cmath_summary_2">Summary</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++">namespace boost {
+namespace decimal {
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType assoc_laguerre(unsigned int n, unsigned int m, DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType hermite(unsigned int n, DecimalType x) noexcept;
+
+template &lt;typename DecimalType&gt;
+constexpr DecimalType laguerre(unsigned int n, DecimalType x) noexcept;
+
+} //namespace decimal
+} //namespace boost</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cmath_non_standard_functions">Non-standard Functions</h3>
+<div class="paragraph">
+<p>The following are convenience functions, or are prescribed in IEEE 754-2019 as required for decimal floating point types.</p>
+</div>
+<div class="sect3">
+<h4 id="cmath_issignaling">issignaling</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++">template &lt;typename Decimal&gt;
+constexpr bool issignaling(Decimal x) noexcept;</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p>In the event of binary arithmetic between two decimal types the result will be the higher precision type of the two (e.g. decimal64 + decimal32 &#8594; decimal64)</p>
+<p>Effects: If x is an sNaN returns true, otherwise returns false.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_samequantum">samequantum</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++">template &lt;typename Decimal&gt;
+constexpr bool samequantum(Decimal x, Decimal y) noexcept;
+
+constexpr bool samequantumd32(decimal32 x, decimal32 y) noexcept;
+constexpr bool samequantumd64(decimal64 x, decimal64 y) noexcept;
+constexpr bool samequantumd128(decimal128 x, decimal128 y) noexcept;</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p><strong>NOTE</strong>: Only two of the same decimal type or decimal type and an integer are supported</p>
+<p>Effects: Determines if the quantum (unbiased) exponents of x and y are the same.</p>
+</div>
+<div class="paragraph">
+<p>If both x and y are NaN, or infinity, they have the same quantum exponents.</p>
+</div>
+<div class="paragraph">
+<p>If exactly one operand is infinity or exactly one operand is NaN, they do not have the same quantum exponents.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_quantexp">quantexp</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++">template &lt;typename Decimal&gt;
+constexpr int quantexp(Decimal x) noexcept;
+
+constexpr bool quantexp32(decimal32 x) noexcept;
+constexpr bool quantexp64(decimal64 x) noexcept;
+constexpr bool quantexp128(decimal128 x) noexcept;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Effects: if x is finite, returns its quantum exponent.</p>
+</div>
+<div class="paragraph">
+<p>Otherwise, a domain error occurs and <code>INT_MIN</code> is returned.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_quantized">quantized</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++">template &lt;typename Decimal&gt;
+constexpr Decimal quantized(Decimal x, Decimal y) noexcept;
+
+constexpr decimal32 quantized32(decimal32 x, decimal32 y) noexcept;
+constexpr decimal64 quantized64(decimal64 x, decimal64 y) noexcept;
+constexpr decimal128 quantized128(decimal128 x, decimal128 y) noexcept;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Returns: a number that is equal in value (except for any rounding) and sign to x, and which has an exponent set to be equal to the exponent of y.</p>
+</div>
+<div class="paragraph">
+<p>If the exponent is being increased, the value is correctly rounded according to the current rounding mode;</p>
+</div>
+<div class="paragraph">
+<p>If the result does not have the same value as x, the "inexact" floating-point exception is raised.</p>
+</div>
+<div class="paragraph">
+<p>If the exponent is being decreased and the significand of the result has more digits than the type would allow, the "invalid" floating-point exception is raised and the result is sNaN.</p>
+</div>
+<div class="paragraph">
+<p>If one or both operands are NaN the result is sNaN.</p>
+</div>
+<div class="paragraph">
+<p>Otherwise, if only one operand is infinity, the "invalid" floating-point exception is raised and the result is sNaN.</p>
+</div>
+<div class="paragraph">
+<p>If both operands are infinity, the result is infinity, with the same sign as x.</p>
+</div>
+<div class="paragraph">
+<p>The quantize functions do not signal underflow.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_frexp10">frexp10</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++">template &lt;typename Decimal&gt;
+constexpr auto frexp10(Decimal num, int* expptr) noexcept;
+
+constexpr std::uint32_t frexpd32(decimal32 num, int* expptr) noexcept;
+constexpr std::uint64_t frexpd64(decimal64 num, int* expptr) noexcept;
+constexpr boost::decimal::detail::uint128 frexpd128(decimal128 num, int* expptr) noexcept;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This function is very similar to <a href="https://en.cppreference.com/w/cpp/numeric/math/frexp">frexp</a>, but returns the significand and an integral power of 10 since the <code>FLT_RADIX</code> of this type is 10.
+The significand is normalized to the number of digits of precision the type has (e.g. for decimal32 it is [1'000'000, 9'999'999]).</p>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div class="paragraph nav-footer">
-<p>← Previous: <a href="overview.html">Overview</a> | ↑ Up: <a href="decimal.html">Decimal: IEEE 754 Decimal Floating Point Numbers</a> | Next: <a href="decimal32.html">Decimal32</a> →</p>
+<p>← Previous: <a href="Numbers.html">Numeric Constants</a> | ↑ Up: <a href="decimal.html">Decimal: IEEE 754 Decimal Floating Point Numbers</a> | Next: <a href="Cstdlib.html">Cstdlib Support</a> →</p>
 </div>
 </div>
 <div id="footer">

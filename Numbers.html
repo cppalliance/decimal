@@ -437,7 +437,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
              .nav-footer{text-align: center; margin-top: auto;}
              .nav-footer > p > a {white-space: nowrap;}</style>
 </head>
-<body id="Decimal" class="article toc2 toc-left">
+<body id="Numbers" class="article toc2 toc-left">
 <div id="header">
 <h1>Decimal: IEEE 754 Decimal Floating Point Numbers</h1>
 <div id="toc" class="toc2">
@@ -445,11 +445,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p><span class="toc-root"><a href="decimal.html">Decimal: IEEE 754 Decimal Floating Point Numbers</a></span></p><ul class="sectlevel1">
 <li><a href="overview.html">Overview</a>
 </li>
-<li><a href="Decimal.html"><span class="toc-current">Decimal</span></a>
-<ul class="sectlevel2">
-<li><a href="Decimal.html#decimal_3_2_8_note">3.2.8 Note</a>
-</li>
-</ul>
+<li><a href="Decimal.html">Decimal</a>
 </li>
 <li><a href="decimal32.html">Decimal32</a>
 </li>
@@ -457,7 +453,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="decimal128.html">Decimal64</a>
 </li>
-<li><a href="Numbers.html">Numeric Constants</a>
+<li><a href="Numbers.html"><span class="toc-current">Numeric Constants</span></a>
+<ul class="sectlevel2">
+<li><a href="Numbers.html#numbers_overview">Overview</a>
+</li>
+<li><a href="Numbers.html#numbers_reference">Reference</a>
+</li>
+</ul>
 </li>
 <li><a href="Cmath.html">Special Functions</a>
 </li>
@@ -480,165 +482,135 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="Decimal">Decimal</h2>
+<h2 id="Numbers">Numeric Constants</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="numbers_overview">Overview</h3>
 <div class="paragraph">
-<p>Synopsis of header <code>&lt;boost/decimal.hpp&gt;</code></p>
+<p>Contains all constants provided by C++20&#8217;s <code>&lt;numbers&gt;</code> specialized for the decimal types, but does not require C++20.</p>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p>e_v - <a href="https://en.wikipedia.org/wiki/E_(mathematical_constant)">Euler&#8217;s Number</a></p>
+</li>
+<li>
+<p>log2e_v - log2(e)</p>
+</li>
+<li>
+<p>log10e_v - log10(e)</p>
+</li>
+<li>
+<p>pi_v - <a href="https://en.wikipedia.org/wiki/Pi">pi</a></p>
+</li>
+<li>
+<p>inv_pi_v - 1/pi</p>
+</li>
+<li>
+<p>inv_sqrtpi_v - 1 / sqrt(pi)</p>
+</li>
+<li>
+<p>ln2_v - ln(2)</p>
+</li>
+<li>
+<p>ln10_v - ln(10)</p>
+</li>
+<li>
+<p>sqrt2_v - sqrt(2)</p>
+</li>
+<li>
+<p>sqrt3_v - sqrt(3)</p>
+</li>
+<li>
+<p>inv_sqrt3_v - 1 / sqrt(3)</p>
+</li>
+<li>
+<p>egamma_v - <a href="https://en.wikipedia.org/wiki/Euler%27s_constant">Euler–Mascheroni constant</a></p>
+</li>
+<li>
+<p>phi_v - <a href="https://en.wikipedia.org/wiki/Golden_ratio">The Golden Ratio</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>There are also non-template variables that provide the constant as a decimal32 type.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="numbers_reference">Reference</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++">// Paragraph numbers are from ISO/IEC DTR 24733
+<pre class="rouge highlight"><code data-lang="c++">#include &lt;boost/decimal/numbers.hpp&gt;
 
 namespace boost {
 namespace decimal {
 
-// 3.2.2 class decimal32:
-class decimal32;
+template &lt;typename Decimal&gt;
+static constexpr Decimal e_v;
 
-// 3.2.3 class decimal64:
-class decimal64;
+template &lt;typename Decimal&gt;
+static constexpr Decimal log2e_v;
 
-// 3.2.4 class decimal128:
-class decimal128;
+template &lt;typename Decimal&gt;
+static constexpr Decimal log10e_v;
 
-// 3.2.7 unary arithmetic operators:
-constexpr decimal32  operator+(decimal32 rhs) noexcept;
-constexpr decimal64  operator+(decimal64 rhs) noexcept;
-constexpr decimal128 operator+(decimal128 rhs) noexcept;
+template &lt;typename Decimal&gt;
+static constexpr Decimal pi_v;
 
-constexpr decimal32  operator-(decimal32 rhs) noexcept;
-constexpr decimal64  operator-(decimal64 rhs) noexcept;
-constexpr decimal128 operator-(decimal128 rhs) noexcept;
+template &lt;typename Decimal&gt;
+static constexpr Decimal inv_pi_v;
 
-// 3.2.8 binary arithmetic operators:
+template &lt;typename Decimal&gt;
+static constexpr Decimal inv_sqrtpi_v;
 
-constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator+(decimal128 lhs, RHS rhs) noexcept;
+template &lt;typename Decimal&gt;
+static constexpr Decimal ln2_v;
 
-constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator-(decimal128 lhs, RHS rhs) noexcept;
+template &lt;typename Decimal&gt;
+static constexpr Decimal ln10_v;
 
-constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator*(decimal128 lhs, RHS rhs) noexcept;
+template &lt;typename Decimal&gt;
+static constexpr Decimal sqrt2_v;
 
-constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal32 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal64 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(LHS lhs, decimal128 rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(decimal32 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(decimal64 lhs, RHS rhs) noexcept;
-constexpr /* see 3.2.8 */ operator/(decimal128 lhs, RHS rhs) noexcept;
+template &lt;typename Decimal&gt;
+static constexpr Decimal sqrt3_v;
 
-// 3.2.9 comparison operators:
+template &lt;typename Decimal&gt;
+static constexpr Decimal inv_sqrt2_v;
 
-constexpr bool operator==(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator==(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator==(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator==(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator==(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator==(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator!=(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator!=(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator!=(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator!=(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator!=(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator!=(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&lt;(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&lt;(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&lt;(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;=(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&lt;=(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&lt;=(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&lt;=(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;=(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&lt;=(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&gt;(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&gt;(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&gt;(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;(decimal128 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;=(LHS lhs, decimal32 rhs) noexcept;
-constexpr bool operator&gt;=(LHS lhs, decimal64 rhs) noexcept;
-constexpr bool operator&gt;=(LHS lhs, decimal128 rhs) noexcept;
-constexpr bool operator&gt;=(decimal32 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;=(decimal64 lhs, RHS rhs) noexcept;
-constexpr bool operator&gt;=(decimal128 lhs, RHS rhs) noexcept;
+template &lt;typename Decimal&gt;
+static constexpr Decimal inv_sqrt3_v;
 
-// If C++20 is available
-constexpr std::partial_ordering operator&lt;=&gt;(decimal32 lhs, RHS rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(decimal64 lhs, RHS rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(decimal128 lhs, RHS rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(LHS lhs, decimal32 rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(LHS lhs, decimal64 rhs) noexcept;
-constexpr std::partial_ordering operator&lt;=&gt;(LHS lhs, decimal128 rhs) noexcept;
+template &lt;typename Decimal&gt;
+static constexpr Decimal egamma_v;
 
-// 3.2.10 Formatted input:
-template &lt;typename charT, typename traits&gt;
-std::basic_istream&lt;charT, traits&gt;&amp;
-operator&gt;&gt;(std::basic_istream&lt;charT, traits&gt;&amp; is,
-decimal32&amp; d);
+template &lt;typename Decimal&gt;
+static constexpr Decimal phi_v;
 
-template &lt;typename charT, typename traits&gt;
-std::basic_istream&lt;charT, traits&gt;&amp;
-operator&gt;&gt;(std::basic_istream&lt;charT, traits&gt; &amp; is,
-decimal64&amp; d);
-
-template &lt;typename charT, typename traits&gt;
-std::basic_istream&lt;charT, traits&gt;&amp;
-operator&gt;&gt;(std::basic_istream&lt;charT, traits&gt; &amp; is,
-decimal128&amp; d);
-
-// 3.2.11 Formatted output:
-template &lt;typename charT, typename traits&gt;
-std::basic_ostream&lt;charT, traits&gt;&amp;
-operator&lt;&lt;(std::basic_ostream&lt;charT, traits&gt;&amp; os,
-decimal32 d);
-
-template &lt;typename charT, typename traits&gt;
-std::basic_ostream&lt;charT, traits&gt;&amp;
-operator&lt;&lt;(std::basic_ostream&lt;charT, traits&gt;&amp; os,
-decimal64 d);
-
-template &lt;typename charT, typename traits&gt;
-std::basic_ostream&lt;charT, traits&gt;&amp;
-operator&lt;&lt;(std::basic_ostream&lt;charT, traits&gt;&amp; os,
-decimal128 d);
+static constexpr auto e {e_v&lt;decimal32&gt;};
+static constexpr auto log2e {log2e_v&lt;decimal32&gt;};
+static constexpr auto log10e {log10e_v&lt;decimal32&gt;};
+static constexpr auto pi {pi_v&lt;decimal32&gt;};
+static constexpr auto inv_pi {inv_pi_v&lt;decimal32&gt;};
+static constexpr auto inv_sqrtpi {inv_sqrtpi_v&lt;decimal32&gt;};
+static constexpr auto ln2 {ln2_v&lt;decimal32&gt;};
+static constexpr auto ln10 {ln10_v&lt;decimal32&gt;};
+static constexpr auto sqrt2 {sqrt2_v&lt;decimal32&gt;};
+static constexpr auto sqrt3 {sqrt3_v&lt;decimal32&gt;};
+static constexpr auto inv_sqrt2 {inv_sqrt2_v&lt;decimal32&gt;};
+static constexpr auto inv_sqrt3 {inv_sqrt3_v&lt;decimal32&gt;};
+static constexpr auto egamma {egamma_v&lt;decimal32&gt;};
+static constexpr auto phi {phi_v&lt;decimal32&gt;};
 
 } //namespace decimal
 } //namespace boost</code></pre>
 </div>
 </div>
-<div class="sect2">
-<h3 id="decimal_3_2_8_note">3.2.8 Note</h3>
-<div class="paragraph">
-<p>In the event of binary arithmetic between a non-decimal type and a decimal type the arithmetic will occur between the native types, and the result will be returned as the same type as the decimal operand. (e.g. decimal32 * uint64_t &#8594; decimal32)</p>
-</div>
-<div class="paragraph">
-<p>In the event of binary arithmetic between two decimal types the result will be the higher precision type of the two (e.g. decimal64 + decimal32 &#8594; decimal64)</p>
-</div>
-<div class="paragraph">
-<p><strong>NOTE</strong>: Only two of the same decimal type or decimal type and an integer are supported</p>
-</div>
 </div>
 </div>
 </div>
 <div class="paragraph nav-footer">
-<p>← Previous: <a href="overview.html">Overview</a> | ↑ Up: <a href="decimal.html">Decimal: IEEE 754 Decimal Floating Point Numbers</a> | Next: <a href="decimal32.html">Decimal32</a> →</p>
+<p>← Previous: <a href="decimal128.html">Decimal64</a> | ↑ Up: <a href="decimal.html">Decimal: IEEE 754 Decimal Floating Point Numbers</a> | Next: <a href="Cmath.html">Special Functions</a> →</p>
 </div>
 </div>
 <div id="footer">
