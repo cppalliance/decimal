@@ -81,6 +81,7 @@ explicit constexpr operator std::float64_t() const noexcept;
 explicit constexpr operator std::bfloat16_t() const noexcept;
 
 explicit constexpr operator decimal64() const noexcept;
+explicit constexpr operator decimal128() const noexcept;
 
 // Literals
 constexpr auto operator  "" _DF(const char* str) -> decimal32
