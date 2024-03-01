@@ -147,13 +147,13 @@ void test_non_finite_values()
     BOOST_TEST(isnan(val));
 
     const char* qnan_str = "nan";
-    val = T(0);
+    val = 0;
     r = from_chars(qnan_str, qnan_str + std::strlen(qnan_str), val);
     BOOST_TEST(r);
     BOOST_TEST(isnan(val));
 
     const char* inf_str = "inf";
-    val = T(0);
+    val = 0;
     r = from_chars(inf_str, inf_str + std::strlen(inf_str), val);
     BOOST_TEST(r.ec == std::errc::result_out_of_range);
     BOOST_TEST(isinf(val));

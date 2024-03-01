@@ -221,6 +221,9 @@ public:
     template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     explicit constexpr decimal32(Integer val) noexcept;
 
+    template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+    constexpr auto operator=(const Integer& val) noexcept -> decimal32&;
+
     // 3.2.2.4 Conversion to integral type
     explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
@@ -1577,6 +1580,14 @@ constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect param
 {
     using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
     *this = decimal32{static_cast<ConversionType>(val), 0};
+}
+
+template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+constexpr auto decimal32::operator=(const Integer& val) noexcept -> decimal32&
+{
+    using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
+    *this = decimal32{static_cast<ConversionType>(val), 0};
+    return *this;
 }
 
 template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
