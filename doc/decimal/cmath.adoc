@@ -110,6 +110,232 @@ They are also all constexpr with C\\++14 unlike the built-in floating point type
 - https://en.cppreference.com/w/cpp/numeric/math/islessgreater[islessgreater]
 - https://en.cppreference.com/w/cpp/numeric/math/isunordered[isunordered]
 
+=== Summary
+
+[source, c++]
+----
+
+namespace boost {
+namespace decimal {
+
+template <typename DecimalType>
+constexpr DecimalType abs(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType fabs(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType abs(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType fmod(DecimalType x, DecimalType y) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType remainder(DecimalType x, DecimalType y) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType remquo(DecimalType x, DecimalType y, int* quo) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType fma(DecimalType x, DecimalType y, DecimalType z) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType fmax(DecimalType x, DecimalType y, int* quo) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType fmin(DecimalType x, DecimalType y, int* quo) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType fdim(DecimalType x, DecimalType y, int* quo) noexcept;
+
+constexpr decimal32 nand32(const char* arg) noexcept;
+constexpr decimal64 nand64(const char* arg) noexcept;
+constexpr decimal128 nand128(const char* arg) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType exp(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType exp2(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType expm1(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType log(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType log10(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType log2(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType log1p(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType pow(DecimalType x, DecimalType y) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType sqrt(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType cbrt(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType hypot(DecimalType x, DecimalType y) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType hypot(DecimalType x, DecimalType y, DecimalType z) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType sin(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType cos(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType tan(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType asin(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType acos(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType atan(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType atan2(DecimalType x, DecimalType y) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType sinh(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType cosh(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType tanh(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType asinh(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType acosh(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType atanh(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType erf(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType erfc(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType tgamma(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType lgamma(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType ceil(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType floor(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType trunc(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType round(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr long lround(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr long long llround(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType nearbyint(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType rint(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr long lrint(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr long long llrint(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType frexp(DecimalType x, int* exp) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType ldexp(DecimalType x, int exp) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType modf(DecimalType x, DecimalType* iptr) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType scalbn(DecimalType x, int exp) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType scalbln(DecimalType x, long exp) noexcept;
+
+template <typename DecimalType>
+constexpr int ilogb(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType logb(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType nextafter(DecimalType from, DecimalType to) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType nexttoward(DecimalType from, long double to) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType copysign(DecimalType mag, DecimalType sgn) noexcept;
+
+template <typename DecimalType>
+constexpr int fpclassify(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr bool isfinite(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr bool isinf(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr bool isnan(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr bool isnormal(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr bool signbit(DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr bool isgreater(DecimalType x, DecimalType y) noexcept;
+
+template <typename DecimalType>
+constexpr bool isgreaterequal(DecimalType x, DecimalType y) noexcept;
+
+template <typename DecimalType>
+constexpr bool isless(DecimalType x, DecimalType y) noexcept;
+
+template <typename DecimalType>
+constexpr bool islessgreater(DecimalType x, DecimalType y) noexcept;
+
+template <typename DecimalType>
+constexpr bool isunordered(DecimalType x, DecimalType y) noexcept;
+
+} //namespace decimal
+} //namespace boost
+----
+
 == C++17 Mathematical Special Functions
 
 The following functions have been implemented for decimal types:
@@ -118,6 +344,26 @@ The following functions have been implemented for decimal types:
 - https://en.cppreference.com/w/cpp/numeric/special_functions/hermite[hermite]
 - https://en.cppreference.com/w/cpp/numeric/special_functions/laguerre[laguerre]
 
+=== Summary
+
+[source, c++]
+----
+
+namespace boost {
+namespace decimal {
+
+template <typename DecimalType>
+constexpr DecimalType assoc_laguerre(unsigned int n, unsigned int m, DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType hermite(unsigned int n, DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType laguerre(unsigned int n, DecimalType x) noexcept;
+
+} //namespace decimal
+} //namespace boost
+----
 
 == Non-standard Functions
 
