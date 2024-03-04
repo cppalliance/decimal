@@ -39,6 +39,7 @@ int main()
 ----
 #include <boost/decimal.hpp>
 #include <type_traits>
+#include <cassert>
 
 int main()
 {
@@ -55,4 +56,47 @@ int main()
 }
 ----
 
+== charconv
 
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <cassert>
+
+int main()
+{
+    using namespace boost::decimal;
+
+    decimal64 val {0.25}; // Construction from a double
+
+    char buffer[256];
+    auto r_to = to_chars(buffer, buffer + sizeof(buffer) - 1, val);
+    assert(r_to); // checks std::errc()
+    *r_to.ptr = '\0';
+
+    decimal64 return_value;
+    auto r_from = from_chars(buffer, buffer + std::strlen(buffer), return_value);
+
+    assert(val == return_value);
+
+    return 0;
+}
+----
+
+== Rounding Mode
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <cassert>
+
+int main()
+{
+    auto default_rounding_mode = boost::decimal::fegetround(); // Default is fe_dec_to_nearest_from_zero
+
+    auto new_rounding_mode = fesetround(boost::decimal::rounding_mode::fe_dec_to_nearest);
+
+    assert(default_rounding_mode != new_rounding_mode);
+
+    return 0;
+}
+----
