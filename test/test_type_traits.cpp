@@ -9,6 +9,7 @@ int main()
 {
     using namespace boost::decimal;
 
+    #ifdef BOOST_DECIMAL_HAS_BOOST_TYPE_TRAITS
     static_assert(boost::is_arithmetic<decimal32>::value, "Incorrect definition");
     static_assert(boost::is_arithmetic<decimal64>::value, "Incorrect definition");
     static_assert(boost::is_arithmetic<decimal128>::value, "Incorrect definition");
@@ -28,6 +29,7 @@ int main()
     static_assert(boost::is_pod<decimal32>::value, "Incorrect definition");
     static_assert(boost::is_pod<decimal64>::value, "Incorrect definition");
     static_assert(boost::is_pod<decimal128>::value, "Incorrect definition");
+    #endif
 
     static_assert(boost::is_decimal_floating_point<decimal32>::value, "Incorrect definition");
     static_assert(boost::is_decimal_floating_point<decimal64>::value, "Incorrect definition");

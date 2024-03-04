@@ -8,6 +8,7 @@
 
 #if __has_include(<boost/type_traits.hpp>)
 
+#define BOOST_DECIMAL_HAS_BOOST_TYPE_TRAITS
 #include <boost/type_traits.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <type_traits>
