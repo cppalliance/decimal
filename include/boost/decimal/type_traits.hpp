@@ -42,15 +42,28 @@ template <> struct is_pod<boost::decimal::decimal128> : public true_type {};
 
 namespace boost {
 
-// Section 3.11.2 is_decimal_floating_point
+namespace decimal {
+namespace detail {
 
-template <typename T> struct is_decimal_floating_point : public false_type{};
+#ifdef BOOST_DECIMAL_HAS_BOOST_TYPE_TRAITS
+using local_true_type = true_type;
+using local_false_type = false_type;
+#else
+using local_true_type = std::true_type;
+using local_false_type = std::false_type;
+#endif
+
+}
+}
+
+// Section 3.11.2 is_decimal_floating_point
+template <typename T> struct is_decimal_floating_point : public decimal::detail::local_false_type{};
 template <typename T> struct is_decimal_floating_point<const T> : public is_decimal_floating_point<T>{};
 template <typename T> struct is_decimal_floating_point<volatile const T> : public is_decimal_floating_point<T>{};
 template <typename T> struct is_decimal_floating_point<volatile T> : public is_decimal_floating_point<T>{};
-template <> struct is_decimal_floating_point<boost::decimal::decimal32> : public true_type{};
-template <> struct is_decimal_floating_point<boost::decimal::decimal64> : public true_type{};
-template <> struct is_decimal_floating_point<boost::decimal::decimal128> : public true_type{};
+template <> struct is_decimal_floating_point<boost::decimal::decimal32> : public decimal::detail::local_true_type{};
+template <> struct is_decimal_floating_point<boost::decimal::decimal64> : public decimal::detail::local_true_type{};
+template <> struct is_decimal_floating_point<boost::decimal::decimal128> : public decimal::detail::local_true_type{};
 
 #if defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L
 template <typename T>
