@@ -4,9 +4,9 @@ Distributed under the Boost Software License, Version 1.0.
 https://www.boost.org/LICENSE_1_0.txt
 ////
 
-[#decimal]
-= Decimal
-:idprefix: decimal_
+[#generic_decimal_]
+= Decimal Types
+:idprefix: generic_decimal_
 
 Synopsis of header `<boost/decimal.hpp>`
 
@@ -154,5 +154,3 @@ decimal128 d);
 In the event of binary arithmetic between a non-decimal type and a decimal type the arithmetic will occur between the native types, and the result will be returned as the same type as the decimal operand. (e.g. decimal32 * uint64_t -> decimal32)
 
 In the event of binary arithmetic between two decimal types the result will be the higher precision type of the two (e.g. decimal64 + decimal32 -> decimal64)
-
-*NOTE*: Only two of the same decimal type or decimal type and an integer are supported
