@@ -36,12 +36,17 @@ void test_non_finite_values()
 {
     std::uniform_real_distribution<float> dist(-1.0, 1.0);
 
-    test_value(std::numeric_limits<T>::quiet_NaN() * T{dist(rng)}, "nan");
-    test_value(-std::numeric_limits<T>::quiet_NaN() * T{dist(rng)}, "-nan");
-    test_value(std::numeric_limits<T>::signaling_NaN() * T{dist(rng)}, "nan(snan)");
-    test_value(-std::numeric_limits<T>::signaling_NaN() * T{dist(rng)}, "-nan(snan)");
-    test_value(std::numeric_limits<T>::infinity() * T{dist(rng)}, "inf");
-    test_value(-std::numeric_limits<T>::infinity() * T{dist(rng)}, "-inf");
+    const auto formats = {chars_format::fixed, chars_format::scientific, chars_format::general, chars_format::hex};
+
+    for (const auto format : formats)
+    {
+        test_value(std::numeric_limits<T>::quiet_NaN() * T {dist(rng)}, "nan", format);
+        test_value(-std::numeric_limits<T>::quiet_NaN() * T {dist(rng)}, "-nan", format);
+        test_value(std::numeric_limits<T>::signaling_NaN() * T {dist(rng)}, "nan(snan)", format);
+        test_value(-std::numeric_limits<T>::signaling_NaN() * T {dist(rng)}, "-nan(snan)", format);
+        test_value(std::numeric_limits<T>::infinity() * T {dist(rng)}, "inf", format);
+        test_value(-std::numeric_limits<T>::infinity() * T {dist(rng)}, "-inf", format);
+    }
 }
 
 template <typename T>
