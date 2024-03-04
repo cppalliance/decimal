@@ -31,7 +31,7 @@ namespace decimal {
 namespace detail {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-constexpr auto from_chars_general_impl(const char* first, const char* last, TargetDecimalType& value) noexcept -> from_chars_result
+constexpr auto from_chars_general_impl(const char* first, const char* last, TargetDecimalType& value, chars_format fmt) noexcept -> from_chars_result
 {
     using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, detail::uint128, std::uint64_t>;
 
@@ -44,7 +44,7 @@ constexpr auto from_chars_general_impl(const char* first, const char* last, Targ
     significand_type significand {};
     std::int32_t expval {};
 
-    auto r {detail::parser(first, last, sign, significand, expval)};
+    auto r {detail::parser(first, last, sign, significand, expval, fmt)};
 
     if (!r)
     {
@@ -84,23 +84,17 @@ constexpr auto from_chars_general_impl(const char* first, const char* last, Targ
 
 constexpr auto from_chars(const char* first, const char* last, decimal32& value, chars_format fmt = chars_format::general) noexcept
 {
-    BOOST_DECIMAL_ASSERT_MSG(fmt != chars_format::hex, "Hex is not yet implemented");
-    static_cast<void>(fmt);
-    return detail::from_chars_general_impl(first, last, value);
+    return detail::from_chars_general_impl(first, last, value, fmt);
 }
 
 constexpr auto from_chars(const char* first, const char* last, decimal64& value, chars_format fmt = chars_format::general) noexcept
 {
-    BOOST_DECIMAL_ASSERT_MSG(fmt != chars_format::hex, "Hex is not yet implemented");
-    static_cast<void>(fmt);
-    return detail::from_chars_general_impl(first, last, value);
+    return detail::from_chars_general_impl(first, last, value, fmt);
 }
 
 constexpr auto from_chars(const char* first, const char* last, decimal128& value, chars_format fmt = chars_format::general) noexcept
 {
-    BOOST_DECIMAL_ASSERT_MSG(fmt != chars_format::hex, "Hex is not yet implemented");
-    static_cast<void>(fmt);
-    return detail::from_chars_general_impl(first, last, value);
+    return detail::from_chars_general_impl(first, last, value, fmt);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
