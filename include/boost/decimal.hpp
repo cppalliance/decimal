@@ -16,5 +16,6 @@
 #include <boost/decimal/hash.hpp>
 #include <boost/decimal/cfloat.hpp>
 #include <boost/decimal/charconv.hpp>
+#include <boost/decimal/type_traits.hpp>
 
 #endif // BOOST_DECIMAL_HPP
