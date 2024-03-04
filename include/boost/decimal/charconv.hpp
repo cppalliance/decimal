@@ -17,6 +17,7 @@
 #include <boost/decimal/detail/to_chars_integer_impl.hpp>
 #include <boost/decimal/detail/buffer_sizing.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
+#include <boost/decimal/detail/attributes.hpp>
 #include <cstdint>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
@@ -482,6 +483,155 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value, int precision = -1) noexcept -> to_chars_result
+{
+    using Unsigned_Integer = std::conditional_t<!std::is_same<TargetDecimalType, decimal128>::value, std::uint64_t, uint128>;
+
+    const auto fp = fpclassify(value);
+    if (fp != FP_NORMAL)
+    {
+        return to_chars_nonfinite(first, last, value, fp);
+    }
+
+    const std::ptrdiff_t buffer_size = last - first;
+    auto real_precision = get_real_precision<TargetDecimalType>(precision);
+
+    if (precision != -1)
+    {
+        real_precision = precision;
+    }
+
+    constexpr auto hex_precision = std::is_same<TargetDecimalType, decimal32>::value ? 6 :
+                                   std::is_same<TargetDecimalType, decimal64>::value ? 14 : 28;
+
+    constexpr auto nibble_bits = CHAR_BIT / 2;
+    constexpr auto hex_bits = hex_precision * nibble_bits;
+    const Unsigned_Integer hex_mask = (static_cast<Unsigned_Integer>(1) << hex_bits) - 1;
+
+    if (buffer_size < real_precision)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    int exp {};
+    const Unsigned_Integer significand = frexp10(value, &exp);
+
+    Unsigned_Integer aligned_significand;
+    BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<TargetDecimalType, decimal32>::value)
+    {
+        aligned_significand = significand << 1;
+    }
+    else
+    {
+        aligned_significand = significand;
+    }
+
+    std::int64_t unbiased_exponent = exp + bias_v<TargetDecimalType>;
+    const std::uint32_t abs_unbiased_exponent = unbiased_exponent < 0 ? static_cast<std::uint32_t>(-unbiased_exponent) :
+                                                static_cast<std::uint32_t>(unbiased_exponent);
+
+    const std::ptrdiff_t total_length = total_buffer_length(real_precision, abs_unbiased_exponent, (value < 0));
+    if (total_length > buffer_size)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    // Round if required
+    if (real_precision < hex_precision)
+    {
+        const int lost_bits = (hex_precision - real_precision) * nibble_bits;
+        const Unsigned_Integer lsb_bit = aligned_significand;
+        const Unsigned_Integer round_bit = aligned_significand << 1;
+        const Unsigned_Integer tail_bit = round_bit - 1;
+        const Unsigned_Integer round = round_bit & (tail_bit | lsb_bit) & (static_cast<Unsigned_Integer>(1) << lost_bits);
+        aligned_significand += round;
+    }
+
+    // Print the sign
+    if (value < 0)
+    {
+        *first++ = '-';
+    }
+
+    // Print the integral part
+    #if BOOST_CHARCONV_LDBL_BITS == 80
+    std::uint32_t leading_nibble;
+    BOOST_IF_CONSTEXPR (std::is_same<Real, long double>::value)
+    {
+        leading_nibble = static_cast<std::uint32_t>(significand >> hex_bits);
+    }
+    else
+    {
+        leading_nibble = static_cast<std::uint32_t>(aligned_significand >> hex_bits);
+    }
+    #else
+    const auto leading_nibble = static_cast<std::uint32_t>(aligned_significand >> hex_bits);
+    #endif
+
+    BOOST_DECIMAL_ASSERT(leading_nibble < 16);
+    *first++ = digit_table[leading_nibble];
+
+    aligned_significand &= hex_mask;
+
+    // Print the fractional part
+    if (real_precision > 0)
+    {
+        *first++ = '.';
+        std::int32_t remaining_bits = hex_bits;
+
+        while (true)
+        {
+            remaining_bits -= nibble_bits;
+            const auto current_nibble = static_cast<std::uint32_t>(aligned_significand >> remaining_bits);
+            *first++ = digit_table[current_nibble];
+
+            --real_precision;
+            if (real_precision == 0)
+            {
+                break;
+            }
+            else if (remaining_bits == 0)
+            {
+                // Do not print trailing zeros with unspecified precision
+                if (precision != -1)
+                {
+                    std::memset(first, '0', static_cast<std::size_t>(real_precision));
+                    first += real_precision;
+                }
+                break;
+            }
+
+            // Mask away the hexit we just printed
+            aligned_significand &= (static_cast<Unsigned_Integer>(1) << remaining_bits) - 1;
+        }
+    }
+
+    // Remove any trailing zeros if the precision was unspecified
+    if (precision == -1)
+    {
+        --first;
+        while (*first == '0')
+        {
+            --first;
+        }
+        ++first;
+    }
+
+    // Print the exponent
+    *first++ = 'p';
+    if (unbiased_exponent < 0)
+    {
+        *first++ = '-';
+    }
+    else
+    {
+        *first++ = '+';
+    }
+
+    return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, abs_unbiased_exponent, 10);
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecimalType value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
 {
     // Sanity check our bounds
@@ -534,11 +684,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
         }
     }
 
-    // TODO(mborland): Insert hex formatting here
-    // LCOV_EXCL_START
-    BOOST_DECIMAL_ASSERT_MSG(fmt != chars_format::hex, "Hex format has not been implemented yet");
-    return {first, std::errc()};
-    // LCOV_EXCL_STOP
+    return to_chars_hex_impl(first, last, value, precision);
 }
 
 } //namespace detail
