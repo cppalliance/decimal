@@ -159,6 +159,31 @@ void test_non_finite_values()
     BOOST_TEST(isinf(val));
 }
 
+template <typename T>
+void test_hex_values()
+{
+    const char* buffer1 = "1.3a2bp-10";
+    T v1;
+    auto r1 = from_chars(buffer1, buffer1 + std::strlen(buffer1), v1, chars_format::hex);
+    BOOST_TEST(r1.ec == std::errc());
+    constexpr auto res_1 = T{UINT64_C(80427), -14, false};
+    BOOST_TEST_EQ(v1, res_1);
+
+    const char* buffer2 = "1.234p-10";
+    T v2;
+    auto r2 = from_chars(buffer2, buffer2 + std::strlen(buffer2), v2, chars_format::hex);
+    BOOST_TEST(r2.ec == std::errc());
+    constexpr auto res_2 = T{UINT64_C(4660), -13, false};
+    BOOST_TEST_EQ(v2, res_2);
+
+    const char* buffer3 = "-2a";
+    T v3;
+    auto r3 = from_chars(buffer3, buffer3 + std::strlen(buffer3), v3, chars_format::hex);
+    BOOST_TEST(r3.ec == std::errc());
+    constexpr auto res_3 = T{UINT64_C(42), 0, true};
+    BOOST_TEST_EQ(v3, res_3);
+}
+
 int main()
 {
     test_from_chars_scientific<decimal32>();
@@ -173,11 +198,15 @@ int main()
     test_non_finite_values<decimal32>();
     test_non_finite_values<decimal64>();
 
+    test_hex_values<decimal32>();
+    test_hex_values<decimal64>();
+
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_from_chars_scientific<decimal128>();
     test_from_chars_fixed<decimal128>();
     test_from_chars_general<decimal128>();
     test_non_finite_values<decimal128>();
+    test_hex_values<decimal128>();
     #endif
 
     return boost::report_errors();
