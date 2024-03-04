@@ -52,6 +52,11 @@ template <> struct is_decimal_floating_point<boost::decimal::decimal32> : public
 template <> struct is_decimal_floating_point<boost::decimal::decimal64> : public true_type{};
 template <> struct is_decimal_floating_point<boost::decimal::decimal128> : public true_type{};
 
+#if defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L
+template <typename T>
+inline constexpr bool is_decimal_floating_point_v = is_decimal_floating_point<T>::value;
+#endif
+
 } // namespace boost
 
 #endif //BOOST_DECIMAL_TYPE_TRAITS_HPP
