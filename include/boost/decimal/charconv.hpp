@@ -526,9 +526,13 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         aligned_significand = significand;
     }
 
-    std::int64_t unbiased_exponent = exp + bias_v<TargetDecimalType>;
-    const std::uint32_t abs_unbiased_exponent = unbiased_exponent < 0 ? static_cast<std::uint32_t>(-unbiased_exponent) :
-                                                static_cast<std::uint32_t>(unbiased_exponent);
+    std::uint32_t abs_unbiased_exponent = exp < 0 ? static_cast<std::uint32_t>(-exp) :
+                                                    static_cast<std::uint32_t>(exp);
+
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<TargetDecimalType, decimal32>::value)
+    {
+        abs_unbiased_exponent += 6;
+    }
 
     const std::ptrdiff_t total_length = total_buffer_length(real_precision, abs_unbiased_exponent, (value < 0));
     if (total_length > buffer_size)
@@ -619,7 +623,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 
     // Print the exponent
     *first++ = 'p';
-    if (unbiased_exponent < 0)
+    if (exp < 0)
     {
         *first++ = '-';
     }
