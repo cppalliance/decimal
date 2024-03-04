@@ -1,0 +1,61 @@
+////
+Copyright 2024 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#type_traits]
+= type_traits support
+:idprefix: type_traits_
+
+== <type_traits>
+
+The following type traits from boost.type_traits have been overloaded fro the decimal types:
+
+[source, c++]
+----
+namespace boost {
+
+template <> struct is_arithmetic<boost::decimal::decimal32> : public true_type {};
+template <> struct is_arithmetic<boost::decimal::decimal64> : public true_type {};
+template <> struct is_arithmetic<boost::decimal::decimal128> : public true_type {};
+
+template <> struct is_fundamental<boost::decimal::decimal32> : public true_type {};
+template <> struct is_fundamental<boost::decimal::decimal64> : public true_type {};
+template <> struct is_fundamental<boost::decimal::decimal128> : public true_type {};
+
+template <> struct is_scalar<boost::decimal::decimal32> : public true_type {};
+template <> struct is_scalar<boost::decimal::decimal64> : public true_type {};
+template <> struct is_scalar<boost::decimal::decimal128> : public true_type {};
+
+template <> struct is_class<boost::decimal::decimal32> : public false_type {};
+template <> struct is_class<boost::decimal::decimal64> : public false_type {};
+template <> struct is_class<boost::decimal::decimal128> : public false_type {};
+
+template <> struct is_pod<boost::decimal::decimal32> : public true_type {};
+template <> struct is_pod<boost::decimal::decimal64> : public true_type {};
+template <> struct is_pod<boost::decimal::decimal128> : public true_type {};
+
+} // namespace boost
+----
+
+CAUTION: These overloads only exist if <boost/type_traits.hpp> is installed.
+In a standalone environment they do not exist.
+
+An additional type_trait has been added `is_decimal_floating_point`, which is defined as follows:
+
+[source, c++]
+----
+namespace boost {
+
+template <typename T> struct is_decimal_floating_point : public false_type{};
+template <typename T> struct is_decimal_floating_point<const T> : public is_decimal_floating_point<T>{};
+template <typename T> struct is_decimal_floating_point<volatile const T> : public is_decimal_floating_point<T>{};
+template <typename T> struct is_decimal_floating_point<volatile T> : public is_decimal_floating_point<T>{};
+
+template <> struct is_decimal_floating_point<boost::decimal::decimal32> : public true_type{};
+template <> struct is_decimal_floating_point<boost::decimal::decimal64> : public true_type{};
+template <> struct is_decimal_floating_point<boost::decimal::decimal128> : public true_type{};
+
+} // namespace boost
+----
