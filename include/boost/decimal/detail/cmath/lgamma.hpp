@@ -11,6 +11,7 @@
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/cmath/impl/lgamma_impl.hpp>
 #include <boost/decimal/detail/cmath/impl/taylor_series_result.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/log.hpp>
@@ -76,53 +77,9 @@ constexpr auto lgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
 
             if (x < half)
             {
-                using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(25))>;
-
-                #if (defined(__clang__) && (__clang__ < 6))
-                #  pragma clang diagnostic push
-                #  pragma clang diagnostic ignored "-Wmissing-braces"
-                #endif
-
-                constexpr auto coefficient_table =
-                    coefficient_array_type
-                    {
-                        // Use a Taylor series expansion of the logarithm of the gamma function.
-                        // N[Series[Log[Gamma[x]], {x, 0, 26}], 32]
-                        //         log(1/x)
-                        //        -EulerGamma                             // * x
-                          T { UINT64_C(822'467'033'424'113'218), -18 },   // x^2
-                        - T { UINT64_C(400'685'634'386'531'428), -18 },   // x^3
-                        + T { UINT64_C(270'580'808'427'784'548), -18 },   // x^4
-                        - T { UINT64_C(207'385'551'028'673'985), -18 },   // x^5
-                        + T { UINT64_C(169'557'176'997'408'190), -18 },   // x^6
-                        - T { UINT64_C(144'049'896'768'846'118), -18 },   // x^7
-                        + T { UINT64_C(125'509'669'524'743'042), -18 },   // x^8
-                        - T { UINT64_C(111'334'265'869'564'690), -18 },   // x^9
-                        + T { UINT64_C(100'099'457'512'781'809), -18 },   // x^10
-                        - T { UINT64_C(909'540'171'458'290'422), -19 },   // x^11
-                        + T { UINT64_C(833'538'405'461'090'040), -19 },   // x^12
-                        - T { UINT64_C(769'325'164'113'521'915), -19 },   // x^13
-                        + T { UINT64_C(714'329'462'953'613'361), -19 },   // x^14
-                        - T { UINT64_C(666'687'058'824'204'680), -19 },   // x^15
-                        + T { UINT64_C(625'009'551'412'130'407), -19 },   // x^16
-                        - T { UINT64_C(588'239'786'586'845'823), -19 },   // x^17
-                        + T { UINT64_C(555'557'676'274'036'111), -19 },   // x^18
-                        - T { UINT64_C(526'316'793'796'166'607), -19 },   // x^19
-                        + T { UINT64_C(500'000'476'981'016'936), -19 },   // x^20
-                        - T { UINT64_C(476'190'703'301'422'280), -19 },   // x^21
-                        + T { UINT64_C(454'545'562'932'046'694), -19 },   // x^22
-                        - T { UINT64_C(434'782'660'530'402'594), -19 },   // x^23
-                        + T { UINT64_C(416'666'691'503'412'105), -19 },   // x^24
-                        - T { UINT64_C(400'000'011'921'401'406), -19 },   // x^25
-                        + T { UINT64_C(384'615'390'346'751'857), -19 },   // x^26
-                    };
-
-                #if (defined(__clang__) && (__clang__ < 6))
-                #  pragma clang diagnostic pop
-                #endif
-
                 // Perform the Taylor series expansion.
-                result = detail::taylor_series_result(x, coefficient_table);
+                //result = detail::taylor_series_result(x, coefficient_table);
+                result = detail::lgamma_taylor_series_expansion(x);
 
                 result = x * fma(result, x, -numbers::egamma_v<T>);
 
