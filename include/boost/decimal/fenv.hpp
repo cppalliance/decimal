@@ -19,7 +19,7 @@ enum class rounding_mode : unsigned
     fe_dec_default = fe_dec_to_nearest_from_zero
 };
 
-rounding_mode _boost_decimal_global_rounding_mode {rounding_mode::fe_dec_default};
+static rounding_mode _boost_decimal_global_rounding_mode {rounding_mode::fe_dec_default};
 
 auto fegetround() noexcept -> rounding_mode
 {
