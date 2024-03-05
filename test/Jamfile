@@ -23,6 +23,7 @@ project : requirements
   ;
 
 compile-fail concepts_test.cpp ;
+run github_issue_426.cpp ;
 run ibm_abs.cpp ;
 run ibm_add.cpp ;
 run quick.cpp ;
