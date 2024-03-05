@@ -11,6 +11,7 @@
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/cmath/impl/taylor_series_result.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/log.hpp>
 #include <boost/decimal/detail/cmath/sin.hpp>
@@ -121,19 +122,7 @@ constexpr auto lgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
                 #endif
 
                 // Perform the Taylor series expansion.
-                auto rit =
-                    coefficient_table.crbegin()
-                  + static_cast<std::size_t>
-                    (
-                      (sizeof(T) == static_cast<std::size_t>(UINT8_C(4))) ? 12U : 0U
-                    );
-
-                result = *rit;
-
-                while(rit != coefficient_table.crend())
-                {
-                    result = fma(result, x, *rit++);
-                }
+                result = detail::taylor_series_result(x, coefficient_table);
 
                 result = x * fma(result, x, -numbers::egamma_v<T>);
 
@@ -193,21 +182,9 @@ constexpr auto lgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
                 #endif
 
                 // Perform the Laurent series expansion.
-                auto rit =
-                    coefficient_table.crbegin()
-                  + static_cast<std::size_t>
-                    (
-                      (sizeof(T) == static_cast<std::size_t>(UINT8_C(4))) ? 12U : 0U
-                    );
-
                 const auto one_over_x = one / x;
 
-                result = *rit;
-
-                while(rit != coefficient_table.crend())
-                {
-                    result = fma(result, one_over_x, *rit++);
-                }
+                result = detail::taylor_series_result(one_over_x, coefficient_table);
 
                 result = (x * (log(x) - one)) + log(result / sqrt(x));
             }
