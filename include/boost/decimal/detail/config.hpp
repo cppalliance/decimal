@@ -42,7 +42,7 @@
 #endif
 
 #ifndef BOOST_DECIMAL_CXX20_CONSTEXPR
-#  define BOOST_DECIMAL_CXX20_CONSTEXPR
+#  define BOOST_DECIMAL_CXX20_CONSTEXPR inline
 #endif
 
 // Include intrinsics if available
