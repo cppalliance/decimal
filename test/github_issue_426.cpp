@@ -4,9 +4,10 @@
 
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
-#include <complex>
 
-#if __cplusplus > 202002L
+#if defined(__GNUC__) && __GNUC__ >= 5 && __cplusplus > 202002L
+
+#include <complex>
 
 int main()
 {
