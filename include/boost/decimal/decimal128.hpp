@@ -477,7 +477,7 @@ public:
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
 
-    friend std::string bit_string(decimal128 rhs) noexcept;
+    friend inline std::string bit_string(decimal128 rhs) noexcept;
     #endif
 
     // 3.6.4 Same Quantum
@@ -556,7 +556,7 @@ public:
 };
 
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
-std::string bit_string(decimal128 rhs) noexcept
+inline std::string bit_string(decimal128 rhs) noexcept
 {
     std::stringstream ss;
     ss << std::hex << rhs.bits_.high << rhs.bits_.low;
