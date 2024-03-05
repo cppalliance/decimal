@@ -24,7 +24,12 @@ int main()
 
 int main()
 {
-    return 0;
+    using namespace boost::decimal;
+
+    const decimal64 test_val = 1.5707963267948966192313216916397514L;
+    BOOST_TEST_EQ(test_val, decimal64{1.5707963267948966192313216916397514L});
+
+    return boost::report_errors();
 }
 
 #endif
