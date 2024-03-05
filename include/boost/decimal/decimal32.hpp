@@ -212,7 +212,7 @@ public:
 
     // 3.2.2.2 Conversion from floating-point type
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
-    explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
+    BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
 
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     BOOST_DECIMAL_CXX20_CONSTEXPR auto operator=(const Float& val) noexcept -> decimal32&;
