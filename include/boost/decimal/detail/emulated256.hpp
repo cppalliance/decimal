@@ -566,7 +566,7 @@ constexpr uint256_t umul512_high256(const uint256_t &x, const uint256_t &y) noex
     return ac + (intermediate >> 128) + (ad >> 128) + (bc >> 128);
 }
 
-auto emulated256_to_buffer(char (&buffer)[ 128 ], uint256_t v)
+inline auto emulated256_to_buffer(char (&buffer)[ 128 ], uint256_t v)
 {
     constexpr uint256_t zero {0, 0};
 
@@ -585,7 +585,7 @@ auto emulated256_to_buffer(char (&buffer)[ 128 ], uint256_t v)
 
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 template <typename charT, typename traits>
-auto operator<<(std::basic_ostream<charT, traits>& os, uint256_t val) -> std::basic_ostream<charT, traits>&
+inline auto operator<<(std::basic_ostream<charT, traits>& os, uint256_t val) -> std::basic_ostream<charT, traits>&
 {
     char buffer[128];
 
