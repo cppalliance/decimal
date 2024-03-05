@@ -212,7 +212,10 @@ public:
 
     // 3.2.2.2 Conversion from floating-point type
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
-    explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
+    BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
+
+    template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
+    BOOST_DECIMAL_CXX20_CONSTEXPR auto operator=(const Float& val) noexcept -> decimal32&;
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
     explicit constexpr decimal32(Decimal val) noexcept;
@@ -1567,6 +1570,13 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
             *this = decimal32 {components.mantissa, components.exponent, components.sign};
         }
     }
+}
+
+template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal32::operator=(const Float& val) noexcept -> decimal32&
+{
+    *this = decimal32{val};
+    return *this;
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>

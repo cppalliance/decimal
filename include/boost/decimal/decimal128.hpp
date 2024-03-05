@@ -227,7 +227,10 @@ public:
     constexpr decimal128(const decimal128& rhs) noexcept = default;
 
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
-    explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal128(Float val) noexcept;
+    BOOST_DECIMAL_CXX20_CONSTEXPR decimal128(Float val) noexcept;
+
+    template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
+    BOOST_DECIMAL_CXX20_CONSTEXPR auto operator=(const Float& val) noexcept -> decimal128&;
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
     constexpr decimal128(Decimal val) noexcept;
@@ -857,6 +860,13 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::decimal128(Float val) noexcept
             *this = decimal128 {components.mantissa, components.exponent, components.sign};
         }
     }
+}
+
+template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal128::operator=(const Float& val) noexcept -> decimal128&
+{
+    *this = decimal128{val};
+    return *this;
 }
 
 template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
