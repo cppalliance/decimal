@@ -19,9 +19,9 @@ enum class rounding_mode : unsigned
     fe_dec_default = fe_dec_to_nearest_from_zero
 };
 
-rounding_mode _boost_decimal_global_rounding_mode {rounding_mode::fe_dec_default};
+static rounding_mode _boost_decimal_global_rounding_mode {rounding_mode::fe_dec_default};
 
-auto fegetround() noexcept -> rounding_mode
+inline auto fegetround() noexcept -> rounding_mode
 {
     return _boost_decimal_global_rounding_mode;
 }
@@ -29,7 +29,7 @@ auto fegetround() noexcept -> rounding_mode
 // If we can't support constexpr and non-constexpr code paths we won't honor the updated rounding-mode,
 // since it will not be used anyway.
 // Return the default rounding mode
-auto fesetround(rounding_mode round) noexcept -> rounding_mode
+inline auto fesetround(rounding_mode round) noexcept -> rounding_mode
 {
     _boost_decimal_global_rounding_mode = round;
     return round;

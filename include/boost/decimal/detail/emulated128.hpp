@@ -1142,7 +1142,7 @@ constexpr auto umul96_lower64(std::uint32_t x, std::uint64_t y) noexcept -> std:
     return x * y;
 }
 
-auto emulated128_to_buffer(char (&buffer)[ 64 ], uint128 v)
+inline auto emulated128_to_buffer(char (&buffer)[ 64 ], uint128 v)
 {
     char* p = buffer + 64;
     *--p = '\0';
@@ -1159,7 +1159,7 @@ auto emulated128_to_buffer(char (&buffer)[ 64 ], uint128 v)
 
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 template <typename charT, typename traits>
-auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&
+inline auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&
 {
     char buffer[64];
 
@@ -1169,7 +1169,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basi
 }
 
 template <typename charT, typename traits>
-auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std::basic_ostream<charT, traits>&
+inline auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std::basic_ostream<charT, traits>&
 {
     char buffer[64];
     char* p;

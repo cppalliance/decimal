@@ -42,7 +42,7 @@
 #endif
 
 #ifndef BOOST_DECIMAL_CXX20_CONSTEXPR
-#  define BOOST_DECIMAL_CXX20_CONSTEXPR
+#  define BOOST_DECIMAL_CXX20_CONSTEXPR inline
 #endif
 
 // Include intrinsics if available
@@ -240,6 +240,12 @@ typedef unsigned __int128 uint128_t;
 
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && ((defined(UBSAN) && (UBSAN == 1)))
 #  define BOOST_DECIMAL_REDUCE_TEST_DEPTH
+#endif
+
+#ifdef __clang__
+#  define BOOST_DECIMAL_CLANG_STATIC static
+#else
+#  define BOOST_DECIMAL_CLANG_STATIC
 #endif
 
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP

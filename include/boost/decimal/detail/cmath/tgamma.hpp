@@ -92,6 +92,7 @@ constexpr auto tgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
                     z = z - nx;
                 }
 
+                /*
                 using local_tgamma_table_type = detail::tgamma_table_struct_type<T>;
 
                 // Perform the Taylor series expansion.
@@ -103,7 +104,9 @@ constexpr auto tgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
                 {
                     result = fma(result, z, *rit++);
                 }
+                */
 
+                result = detail::tgamma_series_expansion(z);
                 result = one / (z * fma(result, z, one));
 
                 if (x_is_gt_one)
