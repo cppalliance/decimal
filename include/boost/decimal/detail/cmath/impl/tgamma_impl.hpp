@@ -96,10 +96,12 @@ constexpr auto tgamma_series_expansion<decimal32>(decimal32 z) noexcept
 {
     auto result = tgamma_table::d32_coeffs[tgamma_table::d32_coeffs.size()];
 
-    for (int i {tgamma_table::d32_coeffs.size()}; i >= 0; --i)
+    for (std::size_t i {tgamma_table::d32_coeffs.size()}; i > 0; --i)
     {
         result = fma(result, z, tgamma_table::d32_coeffs[i]);
     }
+
+    result = fma(result, z, tgamma_table::d32_coeffs[0]);
 
     return result;
 }
@@ -109,10 +111,12 @@ constexpr auto tgamma_series_expansion<decimal64>(decimal64 z) noexcept
 {
     auto result = tgamma_table::d64_coeffs[tgamma_table::d64_coeffs.size()];
 
-    for (int i {tgamma_table::d64_coeffs.size()}; i >= 0; --i)
+    for (std::size_t i {tgamma_table::d64_coeffs.size()}; i > 0; --i)
     {
         result = fma(result, z, tgamma_table::d64_coeffs[i]);
     }
+
+    result = fma(result, z, tgamma_table::d64_coeffs[0]);
 
     return result;
 }
