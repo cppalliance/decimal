@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_DECIMAL_DETAIL_CMATH_IMPL_REMEZ_SERIES_RESULT_HPP
-#define BOOST_DECIMAL_DETAIL_CMATH_IMPL_REMEZ_SERIES_RESULT_HPP
+#ifndef BOOST_DECIMAL_DETAIL_CMATH_IMPL_TAYLOR_SERIES_RESULT_HPP
+#define BOOST_DECIMAL_DETAIL_CMATH_IMPL_TAYLOR_SERIES_RESULT_HPP
 
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/cmath/fma.hpp>
@@ -13,12 +13,13 @@ namespace decimal {
 namespace detail {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T, typename Array>
-constexpr auto remez_series_result(T x, const Array &coeffs) noexcept
+constexpr auto taylor_series_result(T x, const Array &coeffs) noexcept
 {
-    T result {};
+    const std::size_t N = coeffs.size();
 
-    result = coeffs[0];
-    for (std::size_t i {1}; i < coeffs.size(); ++i)
+    auto result = coeffs[N - 1];
+
+    for (std::size_t i = N - 1; i-- > 0;)
     {
         result = fma(result, x, coeffs[i]);
     }
@@ -30,4 +31,4 @@ constexpr auto remez_series_result(T x, const Array &coeffs) noexcept
 } //namespace decimal
 } //namespace boost
 
-#endif //BOOST_DECIMAL_DETAIL_CMATH_IMPL_REMEZ_SERIES_RESULT_HPP
+#endif //BOOST_DECIMAL_DETAIL_CMATH_IMPL_TAYLOR_SERIES_RESULT_HPP

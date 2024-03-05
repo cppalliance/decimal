@@ -7,7 +7,7 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_IMPL_TGAMMA_IMPL_HPP
 
 #include <boost/decimal/detail/concepts.hpp>
-#include <boost/decimal/detail/cmath/impl/remez_series_result.hpp>
+#include <boost/decimal/detail/cmath/impl/taylor_series_result.hpp>
 
 #include <array>
 #include <cstddef>
@@ -94,31 +94,13 @@ constexpr auto tgamma_series_expansion(T z) noexcept;
 template <>
 constexpr auto tgamma_series_expansion<decimal32>(decimal32 z) noexcept
 {
-    auto result = tgamma_table::d32_coeffs[tgamma_table::d32_coeffs.size()];
-
-    for (std::size_t i {tgamma_table::d32_coeffs.size()}; i > 0; --i)
-    {
-        result = fma(result, z, tgamma_table::d32_coeffs[i]);
-    }
-
-    result = fma(result, z, tgamma_table::d32_coeffs[0]);
-
-    return result;
+    return taylor_series_result(z, tgamma_table::d32_coeffs);
 }
 
 template <>
 constexpr auto tgamma_series_expansion<decimal64>(decimal64 z) noexcept
 {
-    auto result = tgamma_table::d64_coeffs[tgamma_table::d64_coeffs.size()];
-
-    for (std::size_t i {tgamma_table::d64_coeffs.size()}; i > 0; --i)
-    {
-        result = fma(result, z, tgamma_table::d64_coeffs[i]);
-    }
-
-    result = fma(result, z, tgamma_table::d64_coeffs[0]);
-
-    return result;
+    return taylor_series_result(z, tgamma_table::d64_coeffs);
 }
 
 // TODO(ckormanyos): Add 128 bit coefficients
