@@ -94,7 +94,7 @@ constexpr std::array<decimal128, 21> sin_table_imp<b>::d128_coeffs;
 
 using sin_table = sin_table_imp<true>;
 
-}
+} //namespace sin_detail
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto sin_impl(T x) noexcept;
