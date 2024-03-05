@@ -242,4 +242,10 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_REDUCE_TEST_DEPTH
 #endif
 
+#ifdef __clang__
+#  define BOOST_DECIMAL_CLANG_STATIC static
+#else
+#  define BOOST_DECIMAL_CLANG_STATIC
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
