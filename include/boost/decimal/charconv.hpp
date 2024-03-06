@@ -453,7 +453,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     const auto current_fractional_digits = r.ptr - output_start - integer_digits - 1;
-    if (current_fractional_digits < precision)
+    if (current_fractional_digits < precision && fmt != chars_format::general)
     {
         append_zeros = true;
     }
