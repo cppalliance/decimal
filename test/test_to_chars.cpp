@@ -399,6 +399,7 @@ int main()
     test_434_fixed<decimal64>();
 
     test_434_scientific<decimal32>();
+    test_434_scientific<decimal64>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_non_finite_values<decimal128>();
@@ -409,6 +410,7 @@ int main()
     test_buffer_overflow<decimal128>();
     zero_test<decimal128>();
     test_434_fixed<decimal128>();
+    test_434_scientific<decimal128>();
     #endif
 
     return boost::report_errors();
