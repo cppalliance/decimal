@@ -376,6 +376,7 @@ int main()
     test_precision<decimal128>();
     test_buffer_overflow<decimal128>();
     zero_test<decimal128>();
+    test_434_fixed<decimal128>();
     #endif
 
     return boost::report_errors();
