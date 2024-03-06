@@ -277,6 +277,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     *(first + 1) = '.';
     first = r.ptr;
 
+    if (precision == 0)
+    {
+        --first;
+    }
+
     // Strip trailing zeros in general mode
     if (fmt == chars_format::general)
     {
