@@ -306,6 +306,21 @@ void test_434_fixed()
     test_value(test_one_and_quarter, "1.250000000", chars_format::fixed, 9);
     test_value(test_one_and_quarter, "1.2500000000", chars_format::fixed, 10);
     test_value(test_one_and_quarter, "1.25000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
+
+    constexpr T tweleve_and_half {125, -1};
+
+    test_value(tweleve_and_half, "13", chars_format::fixed, 0);
+    test_value(tweleve_and_half, "12.5", chars_format::fixed, 1);
+    test_value(tweleve_and_half, "12.50", chars_format::fixed, 2);
+    test_value(tweleve_and_half, "12.500", chars_format::fixed, 3);
+    test_value(tweleve_and_half, "12.5000", chars_format::fixed, 4);
+    test_value(tweleve_and_half, "12.50000", chars_format::fixed, 5);
+    test_value(tweleve_and_half, "12.500000", chars_format::fixed, 6);
+    test_value(tweleve_and_half, "12.5000000", chars_format::fixed, 7);
+    test_value(tweleve_and_half, "12.50000000", chars_format::fixed, 8);
+    test_value(tweleve_and_half, "12.500000000", chars_format::fixed, 9);
+    test_value(tweleve_and_half, "12.5000000000", chars_format::fixed, 10);
+    test_value(tweleve_and_half, "12.50000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
 }
 
 template <typename T>
