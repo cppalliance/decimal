@@ -349,23 +349,25 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         --buffer_size;
     }
 
+    const char* output_start = first;
+
     int num_dig = num_digits(significand);
     bool append_zeros = false;
     int integer_digits = num_dig + exponent;
-    num_dig -= integer_digits - 1;
+    num_dig -= integer_digits;
 
     if (precision != -1)
     {
-        if (num_dig >= precision + 2)
+        if (num_dig >= precision + 1)
         {
-            while (num_dig > precision + 2)
+            while (num_dig > precision + 1)
             {
                 significand /= 10;
                 ++exponent;
                 --num_dig;
             }
 
-            if (num_dig == precision + 2)
+            if (num_dig == precision + 1)
             {
                 --num_dig;
                 exponent += fenv_round(significand);
@@ -404,7 +406,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     // Bounds check again
-    if (abs_value >= 1)
+    if (precision == 0)
+    {
+        return {r.ptr, std::errc()};
+    }
+    else if (abs_value >= 1)
     {
         if (exponent < 0 && -exponent < buffer_size)
         {
@@ -420,7 +426,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             abs_value /= 10;
         }
     }
-    else if (precision != 0)
+    else
     {
         #ifdef BOOST_DECIMAL_DEBUG_FIXED
         std::cerr << std::setprecision(std::numeric_limits<Real>::digits10) << "Value: " << value
@@ -438,18 +444,23 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         boost::decimal::detail::memcpy(first + static_cast<std::size_t>(is_neg), "0.", 2U);
         first += 2;
         r.ptr += 2;
+    }
 
-        while (num_dig < -exponent)
-        {
-            *first++ = '0';
-            ++num_dig;
-            ++r.ptr;
-        }
+    // The leading 0 is an integer digit now that we need to account for
+    if (integer_digits == 0)
+    {
+        ++integer_digits;
+    }
+
+    const auto current_fractional_digits = r.ptr - output_start - integer_digits - 1;
+    if (current_fractional_digits < precision)
+    {
+        append_zeros = true;
     }
 
     if (append_zeros)
     {
-        const auto zeros_inserted = static_cast<std::size_t>(precision - num_dig + 1);
+        const auto zeros_inserted = static_cast<std::size_t>(precision - current_fractional_digits);
 
         if (r.ptr + zeros_inserted > last)
         {
