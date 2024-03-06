@@ -349,11 +349,13 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         --buffer_size;
     }
 
-    int num_dig = 0;
+    int num_dig = num_digits(significand);
     bool append_zeros = false;
+    int integer_digits = num_dig + exponent;
+    num_dig -= integer_digits - 1;
+
     if (precision != -1)
     {
-        num_dig = num_digits(significand);
         if (num_dig >= precision + 2)
         {
             while (num_dig > precision + 2)
@@ -418,7 +420,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             abs_value /= 10;
         }
     }
-    else
+    else if (precision != 0)
     {
         #ifdef BOOST_DECIMAL_DEBUG_FIXED
         std::cerr << std::setprecision(std::numeric_limits<Real>::digits10) << "Value: " << value
@@ -427,7 +429,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
                   << "\n  exp: " << exponent << std::endl;
         #endif
 
-        const auto offset_bytes = static_cast<std::size_t>(-exponent - num_dig);
+        const auto offset_bytes = static_cast<std::size_t>(integer_digits);
 
         boost::decimal::detail::memmove(first + 2 + static_cast<std::size_t>(is_neg) + offset_bytes,
                                         first + static_cast<std::size_t>(is_neg),
