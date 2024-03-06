@@ -273,6 +273,75 @@ void zero_test()
     test_value(val, "0.00000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
 }
 
+// See: https://github.com/cppalliance/decimal/issues/434
+template <typename T>
+void test_434_fixed()
+{
+    constexpr T test_zero_point_three {3, -1};
+
+    test_value(test_zero_point_three, "0", chars_format::fixed, 0);
+    test_value(test_zero_point_three, "0.3", chars_format::fixed, 1);
+    test_value(test_zero_point_three, "0.30", chars_format::fixed, 2);
+    test_value(test_zero_point_three, "0.300", chars_format::fixed, 3);
+    test_value(test_zero_point_three, "0.3000", chars_format::fixed, 4);
+    test_value(test_zero_point_three, "0.30000", chars_format::fixed, 5);
+    test_value(test_zero_point_three, "0.300000", chars_format::fixed, 6);
+    test_value(test_zero_point_three, "0.3000000", chars_format::fixed, 7);
+    test_value(test_zero_point_three, "0.30000000", chars_format::fixed, 8);
+    test_value(test_zero_point_three, "0.300000000", chars_format::fixed, 9);
+    test_value(test_zero_point_three, "0.3000000000", chars_format::fixed, 10);
+    test_value(test_zero_point_three, "0.30000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
+
+    constexpr T test_one_and_quarter {125, -2};
+
+    test_value(test_one_and_quarter, "1", chars_format::fixed, 0);
+    test_value(test_one_and_quarter, "1.3", chars_format::fixed, 1);
+    test_value(test_one_and_quarter, "1.25", chars_format::fixed, 2);
+    test_value(test_one_and_quarter, "1.250", chars_format::fixed, 3);
+    test_value(test_one_and_quarter, "1.2500", chars_format::fixed, 4);
+    test_value(test_one_and_quarter, "1.25000", chars_format::fixed, 5);
+    test_value(test_one_and_quarter, "1.250000", chars_format::fixed, 6);
+    test_value(test_one_and_quarter, "1.2500000", chars_format::fixed, 7);
+    test_value(test_one_and_quarter, "1.25000000", chars_format::fixed, 8);
+    test_value(test_one_and_quarter, "1.250000000", chars_format::fixed, 9);
+    test_value(test_one_and_quarter, "1.2500000000", chars_format::fixed, 10);
+    test_value(test_one_and_quarter, "1.25000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
+
+    constexpr T tweleve_and_half {125, -1};
+
+    test_value(tweleve_and_half, "13", chars_format::fixed, 0);
+    test_value(tweleve_and_half, "12.5", chars_format::fixed, 1);
+    test_value(tweleve_and_half, "12.50", chars_format::fixed, 2);
+    test_value(tweleve_and_half, "12.500", chars_format::fixed, 3);
+    test_value(tweleve_and_half, "12.5000", chars_format::fixed, 4);
+    test_value(tweleve_and_half, "12.50000", chars_format::fixed, 5);
+    test_value(tweleve_and_half, "12.500000", chars_format::fixed, 6);
+    test_value(tweleve_and_half, "12.5000000", chars_format::fixed, 7);
+    test_value(tweleve_and_half, "12.50000000", chars_format::fixed, 8);
+    test_value(tweleve_and_half, "12.500000000", chars_format::fixed, 9);
+    test_value(tweleve_and_half, "12.5000000000", chars_format::fixed, 10);
+    test_value(tweleve_and_half, "12.50000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
+}
+
+template <typename T>
+void test_434_scientific()
+{
+    constexpr T test_zero_point_three {3, -1};
+
+    test_value(test_zero_point_three, "3e-01", chars_format::scientific, 0);
+    test_value(test_zero_point_three, "3.0e-01", chars_format::scientific, 1);
+    test_value(test_zero_point_three, "3.00e-01", chars_format::scientific, 2);
+    test_value(test_zero_point_three, "3.000e-01", chars_format::scientific, 3);
+    test_value(test_zero_point_three, "3.0000e-01", chars_format::scientific, 4);
+    test_value(test_zero_point_three, "3.00000e-01", chars_format::scientific, 5);
+    test_value(test_zero_point_three, "3.000000e-01", chars_format::scientific, 6);
+    test_value(test_zero_point_three, "3.0000000e-01", chars_format::scientific, 7);
+    test_value(test_zero_point_three, "3.00000000e-01", chars_format::scientific, 8);
+    test_value(test_zero_point_three, "3.000000000e-01", chars_format::scientific, 9);
+    test_value(test_zero_point_three, "3.0000000000e-01", chars_format::scientific, 10);
+    test_value(test_zero_point_three, "3.00000000000000000000000000000000000000000000000000e-01", chars_format::scientific, 50);
+}
+
 int main()
 {
     test_non_finite_values<decimal32>();
@@ -296,6 +365,9 @@ int main()
     zero_test<decimal32>();
     zero_test<decimal64>();
 
+    test_434_fixed<decimal32>();
+    test_434_fixed<decimal64>();
+
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_non_finite_values<decimal128>();
     test_small_values<decimal128>();
@@ -304,6 +376,7 @@ int main()
     test_precision<decimal128>();
     test_buffer_overflow<decimal128>();
     zero_test<decimal128>();
+    test_434_fixed<decimal128>();
     #endif
 
     return boost::report_errors();
