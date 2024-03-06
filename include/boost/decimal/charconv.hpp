@@ -259,9 +259,16 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
         return r; // LCOV_EXCL_LINE
     }
 
+    const auto current_digits = r.ptr - (first + 1) - 1;
+
+    if (current_digits < precision && fmt != chars_format::general)
+    {
+        append_zeros = true;
+    }
+
     if (append_zeros)
     {
-        const auto zeros_inserted {static_cast<std::size_t>(precision - significand_digits + 1)};
+        const auto zeros_inserted {static_cast<std::size_t>(precision - current_digits)};
 
         if (r.ptr + zeros_inserted > last)
         {
