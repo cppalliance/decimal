@@ -340,6 +340,36 @@ void test_434_scientific()
     test_value(test_zero_point_three, "3.000000000e-01", chars_format::scientific, 9);
     test_value(test_zero_point_three, "3.0000000000e-01", chars_format::scientific, 10);
     test_value(test_zero_point_three, "3.00000000000000000000000000000000000000000000000000e-01", chars_format::scientific, 50);
+
+    constexpr T test_one_and_quarter {125, -2};
+
+    test_value(test_one_and_quarter, "1e+00", chars_format::scientific, 0);
+    test_value(test_one_and_quarter, "1.3e+00", chars_format::scientific, 1);
+    test_value(test_one_and_quarter, "1.25e+00", chars_format::scientific, 2);
+    test_value(test_one_and_quarter, "1.250e+00", chars_format::scientific, 3);
+    test_value(test_one_and_quarter, "1.2500e+00", chars_format::scientific, 4);
+    test_value(test_one_and_quarter, "1.25000e+00", chars_format::scientific, 5);
+    test_value(test_one_and_quarter, "1.250000e+00", chars_format::scientific, 6);
+    test_value(test_one_and_quarter, "1.2500000e+00", chars_format::scientific, 7);
+    test_value(test_one_and_quarter, "1.25000000e+00", chars_format::scientific, 8);
+    test_value(test_one_and_quarter, "1.250000000e+00", chars_format::scientific, 9);
+    test_value(test_one_and_quarter, "1.2500000000e+00", chars_format::scientific, 10);
+    test_value(test_one_and_quarter, "1.25000000000000000000000000000000000000000000000000e+00", chars_format::scientific, 50);
+
+    constexpr T tweleve_and_half {125, -1};
+
+    test_value(tweleve_and_half, "1e+01", chars_format::scientific, 0);
+    test_value(tweleve_and_half, "1.3e+01", chars_format::scientific, 1);
+    test_value(tweleve_and_half, "1.25e+01", chars_format::scientific, 2);
+    test_value(tweleve_and_half, "1.250e+01", chars_format::scientific, 3);
+    test_value(tweleve_and_half, "1.2500e+01", chars_format::scientific, 4);
+    test_value(tweleve_and_half, "1.25000e+01", chars_format::scientific, 5);
+    test_value(tweleve_and_half, "1.250000e+01", chars_format::scientific, 6);
+    test_value(tweleve_and_half, "1.2500000e+01", chars_format::scientific, 7);
+    test_value(tweleve_and_half, "1.25000000e+01", chars_format::scientific, 8);
+    test_value(tweleve_and_half, "1.250000000e+01", chars_format::scientific, 9);
+    test_value(tweleve_and_half, "1.2500000000e+01", chars_format::scientific, 10);
+    test_value(tweleve_and_half, "1.25000000000000000000000000000000000000000000000000e+01", chars_format::scientific, 50);
 }
 
 int main()
@@ -367,6 +397,8 @@ int main()
 
     test_434_fixed<decimal32>();
     test_434_fixed<decimal64>();
+
+    test_434_scientific<decimal32>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_non_finite_values<decimal128>();
