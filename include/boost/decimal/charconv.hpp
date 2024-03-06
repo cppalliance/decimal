@@ -104,7 +104,7 @@ constexpr auto from_chars(const char* first, const char* last, decimal128& value
 namespace detail {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const TargetDecimalType& value, int fp) noexcept -> to_chars_result
+BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const TargetDecimalType& value, int fp, chars_format fmt, int precision) noexcept -> to_chars_result
 {
     const auto buffer_len = last - first;
 
@@ -119,10 +119,67 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
 
             return {last, std::errc::value_too_large};
         case FP_ZERO:
-            if (buffer_len >= 7)
+            if (fmt == chars_format::general)
             {
-                boost::decimal::detail::memcpy(first, "0.0e+00", 7U);
-                return {first + 7U, std::errc()};
+                if (buffer_len >= 7)
+                {
+                    boost::decimal::detail::memcpy(first, "0.0e+00", 7U);
+                    return {first + 7U, std::errc()};
+                }
+            }
+            else if (fmt == chars_format::hex || fmt == chars_format::scientific)
+            {
+                if (buffer_len >= 7 + precision + 1)
+                {
+                    if (precision == 0)
+                    {
+                        *first++ = '0';
+                    }
+                    else
+                    {
+                        boost::decimal::detail::memcpy(first, "0.0", 3U);
+                        first += 3U;
+
+                        if (precision != -1 && precision != 1)
+                        {
+                            boost::decimal::detail::memset(first, '0', precision - 1);
+                            first += precision - 1;
+                        }
+                    }
+
+                    if (fmt == chars_format::hex)
+                    {
+                        *first++ = 'p';
+                    }
+                    else
+                    {
+                        *first++ = 'e';
+                    }
+
+                    boost::decimal::detail::memcpy(first, "+00", 3U);
+                    return {first + 3U, std::errc()};
+                }
+            }
+            else
+            {
+                if (precision == -1 || precision == 0)
+                {
+                    *first++ = '0';
+                    return {first, std::errc()};
+                }
+                else if (buffer_len > 2 + precision)
+                {
+                    boost::decimal::detail::memcpy(first, "0.0", 3);
+                    first += 3U;
+
+                    if (precision > 1)
+                    {
+                        boost::decimal::detail::memset(first, '0', precision - 1);
+                        first += precision - 1;
+                    }
+
+                    return {first, std::errc()};
+                }
             }
 
             return {last, std::errc::value_too_large};
@@ -158,7 +215,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     const auto fp = fpclassify(value);
     if (fp != FP_NORMAL)
     {
-        return to_chars_nonfinite(first, last, value, fp);
+        return to_chars_nonfinite(first, last, value, fp, fmt, precision);
     }
 
     int exp {};
@@ -273,7 +330,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     const auto fp = fpclassify(value);
     if (fp != FP_NORMAL)
     {
-        return to_chars_nonfinite(first, last, value, fp);
+        return to_chars_nonfinite(first, last, value, fp, fmt, precision);
     }
 
     auto abs_value = abs(value);
