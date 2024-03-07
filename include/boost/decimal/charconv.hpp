@@ -18,6 +18,7 @@
 #include <boost/decimal/detail/buffer_sizing.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
 #include <boost/decimal/detail/attributes.hpp>
+#include <boost/decimal/detail/countl.hpp>
 #include <cstdint>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
@@ -512,16 +513,69 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     }
 
     int exp {};
-    const Unsigned_Integer significand = frexp10(value, &exp);
-    std::uint32_t abs_unbiased_exponent = exp < 0 ? static_cast<std::uint32_t>(-exp) : static_cast<std::uint32_t>(exp);
+    Unsigned_Integer significand = frexp10(value, &exp);
 
-    auto r = to_chars_integer_impl<Unsigned_Integer, Unsigned_Integer>(first, last, significand, 16);
-    if (BOOST_DECIMAL_UNLIKELY(!r))
+    // Calculate the number of bytes
+    constexpr auto significand_bits = std::is_same<Unsigned_Integer, std::uint64_t>::value ? 64 : 128;
+    auto significand_digits = static_cast<int>(std::ceil(static_cast<double>(significand_bits - countl_zero(significand)) / 4));
+    bool append_zeros = false;
+
+    if (precision != -1)
     {
-        return {last, std::errc::value_too_large}; // LCOV_EXCL_LINE
+        if (significand_digits > precision)
+        {
+            // If the precision is specified we need to make sure the result is rounded correctly
+            // using the current fenv rounding mode
+
+            while (significand_digits > precision + 2)
+            {
+                significand /= 16;
+                --significand_digits;
+            }
+
+            if (significand_digits > precision + 1)
+            {
+                fenv_round(significand);
+            }
+        }
+        else if (significand_digits < precision)
+        {
+            append_zeros = true;
+        }
     }
 
+    auto r = to_chars_integer_impl<Unsigned_Integer, Unsigned_Integer>(first + 1, last, significand, 16);
+    if (BOOST_DECIMAL_UNLIKELY(!r))
+    {
+        return r; // LCOV_EXCL_LINE
+    }
+
+    const auto current_digits = r.ptr - (first + 1) - 1;
+    exp += current_digits;
+
+    if (current_digits < precision)
+    {
+        append_zeros = true;
+    }
+
+    if (append_zeros)
+    {
+        const auto zeros_inserted {static_cast<std::size_t>(precision - current_digits)};
+
+        if (r.ptr + zeros_inserted > last)
+        {
+            return {last, std::errc::value_too_large};
+        }
+
+        boost::decimal::detail::memset(r.ptr, '0', zeros_inserted);
+        r.ptr += zeros_inserted;
+    }
+
+    // Insert our decimal point
+    *first = *(first + 1);
+    *(first + 1) = '.';
     first = r.ptr;
+
     if (precision == 0)
     {
         --first;
@@ -537,12 +591,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         *first++ = '+';
     }
 
-    if (abs_unbiased_exponent < 10)
+    if (std::abs(exp) < 10)
     {
         *first++ = '0';
     }
 
-    return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, abs_unbiased_exponent, 10);
+    return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, std::abs(exp), 10);
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
