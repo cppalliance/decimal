@@ -521,23 +521,19 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     int exp {};
     const Unsigned_Integer significand = frexp10(value, &exp);
 
-    Unsigned_Integer aligned_significand;
-    BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<TargetDecimalType, decimal32>::value)
+    // Frexp10 gives a normalized significand, so we need to strip the zeros
+    Unsigned_Integer aligned_significand = significand;
+    while (aligned_significand % 10U == 0)
     {
-        aligned_significand = significand << 1;
-    }
-    else
-    {
-        aligned_significand = significand;
+        aligned_significand /= 10U;
+        ++exp;
     }
 
     std::uint32_t abs_unbiased_exponent = exp < 0 ? static_cast<std::uint32_t>(-exp) :
                                                     static_cast<std::uint32_t>(exp);
 
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<TargetDecimalType, decimal32>::value)
-    {
-        abs_unbiased_exponent += 6;
-    }
+    // Add back exponent offset into the significand
+    abs_unbiased_exponent += std::numeric_limits<TargetDecimalType>::digits - 1;
 
     const std::ptrdiff_t total_length = total_buffer_length(real_precision, abs_unbiased_exponent, (value < 0));
     if (total_length > buffer_size)
@@ -554,12 +550,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         const Unsigned_Integer tail_bit = round_bit - 1;
         const Unsigned_Integer round = round_bit & (tail_bit | lsb_bit) & (static_cast<Unsigned_Integer>(1) << lost_bits);
         aligned_significand += round;
-    }
-
-    // Print the sign
-    if (value < 0)
-    {
-        *first++ = '-';
     }
 
     // Print the integral part
