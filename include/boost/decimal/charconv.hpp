@@ -542,7 +542,13 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 
             if (significand_digits > precision + 1)
             {
-                fenv_round(significand);
+                const auto trailing_digit = significand % 16;
+                significand /= 16;
+                ++exp;
+                if (trailing_digit >= 8)
+                {
+                    ++significand;
+                }
             }
         }
         else if (significand_digits < precision)
