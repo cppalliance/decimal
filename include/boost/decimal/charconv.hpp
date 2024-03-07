@@ -506,13 +506,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         real_precision = precision;
     }
 
-    constexpr auto hex_precision = std::is_same<TargetDecimalType, decimal32>::value ? 6 :
-                                   std::is_same<TargetDecimalType, decimal64>::value ? 14 : 28;
-
-    constexpr auto nibble_bits = CHAR_BIT / 2;
-    constexpr auto hex_bits = hex_precision * nibble_bits;
-    const Unsigned_Integer hex_mask = (static_cast<Unsigned_Integer>(1) << hex_bits) - 1;
-
     if (buffer_size < real_precision)
     {
         return {last, std::errc::value_too_large};
@@ -520,114 +513,20 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 
     int exp {};
     const Unsigned_Integer significand = frexp10(value, &exp);
+    std::uint32_t abs_unbiased_exponent = exp < 0 ? static_cast<std::uint32_t>(-exp) : static_cast<std::uint32_t>(exp);
 
-    // Frexp10 gives a normalized significand, so we need to strip the zeros
-    Unsigned_Integer aligned_significand = significand;
-    while (aligned_significand % 10U == 0)
+    auto r = to_chars_integer_impl<Unsigned_Integer, Unsigned_Integer>(first, last, significand, 16);
+    if (BOOST_DECIMAL_UNLIKELY(!r))
     {
-        aligned_significand /= 10U;
-        ++exp;
+        return {last, std::errc::value_too_large}; // LCOV_EXCL_LINE
     }
 
-    // Add back exponent offset into the significand
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<TargetDecimalType, decimal32>::value)
-    {
-        exp += 6;
-    }
-    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<TargetDecimalType, decimal64>::value)
-    {
-        exp += 14;
-    }
-    else
-    {
-        exp += 28;
-    }
-
-    std::uint32_t abs_unbiased_exponent = exp < 0 ? static_cast<std::uint32_t>(-exp) :
-                                                    static_cast<std::uint32_t>(exp);
-
-    const std::ptrdiff_t total_length = total_buffer_length(real_precision, abs_unbiased_exponent, (value < 0));
-    if (total_length > buffer_size)
-    {
-        return {last, std::errc::value_too_large};
-    }
-
-    // Round if required
-    if (real_precision < hex_precision)
-    {
-        const int lost_bits = (hex_precision - real_precision) * nibble_bits;
-        const Unsigned_Integer lsb_bit = aligned_significand;
-        const Unsigned_Integer round_bit = aligned_significand << 1;
-        const Unsigned_Integer tail_bit = round_bit - 1;
-        const Unsigned_Integer round = round_bit & (tail_bit | lsb_bit) & (static_cast<Unsigned_Integer>(1) << lost_bits);
-        aligned_significand += round;
-    }
-
-    // Print the integral part
-    #if BOOST_CHARCONV_LDBL_BITS == 80
-    std::uint32_t leading_nibble;
-    BOOST_IF_CONSTEXPR (std::is_same<Real, long double>::value)
-    {
-        leading_nibble = static_cast<std::uint32_t>(significand >> hex_bits);
-    }
-    else
-    {
-        leading_nibble = static_cast<std::uint32_t>(aligned_significand >> hex_bits);
-    }
-    #else
-    const auto leading_nibble = static_cast<std::uint32_t>(aligned_significand >> hex_bits);
-    #endif
-
-    BOOST_DECIMAL_ASSERT(leading_nibble < 16);
-    *first++ = digit_table[leading_nibble];
-
-    aligned_significand &= hex_mask;
-
-    // Print the fractional part
-    if (real_precision > 0)
-    {
-        *first++ = '.';
-        std::int32_t remaining_bits = hex_bits;
-
-        while (true)
-        {
-            remaining_bits -= nibble_bits;
-            const auto current_nibble = static_cast<std::uint32_t>(aligned_significand >> remaining_bits);
-            *first++ = digit_table[current_nibble];
-
-            --real_precision;
-            if (real_precision == 0)
-            {
-                break;
-            }
-            else if (remaining_bits == 0)
-            {
-                // Do not print trailing zeros with unspecified precision
-                if (precision != -1)
-                {
-                    std::memset(first, '0', static_cast<std::size_t>(real_precision));
-                    first += real_precision;
-                }
-                break;
-            }
-
-            // Mask away the hexit we just printed
-            aligned_significand &= (static_cast<Unsigned_Integer>(1) << remaining_bits) - 1;
-        }
-    }
-
-    // Remove any trailing zeros if the precision was unspecified
-    if (precision == -1)
+    first = r.ptr;
+    if (precision == 0)
     {
         --first;
-        while (*first == '0')
-        {
-            --first;
-        }
-        ++first;
     }
 
-    // Print the exponent
     *first++ = 'p';
     if (exp < 0)
     {
@@ -638,7 +537,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         *first++ = '+';
     }
 
-    // Ensure min two digits in the exponent
     if (abs_unbiased_exponent < 10)
     {
         *first++ = '0';
