@@ -450,6 +450,7 @@ int main()
     test_434_scientific<decimal64>();
 
     test_hex_format<decimal32>();
+    test_hex_format<decimal64>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_non_finite_values<decimal128>();
@@ -461,6 +462,7 @@ int main()
     zero_test<decimal128>();
     test_434_fixed<decimal128>();
     test_434_scientific<decimal128>();
+    test_hex_format<decimal128>();
     #endif
 
     return boost::report_errors();
