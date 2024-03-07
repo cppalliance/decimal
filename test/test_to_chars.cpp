@@ -170,6 +170,49 @@ void test_fixed_format()
 }
 
 template <typename T>
+void test_hex_format()
+{
+    constexpr double max_value = 1e10;
+    std::uniform_real_distribution<double> dist(-max_value, max_value);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        char buffer[256];
+
+        const auto val {dist(rng)};
+        const T dec_val {val};
+
+        auto to_r = to_chars(buffer, buffer + sizeof(buffer), dec_val, chars_format::hex);
+        *to_r.ptr = '\0';
+        BOOST_TEST(to_r);
+
+        T ret_val;
+        auto from_r = from_chars(buffer, buffer + std::strlen(buffer), ret_val, chars_format::hex);
+        if (!BOOST_TEST(from_r))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Value: " << dec_val
+                      << "\nBuffer: " << buffer
+                      << "\nError: " << static_cast<int>(from_r.ec) << std::endl;
+
+            continue;
+            // LCOV_EXCL_STOP
+        }
+
+        if (!BOOST_TEST_EQ(dec_val, ret_val))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "  Value: " << dec_val
+                      << "\n Buffer: " << buffer
+                      << "\nRet val: " << ret_val << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+template <typename T>
 void test_value(T val, chars_format fmt, int precision, const char* result)
 {
     char buffer[256] {};
@@ -405,6 +448,8 @@ int main()
 
     test_434_scientific<decimal32>();
     test_434_scientific<decimal64>();
+
+    test_hex_format<decimal32>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_non_finite_values<decimal128>();
