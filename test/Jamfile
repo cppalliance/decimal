@@ -48,6 +48,7 @@ run test_atan.cpp ;
 run test_atan2.cpp ;
 run test_atanh.cpp ;
 run test_big_uints.cpp ;
+run test_cbrt.cpp ;
 run test_cmath.cpp ;
 run test_constants.cpp ;
 run test_cosh.cpp ;
