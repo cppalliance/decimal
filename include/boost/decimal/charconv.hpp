@@ -515,6 +515,13 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     int exp {};
     Unsigned_Integer significand = frexp10(value, &exp);
 
+    // Strip zeros of the significand since frexp10 normalizes it
+    while (significand % 10U == 0)
+    {
+        significand /= 10U;
+        ++exp;
+    }
+
     // Calculate the number of bytes
     constexpr auto significand_bits = std::is_same<Unsigned_Integer, std::uint64_t>::value ? 64 : 128;
     auto significand_digits = static_cast<int>(std::ceil(static_cast<double>(significand_bits - countl_zero(significand)) / 4));
