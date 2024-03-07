@@ -615,6 +615,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
 
     constexpr auto min_fractional_value = TargetDecimalType{1, -4};
 
+    if (fmt == chars_format::hex)
+    {
+        return to_chars_hex_impl(first, last, value, precision);
+    }
+
     // Unspecified precision so we always go with the shortest representation
     if (precision == -1)
     {
@@ -629,7 +634,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
                 return to_chars_scientific_impl(first, last, value, fmt, precision);
             }
         }
-        else if (fmt == chars_format::scientific)
+        else
         {
             return to_chars_scientific_impl(first, last, value, fmt, precision);
         }
@@ -651,8 +656,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
             return to_chars_scientific_impl(first, last, value, fmt, precision);
         }
     }
-
-    return to_chars_hex_impl(first, last, value, precision);
 }
 
 } //namespace detail
