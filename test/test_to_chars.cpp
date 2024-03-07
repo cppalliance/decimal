@@ -420,6 +420,55 @@ void test_434_scientific()
     test_value(tweleve_and_half, "1.25000000000000000000000000000000000000000000000000e+01", chars_format::scientific, 50);
 }
 
+template <typename T>
+void test_434_hex()
+{
+    constexpr T one {1, 0};
+
+    test_value(one, "1p+00", chars_format::hex, 0);
+    test_value(one, "1.0p+00", chars_format::hex, 1);
+    test_value(one, "1.00p+00", chars_format::hex, 2);
+    test_value(one, "1.000p+00", chars_format::hex, 3);
+    test_value(one, "1.0000p+00", chars_format::hex, 4);
+    test_value(one, "1.00000p+00", chars_format::hex, 5);
+    test_value(one, "1.000000p+00", chars_format::hex, 6);
+    test_value(one, "1.0000000p+00", chars_format::hex, 7);
+    test_value(one, "1.00000000p+00", chars_format::hex, 8);
+    test_value(one, "1.000000000p+00", chars_format::hex, 9);
+    test_value(one, "1.0000000000p+00", chars_format::hex, 10);
+    test_value(one, "1.00000000000000000000000000000000000000000000000000p+00", chars_format::hex, 50);
+
+    constexpr T test_zero_point_three {3, -1};
+
+    test_value(test_zero_point_three, "3p-01", chars_format::hex, 0);
+    test_value(test_zero_point_three, "3.0p-01", chars_format::hex, 1);
+    test_value(test_zero_point_three, "3.00p-01", chars_format::hex, 2);
+    test_value(test_zero_point_three, "3.000p-01", chars_format::hex, 3);
+    test_value(test_zero_point_three, "3.0000p-01", chars_format::hex, 4);
+    test_value(test_zero_point_three, "3.00000p-01", chars_format::hex, 5);
+    test_value(test_zero_point_three, "3.000000p-01", chars_format::hex, 6);
+    test_value(test_zero_point_three, "3.0000000p-01", chars_format::hex, 7);
+    test_value(test_zero_point_three, "3.00000000p-01", chars_format::hex, 8);
+    test_value(test_zero_point_three, "3.000000000p-01", chars_format::hex, 9);
+    test_value(test_zero_point_three, "3.0000000000p-01", chars_format::hex, 10);
+    test_value(test_zero_point_three, "3.00000000000000000000000000000000000000000000000000p-01", chars_format::hex, 50);
+
+    constexpr T test_one_and_quarter {125, -2};
+
+    test_value(test_one_and_quarter, "8p-01", chars_format::hex, 0);
+    test_value(test_one_and_quarter, "7.dp-01", chars_format::hex, 1);
+    test_value(test_one_and_quarter, "7.d0p-01", chars_format::hex, 2);
+    test_value(test_one_and_quarter, "7.d00p-01", chars_format::hex, 3);
+    test_value(test_one_and_quarter, "7.d000p-01", chars_format::hex, 4);
+    test_value(test_one_and_quarter, "7.d0000p-01", chars_format::hex, 5);
+    test_value(test_one_and_quarter, "7.d00000p-01", chars_format::hex, 6);
+    test_value(test_one_and_quarter, "7.d000000p-01", chars_format::hex, 7);
+    test_value(test_one_and_quarter, "7.d0000000p-01", chars_format::hex, 8);
+    test_value(test_one_and_quarter, "7.d00000000p-01", chars_format::hex, 9);
+    test_value(test_one_and_quarter, "7.d000000000p-01", chars_format::hex, 10);
+    test_value(test_one_and_quarter, "7.d0000000000000000000000000000000000000000000000000p-01", chars_format::hex, 50);
+}
+
 int main()
 {
     test_non_finite_values<decimal32>();
@@ -452,6 +501,9 @@ int main()
     test_hex_format<decimal32>();
     test_hex_format<decimal64>();
 
+    test_434_hex<decimal32>();
+    test_434_hex<decimal64>();
+
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_non_finite_values<decimal128>();
     test_small_values<decimal128>();
@@ -463,6 +515,7 @@ int main()
     test_434_fixed<decimal128>();
     test_434_scientific<decimal128>();
     test_hex_format<decimal128>();
+    test_434_hex<decimal128>();
     #endif
 
     return boost::report_errors();
