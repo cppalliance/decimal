@@ -529,11 +529,22 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         ++exp;
     }
 
+    // Add back exponent offset into the significand
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<TargetDecimalType, decimal32>::value)
+    {
+        exp += 6;
+    }
+    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<TargetDecimalType, decimal64>::value)
+    {
+        exp += 14;
+    }
+    else
+    {
+        exp += 28;
+    }
+
     std::uint32_t abs_unbiased_exponent = exp < 0 ? static_cast<std::uint32_t>(-exp) :
                                                     static_cast<std::uint32_t>(exp);
-
-    // Add back exponent offset into the significand
-    abs_unbiased_exponent += std::numeric_limits<TargetDecimalType>::digits - 1;
 
     const std::ptrdiff_t total_length = total_buffer_length(real_precision, abs_unbiased_exponent, (value < 0));
     if (total_length > buffer_size)
