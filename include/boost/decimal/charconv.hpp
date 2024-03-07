@@ -340,6 +340,13 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         return {last, std::errc::value_too_large};
     }
 
+    const bool is_neg = signbit(value);
+    if (is_neg)
+    {
+        *first++ = '-';
+        --buffer_size;
+    }
+
     const auto fp = fpclassify(value);
     if (fp != FP_NORMAL)
     {
@@ -347,15 +354,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     auto abs_value = abs(value);
-    const bool is_neg = value < 0;
     int exponent {};
     auto significand = frexp10(abs_value, &exponent);
-
-    if (is_neg)
-    {
-        *first++ = '-';
-        --buffer_size;
-    }
 
     const char* output_start = first;
 
@@ -487,10 +487,15 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 {
     using Unsigned_Integer = std::conditional_t<!std::is_same<TargetDecimalType, decimal128>::value, std::uint64_t, uint128>;
 
+    if (signbit(value))
+    {
+        *first++ = '-';
+    }
+
     const auto fp = fpclassify(value);
     if (fp != FP_NORMAL)
     {
-        return to_chars_nonfinite(first, last, value, fp);
+        return to_chars_nonfinite(first, last, value, fp, chars_format::hex, precision);
     }
 
     const std::ptrdiff_t buffer_size = last - first;
