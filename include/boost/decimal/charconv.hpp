@@ -637,6 +637,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         *first++ = '+';
     }
 
+    // Ensure min two digits in the exponent
+    if (abs_unbiased_exponent < 10)
+    {
+        *first++ = '0';
+    }
+
     return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, abs_unbiased_exponent, 10);
 }
 
