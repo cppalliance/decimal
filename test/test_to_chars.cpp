@@ -177,13 +177,12 @@ void test_hex_format()
 
     for (std::size_t i {}; i < N; ++i)
     {
-        char buffer[256];
+        char buffer[256] {};
 
         const auto val {dist(rng)};
         const T dec_val {val};
 
         auto to_r = to_chars(buffer, buffer + sizeof(buffer), dec_val, chars_format::hex);
-        *to_r.ptr = '\0';
         BOOST_TEST(to_r);
 
         T ret_val;
