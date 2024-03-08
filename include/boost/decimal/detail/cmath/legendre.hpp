@@ -41,21 +41,8 @@ constexpr T legendre_impl(unsigned l, T x, bool second = false) noexcept
         return x;
     }
 
-    T p0 {};
-    T p1 {};
-
-    if (second)
-    {
-        // A solution of the second kind (Q):
-        p0 = log1p(x) - log1p(-x) / 2;
-        p1 = x * p0 - 1;
-    }
-    else
-    {
-        // A solution of the first kind (P):
-        p0 = 1;
-        p1 = x;
-    }
+    T p0 {1};
+    T p1 {x};
 
     if (l == 0)
     {

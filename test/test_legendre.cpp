@@ -51,6 +51,11 @@ void test()
             }
         }
     }
+
+    BOOST_TEST(isnan(legendre(1U, dist(rng) * std::numeric_limits<Dec>::signaling_NaN())));
+    BOOST_TEST(isnan(legendre(1U, Dec{10})));
+    BOOST_TEST(isnan(legendre(1U, Dec{-10})));
+    BOOST_TEST(isnan(legendre(200U, dist(rng) * Dec{1})));
 }
 
 int main()
