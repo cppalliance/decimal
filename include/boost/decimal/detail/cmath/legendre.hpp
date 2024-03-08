@@ -30,7 +30,7 @@ constexpr auto legendre_next(unsigned l, T1 x, T2 Pl, T3 Plm1) noexcept
 
 // Implement Legendre P and Q polynomials via recurrence:
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr T legendre_impl(unsigned l, T x, bool second = false) noexcept
+constexpr T legendre_impl(unsigned l, T x) noexcept
 {
     if (x < -1 || x > 1 || l > 128)
     {
