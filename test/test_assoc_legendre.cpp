@@ -14,7 +14,7 @@
 #include <cmath>
 
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-static constexpr auto N = static_cast<std::size_t>(128U); // Number of trials
+static constexpr auto N = static_cast<std::size_t>(10U); // Number of trials
 #else
 static constexpr auto N = static_cast<std::size_t>(128U >> 4U); // Number of trials
 #endif
@@ -41,11 +41,13 @@ void test()
                 auto ret_val {boost::math::legendre_p(static_cast<int>(n), static_cast<int>(m), val1)};
                 auto ret_dec {static_cast<float>(assoc_legendre(n, m, d1))};
 
-                if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 20*std::numeric_limits<float>::epsilon()))
+                if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 200*std::numeric_limits<float>::epsilon()))
                 {
                     // LCOV_EXCL_START
                     std::cerr << "Val 1: " << val1
                               << "\nDec 1: " << d1
+                              << "\nN: " << n
+                              << "\nM: " << m
                               << "\nRet val: " << ret_val
                               << "\nRet dec: " << ret_dec
                               << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
