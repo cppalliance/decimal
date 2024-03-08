@@ -1291,6 +1291,18 @@ constexpr auto operator-(int128 lhs, int128 rhs) noexcept -> int128
     return int128{new_high, new_low};
 }
 
+
+template <>
+constexpr int countl_zero<uint128>(uint128 x) noexcept
+{
+    if (x.high == 0)
+    {
+        return 64 + countl_zero(x.low);
+    }
+
+    return countl_zero(x.high);
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost

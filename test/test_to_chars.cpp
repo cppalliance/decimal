@@ -36,12 +36,17 @@ void test_non_finite_values()
 {
     std::uniform_real_distribution<float> dist(-1.0, 1.0);
 
-    test_value(std::numeric_limits<T>::quiet_NaN() * T{dist(rng)}, "nan");
-    test_value(-std::numeric_limits<T>::quiet_NaN() * T{dist(rng)}, "-nan");
-    test_value(std::numeric_limits<T>::signaling_NaN() * T{dist(rng)}, "nan(snan)");
-    test_value(-std::numeric_limits<T>::signaling_NaN() * T{dist(rng)}, "-nan(snan)");
-    test_value(std::numeric_limits<T>::infinity() * T{dist(rng)}, "inf");
-    test_value(-std::numeric_limits<T>::infinity() * T{dist(rng)}, "-inf");
+    const auto formats = {chars_format::fixed, chars_format::scientific, chars_format::general, chars_format::hex};
+
+    for (const auto format : formats)
+    {
+        test_value(std::numeric_limits<T>::quiet_NaN() * T {dist(rng)}, "nan", format);
+        test_value(-std::numeric_limits<T>::quiet_NaN() * T {dist(rng)}, "-nan", format);
+        test_value(std::numeric_limits<T>::signaling_NaN() * T {dist(rng)}, "nan(snan)", format);
+        test_value(-std::numeric_limits<T>::signaling_NaN() * T {dist(rng)}, "-nan(snan)", format);
+        test_value(std::numeric_limits<T>::infinity() * T {dist(rng)}, "inf", format);
+        test_value(-std::numeric_limits<T>::infinity() * T {dist(rng)}, "-inf", format);
+    }
 }
 
 template <typename T>
@@ -159,6 +164,48 @@ void test_fixed_format()
                       << "Value: " << dec_val
                       << "\nBuffer: " << buffer
                       << "\nRet val:" << ret_val << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+template <typename T>
+void test_hex_format()
+{
+    constexpr double max_value = 1e10;
+    std::uniform_real_distribution<double> dist(-max_value, max_value);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        char buffer[256] {};
+
+        const auto val {dist(rng)};
+        const T dec_val {val};
+
+        auto to_r = to_chars(buffer, buffer + sizeof(buffer), dec_val, chars_format::hex);
+        BOOST_TEST(to_r);
+
+        T ret_val;
+        auto from_r = from_chars(buffer, buffer + std::strlen(buffer), ret_val, chars_format::hex);
+        if (!BOOST_TEST(from_r))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Value: " << dec_val
+                      << "\nBuffer: " << buffer
+                      << "\nError: " << static_cast<int>(from_r.ec) << std::endl;
+
+            continue;
+            // LCOV_EXCL_STOP
+        }
+
+        if (!BOOST_TEST_EQ(dec_val, ret_val))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "  Value: " << dec_val
+                      << "\n Buffer: " << buffer
+                      << "\nRet val: " << ret_val << std::endl;
             // LCOV_EXCL_STOP
         }
     }
@@ -372,6 +419,55 @@ void test_434_scientific()
     test_value(tweleve_and_half, "1.25000000000000000000000000000000000000000000000000e+01", chars_format::scientific, 50);
 }
 
+template <typename T>
+void test_434_hex()
+{
+    constexpr T one {1, 0};
+
+    test_value(one, "1p+00", chars_format::hex, 0);
+    test_value(one, "1.0p+00", chars_format::hex, 1);
+    test_value(one, "1.00p+00", chars_format::hex, 2);
+    test_value(one, "1.000p+00", chars_format::hex, 3);
+    test_value(one, "1.0000p+00", chars_format::hex, 4);
+    test_value(one, "1.00000p+00", chars_format::hex, 5);
+    test_value(one, "1.000000p+00", chars_format::hex, 6);
+    test_value(one, "1.0000000p+00", chars_format::hex, 7);
+    test_value(one, "1.00000000p+00", chars_format::hex, 8);
+    test_value(one, "1.000000000p+00", chars_format::hex, 9);
+    test_value(one, "1.0000000000p+00", chars_format::hex, 10);
+    test_value(one, "1.00000000000000000000000000000000000000000000000000p+00", chars_format::hex, 50);
+
+    constexpr T test_zero_point_three {3, -1};
+
+    test_value(test_zero_point_three, "3p-01", chars_format::hex, 0);
+    test_value(test_zero_point_three, "3.0p-01", chars_format::hex, 1);
+    test_value(test_zero_point_three, "3.00p-01", chars_format::hex, 2);
+    test_value(test_zero_point_three, "3.000p-01", chars_format::hex, 3);
+    test_value(test_zero_point_three, "3.0000p-01", chars_format::hex, 4);
+    test_value(test_zero_point_three, "3.00000p-01", chars_format::hex, 5);
+    test_value(test_zero_point_three, "3.000000p-01", chars_format::hex, 6);
+    test_value(test_zero_point_three, "3.0000000p-01", chars_format::hex, 7);
+    test_value(test_zero_point_three, "3.00000000p-01", chars_format::hex, 8);
+    test_value(test_zero_point_three, "3.000000000p-01", chars_format::hex, 9);
+    test_value(test_zero_point_three, "3.0000000000p-01", chars_format::hex, 10);
+    test_value(test_zero_point_three, "3.00000000000000000000000000000000000000000000000000p-01", chars_format::hex, 50);
+
+    constexpr T test_one_and_quarter {125, -2};
+
+    test_value(test_one_and_quarter, "8p-01", chars_format::hex, 0);
+    test_value(test_one_and_quarter, "7.dp-01", chars_format::hex, 1);
+    test_value(test_one_and_quarter, "7.d0p-01", chars_format::hex, 2);
+    test_value(test_one_and_quarter, "7.d00p-01", chars_format::hex, 3);
+    test_value(test_one_and_quarter, "7.d000p-01", chars_format::hex, 4);
+    test_value(test_one_and_quarter, "7.d0000p-01", chars_format::hex, 5);
+    test_value(test_one_and_quarter, "7.d00000p-01", chars_format::hex, 6);
+    test_value(test_one_and_quarter, "7.d000000p-01", chars_format::hex, 7);
+    test_value(test_one_and_quarter, "7.d0000000p-01", chars_format::hex, 8);
+    test_value(test_one_and_quarter, "7.d00000000p-01", chars_format::hex, 9);
+    test_value(test_one_and_quarter, "7.d000000000p-01", chars_format::hex, 10);
+    test_value(test_one_and_quarter, "7.d0000000000000000000000000000000000000000000000000p-01", chars_format::hex, 50);
+}
+
 int main()
 {
     test_non_finite_values<decimal32>();
@@ -401,6 +497,12 @@ int main()
     test_434_scientific<decimal32>();
     test_434_scientific<decimal64>();
 
+    test_hex_format<decimal32>();
+    test_hex_format<decimal64>();
+
+    test_434_hex<decimal32>();
+    test_434_hex<decimal64>();
+
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_non_finite_values<decimal128>();
     test_small_values<decimal128>();
@@ -411,6 +513,8 @@ int main()
     zero_test<decimal128>();
     test_434_fixed<decimal128>();
     test_434_scientific<decimal128>();
+    test_hex_format<decimal128>();
+    test_434_hex<decimal128>();
     #endif
 
     return boost::report_errors();
