@@ -25,25 +25,62 @@ namespace decimal {
 
 namespace detail {
 
-static constexpr std::array<unsigned, 13> factorals = {{
-    UINT32_C(1),
-    UINT32_C(1),
-    UINT32_C(2),
-    UINT32_C(6),
-    UINT32_C(24),
-    UINT32_C(120),
-    UINT32_C(720),
-    UINT32_C(5040),
-    UINT32_C(40320),
-    UINT32_C(362880),
-    UINT32_C(3628800),
-    UINT32_C(39916800),
-    UINT32_C(479001600)
+// Long double precision double factorials
+static constexpr std::array<long double, 48> p0_values = {{
+    1.0L,
+    1.0L,
+    2.0L,
+    3.0L,
+    8.0L,
+    15.0L,
+    48.0L,
+    105.0L,
+    384.0L,
+    945.0L,
+    3840.0L,
+    10395.0L,
+    46080.0L,
+    135135.0L,
+    645120.0L,
+    2027025.0L,
+    10321920.0L,
+    34459425.0L,
+    185794560.0L,
+    654729075.0L,
+    3715891200.0L,
+    13749310575.0L,
+    81749606400.0L,
+    316234143225.0L,
+    1961990553600.0L,
+    7905853580625.0L,
+    51011754393600.0L,
+    213458046676875.0L,
+    1428329123020800.0L,
+    6190283353629375.0L,
+    42849873690624000.0L,
+    191898783962510625.0L,
+    1371195958099968000.0L,
+    6332659870762850625.0L,
+    46620662575398912000.0L,
+    221643095476699771872.0L,
+    1678343852714360832000.0L,
+    8200794532637891558912.0L,
+    63777066403145711616000.0L,
+    319830986772877770817536.0L,
+    2551082656125828464640000.0L,
+    13113070457687988603191296.0L,
+    107145471557284795514880000.0L,
+    563862029680583509939322880.0L,
+    4714400748520531002654720000.0L,
+    25373791335626257946766213120.0L,
+    216862434431944426122117120000.0L,
+    1.19256819277443412350660195123e+30L
 }};
 
-constexpr unsigned double_factorial(unsigned n) noexcept
+template <typename T>
+constexpr T p0_lookup(unsigned i) noexcept
 {
-    return factorals[n] * factorals[n];
+    return static_cast<T>(p0_values[i]);
 }
 
 template <typename T1, typename T2, typename T3>
@@ -83,13 +120,15 @@ constexpr T assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_power) 
         return legendre(l, x);
     }
 
-    T p0 = double_factorial(2 * m - 1) * sin_theta_power;
+    BOOST_DECIMAL_ASSERT_MSG(m <= 24, "m > 25 has not been implemented");
+    T p0 = p0_lookup<T>(2 * m - 1) * sin_theta_power;
 
     if (m & 1)
     {
         p0 = -p0;
     }
-    else if (m == l)
+
+    if (m == l)
     {
         return p0;
     }
@@ -101,7 +140,7 @@ constexpr T assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_power) 
     while (n < l)
     {
         std::swap(p0, p1);
-        p1 = assoc_laguerre_next(n, m, x, p0, p1);
+        p1 = assoc_legendre_next(n, m, x, p0, p1);
         ++n;
     }
 
