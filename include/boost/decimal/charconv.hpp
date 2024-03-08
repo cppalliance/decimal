@@ -564,7 +564,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     }
 
     const auto current_digits = r.ptr - (first + 1) - 1;
-    exp += current_digits;
+    exp += static_cast<int>(current_digits);
 
     if (current_digits < precision)
     {
