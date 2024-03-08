@@ -73,6 +73,7 @@ run test_git_issue_271.cpp ;
 run test_hash.cpp ;
 run test_hermite.cpp ;
 run test_laguerre.cpp ;
+run test_legendre.cpp ;
 run test_literals.cpp ;
 run test_lgamma.cpp ;
 run test_log.cpp ;
