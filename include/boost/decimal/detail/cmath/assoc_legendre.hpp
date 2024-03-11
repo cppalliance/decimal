@@ -16,6 +16,7 @@
 #include <boost/decimal/detail/cmath/pow.hpp>
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/legendre.hpp>
+#include <boost/decimal/detail/cmath/impl/assoc_legendre_lookup.hpp>
 #include <utility>
 #include <type_traits>
 #include <limits>
@@ -24,8 +25,6 @@ namespace boost {
 namespace decimal {
 
 namespace detail {
-
-// TODO(mborland): make p0 lookup the same as sin, cos, etc.
 
 template <typename T1, typename T2, typename T3>
 constexpr auto assoc_legendre_next(unsigned l, unsigned m, T1 x, T2 Pl, T3 Plm1) noexcept
@@ -64,8 +63,10 @@ constexpr T assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_power) 
         return legendre(l, x);
     }
 
+    // TODO(mborland): Once the lookup table has been exceeded we can calculate m!! but that is far more
+    // complicated and computationally expensive
     BOOST_DECIMAL_ASSERT_MSG(m <= 50, "m > 50 has not been implemented");
-    T p0 = p0_lookup<T>(2 * m - 1) * sin_theta_power;
+    T p0 = assoc_legendre_p0_lookup<T>(2 * m - 1) * sin_theta_power;
 
     if (m & 1)
     {

@@ -73,7 +73,7 @@ void print_value<decimal128>(decimal128 value)
 {
     int ptr;
     const auto sig_val = frexp10(value, &ptr);
-    std::cerr << "decimal128{detail::uint128{" << sig_val.high << "," << sig_val.low << "}," << ptr << "}," << std::endl;
+    std::cerr << "decimal128{detail::uint128{UINT64_C(" << sig_val.high << "),UINT64_C(" << sig_val.low << ")}," << ptr << "}," << std::endl;
 }
 
 template <typename T>
@@ -196,11 +196,12 @@ int main()
     test<decimal128>();
     #endif
 
+    #ifdef BOOST_DECIMAL_GENERATE_ASSOC_LEGENDRE_CONSTANTS
     print_table_constants<decimal32>();
     print_table_constants<decimal64>();
     print_table_constants<decimal128>();
-
     throw;
+    #endif
 
     return boost::report_errors();
 }
