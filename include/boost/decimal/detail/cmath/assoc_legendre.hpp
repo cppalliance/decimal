@@ -46,11 +46,7 @@ constexpr T assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_power) 
         return x;
     }
 
-    if (l == 0 && m == -1)
-    {
-        return sqrt((1 - x) / (1 + x));
-    }
-    else if (l == 1 && m == 0)
+    if (l == 1 && m == 0)
     {
         return x;
     }
