@@ -608,7 +608,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     // Round as required
     if (reduced)
     {
-        exp += static_cast<unsigned>(detail::fenv_round(unsigned_coeff, isneg));
+        exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
     }
 
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};

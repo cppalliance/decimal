@@ -9,7 +9,20 @@
 #if __has_include(<boost/type_traits.hpp>)
 
 #define BOOST_DECIMAL_HAS_BOOST_TYPE_TRAITS
+
+// Warnings propagate up from boost.type_traits so we will ignore them
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wconversion"
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+
 #include <boost/type_traits.hpp>
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic pop
+#endif
+
 #include <boost/decimal/detail/type_traits.hpp>
 #include <type_traits>
 
