@@ -9,6 +9,12 @@
 #include <type_traits>
 #include <cstring>
 
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
+
 template <typename T>
 void test_type_traits()
 {
@@ -30,6 +36,10 @@ void test_memset()
 
     BOOST_TEST_EQ(test.quantity, T{});
 }
+
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
 
 int main()
 {
