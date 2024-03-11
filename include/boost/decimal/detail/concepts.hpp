@@ -5,7 +5,7 @@
 #ifndef BOOST_DECIMAL_DETAIL_CONCEPTS
 #define BOOST_DECIMAL_DETAIL_CONCEPTS
 
-#if (__cplusplus >= 202002L || _MSVC_LANG >= 202002L) && !defined(BOOST_MATH_DISABLE_CONCEPTS)
+#if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && !defined(BOOST_MATH_DISABLE_CONCEPTS)
 
 #if __has_include(<concepts>)
 
