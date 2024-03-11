@@ -5,8 +5,17 @@
 #include "mini_to_chars.hpp"
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
-#include <boost/math/special_functions/next.hpp>
 #include <boost/charconv.hpp>
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wundef"
+#  pragma GCC diagnostic ignored "-Wconversion"
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+#include <boost/math/special_functions/next.hpp>
+
 #include <iostream>
 #include <iomanip>
 #include <sstream>

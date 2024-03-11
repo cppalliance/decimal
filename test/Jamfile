@@ -15,6 +15,16 @@ project : requirements
   <toolset>gcc:<cxxflags>-Wextra
   <toolset>msvc:<warnings>all
 
+  #<toolset>gcc:<cxxflags>-Wsign-conversion
+  #<toolset>gcc:<cxxflags>-Wconversion
+  <toolset>gcc:<cxxflags>-Wundef
+  <toolset>gcc:<cxxflags>-Wold-style-cast
+
+  #<toolset>clang:<cxxflags>-Wsign-conversion
+  #<toolset>clang:<cxxflags>-Wconversion
+  <toolset>clang:<cxxflags>-Wundef
+  <toolset>clang:<cxxflags>-Wold-style-cast
+
   <toolset>msvc:<warnings-as-errors>on
   <toolset>clang:<warnings-as-errors>on
   <toolset>gcc:<warnings-as-errors>on

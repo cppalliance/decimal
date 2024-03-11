@@ -7,8 +7,17 @@
 
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wundef"
+#  pragma GCC diagnostic ignored "-Wconversion"
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
 #include <boost/math/special_functions/next.hpp>
 #include <boost/math/special_functions/legendre.hpp>
+
 #include <iostream>
 #include <random>
 #include <cmath>

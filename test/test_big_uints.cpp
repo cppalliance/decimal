@@ -22,6 +22,15 @@ int main()
 
 #include <boost/core/lightweight_test.hpp>
 #include <boost/decimal.hpp>
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wundef"
+#  pragma GCC diagnostic ignored "-Wconversion"
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+
 #include <boost/multiprecision/cpp_int.hpp>
 
 #include <array>

@@ -50,7 +50,7 @@ std::ostream& operator<<( std::ostream& os, boost::decimal::detail::int128_t v )
     }
     else
     {
-        p = mini_to_chars( buffer, -(boost::decimal::detail::uint128_t)v );
+        p = mini_to_chars( buffer, static_cast<boost::decimal::detail::uint128_t>(-v) );
         *--p = '-';
     }
 
