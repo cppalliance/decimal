@@ -39,7 +39,7 @@ struct hash<boost::decimal::decimal64>
     }
 };
 
-#if __GNUC__ >= 8
+#if defined(__GNUC__) && __GNUC__ >= 8
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
@@ -57,7 +57,7 @@ struct hash<boost::decimal::decimal128>
     }
 };
 
-#if __GNUC__ >= 8
+#if defined(__GNUC__) && __GNUC__ >= 8
 #  pragma GCC diagnostic pop
 #endif
 

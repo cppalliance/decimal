@@ -214,6 +214,10 @@ private:
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
+    constexpr decimal64& operator=(const decimal64& rhs) noexcept = default;
+    constexpr decimal64& operator=(decimal64&& rhs) noexcept = default;
+    constexpr decimal64(const decimal64& rhs) noexcept = default;
+    constexpr decimal64(decimal64&& rhs) noexcept = default;
 
     // 3.2.2.2 Conversion form floating-point type
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
