@@ -56,7 +56,14 @@ void test()
             }
         }
     }
+
+    BOOST_TEST(isnan(assoc_legendre(1U, 1U, dist(rng) * std::numeric_limits<Dec>::signaling_NaN())));
+    BOOST_TEST(isnan(assoc_legendre(1U, 1U, Dec{10})));
+    BOOST_TEST(isnan(assoc_legendre(1U, 1U, Dec{-10})));
+    BOOST_TEST(isnan(assoc_legendre(200U, 1U, dist(rng) * Dec{1})));
 }
+
+// LCOV_EXCL_START
 
 template <typename T>
 void print_value(T value)
@@ -186,6 +193,8 @@ void print_table_constants()
         print_value(T{val});
     }
 }
+
+// LCOV_EXCL_STOP
 
 int main()
 {
