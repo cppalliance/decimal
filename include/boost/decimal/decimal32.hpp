@@ -608,7 +608,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     // Round as required
     if (reduced)
     {
-        exp += detail::fenv_round(unsigned_coeff, isneg);
+        exp += static_cast<unsigned>(detail::fenv_round(unsigned_coeff, isneg));
     }
 
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
@@ -1713,7 +1713,7 @@ constexpr auto mul_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (sig_dig > 9)
     {
-        res_sig /= detail::powers_of_10[sig_dig - 9];
+        res_sig /= detail::pow10(static_cast<std::uint64_t>(sig_dig - 9));
         res_exp += sig_dig - 9;
     }
 
@@ -1825,7 +1825,7 @@ constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decima
 
     if (sig_dig > std::numeric_limits<std::uint32_t>::digits10)
     {
-        res_sig /= detail::powers_of_10[sig_dig - std::numeric_limits<std::uint32_t>::digits10];
+        res_sig /= detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint32_t>::digits10));
         res_exp += sig_dig - std::numeric_limits<std::uint32_t>::digits10;
     }
 

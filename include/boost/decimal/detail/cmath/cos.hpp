@@ -64,7 +64,7 @@ constexpr auto cos(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
             int k {};
             auto r { remquo(x, my_pi_half, &k) };
 
-            const auto n = static_cast<unsigned>(k % 4U);
+            const auto n = static_cast<unsigned>(k % 4);
 
             switch(n)
             {

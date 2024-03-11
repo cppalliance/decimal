@@ -502,7 +502,7 @@ static constexpr auto multipleOfPowerOf2(const unsigned_128_type value, const st
 }
 
 static constexpr
-auto mulShift(const unsigned_128_type m, const std::uint64_t* const mul, const int32_t j) noexcept -> unsigned_128_type
+auto mulShift(const unsigned_128_type m, const std::uint64_t* const mul, const uint32_t j) noexcept -> unsigned_128_type
 {
     BOOST_DECIMAL_ASSERT(j > 128);
 

@@ -138,9 +138,9 @@ static constexpr auto generic_binary_to_decimal(
         const std::int32_t i = -e2 + static_cast<std::int32_t>(q) + k;
         std::uint64_t pow5[4] {};
         generic_computeInvPow5(q, pow5);
-        vr = mulShift(4 * m2, pow5, i);
-        vp = mulShift(4 * m2 + 2, pow5, i);
-        vm = mulShift(4 * m2 - 1 - mmShift, pow5, i);
+        vr = mulShift(4 * m2, pow5, static_cast<std::uint32_t>(i));
+        vp = mulShift(4 * m2 + 2, pow5, static_cast<std::uint32_t>(i));
+        vm = mulShift(4 * m2 - 1 - mmShift, pow5, static_cast<std::uint32_t>(i));
 
         #ifdef BOOST_DECIMAL_DEBUG_RYU
         printf("%s * 2^%d / 10^%d\n", s(mv), e2, q);
@@ -179,9 +179,9 @@ static constexpr auto generic_binary_to_decimal(
         const int32_t j = static_cast<int32_t>(q) - k;
         uint64_t pow5[4] {};
         generic_computePow5(static_cast<uint32_t>(i), pow5);
-        vr = mulShift(4 * m2, pow5, j);
-        vp = mulShift(4 * m2 + 2, pow5, j);
-        vm = mulShift(4 * m2 - 1 - mmShift, pow5, j);
+        vr = mulShift(4 * m2, pow5, static_cast<std::uint32_t>(j));
+        vp = mulShift(4 * m2 + 2, pow5, static_cast<std::uint32_t>(j));
+        vm = mulShift(4 * m2 - 1 - mmShift, pow5, static_cast<std::uint32_t>(j));
 
         #ifdef BOOST_DECIMAL_DEBUG_RYU
         printf("%s * 5^%d / 10^%d\n", s(mv), -e2, q);

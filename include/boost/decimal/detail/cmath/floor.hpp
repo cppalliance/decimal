@@ -73,7 +73,7 @@ constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
         ++new_sig;
     }
 
-    return {new_sig, exp_ptr + decimal_digits, is_neg};
+    return {new_sig, exp_ptr + static_cast<int>(decimal_digits), is_neg};
 }
 
 } // namespace decimal

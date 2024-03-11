@@ -30,7 +30,7 @@ constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
     using RoundType = std::conditional_t<std::is_same<T1, std::uint32_t>::value, decimal32,
                       std::conditional_t<std::is_same<T1, std::uint64_t>::value, decimal64, decimal128>>;
 
-    sig /= detail::pow10<T1>(std::abs(exp) - 1);
+    sig /= detail::pow10(static_cast<T1>(std::abs(exp) - 1));
     detail::fenv_round<RoundType>(sig, sign);
 }
 

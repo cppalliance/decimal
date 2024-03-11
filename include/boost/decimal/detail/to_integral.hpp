@@ -49,7 +49,7 @@ constexpr auto to_integral(Decimal val) noexcept -> TargetType
     auto expval {val.biased_exponent()};
     if (expval > 0)
     {
-        result *= detail::pow10<Conversion_Type>(expval);
+        result *= detail::pow10<Conversion_Type>(static_cast<Conversion_Type>(expval));
     }
     else if (expval < 0)
     {
@@ -58,7 +58,7 @@ constexpr auto to_integral(Decimal val) noexcept -> TargetType
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
     {
-        result = static_cast<bool>(val.isneg()) ? detail::apply_sign(result) : result;
+        result = static_cast<bool>(val.isneg()) ? static_cast<Conversion_Type>(detail::apply_sign(result)) : static_cast<Conversion_Type>(result);
     }
 
     return static_cast<TargetType>(result);
@@ -96,10 +96,11 @@ constexpr auto to_integral_128(Decimal val) noexcept -> TargetType
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
     {
-        result = static_cast<bool>(val.isneg()) ? detail::apply_sign(result) : result;
+        result = static_cast<bool>(val.isneg()) ? static_cast<TargetType>(detail::apply_sign(result)) :
+                                                  static_cast<TargetType>(result);
     }
 
-    return static_cast<TargetType>(result);
+    return result;
 }
 
 

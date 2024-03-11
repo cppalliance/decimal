@@ -41,7 +41,7 @@ void test_compute_float64()
     using boost::decimal::detail::fast_float::compute_float64;
 
     std::mt19937_64 gen(42);
-    std::uniform_int_distribution<std::int64_t> dist (1, 1);
+    std::uniform_int_distribution<std::uint64_t> dist (1, 1);
 
     bool success {};
 
@@ -51,20 +51,20 @@ void test_compute_float64()
     BOOST_TEST_EQ(compute_float64(308, dist(gen), false, success), 1e308);
 
     // out of range
-    BOOST_TEST_EQ(compute_float64(310, 5 * dist(gen), false, success), HUGE_VAL);
-    BOOST_TEST_EQ(compute_float64(310, 5 * dist(gen), true, success), -HUGE_VAL);
-    BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), false, success), HUGE_VAL);
-    BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), true, success), -HUGE_VAL);
-    BOOST_TEST_EQ(compute_float64(-325, 5 * dist(gen), false, success), 0.0);
-    BOOST_TEST_EQ(compute_float64(dist(gen) * 50, 0, false, success), 0.0);
-    BOOST_TEST_EQ(compute_float64(dist(gen) * 50, 0, true, success), 0.0);
+    BOOST_TEST_EQ(compute_float64(310, 5U * dist(gen), false, success), HUGE_VAL);
+    BOOST_TEST_EQ(compute_float64(310, 5U * dist(gen), true, success), -HUGE_VAL);
+    BOOST_TEST_EQ(compute_float64(1000, 5U * dist(gen), false, success), HUGE_VAL);
+    BOOST_TEST_EQ(compute_float64(1000, 5U * dist(gen), true, success), -HUGE_VAL);
+    BOOST_TEST_EQ(compute_float64(-325, 5U * dist(gen), false, success), 0.0);
+    BOOST_TEST_EQ(compute_float64(static_cast<std::int64_t>(dist(gen)) * 50, 0, false, success), 0.0);
+    BOOST_TEST_EQ(compute_float64(static_cast<std::int64_t>(dist(gen)) * 50, 0, true, success), 0.0);
     BOOST_TEST_EQ(compute_float64(300, UINT64_MAX, false, success), 0.0 * static_cast<double>(dist(gen)));
 
     // Composite
-    BOOST_TEST_EQ(compute_float64(10 * dist(gen), 123456789, false, success), 123456789e10);
-    BOOST_TEST_EQ(compute_float64(100 * dist(gen), UINT64_C(4444444444444444444), false, success), 4444444444444444444e100);
-    BOOST_TEST_EQ(compute_float64(100 * dist(gen), std::numeric_limits<std::uint64_t>::max(), false, success), 18446744073709551615e100);
-    BOOST_TEST_EQ(compute_float64(100 * dist(gen), UINT64_C(10000000000000000000), false, success), 10000000000000000000e100);
+    BOOST_TEST_EQ(compute_float64(10 * static_cast<std::int64_t>(dist(gen)), 123456789, false, success), 123456789e10);
+    BOOST_TEST_EQ(compute_float64(100 * static_cast<std::int64_t>(dist(gen)), UINT64_C(4444444444444444444), false, success), 4444444444444444444e100);
+    BOOST_TEST_EQ(compute_float64(100 * static_cast<std::int64_t>(dist(gen)), std::numeric_limits<std::uint64_t>::max(), false, success), 18446744073709551615e100);
+    BOOST_TEST_EQ(compute_float64(100 * static_cast<std::int64_t>(dist(gen)), UINT64_C(10000000000000000000), false, success), 10000000000000000000e100);
 }
 
 #ifdef __GNUC__

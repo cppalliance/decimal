@@ -43,11 +43,11 @@ constexpr auto fast_path(const std::int64_t q, const Unsigned_Integer &w, bool n
 
     if (q < 0)
     {
-        ld /= powers_of_ten_ld[-q];
+        ld /= powers_of_ten_ld[static_cast<std::size_t>(-q)];
     }
     else
     {
-        ld *= powers_of_ten_ld[q];
+        ld *= powers_of_ten_ld[static_cast<std::size_t>(q)];
     }
 
     if (negative)

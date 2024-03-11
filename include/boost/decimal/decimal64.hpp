@@ -1210,7 +1210,7 @@ constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
     {
-        res_sig /= detail::powers_of_10[sig_dig - std::numeric_limits<std::uint64_t>::digits10];
+        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
         res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
     }
 
@@ -1253,7 +1253,7 @@ constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::de
 
     if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
     {
-        res_sig /= detail::powers_of_10[sig_dig - std::numeric_limits<std::uint64_t>::digits10];
+        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
         res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
     }
 
