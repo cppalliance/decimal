@@ -45,6 +45,7 @@ run test_acosh.cpp ;
 run test_asin.cpp ;
 run test_asinh.cpp ;
 run test_assoc_laguerre.cpp ;
+run test_assoc_legendre.cpp ;
 run test_atan.cpp ;
 run test_atan2.cpp ;
 run test_atanh.cpp ;
