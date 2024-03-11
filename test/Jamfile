@@ -13,6 +13,10 @@ project : requirements
 
   <toolset>gcc:<cxxflags>-Wall
   <toolset>gcc:<cxxflags>-Wextra
+  <toolset>gcc:<cxxflags>-Wpedantic
+  <toolset>clang:<cxxflags>-Wall
+  <toolset>clang:<cxxflags>-Wextra
+  <toolset>clang:<cxxflags>-Wpedantic
   <toolset>msvc:<warnings>all
 
   <toolset>gcc:<cxxflags>-Wsign-conversion
