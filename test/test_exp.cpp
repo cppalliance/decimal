@@ -99,7 +99,7 @@ namespace local
       const auto val_flt = exp(x_flt);
       const auto val_dec = exp(x_dec);
 
-      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), static_cast<float_type>(std::numeric_limits<decimal_type>::epsilon()) * tol_factor);
+      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), static_cast<float_type>(std::numeric_limits<decimal_type>::epsilon()) * static_cast<float_type>(tol_factor));
 
       result_is_ok = (result_val_is_ok && result_is_ok);
 

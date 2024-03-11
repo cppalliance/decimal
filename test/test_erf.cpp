@@ -64,7 +64,7 @@ void test_erf()
     // Small values
     using float_type = std::conditional_t<std::is_same<T, decimal32>::value, float, double>;
 
-    std::uniform_real_distribution<float_type> smallest_vals(1e-15, 1e-10);
+    std::uniform_real_distribution<float_type> smallest_vals(static_cast<float_type>(1e-15), static_cast<float_type>(1e-10));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {smallest_vals(rng)};
@@ -84,7 +84,7 @@ void test_erf()
         }
     }
 
-    std::uniform_real_distribution<float_type> second_smallest(1e-10, 0.5);
+    std::uniform_real_distribution<float_type> second_smallest(static_cast<float_type>(1e-10), static_cast<float_type>(0.5));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {second_smallest(rng)};
@@ -104,7 +104,7 @@ void test_erf()
         }
     }
 
-    std::uniform_real_distribution<float_type> erfc_smallest(0.5, 1.5);
+    std::uniform_real_distribution<float_type> erfc_smallest(static_cast<float_type>(0.5), static_cast<float_type>(1.5));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {erfc_smallest(rng)};
@@ -124,7 +124,7 @@ void test_erf()
         }
     }
 
-    std::uniform_real_distribution<float_type> erfc_middle(1.5, 2.5);
+    std::uniform_real_distribution<float_type> erfc_middle(static_cast<float_type>(1.5), static_cast<float_type>(2.5));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {erfc_middle(rng)};
@@ -144,7 +144,7 @@ void test_erf()
         }
     }
 
-    std::uniform_real_distribution<float_type> erfc_large(2.5, 4.5);
+    std::uniform_real_distribution<float_type> erfc_large(static_cast<float_type>(2.5), static_cast<float_type>(4.5));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {erfc_large(rng)};
@@ -164,7 +164,7 @@ void test_erf()
         }
     }
 
-    std::uniform_real_distribution<float_type> catch_all(4.5, 110.0);
+    std::uniform_real_distribution<float_type> catch_all(static_cast<float_type>(4.5), static_cast<float_type>(110.0));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {catch_all(rng)};
@@ -185,7 +185,7 @@ void test_erf()
     }
 
     // Negative values
-    std::uniform_real_distribution<float_type> negative(-2, 0.0);
+    std::uniform_real_distribution<float_type> negative(static_cast<float_type>(-2), static_cast<float_type>(0.0));
     for (std::size_t i {}; i < N / 8; ++i)
     {
         const auto val {negative(rng)};
@@ -459,7 +459,7 @@ void test_erfc()
     // Small values
     using float_type = std::conditional_t<std::is_same<T, decimal32>::value, float, double>;
 
-    std::uniform_real_distribution<float_type> smallest_vals(1e-15, 1e-10);
+    std::uniform_real_distribution<float_type> smallest_vals(static_cast<float_type>(1e-15), static_cast<float_type>(1e-10));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {smallest_vals(rng)};
@@ -479,7 +479,7 @@ void test_erfc()
         }
     }
 
-    std::uniform_real_distribution<float_type> second_smallest(1e-10, 0.5);
+    std::uniform_real_distribution<float_type> second_smallest(static_cast<float_type>(1e-10), static_cast<float_type>(0.5));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {second_smallest(rng)};
@@ -499,7 +499,7 @@ void test_erfc()
         }
     }
 
-    std::uniform_real_distribution<float_type> erfc_smallest(0.5, 1.5);
+    std::uniform_real_distribution<float_type> erfc_smallest(static_cast<float_type>(0.5), static_cast<float_type>(1.5));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {erfc_smallest(rng)};
@@ -519,7 +519,7 @@ void test_erfc()
         }
     }
 
-    std::uniform_real_distribution<float_type> erfc_middle(1.5, 2.5);
+    std::uniform_real_distribution<float_type> erfc_middle(static_cast<float_type>(1.5), static_cast<float_type>(2.5));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {erfc_middle(rng)};
@@ -539,7 +539,7 @@ void test_erfc()
         }
     }
 
-    std::uniform_real_distribution<float_type> erfc_large(2.5, 4.5);
+    std::uniform_real_distribution<float_type> erfc_large(static_cast<float_type>(2.5), static_cast<float_type>(4.5));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {erfc_large(rng)};
@@ -560,7 +560,7 @@ void test_erfc()
         }
     }
 
-    std::uniform_real_distribution<float_type> catch_all(4.5, 10.0);
+    std::uniform_real_distribution<float_type> catch_all(static_cast<float_type>(4.5), static_cast<float_type>(10.0));
     for (std::size_t i {}; i < N / 6; ++i)
     {
         const auto val {catch_all(rng)};
@@ -582,7 +582,7 @@ void test_erfc()
     }
 
     // Negative values
-    std::uniform_real_distribution<float_type> negative_first_path(-2, -0.5);
+    std::uniform_real_distribution<float_type> negative_first_path(static_cast<float_type>(-2), static_cast<float_type>(-0.5));
     for (std::size_t i {}; i < N / 8; ++i)
     {
         const auto val {negative_first_path(rng)};
@@ -603,7 +603,7 @@ void test_erfc()
         }
     }
 
-    std::uniform_real_distribution<float_type> negative_second_path(-0.5, 0.0);
+    std::uniform_real_distribution<float_type> negative_second_path(static_cast<float_type>(-0.5), static_cast<float_type>(0.0));
     for (std::size_t i {}; i < N / 8; ++i)
     {
         const auto val {negative_first_path(rng)};

@@ -29,7 +29,7 @@ void test_compute_float32()
     BOOST_TEST_EQ(compute_float32(310 * dist(gen), 5, true, success), -HUGE_VALF);
     BOOST_TEST_EQ(compute_float32(1000 * dist(gen), 5, false, success), HUGE_VALF);
     BOOST_TEST_EQ(compute_float32(1000 * dist(gen), 5, true, success), -HUGE_VALF);
-    BOOST_TEST_EQ(compute_float32(-325 * dist(gen), 5, false, success), 0);
+    BOOST_TEST_EQ(compute_float32(-325 * dist(gen), 5, false, success), 0.0F);
 
     // Composite
     BOOST_TEST_EQ(compute_float32(10 * dist(gen), 123456789, false, success), 123456789e10F);
@@ -51,14 +51,14 @@ void test_compute_float64()
     BOOST_TEST_EQ(compute_float64(308, dist(gen), false, success), 1e308);
 
     // out of range
-    BOOST_TEST_EQ(compute_float64(310, 5 * dist(gen), false, success), HUGE_VALF);
-    BOOST_TEST_EQ(compute_float64(310, 5 * dist(gen), true, success), -HUGE_VALF);
-    BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), false, success), HUGE_VALF);
-    BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), true, success), -HUGE_VALF);
-    BOOST_TEST_EQ(compute_float64(-325, 5 * dist(gen), false, success), 0);
-    BOOST_TEST_EQ(compute_float64(dist(gen) * 50, 0, false, success), 0);
-    BOOST_TEST_EQ(compute_float64(dist(gen) * 50, 0, true, success), 0);
-    BOOST_TEST_EQ(compute_float64(300, UINT64_MAX, false, success), 0 * dist(gen));
+    BOOST_TEST_EQ(compute_float64(310, 5 * dist(gen), false, success), HUGE_VAL);
+    BOOST_TEST_EQ(compute_float64(310, 5 * dist(gen), true, success), -HUGE_VAL);
+    BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), false, success), HUGE_VAL);
+    BOOST_TEST_EQ(compute_float64(1000, 5 * dist(gen), true, success), -HUGE_VAL);
+    BOOST_TEST_EQ(compute_float64(-325, 5 * dist(gen), false, success), 0.0);
+    BOOST_TEST_EQ(compute_float64(dist(gen) * 50, 0, false, success), 0.0);
+    BOOST_TEST_EQ(compute_float64(dist(gen) * 50, 0, true, success), 0.0);
+    BOOST_TEST_EQ(compute_float64(300, UINT64_MAX, false, success), 0.0 * static_cast<double>(dist(gen)));
 
     // Composite
     BOOST_TEST_EQ(compute_float64(10 * dist(gen), 123456789, false, success), 123456789e10);

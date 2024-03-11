@@ -95,7 +95,7 @@ namespace local
       const auto val_flt = acosh(x_flt);
       const auto val_dec = acosh(x_dec);
 
-      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float>(val_dec), std::numeric_limits<float>::epsilon() * tol_factor);
+      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float>(val_dec), std::numeric_limits<float>::epsilon() * static_cast<float>(tol_factor));
 
       result_is_ok = (result_val_is_ok && result_is_ok);
 

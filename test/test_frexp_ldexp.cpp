@@ -109,7 +109,7 @@ namespace local
 
       const auto ldexp_dec_as_float = static_cast<float>(ldexp_dec);
 
-      const auto result_frexp_ldexp_is_ok = is_close_fraction(ldexp_flt, ldexp_dec_as_float, static_cast<float>(std::numeric_limits<decimal_type>::epsilon()) * tol_factor);
+      const auto result_frexp_ldexp_is_ok = is_close_fraction(ldexp_flt, ldexp_dec_as_float, static_cast<float>(std::numeric_limits<decimal_type>::epsilon()) * static_cast<float>(tol_factor));
 
       if(!result_frexp_ldexp_is_ok)
       {

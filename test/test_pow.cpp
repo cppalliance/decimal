@@ -115,7 +115,7 @@ namespace local
       const auto val_flt = pow(x_flt, a_flt);
       const auto val_dec = pow(x_dec, a_dec);
 
-      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
+      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * static_cast<float_type>(tol_factor));
 
       result_is_ok = (result_val_is_ok && result_is_ok);
 
@@ -158,7 +158,7 @@ namespace local
         const auto val_flt = pow(near_pi_flt, static_cast<float_type>  (p));
         const auto val_dec = pow(near_pi_dec, static_cast<decimal_type>(p));
 
-        const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
+        const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * static_cast<float_type>(tol_factor));
 
         result_is_ok = (result_val_is_ok && result_is_ok);
 
@@ -183,7 +183,7 @@ namespace local
         const auto val_flt = pow(near_pi_flt, static_cast<float_type>  (p));
         const auto val_dec = pow(near_pi_dec, static_cast<decimal_type>(p));
 
-        const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
+        const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * static_cast<float_type>(tol_factor));
 
         result_is_ok = (result_val_is_ok && result_is_ok);
 
@@ -217,7 +217,7 @@ namespace local
         const auto val_flt = pow(inv_pi_flt, static_cast<float_type>  (p));
         const auto val_dec = pow(inv_pi_dec, static_cast<decimal_type>(p));
 
-        const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
+        const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * static_cast<float_type>(tol_factor));
 
         result_is_ok = (result_val_is_ok && result_is_ok);
 
@@ -242,7 +242,7 @@ namespace local
         const auto val_flt = pow(inv_pi_flt, static_cast<float_type>  (p));
         const auto val_dec = pow(inv_pi_dec, p);
 
-        const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
+        const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * static_cast<float_type>(tol_factor));
 
         result_is_ok = (result_val_is_ok && result_is_ok);
 
@@ -274,7 +274,7 @@ namespace local
         const auto val_flt = pow(neg_pi_flt, static_cast<float_type>  (p));
         const auto val_dec = pow(neg_pi_dec, p);
 
-        const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
+        const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * static_cast<float_type>(tol_factor));
 
         result_is_ok = (result_val_is_ok && result_is_ok);
 
