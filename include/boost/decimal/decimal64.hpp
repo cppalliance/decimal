@@ -380,6 +380,8 @@ public:
     constexpr auto operator/=(Decimal rhs) noexcept
         -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>;
 
+    constexpr auto operator%=(decimal64 rhs) noexcept -> decimal64&;
+
     // 3.2.9 Comparison operators:
     // Equality
     friend constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool;
@@ -1819,6 +1821,12 @@ constexpr auto decimal64::operator/=(Decimal rhs) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>
 {
     *this = *this / rhs;
+    return *this;
+}
+
+constexpr auto decimal64::operator%=(decimal64 rhs) noexcept -> decimal64&
+{
+    *this = *this % rhs;
     return *this;
 }
 
