@@ -10,6 +10,7 @@
 #if defined(__clang__) && !defined(__GNUC__)
 #  pragma clang diagnostic push
 #  pragma clang diagnostic ignored "-Wc++98-compat"
+#  pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
 #endif
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
