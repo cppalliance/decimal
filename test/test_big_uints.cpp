@@ -20,7 +20,6 @@ int main()
 // Propagates up from boost.math
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
-#include <boost/core/lightweight_test.hpp>
 #include <boost/decimal.hpp>
 
 #ifdef __GNUC__
@@ -29,10 +28,12 @@ int main()
 #  pragma GCC diagnostic ignored "-Wundef"
 #  pragma GCC diagnostic ignored "-Wconversion"
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
 
 #include <boost/multiprecision/cpp_int.hpp>
-
+#include <boost/core/lightweight_test.hpp>
 #include <array>
 #include <chrono>
 #include <random>
