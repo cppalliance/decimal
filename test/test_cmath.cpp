@@ -6,7 +6,6 @@
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
 #include <boost/decimal.hpp>
-#include <boost/core/lightweight_test.hpp>
 
 #ifdef __GNUC__
 #  pragma GCC diagnostic push
@@ -16,6 +15,7 @@
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
 #endif
 
+#include <boost/core/lightweight_test.hpp>
 #include <boost/math/special_functions/next.hpp>
 
 #include <iostream>

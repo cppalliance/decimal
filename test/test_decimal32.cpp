@@ -5,12 +5,21 @@
 #include "mini_to_chars.hpp"
 
 #include <boost/decimal.hpp>
-#include <boost/core/lightweight_test.hpp>
 #include <bitset>
 #include <limits>
 #include <random>
 #include <cmath>
 #include <cerrno>
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wundef"
+#  pragma GCC diagnostic ignored "-Wconversion"
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+
+#include <boost/core/lightweight_test.hpp>
 
 using namespace boost::decimal;
 
