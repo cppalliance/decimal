@@ -29,6 +29,9 @@ int main()
 #  pragma GCC diagnostic ignored "-Wconversion"
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
+#if defined(__GNUC__) && !defined(__clang__)
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
 
