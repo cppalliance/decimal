@@ -10,11 +10,15 @@
 
 #define BOOST_DECIMAL_HAS_BOOST_TYPE_TRAITS
 
-// Warnings propagate up from boost.type_traits so we will ignore them
+// Warnings propagate up from boost.type_traits, so we will ignore them
 #ifdef __GNUC__
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wconversion"
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+
+#if defined(__GNUC__) && !defined(__clang__)
+#  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
 
 #include <boost/type_traits.hpp>

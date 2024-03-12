@@ -60,11 +60,12 @@ constexpr auto digit_from_char(char val) noexcept -> unsigned char
 #elif defined(__GNUC__) && (__GNUC__ < 7)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Woverflow"
+# pragma GCC diagnostic ignored "-Wduplicated-branches"
 
 #elif defined(__GNUC__) && (__GNUC__ >= 7)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-
+# pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
 
 template <typename Integer, typename Unsigned_Integer>
