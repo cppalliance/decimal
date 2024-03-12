@@ -5,6 +5,13 @@
 #ifndef BOOST_DECIMAL_HPP
 #define BOOST_DECIMAL_HPP
 
+// Clang-Cl likes to throw warnings everywhere for this
+// disable at the global level
+#if defined(__clang__) && !defined(__GNUC__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
@@ -17,5 +24,9 @@
 #include <boost/decimal/cfloat.hpp>
 #include <boost/decimal/charconv.hpp>
 #include <boost/decimal/type_traits.hpp>
+
+#if defined(__clang__) && !defined(__GNUC__)
+#  pragma clang diagnostic pop
+#endif
 
 #endif // BOOST_DECIMAL_HPP
