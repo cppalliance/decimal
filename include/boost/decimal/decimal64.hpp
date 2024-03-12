@@ -568,6 +568,11 @@ constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
     return rhs.bits_;
 }
 
+#if defined(__GNUC__) && __GNUC__ >= 9
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wduplicated-branches"
+#endif
+
 // 3.2.5 initialization from coefficient and exponent:
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool>>
 constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
@@ -720,6 +725,10 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
         }
     }
 }
+
+#if defined(__GNUC__) && __GNUC__ >= 9
+#  pragma GCC diagnostic pop
+#endif
 
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::decimal64(Float val) noexcept

@@ -13,6 +13,7 @@ project : requirements
 
   <toolset>gcc:<cxxflags>-Wall
   <toolset>gcc:<cxxflags>-Wextra
+  <toolset>gcc:<cxxflags>-Wduplicated-branches
   <toolset>clang:<cxxflags>-Wall
   <toolset>clang:<cxxflags>-Wextra
   <toolset>msvc:<warnings>all

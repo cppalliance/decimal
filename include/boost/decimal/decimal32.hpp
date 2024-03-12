@@ -567,6 +567,11 @@ private:
 #  pragma GCC diagnostic pop
 #endif
 
+#if defined(__GNUC__) && __GNUC__ >= 9
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wduplicated-branches"
+#endif
+
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
 constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)
 {
@@ -729,6 +734,10 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         }
     }
 }
+
+#if defined(__GNUC__) && __GNUC__ >= 9
+#  pragma GCC diagnostic pop
+#endif
 
 constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32
 {
