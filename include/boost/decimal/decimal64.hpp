@@ -568,7 +568,7 @@ constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
     return rhs.bits_;
 }
 
-#if defined(__GNUC__) && __GNUC__ >= 9
+#if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
@@ -726,7 +726,7 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     }
 }
 
-#if defined(__GNUC__) && __GNUC__ >= 9
+#if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic pop
 #endif
 

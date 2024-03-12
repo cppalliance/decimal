@@ -677,7 +677,7 @@ constexpr auto decimal128::edit_sign(bool sign) noexcept -> void
     }
 }
 
-#if defined(__GNUC__) && __GNUC__ >= 9
+#if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
@@ -839,7 +839,7 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     }
 }
 
-#if defined(__GNUC__) && __GNUC__ >= 9
+#if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic pop
 #endif
 

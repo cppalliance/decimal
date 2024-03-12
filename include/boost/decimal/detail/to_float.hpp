@@ -20,7 +20,7 @@ namespace boost {
 namespace decimal {
 
 // Duplicated branches when on a machine with 64 bit long doubles
-#if defined(__GNUC__) && __GNUC__ >= 9
+#if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
@@ -82,7 +82,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType
     return result;
 }
 
-#if defined(__GNUC__) && __GNUC__ >= 9
+#if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic pop
 #endif
 
