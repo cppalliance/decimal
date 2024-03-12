@@ -333,6 +333,7 @@ void test_434_fixed()
     test_value(test_zero_point_three, "0.3000", chars_format::fixed, 4);
     test_value(test_zero_point_three, "0.30000", chars_format::fixed, 5);
     test_value(test_zero_point_three, "0.300000", chars_format::fixed, 6);
+    test_value(test_zero_point_three, "0.300000", chars_format::fixed, -1);
     test_value(test_zero_point_three, "0.3000000", chars_format::fixed, 7);
     test_value(test_zero_point_three, "0.30000000", chars_format::fixed, 8);
     test_value(test_zero_point_three, "0.300000000", chars_format::fixed, 9);
@@ -348,6 +349,7 @@ void test_434_fixed()
     test_value(test_one_and_quarter, "1.2500", chars_format::fixed, 4);
     test_value(test_one_and_quarter, "1.25000", chars_format::fixed, 5);
     test_value(test_one_and_quarter, "1.250000", chars_format::fixed, 6);
+    test_value(test_one_and_quarter, "1.250000", chars_format::fixed, -1);
     test_value(test_one_and_quarter, "1.2500000", chars_format::fixed, 7);
     test_value(test_one_and_quarter, "1.25000000", chars_format::fixed, 8);
     test_value(test_one_and_quarter, "1.250000000", chars_format::fixed, 9);
@@ -363,11 +365,45 @@ void test_434_fixed()
     test_value(tweleve_and_half, "12.5000", chars_format::fixed, 4);
     test_value(tweleve_and_half, "12.50000", chars_format::fixed, 5);
     test_value(tweleve_and_half, "12.500000", chars_format::fixed, 6);
+    test_value(tweleve_and_half, "12.500000", chars_format::fixed, -1);
     test_value(tweleve_and_half, "12.5000000", chars_format::fixed, 7);
     test_value(tweleve_and_half, "12.50000000", chars_format::fixed, 8);
     test_value(tweleve_and_half, "12.500000000", chars_format::fixed, 9);
     test_value(tweleve_and_half, "12.5000000000", chars_format::fixed, 10);
     test_value(tweleve_and_half, "12.50000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
+
+    constexpr T one_e_minus_two {1, -2};
+
+    test_value(one_e_minus_two, "0.010000", chars_format::fixed, -1);
+    test_value(one_e_minus_two, "0", chars_format::fixed, 0);
+    test_value(one_e_minus_two, "0.0", chars_format::fixed, 1);
+    test_value(one_e_minus_two, "0.01", chars_format::fixed, 2);
+    test_value(one_e_minus_two, "0.010", chars_format::fixed, 3);
+    test_value(one_e_minus_two, "0.0100", chars_format::fixed, 4);
+    test_value(one_e_minus_two, "0.01000", chars_format::fixed, 5);
+    test_value(one_e_minus_two, "0.010000", chars_format::fixed, 6);
+    test_value(one_e_minus_two, "0.010000", chars_format::fixed, -1);
+    test_value(one_e_minus_two, "0.0100000", chars_format::fixed, 7);
+    test_value(one_e_minus_two, "0.01000000", chars_format::fixed, 8);
+    test_value(one_e_minus_two, "0.010000000", chars_format::fixed, 9);
+    test_value(one_e_minus_two, "0.0100000000", chars_format::fixed, 10);
+    test_value(one_e_minus_two, "0.01000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
+
+    constexpr T one_e_minus_three {1, -3};
+
+    test_value(one_e_minus_three, "0.001000", chars_format::fixed, -1);
+    test_value(one_e_minus_three, "0", chars_format::fixed, 0);
+    test_value(one_e_minus_three, "0.0", chars_format::fixed, 1);
+    test_value(one_e_minus_three, "0.00", chars_format::fixed, 2);
+    test_value(one_e_minus_three, "0.001", chars_format::fixed, 3);
+    test_value(one_e_minus_three, "0.0010", chars_format::fixed, 4);
+    test_value(one_e_minus_three, "0.00100", chars_format::fixed, 5);
+    test_value(one_e_minus_three, "0.001000", chars_format::fixed, 6);
+    test_value(one_e_minus_three, "0.0010000", chars_format::fixed, 7);
+    test_value(one_e_minus_three, "0.00100000", chars_format::fixed, 8);
+    test_value(one_e_minus_three, "0.001000000", chars_format::fixed, 9);
+    test_value(one_e_minus_three, "0.0010000000", chars_format::fixed, 3);
+    test_value(one_e_minus_three, "0.00100000000000000000000000000000000000000000000000", chars_format::fixed, 50);
 }
 
 template <typename T>
@@ -382,6 +418,7 @@ void test_434_scientific()
     test_value(test_zero_point_three, "3.0000e-01", chars_format::scientific, 4);
     test_value(test_zero_point_three, "3.00000e-01", chars_format::scientific, 5);
     test_value(test_zero_point_three, "3.000000e-01", chars_format::scientific, 6);
+    test_value(test_zero_point_three, "3.000000e-01", chars_format::scientific, -1);
     test_value(test_zero_point_three, "3.0000000e-01", chars_format::scientific, 7);
     test_value(test_zero_point_three, "3.00000000e-01", chars_format::scientific, 8);
     test_value(test_zero_point_three, "3.000000000e-01", chars_format::scientific, 9);
@@ -397,6 +434,7 @@ void test_434_scientific()
     test_value(test_one_and_quarter, "1.2500e+00", chars_format::scientific, 4);
     test_value(test_one_and_quarter, "1.25000e+00", chars_format::scientific, 5);
     test_value(test_one_and_quarter, "1.250000e+00", chars_format::scientific, 6);
+    test_value(test_one_and_quarter, "1.250000e+00", chars_format::scientific, -1);
     test_value(test_one_and_quarter, "1.2500000e+00", chars_format::scientific, 7);
     test_value(test_one_and_quarter, "1.25000000e+00", chars_format::scientific, 8);
     test_value(test_one_and_quarter, "1.250000000e+00", chars_format::scientific, 9);
@@ -412,11 +450,27 @@ void test_434_scientific()
     test_value(tweleve_and_half, "1.2500e+01", chars_format::scientific, 4);
     test_value(tweleve_and_half, "1.25000e+01", chars_format::scientific, 5);
     test_value(tweleve_and_half, "1.250000e+01", chars_format::scientific, 6);
+    test_value(tweleve_and_half, "1.250000e+01", chars_format::scientific, -1);
     test_value(tweleve_and_half, "1.2500000e+01", chars_format::scientific, 7);
     test_value(tweleve_and_half, "1.25000000e+01", chars_format::scientific, 8);
     test_value(tweleve_and_half, "1.250000000e+01", chars_format::scientific, 9);
     test_value(tweleve_and_half, "1.2500000000e+01", chars_format::scientific, 10);
     test_value(tweleve_and_half, "1.25000000000000000000000000000000000000000000000000e+01", chars_format::scientific, 50);
+
+    constexpr T one_e_minus_two {1, -2};
+
+    test_value(one_e_minus_two, "1e-02", chars_format::scientific, 0);
+    test_value(one_e_minus_two, "1.0e-02", chars_format::scientific, 1);
+    test_value(one_e_minus_two, "1.00e-02", chars_format::scientific, 2);
+    test_value(one_e_minus_two, "1.000e-02", chars_format::scientific, 3);
+    test_value(one_e_minus_two, "1.0000e-02", chars_format::scientific, 4);
+    test_value(one_e_minus_two, "1.00000e-02", chars_format::scientific, 5);
+    test_value(one_e_minus_two, "1.000000e-02", chars_format::scientific, 6);
+    test_value(one_e_minus_two, "1.000000e-02", chars_format::scientific, -1);
+    test_value(one_e_minus_two, "1.0000000e-02", chars_format::scientific, 7);
+    test_value(one_e_minus_two, "1.00000000e-02", chars_format::scientific, 8);
+    test_value(one_e_minus_two, "1.000000000e-02", chars_format::scientific, 9);
+    test_value(one_e_minus_two, "1.00000000000000000000000000000000000000000000000000e-02", chars_format::scientific, 50);
 }
 
 template <typename T>
