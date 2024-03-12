@@ -402,7 +402,7 @@ void test_434_fixed()
     test_value(one_e_minus_three, "0.0010000", chars_format::fixed, 7);
     test_value(one_e_minus_three, "0.00100000", chars_format::fixed, 8);
     test_value(one_e_minus_three, "0.001000000", chars_format::fixed, 9);
-    test_value(one_e_minus_three, "0.0010000000", chars_format::fixed, 3);
+    test_value(one_e_minus_three, "0.0010000000", chars_format::fixed, 10);
     test_value(one_e_minus_three, "0.00100000000000000000000000000000000000000000000000", chars_format::fixed, 50);
 }
 
