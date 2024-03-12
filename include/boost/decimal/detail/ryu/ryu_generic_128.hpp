@@ -60,7 +60,7 @@ static constexpr auto generic_binary_to_decimal(
     printf("\n");
     #endif
 
-    const std::uint32_t bias = (1u << (exponentBits - 1)) - 1;
+    const std::uint32_t local_bias = (1u << (exponentBits - 1)) - 1;
     const bool ieeeSign = ((bits >> (mantissaBits + exponentBits)) & 1) != 0;
     const unsigned_128_type ieeeMantissa = bits & ((one << mantissaBits) - 1);
     const auto ieeeExponent = static_cast<std::uint32_t>((bits >> mantissaBits) & ((one << exponentBits) - 1u));
@@ -87,11 +87,11 @@ static constexpr auto generic_binary_to_decimal(
         // mantissaBits includes the explicit leading bit, so we need to correct for that here.
         if (ieeeExponent == 0)
         {
-            e2 = static_cast<std::int32_t>(1 - bias - mantissaBits + 1 - 2);
+            e2 = static_cast<std::int32_t>(1 - local_bias - mantissaBits + 1 - 2);
         }
         else
         {
-            e2 = static_cast<std::int32_t>(ieeeExponent - bias - mantissaBits + 1 - 2);
+            e2 = static_cast<std::int32_t>(ieeeExponent - local_bias - mantissaBits + 1 - 2);
         }
         m2 = ieeeMantissa;
     }
@@ -99,11 +99,11 @@ static constexpr auto generic_binary_to_decimal(
     {
         if (ieeeExponent == 0)
         {
-            e2 = static_cast<std::int32_t>(1 - bias - mantissaBits - 2);
+            e2 = static_cast<std::int32_t>(1 - local_bias - mantissaBits - 2);
             m2 = ieeeMantissa;
         } else
         {
-            e2 = static_cast<std::int32_t>(ieeeExponent - bias - mantissaBits - 2U);
+            e2 = static_cast<std::int32_t>(ieeeExponent - local_bias - mantissaBits - 2U);
             m2 = (one << mantissaBits) | ieeeMantissa;
         }
     }
