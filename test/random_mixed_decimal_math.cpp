@@ -3,9 +3,15 @@
 // https://www.boost.org/LICENSE_1_0.txt
 
 #include <boost/decimal.hpp>
-#include <boost/core/lightweight_test.hpp>
 #include <random>
 #include <limits>
+
+#if defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
+#include <boost/core/lightweight_test.hpp>
 
 using namespace boost::decimal;
 

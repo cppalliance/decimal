@@ -5,7 +5,6 @@
 // Propagates up from boost.math
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
-#include <boost/core/lightweight_test.hpp>
 #include <boost/decimal.hpp>
 
 #ifdef __GNUC__
@@ -14,7 +13,10 @@
 #  pragma GCC diagnostic ignored "-Wundef"
 #  pragma GCC diagnostic ignored "-Wconversion"
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
+
+#include <boost/core/lightweight_test.hpp>
 #include <boost/math/special_functions/next.hpp>
 
 #include <cmath>

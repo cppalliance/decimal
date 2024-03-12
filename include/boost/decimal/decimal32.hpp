@@ -1549,6 +1549,11 @@ constexpr auto decimal32::edit_sign(bool sign) noexcept -> void
     }
 }
 
+#if defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 {
@@ -1580,6 +1585,10 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
         }
     }
 }
+
+#if defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
 
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal32::operator=(const Float& val) noexcept -> decimal32&

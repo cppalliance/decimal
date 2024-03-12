@@ -7,6 +7,12 @@
 #include <random>
 
 #include <boost/decimal.hpp>
+
+#if defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 #include <boost/core/lightweight_test.hpp>
 
 auto my_zero() -> boost::decimal::decimal32&;

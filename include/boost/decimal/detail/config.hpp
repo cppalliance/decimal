@@ -202,7 +202,7 @@ typedef unsigned __int128 uint128_t;
 //
 // As does GCC-9:
 //
-#if (__GNUC__ >= 9) && !defined(BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
+#if defined(__GNUC__) && (__GNUC__ >= 9) && !defined(BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
 #  define BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED
 #endif
 

@@ -58,6 +58,11 @@ constexpr auto fast_path(const std::int64_t q, const Unsigned_Integer &w, bool n
     return ld;
 }
 
+#if defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 template <typename Unsigned_Integer>
 constexpr auto compute_float80(std::int64_t q, const Unsigned_Integer &w,
                                const bool negative, bool &success) noexcept -> long double
@@ -146,6 +151,11 @@ constexpr auto compute_float80(std::int64_t q, const Unsigned_Integer &w,
 
     return ld;
 }
+
+#if defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
+
 
 } //namespace fast_float
 } //namespace detail
