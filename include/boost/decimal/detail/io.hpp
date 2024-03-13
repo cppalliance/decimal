@@ -12,6 +12,8 @@
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/to_string.hpp>
+#include <boost/decimal/charconv.hpp>
+#include <system_error>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
@@ -32,50 +34,47 @@ template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE D
 auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>
 {
-    using significand_type = std::conditional_t<std::is_same<DecimalType, decimal128>::value, detail::uint128, std::uint64_t>;
+    charT t_buffer[1024] {}; // What should be an unreasonably high maximum
+    is >> t_buffer;
 
-    char buffer[1024] {}; // What should be an unreasonably high maximum
-    is >> buffer;
+    char buffer[1024] {};
 
-    bool sign {};
-    significand_type significand {};
-    std::int32_t expval {};
-    const auto buffer_len {std::strlen(buffer)};
-
-    if (buffer_len == 0)
+    BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<charT, char>::value)
     {
-        errno = EINVAL;
-        return is;
-    }
+        auto first = buffer;
+        auto t_first = t_buffer;
+        auto t_buffer_end = t_buffer + std::strlen(t_buffer);
 
-    const auto r {detail::parser(buffer, buffer + buffer_len, sign, significand, expval)};
-
-    if (r.ec != std::errc{})
-    {
-        if (r.ec == std::errc::not_supported)
+        while (t_first != t_buffer_end)
         {
-            if (significand)
-            {
-                d = std::numeric_limits<DecimalType>::signaling_NaN();
-            }
-            else
-            {
-                d = std::numeric_limits<DecimalType>::quiet_NaN();
-            }
-        }
-        else if (r.ec == std::errc::value_too_large)
-        {
-            d = std::numeric_limits<DecimalType>::infinity();
-        }
-        else
-        {
-            d = std::numeric_limits<DecimalType>::signaling_NaN();
-            errno = static_cast<int>(r.ec);
+            *first++ = static_cast<char>(*t_first++);
         }
     }
     else
     {
-        d = DecimalType{significand, expval, sign};
+        std::memcpy(buffer, t_buffer, sizeof(t_buffer));
+    }
+
+    chars_format fmt = chars_format::general;
+    const auto flags {is.flags()};
+    if (flags & std::ios_base::scientific)
+    {
+        fmt = chars_format::scientific;
+    }
+    else if (flags & std::ios_base::hex)
+    {
+        fmt = chars_format::hex;
+    }
+    else if (flags & std::ios_base::fixed)
+    {
+        fmt = chars_format::fixed;
+    }
+
+    auto r = from_chars(buffer, buffer + std::strlen(buffer), d, fmt);
+
+    if (BOOST_DECIMAL_UNLIKELY(r.ec == std::errc::not_supported))
+    {
+        d = std::numeric_limits<DecimalType>::signaling_NaN(); // LCOV_EXCL_LINE
     }
 
     return is;
@@ -93,106 +92,48 @@ template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE D
 auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
     -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>
 {
-    const bool d_isneg {signbit(d)};
-    
-    if (issignaling(d))
+    chars_format fmt = chars_format::general;
+    const auto flags {os.flags()};
+    if (flags & std::ios_base::scientific)
     {
-        if (d_isneg)
-        {
-            os << "-";
-        }
-
-        os << "nan(snan)";
-        return os;
+        fmt = chars_format::scientific;
     }
-    else if (isnan(d)) // only quiet NaNs left
+    else if (flags & std::ios_base::hex)
     {
-        if (d_isneg)
-        {
-            os << "-nan(ind)";
-        }
-        else
-        {
-            os << "nan";
-        }
-
-        return os;
+        fmt = chars_format::hex;
     }
-    else if (isinf(d))
+    else if (flags & std::ios_base::fixed)
     {
-        if (d_isneg)
-        {
-            os << "-";
-        }
-
-        os << "inf";
-        return os;
+        fmt = chars_format::fixed;
     }
 
-    // const auto flags {os.flags()};
     auto precision {os.precision()};
     if (precision > std::numeric_limits<DecimalType>::digits10)
     {
         precision = std::numeric_limits<DecimalType>::digits10;
     }
 
-    char buffer[detail::precision_v<DecimalType> + 6] {}; // Sign + Precision + decimal point + e + sign + null terminator
+    char buffer[precision + 8]; // Sign + Precision + decimal point + e + sign + min 2 characters + null terminator
+    auto r = to_chars(buffer, buffer + sizeof(buffer), d, fmt, precision);
+    *r.ptr++ = '\0';
 
-    if (d.isneg() == 1)
+    BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<charT, char>::value)
     {
-        os << "-";
-    }
+        charT t_buffer[precision + 8];
 
-    constexpr auto format {std::is_same<DecimalType, decimal32>::value ? "%" PRIu32 : "%" PRIu64};
-    auto exp {d.biased_exponent()};
-    auto significand {d.full_significand()};
+        auto first = buffer;
+        auto t_first = t_buffer;
+        while (first != r.ptr)
+        {
+            *t_first++ = static_cast<charT>(*first++);
+        }
 
-    auto significand_digits {detail::num_digits(significand)};
-    const bool reduced {significand_digits > precision};
-    while (significand_digits > precision + 1)
-    {
-        significand /= 10;
-        ++exp;
-        --significand_digits;
-    }
-
-    if (reduced)
-    {
-        exp += detail::fenv_round<DecimalType>(significand, d < 0);
-    }
-
-    // Print the significand into the buffer so that we can insert the decimal point
-    detail::print_buffer<DecimalType>(buffer, sizeof(buffer), format, significand);
-    std::memmove(buffer + 2, buffer + 1, static_cast<std::size_t>(precision - 1));
-    std::memset(buffer + 1, '.', 1);
-    os << buffer;
-
-    // Offset will adjust the exponent to compensate for adding the decimal point
-    const auto offset {detail::num_digits(significand) - 1};
-    if (offset == 0)
-    {
-        os << "0";
-    }
-
-    os << "e";
-    auto print_exp {exp + offset};
-
-    if (print_exp < 0)
-    {
-        os << "-";
-        print_exp = -print_exp;
+        os << t_buffer;
     }
     else
     {
-        os << "+";
+        os << buffer;
     }
-
-    if (print_exp < 10)
-    {
-        os << "0";
-    }
-
-    os << print_exp;
 
     return os;
 }
