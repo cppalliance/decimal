@@ -25,7 +25,6 @@
 #include <boost/decimal/detail/to_float.hpp>
 #include <boost/decimal/detail/to_decimal.hpp>
 #include <boost/decimal/detail/promotion.hpp>
-#include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/mixed_decimal_arithmetic.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
@@ -462,18 +461,6 @@ public:
 
     template <BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto operator<=>(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
-    #endif
-
-    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
-    // 3.2.10 Formatted input:
-    template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
-    friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>;
-
-    // 3.2.11 Formatted output:
-    template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
     #endif
 
     // 3.6.4 Same Quantum

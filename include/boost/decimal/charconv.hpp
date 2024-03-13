@@ -191,6 +191,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
                 boost::decimal::detail::memcpy(first, "nan(snan)", 9U);
                 return {first + 9U, std::errc()};
             }
+            else if (signbit(value) && buffer_len >= 9)
+            {
+                boost::decimal::detail::memcpy(first, "nan(ind)", 8U);
+                return {first + 8U, std::errc()};
+            }
             else if (buffer_len >= 3)
             {
                 boost::decimal::detail::memcpy(first, "nan", 3U);
@@ -315,7 +320,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     }
 
     // Always give 2 digits in the exp (ex. 2.0e+09)
-    if (abs_exp < 9)
+    if (abs_exp <= 9)
     {
         *first++ = '0';
     }
@@ -467,6 +472,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
                                             static_cast<std::size_t>(-exponent));
             boost::decimal::detail::memset(r.ptr + exponent, '.', 1U);
             ++r.ptr;
+        }
+        else if (exponent >= 1)
+        {
+            boost::decimal::detail::memset(r.ptr, '0', static_cast<std::size_t>(exponent));
+            r.ptr += exponent;
         }
     }
     else if (!append_leading_zeros)

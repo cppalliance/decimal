@@ -41,7 +41,7 @@ void test_non_finite_values()
     for (const auto format : formats)
     {
         test_value(std::numeric_limits<T>::quiet_NaN() * T {dist(rng)}, "nan", format);
-        test_value(-std::numeric_limits<T>::quiet_NaN() * T {dist(rng)}, "-nan", format);
+        test_value(-std::numeric_limits<T>::quiet_NaN() * T {dist(rng)}, "-nan(ind)", format);
         test_value(std::numeric_limits<T>::signaling_NaN() * T {dist(rng)}, "nan(snan)", format);
         test_value(-std::numeric_limits<T>::signaling_NaN() * T {dist(rng)}, "-nan(snan)", format);
         test_value(std::numeric_limits<T>::infinity() * T {dist(rng)}, "inf", format);
@@ -602,6 +602,9 @@ int main()
     test_hex_format<decimal128>();
     test_434_hex<decimal128>();
     #endif
+
+    // Bugfixes
+    test_value(decimal64{2657844750}, "2657844750", chars_format::general);
 
     return boost::report_errors();
 }

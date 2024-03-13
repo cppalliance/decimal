@@ -190,7 +190,8 @@ void test_roundtrip_integer_stream()
 
     for (std::size_t i {}; i < N; ++i)
     {
-        const decimal64 first_val {dist(rng)};
+        const auto int_val = dist(rng);
+        const decimal64 first_val {int_val};
         const T first_val_int {static_cast<T>(first_val)};
         std::stringstream ss;
         ss << std::setprecision(std::numeric_limits<decimal64>::digits10);
@@ -202,7 +203,10 @@ void test_roundtrip_integer_stream()
         if (!BOOST_TEST_EQ(first_val, return_val) || !BOOST_TEST_EQ(first_val_int, return_val_int))
         {
             // LCOV_EXCL_START
-            std::cerr << "    Val: " << first_val
+            std::cerr //<< std::scientific
+                      //<< std::setprecision(std::numeric_limits<decimal64>::digits10)
+                      << "RNG Val: " << int_val
+                      << "\n    Val: " << first_val
                       << "\nInt Val: " << first_val_int
                       << "\n SS Val: " << ss.str()
                       << "\n    Ret: " << return_val

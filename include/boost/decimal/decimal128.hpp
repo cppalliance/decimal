@@ -26,7 +26,6 @@
 #include <boost/decimal/detail/to_float.hpp>
 #include <boost/decimal/detail/to_decimal.hpp>
 #include <boost/decimal/detail/promotion.hpp>
-#include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
 #include <boost/decimal/detail/shrink_significand.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
@@ -474,16 +473,6 @@ public:
     #endif
 
     #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
-    // 3.2.10 Formatted input:
-    template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
-    friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>;
-
-    // 3.2.11 Formatted output:
-    template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
-
     friend inline std::string bit_string(decimal128 rhs) noexcept;
     #endif
 
