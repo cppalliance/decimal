@@ -191,6 +191,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
                 boost::decimal::detail::memcpy(first, "nan(snan)", 9U);
                 return {first + 9U, std::errc()};
             }
+            else if (signbit(value) && buffer_len >= 9)
+            {
+                boost::decimal::detail::memcpy(first, "nan(ind)", 8U);
+                return {first + 8U, std::errc()};
+            }
             else if (buffer_len >= 3)
             {
                 boost::decimal::detail::memcpy(first, "nan", 3U);
