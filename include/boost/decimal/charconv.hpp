@@ -361,9 +361,18 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     const char* output_start = first;
 
     int num_dig = num_digits(significand);
-    bool append_zeros = false;
+    bool append_trailing_zeros = false;
+    bool append_leading_zeros = false;
+    int num_leading_zeros = 0;
     int integer_digits = num_dig + exponent;
     num_dig -= integer_digits;
+
+    if (integer_digits < 0)
+    {
+        num_leading_zeros = std::abs(integer_digits);
+        integer_digits = 0;
+        append_leading_zeros = true;
+    }
 
     if (precision != -1)
     {
@@ -384,7 +393,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         }
         else if (num_dig < precision && fmt != chars_format::general)
         {
-            append_zeros = true;
+            append_trailing_zeros = true;
         }
 
         // In general formatting we remove trailing 0s
@@ -400,10 +409,41 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     // Make sure the result will fit in the buffer
-    const std::ptrdiff_t total_length = total_buffer_length(num_dig, exponent, is_neg);
+    const std::ptrdiff_t total_length = total_buffer_length(num_dig, exponent, is_neg) + num_leading_zeros;
     if (total_length > buffer_size)
     {
         return {last, std::errc::value_too_large};
+    }
+
+    // Insert the leading zeros and return if the answer is ~0 for current precision
+    if (append_leading_zeros)
+    {
+        if (precision == 0)
+        {
+            *first++ = '0';
+            return {first, std::errc()};
+        }
+        else if (num_leading_zeros > precision)
+        {
+            *first++ = '0';
+            *first++ = '.';
+            std::memset(first, '0', static_cast<std::size_t>(precision));
+            return {first + precision, std::errc()};
+        }
+        else
+        {
+            *first++ = '0';
+            *first++ = '.';
+            std::memset(first, '0', static_cast<std::size_t>(num_leading_zeros));
+            first += num_leading_zeros;
+
+            // We can skip the rest if there's nothing more to do for the required precision
+            if (significand == 0)
+            {
+                std::memset(first, '0', static_cast<std::size_t>(precision - num_leading_zeros));
+                return {first + precision, std::errc()};
+            }
+        }
     }
 
     using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, uint128, std::uint64_t>;
@@ -428,14 +468,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             boost::decimal::detail::memset(r.ptr + exponent, '.', 1U);
             ++r.ptr;
         }
-
-        while (fmod(abs_value, static_cast<TargetDecimalType>(10)) == 0)
-        {
-            *r.ptr++ = '0';
-            abs_value /= 10;
-        }
     }
-    else
+    else if (!append_leading_zeros)
     {
         #ifdef BOOST_DECIMAL_DEBUG_FIXED
         std::cerr << std::setprecision(std::numeric_limits<Real>::digits10) << "Value: " << value
@@ -464,10 +498,10 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     const auto current_fractional_digits = r.ptr - output_start - integer_digits - 1;
     if (current_fractional_digits < precision && fmt != chars_format::general)
     {
-        append_zeros = true;
+        append_trailing_zeros = true;
     }
 
-    if (append_zeros)
+    if (append_trailing_zeros)
     {
         const auto zeros_inserted = static_cast<std::size_t>(precision - current_fractional_digits);
 
