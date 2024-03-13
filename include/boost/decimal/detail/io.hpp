@@ -76,6 +76,10 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     {
         d = std::numeric_limits<DecimalType>::signaling_NaN(); // LCOV_EXCL_LINE
     }
+    else if (static_cast<int>(r.ec) == EINVAL)
+    {
+        errno = EINVAL;
+    }
 
     return is;
 }
@@ -114,7 +118,13 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
     }
 
     char buffer[precision + 8]; // Sign + Precision + decimal point + e + sign + min 2 characters + null terminator
-    auto r = to_chars(buffer, buffer + sizeof(buffer), d, fmt, precision);
+    auto r = to_chars(buffer, buffer + sizeof(buffer), d, fmt, static_cast<int>(precision));
+
+    if (BOOST_DECIMAL_UNLIKELY(!r))
+    {
+        errno = static_cast<int>(r.ec);
+    }
+
     *r.ptr++ = '\0';
 
     BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<charT, char>::value)
