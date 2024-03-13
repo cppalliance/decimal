@@ -117,7 +117,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         precision = std::numeric_limits<DecimalType>::digits10;
     }
 
-    char buffer[precision + 8]; // Sign + Precision + decimal point + e + sign + min 2 characters + null terminator
+    char buffer[static_cast<std::size_t>(precision + 8)]; // Sign + Precision + decimal point + e + sign + min 2 characters + null terminator
     auto r = to_chars(buffer, buffer + sizeof(buffer), d, fmt, static_cast<int>(precision));
 
     if (BOOST_DECIMAL_UNLIKELY(!r))
@@ -129,7 +129,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
 
     BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<charT, char>::value)
     {
-        charT t_buffer[precision + 8];
+        charT t_buffer[static_cast<std::size_t>(precision + 8)];
 
         auto first = buffer;
         auto t_first = t_buffer;
