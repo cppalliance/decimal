@@ -11,11 +11,13 @@
 
 #include <boost/decimal.hpp>
 
-#if defined(__GNUC__)
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
-
 #include <boost/core/lightweight_test.hpp>
 
 template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_zero { 0, 0 }; return my_zero; }
