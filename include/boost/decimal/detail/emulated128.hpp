@@ -27,7 +27,7 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-#if __GNUC__ >= 8
+#if defined(__GNUC__) && __GNUC__ >= 8
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
@@ -647,7 +647,7 @@ struct int128
     #endif
 };
 
-#if (__GNUC__ >= 8) || (!defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__))
+#if (defined(__GNUC__) && __GNUC__ >= 8) || (!defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__))
 #  pragma GCC diagnostic pop
 #endif
 

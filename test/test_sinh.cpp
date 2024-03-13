@@ -10,6 +10,15 @@
 #include <random>
 
 #include <boost/decimal.hpp>
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 #include <boost/core/lightweight_test.hpp>
 
 auto my_zero() -> boost::decimal::decimal32&;
@@ -97,7 +106,7 @@ namespace local
       const auto val_flt = sinh(x_flt);
       const auto val_dec = sinh(x_dec);
 
-      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float>(val_dec), std::numeric_limits<float>::epsilon() * tol_factor);
+      const auto result_val_is_ok = is_close_fraction(val_flt, static_cast<float>(val_dec), std::numeric_limits<float>::epsilon() * static_cast<float>(tol_factor));
 
       result_is_ok = (result_val_is_ok && result_is_ok);
 

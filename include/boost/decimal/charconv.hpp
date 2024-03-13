@@ -144,7 +144,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
 
                         if (precision != -1 && precision != 1)
                         {
-                            boost::decimal::detail::memset(first, '0', precision - 1);
+                            boost::decimal::detail::memset(first, '0', static_cast<std::size_t>(precision - 1));
                             first += precision - 1;
                         }
                     }
@@ -171,12 +171,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
                 }
                 else if (buffer_len > 2 + precision)
                 {
-                    boost::decimal::detail::memcpy(first, "0.0", 3);
+                    boost::decimal::detail::memcpy(first, "0.0", 3U);
                     first += 3U;
 
                     if (precision > 1)
                     {
-                        boost::decimal::detail::memset(first, '0', precision - 1);
+                        boost::decimal::detail::memset(first, '0', static_cast<std::size_t>(precision - 1));
                         first += precision - 1;
                     }
 
@@ -465,7 +465,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         {
             boost::decimal::detail::memmove(r.ptr + exponent + 1, r.ptr + exponent,
                                             static_cast<std::size_t>(-exponent));
-            boost::decimal::detail::memset(r.ptr + exponent, '.', 1);
+            boost::decimal::detail::memset(r.ptr + exponent, '.', 1U);
             ++r.ptr;
         }
     }
@@ -643,7 +643,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         *first++ = '0';
     }
 
-    return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, std::abs(exp), 10);
+    return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, static_cast<std::uint32_t>(std::abs(exp)), 10);
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>

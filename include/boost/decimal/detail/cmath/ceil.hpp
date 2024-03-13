@@ -68,7 +68,7 @@ constexpr auto ceil BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
     }
     new_sig *= 10;
 
-    return {new_sig, exp_ptr + decimal_digits - 1, is_neg};
+    return {new_sig, exp_ptr + static_cast<int>(decimal_digits) - 1, is_neg};
 }
 
 } // namespace decimal

@@ -677,6 +677,11 @@ constexpr auto decimal128::edit_sign(bool sign) noexcept -> void
     }
 }
 
+#if defined(__GNUC__) && __GNUC__ >= 6
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wduplicated-branches"
+#endif
+
 // TODO(mborland): Rather than doing bitwise operations on the whole uint128 we should
 // be able to only operate on the affected word
 //
@@ -834,6 +839,18 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     }
 }
 
+#if defined(__GNUC__) && __GNUC__ >= 6
+#  pragma GCC diagnostic pop
+#endif
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::decimal128(Float val) noexcept
 {
@@ -865,6 +882,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal128::decimal128(Float val) noexcept
         }
     }
 }
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
 
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal128::operator=(const Float& val) noexcept -> decimal128&

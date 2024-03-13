@@ -43,11 +43,11 @@ constexpr auto fast_path(const std::int64_t q, const Unsigned_Integer &w, bool n
 
     if (q < 0)
     {
-        ld /= powers_of_ten_ld[-q];
+        ld /= powers_of_ten_ld[static_cast<std::size_t>(-q)];
     }
     else
     {
-        ld *= powers_of_ten_ld[q];
+        ld *= powers_of_ten_ld[static_cast<std::size_t>(q)];
     }
 
     if (negative)
@@ -57,6 +57,14 @@ constexpr auto fast_path(const std::int64_t q, const Unsigned_Integer &w, bool n
 
     return ld;
 }
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
 
 template <typename Unsigned_Integer>
 constexpr auto compute_float80(std::int64_t q, const Unsigned_Integer &w,
@@ -146,6 +154,13 @@ constexpr auto compute_float80(std::int64_t q, const Unsigned_Integer &w,
 
     return ld;
 }
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
+
 
 } //namespace fast_float
 } //namespace detail

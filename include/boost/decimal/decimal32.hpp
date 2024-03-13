@@ -567,6 +567,11 @@ private:
 #  pragma GCC diagnostic pop
 #endif
 
+#if defined(__GNUC__) && __GNUC__ >= 6
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wduplicated-branches"
+#endif
+
 template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
 constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)
 {
@@ -608,7 +613,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     // Round as required
     if (reduced)
     {
-        exp += detail::fenv_round(unsigned_coeff, isneg);
+        exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
     }
 
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
@@ -729,6 +734,10 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         }
     }
 }
+
+#if defined(__GNUC__) && __GNUC__ >= 6
+#  pragma GCC diagnostic pop
+#endif
 
 constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32
 {
@@ -1540,6 +1549,14 @@ constexpr auto decimal32::edit_sign(bool sign) noexcept -> void
     }
 }
 
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 {
@@ -1571,6 +1588,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
         }
     }
 }
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
 
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal32::operator=(const Float& val) noexcept -> decimal32&
@@ -1713,7 +1736,7 @@ constexpr auto mul_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (sig_dig > 9)
     {
-        res_sig /= detail::powers_of_10[sig_dig - 9];
+        res_sig /= detail::pow10(static_cast<std::uint64_t>(sig_dig - 9));
         res_exp += sig_dig - 9;
     }
 
@@ -1825,7 +1848,7 @@ constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decima
 
     if (sig_dig > std::numeric_limits<std::uint32_t>::digits10)
     {
-        res_sig /= detail::powers_of_10[sig_dig - std::numeric_limits<std::uint32_t>::digits10];
+        res_sig /= detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint32_t>::digits10));
         res_exp += sig_dig - std::numeric_limits<std::uint32_t>::digits10;
     }
 

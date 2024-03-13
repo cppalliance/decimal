@@ -414,7 +414,7 @@ jobs:
                 B2_ARGS+=("address-model=${{matrix.address_model}}")
             fi
             B2_ARGS+=("libs/$LIBRARY/test")
-            ./b2 "${B2_ARGS[@]}"
+            ./b2 "${B2_ARGS[@]}" cxxflags="-Wall -Wextra -Werror"
 
   windows:
     strategy:

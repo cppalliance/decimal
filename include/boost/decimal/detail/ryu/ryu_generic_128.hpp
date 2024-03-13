@@ -63,7 +63,7 @@ static constexpr auto generic_binary_to_decimal(
     const std::uint32_t local_bias = (1u << (exponentBits - 1)) - 1;
     const bool ieeeSign = ((bits >> (mantissaBits + exponentBits)) & 1) != 0;
     const unsigned_128_type ieeeMantissa = bits & ((one << mantissaBits) - 1);
-    const auto ieeeExponent = (uint32_t) ((bits >> mantissaBits) & ((one << exponentBits) - 1u));
+    const auto ieeeExponent = static_cast<std::uint32_t>((bits >> mantissaBits) & ((one << exponentBits) - 1u));
 
     if (ieeeExponent == 0 && ieeeMantissa == 0)
     {
@@ -79,7 +79,7 @@ static constexpr auto generic_binary_to_decimal(
         return fd;
     }
 
-    int32_t e2 {};
+    std::int32_t e2 {};
     unsigned_128_type m2 {};
     // We subtract 2 in all cases so that the bounds computation has 2 additional bits.
     if (explicitLeadingBit)
@@ -87,11 +87,11 @@ static constexpr auto generic_binary_to_decimal(
         // mantissaBits includes the explicit leading bit, so we need to correct for that here.
         if (ieeeExponent == 0)
         {
-            e2 = (int32_t)(1 - local_bias - mantissaBits + 1 - 2);
+            e2 = static_cast<std::int32_t>(1 - local_bias - mantissaBits + 1 - 2);
         }
         else
         {
-            e2 = (int32_t)(ieeeExponent - local_bias - mantissaBits + 1 - 2);
+            e2 = static_cast<std::int32_t>(ieeeExponent - local_bias - mantissaBits + 1 - 2);
         }
         m2 = ieeeMantissa;
     }
@@ -99,11 +99,11 @@ static constexpr auto generic_binary_to_decimal(
     {
         if (ieeeExponent == 0)
         {
-            e2 = (int32_t)(1 - local_bias - mantissaBits - 2);
+            e2 = static_cast<std::int32_t>(1 - local_bias - mantissaBits - 2);
             m2 = ieeeMantissa;
         } else
         {
-            e2 = static_cast<int32_t>(ieeeExponent - local_bias - mantissaBits - 2);
+            e2 = static_cast<std::int32_t>(ieeeExponent - local_bias - mantissaBits - 2U);
             m2 = (one << mantissaBits) | ieeeMantissa;
         }
     }
@@ -133,14 +133,14 @@ static constexpr auto generic_binary_to_decimal(
         // I tried special-casing q == 0, but there was no effect on performance.
         // This expression is slightly faster than max(0, log10Pow2(e2) - 1).
         const std::uint32_t q = log10Pow2(e2) - (e2 > 3);
-        e10 = (int32_t)q;
-        const int32_t k = BOOST_DECIMAL_POW5_INV_BITCOUNT + pow5bits(q) - 1;
-        const auto i = (int32_t)(-e2 + q + k);
-        uint64_t pow5[4] {};
+        e10 = static_cast<int32_t>(q);
+        const std::int32_t k = BOOST_DECIMAL_POW5_INV_BITCOUNT + static_cast<std::int32_t>(pow5bits(q)) - 1;
+        const std::int32_t i = -e2 + static_cast<std::int32_t>(q) + k;
+        std::uint64_t pow5[4] {};
         generic_computeInvPow5(q, pow5);
-        vr = mulShift(4 * m2, pow5, i);
-        vp = mulShift(4 * m2 + 2, pow5, i);
-        vm = mulShift(4 * m2 - 1 - mmShift, pow5, i);
+        vr = mulShift(4 * m2, pow5, static_cast<std::uint32_t>(i));
+        vp = mulShift(4 * m2 + 2, pow5, static_cast<std::uint32_t>(i));
+        vm = mulShift(4 * m2 - 1 - mmShift, pow5, static_cast<std::uint32_t>(i));
 
         #ifdef BOOST_DECIMAL_DEBUG_RYU
         printf("%s * 2^%d / 10^%d\n", s(mv), e2, q);
@@ -172,16 +172,16 @@ static constexpr auto generic_binary_to_decimal(
     else
     {
         // This expression is slightly faster than max(0, log10Pow5(-e2) - 1).
-        const uint32_t q = log10Pow5(-e2) - (int32_t)(-e2 > 1);
-        e10 = (int32_t)q + e2;
-        const auto i = (int32_t)(-e2 - q);
-        const int32_t k = (int32_t)pow5bits(i) - BOOST_DECIMAL_POW5_BITCOUNT;
-        const int32_t j = (int32_t)q - k;
+        const uint32_t q = log10Pow5(-e2) - static_cast<uint32_t>(-e2 > 1);
+        e10 = static_cast<int32_t>(q) + e2;
+        const int32_t i = -e2 - static_cast<int32_t>(q);
+        const int32_t k = static_cast<int32_t>(pow5bits(static_cast<uint32_t>(i))) - BOOST_DECIMAL_POW5_BITCOUNT;
+        const int32_t j = static_cast<int32_t>(q) - k;
         uint64_t pow5[4] {};
-        generic_computePow5(i, pow5);
-        vr = mulShift(4 * m2, pow5, j);
-        vp = mulShift(4 * m2 + 2, pow5, j);
-        vm = mulShift(4 * m2 - 1 - mmShift, pow5, j);
+        generic_computePow5(static_cast<uint32_t>(i), pow5);
+        vr = mulShift(4 * m2, pow5, static_cast<std::uint32_t>(j));
+        vp = mulShift(4 * m2 + 2, pow5, static_cast<std::uint32_t>(j));
+        vm = mulShift(4 * m2 - 1 - mmShift, pow5, static_cast<std::uint32_t>(j));
 
         #ifdef BOOST_DECIMAL_DEBUG_RYU
         printf("%s * 5^%d / 10^%d\n", s(mv), -e2, q);
@@ -236,7 +236,7 @@ static constexpr auto generic_binary_to_decimal(
     {
         vmIsTrailingZeros &= vm % 10 == 0;
         vrIsTrailingZeros &= lastRemovedDigit == 0;
-        lastRemovedDigit = (uint8_t) (vr % 10);
+        lastRemovedDigit = static_cast<uint8_t>(vr % 10);
         vr /= 10;
         vp /= 10;
         vm /= 10;
@@ -253,7 +253,7 @@ static constexpr auto generic_binary_to_decimal(
         while (vm % 10 == 0)
         {
             vrIsTrailingZeros &= lastRemovedDigit == 0;
-            lastRemovedDigit = (uint8_t) (vr % 10);
+            lastRemovedDigit = static_cast<uint8_t>(vr % 10);
             vr /= 10;
             vp /= 10;
             vm /= 10;
@@ -272,8 +272,8 @@ static constexpr auto generic_binary_to_decimal(
         lastRemovedDigit = 4;
     }
     // We need to take vr+1 if vr is outside bounds, or we need to round up.
-    output = vr + (unsigned_128_type)((vr == vm && (!acceptBounds || !vmIsTrailingZeros)) || (lastRemovedDigit >= 5));
-    const auto exp = static_cast<std::int32_t>(e10 + static_cast<std::int32_t>(removed));
+    output = vr + static_cast<unsigned_128_type>((vr == vm && (!acceptBounds || !vmIsTrailingZeros)) || (lastRemovedDigit >= 5));
+    const auto exp = e10 + static_cast<std::int32_t>(removed);
 
     #ifdef BOOST_DECIMAL_DEBUG_RYU
     printf("V+=%s\nV =%s\nV-=%s\n", s(vp), s(vr), s(vm));
@@ -298,7 +298,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<float>(float val) noe
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<double>(double val) noexcept -> floating_decimal_128
 {
-    static_assert(sizeof(double) == sizeof(uint64_t), "Float is not 64 bits");
+    static_assert(sizeof(double) == sizeof(uint64_t), "Double is not 64 bits");
     auto bits = bit_cast<uint64_t>(val);
     return generic_binary_to_decimal(bits, 52, 11, false);
 }
@@ -308,7 +308,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<double>(double val) n
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<long double>(long double val) noexcept -> floating_decimal_128
 {
-    static_assert(sizeof(long double) == sizeof(uint64_t), "Float is not 64 bits");
+    static_assert(sizeof(long double) == sizeof(uint64_t), "Long double is not 64 bits");
     auto bits = bit_cast<uint64_t>(val);
     return generic_binary_to_decimal(bits, 52, 11, false);
 }

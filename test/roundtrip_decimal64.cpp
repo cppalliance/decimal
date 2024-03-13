@@ -5,12 +5,21 @@
 #include "mini_to_chars.hpp"
 
 #include <boost/decimal.hpp>
-#include <boost/core/lightweight_test.hpp>
 #include <limits>
 #include <random>
 #include <sstream>
 #include <iomanip>
 #include <cerrno>
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
+#include <boost/core/lightweight_test.hpp>
 
 using namespace boost::decimal;
 

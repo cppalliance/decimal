@@ -568,6 +568,11 @@ constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
     return rhs.bits_;
 }
 
+#if defined(__GNUC__) && __GNUC__ >= 6
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wduplicated-branches"
+#endif
+
 // 3.2.5 initialization from coefficient and exponent:
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool>>
 constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
@@ -721,6 +726,18 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     }
 }
 
+#if defined(__GNUC__) && __GNUC__ >= 6
+#  pragma GCC diagnostic pop
+#endif
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::decimal64(Float val) noexcept
 {
@@ -752,6 +769,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::decimal64(Float val) noexcept
         }
     }
 }
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
 
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal64::operator=(const Float& val) noexcept -> decimal64&
@@ -1210,7 +1233,7 @@ constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
     {
-        res_sig /= detail::powers_of_10[sig_dig - std::numeric_limits<std::uint64_t>::digits10];
+        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
         res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
     }
 
@@ -1253,7 +1276,7 @@ constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::de
 
     if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
     {
-        res_sig /= detail::powers_of_10[sig_dig - std::numeric_limits<std::uint64_t>::digits10];
+        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
         res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
     }
 

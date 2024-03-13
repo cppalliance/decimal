@@ -78,6 +78,12 @@
 
 BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE_BEGIN
 
+// Clang-Cl does not like the use of flat arrays
+#if defined(__clang__) && !defined(__GNUC__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
+
 namespace math { namespace wide_integer {
 
 namespace detail {
@@ -1011,6 +1017,10 @@ using uint256_t = uintwide_t<static_cast<size_t>(UINT32_C(256))>;
 
 } // namespace wide_integer
 } // namespace math
+
+#if defined(__clang__) && !defined(__GNUC__)
+#pragma clang diagnostic pop
+#endif
 
 BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE_END
 
