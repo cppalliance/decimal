@@ -468,12 +468,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             boost::decimal::detail::memset(r.ptr + exponent, '.', 1);
             ++r.ptr;
         }
-
-        while (fmod(abs_value, static_cast<TargetDecimalType>(10)) == 0)
-        {
-            *r.ptr++ = '0';
-            abs_value /= 10;
-        }
     }
     else if (!append_leading_zeros)
     {
