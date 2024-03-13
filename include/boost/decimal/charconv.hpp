@@ -320,7 +320,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     }
 
     // Always give 2 digits in the exp (ex. 2.0e+09)
-    if (abs_exp < 9)
+    if (abs_exp <= 9)
     {
         *first++ = '0';
     }
@@ -472,6 +472,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
                                             static_cast<std::size_t>(-exponent));
             boost::decimal::detail::memset(r.ptr + exponent, '.', 1U);
             ++r.ptr;
+        }
+        else if (exponent >= 1)
+        {
+            boost::decimal::detail::memset(r.ptr, '0', static_cast<std::size_t>(exponent));
+            r.ptr += exponent;
         }
     }
     else if (!append_leading_zeros)
