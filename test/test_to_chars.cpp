@@ -603,6 +603,9 @@ int main()
     test_434_hex<decimal128>();
     #endif
 
+    // Bugfixes
+    test_value(decimal64{2657844750}, "2657844750", chars_format::general);
+
     return boost::report_errors();
 }
 
