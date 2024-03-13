@@ -14,8 +14,9 @@ project : requirements
   <toolset>gcc:<cxxflags>-Wall
   <toolset>gcc:<cxxflags>-Wextra
 
-  <toolset>clang:<cxxflags>-Wall
-  <toolset>clang:<cxxflags>-Wextra
+  # Clang-Cl gives errors that are incorrect or irrelevant (e.g. C++98 compat)
+  #<toolset>clang:<cxxflags>-Wall
+  #<toolset>clang:<cxxflags>-Wextra
 
   <toolset>msvc:<warnings>all
 
@@ -24,7 +25,7 @@ project : requirements
   <toolset>gcc:<cxxflags>-Wconversion
   <toolset>gcc:<cxxflags>-Wundef
   <toolset>gcc:<cxxflags>-Wold-style-cast
-  <toolset>gcc:<cxxflags>-Wduplicated-branches
+  #<toolset>gcc:<cxxflags>-Wduplicated-branches
   <toolset>gcc:<cxxflags>-Wfloat-equal
 
   <toolset>clang:<cxxflags>-Wsign-conversion
