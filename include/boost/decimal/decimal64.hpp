@@ -730,7 +730,10 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
 #  pragma GCC diagnostic pop
 #endif
 
-#if defined(__GNUC__)
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
@@ -767,7 +770,9 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::decimal64(Float val) noexcept
     }
 }
 
-#if defined(__GNUC__)
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
 #  pragma GCC diagnostic pop
 #endif
 

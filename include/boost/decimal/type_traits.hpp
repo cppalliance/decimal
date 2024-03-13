@@ -11,19 +11,23 @@
 #define BOOST_DECIMAL_HAS_BOOST_TYPE_TRAITS
 
 // Warnings propagate up from boost.type_traits, so we will ignore them
-#ifdef __GNUC__
+#ifdef __clang__
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wconversion"
+#  pragma clang diagnostic ignored "-Wsign-conversion"
+#  pragma clang diagnostic ignored "-Wold-style-cast"
+#elif defined(__GNUC__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wconversion"
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
-#endif
-
-#if defined(__GNUC__) && !defined(__clang__)
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
 
 #include <boost/type_traits.hpp>
 
-#ifdef __GNUC__
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
 #  pragma GCC diagnostic pop
 #endif
 
