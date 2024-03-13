@@ -25,6 +25,7 @@
 #include <boost/decimal/cfloat.hpp>
 #include <boost/decimal/charconv.hpp>
 #include <boost/decimal/type_traits.hpp>
+#include <boost/decimal/detail/io.hpp>
 
 #if defined(__clang__) && !defined(__GNUC__)
 #  pragma clang diagnostic pop
