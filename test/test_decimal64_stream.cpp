@@ -3,7 +3,7 @@
 // https://www.boost.org/LICENSE_1_0.txt
 
 #include "mini_to_chars.hpp"
-#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <iostream>
 #include <iomanip>
@@ -74,7 +74,7 @@ void test_ostream()
     decimal64 val {123456, 0};
     std::stringstream out;
     out << val;
-    BOOST_TEST_CSTR_EQ(out.str().c_str(), "1.23456e+05");
+    BOOST_TEST_CSTR_EQ(out.str().c_str(), "123456");
 
     decimal64 zero {0, 0};
     std::stringstream zero_out;
