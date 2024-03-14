@@ -4,8 +4,8 @@
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_ELLINT_RC_HPP
-#define BOOST_ELLINT_RC_HPP
+#ifndef BOOST_DECIMAL_DETAIL_CMATH_IMPL_ELLINT_RC_HPP
+#define BOOST_DECIMAL_DETAIL_CMATH_IMPL_ELLINT_RC_HPP
 
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/detail/config.hpp>
@@ -84,4 +84,4 @@ constexpr auto ellint_rc(T1 x, T2 y) noexcept
 } //namespace decimal
 } //namespace boost
 
-#endif //BOOST_ELLINT_RC_HPP
+#endif //BOOST_DECIMAL_DETAIL_CMATH_IMPL_ELLINT_RC_HPP

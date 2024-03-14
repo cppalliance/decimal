@@ -4,9 +4,9 @@
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_ELLINT_1_HPP
-#define BOOST_ELLINT_1_HPP
+#ifndef BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
+#define BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
 
-#include <boost/decimal/detail/cmath/impl/ellint_rc.hpp>
+#include <boost/decimal/detail/cmath/impl/ellint_rf.hpp>
 
-#endif //BOOST_ELLINT_1_HPP
+#endif //BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
