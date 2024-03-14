@@ -135,8 +135,8 @@ void test_strtod_edges()
 template <typename T>
 void test_locales()
 {
-    const char buffer[] = "1.1897e+02";
-    constexpr auto valdiation_value = static_cast<T>(1.1897e+02);
+    const char buffer[] = "1,1897e+02";
+    const auto valdiation_value = static_cast<T>(1.1897e+02);
 
     try
     {
@@ -164,7 +164,6 @@ int main()
     roundtrip_strtod<decimal32>();
     roundtrip_wcstrtod<decimal32>();
     test_strtod_edges<decimal32>();
-    test_locales<decimal32>();
 
     roundtrip_strtod<decimal64>();
     roundtrip_wcstrtod<decimal64>();
@@ -173,6 +172,10 @@ int main()
     roundtrip_strtod<decimal128>();
     roundtrip_wcstrtod<decimal128>();
     test_strtod_edges<decimal128>();
-    
+
+    test_locales<decimal32>();
+    test_locales<decimal64>();
+    test_locales<decimal128>();
+
     return boost::report_errors();
 }
