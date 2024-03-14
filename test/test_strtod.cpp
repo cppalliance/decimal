@@ -132,11 +132,39 @@ void test_strtod_edges()
     BOOST_TEST(isnan(boost::decimal::strtod<T>(junk_str, nullptr))) && BOOST_TEST_EQ(errno, EINVAL);
 }
 
+template <typename T>
+void test_locales()
+{
+    const char buffer[] = "1.1897e+02";
+    constexpr auto valdiation_value = static_cast<T>(1.1897e+02);
+
+    try
+    {
+        #ifdef BOOST_MSVC
+        std::locale::global(std::locale("German"));
+        #else
+        std::locale::global(std::locale("de_DE.UTF-8"));
+        #endif
+    }
+    // LCOV_EXCL_START
+    catch (...)
+    {
+        std::cerr << "Locale not installed. Skipping test." << std::endl;
+        return;
+    }
+    // LCOV_EXCL_STOP
+
+    char* enddptr;
+    const auto val = boost::decimal::strtod<T>(buffer, &enddptr);
+    BOOST_TEST_EQ(valdiation_value, val);
+}
+
 int main()
 {
     roundtrip_strtod<decimal32>();
     roundtrip_wcstrtod<decimal32>();
     test_strtod_edges<decimal32>();
+    test_locales<decimal32>();
 
     roundtrip_strtod<decimal64>();
     roundtrip_wcstrtod<decimal64>();
