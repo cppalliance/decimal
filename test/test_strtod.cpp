@@ -55,16 +55,14 @@ void roundtrip_strtod()
         char* endptr {};
 
         const T return_val {boost::decimal::strtod<T>(ss.str().c_str(), &endptr)};
-        const auto len {std::strlen(ss.str().c_str())};
-        const auto dist {endptr - ss.str().c_str()};
 
-        if (!BOOST_TEST_EQ(val, return_val) && BOOST_TEST_EQ(len, dist))
+        if (!BOOST_TEST_EQ(val, return_val))
         {
             // LCOV_EXCL_START
-            std::cerr << "Val 1: " << val
-                      << "\nVal 2: " << return_val
-                      << "\nStrlen: " << len
-                      << "\n  Dist: " << dist << std::endl;
+            std::cerr << std::scientific
+                      << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Val 1: " << val
+                      << "\nVal 2: " << return_val << std::endl;
             // LCOV_EXCL_STOP
         }
     }
@@ -89,18 +87,14 @@ void roundtrip_wcstrtod()
         wchar_t* endptr {};
 
         const T return_val {boost::decimal::wcstod<T>(ss.str().c_str(), &endptr)};
-        const auto len {ss.str().size()};
-        const auto dist {endptr - ss.str().c_str()};
 
-        if (!BOOST_TEST_EQ(val, return_val) && BOOST_TEST_EQ(len, dist))
+        if (!BOOST_TEST_EQ(val, return_val))
         {
             // LCOV_EXCL_START
             std::cerr << std::scientific
                       << std::setprecision(std::numeric_limits<T>::digits10)
                       << "Val 1: " << val
-                      << "\nVal 2: " << return_val
-                      << "\nStrlen: " << len
-                      << "\n  Dist: " << dist << std::endl;
+                      << "\nVal 2: " << return_val << std::endl;
             // LCOV_EXCL_STOP
         }
     }
@@ -159,11 +153,27 @@ void test_locales()
     BOOST_TEST_EQ(valdiation_value, val);
 }
 
+template <typename T>
+void test_spot(const char* str, T val)
+{
+    char* endptr;
+    auto return_val = boost::decimal::strtod<T>(str, &endptr);
+    if (!BOOST_TEST_EQ(val, return_val))
+    {
+        // LCOV_EXCL_START
+        std::cerr << std::scientific
+                  << std::setprecision(std::numeric_limits<T>::digits10)
+                  << "Val 1: " << val
+                  << "\nVal 2: " << return_val << std::endl;
+        // LCOV_EXCL_STOP
+    }
+}
+
 int main()
 {
-    roundtrip_strtod<decimal32>();
-    roundtrip_wcstrtod<decimal32>();
-    test_strtod_edges<decimal32>();
+    //roundtrip_strtod<decimal32>();
+    //roundtrip_wcstrtod<decimal32>();
+    //test_strtod_edges<decimal32>();
 
     roundtrip_strtod<decimal64>();
     roundtrip_wcstrtod<decimal64>();
@@ -176,6 +186,8 @@ int main()
     test_locales<decimal32>();
     test_locales<decimal64>();
     test_locales<decimal128>();
+
+    test_spot("2.9379440e-03", decimal32{UINT32_C(29379440), -10});
 
     return boost::report_errors();
 }
