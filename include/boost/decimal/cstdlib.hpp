@@ -48,12 +48,6 @@ inline auto strtod_calculation(const char* str, char** endptr, char* buffer, std
 {
     using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, detail::uint128, std::uint64_t>;
 
-    if (str == nullptr)
-    {
-        errno = EINVAL;
-        return std::numeric_limits<TargetDecimalType>::signaling_NaN();
-    }
-
     std::memcpy(buffer, str, str_length);
     convert_string_locale(buffer);
 
@@ -103,6 +97,12 @@ inline auto strtod_calculation(const char* str, char** endptr, char* buffer, std
 template <typename TargetDecimalType>
 inline auto strtod_impl(const char* str, char** endptr) noexcept -> TargetDecimalType
 {
+    if (str == nullptr)
+    {
+        errno = EINVAL;
+        return std::numeric_limits<TargetDecimalType>::signaling_NaN();
+    }
+
     const auto str_length {std::strlen(str)};
 
     if (str_length < 1024U)
