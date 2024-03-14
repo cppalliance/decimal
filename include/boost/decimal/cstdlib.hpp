@@ -10,9 +10,12 @@
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
-
-#include <cstdint>
+#include <memory>
+#include <new>
 #include <limits>
+#include <locale>
+#include <cstdint>
+#include <clocale>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
@@ -21,9 +24,27 @@ namespace decimal {
 
 namespace detail {
 
+// We know that the string is in the "C" locale because it would have previously passed through our parser.
+// Convert the string into the current locale so that the strto* family of functions
+// works correctly for the given locale.
+//
+// We are operating on our own copy of the buffer, so we are free to modify it.
+inline void convert_string_locale(char* buffer) noexcept
+{
+    const auto locale_decimal_point = *std::localeconv()->decimal_point;
+    if (locale_decimal_point != '.')
+    {
+        auto p = std::strchr(buffer, '.');
+        if (p != nullptr)
+        {
+            *p = locale_decimal_point;
+        }
+    }
+}
+
 // 3.8.2
 template <typename TargetDecimalType>
-constexpr auto strtod_impl(const char* str, char** endptr) noexcept -> TargetDecimalType
+inline auto strtod_calculation(const char* str, char** endptr, char* buffer, std::size_t str_length) noexcept -> TargetDecimalType
 {
     using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, detail::uint128, std::uint64_t>;
 
