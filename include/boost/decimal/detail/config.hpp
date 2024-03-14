@@ -109,9 +109,9 @@ typedef unsigned __int128 uint128_t;
 } // namespace boost
 
 #  define BOOST_DECIMAL_HAS_INT128
-#  define BOOST_DECIMAL_INT128_MAX  (boost::decimal::detail::int128_t)(((boost::decimal::detail::uint128_t) 1 << 127) - 1)
+#  define BOOST_DECIMAL_INT128_MAX  static_cast<boost::decimal::detail::int128_t>((static_cast<boost::decimal::detail::uint128_t>(1) << 127) - 1)
 #  define BOOST_DECIMAL_INT128_MIN  (-BOOST_DECIMAL_INT128_MAX - 1)
-#  define BOOST_DECIMAL_UINT128_MAX ((2 * (boost::decimal::detail::uint128_t) BOOST_DECIMAL_INT128_MAX) + 1)
+#  define BOOST_DECIMAL_UINT128_MAX ((2 * static_cast<boost::decimal::detail::uint128_t>(BOOST_DECIMAL_INT128_MAX)) + 1)
 #endif
 
 // 128-bit floats
@@ -129,7 +129,7 @@ typedef unsigned __int128 uint128_t;
 // All of these types are optional so check for each of them individually
 #ifdef __has_include
 #  if __has_include(<stdfloat>)
-#    if __cplusplus > 202002L || _MSVC_LANG > 202002L
+#    if __cplusplus > 202002L || (defined(_MSVC_LANG) && _MSVC_LANG > 202002L)
 #    include <stdfloat>
 #    endif
 #  endif
@@ -202,7 +202,7 @@ typedef unsigned __int128 uint128_t;
 //
 // As does GCC-9:
 //
-#if (__GNUC__ >= 9) && !defined(BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
+#if defined(__GNUC__) && (__GNUC__ >= 9) && !defined(BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
 #  define BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED
 #endif
 

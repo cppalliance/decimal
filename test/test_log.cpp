@@ -10,6 +10,15 @@
 #include <random>
 
 #include <boost/decimal.hpp>
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 #include <boost/core/lightweight_test.hpp>
 
 template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_zero { 0, 0 }; return my_zero; }
@@ -99,7 +108,7 @@ namespace local
       const auto val_flt = log(x_flt);
       const auto val_dec = log(x_dec);
 
-      const auto result_log_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
+      const auto result_log_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * static_cast<float_type>(tol_factor));
 
       result_is_ok = (result_log_is_ok && result_is_ok);
 
@@ -140,7 +149,7 @@ namespace local
       const auto val_flt = log(x_flt);
       const auto val_dec = log(x_dec);
 
-      const auto result_log_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * tol_factor);
+      const auto result_log_is_ok = is_close_fraction(val_flt, static_cast<float_type>(val_dec), std::numeric_limits<float_type>::epsilon() * static_cast<float_type>(tol_factor));
 
       result_is_ok = (result_log_is_ok && result_is_ok);
 
@@ -276,7 +285,7 @@ namespace local
       const auto lg_flt = log(x_flt);
       const auto lg_dec = log(x_dec);
 
-      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * tol_factor);
+      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * static_cast<float>(tol_factor));
 
       BOOST_TEST(result_log_is_ok);
 
@@ -294,7 +303,7 @@ namespace local
       const auto lg_dec          = log(x_dec);
       const auto lg_dec_as_float = static_cast<float>(lg_dec);
 
-      const auto result_log_is_ok = is_close_fraction(lg_flt, lg_dec_as_float, std::numeric_limits<float>::epsilon() * tol_factor);
+      const auto result_log_is_ok = is_close_fraction(lg_flt, lg_dec_as_float, std::numeric_limits<float>::epsilon() * static_cast<float>(tol_factor));
 
       BOOST_TEST(result_log_is_ok);
 

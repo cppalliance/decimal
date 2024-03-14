@@ -5,8 +5,26 @@
 #include "mini_to_chars.hpp"
 
 #include <boost/decimal.hpp>
-#include <boost/core/lightweight_test.hpp>
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wold-style-cast"
+#  pragma clang diagnostic ignored "-Wundef"
+#  pragma clang diagnostic ignored "-Wconversion"
+#  pragma clang diagnostic ignored "-Wsign-conversion"
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wundef"
+#  pragma GCC diagnostic ignored "-Wconversion"
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 #include <boost/math/special_functions/next.hpp>
+#include <boost/core/lightweight_test.hpp>
+
 #include <limits>
 #include <random>
 #include <sstream>

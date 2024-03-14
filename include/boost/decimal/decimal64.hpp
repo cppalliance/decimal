@@ -25,7 +25,6 @@
 #include <boost/decimal/detail/to_float.hpp>
 #include <boost/decimal/detail/to_decimal.hpp>
 #include <boost/decimal/detail/promotion.hpp>
-#include <boost/decimal/detail/io.hpp>
 #include <boost/decimal/detail/comparison.hpp>
 #include <boost/decimal/detail/mixed_decimal_arithmetic.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
@@ -464,18 +463,6 @@ public:
     friend constexpr auto operator<=>(Integer lhs, decimal64 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
     #endif
 
-    #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
-    // 3.2.10 Formatted input:
-    template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
-    friend auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>;
-
-    // 3.2.11 Formatted output:
-    template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>;
-    #endif
-
     // 3.6.4 Same Quantum
     friend constexpr auto samequantumd64(decimal64 lhs, decimal64 rhs) noexcept -> bool;
 
@@ -567,6 +554,11 @@ constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
 {
     return rhs.bits_;
 }
+
+#if defined(__GNUC__) && __GNUC__ >= 6
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wduplicated-branches"
+#endif
 
 // 3.2.5 initialization from coefficient and exponent:
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1>, bool>>
@@ -721,6 +713,18 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     }
 }
 
+#if defined(__GNUC__) && __GNUC__ >= 6
+#  pragma GCC diagnostic pop
+#endif
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::decimal64(Float val) noexcept
 {
@@ -752,6 +756,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64::decimal64(Float val) noexcept
         }
     }
 }
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
 
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal64::operator=(const Float& val) noexcept -> decimal64&
@@ -1210,7 +1220,7 @@ constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
     {
-        res_sig /= detail::powers_of_10[sig_dig - std::numeric_limits<std::uint64_t>::digits10];
+        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
         res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
     }
 
@@ -1253,7 +1263,7 @@ constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::de
 
     if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
     {
-        res_sig /= detail::powers_of_10[sig_dig - std::numeric_limits<std::uint64_t>::digits10];
+        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
         res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
     }
 

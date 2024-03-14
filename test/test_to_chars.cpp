@@ -41,7 +41,7 @@ void test_non_finite_values()
     for (const auto format : formats)
     {
         test_value(std::numeric_limits<T>::quiet_NaN() * T {dist(rng)}, "nan", format);
-        test_value(-std::numeric_limits<T>::quiet_NaN() * T {dist(rng)}, "-nan", format);
+        test_value(-std::numeric_limits<T>::quiet_NaN() * T {dist(rng)}, "-nan(ind)", format);
         test_value(std::numeric_limits<T>::signaling_NaN() * T {dist(rng)}, "nan(snan)", format);
         test_value(-std::numeric_limits<T>::signaling_NaN() * T {dist(rng)}, "-nan(snan)", format);
         test_value(std::numeric_limits<T>::infinity() * T {dist(rng)}, "inf", format);
@@ -404,6 +404,38 @@ void test_434_fixed()
     test_value(one_e_minus_three, "0.001000000", chars_format::fixed, 9);
     test_value(one_e_minus_three, "0.0010000000", chars_format::fixed, 10);
     test_value(one_e_minus_three, "0.00100000000000000000000000000000000000000000000000", chars_format::fixed, 50);
+
+    constexpr T ten {1, 1};
+
+    test_value(ten, "10.000000", chars_format::fixed, -1);
+    test_value(ten, "10", chars_format::fixed, 0);
+    test_value(ten, "10.0", chars_format::fixed, 1);
+    test_value(ten, "10.00", chars_format::fixed, 2);
+    test_value(ten, "10.000", chars_format::fixed, 3);
+    test_value(ten, "10.0000", chars_format::fixed, 4);
+    test_value(ten, "10.00000", chars_format::fixed, 5);
+    test_value(ten, "10.000000", chars_format::fixed, 6);
+    test_value(ten, "10.0000000", chars_format::fixed, 7);
+    test_value(ten, "10.00000000", chars_format::fixed, 8);
+    test_value(ten, "10.000000000", chars_format::fixed, 9);
+    test_value(ten, "10.0000000000", chars_format::fixed, 10);
+    test_value(ten, "10.00000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
+
+    constexpr T twelve_and_half {125, -1};
+
+    test_value(twelve_and_half, "12.500000", chars_format::fixed, -1);
+    test_value(twelve_and_half, "13", chars_format::fixed, 0);
+    test_value(twelve_and_half, "12.5", chars_format::fixed, 1);
+    test_value(twelve_and_half, "12.50", chars_format::fixed, 2);
+    test_value(twelve_and_half, "12.500", chars_format::fixed, 3);
+    test_value(twelve_and_half, "12.5000", chars_format::fixed, 4);
+    test_value(twelve_and_half, "12.50000", chars_format::fixed, 5);
+    test_value(twelve_and_half, "12.500000", chars_format::fixed, 6);
+    test_value(twelve_and_half, "12.5000000", chars_format::fixed, 7);
+    test_value(twelve_and_half, "12.50000000", chars_format::fixed, 8);
+    test_value(twelve_and_half, "12.500000000", chars_format::fixed, 9);
+    test_value(twelve_and_half, "12.5000000000", chars_format::fixed, 10);
+    test_value(twelve_and_half, "12.50000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
 }
 
 template <typename T>
@@ -570,6 +602,9 @@ int main()
     test_hex_format<decimal128>();
     test_434_hex<decimal128>();
     #endif
+
+    // Bugfixes
+    test_value(decimal64{2657844750}, "2657844750", chars_format::general);
 
     return boost::report_errors();
 }

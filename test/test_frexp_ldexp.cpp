@@ -10,6 +10,15 @@
 #include <random>
 
 #include <boost/decimal.hpp>
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 #include <boost/core/lightweight_test.hpp>
 
 namespace local
@@ -109,7 +118,7 @@ namespace local
 
       const auto ldexp_dec_as_float = static_cast<float>(ldexp_dec);
 
-      const auto result_frexp_ldexp_is_ok = is_close_fraction(ldexp_flt, ldexp_dec_as_float, static_cast<float>(std::numeric_limits<decimal_type>::epsilon()) * tol_factor);
+      const auto result_frexp_ldexp_is_ok = is_close_fraction(ldexp_flt, ldexp_dec_as_float, static_cast<float>(std::numeric_limits<decimal_type>::epsilon()) * static_cast<float>(tol_factor));
 
       if(!result_frexp_ldexp_is_ok)
       {

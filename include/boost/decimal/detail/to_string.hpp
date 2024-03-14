@@ -32,7 +32,7 @@ namespace decimal {
 
 // GCC UBSAN warns of format truncation from the constexpr calculation of the format
 // This warning was added in GCC 7.1
-#if __GNUC__ >= 7
+#if defined(__GNUC__) && __GNUC__ >= 7
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wformat-truncation"
 #endif
@@ -187,7 +187,7 @@ auto to_string(DecimalType value) -> std::string
     return res;
 }
 
-#if __GNUC__ >= 7
+#if defined(__GNUC__) && __GNUC__ >= 7
 #  pragma GCC diagnostic pop
 #endif
 

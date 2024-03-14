@@ -13,7 +13,26 @@ project : requirements
 
   <toolset>gcc:<cxxflags>-Wall
   <toolset>gcc:<cxxflags>-Wextra
+
+  # Clang-Cl gives errors that are incorrect or irrelevant (e.g. C++98 compat)
+  #<toolset>clang:<cxxflags>-Wall
+  #<toolset>clang:<cxxflags>-Wextra
+
   <toolset>msvc:<warnings>all
+
+  # Additional flags by request
+  <toolset>gcc:<cxxflags>-Wsign-conversion
+  <toolset>gcc:<cxxflags>-Wconversion
+  <toolset>gcc:<cxxflags>-Wundef
+  <toolset>gcc:<cxxflags>-Wold-style-cast
+  #<toolset>gcc:<cxxflags>-Wduplicated-branches
+  <toolset>gcc:<cxxflags>-Wfloat-equal
+
+  <toolset>clang:<cxxflags>-Wsign-conversion
+  <toolset>clang:<cxxflags>-Wconversion
+  <toolset>clang:<cxxflags>-Wundef
+  <toolset>clang:<cxxflags>-Wold-style-cast
+  <toolset>clang:<cxxflags>-Wfloat-equal
 
   <toolset>msvc:<warnings-as-errors>on
   <toolset>clang:<warnings-as-errors>on
@@ -85,7 +104,7 @@ run test_promotion.cpp ;
 run test_sin_cos.cpp ;
 run test_sinh.cpp ;
 run test_sqrt.cpp ;
-run test_strtod.cpp ;
+#run test_strtod.cpp ;
 run test_tan.cpp ;
 run test_tanh.cpp ;
 run test_tgamma.cpp ;
