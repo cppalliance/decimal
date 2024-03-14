@@ -125,7 +125,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
         errno = static_cast<int>(r.ec);
     }
 
-    *r.ptr++ = '\0';
+    *r.ptr = '\0';
 
     BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<charT, char>::value)
     {
