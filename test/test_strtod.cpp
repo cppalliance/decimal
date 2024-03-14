@@ -42,19 +42,20 @@ void roundtrip_strtod()
     std::mt19937_64 rng(42);
 
     std::uniform_int_distribution<std::int64_t> sig(1'000'000, 9'999'999);
-    std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<T>::min_exponent10 + 19,
-                                                    std::numeric_limits<T>::max_exponent10 - 19);
 
     constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
-        const T val {sig(rng), exp(rng)};
-        std::stringstream ss;
-        ss << std::setprecision(std::numeric_limits<T>::digits10);
-        ss << val;
+        const T val {sig(rng)};
+        char buffer[256] {};
+        auto r = to_chars(buffer, buffer + sizeof(buffer), val);
+        if (!r)
+        {
+            continue; // LCOV_EXCL_LINE
+        }
         char* endptr {};
 
-        const T return_val {boost::decimal::strtod<T>(ss.str().c_str(), &endptr)};
+        const T return_val {boost::decimal::strtod<T>(buffer, &endptr)};
 
         if (!BOOST_TEST_EQ(val, return_val))
         {
@@ -74,13 +75,11 @@ void roundtrip_wcstrtod()
     std::mt19937_64 rng(42);
 
     std::uniform_int_distribution<std::int64_t> sig(1'000'000, 9'999'999);
-    std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<T>::min_exponent10 + 19,
-                                                    std::numeric_limits<T>::max_exponent10 - 19);
 
     constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
-        const T val {sig(rng), exp(rng)};
+        const T val {sig(rng)};
         std::wstringstream ss;
         ss << std::setprecision(std::numeric_limits<T>::digits10);
         ss << val;
@@ -247,9 +246,9 @@ void test_alloc()
 
 int main()
 {
-    //roundtrip_strtod<decimal32>();
-    //roundtrip_wcstrtod<decimal32>();
-    //test_strtod_edges<decimal32>();
+    roundtrip_strtod<decimal32>();
+    roundtrip_wcstrtod<decimal32>();
+    test_strtod_edges<decimal32>();
 
     roundtrip_strtod<decimal64>();
     roundtrip_wcstrtod<decimal64>();
