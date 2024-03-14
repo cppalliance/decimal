@@ -34,10 +34,10 @@ inline void convert_string_locale(char* buffer) noexcept
     const auto locale_decimal_point = *std::localeconv()->decimal_point;
     if (locale_decimal_point != '.')
     {
-        auto p = std::strchr(buffer, '.');
+        auto p = std::strchr(buffer, static_cast<int>(locale_decimal_point));
         if (p != nullptr)
         {
-            *p = locale_decimal_point;
+            *p = '.';
         }
     }
 }
@@ -54,11 +54,14 @@ inline auto strtod_calculation(const char* str, char** endptr, char* buffer, std
         return std::numeric_limits<TargetDecimalType>::signaling_NaN();
     }
 
+    std::memcpy(buffer, str, str_length);
+    convert_string_locale(buffer);
+
     bool sign {};
     significand_type significand {};
     std::int32_t expval {};
 
-    const auto r {detail::parser(str, str + str_length, sign, significand, expval)};
+    const auto r {detail::parser(buffer, buffer + str_length, sign, significand, expval)};
     TargetDecimalType d {};
 
     if (r.ec != std::errc{})
@@ -91,7 +94,7 @@ inline auto strtod_calculation(const char* str, char** endptr, char* buffer, std
 
     if (endptr != nullptr)
     {
-        *endptr = const_cast<char*>(str + (r.ptr - str));
+        *endptr = const_cast<char*>(str + (r.ptr - buffer));
     }
 
     return d;
