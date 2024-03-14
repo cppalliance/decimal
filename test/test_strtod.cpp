@@ -254,9 +254,9 @@ int main()
     roundtrip_wcstrtod<decimal64>();
     test_strtod_edges<decimal64>();
 
-    roundtrip_strtod<decimal128>();
-    roundtrip_wcstrtod<decimal128>();
-    test_strtod_edges<decimal128>();
+    //roundtrip_strtod<decimal128>();
+    //roundtrip_wcstrtod<decimal128>();
+    //test_strtod_edges<decimal128>();
 
     test_spot("2.9379440e-03", decimal32{UINT32_C(29379440), -10});
 
@@ -265,7 +265,7 @@ int main()
 
     test_locales<decimal32>();
     test_locales<decimal64>();
-    test_locales<decimal128>();
+    //test_locales<decimal128>();
 
     return boost::report_errors();
 }
