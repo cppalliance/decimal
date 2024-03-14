@@ -130,17 +130,10 @@ inline auto strtod_impl(const char* str, char** endptr) noexcept -> TargetDecima
 
 // 3.9.2
 template <typename TargetDecimalType>
-inline auto wcstod_impl(const wchar_t* str, wchar_t** endptr) noexcept -> TargetDecimalType
+inline auto wcstod_calculation(const wchar_t* str, wchar_t** endptr, char* buffer, std::size_t str_length) noexcept -> TargetDecimalType
 {
-    char buffer[1024] {};
-    if (str == nullptr || detail::strlen(str) > sizeof(buffer))
-    {
-        errno = EINVAL;
-        return std::numeric_limits<TargetDecimalType>::signaling_NaN();
-    }
-
     // Convert all the characters from wchar_t to char and use regular strtod32
-    for (std::size_t i {}; i < detail::strlen(str); ++i)
+    for (std::size_t i {}; i < str_length; ++i)
     {
         auto val {*(str + i)};
         if (BOOST_DECIMAL_UNLIKELY(val > 255))
@@ -161,6 +154,38 @@ inline auto wcstod_impl(const wchar_t* str, wchar_t** endptr) noexcept -> Target
     }
 
     return return_val;
+}
+
+template <typename TargetDecimalType>
+inline auto wcstod_impl(const wchar_t* str, wchar_t** endptr) noexcept -> TargetDecimalType
+{
+    if (str == nullptr)
+    {
+        errno = EINVAL;
+        return std::numeric_limits<TargetDecimalType>::signaling_NaN();
+    }
+
+    const auto str_length {detail::strlen(str)};
+
+    if (str_length < 1024U)
+    {
+        char buffer[1024U];
+        return wcstod_calculation<TargetDecimalType>(str, endptr, buffer, str_length);
+    }
+
+    // If the string to be parsed does not fit into the 1024 byte static buffer than we have to allocate a buffer.
+    // malloc is used here because it does not throw on allocation failure.
+    std::unique_ptr<char[]> buffer(new(std::nothrow) char[str_length + 1]);
+    if (buffer == nullptr)
+    {
+        // Hard to get coverage on memory exhaustion
+        // LCOV_EXCL_START
+        errno = ENOMEM;
+        return std::numeric_limits<TargetDecimalType>::signaling_NaN();
+        // LCOV_EXCL_STOP
+    }
+
+    return wcstod_calculation<TargetDecimalType>(str, endptr, buffer.get(), str_length);
 }
 
 } //namespace detail

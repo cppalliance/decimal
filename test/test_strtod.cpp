@@ -233,6 +233,16 @@ void test_alloc()
     char* enddptr;
     auto return_value {boost::decimal::strtod<T>(buffer, &enddptr)};
     BOOST_TEST_EQ(return_value, validation_value);
+
+    wchar_t wc_buffer[5000] {};
+    for (std::size_t i {}; i < sizeof(buffer); ++i)
+    {
+        wc_buffer[i] = static_cast<wchar_t>(buffer[i]);
+    }
+
+    wchar_t* wc_endptr;
+    auto wc_return_value {boost::decimal::wcstod<T>(wc_buffer, &wc_endptr)};
+    BOOST_TEST_EQ(wc_return_value, validation_value);
 }
 
 int main()
