@@ -116,8 +116,11 @@ inline auto strtod_impl(const char* str, char** endptr) noexcept -> TargetDecima
     std::unique_ptr<char[]> buffer(new(std::nothrow) char[str_length + 1]);
     if (buffer == nullptr)
     {
+        // Hard to get coverage on memory exhaustion
+        // LCOV_EXCL_START
         errno = ENOMEM;
         return std::numeric_limits<TargetDecimalType>::signaling_NaN();
+        // LCOV_EXCL_STOP
     }
 
     auto d = strtod_calculation<TargetDecimalType>(str, endptr, buffer.get(), str_length);
