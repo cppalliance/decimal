@@ -17,6 +17,8 @@
 #include <boost/decimal/detail/to_chars_integer_impl.hpp>
 #include <boost/decimal/detail/buffer_sizing.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
+#include <boost/decimal/detail/attributes.hpp>
+#include <boost/decimal/detail/countl.hpp>
 #include <cstdint>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
@@ -104,7 +106,7 @@ constexpr auto from_chars(const char* first, const char* last, decimal128& value
 namespace detail {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const TargetDecimalType& value, int fp) noexcept -> to_chars_result
+BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const TargetDecimalType& value, int fp, chars_format fmt, int precision) noexcept -> to_chars_result
 {
     const auto buffer_len = last - first;
 
@@ -119,10 +121,67 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
 
             return {last, std::errc::value_too_large};
         case FP_ZERO:
-            if (buffer_len >= 7)
+            if (fmt == chars_format::general)
             {
-                boost::decimal::detail::memcpy(first, "0.0e+00", 7U);
-                return {first + 7U, std::errc()};
+                if (buffer_len >= 7)
+                {
+                    boost::decimal::detail::memcpy(first, "0.0e+00", 7U);
+                    return {first + 7U, std::errc()};
+                }
+            }
+            else if (fmt == chars_format::hex || fmt == chars_format::scientific)
+            {
+                if (buffer_len >= 7 + precision + 1)
+                {
+                    if (precision == 0)
+                    {
+                        *first++ = '0';
+                    }
+                    else
+                    {
+                        boost::decimal::detail::memcpy(first, "0.0", 3U);
+                        first += 3U;
+
+                        if (precision != -1 && precision != 1)
+                        {
+                            boost::decimal::detail::memset(first, '0', precision - 1);
+                            first += precision - 1;
+                        }
+                    }
+
+                    if (fmt == chars_format::hex)
+                    {
+                        *first++ = 'p';
+                    }
+                    else
+                    {
+                        *first++ = 'e';
+                    }
+
+                    boost::decimal::detail::memcpy(first, "+00", 3U);
+                    return {first + 3U, std::errc()};
+                }
+            }
+            else
+            {
+                if (precision == -1 || precision == 0)
+                {
+                    *first++ = '0';
+                    return {first, std::errc()};
+                }
+                else if (buffer_len > 2 + precision)
+                {
+                    boost::decimal::detail::memcpy(first, "0.0", 3);
+                    first += 3U;
+
+                    if (precision > 1)
+                    {
+                        boost::decimal::detail::memset(first, '0', precision - 1);
+                        first += precision - 1;
+                    }
+
+                    return {first, std::errc()};
+                }
             }
 
             return {last, std::errc::value_too_large};
@@ -158,7 +217,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     const auto fp = fpclassify(value);
     if (fp != FP_NORMAL)
     {
-        return to_chars_nonfinite(first, last, value, fp);
+        return to_chars_nonfinite(first, last, value, fp, fmt, precision);
     }
 
     int exp {};
@@ -202,9 +261,16 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
         return r; // LCOV_EXCL_LINE
     }
 
+    const auto current_digits = r.ptr - (first + 1) - 1;
+
+    if (current_digits < precision && fmt != chars_format::general)
+    {
+        append_zeros = true;
+    }
+
     if (append_zeros)
     {
-        const auto zeros_inserted {static_cast<std::size_t>(precision - significand_digits + 1)};
+        const auto zeros_inserted {static_cast<std::size_t>(precision - current_digits)};
 
         if (r.ptr + zeros_inserted > last)
         {
@@ -219,6 +285,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     *first = *(first + 1);
     *(first + 1) = '.';
     first = r.ptr;
+
+    if (precision == 0)
+    {
+        --first;
+    }
 
     // Strip trailing zeros in general mode
     if (fmt == chars_format::general)
@@ -270,38 +341,51 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         return {last, std::errc::value_too_large};
     }
 
-    const auto fp = fpclassify(value);
-    if (fp != FP_NORMAL)
-    {
-        return to_chars_nonfinite(first, last, value, fp);
-    }
-
-    auto abs_value = abs(value);
-    const bool is_neg = value < 0;
-    int exponent {};
-    auto significand = frexp10(abs_value, &exponent);
-
+    const bool is_neg = signbit(value);
     if (is_neg)
     {
         *first++ = '-';
         --buffer_size;
     }
 
-    int num_dig = 0;
-    bool append_zeros = false;
+    const auto fp = fpclassify(value);
+    if (fp != FP_NORMAL)
+    {
+        return to_chars_nonfinite(first, last, value, fp, fmt, precision);
+    }
+
+    auto abs_value = abs(value);
+    int exponent {};
+    auto significand = frexp10(abs_value, &exponent);
+
+    const char* output_start = first;
+
+    int num_dig = num_digits(significand);
+    bool append_trailing_zeros = false;
+    bool append_leading_zeros = false;
+    int num_leading_zeros = 0;
+    int integer_digits = num_dig + exponent;
+    num_dig -= integer_digits;
+
+    if (integer_digits < 0)
+    {
+        num_leading_zeros = std::abs(integer_digits);
+        integer_digits = 0;
+        append_leading_zeros = true;
+    }
+
     if (precision != -1)
     {
-        num_dig = num_digits(significand);
-        if (num_dig >= precision + 2)
+        if (num_dig >= precision + 1)
         {
-            while (num_dig > precision + 2)
+            while (num_dig > precision + 1)
             {
                 significand /= 10;
                 ++exponent;
                 --num_dig;
             }
 
-            if (num_dig == precision + 2)
+            if (num_dig == precision + 1)
             {
                 --num_dig;
                 exponent += fenv_round(significand);
@@ -309,7 +393,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         }
         else if (num_dig < precision && fmt != chars_format::general)
         {
-            append_zeros = true;
+            append_trailing_zeros = true;
         }
 
         // In general formatting we remove trailing 0s
@@ -325,10 +409,41 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     // Make sure the result will fit in the buffer
-    const std::ptrdiff_t total_length = total_buffer_length(num_dig, exponent, is_neg);
+    const std::ptrdiff_t total_length = total_buffer_length(num_dig, exponent, is_neg) + num_leading_zeros;
     if (total_length > buffer_size)
     {
         return {last, std::errc::value_too_large};
+    }
+
+    // Insert the leading zeros and return if the answer is ~0 for current precision
+    if (append_leading_zeros)
+    {
+        if (precision == 0)
+        {
+            *first++ = '0';
+            return {first, std::errc()};
+        }
+        else if (num_leading_zeros > precision)
+        {
+            *first++ = '0';
+            *first++ = '.';
+            std::memset(first, '0', static_cast<std::size_t>(precision));
+            return {first + precision, std::errc()};
+        }
+        else
+        {
+            *first++ = '0';
+            *first++ = '.';
+            std::memset(first, '0', static_cast<std::size_t>(num_leading_zeros));
+            first += num_leading_zeros;
+
+            // We can skip the rest if there's nothing more to do for the required precision
+            if (significand == 0)
+            {
+                std::memset(first, '0', static_cast<std::size_t>(precision - num_leading_zeros));
+                return {first + precision, std::errc()};
+            }
+        }
     }
 
     using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, uint128, std::uint64_t>;
@@ -340,7 +455,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     // Bounds check again
-    if (abs_value >= 1)
+    if (precision == 0)
+    {
+        return {r.ptr, std::errc()};
+    }
+    else if (abs_value >= 1)
     {
         if (exponent < 0 && -exponent < buffer_size)
         {
@@ -356,7 +475,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             abs_value /= 10;
         }
     }
-    else
+    else if (!append_leading_zeros)
     {
         #ifdef BOOST_DECIMAL_DEBUG_FIXED
         std::cerr << std::setprecision(std::numeric_limits<Real>::digits10) << "Value: " << value
@@ -365,7 +484,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
                   << "\n  exp: " << exponent << std::endl;
         #endif
 
-        const auto offset_bytes = static_cast<std::size_t>(-exponent - num_dig);
+        const auto offset_bytes = static_cast<std::size_t>(integer_digits);
 
         boost::decimal::detail::memmove(first + 2 + static_cast<std::size_t>(is_neg) + offset_bytes,
                                         first + static_cast<std::size_t>(is_neg),
@@ -374,18 +493,23 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         boost::decimal::detail::memcpy(first + static_cast<std::size_t>(is_neg), "0.", 2U);
         first += 2;
         r.ptr += 2;
-
-        while (num_dig < -exponent)
-        {
-            *first++ = '0';
-            ++num_dig;
-            ++r.ptr;
-        }
     }
 
-    if (append_zeros)
+    // The leading 0 is an integer digit now that we need to account for
+    if (integer_digits == 0)
     {
-        const auto zeros_inserted = static_cast<std::size_t>(precision - num_dig + 1);
+        ++integer_digits;
+    }
+
+    const auto current_fractional_digits = r.ptr - output_start - integer_digits - 1;
+    if (current_fractional_digits < precision && fmt != chars_format::general)
+    {
+        append_trailing_zeros = true;
+    }
+
+    if (append_trailing_zeros)
+    {
+        const auto zeros_inserted = static_cast<std::size_t>(precision - current_fractional_digits);
 
         if (r.ptr + zeros_inserted > last)
         {
@@ -397,6 +521,135 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     return {r.ptr, std::errc()};
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value, int precision = -1) noexcept -> to_chars_result
+{
+    using Unsigned_Integer = std::conditional_t<!std::is_same<TargetDecimalType, decimal128>::value, std::uint64_t, uint128>;
+
+    if (signbit(value))
+    {
+        *first++ = '-';
+    }
+
+    const auto fp = fpclassify(value);
+    if (fp != FP_NORMAL)
+    {
+        return to_chars_nonfinite(first, last, value, fp, chars_format::hex, precision);
+    }
+
+    const std::ptrdiff_t buffer_size = last - first;
+    auto real_precision = get_real_precision<TargetDecimalType>(precision);
+
+    if (precision != -1)
+    {
+        real_precision = precision;
+    }
+
+    if (buffer_size < real_precision)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    int exp {};
+    Unsigned_Integer significand = frexp10(value, &exp);
+
+    // Strip zeros of the significand since frexp10 normalizes it
+    while (significand % 10U == 0)
+    {
+        significand /= 10U;
+        ++exp;
+    }
+
+    // Calculate the number of bytes
+    constexpr auto significand_bits = std::is_same<Unsigned_Integer, std::uint64_t>::value ? 64 : 128;
+    auto significand_digits = static_cast<int>(std::ceil(static_cast<double>(significand_bits - countl_zero(significand)) / 4));
+    bool append_zeros = false;
+
+    if (precision != -1)
+    {
+        if (significand_digits > precision)
+        {
+            // If the precision is specified we need to make sure the result is rounded correctly
+            // using the current fenv rounding mode
+
+            while (significand_digits > precision + 2)
+            {
+                significand /= 16;
+                --significand_digits;
+            }
+
+            if (significand_digits > precision + 1)
+            {
+                const auto trailing_digit = significand % 16;
+                significand /= 16;
+                ++exp;
+                if (trailing_digit >= 8)
+                {
+                    ++significand;
+                }
+            }
+        }
+        else if (significand_digits < precision)
+        {
+            append_zeros = true;
+        }
+    }
+
+    auto r = to_chars_integer_impl<Unsigned_Integer, Unsigned_Integer>(first + 1, last, significand, 16);
+    if (BOOST_DECIMAL_UNLIKELY(!r))
+    {
+        return r; // LCOV_EXCL_LINE
+    }
+
+    const auto current_digits = r.ptr - (first + 1) - 1;
+    exp += static_cast<int>(current_digits);
+
+    if (current_digits < precision)
+    {
+        append_zeros = true;
+    }
+
+    if (append_zeros)
+    {
+        const auto zeros_inserted {static_cast<std::size_t>(precision - current_digits)};
+
+        if (r.ptr + zeros_inserted > last)
+        {
+            return {last, std::errc::value_too_large};
+        }
+
+        boost::decimal::detail::memset(r.ptr, '0', zeros_inserted);
+        r.ptr += zeros_inserted;
+    }
+
+    // Insert our decimal point
+    *first = *(first + 1);
+    *(first + 1) = '.';
+    first = r.ptr;
+
+    if (precision == 0)
+    {
+        --first;
+    }
+
+    *first++ = 'p';
+    if (exp < 0)
+    {
+        *first++ = '-';
+    }
+    else
+    {
+        *first++ = '+';
+    }
+
+    if (std::abs(exp) < 10)
+    {
+        *first++ = '0';
+    }
+
+    return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, std::abs(exp), 10);
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
@@ -415,6 +668,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
 
     constexpr auto min_fractional_value = TargetDecimalType{1, -4};
 
+    if (fmt == chars_format::hex)
+    {
+        return to_chars_hex_impl(first, last, value, precision);
+    }
+
     // Unspecified precision so we always go with the shortest representation
     if (precision == -1)
     {
@@ -429,7 +687,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
                 return to_chars_scientific_impl(first, last, value, fmt, precision);
             }
         }
-        else if (fmt == chars_format::scientific)
+        else
         {
             return to_chars_scientific_impl(first, last, value, fmt, precision);
         }
@@ -451,12 +709,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
             return to_chars_scientific_impl(first, last, value, fmt, precision);
         }
     }
-
-    // TODO(mborland): Insert hex formatting here
-    // LCOV_EXCL_START
-    BOOST_DECIMAL_ASSERT_MSG(fmt != chars_format::hex, "Hex format has not been implemented yet");
-    return {first, std::errc()};
-    // LCOV_EXCL_STOP
 }
 
 } //namespace detail

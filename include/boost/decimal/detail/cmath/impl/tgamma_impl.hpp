@@ -113,6 +113,9 @@ constexpr std::array<decimal32, 15> tgamma_table_imp<b>::d32_coeffs;
 template <bool b>
 constexpr std::array<decimal64, 36> tgamma_table_imp<b>::d64_coeffs;
 
+template <bool b>
+constexpr std::array<decimal128, 36> tgamma_table_imp<b>::d128_coeffs;
+
 #endif
 
 } //namespace tgamma_detail
@@ -120,14 +123,7 @@ constexpr std::array<decimal64, 36> tgamma_table_imp<b>::d64_coeffs;
 using tgamma_table = tgamma_detail::tgamma_table_imp<true>;
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto tgamma_series_expansion(T z) noexcept
-{
-    // LCOV_EXCL_START
-    //static_assert(!std::is_same<T, decimal128>::value, "Decimal128 has not been implemented");
-    static_cast<void>(z);
-    return T{1,0,true};
-    // LCOV_EXCL_STOP
-}
+constexpr auto tgamma_series_expansion(T z) noexcept;
 
 template <>
 constexpr auto tgamma_series_expansion<decimal32>(decimal32 z) noexcept

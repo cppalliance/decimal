@@ -224,7 +224,9 @@ public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
     constexpr decimal128& operator=(const decimal128& rhs) noexcept = default;
+    constexpr decimal128& operator=(decimal128&& rhs) noexcept = default;
     constexpr decimal128(const decimal128& rhs) noexcept = default;
+    constexpr decimal128(decimal128&& rhs) noexcept = default;
 
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     BOOST_DECIMAL_CXX20_CONSTEXPR decimal128(Float val) noexcept;
@@ -390,6 +392,8 @@ public:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     constexpr auto operator/=(Decimal rhs) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal128&>;
+
+    constexpr auto operator%=(decimal128 rhs) noexcept -> decimal128&;
 
     // 3.2.9 Comparison operators:
     // Equality
@@ -2139,6 +2143,12 @@ constexpr auto decimal128::operator/=(Decimal rhs) noexcept
 -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal128&>
 {
     *this = *this / rhs;
+    return *this;
+}
+
+constexpr auto decimal128::operator%=(decimal128 rhs) noexcept -> decimal128&
+{
+    *this = *this % rhs;
     return *this;
 }
 

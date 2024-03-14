@@ -214,6 +214,10 @@ private:
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
+    constexpr decimal64& operator=(const decimal64& rhs) noexcept = default;
+    constexpr decimal64& operator=(decimal64&& rhs) noexcept = default;
+    constexpr decimal64(const decimal64& rhs) noexcept = default;
+    constexpr decimal64(decimal64&& rhs) noexcept = default;
 
     // 3.2.2.2 Conversion form floating-point type
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
@@ -379,6 +383,8 @@ public:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     constexpr auto operator/=(Decimal rhs) noexcept
         -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>;
+
+    constexpr auto operator%=(decimal64 rhs) noexcept -> decimal64&;
 
     // 3.2.9 Comparison operators:
     // Equality
@@ -1819,6 +1825,12 @@ constexpr auto decimal64::operator/=(Decimal rhs) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal64&>
 {
     *this = *this / rhs;
+    return *this;
+}
+
+constexpr auto decimal64::operator%=(decimal64 rhs) noexcept -> decimal64&
+{
+    *this = *this % rhs;
     return *this;
 }
 
