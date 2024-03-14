@@ -31,7 +31,11 @@ jobs:
         with:
           fetch-depth: '0'
       - name: update-tools
-        run: sudo apt install lcov
+        run: |
+          sudo apt install lcov locales
+          sudo locale-gen de_DE.UTF-8
+          sudo update-locale
+
       - name: clone-submods-bootstrap-headers-boost-develop
         run: |
           git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
