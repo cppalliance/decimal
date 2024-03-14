@@ -17,14 +17,17 @@ The following functions from <cstdlib> are provided:
 namespace boost {
 namespace decimal {
 
-constexpr decimal32 strtod32(const char* str, char** endptr) noexcept
-constexpr decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept
+inline decimal64 strtod(const char* str, char** endptr) noexcept;
+inline decimal64 wcstod(const wchar_t* str, wchar_t** endptr) noexcept;
 
-constexpr decimal64 strtod64(const char* str, char** endptr) noexcept
-constexpr decimal64 wcstod64(const wchar_t* str, wchar_t** endptr) noexcept
+inline decimal32 strtod32(const char* str, char** endptr) noexcept;
+inline decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept;
 
-constexpr decimal128 strtod128(const char* str, char** endptr) noexcept
-constexpr decimal128 wcstod128(const wchar_t* str, wchar_t** endptr) noexcept
+inline decimal64 strtod64(const char* str, char** endptr) noexcept;
+inline decimal64 wcstod64(const wchar_t* str, wchar_t** endptr) noexcept;
+
+inline decimal128 strtod128(const char* str, char** endptr) noexcept;
+inline decimal128 wcstod128(const wchar_t* str, wchar_t** endptr) noexcept;
 
 } //namespace decimal
 } //namespace boost

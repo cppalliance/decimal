@@ -186,43 +186,43 @@ inline auto wcstod_impl(const wchar_t* str, wchar_t** endptr) noexcept -> Target
 } //namespace detail
 
 template <typename TargetDecimalType = decimal64>
-constexpr auto strtod(const char* str, char** endptr) noexcept -> TargetDecimalType
+inline auto strtod(const char* str, char** endptr) noexcept -> TargetDecimalType
 {
     return detail::strtod_impl<TargetDecimalType>(str, endptr);
 }
 
 template <typename TargetDecimalType = decimal64>
-constexpr auto wcstod(const wchar_t* str, wchar_t** endptr) noexcept -> TargetDecimalType
+inline auto wcstod(const wchar_t* str, wchar_t** endptr) noexcept -> TargetDecimalType
 {
     return detail::wcstod_impl<TargetDecimalType>(str, endptr);
 }
 
-constexpr auto strtod32(const char* str, char** endptr) noexcept -> decimal32
+inline auto strtod32(const char* str, char** endptr) noexcept -> decimal32
 {
     return detail::strtod_impl<decimal32>(str, endptr);
 }
 
-constexpr auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decimal32
+inline auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decimal32
 {
     return detail::wcstod_impl<decimal32>(str, endptr);
 }
 
-constexpr auto strtod64(const char* str, char** endptr) noexcept -> decimal64
+inline auto strtod64(const char* str, char** endptr) noexcept -> decimal64
 {
     return detail::strtod_impl<decimal64>(str, endptr);
 }
 
-constexpr auto wcstod64(const wchar_t* str, wchar_t** endptr) noexcept -> decimal64
+inline auto wcstod64(const wchar_t* str, wchar_t** endptr) noexcept -> decimal64
 {
     return detail::wcstod_impl<decimal64>(str, endptr);
 }
 
-constexpr auto strtod128(const char* str, char** endptr) noexcept -> decimal128
+inline auto strtod128(const char* str, char** endptr) noexcept -> decimal128
 {
     return detail::strtod_impl<decimal128>(str, endptr);
 }
 
-constexpr auto wcstod128(const wchar_t* str, wchar_t** endptr) noexcept -> decimal128
+inline auto wcstod128(const wchar_t* str, wchar_t** endptr) noexcept -> decimal128
 {
     return detail::wcstod_impl<decimal128>(str, endptr);
 }
