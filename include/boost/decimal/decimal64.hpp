@@ -226,11 +226,11 @@ public:
     BOOST_DECIMAL_CXX20_CONSTEXPR auto operator=(const Float& val) noexcept -> decimal64&;
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
-    constexpr decimal64(Decimal val) noexcept;
+    explicit constexpr decimal64(Decimal val) noexcept;
 
     // 3.2.3.3 Conversion from integral type
     template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
-    explicit constexpr decimal64(Integer val) noexcept;
+    constexpr decimal64(Integer val) noexcept;
 
     template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     constexpr auto operator=(const Integer& val) noexcept -> decimal64&;
