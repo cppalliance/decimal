@@ -1,4 +1,4 @@
-// Copyright 2023 Matt Borland
+// Copyright 2023 - 2024 Matt Borland
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -10,14 +10,20 @@
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/charconv.hpp>
+#include <algorithm>
 #include <format>
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <tuple>
 
-// See for general impl
-// https://en.cppreference.com/w/cpp/utility/format/formatter
+// Default :g
+// Fixed :f
+// Scientific :3
+// Hex :a
+//
+// Capital letter for any of the above leads to all characters being uppercase
 
 namespace boost::decimal::detail {
 
@@ -25,11 +31,12 @@ template <typename ParseContext>
 constexpr auto parse_impl(ParseContext& ctx)
 {
     auto it {ctx.begin()};
-    int precision = 5;
+    int precision = 6;
+    boost::decimal::chars_format fmt = boost::decimal::chars_format::general;
 
     if (it == ctx.end())
     {
-        return std::make_tuple(precision, it);
+        return std::make_tuple(precision, fmt, it);
     }
 
     if (*it == '.')
@@ -54,79 +61,35 @@ constexpr auto parse_impl(ParseContext& ctx)
         throw std::format_error("Invalid format");
     }
 
-    return std::make_tuple(precision, it);
+    return std::make_tuple(precision, fmt, it);
 };
 };
 
 template <>
 struct std::formatter<boost::decimal::decimal32>
 {
-    int precision {};
-
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
-    {
-        auto res {boost::decimal::detail::parse_impl(ctx)};
-        precision = std::get<0>(res);
-        return std::get<1>(res);
-    }
-
-    template <typename FormatContext>
-    auto format(const boost::decimal::decimal32& v, FormatContext& ctx)
-    {
-        std::ostringstream out;
-        out << std::setprecision(precision) << v;
-
-        return std::ranges::copy(std::move(out).str(), ctx.out()).out;
-    }
-};
-
-template <>
-struct std::formatter<boost::decimal::decimal64>
-{
     int precision;
+    boost::decimal::chars_format fmt;
 
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    constexpr auto parse(const std::basic_format_parse_context<char>& context)
     {
-        auto res {boost::decimal::detail::parse_impl(ctx)};
+        auto res {boost::decimal::detail::parse_impl(context)};
         precision = std::get<0>(res);
-        return std::get<1>(res);
+        fmt = std::get<1>(res);
+        return std::get<2>(res);
     }
 
-    template <typename FormatContext>
-    auto format(const boost::decimal::decimal32& v, FormatContext& ctx)
+    template <typename OutputIterator>
+    auto format(const boost::decimal::decimal32& v, std::basic_format_context<OutputIterator, char>& context) const
     {
-        std::ostringstream out;
-        out << std::setprecision(precision) << v;
-
-        return std::ranges::copy(std::move(out).str(), ctx.out()).out;
+        auto&& out = context.out();
+        char buffer[128U];
+        const auto r = to_chars(buffer, buffer + sizeof(buffer), v, fmt, precision);
+        *r.ptr = '\0';
+        out = std::copy(buffer, r.ptr, out);
+        return out;
     }
 };
-
-template <>
-struct std::formatter<boost::decimal::decimal128>
-{
-    int precision;
-
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
-    {
-        auto res {boost::decimal::detail::parse_impl(ctx)};
-        precision = std::get<0>(res);
-        return std::get<1>(res);
-    }
-
-    template <typename FormatContext>
-    auto format(const boost::decimal::decimal32& v, FormatContext& ctx)
-    {
-        std::ostringstream out;
-        out << std::setprecision(precision) << v;
-
-        return std::ranges::copy(std::move(out).str(), ctx.out()).out;
-    }
-};
-
 
 #endif
 
