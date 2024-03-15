@@ -45,12 +45,11 @@ constexpr auto ellint_k_imp(T k) -> T
       return std::numeric_limits<T>::signaling_NaN();
    }
 
-   T x = 0;
-   T y = 1 - k * k;
-   T z = 1;
-   T value = ellint_rf_imp(x, y, z);
+   constexpr T x {0};
+   T y {1 - k * k};
+   constexpr T z {1};
 
-   return value;
+   return ellint_impl::ellint_rf_imp(x, y, z);
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
@@ -113,7 +112,7 @@ constexpr auto ellint_f_impl(T phi, T k) noexcept -> T
           // c-1 simplifies to cot^2(rphi) which avoid cancellation:
           //
           T c = 1 / sinp;
-          result = static_cast<T>(s * ellint_rf_imp(cosp / sinp, c - k * k, c));
+          result = static_cast<T>(s * ellint_impl::ellint_rf_imp(cosp / sinp, c - k * k, c));
        }
        else
        {
@@ -132,7 +131,7 @@ constexpr auto ellint_f_impl(T phi, T k) noexcept -> T
 } //namespace detail
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto comp_ellint(T k) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+constexpr auto comp_ellint_1(T k) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
    return detail::ellint_k_imp(k);
 }

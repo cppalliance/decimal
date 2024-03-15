@@ -26,13 +26,12 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto ellint_rf_imp(T x, T y, T z) noexcept
 {
     constexpr T zero {0, 0};
-    constexpr T one {1, 0};
 
     if (x < zero || y < zero || z < zero)
     {
         return std::numeric_limits<T>::signaling_NaN();
     }
-    if (x + y == zero || y + z == 0 || z + x == 0)
+    if (x + y == zero || y + z == zero || z + x == zero)
     {
         return std::numeric_limits<T>::signaling_NaN();
     }
@@ -50,7 +49,7 @@ constexpr auto ellint_rf_imp(T x, T y, T z) noexcept
         else
         {
             // 2 equal, x and y:
-            if(z == 0)
+            if(z == zero)
             {
                 return numbers::pi_v<T> / (2 * sqrt(x));
             }
@@ -96,35 +95,38 @@ constexpr auto ellint_rf_imp(T x, T y, T z) noexcept
         //
         // Special case for one value zero:
         //
-        T xn = sqrt(x);
-        T yn = sqrt(y);
+        T xn {sqrt(x)};
+        T yn {sqrt(y)};
 
-        while(fabs(xn - yn) >= T{27, -1} * std::numeric_limits<T>::epsilon() * fabs(xn))
+        unsigned k {1U};
+        while(fabs(xn - yn) >= T{27, -1} * std::numeric_limits<T>::epsilon() * fabs(xn) && k < 20)
         {
-            T t = sqrt(xn * yn);
+            T t {sqrt(xn * yn)};
             xn = (xn + yn) / 2;
             yn = t;
+            ++k;
         }
-        return numbers::pi_v() / (xn + yn);
+
+        return numbers::pi_v<T> / (xn + yn);
     }
 
-    T xn = x;
-    T yn = y;
-    T zn = z;
-    T An = (x + y + z) / 3;
-    T A0 = An;
-    T Q = pow(3 * std::numeric_limits<T>::epsilon(), T{-1} / 8) * (std::max)((std::max)(fabs(An - xn), fabs(An - yn)), fabs(An - zn));
-    T fn = 1;
+    T xn {x};
+    T yn {y};
+    T zn {z};
+    T An {(x + y + z) / 3};
+    T A0 {An};
+    T Q {pow(3 * std::numeric_limits<T>::epsilon(), T{-1} / 8) * (std::max)((std::max)(fabs(An - xn), fabs(An - yn)), fabs(An - zn))};
+    T fn {1};
 
 
     // duplication
-    unsigned k = 1;
-    for(; k < 1000000U; ++k)
+    unsigned k {1U};
+    for(; k < 100U; ++k)
     {
-        T root_x = sqrt(xn);
-        T root_y = sqrt(yn);
-        T root_z = sqrt(zn);
-        T lambda = root_x * root_y + root_x * root_z + root_y * root_z;
+        T root_x {sqrt(xn)};
+        T root_y {sqrt(yn)};
+        T root_z {sqrt(zn)};
+        T lambda {root_x * root_y + root_x * root_z + root_y * root_z};
         An = (An + lambda) / 4;
         xn = (xn + lambda) / 4;
         yn = (yn + lambda) / 4;
@@ -137,13 +139,13 @@ constexpr auto ellint_rf_imp(T x, T y, T z) noexcept
         }
     }
 
-    T X = (A0 - x) / (An * fn);
-    T Y = (A0 - y) / (An * fn);
-    T Z = -X - Y;
+    T X {(A0 - x) / (An * fn)};
+    T Y {(A0 - y) / (An * fn)};
+    T Z {-X - Y};
 
     // Taylor series expansion to the 7th order
-    T E2 = X * Y - Z * Z;
-    T E3 = X * Y * Z;
+    T E2 {X * Y - Z * Z};
+    T E3 {X * Y * Z};
     return (1 + E3 * (T(1) / 14 + 3 * E3 / 104) + E2 * (T(-1) / 10 + E2 / 24 - (3 * E3) / 44 - 5 * E2 * E2 / 208 + E2 * E3 / 16)) / sqrt(An);
 }
 
