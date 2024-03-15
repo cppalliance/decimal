@@ -55,74 +55,77 @@ constexpr auto ellint_k_imp(T k) -> T
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto ellint_f_impl(T phi, T k) noexcept -> T
 {
-   constexpr T half_pi = numbers::pi_v<T> / 2;
+    constexpr T half_pi {numbers::pi_v<T> / 2};
 
-   bool invert = false;
+    bool invert {false};
     if (phi < 0)
     {
-       phi = fabs(phi);
-       invert = true;
+        phi = fabs(phi);
+        invert = true;
     }
 
     T result;
 
     if (isinf(phi))
     {
-       return std::numeric_limits<T>::signaling_NaN();
+        return std::numeric_limits<T>::signaling_NaN();
     }
 
     if(phi > 1 / std::numeric_limits<T>::epsilon())
     {
-       // Phi is so large that phi%pi is necessarily zero (or garbage),
-       // just return the second part of the duplication formula:
-       result = 2 * phi * ellint_k_imp(k) / numbers::pi_v<T>;
+        // Phi is so large that phi%pi is necessarily zero (or garbage),
+        // just return the second part of the duplication formula:
+        result = 2 * phi * ellint_k_imp(k) / numbers::pi_v<T>;
     }
     else
     {
-       // Carlson's algorithm works only for |phi| <= pi/2,
-       // use the integrand's periodicity to normalize phi
-       //
-       // Xiaogang's original code used a cast to long long here
-       // but that fails if T has more digits than a long long,
-       // so rewritten to use fmod instead:
-       //
-       T rphi = fmod(phi, half_pi);
-       T m = round((phi - rphi) / half_pi);
-       BOOST_MATH_INSTRUMENT_VARIABLE(m);
-       int s = 1;
-       if (fmod(m, T(2)) > T(0.5))
-       {
-          m += 1;
-          s = -1;
-          rphi = half_pi - rphi;
-       }
-       T sinp = sin(rphi);
-       sinp *= sinp;
-       if (sinp * k * k >= 1)
-       {
-          return std::numeric_limits<T>::signaling_NaN();
-       }
-       T cosp = cos(rphi);
-       cosp *= cosp;
-       if(sinp > (std::numeric_limits<T>::min)())
-       {
-          BOOST_DECIMAL_ASSERT(rphi != 0); // precondition, can't be true if sin(rphi) != 0.
-          //
-          // Use http://dlmf.nist.gov/19.25#E5, note that
-          // c-1 simplifies to cot^2(rphi) which avoid cancellation:
-          //
-          T c = 1 / sinp;
-          result = static_cast<T>(s * ellint_impl::ellint_rf_imp(cosp / sinp, c - k * k, c));
-       }
-       else
-       {
-          result = s * sin(rphi);
-       }
+        // Carlson's algorithm works only for |phi| <= pi/2,
+        // use the integrand's periodicity to normalize phi
+        //
+        // Xiaogang's original code used a cast to long long here
+        // but that fails if T has more digits than a long long,
+        // so rewritten to use fmod instead:
+        //
+        T rphi = fmod(phi, half_pi);
+        T m = round((phi - rphi) / half_pi);
+        int s = 1;
 
-       if(m != 0)
-       {
-          result += m * ellint_k_imp(k);
-       }
+        if (fmod(m, T(2)) > T(0.5))
+        {
+            m += 1;
+            s = -1;
+            rphi = half_pi - rphi;
+        }
+
+        T sinp = sin(rphi);
+        sinp *= sinp;
+
+        if (sinp * k * k >= 1)
+        {
+            return std::numeric_limits<T>::signaling_NaN();
+        }
+
+        T cosp = cos(rphi);
+        cosp *= cosp;
+        if(sinp > (std::numeric_limits<T>::min)())
+        {
+            BOOST_DECIMAL_ASSERT(rphi != 0); // precondition, can't be true if sin(rphi) != 0.
+            //
+            // Use http://dlmf.nist.gov/19.25#E5, note that
+            // c-1 simplifies to cot^2(rphi) which avoid cancellation:
+            //
+            T c = 1 / sinp;
+            result = static_cast<T>(s * ellint_impl::ellint_rf_imp(cosp / sinp, c - k * k, c));
+        }
+        else
+        {
+            result = s * sin(rphi);
+        }
+
+        if(m != 0)
+        {
+            result += m * ellint_k_imp(k);
+        }
     }
 
     return invert ? -result : result;

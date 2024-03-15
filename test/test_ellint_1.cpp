@@ -70,13 +70,45 @@ void test_comp_ellint()
     }
 }
 
+template <typename T>
+void test_ellint()
+{
+    std::uniform_real_distribution<float> dist(-1.0F, 1.0F);
+
+    constexpr auto local_N = std::is_same<T, decimal128>::value ? N / 4 : N;
+    for (std::size_t i {}; i < local_N; ++i)
+    {
+        const auto k_val {dist(rng)};
+        const auto phi_val {dist(rng)};
+        const T k_dec_val {k_val};
+        const T phi_dec_val {phi_val};
+
+        const auto float_res {boost::math::ellint_1(k_val, phi_val)};
+        const auto dec_res {static_cast<float>(ellint_1(k_dec_val, phi_dec_val))};
+        const auto distance {boost::math::float_distance(float_res, dec_res)};
+
+        if (!BOOST_TEST(std::abs(distance) < 30))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Float: " << float_res
+                      << "\n  Dec: " << dec_res
+                      << "\n Dist: " << distance << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
 int main()
 {
     test_comp_ellint<decimal32>();
     test_comp_ellint<decimal64>();
 
+    test_ellint<decimal32>();
+    test_ellint<decimal64>();
+
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_comp_ellint<decimal128>();
+    test_ellint<decimal128>();
     #endif
 
     return boost::report_errors();
