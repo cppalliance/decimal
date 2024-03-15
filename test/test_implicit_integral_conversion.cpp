@@ -6,7 +6,6 @@
 #include <boost/core/lightweight_test.hpp>
 #include <random>
 
-constexpr std::size_t N {1024};
 static std::mt19937_64 rng(42);
 
 template <typename T>
