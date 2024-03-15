@@ -17,6 +17,7 @@
 #include <iomanip>
 #include <string>
 #include <tuple>
+#include <cctype>
 
 // Default :g
 // Fixed :f
@@ -31,12 +32,26 @@ template <typename ParseContext>
 constexpr auto parse_impl(ParseContext& ctx)
 {
     auto it {ctx.begin()};
+    ++it;
     int precision = 6;
     boost::decimal::chars_format fmt = boost::decimal::chars_format::general;
+    bool is_upper = false;
+    int padding_digits = 0;
 
     if (it == ctx.end())
     {
-        return std::make_tuple(precision, fmt, it);
+        return std::make_tuple(precision, fmt, is_upper, padding_digits, it);
+    }
+
+    while (*it >= '0' && *it <= '9')
+    {
+        padding_digits = padding_digits * 10 + *it;
+        ++it;
+    }
+
+    if (*it == ':')
+    {
+        ++it;
     }
 
     if (*it == '.')
@@ -49,9 +64,37 @@ constexpr auto parse_impl(ParseContext& ctx)
             ++it;
         }
 
-        if (*it != 'f')
+        switch (*it)
         {
-            throw std::format_error("Invalid format");
+            case 'G':
+                is_upper = true;
+                [[fallthrough]];
+            case 'g':
+                fmt = chars_format::general;
+                break;
+
+            case 'F':
+                [[fallthrough]];
+            case 'f':
+                fmt = chars_format::fixed;
+                break;
+
+            case 'E':
+                is_upper = true;
+                [[fallthrough]];
+            case 'e':
+                fmt = chars_format::scientific;
+                break;
+
+            case 'A':
+                is_upper = true;
+                [[fallthrough]];
+            case 'a':
+                fmt = chars_format::hex;
+                break;
+
+            default:
+                throw std::format_error("Invalid format");
         }
         ++it;
     }
@@ -61,22 +104,29 @@ constexpr auto parse_impl(ParseContext& ctx)
         throw std::format_error("Invalid format");
     }
 
-    return std::make_tuple(precision, fmt, it);
+    return std::make_tuple(precision, fmt, is_upper, padding_digits, it);
 };
-};
+
+} //namespace boost::decimal::detail
 
 template <>
 struct std::formatter<boost::decimal::decimal32>
 {
     int precision;
     boost::decimal::chars_format fmt;
+    bool is_upper;
+    int padding_digits;
 
     constexpr auto parse(const std::basic_format_parse_context<char>& context)
     {
-        auto res {boost::decimal::detail::parse_impl(context)};
+        const auto res {boost::decimal::detail::parse_impl(context)};
+
         precision = std::get<0>(res);
         fmt = std::get<1>(res);
-        return std::get<2>(res);
+        is_upper = std::get<2>(res);
+        padding_digits = std::get<3>(res);
+
+        return std::get<4>(res);
     }
 
     template <typename OutputIterator>
@@ -86,7 +136,19 @@ struct std::formatter<boost::decimal::decimal32>
         char buffer[128U];
         const auto r = to_chars(buffer, buffer + sizeof(buffer), v, fmt, precision);
         *r.ptr = '\0';
-        out = std::copy(buffer, r.ptr, out);
+        std::string s(buffer);
+
+        if (is_upper)
+        {
+            std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){ return std::toupper(c); });
+        }
+
+        if (s.size() < static_cast<std::size_t>(padding_digits))
+        {
+            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), '0');
+        }
+
+        out = std::copy(s.begin(), s.end(), out);
         return out;
     }
 };
