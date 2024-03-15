@@ -5,7 +5,7 @@
 #ifndef BOOST_DECIMAL_FORMAT_HPP
 #define BOOST_DECIMAL_FORMAT_HPP
 
-#if __cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L) && __has_include(<format>) && !defined(BOOST_DECIMAL_DISABLE_CLIB)
+#if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && __has_include(<format>) && !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>

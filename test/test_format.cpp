@@ -7,7 +7,7 @@
 
 using namespace boost::decimal;
 
-#if __cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L) && __has_include(<format>) && !defined(BOOST_DECIMAL_DISABLE_CLIB)
+#if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && __has_include(<format>) && !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
 #include <format>
 
