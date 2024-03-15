@@ -34,10 +34,7 @@ void test()
     BOOST_TEST_EQ(std::format("{}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
     */
 
-    constexpr const char* fmt_string = "{}";
-
-    BOOST_TEST_EQ(std::format(fmt_string, 1.0), "1");
-    BOOST_TEST_EQ(std::format(fmt_string, T{1}), "1");
+    BOOST_TEST_EQ(std::format("{}", T{1}), "1");
 }
 
 int main()
