@@ -5,7 +5,9 @@
 #ifndef BOOST_DECIMAL_FORMAT_HPP
 #define BOOST_DECIMAL_FORMAT_HPP
 
-#if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && __has_include(<format>) && !defined(BOOST_DECIMAL_DISABLE_CLIB)
+// Many compilers seem to have <format> with completly broken support so narrow down our support range
+#if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && !defined(BOOST_DECIMAL_DISABLE_CLIB) && \
+    ((defined(__GNUC__) && __GNUC__ >= 13) || (defined(__clang__) && __clang_major__ >= 17) || (defined(_MSC_VER) && _MSC_VER >= 1930))
 
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
