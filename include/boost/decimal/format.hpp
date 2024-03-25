@@ -33,14 +33,14 @@ constexpr auto parse_impl(ParseContext& ctx)
 {
     auto it {ctx.begin()};
     ++it;
-    int precision = 6;
+    int ctx_precision = 6;
     boost::decimal::chars_format fmt = boost::decimal::chars_format::general;
     bool is_upper = false;
     int padding_digits = 0;
 
     if (it == ctx.end())
     {
-        return std::make_tuple(precision, fmt, is_upper, padding_digits, it);
+        return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
     }
 
     while (*it >= '0' && *it <= '9')
@@ -57,10 +57,10 @@ constexpr auto parse_impl(ParseContext& ctx)
     if (*it == '.')
     {
         ++it;
-        precision = 0;
+        ctx_precision = 0;
         while (*it >= '0' && *it <= '9')
         {
-            precision = precision * 10 + *it;
+            ctx_precision = ctx_precision * 10 + *it;
             ++it;
         }
 
@@ -104,7 +104,7 @@ constexpr auto parse_impl(ParseContext& ctx)
         throw std::format_error("Invalid format");
     }
 
-    return std::make_tuple(precision, fmt, is_upper, padding_digits, it);
+    return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
 };
 
 } //namespace boost::decimal::detail
@@ -112,7 +112,7 @@ constexpr auto parse_impl(ParseContext& ctx)
 template <>
 struct std::formatter<boost::decimal::decimal32>
 {
-    int precision;
+    int ctx_precision;
     boost::decimal::chars_format fmt;
     bool is_upper;
     int padding_digits;
@@ -121,7 +121,7 @@ struct std::formatter<boost::decimal::decimal32>
     {
         const auto res {boost::decimal::detail::parse_impl(context)};
 
-        precision = std::get<0>(res);
+        ctx_precision = std::get<0>(res);
         fmt = std::get<1>(res);
         is_upper = std::get<2>(res);
         padding_digits = std::get<3>(res);
@@ -134,7 +134,7 @@ struct std::formatter<boost::decimal::decimal32>
     {
         auto&& out = context.out();
         char buffer[128U];
-        const auto r = to_chars(buffer, buffer + sizeof(buffer), v, fmt, precision);
+        const auto r = to_chars(buffer, buffer + sizeof(buffer), v, fmt, ctx_precision);
         *r.ptr = '\0';
         std::string s(buffer);
 
