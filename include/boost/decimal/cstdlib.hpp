@@ -134,12 +134,13 @@ inline auto wcstod_calculation(const wchar_t* str, wchar_t** endptr, char* buffe
         if (BOOST_DECIMAL_UNLIKELY(val > 255))
         {
             // Character can not be converted
-            break;
+            return std::numeric_limits<TargetDecimalType>::signaling_NaN();
         }
 
         buffer[i] = static_cast<char>(val);
     }
 
+    *(buffer + str_length) = '\0';
     char* short_endptr {};
     const auto return_val {strtod_impl<TargetDecimalType>(buffer, &short_endptr)};
 
