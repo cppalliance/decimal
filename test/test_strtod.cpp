@@ -254,18 +254,21 @@ int main()
     roundtrip_wcstrtod<decimal64>();
     test_strtod_edges<decimal64>();
 
-    //roundtrip_strtod<decimal128>();
-    //roundtrip_wcstrtod<decimal128>();
-    //test_strtod_edges<decimal128>();
+    roundtrip_strtod<decimal128>();
+    roundtrip_wcstrtod<decimal128>();
+    test_strtod_edges<decimal128>();
 
     test_spot("2.9379440e-03", decimal32{UINT32_C(29379440), -10});
 
     test_alloc<decimal32>();
     test_alloc<decimal64>();
 
+    // Homebrew GCC does not support locales
+    #if !(defined(__GNUC__) && __GNUC__ >= 5 && defined(__APPLE__))
     test_locales<decimal32>();
     test_locales<decimal64>();
-    //test_locales<decimal128>();
+    test_locales<decimal128>();
+    #endif
 
     return boost::report_errors();
 }
