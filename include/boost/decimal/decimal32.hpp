@@ -221,7 +221,7 @@ public:
 
     // 3.2.2.3 Conversion from integral type
     template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
-    explicit constexpr decimal32(Integer val) noexcept;
+    constexpr decimal32(Integer val) noexcept;
 
     template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     constexpr auto operator=(const Integer& val) noexcept -> decimal32&;

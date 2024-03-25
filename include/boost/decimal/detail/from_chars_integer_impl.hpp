@@ -170,7 +170,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
         {
             // overflow is not possible in the first nd characters
 
-            const unsigned char current_digit = digit_from_char(*next);
+            const auto current_digit = static_cast<Unsigned_Integer>(digit_from_char(*next));
 
             if (current_digit >= unsigned_base)
             {
@@ -183,7 +183,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
 
         for( ; i < nc; ++i )
         {
-            const unsigned char current_digit = digit_from_char(*next);
+            const auto current_digit = static_cast<Unsigned_Integer>(digit_from_char(*next));
 
             if (current_digit >= unsigned_base)
             {

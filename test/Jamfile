@@ -93,6 +93,7 @@ run test_git_issue_266.cpp ;
 run test_git_issue_271.cpp ;
 run test_hash.cpp ;
 run test_hermite.cpp ;
+run test_implicit_integral_conversion.cpp ;
 run test_laguerre.cpp ;
 run test_legendre.cpp ;
 run test_literals.cpp ;
