@@ -42,16 +42,21 @@ void roundtrip_strtod()
     std::mt19937_64 rng(42);
 
     std::uniform_int_distribution<std::int64_t> sig(1'000'000, 9'999'999);
+    std::uniform_int_distribution<std::int64_t> exp(-15, 15);
 
     constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
-        const T val {sig(rng)};
+        const T val {sig(rng), exp(rng)};
         char buffer[256] {};
         auto r = to_chars(buffer, buffer + sizeof(buffer), val);
         if (!r)
         {
             continue; // LCOV_EXCL_LINE
+        }
+        else
+        {
+            *r.ptr = '\0';
         }
         char* endptr {};
 
@@ -62,7 +67,8 @@ void roundtrip_strtod()
             // LCOV_EXCL_START
             std::cerr << std::scientific
                       << std::setprecision(std::numeric_limits<T>::digits10)
-                      << "Val 1: " << val
+                      << "Counter: " << i
+                      << "\nVal 1: " << val
                       << "\nVal 2: " << return_val << std::endl;
             // LCOV_EXCL_STOP
         }
@@ -74,12 +80,13 @@ void roundtrip_wcstrtod()
 {
     std::mt19937_64 rng(42);
 
-    std::uniform_int_distribution<std::int64_t> sig(1'000'000, 9'999'999);
+    std::uniform_int_distribution<std::int64_t> sig(1'000, 9'999);
+    std::uniform_int_distribution<std::int64_t> exp(-15, 15);
 
     constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
-        const T val {sig(rng)};
+        const T val {sig(rng), exp(rng)};
         std::wstringstream ss;
         ss << std::setprecision(std::numeric_limits<T>::digits10);
         ss << val;
@@ -92,7 +99,8 @@ void roundtrip_wcstrtod()
             // LCOV_EXCL_START
             std::cerr << std::scientific
                       << std::setprecision(std::numeric_limits<T>::digits10)
-                      << "Val 1: " << val
+                      << "Counter: " << i
+                      << "\nVal 1: " << val
                       << "\nVal 2: " << return_val << std::endl;
             // LCOV_EXCL_STOP
         }
@@ -259,6 +267,8 @@ int main()
     test_strtod_edges<decimal128>();
 
     test_spot("2.9379440e-03", decimal32{UINT32_C(29379440), -10});
+    test_spot("3.4255120e+06", decimal32{3.4255120e+06F});
+    test_spot("0.052306360", decimal32{ 5.2306360e-02});
 
     test_alloc<decimal32>();
     test_alloc<decimal64>();
