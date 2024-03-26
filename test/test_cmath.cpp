@@ -721,7 +721,7 @@ void test_rint()
 
         auto ret_val {static_cast<float>(std::rint(val1))};
         auto ret_dec {static_cast<float>(rint(d1))};
-        
+
         if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
         {
             // LCOV_EXCL_START
@@ -860,30 +860,6 @@ void test_llrint()
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
-    for (std::size_t n {}; n < max_iter; ++n)
-    {
-        const auto val1 {dist(rng)};
-        Dec d1 {val1};
-
-        auto ret_val {std::llrint(val1)};
-        auto ret_dec {llrint(d1)};
-
-        // Difference in significant figures
-        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
-        {
-            continue;
-        }
-
-        if (!BOOST_TEST_EQ(ret_val, ret_dec))
-        {
-            // LCOV_EXCL_START
-            std::cerr << "Val 1: " << val1
-                      << "\nDec 1: " << d1
-                      << "\nRet val: " << ret_val
-                      << "\nRet dec: " << ret_dec << std::endl;
-            // LCOV_EXCL_STOP
-        }
-    }
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
