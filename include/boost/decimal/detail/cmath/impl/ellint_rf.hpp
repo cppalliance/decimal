@@ -39,9 +39,9 @@ constexpr auto ellint_rf_imp(T x, T y, T z) noexcept
     //
     // Special cases from http://dlmf.nist.gov/19.20#i
     //
-    if(x == y)
+    if (x == y)
     {
-        if(x == z)
+        if (x == z)
         {
             // x, y, z equal:
             return 1 / sqrt(x);
@@ -59,9 +59,9 @@ constexpr auto ellint_rf_imp(T x, T y, T z) noexcept
             }
         }
     }
-    if(x == z)
+    if (x == z)
     {
-        if(y == 0)
+        if (y == 0)
         {
             return numbers::pi_v<T> / (2 * sqrt(x));
         }
@@ -70,9 +70,9 @@ constexpr auto ellint_rf_imp(T x, T y, T z) noexcept
             return ellint_rc_imp(y, x);
         }
     }
-    if(y == z)
+    if (y == z)
     {
-        if(x == 0)
+        if (x == 0)
         {
             return numbers::pi_v<T> / (2 * sqrt(y));
         }
@@ -82,15 +82,15 @@ constexpr auto ellint_rf_imp(T x, T y, T z) noexcept
         }
     }
 
-    if(x == 0)
+    if (x == 0)
     {
         swap(x, z);
     }
-    else if(y == 0)
+    else if (y == 0)
     {
         swap(y, z);
     }
-    if(z == 0)
+    if (z == 0)
     {
         //
         // Special case for one value zero:
@@ -110,6 +110,8 @@ constexpr auto ellint_rf_imp(T x, T y, T z) noexcept
         return numbers::pi_v<T> / (xn + yn);
     }
 
+    // TODO(mborland): Unblock once ellint_1 is in
+    // LCOV_EXCL_START
     T xn {x};
     T yn {y};
     T zn {z};
@@ -121,7 +123,7 @@ constexpr auto ellint_rf_imp(T x, T y, T z) noexcept
 
     // duplication
     unsigned k {1U};
-    for(; k < 100U; ++k)
+    for(; k < 1000U; ++k)
     {
         T root_x {sqrt(xn)};
         T root_y {sqrt(yn)};
@@ -147,6 +149,7 @@ constexpr auto ellint_rf_imp(T x, T y, T z) noexcept
     T E2 {X * Y - Z * Z};
     T E3 {X * Y * Z};
     return (1 + E3 * (T(1) / 14 + 3 * E3 / 104) + E2 * (T(-1) / 10 + E2 / 24 - (3 * E3) / 44 - 5 * E2 * E2 / 208 + E2 * E3 / 16)) / sqrt(An);
+    // LCOV_EXCL_STOP
 }
 
 } //namespace ellint_impl

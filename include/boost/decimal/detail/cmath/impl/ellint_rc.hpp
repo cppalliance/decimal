@@ -20,6 +20,9 @@ namespace decimal {
 namespace detail {
 namespace ellint_impl {
 
+// TODO(mborland): Unblock once ellint_1 is in
+// LCOV_EXCL_START
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto ellint_rc_imp(T x, T y) noexcept
 {
@@ -81,6 +84,8 @@ constexpr auto ellint_rc(T1 x, T2 y) noexcept
     using promoted_type = promote_args_t<T1, T2>;
     return ellint_impl::ellint_rc_imp(static_cast<promoted_type>(x), static_cast<promoted_type>(y));
 }
+
+// LCOV_EXCL_STOP
 
 } //namespace detail
 } //namespace decimal

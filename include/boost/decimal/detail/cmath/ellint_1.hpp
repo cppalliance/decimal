@@ -64,7 +64,7 @@ constexpr auto ellint_f_impl(T phi, T k) noexcept -> T
         invert = true;
     }
 
-    T result;
+    T result {};
 
     if (isinf(phi))
     {
@@ -90,7 +90,7 @@ constexpr auto ellint_f_impl(T phi, T k) noexcept -> T
         T m = round((phi - rphi) / half_pi);
         int s = 1;
 
-        if (fmod(m, T(2)) > T(0.5))
+        if (fmod(m, T{2}) > T{5, -1})
         {
             m += 1;
             s = -1;
@@ -107,7 +107,7 @@ constexpr auto ellint_f_impl(T phi, T k) noexcept -> T
 
         T cosp = cos(rphi);
         cosp *= cosp;
-        if(sinp > (std::numeric_limits<T>::min)())
+        if (sinp > (std::numeric_limits<T>::min)())
         {
             BOOST_DECIMAL_ASSERT(rphi != 0); // precondition, can't be true if sin(rphi) != 0.
             //
@@ -139,6 +139,7 @@ constexpr auto comp_ellint_1(T k) noexcept -> std::enable_if_t<detail::is_decima
    return detail::ellint_k_imp(k);
 }
 
+/*
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
 constexpr auto ellint_1(T1 k, T2 phi) noexcept
    -> std::enable_if_t<detail::is_decimal_floating_point_v<T1> &&
@@ -147,6 +148,7 @@ constexpr auto ellint_1(T1 k, T2 phi) noexcept
    using promoted_type = detail::promote_args_t<T1, T2>;
    return detail::ellint_f_impl(static_cast<promoted_type>(phi), static_cast<promoted_type>(k));
 }
+*/
 
 } //namespace decimal
 } //namespace boost
