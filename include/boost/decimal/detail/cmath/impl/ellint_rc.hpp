@@ -37,6 +37,8 @@ constexpr auto ellint_rc_imp(T x, T y) noexcept
     if (y < 0)
     {
         prefix = sqrt(x / (x - y));
+        x = x - y;
+        y = -y;
     }
     else
     {
