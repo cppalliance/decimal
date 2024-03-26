@@ -584,7 +584,7 @@ void test_two_val_hypot()
 
         if (ret_val == 0 || ret_dec == 0)
         {
-            BOOST_TEST_EQ(ret_val, ret_dec);
+            BOOST_TEST_EQ(ret_val, ret_dec); // LCOV_EXCL_LINE
         }
         else if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
         {
@@ -632,7 +632,7 @@ void test_mixed_two_val_hypot()
 
         if (ret_val == 0 || ret_dec == 0)
         {
-            BOOST_TEST_EQ(ret_val, ret_dec);
+            BOOST_TEST_EQ(ret_val, ret_dec); // LCOV_EXCL_LINE
         }
         else if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
         {
