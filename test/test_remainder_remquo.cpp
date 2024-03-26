@@ -106,7 +106,8 @@ void test_remquo()
         if (!(BOOST_TEST(std::fabs(ret_val - ret_dec) < 0.005) && BOOST_TEST(flt_int == dec_int)))
         {
             // LCOV_EXCL_START
-            std::cerr << "Val 1: " << val1
+            std::cerr << "Test Number: " << n
+                      << "\nVal 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << d2
@@ -132,11 +133,11 @@ int main()
 {
     test_remquo<decimal32>();
     test_remquo<decimal64>();
-    //test_remquo<decimal128>();
+    test_remquo<decimal128>();
 
     test_remainder<decimal32>();
     test_remainder<decimal64>();
-    //test_remainder<decimal128>();
+    test_remainder<decimal128>();
 
     return boost::report_errors();
 }

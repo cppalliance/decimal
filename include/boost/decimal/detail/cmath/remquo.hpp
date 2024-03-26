@@ -19,7 +19,6 @@ namespace decimal {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto remquo(T x, T y, int* quo) noexcept -> T
 {
-    using signed_significand_type = std::conditional_t<std::is_same<T, decimal128>::value, detail::int128, std::int64_t>;
     using unsigned_significand_type = std::conditional_t<std::is_same<T, decimal128>::value, detail::uint128, std::uint64_t>;
 
     constexpr T zero {0, 0};
@@ -43,8 +42,7 @@ constexpr auto remquo(T x, T y, int* quo) noexcept -> T
     auto div {x / y};
     T n {};
     const T frac {modf(div, &n)};
-    auto sig {static_cast<signed_significand_type>(n)};
-    auto usig {static_cast<unsigned_significand_type>(sig < 0 ? -sig : sig)};
+    auto usig {static_cast<unsigned_significand_type>(n < 0 ? -n : n)};
 
     // Apple clang and MSVC use the last nibble.
     // Everyone else uses 3 bits.
@@ -54,7 +52,7 @@ constexpr auto remquo(T x, T y, int* quo) noexcept -> T
     #else
     *quo = static_cast<int>(usig & 0b111);
     #endif
-    *quo = sig < 0 ? -*quo : *quo;
+    *quo = n < 0 ? -*quo : *quo;
 
     // Now compute the remainder
     if (frac > half)
