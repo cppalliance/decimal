@@ -68,6 +68,7 @@
 #include <boost/decimal/detail/cmath/assoc_laguerre.hpp>
 #include <boost/decimal/detail/cmath/legendre.hpp>
 #include <boost/decimal/detail/cmath/assoc_legendre.hpp>
+#include <boost/decimal/detail/cmath/ellint_1.hpp>
 #include <boost/decimal/numbers.hpp>
 
 // Macros from 3.6.2
