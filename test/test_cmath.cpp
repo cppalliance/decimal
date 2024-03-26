@@ -721,36 +721,16 @@ void test_rint()
 
         auto ret_val {static_cast<float>(std::rint(val1))};
         auto ret_dec {static_cast<float>(rint(d1))};
-
-        // Difference in default rounding mode
-        // Float goes to even while decimal is to nearest from zero
-        if (ret_val < val1 && ret_dec - 1 == ret_val)
-        {
-            continue;
-        }
-
-        if (std::fabs(val1) > 9'999'999.0F)
-        {
-            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
-            {
-                // LCOV_EXCL_START
-                std::cerr << std::setprecision(std::numeric_limits<Dec>::digits10)
-                          << "Val 1: " << val1
-                          << "\nDec 1: " << d1
-                          << "\nRet val: " << ret_val
-                          << "\nRet dec: " << ret_dec
-                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
-                // LCOV_EXCL_STOP
-            }
-        }
-        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        
+        if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
         {
             // LCOV_EXCL_START
-            std::cerr << "Val 1: " << val1
+            std::cerr << std::setprecision(std::numeric_limits<Dec>::digits10)
+                      << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
-                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+                      << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
             // LCOV_EXCL_STOP
         }
     }
@@ -774,20 +754,7 @@ void test_rint()
             continue;
         }
 
-        if (std::fabs(val1) > 9'999'999.0F)
-        {
-            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
-            {
-                // LCOV_EXCL_START
-                std::cerr << "Val 1: " << val1
-                          << "\nDec 1: " << d1
-                          << "\nRet val: " << ret_val
-                          << "\nRet dec: " << ret_dec
-                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
-                // LCOV_EXCL_STOP
-            }
-        }
-        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
