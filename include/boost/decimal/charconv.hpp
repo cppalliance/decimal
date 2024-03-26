@@ -490,11 +490,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
         const auto offset_bytes = static_cast<std::size_t>(integer_digits);
 
-        boost::decimal::detail::memmove(first + 2 + static_cast<std::size_t>(is_neg) + offset_bytes,
-                                        first + static_cast<std::size_t>(is_neg),
+        boost::decimal::detail::memmove(first + 2 + offset_bytes,
+                                        first,
                                         static_cast<std::size_t>(-exponent) - offset_bytes);
 
-        boost::decimal::detail::memcpy(first + static_cast<std::size_t>(is_neg), "0.", 2U);
+        boost::decimal::detail::memcpy(first, "0.", 2U);
         first += 2;
         r.ptr += 2;
     }
