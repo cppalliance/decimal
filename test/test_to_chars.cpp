@@ -606,6 +606,10 @@ int main()
     // Bugfixes
     test_value(decimal64{2657844750}, "2657844750", chars_format::general);
 
+    // See: https://github.com/cppalliance/decimal/issues/470
+    test_value(decimal32{504.29034} / decimal32{-727.45465}, "-0.693226", chars_format::general, 6);
+    test_value(decimal32{504.29034} / decimal32{-727.45465}, "-6.932257e-01", chars_format::scientific, 6);
+
     return boost::report_errors();
 }
 
