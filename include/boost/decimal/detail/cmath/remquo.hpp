@@ -17,7 +17,7 @@ namespace boost {
 namespace decimal {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto remquo(T x, T y, int* quo) noexcept -> T
+constexpr auto remquo(T x, T y, int* quo) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
     using unsigned_significand_type = std::conditional_t<std::is_same<T, decimal128>::value, detail::uint128, std::uint64_t>;
 
@@ -48,10 +48,12 @@ constexpr auto remquo(T x, T y, int* quo) noexcept -> T
     // Everyone else uses 3 bits.
     // Standard only specifies at least 3, so they are both correct
     #if defined(__APPLE__) || defined(_MSC_VER)
-    *quo = static_cast<int>(usig & 0b1111);
+    constexpr auto unsigned_value_mask {0b1111U};
     #else
-    *quo = static_cast<int>(usig & 0b111);
+    constexpr auto unsigned_value_mask {0b111U};
     #endif
+
+    *quo = static_cast<int>(usig & unsigned_value_mask);
     *quo = n < 0 ? -*quo : *quo;
 
     // Now compute the remainder
@@ -59,11 +61,19 @@ constexpr auto remquo(T x, T y, int* quo) noexcept -> T
     {
         ++n;
         *quo += 1;
+        if (static_cast<unsigned>(*quo) > unsigned_value_mask)
+        {
+            *quo = 0;
+        }
     }
     else if (frac < -half)
     {
         --n;
         *quo -= 1;
+        if (static_cast<unsigned>(-*quo) > unsigned_value_mask)
+        {
+            *quo = 0;
+        }
     }
 
     return x - n*y;
