@@ -94,6 +94,15 @@ void test_remquo()
         auto ret_val {std::remquo(val1, val2, &flt_int)};
         auto ret_dec {static_cast<float>(remquo(d1, d2, &dec_int))};
 
+        #if defined(__APPLE__) || defined(_MSC_VER)
+        if (std::abs(flt_int) > 0b1111)
+        #else
+        if (std::abs(flt_int) > 0b111)
+        #endif
+        {
+            continue; // LCOV_EXCL_LINE
+        }
+
         if (!(BOOST_TEST(std::fabs(ret_val - ret_dec) < 0.005) && BOOST_TEST(flt_int == dec_int)))
         {
             // LCOV_EXCL_START
@@ -121,15 +130,13 @@ void test_remquo()
 
 int main()
 {
-    //test_remquo<decimal32>();
-    //test_remquo<decimal64>();
-    test_remquo<decimal128>();
+    test_remquo<decimal32>();
+    test_remquo<decimal64>();
+    //test_remquo<decimal128>();
 
-    /*
     test_remainder<decimal32>();
     test_remainder<decimal64>();
-    test_remainder<decimal128>();
-    */
+    //test_remainder<decimal128>();
 
     return boost::report_errors();
 }

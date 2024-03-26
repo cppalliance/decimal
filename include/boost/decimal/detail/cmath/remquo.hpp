@@ -17,7 +17,7 @@ namespace boost {
 namespace decimal {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto remquo(T x, T y, int* quo) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+constexpr auto remquo(T x, T y, int* quo) noexcept -> T
 {
     using signed_significand_type = std::conditional_t<std::is_same<T, decimal128>::value, detail::int128, std::int64_t>;
     using unsigned_significand_type = std::conditional_t<std::is_same<T, decimal128>::value, detail::uint128, std::uint64_t>;
@@ -46,7 +46,7 @@ constexpr auto remquo(T x, T y, int* quo) noexcept -> std::enable_if_t<detail::i
     auto sig {static_cast<signed_significand_type>(n)};
     auto usig {static_cast<unsigned_significand_type>(sig < 0 ? -sig : sig)};
 
-    // Apple clang and MSVC use the last byte.
+    // Apple clang and MSVC use the last nibble.
     // Everyone else uses 3 bits.
     // Standard only specifies at least 3, so they are both correct
     #if defined(__APPLE__) || defined(_MSC_VER)
@@ -60,11 +60,12 @@ constexpr auto remquo(T x, T y, int* quo) noexcept -> std::enable_if_t<detail::i
     if (frac > half)
     {
         ++n;
-        ++*quo;
+        *quo += 1;
     }
     else if (frac < -half)
     {
         --n;
+        *quo -= 1;
     }
 
     return x - n*y;
