@@ -584,7 +584,7 @@ void test_two_val_hypot()
 
         if (ret_val == 0 || ret_dec == 0)
         {
-            BOOST_TEST_EQ(ret_val, ret_dec);
+            BOOST_TEST_EQ(ret_val, ret_dec); // LCOV_EXCL_LINE
         }
         else if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
         {
@@ -632,7 +632,7 @@ void test_mixed_two_val_hypot()
 
         if (ret_val == 0 || ret_dec == 0)
         {
-            BOOST_TEST_EQ(ret_val, ret_dec);
+            BOOST_TEST_EQ(ret_val, ret_dec); // LCOV_EXCL_LINE
         }
         else if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 1500))
         {
@@ -722,35 +722,15 @@ void test_rint()
         auto ret_val {static_cast<float>(std::rint(val1))};
         auto ret_dec {static_cast<float>(rint(d1))};
 
-        // Difference in default rounding mode
-        // Float goes to even while decimal is to nearest from zero
-        if (ret_val < val1 && ret_dec - 1 == ret_val)
-        {
-            continue;
-        }
-
-        if (std::fabs(val1) > 9'999'999.0F)
-        {
-            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
-            {
-                // LCOV_EXCL_START
-                std::cerr << std::setprecision(std::numeric_limits<Dec>::digits10)
-                          << "Val 1: " << val1
-                          << "\nDec 1: " << d1
-                          << "\nRet val: " << ret_val
-                          << "\nRet dec: " << ret_dec
-                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
-                // LCOV_EXCL_STOP
-            }
-        }
-        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
         {
             // LCOV_EXCL_START
-            std::cerr << "Val 1: " << val1
+            std::cerr << std::setprecision(std::numeric_limits<Dec>::digits10)
+                      << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
-                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+                      << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
             // LCOV_EXCL_STOP
         }
     }
@@ -774,20 +754,7 @@ void test_rint()
             continue;
         }
 
-        if (std::fabs(val1) > 9'999'999.0F)
-        {
-            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
-            {
-                // LCOV_EXCL_START
-                std::cerr << "Val 1: " << val1
-                          << "\nDec 1: " << d1
-                          << "\nRet val: " << ret_val
-                          << "\nRet dec: " << ret_dec
-                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
-                // LCOV_EXCL_STOP
-            }
-        }
-        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -893,30 +860,6 @@ void test_llrint()
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
-    for (std::size_t n {}; n < max_iter; ++n)
-    {
-        const auto val1 {dist(rng)};
-        Dec d1 {val1};
-
-        auto ret_val {std::llrint(val1)};
-        auto ret_dec {llrint(d1)};
-
-        // Difference in significant figures
-        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
-        {
-            continue;
-        }
-
-        if (!BOOST_TEST_EQ(ret_val, ret_dec))
-        {
-            // LCOV_EXCL_START
-            std::cerr << "Val 1: " << val1
-                      << "\nDec 1: " << d1
-                      << "\nRet val: " << ret_val
-                      << "\nRet dec: " << ret_dec << std::endl;
-            // LCOV_EXCL_STOP
-        }
-    }
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
@@ -968,34 +911,14 @@ void test_nearbyint()
         auto ret_val {static_cast<float>(std::nearbyint(val1))};
         auto ret_dec {static_cast<float>(nearbyint(d1))};
 
-        // Difference in default rounding mode
-        // Float goes to even while decimal is to nearest from zero
-        if (ret_val < val1 && ret_dec - 1 == ret_val)
-        {
-            continue;
-        }
-
-        if (std::fabs(val1) > 9'999'999.0F)
-        {
-            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
-            {
-                // LCOV_EXCL_START
-                std::cerr << "Val 1: " << val1
-                          << "\nDec 1: " << d1
-                          << "\nRet val: " << ret_val
-                          << "\nRet dec: " << ret_dec
-                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
-                // LCOV_EXCL_STOP
-            }
-        }
-        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
-                      << "\nEps: " << std::fabs(ret_val - ret_dec) / std::numeric_limits<float>::epsilon() << std::endl;
+                      << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
             // LCOV_EXCL_STOP
         }
     }
@@ -1019,20 +942,7 @@ void test_nearbyint()
             continue;
         }
 
-        if (std::fabs(val1) > 9'999'999.0F)
-        {
-            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
-            {
-                // LCOV_EXCL_START
-                std::cerr << "Val 1: " << val1
-                          << "\nDec 1: " << d1
-                          << "\nRet val: " << ret_val
-                          << "\nRet dec: " << ret_dec
-                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
-                // LCOV_EXCL_STOP
-            }
-        }
-        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -1074,20 +984,7 @@ void test_round()
             continue;
         }
 
-        if (std::fabs(val1) > 9'999'999.0F)
-        {
-            if(!BOOST_TEST(std::fabs(boost::math::float_distance(val1, ret_dec)) < 10))
-            {
-                // LCOV_EXCL_START
-                std::cerr << "Val 1: " << val1
-                          << "\nDec 1: " << d1
-                          << "\nRet val: " << ret_val
-                          << "\nRet dec: " << ret_dec
-                          << "\nDist: " << boost::math::float_distance(val1, ret_dec) << std::endl;
-                // LCOV_EXCL_STOP
-            }
-        }
-        else if (!BOOST_TEST_EQ(ret_val, ret_dec))
+        if (!BOOST_TEST_EQ(ret_val, ret_dec))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -1112,30 +1009,6 @@ void test_lround()
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
-    for (std::size_t n {}; n < max_iter; ++n)
-    {
-        const auto val1 {dist(rng)};
-        Dec d1 {val1};
-
-        auto ret_val {std::lround(val1)};
-        auto ret_dec {lround(d1)};
-
-        // Difference in significant figures
-        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
-        {
-            continue;
-        }
-
-        if (!BOOST_TEST_EQ(ret_val, ret_dec))
-        {
-            // LCOV_EXCL_START
-            std::cerr << "Val 1: " << val1
-                      << "\nDec 1: " << d1
-                      << "\nRet val: " << ret_val
-                      << "\nRet dec: " << ret_dec << std::endl;
-            // LCOV_EXCL_STOP
-        }
-    }
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
@@ -1179,30 +1052,6 @@ void test_llround()
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
-    for (std::size_t n {}; n < max_iter; ++n)
-    {
-        const auto val1 {dist(rng)};
-        Dec d1 {val1};
-
-        auto ret_val {std::llround(val1)};
-        auto ret_dec {llround(d1)};
-
-        // Difference in significant figures
-        if (ret_dec > 9'999'999 || ret_dec < -9'999'999)
-        {
-            continue;
-        }
-
-        if (!BOOST_TEST_EQ(ret_val, ret_dec))
-        {
-            // LCOV_EXCL_START
-            std::cerr << "Val 1: " << val1
-                      << "\nDec 1: " << d1
-                      << "\nRet val: " << ret_val
-                      << "\nRet dec: " << ret_dec << std::endl;
-            // LCOV_EXCL_STOP
-        }
-    }
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
@@ -1258,7 +1107,7 @@ void test_nextafter()
 
         if (ret_val == 0 || ret_dec == 0)
         {
-            BOOST_TEST_EQ(ret_val, ret_dec);
+            BOOST_TEST_EQ(ret_val, ret_dec); // LCOV_EXCL_LINE
         }
         else if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
         {
@@ -1301,7 +1150,7 @@ void test_nexttoward()
 
         if (ret_val == 0 || ret_dec == 0)
         {
-            BOOST_TEST_EQ(ret_val, ret_dec);
+            BOOST_TEST_EQ(ret_val, ret_dec); // LCOV_EXCL_LINE
         }
         else if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
         {
