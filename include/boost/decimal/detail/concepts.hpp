@@ -9,7 +9,33 @@
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 
-#if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && !defined(BOOST_MATH_DISABLE_CONCEPTS)
+// GCC-11 yields internal compiler errors when using the concepts
+
+/*
+./boost/decimal/detail/concepts.hpp:239:80: note: in definition of macro 'BOOST_DECIMAL_REQUIRES_RETURN'
+  239 | #define BOOST_DECIMAL_REQUIRES_RETURN(X, T, ReturnType) -> ReturnType requires X<T>
+      |                                                                                ^
+0xe3223b internal_error(char const*, ...)
+    ???:0
+0xf56ed4 duplicate_decls(tree_node*, tree_node*, bool, bool)
+    ???:0
+0xf60a2b pushdecl_namespace_level(tree_node*, bool)
+    ???:0
+0x10801ca push_template_decl(tree_node*, bool)
+    ???:0
+0x1527ec1 do_friend(tree_node*, tree_node*, tree_node*, tree_node*, overload_flags, bool)
+    ???:0
+0xfc4e1e grokdeclarator(cp_declarator const*, cp_decl_specifier_seq*, decl_context, int, tree_node**)
+    ???:0
+0x100dcf4 grokfield(cp_declarator const*, cp_decl_specifier_seq*, tree_node*, bool, tree_node*, tree_node*)
+    ???:0
+0x149dce3 c_parse_file()
+    ???:0
+0x148d4de c_common_parse_file()
+    ???:0
+*/
+#if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && !defined(BOOST_MATH_DISABLE_CONCEPTS) &&\
+    (!defined(__GNUC__) || __GNUC__ != 11)
 
 #if __has_include(<concepts>)
 
