@@ -753,8 +753,9 @@ constexpr auto erf_impl<decimal128>(decimal128 z, bool invert) noexcept -> decim
 
 } //namespace detail
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto erf(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+template <typename T>
+constexpr auto erf(T z) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // Edge cases
     const auto fp {fpclassify(z)};
@@ -771,8 +772,9 @@ constexpr auto erf(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating
     return detail::erf_impl(z, false);
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto erfc(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+template <typename T>
+constexpr auto erfc(T z) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // Edge cases
     const auto fp {fpclassify(z)};

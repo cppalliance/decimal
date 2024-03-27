@@ -18,7 +18,9 @@ namespace decimal {
 
 namespace detail {
 
-template <typename T1, typename T2, typename T3>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T3>
 constexpr auto laguerre_next(unsigned n, T1 x, T2 Ln, T3 Lnm1)
 {
     using promoted_type = promote_args_t<T1, T2, T3>;
@@ -28,8 +30,9 @@ constexpr auto laguerre_next(unsigned n, T1 x, T2 Ln, T3 Lnm1)
 } //namespace detail
 
 // Implement Laguerre polynomials via recurrence:
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto laguerre(unsigned n, T x) -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
+template <typename T>
+constexpr auto laguerre(unsigned n, T x)
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     T p0 {UINT64_C(1)};
     T p1 {UINT64_C(1) - x};

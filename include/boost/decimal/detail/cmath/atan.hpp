@@ -158,8 +158,9 @@ constexpr auto atan_huge_impl(T x) noexcept
 
 } //namespace detail
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto atan(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
+template <typename T>
+constexpr auto atan(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto fpc {fpclassify(x)};
     const auto isneg {signbit(x)};

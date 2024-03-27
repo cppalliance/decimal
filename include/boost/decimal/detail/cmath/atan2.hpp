@@ -36,8 +36,9 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T> constexpr T pi_constants<T>::th
 } // namespace atan2_detail
 } // namespace detail
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+template <typename T>
 constexpr auto atan2(T y, T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto fpcx {fpclassify(x)};
     const auto fpcy {fpclassify(y)};

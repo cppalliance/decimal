@@ -23,10 +23,10 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
 constexpr auto nextafter(T1 val, T2 direction) noexcept
-    -> std::enable_if_t<(detail::is_decimal_floating_point_v<T1> || detail::is_decimal_floating_point_v<T2>),
-                         detail::promote_args_t<T1, T2>>
+    BOOST_DECIMAL_REQUIRES_TWO(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2)
 {
     if (isnan(val) || isinf(val))
     {
@@ -44,9 +44,9 @@ constexpr auto nextafter(T1 val, T2 direction) noexcept
     return val - std::numeric_limits<T1>::epsilon();
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+template <typename T>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto nexttoward(T val, long double direction) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto dec_direction {static_cast<T>(direction)};
     return nextafter(val, dec_direction);

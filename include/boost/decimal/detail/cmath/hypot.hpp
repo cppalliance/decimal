@@ -19,7 +19,8 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
 constexpr auto hypot(T1 x, T2 y) noexcept
 {
     using promoted_type = detail::promote_args_t<T1, T2>;

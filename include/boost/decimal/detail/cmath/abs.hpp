@@ -15,9 +15,9 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+template <typename T>
 constexpr auto abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     return signbit(rhs) ? -rhs : rhs;
 }

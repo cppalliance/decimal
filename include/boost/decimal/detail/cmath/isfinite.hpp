@@ -15,9 +15,9 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+template <typename T>
 constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
     return !isinf(rhs) && !isnan(rhs);
 }

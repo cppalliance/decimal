@@ -1,9 +1,13 @@
-// Copyright 2022 - 2023 Matt Borland
+// Copyright 2022 - 2024 Matt Borland
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef BOOST_DECIMAL_DETAIL_CONCEPTS
 #define BOOST_DECIMAL_DETAIL_CONCEPTS
+
+#include <type_traits>
+#include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
 
 #if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && !defined(BOOST_MATH_DISABLE_CONCEPTS)
 
@@ -13,11 +17,9 @@
 #include <algorithm>
 #include <concepts>
 #include <functional>
-#include <type_traits>
 #include <limits>
 #include <iterator>
 #include <complex>
-#include <boost/decimal/detail/type_traits.hpp>
 
 namespace boost::decimal::concepts {
 
@@ -232,7 +234,9 @@ concept decimal_floating_point_type = boost::decimal::detail::is_decimal_floatin
 #define BOOST_DECIMAL_OUTPUT_ITER(I, T) boost::decimal::concepts::output_iterator<I, T>
 #define BOOST_DECIMAL_REQUIRES_ITER(X) requires X
 
-#define BOOST_DECIMAL_REQUIRES(X, T) requires X<T>
+#define BOOST_DECIMAL_REQUIRES(X, T) -> T requires X<T>
+#define BOOST_DECIMAL_REQUIRES_TWO(X1, T1, X2, T2) -> detail::promote_args_t<T1, T2> requires X1<T1> && X2<T2>
+#define BOOST_DECIMAL_REQUIRES_RETURN(X, T, ReturnType) -> ReturnType requires X<T>
 
 #ifdef BOOST_DECIMAL_EXEC_COMPATIBLE
 #include <execution>
@@ -374,7 +378,15 @@ concept execution_policy = std::is_execution_policy_v<std::remove_cvref_t<T>>;
 #endif
 
 #ifndef BOOST_DECIMAL_REQUIRES
-#  define BOOST_DECIMAL_REQUIRES(X, T)
+#  define BOOST_DECIMAL_REQUIRES(X, T) -> std::enable_if_t<X<T>, T>
+#endif
+
+#ifndef BOOST_DECIMAL_REQUIRES_TWO
+#  define BOOST_DECIMAL_REQUIRES_TWO(X1, T1, X2, T2) -> std::enable_if_t<X1<T1> && X2<T2>, detail::promote_args_t<T1, T2>>
+#endif
+
+#ifndef BOOST_DECIMAL_REQUIRES_RETURN
+#  define BOOST_DECIMAL_REQUIRES_RETURN(X, T, ReturnType) -> std::enable_if_t<X<T>, ReturnType>
 #endif
 
 #endif //BOOST_DECIMAL_DETAIL_CONCEPTS
