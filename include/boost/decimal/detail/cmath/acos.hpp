@@ -9,6 +9,7 @@
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/cmath/fabs.hpp>
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/impl/asin_impl.hpp>
@@ -18,8 +19,10 @@
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
 template <typename T>
-constexpr auto acos(T x) noexcept
+constexpr auto acos_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     if (isnan(x))
@@ -27,8 +30,9 @@ constexpr auto acos(T x) noexcept
         return x;
     }
 
-    constexpr T half_pi {numbers::pi_v<T> / 2};
-    const auto absx {fabs(x)};
+    constexpr auto half_pi {numbers::pi_v<T> / 2};
+    const auto absx {fabs(static_cast<T>(x))};
+
     T result {};
 
     if (absx > 1)
@@ -37,22 +41,45 @@ constexpr auto acos(T x) noexcept
     }
     else if (x < T{5, -1, true})
     {
-        result = numbers::pi_v<T> - 2 * detail::asin_impl(sqrt((1 - absx) / 2));
+        result = numbers::pi_v<T> - 2 * detail::asin_series(sqrt((1 - absx) / 2));
     }
     else if (x < -std::numeric_limits<T>::epsilon())
     {
-        result = half_pi + detail::asin_impl(absx);
+        result = half_pi + detail::asin_series(absx);
     }
     else if (x < T{5, -1})
     {
-        result = half_pi - detail::asin_impl(x);
+        result = half_pi - detail::asin_series(x);
     }
     else
     {
-        result = half_pi - (half_pi - 2 * detail::asin_impl(sqrt((1 - x) / 2)));
+        result = half_pi - (half_pi - 2 * detail::asin_series(sqrt((1 - x) / 2)));
     }
 
     return result;
+}
+
+} // namespace detail
+
+template <typename T>
+constexpr auto acos(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::acos_impl(static_cast<evaluation_type>(x)));
 }
 
 } //namespace decimal
