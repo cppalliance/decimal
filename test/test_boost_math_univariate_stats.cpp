@@ -18,7 +18,11 @@
 #  pragma clang diagnostic ignored "-Wconversion"
 #  pragma clang diagnostic ignored "-Wsign-conversion"
 #  pragma clang diagnostic ignored "-Wfloat-equal"
-#  pragma clang diagnostic ignored "-Wdeprecated-copy"
+
+#  if __clang_major__ >= 10
+#    pragma clang diagnostic ignored "-Wdeprecated-copy"
+#  endif
+
 #elif defined(__GNUC__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wold-style-cast"
