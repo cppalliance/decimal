@@ -16,8 +16,9 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto remquo(T x, T y, int* quo) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+template <typename T>
+constexpr auto remquo(T x, T y, int* quo) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     using unsigned_significand_type = std::conditional_t<std::is_same<T, decimal128>::value, detail::uint128, std::uint64_t>;
 

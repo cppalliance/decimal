@@ -17,8 +17,9 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto frexp(T v, int* expon) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+template <typename T>
+constexpr auto frexp(T v, int* expon) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // This implementation of frexp follows closely that of eval_frexp
     // in Boost.Multiprecision's cpp_dec_float template class.

@@ -20,9 +20,9 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+template <typename T>
 constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     using DivType = std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
                     std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>;
@@ -73,7 +73,7 @@ constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
         ++new_sig;
     }
 
-    return {new_sig, exp_ptr + static_cast<int>(decimal_digits), is_neg};
+    return T{new_sig, exp_ptr + static_cast<int>(decimal_digits), is_neg};
 }
 
 } // namespace decimal

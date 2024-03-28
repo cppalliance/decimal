@@ -14,8 +14,9 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto isless(T lhs, T rhs) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>
+template <typename T>
+constexpr auto isless(T lhs, T rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
     if (isnan(lhs) || isnan(rhs))
     {
@@ -25,8 +26,9 @@ constexpr auto isless(T lhs, T rhs) noexcept -> std::enable_if_t<detail::is_deci
     return lhs < rhs;
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto islessequal(T lhs, T rhs) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>
+template <typename T>
+constexpr auto islessequal(T lhs, T rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
     if (isnan(lhs) || isnan(rhs))
     {
@@ -36,8 +38,9 @@ constexpr auto islessequal(T lhs, T rhs) noexcept -> std::enable_if_t<detail::is
     return lhs <= rhs;
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto islessgreater(T lhs, T rhs) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>
+template <typename T>
+constexpr auto islessgreater(T lhs, T rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
     if (isnan(lhs) || isnan(rhs))
     {

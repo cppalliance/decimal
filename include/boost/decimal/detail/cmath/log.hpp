@@ -25,7 +25,7 @@ namespace detail {
 #  pragma clang diagnostic ignored "-Wmissing-braces"
 #endif
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 static constexpr std::array<T, 11> small_coefficient_table {
     // (1,) 12, 80, 448, 2304, 11264, 53248, 245760, 1114112, 4980736, 22020096, 96468992, ...
     // See also Sloane's A058962 at: https://oeis.org/A058962
@@ -52,7 +52,7 @@ static constexpr std::array<T, 11> small_coefficient_table {
     T { UINT64_C(103660251783288043), -18 - 7 }  // * z^23
 };
 
-template <typename T>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 static constexpr std::array<T, 11> large_coefficient_table {
     T{uint128{UINT64_C(451750905202293), UINT64_C(9484758194528277842)}, -35},  // z^3
     T{uint128{UINT64_C(67762635780344), UINT64_C(500376525493764096)}, -35},    // z^5
@@ -73,8 +73,9 @@ static constexpr std::array<T, 11> large_coefficient_table {
 
 } //namespace detail
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
+template <typename T>
+constexpr auto log(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero { 0, 0 };
     constexpr T one  { 1, 0 };

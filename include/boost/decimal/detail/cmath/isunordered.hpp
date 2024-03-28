@@ -14,8 +14,9 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto isunordered(T lhs, T rhs) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, bool>
+template <typename T>
+constexpr auto isunordered(T lhs, T rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
     return isnan(lhs) || isnan(rhs);
 }

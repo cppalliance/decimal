@@ -1,11 +1,41 @@
-// Copyright 2022 - 2023 Matt Borland
+// Copyright 2022 - 2024 Matt Borland
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef BOOST_DECIMAL_DETAIL_CONCEPTS
 #define BOOST_DECIMAL_DETAIL_CONCEPTS
 
-#if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && !defined(BOOST_MATH_DISABLE_CONCEPTS)
+#include <type_traits>
+#include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
+
+// GCC-11 yields internal compiler errors when using the concepts
+
+/*
+./boost/decimal/detail/concepts.hpp:239:80: note: in definition of macro 'BOOST_DECIMAL_REQUIRES_RETURN'
+  239 | #define BOOST_DECIMAL_REQUIRES_RETURN(X, T, ReturnType) -> ReturnType requires X<T>
+      |                                                                                ^
+0xe3223b internal_error(char const*, ...)
+    ???:0
+0xf56ed4 duplicate_decls(tree_node*, tree_node*, bool, bool)
+    ???:0
+0xf60a2b pushdecl_namespace_level(tree_node*, bool)
+    ???:0
+0x10801ca push_template_decl(tree_node*, bool)
+    ???:0
+0x1527ec1 do_friend(tree_node*, tree_node*, tree_node*, tree_node*, overload_flags, bool)
+    ???:0
+0xfc4e1e grokdeclarator(cp_declarator const*, cp_decl_specifier_seq*, decl_context, int, tree_node**)
+    ???:0
+0x100dcf4 grokfield(cp_declarator const*, cp_decl_specifier_seq*, tree_node*, bool, tree_node*, tree_node*)
+    ???:0
+0x149dce3 c_parse_file()
+    ???:0
+0x148d4de c_common_parse_file()
+    ???:0
+*/
+#if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && !defined(BOOST_MATH_DISABLE_CONCEPTS) &&\
+    (!defined(__GNUC__) || __GNUC__ != 11)
 
 #if __has_include(<concepts>)
 
@@ -13,11 +43,9 @@
 #include <algorithm>
 #include <concepts>
 #include <functional>
-#include <type_traits>
 #include <limits>
 #include <iterator>
 #include <complex>
-#include <boost/decimal/detail/type_traits.hpp>
 
 namespace boost::decimal::concepts {
 
@@ -232,7 +260,9 @@ concept decimal_floating_point_type = boost::decimal::detail::is_decimal_floatin
 #define BOOST_DECIMAL_OUTPUT_ITER(I, T) boost::decimal::concepts::output_iterator<I, T>
 #define BOOST_DECIMAL_REQUIRES_ITER(X) requires X
 
-#define BOOST_DECIMAL_REQUIRES(X, T) requires X<T>
+#define BOOST_DECIMAL_REQUIRES(X, T) -> T requires X<T>
+#define BOOST_DECIMAL_REQUIRES_TWO(X1, T1, X2, T2) -> detail::promote_args_t<T1, T2> requires X1<T1> && X2<T2>
+#define BOOST_DECIMAL_REQUIRES_RETURN(X, T, ReturnType) -> ReturnType requires X<T>
 
 #ifdef BOOST_DECIMAL_EXEC_COMPATIBLE
 #include <execution>
@@ -374,7 +404,15 @@ concept execution_policy = std::is_execution_policy_v<std::remove_cvref_t<T>>;
 #endif
 
 #ifndef BOOST_DECIMAL_REQUIRES
-#  define BOOST_DECIMAL_REQUIRES(X, T)
+#  define BOOST_DECIMAL_REQUIRES(X, T) -> std::enable_if_t<X<T>, T>
+#endif
+
+#ifndef BOOST_DECIMAL_REQUIRES_TWO
+#  define BOOST_DECIMAL_REQUIRES_TWO(X1, T1, X2, T2) -> std::enable_if_t<X1<T1> && X2<T2>, detail::promote_args_t<T1, T2>>
+#endif
+
+#ifndef BOOST_DECIMAL_REQUIRES_RETURN
+#  define BOOST_DECIMAL_REQUIRES_RETURN(X, T, ReturnType) -> std::enable_if_t<X<T>, ReturnType>
 #endif
 
 #endif //BOOST_DECIMAL_DETAIL_CONCEPTS

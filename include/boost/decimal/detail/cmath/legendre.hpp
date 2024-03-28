@@ -21,7 +21,9 @@ namespace decimal {
 
 namespace detail {
 
-template <typename T1, typename T2, typename T3>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T3>
 constexpr auto legendre_next(unsigned l, T1 x, T2 Pl, T3 Plm1) noexcept
 {
     using result_type = promote_args_t<T1, T2, T3>;
@@ -30,7 +32,7 @@ constexpr auto legendre_next(unsigned l, T1 x, T2 Pl, T3 Plm1) noexcept
 
 // Implement Legendre P and Q polynomials via recurrence:
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr T legendre_impl(unsigned l, T x) noexcept
+constexpr auto legendre_impl(unsigned l, T x) noexcept
 {
     if (x < -1 || x > 1 || l > 128)
     {
@@ -63,8 +65,9 @@ constexpr T legendre_impl(unsigned l, T x) noexcept
 
 } //namespace detail
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto legendre(unsigned n, T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+template <typename T>
+constexpr auto legendre(unsigned n, T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     return detail::legendre_impl(n, x);
 }

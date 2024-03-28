@@ -34,10 +34,11 @@ constexpr auto nand32(const char* arg) noexcept -> decimal32
     return detail::nan_impl<decimal32>(arg);
 }
 
-template <typename Dec>
-constexpr auto nan(const char* arg) noexcept -> Dec
+template <typename T>
+constexpr auto nan(const char* arg) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    return detail::nan_impl<Dec>(arg);
+    return detail::nan_impl<T>(arg);
 }
 
 constexpr auto nand64(const char* arg) noexcept -> decimal64

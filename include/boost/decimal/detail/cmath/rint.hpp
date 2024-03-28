@@ -42,7 +42,7 @@ constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
 #endif
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T, BOOST_DECIMAL_INTEGRAL Int>
-constexpr auto lrint_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, Int>
+constexpr auto lrint_impl(T num) noexcept -> Int
 {
     constexpr T zero {0, 0};
     constexpr T lmax {(std::numeric_limits<Int>::max)()};
@@ -98,8 +98,9 @@ constexpr auto lrint_impl(T num) noexcept -> std::enable_if_t<detail::is_decimal
 } //namespace detail
 
 // Rounds the number using the default rounding mode
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto rint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+template <typename T>
+constexpr auto rint(T num) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero {0, 0};
     constexpr T max_round_value {1 / std::numeric_limits<T>::epsilon()};
@@ -127,14 +128,16 @@ constexpr auto rint(T num) noexcept -> std::enable_if_t<detail::is_decimal_float
     return {sig, 0, is_neg};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto lrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long>
+template <typename T>
+constexpr auto lrint(T num) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, long)
 {
     return detail::lrint_impl<T, long>(num);
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto llrint(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, long long>
+template <typename T>
+constexpr auto llrint(T num) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, long long)
 {
     return detail::lrint_impl<T, long long>(num);
 }
