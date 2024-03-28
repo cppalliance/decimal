@@ -50,7 +50,7 @@ using std::abs;
 using namespace boost::decimal;
 
 template <typename T>
-std::vector<T> generate_random_vector(std::size_t size, std::size_t seed)
+std::vector<T> generate_random_vector(std::size_t size, unsigned seed)
 {
     if (seed == 0)
     {
@@ -116,7 +116,7 @@ void test_mean()
     // Stress test:
     for (std::size_t i = 1; i < 30; ++i)
     {
-        v = generate_random_vector<Real>(i, 12803);
+        v = generate_random_vector<Real>(i, 12803U);
         auto naive_ = naive_mean(v);
         auto higham_ = boost::math::statistics::mean(v);
         if (abs(higham_ - naive_) >= 100*tol*abs(naive_))
