@@ -41,19 +41,19 @@ constexpr auto acos_impl(T x) noexcept
     }
     else if (x < T{5, -1, true})
     {
-        result = numbers::pi_v<T> - 2 * detail::asin_impl(sqrt((1 - absx) / 2));
+        result = numbers::pi_v<T> - 2 * detail::asin_series(sqrt((1 - absx) / 2));
     }
     else if (x < -std::numeric_limits<T>::epsilon())
     {
-        result = half_pi + detail::asin_impl(absx);
+        result = half_pi + detail::asin_series(absx);
     }
     else if (x < T{5, -1})
     {
-        result = half_pi - detail::asin_impl(x);
+        result = half_pi - detail::asin_series(x);
     }
     else
     {
-        result = half_pi - (half_pi - 2 * detail::asin_impl(sqrt((1 - x) / 2)));
+        result = half_pi - (half_pi - 2 * detail::asin_series(sqrt((1 - x) / 2)));
     }
 
     return result;
