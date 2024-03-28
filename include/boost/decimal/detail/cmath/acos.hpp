@@ -9,6 +9,7 @@
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/cmath/fabs.hpp>
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/impl/asin_impl.hpp>
@@ -27,8 +28,19 @@ constexpr auto acos(T x) noexcept
         return x;
     }
 
-    constexpr T half_pi {numbers::pi_v<T> / 2};
-    const auto absx {fabs(x)};
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+    using evaluation_type = T;
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+    #else
+    #error "Invalid value for BOOST_DECIMAL_DEC_EVAL_METHOD"
+    #endif
+
+    constexpr auto half_pi {numbers::pi_v<evaluation_type> / 2};
+    const auto absx {fabs(static_cast<evaluation_type>(x))};
+
     T result {};
 
     if (absx > 1)
@@ -37,19 +49,19 @@ constexpr auto acos(T x) noexcept
     }
     else if (x < T{5, -1, true})
     {
-        result = numbers::pi_v<T> - 2 * detail::asin_impl(sqrt((1 - absx) / 2));
+        result = static_cast<T>(numbers::pi_v<evaluation_type> - 2 * detail::asin_impl(sqrt((1 - absx) / 2)));
     }
     else if (x < -std::numeric_limits<T>::epsilon())
     {
-        result = half_pi + detail::asin_impl(absx);
+        result = static_cast<T>(half_pi + detail::asin_impl(absx));
     }
     else if (x < T{5, -1})
     {
-        result = half_pi - detail::asin_impl(x);
+        result = static_cast<T>(half_pi - detail::asin_impl(static_cast<evaluation_type>(x)));
     }
     else
     {
-        result = half_pi - (half_pi - 2 * detail::asin_impl(sqrt((1 - x) / 2)));
+        result = static_cast<T>(half_pi - (half_pi - 2 * detail::asin_impl(sqrt((1 - static_cast<evaluation_type>(x)) / 2))));
     }
 
     return result;
