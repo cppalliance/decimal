@@ -73,13 +73,9 @@ constexpr auto acos(T x) noexcept
 
     using evaluation_type = detail::promote_args_t<T, decimal64>;
 
-    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
 
     using evaluation_type = detail::promote_args_t<T, decimal128>;
-
-    #else
-
-    #error "Invalid value for BOOST_DECIMAL_DEC_EVAL_METHOD"
 
     #endif
 

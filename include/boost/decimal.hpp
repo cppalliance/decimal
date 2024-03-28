@@ -19,6 +19,10 @@
 #  define BOOST_DECIMAL_DEC_EVAL_METHOD 0
 #endif
 
+#if BOOST_DECIMAL_DEC_EVAL_METHOD < 0 || BOOST_DECIMAL_DEC_EVAL_METHOD > 2
+#  error "Unsupported value of BOOST_DECIMAL_DEC_EVAL_METHOD. Must be 0, 1, or 2"
+#endif
+
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
