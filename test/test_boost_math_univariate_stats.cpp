@@ -6,6 +6,9 @@
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
  */
 
+// Propogates up from boost.math
+#define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
+
 #include <boost/decimal.hpp>
 
 #if defined(__clang__)
@@ -15,6 +18,7 @@
 #  pragma clang diagnostic ignored "-Wconversion"
 #  pragma clang diagnostic ignored "-Wsign-conversion"
 #  pragma clang diagnostic ignored "-Wfloat-equal"
+#  pragma clang diagnostic ignored "-Wdeprecated-copy"
 #elif defined(__GNUC__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -22,6 +26,7 @@
 #  pragma GCC diagnostic ignored "-Wconversion"
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
+#  pragma GCC diagnostic ignored "-Wdeprecated-copy"
 #endif
 
 #include <vector>
