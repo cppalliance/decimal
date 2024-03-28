@@ -22,6 +22,11 @@ The other major difference between binary and decimal floating point types is th
 For example 1e5 could also be stored as 0.1e6, 0.01e7, so on and so forth.
 These are referred to as cohorts which binary does not have as there is only one way to represent each number in binary floating point.
 
+== Use Cases
+
+The use case for Decimal Floating Point numbers is where rounding errors are significantly impactful such as finance.
+In applications where integer or fixed-point arithmetic are used to combat this issue Decimal Floating Point numbers can provide a significantly greater range of values.
+
 == Supported Compilers
 
 Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon), and Windows with the following compilers:
