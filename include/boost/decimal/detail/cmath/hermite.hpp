@@ -27,10 +27,8 @@ constexpr auto hermite_next(unsigned n, T1 x, T2 Hn, T3 Hnm1)
     return 2 * static_cast<promoted_type>(x) * static_cast<promoted_type>(Hn) - 2 * n * static_cast<promoted_type>(Hnm1);
 }
 
-} //namespace detail
-
 template <typename T>
-constexpr auto hermite(unsigned n, T x) noexcept
+constexpr auto hermite_impl(unsigned n, T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     T p0 {UINT64_C(1)};
@@ -46,11 +44,34 @@ constexpr auto hermite(unsigned n, T x) noexcept
     while (c < n)
     {
         std::swap(p0, p1);
-        p1 = static_cast<T>(detail::hermite_next(c, x, p0, p1));
+        p1 = static_cast<T>(hermite_next(c, x, p0, p1));
         ++c;
     }
 
     return p1;
+}
+
+} //namespace detail
+
+template <typename T>
+constexpr auto hermite(unsigned n, T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::hermite_impl(n, static_cast<evaluation_type>(x)));
 }
 
 } //namespace decimal

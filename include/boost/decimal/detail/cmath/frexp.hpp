@@ -17,8 +17,10 @@
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
 template <typename T>
-constexpr auto frexp(T v, int* expon) noexcept
+constexpr auto frexp_impl(T v, int* expon) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // This implementation of frexp follows closely that of eval_frexp
@@ -69,18 +71,18 @@ constexpr auto frexp(T v, int* expon) noexcept
 
         while (result_frexp >= local_one)
         {
-          result_frexp /= local_two;
+            result_frexp /= local_two;
 
-          ++t;
+            ++t;
         }
 
         constexpr T local_half { 5, -1 };
 
         while (result_frexp < local_half)
         {
-          result_frexp *= local_two;
+            result_frexp *= local_two;
 
-          --t;
+            --t;
         }
 
         if (expon != nullptr) { *expon = t; }
@@ -91,6 +93,30 @@ constexpr auto frexp(T v, int* expon) noexcept
     return result_frexp;
 }
 
-}} // Namespaces
+} // namespace detail
+
+template <typename T>
+constexpr auto frexp(T v, int* expon) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::frexp_impl(static_cast<evaluation_type>(v), expon));
+}
+
+} // namespace decimal
+} // namespace boost
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_FREXP_HPP

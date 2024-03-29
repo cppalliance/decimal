@@ -11,8 +11,6 @@
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/promotion.hpp>
-#include <boost/decimal/detail/cmath/log1p.hpp>
-#include <boost/decimal/detail/cmath/tgamma.hpp>
 #include <boost/decimal/detail/cmath/pow.hpp>
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/legendre.hpp>
@@ -97,7 +95,23 @@ template <typename T>
 constexpr auto assoc_legendre(unsigned n, unsigned m, T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    return detail::assoc_legendre_impl(n, m, x, pow(1 - x*x, T{m} / 2));
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return detail::assoc_legendre_impl(n, m, static_cast<evaluation_type>(x),
+                                       pow(1 - static_cast<evaluation_type>(x)*static_cast<evaluation_type>(x),
+                                       evaluation_type{m} / 2));
 }
 
 } //namespace decimal
