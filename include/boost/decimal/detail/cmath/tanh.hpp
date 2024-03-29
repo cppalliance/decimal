@@ -144,7 +144,7 @@ constexpr auto tanh(T x) noexcept
 
     #endif
 
-    return static_cast<T>(detail::asin_impl(static_cast<evaluation_type>(x)));
+    return static_cast<T>(detail::tanh_impl(static_cast<evaluation_type>(x)));
 }
 
 } // namespace decimal

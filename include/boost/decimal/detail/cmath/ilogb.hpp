@@ -15,10 +15,8 @@
 namespace boost {
 namespace decimal {
 
-namespace detail {
-
 template <typename T>
-constexpr auto ilogb_impl(T d) noexcept
+constexpr auto ilogb(T d) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
 {
     const auto fpc_d = fpclassify(d);
@@ -41,29 +39,6 @@ constexpr auto ilogb_impl(T d) noexcept
     const auto expval = static_cast<int>(static_cast<int>(d.unbiased_exponent()) + offset);
 
     return expval;
-}
-
-} // namespace detail
-
-template <typename T>
-constexpr auto ilogb(T d) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
-{
-    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
-
-    using evaluation_type = T;
-
-    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
-
-    using evaluation_type = detail::promote_args_t<T, decimal64>;
-
-    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
-
-    using evaluation_type = detail::promote_args_t<T, decimal128>;
-
-    #endif
-
-    return static_cast<T>(detail::ilogb_impl(static_cast<evaluation_type>(d)));
 }
 
 } // namespace decimal
