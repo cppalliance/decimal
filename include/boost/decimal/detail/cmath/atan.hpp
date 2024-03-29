@@ -21,7 +21,7 @@ namespace decimal {
 namespace detail {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto atan_impl(T x) noexcept
+constexpr auto atan_small_impl(T x) noexcept
 {
     T result {};
 
@@ -156,10 +156,8 @@ constexpr auto atan_huge_impl(T x) noexcept
     return result;
 }
 
-} //namespace detail
-
 template <typename T>
-constexpr auto atan(T x) noexcept
+constexpr auto atan_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto fpc {fpclassify(x)};
@@ -185,22 +183,22 @@ constexpr auto atan(T x) noexcept
     }
     else if (absx <= T{4375, -4})
     {
-        result = detail::atan_impl(absx);
+        result = detail::atan_small_impl(absx);
     }
     else if (absx <= T{6875, -4})
     {
         constexpr T atan_half {UINT64_C(4636476090008061162), -19};
-        result = atan_half + detail::atan_impl((x - T{5, -1}) / (1 + x / 2));
+        result = atan_half + detail::atan_small_impl((x - T{5, -1}) / (1 + x / 2));
     }
     else if (absx <= T{11875, -4})
     {
         constexpr T atan_one {UINT64_C(7853981633974483096), -19};
-        result = atan_one + detail::atan_impl((x - 1) / (x + 1));
+        result = atan_one + detail::atan_small_impl((x - 1) / (x + 1));
     }
     else if (absx <= T{24375, -4})
     {
         constexpr T atan_three_halves {UINT64_C(9827937232473290679), -19};
-        result = atan_three_halves + detail::atan_impl((x - T{15, -1}) / (1 + T{15, -1} * x));
+        result = atan_three_halves + detail::atan_small_impl((x - T{15, -1}) / (1 + T{15, -1} * x));
     }
     else if (absx <= T{6})
     {
@@ -217,7 +215,7 @@ constexpr auto atan(T x) noexcept
     else
     {
         constexpr T atan_inf {numbers::pi_v<T> / 2};
-        result = atan_inf - detail::atan_impl(1 / x);
+        result = atan_inf - detail::atan_small_impl(1 / x);
     }
 
     // arctan(-x) == -arctan(x)
@@ -227,6 +225,29 @@ constexpr auto atan(T x) noexcept
     }
 
     return result;
+}
+
+} //namespace detail
+
+template <typename T>
+constexpr auto atan(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::atan_impl(static_cast<evaluation_type>(x)));
 }
 
 } //namespace decimal

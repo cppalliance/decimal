@@ -28,10 +28,8 @@ constexpr auto assoc_laguerre_next(unsigned n, unsigned l, T1 x, T2 Pl, T3 Plm1)
     return ((2 * n + l + 1 - static_cast<promoted_type>(x)) * static_cast<promoted_type>(Pl) - (n + l) * static_cast<promoted_type>(Plm1)) / (n+1);
 }
 
-} //namespace detail
-
 template <typename T>
-constexpr auto assoc_laguerre(unsigned n, unsigned m, T x)
+constexpr auto assoc_laguerre_impl(unsigned n, unsigned m, T x)
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // Special cases:
@@ -54,11 +52,34 @@ constexpr auto assoc_laguerre(unsigned n, unsigned m, T x)
     while(c < n)
     {
         std::swap(p0, p1);
-        p1 = static_cast<T>(detail::assoc_laguerre_next(c, m, x, p0, p1));
+        p1 = static_cast<T>(assoc_laguerre_next(c, m, x, p0, p1));
         ++c;
     }
 
     return p1;
+}
+
+} //namespace detail
+
+template <typename T>
+constexpr auto assoc_laguerre(unsigned n, unsigned m, T x)
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::assoc_laguerre_impl(n, m, static_cast<evaluation_type>(x)));
 }
 
 } //namespace decimal

@@ -44,7 +44,4 @@
 #define BOOST_DECIMAL_DEC64_SUBNORMAL std::numeric_limits<boost::decimal::decimal64>::denorm_min()
 #define BOOST_DECIMAL_DEC128_SUBNORMAL std::numeric_limits<boost::decimal::decimal128>::denorm_min()
 
-// 3.4.7 evaluation format:
-#define BOOST_DECIMAL_DEC_EVAL_METHOD 0
-
 #endif //BOOST_DECIMAL_CFLOAT_HPP

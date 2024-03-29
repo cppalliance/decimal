@@ -17,8 +17,10 @@
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
 template <typename T>
-constexpr auto log10(T x) noexcept
+constexpr auto log10_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // TODO(ckormanyos) Actually this is eintirely preliminary. The implementation
@@ -30,6 +32,29 @@ constexpr auto log10(T x) noexcept
     // in an exact result.
 
     return log(x) / numbers::ln10_v<T>;
+}
+
+} // namespace detail
+
+template <typename T>
+constexpr auto log10(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::log10_impl(static_cast<evaluation_type>(x)));
 }
 
 } // namespace decimal

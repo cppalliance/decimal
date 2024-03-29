@@ -18,8 +18,10 @@
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
 template <typename T>
-constexpr auto exp(T x) noexcept
+constexpr auto exp_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto fpc = fpclassify(x);
@@ -65,9 +67,9 @@ constexpr auto exp(T x) noexcept
 
             if (x > numbers::ln2_v<T>)
             {
-                nf2 = int(x / numbers::ln2_v<T>);
+                nf2 = static_cast<int>(x / numbers::ln2_v<T>);
 
-                x -= (numbers::ln2_v<T> * nf2);
+                x -= numbers::ln2_v<T> * nf2;
             }
 
             // PadeApproximant[Exp[x] - 1, {x, 0, {6, 6}}]
@@ -98,6 +100,29 @@ constexpr auto exp(T x) noexcept
     }
 
     return result;
+}
+
+} // namespace detail
+
+template <typename T>
+constexpr auto exp(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::exp_impl(static_cast<evaluation_type>(x)));
 }
 
 } // namespace decimal

@@ -19,37 +19,36 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
-          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
-constexpr auto hypot(T1 x, T2 y) noexcept
-{
-    using promoted_type = detail::promote_args_t<T1, T2>;
+namespace detail {
 
-    constexpr promoted_type zero {0, 0};
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto hypot_impl(T x, T y) noexcept
+{
+    constexpr T zero {0, 0};
 
     if (abs(x) == zero || isnan(y))
     {
-        return static_cast<promoted_type>(y);
+        return y;
     }
     else if (abs(y) == zero || isnan(x))
     {
-        return static_cast<promoted_type>(x);
+        return x;
     }
     else if (isinf(x) || isinf(y))
     {
         // Return +inf even if the other value is nan
-        return std::numeric_limits<promoted_type>::infinity();
+        return std::numeric_limits<T>::infinity();
     }
 
-    auto new_x {static_cast<promoted_type>(abs(x))};
-    auto new_y {static_cast<promoted_type>(abs(y))};
+    auto new_x {abs(x)};
+    auto new_y {abs(y)};
 
     if (new_y > new_x)
     {
         detail::swap(new_x, new_y);
     }
 
-    if (new_x * std::numeric_limits<promoted_type>::epsilon() >= new_y)
+    if (new_x * std::numeric_limits<T>::epsilon() >= new_y)
     {
         return new_x;
     }
@@ -58,36 +57,82 @@ constexpr auto hypot(T1 x, T2 y) noexcept
     return new_x * sqrt(1 + rat * rat);
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
-          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2,
-          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T3>
-constexpr auto hypot(T1 x, T2 y, T3 z) noexcept
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto hypot_impl(T x, T y, T z) noexcept
 {
-    using promoted_type = detail::promote_args_t<T1, T2, T3>;
-
     if (isinf(x) || isinf(y) || isinf(z))
     {
-        return std::numeric_limits<promoted_type>::infinity();
+        return std::numeric_limits<T>::infinity();
     }
     else if (isnan(x))
     {
-        return static_cast<promoted_type>(x);
+        return x;
     }
     else if (isnan(y))
     {
-        return static_cast<promoted_type>(y);
+        return y;
     }
     else if (isnan(z))
     {
-        return static_cast<promoted_type>(z);
+        return z;
     }
 
-    const promoted_type a {fmax(fmax(x, y), z)};
-    const promoted_type x_over_a {x / a};
-    const promoted_type y_over_a {y / a};
-    const promoted_type z_over_a {z / a};
+    const auto a {fmax(fmax(x, y), z)};
+    const auto x_over_a {x / a};
+    const auto y_over_a {y / a};
+    const auto z_over_a {z / a};
 
     return a * sqrt((x_over_a * x_over_a) + (y_over_a * y_over_a) + (z_over_a * z_over_a));
+}
+
+} // namespace detail
+
+template <typename T1, typename T2>
+constexpr auto hypot(T1 x, T2 y) noexcept
+    BOOST_DECIMAL_REQUIRES_TWO(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = detail::promote_args_t<T1, T2>;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T1, T2, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T1, T2, decimal128>;
+
+    #endif
+
+    using return_type = detail::promote_args_t<T1, T2>;
+
+    return static_cast<return_type>(detail::hypot_impl(static_cast<evaluation_type>(x), static_cast<evaluation_type>(y)));
+}
+
+template <typename T1, typename T2, typename T3>
+constexpr auto hypot(T1 x, T2 y, T3 z) noexcept
+    BOOST_DECIMAL_REQUIRES_THREE(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2, detail::is_decimal_floating_point_v, T3)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = detail::promote_args_t<T1, T2, T3>;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T1, T2, T3, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T1, T2, T3, decimal128>;
+
+    #endif
+
+    using return_type = detail::promote_args_t<T1, T2, T3>;
+
+    return static_cast<return_type>(detail::hypot_impl(static_cast<evaluation_type>(x),
+                                                       static_cast<evaluation_type>(y),
+                                                       static_cast<evaluation_type>(z)));
 }
 
 } //namespace decimal

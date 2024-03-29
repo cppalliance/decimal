@@ -20,8 +20,10 @@
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
 template <typename T>
-constexpr auto cos(T x) noexcept
+constexpr auto cos_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     T result { };
@@ -70,23 +72,46 @@ constexpr auto cos(T x) noexcept
             switch(n)
             {
                 case 3U:
-                    result = detail::sin_impl(r);
+                    result = detail::sin_series_expansion(r);
                     break;
                 case 2U:
-                    result = -detail::cos_impl(r);
+                    result = -detail::cos_series_expansion(r);
                     break;
                 case 1U:
-                    result = -detail::sin_impl(r);
+                    result = -detail::sin_series_expansion(r);
                     break;
                 case 0U:
                 default:
-                    result = detail::cos_impl(r);
+                    result = detail::cos_series_expansion(r);
                     break;
             }
         }
     }
 
     return result;
+}
+
+} // namespace detail
+
+template <typename T>
+constexpr auto cos(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::cos_impl(static_cast<evaluation_type>(x)));
 }
 
 } // namespace decimal
