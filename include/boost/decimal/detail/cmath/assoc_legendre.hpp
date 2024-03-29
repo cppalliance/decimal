@@ -109,9 +109,9 @@ constexpr auto assoc_legendre(unsigned n, unsigned m, T x) noexcept
 
     #endif
 
-    return detail::assoc_legendre_impl(n, m, static_cast<evaluation_type>(x),
+    return static_cast<T>(detail::assoc_legendre_impl(n, m, static_cast<evaluation_type>(x),
                                        pow(1 - static_cast<evaluation_type>(x)*static_cast<evaluation_type>(x),
-                                       evaluation_type{m} / 2));
+                                       evaluation_type{m} / 2)));
 }
 
 } //namespace decimal
