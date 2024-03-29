@@ -610,6 +610,9 @@ int main()
     test_value(decimal32{504.29034} / decimal32{-727.45465}, "-0.693226", chars_format::general, 6);
     test_value(decimal32{504.29034} / decimal32{-727.45465}, "-6.932257e-01", chars_format::scientific, 6);
 
+    // See: https://github.com/cppalliance/decimal/issues/478
+    test_value(std::numeric_limits<decimal32>::epsilon(), "1e-07");
+
     return boost::report_errors();
 }
 
