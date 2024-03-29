@@ -304,7 +304,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
         {
             --first;
         }
-        ++first;
+
+        // Remove decimal point if not significant digits
+        if (*first != '.')
+        {
+            ++first;
+        }
     }
 
     // Insert the exponent character
