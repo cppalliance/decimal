@@ -69,12 +69,12 @@ constexpr auto tan(T x) noexcept
         {
             case 1U:
             case 3U:
-                result = -detail::cos_impl(r) / detail::sin_impl(r);
+                result = -detail::cos_series_expansion(r) / detail::sin_series_expansion(r);
                 break;
             case 0U:
             case 2U:
             default:
-                result = detail::sin_impl(r) / detail::cos_impl(r);
+                result = detail::sin_series_expansion(r) / detail::cos_series_expansion(r);
                 break;
         }
     }
