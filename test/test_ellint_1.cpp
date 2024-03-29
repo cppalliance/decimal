@@ -22,6 +22,9 @@
 #  pragma GCC diagnostic ignored "-Wfloat-conversion"
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
+#  if __GNUC__ == 10
+#  pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#  endif
 #endif
 
 #include <boost/math/special_functions.hpp>
