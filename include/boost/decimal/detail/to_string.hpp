@@ -59,8 +59,9 @@ void print_buffer(char* buffer, std::size_t buffer_size, const char*, Integer si
 
 } //namespace detail
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
-auto to_string(DecimalType value) -> std::string
+template <typename DecimalType>
+auto to_string(DecimalType value)
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::string)
 {
     std::string res;
 

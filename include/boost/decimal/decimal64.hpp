@@ -150,11 +150,13 @@ private:
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL TargetType>
-    friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_integral(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_REAL TargetType>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
+    template <typename Decimal, typename TargetType>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_floating_point_v, TargetType, TargetType);
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;

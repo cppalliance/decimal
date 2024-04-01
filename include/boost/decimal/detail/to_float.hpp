@@ -25,8 +25,9 @@ namespace decimal {
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_REAL TargetType>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType
+template <typename Decimal, typename TargetType>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
+    BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_floating_point_v, TargetType, TargetType)
 {
     bool success {};
 
