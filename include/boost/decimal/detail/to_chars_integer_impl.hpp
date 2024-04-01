@@ -37,7 +37,8 @@ static constexpr char digit_table[] = {
 
 // Use a simple lookup table to put together the Integer in character form
 template <typename Integer, typename Unsigned_Integer>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Integer value, int base) noexcept -> to_chars_result
+BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Integer value, int base) noexcept
+    BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_integral_v, Integer, detail::is_integral_v, Unsigned_Integer, to_chars_result)
 {
     const std::ptrdiff_t output_length = last - first;
 

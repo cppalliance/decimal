@@ -229,6 +229,8 @@ concept decimal_floating_point_type = boost::decimal::detail::is_decimal_floatin
 
 } // boost::decimal::concepts
 
+#define BOOST_DECIMAL_HAS_CONCEPTS 1
+
 #define BOOST_DECIMAL_INTEGRAL boost::decimal::concepts::integral
 #define BOOST_DECIMAL_SIGNED_INTEGRAL boost::decimal::concepts::signed_integral
 #define BOOST_DECIMAL_UNSIGNED_INTEGRAL boost::decimal::concepts::unsigned_integral
@@ -262,6 +264,7 @@ concept decimal_floating_point_type = boost::decimal::detail::is_decimal_floatin
 
 #define BOOST_DECIMAL_REQUIRES(X, T) -> T requires X<T>
 #define BOOST_DECIMAL_REQUIRES_TWO(X1, T1, X2, T2) -> detail::promote_args_t<T1, T2> requires X1<T1> && X2<T2>
+#define BOOST_DECIMAL_REQUIRES_TWO_RETURN(X1, T1, X2, T2, ReturnType) -> ReturnType requires X1<T1> && X2<T2>
 #define BOOST_DECIMAL_REQUIRES_THREE(X1, T1, X2, T2, X3, T3) -> detail::promote_args_t<T1, T2, T3> requires X1<T1> && X2<T2> && X3<T3>
 #define BOOST_DECIMAL_REQUIRES_RETURN(X, T, ReturnType) -> ReturnType requires X<T>
 
@@ -410,6 +413,10 @@ concept execution_policy = std::is_execution_policy_v<std::remove_cvref_t<T>>;
 
 #ifndef BOOST_DECIMAL_REQUIRES_TWO
 #  define BOOST_DECIMAL_REQUIRES_TWO(X1, T1, X2, T2) -> std::enable_if_t<X1<T1> && X2<T2>, detail::promote_args_t<T1, T2>>
+#endif
+
+#ifndef BOOST_DECIMAL_REQUIRES_TWO_RETURN
+#  define BOOST_DECIMAL_REQUIRES_TWO_RETURN(X1, T1, X2, T2, ReturnType) -> std::enable_if_t<X1<T1> && X2<T2>, ReturnType>
 #endif
 
 #ifndef BOOST_DECIMAL_REQUIRES_THREE
