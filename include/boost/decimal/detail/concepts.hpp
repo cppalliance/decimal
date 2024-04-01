@@ -229,6 +229,8 @@ concept decimal_floating_point_type = boost::decimal::detail::is_decimal_floatin
 
 } // boost::decimal::concepts
 
+#define BOOST_DECIMAL_HAS_CONCEPTS 1
+
 #define BOOST_DECIMAL_INTEGRAL boost::decimal::concepts::integral
 #define BOOST_DECIMAL_SIGNED_INTEGRAL boost::decimal::concepts::signed_integral
 #define BOOST_DECIMAL_UNSIGNED_INTEGRAL boost::decimal::concepts::unsigned_integral
