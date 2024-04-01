@@ -476,11 +476,11 @@ public:
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     friend constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::partial_ordering;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering);
     #endif
