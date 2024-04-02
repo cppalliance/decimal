@@ -482,6 +482,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         {
             boost::decimal::detail::memset(r.ptr, '0', static_cast<std::size_t>(exponent));
             r.ptr += exponent;
+            *r.ptr++ = '.';
+        }
+        else
+        {
+            *r.ptr++ = '.';
         }
     }
     else if (!append_leading_zeros)
