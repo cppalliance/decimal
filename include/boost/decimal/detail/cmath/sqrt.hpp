@@ -48,54 +48,34 @@ constexpr auto sqrt_impl(T val) noexcept
     }
     else
     {
+        constexpr T epsilon = std::numeric_limits<T>::epsilon() * 100;
         constexpr T one { 1, 0 };
+        constexpr T half {5, -1};
+        T error = one / epsilon;
 
-        const auto arg_is_gt_one = (val > one);
-
-        if (arg_is_gt_one || val < one)
+        T x {};
+        if (val > one)
         {
-            // TODO(ckormanyos)
-            // TODO(mborland)
-            // This implementation of square root, although it works, needs optimization.
-            // Using base-2 frexp/ldexp might not be the best, rather use base-10?
-
-            int exp2val { };
-
-            const auto man = frexp(val, &exp2val);
-
-            const auto corrected = (static_cast<unsigned>(exp2val) & 1U) != 0U;
-
-            // TODO(ckormanyos)
-            // Try to find a way to get a better (much better) initial guess.
-
-            if(!corrected)
-            {
-                result = ldexp(man / 2, exp2val / 2);
-            }
-            else
-            {
-                val = val * 2;
-
-                result = ldexp(man, arg_is_gt_one ? --exp2val / 2 : ++exp2val / 2);
-            }
-
-            constexpr auto newton_steps = (sizeof(T) == 4U) ? 5U :
-                                          (sizeof(T) == 8U) ? 6U : 10U;
-
-            for(auto i = 0U; i < newton_steps; ++i)
-            {
-                result = (result + val / result) / 2;
-            }
-
-            if (corrected)
-            {
-                result /= numbers::sqrt2_v<T>;
-            }
+            // Scale down if val is large by dividing the exp by 2
+            int exp {};
+            auto sig = frexp10(val, &exp);
+            x = T{sig, exp / 2};
         }
         else
         {
-            result = one;
+            // Trivial heuristic
+            x = val + half;
         }
+
+        while (error > epsilon)
+        {
+            const T new_x = (x + val / x) / 2;
+
+            error = fabs(new_x - x);
+            x = new_x;
+        }
+
+        result = x;
     }
 
     return result;
