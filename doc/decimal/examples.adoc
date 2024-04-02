@@ -33,6 +33,9 @@ int main()
 }
 ----
 
+This is the recommended way of constructing a fractional number as opposed to `decimal32 a {0.2}`.
+The representation is exact with integers whereas you may get surprising or unwanted conversion from binary floating point
+
 == Promotion
 
 [source, c++]
@@ -67,7 +70,7 @@ int main()
 {
     using namespace boost::decimal;
 
-    decimal64 val {0.25}; // Construction from a double
+    decimal64 val {0.25}; // Construction from a double (not recommended but allowed)
 
     char buffer[256];
     auto r_to = to_chars(buffer, buffer + sizeof(buffer) - 1, val);
