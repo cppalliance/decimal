@@ -140,7 +140,7 @@ struct decimal128_components
 
 } //namespace detail
 
-BOOST_DECIMAL_EXPORT class decimal128 final
+class decimal128 final
 {
 private:
     detail::uint128 bits_ {};

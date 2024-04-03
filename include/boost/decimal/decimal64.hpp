@@ -130,7 +130,7 @@ struct decimal64_components
 #  pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
 
-BOOST_DECIMAL_EXPORT class decimal64 final
+class decimal64 final
 {
 private:
 

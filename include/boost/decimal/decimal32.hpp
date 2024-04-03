@@ -132,7 +132,7 @@ struct decimal32_components
 
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
-BOOST_DECIMAL_EXPORT class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
+class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
 {
 private:
 
