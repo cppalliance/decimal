@@ -15,9 +15,12 @@
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/legendre.hpp>
 #include <boost/decimal/detail/cmath/impl/assoc_legendre_lookup.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <utility>
 #include <type_traits>
 #include <limits>
+#endif
 
 namespace boost {
 namespace decimal {

@@ -15,10 +15,13 @@
 #include <boost/decimal/detail/cmath/ceil.hpp>
 #include <boost/decimal/detail/cmath/trunc.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <limits>
 #include <cmath>
 #include <climits>
+#endif
 
 namespace boost {
 namespace decimal {

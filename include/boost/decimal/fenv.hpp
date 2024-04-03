@@ -5,7 +5,11 @@
 #ifndef BOOST_DECIMAL_FENV_HPP
 #define BOOST_DECIMAL_FENV_HPP
 
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cfenv>
+#endif
 
 namespace boost { namespace decimal {
 

@@ -14,8 +14,11 @@
 #include <boost/decimal/detail/cmath/frexp10.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {

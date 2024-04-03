@@ -12,8 +12,11 @@
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/laguerre.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {

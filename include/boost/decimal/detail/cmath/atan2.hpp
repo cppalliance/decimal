@@ -13,9 +13,11 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/numbers.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {

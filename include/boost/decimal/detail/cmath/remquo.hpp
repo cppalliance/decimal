@@ -10,9 +10,12 @@
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <limits>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {

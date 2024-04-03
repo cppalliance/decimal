@@ -5,8 +5,11 @@
 #ifndef BOOST_DECIMAL_FWD_HPP
 #define BOOST_DECIMAL_FWD_HPP
 
-#include <limits>
 #include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <limits>
+#endif
 
 namespace boost { namespace decimal {
 

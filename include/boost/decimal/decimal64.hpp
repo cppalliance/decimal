@@ -35,6 +35,8 @@
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+
 #include <cerrno>
 #include <cinttypes>
 #include <climits>
@@ -48,6 +50,8 @@
 #include <cwchar>
 #include <iostream>
 #endif
+
+#endif // BOOST_DECIMAL_BUILD_MODULE
 
 namespace boost {
 namespace decimal {

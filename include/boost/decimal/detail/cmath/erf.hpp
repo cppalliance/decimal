@@ -17,8 +17,11 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/decimal128.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
 #include <array>
+#endif
 
 namespace boost {
 namespace decimal {

@@ -6,9 +6,6 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_LGAMMA_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_LGAMMA_HPP
 
-#include <array>
-#include <type_traits>
-
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/config.hpp>
@@ -21,6 +18,11 @@
 #include <boost/decimal/detail/cmath/tgamma.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/numbers.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <array>
+#include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {

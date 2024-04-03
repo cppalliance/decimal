@@ -10,12 +10,15 @@
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <memory>
 #include <new>
 #include <limits>
 #include <locale>
 #include <cstdint>
 #include <clocale>
+#endif
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 

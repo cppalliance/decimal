@@ -15,8 +15,11 @@
 #include <boost/decimal/detail/cmath/remquo.hpp>
 #include <boost/decimal/detail/cmath/impl/sin_impl.hpp>
 #include <boost/decimal/detail/cmath/impl/cos_impl.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {

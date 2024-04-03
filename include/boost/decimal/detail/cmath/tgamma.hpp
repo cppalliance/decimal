@@ -12,7 +12,11 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <iterator>
+#include <limits>
+#endif
 
 namespace boost {
 namespace decimal {

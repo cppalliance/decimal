@@ -13,8 +13,10 @@
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstring>
+#endif
 
 namespace boost { namespace decimal {
 

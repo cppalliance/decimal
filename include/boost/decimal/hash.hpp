@@ -9,8 +9,11 @@
 #include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/decimal128.hpp>
 #include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <functional>
 #include <cstring>
+#endif
 
 namespace std {
 

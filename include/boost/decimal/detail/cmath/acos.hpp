@@ -14,8 +14,12 @@
 #include <boost/decimal/detail/cmath/fabs.hpp>
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/impl/asin_impl.hpp>
+
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {

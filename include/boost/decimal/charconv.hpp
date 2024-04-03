@@ -19,7 +19,10 @@
 #include <boost/decimal/detail/cmath/frexp10.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/countl.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
+#endif
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 

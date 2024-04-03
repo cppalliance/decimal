@@ -14,8 +14,11 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {

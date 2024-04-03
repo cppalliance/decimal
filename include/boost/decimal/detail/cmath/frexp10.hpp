@@ -5,14 +5,17 @@
 #ifndef BOOST_DECIMAL_DETAIL_FREXP10_HPP
 #define BOOST_DECIMAL_DETAIL_FREXP10_HPP
 
-#include <limits>
-#include <type_traits>
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <limits>
+#include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {
