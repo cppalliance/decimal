@@ -248,4 +248,10 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_CLANG_STATIC
 #endif
 
+#ifdef BOOST_DECIMAL_BUILD_MODULE
+#  define BOOST_DECIMAL_EXPORT export
+#else
+#  define BOOST_DECIMAL_EXPORT
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
