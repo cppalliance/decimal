@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_FWD_HPP
 
 #include <limits>
+#include <boost/decimal/detail/config.hpp>
 
 namespace boost { namespace decimal {
 
@@ -20,23 +21,23 @@ namespace std {
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal32>;
+BOOST_DECIMAL_EXPORT class numeric_limits<boost::decimal::decimal32>;
 #else
-struct numeric_limits<boost::decimal::decimal32>;
+BOOST_DECIMAL_EXPORT struct numeric_limits<boost::decimal::decimal32>;
 #endif
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal64>;
+BOOST_DECIMAL_EXPORT class numeric_limits<boost::decimal::decimal64>;
 #else
-struct numeric_limits<boost::decimal::decimal64>;
+BOOST_DECIMAL_EXPORT struct numeric_limits<boost::decimal::decimal64>;
 #endif
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal128>;
+BOOST_DECIMAL_EXPORT class numeric_limits<boost::decimal::decimal128>;
 #else
-struct numeric_limits<boost::decimal::decimal128>;
+BOOST_DECIMAL_EXPORT struct numeric_limits<boost::decimal::decimal128>;
 #endif
 
 } // Namespace std

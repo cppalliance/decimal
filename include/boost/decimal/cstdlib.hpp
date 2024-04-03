@@ -186,44 +186,44 @@ inline auto wcstod_impl(const wchar_t* str, wchar_t** endptr) noexcept -> Target
 
 } //namespace detail
 
-template <typename TargetDecimalType = decimal64>
+BOOST_DECIMAL_EXPORT template <typename TargetDecimalType = decimal64>
 inline auto strtod(const char* str, char** endptr) noexcept -> TargetDecimalType
 {
     return detail::strtod_impl<TargetDecimalType>(str, endptr);
 }
 
-template <typename TargetDecimalType = decimal64>
+BOOST_DECIMAL_EXPORT template <typename TargetDecimalType = decimal64>
 inline auto wcstod(const wchar_t* str, wchar_t** endptr) noexcept -> TargetDecimalType
 {
     return detail::wcstod_impl<TargetDecimalType>(str, endptr);
 }
 
-inline auto strtod32(const char* str, char** endptr) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT inline auto strtod32(const char* str, char** endptr) noexcept -> decimal32
 {
     return detail::strtod_impl<decimal32>(str, endptr);
 }
 
-inline auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT inline auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decimal32
 {
     return detail::wcstod_impl<decimal32>(str, endptr);
 }
 
-inline auto strtod64(const char* str, char** endptr) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT inline auto strtod64(const char* str, char** endptr) noexcept -> decimal64
 {
     return detail::strtod_impl<decimal64>(str, endptr);
 }
 
-inline auto wcstod64(const wchar_t* str, wchar_t** endptr) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT inline auto wcstod64(const wchar_t* str, wchar_t** endptr) noexcept -> decimal64
 {
     return detail::wcstod_impl<decimal64>(str, endptr);
 }
 
-inline auto strtod128(const char* str, char** endptr) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT inline auto strtod128(const char* str, char** endptr) noexcept -> decimal128
 {
     return detail::strtod_impl<decimal128>(str, endptr);
 }
 
-inline auto wcstod128(const wchar_t* str, wchar_t** endptr) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT inline auto wcstod128(const wchar_t* str, wchar_t** endptr) noexcept -> decimal128
 {
     return detail::wcstod_impl<decimal128>(str, endptr);
 }

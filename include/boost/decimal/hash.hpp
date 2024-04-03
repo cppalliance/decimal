@@ -8,13 +8,14 @@
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <functional>
 #include <cstring>
 
 namespace std {
 
 template <>
-struct hash<boost::decimal::decimal32>
+BOOST_DECIMAL_EXPORT struct hash<boost::decimal::decimal32>
 {
     // Since the underlying type is a std::uint32_t we will rely on its hash function from the STL
     auto operator()(const boost::decimal::decimal32& v) const noexcept -> std::size_t
@@ -27,7 +28,7 @@ struct hash<boost::decimal::decimal32>
 };
 
 template <>
-struct hash<boost::decimal::decimal64>
+BOOST_DECIMAL_EXPORT struct hash<boost::decimal::decimal64>
 {
     // Since the underlying type is a std::uint64_t we will rely on its hash function from the STL
     auto operator()(const boost::decimal::decimal64& v) const noexcept -> std::size_t
@@ -45,7 +46,7 @@ struct hash<boost::decimal::decimal64>
 #endif
 
 template <>
-struct hash<boost::decimal::decimal128>
+BOOST_DECIMAL_EXPORT struct hash<boost::decimal::decimal128>
 {
     // Take the xor of the two words and hash that
     auto operator()(const boost::decimal::decimal128& v) const noexcept -> std::size_t

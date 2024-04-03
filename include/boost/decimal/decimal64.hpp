@@ -126,7 +126,7 @@ struct decimal64_components
 #  pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
 
-class decimal64 final
+BOOST_DECIMAL_EXPORT class decimal64 final
 {
 private:
 
@@ -2406,9 +2406,9 @@ namespace std {
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal64>
+BOOST_DECIMAL_EXPORT class numeric_limits<boost::decimal::decimal64>
 #else
-struct numeric_limits<boost::decimal::decimal64>
+BOOST_DECIMAL_EXPORT struct numeric_limits<boost::decimal::decimal64>
 #endif
 {
 

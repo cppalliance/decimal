@@ -128,7 +128,7 @@ struct decimal32_components
 
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
-class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
+BOOST_DECIMAL_EXPORT class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
 {
 private:
 
@@ -2465,9 +2465,9 @@ namespace std {
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal32>
+BOOST_DECIMAL_EXPORT class numeric_limits<boost::decimal::decimal32>
 #else
-struct numeric_limits<boost::decimal::decimal32>
+BOOST_DECIMAL_EXPORT struct numeric_limits<boost::decimal::decimal32>
 #endif
 {
 

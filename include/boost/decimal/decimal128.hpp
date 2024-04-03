@@ -136,7 +136,7 @@ struct decimal128_components
 
 } //namespace detail
 
-class decimal128 final
+BOOST_DECIMAL_EXPORT class decimal128 final
 {
 private:
     detail::uint128 bits_ {};
@@ -2495,9 +2495,9 @@ namespace std {
 
 template<>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal128>
+BOOST_DECIMAL_EXPORT class numeric_limits<boost::decimal::decimal128>
 #else
-struct numeric_limits<boost::decimal::decimal128>
+BOOST_DECIMAL_EXPORT struct numeric_limits<boost::decimal::decimal128>
 #endif
 {
 
