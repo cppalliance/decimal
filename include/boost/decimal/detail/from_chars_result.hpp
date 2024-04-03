@@ -9,16 +9,18 @@
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <system_error>
+#endif
 
-namespace boost { namespace decimal {
+namespace boost {
+namespace decimal {
 
 // 22.13.3, Primitive numerical input conversion
 
-template <typename UC>
-struct from_chars_result_t
+BOOST_DECIMAL_EXPORT struct from_chars_result
 {
-    const UC* ptr;
+    const char* ptr;
 
     // Values:
     // 0 = no error
@@ -26,20 +28,18 @@ struct from_chars_result_t
     // ERANGE = result_out_of_range
     std::errc ec;
 
-    friend constexpr auto operator==(const from_chars_result_t<UC>& lhs, const from_chars_result_t<UC>& rhs) noexcept -> bool
+    friend constexpr auto operator==(const from_chars_result& lhs, const from_chars_result& rhs) noexcept -> bool
     {
         return lhs.ptr == rhs.ptr && lhs.ec == rhs.ec;
     }
 
-    friend constexpr auto operator!=(const from_chars_result_t<UC>& lhs, const from_chars_result_t<UC>& rhs) noexcept -> bool
+    friend constexpr auto operator!=(const from_chars_result& lhs, const from_chars_result& rhs) noexcept -> bool
     {
         return !(lhs == rhs); // NOLINT : Expression can not be simplified since this is the definition
     }
 
     constexpr explicit operator bool() const noexcept { return ec == std::errc{}; }
 };
-
-using from_chars_result = from_chars_result_t<char>;
 
 } // namespace decimal
 } // namespace boost
