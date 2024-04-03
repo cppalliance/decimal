@@ -81,7 +81,7 @@ constexpr auto asinh_impl(T x) noexcept
 
 } // namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto asinh(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

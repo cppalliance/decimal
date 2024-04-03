@@ -10,6 +10,7 @@
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/remquo.hpp>
 #include <boost/decimal/detail/cmath/impl/sin_impl.hpp>
@@ -20,7 +21,7 @@
 namespace boost {
 namespace decimal {
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto tan(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

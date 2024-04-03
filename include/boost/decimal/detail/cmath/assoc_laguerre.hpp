@@ -10,6 +10,7 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/laguerre.hpp>
 #include <type_traits>
 #include <cstdint>
@@ -61,7 +62,7 @@ constexpr auto assoc_laguerre_impl(unsigned n, unsigned m, T x)
 
 } //namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto assoc_laguerre(unsigned n, unsigned m, T x)
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

@@ -13,6 +13,7 @@
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <type_traits>
 #include <cmath>
 
@@ -87,7 +88,7 @@ constexpr auto hypot_impl(T x, T y, T z) noexcept
 
 } // namespace detail
 
-template <typename T1, typename T2>
+BOOST_DECIMAL_EXPORT template <typename T1, typename T2>
 constexpr auto hypot(T1 x, T2 y) noexcept
     BOOST_DECIMAL_REQUIRES_TWO(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2)
 {
@@ -110,7 +111,7 @@ constexpr auto hypot(T1 x, T2 y) noexcept
     return static_cast<return_type>(detail::hypot_impl(static_cast<evaluation_type>(x), static_cast<evaluation_type>(y)));
 }
 
-template <typename T1, typename T2, typename T3>
+BOOST_DECIMAL_EXPORT template <typename T1, typename T2, typename T3>
 constexpr auto hypot(T1 x, T2 y, T3 z) noexcept
     BOOST_DECIMAL_REQUIRES_THREE(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2, detail::is_decimal_floating_point_v, T3)
 {

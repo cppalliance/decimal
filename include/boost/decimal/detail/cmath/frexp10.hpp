@@ -12,6 +12,7 @@
 #include <boost/decimal/detail/normalize.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 
 namespace boost {
 namespace decimal {
@@ -20,7 +21,7 @@ namespace decimal {
 // Returns num in the range [1'000'000, 9'999'999]
 //
 // If the conversion can not be performed returns UINT32_MAX and exp = 0
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto frexp10(T num, int* expptr) noexcept
     -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,

@@ -11,7 +11,7 @@
 #include <boost/decimal/detail/cmath/sin.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/numbers.hpp>
-
+#include <boost/decimal/detail/config.hpp>
 #include <iterator>
 
 namespace boost {
@@ -114,7 +114,7 @@ constexpr auto tgamma_impl(T x) noexcept
 
 } // namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto tgamma(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

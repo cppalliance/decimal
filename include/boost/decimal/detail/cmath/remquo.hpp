@@ -9,6 +9,7 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <type_traits>
 #include <limits>
 #include <cmath>

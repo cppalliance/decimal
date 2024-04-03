@@ -29,24 +29,24 @@ constexpr auto nan_impl(const char* arg) noexcept -> TargetDecimalType
 
 } //namespace detail
 
-constexpr auto nand32(const char* arg) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT constexpr auto nand32(const char* arg) noexcept -> decimal32
 {
     return detail::nan_impl<decimal32>(arg);
 }
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto nan(const char* arg) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     return detail::nan_impl<T>(arg);
 }
 
-constexpr auto nand64(const char* arg) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT constexpr auto nand64(const char* arg) noexcept -> decimal64
 {
     return detail::nan_impl<decimal64>(arg);
 }
 
-constexpr auto nand128(const char* arg) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT constexpr auto nand128(const char* arg) noexcept -> decimal128
 {
     return detail::nan_impl<decimal128>(arg);
 }

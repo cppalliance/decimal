@@ -91,7 +91,7 @@ constexpr auto assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_powe
 
 } //namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto assoc_legendre(unsigned n, unsigned m, T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

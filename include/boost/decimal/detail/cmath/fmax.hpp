@@ -9,13 +9,14 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <type_traits>
 #include <cmath>
 
 namespace boost {
 namespace decimal {
 
-template <typename T1, typename T2>
+BOOST_DECIMAL_EXPORT template <typename T1, typename T2>
 constexpr auto fmax(T1 lhs, T2 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_TWO(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2)
 {
