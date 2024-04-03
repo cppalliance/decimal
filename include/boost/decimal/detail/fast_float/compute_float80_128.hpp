@@ -9,10 +9,12 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/bit_layouts.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <array>
 #include <climits>
 #include <limits>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {

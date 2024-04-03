@@ -10,7 +10,9 @@
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
+#endif
 
 #define BOOST_DECIMAL_POW5_TABLE_SIZE 56
 #define BOOST_DECIMAL_POW5_BITCOUNT 249

@@ -5,14 +5,18 @@
 #ifndef BOOST_DECIMAL_DETAIL_TO_CHARS_RESULT_HPP
 #define BOOST_DECIMAL_DETAIL_TO_CHARS_RESULT_HPP
 
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <system_error>
+#endif
 
 // 22.13.2, Primitive numerical output conversion
 
 namespace boost {
 namespace decimal {
 
-struct to_chars_result
+BOOST_DECIMAL_EXPORT struct to_chars_result
 {
     char *ptr;
     std::errc ec;

@@ -12,8 +12,10 @@
 #include <boost/decimal/detail/bit_layouts.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cinttypes>
 #include <cstdint>
+#endif
 
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 #ifdef BOOST_DECIMAL_DEBUG_RYU

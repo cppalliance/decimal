@@ -8,8 +8,10 @@
 
 #include <boost/decimal/detail/config.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
 #include <limits>
+#endif
 
 namespace boost {
 namespace decimal {

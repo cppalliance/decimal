@@ -13,6 +13,8 @@
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/to_string.hpp>
 #include <boost/decimal/charconv.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <system_error>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
@@ -25,6 +27,7 @@
 #include <iostream>
 #include <system_error>
 #include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {

@@ -5,9 +5,12 @@
 #ifndef BOOST_DECIMAL_DETAIL_CONCEPTS
 #define BOOST_DECIMAL_DETAIL_CONCEPTS
 
-#include <type_traits>
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <type_traits>
+#endif
 
 // GCC-11 yields internal compiler errors when using the concepts
 
@@ -39,6 +42,7 @@
 
 #if __has_include(<concepts>)
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <utility>
 #include <algorithm>
 #include <concepts>
@@ -46,6 +50,7 @@
 #include <limits>
 #include <iterator>
 #include <complex>
+#endif
 
 namespace boost::decimal::concepts {
 

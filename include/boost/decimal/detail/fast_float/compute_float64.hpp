@@ -11,10 +11,13 @@
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 #include <boost/decimal/detail/countl.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
 #include <cfloat>
 #include <cstring>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {

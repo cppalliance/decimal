@@ -9,9 +9,14 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
-#include <type_traits>
 
-namespace boost { namespace decimal { namespace detail {
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <type_traits>
+#endif
+
+namespace boost {
+namespace decimal {
+namespace detail {
 
 template <typename T>
 struct is_signed { static constexpr bool value = std::is_signed<T>::value; };

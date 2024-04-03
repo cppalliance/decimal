@@ -11,6 +11,8 @@
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/to_chars_result.hpp>
 #include <boost/decimal/detail/memcpy.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
 #include <system_error>
 #include <type_traits>
@@ -23,6 +25,7 @@
 #include <cstdint>
 #include <climits>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {

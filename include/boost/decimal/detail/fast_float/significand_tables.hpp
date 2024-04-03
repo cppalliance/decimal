@@ -7,7 +7,10 @@
 #define BOOST_DECIMAL_DETAIL_FAST_FLOAT_SIGNIFICAND_TABLES_HPP
 
 #include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
+#endif
 
 // The significand of a floating point number is often referred to as the mantissa.
 // Using the term mantissa is discouraged by IEEE 1516

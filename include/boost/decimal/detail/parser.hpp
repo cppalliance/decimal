@@ -11,6 +11,7 @@
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/chars_format.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
@@ -19,6 +20,8 @@
 #include <system_error>
 #endif
 #include <type_traits>
+
+#endif // BOOST_DECIMAL_BUILD_MODULE
 
 namespace boost {
 namespace decimal {

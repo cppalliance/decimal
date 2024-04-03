@@ -5,9 +5,15 @@
 #ifndef BOOST_DECIMAL_DETAIL_UTILITIES_HPP
 #define BOOST_DECIMAL_DETAIL_UTILITIES_HPP
 
-#include <cstddef>
+#include <boost/decimal/detail/config.hpp>
 
-namespace boost { namespace decimal { namespace detail {
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <cstddef>
+#endif
+
+namespace boost {
+namespace decimal {
+namespace detail {
 
 template <typename T>
 constexpr auto swap(T& x, T& y) noexcept -> void

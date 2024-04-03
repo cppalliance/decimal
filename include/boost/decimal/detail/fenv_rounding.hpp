@@ -10,7 +10,9 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/config.hpp>
 
-namespace boost { namespace decimal { namespace detail {
+namespace boost {
+namespace decimal {
+namespace detail {
 
 #ifdef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
 

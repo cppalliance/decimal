@@ -20,6 +20,21 @@ module;
 #include <utility>
 #include <algorithm>
 #include <iterator>
+#include <initializer_list>
+#include <bit>
+#include <concepts>
+#include <functional>
+#include <iomanip>
+#include <iosfwd>
+#include <ios>
+#include <ostream>
+#include <tuple>
+#include <system_error>
+
+// <stdfloat> is a C++23 feature that is not everywhere yet
+#if __has_include(<stdfloat>)
+#  include <stdfloat>
+#endif
 
 #include <cfenv>
 #include <cfloat>
@@ -31,6 +46,17 @@ module;
 #include <cmath>
 #include <cwchar>
 #include <cstddef>
+#include <cinttypes>
+#include <cstdlib>
+#include <cassert>
+
+#if defined(_MSC_VER)
+#  include <intrin.h>
+#elif defined(__x86_64__)
+#  include <x86intrin.h>
+#elif defined(__ARM_NEON__)
+#  include <arm_neon.h>
+#endif
 
 #define BOOST_DECIMAL_BUILD_MODULE
 

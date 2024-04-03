@@ -52,7 +52,9 @@
 //   Use #define BOOST_DECIMAL_DISABLE_CLIB to disable uses of both assert as well as I/O streaming (and all oother heavyweight C-LIB artifacts).
 
 #if (!defined(BOOST_DECIMAL_DISABLE_CASSERT) && !defined(BOOST_DECIMAL_DISABLE_CLIB))
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cassert>
+#endif
 #endif
 
 #ifndef BOOST_DECIMAL_DISABLE_CASSERT
@@ -75,17 +77,23 @@
 
 // Include intrinsics if available
 #if defined(_MSC_VER)
-#  include <intrin.h>
+#  ifndef BOOST_DECIMAL_BUILD_MODULE
+#    include <intrin.h>
+#  endif
 #  if defined(_WIN64)
 #    define BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS
 #  else
 #    define BOOST_DECIMAL_HAS_MSVC_32BIT_INTRINSICS
 #  endif
 #elif defined(__x86_64__)
-#  include <x86intrin.h>
+#  ifndef BOOST_DECIMAL_BUILD_MODULE
+#    include <x86intrin.h>
+#  endif
 #  define BOOST_DECIMAL_HAS_X86_INTRINSICS
 #elif defined(__ARM_NEON__)
-#  include <arm_neon.h>
+#  ifndef BOOST_DECIMAL_BUILD_MODULE
+#    include <arm_neon.h>
+#  endif
 #  define BOOST_DECIMAL_HAS_ARM_INTRINSICS
 #else
 #  define BOOST_DECIMAL_HAS_NO_INTRINSICS
@@ -130,7 +138,9 @@ typedef unsigned __int128 uint128_t;
 #ifdef __has_include
 #  if __has_include(<stdfloat>)
 #    if __cplusplus > 202002L || (defined(_MSVC_LANG) && _MSVC_LANG > 202002L)
-#    include <stdfloat>
+#      ifndef BOOST_DECIMAL_BUILD_MODULE
+#        include <stdfloat>
+#      endif
 #    endif
 #  endif
 #endif

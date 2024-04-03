@@ -8,13 +8,15 @@
 // https://stackoverflow.com/questions/1489830/efficient-way-to-determine-number-of-digits-in-an-integer?page=1&tab=scoredesc#tab-top
 // https://graphics.stanford.edu/~seander/bithacks.html
 
-#include <array>
-#include <cstdint>
-#include <limits>
-
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/emulated256.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <array>
+#include <cstdint>
+#include <limits>
+#endif
 
 namespace boost { namespace decimal { namespace detail {
 

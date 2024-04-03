@@ -12,6 +12,7 @@
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <system_error>
 #include <type_traits>
 #include <limits>
@@ -19,8 +20,11 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#endif
 
-namespace boost { namespace decimal { namespace detail {
+namespace boost {
+namespace decimal {
+namespace detail {
 
 static constexpr unsigned char uchar_values[] =
      {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,

@@ -6,8 +6,11 @@
 #define BOOST_DECIMAL_DETAIL_MEMCPY_HPP
 
 #include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstring>
 #include <cstdint>
+#endif
 
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89689
 // GCC 10 added checks for length of memcpy which yields the following warning (converted to error with -Werror)
