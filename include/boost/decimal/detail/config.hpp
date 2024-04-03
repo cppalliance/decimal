@@ -187,7 +187,9 @@ typedef unsigned __int128 uint128_t;
 #endif
 
 #if defined(__cpp_lib_three_way_comparison) && __cpp_lib_three_way_comparison >= 201907L
-#  include <compare>
+#  ifndef BOOST_DECIMAL_BUILD_MODULE
+#    include <compare>
+#  endif
 #  define BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 #endif
 
@@ -262,6 +264,14 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_EXPORT export
 #else
 #  define BOOST_DECIMAL_EXPORT
+#endif
+
+#if defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L
+#  define BOOST_DECIMAL_CONSTEXPR_VARIABLE inline constexpr
+#  define BOOST_DECIMAL_CLANG_CONSTEXPR_VARIABLE_SPECIALIZATION BOOST_DECIMAL_CONSTEXPR_VARIABLE
+#else
+#  define BOOST_DECIMAL_CONSTEXPR_VARIABLE static constexpr
+#  define BOOST_DECIMAL_CLANG_CONSTEXPR_VARIABLE_SPECIALIZATION BOOST_DECIMAL_CLANG_STATIC constexpr
 #endif
 
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
