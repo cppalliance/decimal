@@ -600,8 +600,8 @@ void test_two_val_hypot()
         }
     }
 
-    const auto big_val {dist(rng)};
-    BOOST_TEST_EQ(hypot(Dec(big_val), Dec(big_val * 1e20F)), Dec(big_val * 1e20F));
+    const auto big_val {static_cast<double>(dist(rng))};
+    BOOST_TEST_EQ(hypot(Dec(big_val), Dec(big_val * 1e100)), Dec(big_val * 1e100));
 
     Dec inf {std::numeric_limits<Dec>::infinity() * static_cast<int>(dist(rng))};
     Dec nan {std::numeric_limits<Dec>::quiet_NaN() * static_cast<int>(dist(rng))};

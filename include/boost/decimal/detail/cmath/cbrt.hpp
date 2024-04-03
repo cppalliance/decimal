@@ -54,9 +54,21 @@ constexpr auto cbrt_impl(T val) noexcept
     else
     {
         constexpr T epsilon = std::numeric_limits<T>::epsilon() * 100;
-        T error = 1 / epsilon;
+        T error = one / epsilon;
 
-        T x = val > 1 ? val / 3 : val * 2; // Initial Guess
+        T x {};
+        if (val > one)
+        {
+            // Scale down if val is large by dividing the exp by 3
+            int exp {};
+            auto sig = frexp10(val, &exp);
+            x = T{sig, exp / 3};
+        }
+        else
+        {
+            // Trivial heuristic
+            x = val * 2;
+        }
 
         while (error > epsilon)
         {
