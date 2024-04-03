@@ -21,23 +21,23 @@ namespace std {
 
 template <>
 #ifdef _MSC_VER
-BOOST_DECIMAL_EXPORT class numeric_limits<boost::decimal::decimal32>;
+class numeric_limits<boost::decimal::decimal32>;
 #else
-BOOST_DECIMAL_EXPORT struct numeric_limits<boost::decimal::decimal32>;
+struct numeric_limits<boost::decimal::decimal32>;
 #endif
 
 template <>
 #ifdef _MSC_VER
-BOOST_DECIMAL_EXPORT class numeric_limits<boost::decimal::decimal64>;
+class numeric_limits<boost::decimal::decimal64>;
 #else
-BOOST_DECIMAL_EXPORT struct numeric_limits<boost::decimal::decimal64>;
+struct numeric_limits<boost::decimal::decimal64>;
 #endif
 
 template <>
 #ifdef _MSC_VER
-BOOST_DECIMAL_EXPORT class numeric_limits<boost::decimal::decimal128>;
+class numeric_limits<boost::decimal::decimal128>;
 #else
-BOOST_DECIMAL_EXPORT struct numeric_limits<boost::decimal::decimal128>;
+struct numeric_limits<boost::decimal::decimal128>;
 #endif
 
 } // Namespace std

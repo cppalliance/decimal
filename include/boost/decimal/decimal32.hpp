@@ -2463,11 +2463,11 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
 
 namespace std {
 
-template <>
+BOOST_DECIMAL_EXPORT template <>
 #ifdef _MSC_VER
-BOOST_DECIMAL_EXPORT class numeric_limits<boost::decimal::decimal32>
+class numeric_limits<boost::decimal::decimal32>
 #else
-BOOST_DECIMAL_EXPORT struct numeric_limits<boost::decimal::decimal32>
+struct numeric_limits<boost::decimal::decimal32>
 #endif
 {
 

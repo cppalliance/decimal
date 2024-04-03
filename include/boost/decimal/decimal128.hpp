@@ -2493,11 +2493,11 @@ constexpr auto fmad128(decimal128 x, decimal128 y, decimal128 z) noexcept -> dec
 
 namespace std {
 
-template<>
+BOOST_DECIMAL_EXPORT template<>
 #ifdef _MSC_VER
-BOOST_DECIMAL_EXPORT class numeric_limits<boost::decimal::decimal128>
+class numeric_limits<boost::decimal::decimal128>
 #else
-BOOST_DECIMAL_EXPORT struct numeric_limits<boost::decimal::decimal128>
+struct numeric_limits<boost::decimal::decimal128>
 #endif
 {
 
