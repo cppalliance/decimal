@@ -48,7 +48,8 @@ constexpr auto sqrt_impl(T val) noexcept
     }
     else
     {
-        constexpr T epsilon = std::numeric_limits<T>::epsilon() * 100;
+        // Loosens tolerance with the increase in digits so it's not excessively expensive
+        constexpr T epsilon = std::numeric_limits<T>::epsilon() * std::numeric_limits<T>::digits10;
         constexpr T one { 1, 0 };
         constexpr T half {5, -1};
         T error = one / epsilon;
