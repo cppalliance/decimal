@@ -52,9 +52,9 @@
 //   Use #define BOOST_DECIMAL_DISABLE_CLIB to disable uses of both assert as well as I/O streaming (and all oother heavyweight C-LIB artifacts).
 
 #if (!defined(BOOST_DECIMAL_DISABLE_CASSERT) && !defined(BOOST_DECIMAL_DISABLE_CLIB))
-#ifndef BOOST_DECIMAL_BUILD_MODULE
-#include <cassert>
-#endif
+#  ifndef BOOST_DECIMAL_BUILD_MODULE
+#    include <cassert>
+#  endif
 #endif
 
 #ifndef BOOST_DECIMAL_DISABLE_CASSERT
