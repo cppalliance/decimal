@@ -71,4 +71,39 @@ import std.compat;
 
 export module boost2.decimal;
 
+// Forward declarations are not available so add the contents of fwd.hpp here
+
+export namespace boost::decimal {
+
+class decimal32;
+class decimal64;
+class decimal128;
+
+} // namespace boost::decimal
+
+export namespace std {
+
+template <>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal32>;
+#else
+struct numeric_limits<boost::decimal::decimal32>;
+#endif
+
+template <>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal64>;
+#else
+struct numeric_limits<boost::decimal::decimal64>;
+#endif
+
+template <>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal128>;
+#else
+struct numeric_limits<boost::decimal::decimal128>;
+#endif
+
+} // Namespace std
+
 #include <boost/decimal.hpp>

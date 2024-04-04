@@ -9,7 +9,6 @@
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
-#endif
 
 namespace boost {
 namespace decimal {
@@ -45,5 +44,7 @@ struct numeric_limits<boost::decimal::decimal128>;
 #endif
 
 } // Namespace std
+
+#endif // BOOST_DECIMAL_BUILD_MODULE
 
 #endif // BOOST_DECIMAL_FWD_HPP
