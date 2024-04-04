@@ -96,4 +96,9 @@ struct numeric_limits<boost::decimal::decimal128>;
 
 } // Namespace std
 
+// MSVC wants <boost/decimal> to be imported but also does not support importing it...
+#ifdef _MSC_VER
+#  pragma warning( disable : 5244 )
+#endif
+
 #include <boost/decimal.hpp>
