@@ -31,7 +31,7 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-static constexpr char digit_table[] = {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE char digit_table[] = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',

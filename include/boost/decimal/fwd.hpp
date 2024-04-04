@@ -11,7 +11,8 @@
 #include <limits>
 #endif
 
-namespace boost { namespace decimal {
+namespace boost {
+namespace decimal {
 
 class decimal32;
 class decimal64;

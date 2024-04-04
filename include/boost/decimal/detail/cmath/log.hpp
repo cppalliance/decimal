@@ -29,7 +29,7 @@ namespace detail {
 #endif
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-static constexpr std::array<T, 11> small_coefficient_table {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::array<T, 11> small_coefficient_table {
     // (1,) 12, 80, 448, 2304, 11264, 53248, 245760, 1114112, 4980736, 22020096, 96468992, ...
     // See also Sloane's A058962 at: https://oeis.org/A058962
 
@@ -56,7 +56,7 @@ static constexpr std::array<T, 11> small_coefficient_table {
 };
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-static constexpr std::array<T, 11> large_coefficient_table {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::array<T, 11> large_coefficient_table {
     T{uint128{UINT64_C(451750905202293), UINT64_C(9484758194528277842)}, -35},  // z^3
     T{uint128{UINT64_C(67762635780344), UINT64_C(500376525493764096)}, -35},    // z^5
     T{uint128{UINT64_C(121004706750614), UINT64_C(6164027816584450626)}, -36},  // z^7

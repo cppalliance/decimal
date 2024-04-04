@@ -6,7 +6,7 @@
 #ifndef BOOST_DECIMAL_TYPE_TRAITS_HPP
 #define BOOST_DECIMAL_TYPE_TRAITS_HPP
 
-#if __has_include(<boost/type_traits.hpp>)
+#if __has_include(<boost/type_traits.hpp>) && !defined(BOOST_DECIMAL_BUILD_MODULE)
 
 #define BOOST_DECIMAL_HAS_BOOST_TYPE_TRAITS
 
@@ -33,10 +33,7 @@
 
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/config.hpp>
-
-#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
-#endif
 
 namespace boost {
 
