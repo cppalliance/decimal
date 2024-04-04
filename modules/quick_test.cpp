@@ -17,7 +17,7 @@ int main()
 
     decimal32 a {2, 0};
     a += 2;
-    std::cout << static_cast<double>(a) << std::endl;
+    std::cout << a << std::endl;
 
     return 0;
 }

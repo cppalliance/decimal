@@ -12,13 +12,12 @@
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/to_string.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/charconv.hpp>
-
-#ifndef BOOST_DECIMAL_BUILD_MODULE
-#include <system_error>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cerrno>
 #include <cstring>
 #include <cinttypes>
@@ -33,7 +32,7 @@ namespace boost {
 namespace decimal {
 
 // 3.2.10 Formatted input:
-template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+BOOST_DECIMAL_EXPORT template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
 auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>
 {
@@ -95,7 +94,7 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
 #endif
 
 // 3.2.11 Formatted output
-template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+BOOST_DECIMAL_EXPORT template <typename charT, typename traits, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
 auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
     -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_ostream<charT, traits>&>
 {
