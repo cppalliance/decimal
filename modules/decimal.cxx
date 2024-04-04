@@ -6,14 +6,6 @@
 module;
 
 #include <version>
-
-#if defined(__cpp_lib_modules) && __cpp_lib_modules >= 202207L
-
-import std;
-import std.compat;
-
-#else
-
 #include <memory>
 #include <new>
 #include <limits>
@@ -56,8 +48,6 @@ import std.compat;
 #include <cinttypes>
 #include <cstdlib>
 #include <cassert>
-
-#endif // Import std
 
 #if defined(_MSC_VER)
 #  include <intrin.h>
