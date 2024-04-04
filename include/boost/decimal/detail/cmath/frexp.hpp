@@ -5,14 +5,17 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_FREXP_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_FREXP_HPP
 
-#include <cmath>
-#include <type_traits>
-#include <limits>
-
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/cmath/impl/pow_impl.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <cmath>
+#include <type_traits>
+#include <limits>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -95,7 +98,7 @@ constexpr auto frexp_impl(T v, int* expon) noexcept
 
 } // namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto frexp(T v, int* expon) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

@@ -14,10 +14,14 @@
 #include <boost/decimal/detail/cmath/ldexp.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/decimal128.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
 #include <array>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -791,7 +795,7 @@ constexpr auto erfc_impl(T z) noexcept
 
 } //namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto erf(T z) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
@@ -812,7 +816,7 @@ constexpr auto erf(T z) noexcept
     return static_cast<T>(detail::erf_impl(static_cast<evaluation_type>(z)));
 }
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto erfc(T z) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

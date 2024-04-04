@@ -10,14 +10,18 @@
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
 #include <boost/decimal/detail/cmath/trunc.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <limits>
 #include <cmath>
 #include <climits>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -98,7 +102,7 @@ constexpr auto lrint_impl(T num) noexcept -> Int
 } //namespace detail
 
 // Rounds the number using the default rounding mode
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto rint(T num) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
@@ -128,14 +132,14 @@ constexpr auto rint(T num) noexcept
     return {sig, 0, is_neg};
 }
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto lrint(T num) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, long)
 {
     return detail::lrint_impl<T, long>(num);
 }
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto llrint(T num) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, long long)
 {

@@ -6,14 +6,17 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_LOG2_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_LOG2_HPP
 
-#include <cmath>
-#include <type_traits>
-
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/detail/cmath/log.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <cmath>
+#include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -29,7 +32,7 @@ constexpr auto log2_impl(T x) noexcept
 
 } //namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto log2(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

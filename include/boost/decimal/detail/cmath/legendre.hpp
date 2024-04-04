@@ -12,9 +12,12 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/cmath/log1p.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <utility>
 #include <type_traits>
 #include <limits>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -65,7 +68,7 @@ constexpr auto legendre_impl(unsigned l, T x) noexcept
 
 } //namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto legendre(unsigned n, T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

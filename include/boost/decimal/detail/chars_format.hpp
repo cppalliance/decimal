@@ -5,12 +5,14 @@
 #ifndef BOOST_DECIMAL_CHARS_FORMAT_HPP
 #define BOOST_DECIMAL_CHARS_FORMAT_HPP
 
+#include <boost/decimal/detail/config.hpp>
+
 namespace boost {
 namespace decimal {
 
 // Floating-point format for primitive numerical conversion
 // chars_format is a bitmask type (16.3.3.3.3)
-enum class chars_format : unsigned
+BOOST_DECIMAL_EXPORT enum class chars_format : unsigned
 {
     scientific = 1 << 0,
     fixed = 1 << 1,

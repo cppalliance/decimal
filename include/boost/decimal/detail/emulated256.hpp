@@ -9,9 +9,11 @@
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/wide-integer/uintwide_t.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
 #include <cmath>
 #include <tuple>
+#endif
 
 namespace boost {
 namespace decimal {

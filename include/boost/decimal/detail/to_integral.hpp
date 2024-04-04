@@ -5,13 +5,16 @@
 #ifndef BOOST_DECIMAL_DETAIL_TO_INTEGRAL_HPP
 #define BOOST_DECIMAL_DETAIL_TO_INTEGRAL_HPP
 
-#include <cerrno>
-#include <limits>
-#include <type_traits>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <cerrno>
+#include <limits>
+#include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {

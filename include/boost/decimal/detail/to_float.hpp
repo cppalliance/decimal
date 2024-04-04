@@ -6,15 +6,18 @@
 #ifndef BOOST_DECIMAL_DETAIL_TO_FLOAT_HPP
 #define BOOST_DECIMAL_DETAIL_TO_FLOAT_HPP
 
-#include <cerrno>
-#include <limits>
-#include <type_traits>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/shrink_significand.hpp>
 #include <boost/decimal/detail/fast_float/compute_float32.hpp>
 #include <boost/decimal/detail/fast_float/compute_float64.hpp>
 #include <boost/decimal/detail/fast_float/compute_float80_128.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <cerrno>
+#include <limits>
+#include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {

@@ -1,0 +1,27 @@
+# Copyright 2022 John Maddock
+# Copyright 2024 Matt Borland
+# Distributed under the Boost Software License, Version 1.0.
+# https://www.boost.org/LICENSE_1_0.txt
+
+# bring in the rules for testing
+import testing ;
+import modules ;
+import path ;
+import pch ;
+import ../../config/checks/config : requires ;
+
+project
+    : requirements
+      <toolset>msvc:<warnings>all
+      <toolset>msvc:<asynch-exceptions>on
+      <toolset>msvc:<cxxstd>latest
+
+      <toolset>gcc:<cxxflags>-fmodules-ts
+      <toolset>gcc:<cxxstd>23
+
+      <toolset>clang:<cxxstd>23
+    ;
+
+obj decimal : decimal.cxx : <toolset>msvc:<cxxflags>-interface ;
+
+run quick_test.cpp decimal : : : <dependency>decimal ;

@@ -6,13 +6,16 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_EXPM1_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_EXPM1_HPP
 
-#include <array>
-#include <type_traits>
-
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/numbers.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <array>
+#include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -135,7 +138,7 @@ constexpr auto expm1_impl(T x) noexcept
 
 } // namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto expm1(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

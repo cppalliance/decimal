@@ -15,9 +15,12 @@
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/legendre.hpp>
 #include <boost/decimal/detail/cmath/impl/assoc_legendre_lookup.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <utility>
 #include <type_traits>
 #include <limits>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -91,7 +94,7 @@ constexpr auto assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_powe
 
 } //namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto assoc_legendre(unsigned n, unsigned m, T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

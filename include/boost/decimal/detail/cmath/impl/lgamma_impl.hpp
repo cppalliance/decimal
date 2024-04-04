@@ -6,12 +6,15 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_IMPL_LGAMMA_IMPL_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_IMPL_LGAMMA_IMPL_HPP
 
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/cmath/impl/taylor_series_result.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {

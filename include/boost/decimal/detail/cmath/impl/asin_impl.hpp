@@ -5,10 +5,14 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_IMPL_ASIN_IMPL_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_IMPL_ASIN_IMPL_HPP
 
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/cmath/impl/remez_series_result.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {

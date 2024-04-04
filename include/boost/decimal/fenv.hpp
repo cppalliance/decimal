@@ -5,11 +5,16 @@
 #ifndef BOOST_DECIMAL_FENV_HPP
 #define BOOST_DECIMAL_FENV_HPP
 
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cfenv>
+#endif
 
-namespace boost { namespace decimal {
+namespace boost {
+namespace decimal {
 
-enum class rounding_mode : unsigned
+BOOST_DECIMAL_EXPORT enum class rounding_mode : unsigned
 {
     fe_dec_downward = 1 << 0,
     fe_dec_to_nearest = 1 << 1,
@@ -19,9 +24,9 @@ enum class rounding_mode : unsigned
     fe_dec_default = fe_dec_to_nearest_from_zero
 };
 
-static rounding_mode _boost_decimal_global_rounding_mode {rounding_mode::fe_dec_default};
+BOOST_DECIMAL_INLINE_VARIABLE rounding_mode _boost_decimal_global_rounding_mode {rounding_mode::fe_dec_default};
 
-inline auto fegetround() noexcept -> rounding_mode
+BOOST_DECIMAL_EXPORT inline auto fegetround() noexcept -> rounding_mode
 {
     return _boost_decimal_global_rounding_mode;
 }
@@ -29,7 +34,7 @@ inline auto fegetround() noexcept -> rounding_mode
 // If we can't support constexpr and non-constexpr code paths we won't honor the updated rounding-mode,
 // since it will not be used anyway.
 // Return the default rounding mode
-inline auto fesetround(rounding_mode round) noexcept -> rounding_mode
+BOOST_DECIMAL_EXPORT inline auto fesetround(rounding_mode round) noexcept -> rounding_mode
 {
     _boost_decimal_global_rounding_mode = round;
     return round;

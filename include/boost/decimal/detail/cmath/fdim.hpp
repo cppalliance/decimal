@@ -8,14 +8,18 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <limits>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto fdim(T x, T y) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

@@ -8,12 +8,16 @@
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <functional>
 #include <cstring>
+#endif
 
 namespace std {
 
-template <>
+BOOST_DECIMAL_EXPORT template <>
 struct hash<boost::decimal::decimal32>
 {
     // Since the underlying type is a std::uint32_t we will rely on its hash function from the STL
@@ -26,7 +30,7 @@ struct hash<boost::decimal::decimal32>
     }
 };
 
-template <>
+BOOST_DECIMAL_EXPORT template <>
 struct hash<boost::decimal::decimal64>
 {
     // Since the underlying type is a std::uint64_t we will rely on its hash function from the STL
@@ -44,7 +48,7 @@ struct hash<boost::decimal::decimal64>
 #  pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
 
-template <>
+BOOST_DECIMAL_EXPORT template <>
 struct hash<boost::decimal::decimal128>
 {
     // Take the xor of the two words and hash that

@@ -6,8 +6,11 @@
 #define BOOST_DECIMAL_DETAIL_BIT_CAST_HPP
 
 #include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstring>
+#endif
 
 namespace boost {
 namespace decimal {

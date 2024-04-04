@@ -10,8 +10,12 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -53,7 +57,7 @@ constexpr auto laguerre_impl(unsigned n, T x)
 
 } //namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto laguerre(unsigned n, T x)
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {

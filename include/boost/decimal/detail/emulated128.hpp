@@ -12,6 +12,8 @@
 #include <boost/decimal/detail/countl.hpp>
 #include <boost/decimal/detail/wide-integer/uintwide_t.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+
 #include <cmath>
 #include <cstdint>
 #include <limits>
@@ -22,6 +24,8 @@
 #include <iosfwd>
 #include <ostream>
 #endif
+
+#endif // BOOST_DECIMAL_BUILD_MODULE
 
 namespace boost {
 namespace decimal {

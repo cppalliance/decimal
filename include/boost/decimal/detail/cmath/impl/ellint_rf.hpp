@@ -15,7 +15,10 @@
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/atan.hpp>
 #include <boost/decimal/detail/cmath/impl/ellint_rc.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
+#endif
 
 namespace boost {
 namespace decimal {

@@ -8,16 +8,20 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/modf.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <limits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto round(T num) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
@@ -89,14 +93,14 @@ constexpr auto int_round_impl(T num) noexcept -> Int
 
 } //namespace detail
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto lround(T num) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, long)
 {
     return detail::int_round_impl<T, long>(num);
 }
 
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto llround(T num) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, long long)
 {

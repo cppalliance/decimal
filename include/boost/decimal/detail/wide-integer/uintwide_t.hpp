@@ -18,6 +18,9 @@
 
 #define BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE boost::decimal
 
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cinttypes>
 #include <cstddef>
 #include <cstdint>
@@ -26,6 +29,7 @@
 #include <initializer_list>
 #include <limits>
 #include <type_traits>
+#endif
 
 #if (defined(_MSC_VER) && (!defined(__GNUC__) && !defined(__clang__)))
   #if (_MSC_VER >= 1900) && defined(_HAS_CXX20) && (_HAS_CXX20 != 0)
