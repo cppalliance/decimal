@@ -2,14 +2,22 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+// Import the STL if we can
+#if defined(__cpp_lib_modules) && __cpp_lib_modules >= 202207L
+import std;
+#else
 #include <iostream>
+#endif
 
 import boost2.decimal;
 
 int main()
 {
-    boost::decimal::decimal32 a {2, 0};
-    std::cout << a << std::endl;
+    using namespace boost::decimal;
+
+    decimal32 a {2, 0};
+    a += 2;
+    std::cout << static_cast<double>(a) << std::endl;
 
     return 0;
 }
