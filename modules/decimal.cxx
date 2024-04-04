@@ -5,9 +5,14 @@
 // Global module fragment required for non-module preprocessing
 module;
 
-// Should be able to add a macro check for the following
-//import std;
-//import std.compat;
+#include <version>
+
+#if defined(__cpp_lib_modules) && __cpp_lib_modules >= 202207L
+
+import std;
+import std.compat;
+
+#else
 
 #include <memory>
 #include <new>
@@ -51,6 +56,8 @@ module;
 #include <cinttypes>
 #include <cstdlib>
 #include <cassert>
+
+#endif // Import std
 
 #if defined(_MSC_VER)
 #  include <intrin.h>
