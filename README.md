@@ -99,4 +99,4 @@ int main()
 
 # Full Documentation
 
-The complete documentation can be found at: https://cppalliance.org/decimal/overview.html
+The complete documentation can be found at: https://cppalliance.org/decimal/decimal.html
