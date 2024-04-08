@@ -13,6 +13,7 @@
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/to_string.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/locale_conversion.hpp>
 #include <boost/decimal/charconv.hpp>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
@@ -56,6 +57,8 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     {
         std::memcpy(buffer, t_buffer, sizeof(t_buffer));
     }
+
+    detail::convert_string_to_c_locale(buffer);
 
     chars_format fmt = chars_format::general;
     const auto flags {is.flags()};
@@ -128,6 +131,8 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
     }
 
     *r.ptr = '\0';
+
+    detail::convert_string_to_local_locale(buffer);
 
     BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<charT, char>::value)
     {
