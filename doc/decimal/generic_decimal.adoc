@@ -114,6 +114,7 @@ constexpr std::partial_ordering operator<=>(LHS lhs, decimal64 rhs) noexcept;
 constexpr std::partial_ordering operator<=>(LHS lhs, decimal128 rhs) noexcept;
 
 // 3.2.10 Formatted input:
+// These functions are locale dependent
 template <typename charT, typename traits>
 std::basic_istream<charT, traits>&
 operator>>(std::basic_istream<charT, traits>& is,
@@ -130,6 +131,7 @@ operator>>(std::basic_istream<charT, traits> & is,
 decimal128& d);
 
 // 3.2.11 Formatted output:
+// These functions are locale dependent
 template <typename charT, typename traits>
 std::basic_ostream<charT, traits>&
 operator<<(std::basic_ostream<charT, traits>& os,
