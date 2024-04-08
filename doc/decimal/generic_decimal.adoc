@@ -37,6 +37,7 @@ constexpr decimal64  operator-(decimal64 rhs) noexcept;
 constexpr decimal128 operator-(decimal128 rhs) noexcept;
 
 // 3.2.8 binary arithmetic operators:
+// LHS and RHS can be any integer or decimal type
 
 constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal32 rhs) noexcept;
 constexpr /* see 3.2.8 */ operator+(LHS lhs, decimal64 rhs) noexcept;
@@ -67,6 +68,7 @@ constexpr /* see 3.2.8 */ operator/(decimal64 lhs, RHS rhs) noexcept;
 constexpr /* see 3.2.8 */ operator/(decimal128 lhs, RHS rhs) noexcept;
 
 // 3.2.9 comparison operators:
+// LHS and RHS can be any integer or decimal type
 
 constexpr bool operator==(LHS lhs, decimal32 rhs) noexcept;
 constexpr bool operator==(LHS lhs, decimal64 rhs) noexcept;
@@ -106,6 +108,8 @@ constexpr bool operator>=(decimal64 lhs, RHS rhs) noexcept;
 constexpr bool operator>=(decimal128 lhs, RHS rhs) noexcept;
 
 // If C++20 is available
+// LHS and RHS can be any integer or decimal type
+
 constexpr std::partial_ordering operator<=>(decimal32 lhs, RHS rhs) noexcept;
 constexpr std::partial_ordering operator<=>(decimal64 lhs, RHS rhs) noexcept;
 constexpr std::partial_ordering operator<=>(decimal128 lhs, RHS rhs) noexcept;
