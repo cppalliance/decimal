@@ -20,7 +20,7 @@ As opposed to binary floating point types IEEE 754 defined 5 rounding modes inst
 
 The default rounding mode is to nearest from zero.
 
-IMPORTANT: The rounding mode can only be changed at runtime. All constexpr calculations will use the default.
+IMPORTANT: The rounding mode can only be changed at runtime. All constexpr calculations will use the default of to nearest from zero.
 
 [source, c++]
 ----
