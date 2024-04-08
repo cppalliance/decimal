@@ -10,6 +10,7 @@
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/utilities.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+#include <boost/decimal/detail/locale_conversion.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <memory>
@@ -26,19 +27,6 @@ namespace boost {
 namespace decimal {
 
 namespace detail {
-
-inline void convert_string_locale(char* buffer) noexcept
-{
-    const auto locale_decimal_point = *std::localeconv()->decimal_point;
-    if (locale_decimal_point != '.')
-    {
-        auto p = std::strchr(buffer, static_cast<int>(locale_decimal_point));
-        if (p != nullptr)
-        {
-            *p = '.';
-        }
-    }
-}
 
 // 3.8.2
 template <typename TargetDecimalType>
