@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == <cmath>
 
-Decimal contains all functions from `<cmath>` and they have the same handling as built-in floating point types.
+Decimal contains overloads for all functions from `<cmath>`, and they have the same handling as built-in floating point types.
 They are also all constexpr with C\\++14 unlike the built-in floating point types which require either C++23 or 26.
 
 === Basic Operations

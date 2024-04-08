@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == <cfloat>
 
-The following macros are extended from <cfloat> for the decimal floating point types:
+The following macros analogous to those from <cfloat> for the decimal floating point types:
 
 [source, c++]
 ----

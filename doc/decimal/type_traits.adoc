@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == <type_traits>
 
-The following type traits from boost.type_traits have been overloaded fro the decimal types:
+The following type traits from boost.type_traits have been overloaded for the decimal types:
 
 [source, c++]
 ----

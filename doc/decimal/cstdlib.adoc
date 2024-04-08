@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == <cstdlib>
 
-The following functions from <cstdlib> are provided:
+The following functions analogous to those from <cstdlib> are provided:
 
 [source, c++]
 ----
