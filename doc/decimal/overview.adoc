@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == Description
 
-Boost.Decimal is an implementation of IEEE 754 Decimal Floating Point numbers.
+Boost.Decimal is an implementation of https://standards.ieee.org/ieee/754/6210/[IEEE 754] and https://www.open-std.org/JTC1/SC22/WG21/docs/papers/2009/n2849.pdf[ISO/IEC DTR 24733] Decimal Floating Point numbers.
 The library is header-only, has no dependencies, and requires C++14.
 
 == Motivation
