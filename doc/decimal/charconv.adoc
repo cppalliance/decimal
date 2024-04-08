@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == <charconv>
 
-The following functions from https://en.cppreference.com/w/cpp/header/charconv[<charconv>] are provided:
+The following functions analogous to those from https://en.cppreference.com/w/cpp/header/charconv[<charconv>] are provided:
 
 [source, c++]
 ----

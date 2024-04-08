@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == Overview
 
-Contains all constants provided by C+\+20's `<numbers>` specialized for the decimal types, but does not require C++20.
+Contains all constants provided by C+\+20's `<numbers>` specialized for the decimal types. These does not require C++20.
 
 - e_v - https://en.wikipedia.org/wiki/E_(mathematical_constant)[Euler's Number]
 - log2e_v - log2(e)
