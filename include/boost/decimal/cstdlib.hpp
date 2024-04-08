@@ -35,7 +35,7 @@ inline auto strtod_calculation(const char* str, char** endptr, char* buffer, std
     using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, detail::uint128, std::uint64_t>;
 
     std::memcpy(buffer, str, str_length);
-    convert_string_locale(buffer);
+    convert_string_to_c_locale(buffer);
 
     bool sign {};
     significand_type significand {};

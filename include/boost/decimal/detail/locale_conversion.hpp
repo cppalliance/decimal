@@ -15,7 +15,7 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-inline void convert_string_locale(char* buffer) noexcept
+inline void convert_string_to_c_locale(char* buffer) noexcept
 {
     const auto locale_decimal_point = *std::localeconv()->decimal_point;
     if (locale_decimal_point != '.')
@@ -24,6 +24,19 @@ inline void convert_string_locale(char* buffer) noexcept
         if (p != nullptr)
         {
             *p = '.';
+        }
+    }
+}
+
+inline void convert_string_to_local_locale(char* buffer) noexcept
+{
+    const auto locale_decimal_point = *std::localeconv()->decimal_point;
+    if (locale_decimal_point != '.')
+    {
+        auto p = std::strchr(buffer, static_cast<int>('.'));
+        if (p != nullptr)
+        {
+            *p = locale_decimal_point;
         }
     }
 }
