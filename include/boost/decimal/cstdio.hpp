@@ -90,16 +90,12 @@ inline auto parse_format(const char* format) -> parameters
         ++iter;
         if (iter == last)
         {
-            params.return_type = decimal_type::decimal64;
             return params;
         }
         else if (*iter == 'D')
         {
             params.return_type = decimal_type::decimal128;
-        }
-        else
-        {
-            params.return_type = decimal_type::decimal64;
+            ++iter;
         }
     }
 
