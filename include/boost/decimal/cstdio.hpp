@@ -113,15 +113,15 @@ inline auto parse_format(const char* format) -> parameters
         case 'E':
             params.upper_case = true;
         case 'e':
-            params.chars_format = chars_format::scientific;
+            params.fmt = chars_format::scientific;
             break;
         case 'f':
-            params.chars_format = chars_format::fixed;
+            params.fmt = chars_format::fixed;
             break;
         case 'A':
             params.upper_case = true;
         case 'a':
-            params.chars_format = chars_format::hex;
+            params.fmt = chars_format::hex;
             break;
         default:
             // Invalid specifier
