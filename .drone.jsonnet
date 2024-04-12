@@ -270,6 +270,22 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
         ["deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"],
     ),
 
+    linux_pipeline(
+        "Linux 22.04 Clang 16",
+        "cppalliance/droneubuntu2204:1",
+        { TOOLSET: 'clang', COMPILER: 'clang++-16', CXXSTD: '03,11,14,17,20,2b' },
+        "clang-16",
+        ["deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main"],
+    ),
+
+    linux_pipeline(
+        "Linux 23.10 Clang 17",
+        "cppalliance/droneubuntu2310:1",
+        { TOOLSET: 'clang', COMPILER: 'clang++-17', CXXSTD: '03,11,14,17,20,2b' },
+        "clang-17",
+        ["deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"],
+    ),
+
     macos_pipeline(
         "MacOS 10.15 Xcode 12.2 UBSAN",
         { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,2a' } + ubsan,
