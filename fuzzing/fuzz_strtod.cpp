@@ -12,13 +12,13 @@ extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size
     {
         auto c_data = reinterpret_cast<const char*>(data);
 
-        char** endptr;
+        char** endptr = nullptr;
 
-        boost::decimal::decimal32 f_val = boost::decimal::strtod32(c_data, endptr);
+        boost::decimal::strtod32(c_data, endptr);
 
-        boost::decimal::decimal64 val = boost::decimal::strtod64(c_data, endptr);
+        boost::decimal::strtod64(c_data, endptr);
 
-        boost::decimal::decimal128 ld_val = boost::decimal::strtod128(c_data, endptr);
+        boost::decimal::strtod128(c_data, endptr);
     }
     catch(...)
     {
