@@ -146,6 +146,55 @@ inline void make_uppercase(char* first, const char* last) noexcept
 
 } // namespace detail
 
+template <typename T>
+inline int snprintf(char* buffer, std::size_t buf_size, const char* format, T value) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
+{
+    if (buffer == nullptr || format == nullptr)
+    {
+        return -1;
+    }
+
+    auto params = detail::parse_format(format);
+
+    to_chars_result r;
+    switch (params.return_type)
+    {
+        case detail::decimal_type::decimal32:
+            r = to_chars(buffer, buffer + buf_size, static_cast<decimal32>(value), params.fmt, params.precision);
+            break;
+        case detail::decimal_type::decimal64:
+            r = to_chars(buffer, buffer + buf_size, static_cast<decimal64>(value), params.fmt, params.precision);
+            break;
+        default:
+            r = to_chars(buffer, buffer + buf_size, static_cast<decimal128>(value), params.fmt, params.precision);
+            break;
+    }
+
+    if (!r)
+    {
+        errno = static_cast<int>(r.ec);
+        return -1;
+    }
+
+    *r.ptr = '\0';
+    if (params.upper_case)
+    {
+        detail::make_uppercase(buffer, r.ptr);
+    }
+
+    detail::convert_string_to_local_locale(buffer);
+
+    return static_cast<int>(r.ptr - buffer);
+}
+
+template <typename T>
+inline int sprintf(char* buffer, const char* format, T value) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
+{
+    return snprintf(buffer, sizeof(buffer), format, value);
+}
+
 } // namespace decimal
 } // namespace boost
 
