@@ -8,10 +8,11 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/locale_conversion.hpp>
 #include <boost/decimal/detail/parser.hpp>
+#include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/charconv.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
-#include <cstdint>
+#include <cctype>
 #endif
 
 // H is the type modifier used for decimal32
@@ -129,6 +130,18 @@ inline auto parse_format(const char* format) -> parameters
     }
 
     return params;
+}
+
+inline void make_uppercase(char* first, const char* last) noexcept
+{
+    while (first != last)
+    {
+        if (*first >= 'a' && *first <= 'e' || *first == 'p')
+        {
+            *first = static_cast<char>(std::toupper(static_cast<int>(*first)));
+        }
+        ++first;
+    }
 }
 
 } // namespace detail
