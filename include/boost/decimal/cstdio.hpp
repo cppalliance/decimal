@@ -70,7 +70,7 @@ inline auto parse_format(const char* format) -> parameters
         params.precision = 0;
         while (iter != last && is_integer_char(*iter))
         {
-            params.precision = params.precision * 10 + *iter;
+            params.precision = params.precision * 10 + digit_from_char(*iter);
             ++iter;
         }
 
@@ -136,7 +136,7 @@ inline void make_uppercase(char* first, const char* last) noexcept
 {
     while (first != last)
     {
-        if (*first >= 'a' && *first <= 'e' || *first == 'p')
+        if ((*first >= 'a' && *first <= 'e') || *first == 'p')
         {
             *first = static_cast<char>(std::toupper(static_cast<int>(*first)));
         }
@@ -147,7 +147,7 @@ inline void make_uppercase(char* first, const char* last) noexcept
 } // namespace detail
 
 template <typename T>
-inline int snprintf(char* buffer, std::size_t buf_size, const char* format, T value) noexcept
+inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T value) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
 {
     if (buffer == nullptr || format == nullptr)
@@ -189,7 +189,7 @@ inline int snprintf(char* buffer, std::size_t buf_size, const char* format, T va
 }
 
 template <typename T>
-inline int sprintf(char* buffer, const char* format, T value) noexcept
+inline auto sprintf(char* buffer, const char* format, T value) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
 {
     return snprintf(buffer, sizeof(buffer), format, value);

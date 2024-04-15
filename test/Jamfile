@@ -108,6 +108,7 @@ run test_promotion.cpp ;
 run test_remainder_remquo.cpp ;
 run test_sin_cos.cpp ;
 run test_sinh.cpp ;
+run test_snprintf.cpp ;
 run test_sqrt.cpp ;
 run test_strtod.cpp ;
 run test_tan.cpp ;
