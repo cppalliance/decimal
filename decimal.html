@@ -641,6 +641,16 @@ pre.rouge .gs {
 <li><a href="#cfloat_cfloat">&lt;cfloat&gt;</a></li>
 </ul>
 </li>
+<li><a href="#cstdio">cstdio support</a>
+<ul class="sectlevel2">
+<li><a href="#cstdio_cstdio">&lt;cstdio&gt;</a>
+<ul class="sectlevel3">
+<li><a href="#cstdio_type_modifiers">Type Modifiers</a></li>
+<li><a href="#cstdio_examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#functional">functional support</a>
 <ul class="sectlevel2">
 <li><a href="#functional_functional">&lt;functional&gt;</a></li>
@@ -2160,18 +2170,6 @@ The significand is normalized to the number of digits of precision the type has 
 </li>
 </ul>
 </div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Warning</div>
-</td>
-<td class="content">
-Hex format is currently in development and will <code>assert</code> unusable right now.
-</td>
-</tr>
-</table>
-</div>
 </div>
 </div>
 </div>
@@ -2304,6 +2302,113 @@ The rounding mode can only be changed at runtime. All constexpr calculations wil
 </div>
 <div class="paragraph">
 <p>To use the functionallity you must <code>#define BOOST_DECIMAL_DEC_EVAL_METHOD</code> to the value you want before you <code>#include &lt;boost/decimal.hpp&gt;</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cstdio">cstdio support</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="cstdio_cstdio">&lt;cstdio&gt;</h3>
+<div class="paragraph">
+<p>The following functions analogous to those from &lt;cstdio&gt; are provided:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Dec</span><span class="p">&gt;</span>
+<span class="kt">int</span> <span class="n">snprintf</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">buf_size</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">format</span><span class="p">,</span> <span class="n">Dec</span> <span class="n">value</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Dec</span><span class="p">&gt;</span>
+<span class="kt">int</span> <span class="n">sprintf</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">format</span><span class="p">,</span> <span class="n">Dec</span> <span class="n">value</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="p">}</span> <span class="c1">//namespace decimal</span>
+<span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+In the interest of safety <code>sprintf</code> simply calls <code>snprintf</code> with buf_size equal to sizeof(buffer).
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="cstdio_type_modifiers">Type Modifiers</h4>
+<div class="paragraph">
+<p>The type modifiers to be used are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>"H" for <code>decimal32</code></p>
+</li>
+<li>
+<p>"D" for <code>decimal64</code></p>
+</li>
+<li>
+<p>"DD" for <code>decimal128</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The remaining specifications of cstdio are the same as usual:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>"g" or "G" for general format</p>
+</li>
+<li>
+<p>"e" or "E" for scientific format</p>
+</li>
+<li>
+<p>"f" for fixed format</p>
+</li>
+<li>
+<p>"a" or "A" for hex format</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The uppercase format will return with all applicable values in uppercase (e.g. 3.14E+02 vs 3.14e+02)
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cstdio_examples">Examples</h4>
+<div class="paragraph">
+<p>Here are some example formats:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>"%Hg" will print a <code>decimal32</code> in general format</p>
+</li>
+<li>
+<p>"%.3De" will print a <code>decimal64</code> in scientific format with 3 digits of precision</p>
+</li>
+<li>
+<p>"%.5DDA" will print a <code>decimal128</code> in hex format with 5 digits of precision and all letters will be capitalized (e.g. 1.F2CP+2 vs 1.f2cp+2)</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -2753,7 +2858,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-04-02 10:23:24 +0200
+Last updated 2024-04-16 08:58:11 +0200
 </div>
 </div>
 <style>
