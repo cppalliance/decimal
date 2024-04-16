@@ -136,7 +136,7 @@ inline void make_uppercase(char* first, const char* last) noexcept
 {
     while (first != last)
     {
-        if ((*first >= 'a' && *first <= 'e') || *first == 'p')
+        if ((*first >= 'a' && *first <= 'f') || *first == 'p')
         {
             *first = static_cast<char>(std::toupper(static_cast<int>(*first)));
         }
