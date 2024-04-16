@@ -15,6 +15,8 @@
 #include <cctype>
 #endif
 
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+
 // H is the type modifier used for decimal32
 // D is the type modifier used for deciaml64
 // DD is the type modifier used for decimal128
@@ -197,5 +199,7 @@ inline auto sprintf(char* buffer, const char* format, T value) noexcept
 
 } // namespace decimal
 } // namespace boost
+
+#endif // #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
 #endif //BOOST_DECIMAL_CSTDIO_HPP
