@@ -27,6 +27,9 @@
 #  pragma GCC diagnostic ignored "-Wconversion"
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
+#elif defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable : 4244) //Implicit conversion from char to int in toupper
 #endif
 
 #include <boost/core/lightweight_test.hpp>
