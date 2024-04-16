@@ -1,0 +1,55 @@
+////
+Copyright 2024 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#cstdio]
+= cstdio support
+:idprefix: cstdio_
+
+== <cstdio>
+
+The following functions analogous to those from <cstdio> are provided:
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
+template <typename Dec>
+int snprintf(char* buffer, std::size_t buf_size, const char* format, Dec value) noexcept;
+
+template <typename Dec>
+int sprintf(char* buffer, const char* format, Dec value) noexcept;
+
+} //namespace decimal
+} //namespace boost
+----
+
+WARNING: In the interest of safety `sprintf` simply calls `snprintf` with buf_size equal to sizeof(buffer).
+
+=== Type Modifiers
+
+The type modifiers to be used are:
+
+- "H" for `decimal32`
+- "D" for `decimal64`
+- "DD" for `decimal128`
+
+The remaining specifications of cstdio are the same as usual:
+
+- "g" or "G" for general format
+- "e" or "E" for scientific format
+- "f" for fixed format
+- "a" or "A" for hex format
+
+NOTE: The uppercase format will return with all applicable values in uppercase (e.g. 3.14E+02 vs 3.14e+02)
+
+=== Examples
+
+Here are some example formats:
+
+- "%Hg" will print a `decimal32` in general format
+- "%.3De" will print a `decimal64` in scientific format with 3 digits of precision
+- "%.5DDA" will print a `decimal128` in hex format with 5 digits of precision and all letters will be capitalized (e.g. 1.F2CP+2 vs 1.f2cp+2)
