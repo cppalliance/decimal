@@ -228,6 +228,29 @@ inline auto sprintf(char* buffer, const char* format, T... values) noexcept
     return detail::snprintf_impl(buffer, sizeof(buffer), format, params, values...);
 }
 
+template <typename... T>
+inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
+#ifndef BOOST_DECIMAL_HAS_CONCEPTS
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
+    #else
+    -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
+    #endif
+{
+    const auto params = detail::parse_format(format);
+    char char_buffer[1024];
+
+    int bytes {};
+    for (const auto value : {values...})
+    {
+        const auto current_bytes = snprintf(char_buffer, char_buffer + sizeof(char_buffer), format, params, value);
+        if (current_bytes)
+        {
+            bytes += std::fwrite(char_buffer, sizeof(char), static_cast<std::size_t>(current_bytes), buffer);
+        }
+    }
+
+    return bytes;
+}
 
 } // namespace decimal
 } // namespace boost
