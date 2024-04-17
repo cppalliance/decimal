@@ -17,11 +17,11 @@ The following functions analogous to those from <cstdio> are provided:
 namespace boost {
 namespace decimal {
 
-template <typename Dec>
-int snprintf(char* buffer, std::size_t buf_size, const char* format, Dec value) noexcept;
+template <typename... Dec>
+int snprintf(char* buffer, std::size_t buf_size, const char* format, Dec... value) noexcept;
 
-template <typename Dec>
-int sprintf(char* buffer, const char* format, Dec value) noexcept;
+template <typename... Dec>
+int sprintf(char* buffer, const char* format, Dec... value) noexcept;
 
 } //namespace decimal
 } //namespace boost
