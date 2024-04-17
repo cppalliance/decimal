@@ -252,6 +252,17 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
     return bytes;
 }
 
+template <typename... T>
+inline auto printf(const char* format, T... values) noexcept
+    #ifndef BOOST_DECIMAL_HAS_CONCEPTS
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
+    #else
+    -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
+    #endif
+{
+    return fprintf(stdout, format, values...);
+}
+
 } // namespace decimal
 } // namespace boost
 
