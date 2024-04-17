@@ -13,6 +13,7 @@
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cctype>
+#include <cstdio>
 #endif
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
@@ -151,7 +152,7 @@ inline void make_uppercase(char* first, const char* last) noexcept
 }
 
 template <typename... T>
-inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format, T... values) noexcept
+inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format, parameters params, T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
     -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
     #else
@@ -162,8 +163,6 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
     {
         return -1;
     }
-
-    auto params = detail::parse_format(format);
 
     std::ptrdiff_t byte_count {};
     for (const auto value : {values...})
@@ -212,7 +211,8 @@ inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T..
     -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
     #endif
 {
-    return detail::snprintf_impl(buffer, buf_size, format, values...);
+    const auto params = detail::parse_format(format);
+    return detail::snprintf_impl(buffer, buf_size, format, params, values...);
 }
 
 template <typename... T>
@@ -223,8 +223,10 @@ inline auto sprintf(char* buffer, const char* format, T... values) noexcept
     -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
     #endif
 {
-    return detail::snprintf_impl(buffer, sizeof(buffer), format, values...);
+    const auto params = detail::parse_format(format);
+    return detail::snprintf_impl(buffer, sizeof(buffer), format, params, values...);
 }
+
 
 } // namespace decimal
 } // namespace boost
