@@ -476,6 +476,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     {
         if (exponent < 0 && -exponent < buffer_size)
         {
+            // Bounds check our move
+            if (r.ptr + 2 > last)
+            {
+                return {last, std::errc::value_too_large};
+            }
+
             boost::decimal::detail::memmove(r.ptr + exponent + 1, r.ptr + exponent,
                                             static_cast<std::size_t>(-exponent));
             boost::decimal::detail::memset(r.ptr + exponent, '.', 1U);
@@ -483,6 +489,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         }
         else if (exponent >= 1)
         {
+            // Bounds check the length of the memset before doing so
+            if (r.ptr + exponent + 1 > last)
+            {
+                return {last, std::errc::value_too_large};
+            }
+
             boost::decimal::detail::memset(r.ptr, '0', static_cast<std::size_t>(exponent));
             r.ptr += exponent;
 
@@ -506,6 +518,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         #endif
 
         const auto offset_bytes = static_cast<std::size_t>(integer_digits);
+
+        // Bounds check memmove followed by insertion of 0.
+        if (first + 2 + offset_bytes + (static_cast<std::size_t>(-exponent) - offset_bytes) + 2 > last)
+        {
+            return {last, std::errc::value_too_large};
+        }
 
         boost::decimal::detail::memmove(first + 2 + offset_bytes,
                                         first,
