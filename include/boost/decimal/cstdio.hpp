@@ -165,7 +165,7 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
     }
 
     std::ptrdiff_t byte_count {};
-    for (const auto value : {values...})
+    for (const auto& value : {values...})
     {
         to_chars_result r;
         switch (params.return_type)
