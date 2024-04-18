@@ -13,6 +13,7 @@
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cctype>
+#include <cstdio>
 #endif
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
@@ -150,56 +151,83 @@ inline void make_uppercase(char* first, const char* last) noexcept
     }
 }
 
-} // namespace detail
-
-template <typename T>
-inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T value) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
+template <typename... T>
+inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format, parameters params, T... values) noexcept
+    #ifndef BOOST_DECIMAL_HAS_CONCEPTS
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
+    #else
+    -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
+    #endif
 {
     if (buffer == nullptr || format == nullptr)
     {
         return -1;
     }
 
-    auto params = detail::parse_format(format);
-
-    to_chars_result r;
-    switch (params.return_type)
+    std::ptrdiff_t byte_count {};
+    for (const auto& value : {values...})
     {
-        case detail::decimal_type::decimal32:
-            r = to_chars(buffer, buffer + buf_size, static_cast<decimal32>(value), params.fmt, params.precision);
-            break;
-        case detail::decimal_type::decimal64:
-            r = to_chars(buffer, buffer + buf_size, static_cast<decimal64>(value), params.fmt, params.precision);
-            break;
-        default:
-            r = to_chars(buffer, buffer + buf_size, static_cast<decimal128>(value), params.fmt, params.precision);
-            break;
+        to_chars_result r;
+        switch (params.return_type)
+        {
+            // Subtract 1 from all cases to ensure there is room to insert the null terminator
+            case detail::decimal_type::decimal32:
+                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count - 1, static_cast<decimal32>(value), params.fmt, params.precision);
+                break;
+            case detail::decimal_type::decimal64:
+                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count - 1, static_cast<decimal64>(value), params.fmt, params.precision);
+                break;
+            default:
+                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count - 1, static_cast<decimal128>(value), params.fmt, params.precision);
+                break;
+        }
+
+        if (!r)
+        {
+            errno = static_cast<int>(r.ec);
+            return -1;
+        }
+
+        *r.ptr = '\0';
+        if (params.upper_case)
+        {
+            detail::make_uppercase(buffer, r.ptr);
+        }
+
+        detail::convert_string_to_local_locale(buffer);
+
+        byte_count += r.ptr - buffer;
     }
 
-    if (!r)
-    {
-        errno = static_cast<int>(r.ec);
-        return -1;
-    }
-
-    *r.ptr = '\0';
-    if (params.upper_case)
-    {
-        detail::make_uppercase(buffer, r.ptr);
-    }
-
-    detail::convert_string_to_local_locale(buffer);
-
-    return static_cast<int>(r.ptr - buffer);
+    return static_cast<int>(byte_count);
 }
 
-template <typename T>
-inline auto sprintf(char* buffer, const char* format, T value) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
+} // namespace detail
+
+template <typename... T>
+inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T... values) noexcept
+    #ifndef BOOST_DECIMAL_HAS_CONCEPTS
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
+    #else
+    -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
+    #endif
 {
-    return snprintf(buffer, sizeof(buffer), format, value);
+    const auto params = detail::parse_format(format);
+    return detail::snprintf_impl(buffer, buf_size, format, params, values...);
 }
+
+template <typename... T>
+inline auto sprintf(char* buffer, const char* format, T... values) noexcept
+    #ifndef BOOST_DECIMAL_HAS_CONCEPTS
+    -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
+    #else
+    -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
+    #endif
+{
+    const auto params = detail::parse_format(format);
+    return detail::snprintf_impl(buffer, sizeof(buffer), format, params, values...);
+}
+
 
 } // namespace decimal
 } // namespace boost
