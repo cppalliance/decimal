@@ -170,14 +170,15 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
         to_chars_result r;
         switch (params.return_type)
         {
+            // Subtract 1 from all cases to ensure there is room to insert the null terminator
             case detail::decimal_type::decimal32:
-                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count, static_cast<decimal32>(value), params.fmt, params.precision);
+                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count - 1, static_cast<decimal32>(value), params.fmt, params.precision);
                 break;
             case detail::decimal_type::decimal64:
-                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count, static_cast<decimal64>(value), params.fmt, params.precision);
+                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count - 1, static_cast<decimal64>(value), params.fmt, params.precision);
                 break;
             default:
-                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count, static_cast<decimal128>(value), params.fmt, params.precision);
+                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count - 1, static_cast<decimal128>(value), params.fmt, params.precision);
                 break;
         }
 
