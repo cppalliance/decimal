@@ -90,6 +90,7 @@ run test_exp.cpp ;
 run test_expm1.cpp ;
 run test_fenv.cpp ;
 run test_float_conversion.cpp ;
+run-fail test_fprintf.cpp ;
 run test_frexp_ldexp.cpp ;
 run test_from_chars.cpp ;
 run test_git_issue_266.cpp ;

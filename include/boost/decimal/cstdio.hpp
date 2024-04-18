@@ -242,7 +242,7 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
     int bytes {};
     for (const auto value : {values...})
     {
-        const auto current_bytes = snprintf(char_buffer, char_buffer + sizeof(char_buffer), format, params, value);
+        const auto current_bytes = detail::snprintf_impl(char_buffer, sizeof(char_buffer), format, params, value);
         if (current_bytes)
         {
             bytes += std::fwrite(char_buffer, sizeof(char), static_cast<std::size_t>(current_bytes), buffer);
