@@ -297,14 +297,12 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
     }
     else
     {
+        // LCOV_EXCL_START
         std::unique_ptr<char[]> longer_char_buffer(new(std::nothrow) char[format_len + value_space + 1]);
-        if (buffer == nullptr)
+        if (longer_char_buffer == nullptr)
         {
-            // Hard to get coverage on memory exhaustion
-            // LCOV_EXCL_START
             errno = ENOMEM;
             return -1;
-            // LCOV_EXCL_STOP
         }
 
         bytes = detail::snprintf_impl(longer_char_buffer.get(), format_len, format, values...);
@@ -312,6 +310,7 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
         {
             bytes += static_cast<int>(std::fwrite(longer_char_buffer.get(), sizeof(char), static_cast<std::size_t>(bytes), buffer));
         }
+        // LCOV_EXCL_STOP
     }
 
     return bytes;
