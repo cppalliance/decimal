@@ -77,6 +77,31 @@ void test_uppercase(T value, const char* format_sprintf, chars_format fmt = char
     BOOST_TEST_EQ(num_bytes, r.ptr - charconv_buffer);
 }
 
+void test_locales()
+{
+    const char buffer[] = "1,1897e+02";
+
+    try
+    {
+        #ifdef BOOST_MSVC
+        std::locale::global(std::locale("German"));
+        #else
+        std::locale::global(std::locale("de_DE.UTF-8"));
+        #endif
+    }
+        // LCOV_EXCL_START
+    catch (...)
+    {
+        std::cerr << "Locale not installed. Skipping test." << std::endl;
+        return;
+    }
+    // LCOV_EXCL_STOP
+
+    char printf_buffer[256];
+    snprintf(printf_buffer, sizeof(printf_buffer), "%.4De", decimal64{11897, -2});
+    BOOST_TEST_CSTR_EQ(printf_buffer, buffer);
+}
+
 template <typename T>
 void test_bootstrap()
 {
@@ -148,6 +173,8 @@ int main()
     test_bootstrap<decimal32>();
     test_bootstrap<decimal64>();
     test_bootstrap<decimal128>();
+
+    test_locales();
 
     return boost::report_errors();
 }

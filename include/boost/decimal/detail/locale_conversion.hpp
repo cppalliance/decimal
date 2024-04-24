@@ -41,6 +41,23 @@ inline void convert_string_to_local_locale(char* buffer) noexcept
     }
 }
 
+inline void convert_pointer_pair_to_local_locale(char* first, const char* last) noexcept
+{
+    const auto locale_decimal_point = *std::localeconv()->decimal_point;
+    if (locale_decimal_point != '.')
+    {
+        while (first != last)
+        {
+            if (*first == '.')
+            {
+                *first = locale_decimal_point;
+            }
+
+            ++first;
+        }
+    }
+}
+
 } //namespace detail
 } //namespace decimal
 } //namespace boost
