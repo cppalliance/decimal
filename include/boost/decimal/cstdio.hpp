@@ -295,7 +295,7 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
         bytes = detail::snprintf_impl(char_buffer, sizeof(char_buffer), format, values...);
         if (bytes)
         {
-            bytes += std::fwrite(char_buffer, sizeof(char), static_cast<std::size_t>(bytes), buffer);
+            bytes += static_cast<int>(std::fwrite(char_buffer, sizeof(char), static_cast<std::size_t>(bytes), buffer));
         }
     }
     else
@@ -313,7 +313,7 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
         bytes = detail::snprintf_impl(longer_char_buffer.get(), format_len, format, values...);
         if (bytes)
         {
-            bytes += std::fwrite(longer_char_buffer.get(), sizeof(char), static_cast<std::size_t>(bytes), buffer);
+            bytes += static_cast<int>(std::fwrite(longer_char_buffer.get(), sizeof(char), static_cast<std::size_t>(bytes), buffer));
         }
     }
 
