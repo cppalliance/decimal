@@ -12,6 +12,8 @@
 #include <boost/decimal/charconv.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <memory>
+#include <new>
 #include <cctype>
 #include <cstdio>
 #endif
@@ -152,7 +154,7 @@ inline void make_uppercase(char* first, const char* last) noexcept
 }
 
 template <typename... T>
-inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format, parameters params, T... values) noexcept
+inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format, T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
     -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
     #else
@@ -164,21 +166,54 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
         return -1;
     }
 
-    std::ptrdiff_t byte_count {};
-    for (const auto& value : {values...})
+    std::size_t byte_count {};
+    const std::initializer_list<std::common_type_t<T...>> values_list {values...};
+    auto value_iter = values_list.begin();
+    const char* iter {format};
+    const char* buffer_begin {buffer};
+
+    const auto format_size = std::strlen(format);
+
+    if (*iter == '"')
     {
+        ++iter;
+    }
+
+    while (byte_count < format_size)
+    {
+        while (byte_count < format_size && *iter != '%')
+        {
+            *buffer++ = *iter++;
+            ++byte_count;
+        }
+
+        if (byte_count == format_size)
+        {
+            break;
+        }
+
+        char params_buffer[10] {};
+        std::size_t param_iter {};
+        while (byte_count < format_size && *iter != ' ' && *iter != '"')
+        {
+            params_buffer[param_iter] = *iter++;
+            ++byte_count;
+            ++param_iter;
+        }
+
+        const auto params = parse_format(params_buffer);
         to_chars_result r;
         switch (params.return_type)
         {
             // Subtract 1 from all cases to ensure there is room to insert the null terminator
             case detail::decimal_type::decimal32:
-                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count - 1, static_cast<decimal32>(value), params.fmt, params.precision);
+                r = to_chars(buffer, buffer + buf_size - byte_count, static_cast<decimal32>(*value_iter), params.fmt, params.precision);
                 break;
             case detail::decimal_type::decimal64:
-                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count - 1, static_cast<decimal64>(value), params.fmt, params.precision);
+                r = to_chars(buffer, buffer + buf_size - byte_count, static_cast<decimal64>(*value_iter), params.fmt, params.precision);
                 break;
             default:
-                r = to_chars(buffer + byte_count, buffer + buf_size - byte_count - 1, static_cast<decimal128>(value), params.fmt, params.precision);
+                r = to_chars(buffer, buffer + buf_size - byte_count, static_cast<decimal128>(*value_iter), params.fmt, params.precision);
                 break;
         }
 
@@ -188,18 +223,16 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
             return -1;
         }
 
-        *r.ptr = '\0';
-        if (params.upper_case)
+        buffer = r.ptr;
+
+        if (value_iter != values_list.end())
         {
-            detail::make_uppercase(buffer, r.ptr);
+            ++value_iter;
         }
-
-        detail::convert_string_to_local_locale(buffer);
-
-        byte_count += r.ptr - buffer;
     }
 
-    return static_cast<int>(byte_count);
+    *buffer = '\0';
+    return static_cast<int>(buffer - buffer_begin);
 }
 
 } // namespace detail
@@ -212,8 +245,7 @@ inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T..
     -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
     #endif
 {
-    const auto params = detail::parse_format(format);
-    return detail::snprintf_impl(buffer, buf_size, format, params, values...);
+    return detail::snprintf_impl(buffer, buf_size, format, values...);
 }
 
 template <typename... T>
@@ -224,8 +256,7 @@ inline auto sprintf(char* buffer, const char* format, T... values) noexcept
     -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
     #endif
 {
-    const auto params = detail::parse_format(format);
-    return detail::snprintf_impl(buffer, sizeof(buffer), format, params, values...);
+    return detail::snprintf_impl(buffer, sizeof(buffer), format, values...);
 }
 
 template <typename... T>
@@ -236,16 +267,39 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
     -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
     #endif
 {
-    const auto params = detail::parse_format(format);
+    if (format == nullptr)
+    {
+        return -1;
+    }
+
+    const auto format_len{std::strlen(format)};
+    int bytes {};
     char char_buffer[1024];
 
-    int bytes {};
-    for (const auto value : {values...})
+    if (format_len <= 1024U)
     {
-        const auto current_bytes = detail::snprintf_impl(char_buffer, sizeof(char_buffer), format, params, value);
-        if (current_bytes)
+        bytes = detail::snprintf_impl(char_buffer, sizeof(char_buffer), format, values...);
+        if (bytes)
         {
-            bytes += std::fwrite(char_buffer, sizeof(char), static_cast<std::size_t>(current_bytes), buffer);
+            bytes += std::fwrite(char_buffer, sizeof(char), static_cast<std::size_t>(bytes), buffer);
+        }
+    }
+    else
+    {
+        std::unique_ptr<char[]> longer_char_buffer(new(std::nothrow) char[format_len + 1]);
+        if (buffer == nullptr)
+        {
+            // Hard to get coverage on memory exhaustion
+            // LCOV_EXCL_START
+            errno = ENOMEM;
+            return -1;
+            // LCOV_EXCL_STOP
+        }
+
+        bytes = detail::snprintf_impl(longer_char_buffer.get(), format_len, format, values...);
+        if (bytes)
+        {
+            bytes += std::fwrite(longer_char_buffer.get(), sizeof(char), static_cast<std::size_t>(bytes), buffer);
         }
     }
 
