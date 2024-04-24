@@ -9,6 +9,7 @@
 #include <boost/decimal/detail/locale_conversion.hpp>
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/charconv.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -49,8 +50,8 @@ inline auto parse_format(const char* format) -> parameters
     // If the format is unspecified or incorrect we will use this as the default values
     parameters params {6, chars_format::general, decimal_type::decimal64, false};
 
-    auto iter = format;
-    const auto last = format + std::strlen(format);
+    auto iter {format};
+    const auto last {format + std::strlen(format)};
 
     if (iter == last || *iter != '%')
     {
@@ -171,30 +172,31 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
     auto value_iter = values_list.begin();
     const char* iter {format};
     const char* buffer_begin {buffer};
+    const char* buffer_end {buffer + buf_size};
 
-    const auto format_size = std::strlen(format);
+    const auto format_size {std::strlen(format)};
 
     if (*iter == '"')
     {
         ++iter;
     }
 
-    while (byte_count < format_size)
+    while (buffer < buffer_end && byte_count < format_size)
     {
-        while (byte_count < format_size && *iter != '%')
+        while (buffer < buffer_end && byte_count < format_size && *iter != '%')
         {
             *buffer++ = *iter++;
             ++byte_count;
         }
 
-        if (byte_count == format_size)
+        if (byte_count == format_size || buffer == buffer_end)
         {
             break;
         }
 
         char params_buffer[10] {};
         std::size_t param_iter {};
-        while (byte_count < format_size && *iter != ' ' && *iter != '"')
+        while (param_iter < 10U && byte_count < format_size && *iter != ' ' && *iter != '"')
         {
             params_buffer[param_iter] = *iter++;
             ++byte_count;
@@ -279,11 +281,16 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
         return -1;
     }
 
+    // Heuristics for how much extra space we need to write the values
+    using common_t = std::common_type_t<T...>;
+    const std::initializer_list<common_t> values_list {values...};
+    const auto value_space {detail::max_string_length_v<common_t> * values_list.size()};
+
     const auto format_len{std::strlen(format)};
     int bytes {};
     char char_buffer[1024];
 
-    if (format_len <= 1024U)
+    if (format_len + value_space <= 1024U)
     {
         bytes = detail::snprintf_impl(char_buffer, sizeof(char_buffer), format, values...);
         if (bytes)
@@ -293,7 +300,7 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
     }
     else
     {
-        std::unique_ptr<char[]> longer_char_buffer(new(std::nothrow) char[format_len + 1]);
+        std::unique_ptr<char[]> longer_char_buffer(new(std::nothrow) char[format_len + value_space + 1]);
         if (buffer == nullptr)
         {
             // Hard to get coverage on memory exhaustion
