@@ -176,11 +176,6 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
 
     const auto format_size {std::strlen(format)};
 
-    if (*iter == '"')
-    {
-        ++iter;
-    }
-
     while (buffer < buffer_end && byte_count < format_size)
     {
         while (buffer < buffer_end && byte_count < format_size && *iter != '%')
@@ -221,8 +216,10 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
 
         if (!r)
         {
+            // LCOV_EXCL_START
             errno = static_cast<int>(r.ec);
             return -1;
+            // LCOV_EXCL_STOP
         }
 
         // Adjust the capitalization and locale
