@@ -12,10 +12,10 @@ int main()
     boost::decimal::printf("%Hg", d);
     std::cout << std::endl;
 
-    boost::decimal::printf("%Hg", d, d);
+    boost::decimal::printf("%Hg %Hg", d, d);
     std::cout << std::endl;
 
-    boost::decimal::printf("%Hg", d, d, d);
+    boost::decimal::printf("%Hg %Hg %Hg", d, d, d);
     std::cout << std::endl;
 
     return 1;
