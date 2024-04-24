@@ -18,5 +18,8 @@ int main()
     boost::decimal::printf("%Hg %Hg %Hg", d, d, d);
     std::cout << std::endl;
 
+    boost::decimal::printf("Value 1: %Hg, Value 2: %Hg, Value 3: %Hg", d, d, d);
+    std::cout << std::endl;
+
     return 1;
 }
