@@ -223,6 +223,13 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
             return -1;
         }
 
+        // Adjust the capitalization and locale
+        if (params.upper_case)
+        {
+            detail::make_uppercase(buffer, r.ptr);
+        }
+        convert_pointer_pair_to_local_locale(buffer, r.ptr);
+
         buffer = r.ptr;
 
         if (value_iter != values_list.end())
