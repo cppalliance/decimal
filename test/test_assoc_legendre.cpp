@@ -74,10 +74,10 @@ void test()
         }
     }
 
-    BOOST_TEST(isnan(assoc_legendre(1U, 1U, dist(rng) * std::numeric_limits<Dec>::signaling_NaN())));
+    BOOST_TEST(isnan(assoc_legendre(1U, 1U, Dec{dist(rng)} * std::numeric_limits<Dec>::signaling_NaN())));
     BOOST_TEST(isnan(assoc_legendre(1U, 1U, Dec{10})));
     BOOST_TEST(isnan(assoc_legendre(1U, 1U, Dec{-10})));
-    BOOST_TEST(isnan(assoc_legendre(200U, 1U, dist(rng) * Dec{1})));
+    BOOST_TEST(isnan(assoc_legendre(200U, 1U, Dec{dist(rng)} * Dec{1})));
 }
 
 // LCOV_EXCL_START
