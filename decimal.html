@@ -675,6 +675,28 @@ pre.rouge .gs {
 <li><a href="#examples_rounding_mode">Rounding Mode</a></li>
 </ul>
 </li>
+<li><a href="#Benchmarks">Benchmarks</a>
+<ul class="sectlevel2">
+<li><a href="#benchmarks_how_to_run_the_benchmarks">How to run the Benchmarks</a></li>
+<li><a href="#benchmarks_comparisons">Comparisons</a>
+<ul class="sectlevel3">
+<li><a href="#benchmarks_m1_macos_results">M1 macOS Results</a></li>
+</ul>
+</li>
+<li><a href="#benchmarks_basic_operations">Basic Operations</a>
+<ul class="sectlevel3">
+<li><a href="#benchmarks_m1_macos_results_2">M1 macOS Results</a>
+<ul class="sectlevel4">
+<li><a href="#benchmarks_addition">Addition</a></li>
+<li><a href="#benchmarks_subtraction">Subtraction</a></li>
+<li><a href="#benchmarks_multiplication">Multiplication</a></li>
+<li><a href="#benchmarks_division">Division</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#design">Design Decisions</a>
 <ul class="sectlevel2">
 <li><a href="#design_c14_requirement">C++14 Requirement</a>
@@ -2319,11 +2341,17 @@ The rounding mode can only be changed at runtime. All constexpr calculations wil
 <pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
 <span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Dec</span><span class="p">&gt;</span>
-<span class="kt">int</span> <span class="n">snprintf</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">buf_size</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">format</span><span class="p">,</span> <span class="n">Dec</span> <span class="n">value</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="o">...</span> <span class="nc">Dec</span><span class="p">&gt;</span>
+<span class="kt">int</span> <span class="n">snprintf</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">buf_size</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">format</span><span class="p">,</span> <span class="n">Dec</span><span class="p">...</span> <span class="n">value</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Dec</span><span class="p">&gt;</span>
-<span class="kt">int</span> <span class="n">sprintf</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">format</span><span class="p">,</span> <span class="n">Dec</span> <span class="n">value</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="o">...</span> <span class="nc">Dec</span><span class="p">&gt;</span>
+<span class="kt">int</span> <span class="n">sprintf</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">format</span><span class="p">,</span> <span class="n">Dec</span><span class="p">...</span> <span class="n">value</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="o">...</span> <span class="nc">Dec</span><span class="p">&gt;</span>
+<span class="kt">int</span> <span class="n">fprintf</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">FILE</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">format</span><span class="p">,</span> <span class="n">Dec</span><span class="p">...</span> <span class="n">values</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="o">...</span> <span class="nc">Dec</span><span class="p">&gt;</span>
+<span class="kt">int</span> <span class="n">printf</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">format</span><span class="p">,</span> <span class="n">Dec</span><span class="p">...</span> <span class="n">values</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
@@ -2635,7 +2663,18 @@ The uppercase format will return with all applicable values in uppercase (e.g. 3
 <li>
 <p><code>BOOST_DECIMAL_DISABLE_CLIB</code>: Defines both of the above macros. In testing this reduces ROM usage by ~50%.</p>
 </li>
+<li>
+<p><code>BOOST_DECIMAL_ALLOW_IMPLICIT_CONVERSIONS</code>: Allows a binary floating-point type (e.g. <code>double</code>) to be implicitly converted to a decimal floating point type.
+This option is not recommended, but can be useful if you want to use specific functionality from the standard library with internal conversions such as:</p>
+</li>
 </ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">constexpr</span> <span class="n">decimal64</span> <span class="n">half</span> <span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">};</span>
+<span class="n">std</span><span class="o">::</span><span class="n">complex</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span> <span class="n">test_val</span> <span class="p">{</span><span class="n">half</span><span class="p">,</span> <span class="n">half</span><span class="p">};</span>
+<span class="k">const</span> <span class="k">auto</span> <span class="n">res</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">acos</span><span class="p">(</span><span class="n">test_val</span><span class="p">);</span></code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -2817,6 +2856,267 @@ The representation is exact with integers whereas you may get surprising or unwa
 </div>
 </div>
 <div class="sect1">
+<h2 id="Benchmarks">Benchmarks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section describes a range of performance benchmarks that have been run comparing this library with the standard library, and how to run your own benchmarks if required.</p>
+</div>
+<div class="paragraph">
+<p>The values in the ratio column are how many times longer running a specific operation takes in comparison to the same operation with a <code>double</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+On nearly all platforms there is hardware support for binary floating point math, so we are comparing hardware to software runtimes; <strong>Decimal will be slower</strong>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="benchmarks_how_to_run_the_benchmarks">How to run the Benchmarks</h3>
+<div id="run_benchmarks_" class="paragraph">
+<p>To run the benchmarks yourself, navigate to the test folder and define <code>BOOST_DECIMAL_RUN_BENCHMARKS</code> when running the tests.
+An example on Linux with b2: <code>../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_DECIMAL_RUN_BENCHMARKS benchmarks -a release</code> .</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="benchmarks_comparisons">Comparisons</h3>
+<div class="paragraph">
+<p>The benchmark for comparisons generates a random vector containing 10,000,000 elements and does operations <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&#8656;</code>, <code>==</code>, and <code>!=</code> between <code>vec[i] and vec[i + 1]</code>.</p>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_m1_macos_results">M1 macOS Results</h4>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (ms)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.333</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">380</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">63.333</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">408</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">608.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">14641</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2440.170</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="benchmarks_basic_operations">Basic Operations</h3>
+<div class="paragraph">
+<p>The benchmark for these operations generates a random vector containing 10,000,000 elements and does operations <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> between <code>vec[i] and vec[i + 1]</code>.</p>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_m1_macos_results_2">M1 macOS Results</h4>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4</p>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_addition">Addition</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (ms)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.500</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">361</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">90.250</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">568</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">142.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">13428</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3357.000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_subtraction">Subtraction</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (ms)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">307</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">307.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">465</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">465.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11444</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11444.000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_multiplication">Multiplication</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (ms)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.333</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">311</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">103.667</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">569</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">189.667</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9430</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3143.330</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_division">Division</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (ms)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.667</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">319</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">106.333</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">395</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">131.667</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">14781</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4927.000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="design">Design Decisions</h2>
 <div class="sectionbody">
 <div class="sect2">
@@ -2858,7 +3158,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-04-16 08:58:11 +0200
+Last updated 2024-04-25 11:40:04 +0200
 </div>
 </div>
 <style>
