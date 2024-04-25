@@ -240,6 +240,9 @@ public:
     #else
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     #endif
+    #ifndef BOOST_DECIMAL_ALLOW_IMPLICIT_CONVERSIONS
+    explicit
+    #endif
     BOOST_DECIMAL_CXX20_CONSTEXPR decimal128(Float val) noexcept;
 
     template <typename Float>

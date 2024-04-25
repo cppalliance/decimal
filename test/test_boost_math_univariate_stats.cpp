@@ -60,10 +60,10 @@ std::vector<T> generate_random_vector(std::size_t size, unsigned seed)
 
     std::mt19937 gen(seed);
 
-    boost::random::normal_distribution<T> dis(0, 1);
+    boost::random::normal_distribution<double> dis(0, 1);
     for(std::size_t i = 0; i < v.size(); ++i)
     {
-        v[i] = dis(gen);
+        v[i] = T{dis(gen)};
     }
     return v;
 }
