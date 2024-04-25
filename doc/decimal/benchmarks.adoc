@@ -1,0 +1,140 @@
+////
+Copyright 2024 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#Benchmarks]
+= Benchmarks
+:idprefix: benchmarks_
+
+This section describes a range of performance benchmarks that have been run comparing this library with the standard library, and how to run your own benchmarks if required.
+
+The values in the ratio column are how many times longer running a specific operation takes in comparison to the same operation with a `double`.
+
+IMPORTANT: On nearly all platforms there is hardware support for binary floating point math, so we are comparing hardware to software runtimes; *Decimal will be slower*
+
+== How to run the Benchmarks
+[#run_benchmarks_]
+
+To run the benchmarks yourself, navigate to the test folder and define `BOOST_DECIMAL_RUN_BENCHMARKS` when running the tests.
+An example on Linux with b2: `../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_DECIMAL_RUN_BENCHMARKS benchmarks -a release` .
+
+== Comparisons
+
+The benchmark for comparisons generates a random vector containing 10,000,000 elements and does operations `>`, `>=`, `<`, `<=`, `==`, and `!=` between `vec[i] and vec[i + 1]`.
+
+=== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+
+|===
+| Type | Runtime (ms) | Ratio to `double`
+| `float`
+| 8
+| 1.333
+| `double`
+| 6
+| 1.000
+| `decimal32`
+| 380
+| 63.333
+| `decimal64`
+| 408
+| 608.000
+| `decimal128`
+| 14641
+| 2440.170
+|===
+
+== Basic Operations
+
+The benchmark for these operations generates a random vector containing 10,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
+
+=== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+
+==== Addition
+
+|===
+| Type | Runtime (ms) | Ratio to `double`
+| `float`
+| 6
+| 1.500
+| `double`
+| 4
+| 1.000
+| `decimal32`
+| 361
+| 90.250
+| `decimal64`
+| 568
+| 142.000
+| `decimal128`
+| 13428
+| 3357.000
+|===
+
+==== Subtraction
+
+|===
+| Type | Runtime (ms) | Ratio to `double`
+| `float`
+| 3
+| 3.000
+| `double`
+| 1
+| 1.000
+| `decimal32`
+| 307
+| 307.000
+| `decimal64`
+| 465
+| 465.000
+| `decimal128`
+| 11444
+| 11444.000
+|===
+
+==== Multiplication
+
+|===
+| Type | Runtime (ms) | Ratio to `double`
+| `float`
+| 1
+| 0.333
+| `double`
+| 3
+| 1.000
+| `decimal32`
+| 311
+| 103.667
+| `decimal64`
+| 569
+| 189.667
+| `decimal128`
+| 9430
+| 3143.330
+|===
+
+==== Division
+
+|===
+| Type | Runtime (ms) | Ratio to `double`
+| `float`
+| 2
+| 0.667
+| `double`
+| 3
+| 1.000
+| `decimal32`
+| 319
+| 106.333
+| `decimal64`
+| 395
+| 131.667
+| `decimal128`
+| 14781
+| 4927.000
+|===
