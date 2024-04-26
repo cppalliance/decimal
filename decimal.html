@@ -695,6 +695,49 @@ pre.rouge .gs {
 </li>
 </ul>
 </li>
+<li><a href="#benchmarks_selected_special_functions">Selected Special Functions</a>
+<ul class="sectlevel3">
+<li><a href="#benchmarks_m1_macos_results_3">M1 macOS Results</a>
+<ul class="sectlevel4">
+<li><a href="#benchmarks_sqrt">SQRT</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#benchmarks_charconv"><code>&lt;charconv&gt;</code></a>
+<ul class="sectlevel3">
+<li><a href="#benchmarks_from_chars_general"><code>from_chars</code> general</a>
+<ul class="sectlevel4">
+<li><a href="#benchmarks_m1_macos_results_4">M1 macOS Results</a></li>
+</ul>
+</li>
+<li><a href="#benchmarks_from_chars_scientific"><code>from_chars</code> scientific</a>
+<ul class="sectlevel4">
+<li><a href="#benchmarks_m1_macos_results_5">M1 macOS Results</a></li>
+</ul>
+</li>
+<li><a href="#benchmarks_to_chars_general_shortest_representation"><code>to_chars</code> general shortest representation</a>
+<ul class="sectlevel4">
+<li><a href="#benchmarks_m1_macos_results_6">M1 macOS Results</a></li>
+</ul>
+</li>
+<li><a href="#benchmarks_to_chars_general_6_digits_of_precision"><code>to_chars</code> general 6-digits of precision</a>
+<ul class="sectlevel4">
+<li><a href="#benchmarks_m1_macos_results_7">M1 macOS Results</a></li>
+</ul>
+</li>
+<li><a href="#benchmarks_to_chars_scientific_shortest_representation"><code>to_chars</code> scientific shortest representation</a>
+<ul class="sectlevel4">
+<li><a href="#benchmarks_m1_macos_results_8">M1 macOS Results</a></li>
+</ul>
+</li>
+<li><a href="#benchmarks_to_chars_scientific_6_digits_of_precision"><code>to_chars</code> scientific 6-digits of precision</a>
+<ul class="sectlevel4">
+<li><a href="#benchmarks_m1_macos_results_9">M1 macOS Results</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#design">Design Decisions</a>
@@ -2886,7 +2929,8 @@ An example on Linux with b2: <code>../../../b2 cxxstd=20 toolset=gcc-13 define=B
 <div class="sect2">
 <h3 id="benchmarks_comparisons">Comparisons</h3>
 <div class="paragraph">
-<p>The benchmark for comparisons generates a random vector containing 10,000,000 elements and does operations <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&#8656;</code>, <code>==</code>, and <code>!=</code> between <code>vec[i] and vec[i + 1]</code>.</p>
+<p>The benchmark for comparisons generates a random vector containing 2,000,000 elements and does operations <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&#8656;</code>, <code>==</code>, and <code>!=</code> between <code>vec[i] and vec[i + 1]</code>.
+This is repeated 5 times to generate stable results.</p>
 </div>
 <div class="sect3">
 <h4 id="benchmarks_m1_macos_results">M1 macOS Results</h4>
@@ -2902,33 +2946,33 @@ An example on Linux with b2: <code>../../../b2 cxxstd=20 toolset=gcc-13 define=B
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (ms)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.333</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9032</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.589</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5684</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">380</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">63.333</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">285,453</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50.2204</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">408</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">608.000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">352,644</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">62.042</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">14641</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2440.170</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15,355,817</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2701.590</p></td>
 </tr>
 </tbody>
 </table>
@@ -2937,7 +2981,8 @@ An example on Linux with b2: <code>../../../b2 cxxstd=20 toolset=gcc-13 define=B
 <div class="sect2">
 <h3 id="benchmarks_basic_operations">Basic Operations</h3>
 <div class="paragraph">
-<p>The benchmark for these operations generates a random vector containing 10,000,000 elements and does operations <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> between <code>vec[i] and vec[i + 1]</code>.</p>
+<p>The benchmark for these operations generates a random vector containing 2,000,000 elements and does operations <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> between <code>vec[i] and vec[i + 1]</code>.
+This is repeated 5 times to generate stable results.</p>
 </div>
 <div class="sect3">
 <h4 id="benchmarks_m1_macos_results_2">M1 macOS Results</h4>
@@ -2955,33 +3000,33 @@ An example on Linux with b2: <code>../../../b2 cxxstd=20 toolset=gcc-13 define=B
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (ms)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.500</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1641</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.965</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1708</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">361</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">90.250</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">378,252</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">221.459</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">568</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">142.000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">589,313</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">345.031</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">13428</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3357.000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">13,829,995</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8097.190</p></td>
 </tr>
 </tbody>
 </table>
@@ -2997,33 +3042,33 @@ An example on Linux with b2: <code>../../../b2 cxxstd=20 toolset=gcc-13 define=B
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (ms)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3.000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3633</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.221</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1636</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">307</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">307.000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">307,765</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">188.120</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">465</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">465.000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">461,442</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">282.055</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">11444</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">11444.000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11,449,306</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6998.350</p></td>
 </tr>
 </tbody>
 </table>
@@ -3039,33 +3084,33 @@ An example on Linux with b2: <code>../../../b2 cxxstd=20 toolset=gcc-13 define=B
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (ms)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.333</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1678</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.523</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3209</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">311</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">103.667</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">310,543</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">96.773</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">569</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">189.667</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">570,938</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">177.918</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">9430</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3143.330</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9,434,297</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2939.95</p></td>
 </tr>
 </tbody>
 </table>
@@ -3081,33 +3126,398 @@ An example on Linux with b2: <code>../../../b2 cxxstd=20 toolset=gcc-13 define=B
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (ms)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.667</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2019</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.565</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3572</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">319</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">106.333</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">322,116</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">90.178</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">395</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">131.667</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">734,173</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">205.536</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">14781</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">4927.000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">14,592,284</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4085.19</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="benchmarks_selected_special_functions">Selected Special Functions</h3>
+<div class="paragraph">
+<p>The benchmark for these operations generates a random vector containing 2,000,000 elements and does operations <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> between <code>vec[i] and vec[i + 1]</code>.
+This is repeated 5 times to generate stable results.</p>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_m1_macos_results_3">M1 macOS Results</h4>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4</p>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_sqrt">SQRT</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1904</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.565</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3746</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,050,241</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1341.72</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12,084,821</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3210.630</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">275,779,340</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">73267.60</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="benchmarks_charconv"><code>&lt;charconv&gt;</code></h3>
+<div class="paragraph">
+<p>For all the following the results compare against <a href="https://github.com/boostorg/charconv">boost.charconv</a> for 10'000'000 conversions.</p>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_from_chars_general"><code>from_chars</code> general</h4>
+<div class="sect4">
+<h5 id="benchmarks_m1_macos_results_4">M1 macOS Results</h5>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">235,816</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.953</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">247,307</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">366,682</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.483</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">485,965</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.965</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<code>decimal128</code> is currently absent due to results showing it is 2 orders of magnitude faster than the others.
+This should not be the case so will be investigated.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_from_chars_scientific"><code>from_chars</code> scientific</h4>
+<div class="sect4">
+<h5 id="benchmarks_m1_macos_results_5">M1 macOS Results</h5>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">241,893</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.975</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">247,975</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">358,189</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.444</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">477,574</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.926</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<code>decimal128</code> is currently absent due to results showing it is 2 orders of magnitude faster than the others.
+This should not be the case so will be investigated.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_to_chars_general_shortest_representation"><code>to_chars</code> general shortest representation</h4>
+<div class="sect4">
+<h5 id="benchmarks_m1_macos_results_6">M1 macOS Results</h5>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">316,300</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.040</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">304,272</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">406,053</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.335</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">678,451</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.230</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,309,346</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20.736</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_to_chars_general_6_digits_of_precision"><code>to_chars</code> general 6-digits of precision</h4>
+<div class="sect4">
+<h5 id="benchmarks_m1_macos_results_7">M1 macOS Results</h5>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">323,867</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.967</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">334,989</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">409,608</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.223</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">702,339</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.097</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,305,521</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18.823</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_to_chars_scientific_shortest_representation"><code>to_chars</code> scientific shortest representation</h4>
+<div class="sect4">
+<h5 id="benchmarks_m1_macos_results_8">M1 macOS Results</h5>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">286,330</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.011</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">283,287</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">290,117</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.024</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">499,637</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.764</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,096,910</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.932</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_to_chars_scientific_6_digits_of_precision"><code>to_chars</code> scientific 6-digits of precision</h4>
+<div class="sect4">
+<h5 id="benchmarks_m1_macos_results_9">M1 macOS Results</h5>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">258,710</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.809</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">319,676</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">292,250</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.914</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">516,399</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.615</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,108,380</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9.724</p></td>
 </tr>
 </tbody>
 </table>
@@ -3158,7 +3568,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-04-25 11:40:04 +0200
+Last updated 2024-04-25 11:42:41 +0200
 </div>
 </div>
 <style>
