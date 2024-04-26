@@ -15,7 +15,6 @@
 #include <cmath>
 #include <cstring>
 
-#define BOOST_DECIMAL_RUN_BENCHMARKS
 #ifdef BOOST_DECIMAL_RUN_BENCHMARKS
 
 using namespace boost::decimal;
