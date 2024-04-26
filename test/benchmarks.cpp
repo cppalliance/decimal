@@ -11,6 +11,7 @@
 #include <type_traits>
 #include <iostream>
 #include <iomanip>
+#include <string>
 #include <cmath>
 #include <cstring>
 
@@ -229,6 +230,113 @@ void test_to_chars(const char* type)
     test_boost_to_chars(data, true, "general   ", 6, type);
 }
 
+template<class T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+BOOST_DECIMAL_NO_INLINE void init_from_chars_input_data( std::vector<std::string>& data, bool general )
+{
+    using std::isfinite;
+
+    data.reserve( N );
+
+    std::mt19937_64 rng;
+
+    for( unsigned i = 0; i < N; ++i )
+    {
+        std::uint64_t tmp = rng();
+
+        T x;
+        std::memcpy( &x, &tmp, sizeof(x) );
+
+        if( !isfinite(x) ) continue;
+
+        char buffer[ 64 ];
+        auto r = boost::charconv::to_chars( buffer, buffer + sizeof( buffer ), x, general? boost::charconv::chars_format::general: boost::charconv::chars_format::scientific );
+
+        std::string y( buffer, r.ptr );
+        data.push_back( y );
+    }
+}
+
+template<class T, std::enable_if_t<!std::is_floating_point<T>::value, bool> = true>
+BOOST_DECIMAL_NO_INLINE void init_from_chars_input_data( std::vector<std::string>& data, bool general )
+{
+    using std::isfinite;
+
+    data.reserve( N );
+
+    std::mt19937_64 rng;
+
+    for( unsigned i = 0; i < N; ++i )
+    {
+        std::uint64_t tmp = rng();
+
+        T x;
+        std::memcpy( &x, &tmp, sizeof(x) );
+
+        if( !isfinite(x) ) continue;
+
+        char buffer[ 64 ];
+        auto r = boost::decimal::to_chars( buffer, buffer + sizeof( buffer ), x, general? boost::decimal::chars_format::general: boost::decimal::chars_format::scientific );
+
+        std::string y( buffer, r.ptr );
+        data.push_back( y );
+    }
+}
+
+template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+BOOST_DECIMAL_NO_INLINE void test_boost_from_chars( std::vector<std::string> const& data, bool general, char const* label, char const* type )
+{
+    auto t1 = std::chrono::steady_clock::now();
+
+    std::size_t s = 0;
+
+    for( int i = 0; i < K; ++i )
+    {
+        for( auto const& x: data )
+        {
+            T y;
+            auto r = boost::charconv::from_chars( x.data(), x.data() + x.size(), y, general? boost::charconv::chars_format::general: boost::charconv::chars_format::scientific );
+
+            s = static_cast<std::size_t>(r.ec);
+        }
+    }
+
+    auto t2 = std::chrono::steady_clock::now();
+
+    std::cout << "boost::charconv::from_chars<" << std::left << std::setw(10) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+}
+
+template <typename T, std::enable_if_t<!std::is_floating_point<T>::value, bool> = true>
+BOOST_DECIMAL_NO_INLINE void test_boost_from_chars( std::vector<std::string> const& data, bool general, char const* label, char const* type )
+{
+    auto t1 = std::chrono::steady_clock::now();
+    std::size_t s = 0;
+
+    for( int i = 0; i < K; ++i )
+    {
+        for( auto const& x: data )
+        {
+            T y;
+            auto r = boost::decimal::from_chars( x.data(), x.data() + x.size(), y, general? boost::decimal::chars_format::general: boost::decimal::chars_format::scientific );
+
+            s = static_cast<std::size_t>(r.ec);
+        }
+    }
+
+    auto t2 = std::chrono::steady_clock::now();
+
+    std::cout << "boost::decimal::from_chars<" << std::left << std::setw(10) << type << ">,  " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+}
+
+template <typename T>
+void test_from_chars(bool general, const char* type)
+{
+    std::vector<std::string> data;
+    init_from_chars_input_data<T>(data, general);
+
+    char const* label = general? "general   ": "scientific";
+    test_boost_from_chars<T>( data, general, label, type );
+}
+
 int main()
 {
     const auto float_vector = generate_random_vector<float>();
@@ -236,7 +344,7 @@ int main()
     const auto dec32_vector = generate_random_vector<decimal32>();
     const auto dec64_vector = generate_random_vector<decimal64>();
     const auto dec128_vector = generate_random_vector<decimal128>();
-    
+
     std::cout << "===== Comparisons =====\n";
 
     test_comparisons(float_vector, "float");
@@ -291,6 +399,18 @@ int main()
     test_to_chars<decimal32>("decimal32");
     test_to_chars<decimal64>("decimal64");
     test_to_chars<decimal128>("decimal128");
+
+    std::cout << "\n===== <charconv> from_chars =====\n";
+    test_from_chars<float>(false, "float");
+    test_from_chars<float>(true, "float");
+    test_from_chars<double>(false, "double");
+    test_from_chars<double>(true, "double");
+    test_from_chars<decimal32>(false, "decimal32");
+    test_from_chars<decimal32>(true, "decimal32");
+    test_from_chars<decimal64>(false, "decimal64");
+    test_from_chars<decimal64>(true, "decimal64");
+    test_from_chars<decimal128>(false, "decimal128");
+    test_from_chars<decimal128>(true, "decimal128");
 
     std::cout << std::endl;
 
