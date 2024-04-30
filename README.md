@@ -1,8 +1,11 @@
 # Decimal
-[![CI](https://github.com/cppalliance/decimal/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/ci.yml)
-[![Build Status](https://drone.cpp.al/api/badges/cppalliance/decimal/status.svg?ref=refs/heads/develop)](https://drone.cpp.al/cppalliance/decimal)
-[![codecov](https://codecov.io/gh/cppalliance/decimal/graph/badge.svg?token=drvY8nnV5S)](https://codecov.io/gh/cppalliance/decimal)
-[![Fuzzing](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml)
+|                  | Master                                                                                                                                                            |   Develop   |
+|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| Drone            | [![Build Status](https://drone.cpp.al/api/badges/cppalliance/decimal/status.svg?ref=refs/heads/master)](https://drone.cpp.al/cppalliance/decimal)                 | [![Build Status](https://drone.cpp.al/api/badges/cppalliance/decimal/status.svg?ref=refs/heads/develop)](https://drone.cpp.al/cppalliance/decimal) |
+| Github Actions | [![CI](https://github.com/cppalliance/decimal/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/ci.yml) | [![CI](https://github.com/cppalliance/decimal/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/ci.yml)
+| Codecov | [![codecov](https://codecov.io/gh/cppalliance/decimal/branch/master/graph/badge.svg?token=drvY8nnV5S)](https://codecov.io/gh/cppalliance/decimal)                 | [![codecov](https://codecov.io/gh/cppalliance/decimal/graph/badge.svg?token=drvY8nnV5S)](https://codecov.io/gh/cppalliance/decimal) |
+| Fuzzing | [![Fuzzing](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml) | [![Fuzzing](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml) |
+
 ---
 
 An implementation of IEEE 754 decimal floating point numbers.
@@ -19,7 +22,7 @@ It can either be copied into the directory of your choice, or installed with CMa
 
 # Supported Platforms
 
-Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon), and Windows with the following compilers:
+Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon), and Windows (x86_64) with the following compilers:
 
 * GCC 7 and later
 * Clang 6 and later
