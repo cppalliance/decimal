@@ -1,0 +1,46 @@
+////
+Copyright 2023 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#cfenv]
+= cfenv support
+:idprefix: cfenv_
+
+== <cfenv>
+
+As opposed to binary floating point types IEEE 754 defined 5 rounding modes instead of 4. They are:
+
+1. Downward
+2. To nearest
+3. To nearest from zero
+4. Toward zero
+5. Upward
+
+The default rounding mode is to nearest from zero.
+
+IMPORTANT: The rounding mode can only be changed at runtime. All constexpr calculations will use the default of to nearest from zero.
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
+enum class rounding_mode : unsigned
+{
+    fe_dec_downward = 1 << 0,
+    fe_dec_to_nearest = 1 << 1,
+    fe_dec_to_nearest_from_zero = 1 << 2,
+    fe_dec_toward_zero = 1 << 3,
+    fe_dec_upward = 1 << 4,
+    fe_dec_default = fe_dec_to_nearest_from_zero
+};
+
+rounding_mode fegetround() noexcept;
+rounding_mode fesetround(rounding_mode round) noexcept;
+
+} //namespace decimal
+} //namespace boost
+----
+

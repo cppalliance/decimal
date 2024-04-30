@@ -1,5 +1,6 @@
 # Copyright 2022 Peter Dimov
-# Copyright 2023 Matt Borland
+# Copyright 2023 - 2024 Matt Borland
+# Copyright 2023 - 2024 Christopher Kormanyos
 # Distributed under the Boost Software License, Version 1.0.
 # https://www.boost.org/LICENSE_1_0.txt
 
@@ -8,13 +9,114 @@ import ../../config/checks/config : requires ;
 
 project : requirements
 
-  <library>/boost/decimal//boost_decimal
+  <library>/boost/charconv//boost_charconv
 
-  <warnings>extra
+  <toolset>gcc:<cxxflags>-Wall
+  <toolset>gcc:<cxxflags>-Wextra
+
+  # Clang-Cl gives errors that are incorrect or irrelevant (e.g. C++98 compat)
+  #<toolset>clang:<cxxflags>-Wall
+  #<toolset>clang:<cxxflags>-Wextra
+
+  <toolset>msvc:<warnings>all
+
+  # Additional flags by request
+  <toolset>gcc:<cxxflags>-Wsign-conversion
+  <toolset>gcc:<cxxflags>-Wconversion
+  <toolset>gcc:<cxxflags>-Wundef
+  <toolset>gcc:<cxxflags>-Wold-style-cast
+  #<toolset>gcc:<cxxflags>-Wduplicated-branches
+  <toolset>gcc:<cxxflags>-Wfloat-equal
+
+  <toolset>clang:<cxxflags>-Wsign-conversion
+  <toolset>clang:<cxxflags>-Wconversion
+  <toolset>clang:<cxxflags>-Wundef
+  <toolset>clang:<cxxflags>-Wold-style-cast
+  <toolset>clang:<cxxflags>-Wfloat-equal
 
   <toolset>msvc:<warnings-as-errors>on
   <toolset>clang:<warnings-as-errors>on
-  <toolset>gcc:<warnings-as-errors>on ;
+  <toolset>gcc:<warnings-as-errors>on
 
+  [ requires cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction cxx14_variable_templates cxx14_constexpr ]
+  ;
+
+run-fail benchmarks.cpp ;
+compile-fail concepts_test.cpp ;
+run github_issue_426.cpp ;
+run github_issue_448.cpp ;
+run ibm_abs.cpp ;
+run ibm_add.cpp ;
+run link_1.cpp link_2.cpp link_3.cpp ;
 run quick.cpp ;
+run random_decimal32_comp.cpp ;
+run random_decimal32_math.cpp ;
+run random_decimal64_comp.cpp ;
+run random_decimal64_math.cpp ;
+run random_decimal128_comp.cpp ;
+run random_decimal128_math.cpp ;
+run random_mixed_decimal_comp.cpp ;
+run random_mixed_decimal_math.cpp ;
+run roundtrip_decimal32.cpp ;
+run roundtrip_decimal64.cpp ;
+run roundtrip_decimal128.cpp ;
+run test_acos.cpp ;
+run test_acosh.cpp ;
+run test_asin.cpp ;
+run test_asinh.cpp ;
+run test_assoc_laguerre.cpp ;
+run test_assoc_legendre.cpp ;
+run test_atan.cpp ;
+run test_atan2.cpp ;
+run test_atanh.cpp ;
+compile-fail test_bad_evaluation_method.cpp ;
+run test_big_uints.cpp ;
+run test_boost_math_univariate_stats.cpp ;
+run test_cbrt.cpp ;
+run test_cmath.cpp ;
+run test_constants.cpp ;
+run test_cosh.cpp ;
 run test_decimal32.cpp ;
+run test_decimal32_stream.cpp ;
+run test_decimal64_basis.cpp ;
+run test_decimal64_stream.cpp ;
+run test_decimal128_basis.cpp ;
+run test_decimal_quantum.cpp ;
+run test_edges_and_behave.cpp ;
+run test_edit_members.cpp ;
+run test_ellint_1.cpp ;
+run test_emulated128.cpp ;
+run test_erf.cpp ;
+run test_exp.cpp ;
+compile-fail test_explicit_floats.cpp ;
+run test_expm1.cpp ;
+run test_fenv.cpp ;
+run test_float_conversion.cpp ;
+run-fail test_fprintf.cpp ;
+run test_frexp_ldexp.cpp ;
+run test_from_chars.cpp ;
+run test_git_issue_266.cpp ;
+run test_git_issue_271.cpp ;
+run test_hash.cpp ;
+run test_hermite.cpp ;
+run test_implicit_integral_conversion.cpp ;
+run test_laguerre.cpp ;
+run test_legendre.cpp ;
+run test_literals.cpp ;
+run test_lgamma.cpp ;
+run test_log.cpp ;
+run test_log1p.cpp ;
+run test_pow.cpp ;
+run test_promotion.cpp ;
+run test_remainder_remquo.cpp ;
+run test_sin_cos.cpp ;
+run test_sinh.cpp ;
+run test_snprintf.cpp ;
+run test_sqrt.cpp ;
+run test_strtod.cpp ;
+run test_tan.cpp ;
+run test_tanh.cpp ;
+run test_tgamma.cpp ;
+run test_to_chars.cpp ;
+run test_to_string.cpp ;
+run test_type_traits.cpp ;

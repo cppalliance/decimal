@@ -1,0 +1,69 @@
+////
+Copyright 2024 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#charconv]
+= charconv support
+:idprefix: charconv_
+
+== <charconv>
+
+The following functions analogous to those from https://en.cppreference.com/w/cpp/header/charconv[<charconv>] are provided:
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
+enum class chars_format : unsigned
+{
+    scientific = 1 << 0,
+    fixed = 1 << 1,
+    hex = 1 << 2,
+    general = fixed | scientific
+};
+
+struct from_chars_result
+{
+    const char* ptr;
+    std::errc ptr;
+
+    friend constexpr auto operator==(const from_chars_result& lhs, const from_chars_result& rhs) noexcept = default;
+
+    constexpr explicit operator bool() const noexcept { return ec == std::errc{}; }
+}
+
+struct to_chars_result
+{
+    char* ptr;
+    std::errc ptr;
+
+    friend constexpr auto operator==(const to_chars_result& lhs, const to_chars_result& rhs) noexcept = default;
+
+    constexpr explicit operator bool() const noexcept { return ec == std::errc{}; }
+}
+
+template <typename DecimalType>
+constexpr from_chars_result from_chars(const char* first, const char* last, DecimalType& value, chars_format fmt = chars_format::general)
+
+template <typename DecimalType>
+BOOST_DECIMAL_CONSTEXPR to_chars_result to_chars(char* first, char* last, DecimalType value) noexcept;
+
+template <typename DecimalType>
+BOOST_DECIMAL_CONSTEXPR to_chars_result to_chars(char* first, char* last, DecimalType value, chars_format fmt) noexcept;
+
+template <typename DecimalType>
+BOOST_DECIMAL_CONSTEXPR to_chars_result to_chars(char* first, char* last, DecimalType value, chars_format fmt, int precision) noexcept;
+
+} //namespace decimal
+} //namespace boost
+----
+
+NOTE: `BOOST_DECIMAL_CONSTEXPR` is defined if:
+
+ - `_MSC_FULL_VER` >= 192528326
+ - `\\__GNUC__` >= 9
+ - Compiler has: `__builtin_is_constant_evaluated()`
+ - C++20 support with: `std::is_constant_evaluated()`

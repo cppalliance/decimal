@@ -1,0 +1,101 @@
+////
+Copyright 2023 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#numbers]
+= Numeric Constants
+:idprefix: numbers_
+
+== Overview
+
+Contains all constants provided by C+\+20's `<numbers>` specialized for the decimal types. These does not require C++20.
+
+- e_v - https://en.wikipedia.org/wiki/E_(mathematical_constant)[Euler's Number]
+- log2e_v - log2(e)
+- log10e_v - log10(e)
+- pi_v - https://en.wikipedia.org/wiki/Pi[pi]
+- inv_pi_v - 1/pi
+- inv_sqrtpi_v - 1 / sqrt(pi)
+- ln2_v - ln(2)
+- ln10_v - ln(10)
+- sqrt2_v - sqrt(2)
+- sqrt3_v - sqrt(3)
+- inv_sqrt3_v - 1 / sqrt(3)
+- egamma_v - https://en.wikipedia.org/wiki/Euler%27s_constant[Euler–Mascheroni constant]
+- phi_v - https://en.wikipedia.org/wiki/Golden_ratio[The Golden Ratio]
+
+There are also non-template variables that provide the constant as a decimal32 type.
+
+== Reference
+
+[source, c++]
+----
+
+#include <boost/decimal/numbers.hpp>
+
+namespace boost {
+namespace decimal {
+
+template <typename Decimal>
+static constexpr Decimal e_v;
+
+template <typename Decimal>
+static constexpr Decimal log2e_v;
+
+template <typename Decimal>
+static constexpr Decimal log10e_v;
+
+template <typename Decimal>
+static constexpr Decimal pi_v;
+
+template <typename Decimal>
+static constexpr Decimal inv_pi_v;
+
+template <typename Decimal>
+static constexpr Decimal inv_sqrtpi_v;
+
+template <typename Decimal>
+static constexpr Decimal ln2_v;
+
+template <typename Decimal>
+static constexpr Decimal ln10_v;
+
+template <typename Decimal>
+static constexpr Decimal sqrt2_v;
+
+template <typename Decimal>
+static constexpr Decimal sqrt3_v;
+
+template <typename Decimal>
+static constexpr Decimal inv_sqrt2_v;
+
+template <typename Decimal>
+static constexpr Decimal inv_sqrt3_v;
+
+template <typename Decimal>
+static constexpr Decimal egamma_v;
+
+template <typename Decimal>
+static constexpr Decimal phi_v;
+
+static constexpr auto e {e_v<decimal32>};
+static constexpr auto log2e {log2e_v<decimal32>};
+static constexpr auto log10e {log10e_v<decimal32>};
+static constexpr auto pi {pi_v<decimal32>};
+static constexpr auto inv_pi {inv_pi_v<decimal32>};
+static constexpr auto inv_sqrtpi {inv_sqrtpi_v<decimal32>};
+static constexpr auto ln2 {ln2_v<decimal32>};
+static constexpr auto ln10 {ln10_v<decimal32>};
+static constexpr auto sqrt2 {sqrt2_v<decimal32>};
+static constexpr auto sqrt3 {sqrt3_v<decimal32>};
+static constexpr auto inv_sqrt2 {inv_sqrt2_v<decimal32>};
+static constexpr auto inv_sqrt3 {inv_sqrt3_v<decimal32>};
+static constexpr auto egamma {egamma_v<decimal32>};
+static constexpr auto phi {phi_v<decimal32>};
+
+} //namespace decimal
+} //namespace boost
+
+----

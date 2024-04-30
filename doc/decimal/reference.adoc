@@ -1,18 +1,18 @@
 ////
-Copyright 2023 Peter Dimov
+Copyright 2023 Matt Borland
 Distributed under the Boost Software License, Version 1.0.
 https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#reference]
-# Reference
+= Reference
 :idprefix: ref_
 
-## <boost/decimal/decimal32.hpp
+== <boost/decimal/decimal32.hpp>
 
-### Synopsis
+=== Synopsis
 
-## <boost/decimal.hpp>
+== <boost/decimal.hpp>
 
 This convenience header includes all headers previously
 mentioned.

@@ -30,3 +30,18 @@
 *.exe
 *.out
 *.app
+test/cover/*.gcov
+test/cover/bin/
+test/cover/obj/
+test/cover/coverage.info
+test/cover/coverage_unfiltered.info
+test/tidy/err/
+test/tidy/tmp/
+cmake-build-debug/
+test/metal/bin/
+
+# Modules
+*.gcm
+
+# Mac option
+*.DS_Store

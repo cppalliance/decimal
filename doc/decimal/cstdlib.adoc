@@ -1,0 +1,34 @@
+////
+Copyright 2023 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#cstdlib]
+= cstdlib support
+:idprefix: cstdlib_
+
+== <cstdlib>
+
+The following functions analogous to those from <cstdlib> are provided:
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
+inline decimal64 strtod(const char* str, char** endptr) noexcept;
+inline decimal64 wcstod(const wchar_t* str, wchar_t** endptr) noexcept;
+
+inline decimal32 strtod32(const char* str, char** endptr) noexcept;
+inline decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept;
+
+inline decimal64 strtod64(const char* str, char** endptr) noexcept;
+inline decimal64 wcstod64(const wchar_t* str, wchar_t** endptr) noexcept;
+
+inline decimal128 strtod128(const char* str, char** endptr) noexcept;
+inline decimal128 wcstod128(const wchar_t* str, wchar_t** endptr) noexcept;
+
+} //namespace decimal
+} //namespace boost
+----

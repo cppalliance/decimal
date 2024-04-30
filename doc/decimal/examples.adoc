@@ -1,0 +1,105 @@
+////
+Copyright 2023 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#examples]
+= Examples
+:idprefix: examples_
+
+== Construction from an Integer and Exponent
+
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <iostream>
+
+int main()
+{
+    constexpr boost::decimal::decimal32 a {2, -1}; // Constructs the number 0.2
+    constexpr boost::decimal::decimal32 b {1, -1}; // Constructs the number 0.1
+    boost::decimal::decimal32 sum {a + b};
+
+    std::cout << sum << std::endl; // prints 0.3
+
+    const boost::decimal::decimal32 neg_a {2, -1, true}; // Constructs the number -0.2
+
+    sum += neg_a;
+
+    std::cout << sum << std::endl; // Prints 0.1
+
+    return 0;
+}
+----
+
+This is the recommended way of constructing a fractional number as opposed to `decimal32 a {0.2}`.
+The representation is exact with integers whereas you may get surprising or unwanted conversion from binary floating point
+
+== Promotion
+
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <type_traits>
+#include <cassert>
+
+int main()
+{
+    using namespace boost::decimal;
+
+    decimal32 x {1}; // Constructs from an integer
+    decimal64 y {2};
+
+    auto sum {x + y};
+
+    assert(std::is_same<decimal64, decltype(sum)>::value);
+
+    return 0;
+}
+----
+
+== charconv
+
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <cassert>
+
+int main()
+{
+    using namespace boost::decimal;
+
+    decimal64 val {0.25}; // Construction from a double (not recommended but allowed)
+
+    char buffer[256];
+    auto r_to = to_chars(buffer, buffer + sizeof(buffer) - 1, val);
+    assert(r_to); // checks std::errc()
+    *r_to.ptr = '\0';
+
+    decimal64 return_value;
+    auto r_from = from_chars(buffer, buffer + std::strlen(buffer), return_value);
+
+    assert(val == return_value);
+
+    return 0;
+}
+----
+
+== Rounding Mode
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <cassert>
+
+int main()
+{
+    auto default_rounding_mode = boost::decimal::fegetround(); // Default is fe_dec_to_nearest_from_zero
+
+    auto new_rounding_mode = fesetround(boost::decimal::rounding_mode::fe_dec_to_nearest);
+
+    assert(default_rounding_mode != new_rounding_mode);
+
+    return 0;
+}
+----

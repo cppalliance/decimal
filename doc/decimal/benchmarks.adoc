@@ -1,0 +1,334 @@
+////
+Copyright 2024 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#Benchmarks]
+= Benchmarks
+:idprefix: benchmarks_
+
+This section describes a range of performance benchmarks that have been run comparing this library with the standard library, and how to run your own benchmarks if required.
+
+The values in the ratio column are how many times longer running a specific operation takes in comparison to the same operation with a `double`.
+
+IMPORTANT: On nearly all platforms there is hardware support for binary floating point math, so we are comparing hardware to software runtimes; *Decimal will be slower*
+
+== How to run the Benchmarks
+[#run_benchmarks_]
+
+To run the benchmarks yourself, navigate to the test folder and define `BOOST_DECIMAL_RUN_BENCHMARKS` when running the tests.
+An example on Linux with b2: `../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_DECIMAL_RUN_BENCHMARKS benchmarks -a release` .
+
+== Comparisons
+
+The benchmark for comparisons generates a random vector containing 2,000,000 elements and does operations `>`, `>=`, `<`, `<=`, `==`, and `!=` between `vec[i] and vec[i + 1]`.
+This is repeated 5 times to generate stable results.
+
+=== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 9032
+| 1.589
+| `double`
+| 5684
+| 1.000
+| `decimal32`
+| 285,453
+| 50.2204
+| `decimal64`
+| 352,644
+| 62.042
+| `decimal128`
+| 15,355,817
+| 2701.590
+|===
+
+== Basic Operations
+
+The benchmark for these operations generates a random vector containing 2,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
+This is repeated 5 times to generate stable results.
+
+=== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+
+==== Addition
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 1641
+| 0.965
+| `double`
+| 1708
+| 1.000
+| `decimal32`
+| 378,252
+| 221.459
+| `decimal64`
+| 589,313
+| 345.031
+| `decimal128`
+| 13,829,995
+| 8097.190
+|===
+
+==== Subtraction
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 3633
+| 2.221
+| `double`
+| 1636
+| 1.000
+| `decimal32`
+| 307,765
+| 188.120
+| `decimal64`
+| 461,442
+| 282.055
+| `decimal128`
+| 11,449,306
+| 6998.350
+|===
+
+==== Multiplication
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 1678
+| 0.523
+| `double`
+| 3209
+| 1.000
+| `decimal32`
+| 310,543
+| 96.773
+| `decimal64`
+| 570,938
+| 177.918
+| `decimal128`
+| 9,434,297
+| 2939.95
+|===
+
+==== Division
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 2019
+| 0.565
+| `double`
+| 3572
+| 1.000
+| `decimal32`
+| 322,116
+| 90.178
+| `decimal64`
+| 734,173
+| 205.536
+| `decimal128`
+| 14,592,284
+| 4085.19
+|===
+
+== Selected Special Functions
+
+The benchmark for these operations generates a random vector containing 2,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
+This is repeated 5 times to generate stable results.
+
+=== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+
+==== SQRT
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 1904
+| 0.565
+| `double`
+| 3746
+| 1.000
+| `decimal32`
+| 5,050,241
+| 1341.72
+| `decimal64`
+| 12,084,821
+| 3210.630
+| `decimal128`
+| 275,779,340
+| 73267.60
+|===
+
+== `<charconv>`
+
+For all the following the results compare against https://github.com/boostorg/charconv[boost.charconv] for 10'000'000 conversions.
+
+=== `from_chars` general
+
+==== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 235,816
+| 0.953
+| `double`
+| 247,307
+| 1.000
+| `decimal32`
+| 366,682
+| 1.483
+| `decimal64`
+| 485,965
+| 1.965
+// Decimal128 was two orders of magnitude faster. I expect an issue
+//| `decimal128`
+//| 275,779,340
+//| 73267.60
+|===
+
+NOTE: `decimal128` is currently absent due to results showing it is 2 orders of magnitude faster than the others.
+This should not be the case so will be investigated.
+
+=== `from_chars` scientific
+
+==== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 241,893
+| 0.975
+| `double`
+| 247,975
+| 1.000
+| `decimal32`
+| 358,189
+| 1.444
+| `decimal64`
+| 477,574
+| 1.926
+// Decimal128 was two orders of magnitude faster. I expect an issue
+//| `decimal128`
+//| 275,779,340
+//| 73267.60
+|===
+
+NOTE: `decimal128` is currently absent due to results showing it is 2 orders of magnitude faster than the others.
+This should not be the case so will be investigated.
+
+=== `to_chars` general shortest representation
+
+==== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 316,300
+| 1.040
+| `double`
+| 304,272
+| 1.000
+| `decimal32`
+| 406,053
+| 1.335
+| `decimal64`
+| 678,451
+| 2.230
+| `decimal128`
+| 6,309,346
+| 20.736
+|===
+
+=== `to_chars` general 6-digits of precision
+
+==== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 323,867
+| 0.967
+| `double`
+| 334,989
+| 1.000
+| `decimal32`
+| 409,608
+| 1.223
+| `decimal64`
+| 702,339
+| 2.097
+| `decimal128`
+| 6,305,521
+| 18.823
+|===
+
+=== `to_chars` scientific shortest representation
+
+==== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 286,330
+| 1.011
+| `double`
+| 283,287
+| 1.000
+| `decimal32`
+| 290,117
+| 1.024
+| `decimal64`
+| 499,637
+| 1.764
+| `decimal128`
+| 3,096,910
+| 10.932
+|===
+
+=== `to_chars` scientific 6-digits of precision
+
+==== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 258,710
+| 0.809
+| `double`
+| 319,676
+| 1.000
+| `decimal32`
+| 292,250
+| 0.914
+| `decimal64`
+| 516,399
+| 1.615
+| `decimal128`
+| 3,108,380
+| 9.724
+|===
