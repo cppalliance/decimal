@@ -371,6 +371,31 @@ auto main() -> int
     result_is_ok = (result_edge_is_ok && result_is_ok);
   }
 
+  {
+    using decimal_type = boost::decimal::decimal128;
+
+    const char str_ctrl[] = "12.64819265438397922113369900828315";
+
+    const decimal_type x = decimal_type { 456, -2 };
+
+    // N[Gamma[456/100], 34]
+    // 12.64819265438397922113369900828315
+    const auto tg = tgamma(x);
+
+    decimal_type ctrl { };
+
+    from_chars(str_ctrl, str_ctrl + std::strlen(str_ctrl), ctrl);
+
+    //std::cout << std::setprecision(34) << tg   << std::endl;
+    //std::cout << std::setprecision(34) << ctrl << std::endl;
+
+    const auto result_tgamma_is_ok   = local::is_close_fraction(tg, ctrl, std::numeric_limits<decimal_type>::epsilon() * 1000000);
+
+    BOOST_TEST(result_tgamma_is_ok);
+
+    result_is_ok = (result_tgamma_is_ok && result_is_ok);
+  }
+
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 
   return (result_is_ok ? 0 : -1);
