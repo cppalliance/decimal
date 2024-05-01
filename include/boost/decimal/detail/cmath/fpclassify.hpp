@@ -9,15 +9,19 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
 {
     constexpr T zero {0, 0};
 

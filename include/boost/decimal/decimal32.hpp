@@ -33,6 +33,8 @@
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+
 #include <cerrno>
 #include <climits>
 #include <cmath>
@@ -46,17 +48,19 @@
 #include <iostream>
 #endif
 
+#endif // BOOST_DECIMAL_BUILD_MODULE
+
 namespace boost { namespace decimal {
 
 namespace detail {
 
 // See IEEE 754 section 3.5.2
-static constexpr auto d32_inf_mask      = UINT32_C(0b0'11110'000000'0000000000'0000000000);
-static constexpr auto d32_nan_mask      = UINT32_C(0b0'11111'000000'0000000000'0000000000);
-static constexpr auto d32_snan_mask     = UINT32_C(0b0'11111'100000'0000000000'0000000000);
-static constexpr auto d32_comb_inf_mask = UINT32_C(0b0'11110'000000'0000000000'0000000000);
-static constexpr auto d32_comb_nan_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
-static constexpr auto d32_exp_snan_mask = UINT32_C(0b0'00000'100000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_inf_mask      = UINT32_C(0b0'11110'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_nan_mask      = UINT32_C(0b0'11111'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_snan_mask     = UINT32_C(0b0'11111'100000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_comb_inf_mask = UINT32_C(0b0'11110'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_comb_nan_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_exp_snan_mask = UINT32_C(0b0'00000'100000'0000000000'0000000000);
 
 // Masks to update the significand based on the combination field
 // In these first three 00, 01, or 10 are the leading 2 bits of the exp
@@ -66,21 +70,21 @@ static constexpr auto d32_exp_snan_mask = UINT32_C(0b0'00000'100000'0000000000'0
 // s 00 TTT (00)eeeeee (0TTT)[tttttttttt][tttttttttt]
 // s 01 TTT (01)eeeeee (0TTT)[tttttttttt][tttttttttt]
 // s 10 TTT (10)eeeeee (0TTT)[tttttttttt][tttttttttt]
-static constexpr std::uint32_t d32_sign_mask = UINT32_C(0b1'00000'000000'0000000000'0000000000);
-static constexpr std::uint32_t d32_combination_field_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
-static constexpr std::uint32_t d32_exponent_mask = UINT32_C(0b0'00000'111111'0000000000'0000000000);
-static constexpr std::uint32_t d32_significand_mask = UINT32_C(0b0'00000'000000'1111111111'1111111111);
-static constexpr std::uint32_t d32_significand_bits = UINT32_C(20);
-static constexpr std::uint32_t d32_exponent_bits = UINT32_C(6);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_sign_mask = UINT32_C(0b1'00000'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_combination_field_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_exponent_mask = UINT32_C(0b0'00000'111111'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_significand_mask = UINT32_C(0b0'00000'000000'1111111111'1111111111);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_significand_bits = UINT32_C(20);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_exponent_bits = UINT32_C(6);
 
-static constexpr std::uint32_t d32_comb_01_mask = UINT32_C(0b0'01000'000000'0000000000'0000000000);
-static constexpr std::uint32_t d32_comb_10_mask = UINT32_C(0b0'10000'000000'0000000000'0000000000);
-static constexpr std::uint32_t d32_comb_00_01_10_significand_bits = UINT32_C(0b0'00111'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_comb_01_mask = UINT32_C(0b0'01000'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_comb_10_mask = UINT32_C(0b0'10000'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_comb_00_01_10_significand_bits = UINT32_C(0b0'00111'000000'0000000000'0000000000);
 
 // This mask is used to determine if we use the masks above or below since 11 TTT is invalid
-static constexpr std::uint32_t d32_comb_11_mask = UINT32_C(0b0'11000'000000'0000000000'0000000000);
-static constexpr std::uint32_t d32_comb_11_exp_bits = UINT32_C(0b0'00110'000000'0000000000'0000000000);
-static constexpr std::uint32_t d32_comb_11_significand_bits = UINT32_C(0b0'00001'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_comb_11_mask = UINT32_C(0b0'11000'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_comb_11_exp_bits = UINT32_C(0b0'00110'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_comb_11_significand_bits = UINT32_C(0b0'00001'000000'0000000000'0000000000);
 
 // For these masks the first two bits of the combination field imply 100 T as the
 // leading bits of the significand and then bits 3 and 4 are the exp
@@ -89,27 +93,27 @@ static constexpr std::uint32_t d32_comb_11_significand_bits = UINT32_C(0b0'00001
 // s 1100 T (00)eeeeee (100T)[tttttttttt][tttttttttt]
 // s 1101 T (01)eeeeee (100T)[tttttttttt][tttttttttt]
 // s 1110 T (10)eeeeee (100T)[tttttttttt][tttttttttt]
-// static constexpr std::uint32_t comb_1100_mask = 0b11000;
-static constexpr std::uint32_t d32_comb_1101_mask = UINT32_C(0b0'11010'000000'0000000000'0000000000);
-static constexpr std::uint32_t d32_comb_1110_mask = UINT32_C(0b0'11100'000000'0000000000'0000000000);
+// BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t comb_1100_mask = 0b11000;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_comb_1101_mask = UINT32_C(0b0'11010'000000'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_comb_1110_mask = UINT32_C(0b0'11100'000000'0000000000'0000000000);
 
 // Powers of 2 used to determine the size of the significand
-static constexpr std::uint32_t d32_no_combination = UINT32_C(0b1111111111'1111111111);
-static constexpr std::uint32_t d32_big_combination = UINT32_C(0b0111'1111111111'1111111111);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_no_combination = UINT32_C(0b1111111111'1111111111);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_big_combination = UINT32_C(0b0111'1111111111'1111111111);
 
 // Exponent fields
-static constexpr std::uint32_t d32_max_exp_no_combination = UINT32_C(0b111111);
-static constexpr std::uint32_t d32_exp_combination_field_mask = d32_max_exp_no_combination;
-static constexpr std::uint32_t d32_exp_one_combination = UINT32_C(0b1'111111);
-static constexpr std::uint32_t d32_max_biased_exp = UINT32_C(0b10'111111);
-static constexpr std::uint32_t d32_small_combination_field_mask = UINT32_C(0b0'00000'000111'0000000000'0000000000);
-static constexpr std::uint32_t d32_big_combination_field_mask = UINT32_C(0b0'00000'000001'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_max_exp_no_combination = UINT32_C(0b111111);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_exp_combination_field_mask = d32_max_exp_no_combination;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_exp_one_combination = UINT32_C(0b1'111111);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_max_biased_exp = UINT32_C(0b10'111111);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_small_combination_field_mask = UINT32_C(0b0'00000'000111'0000000000'0000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_big_combination_field_mask = UINT32_C(0b0'00000'000001'0000000000'0000000000);
 
 // Constexpr construction from an uint32_t without having to memcpy
-//static constexpr std::uint32_t d32_construct_sign_mask = UINT32_C(0b1'00000'000000'0000000000'0000000000);
-//static constexpr std::uint32_t d32_construct_combination_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
-//static constexpr std::uint32_t d32_construct_exp_mask = UINT32_C(0b0'00000'111111'0000000000'0000000000);
-//static constexpr std::uint32_t d32_construct_significand_mask = d32_no_combination;
+//BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_sign_mask = UINT32_C(0b1'00000'000000'0000000000'0000000000);
+//BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_combination_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
+//BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_exp_mask = UINT32_C(0b0'00000'111111'0000000000'0000000000);
+//BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_significand_mask = d32_no_combination;
 
 struct decimal32_components
 {
@@ -128,7 +132,7 @@ struct decimal32_components
 
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
-class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
+BOOST_DECIMAL_EXPORT class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
 {
 private:
 
@@ -147,11 +151,13 @@ private:
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL TargetType>
-    friend constexpr auto to_integral(Decimal val) noexcept -> TargetType;
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_integral(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_REAL TargetType>
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept -> TargetType;
+    template <typename Decimal, typename TargetType>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_floating_point_v, TargetType, TargetType);
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
@@ -161,11 +167,13 @@ private:
     friend constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
     friend constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, const decimal32& q, decimal32& r) noexcept -> void;
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>;
+    template <typename T>
+    friend constexpr auto ilogb(T d) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int);
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto logb(T num) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>;
+    template <typename T>
+    friend constexpr auto logb(T num) noexcept
+        BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T);
 
     // Debug bit pattern
     friend constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32;
@@ -210,21 +218,38 @@ public:
     constexpr decimal32() noexcept = default;
 
     // 3.2.2.2 Conversion from floating-point type
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_REAL Float>
+    #else
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
+    #endif
+    #ifndef BOOST_DECIMAL_ALLOW_IMPLICIT_CONVERSIONS
+    explicit
+    #endif
     BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
 
-    template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
-    BOOST_DECIMAL_CXX20_CONSTEXPR auto operator=(const Float& val) noexcept -> decimal32&;
+    template <typename Float>
+    BOOST_DECIMAL_CXX20_CONSTEXPR auto operator=(const Float& val) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_floating_point_v, Float, decimal32&);
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+    #else
+    template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    #endif
     explicit constexpr decimal32(Decimal val) noexcept;
 
     // 3.2.2.3 Conversion from integral type
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_INTEGRAL Integer>
+    #else
     template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
-    explicit constexpr decimal32(Integer val) noexcept;
+    #endif
+    constexpr decimal32(Integer val) noexcept;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
-    constexpr auto operator=(const Integer& val) noexcept -> decimal32&;
+    template <typename Integer>
+    constexpr auto operator=(const Integer& val) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&);
 
     // 3.2.2.4 Conversion to integral type
     explicit constexpr operator bool() const noexcept;
@@ -248,10 +273,18 @@ public:
     explicit constexpr operator Decimal() const noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
-    template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL T2>
+    #else
+    template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T> && detail::is_integral_v<T2>, bool> = true>
+    #endif
     constexpr decimal32(T coeff, T2 exp, bool sign = false) noexcept;
 
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_INTEGRAL T>
+    #else
     template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
+    #endif
     constexpr decimal32(bool coeff, T exp, bool sign = false) noexcept;
 
     constexpr decimal32(const decimal32& val) noexcept = default;
@@ -291,43 +324,43 @@ public:
     // 3.2.8 binary arithmetic operators:
     friend constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator+(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
     friend constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
     friend constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator*(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
     friend constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
     friend constexpr auto operator%(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
@@ -340,43 +373,43 @@ public:
     // 3.2.2.6 Compound assignment
     constexpr auto operator+=(decimal32 rhs) noexcept -> decimal32&;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     constexpr auto operator+=(Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&);
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+    template <typename Decimal>
     constexpr auto operator+=(Decimal rhs) noexcept
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, Decimal, decimal32&);
 
     constexpr auto operator-=(decimal32 rhs) noexcept -> decimal32&;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     constexpr auto operator-=(Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&);
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+    template <typename Decimal>
     constexpr auto operator-=(Decimal rhs) noexcept
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, Decimal, decimal32&);
 
     constexpr auto operator*=(decimal32 rhs) noexcept -> decimal32&;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     constexpr auto operator*=(Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&);
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+    template <typename Decimal>
     constexpr auto operator*=(Decimal rhs) noexcept
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, Decimal, decimal32&);
 
     constexpr auto operator/=(decimal32 rhs) noexcept -> decimal32&;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     constexpr auto operator/=(Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&);
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+    template <typename Decimal>
     constexpr auto operator/=(Decimal rhs) noexcept
-        -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, Decimal, decimal32&);
 
     constexpr auto operator%=(decimal32 rhs) noexcept -> decimal32&;
 
@@ -384,129 +417,131 @@ public:
     // Equality
     friend constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator==(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator==(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     // Inequality
     friend constexpr auto operator!=(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator!=(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     // Less
     friend constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator<(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     // Less equal
     friend constexpr auto operator<=(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator<=(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     // Greater
     friend constexpr auto operator>(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator>(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     // Greater equal
     friend constexpr auto operator>=(decimal32 lhs, decimal32 rhs) noexcept -> bool;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, bool>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     friend constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::partial_ordering;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
-    friend constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
+    template <typename Integer>
+    friend constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
-    friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>;
+    template <typename Integer>
+    friend constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering);
     #endif
 
     // Bitwise operators
     friend constexpr auto operator&(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator&(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator&(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
     friend constexpr auto operator|(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator|(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator|(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
     friend constexpr auto operator^(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator^(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator^(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
     friend constexpr auto operator<<(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator<<(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator<<(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
     friend constexpr auto operator>>(decimal32 lhs, decimal32 rhs) noexcept -> decimal32;
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator>>(decimal32 lhs, Integer rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
-    template <BOOST_DECIMAL_INTEGRAL Integer>
+    template <typename Integer>
     friend constexpr auto operator>>(Integer lhs, decimal32 rhs) noexcept
-        -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>;
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32);
 
     friend constexpr auto operator~(decimal32 lhs) noexcept -> decimal32;
 
@@ -539,12 +574,14 @@ public:
 private:
 #endif
     // Replaces the biased exponent with the value of exp
-    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
-    constexpr auto edit_exponent(T exp) noexcept -> void;
+    template <typename T>
+    constexpr auto edit_exponent(T exp) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, T, void);
 
     // Replaces the value of the significand with sig
-    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
-    constexpr auto edit_significand(T sig) noexcept -> void;
+    template <typename T>
+    constexpr auto edit_significand(T sig) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, T, void);
 
     // Replaces the current sign with the one provided
     constexpr auto edit_sign(bool sign) noexcept -> void;
@@ -559,7 +596,11 @@ private:
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
 
-template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T>, bool>>
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL T2>
+#else
+template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T> && detail::is_integral_v<T2>, bool>>
+#endif
 constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)
 {
     using Unsigned_Integer = detail::make_unsigned_t<T>;
@@ -990,8 +1031,9 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     return {result.sig, result.exp, result.sign};
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+template <typename Integer>
+constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     if (isnan(lhs) || isinf(lhs))
     {
@@ -1040,8 +1082,9 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
     return decimal32(result.sig, result.exp, result.sign);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator+(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+template <typename Integer>
+constexpr auto operator+(Integer lhs, decimal32 rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return rhs + lhs;
 }
@@ -1064,17 +1107,17 @@ constexpr auto decimal32::operator+=(decimal32 rhs) noexcept -> decimal32&
     return *this;
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto decimal32::operator+=(Integer rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
 {
     *this = *this + rhs;
     return *this;
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+template <typename Decimal>
 constexpr auto decimal32::operator+=(Decimal rhs) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, Decimal, decimal32&)
 {
     *this = *this + rhs;
     return *this;
@@ -1113,8 +1156,9 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     return {result.sig, result.exp, result.sign};
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+template <typename Integer>
+constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     if (isinf(lhs) || isnan(lhs))
     {
@@ -1146,8 +1190,9 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
     return {result.sig, result.exp, result.sign};
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+template <typename Integer>
+constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     if (isinf(rhs) || isnan(rhs))
     {
@@ -1197,17 +1242,17 @@ constexpr auto decimal32::operator-=(decimal32 rhs) noexcept -> decimal32&
     return *this;
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+template <typename Decimal>
 constexpr auto decimal32::operator-=(Decimal rhs) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, Decimal, decimal32&)
 {
     *this = *this - rhs;
     return *this;
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto decimal32::operator-=(Integer rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
 {
     *this = *this - rhs;
     return *this;
@@ -1224,14 +1269,16 @@ constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool
                             rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator==(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator==(decimal32 lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return mixed_equality_impl(lhs, rhs);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator==(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator==(Integer lhs, decimal32 rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return mixed_equality_impl(rhs, lhs);
 }
@@ -1241,14 +1288,16 @@ constexpr auto operator!=(decimal32 lhs, decimal32 rhs) noexcept -> bool
     return !(lhs == rhs);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator!=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator!=(decimal32 lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return !(lhs == rhs);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return !(lhs == rhs);
 }
@@ -1280,14 +1329,16 @@ constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool
                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator<(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator<(decimal32 lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return less_impl(lhs, rhs);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     if (isnan(rhs))
     {
@@ -1307,8 +1358,9 @@ constexpr auto operator<=(decimal32 lhs, decimal32 rhs) noexcept -> bool
     return !(rhs < lhs);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator<=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator<=(decimal32 lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     if (isnan(lhs))
     {
@@ -1318,8 +1370,9 @@ constexpr auto operator<=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if
     return !(rhs < lhs);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     if (isnan(rhs))
     {
@@ -1334,8 +1387,9 @@ constexpr auto operator>(decimal32 lhs, decimal32 rhs) noexcept -> bool
     return rhs < lhs;
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator>(decimal32 lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     if (isnan(lhs))
     {
@@ -1345,8 +1399,9 @@ constexpr auto operator>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
     return rhs < lhs;
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     if (isnan(rhs))
     {
@@ -1366,8 +1421,9 @@ constexpr auto operator>=(decimal32 lhs, decimal32 rhs) noexcept -> bool
     return !(lhs < rhs);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     if (isnan(lhs))
     {
@@ -1377,8 +1433,9 @@ constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept -> std::enable_if
     return !(lhs < rhs);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+template <typename Integer>
+constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     if (isnan(rhs))
     {
@@ -1408,8 +1465,9 @@ constexpr auto operator<=>(decimal32 lhs, decimal32 rhs) noexcept -> std::partia
     return std::partial_ordering::unordered;
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>
+template <typename Integer>
+constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
 {
     if (lhs < rhs)
     {
@@ -1427,8 +1485,9 @@ constexpr auto operator<=>(decimal32 lhs, Integer rhs) noexcept -> std::enable_i
     return std::partial_ordering::unordered;
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, std::partial_ordering>
+template <typename Integer>
+constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
 {
     if (lhs < rhs)
     {
@@ -1478,8 +1537,9 @@ constexpr auto decimal32::biased_exponent() const noexcept -> std::int32_t
     return static_cast<std::int32_t>(unbiased_exponent()) - detail::bias;
 }
 
-template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
-constexpr auto decimal32::edit_exponent(T expval) noexcept -> void
+template <typename T>
+constexpr auto decimal32::edit_exponent(T expval) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, T, void)
 {
     *this = decimal32(this->full_significand(), expval, this->isneg());
 }
@@ -1512,8 +1572,9 @@ constexpr auto decimal32::full_significand() const noexcept -> std::uint32_t
     return significand;
 }
 
-template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
-constexpr auto decimal32::edit_significand(T sig) noexcept -> void
+template <typename T>
+constexpr auto decimal32::edit_significand(T sig) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, T, void)
 {
     *this = decimal32(sig, this->biased_exponent(), this->isneg());
 }
@@ -1544,7 +1605,11 @@ constexpr auto decimal32::edit_sign(bool sign) noexcept -> void
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
 
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_REAL Float>
+#else
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
+#endif
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 {
     if (val != val)
@@ -1582,35 +1647,49 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 #  pragma GCC diagnostic pop
 #endif
 
-template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal32::operator=(const Float& val) noexcept -> decimal32&
+template <typename Float>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto decimal32::operator=(const Float& val) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_floating_point_v, Float, decimal32&)
 {
     *this = decimal32{val};
     return *this;
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+#else
+template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+#endif
 constexpr decimal32::decimal32(Decimal val) noexcept
 {
     *this = to_decimal<decimal32, Decimal>(val);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_INTEGRAL Integer>
+#else
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+#endif
 constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect parameter is never used
 {
     using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
     *this = decimal32{static_cast<ConversionType>(val), 0};
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
-constexpr auto decimal32::operator=(const Integer& val) noexcept -> decimal32&
+template <typename Integer>
+constexpr auto decimal32::operator=(const Integer& val) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
 {
     using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
     *this = decimal32{static_cast<ConversionType>(val), 0};
     return *this;
 }
 
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_INTEGRAL T>
+#else
 template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
+#endif
 constexpr decimal32::decimal32(bool coeff, T exp, bool sign) noexcept
 {
     *this = decimal32(static_cast<std::int32_t>(coeff), exp, sign);
@@ -1765,8 +1844,9 @@ constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     return {result.sig, result.exp, result.sign};
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+template <typename Integer>
+constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     if (isnan(lhs) || isinf(lhs))
     {
@@ -1790,8 +1870,9 @@ constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
     return {result.sig, result.exp, result.sign};
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator*(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+template <typename Integer>
+constexpr auto operator*(Integer lhs, decimal32 rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return rhs * lhs;
 }
@@ -1802,17 +1883,17 @@ constexpr auto decimal32::operator*=(decimal32 rhs) noexcept -> decimal32&
     return *this;
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto decimal32::operator*=(Integer rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
 {
     *this = *this * rhs;
     return *this;
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+template <typename Decimal>
 constexpr auto decimal32::operator*=(Decimal rhs) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, Decimal, decimal32&)
 {
     *this = *this * rhs;
     return *this;
@@ -1944,8 +2025,9 @@ constexpr auto operator/(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     return q;
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+template <typename Integer>
+constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     // Check pre-conditions
     constexpr decimal32 zero {0, 0};
@@ -1987,8 +2069,9 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept -> std::enable_if_
     return decimal32(q_components.sig, q_components.exp, q_components.sign);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
-constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+template <typename Integer>
+constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     // Check pre-conditions
     constexpr decimal32 zero {0, 0};
@@ -2035,17 +2118,17 @@ constexpr auto decimal32::operator/=(decimal32 rhs) noexcept -> decimal32&
     return *this;
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto decimal32::operator/=(Integer rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32&>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
 {
     *this = *this / rhs;
     return *this;
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+template <typename Decimal>
 constexpr auto decimal32::operator/=(Decimal rhs) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, decimal32&>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, Decimal, decimal32&)
 {
     *this = *this / rhs;
     return *this;
@@ -2126,16 +2209,16 @@ constexpr auto operator&(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     return from_bits(lhs.bits_ & rhs.bits_);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto operator&(decimal32 lhs, Integer rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return from_bits(lhs.bits_ & static_cast<std::uint32_t>(rhs));
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto operator&(Integer lhs, decimal32 rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return from_bits(static_cast<std::uint32_t>(lhs) & rhs.bits_);
 }
@@ -2145,16 +2228,16 @@ constexpr auto operator|(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     return from_bits(lhs.bits_ | rhs.bits_);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto operator|(decimal32 lhs, Integer rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return from_bits(lhs.bits_ | static_cast<std::uint32_t>(rhs));
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto operator|(Integer lhs, decimal32 rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return from_bits(static_cast<std::uint32_t>(lhs) | rhs.bits_);
 }
@@ -2164,16 +2247,16 @@ constexpr auto operator^(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     return from_bits(lhs.bits_ ^ rhs.bits_);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto operator^(decimal32 lhs, Integer rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return from_bits(lhs.bits_ ^ static_cast<std::uint32_t>(rhs));
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto operator^(Integer lhs, decimal32 rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return from_bits(static_cast<std::uint32_t>(lhs) ^ rhs.bits_);
 }
@@ -2183,16 +2266,16 @@ constexpr auto operator<<(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     return from_bits(lhs.bits_ << rhs.bits_);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto operator<<(decimal32 lhs, Integer rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return from_bits(lhs.bits_ << static_cast<std::uint32_t>(rhs));
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto operator<<(Integer lhs, decimal32 rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return from_bits(static_cast<std::uint32_t>(lhs) << rhs.bits_);
 }
@@ -2202,16 +2285,16 @@ constexpr auto operator>>(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     return from_bits(lhs.bits_ >> rhs.bits_);
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto operator>>(decimal32 lhs, Integer rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return from_bits(lhs.bits_ >> static_cast<std::uint32_t>(rhs));
 }
 
-template <BOOST_DECIMAL_INTEGRAL Integer>
+template <typename Integer>
 constexpr auto operator>>(Integer lhs, decimal32 rhs) noexcept
-    -> std::enable_if_t<detail::is_integral_v<Integer>, decimal32>
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     return from_bits(static_cast<std::uint32_t>(lhs) >> rhs.bits_);
 }
@@ -2387,7 +2470,7 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
 
 namespace std {
 
-template <>
+BOOST_DECIMAL_EXPORT template <>
 #ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal32>
 #else

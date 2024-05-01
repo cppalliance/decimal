@@ -10,7 +10,10 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/cstdlib.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
+#endif
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
@@ -29,23 +32,24 @@ constexpr auto nan_impl(const char* arg) noexcept -> TargetDecimalType
 
 } //namespace detail
 
-constexpr auto nand32(const char* arg) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT constexpr auto nand32(const char* arg) noexcept -> decimal32
 {
     return detail::nan_impl<decimal32>(arg);
 }
 
-template <typename Dec>
-constexpr auto nan(const char* arg) noexcept -> Dec
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto nan(const char* arg) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    return detail::nan_impl<Dec>(arg);
+    return detail::nan_impl<T>(arg);
 }
 
-constexpr auto nand64(const char* arg) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT constexpr auto nand64(const char* arg) noexcept -> decimal64
 {
     return detail::nan_impl<decimal64>(arg);
 }
 
-constexpr auto nand128(const char* arg) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT constexpr auto nand128(const char* arg) noexcept -> decimal128
 {
     return detail::nan_impl<decimal128>(arg);
 }

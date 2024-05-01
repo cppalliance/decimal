@@ -10,18 +10,23 @@
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/remquo.hpp>
 #include <boost/decimal/detail/cmath/impl/sin_impl.hpp>
 #include <boost/decimal/detail/cmath/impl/cos_impl.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto tan(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto tan(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     T result { };
 
@@ -68,12 +73,12 @@ constexpr auto tan(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         {
             case 1U:
             case 3U:
-                result = -detail::cos_impl(r) / detail::sin_impl(r);
+                result = -detail::cos_series_expansion(r) / detail::sin_series_expansion(r);
                 break;
             case 0U:
             case 2U:
             default:
-                result = detail::sin_impl(r) / detail::cos_impl(r);
+                result = detail::sin_series_expansion(r) / detail::cos_series_expansion(r);
                 break;
         }
     }

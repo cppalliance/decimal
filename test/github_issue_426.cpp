@@ -2,6 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#define BOOST_DECIMAL_ALLOW_IMPLICIT_CONVERSIONS
+
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 

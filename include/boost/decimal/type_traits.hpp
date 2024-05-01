@@ -6,7 +6,7 @@
 #ifndef BOOST_DECIMAL_TYPE_TRAITS_HPP
 #define BOOST_DECIMAL_TYPE_TRAITS_HPP
 
-#if __has_include(<boost/type_traits.hpp>)
+#if __has_include(<boost/type_traits.hpp>) && !defined(BOOST_DECIMAL_BUILD_MODULE)
 
 #define BOOST_DECIMAL_HAS_BOOST_TYPE_TRAITS
 
@@ -32,29 +32,30 @@
 #endif
 
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <type_traits>
 
 namespace boost {
 
-template <> struct is_arithmetic<boost::decimal::decimal32> : public true_type {};
-template <> struct is_arithmetic<boost::decimal::decimal64> : public true_type {};
-template <> struct is_arithmetic<boost::decimal::decimal128> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_arithmetic<boost::decimal::decimal32> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_arithmetic<boost::decimal::decimal64> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_arithmetic<boost::decimal::decimal128> : public true_type {};
 
-template <> struct is_fundamental<boost::decimal::decimal32> : public true_type {};
-template <> struct is_fundamental<boost::decimal::decimal64> : public true_type {};
-template <> struct is_fundamental<boost::decimal::decimal128> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_fundamental<boost::decimal::decimal32> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_fundamental<boost::decimal::decimal64> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_fundamental<boost::decimal::decimal128> : public true_type {};
 
-template <> struct is_scalar<boost::decimal::decimal32> : public true_type {};
-template <> struct is_scalar<boost::decimal::decimal64> : public true_type {};
-template <> struct is_scalar<boost::decimal::decimal128> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_scalar<boost::decimal::decimal32> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_scalar<boost::decimal::decimal64> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_scalar<boost::decimal::decimal128> : public true_type {};
 
-template <> struct is_class<boost::decimal::decimal32> : public false_type {};
-template <> struct is_class<boost::decimal::decimal64> : public false_type {};
-template <> struct is_class<boost::decimal::decimal128> : public false_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_class<boost::decimal::decimal32> : public false_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_class<boost::decimal::decimal64> : public false_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_class<boost::decimal::decimal128> : public false_type {};
 
-template <> struct is_pod<boost::decimal::decimal32> : public true_type {};
-template <> struct is_pod<boost::decimal::decimal64> : public true_type {};
-template <> struct is_pod<boost::decimal::decimal128> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_pod<boost::decimal::decimal32> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_pod<boost::decimal::decimal64> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_pod<boost::decimal::decimal128> : public true_type {};
 
 
 } // namespace boost
@@ -78,16 +79,16 @@ using local_false_type = std::false_type;
 }
 
 // Section 3.11.2 is_decimal_floating_point
-template <typename T> struct is_decimal_floating_point : public decimal::detail::local_false_type{};
-template <typename T> struct is_decimal_floating_point<const T> : public is_decimal_floating_point<T>{};
-template <typename T> struct is_decimal_floating_point<volatile const T> : public is_decimal_floating_point<T>{};
-template <typename T> struct is_decimal_floating_point<volatile T> : public is_decimal_floating_point<T>{};
-template <> struct is_decimal_floating_point<boost::decimal::decimal32> : public decimal::detail::local_true_type{};
-template <> struct is_decimal_floating_point<boost::decimal::decimal64> : public decimal::detail::local_true_type{};
-template <> struct is_decimal_floating_point<boost::decimal::decimal128> : public decimal::detail::local_true_type{};
+BOOST_DECIMAL_EXPORT template <typename T> struct is_decimal_floating_point : public decimal::detail::local_false_type{};
+BOOST_DECIMAL_EXPORT template <typename T> struct is_decimal_floating_point<const T> : public is_decimal_floating_point<T>{};
+BOOST_DECIMAL_EXPORT template <typename T> struct is_decimal_floating_point<volatile const T> : public is_decimal_floating_point<T>{};
+BOOST_DECIMAL_EXPORT template <typename T> struct is_decimal_floating_point<volatile T> : public is_decimal_floating_point<T>{};
+BOOST_DECIMAL_EXPORT template <> struct is_decimal_floating_point<boost::decimal::decimal32> : public decimal::detail::local_true_type{};
+BOOST_DECIMAL_EXPORT template <> struct is_decimal_floating_point<boost::decimal::decimal64> : public decimal::detail::local_true_type{};
+BOOST_DECIMAL_EXPORT template <> struct is_decimal_floating_point<boost::decimal::decimal128> : public decimal::detail::local_true_type{};
 
 #if defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L
-template <typename T>
+BOOST_DECIMAL_EXPORT template <typename T>
 inline constexpr bool is_decimal_floating_point_v = is_decimal_floating_point<T>::value;
 #endif
 

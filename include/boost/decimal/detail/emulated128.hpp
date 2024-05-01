@@ -12,6 +12,8 @@
 #include <boost/decimal/detail/countl.hpp>
 #include <boost/decimal/detail/wide-integer/uintwide_t.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+
 #include <cmath>
 #include <cstdint>
 #include <limits>
@@ -22,6 +24,8 @@
 #include <iosfwd>
 #include <ostream>
 #endif
+
+#endif // BOOST_DECIMAL_BUILD_MODULE
 
 namespace boost {
 namespace decimal {
@@ -637,6 +641,9 @@ struct int128
     constexpr auto operator<(std::int64_t rhs) const noexcept -> bool;
     constexpr auto operator==(std::int64_t rhs) const noexcept -> bool;
     constexpr auto operator>(std::int64_t rhs) const noexcept -> bool;
+    constexpr auto operator<(int rhs) const noexcept -> bool;
+    constexpr auto operator==(int rhs) const noexcept -> bool;
+    constexpr auto operator>(int rhs) const noexcept -> bool;
 
     friend constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128;
     friend constexpr auto operator-(int128 lhs, int128 rhs) noexcept -> int128;
@@ -1275,6 +1282,21 @@ constexpr auto int128::operator<(std::int64_t rhs) const noexcept -> bool
 constexpr auto int128::operator>(std::int64_t rhs) const noexcept -> bool
 {
     return !(*this == rhs) && !(*this < rhs);
+}
+
+constexpr auto int128::operator==(int rhs) const noexcept -> bool
+{
+    return *this == static_cast<std::int64_t>(rhs);
+}
+
+constexpr auto int128::operator<(int rhs) const noexcept -> bool
+{
+    return *this < static_cast<std::int64_t>(rhs);
+}
+
+constexpr auto int128::operator>(int rhs) const noexcept -> bool
+{
+    return *this > static_cast<std::int64_t>(rhs);
 }
 
 constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128

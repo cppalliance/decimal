@@ -10,13 +10,18 @@
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
+#endif
 
 #define BOOST_DECIMAL_POW5_TABLE_SIZE 56
 #define BOOST_DECIMAL_POW5_BITCOUNT 249
 #define BOOST_DECIMAL_POW5_INV_BITCOUNT 249
 
-namespace boost { namespace decimal { namespace detail { namespace ryu {
+namespace boost {
+namespace decimal {
+namespace detail {
+namespace ryu {
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 using unsigned_128_type = uint128_t;
@@ -29,7 +34,7 @@ using unsigned_128_type = uint128;
 // There's no way to define 128-bit constants in C, so we use little-endian
 // pairs of 64-bit constants.
 
-static constexpr std::uint64_t GENERIC_POW5_TABLE[BOOST_DECIMAL_POW5_TABLE_SIZE][2] = {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t GENERIC_POW5_TABLE[BOOST_DECIMAL_POW5_TABLE_SIZE][2] = {
 { UINT64_C(                   1), UINT64_C(                   0) },
 { UINT64_C(                   5), UINT64_C(                   0) },
 { UINT64_C(                  25), UINT64_C(                   0) },
@@ -88,7 +93,7 @@ static constexpr std::uint64_t GENERIC_POW5_TABLE[BOOST_DECIMAL_POW5_TABLE_SIZE]
 { UINT64_C(18443565265187884909), UINT64_C(15046327690525280101) }
 };
 
-static constexpr std::uint64_t GENERIC_POW5_SPLIT[89][4] = {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t GENERIC_POW5_SPLIT[89][4] = {
 { UINT64_C(                   0), UINT64_C(                   0), UINT64_C(                   0),   UINT64_C( 72057594037927936) },
 { UINT64_C(                   0), UINT64_C( 5206161169240293376), UINT64_C( 4575641699882439235),   UINT64_C( 73468396926392969) },
 { UINT64_C( 3360510775605221349), UINT64_C( 6983200512169538081), UINT64_C( 4325643253124434363),   UINT64_C( 74906821675075173) },
@@ -182,7 +187,7 @@ static constexpr std::uint64_t GENERIC_POW5_SPLIT[89][4] = {
 
 // Unfortunately, the results are sometimes off by one or two. We use an additional
 // lookup table to store those cases and adjust the result.
-static constexpr std::uint64_t POW5_ERRORS[156] = {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t POW5_ERRORS[156] = {
 UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x9555596400000000),
 UINT64_C(0x65a6569525565555), UINT64_C(0x4415551445449655), UINT64_C(0x5105015504144541), UINT64_C(0x65a69969a6965964),
 UINT64_C(0x5054955969959656), UINT64_C(0x5105154515554145), UINT64_C(0x4055511051591555), UINT64_C(0x5500514455550115),
@@ -224,7 +229,7 @@ UINT64_C(0x5554655255559545), UINT64_C(0x9555455441155556), UINT64_C(0x000000005
 UINT64_C(0x5044044040000000), UINT64_C(0x1045040440010500), UINT64_C(0x0000400000040000), UINT64_C(0x0000000000000000)
 };
 
-static constexpr std::uint64_t GENERIC_POW5_INV_SPLIT[89][4] = {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t GENERIC_POW5_INV_SPLIT[89][4] = {
 { UINT64_C(                   0), UINT64_C(                   0), UINT64_C(                   0),   UINT64_C(144115188075855872) },
 { UINT64_C( 1573859546583440065), UINT64_C( 2691002611772552616), UINT64_C( 6763753280790178510),   UINT64_C(141347765182270746) },
 { UINT64_C(12960290449513840412), UINT64_C(12345512957918226762), UINT64_C(18057899791198622765),   UINT64_C(138633484706040742) },
@@ -316,7 +321,7 @@ static constexpr std::uint64_t GENERIC_POW5_INV_SPLIT[89][4] = {
 { UINT64_C( 7184427196661305643), UINT64_C(14332510582433188173), UINT64_C(14230167953789677901),   UINT64_C(104649889046128358) }
 };
 
-static constexpr std::uint64_t POW5_INV_ERRORS[154] = {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t POW5_INV_ERRORS[154] = {
 UINT64_C(0x1144155514145504), UINT64_C(0x0000541555401141), UINT64_C(0x0000000000000000), UINT64_C(0x0154454000000000),
 UINT64_C(0x4114105515544440), UINT64_C(0x0001001111500415), UINT64_C(0x4041411410011000), UINT64_C(0x5550114515155014),
 UINT64_C(0x1404100041554551), UINT64_C(0x0515000450404410), UINT64_C(0x5054544401140004), UINT64_C(0x5155501005555105),
@@ -359,14 +364,14 @@ UINT64_C(0x0040000400105555), UINT64_C(0x0000000000000001),
 };
 
 // Returns e == 0 ? 1 : ceil(log_2(5^e)); requires 0 <= e <= 32768.
-static constexpr auto pow5bits(const std::uint32_t e) noexcept -> std::uint32_t
+inline constexpr auto pow5bits(const std::uint32_t e) noexcept -> std::uint32_t
 {
     BOOST_DECIMAL_ASSERT(e <= 1 << 15);
 
     return static_cast<std::uint32_t>(((e * UINT64_C(163391164108059)) >> 46) + 1);
 }
 
-static constexpr
+inline constexpr
 auto mul_128_256_shift(
         const std::uint64_t* const a, const std::uint64_t* const b,
         const std::uint32_t shift, const std::uint32_t corr,
@@ -430,7 +435,7 @@ auto mul_128_256_shift(
 }
 
 // Computes 5^i in the form required by Ryu, and stores it in the given pointer.
-static constexpr auto generic_computePow5(const std::uint32_t i, std::uint64_t* const result) noexcept -> void
+inline constexpr auto generic_computePow5(const std::uint32_t i, std::uint64_t* const result) noexcept -> void
 {
     const std::uint32_t base = i / BOOST_DECIMAL_POW5_TABLE_SIZE;
     const std::uint32_t base2 = base * BOOST_DECIMAL_POW5_TABLE_SIZE;
@@ -453,7 +458,7 @@ static constexpr auto generic_computePow5(const std::uint32_t i, std::uint64_t* 
 }
 
 // Computes 5^-i in the form required by Ryu, and stores it in the given pointer.
-static constexpr auto generic_computeInvPow5(const std::uint32_t i, std::uint64_t* const result) noexcept -> void
+inline constexpr auto generic_computeInvPow5(const std::uint32_t i, std::uint64_t* const result) noexcept -> void
 {
     const std::uint32_t base = (i + BOOST_DECIMAL_POW5_TABLE_SIZE - 1) / BOOST_DECIMAL_POW5_TABLE_SIZE;
     const std::uint32_t base2 = base * BOOST_DECIMAL_POW5_TABLE_SIZE;
@@ -475,7 +480,7 @@ static constexpr auto generic_computeInvPow5(const std::uint32_t i, std::uint64_
     }
 }
 
-static constexpr auto pow5Factor(unsigned_128_type value) noexcept -> std::uint32_t
+inline constexpr auto pow5Factor(unsigned_128_type value) noexcept -> std::uint32_t
 {
     for (std::uint32_t count = 0; value > 0; ++count)
     {
@@ -489,19 +494,19 @@ static constexpr auto pow5Factor(unsigned_128_type value) noexcept -> std::uint3
 }
 
 // Returns true if value is divisible by 5^p.
-static constexpr auto multipleOfPowerOf5(const unsigned_128_type value, const std::uint32_t p) noexcept -> bool
+inline constexpr auto multipleOfPowerOf5(const unsigned_128_type value, const std::uint32_t p) noexcept -> bool
 {
     // I tried a case distinction on p, but there was no performance difference.
     return pow5Factor(value) >= p;
 }
 
 // Returns true if value is divisible by 2^p.
-static constexpr auto multipleOfPowerOf2(const unsigned_128_type value, const std::uint32_t p) noexcept -> bool
+inline constexpr auto multipleOfPowerOf2(const unsigned_128_type value, const std::uint32_t p) noexcept -> bool
 {
     return (value & ((static_cast<unsigned_128_type>(1) << p) - 1)) == 0;
 }
 
-static constexpr
+inline constexpr
 auto mulShift(const unsigned_128_type m, const std::uint64_t* const mul, const uint32_t j) noexcept -> unsigned_128_type
 {
     BOOST_DECIMAL_ASSERT(j > 128);
@@ -515,7 +520,7 @@ auto mulShift(const unsigned_128_type m, const std::uint64_t* const mul, const u
 }
 
 // Returns floor(log_10(2^e)).
-static constexpr auto log10Pow2(const int32_t e) noexcept -> std::uint32_t
+inline constexpr auto log10Pow2(const int32_t e) noexcept -> std::uint32_t
 {
     // The first value this approximation fails for is 2^1651 which is just greater than 10^297.
     BOOST_DECIMAL_ASSERT(e >= 0);
@@ -525,7 +530,7 @@ static constexpr auto log10Pow2(const int32_t e) noexcept -> std::uint32_t
 }
 
 // Returns floor(log_10(5^e)).
-static constexpr auto log10Pow5(const int32_t e) noexcept -> std::uint32_t
+inline constexpr auto log10Pow5(const int32_t e) noexcept -> std::uint32_t
 {
     // The first value this approximation fails for is 5^2621 which is just greater than 10^1832.
     BOOST_DECIMAL_ASSERT(e >= 0);

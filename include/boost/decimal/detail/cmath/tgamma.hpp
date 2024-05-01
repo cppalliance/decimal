@@ -11,14 +11,21 @@
 #include <boost/decimal/detail/cmath/sin.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/numbers.hpp>
+#include <boost/decimal/detail/config.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <iterator>
+#include <limits>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto tgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
+namespace detail {
+
+template <typename T>
+constexpr auto tgamma_impl(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     T result { };
 
@@ -107,6 +114,29 @@ constexpr auto tgamma(T x) noexcept -> std::enable_if_t<detail::is_decimal_float
     }
 
     return result;
+}
+
+} // namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto tgamma(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::tgamma_impl(static_cast<evaluation_type>(x)));
 }
 
 } // namespace decimal

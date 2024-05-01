@@ -5,10 +5,14 @@
 #ifndef BOOST_DECIMAL_DETAIL_FAST_FLOAT_COMPUTE_FLOAT32_HPP
 #define BOOST_DECIMAL_DETAIL_FAST_FLOAT_COMPUTE_FLOAT32_HPP
 
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/fast_float/compute_float64.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
 #include <cstdint>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {

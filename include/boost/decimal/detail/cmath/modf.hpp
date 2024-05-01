@@ -9,16 +9,21 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto modf(T x, T* iptr) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto modf(T x, T* iptr) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero {0, 0};
     const auto is_neg {x < zero};

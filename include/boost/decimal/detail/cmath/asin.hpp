@@ -9,18 +9,25 @@
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/fabs.hpp>
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/impl/asin_impl.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto asin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
+namespace detail {
+
+template <typename T>
+constexpr auto asin_impl(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto fpc {fpclassify(x)};
     const auto isneg {signbit(x)};
@@ -39,12 +46,12 @@ constexpr auto asin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
     }
     else if (absx <= T{5, -1})
     {
-        result = detail::asin_impl(absx);
+        result = asin_series(absx);
     }
     else if (absx <= T{1, 0})
     {
         constexpr T half_pi {numbers::pi_v<T> / 2};
-        result = half_pi - 2 * detail::asin_impl(sqrt((1 - absx) / 2));
+        result = half_pi - 2 * asin_series(sqrt((1 - absx) / 2));
     }
     else
     {
@@ -58,6 +65,29 @@ constexpr auto asin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floatin
     }
 
     return result;
+}
+
+} //namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto asin(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::asin_impl(static_cast<evaluation_type>(x)));
 }
 
 } //namespace decimal

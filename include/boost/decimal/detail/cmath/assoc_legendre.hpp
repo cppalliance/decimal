@@ -11,22 +11,25 @@
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/promotion.hpp>
-#include <boost/decimal/detail/cmath/log1p.hpp>
-#include <boost/decimal/detail/cmath/tgamma.hpp>
 #include <boost/decimal/detail/cmath/pow.hpp>
 #include <boost/decimal/detail/cmath/sqrt.hpp>
 #include <boost/decimal/detail/cmath/legendre.hpp>
 #include <boost/decimal/detail/cmath/impl/assoc_legendre_lookup.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <utility>
 #include <type_traits>
 #include <limits>
+#endif
 
 namespace boost {
 namespace decimal {
 
 namespace detail {
 
-template <typename T1, typename T2, typename T3>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T3>
 constexpr auto assoc_legendre_next(unsigned l, unsigned m, T1 x, T2 Pl, T3 Plm1) noexcept
 {
     using result_type = promote_args_t<T1, T2, T3>;
@@ -34,8 +37,9 @@ constexpr auto assoc_legendre_next(unsigned l, unsigned m, T1 x, T2 Pl, T3 Plm1)
 }
 
 // Implement Legendre P and Q polynomials via recurrence:
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr T assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_power) noexcept
+template <typename T>
+constexpr auto assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_power) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     if (x < -1 || x > 1 || l > 128)
     {
@@ -90,10 +94,27 @@ constexpr T assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_power) 
 
 } //namespace detail
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto assoc_legendre(unsigned n, unsigned m, T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto assoc_legendre(unsigned n, unsigned m, T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    return detail::assoc_legendre_impl(n, m, x, pow(1 - x*x, T{m} / 2));
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::assoc_legendre_impl(n, m, static_cast<evaluation_type>(x),
+                                       pow(1 - static_cast<evaluation_type>(x)*static_cast<evaluation_type>(x),
+                                       evaluation_type{m} / 2)));
 }
 
 } //namespace decimal

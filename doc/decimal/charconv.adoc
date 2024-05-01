@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == <charconv>
 
-The following functions from https://en.cppreference.com/w/cpp/header/charconv[<charconv>] are provided:
+The following functions analogous to those from https://en.cppreference.com/w/cpp/header/charconv[<charconv>] are provided:
 
 [source, c++]
 ----
@@ -67,5 +67,3 @@ NOTE: `BOOST_DECIMAL_CONSTEXPR` is defined if:
  - `\\__GNUC__` >= 9
  - Compiler has: `__builtin_is_constant_evaluated()`
  - C++20 support with: `std::is_constant_evaluated()`
-
-WARNING: Hex format is currently in development and will `assert` unusable right now.

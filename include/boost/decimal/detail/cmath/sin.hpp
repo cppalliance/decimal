@@ -10,18 +10,25 @@
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/cos.hpp>
 #include <boost/decimal/detail/cmath/remquo.hpp>
 #include <boost/decimal/detail/cmath/impl/sin_impl.hpp>
 #include <boost/decimal/detail/cmath/impl/cos_impl.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
+namespace detail {
+
+template <typename T>
+constexpr auto sin_impl(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     T result { };
 
@@ -63,17 +70,17 @@ constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
         switch(n)
         {
             case 3U:
-                result = -detail::cos_impl(r);
+                result = -detail::cos_series_expansion(r);
                 break;
             case 2U:
-                result = -detail::sin_impl(r);
+                result = -detail::sin_series_expansion(r);
                 break;
             case 1U:
-                result = detail::cos_impl(r);
+                result = detail::cos_series_expansion(r);
                 break;
             case 0U:
             default:
-                result = detail::sin_impl(r);
+                result = detail::sin_series_expansion(r);
                 break;
         }
     }
@@ -81,7 +88,31 @@ constexpr auto sin(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
     return result;
 }
 
+} // namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto sin(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::sin_impl(static_cast<evaluation_type>(x)));
+}
+
 } // namespace decimal
 } // namespace boost
+
 
 #endif // BOOST_DECIMAL_DETAIL_CMATH_SIN_HPP

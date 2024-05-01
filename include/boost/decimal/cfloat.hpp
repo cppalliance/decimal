@@ -5,9 +5,13 @@
 #ifndef BOOST_DECIMAL_CFLOAT_HPP
 #define BOOST_DECIMAL_CFLOAT_HPP
 
-#include <cfloat>
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/decimal128.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <cfloat>
+#endif
 
 // number of digits in the coefficient:
 #define BOOST_DECIMAL_DEC32_MANT_DIG std::numeric_limits<boost::decimal::decimal32>::digits
@@ -43,8 +47,5 @@
 #define BOOST_DECIMAL_DEC32_SUBNORMAL std::numeric_limits<boost::decimal::decimal32>::denorm_min()
 #define BOOST_DECIMAL_DEC64_SUBNORMAL std::numeric_limits<boost::decimal::decimal64>::denorm_min()
 #define BOOST_DECIMAL_DEC128_SUBNORMAL std::numeric_limits<boost::decimal::decimal128>::denorm_min()
-
-// 3.4.7 evaluation format:
-#define BOOST_DECIMAL_DEC_EVAL_METHOD 0
 
 #endif //BOOST_DECIMAL_CFLOAT_HPP

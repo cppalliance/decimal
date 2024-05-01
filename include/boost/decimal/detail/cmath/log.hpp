@@ -6,14 +6,17 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_LOG_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_LOG_HPP
 
-#include <cmath>
-#include <type_traits>
-
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/numbers.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <cmath>
+#include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -25,8 +28,8 @@ namespace detail {
 #  pragma clang diagnostic ignored "-Wmissing-braces"
 #endif
 
-template <typename T>
-static constexpr std::array<T, 11> small_coefficient_table {
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::array<T, 11> small_coefficient_table {
     // (1,) 12, 80, 448, 2304, 11264, 53248, 245760, 1114112, 4980736, 22020096, 96468992, ...
     // See also Sloane's A058962 at: https://oeis.org/A058962
 
@@ -52,8 +55,8 @@ static constexpr std::array<T, 11> small_coefficient_table {
     T { UINT64_C(103660251783288043), -18 - 7 }  // * z^23
 };
 
-template <typename T>
-static constexpr std::array<T, 11> large_coefficient_table {
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::array<T, 11> large_coefficient_table {
     T{uint128{UINT64_C(451750905202293), UINT64_C(9484758194528277842)}, -35},  // z^3
     T{uint128{UINT64_C(67762635780344), UINT64_C(500376525493764096)}, -35},    // z^5
     T{uint128{UINT64_C(121004706750614), UINT64_C(6164027816584450626)}, -36},  // z^7
@@ -71,10 +74,9 @@ static constexpr std::array<T, 11> large_coefficient_table {
 #  pragma clang diagnostic pop
 #endif
 
-} //namespace detail
-
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
+template <typename T>
+constexpr auto log_impl(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero { 0, 0 };
     constexpr T one  { 1, 0 };
@@ -160,6 +162,29 @@ constexpr auto log(T x) noexcept -> std::enable_if_t<detail::is_decimal_floating
     }
 
     return result;
+}
+
+} //namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto log(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::log_impl(static_cast<evaluation_type>(x)));
 }
 
 } // namespace decimal

@@ -14,10 +14,14 @@
 #include <boost/decimal/detail/cmath/ldexp.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/numbers.hpp>
 #include <boost/decimal/decimal128.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
 #include <array>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -96,7 +100,7 @@ constexpr auto erf_series_near_zero_sum(const T &x) noexcept -> T
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto erf_impl(T z, bool invert) noexcept -> T
+constexpr auto erf_calc_impl(T z, bool invert) noexcept -> T
 {
     constexpr T zero {0, 0};
 
@@ -104,15 +108,15 @@ constexpr auto erf_impl(T z, bool invert) noexcept -> T
     {
         if (!invert)
         {
-            return -erf_impl(-z, invert);
+            return -erf_calc_impl(-z, invert);
         }
         else if (z < T{5, -1, true})
         {
-            return 2 - erf_impl(-z, invert);
+            return 2 - erf_calc_impl(-z, invert);
         }
         else
         {
-            return 1 + erf_impl(-z, false);
+            return 1 + erf_calc_impl(-z, false);
         }
     }
 
@@ -324,7 +328,7 @@ constexpr auto erf_impl(T z, bool invert) noexcept -> T
 }
 
 template <>
-constexpr auto erf_impl<decimal128>(decimal128 z, bool invert) noexcept -> decimal128
+constexpr auto erf_calc_impl<decimal128>(decimal128 z, bool invert) noexcept -> decimal128
 {
     constexpr decimal128 zero {0, 0};
     constexpr decimal128 half {5, -1};
@@ -334,15 +338,15 @@ constexpr auto erf_impl<decimal128>(decimal128 z, bool invert) noexcept -> decim
     {
         if (!invert)
         {
-            return -erf_impl(-z, invert);
+            return -erf_calc_impl(-z, invert);
         }
         else if (z < -half)
         {
-            return 2 - erf_impl(-z, invert);
+            return 2 - erf_calc_impl(-z, invert);
         }
         else
         {
-            return 1 + erf_impl(-z, false);
+            return 1 + erf_calc_impl(-z, false);
         }
     }
 
@@ -751,10 +755,9 @@ constexpr auto erf_impl<decimal128>(decimal128 z, bool invert) noexcept -> decim
     return result;
 }
 
-} //namespace detail
-
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto erf(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+template <typename T>
+constexpr auto erf_impl(T z) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // Edge cases
     const auto fp {fpclassify(z)};
@@ -768,11 +771,12 @@ constexpr auto erf(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating
         return z < T{0} ? T{-1} : T{1};
     }
 
-    return detail::erf_impl(z, false);
+    return detail::erf_calc_impl(z, false);
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto erfc(T z) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+template <typename T>
+constexpr auto erfc_impl(T z) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // Edge cases
     const auto fp {fpclassify(z)};
@@ -786,7 +790,51 @@ constexpr auto erfc(T z) noexcept -> std::enable_if_t<detail::is_decimal_floatin
         return z < T{0} ? T{2} : T{0};
     }
 
-    return detail::erf_impl(z, true);
+    return detail::erf_calc_impl(z, true);
+}
+
+} //namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto erf(T z) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::erf_impl(static_cast<evaluation_type>(z)));
+}
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto erfc(T z) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::erfc_impl(static_cast<evaluation_type>(z)));
 }
 
 } //namespace decimal

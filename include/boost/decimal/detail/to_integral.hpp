@@ -5,13 +5,16 @@
 #ifndef BOOST_DECIMAL_DETAIL_TO_INTEGRAL_HPP
 #define BOOST_DECIMAL_DETAIL_TO_INTEGRAL_HPP
 
-#include <cerrno>
-#include <limits>
-#include <type_traits>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <cerrno>
+#include <limits>
+#include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -26,8 +29,9 @@ namespace decimal {
 // Attempts conversion to integral type:
 // If this is nan sets errno to EINVAL and returns 0
 // If this is not representable sets errno to ERANGE and returns 0
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL TargetType>
-constexpr auto to_integral(Decimal val) noexcept -> TargetType
+template <typename Decimal, typename TargetType>
+constexpr auto to_integral(Decimal val) noexcept
+    BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType)
 {
     using Conversion_Type = std::conditional_t<std::numeric_limits<TargetType>::is_signed, std::int64_t, std::uint64_t>;
 
@@ -64,8 +68,9 @@ constexpr auto to_integral(Decimal val) noexcept -> TargetType
     return static_cast<TargetType>(result);
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL TargetType>
-constexpr auto to_integral_128(Decimal val) noexcept -> TargetType
+template <typename Decimal, typename TargetType>
+constexpr auto to_integral_128(Decimal val) noexcept
+    BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType)
 {
     constexpr Decimal max_target_type { (std::numeric_limits<TargetType>::max)() };
     constexpr Decimal min_target_type { (std::numeric_limits<TargetType>::min)() };

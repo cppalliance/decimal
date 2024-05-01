@@ -10,26 +10,30 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
 
 namespace detail {
 
-template <typename T1, typename T2, typename T3>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T3>
 constexpr auto laguerre_next(unsigned n, T1 x, T2 Ln, T3 Lnm1)
 {
     using promoted_type = promote_args_t<T1, T2, T3>;
     return ((2 * n + 1 - static_cast<promoted_type>(x)) * static_cast<promoted_type>(Ln) - n * static_cast<promoted_type>(Lnm1)) / (n + 1);
 }
 
-} //namespace detail
-
 // Implement Laguerre polynomials via recurrence:
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto laguerre(unsigned n, T x) -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
+constexpr auto laguerre_impl(unsigned n, T x)
 {
     T p0 {UINT64_C(1)};
     T p1 {UINT64_C(1) - x};
@@ -44,11 +48,34 @@ constexpr auto laguerre(unsigned n, T x) -> std::enable_if_t<detail::is_decimal_
     while(c < n)
     {
         std::swap(p0, p1);
-        p1 = detail::laguerre_next(c, x, p0, p1);
+        p1 = laguerre_next(c, x, p0, p1);
         ++c;
     }
 
     return p1;
+}
+
+} //namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto laguerre(unsigned n, T x)
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::laguerre_impl(n, static_cast<evaluation_type>(x)));
 }
 
 } //namespace decimal

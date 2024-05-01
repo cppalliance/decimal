@@ -1,0 +1,57 @@
+////
+Copyright 2024 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#cfloat]
+= cfloat support
+:idprefix: cfloat_
+
+== <cfloat>
+
+The following macros analogous to those from <cfloat> for the decimal floating point types:
+
+[source, c++]
+----
+
+// Number of digits in the coefficient
+#define BOOST_DECIMAL_DEC32_MANT_DIG  7
+#define BOOST_DECIMAL_DEC64_MANT_DIG  16
+#define BOOST_DECIMAL_DEC128_MANT_DIG 34
+
+// Minimum exponent
+#define BOOST_DECIMAL_DEC32_MIN_EXP  -94
+#define BOOST_DECIMAL_DEC64_MIN_EXP  -382
+#define BOOST_DECIMAL_DEC128_MIN_EXP -6142
+
+// Maximum exponent
+#define BOOST_DECIMAL_DEC32_MAX_EXP  97
+#define BOOST_DECIMAL_DEC64_MAX_EXP  385
+#define BOOST_DECIMAL_DEC128_MAX_EXP 6145
+
+// Maximum Finite Value
+#define BOOST_DECIMAL_DEC32_MAX  std::numeric_limits<boost::decimal::decimal32>::max()
+#define BOOST_DECIMAL_DEC64_MAX  std::numeric_limits<boost::decimal::decimal64>::max()
+#define BOOST_DECIMAL_DEC128_MAX std::numeric_limits<boost::decimal::decimal128>::max()
+
+// Minimum positive normal vlaue
+#define BOOST_DECIMAL_DEC32_MIN std::numeric_limits<boost::decimal::decimal32>::min()
+#define BOOST_DECIMAL_DEC64_MIN   std::numeric_limits<boost::decimal::decimal64>::min()
+#define BOOST_DECIMAL_DEC128_MIN std::numeric_limits<boost::decimal::decimal128>::min()
+
+// Minimum positive sub-normal value
+#define BOOST_DECIMAL_DEC32_MAX  std::numeric_limits<boost::decimal::decimal32>::denorm_min()
+#define BOOST_DECIMAL_DEC64_MAX  std::numeric_limits<boost::decimal::decimal64>::denorm_min()
+#define BOOST_DECIMAL_DEC128_MAX std::numeric_limits<boost::decimal::decimal128>::denorm_min()
+----
+
+Additionally `BOOST_DECIMAL_DEC_EVAL_METHOD` is similar to `FLT_EVAL_METHOD`: https://en.cppreference.com/w/cpp/types/climits/FLT_EVAL_METHOD
+
+The valid values are:
+
+- 0: all operations evaluated in the range and precision of the native type
+- 1: all `decimal32` operations are evaluated with the precision and range of `decimal64` internally, and returned as `decimal64`
+- 2: all `decimal32` and `decimal64` operations are evaluated with the precision and range of `decimal128` internally, and returned as the original type.
+
+To use the functionallity you must `#define BOOST_DECIMAL_DEC_EVAL_METHOD` to the value you want before you `#include <boost/decimal.hpp>`.

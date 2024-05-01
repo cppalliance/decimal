@@ -9,9 +9,11 @@
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/cmath/impl/taylor_series_result.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {

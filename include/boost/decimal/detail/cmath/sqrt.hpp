@@ -9,16 +9,23 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+namespace detail {
+
+template <typename T>
+constexpr auto sqrt_impl(T val) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero {0, 0};
 
@@ -45,57 +52,61 @@ constexpr auto sqrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
     }
     else
     {
+        // Loosens tolerance with the increase in digits so it's not excessively expensive
+        constexpr T epsilon = std::numeric_limits<T>::epsilon() * std::numeric_limits<T>::digits10;
         constexpr T one { 1, 0 };
+        constexpr T half {5, -1};
+        T error = one / epsilon;
 
-        const auto arg_is_gt_one = (val > one);
-
-        if (arg_is_gt_one || val < one)
+        T x {};
+        if (val > one)
         {
-            // TODO(ckormanyos)
-            // TODO(mborland)
-            // This implementation of square root, although it works, needs optimization.
-            // Using base-2 frexp/ldexp might not be the best, rather use base-10?
-
-            int exp2val { };
-
-            const auto man = frexp(val, &exp2val);
-
-            const auto corrected = (static_cast<unsigned>(exp2val) & 1U) != 0U;
-
-            // TODO(ckormanyos)
-            // Try to find a way to get a better (much better) initial guess.
-
-            if(!corrected)
-            {
-                result = ldexp(man / 2, exp2val / 2);
-            }
-            else
-            {
-                val = val * 2;
-
-                result = ldexp(man, arg_is_gt_one ? --exp2val / 2 : ++exp2val / 2);
-            }
-
-            constexpr auto newton_steps = (sizeof(T) == 4U) ? 5U :
-                                          (sizeof(T) == 8U) ? 6U : 10U;
-
-            for(auto i = 0U; i < newton_steps; ++i)
-            {
-                result = (result + val / result) / 2;
-            }
-
-            if (corrected)
-            {
-                result /= numbers::sqrt2_v<T>;
-            }
+            // Scale down if val is large by dividing the exp by 2
+            int exp {};
+            auto sig = frexp10(val, &exp);
+            x = T{sig, exp / 2};
         }
         else
         {
-            result = one;
+            // Trivial heuristic
+            x = val + half;
         }
+
+        while (error > epsilon)
+        {
+            const T new_x = (x + val / x) / 2;
+
+            error = fabs(new_x - x);
+            x = new_x;
+        }
+
+        result = x;
     }
 
     return result;
+}
+
+} //namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto sqrt(T val) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::sqrt_impl(static_cast<evaluation_type>(val)));
 }
 
 } //namespace decimal

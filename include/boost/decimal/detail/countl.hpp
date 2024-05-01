@@ -8,8 +8,10 @@
 
 #include <boost/decimal/detail/config.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
 #include <limits>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -49,7 +51,7 @@ constexpr int countl_impl(unsigned long long x) noexcept
 
 #else
 
-static constexpr int index64[64] = {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int index64[64] = {
     0, 47,  1, 56, 48, 27,  2, 60,
     57, 49, 41, 37, 28, 16,  3, 61,
     54, 58, 35, 52, 50, 42, 21, 44,

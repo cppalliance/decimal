@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == Description
 
-Boost.Decimal is an implementation of IEEE 754 Decimal Floating Point numbers.
+Boost.Decimal is an implementation of https://standards.ieee.org/ieee/754/6210/[IEEE 754] and https://www.open-std.org/JTC1/SC22/WG21/docs/papers/2009/n2849.pdf[ISO/IEC DTR 24733] Decimal Floating Point numbers.
 The library is header-only, has no dependencies, and requires C++14.
 
 == Motivation
@@ -22,6 +22,11 @@ The other major difference between binary and decimal floating point types is th
 For example 1e5 could also be stored as 0.1e6, 0.01e7, so on and so forth.
 These are referred to as cohorts which binary does not have as there is only one way to represent each number in binary floating point.
 
+== Use Cases
+
+The use case for Decimal Floating Point numbers is where rounding errors are significantly impactful such as finance.
+In applications where integer or fixed-point arithmetic are used to combat this issue Decimal Floating Point numbers can provide a significantly greater range of values.
+
 == Supported Compilers
 
 Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon), and Windows with the following compilers:
@@ -32,3 +37,31 @@ Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, a
 
 Tested on https://github.com/cppalliance/decimal/actions[Github Actions] and https://drone.cpp.al/cppalliance/decimal[Drone].
 Coverage can be found on https://app.codecov.io/gh/cppalliance/decimal[Codecov].
+
+== Basic Usage
+
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <iostream>
+#include <iomanip>
+
+int main()
+{
+    using namespace boost::decimal;
+
+    // Outputs 0.30000000000000004
+    std::cout << std::setprecision(17) << 0.1 + 0.2;
+
+    // Construct the two decimal values
+    constexpr decimal64 a {1, -1}; // 1e-1 or 0.1
+    constexpr decimal64 b {2, -1}; // 2e-1 or 0.2
+
+    // Outputs 0.30000000000000000
+    std::cout << a + b << std::endl;
+
+    return 0;
+}
+
+----
+

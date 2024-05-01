@@ -7,8 +7,11 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <limits>
+#endif
 
 #ifdef _MSC_VER
 # pragma warning(push)
@@ -34,7 +37,7 @@ template <typename Integer, typename Unsigned_Integer = detail::make_unsigned_t<
           std::enable_if_t<detail::is_signed_v<Integer>, bool> = true>
 constexpr auto make_positive_unsigned(Integer val) noexcept -> Unsigned_Integer
 {
-    return static_cast<Unsigned_Integer>(val < static_cast<std::int8_t>(0) ? apply_sign(val) : static_cast<Unsigned_Integer>(val));
+    return static_cast<Unsigned_Integer>(val < static_cast<Integer>(static_cast<std::int8_t>(0)) ? apply_sign(val) : static_cast<Unsigned_Integer>(val));
 }
 
 template <typename Unsigned_Integer, std::enable_if_t<!detail::is_signed_v<Unsigned_Integer>, bool> = true>

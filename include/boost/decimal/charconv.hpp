@@ -19,7 +19,10 @@
 #include <boost/decimal/detail/cmath/frexp10.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/countl.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
+#endif
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
@@ -84,17 +87,17 @@ constexpr auto from_chars_general_impl(const char* first, const char* last, Targ
 
 } //namespace detail
 
-constexpr auto from_chars(const char* first, const char* last, decimal32& value, chars_format fmt = chars_format::general) noexcept
+BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal32& value, chars_format fmt = chars_format::general) noexcept
 {
     return detail::from_chars_general_impl(first, last, value, fmt);
 }
 
-constexpr auto from_chars(const char* first, const char* last, decimal64& value, chars_format fmt = chars_format::general) noexcept
+BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal64& value, chars_format fmt = chars_format::general) noexcept
 {
     return detail::from_chars_general_impl(first, last, value, fmt);
 }
 
-constexpr auto from_chars(const char* first, const char* last, decimal128& value, chars_format fmt = chars_format::general) noexcept
+BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal128& value, chars_format fmt = chars_format::general) noexcept
 {
     return detail::from_chars_general_impl(first, last, value, fmt);
 }
@@ -304,7 +307,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
         {
             --first;
         }
-        ++first;
+
+        // Remove decimal point if not significant digits
+        if (*first != '.')
+        {
+            ++first;
+        }
     }
 
     // Insert the exponent character
@@ -468,6 +476,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     {
         if (exponent < 0 && -exponent < buffer_size)
         {
+            // Bounds check our move
+            if (r.ptr + 2 > last)
+            {
+                return {last, std::errc::value_too_large};
+            }
+
             boost::decimal::detail::memmove(r.ptr + exponent + 1, r.ptr + exponent,
                                             static_cast<std::size_t>(-exponent));
             boost::decimal::detail::memset(r.ptr + exponent, '.', 1U);
@@ -475,8 +489,23 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         }
         else if (exponent >= 1)
         {
+            // Bounds check the length of the memset before doing so
+            if (r.ptr + exponent + 1 > last)
+            {
+                return {last, std::errc::value_too_large};
+            }
+
             boost::decimal::detail::memset(r.ptr, '0', static_cast<std::size_t>(exponent));
             r.ptr += exponent;
+
+            if (append_trailing_zeros)
+            {
+                *r.ptr++ = '.';
+            }
+        }
+        else if (append_trailing_zeros)
+        {
+            *r.ptr++ = '.';
         }
     }
     else if (!append_leading_zeros)
@@ -490,11 +519,17 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
         const auto offset_bytes = static_cast<std::size_t>(integer_digits);
 
-        boost::decimal::detail::memmove(first + 2 + static_cast<std::size_t>(is_neg) + offset_bytes,
-                                        first + static_cast<std::size_t>(is_neg),
+        // Bounds check memmove followed by insertion of 0.
+        if (first + 2 + offset_bytes + (static_cast<std::size_t>(-exponent) - offset_bytes) + 2 > last)
+        {
+            return {last, std::errc::value_too_large};
+        }
+
+        boost::decimal::detail::memmove(first + 2 + offset_bytes,
+                                        first,
                                         static_cast<std::size_t>(-exponent) - offset_bytes);
 
-        boost::decimal::detail::memcpy(first + static_cast<std::size_t>(is_neg), "0.", 2U);
+        boost::decimal::detail::memcpy(first, "0.", 2U);
         first += 2;
         r.ptr += 2;
     }
@@ -717,17 +752,17 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
 
 } //namespace detail
 
-BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32 value) noexcept -> to_chars_result
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32 value) noexcept -> to_chars_result
 {
     return detail::to_chars_impl(first, last, value);
 }
 
-BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32 value, chars_format fmt) noexcept -> to_chars_result
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32 value, chars_format fmt) noexcept -> to_chars_result
 {
     return detail::to_chars_impl(first, last, value, fmt);
 }
 
-BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32 value, chars_format fmt, int precision) noexcept -> to_chars_result
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32 value, chars_format fmt, int precision) noexcept -> to_chars_result
 {
     if (precision < 0)
     {
@@ -737,17 +772,17 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32 value, 
     return detail::to_chars_impl(first, last, value, fmt, precision);
 }
 
-BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value) noexcept -> to_chars_result
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value) noexcept -> to_chars_result
 {
     return detail::to_chars_impl(first, last, value);
 }
 
-BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value, chars_format fmt) noexcept -> to_chars_result
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value, chars_format fmt) noexcept -> to_chars_result
 {
     return detail::to_chars_impl(first, last, value, fmt);
 }
 
-BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value, chars_format fmt, int precision) noexcept -> to_chars_result
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value, chars_format fmt, int precision) noexcept -> to_chars_result
 {
     if (precision < 0)
     {
@@ -757,17 +792,17 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value, 
     return detail::to_chars_impl(first, last, value, fmt, precision);
 }
 
-BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128 value) noexcept -> to_chars_result
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128 value) noexcept -> to_chars_result
 {
     return detail::to_chars_impl(first, last, value);
 }
 
-BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128 value, chars_format fmt) noexcept -> to_chars_result
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128 value, chars_format fmt) noexcept -> to_chars_result
 {
     return detail::to_chars_impl(first, last, value, fmt);
 }
 
-BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128 value, chars_format fmt, int precision) noexcept -> to_chars_result
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128 value, chars_format fmt, int precision) noexcept -> to_chars_result
 {
     if (precision < 0)
     {

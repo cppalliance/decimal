@@ -12,16 +12,16 @@ using namespace boost::decimal;
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 void test()
 {
-    BOOST_TEST_EQ(to_string(T{1}), "1");
-    BOOST_TEST_EQ(to_string(T{10}), "1e+01");
-    BOOST_TEST_EQ(to_string(T{100}), "1e+02");
-    BOOST_TEST_EQ(to_string(T{1000}), "1e+03");
-    BOOST_TEST_EQ(to_string(T{10000}), "1e+04");
-    BOOST_TEST_EQ(to_string(T{210000}), "2.1e+05");
-    BOOST_TEST_EQ(to_string(T{2100000}), "2.1e+06");
-    BOOST_TEST_EQ(to_string(T{21, 6, true}), "-2.1e+07");
-    BOOST_TEST_EQ(to_string(T{211, 6, true}), "-2.11e+08");
-    BOOST_TEST_EQ(to_string(T{2111, 6, true}), "-2.111e+09");
+    BOOST_TEST_EQ(to_string(T{1}), "1.000000");
+    BOOST_TEST_EQ(to_string(T{10}), "10.000000");
+    BOOST_TEST_EQ(to_string(T{100}), "100.000000");
+    BOOST_TEST_EQ(to_string(T{1000}), "1000.000000");
+    BOOST_TEST_EQ(to_string(T{10000}), "10000.000000");
+    BOOST_TEST_EQ(to_string(T{210000}), "210000.000000");
+    BOOST_TEST_EQ(to_string(T{2100000}), "2100000.000000");
+    BOOST_TEST_EQ(to_string(T{21, 6, true}), "-21000000.000000");
+    BOOST_TEST_EQ(to_string(T{211, 6, true}), "-211000000.000000");
+    BOOST_TEST_EQ(to_string(T{2111, 6, true}), "-2111000000.000000");
 
     BOOST_TEST_EQ(to_string(std::numeric_limits<T>::infinity()), "inf");
     BOOST_TEST_EQ(to_string(-std::numeric_limits<T>::infinity()), "-inf");

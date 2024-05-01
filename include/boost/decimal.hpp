@@ -13,6 +13,16 @@
 #  pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
 #endif
 
+// 3.4.7 evaluation format:
+// This is defined at top level because it has ramifications for every successive header
+#ifndef BOOST_DECIMAL_DEC_EVAL_METHOD
+#  define BOOST_DECIMAL_DEC_EVAL_METHOD 0
+#endif
+
+#if BOOST_DECIMAL_DEC_EVAL_METHOD < 0 || BOOST_DECIMAL_DEC_EVAL_METHOD > 2
+#  error "Unsupported value of BOOST_DECIMAL_DEC_EVAL_METHOD. Must be 0, 1, or 2"
+#endif
+
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
@@ -26,6 +36,7 @@
 #include <boost/decimal/charconv.hpp>
 #include <boost/decimal/type_traits.hpp>
 #include <boost/decimal/detail/io.hpp>
+#include <boost/decimal/cstdio.hpp>
 
 #if defined(__clang__) && !defined(__GNUC__)
 #  pragma clang diagnostic pop

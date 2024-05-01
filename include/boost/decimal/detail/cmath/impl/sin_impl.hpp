@@ -9,8 +9,12 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/cmath/impl/remez_series_result.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -97,10 +101,10 @@ using sin_table = sin_table_imp<true>;
 } //namespace sin_detail
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto sin_impl(T x) noexcept;
+constexpr auto sin_series_expansion(T x) noexcept;
 
 template <>
-constexpr auto sin_impl<decimal32>(decimal32 x) noexcept
+constexpr auto sin_series_expansion<decimal32>(decimal32 x) noexcept
 {
     const auto b_neg = signbit(x);
     x = abs(x);
@@ -109,7 +113,7 @@ constexpr auto sin_impl<decimal32>(decimal32 x) noexcept
 }
 
 template <>
-constexpr auto sin_impl<decimal64>(decimal64 x) noexcept
+constexpr auto sin_series_expansion<decimal64>(decimal64 x) noexcept
 {
     const auto b_neg = signbit(x);
     x = abs(x);
@@ -118,7 +122,7 @@ constexpr auto sin_impl<decimal64>(decimal64 x) noexcept
 }
 
 template <>
-constexpr auto sin_impl<decimal128>(decimal128 x) noexcept
+constexpr auto sin_series_expansion<decimal128>(decimal128 x) noexcept
 {
     const auto b_neg = signbit(x);
     x = abs(x);

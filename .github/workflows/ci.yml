@@ -77,6 +77,13 @@ jobs:
             os: ubuntu-22.04
             install:
               - g++-12-multilib
+          - toolset: gcc-13
+            cxxstd: "03,11,14,17,20,23"
+            address_model: 32,64
+            os: ubuntu-22.04
+            install:
+              - g++-13-multilib
+            cxxflags: -Wno-uninitialized
           - toolset: gcc-12
             cxxstd: "03-gnu,11-gnu,14-gnu,17-gnu,20-gnu,23-gnu"
             address_model: "32"
@@ -197,6 +204,26 @@ jobs:
               - "https://apt.llvm.org/llvm-snapshot.gpg.key"
             cxxflags: -stdlib=libc++
             linkflags: -stdlib=libc++
+          - toolset: clang
+            compiler: clang++-16
+            cxxstd: "03,11,14,17,20,2b"
+            os: ubuntu-22.04
+            install:
+              - clang-16
+            sources:
+              - "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main"
+            source_keys:
+              - "https://apt.llvm.org/llvm-snapshot.gpg.key"
+          - toolset: clang
+            compiler: clang++-17
+            cxxstd: "03,11,14,17,20,2b"
+            os: ubuntu-22.04
+            install:
+              - clang-17
+            sources:
+              - "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"
+            source_keys:
+              - "https://apt.llvm.org/llvm-snapshot.gpg.key"
           - name: UBSAN
             toolset: clang
             compiler: clang++-14
@@ -216,6 +243,12 @@ jobs:
           - toolset: clang
             cxxstd: "03,11,14,17,20,2b"
             os: macos-12
+          - toolset: clang
+            cxxstd: "03,11,14,17,20,2b"
+            os: macos-13
+          - toolset: clang
+            cxxstd: "03,11,14,17,20,2b"
+            os: macos-14
 
     timeout-minutes: 120
     runs-on: ${{matrix.os}}
@@ -302,7 +335,9 @@ jobs:
                 done
             fi
             sudo apt-get -o Acquire::Retries=$NET_RETRY_COUNT update
-            sudo apt-get -o Acquire::Retries=$NET_RETRY_COUNT install -y ${{join(matrix.install, ' ')}}
+            sudo apt-get -o Acquire::Retries=$NET_RETRY_COUNT install -y ${{join(matrix.install, ' ')}} locales
+            sudo locale-gen de_DE.UTF-8
+            sudo update-locale
       - name: Setup GCC Toolchain
         if: matrix.gcc_toolchain
         run: |

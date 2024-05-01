@@ -15,7 +15,7 @@ https://www.boost.org/LICENSE_1_0.txt
 Using C++14's relaxed definition of `constexpr` nearly all functionality of the library can be constexpr.
 This allows Boost.Decimal to better emulate the functionality a built-in type would have.
 
-=== Boost.Math Integration (Planned Feature)
+=== Boost.Math Integration
 
 Boost.Math requires C++14 as the minimum language standard for the library.
 By meeting this requirement, and Boost.Math's conceptual requirements for a user-defined type we are able to provide the statistics, interpolation, quadrature, etc. out of the box.

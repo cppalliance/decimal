@@ -9,16 +9,23 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto cbrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+namespace detail {
+
+template <typename T>
+constexpr auto cbrt_impl(T val) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero {0, 0};
     constexpr T one {1, 0};
@@ -51,9 +58,21 @@ constexpr auto cbrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
     else
     {
         constexpr T epsilon = std::numeric_limits<T>::epsilon() * 100;
-        T error = 1 / epsilon;
+        T error = one / epsilon;
 
-        T x = val > 1 ? val / 3 : val * 2; // Initial Guess
+        T x {};
+        if (val > one)
+        {
+            // Scale down if val is large by dividing the exp by 3
+            int exp {};
+            auto sig = frexp10(val, &exp);
+            x = T{sig, exp / 3};
+        }
+        else
+        {
+            // Trivial heuristic
+            x = val * 2;
+        }
 
         while (error > epsilon)
         {
@@ -67,6 +86,29 @@ constexpr auto cbrt(T val) noexcept -> std::enable_if_t<detail::is_decimal_float
     }
 
     return result;
+}
+
+} //namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto cbrt(T val) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::cbrt_impl(static_cast<evaluation_type>(val)));
 }
 
 } //namespace decimal

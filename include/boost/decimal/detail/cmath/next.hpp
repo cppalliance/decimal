@@ -11,22 +11,27 @@
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/modf.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/round.hpp>
 #include <boost/decimal/detail/cmath/ilogb.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <limits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
+BOOST_DECIMAL_EXPORT
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
 constexpr auto nextafter(T1 val, T2 direction) noexcept
-    -> std::enable_if_t<(detail::is_decimal_floating_point_v<T1> || detail::is_decimal_floating_point_v<T2>),
-                         detail::promote_args_t<T1, T2>>
+    BOOST_DECIMAL_REQUIRES_TWO(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2)
 {
     if (isnan(val) || isinf(val))
     {
@@ -44,9 +49,9 @@ constexpr auto nextafter(T1 val, T2 direction) noexcept
     return val - std::numeric_limits<T1>::epsilon();
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+BOOST_DECIMAL_EXPORT template <typename T>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto nexttoward(T val, long double direction) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto dec_direction {static_cast<T>(direction)};
     return nextafter(val, dec_direction);

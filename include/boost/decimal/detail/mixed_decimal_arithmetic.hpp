@@ -10,7 +10,10 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {

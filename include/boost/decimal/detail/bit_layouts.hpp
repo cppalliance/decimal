@@ -6,8 +6,11 @@
 #define BOOST_DECIMAL_DETAIL_BIT_LAYOUTS_HPP
 
 #include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
 #include <cfloat>
+#endif
 
 // Layouts of floating point types as specified by IEEE 754
 // See page 23 of IEEE 754-2008

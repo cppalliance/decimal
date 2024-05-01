@@ -8,21 +8,22 @@
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/detail/config.hpp>
 
 namespace boost {
 namespace decimal {
 
-constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
     return fmad32(x, y, z);
 }
 
-constexpr auto fma(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT constexpr auto fma(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
 {
     return fmad64(x, y, z);
 }
 
-constexpr auto fma(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT constexpr auto fma(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
 {
     return fmad128(x, y, z);
 }

@@ -5,18 +5,22 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_ILOGB_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_ILOGB_HPP
 
-#include <cmath>
-#include <type_traits>
-
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <cmath>
+#include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto ilogb(T d) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, int>
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto ilogb(T d) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
 {
     const auto fpc_d = fpclassify(d);
 

@@ -10,7 +10,9 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/config.hpp>
 
-namespace boost { namespace decimal { namespace detail {
+namespace boost {
+namespace decimal {
+namespace detail {
 
 #ifdef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
 
@@ -18,6 +20,8 @@ namespace boost { namespace decimal { namespace detail {
 template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
 constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 {
+    using significand_type = std::conditional_t<std::is_same<TargetType, decimal128>::value, detail::uint128, int>;
+
     const auto trailing_num {val % 10};
     int exp_delta {};
     val /= 10;
@@ -28,7 +32,7 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
         ++val;
     }
 
-    if (val > max_significand_v<TargetType>)
+    if (static_cast<significand_type>(val) > max_significand_v<TargetType>)
     {
         val /= 10;
         ++exp_delta;
@@ -42,6 +46,8 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
 constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT(readability-function-cognitive-complexity)
 {
+    using significand_type = std::conditional_t<std::is_same<TargetType, decimal128>::value, detail::uint128, int>;
+
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
     {
         const auto trailing_num {val % 10};
@@ -57,7 +63,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         // If the significand was e.g. 99'999'999 rounding up
         // would put it out of range again
 
-        if (val > max_significand_v<TargetType>)
+        if (static_cast<significand_type>(val) > max_significand_v<TargetType>)
         {
             val /= 10;
             ++exp_delta;
@@ -121,7 +127,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         // If the significand was e.g. 99'999'999 rounding up
         // would put it out of range again
 
-        if (val > max_significand_v<TargetType>)
+        if (static_cast<significand_type>(val) > max_significand_v<TargetType>)
         {
             val /= 10;
             ++exp;

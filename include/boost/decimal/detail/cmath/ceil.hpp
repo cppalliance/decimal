@@ -11,17 +11,21 @@
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto ceil BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     using DivType = std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
                     std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>;
@@ -68,7 +72,7 @@ constexpr auto ceil BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
     }
     new_sig *= 10;
 
-    return {new_sig, exp_ptr + static_cast<int>(decimal_digits) - 1, is_neg};
+    return T{new_sig, exp_ptr + static_cast<int>(decimal_digits) - 1, is_neg};
 }
 
 } // namespace decimal

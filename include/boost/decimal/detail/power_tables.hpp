@@ -8,12 +8,16 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <array>
 #include <cstdint>
+#endif
 
-namespace boost { namespace decimal { namespace detail {
+namespace boost {
+namespace decimal {
+namespace detail {
 
-static constexpr std::array<std::uint64_t, 20> powers_of_10 =
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::array<std::uint64_t, 20> powers_of_10 =
 {{
          UINT64_C(1), UINT64_C(10), UINT64_C(100), UINT64_C(1000), UINT64_C(10000), UINT64_C(100000), UINT64_C(1000000),
          UINT64_C(10000000), UINT64_C(100000000), UINT64_C(1000000000), UINT64_C(10000000000), UINT64_C(100000000000),

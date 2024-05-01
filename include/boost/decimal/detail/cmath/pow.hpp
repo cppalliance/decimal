@@ -6,21 +6,24 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_POW_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_POW_HPP
 
-#include <algorithm>
-#include <cmath>
-#include <type_traits>
-
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/cmath/impl/pow_impl.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <algorithm>
+#include <cmath>
+#include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T, BOOST_DECIMAL_INTEGRAL IntegralType>
+BOOST_DECIMAL_EXPORT template <typename T, typename IntegralType>
 constexpr auto pow(T b, IntegralType p) noexcept
-    -> std::enable_if_t<(detail::is_decimal_floating_point_v<T> && std::is_integral<IntegralType>::value), T> // NOLINT(misc-no-recursion)
+    BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, T, detail::is_integral_v, IntegralType, T)
 {
     using local_integral_type = IntegralType;
 
@@ -147,8 +150,9 @@ constexpr auto pow(T b, IntegralType p) noexcept
     return result;
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto pow(T x, T a) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto pow(T x, T a) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero { 0, 0 };
 

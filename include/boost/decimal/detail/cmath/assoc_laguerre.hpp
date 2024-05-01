@@ -10,26 +10,31 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/laguerre.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
 
 namespace detail {
 
-template <typename T1, typename T2, typename T3>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2,
+          BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T3>
 constexpr auto assoc_laguerre_next(unsigned n, unsigned l, T1 x, T2 Pl, T3 Plm1)
 {
     using promoted_type = promote_args_t<T1, T2, T3>;
     return ((2 * n + l + 1 - static_cast<promoted_type>(x)) * static_cast<promoted_type>(Pl) - (n + l) * static_cast<promoted_type>(Plm1)) / (n+1);
 }
 
-} //namespace detail
-
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto assoc_laguerre(unsigned n, unsigned m, T x) -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T> // NOLINT(misc-no-recursion)
+template <typename T>
+constexpr auto assoc_laguerre_impl(unsigned n, unsigned m, T x)
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // Special cases:
     if(m == 0)
@@ -51,11 +56,34 @@ constexpr auto assoc_laguerre(unsigned n, unsigned m, T x) -> std::enable_if_t<d
     while(c < n)
     {
         std::swap(p0, p1);
-        p1 = static_cast<T>(detail::assoc_laguerre_next(c, m, x, p0, p1));
+        p1 = static_cast<T>(assoc_laguerre_next(c, m, x, p0, p1));
         ++c;
     }
 
     return p1;
+}
+
+} //namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto assoc_laguerre(unsigned n, unsigned m, T x)
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::assoc_laguerre_impl(n, m, static_cast<evaluation_type>(x)));
 }
 
 } //namespace decimal

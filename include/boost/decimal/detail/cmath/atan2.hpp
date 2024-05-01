@@ -10,11 +10,14 @@
 #include <boost/decimal/detail/cmath/atan.hpp>
 #include <boost/decimal/detail/cmath/fabs.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/numbers.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cstdint>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -34,10 +37,10 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T> constexpr T pi_constants<T>::pi
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T> constexpr T pi_constants<T>::three_pi_over_four;
 
 } // namespace atan2_detail
-} // namespace detail
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto atan2(T y, T x) noexcept
+template <typename T>
+constexpr auto atan2_impl(T y, T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto fpcx {fpclassify(x)};
     const auto fpcy {fpclassify(y)};
@@ -66,13 +69,13 @@ constexpr auto atan2(T y, T x) noexcept
     }
     else if (fpcy == FP_INFINITE && isfinitex)
     {
-        result = detail::atan2_detail::pi_constants<T>::pi_over_two;
+        result = atan2_detail::pi_constants<T>::pi_over_two;
 
         if (signy) { result = -result; }
     }
     else if (fpcy == FP_INFINITE && fpcx == FP_INFINITE && signx)
     {
-        result = detail::atan2_detail::pi_constants<T>::three_pi_over_four;
+        result = atan2_detail::pi_constants<T>::three_pi_over_four;
 
         if (signy) { result = -result; }
     }
@@ -84,7 +87,7 @@ constexpr auto atan2(T y, T x) noexcept
     }
     else if (fpcx == FP_ZERO)
     {
-        result = detail::atan2_detail::pi_constants<T>::pi_over_two;
+        result = atan2_detail::pi_constants<T>::pi_over_two;
 
         if (signy) { result = -result; }
     }
@@ -128,6 +131,29 @@ constexpr auto atan2(T y, T x) noexcept
     }
 
     return result;
+}
+
+} // namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto atan2(T y, T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::atan2_impl(static_cast<evaluation_type>(y), static_cast<evaluation_type>(x)));
 }
 
 } //namespace decimal

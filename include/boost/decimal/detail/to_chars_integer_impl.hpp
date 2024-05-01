@@ -11,6 +11,8 @@
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/to_chars_result.hpp>
 #include <boost/decimal/detail/memcpy.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
 #include <system_error>
 #include <type_traits>
@@ -23,12 +25,13 @@
 #include <cstdint>
 #include <climits>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {
 namespace detail {
 
-static constexpr char digit_table[] = {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE char digit_table[] = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
@@ -37,7 +40,8 @@ static constexpr char digit_table[] = {
 
 // Use a simple lookup table to put together the Integer in character form
 template <typename Integer, typename Unsigned_Integer>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Integer value, int base) noexcept -> to_chars_result
+BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Integer value, int base) noexcept
+    BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_integral_v, Integer, detail::is_integral_v, Unsigned_Integer, to_chars_result)
 {
     const std::ptrdiff_t output_length = last - first;
 

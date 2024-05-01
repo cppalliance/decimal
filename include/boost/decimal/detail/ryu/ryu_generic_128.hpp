@@ -12,8 +12,10 @@
 #include <boost/decimal/detail/bit_layouts.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cinttypes>
 #include <cstdint>
+#endif
 
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 #ifdef BOOST_DECIMAL_DEBUG_RYU
@@ -21,10 +23,13 @@
 #endif
 #endif
 
-namespace boost { namespace decimal { namespace detail { namespace ryu {
+namespace boost {
+namespace decimal {
+namespace detail {
+namespace ryu {
 
-static constexpr int32_t fd128_exceptional_exponent = 0x7FFFFFFF;
-static constexpr unsigned_128_type one = 1;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int32_t fd128_exceptional_exponent = 0x7FFFFFFF;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE unsigned_128_type one = 1;
 
 struct floating_decimal_128
 {
@@ -47,7 +52,7 @@ static char* s(unsigned_128_type v) {
 }
 #endif
 
-static constexpr auto generic_binary_to_decimal(
+inline constexpr auto generic_binary_to_decimal(
         const unsigned_128_type bits,
         const std::uint32_t mantissaBits, const std::uint32_t exponentBits, const bool explicitLeadingBit) noexcept -> struct floating_decimal_128
 {

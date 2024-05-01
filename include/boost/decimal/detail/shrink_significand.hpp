@@ -5,12 +5,15 @@
 #ifndef BOOST_DECIMAL_DETAIL_SHRINK_SIGNIFICAND_HPP
 #define BOOST_DECIMAL_DETAIL_SHRINK_SIGNIFICAND_HPP
 
-#include <limits>
-#include <type_traits>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+#include <limits>
+#include <type_traits>
+#endif
 
 namespace boost {
 namespace decimal {

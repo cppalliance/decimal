@@ -68,6 +68,7 @@
 #include <boost/decimal/detail/cmath/assoc_laguerre.hpp>
 #include <boost/decimal/detail/cmath/legendre.hpp>
 #include <boost/decimal/detail/cmath/assoc_legendre.hpp>
+#include <boost/decimal/detail/cmath/ellint_1.hpp>
 #include <boost/decimal/numbers.hpp>
 
 // Macros from 3.6.2
@@ -79,94 +80,95 @@
 #define BOOST_DECIMAL_FP_FAST_FMAD64 1
 #define BOOST_DECIMAL_FP_FAST_FMAD128 1
 
-namespace boost { namespace decimal {
+namespace boost {
+namespace decimal {
 
-constexpr auto scalbn(decimal32 num, int expval) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal32 num, int expval) noexcept -> decimal32
 {
     return scalbnd32(num, expval);
 }
 
-constexpr auto scalbn(decimal64 num, int expval) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal64 num, int expval) noexcept -> decimal64
 {
     return scalbnd64(num, expval);
 }
 
-constexpr auto scalbn(decimal128 num, int expval) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal128 num, int expval) noexcept -> decimal128
 {
     return scalbnd128(num, expval);
 }
 
-constexpr auto scalbln(decimal32 num, long expval) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal32 num, long expval) noexcept -> decimal32
 {
     return scalblnd32(num, expval);
 }
 
-constexpr auto scalbln(decimal64 num, long expval) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal64 num, long expval) noexcept -> decimal64
 {
     return scalblnd64(num, expval);
 }
 
-constexpr auto scalbln(decimal128 num, long expval) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal128 num, long expval) noexcept -> decimal128
 {
     return scalblnd128(num, expval);
 }
 
-constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 {
     return copysignd32(mag, sgn);
 }
 
-constexpr auto copysign(decimal64 mag, decimal64 sgn) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal64 mag, decimal64 sgn) noexcept -> decimal64
 {
     return copysignd64(mag, sgn);
 }
 
-constexpr auto copysign(decimal128 mag, decimal128 sgn) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal128 mag, decimal128 sgn) noexcept -> decimal128
 {
     return copysignd128(mag, sgn);
 }
 
-constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool
+BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     return samequantumd32(lhs, rhs);
 }
 
-constexpr auto samequantum(decimal64 lhs, decimal64 rhs) noexcept -> bool
+BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal64 lhs, decimal64 rhs) noexcept -> bool
 {
     return samequantumd64(lhs, rhs);
 }
 
-constexpr auto samequantum(decimal128 lhs, decimal128 rhs) noexcept -> bool
+BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal128 lhs, decimal128 rhs) noexcept -> bool
 {
     return samequantumd128(lhs, rhs);
 }
 
-constexpr auto quantexp(decimal32 x) noexcept -> int
+BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal32 x) noexcept -> int
 {
     return quantexpd32(x);
 }
 
-constexpr auto quantexp(decimal64 x) noexcept -> int
+BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal64 x) noexcept -> int
 {
     return quantexpd64(x);
 }
 
-constexpr auto quantexp(decimal128 x) noexcept -> int
+BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal128 x) noexcept -> int
 {
     return quantexpd128(x);
 }
 
-constexpr auto quantize(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     return quantized32(lhs, rhs);
 }
 
-constexpr auto quantize(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
 {
     return quantized64(lhs, rhs);
 }
 
-constexpr auto quantize(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
 {
     return quantized128(lhs, rhs);
 }

@@ -12,6 +12,7 @@
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <system_error>
 #include <type_traits>
 #include <limits>
@@ -19,10 +20,13 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#endif
 
-namespace boost { namespace decimal { namespace detail {
+namespace boost {
+namespace decimal {
+namespace detail {
 
-static constexpr unsigned char uchar_values[] =
+BOOST_DECIMAL_CONSTEXPR_VARIABLE unsigned char uchar_values[] =
      {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
       255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
       255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
@@ -170,7 +174,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
         {
             // overflow is not possible in the first nd characters
 
-            const unsigned char current_digit = digit_from_char(*next);
+            const auto current_digit = static_cast<Unsigned_Integer>(digit_from_char(*next));
 
             if (current_digit >= unsigned_base)
             {
@@ -183,7 +187,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
 
         for( ; i < nc; ++i )
         {
-            const unsigned char current_digit = digit_from_char(*next);
+            const auto current_digit = static_cast<Unsigned_Integer>(digit_from_char(*next));
 
             if (current_digit >= unsigned_base)
             {

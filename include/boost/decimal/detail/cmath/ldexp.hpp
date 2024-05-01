@@ -9,14 +9,20 @@
 #include <boost/decimal/detail/cmath/impl/pow_impl.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
 #include <cmath>
+#endif
 
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto ldexp(T v, int e2) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
+constexpr auto ldexp_impl(T v, int e2) noexcept
 {
     T result { };
 
@@ -48,6 +54,29 @@ constexpr auto ldexp(T v, int e2) noexcept -> std::enable_if_t<detail::is_decima
     }
 
     return result;
+}
+
+} // namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto ldexp(T v, int e2) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::ldexp_impl(static_cast<evaluation_type>(v), e2));
 }
 
 } // namespace decimal
