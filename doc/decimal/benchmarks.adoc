@@ -22,7 +22,7 @@ An example on Linux with b2: `../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_
 
 == Comparisons
 
-The benchmark for comparisons generates a random vector containing 2,000,000 elements and does operations `>`, `>=`, `<`, `<=`, `==`, and `!=` between `vec[i] and vec[i + 1]`.
+The benchmark for comparisons generates a random vector containing 2,000,000 elements and does operations `>`, `>=`, `<`, `\<=`, `==`, and `!=` between `vec[i] and vec[i + 1]`.
 This is repeated 5 times to generate stable results.
 
 === M1 macOS Results
