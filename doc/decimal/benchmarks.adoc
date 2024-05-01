@@ -22,7 +22,7 @@ An example on Linux with b2: `../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_
 
 == Comparisons
 
-The benchmark for comparisons generates a random vector containing 2,000,000 elements and does operations `>`, `>=`, `<`, `<=`, `==`, and `!=` between `vec[i] and vec[i + 1]`.
+The benchmark for comparisons generates a random vector containing 2,000,000 elements and does operations `>`, `>=`, `<`, `\<=`, `==`, and `!=` between `vec[i] and vec[i + 1]`.
 This is repeated 5 times to generate stable results.
 
 === M1 macOS Results
@@ -32,20 +32,20 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 9032
-| 1.589
+| 8764
+| 1.577
 | `double`
-| 5684
+| 5559
 | 1.000
 | `decimal32`
-| 285,453
-| 50.2204
+| 276,124
+| 49.672
 | `decimal64`
-| 352,644
-| 62.042
+| 355,999
+| 64.760
 | `decimal128`
-| 15,355,817
-| 2701.590
+| 989,028
+| 177.915
 |===
 
 == Basic Operations
@@ -62,20 +62,20 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 1641
-| 0.965
+| 2113
+| 0.739
 | `double`
-| 1708
+| 2860
 | 1.000
 | `decimal32`
-| 378,252
-| 221.459
+| 353,836
+| 123.719
 | `decimal64`
-| 589,313
-| 345.031
+| 409,098
+| 143.041
 | `decimal128`
-| 13,829,995
-| 8097.190
+| 2,418,039
+| 845.468
 |===
 
 ==== Subtraction
@@ -83,20 +83,20 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 3633
-| 2.221
+| 1782
+| 1.061
 | `double`
-| 1636
+| 1680
 | 1.000
 | `decimal32`
-| 307,765
-| 188.120
+| 293,927
+| 174.957
 | `decimal64`
-| 461,442
-| 282.055
+| 329,425
+| 196.086
 | `decimal128`
-| 11,449,306
-| 6998.350
+| 1,527,261
+| 909.084
 |===
 
 ==== Multiplication
@@ -104,20 +104,20 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 1678
-| 0.523
+| 1691
+| 0.979
 | `double`
-| 3209
+| 1728
 | 1.000
 | `decimal32`
-| 310,543
-| 96.773
+| 309,117
+| 178.887
 | `decimal64`
-| 570,938
-| 177.918
+| 408,010
+| 236.117
 | `decimal128`
-| 9,434,297
-| 2939.95
+| 2,506,105
+| 1450.292
 |===
 
 ==== Division
@@ -125,20 +125,20 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 2019
-| 0.565
+| 2058
+| 0.846
 | `double`
-| 3572
+| 2434
 | 1.000
 | `decimal32`
-| 322,116
-| 90.178
+| 304,852
+| 125.247
 | `decimal64`
-| 734,173
-| 205.536
+| 519,990
+| 213.636
 | `decimal128`
-| 14,592,284
-| 4085.19
+| 3,534,909
+| 1452.304
 |===
 
 == Selected Special Functions
@@ -155,20 +155,20 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 1904
-| 0.565
+| 2021
+| 0.626
 | `double`
-| 3746
+| 3229
 | 1.000
 | `decimal32`
-| 5,050,241
-| 1341.72
+| 4,826,066
+| 1494.601
 | `decimal64`
-| 12,084,821
-| 3210.630
+| 7,780,637
+| 2409.612
 | `decimal128`
-| 275,779,340
-| 73267.60
+| 100,269,145
+| 31052.693
 |===
 
 == `<charconv>`

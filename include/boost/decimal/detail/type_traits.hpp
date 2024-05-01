@@ -44,6 +44,9 @@ template <typename T>
 constexpr bool is_signed_v = is_signed<T>::value;
 
 template <typename T>
+constexpr bool is_unsigned_v = !is_signed_v<T>;
+
+template <typename T>
 struct make_unsigned { using type = std::make_unsigned_t<T>; };
 
 template <>
