@@ -1,0 +1,16 @@
+{
+  "name": "decimal",
+  "version": "1.0.0",
+  "description": "A C++14 implementation of IEEE 754 decimal floating point numbers",
+  "homepage": "https://github.com/cppalliance/decimal",
+  "dependencies": [
+    {
+      "name": "boost-vcpkg-helpers",
+      "version>=": "1.81.0"
+    },
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    }
+    ]
+}
