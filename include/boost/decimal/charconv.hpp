@@ -19,6 +19,7 @@
 #include <boost/decimal/detail/cmath/frexp10.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/countl.hpp>
+#include <boost/decimal/detail/remove_trailing_zeros.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -412,12 +413,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         // In general formatting we remove trailing 0s
         if (fmt == chars_format::general)
         {
-            while (significand % 10 == 0)
-            {
-                significand /= 10;
-                ++exponent;
-                --num_dig;
-            }
+
+            const auto zeros_removal {remove_trailing_zeros(significand)};
+            significand = zeros_removal.trimmed_number;
+            exponent += static_cast<int>(zeros_removal.number_of_removed_zeros);
+            num_dig -= static_cast<int>(zeros_removal.number_of_removed_zeros);
         }
     }
 
