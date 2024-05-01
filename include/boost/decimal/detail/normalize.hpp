@@ -23,12 +23,9 @@ constexpr auto normalize(T1& significand, T2& exp) noexcept -> void
 
     if (digits < detail::precision_v<TargetDecimalType>)
     {
-        while (digits < detail::precision_v<TargetDecimalType>)
-        {
-            significand *= 10;
-            --exp;
-            ++digits;
-        }
+        const auto zeros_needed {detail::precision_v<TargetDecimalType> - digits};
+        significand *= pow10(static_cast<T1>(zeros_needed));
+        exp -= zeros_needed;
     }
     else if (digits > detail::precision_v<TargetDecimalType>)
     {
@@ -62,12 +59,9 @@ constexpr auto normalize(T1& significand, T2& exp) noexcept
 
     if (digits < detail::precision_v<decimal128>)
     {
-        while (digits < detail::precision_v<decimal128>)
-        {
-            significand *= UINT64_C(10);
-            --exp;
-            ++digits;
-        }
+        const auto zeros_needed {detail::precision_v<TargetDecimalType> - digits};
+        significand *= pow10(static_cast<T1>(zeros_needed));
+        exp -= zeros_needed;
     }
 
     else if (digits > detail::precision_v<TargetDecimalType>)
