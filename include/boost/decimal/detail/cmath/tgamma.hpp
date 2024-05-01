@@ -99,8 +99,14 @@ constexpr auto tgamma_impl(T x) noexcept
                     z = z - nx;
                 }
 
+                auto my_own_fma =
+                    [](T x, T y, T z)
+                    {
+                        return (x * y) + z;
+                    };
+
                 result = detail::tgamma_series_expansion(z);
-                result = one / (z * fma(result, z, one));
+                result = one / (z * my_own_fma(result, z, one));
 
                 if (x_is_gt_one)
                 {
