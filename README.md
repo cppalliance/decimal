@@ -18,7 +18,31 @@ This library is not an official boost library, and is under active development.
 # How To Use The Library
 
 This library is header only, and contains no dependencies.
-It can either be copied into the directory of your choice, or installed with CMake.
+
+## CMake
+
+````
+git clone https://github.com/cppalliance/decimal
+cd decimal
+mkdir build && cd build
+cmake .. OR cmake .. -DCMAKE_INSTALL_PREFIX=/your/custom/path
+cmake --install .
+````
+
+## vcpkg
+
+````
+git clone https://github.com/cppalliance/decimal
+cd decimal
+vcpkg install decimal --overlay-ports=ports/decimal 
+````
+
+## Conan
+
+````
+git clone https://github.com/cppalliance/decimal
+conan create decimal/conan --build missing
+````
 
 # Supported Platforms
 
