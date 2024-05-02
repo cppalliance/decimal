@@ -30,7 +30,8 @@ auto main() -> int
 
         strm << std::setprecision(std::numeric_limits<local_decimal_type>::digits10) << x;
 
-        std::cout << strm.str() << std::endl;
+        std::cout << "Expected: 4.56" << std::endl;
+        std::cout << "     Got: " << strm.str() << std::endl;
     }
 
     {
@@ -38,7 +39,8 @@ auto main() -> int
 
         strm << std::setprecision(std::numeric_limits<local_decimal_type>::digits10) << tg;
 
-        std::cout << strm.str() << std::endl;
+        std::cout << "Expected: 12.64819265438397922113369900828314" << std::endl;
+        std::cout << "     Got: " << strm.str() << std::endl;
     }
 
     return 1;
