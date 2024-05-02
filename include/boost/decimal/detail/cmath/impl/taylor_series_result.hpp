@@ -27,27 +27,6 @@ constexpr auto taylor_series_result(T x, const Array &coeffs) noexcept
     return result;
 }
 
-template <typename Array>
-constexpr auto taylor_series_result(boost::decimal::decimal128 x, const Array &coeffs) noexcept
-{
-    const std::size_t N = coeffs.size();
-
-    auto result = coeffs[N - 1];
-
-    auto my_own_fma =
-        [](boost::decimal::decimal128 x, boost::decimal::decimal128 y, boost::decimal::decimal128 z)
-        {
-            return (x * y) + z;
-        };
-
-    for (std::size_t i = N - 1; i-- > 0;)
-    {
-        result = my_own_fma(result, x, coeffs[i]);
-    }
-
-    return result;
-}
-
 } //namespace detail
 } //namespace decimal
 } //namespace boost

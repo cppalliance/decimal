@@ -63,6 +63,14 @@ namespace local
       const auto delta = fabs(1 - (a / b));
 
       result_is_ok = (delta < tol);
+
+      if (!result_is_ok)
+      {
+          std::cerr << std::setprecision(std::numeric_limits<NumericType>::digits10) << "a: " << a
+                    << "\nb: " << b
+                    << "\ndelta: " << delta
+                    << "\ntol: " << tol << std::endl;
+      }
     }
 
     return result_is_ok;
