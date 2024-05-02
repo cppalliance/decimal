@@ -2434,6 +2434,7 @@ constexpr auto fmad128(decimal128 x, decimal128 y, decimal128 z) noexcept -> dec
 
     return dec_result + z;
 
+    /*
     const auto res_add {detail::check_non_finite(dec_result, z)};
     if (res_add != zero)
     {
@@ -2475,6 +2476,7 @@ constexpr auto fmad128(decimal128 x, decimal128 y, decimal128 z) noexcept -> dec
     }
 
     return {result.sig, result.exp, result.sign};
+    */
 }
 
 } //namespace decimal
