@@ -77,6 +77,7 @@ void test_uppercase(T value, const char* format_sprintf, chars_format fmt = char
     BOOST_TEST_EQ(num_bytes, r.ptr - charconv_buffer);
 }
 
+#if !(defined(__APPLE__) && defined(__GNUC__) && !defined(__clang__))
 void test_locales()
 {
     const char buffer[] = "1,1897e+02";
@@ -89,7 +90,7 @@ void test_locales()
         std::locale::global(std::locale("de_DE.UTF-8"));
         #endif
     }
-        // LCOV_EXCL_START
+    // LCOV_EXCL_START
     catch (...)
     {
         std::cerr << "Locale not installed. Skipping test." << std::endl;
@@ -101,6 +102,7 @@ void test_locales()
     snprintf(printf_buffer, sizeof(printf_buffer), "%.4De", decimal64{11897, -2});
     BOOST_TEST_CSTR_EQ(printf_buffer, buffer);
 }
+#endif
 
 template <typename T>
 void test_bootstrap()
@@ -174,7 +176,10 @@ int main()
     test_bootstrap<decimal64>();
     test_bootstrap<decimal128>();
 
+    // Homebrew gcc on mac does not support locales
+    #if !(defined(__APPLE__) && defined(__GNUC__) && !defined(__clang__))
     test_locales();
+    #endif
 
     return boost::report_errors();
 }
