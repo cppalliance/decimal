@@ -14,22 +14,26 @@ def mod_inverse(a, m):
         return x % m
 
 # Constants
-q0 = 5
-twobt_min_1 = 2**127
+bits = int(128)
+t = int(2)
+
+q = int(10)**t
+q0 = int(q / int(2)**t)
+print("Q0: ", q0)
+twobt_min_t = int(2**(bits - t))
 
 # Calculate the modular inverse
-m0 = mod_inverse(q0, twobt_min_1)
+m0 = int(mod_inverse(q0, twobt_min_t))
 print("M0: ", m0)
 
-p0 = int((q0 * m0 - 1) / twobt_min_1)
+p0 = int((q0 * m0 - 1) / twobt_min_t)
 print("P0: ", p0)
 
 p = int(q0 + p0)
 print("P: ", p)
 
-m = int((twobt_min_1 * p + 1) / q0)
+m = int((twobt_min_t * p + 1) / q0)
 print("M: ", m)
 
-
-threshold_value = int(2**128 / 10 + 1)
+threshold_value = int(2**bits / q + 1)
 print("Threshold Value: ", threshold_value)

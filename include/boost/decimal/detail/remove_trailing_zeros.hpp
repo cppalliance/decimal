@@ -85,6 +85,7 @@ constexpr auto remove_trailing_zeros(std::uint64_t n) noexcept -> remove_trailin
     return {n, s};
 }
 
+/*
 constexpr auto remove_trailing_zeros(uint128 n) noexcept -> remove_trailing_zeros_return<uint128>
 {
     if (n.high == UINT64_C(0))
@@ -111,6 +112,39 @@ constexpr auto remove_trailing_zeros(uint128 n) noexcept -> remove_trailing_zero
             break;
         }
     }
+
+    return {n, s};
+}
+*/
+
+constexpr auto remove_trailing_zeros(uint128 n) noexcept -> remove_trailing_zeros_return<uint128>
+{
+    std::size_t s {};
+
+    auto r = rotr<128>(n * uint128{UINT64_C(0x3275305C1066), UINT64_C(0xE4A4D1417CD9A041)}, 16);
+    auto b = r < uint128{UINT64_C(0x734), UINT64_C(0xACA5F6226F0ADA62)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<128>(n * uint128{UINT64_C(0x6B7213EE9F5A78), UINT64_C(0xC767074B22E90E21)}, 8);
+    b = r < uint128{UINT64_C(0x2AF31DC461), UINT64_C(0x1873BF3F70834ACE)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<128>(n * uint128{UINT64_C(0x95182A9930BE0DE), UINT64_C(0xD288CE703AFB7E91)}, 4);
+    b = r < uint128{UINT64_C(0x68DB8BAC710CB), UINT64_C(0x295E9E1B089A0276)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<128>(n * uint128{UINT64_C(0x28F5C28F5C28F5C2), UINT64_C(0x8F5C28F5C28F5C29)}, 2);
+    b = r < uint128{UINT64_C(0x28F5C28F5C28F5C), UINT64_C(0x28F5C28F5C28F5C3)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<128>(n * uint128{UINT64_C(0xCCCCCCCCCCCCCCCC), UINT64_C(0xCCCCCCCCCCCCCCCD)}, 1);
+    b = r < uint128{UINT64_C(0x1999999999999999), UINT64_C(0x999999999999999A)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
 
     return {n, s};
 }
