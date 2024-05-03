@@ -26,9 +26,11 @@ void test()
             const auto temp {boost::decimal::detail::remove_trailing_zeros(static_cast<T>(val))};
             if (!BOOST_TEST_EQ(temp.trimmed_number, T(1)))
             {
+                // LCOV_EXCL_START
                 std::cerr << "Input Number: " << val
                           << "\nOutput Number: " << temp.trimmed_number
                           << "\nZeros removed: " << temp.number_of_removed_zeros << std::endl;
+                // LCOV_EXCL_STOP
             }
         }
     }
@@ -64,9 +66,11 @@ void test_extended()
         const auto temp {boost::decimal::detail::remove_trailing_zeros(val)};
         if (!BOOST_TEST_EQ(temp.trimmed_number, detail::uint128(1)))
         {
+            // LCOV_EXCL_START
             std::cerr << "Input Number: " << val
                       << "\nOutput Number: " << temp.trimmed_number
                       << "\nZeros removed: " << temp.number_of_removed_zeros << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
