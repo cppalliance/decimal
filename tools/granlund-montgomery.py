@@ -9,13 +9,13 @@ def extended_euclidean(a, b):
 def mod_inverse(a, m):
     gcd, x, _ = extended_euclidean(a, m)
     if gcd != 1:
-        return None  # Modular inverse doesn't exist
+        return 0  # Modular inverse doesn't exist
     else:
         return x % m
 
 # Constants
 bits = int(128)
-t = int(2)
+t = int(32)
 
 q = int(10)**t
 q0 = int(q / int(2)**t)
