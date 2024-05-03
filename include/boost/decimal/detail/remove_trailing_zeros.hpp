@@ -85,7 +85,6 @@ constexpr auto remove_trailing_zeros(std::uint64_t n) noexcept -> remove_trailin
     return {n, s};
 }
 
-// TODO(mborland): Make this better for the 2-word case
 constexpr auto remove_trailing_zeros(uint128 n) noexcept -> remove_trailing_zeros_return<uint128>
 {
     if (n.high == UINT64_C(0))
@@ -94,12 +93,23 @@ constexpr auto remove_trailing_zeros(uint128 n) noexcept -> remove_trailing_zero
         return {static_cast<uint128>(temp.trimmed_number), temp.number_of_removed_zeros};
     }
 
-    std::size_t s {};
+    std::size_t s = 0;
+    constexpr detail::uint128 m {UINT64_C(0xCCCCCCCCCCCCCCCC), UINT64_C(0xCCCCCCCCCCCCCCCD)};
+    constexpr detail::uint128 threshold_value {UINT64_C(0x1999999999999999), UINT64_C(0x999999999999999A)};
 
-    while (n % 10 == 0)
+    while (true)
     {
-        n /= 10;
-        ++s;
+        const auto r = rotr<128>(n * m, 1);
+
+        if (r < threshold_value)
+        {
+            n = r;
+            s += 1;
+        }
+        else
+        {
+            break;
+        }
     }
 
     return {n, s};
