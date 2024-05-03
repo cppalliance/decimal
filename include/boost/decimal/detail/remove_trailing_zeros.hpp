@@ -40,8 +40,13 @@ constexpr auto remove_trailing_zeros(std::uint32_t n) noexcept -> remove_trailin
 {
     std::size_t s {};
 
-    auto r = rotr<32>(n * UINT32_C(184254097), 4);
-    auto b = r < UINT32_C(429497);
+    auto r = rotr<32>(n * UINT32_C(15273505), 8);
+    auto b = r < UINT32_C(43);
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<32>(n * UINT32_C(184254097), 4);
+    b = r < UINT32_C(429497);
     s = s * 2U + static_cast<std::size_t>(b);
     n = b ? r : n;
 
@@ -62,8 +67,13 @@ constexpr auto remove_trailing_zeros(std::uint64_t n) noexcept -> remove_trailin
 {
     std::size_t s {};
 
-    auto r = rotr<64>(n * UINT64_C(28999941890838049), 8);
-    auto b = r < UINT64_C(184467440738);
+    auto r = rotr<64>(n * UINT64_C(230079197716545), 16);
+    auto b = r < UINT64_C(1845);
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<64>(n * UINT64_C(28999941890838049), 8);
+    b = r < UINT64_C(184467440738);
     s = s * 2U + static_cast<std::size_t>(b);
     n = b ? r : n;
 
