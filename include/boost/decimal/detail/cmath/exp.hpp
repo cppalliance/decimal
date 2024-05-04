@@ -7,6 +7,7 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_EXP_HPP
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
+#include <boost/decimal/detail/cmath/impl/exp_impl.hpp>
 #include <boost/decimal/detail/cmath/impl/pow_impl.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
@@ -75,18 +76,9 @@ constexpr auto exp_impl(T x) noexcept
                 x -= numbers::ln2_v<T> * nf2;
             }
 
-            // PadeApproximant[Exp[x] - 1, {x, 0, {6, 6}}]
-            // FullSimplify[%]
-            //   (84 x (7920 + 240 x^2 + x^4))
-            // / (665280 + x (-332640 + x (75600 + x (-10080 + x (840 + (-42 + x) x)))))
-
-            const auto x2 = x * x;
-
-            // Use the small-argument Pade approximation having coefficients shown above.
-            const T top = T { UINT8_C(84), 0 } * x * ( T { UINT16_C(7920), 0 } + ( T { UINT8_C(240), 0 } + x2) * x2);
-            const T bot = T { UINT32_C(665280), 0 } + x * (T { INT32_C(-332640), 0 } + x * (T { UINT32_C(75600), 0 } + x * (T { INT16_C(-10080), 0 } + x * (T { UINT16_C(840), 0 } + (T { INT8_C(-42), 0 } + x) * x))));
-
-            result = one + (top / bot);
+            // TODO: Chris: At 32-bit, reduce the number of coefficients in the Pade appxorimant of the exp() function.
+            // TODO: Chris: At 128-bit, add more coefficients to the Pade appxorimant of the exp() function.
+            result = detail::exp_pade_appxroximant(x);
 
             if (nf2 > 0)
             {
