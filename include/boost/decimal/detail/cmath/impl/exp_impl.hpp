@@ -64,14 +64,15 @@ constexpr auto exp_pade_appxroximant<decimal64>(decimal64 x) noexcept
 template <>
 constexpr auto exp_pade_appxroximant<decimal128>(decimal128 x) noexcept
 {
-    // TODO: Chris: At 128-bit, add more coefficients to the Pade appxorimant of the exp() function.
-
     // Compute exp(x) - 1 for x small.
 
     // Use an order-12 Pade approximation of the exponential function.
     // PadeApproximant[Exp[x] - 1, {x, 0, 12, 12}].
 
     using local_float_t = decimal128;
+
+    // Rescale the argument even further (and note the three squarings below).
+    x /= 8;
 
     const local_float_t x2 = (x * x);
 
@@ -98,7 +99,13 @@ constexpr auto exp_pade_appxroximant<decimal128>(decimal128 x) noexcept
                                           + local_float_t( +boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(54210108624275),  UINT64_C(4089650035136921600)  }, -33 } ))
                                           ;
 
-    return local_float_t { 1 } + ((x * top) / bot);
+    local_float_t result { local_float_t { 1 } + ((x * top) / bot) };
+
+    result *= result;
+    result *= result;
+    result *= result;
+
+    return result;
 }
 
 } //namespace detail

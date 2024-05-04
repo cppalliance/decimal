@@ -268,7 +268,7 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_cosh_128(const float tol_factor) -> bool
+  auto test_cosh_128(const int tol_factor) -> bool
   {
     using decimal_type = boost::decimal::decimal128;
 
@@ -276,7 +276,7 @@ namespace local
 
     const str_ctrl_array_type ctrl_strings =
     {{
-       // Table[N[Cosh[n/10 + n/100], 32], {n, 1, 19, 1}]
+       // Table[N[Cosh[n/10 + n/100], 36], {n, 1, 19, 1}]
        "1.00605610287769977108879617596474784",
        "1.02429776427492965125226008299305162",
        "1.05494593094785321789908314053177016",
@@ -352,9 +352,7 @@ auto main() -> int
 
   const auto result_pos64_is_ok = local::test_cosh_64(64);
 
-  // TODO: Chris: At 32-bit, reduce the number of coefficients in the Pade appxorimant of the exp() function.
-  // TODO: Chris: At 128-bit, add more coefficients to the Pade appxorimant of the exp() function.
-  const auto result_pos128_is_ok = local::test_cosh_128(1.0E10F);
+  const auto result_pos128_is_ok = local::test_cosh_128(500000);
 
   BOOST_TEST(result_pos_is_ok);
   BOOST_TEST(result_neg_is_ok);

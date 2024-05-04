@@ -27,7 +27,7 @@ struct cosh_table_imp
 private:
     using d32_coeffs_t  = std::array<decimal32,   6>;
     using d64_coeffs_t  = std::array<decimal64,   9>;
-    using d128_coeffs_t = std::array<decimal128, 11>;
+    using d128_coeffs_t = std::array<decimal128, 17>;
 
 public:
     static constexpr d32_coeffs_t d32_coeffs =
@@ -59,7 +59,7 @@ public:
 
     static constexpr d128_coeffs_t d128_coeffs =
     {{
-         // Series[Cosh[x], {x, 0, 22}]
+         // Series[Cosh[x], {x, 0, 34}]
          //            (1),                                                                                                                   // * 1
          ::boost::decimal::decimal128 { 5, -1 },                                                                                              // * x^2
          ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(225875452601146), UINT64_C(13965751134118914724) }, -35 }, // * x^4
@@ -71,8 +71,14 @@ public:
          ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(259095985355981), UINT64_C(6015479145837302244)  }, -47 }, // * x^16
          ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(84671890639209),  UINT64_C(10767230553416093986) }, -49 }, // * x^18
          ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(222820764840025), UINT64_C(4062785569898205740)  }, -52 }, // * x^20
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(482296027792262), UINT64_C(7037075391028107068)  }, -55 }  // * x^22
-     }};
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(482296027792262), UINT64_C(7037075391028107068)  }, -55 }, // * x^22
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(87372468802946),  UINT64_C(1542176615384940434)  }, -57 }, // * x^24
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(134419182773763), UINT64_C(3791559721646796942)  }, -60 }, // * x^26
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(177803151817147), UINT64_C(1794430560736952558)  }, -63 }, // * x^28
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(204371438870284), UINT64_C(366311534299067156)   }, -66 }, // * x^30
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(206019595635366), UINT64_C(17625897212400736954) }, -69 }, // * x^32
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(183618177928134), UINT64_C(9987905770721758456)  }, -72 }, // * x^34
+    }};
 };
 
 #if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)

@@ -76,8 +76,6 @@ constexpr auto exp_impl(T x) noexcept
                 x -= numbers::ln2_v<T> * nf2;
             }
 
-            // TODO: Chris: At 32-bit, reduce the number of coefficients in the Pade appxorimant of the exp() function.
-            // TODO: Chris: At 128-bit, add more coefficients to the Pade appxorimant of the exp() function.
             result = detail::exp_pade_appxroximant(x);
 
             if (nf2 > 0)
