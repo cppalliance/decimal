@@ -367,6 +367,8 @@ auto main() -> int
 
   BOOST_TEST(result_pos64_is_ok);
 
+  BOOST_TEST(result_pos128_is_ok);
+
   result_is_ok = (result_pos_is_ok  && result_is_ok);
   result_is_ok = (result_neg_is_ok  && result_is_ok);
 
