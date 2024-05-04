@@ -58,9 +58,9 @@ namespace local
 
     if(b == static_cast<NumericType>(0))
     {
-      delta = fabs(a - b);
+      delta = fabs(a - b); // LCOV_EXCL_LINE
 
-      result_is_ok = (delta < tol);
+      result_is_ok = (delta < tol); // LCOV_EXCL_LINE
     }
     else
     {
