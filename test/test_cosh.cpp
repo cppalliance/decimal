@@ -272,7 +272,7 @@ namespace local
   {
     using decimal_type = boost::decimal::decimal128;
 
-    using str_ctrl_array_type = std::array<const char*, 9U>;
+    using str_ctrl_array_type = std::array<const char*, 19U>;
 
     const str_ctrl_array_type ctrl_strings =
     {{
@@ -285,17 +285,17 @@ namespace local
        "1.22582183444686537963701508470572944",
        "1.31138966104807154082141166943546113",
        "1.41284130904939560893504431681606722",
-       "1.53140558168565398981570176198960768"
-       "1.66851855382225633267362743000999396"
-       "1.82584096598945552946759518887583756"
-       "2.00527833961335646927038567671483767"
-       "2.20900405708350034304962730687406799"
-       "2.43948568620755192849077658896354304"
-       "2.69951486790030142594792594194283348"
-       "2.99224112911281958915144028653782015"
-       "3.32121003055092127036355857556155319"
-       "3.69040611123595250949497414647005637"
-       "4.10430115006125749566868477118593588"
+       "1.53140558168565398981570176198960768",
+       "1.66851855382225633267362743000999396",
+       "1.82584096598945552946759518887583756",
+       "2.00527833961335646927038567671483767",
+       "2.20900405708350034304962730687406799",
+       "2.43948568620755192849077658896354304",
+       "2.69951486790030142594792594194283348",
+       "2.99224112911281958915144028653782015",
+       "3.32121003055092127036355857556155319",
+       "3.69040611123595250949497414647005637",
+       "4.10430115006125749566868477118593588",
     }};
 
     std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> cosh_values { };
@@ -325,9 +325,9 @@ namespace local
         from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
       );
 
-      const auto result_tgamma_is_ok = is_close_fraction(cosh_values[i], ctrl_values[i], my_tol);
+      const auto result_cosh_is_ok = is_close_fraction(cosh_values[i], ctrl_values[i], my_tol);
 
-      result_is_ok = (result_tgamma_is_ok && result_is_ok);
+      result_is_ok = (result_cosh_is_ok && result_is_ok);
     }
 
     return result_is_ok;

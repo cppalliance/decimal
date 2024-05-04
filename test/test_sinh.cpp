@@ -268,6 +268,71 @@ namespace local
     return result_is_ok;
   }
 
+  auto test_sinh_128(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal128;
+
+    using str_ctrl_array_type = std::array<const char*, 19U>;
+
+    const str_ctrl_array_type ctrl_strings =
+    {{
+       // Table[N[Sinh[n/10 + n/100], 36], {n, 1, 19, 1}]
+       "0.110221967581171520411941593088236059",
+       "0.221778966312451168268004699999644624",
+       "0.336022197515927048343664664421348663",
+       "0.454335398714097341758947808091367454",
+       "0.578151603743454270751273401127877909",
+       "0.708970499955166142056110066313962238",
+       "0.848376592736843467566140720904565722",
+       "0.998058397367814241955840599316835579",
+       "1.15982889066360829928417764208140629",
+       "1.33564747012417677938478052357867844",
+       "1.52764368655956815153599423849987448",
+       "1.73814303764750609928767015311103557",
+       "1.96969513483974581353076445747887002",
+       "2.22510458478057397430261017728023479",
+       "2.50746495927954731170938115076950165",
+       "2.82019626528976906072890033791187430",
+       "3.16708636873578984466547274878757638",
+       "3.55233687392505969901746060667469125",
+       "3.98061401424380267930475594525594567",
+    }};
+
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> sinh_values { };
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
+
+    int nx { 1 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
+    {
+      const decimal_type
+        x_arg
+        {
+            decimal_type { nx, -1 }
+          + decimal_type { nx, -2 }
+        };
+
+      ++nx;
+
+      sinh_values[i] = sinh(x_arg);
+
+      static_cast<void>
+      (
+        from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+      );
+
+      const auto result_sinh_is_ok = is_close_fraction(sinh_values[i], ctrl_values[i], my_tol);
+
+      result_is_ok = (result_sinh_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
 } // namespace local
 
 auto main() -> int
@@ -287,6 +352,8 @@ auto main() -> int
 
   const auto result_pos64_is_ok = local::test_sinh_64(64);
 
+  const auto result_pos128_is_ok = local::test_sinh_128(500000);
+
   BOOST_TEST(result_pos_is_ok);
   BOOST_TEST(result_neg_is_ok);
 
@@ -297,6 +364,8 @@ auto main() -> int
   BOOST_TEST(result_neg_wide_is_ok);
 
   BOOST_TEST(result_pos64_is_ok);
+
+  BOOST_TEST(result_pos128_is_ok);
 
   result_is_ok = (result_pos_is_ok  && result_is_ok);
   result_is_ok = (result_neg_is_ok  && result_is_ok);
@@ -310,6 +379,8 @@ auto main() -> int
   result_is_ok = (result_edge_is_ok && result_is_ok);
 
   result_is_ok = (result_pos64_is_ok && result_is_ok);
+
+  result_is_ok = (result_pos128_is_ok && result_is_ok);
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 
