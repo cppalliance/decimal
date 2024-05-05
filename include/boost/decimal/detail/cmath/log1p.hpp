@@ -25,12 +25,11 @@ BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto log1p(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
+    constexpr T one { 1, 0 };
+
+    T result { };
+
     const auto fpc = fpclassify(x);
-
-    constexpr T zero { 0, 0 };
-    constexpr T one  { 1, 0 };
-
-    auto result = zero;
 
     if (fpc == FP_ZERO)
     {
@@ -38,32 +37,17 @@ constexpr auto log1p(T x) noexcept
     }
     else if (fpc != FP_NORMAL)
     {
-        if (fpc == FP_INFINITE)
-        {
-            if (signbit(x))
-            {
-                result = std::numeric_limits<T>::quiet_NaN();
-            }
-            else
-            {
-                result = x;
-            }
-        }
-        else if (fpc == FP_NAN)
-        {
-            result = x;
-        }
+        result =
+        (
+            ((fpc == FP_INFINITE) && signbit(x)) ? std::numeric_limits<T>::quiet_NaN() : x
+        );
     }
     else if (-x >= one)
     {
-        if (-x == one)
-        {
-            result = -std::numeric_limits<T>::infinity();
-        }
-        else
-        {
-            result = std::numeric_limits<T>::quiet_NaN();
-        }
+        result =
+        (
+            (-x == one) ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::quiet_NaN()
+        );
     }
     else
     {
@@ -73,9 +57,7 @@ constexpr auto log1p(T x) noexcept
         }
         else
         {
-            result = detail::log1p_series_expansion(x);
-            result = fma(result, x, one);
-            result *= x;
+            result = x * fma(detail::log1p_series_expansion(x), x, one);
         }
     }
 

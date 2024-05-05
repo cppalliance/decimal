@@ -28,7 +28,7 @@ constexpr auto log(T x) noexcept
     constexpr T zero { 0, 0 };
     constexpr T one  { 1, 0 };
 
-    auto result = zero;
+    T result { };
 
     if (isnan(x))
     {
@@ -36,14 +36,7 @@ constexpr auto log(T x) noexcept
     }
     else if (isinf(x))
     {
-        if (!signbit(x))
-        {
-            result = x;
-        }
-        else
-        {
-            result = std::numeric_limits<T>::quiet_NaN();
-        }
+        result = (!signbit(x)) ? x: std::numeric_limits<T>::quiet_NaN();
     }
     else if (x < one)
     {
@@ -85,8 +78,7 @@ constexpr auto log(T x) noexcept
         const auto z   = s + s;
         const auto zsq = z * z;
 
-        result = detail::log_series_expansion(zsq);
-        result = z * fma(result, zsq, one);
+        result = z * fma(detail::log_series_expansion(zsq), zsq, one);
 
         if (exp2val > 0)
         {
