@@ -66,6 +66,9 @@ constexpr auto exp_pade_appxroximant<decimal128>(decimal128 x) noexcept
 {
     // Compute exp(x) - 1 for x small.
 
+    // TODO: Does it make sense to try and improve accuracy/precision with more Pade terms?
+    // Or would a simple Tylor expansion here simply be better?
+
     // Use an order-12 Pade approximation of the exponential function.
     // PadeApproximant[Exp[x] - 1, {x, 0, 12, 12}].
 
