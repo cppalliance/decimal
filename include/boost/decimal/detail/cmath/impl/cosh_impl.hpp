@@ -99,7 +99,7 @@ constexpr typename cosh_table_imp<b>::d128_coeffs_t cosh_table_imp<b>::d128_coef
 using cosh_table = cosh_detail::cosh_table_imp<true>;
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto cosh_series_expansion(T z) noexcept;
+constexpr auto cosh_series_expansion(T z2) noexcept;
 
 template <>
 constexpr auto cosh_series_expansion<decimal32>(decimal32 z2) noexcept

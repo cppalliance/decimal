@@ -107,7 +107,7 @@ constexpr typename tanh_table_imp<b>::d128_coeffs_t tanh_table_imp<b>::d128_coef
 using tanh_table = tanh_detail::tanh_table_imp<true>;
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto tanh_series_expansion(T z) noexcept;
+constexpr auto tanh_series_expansion(T z2) noexcept;
 
 template <>
 constexpr auto tanh_series_expansion<decimal32>(decimal32 z2) noexcept
