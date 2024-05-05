@@ -378,9 +378,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal128;
-
-    const auto result_pos128_is_ok = local::test_exp_128(400000);
+    const auto result_pos128_is_ok = local::test_exp_128(400'000);
 
     BOOST_TEST(result_pos128_is_ok);
 
