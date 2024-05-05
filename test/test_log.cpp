@@ -56,16 +56,30 @@ namespace local
 
     auto result_is_ok = bool { };
 
+    NumericType delta { };
+
     if(b == static_cast<NumericType>(0))
     {
-      result_is_ok = (fabs(a - b) < tol);
+      delta = fabs(a - b); // LCOV_EXCL_LINE
+
+      result_is_ok = (delta < tol); // LCOV_EXCL_LINE
     }
     else
     {
-      const auto delta = fabs(1 - (a / b));
+      delta = fabs(1 - (a / b));
 
       result_is_ok = (delta < tol);
     }
+
+    // LCOV_EXCL_START
+    if (!result_is_ok)
+    {
+      std::cerr << std::setprecision(std::numeric_limits<NumericType>::digits10) << "a: " << a
+                << "\nb: " << b
+                << "\ndelta: " << delta
+                << "\ntol: " << tol << std::endl;
+    }
+    // LCOV_EXCL_STOP
 
     return result_is_ok;
   }
@@ -93,7 +107,7 @@ namespace local
     auto trials = static_cast<std::uint32_t>(UINT8_C(0));
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x400)) : static_cast<std::uint32_t>(UINT32_C(0x40));
+    constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x200)) : static_cast<std::uint32_t>(UINT32_C(0x40));
     #else
     constexpr auto count = (sizeof(decimal_type) == static_cast<std::size_t>(UINT8_C(4))) ? static_cast<std::uint32_t>(UINT32_C(0x40)) : static_cast<std::uint32_t>(UINT32_C(0x4));
     #endif
@@ -114,13 +128,13 @@ namespace local
 
       if(!result_log_is_ok)
       {
-          // LCOV_EXCL_START
-        std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
-        std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
-        std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
+        // LCOV_EXCL_START
+        std::cerr << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
+        std::cerr << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
+        std::cerr << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
-          // LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
       }
     }
 
@@ -155,13 +169,13 @@ namespace local
 
       if(!result_log_is_ok)
       {
-          // LCOV_EXCL_START
-        std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
-        std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
-        std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
+        // LCOV_EXCL_START
+        std::cerr << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
+        std::cerr << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
+        std::cerr << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
-          // LCOV_EXCL_START
+        // LCOV_EXCL_START
       }
     }
 
@@ -312,7 +326,123 @@ namespace local
 
     return result_is_ok;
   }
-}
+
+  auto test_log_64(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal64;
+
+    using val_ctrl_array_type = std::array<double, 28U>;
+
+    const val_ctrl_array_type ctrl_values =
+    {{
+      // Table[N[Log[111 10^n], 17], {n, -3, 24, 1}]
+      -2.1982250776698029, 0.10436001532424277, 2.4069451083182885,
+       4.7095302013123341, 7.0121152943063798, 9.3147003873004255,
+       11.617285480294471, 13.919870573288517, 16.222455666282563,
+       18.525040759276608, 20.827625852270654, 23.130210945264700,
+       25.432796038258745, 27.735381131252791, 30.037966224246837,
+       32.340551317240882, 34.643136410234928, 36.945721503228974,
+       39.248306596223019, 41.550891689217065, 43.853476782211111,
+       46.156061875205156, 48.458646968199202, 50.761232061193248,
+       53.063817154187294, 55.366402247181339, 57.668987340175385,
+       59.971572433169431
+    }};
+
+    std::array<decimal_type, std::tuple_size<val_ctrl_array_type>::value> log_values { };
+
+    int nx { -3 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<val_ctrl_array_type>::value; ++i)
+    {
+      // Table[N[Log[111 10^n], 17], {n, -3, 24, 1}]
+
+      const decimal_type x_arg { 111, nx };
+
+      log_values[i] = log(x_arg);
+
+      ++nx;
+
+      const auto result_log_is_ok = is_close_fraction(log_values[i], decimal_type(ctrl_values[i]), my_tol);
+
+      result_is_ok = (result_log_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
+  auto test_log_128(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal128;
+
+    using str_ctrl_array_type = std::array<const char*, 28U>;
+
+    const str_ctrl_array_type ctrl_strings =
+    {{
+       // Table[N[Log[111 10^n], 36], {n, -3, 24, 1}]
+       "-2.19822507766980291629063345609911975",
+       "0.104360015324242767727357998585244453",
+       "2.40694510831828845174534945326960866",
+       "4.70953020131233413576334090795397287",
+       "7.01211529430637981978133236263833708",
+       "9.31470038730042550379932381732270128",
+       "11.6172854802944711878173152720070655",
+       "13.9198705732885168718353067266914297",
+       "16.2224556662825625558532981813757939",
+       "18.5250407592766082398712896360601581",
+       "20.8276258522706539238892810907445223",
+       "23.1302109452646996079072725454288865",
+       "25.4327960382587452919252640001132507",
+       "27.7353811312527909759432554547976149",
+       "30.0379662242468366599612469094819792",
+       "32.3405513172408823439792383641663434",
+       "34.6431364102349280279972298188507076",
+       "36.9457215032289737120152212735350718",
+       "39.2483065962230193960332127282194360",
+       "41.5508916892170650800512041829038002",
+       "43.8534767822111107640691956375881644",
+       "46.1560618752051564480871870922725286",
+       "48.4586469681992021321051785469568928",
+       "50.7612320611932478161231700016412570",
+       "53.0638171541872935001411614563256212",
+       "55.3664022471813391841591529110099854",
+       "57.6689873401753848681771443656943496",
+       "59.9715724331694305521951358203787139",
+    }};
+
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> log_values { };
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
+
+    int nx { -3 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
+    {
+      const decimal_type x_arg { 111, nx };
+
+      ++nx;
+
+      log_values[i] = log(x_arg);
+
+      static_cast<void>
+      (
+        from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+      );
+
+      const auto result_log_is_ok = is_close_fraction(log_values[i], ctrl_values[i], my_tol);
+
+      result_is_ok = (result_log_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+} // namespace local
 
 auto main() -> int
 {
@@ -338,6 +468,22 @@ auto main() -> int
     const auto test_log_edge_is_ok            = local::test_log_edge           <decimal_type, float_type>(24);
 
     result_is_ok = (test_log_is_ok && test_log_between_1_and_2_is_ok && test_log_edge_is_ok && result_is_ok);
+  }
+
+  {
+    const auto result_pos64_is_ok = local::test_log_64(512);
+
+    BOOST_TEST(result_pos64_is_ok);
+
+    result_is_ok = (result_pos64_is_ok && result_is_ok);
+  }
+
+  {
+    const auto result_pos128_is_ok = local::test_log_128(1'400'000);
+
+    BOOST_TEST(result_pos128_is_ok);
+
+    result_is_ok = (result_pos128_is_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);

@@ -27,7 +27,7 @@ struct log_table_imp
 private:
     using d32_coeffs_t  = std::array<decimal32,   8>;
     using d64_coeffs_t  = std::array<decimal64,  11>;
-    using d128_coeffs_t = std::array<decimal128, 17>;
+    using d128_coeffs_t = std::array<decimal128, 21>;
 
 public:
     static constexpr d32_coeffs_t d32_coeffs =
@@ -63,25 +63,29 @@ public:
 
     static constexpr d128_coeffs_t d128_coeffs =
     {{
-         // Series[Cosh[x], {x, 0, 34}]
-         //            (1),                                                                                                                   // * 1
-         ::boost::decimal::decimal128 { 5, -1 },                                                                                              // * x^2
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(225875452601146), UINT64_C(13965751134118914724) }, -35 }, // * x^4
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(75291817533715),  UINT64_C(10804165069276155440) }, -36 }, // * x^6
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(134449674167349), UINT64_C(4799281565792772746)  }, -38 }, // * x^8
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(149388526852610), UINT64_C(5332535073103080820)  }, -40 }, // * x^10
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(113173126403492), UINT64_C(11865690723015477068) }, -42 }, // * x^12
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(62183036485435),  UINT64_C(9560282387433155251)  }, -44 }, // * x^14
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(259095985355981), UINT64_C(6015479145837302244)  }, -47 }, // * x^16
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(84671890639209),  UINT64_C(10767230553416093986) }, -49 }, // * x^18
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(222820764840025), UINT64_C(4062785569898205740)  }, -52 }, // * x^20
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(482296027792262), UINT64_C(7037075391028107068)  }, -55 }, // * x^22
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(87372468802946),  UINT64_C(1542176615384940434)  }, -57 }, // * x^24
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(134419182773763), UINT64_C(3791559721646796942)  }, -60 }, // * x^26
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(177803151817147), UINT64_C(1794430560736952558)  }, -63 }, // * x^28
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(204371438870284), UINT64_C(366311534299067156)   }, -66 }, // * x^30
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(206019595635366), UINT64_C(17625897212400736954) }, -69 }, // * x^32
-         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(183618177928134), UINT64_C(9987905770721758456)  }, -72 }, // * x^34
+         // Series[Log[(1 + (z/2))/(1 - (z/2))], {z, 0, 43}]
+         //            (1),                                                                                                                   // * z
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(451750905202293), UINT64_C(9484758194528277842)  }, -35 }, // * z^3
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(67762635780344),  UINT64_C(500376525493764096)   }, -35 }, // * z^5
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(121004706750614), UINT64_C(6164027816584450626)  }, -36 }, // * z^7
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(235286929792861), UINT64_C(3787056721709964394)  }, -37 }, // * z^9
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(481268720030852), UINT64_C(8584740752302634068)  }, -38 }, // * z^11
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(101806844621911), UINT64_C(1816002851448634124)  }, -38 }, // * z^13
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(220581496680807), UINT64_C(7009130190423632548)  }, -39 }, // * z^15
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(486576830913545), UINT64_C(12748560115094843630) }, -40 }, // * z^17
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(108839554283293), UINT64_C(2123490654414259032)  }, -40 }, // * z^19
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(246184706116972), UINT64_C(9634423737622849438)  }, -41 }, // * z^21
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(56194335091917),  UINT64_C(11823550152479764302) }, -41 }, // * z^23
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(129246970711410), UINT64_C(10592095684364861440) }, -42 }, // * z^25
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(299182802572709), UINT64_C(12220910627630811506) }, -43 }, // * z^27
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(69637376460889),  UINT64_C(5865971761607874066)  }, -43 }, // * z^29
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(162861606239176), UINT64_C(11636108014793143194) }, -44 }, // * z^31
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(382478014652611), UINT64_C(14470401740943906374) }, -45 }, // * z^33
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(90155532025258),  UINT64_C(9076666090147568782)  }, -45 }, // * z^35
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(213205650059732), UINT64_C(16978042870933143358) }, -46 }, // * z^37
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(505680067449366), UINT64_C(9996854995997550184)  }, -47 }, // * z^39
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(120253186771495), UINT64_C(12950434681540257980) }, -47 }, // * z^41
+         ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(286650038234379), UINT64_C(5345076336561816786)  }, -48 }, // * z^43
     }};
 };
 
