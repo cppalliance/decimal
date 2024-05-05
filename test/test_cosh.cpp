@@ -127,9 +127,9 @@ namespace local
       if(!result_val_is_ok)
       {
           // LCOV_EXCL_START
-        std::cout << "x_flt  : " <<                    x_flt   << std::endl;
-        std::cout << "val_flt: " << std::scientific << val_flt << std::endl;
-        std::cout << "val_dec: " << std::scientific << val_dec << std::endl;
+        std::cerr << "x_flt  : " <<                    x_flt   << std::endl;
+        std::cerr << "val_flt: " << std::scientific << val_flt << std::endl;
+        std::cerr << "val_dec: " << std::scientific << val_dec << std::endl;
 
         break;
           // LCOV_EXCL_STOP

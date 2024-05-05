@@ -1,5 +1,5 @@
-// Copyright 2023 Matt Borland
-// Copyright 2023 Christopher Kormanyos
+// Copyright 2023 - 2024 Matt Borland
+// Copyright 2023 - 2024 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -7,9 +7,10 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_TANH_HPP
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
-#include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/cmath/impl/tanh_impl.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/numbers.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -67,50 +68,9 @@ constexpr auto tanh_impl(T x) noexcept
 
             if (x < quarter)
             {
-                using coefficient_array_type = std::array<T, static_cast<std::size_t>(UINT8_C(11))>;
-
-                #if (defined(__clang__) && (__clang__ < 6))
-                #  pragma clang diagnostic push
-                #  pragma clang diagnostic ignored "-Wmissing-braces"
-                #endif
-
-                constexpr auto coefficient_table =
-                    coefficient_array_type
-                    {
-                        // Series[Tanh[x], {x, 0, 23}]
-                        //         (1),                             // * x
-                        -T { UINT64_C(333333333333333333), - 18 - 0 },  // * x^3
-                         T { UINT64_C(133333333333333333), - 18 - 0 },  // * x^5
-                        -T { UINT64_C(539682539682539683), - 18 - 1 },  // * x^7
-                         T { UINT64_C(218694885361552028), - 18 - 1 },  // * x^9
-                        -T { UINT64_C(886323552990219657), - 18 - 2 },  // * x^11
-                         T { UINT64_C(359212803657248102), - 18 - 2 },  // * x^13
-                        -T { UINT64_C(145583438705131827), - 18 - 2 },  // * x^15
-                         T { UINT64_C(590027440945585981), - 18 - 3 },  // * x^17
-                        -T { UINT64_C(239129114243552481), - 18 - 3 },  // * x^19
-                         T { UINT64_C(969153795692945033), - 18 - 4 },  // * x^21
-                        -T { UINT64_C(392783238833168341), - 18 - 4 },  // * x^23
-                    };
-
-                #if (defined(__clang__) && (__clang__ < 6))
-                #  pragma clang diagnostic pop
-                #endif
-
-                auto rit =
-                    coefficient_table.crbegin()
-                  + static_cast<std::size_t>
-                    (
-                      (sizeof(T) == static_cast<std::size_t>(UINT8_C(4))) ? 6U : 0U
-                    );
-
-                result = *rit;
-
                 const auto xsq = x * x;
 
-                while(rit != coefficient_table.crend())
-                {
-                    result = fma(result, xsq, *rit++);
-                }
+                result = detail::tanh_series_expansion(xsq);
 
                 result = x * fma(result, xsq, one);
             }
