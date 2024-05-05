@@ -59,7 +59,7 @@ public:
 
     static constexpr d128_coeffs_t d128_coeffs =
     {{
-         // Series[Cosh[x], {x, 0, 34}]
+         // Series[Sinh[x], {x, 0, 34}]
          //            (1),                                                                                                                   // * x
          ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(90350181040458),  UINT64_C(12964998083131386532) }, -34 }, // * x^3
          ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(451750905202293), UINT64_C(9484758194528277842)  }, -36 }, // * x^5

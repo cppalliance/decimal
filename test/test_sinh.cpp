@@ -22,7 +22,6 @@
 #include <boost/core/lightweight_test.hpp>
 
 auto my_zero() -> boost::decimal::decimal32&;
-auto my_one () -> boost::decimal::decimal32&;
 
 namespace local
 {
@@ -58,9 +57,9 @@ namespace local
 
     if(b == static_cast<NumericType>(0))
     {
-      delta = fabs(a - b);
+      delta = fabs(a - b); // LCOV_EXCL_LINE
 
-      result_is_ok = (delta < tol);
+      result_is_ok = (delta < tol); // LCOV_EXCL_LINE
     }
     else
     {
@@ -127,9 +126,9 @@ namespace local
       if(!result_val_is_ok)
       {
           // LCOV_EXCL_START
-        std::cout << "x_flt  : " <<                    x_flt   << std::endl;
-        std::cout << "val_flt: " << std::scientific << val_flt << std::endl;
-        std::cout << "val_dec: " << std::scientific << val_dec << std::endl;
+        std::cerr << "x_flt  : " <<                    x_flt   << std::endl;
+        std::cerr << "val_flt: " << std::scientific << val_flt << std::endl;
+        std::cerr << "val_dec: " << std::scientific << val_dec << std::endl;
 
         break;
           // LCOV_EXCL_STOP
@@ -352,7 +351,7 @@ auto main() -> int
 
   const auto result_pos64_is_ok = local::test_sinh_64(64);
 
-  const auto result_pos128_is_ok = local::test_sinh_128(500000);
+  const auto result_pos128_is_ok = local::test_sinh_128(400000);
 
   BOOST_TEST(result_pos_is_ok);
   BOOST_TEST(result_neg_is_ok);
@@ -388,4 +387,3 @@ auto main() -> int
 }
 
 auto my_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_zero { 0, 0 }; return val_zero; }
-auto my_one () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_one  { 1, 0 }; return val_one; }

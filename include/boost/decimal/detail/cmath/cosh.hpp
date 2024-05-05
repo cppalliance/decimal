@@ -68,11 +68,10 @@ constexpr auto cosh_impl(T x) noexcept
             else
             {
                 const auto exp_pos_val = exp(x);
-                const auto exp_neg_val = one / exp_pos_val;
 
                 constexpr T two { 2, 0 };
 
-                result = (exp_pos_val + exp_neg_val) / two;
+                result = (exp_pos_val + (one / exp_pos_val)) / two;
             }
         }
     }

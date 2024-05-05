@@ -54,24 +54,30 @@ namespace local
 
     auto result_is_ok = bool { };
 
+    NumericType delta { };
+
     if(b == static_cast<NumericType>(0))
     {
-      result_is_ok = (fabs(a - b) < tol);
+      delta = fabs(a - b); // LCOV_EXCL_LINE
+
+      result_is_ok = (delta < tol); // LCOV_EXCL_LINE
     }
     else
     {
-      const auto delta = fabs(1 - (a / b));
+      delta = fabs(1 - (a / b));
 
       result_is_ok = (delta < tol);
-
-      if (!result_is_ok)
-      {
-          std::cerr << std::setprecision(std::numeric_limits<NumericType>::digits10) << "a: " << a
-                    << "\nb: " << b
-                    << "\ndelta: " << delta
-                    << "\ntol: " << tol << std::endl;
-      }
     }
+
+    // LCOV_EXCL_START
+    if (!result_is_ok)
+    {
+      std::cerr << std::setprecision(std::numeric_limits<NumericType>::digits10) << "a: " << a
+                << "\nb: " << b
+                << "\ndelta: " << delta
+                << "\ntol: " << tol << std::endl;
+    }
+    // LCOV_EXCL_STOP
 
     return result_is_ok;
   }
@@ -121,9 +127,9 @@ namespace local
       if(!result_val_is_ok)
       {
           // LCOV_EXCL_START
-        std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
-        std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
-        std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
+        std::cerr << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
+        std::cerr << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
+        std::cerr << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
           // LCOV_EXCL_STOP
@@ -325,6 +331,60 @@ namespace local
     return result_is_ok;
   }
 
+  auto test_tgamma_64(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal64;
+
+    using val_ctrl_array_type = std::array<double, 9U>;
+
+    const val_ctrl_array_type ctrl_values =
+    {{
+      // Table[N[Gamma[(100 n + 10 n + 1)/100], 17], {n, 1, 9, 1}]
+      0.94739550403930194,
+      1.1078475565340642,
+      2.7113982392439032,
+      10.275404092015205,
+      53.193428252500821,
+      350.99860982420059,
+      2825.0945368041871,
+      26903.671946749768,
+      296439.08210247219
+    }};
+
+    std::array<decimal_type, std::tuple_size<val_ctrl_array_type>::value> tgamma_values { };
+
+    int nx { 1 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<val_ctrl_array_type>::value; ++i)
+    {
+      // Table[N[Gamma[(100 n + 10 n + 1)/100], 17], {n, 1, 9, 1}]
+
+      const decimal_type x_arg =
+        decimal_type
+        {
+            decimal_type { 1, 2 } * nx
+          + decimal_type { 1, 1 } * nx
+          + 1
+        }
+        / decimal_type { 1, 2 };
+
+
+      tgamma_values[i] = tgamma(x_arg);
+
+      ++nx;
+
+      const auto result_tgamma_is_ok = is_close_fraction(tgamma_values[i], decimal_type(ctrl_values[i]), my_tol);
+
+      result_is_ok = (result_tgamma_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
   auto test_tgamma_128(const int tol_factor) -> bool
   {
     using decimal_type = boost::decimal::decimal128;
@@ -348,7 +408,7 @@ namespace local
     std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> tg_values   { };
     std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
 
-    int n { 1 };
+    int nx { 1 };
 
     bool result_is_ok { true };
 
@@ -356,16 +416,16 @@ namespace local
 
     for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
     {
-      decimal_type x_arg =
+      const decimal_type x_arg =
         decimal_type
         {
-            decimal_type { 1, 2 } * n
-          + decimal_type { 1, 1 } * n
+            decimal_type { 1, 2 } * nx
+          + decimal_type { 1, 1 } * nx
           + 1
         }
         / decimal_type { 1, 2 };
 
-        ++n;
+        ++nx;
 
         tg_values[i] = tgamma(x_arg);
 
@@ -438,7 +498,17 @@ auto main() -> int
   }
 
   {
-    const auto result_tgamma128_is_ok   = local::test_tgamma_128(1000000);
+    const auto result_tgamma64_is_ok   = local::test_tgamma_64(128);
+
+    BOOST_TEST(result_tgamma64_is_ok);
+
+    result_is_ok = (result_tgamma64_is_ok && result_is_ok);
+  }
+
+  {
+    // TODO(ckormanyos) Can the accuracy/precision of tgamma-128 be improved?
+
+    const auto result_tgamma128_is_ok   = local::test_tgamma_128(800'000);
 
     BOOST_TEST(result_tgamma128_is_ok);
 

@@ -76,7 +76,7 @@ constexpr auto exp_impl(T x) noexcept
                 x -= numbers::ln2_v<T> * nf2;
             }
 
-            result = detail::exp_pade_appxroximant(x);
+            result = detail::exp_pade_appxroximant_or_series(x);
 
             if (nf2 > 0)
             {
