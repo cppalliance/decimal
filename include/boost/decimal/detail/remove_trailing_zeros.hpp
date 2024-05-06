@@ -95,14 +95,17 @@ constexpr auto remove_trailing_zeros(std::uint64_t n) noexcept -> remove_trailin
     return {n, s};
 }
 
-namespace impl {
-
-constexpr auto remove_trailing_zeros_impl(uint128 n) noexcept -> remove_trailing_zeros_return<uint128>
+constexpr auto remove_trailing_zeros(uint128 n) noexcept -> remove_trailing_zeros_return<uint128>
 {
     std::size_t s {};
 
-    auto r = rotr<128>(n * uint128 {UINT64_C(0x3275305C1066), UINT64_C(0xE4A4D1417CD9A041)}, 16);
-    auto b = r < uint128 {UINT64_C(0x734), UINT64_C(0xACA5F6226F0ADA62)};
+    auto r = rotr<128>(n * uint128(UINT64_C(0x62B42691AD836EB1), UINT64_C(0x16590F420A835081)), 32);
+    auto b = r < uint128 {UINT64_C(0x0), UINT64_C(0x33EC48)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<128>(n * uint128 {UINT64_C(0x3275305C1066), UINT64_C(0xE4A4D1417CD9A041)}, 16);
+    b = r < uint128 {UINT64_C(0x734), UINT64_C(0xACA5F6226F0ADA62)};
     s = s * 2U + static_cast<std::size_t>(b);
     n = b ? r : n;
 
@@ -127,21 +130,6 @@ constexpr auto remove_trailing_zeros_impl(uint128 n) noexcept -> remove_trailing
     n = b ? r : n;
 
     return {n, s};
-}
-
-} // namespace impl
-
-constexpr auto remove_trailing_zeros(uint128 n) noexcept -> remove_trailing_zeros_return<uint128>
-{
-    const auto temp {impl::remove_trailing_zeros_impl(n)};
-    if (BOOST_DECIMAL_LIKELY(temp.number_of_removed_zeros < 31))
-    {
-        return temp;
-    }
-
-    // Since 32 is not a valid value of t we need to keep removing zeros
-    const auto round2 {remove_trailing_zeros(static_cast<std::uint32_t>(temp.trimmed_number))};
-    return {static_cast<uint128>(round2.trimmed_number), round2.number_of_removed_zeros + 31};
 }
 
 } // namespace detail
