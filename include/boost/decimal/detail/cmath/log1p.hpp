@@ -21,8 +21,10 @@
 namespace boost {
 namespace decimal {
 
-BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto log1p(T x) noexcept
+namespace detail {
+
+template <typename T>
+constexpr auto log1p_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T one { 1, 0 };
@@ -62,6 +64,29 @@ constexpr auto log1p(T x) noexcept
     }
 
     return result;
+}
+
+} // namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto log1p(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::log1p_impl(static_cast<evaluation_type>(x)));
 }
 
 } // namespace decimal

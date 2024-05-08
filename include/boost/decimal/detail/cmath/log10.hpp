@@ -34,6 +34,9 @@ constexpr auto log10_impl(T x) noexcept
     // TODO(ckormanyos) Put in a basic check for pure powers of 10, resulting
     // in an exact result.
 
+    // Starting point: See implementation of log() and adapt to the following series.
+    // Series[Log[10] Log[10, (1 + (z/2))/(1 - (z/2))], {z, 0, 17}]
+
     return log(x) / numbers::ln10_v<T>;
 }
 
