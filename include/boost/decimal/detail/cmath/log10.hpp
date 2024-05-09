@@ -7,9 +7,10 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_LOG10_HPP
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
-#include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/cmath/impl/log_impl.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/numbers.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -26,21 +27,102 @@ template <typename T>
 constexpr auto log10_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    // TODO(ckormanyos) Actually this is eintirely preliminary. The implementation
-    // of log10 will/should-be entirely re-worked with specific base-10-relevant details.
+    constexpr T zero { 0, 0 };
+    constexpr T one  { 1, 0 };
 
-    // TODO(ckormanyos) Handle non-normal varguments.
+    T result { };
 
-    // TODO(ckormanyos) Put in a basic check for pure powers of 10, resulting
-    // in an exact result.
+    if (isnan(x))
+    {
+        result = x;
+    }
+    else if (isinf(x))
+    {
+        result = (!signbit(x)) ? x: std::numeric_limits<T>::quiet_NaN();
+    }
+    else if (x < one)
+    {
+        // Handle reflection, the [+/-] zero-pole, and non-pole, negative x.
+        if (x > zero)
+        {
+            result = -log10(one / x);
+        }
+        else if ((x == zero) || (-x == zero))
+        {
+            // Actually, this should be equivalent to -HUGE_VAL.
 
-    // Starting point: See implementation of log() and adapt to the following series.
-    // Series[Log[10] Log[10, (1 + (z/2))/(1 - (z/2))], {z, 0, 17}]
+            result = -std::numeric_limits<T>::infinity();
+        }
+        else
+        {
+            result = std::numeric_limits<T>::quiet_NaN();
+        }
+    }
+    else if(x > one)
+    {
+        // The algorithm for base-10 logarithm is based on Chapter 5, pages 35-36
+        // of Cody and Waite, Software Manual for the Elementary Functions,
+        // Prentice Hall, 1980.
 
-    return log(x) / numbers::ln10_v<T>;
+        int exp10val { };
+
+        T g { frexp10(x, &exp10val) };
+
+        while(g > one)
+        {
+            // TODO(ckormanyos) Do we really have to multiply individual powers
+            // of 10 here? Or is there a reliable way to simply use pow10()?
+            // For instance count intagral orders of exp10val and divide by pow10().
+
+            g /= 10;
+
+            ++exp10val;
+        }
+
+        if(g == one)
+        {
+            result = T { exp10val };
+        }
+        else
+        {
+            constexpr T inv_sqrt10 { UINT64_C(3162277660168379332), -19 };
+
+            const bool reduce_sqrt10 { g < inv_sqrt10 };
+
+            if (reduce_sqrt10)
+            {
+                constexpr T sqrt10 { UINT64_C(3162277660168379332), -18 };
+
+                g *= sqrt10;
+            }
+
+            const T s   { (g - one) / (g + one) };
+            const T z   { s + s };
+            const T zsq { z * z };
+
+            result = z * fma(detail::log_series_expansion(zsq), zsq, one);
+
+            result /= numbers::ln10_v<T>;
+
+            if(reduce_sqrt10)
+            {
+                constexpr T half { 5, -1 };
+
+                result -= half;
+            }
+
+            result += static_cast<T>(exp10val);
+        }
+    }
+    else
+    {
+        result = zero;
+    }
+
+    return result;
 }
 
-} // namespace detail
+} //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto log10(T x) noexcept
