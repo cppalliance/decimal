@@ -32,32 +32,39 @@ constexpr auto log10_impl(T x) noexcept
 
     T result { };
 
-    if (isnan(x))
+    const auto fpc = fpclassify(x);
+
+    if (fpc == FP_ZERO)
     {
-        result = x;
+        result = -std::numeric_limits<T>::infinity();
     }
-    else if (isinf(x))
+    else if (signbit(x) || (fpc == FP_NAN))
     {
-        result = (!signbit(x)) ? x: std::numeric_limits<T>::quiet_NaN();
+        result = std::numeric_limits<T>::quiet_NaN();
+    }
+    else if (fpc == FP_INFINITE)
+    {
+        result = std::numeric_limits<T>::infinity();
     }
     else
     {
         int exp10val { };
 
-        T g { frexp10(x, &exp10val) };
+        auto gn { frexp10(x, &exp10val) };
 
-        while(g > one)
-        {
-          g /= 10;
+        const auto zeros_removal_result { detail::remove_trailing_zeros(gn) };
 
-          ++exp10val;
-        }
-
-        const bool is_pure = (g == one);
+        const bool is_pure { (zeros_removal_result.trimmed_number == one) };
 
         if(is_pure)
         {
-            result = T { exp10val };
+            // Here, a pure power-of-10 argument gets a pure integral result.
+            result =
+                T
+                {
+                      exp10val
+                    + static_cast<int>(zeros_removal_result.number_of_removed_zeros)
+                };
         }
         else
         {
@@ -70,8 +77,6 @@ constexpr auto log10_impl(T x) noexcept
                 }
                 else if ((x == zero) || (-x == zero))
                 {
-                    // Actually, this should be equivalent to -HUGE_VAL.
-
                     result = -std::numeric_limits<T>::infinity();
                 }
                 else
@@ -84,6 +89,11 @@ constexpr auto log10_impl(T x) noexcept
                 // The algorithm for base-10 logarithm is based on Chapter 5, pages 35-36
                 // of Cody and Waite, Software Manual for the Elementary Functions,
                 // Prentice Hall, 1980.
+
+                T g { T { gn } / pow10(std::numeric_limits<T>::digits10) };
+
+                exp10val += std::numeric_limits<T>::digits10;
+
                 constexpr T inv_sqrt10 { UINT64_C(3162277660168379332), -19 };
 
                 const bool reduce_sqrt10 { g < inv_sqrt10 };
@@ -118,6 +128,7 @@ constexpr auto log10_impl(T x) noexcept
             }
         }
     }
+
     return result;
 }
 

@@ -22,6 +22,10 @@
 
 #include <boost/core/lightweight_test.hpp>
 
+template<typename DecimalType> auto my_zero() -> DecimalType&;
+template<typename DecimalType> auto my_one () -> DecimalType&;
+template<typename DecimalType> auto my_inf () -> DecimalType&;
+
 namespace local
 {
   template<typename IntegralTimePointType,
@@ -182,6 +186,114 @@ namespace local
     return result_is_ok;
   }
 
+  template<typename DecimalType, typename FloatType>
+  auto test_log10_edge() -> bool
+  {
+    using decimal_type = DecimalType;
+    using float_type   = FloatType;
+
+    std::mt19937_64 gen;
+
+    gen.seed(time_point<typename std::mt19937_64::result_type>());
+
+    std::uniform_real_distribution<float_type> dist(1.0F, 2.0F);
+
+    volatile auto result_is_ok = true;
+
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    {
+      static_cast<void>(index);
+
+      const auto log_zero = log10(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+
+      const volatile auto result_log_zero_is_ok = (isinf(log_zero) && (log_zero < ::my_zero<decimal_type>()));
+
+      BOOST_TEST(result_log_zero_is_ok);
+
+      result_is_ok = (result_log_zero_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    {
+      static_cast<void>(index);
+
+      const auto log_zero_minus = log10(-::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+
+      const volatile auto result_log_zero_minus_is_ok = (isinf(log_zero_minus) && (log_zero_minus < ::my_zero<decimal_type>()));
+
+      BOOST_TEST(result_log_zero_minus_is_ok);
+
+      result_is_ok = (result_log_zero_minus_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    {
+      static_cast<void>(index);
+
+      const auto log_one = log10(::my_one<decimal_type>());
+
+      const volatile auto result_log_one_is_ok = (log_one == ::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+
+      BOOST_TEST(result_log_one_is_ok);
+
+      result_is_ok = (result_log_one_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    {
+      static_cast<void>(index);
+
+      const auto log_one_minus = log10(-::my_one<decimal_type>());
+
+      const volatile auto result_log_one_minus_is_ok = isnan(log_one_minus);
+
+      BOOST_TEST(result_log_one_minus_is_ok);
+
+      result_is_ok = (result_log_one_minus_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    {
+      static_cast<void>(index);
+
+      const auto log_inf = log10(::my_inf<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+
+      const volatile auto result_log_inf_is_ok = isinf(log_inf);
+
+      BOOST_TEST(result_log_inf_is_ok);
+
+      result_is_ok = (result_log_inf_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    {
+      static_cast<void>(index);
+
+      const auto log_inf_minus = log10(-::my_inf<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+
+      const volatile auto result_log_inf_minus_is_ok = isnan(log_inf_minus);
+
+      BOOST_TEST(result_log_inf_minus_is_ok);
+
+      result_is_ok = (result_log_inf_minus_is_ok && result_is_ok);
+    }
+
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    {
+      static_cast<void>(index);
+
+      const auto log_nan = log10(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+
+      const volatile auto result_log_nan_is_ok = isnan(log_nan);
+
+      BOOST_TEST(result_log_nan_is_ok);
+
+      result_is_ok = (result_log_nan_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
 } // namespace local
 
 auto main() -> int
@@ -194,6 +306,8 @@ auto main() -> int
 
     const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(128);
 
+    BOOST_TEST(test_log10_is_ok);
+
     result_is_ok = (test_log10_is_ok && result_is_ok);
   }
 
@@ -203,10 +317,53 @@ auto main() -> int
 
     const auto test_log10_pow10_is_ok = local::test_log10_pow10<decimal_type, float_type>();
 
+    BOOST_TEST(test_log10_pow10_is_ok);
+
     result_is_ok = (test_log10_pow10_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal32;
+    using float_type   = float;
+
+    const auto test_log10_edge_is_ok = local::test_log10_edge<decimal_type, float_type>();
+
+    BOOST_TEST(test_log10_edge_is_ok);
+
+    result_is_ok = (test_log10_edge_is_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 
   return (result_is_ok ? 0 : -1);
+}
+
+template<typename DecimalType>
+auto my_zero() -> DecimalType&
+{
+  using decimal_type = DecimalType;
+
+  static decimal_type val_zero { 0, 0 };
+
+  return val_zero;
+}
+
+template<typename DecimalType>
+auto my_one() -> DecimalType&
+{
+  using decimal_type = DecimalType;
+
+  static decimal_type val_one { 1, 0 };
+
+  return val_one;
+}
+
+template<typename DecimalType>
+auto my_inf() -> DecimalType&
+{
+  using decimal_type = DecimalType;
+
+  static decimal_type val_inf { std::numeric_limits<decimal_type>::infinity() };
+
+  return val_inf;
 }
