@@ -40,85 +40,84 @@ constexpr auto log10_impl(T x) noexcept
     {
         result = (!signbit(x)) ? x: std::numeric_limits<T>::quiet_NaN();
     }
-    else if (x < one)
+    else
     {
-        // Handle reflection, the [+/-] zero-pole, and non-pole, negative x.
-        if (x > zero)
-        {
-            result = -log10(one / x);
-        }
-        else if ((x == zero) || (-x == zero))
-        {
-            // Actually, this should be equivalent to -HUGE_VAL.
-
-            result = -std::numeric_limits<T>::infinity();
-        }
-        else
-        {
-            result = std::numeric_limits<T>::quiet_NaN();
-        }
-    }
-    else if(x > one)
-    {
-        // The algorithm for base-10 logarithm is based on Chapter 5, pages 35-36
-        // of Cody and Waite, Software Manual for the Elementary Functions,
-        // Prentice Hall, 1980.
-
         int exp10val { };
 
         T g { frexp10(x, &exp10val) };
 
         while(g > one)
         {
-            // TODO(ckormanyos) Do we really have to multiply individual powers
-            // of 10 here? Or is there a reliable way to simply use pow10()?
-            // For instance count intagral orders of exp10val and divide by pow10().
+          g /= 10;
 
-            g /= 10;
-
-            ++exp10val;
+          ++exp10val;
         }
 
-        if(g == one)
+        const bool is_pure = (g == one);
+
+        if(is_pure)
         {
             result = T { exp10val };
         }
         else
         {
-            constexpr T inv_sqrt10 { UINT64_C(3162277660168379332), -19 };
-
-            const bool reduce_sqrt10 { g < inv_sqrt10 };
-
-            if (reduce_sqrt10)
+            if (x < one)
             {
-                constexpr T sqrt10 { UINT64_C(3162277660168379332), -18 };
+                // Handle reflection, the [+/-] zero-pole, and non-pole, negative x.
+                if (x > zero)
+                {
+                    result = -log10(one / x);
+                }
+                else if ((x == zero) || (-x == zero))
+                {
+                    // Actually, this should be equivalent to -HUGE_VAL.
 
-                g *= sqrt10;
+                    result = -std::numeric_limits<T>::infinity();
+                }
+                else
+                {
+                    result = std::numeric_limits<T>::quiet_NaN();
+                }
             }
-
-            const T s   { (g - one) / (g + one) };
-            const T z   { s + s };
-            const T zsq { z * z };
-
-            result = z * fma(detail::log_series_expansion(zsq), zsq, one);
-
-            result /= numbers::ln10_v<T>;
-
-            if(reduce_sqrt10)
+            else if(x > one)
             {
-                constexpr T half { 5, -1 };
+                // The algorithm for base-10 logarithm is based on Chapter 5, pages 35-36
+                // of Cody and Waite, Software Manual for the Elementary Functions,
+                // Prentice Hall, 1980.
+                constexpr T inv_sqrt10 { UINT64_C(3162277660168379332), -19 };
 
-                result -= half;
+                const bool reduce_sqrt10 { g < inv_sqrt10 };
+
+                if (reduce_sqrt10)
+                {
+                    constexpr T sqrt10 { UINT64_C(3162277660168379332), -18 };
+
+                    g *= sqrt10;
+                }
+
+                const T s   { (g - one) / (g + one) };
+                const T z   { s + s };
+                const T zsq { z * z };
+
+                result = z * fma(detail::log_series_expansion(zsq), zsq, one);
+
+                result /= numbers::ln10_v<T>;
+
+                if(reduce_sqrt10)
+                {
+                    constexpr T half { 5, -1 };
+
+                    result -= half;
+                }
+
+                result += static_cast<T>(exp10val);
             }
-
-            result += static_cast<T>(exp10val);
+            else
+            {
+                result = zero;
+            }
         }
     }
-    else
-    {
-        result = zero;
-    }
-
     return result;
 }
 

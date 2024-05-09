@@ -156,7 +156,7 @@ namespace local
   }
 
   template<typename DecimalType, typename FloatType>
-  auto test_log10_pow10(const int tol_factor) -> bool
+  auto test_log10_pow10() -> bool
   {
     using decimal_type = DecimalType;
     using float_type   = FloatType;
@@ -167,9 +167,12 @@ namespace local
     {
       const decimal_type x_arg { 1, i };
 
-      const decimal_type log_val_p10 = log10(x_arg);
+      const decimal_type val_dec  = log10(x_arg);
+      const float_type   val_ctrl =  static_cast<float_type>(i);
 
-      const auto result_log10_pow10_is_ok = (static_cast<float_type>(log_val_p10) == static_cast<float_type>(i));
+      const float_type val_to_check = static_cast<float_type>(val_dec);
+
+      const auto result_log10_pow10_is_ok = (val_to_check == val_ctrl);
 
       result_is_ok = (result_log10_pow10_is_ok && result_is_ok);
     }
@@ -192,6 +195,15 @@ auto main() -> int
     const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(128);
 
     result_is_ok = (test_log10_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal32;
+    using float_type   = float;
+
+    const auto test_log10_pow10_is_ok = local::test_log10_pow10<decimal_type, float_type>();
+
+    result_is_ok = (test_log10_pow10_is_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
