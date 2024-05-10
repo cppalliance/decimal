@@ -7,7 +7,6 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_LOG_HPP
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
-#include <boost/decimal/detail/cmath/impl/log_impl.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
@@ -27,18 +26,24 @@ template <typename T>
 constexpr auto log_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    constexpr T zero { 0, 0 };
     constexpr T one  { 1, 0 };
+    constexpr T zero { 0, 0 };
 
     T result { };
 
-    if (isnan(x))
+    const auto fpc = fpclassify(x);
+
+    if (fpc == FP_ZERO)
     {
-        result = x;
+        result = -std::numeric_limits<T>::infinity();
     }
-    else if (isinf(x))
+    else if (signbit(x) || (fpc == FP_NAN))
     {
-        result = (!signbit(x)) ? x: std::numeric_limits<T>::quiet_NaN();
+        result = std::numeric_limits<T>::quiet_NaN();
+    }
+    else if (fpc == FP_INFINITE)
+    {
+        result = std::numeric_limits<T>::infinity();
     }
     else if (x < one)
     {
@@ -49,8 +54,6 @@ constexpr auto log_impl(T x) noexcept
         }
         else if ((x == zero) || (-x == zero))
         {
-            // Actually, this should be equivalent to -HUGE_VAL.
-
             result = -std::numeric_limits<T>::infinity();
         }
         else
@@ -60,32 +63,7 @@ constexpr auto log_impl(T x) noexcept
     }
     else if(x > one)
     {
-        // The algorithm for logarithm is based on Chapter 5, pages 35-36
-        // of Cody and Waite, Software Manual for the Elementary Functions,
-        // Prentice Hall, 1980.
-
-        int exp2val { };
-
-        // TODO(ckormanyos) There is probably something more efficient than calling frexp here.
-        auto g = frexp(x, &exp2val);
-
-        if (g < numbers::inv_sqrt2_v<T>)
-        {
-            g += g;
-
-            --exp2val;
-        }
-
-        const auto s   = (g - one) / (g + one);
-        const auto z   = s + s;
-        const auto zsq = z * z;
-
-        result = z * fma(detail::log_series_expansion(zsq), zsq, one);
-
-        if (exp2val > 0)
-        {
-            result += static_cast<T>(exp2val * numbers::ln2_v<T>);
-        }
+        result = log10(x) * numbers::ln10_v<T>;
     }
     else
     {

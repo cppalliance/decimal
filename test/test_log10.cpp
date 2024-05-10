@@ -373,7 +373,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(64);
+    const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(128);
 
     BOOST_TEST(test_log10_is_ok);
 
@@ -384,7 +384,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(256);
+    const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(512);
 
     BOOST_TEST(test_log10_is_ok);
 
@@ -414,7 +414,7 @@ auto main() -> int
   }
 
   {
-    const auto result_pos128_is_ok = local::test_log10_128(1'400'000);
+    const auto result_pos128_is_ok = local::test_log10_128(600'000);
 
     BOOST_TEST(result_pos128_is_ok);
 
