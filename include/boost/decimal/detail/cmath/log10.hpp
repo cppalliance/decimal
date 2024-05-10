@@ -50,21 +50,15 @@ constexpr auto log10_impl(T x) noexcept
     {
         int exp10val { };
 
-        using representation_type = std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
-                                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>;
+        const auto gn { frexp10(x, &exp10val) };
 
-        const representation_type gn { frexp10(x, &exp10val) };
-
-        const remove_trailing_zeros_return<representation_type>
+        const auto
             zeros_removal
             {
                 remove_trailing_zeros(gn)
             };
 
-        const bool is_pure
-        {
-            (zeros_removal.trimmed_number == static_cast<representation_type>(UINT8_C(1)))
-        };
+        const bool is_pure { static_cast<unsigned>(zeros_removal.trimmed_number) == 1U };
 
         if(is_pure)
         {
