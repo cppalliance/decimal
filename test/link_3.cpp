@@ -4,6 +4,7 @@
 
 #include <boost/decimal.hpp>
 
+// LCOV_EXCL_START
 void f1();
 void f2();
 
@@ -16,3 +17,4 @@ int main()
 void test_odr_use(const boost::decimal::rounding_mode*)
 {
 }
+// LCOV_EXCL_STOP

@@ -6,6 +6,7 @@
 
 void test_odr_use(const boost::decimal::rounding_mode*);
 
+// LCOV_EXCL_START
 template <typename T>
 void test()
 {
@@ -18,3 +19,4 @@ void f1()
     test<boost::decimal::decimal64>();
     test<boost::decimal::decimal128>();
 }
+// LCOV_EXCL_STOP
