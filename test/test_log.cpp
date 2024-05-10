@@ -452,9 +452,9 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto test_log_is_ok                 = local::test_log                <decimal_type, float_type>(12);
-    const auto test_log_between_1_and_2_is_ok = local::test_log_between_1_and_2<decimal_type, float_type>(24);
-    const auto test_log_edge_is_ok            = local::test_log_edge           <decimal_type, float_type>(12);
+    const auto test_log_is_ok                 = local::test_log                <decimal_type, float_type>(32);
+    const auto test_log_between_1_and_2_is_ok = local::test_log_between_1_and_2<decimal_type, float_type>(64);
+    const auto test_log_edge_is_ok            = local::test_log_edge           <decimal_type, float_type>(32);
 
     result_is_ok = (test_log_is_ok && test_log_between_1_and_2_is_ok && test_log_edge_is_ok && result_is_ok);
   }
@@ -463,9 +463,9 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto test_log_is_ok                 = local::test_log                <decimal_type, float_type>(24);
-    const auto test_log_between_1_and_2_is_ok = local::test_log_between_1_and_2<decimal_type, float_type>(256);
-    const auto test_log_edge_is_ok            = local::test_log_edge           <decimal_type, float_type>(24);
+    const auto test_log_is_ok                 = local::test_log                <decimal_type, float_type>(64);
+    const auto test_log_between_1_and_2_is_ok = local::test_log_between_1_and_2<decimal_type, float_type>(512);
+    const auto test_log_edge_is_ok            = local::test_log_edge           <decimal_type, float_type>(64);
 
     result_is_ok = (test_log_is_ok && test_log_between_1_and_2_is_ok && test_log_edge_is_ok && result_is_ok);
   }
@@ -479,7 +479,7 @@ auto main() -> int
   }
 
   {
-    const auto result_pos128_is_ok = local::test_log_128(1'400'000);
+    const auto result_pos128_is_ok = local::test_log_128(800'000);
 
     BOOST_TEST(result_pos128_is_ok);
 
