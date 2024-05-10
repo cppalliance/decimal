@@ -20,10 +20,11 @@
 #endif
 #include <boost/core/lightweight_test.hpp>
 
-template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_zero { 0, 0 }; return my_zero; }
-template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_one  { 1, 0 }; return my_one; }
-template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_inf  { std::numeric_limits<decimal_type>::infinity() };  return my_inf; }
-template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_nan  { std::numeric_limits<decimal_type>::quiet_NaN() }; return my_nan; }
+template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_zero { 0, 0 }; return my_val_zero; }
+template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_one  { 1, 0 }; return my_val_one; }
+template<typename DecimalType> auto my_ten () -> DecimalType&;
+template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_inf  { std::numeric_limits<decimal_type>::infinity() };  return my_val_inf; }
+template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_nan  { std::numeric_limits<decimal_type>::quiet_NaN() }; return my_val_nan; }
 
 namespace local
 {
@@ -300,6 +301,64 @@ namespace local
 
       BOOST_TEST(result_is_ok);
     }
+
+    return result_is_ok;
+  }
+
+  template<typename DecimalType>
+  auto test_10_pow_n() -> bool
+  {
+    using decimal_type = DecimalType;
+
+    using ctrl_val_array_type = std::array<decimal_type, static_cast<std::size_t>(UINT8_C(5))>;
+
+    bool result_is_ok { true };
+
+    {
+      const ctrl_val_array_type ctrl_values =
+      {{
+        decimal_type { 1,  1},
+        decimal_type { 1,  4},
+        decimal_type { 1,  9},
+        decimal_type { 1, 16},
+        decimal_type { 1, 25},
+      }};
+
+      for(auto i = 0; i < std::tuple_size<ctrl_val_array_type>::value; ++i)
+      {
+        const int n = i + 1;
+
+        decimal_type p10 = pow(pow(::my_ten<decimal_type>(), n), n);
+
+        const bool result_p10_is_ok = (p10 == ctrl_values[static_cast<std::size_t>(i)]);
+
+        result_is_ok = (result_p10_is_ok && result_is_ok);
+      }
+    }
+
+    {
+      const ctrl_val_array_type ctrl_values =
+      {{
+        decimal_type { 1,  -1},
+        decimal_type { 1,  -4},
+        decimal_type { 1,  -9},
+        decimal_type { 1, -16},
+        decimal_type { 1, -25},
+      }};
+
+      for(auto i = 0; i < std::tuple_size<ctrl_val_array_type>::value; ++i)
+      {
+        const int n = i + 1;
+
+        decimal_type p10 = pow(pow(::my_ten<decimal_type>(), -n), n);
+
+        const bool result_p10_is_ok = (p10 == ctrl_values[static_cast<std::size_t>(i)]);
+
+        result_is_ok = (result_p10_is_ok && result_is_ok);
+      }
+    }
+
+    BOOST_TEST(result_is_ok);
 
     return result_is_ok;
   }
@@ -974,6 +1033,15 @@ namespace local
   }
 }
 
+template<typename DecimalType> auto my_ten () -> DecimalType&
+{
+  using decimal_type = DecimalType;
+
+  static decimal_type my_val_ten  { 1, 1 };
+
+  return my_val_ten;
+}
+
 auto main() -> int
 {
   auto result_is_ok = true;
@@ -991,6 +1059,14 @@ auto main() -> int
     const auto result_test_pow_is_ok = (test_pow_pos_is_ok && test_pow_neg_is_ok && test_pow_edge_is_ok && test_pow_n_edge_is_ok && test_pow_n_is_ok);
 
     result_is_ok = (result_test_pow_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal32;
+
+    const auto test_10_pow_n_is_ok   = local::test_10_pow_n<decimal_type>();
+
+    result_is_ok = (test_10_pow_n_is_ok && result_is_ok);
   }
 
   {
