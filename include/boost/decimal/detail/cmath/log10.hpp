@@ -71,19 +71,8 @@ constexpr auto log10_impl(T x) noexcept
         {
             if (x < one)
             {
-                // Handle reflection, the [+/-] zero-pole, and non-pole, negative x.
-                if (x > zero)
-                {
-                    result = -log10(one / x);
-                }
-                else if ((x == zero) || (-x == zero))
-                {
-                    result = -std::numeric_limits<T>::infinity();
-                }
-                else
-                {
-                    result = std::numeric_limits<T>::quiet_NaN();
-                }
+                // Handle reflection.
+                result = -log10(one / x);
             }
             else if(x > one)
             {
