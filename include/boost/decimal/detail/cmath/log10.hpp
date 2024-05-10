@@ -50,21 +50,28 @@ constexpr auto log10_impl(T x) noexcept
     {
         int exp10val { };
 
-        auto gn { frexp10(x, &exp10val) };
+        using representation_type = std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
+                                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>;
 
-        const auto zeros_removal_result { detail::remove_trailing_zeros(gn) };
+        const representation_type gn { frexp10(x, &exp10val) };
 
-        const bool is_pure { (zeros_removal_result.trimmed_number == one) };
+        const remove_trailing_zeros_return<representation_type>
+            zeros_removal
+            {
+                remove_trailing_zeros(gn)
+            };
+
+        const bool is_pure
+        {
+            (zeros_removal.trimmed_number == static_cast<representation_type>(UINT8_C(1)))
+        };
 
         if(is_pure)
         {
             // Here, a pure power-of-10 argument gets a pure integral result.
-            result =
-                T
-                {
-                      exp10val
-                    + static_cast<int>(zeros_removal_result.number_of_removed_zeros)
-                };
+            const int p10 { exp10val + static_cast<int>(zeros_removal.number_of_removed_zeros) };
+
+            result = T { p10 };
         }
         else
         {
@@ -86,23 +93,25 @@ constexpr auto log10_impl(T x) noexcept
             }
             else if(x > one)
             {
-                // The algorithm for base-10 logarithm is based on Chapter 5, pages 35-36
-                // of Cody and Waite, Software Manual for the Elementary Functions,
-                // Prentice Hall, 1980.
+                // The algorithm for base-10 logarithm is based on Chapter 5,
+                // pages 35-36 of Cody and Waite, "Software Manual for the
+                // Elementary Functions", Prentice Hall, 1980.
 
-                T g { T { gn } / pow10(std::numeric_limits<T>::digits10) };
+                // In this implementation, however, we use 2s (as for natural
+                // logarithm in Cody and Waite) even though we are computing
+                // the base-10 logarithm.
+
+                T g { gn, -std::numeric_limits<T>::digits10 };
 
                 exp10val += std::numeric_limits<T>::digits10;
 
-                constexpr T inv_sqrt10 { UINT64_C(3162277660168379332), -19 };
+                int reduce_sqrt2 { };
 
-                const bool reduce_sqrt10 { g < inv_sqrt10 };
-
-                if (reduce_sqrt10)
+                while (g < numbers::inv_sqrt2_v<T>)
                 {
-                    constexpr T sqrt10 { UINT64_C(3162277660168379332), -18 };
+                    g += g;
 
-                    g *= sqrt10;
+                    ++reduce_sqrt2;
                 }
 
                 const T s   { (g - one) / (g + one) };
@@ -113,11 +122,9 @@ constexpr auto log10_impl(T x) noexcept
 
                 result /= numbers::ln10_v<T>;
 
-                if(reduce_sqrt10)
+                for(int i = 0; i < reduce_sqrt2; ++i)
                 {
-                    constexpr T half { 5, -1 };
-
-                    result -= half;
+                    result -= numbers::log10_2_v<T>;
                 }
 
                 result += static_cast<T>(exp10val);

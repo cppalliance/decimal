@@ -98,7 +98,7 @@ namespace local
     auto dis_r =
       std::uniform_real_distribution<float_type>
       {
-        static_cast<float_type>(1.2L),
+        static_cast<float_type>(1.4L),
         static_cast<float_type>(8.9L)
       };
 
@@ -294,6 +294,75 @@ namespace local
     return result_is_ok;
   }
 
+  auto test_log10_128(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal128;
+
+    using str_ctrl_array_type = std::array<const char*, 28U>;
+
+    const str_ctrl_array_type ctrl_strings =
+    {{
+       // Table[N[Log[10, 456 10^n], 36], {n, -3, 24, 1}]
+       "-0.341035157335565015527421936814476293",
+       "0.658964842664434984472578063185523707",
+       "1.65896484266443498447257806318552371",
+       "2.65896484266443498447257806318552371",
+       "3.65896484266443498447257806318552371",
+       "4.65896484266443498447257806318552371",
+       "5.65896484266443498447257806318552371",
+       "6.65896484266443498447257806318552371",
+       "7.65896484266443498447257806318552371",
+       "8.65896484266443498447257806318552371",
+       "9.65896484266443498447257806318552371",
+       "10.6589648426644349844725780631855237",
+       "11.6589648426644349844725780631855237",
+       "12.6589648426644349844725780631855237",
+       "13.6589648426644349844725780631855237",
+       "14.6589648426644349844725780631855237",
+       "15.6589648426644349844725780631855237",
+       "16.6589648426644349844725780631855237",
+       "17.6589648426644349844725780631855237",
+       "18.6589648426644349844725780631855237",
+       "19.6589648426644349844725780631855237",
+       "20.6589648426644349844725780631855237",
+       "21.6589648426644349844725780631855237",
+       "22.6589648426644349844725780631855237",
+       "23.6589648426644349844725780631855237",
+       "24.6589648426644349844725780631855237",
+       "25.6589648426644349844725780631855237",
+       "26.6589648426644349844725780631855237",
+    }};
+
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> log_values { };
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
+
+    int nx { -3 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
+    {
+      const decimal_type x_arg { 456, nx };
+
+      ++nx;
+
+      log_values[i] = log10(x_arg);
+
+      static_cast<void>
+      (
+        from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+      );
+
+      const auto result_log_is_ok = is_close_fraction(log_values[i], ctrl_values[i], my_tol);
+
+      result_is_ok = (result_log_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
 } // namespace local
 
 auto main() -> int
@@ -304,7 +373,18 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(128);
+    const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(64);
+
+    BOOST_TEST(test_log10_is_ok);
+
+    result_is_ok = (test_log10_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal64;
+    using float_type   = double;
+
+    const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(256);
 
     BOOST_TEST(test_log10_is_ok);
 
@@ -331,6 +411,14 @@ auto main() -> int
     BOOST_TEST(test_log10_edge_is_ok);
 
     result_is_ok = (test_log10_edge_is_ok && result_is_ok);
+  }
+
+  {
+    const auto result_pos128_is_ok = local::test_log10_128(1'400'000);
+
+    BOOST_TEST(result_pos128_is_ok);
+
+    result_is_ok = (result_pos128_is_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
