@@ -22,7 +22,6 @@
 #include <boost/core/lightweight_test.hpp>
 
 auto my_zero() -> boost::decimal::decimal32&;
-auto my_one () -> boost::decimal::decimal32&;
 
 namespace local
 {
@@ -56,7 +55,7 @@ namespace local
 
     if(b == static_cast<NumericType>(0))
     {
-      result_is_ok = (fabs(a - b) < tol);
+      result_is_ok = (fabs(a - b) < tol); // LCOV_EXCL_LINE
     }
     else
     {
@@ -268,4 +267,3 @@ auto main() -> int
 }
 
 auto my_zero() -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_zero { 0, 0 }; return val_zero; }
-auto my_one () -> boost::decimal::decimal32& { static boost::decimal::decimal32 val_one  { 1, 0 }; return val_one; }

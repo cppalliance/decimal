@@ -58,7 +58,7 @@ namespace local
 
     if(b == static_cast<NumericType>(0))
     {
-      result_is_ok = (fabs(a - b) < tol);
+      result_is_ok = (fabs(a - b) < tol); // LCOV_EXCL_LINE
     }
     else
     {
@@ -324,9 +324,9 @@ namespace local
         decimal_type { 1, 25},
       }};
 
-      for(auto i = 0; i < std::tuple_size<ctrl_val_array_type>::value; ++i)
+      for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<ctrl_val_array_type>::value; ++i)
       {
-        const int n = i + 1;
+        const int n = static_cast<int>(i + static_cast<std::size_t>(UINT8_C(1)));
 
         decimal_type p10 = pow(pow(::my_ten<decimal_type>(), n), n);
 
@@ -346,9 +346,9 @@ namespace local
         decimal_type { 1, -25},
       }};
 
-      for(auto i = 0; i < std::tuple_size<ctrl_val_array_type>::value; ++i)
+      for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<ctrl_val_array_type>::value; ++i)
       {
-        const int n = i + 1;
+        const int n = static_cast<int>(i + static_cast<std::size_t>(UINT8_C(1)));
 
         decimal_type p10 = pow(pow(::my_ten<decimal_type>(), -n), n);
 
