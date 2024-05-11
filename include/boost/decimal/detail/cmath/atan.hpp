@@ -53,8 +53,8 @@ constexpr auto atan_impl(T x) noexcept
         {
             const bool is_smallish { x <= T { 6 } };
 
-            // The portion of the algorithm for arc-tangent of large-valued argument
-            // is based on Chapter 11, page 194 of Cody and Waite, "Software Manual
+            // The portion of the algorithm for arc-tangent regarding scaling large-valued
+            // argument is based on Chapter 11, page 194 of Cody and Waite, "Software Manual
             // for the Elementary Functions", Prentice Hall, 1980.
 
             const T
@@ -64,8 +64,6 @@ constexpr auto atan_impl(T x) noexcept
                         ? ((x * numbers::sqrt3_v<T>) - one) / (numbers::sqrt3_v<T> + x)
                         :   x
                 };
-
-            constexpr T my_pi_over_six { numbers::pi_v<T> / static_cast<int>(INT8_C(6)) };
 
             constexpr T half         {  5, -1 };
             constexpr T three_halves { 15, -1 };
@@ -80,6 +78,8 @@ constexpr auto atan_impl(T x) noexcept
 
             if(!is_smallish)
             {
+                constexpr T my_pi_over_six { numbers::pi_v<T> / static_cast<int>(INT8_C(6)) };
+
                 result += my_pi_over_six;
             }
         }
