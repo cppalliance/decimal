@@ -1,5 +1,5 @@
-// Copyright 2023 Matt Borland
-// Copyright 2023 Christopher Kormanyos
+// Copyright 2023 - 2024 Matt Borland
+// Copyright 2023 - 2024 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -7,7 +7,7 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_EXP_HPP
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
-#include <boost/decimal/detail/cmath/impl/exp_impl.hpp>
+#include <boost/decimal/detail/cmath/impl/expm1_impl.hpp>
 #include <boost/decimal/detail/cmath/impl/pow_impl.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
@@ -76,7 +76,7 @@ constexpr auto exp_impl(T x) noexcept
                 x -= numbers::ln2_v<T> * nf2;
             }
 
-            result = detail::exp_pade_appxroximant_or_series(x);
+            result = fma(x, detail::expm1_series_expansion(x), one);
 
             if (nf2 > 0)
             {
