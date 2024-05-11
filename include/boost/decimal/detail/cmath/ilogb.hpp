@@ -22,26 +22,30 @@ BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto ilogb(T d) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
 {
-    const auto fpc_d = fpclassify(d);
+    const auto fpc = fpclassify(d);
 
-    if (fpc_d == FP_ZERO)
+    int result { };
+
+    if (fpc == FP_ZERO)
     {
-        return FP_ILOGB0;
+        result = static_cast<int>(FP_ILOGB0);
     }
-    else if (fpc_d == FP_INFINITE)
+    else if (fpc == FP_INFINITE)
     {
-        return INT_MAX;
+        result = static_cast<int>(INT_MAX);
     }
-    else if (fpc_d == FP_NAN)
+    else if (fpc == FP_NAN)
     {
-        return FP_ILOGBNAN;
+        result = static_cast<int>(FP_ILOGBNAN);
+    }
+    else
+    {
+        const auto offset = detail::num_digits(d.full_significand()) - 1;
+
+        result = static_cast<int>(static_cast<int>(d.unbiased_exponent()) + offset);
     }
 
-    const auto offset = detail::num_digits(d.full_significand()) - 1;
-
-    const auto expval = static_cast<int>(static_cast<int>(d.unbiased_exponent()) + offset);
-
-    return expval;
+    return result;
 }
 
 } // namespace decimal

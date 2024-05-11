@@ -1,5 +1,5 @@
-// Copyright 2023 Matt Borland
-// Copyright 2023 Christopher Kormanyos
+// Copyright 2023 - 2024 Matt Borland
+// Copyright 2023 - 2024 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -53,16 +53,30 @@ namespace local
 
     auto result_is_ok = bool { };
 
+    NumericType delta { };
+
     if(b == static_cast<NumericType>(0))
     {
-      result_is_ok = (fabs(a - b) < tol); // LCOV_EXCL_LINE
+      delta = fabs(a - b); // LCOV_EXCL_LINE
+
+      result_is_ok = (delta < tol); // LCOV_EXCL_LINE
     }
     else
     {
-      const auto delta = fabs(1 - (a / b));
+      delta = fabs(1 - (a / b));
 
       result_is_ok = (delta < tol);
     }
+
+    // LCOV_EXCL_START
+    if (!result_is_ok)
+    {
+      std::cerr << std::setprecision(std::numeric_limits<NumericType>::digits10) << "a: " << a
+                << "\nb: " << b
+                << "\ndelta: " << delta
+                << "\ntol: " << tol << std::endl;
+    }
+    // LCOV_EXCL_STOP
 
     return result_is_ok;
   }
@@ -112,9 +126,9 @@ namespace local
       if(!result_val_is_ok)
       {
           // LCOV_EXCL_START
-        std::cout << "x_flt  : " <<                    x_flt   << std::endl;
-        std::cout << "val_flt: " << std::scientific << val_flt << std::endl;
-        std::cout << "val_dec: " << std::scientific << val_dec << std::endl;
+        std::cerr << "x_flt  : " <<                    x_flt   << std::endl;
+        std::cerr << "val_flt: " << std::scientific << val_flt << std::endl;
+        std::cerr << "val_dec: " << std::scientific << val_dec << std::endl;
 
         break;
           // LCOV_EXCL_STOP
@@ -204,6 +218,108 @@ namespace local
     return result_is_ok;
   }
 
+  auto test_expm1_64(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal64;
+
+    using val_ctrl_array_type = std::array<double, 10U>;
+
+    const val_ctrl_array_type ctrl_values =
+    {{
+      // Table[N[Exp[n/10 + n/100] - 1, 17], {n, 1, 10, 1}]
+      0.11627807045887129, 0.24607673058738082, 0.39096812846378027,
+      0.55270721851133604, 0.73325301786739524, 0.93479233440203152,
+      1.1597662537849150,  1.4108997064172099,  1.6912344723492623,
+      2.0041660239464331
+    }};
+
+    std::array<decimal_type, std::tuple_size<val_ctrl_array_type>::value> expm1_values { };
+
+    int nx { 1 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<val_ctrl_array_type>::value; ++i)
+    {
+      // Table[N[Exp[n/10 + n/100] - 1, 17], {n, 1, 10, 1}]
+
+      const decimal_type
+        x_arg
+        {
+            decimal_type { nx, -1 }
+          + decimal_type { nx, -2 }
+        };
+
+      expm1_values[i] = expm1(x_arg);
+
+      ++nx;
+
+      const auto result_expm1_is_ok = is_close_fraction(expm1_values[i], decimal_type(ctrl_values[i]), my_tol);
+
+      result_is_ok = (result_expm1_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
+  auto test_expm1_128(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal128;
+
+    using str_ctrl_array_type = std::array<const char*, 10U>;
+
+    const str_ctrl_array_type ctrl_strings =
+    {{
+       // Table[N[Exp[n/10 + n/100] - 1, 36], {n, 1, 10, 1}]
+       "0.116278070458871291500737769052983899",
+       "0.246076730587380819520264782992696244",
+       "0.390968128463780266242747804953118824",
+       "0.552707218511336042050079646191694969",
+       "0.733253017867395236821916767137328837",
+       "0.934792334402031521693125151019691675",
+       "1.15976625378491500838755239034002685",
+       "1.41089970641720985089088491613290280",
+       "1.69123447234926228909987940407101397",
+       "2.00416602394643311205840795358867239",
+    }};
+
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> expm1_values { };
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
+
+    int nx { 1 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
+    {
+      const decimal_type
+        x_arg
+        {
+            decimal_type { nx, -1 }
+          + decimal_type { nx, -2 }
+        };
+
+      ++nx;
+
+      expm1_values[i] = expm1(x_arg);
+
+      static_cast<void>
+      (
+        from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+      );
+
+      const auto result_expm1_is_ok = is_close_fraction(expm1_values[i], ctrl_values[i], my_tol);
+
+      result_is_ok = (result_expm1_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
 } // namespace local
 
 auto main() -> int
@@ -221,6 +337,10 @@ auto main() -> int
 
   const auto result_edge_is_ok = local::test_expm1_edge();
 
+  const auto result_pos64_is_ok = local::test_expm1_64(64);
+
+  const auto result_pos128_is_ok = local::test_expm1_128(400'000);
+
   BOOST_TEST(result_pos_is_ok);
   BOOST_TEST(result_neg_is_ok);
 
@@ -232,6 +352,10 @@ auto main() -> int
 
   BOOST_TEST(result_edge_is_ok);
 
+  BOOST_TEST(result_pos64_is_ok);
+
+  BOOST_TEST(result_pos128_is_ok);
+
   result_is_ok = (result_pos_is_ok  && result_is_ok);
   result_is_ok = (result_neg_is_ok  && result_is_ok);
 
@@ -242,6 +366,10 @@ auto main() -> int
   result_is_ok = (result_neg_wide_is_ok  && result_is_ok);
 
   result_is_ok = (result_edge_is_ok && result_is_ok);
+
+  result_is_ok = (result_pos64_is_ok && result_is_ok);
+
+  result_is_ok = (result_pos128_is_ok && result_is_ok);
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 

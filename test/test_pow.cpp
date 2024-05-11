@@ -1051,10 +1051,10 @@ auto main() -> int
     using float_type   = float;
 
     const auto test_pow_edge_is_ok   = local::test_pow_edge  <decimal_type, float_type>();
-    const auto test_pow_n_edge_is_ok = local::test_pow_n_edge<decimal_type, float_type>(512);
-    const auto test_pow_pos_is_ok    = local::test_pow       <decimal_type, float_type>(512, false);
-    const auto test_pow_neg_is_ok    = local::test_pow       <decimal_type, float_type>(512, true);
-    const auto test_pow_n_is_ok      = local::test_pow_n     <decimal_type, float_type>(512);
+    const auto test_pow_n_edge_is_ok = local::test_pow_n_edge<decimal_type, float_type>(256);
+    const auto test_pow_pos_is_ok    = local::test_pow       <decimal_type, float_type>(256, false);
+    const auto test_pow_neg_is_ok    = local::test_pow       <decimal_type, float_type>(256, true);
+    const auto test_pow_n_is_ok      = local::test_pow_n     <decimal_type, float_type>(256);
 
     const auto result_test_pow_is_ok = (test_pow_pos_is_ok && test_pow_neg_is_ok && test_pow_edge_is_ok && test_pow_n_edge_is_ok && test_pow_n_is_ok);
 
@@ -1073,8 +1073,8 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto test_pow_pos_is_ok = local::test_pow<decimal_type, float_type>(4096, false);
-    const auto test_pow_is_neg_ok = local::test_pow<decimal_type, float_type>(4096, true);
+    const auto test_pow_pos_is_ok = local::test_pow<decimal_type, float_type>(1024, false);
+    const auto test_pow_is_neg_ok = local::test_pow<decimal_type, float_type>(1024, true);
 
     result_is_ok = (test_pow_pos_is_ok && test_pow_is_neg_ok && result_is_ok);
   }
