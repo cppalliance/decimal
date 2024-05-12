@@ -125,7 +125,7 @@ constexpr auto atan_series<decimal128>(decimal128 x) noexcept
             + x2 * (decimal128 { UINT64_C(5134145876036100) }
             + x2 * (decimal128 { UINT64_C(463911017673180) }
             + x2 * (decimal128 { UINT64_C(16016872057515) }
-            +       decimal128 { UINT64_C(90194313216) } * x2))))))))
+            + x2 *  decimal128 { UINT64_C(90194313216) }))))))))
         };
 
     const decimal128
@@ -140,7 +140,7 @@ constexpr auto atan_series<decimal128>(decimal128 x) noexcept
             + x2 * (decimal128 { UINT64_C(10819658401051500) }
             + x2 * (decimal128 { UINT64_C(1298359008126180) }
             + x2 * (decimal128 { UINT64_C(70562989572075) }
-            +       decimal128 { UINT64_C(1120047453525) } * x2))))))))
+            + x2 *  decimal128 { UINT64_C(1120047453525) }))))))))
         };
 
     return (x * top) / bot;

@@ -51,7 +51,8 @@ constexpr auto atan_impl(T x) noexcept
 
         if (x <= T { 48 })
         {
-            const bool is_smallish { x <= T { 3 } };
+            // Define small-ish argiments to be less than 39/16.
+            const bool is_smallish { x <= T { 24375, -4 } };
 
             // The portion of the algorithm for arc-tangent regarding scaling large-valued
             // argument is based on Chapter 11, page 194 of Cody and Waite, "Software Manual
