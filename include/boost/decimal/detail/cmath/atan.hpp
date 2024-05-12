@@ -51,7 +51,7 @@ constexpr auto atan_impl(T x) noexcept
 
         if (x <= T { 48 })
         {
-            const bool is_smallish { x <= T { 6 } };
+            const bool is_smallish { x <= T { 3 } };
 
             // The portion of the algorithm for arc-tangent regarding scaling large-valued
             // argument is based on Chapter 11, page 194 of Cody and Waite, "Software Manual
@@ -69,11 +69,10 @@ constexpr auto atan_impl(T x) noexcept
             constexpr T three_halves { 15, -1 };
 
             result =   (fx_arg <= std::numeric_limits<T>::epsilon()) ? fx_arg
-                     : (fx_arg <= T { 4375,  -4 })                   ?                              detail::atan_series_small (fx_arg)
-                     : (fx_arg <= T { 6875,  -4 })                   ? detail::atan_values<T>(0U) + detail::atan_series_small((fx_arg - half) / (one + fx_arg / 2))
-                     : (fx_arg <= T { 11875, -4 })                   ? detail::atan_values<T>(1U) + detail::atan_series_small((fx_arg - one) / (fx_arg + one))
-                     : (fx_arg <= T { 24375, -4 })                   ? detail::atan_values<T>(2U) + detail::atan_series_small((fx_arg - three_halves) / (one + three_halves * fx_arg))
-                     :                                                                              detail::atan_series_med  ( fx_arg)
+                     : (fx_arg <= T { 4375,  -4 })                   ?                              detail::atan_series (fx_arg)
+                     : (fx_arg <= T { 6875,  -4 })                   ? detail::atan_values<T>(0U) + detail::atan_series((fx_arg - half) / (one + fx_arg / 2))
+                     : (fx_arg <= T { 11875, -4 })                   ? detail::atan_values<T>(1U) + detail::atan_series((fx_arg - one) / (fx_arg + one))
+                     :                                                 detail::atan_values<T>(2U) + detail::atan_series((fx_arg - three_halves) / (one + three_halves * fx_arg))
                      ;
 
             if(!is_smallish)
@@ -85,7 +84,7 @@ constexpr auto atan_impl(T x) noexcept
         }
         else
         {
-            result = my_pi_half - detail::atan_series_small(one / x);
+            result = my_pi_half - detail::atan_series(one / x);
         }
     }
 
