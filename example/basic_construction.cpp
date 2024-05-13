@@ -4,6 +4,7 @@
 
 #include <boost/decimal.hpp>
 #include <iostream>
+#include <iomanip>
 
 int main()
 {
@@ -22,5 +23,23 @@ int main()
         std::cout << "All equal values" << std::endl;
     }
 
+    constexpr decimal64 val_4 {decimal64{2, -1} + decimal64{1, -1}};
+    constexpr double float_val_4 {0.2 + 0.1};
+    const decimal64 val_5 { float_val_4 };
+
+    std::cout << std::setprecision(17) << "Val_4: " << val_4 << '\n'
+              <<  "Float: " << float_val_4 << '\n'
+              <<  "Val_5: " << val_5 << '\n';
+
+    if (val_4 == val_5)
+    {
+        std::cout << "Floats are equal" << std::endl;
+    }
+    else
+    {
+        std::cout << "Floats are not equal" << std::endl;
+    }
+
     return 0;
 }
+
