@@ -96,7 +96,7 @@ int main()
 {
     auto default_rounding_mode = boost::decimal::fegetround(); // Default is fe_dec_to_nearest_from_zero
 
-    auto new_rounding_mode = fesetround(boost::decimal::rounding_mode::fe_dec_to_nearest);
+    auto new_rounding_mode = boost::decimal::fesetround(boost::decimal::rounding_mode::fe_dec_to_nearest);
 
     assert(default_rounding_mode != new_rounding_mode);
 

@@ -125,4 +125,5 @@ run test_to_string.cpp ;
 run test_type_traits.cpp ;
 
 # Examples
-run ../example/basic_construction.cpp ;
+run ../examples/basic_construction.cpp ;
+run ../examples/rounding_mode.cpp ;
