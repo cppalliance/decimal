@@ -481,9 +481,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    // TODO(ckormanyos) Can we reduce the tolerance on lgamma()-64?
-    // Can the approximation be done a bit better (Lanczos from Math?).
-    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(0x80000, 0.1L, 0.9L);
+    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(2048, 0.1L, 0.9L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
@@ -494,9 +492,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    // TODO(ckormanyos) Can we reduce the tolerance on lgamma()-64?
-    // Can the approximation be done a bit better (Lanczos from Math?).
-    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(0x80000, 1.1L, 123.4L);
+    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(2048, 1.1L, 123.4L);
 
     BOOST_TEST(result_tgamma_is_ok);
 

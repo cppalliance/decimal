@@ -74,16 +74,21 @@ constexpr auto lgamma_impl(T x) noexcept
         }
         else
         {
-            constexpr T half { 5, -1 };
+            constexpr int asymp_cutoff
+            {
+                  std::numeric_limits<T>::digits10 < 10 ? T { 1, 1 }
+                : std::numeric_limits<T>::digits10 < 20 ? T { 3, 1 }
+                :                                         T { 1, 2 }
+            };
 
-            if (x < half)
+            if (x < T { 1, -1 })
             {
                 // Perform the Taylor series expansion.
 
                 result =   (x * fma(detail::lgamma_taylor_series_expansion(x), x, -numbers::egamma_v<T>))
                          - log(x);
             }
-            else if (x < T { 1,  1 })
+            else if (x < asymp_cutoff)
             {
                 result = log(tgamma(x));
             }
@@ -92,6 +97,8 @@ constexpr auto lgamma_impl(T x) noexcept
                 // Perform the Laurent series expansion. Do note, however, that
                 // the coefficients of the Laurent asymptotic expansion are exactly
                 // the same as those used for the tgamma() function.
+
+                constexpr T half { 5, -1 };
 
                 result =   (((x - half) * (log(x)) - x))
                          + log(detail::tgamma_series_expansion_asymp(one / x));
