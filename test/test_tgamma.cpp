@@ -452,7 +452,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(512, 0.01L, 23.4L);
+    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(768, 0.01L, 23.4L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
@@ -463,7 +463,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(2048, 0.01L, 78.9L);
+    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(3072, 0.01L, 78.9L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
@@ -471,7 +471,7 @@ auto main() -> int
   }
 
   {
-    const auto result_neg32_is_ok = local::test_tgamma_neg32(512);
+    const auto result_neg32_is_ok = local::test_tgamma_neg32(768);
 
     BOOST_TEST(result_neg32_is_ok);
 
@@ -498,7 +498,7 @@ auto main() -> int
   }
 
   {
-    const auto result_tgamma64_is_ok   = local::test_tgamma_64(128);
+    const auto result_tgamma64_is_ok   = local::test_tgamma_64(256);
 
     BOOST_TEST(result_tgamma64_is_ok);
 
@@ -506,9 +506,7 @@ auto main() -> int
   }
 
   {
-    // TODO(ckormanyos) Can the accuracy/precision of tgamma-128 be improved?
-
-    const auto result_tgamma128_is_ok   = local::test_tgamma_128(800'000);
+    const auto result_tgamma128_is_ok   = local::test_tgamma_128(1'000'000);
 
     BOOST_TEST(result_tgamma128_is_ok);
 

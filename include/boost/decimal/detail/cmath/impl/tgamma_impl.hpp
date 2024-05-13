@@ -24,12 +24,14 @@ namespace tgamma_detail {
 template <bool b>
 struct tgamma_table_imp
 {
-private:
     using d32_coeffs_t  = std::array<decimal32,  15>;
     using d64_coeffs_t  = std::array<decimal64,  36>;
     using d128_coeffs_t = std::array<decimal128, 44>;
 
-public:
+    using d32_coeffs_asymp_t  = std::array<decimal32,   8>;
+    using d64_coeffs_asymp_t  = std::array<decimal64,  15>;
+    using d128_coeffs_asymp_t = std::array<decimal128, 30>;
+
     static constexpr d32_coeffs_t d32_coeffs =
     {{
         // N[Series[1/Gamma[z], {z, 0, 16}], 19]
@@ -48,6 +50,19 @@ public:
         +::boost::decimal::decimal32 { UINT64_C(1'133'027'231'981'695'882), - 19 - 5 }, // * z^14
         -::boost::decimal::decimal32 { UINT64_C(2'056'338'416'977'607'103), - 19 - 6 }, // * z^15
         +::boost::decimal::decimal32 { UINT64_C(6'116'095'104'481'415'818), - 19 - 8 }, // * z^16
+    }};
+
+    static constexpr d32_coeffs_asymp_t d32_coeffs_asymp =
+    {{
+        // N[Series[Gamma[x] Sqrt[x], {x, Infinity, 7}], 19]
+        +::boost::decimal::decimal32 { UINT64_C(2506628274631000502), - 19 + 1 },
+        +::boost::decimal::decimal32 { UINT64_C(2088856895525833752), - 19 - 0 }, // / x
+        +::boost::decimal::decimal32 { UINT64_C(8703570398024307300), - 19 - 2 }, // / x^2
+        -::boost::decimal::decimal32 { UINT64_C(6721090474029881748), - 19 - 2 }, // / x^3
+        -::boost::decimal::decimal32 { UINT64_C(5752012381101712348), - 19 - 3 }, // / x^4
+        +::boost::decimal::decimal32 { UINT64_C(1965294881583203064), - 19 - 2 }, // / x^5
+        +::boost::decimal::decimal32 { UINT64_C(1747825212045591212), - 19 - 3 }, // / x^6
+        -::boost::decimal::decimal32 { UINT64_C(1484341135158276145), - 19 - 2 }, // / x^7
     }};
 
     static constexpr d64_coeffs_t d64_coeffs =
@@ -79,7 +94,27 @@ public:
          +::boost::decimal::decimal64 { UINT64_C(1'226'778'628'238'260'790), - 19 - 14 }, // * z^25
          -::boost::decimal::decimal64 { UINT64_C(1'181'259'301'697'458'770), - 19 - 15 }, // * z^26
          +::boost::decimal::decimal64 { UINT64_C(1'186'692'254'751'600'333), - 19 - 17 }, // * z^27
-     }};
+    }};
+
+    static constexpr d64_coeffs_asymp_t d64_coeffs_asymp =
+    {{
+         // N[Series[Gamma[x] Sqrt[x], {x, Infinity, 14}], 19]
+         +::boost::decimal::decimal64 { UINT64_C(2506628274631000502), - 19 + 1  },
+         +::boost::decimal::decimal64 { UINT64_C(2088856895525833752), - 19 - 0  }, // / x
+         +::boost::decimal::decimal64 { UINT64_C(8703570398024307300), - 19 - 2  }, // / x^2
+         -::boost::decimal::decimal64 { UINT64_C(6721090474029881748), - 19 - 2  }, // / x^3
+         -::boost::decimal::decimal64 { UINT64_C(5752012381101712348), - 19 - 3  }, // / x^4
+         +::boost::decimal::decimal64 { UINT64_C(1965294881583203064), - 19 - 2  }, // / x^5
+         +::boost::decimal::decimal64 { UINT64_C(1747825212045591212), - 19 - 3  }, // / x^6
+         -::boost::decimal::decimal64 { UINT64_C(1484341135158276145), - 19 - 2  }, // / x^7
+         -::boost::decimal::decimal64 { UINT64_C(1296375732112554321), - 19 - 3  }, // / x^8
+         +::boost::decimal::decimal64 { UINT64_C(2104311229753206373), - 19 - 2  }, // / x^9
+         +::boost::decimal::decimal64 { UINT64_C(1805999456555504364), - 19 - 3  }, // / x^10
+         -::boost::decimal::decimal64 { UINT64_C(4798785670546346063), - 19 - 2  }, // / x^11
+         -::boost::decimal::decimal64 { UINT64_C(4073678593815251825), - 19 - 3  }, // / x^12
+         +::boost::decimal::decimal64 { UINT64_C(1605085033194459600), - 19 - 1  }, // / x^13
+         +::boost::decimal::decimal64 { UINT64_C(1353992280159094113), - 19 - 2  }, // / x^14
+    }};
 
     static constexpr d128_coeffs_t d128_coeffs =
     {{
@@ -128,19 +163,54 @@ public:
          +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(61514934723438),  UINT64_C(5918930041313493498)  }, -68 },   // * z^43
          +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(251487992814431), UINT64_C(6680121266003781724)  }, -68 },   // * z^44
          -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(289879709778175), UINT64_C(4432551928123929090)  }, -69 },   // * z^45
-     }};
+    }};
+
+    static constexpr d128_coeffs_asymp_t d128_coeffs_asymp =
+    {{
+        // N[Series[Gamma[x] Sqrt[x], {x, Infinity, 29}], 36]
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(135884591048426), UINT64_C(2199768757482254624)  }, -33 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(113237159207021), UINT64_C(14130970013708246594) }, -34 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(471821496695924), UINT64_C(464352157037447386)   }, -36 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(364351044670741), UINT64_C(6097570099755222654)  }, -36 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(311817215987699), UINT64_C(14568946901511994136) }, -37 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(106538849009357), UINT64_C(10090636838411945598) }, -36 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(94749794601238),  UINT64_C(6866971493329372072)  }, -37 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(80466294172410),  UINT64_C(2547924282344488810)  }, -36 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(70276669255695),  UINT64_C(16334355597894868319) }, -37 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(114074940344203), UINT64_C(9044723431924593842)  }, -36 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(97903426715255),  UINT64_C(16799883086492113070) }, -37 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(260142692464932), UINT64_C(15263500517507471568) }, -36 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(220834559071109), UINT64_C(9975868582270637886)  }, -37 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(87011834000670),  UINT64_C(1012280154922930780)  }, -35 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(73400068583854),  UINT64_C(10697903424322046536) }, -36 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(401238402683293), UINT64_C(16385890397153029532) }, -35 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(337230714209057), UINT64_C(16967592325356259778) }, -36 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(243967353836524), UINT64_C(9499344852909361366)  }, -34 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(204589376322286), UINT64_C(11872292347365127784) }, -35 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(189124322379112), UINT64_C(14090568112327257998) }, -33 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(158368431339348), UINT64_C(2168574764773383622)  }, -34 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(182057977444481), UINT64_C(3733389993208297254)  }, -32 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(152300056275284), UINT64_C(17612360680536377126) }, -33 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(213068958411016), UINT64_C(2976936113300142334)  }, -31 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(178115660634938), UINT64_C(17553310597074079872) }, -32 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(297934512372623), UINT64_C(8697957613905306402)  }, -30 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(248927979034058), UINT64_C(1995178765856766712)  }, -31 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(490558583154992), UINT64_C(14703601007071441008) }, -29 },
+        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(409702547605069), UINT64_C(12211101634789053596) }, -30 },
+        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(93943319594850),  UINT64_C(9012698938647704180)  }, -27 },
+    }};
+
 };
 
 #if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
 
-template <bool b>
-constexpr std::array<decimal32, 15> tgamma_table_imp<b>::d32_coeffs;
+template <bool b> constexpr typename tgamma_table_imp<b>::d32_coeffs_t  tgamma_table_imp<b>::d32_coeffs;
+template <bool b> constexpr typename tgamma_table_imp<b>::d64_coeffs_t  tgamma_table_imp<b>::d64_coeffs;
+template <bool b> constexpr typename tgamma_table_imp<b>::d128_coeffs_t tgamma_table_imp<b>::d128_coeffs;
 
-template <bool b>
-constexpr std::array<decimal64, 36> tgamma_table_imp<b>::d64_coeffs;
-
-template <bool b>
-constexpr std::array<decimal128, 44> tgamma_table_imp<b>::d128_coeffs;
+template <bool b> constexpr typename tgamma_table_imp<b>::d32_coeffs_asymp_t  tgamma_table_imp<b>::d32_coeffs_asymp;
+template <bool b> constexpr typename tgamma_table_imp<b>::d64_coeffs_asymp_t  tgamma_table_imp<b>::d64_coeffs_asymp;
+template <bool b> constexpr typename tgamma_table_imp<b>::d128_coeffs_asymp_t tgamma_table_imp<b>::d128_coeffs_asymp;
 
 #endif
 
@@ -167,6 +237,27 @@ template <>
 constexpr auto tgamma_series_expansion<decimal128>(decimal128 z) noexcept
 {
     return taylor_series_result(z, tgamma_table::d128_coeffs);
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto tgamma_series_expansion_asymp(T z) noexcept;
+
+template <>
+constexpr auto tgamma_series_expansion_asymp<decimal32>(decimal32 z) noexcept
+{
+    return taylor_series_result(z, tgamma_table::d32_coeffs_asymp);
+}
+
+template <>
+constexpr auto tgamma_series_expansion_asymp<decimal64>(decimal64 z) noexcept
+{
+    return taylor_series_result(z, tgamma_table::d64_coeffs_asymp);
+}
+
+template <>
+constexpr auto tgamma_series_expansion_asymp<decimal128>(decimal128 z) noexcept
+{
+    return taylor_series_result(z, tgamma_table::d128_coeffs_asymp);
 }
 
 } //namespace detail

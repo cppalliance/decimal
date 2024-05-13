@@ -79,35 +79,31 @@ constexpr auto tgamma_impl(T x) noexcept
             }
             else
             {
-                const auto x_is_gt_one = (x > one);
-
-                auto r = one;
-
-                auto z = x;
-
-                if (x_is_gt_one)
+                if (x < T { 1, 1 })
                 {
-                    // Use scaling for arguments greater than one.
-                    // TODO(ckormanyos) The work of upscaling can become excessive for large argument.
-                    // TODO(ckormanyos) For large argument (above a cutoff) use asymptotic expansion.
+                    T r { 1 };
+
+                    T z { x };
+
+                    // Use small-argument Taylor series expansion
+                    // (with scaling for arguments greater than one).
 
                     for(auto k = 1; k <= nx; ++k)
                     {
-                        r = r * (z - k);
+                        r *= (z - k);
                     }
 
-                    z = z - nx;
+                    z -= nx;
+
+                    result = r / (z * fma(detail::tgamma_series_expansion(z), z, one));
                 }
-
-                result = detail::tgamma_series_expansion(z);
-                result = one / (z * fma(result, z, one));
-
-                if (x_is_gt_one)
+                else
                 {
-                    // Downscale: From above, when scaling for arguments greater than one.
-                    // TODO(ckormanyos) See related notes above regarding scaling for large argument.
+                    // Use large-argument asymptotic expansion.
 
-                    result *= r;
+                    const T prefix { exp(-x) * pow(x, x - T { 5, -1 }) };
+
+                    result =  prefix * detail::tgamma_series_expansion_asymp(one / x);
                 }
             }
         }
