@@ -7,9 +7,10 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_LOG10_HPP
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
-#include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/cmath/impl/log_impl.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/numbers.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -26,18 +27,102 @@ template <typename T>
 constexpr auto log10_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    // TODO(ckormanyos) Actually this is eintirely preliminary. The implementation
-    // of log10 will/should-be entirely re-worked with specific base-10-relevant details.
+    constexpr T zero { 0, 0 };
+    constexpr T one  { 1, 0 };
 
-    // TODO(ckormanyos) Handle non-normal varguments.
+    T result { };
 
-    // TODO(ckormanyos) Put in a basic check for pure powers of 10, resulting
-    // in an exact result.
+    const auto fpc = fpclassify(x);
 
-    return log(x) / numbers::ln10_v<T>;
+    if (fpc == FP_ZERO)
+    {
+        result = -std::numeric_limits<T>::infinity();
+    }
+    else if (signbit(x) || (fpc == FP_NAN))
+    {
+        result = std::numeric_limits<T>::quiet_NaN();
+    }
+    else if (fpc == FP_INFINITE)
+    {
+        result = std::numeric_limits<T>::infinity();
+    }
+    else
+    {
+        int exp10val { };
+
+        const auto gn { frexp10(x, &exp10val) };
+
+        const auto
+            zeros_removal
+            {
+                remove_trailing_zeros(gn)
+            };
+
+        const bool is_pure { static_cast<unsigned>(zeros_removal.trimmed_number) == 1U };
+
+        if(is_pure)
+        {
+            // Here, a pure power-of-10 argument gets a pure integral result.
+            const int p10 { exp10val + static_cast<int>(zeros_removal.number_of_removed_zeros) };
+
+            result = T { p10 };
+        }
+        else
+        {
+            if (x < one)
+            {
+                // Handle reflection.
+                result = -log10(one / x);
+            }
+            else if(x > one)
+            {
+                // The algorithm for base-10 logarithm is based on Chapter 5,
+                // pages 35-36 of Cody and Waite, "Software Manual for the
+                // Elementary Functions", Prentice Hall, 1980.
+
+                // In this implementation, however, we use 2s (as for natural
+                // logarithm in Cody and Waite) even though we are computing
+                // the base-10 logarithm.
+
+                T g { gn, -std::numeric_limits<T>::digits10 };
+
+                exp10val += std::numeric_limits<T>::digits10;
+
+                int reduce_sqrt2 { };
+
+                while (g < numbers::inv_sqrt2_v<T>)
+                {
+                    g += g;
+
+                    ++reduce_sqrt2;
+                }
+
+                const T s   { (g - one) / (g + one) };
+                const T z   { s + s };
+                const T zsq { z * z };
+
+                result = z * fma(detail::log_series_expansion(zsq), zsq, one);
+
+                result /= numbers::ln10_v<T>;
+
+                for(int i = 0; i < reduce_sqrt2; ++i)
+                {
+                    result -= numbers::log10_2_v<T>;
+                }
+
+                result += static_cast<T>(exp10val);
+            }
+            else
+            {
+                result = zero;
+            }
+        }
+    }
+
+    return result;
 }
 
-} // namespace detail
+} //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto log10(T x) noexcept

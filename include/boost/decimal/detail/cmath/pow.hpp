@@ -123,27 +123,52 @@ constexpr auto pow(T b, IntegralType p) noexcept
         {
             result = one;
         }
-        else BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<local_integral_type>::value)
+        else
         {
-            if(p < static_cast<local_integral_type>(UINT8_C(0)))
-            {
-                const auto up =
-                    static_cast<local_unsigned_integral_type>
-                    (
-                          static_cast<local_unsigned_integral_type>(~p)
-                        + static_cast<local_unsigned_integral_type>(UINT8_C(1))
-                    );
+            int exp10val { };
 
-                result = one / detail::pow_n_impl(b, up);
+            const auto bn { frexp10(b, &exp10val) };
+
+            const auto
+                zeros_removal
+                {
+                    detail::remove_trailing_zeros(bn)
+                };
+
+            const bool is_pure { static_cast<int>(zeros_removal.trimmed_number) == 1 };
+
+            if(is_pure)
+            {
+                // Here, a pure power-of-10 argument (b) gets a pure integral result.
+                const int log10_val { exp10val + static_cast<int>(zeros_removal.number_of_removed_zeros) };
+
+                result = T { 1, static_cast<int>(log10_val * static_cast<int>(p)) };
             }
             else
             {
-                result = detail::pow_n_impl(b, static_cast<local_unsigned_integral_type>(p));
+                BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<local_integral_type>::value)
+                {
+                    if(p < static_cast<local_integral_type>(UINT8_C(0)))
+                    {
+                        const auto up =
+                            static_cast<local_unsigned_integral_type>
+                            (
+                                  static_cast<local_unsigned_integral_type>(~p)
+                                + static_cast<local_unsigned_integral_type>(UINT8_C(1))
+                            );
+
+                        result = one / detail::pow_n_impl(b, up);
+                    }
+                    else
+                    {
+                        result = detail::pow_n_impl(b, static_cast<local_unsigned_integral_type>(p));
+                    }
+                }
+                else
+                {
+                    result = detail::pow_n_impl(b, static_cast<local_unsigned_integral_type>(p));
+                }
             }
-        }
-        else
-        {
-            result = detail::pow_n_impl(b, static_cast<local_unsigned_integral_type>(p));
         }
     }
 

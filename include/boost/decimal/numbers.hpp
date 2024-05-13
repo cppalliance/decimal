@@ -39,6 +39,13 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION decimal128 log10e_v<decimal128> 
                                                                                                              UINT64_C(2047877485384264674)}, -34};
 
 BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
+BOOST_DECIMAL_CONSTEXPR_VARIABLE Dec log10_2_v = Dec{UINT64_C(3010299956639811952), -19};
+
+BOOST_DECIMAL_EXPORT template <>
+BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION decimal128 log10_2_v<decimal128> = decimal128{detail::uint128{UINT64_C(163188687641095),
+                                                                                                              UINT64_C(3612628795761985410)}, -34};
+
+BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 BOOST_DECIMAL_CONSTEXPR_VARIABLE Dec pi_v = Dec{UINT64_C(3141592653589793238), -18};
 
 BOOST_DECIMAL_EXPORT template <>
@@ -127,8 +134,9 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION decimal128 phi_v<decimal128> = d
                                                                                                           UINT64_C(2061523135646567614)}, -33};
 
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto e {e_v<decimal64>};
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto log2e {log2e_v<decimal64>};
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto log10_2 {log10_2_v<decimal64>};
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto log10e {log10e_v<decimal64>};
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto log2e {log2e_v<decimal64>};
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto pi {pi_v<decimal64>};
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto inv_pi {inv_pi_v<decimal64>};
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto inv_sqrtpi {inv_sqrtpi_v<decimal64>};

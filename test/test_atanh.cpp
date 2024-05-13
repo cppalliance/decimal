@@ -56,7 +56,7 @@ namespace local
 
     if(b == static_cast<NumericType>(0))
     {
-      result_is_ok = (fabs(a - b) < tol);
+      result_is_ok = (fabs(a - b) < tol); // LCOV_EXCL_LINE
     }
     else
     {

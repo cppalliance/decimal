@@ -40,8 +40,13 @@ constexpr auto remove_trailing_zeros(std::uint32_t n) noexcept -> remove_trailin
 {
     std::size_t s {};
 
-    auto r = rotr<32>(n * UINT32_C(184254097), 4);
-    auto b = r < UINT32_C(429497);
+    auto r = rotr<32>(n * UINT32_C(15273505), 8);
+    auto b = r < UINT32_C(43);
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<32>(n * UINT32_C(184254097), 4);
+    b = r < UINT32_C(429497);
     s = s * 2U + static_cast<std::size_t>(b);
     n = b ? r : n;
 
@@ -62,8 +67,13 @@ constexpr auto remove_trailing_zeros(std::uint64_t n) noexcept -> remove_trailin
 {
     std::size_t s {};
 
-    auto r = rotr<64>(n * UINT64_C(28999941890838049), 8);
-    auto b = r < UINT64_C(184467440738);
+    auto r = rotr<64>(n * UINT64_C(230079197716545), 16);
+    auto b = r < UINT64_C(1845);
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<64>(n * UINT64_C(28999941890838049), 8);
+    b = r < UINT64_C(184467440738);
     s = s * 2U + static_cast<std::size_t>(b);
     n = b ? r : n;
 
@@ -85,22 +95,39 @@ constexpr auto remove_trailing_zeros(std::uint64_t n) noexcept -> remove_trailin
     return {n, s};
 }
 
-// TODO(mborland): Make this better for the 2-word case
 constexpr auto remove_trailing_zeros(uint128 n) noexcept -> remove_trailing_zeros_return<uint128>
 {
-    if (n.high == UINT64_C(0))
-    {
-        const auto temp {remove_trailing_zeros(n.low)};
-        return {static_cast<uint128>(temp.trimmed_number), temp.number_of_removed_zeros};
-    }
-
     std::size_t s {};
 
-    while (n % 10 == 0)
-    {
-        n /= 10;
-        ++s;
-    }
+    auto r = rotr<128>(n * uint128(UINT64_C(0x62B42691AD836EB1), UINT64_C(0x16590F420A835081)), 32);
+    auto b = r < uint128 {UINT64_C(0x0), UINT64_C(0x33EC48)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<128>(n * uint128 {UINT64_C(0x3275305C1066), UINT64_C(0xE4A4D1417CD9A041)}, 16);
+    b = r < uint128 {UINT64_C(0x734), UINT64_C(0xACA5F6226F0ADA62)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<128>(n * uint128 {UINT64_C(0x6B7213EE9F5A78), UINT64_C(0xC767074B22E90E21)}, 8);
+    b = r < uint128 {UINT64_C(0x2AF31DC461), UINT64_C(0x1873BF3F70834ACE)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<128>(n * uint128 {UINT64_C(0x95182A9930BE0DE), UINT64_C(0xD288CE703AFB7E91)}, 4);
+    b = r < uint128 {UINT64_C(0x68DB8BAC710CB), UINT64_C(0x295E9E1B089A0276)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<128>(n * uint128 {UINT64_C(0x28F5C28F5C28F5C2), UINT64_C(0x8F5C28F5C28F5C29)}, 2);
+    b = r < uint128 {UINT64_C(0x28F5C28F5C28F5C), UINT64_C(0x28F5C28F5C28F5C3)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
+
+    r = rotr<128>(n * uint128 {UINT64_C(0xCCCCCCCCCCCCCCCC), UINT64_C(0xCCCCCCCCCCCCCCCD)}, 1);
+    b = r < uint128 {UINT64_C(0x1999999999999999), UINT64_C(0x999999999999999A)};
+    s = s * 2U + static_cast<std::size_t>(b);
+    n = b ? r : n;
 
     return {n, s};
 }
