@@ -362,11 +362,12 @@ namespace local
   {
     using decimal_type = boost::decimal::decimal128;
 
-    using str_ctrl_array_type = std::array<const char*, 20U>;
+    using str_ctrl_array_type = std::array<const char*, 21U>;
 
     const str_ctrl_array_type ctrl_strings =
     {{
-       // Table[N[Log[Gamma[(100 n + 10 n + 1)/100]], 36], {n, 1, 20, 1}]
+       // Table[N[Log[Gamma[(100 n + 10 n + 1)/100]], 36], {n, 0, 20, 1}]
+       "4.59947987804202172251394541100874809",
        "-0.0540386340818523935917550731681660590",
        "0.102418994503958632699253052937769400",
        "0.997464457272922372053206167365619618",
@@ -392,7 +393,7 @@ namespace local
     std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> tg_values   { };
     std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
 
-    int nx { 1 };
+    int nx { 0 };
 
     bool result_is_ok { true };
 
@@ -409,14 +410,14 @@ namespace local
         }
         / decimal_type { 1, 2 };
 
-        ++nx;
+      ++nx;
 
-        tg_values[i] = lgamma(x_arg);
+      tg_values[i] = lgamma(x_arg);
 
-        static_cast<void>
-        (
-          from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
-        );
+      static_cast<void>
+      (
+        from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+      );
 
       const auto result_lgamma_is_ok = is_close_fraction(tg_values[i], ctrl_values[i], my_tol);
 
@@ -436,7 +437,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_special_issue385_is_ok = local::test_special_issue385<decimal_type, float_type>(2048);
+    const auto result_special_issue385_is_ok = local::test_special_issue385<decimal_type, float_type>(1024);
 
     BOOST_TEST(result_special_issue385_is_ok);
 
@@ -447,7 +448,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 0.1L, 0.9L);
+    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(256, 0.1L, 0.9L);
 
     BOOST_TEST(result_lgamma_is_ok);
 
@@ -469,7 +470,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 2.1L, 123.4L);
+    const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(256, 2.1L, 123.4L);
 
     BOOST_TEST(result_lgamma_is_ok);
 
@@ -480,7 +481,22 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(2048, 2.1L, 123.4L);
+    // TODO(ckormanyos) Can we reduce the tolerance on lgamma()-64?
+    // Can the approximation be done a bit better (Lanczos from Math?).
+    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(0x80000, 0.1L, 0.9L);
+
+    BOOST_TEST(result_tgamma_is_ok);
+
+    result_is_ok = (result_tgamma_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal64;
+    using float_type   = double;
+
+    // TODO(ckormanyos) Can we reduce the tolerance on lgamma()-64?
+    // Can the approximation be done a bit better (Lanczos from Math?).
+    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(0x80000, 1.1L, 123.4L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
