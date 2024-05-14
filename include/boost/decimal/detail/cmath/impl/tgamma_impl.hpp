@@ -28,7 +28,7 @@ struct tgamma_table_imp
     using d64_coeffs_t  = std::array<decimal64,  36>;
     using d128_coeffs_t = std::array<decimal128, 45>;
 
-    using d32_coeffs_asymp_t  = std::array<decimal32,   8>;
+    using d32_coeffs_asymp_t  = std::array<decimal32,  10>;
     using d64_coeffs_asymp_t  = std::array<decimal64,  15>;
     using d128_coeffs_asymp_t = std::array<decimal128, 30>;
 
@@ -63,6 +63,8 @@ struct tgamma_table_imp
         +::boost::decimal::decimal32 { UINT64_C(1965294881583203064), - 19 - 2 }, // / x^5
         +::boost::decimal::decimal32 { UINT64_C(1747825212045591212), - 19 - 3 }, // / x^6
         -::boost::decimal::decimal32 { UINT64_C(1484341135158276145), - 19 - 2 }, // / x^7
+        -::boost::decimal::decimal32 { UINT64_C(1296375732112554321), - 19 - 3 }, // / x^8
+        +::boost::decimal::decimal32 { UINT64_C(2104311229753206373), - 19 - 2 }, // / x^9
     }};
 
     static constexpr d64_coeffs_t d64_coeffs =

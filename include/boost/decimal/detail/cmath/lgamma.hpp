@@ -76,8 +76,8 @@ constexpr auto lgamma_impl(T x) noexcept
         {
             constexpr int asymp_cutoff
             {
-                  std::numeric_limits<T>::digits10 < 10 ? T { 1, 1 }
-                : std::numeric_limits<T>::digits10 < 20 ? T { 3, 1 }
+                  std::numeric_limits<T>::digits10 < 10 ? T { 2, 1 }
+                : std::numeric_limits<T>::digits10 < 20 ? T { 5, 1 }
                 :                                         T { 1, 2 }
             };
 
@@ -88,7 +88,7 @@ constexpr auto lgamma_impl(T x) noexcept
                 result =   (x * fma(detail::lgamma_taylor_series_expansion(x), x, -numbers::egamma_v<T>))
                          - log(x);
             }
-            else if (x < asymp_cutoff)
+            else if (x < T { asymp_cutoff })
             {
                 result = log(tgamma(x));
             }
