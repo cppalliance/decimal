@@ -13,6 +13,75 @@
 namespace boost {
 namespace decimal {
 
+constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
+{
+    // First calculate x * y without rounding
+    constexpr decimal32 zero {0, 0};
+
+    const auto res {detail::check_non_finite(x, y)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    auto sig_lhs {x.full_significand()};
+    auto exp_lhs {x.biased_exponent()};
+    detail::normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {y.full_significand()};
+    auto exp_rhs {y.biased_exponent()};
+    detail::normalize(sig_rhs, exp_rhs);
+
+    auto mul_result {mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
+    const decimal32 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
+
+    const auto res_add {detail::check_non_finite(dec_result, z)};
+    if (res_add != zero)
+    {
+        return res_add;
+    }
+
+    bool lhs_bigger {dec_result > z};
+    if (dec_result.isneg() && z.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+    bool abs_lhs_bigger {abs(dec_result) > abs(z)};
+
+    // To avoid the rounding step we promote the constituent pieces to the next higher type
+    detail::decimal64_components promoted_mul_result {static_cast<std::uint64_t>(mul_result.sig),
+                                                      mul_result.exp, mul_result.sign};
+
+    detail::normalize<decimal64>(promoted_mul_result.sig, promoted_mul_result.exp);
+
+    auto sig_z {static_cast<std::uint64_t>(z.full_significand())};
+    auto exp_z {z.biased_exponent()};
+    detail::normalize<decimal64>(sig_z, exp_z);
+    detail::decimal64_components z_components {sig_z, exp_z, z.isneg()};
+
+    if (!lhs_bigger)
+    {
+        detail::swap(promoted_mul_result, z_components);
+        abs_lhs_bigger = !abs_lhs_bigger;
+    }
+
+    detail::decimal64_components result {};
+
+    if (!promoted_mul_result.sign && z_components.sign)
+    {
+        result = d64_sub_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+                              z_components.sig, z_components.exp, z_components.sign,
+                              abs_lhs_bigger);
+    }
+    else
+    {
+        result = d64_add_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+                              z_components.sig, z_components.exp, z_components.sign);
+    }
+
+    return {result.sig, result.exp, result.sign};
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
     return fmad32(x, y, z);
