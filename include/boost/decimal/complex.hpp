@@ -32,12 +32,6 @@ public:
     constexpr complex() noexcept = default;
     constexpr explicit complex(T real) noexcept : real_ {real}, imag_ {T{0}} {}
     constexpr complex(T real, T imag) noexcept : real_ {real}, imag_ {imag} {}
-    constexpr complex& operator=(const complex& rhs)
-    {
-        real_ = rhs.real_;
-        imag_ = rhs.imag_;
-        return *this;
-    }
 
     constexpr T real() const noexcept { return real_; }
     constexpr T imag() const noexcept { return imag_; }
