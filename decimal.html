@@ -673,6 +673,8 @@ pre.rouge .gs {
 <li><a href="#examples_promotion">Promotion</a></li>
 <li><a href="#examples_charconv">charconv</a></li>
 <li><a href="#examples_rounding_mode">Rounding Mode</a></li>
+<li><a href="#examples_generic_programming">Generic Programming</a></li>
+<li><a href="#examples_literals_and_constants">Literals and Constants</a></li>
 </ul>
 </li>
 <li><a href="#Benchmarks">Benchmarks</a>
@@ -2794,6 +2796,9 @@ In a standalone environment they do not exist.
 <div class="sect1">
 <h2 id="examples">Examples</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>All examples can be found in the library <code>examples/</code> folder as well.</p>
+</div>
 <div class="sect2">
 <h3 id="examples_construction_from_an_integer_and_exponent">Construction from an Integer and Exponent</h3>
 <div class="listingblock">
@@ -2853,13 +2858,14 @@ The representation is exact with integers whereas you may get surprising or unwa
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/decimal.hpp&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
 #include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
 </span>
 <span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="k">using</span> <span class="k">namespace</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="p">;</span>
 
-    <span class="n">decimal64</span> <span class="n">val</span> <span class="p">{</span><span class="mf">0.25</span><span class="p">};</span> <span class="c1">// Construction from a double (not recommended but allowed)</span>
+    <span class="n">decimal64</span> <span class="n">val</span> <span class="p">{</span><span class="mf">0.25</span><span class="p">};</span> <span class="c1">// Construction from a double (not recommended but explicit construction is allowed)</span>
 
     <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
     <span class="k">auto</span> <span class="n">r_to</span> <span class="o">=</span> <span class="n">to_chars</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">buffer</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
@@ -2868,8 +2874,12 @@ The representation is exact with integers whereas you may get surprising or unwa
 
     <span class="n">decimal64</span> <span class="n">return_value</span><span class="p">;</span>
     <span class="k">auto</span> <span class="n">r_from</span> <span class="o">=</span> <span class="n">from_chars</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">buffer</span> <span class="o">+</span> <span class="n">std</span><span class="o">::</span><span class="n">strlen</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span> <span class="n">return_value</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">r_from</span><span class="p">);</span>
 
     <span class="n">assert</span><span class="p">(</span><span class="n">val</span> <span class="o">==</span> <span class="n">return_value</span><span class="p">);</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">" Initial Value: "</span> <span class="o">&lt;&lt;</span> <span class="n">val</span> <span class="o">&lt;&lt;</span> <span class="sc">'\n'</span>
+              <span class="o">&lt;&lt;</span> <span class="s">"Returned Value: "</span> <span class="o">&lt;&lt;</span> <span class="n">return_value</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span></code></pre>
@@ -2887,9 +2897,82 @@ The representation is exact with integers whereas you may get surprising or unwa
 <span class="p">{</span>
     <span class="k">auto</span> <span class="n">default_rounding_mode</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">fegetround</span><span class="p">();</span> <span class="c1">// Default is fe_dec_to_nearest_from_zero</span>
 
-    <span class="k">auto</span> <span class="n">new_rounding_mode</span> <span class="o">=</span> <span class="n">fesetround</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">rounding_mode</span><span class="o">::</span><span class="n">fe_dec_to_nearest</span><span class="p">);</span>
+    <span class="k">auto</span> <span class="n">new_rounding_mode</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">fesetround</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">rounding_mode</span><span class="o">::</span><span class="n">fe_dec_to_nearest</span><span class="p">);</span>
 
     <span class="n">assert</span><span class="p">(</span><span class="n">default_rounding_mode</span> <span class="o">!=</span> <span class="n">new_rounding_mode</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="examples_generic_programming">Generic Programming</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/decimal.hpp&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;limits&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;cmath&gt;</span><span class="cp">
+</span>
+<span class="kt">int</span> <span class="n">error_counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span>
+<span class="kt">bool</span> <span class="nf">float_equal</span><span class="p">(</span><span class="n">T</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">T</span> <span class="n">rhs</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">fabs</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">fabs</span><span class="p">(</span><span class="n">lhs</span> <span class="o">-</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">epsilon</span><span class="p">();</span> <span class="c1">// numeric_limits is overloaded for all decimal types</span>
+<span class="p">}</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span>
+<span class="kt">void</span> <span class="nf">test</span><span class="p">(</span><span class="n">T</span> <span class="n">val</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">sin</span><span class="p">;</span> <span class="c1">// ADL allows builtin and decimal types to both be used</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">float_equal</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="o">-</span><span class="n">val</span><span class="p">)))</span> <span class="c1">// sin(x) == -sin(-x)</span>
+    <span class="p">{</span>
+        <span class="o">++</span><span class="n">error_counter</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">test</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="n">F</span><span class="p">);</span>
+    <span class="n">test</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">);</span>
+    <span class="n">test</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="n">L</span><span class="p">);</span>
+
+    <span class="n">test</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">true</span><span class="p">});</span>
+    <span class="n">test</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">true</span><span class="p">});</span>
+    <span class="n">test</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">true</span><span class="p">});</span>
+
+    <span class="k">return</span> <span class="n">error_counter</span><span class="p">;</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="examples_literals_and_constants">Literals and Constants</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/decimal.hpp&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span>
+<span class="kt">bool</span> <span class="nf">float_equal</span><span class="p">(</span><span class="n">T</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">T</span> <span class="n">rhs</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">fabs</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">fabs</span><span class="p">(</span><span class="n">lhs</span> <span class="o">-</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">epsilon</span><span class="p">();</span> <span class="c1">// numeric_limits is overloaded for all decimal types</span>
+<span class="p">}</span>
+
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="k">namespace</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="p">;</span>
+
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">pi_32</span> <span class="p">{</span><span class="s">"3.141592653589793238"</span><span class="n">_DF</span><span class="p">};</span>
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">pi_64</span> <span class="p">{</span><span class="s">"3.141592653589793238"</span><span class="n">_DD</span><span class="p">};</span>
+
+    <span class="n">assert</span><span class="p">(</span><span class="n">float_equal</span><span class="p">(</span><span class="n">pi_32</span><span class="p">,</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">(</span><span class="n">pi_64</span><span class="p">)));</span> <span class="c1">// Explicit conversion between decimal types</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">float_equal</span><span class="p">(</span><span class="n">pi_32</span><span class="p">,</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">numbers</span><span class="o">::</span><span class="n">pi_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">));</span> <span class="c1">// Constants available in numbers namespace</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">float_equal</span><span class="p">(</span><span class="n">pi_64</span><span class="p">,</span> <span class="n">numbers</span><span class="o">::</span><span class="n">pi</span><span class="p">));</span> <span class="c1">// Default constant type is decimal64</span>
 
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span></code></pre>
@@ -2929,7 +3012,7 @@ An example on Linux with b2: <code>../../../b2 cxxstd=20 toolset=gcc-13 define=B
 <div class="sect2">
 <h3 id="benchmarks_comparisons">Comparisons</h3>
 <div class="paragraph">
-<p>The benchmark for comparisons generates a random vector containing 2,000,000 elements and does operations <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&#8656;</code>, <code>==</code>, and <code>!=</code> between <code>vec[i] and vec[i + 1]</code>.
+<p>The benchmark for comparisons generates a random vector containing 2,000,000 elements and does operations <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>==</code>, and <code>!=</code> between <code>vec[i] and vec[i + 1]</code>.
 This is repeated 5 times to generate stable results.</p>
 </div>
 <div class="sect3">
@@ -2951,28 +3034,28 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">9032</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.589</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8764</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.577</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5684</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5559</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">285,453</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">50.2204</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">276,124</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">49.672</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">352,644</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">62.042</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">355,999</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64.760</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">15,355,817</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2701.590</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">989,028</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">177.915</p></td>
 </tr>
 </tbody>
 </table>
@@ -3005,28 +3088,28 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1641</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.965</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2113</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.739</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1708</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2860</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">378,252</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">221.459</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">353,836</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">123.719</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">589,313</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">345.031</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">409,098</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">143.041</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">13,829,995</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8097.190</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,418,039</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">845.468</p></td>
 </tr>
 </tbody>
 </table>
@@ -3047,28 +3130,28 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3633</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2.221</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1782</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.061</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1636</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1680</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">307,765</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">188.120</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">293,927</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">174.957</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">461,442</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">282.055</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">329,425</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">196.086</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">11,449,306</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">6998.350</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,527,261</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">909.084</p></td>
 </tr>
 </tbody>
 </table>
@@ -3089,28 +3172,28 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1678</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.523</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1691</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.979</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3209</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1728</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">310,543</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">96.773</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">309,117</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">178.887</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">570,938</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">177.918</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">408,010</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">236.117</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">9,434,297</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2939.95</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,506,105</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1450.292</p></td>
 </tr>
 </tbody>
 </table>
@@ -3131,28 +3214,28 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2019</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.565</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2058</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.846</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3572</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2434</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">322,116</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">90.178</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">304,852</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">125.247</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">734,173</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">205.536</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">519,990</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">213.636</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">14,592,284</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">4085.19</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,534,909</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1452.304</p></td>
 </tr>
 </tbody>
 </table>
@@ -3186,28 +3269,28 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1904</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.565</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2021</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.626</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3746</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3229</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5,050,241</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1341.72</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,826,066</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1494.601</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">12,084,821</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3210.630</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7,780,637</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2409.612</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">275,779,340</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">73267.60</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100,269,145</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">31052.693</p></td>
 </tr>
 </tbody>
 </table>
@@ -3568,7 +3651,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-04-25 11:42:41 +0200
+Last updated 2024-04-26 11:04:32 +0200
 </div>
 </div>
 <style>
