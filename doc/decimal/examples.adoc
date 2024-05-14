@@ -8,6 +8,8 @@ https://www.boost.org/LICENSE_1_0.txt
 = Examples
 :idprefix: examples_
 
+All examples can be found in the library `examples/` folder as well.
+
 == Construction from an Integer and Exponent
 
 [source, c++]
@@ -64,13 +66,14 @@ int main()
 [source, c++]
 ----
 #include <boost/decimal.hpp>
+#include <iostream>
 #include <cassert>
 
 int main()
 {
     using namespace boost::decimal;
 
-    decimal64 val {0.25}; // Construction from a double (not recommended but allowed)
+    decimal64 val {0.25}; // Construction from a double (not recommended but explicit construction is allowed)
 
     char buffer[256];
     auto r_to = to_chars(buffer, buffer + sizeof(buffer) - 1, val);
@@ -79,8 +82,12 @@ int main()
 
     decimal64 return_value;
     auto r_from = from_chars(buffer, buffer + std::strlen(buffer), return_value);
+    assert(r_from);
 
     assert(val == return_value);
+
+    std::cout << " Initial Value: " << val << '\n'
+              << "Returned Value: " << return_value << std::endl;
 
     return 0;
 }

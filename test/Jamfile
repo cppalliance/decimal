@@ -126,4 +126,5 @@ run test_type_traits.cpp ;
 
 # Examples
 run ../examples/basic_construction.cpp ;
+run ../examples/charconv.cpp ;
 run ../examples/rounding_mode.cpp ;
