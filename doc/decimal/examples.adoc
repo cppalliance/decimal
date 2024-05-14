@@ -8,6 +8,8 @@ https://www.boost.org/LICENSE_1_0.txt
 = Examples
 :idprefix: examples_
 
+All examples can be found in the library `examples/` folder as well.
+
 == Construction from an Integer and Exponent
 
 [source, c++]
@@ -64,13 +66,14 @@ int main()
 [source, c++]
 ----
 #include <boost/decimal.hpp>
+#include <iostream>
 #include <cassert>
 
 int main()
 {
     using namespace boost::decimal;
 
-    decimal64 val {0.25}; // Construction from a double (not recommended but allowed)
+    decimal64 val {0.25}; // Construction from a double (not recommended but explicit construction is allowed)
 
     char buffer[256];
     auto r_to = to_chars(buffer, buffer + sizeof(buffer) - 1, val);
@@ -79,8 +82,12 @@ int main()
 
     decimal64 return_value;
     auto r_from = from_chars(buffer, buffer + std::strlen(buffer), return_value);
+    assert(r_from);
 
     assert(val == return_value);
+
+    std::cout << " Initial Value: " << val << '\n'
+              << "Returned Value: " << return_value << std::endl;
 
     return 0;
 }
@@ -96,9 +103,78 @@ int main()
 {
     auto default_rounding_mode = boost::decimal::fegetround(); // Default is fe_dec_to_nearest_from_zero
 
-    auto new_rounding_mode = fesetround(boost::decimal::rounding_mode::fe_dec_to_nearest);
+    auto new_rounding_mode = boost::decimal::fesetround(boost::decimal::rounding_mode::fe_dec_to_nearest);
 
     assert(default_rounding_mode != new_rounding_mode);
+
+    return 0;
+}
+----
+
+== Generic Programming
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <limits>
+#include <cmath>
+
+int error_counter = 0;
+
+template <typename T>
+bool float_equal(T lhs, T rhs)
+{
+    using std::fabs;
+    return fabs(lhs - rhs) < std::numeric_limits<T>::epsilon(); // numeric_limits is overloaded for all decimal types
+}
+
+template <typename T>
+void test(T val)
+{
+    using std::sin; // ADL allows builtin and decimal types to both be used
+    if (!float_equal(sin(val), -sin(-val))) // sin(x) == -sin(-x)
+    {
+        ++error_counter;
+    }
+}
+
+int main()
+{
+    test(-0.5F);
+    test(-0.5);
+    test(-0.5L);
+
+    test(boost::decimal::decimal32{5, -1, true});
+    test(boost::decimal::decimal64{5, -1, true});
+    test(boost::decimal::decimal128{5, -1, true});
+
+    return error_counter;
+}
+----
+
+== Literals and Constants
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <cassert>
+
+template <typename T>
+bool float_equal(T lhs, T rhs)
+{
+    using std::fabs;
+    return fabs(lhs - rhs) < std::numeric_limits<T>::epsilon(); // numeric_limits is overloaded for all decimal types
+}
+
+
+int main()
+{
+    using namespace boost::decimal;
+
+    const auto pi_32 {"3.141592653589793238"_DF};
+    const auto pi_64 {"3.141592653589793238"_DD};
+
+    assert(float_equal(pi_32, static_cast<decimal32>(pi_64))); // Explicit conversion between decimal types
+    assert(float_equal(pi_32, boost::decimal::numbers::pi_v<decimal32>)); // Constants available in numbers namespace
+    assert(float_equal(pi_64, numbers::pi)); // Default constant type is decimal64
 
     return 0;
 }
