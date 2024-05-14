@@ -3,6 +3,33 @@
 // https://www.boost.org/LICENSE_1_0.txt
 
 #include <boost/decimal.hpp>
+
+// Propogates up from boost.math
+#define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wold-style-cast"
+#  pragma clang diagnostic ignored "-Wundef"
+#  pragma clang diagnostic ignored "-Wconversion"
+#  pragma clang diagnostic ignored "-Wsign-conversion"
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#  pragma clang diagnostic ignored "-Wfloat-conversion"
+
+#  if (__clang_major__ >= 10 && !defined(__APPLE__)) || __clang_major__ >= 13
+#    pragma clang diagnostic ignored "-Wdeprecated-copy"
+#  endif
+
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wundef"
+#  pragma GCC diagnostic ignored "-Wconversion"
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#  pragma GCC diagnostic ignored "-Wfloat-conversion"
+#endif
+
 #include <boost/math/constants/constants.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <limits>
