@@ -1536,7 +1536,7 @@ constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     while (delta_exp > 1)
     {
-        rhs_sig /= detail::pow10(static_cast<detail::uint128>(delta_exp - 1));
+        sig_smaller /= detail::pow10(static_cast<detail::uint128>(delta_exp - 1));
         delta_exp = 1;
     }
 
