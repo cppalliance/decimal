@@ -166,6 +166,53 @@ constexpr auto num_digits(std::uint64_t x) noexcept -> int
 # pragma warning(disable: 4307) // MSVC 14.1 warns of intergral constant overflow
 #endif
 
+#if defined(__cpp_lib_array_constexpr) && __cpp_lib_array_constexpr >= 201603L
+
+template <typename T, std::size_t N>
+constexpr auto generate_array() noexcept -> std::array<T, N>
+{
+    std::array<T, N> values {};
+
+    values[0] = 1;
+    for (std::size_t i {1}; i < N; ++i)
+    {
+        values[i] = values[i - 1] * 10;
+    }
+
+    return values;
+}
+
+constexpr int num_digits(uint128 x) noexcept
+{
+    constexpr auto powers_of_10 = generate_array<boost::decimal::detail::uint128, 39>();
+
+    if (x == 0)
+    {
+        return 1;
+    }
+
+    std::uint32_t left = 0U;
+    std::uint32_t right = 38U;
+
+    while (left < right)
+    {
+        std::uint32_t mid = (left + right + 1U) / 2U;
+
+        if (x >= powers_of_10[mid])
+        {
+            left = mid;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+
+    return static_cast<int>(left + 1);
+}
+
+#else
+
 constexpr int num_digits(uint128 x) noexcept
 {
     if (x.high == 0)
@@ -189,6 +236,8 @@ constexpr int num_digits(uint128 x) noexcept
 
     return 1;
 }
+
+#endif // Constexpr array
 
 constexpr int num_digits(const uint256_t& x) noexcept
 {
@@ -225,34 +274,21 @@ constexpr int num_digits(const uint256_t& x) noexcept
 
 #if defined(__cpp_lib_array_constexpr) && __cpp_lib_array_constexpr >= 201603L
 
-constexpr auto generate_builtin_128_array() noexcept -> std::array<boost::decimal::detail::uint128_t, 39>
-{
-    std::array<boost::decimal::detail::uint128_t, 39> values {};
-
-    values[0] = 1;
-    for (std::size_t i {1}; i < 39; ++i)
-    {
-        values[i] = values[i - 1] * 10;
-    }
-
-    return values;
-}
-
 constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
 {
-    constexpr auto powers_of_10 = generate_builtin_128_array();
+    constexpr auto powers_of_10 = generate_array<boost::decimal::detail::uint128_t, 39>();
 
     if (x == 0)
     {
         return 1;
     }
 
-    std::uint32_t left = 0;
-    std::uint32_t right = 38;
+    std::uint32_t left = 0U;
+    std::uint32_t right = 38U;
 
     while (left < right)
     {
-        std::uint32_t mid = (left + right + 1) / 2;
+        std::uint32_t mid = (left + right + 1U) / 2U;
 
         if (x >= powers_of_10[mid])
         {
