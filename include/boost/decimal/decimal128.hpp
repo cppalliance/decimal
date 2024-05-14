@@ -1459,12 +1459,9 @@ constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (delta_exp <= 3)
     {
-        while (delta_exp > 0)
-        {
-            lhs_sig *= 10;
-            --delta_exp;
-            --lhs_exp;
-        }
+        lhs_sig *= detail::pow10(static_cast<detail::uint128>(delta_exp));
+        lhs_exp -= delta_exp;
+        delta_exp = 0;
     }
     else
     {
@@ -1475,8 +1472,8 @@ constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     while (delta_exp > 1)
     {
-        rhs_sig /= 10;
-        --delta_exp;
+        rhs_sig /= detail::pow10(static_cast<detail::uint128>(delta_exp - 1));
+        delta_exp = 1;
     }
 
     if (delta_exp == 1)
