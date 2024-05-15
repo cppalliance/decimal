@@ -19,7 +19,8 @@ static constexpr auto N = static_cast<std::size_t>(1024U); // Number of trials
 static constexpr auto N = static_cast<std::size_t>(1024U >> 4U); // Number of trials
 #endif
 
-#if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+// stringop overflow errors from gcc-13 and on with x86
+#if !defined(BOOST_DECIMAL_DISABLE_CLIB) && !(defined(__GNUC__) && __GNUC__ >= 13 && !defined(__aarch64__))
 
 template <typename T>
 void test_value(T val, const char* result, chars_format fmt = boost::decimal::chars_format::general, int precision = -1)
