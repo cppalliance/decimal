@@ -16,7 +16,7 @@ The library is header-only, has no dependencies, and requires C++14.
 == Motivation
 
 Current C++ floating point types store the significand (often incorrectly referred to as the mantissa) as binary digits.
-Famously this leads to rounding errors: https://0.30000000000000004.com.
+Famously this leads to representation errors: https://0.30000000000000004.com.
 Decimal floating point numbers avoid this issue by storing the significand in base-10 (decimal).
 The other major difference between binary and decimal floating point types is that the latter allows for multiple representations of the same number.
 For example 1e5 could also be stored as 0.1e6, 0.01e7, so on and so forth.
