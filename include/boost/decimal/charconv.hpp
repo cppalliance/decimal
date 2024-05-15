@@ -812,6 +812,18 @@ BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* la
     return detail::to_chars_impl(first, last, value, fmt, precision);
 }
 
+template <typename T>
+struct limits
+{
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_chars = boost::decimal::detail::max_string_length_v<T>;
+};
+
+#if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
+
+template <typename T> BOOST_DECIMAL_ATTRIBUTE_UNUSED constexpr int limits<T>::max_chars;
+
+#endif
+
 } //namespace decimal
 } //namespace boost
 
