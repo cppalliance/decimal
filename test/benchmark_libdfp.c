@@ -8,7 +8,7 @@
 #include <time.h>
 #include <inttypes.h>
 
-#define K 20000000
+#define K 2000000
 #define N 5
 
 double float_rand(double min, double max)
@@ -17,7 +17,7 @@ double float_rand(double min, double max)
     return min + scale * (max - min);
 }
 
-void generate_vector_32(_Decimal32* buffer, size_t buffer_len)
+__attribute__ ((__noinline__)) void generate_vector_32(_Decimal32* buffer, size_t buffer_len)
 {
     size_t i = 0;
     while (i < buffer_len)
@@ -27,7 +27,7 @@ void generate_vector_32(_Decimal32* buffer, size_t buffer_len)
     }
 }
 
-void test_comparisons_32(_Decimal32* data, const char* label)
+__attribute__ ((__noinline__)) void test_comparisons_32(_Decimal32* data, const char* label)
 {
     struct timespec t1, t2;
     clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -56,7 +56,7 @@ void test_comparisons_32(_Decimal32* data, const char* label)
     printf("Comparisons    <%-10s >: %-10" PRIu64 " us (s=%zu)\n", label, elapsed_time_us, s);
 }
 
-void generate_vector_64(_Decimal64* buffer, size_t buffer_len)
+__attribute__ ((__noinline__)) void generate_vector_64(_Decimal64* buffer, size_t buffer_len)
 {
     size_t i = 0;
     while (i < buffer_len)
@@ -66,7 +66,7 @@ void generate_vector_64(_Decimal64* buffer, size_t buffer_len)
     }
 }
 
-void test_comparisons_64(_Decimal64* data, const char* label)
+__attribute__ ((__noinline__)) void test_comparisons_64(_Decimal64* data, const char* label)
 {
     struct timespec t1, t2;
     clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -95,7 +95,7 @@ void test_comparisons_64(_Decimal64* data, const char* label)
     printf("Comparisons    <%-10s >: %-10" PRIu64 " us (s=%zu)\n", label, elapsed_time_us, s);
 }
 
-void generate_vector_128(_Decimal128* buffer, size_t buffer_len)
+__attribute__ ((__noinline__)) void generate_vector_128(_Decimal128* buffer, size_t buffer_len)
 {
     size_t i = 0;
     while (i < buffer_len)
@@ -105,7 +105,7 @@ void generate_vector_128(_Decimal128* buffer, size_t buffer_len)
     }
 }
 
-void test_comparisons_128(_Decimal128* data, const char* label)
+__attribute__ ((__noinline__)) void test_comparisons_128(_Decimal128* data, const char* label)
 {
     struct timespec t1, t2;
     clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -155,7 +155,7 @@ _Decimal32 div_32(_Decimal32 a, _Decimal32 b)
     return a / b;
 }
 
-void test_two_element_operation_32(_Decimal32* data, operation_32 op, const char* label, const char* op_label)
+__attribute__ ((__noinline__)) void test_two_element_operation_32(_Decimal32* data, operation_32 op, const char* label, const char* op_label)
 {
     struct timespec t1, t2;
     clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -200,7 +200,7 @@ _Decimal64 div_64(_Decimal64 a, _Decimal64 b)
     return a / b;
 }
 
-void test_two_element_operation_64(_Decimal64* data, operation_64 op, const char* label, const char* op_label)
+__attribute__ ((__noinline__)) void test_two_element_operation_64(_Decimal64* data, operation_64 op, const char* label, const char* op_label)
 {
     struct timespec t1, t2;
     clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -245,7 +245,7 @@ _Decimal128 div_128(_Decimal128 a, _Decimal128 b)
     return a / b;
 }
 
-void test_two_element_operation_128(_Decimal128* data, operation_128 op, const char* label, const char* op_label)
+__attribute__ ((__noinline__)) void test_two_element_operation_128(_Decimal128* data, operation_128 op, const char* label, const char* op_label)
 {
     struct timespec t1, t2;
     clock_gettime(CLOCK_MONOTONIC, &t1);
