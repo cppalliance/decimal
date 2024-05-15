@@ -184,7 +184,7 @@ constexpr auto generate_array() noexcept -> std::array<T, N>
 
 constexpr int num_digits(uint128 x) noexcept
 {
-    constexpr auto powers_of_10 = generate_array<boost::decimal::detail::uint128, 39>();
+    constexpr auto big_powers_of_10 = generate_array<boost::decimal::detail::uint128, 39>();
 
     if (x == 0)
     {
@@ -198,7 +198,7 @@ constexpr int num_digits(uint128 x) noexcept
     {
         std::uint32_t mid = (left + right + 1U) / 2U;
 
-        if (x >= powers_of_10[mid])
+        if (x >= big_powers_of_10[mid])
         {
             left = mid;
         }
@@ -276,7 +276,7 @@ constexpr int num_digits(const uint256_t& x) noexcept
 
 constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
 {
-    constexpr auto powers_of_10 = generate_array<boost::decimal::detail::uint128_t, 39>();
+    constexpr auto big_powers_of_10 = generate_array<boost::decimal::detail::uint128_t, 39>();
 
     if (x == 0)
     {
@@ -290,7 +290,7 @@ constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
     {
         std::uint32_t mid = (left + right + 1U) / 2U;
 
-        if (x >= powers_of_10[mid])
+        if (x >= big_powers_of_10[mid])
         {
             left = mid;
         }
