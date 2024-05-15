@@ -224,6 +224,51 @@ void test_two_element_operation_64(_Decimal64* data, operation_64 op, const char
     printf("%-15s<%-10s >: %-10" PRIu64 " us (s=%zu)\n", op_label, label, elapsed_time_us, s);
 }
 
+typedef _Decimal128 (*operation_128)(_Decimal128, _Decimal128);
+
+_Decimal128 add_128(_Decimal128 a, _Decimal128 b)
+{
+    return a + b;
+}
+_Decimal128 sub_128(_Decimal128 a, _Decimal128 b)
+{
+    return a - b;
+}
+
+_Decimal128 mul_128(_Decimal128 a, _Decimal128 b)
+{
+    return a * b;
+}
+
+_Decimal128 div_128(_Decimal128 a, _Decimal128 b)
+{
+    return a / b;
+}
+
+void test_two_element_operation_128(_Decimal128* data, operation_128 op, const char* label, const char* op_label)
+{
+    struct timespec t1, t2;
+    clock_gettime(CLOCK_MONOTONIC, &t1);
+    
+    size_t s = 0;
+
+    for (size_t n = 0; n < N; ++n)
+    {
+        for (size_t k = 0; k < K - 1; ++k)
+        {
+            _Decimal128 val1 = data[k];
+            _Decimal128 val2 = data[k + 1];
+
+            s += (size_t)op(val1, val2);
+        }
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &t2);
+
+    uint64_t elapsed_time_us = (uint64_t)((t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_nsec - t1.tv_nsec) / 1000);
+    printf("%-15s<%-10s>: %-10" PRIu64 " us (s=%zu)\n", op_label, label, elapsed_time_us, s);
+}
+
 int main()
 {
     // One time init of random number generator
@@ -253,21 +298,25 @@ int main()
 
     test_two_element_operation_32(d32_array, add_32, "_Decimal32", "Addition");
     test_two_element_operation_64(d64_array, add_64, "_Decimal64", "Addition");
+    test_two_element_operation_128(d128_array, add_128, "_Decimal128", "Addition");
 
     printf("\n===== Subtraction =====\n");
 
     test_two_element_operation_32(d32_array, sub_32, "_Decimal32", "Subtraction");
     test_two_element_operation_64(d64_array, sub_64, "_Decimal64", "Subtraction");
+    test_two_element_operation_128(d128_array, sub_128, "_Decimal128", "Subtraction");
 
     printf("\n===== Multiplication =====\n");
 
     test_two_element_operation_32(d32_array, mul_32, "_Decimal32", "Multiplication");
     test_two_element_operation_64(d64_array, mul_64, "_Decimal64", "Multiplication");
+    test_two_element_operation_128(d128_array, mul_128, "_Decimal128", "Multiplication");
 
     printf("\n===== Division =====\n");
 
     test_two_element_operation_32(d32_array, div_32, "_Decimal32", "Division");
     test_two_element_operation_64(d64_array, div_64, "_Decimal64", "Division");
+    test_two_element_operation_128(d128_array, div_128, "_Decimal128", "Division");
 
     free(d32_array);
     free(d64_array);
