@@ -33,8 +33,8 @@ include::decimal/config.adoc[]
 include::decimal/type_traits.adoc[]
 include::decimal/examples.adoc[]
 include::decimal/benchmarks.adoc[]
-//include::decimal/reference.adoc[]
 include::decimal/design.adoc[]
+include::decimal/reference.adoc[]
 include::decimal/copyright.adoc[]
 
 :leveloffset: -1
