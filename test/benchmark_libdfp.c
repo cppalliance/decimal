@@ -1,0 +1,165 @@
+// Copyright 2024 Matt Borland
+// Distributed under the Boost Software License, Version 1.0.
+// https://www.boost.org/LICENSE_1_0.txt
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <time.h>
+#include <inttypes.h>
+
+#define K 20000000
+#define N 5
+
+double float_rand(double min, double max)
+{
+    float scale = rand() / (double) RAND_MAX;
+    return min + scale * (max - min);
+}
+
+void generate_vector_32(_Decimal32* buffer, size_t buffer_len)
+{
+    size_t i = 0;
+    while (i < buffer_len)
+    {
+        buffer[i] = float_rand(0.0, 1.0);
+        ++i;
+    }
+}
+
+void test_comparisons_32(_Decimal32* data, const char* label)
+{
+    struct timespec t1, t2;
+    clock_gettime(CLOCK_MONOTONIC, &t1);
+    
+    size_t s = 0;
+
+    for (size_t n = 0; n < N; ++n)
+    {
+        for (size_t k = 0; k < K - 1; ++k)
+        {
+            _Decimal32 val1 = data[k];
+            _Decimal32 val2 = data[k + 1];
+
+            s += (size_t)(val1 > val2);
+            s += (size_t)(val1 >= val2);
+            s += (size_t)(val1 < val2);
+            s += (size_t)(val1 <= val2);
+            s += (size_t)(val1 == val2);
+            s += (size_t)(val1 != val2);
+        }
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &t2);
+
+    uint64_t elapsed_time_us = (uint64_t)((t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_nsec - t1.tv_nsec) / 1000);
+    printf("comparisons<%-10s >: %-10" PRIu64 " us (s=%zu)\n", label, elapsed_time_us, s);
+}
+
+void generate_vector_64(_Decimal64* buffer, size_t buffer_len)
+{
+    size_t i = 0;
+    while (i < buffer_len)
+    {
+        buffer[i] = float_rand(0.0, 1.0);
+        ++i;
+    }
+}
+
+void test_comparisons_64(_Decimal64* data, const char* label)
+{
+    struct timespec t1, t2;
+    clock_gettime(CLOCK_MONOTONIC, &t1);
+    
+    size_t s = 0;
+
+    for (size_t n = 0; n < N; ++n)
+    {
+        for (size_t k = 0; k < K - 1; ++k)
+        {
+            _Decimal64 val1 = data[k];
+            _Decimal64 val2 = data[k + 1];
+
+            s += (size_t)(val1 > val2);
+            s += (size_t)(val1 >= val2);
+            s += (size_t)(val1 < val2);
+            s += (size_t)(val1 <= val2);
+            s += (size_t)(val1 == val2);
+            s += (size_t)(val1 != val2);
+        }
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &t2);
+
+    uint64_t elapsed_time_us = (uint64_t)((t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_nsec - t1.tv_nsec) / 1000);
+    printf("comparisons<%-10s >: %-10" PRIu64 " us (s=%zu)\n", label, elapsed_time_us, s);
+}
+
+void generate_vector_128(_Decimal128* buffer, size_t buffer_len)
+{
+    size_t i = 0;
+    while (i < buffer_len)
+    {
+        buffer[i] = float_rand(0.0, 1.0);
+        ++i;
+    }
+}
+
+void test_comparisons_128(_Decimal128* data, const char* label)
+{
+    struct timespec t1, t2;
+    clock_gettime(CLOCK_MONOTONIC, &t1);
+    
+    size_t s = 0;
+
+    for (size_t n = 0; n < N; ++n)
+    {
+        for (size_t k = 0; k < K - 1; ++k)
+        {
+            _Decimal128 val1 = data[k];
+            _Decimal128 val2 = data[k + 1];
+
+            s += (size_t)(val1 > val2);
+            s += (size_t)(val1 >= val2);
+            s += (size_t)(val1 < val2);
+            s += (size_t)(val1 <= val2);
+            s += (size_t)(val1 == val2);
+            s += (size_t)(val1 != val2);
+        }
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &t2);
+
+    uint64_t elapsed_time_us = (uint64_t)((t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_nsec - t1.tv_nsec) / 1000);
+    printf("comparisons<%-10s>: %-10" PRIu64 " us (s=%zu)\n", label, elapsed_time_us, s);
+}
+
+int main()
+{
+    // One time init of random number generator
+    srand(time(NULL));
+    
+    _Decimal32* d32_array = malloc(K * sizeof(_Decimal32));
+    _Decimal64* d64_array = malloc(K * sizeof(_Decimal64));
+    _Decimal128* d128_array = malloc(K * sizeof(_Decimal128));
+    
+    if (d32_array == NULL || d64_array == NULL || d128_array == NULL)
+    {
+        return 1;
+    }
+
+    generate_vector_32(d32_array, K);
+    test_comparisons_32(d32_array, "_Decimal32");
+
+    generate_vector_64(d64_array, K);
+    test_comparisons_64(d64_array, "_Decimal64");
+
+    generate_vector_128(d128_array, K);
+    test_comparisons_128(d128_array, "_Decimal128");
+    
+    free(d32_array);
+    free(d64_array);
+    free(d128_array);
+
+    return 0;
+}
