@@ -76,8 +76,12 @@ public:
     friend constexpr auto operator>=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
 
     // Unary operators
-    friend constexpr auto operator+(decimal32_fast rhs) -> decimal32_fast;
-    friend constexpr auto operator-(decimal32_fast lhs) -> decimal32_fast;
+    friend constexpr auto operator+(decimal32_fast rhs) noexcept -> decimal32_fast;
+    friend constexpr auto operator-(decimal32_fast lhs) noexcept -> decimal32_fast;
+
+    // Binary arithmetic
+    friend constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
+    friend constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
@@ -241,15 +245,87 @@ constexpr auto operator>=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bo
     return !(lhs < rhs);
 }
 
-constexpr auto operator+(decimal32_fast rhs) -> decimal32_fast
+constexpr auto operator+(decimal32_fast rhs) noexcept -> decimal32_fast
 {
     return rhs;
 }
 
-constexpr auto operator-(decimal32_fast rhs) -> decimal32_fast
+constexpr auto operator-(decimal32_fast rhs) noexcept -> decimal32_fast
 {
     rhs.significand_ = -rhs.significand_;
     return rhs;
+}
+
+constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
+{
+    constexpr decimal32_fast zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && rhs.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+
+    // Ensure that lhs is always the larger for ease of implementation
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs, rhs);
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs - abs(rhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize(sig_rhs, exp_rhs);
+
+    const auto result {add_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
+{
+    constexpr decimal32_fast zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize(sig_rhs, exp_rhs);
+
+    const auto result {sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
+                                sig_rhs, exp_rhs, rhs.isneg(),
+                                abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
 }
 
 } // namespace decimal
