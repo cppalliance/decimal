@@ -30,7 +30,7 @@ private:
     std::int32_t significand_;
     std::uint8_t exponent_;
 
-    constexpr bool isneg()
+    constexpr auto isneg() noexcept -> bool
     {
         return significand_ < 0;
     }
@@ -44,6 +44,13 @@ public:
 
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast(Float val) noexcept;
+
+    // cmath functions that are easier as friends
+    friend constexpr auto signbit(decimal32_fast val) noexcept -> bool;
+    friend constexpr auto isinf(decimal32_fast val) noexcept -> bool;
+    friend constexpr auto isnan(decimal32_fast val) noexcept -> bool;
+    friend constexpr auto issignaling(decimal32_fast val) noexcept -> bool;
+    friend constexpr auto isnormal(decimal32_fast val) noexcept -> bool;
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
@@ -55,8 +62,8 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
     Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
 
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
-    const bool reduced {unsigned_coeff_digits > detail::precision};
-    while (unsigned_coeff_digits > detail::precision + 1)
+    const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal32>};
+    while (unsigned_coeff_digits > detail::precision_v<decimal32> + 1)
     {
         unsigned_coeff /= 10;
         ++exp;
@@ -107,6 +114,36 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast::decimal32_fast(Float val) noexcept
         const auto components {detail::ryu::floating_point_to_fd128(val)};
         *this = decimal32_fast {components.mantissa, components.exponent, components.sign};
     }
+}
+
+constexpr auto signbit(decimal32_fast val) noexcept -> bool
+{
+    return val.significand_ < 0;
+}
+
+constexpr auto isinf(decimal32_fast val) noexcept -> bool
+{
+    return val.significand_ == std::numeric_limits<std::int32_t>::max();
+}
+
+constexpr auto isnan(decimal32_fast val) noexcept -> bool
+{
+    return val.significand_ == std::numeric_limits<std::int32_t>::min();
+}
+
+constexpr auto issignaling(decimal32_fast val) noexcept -> bool
+{
+    return val.significand_ == (std::numeric_limits<std::int32_t>::min() + 1);
+}
+
+constexpr auto isnormal(decimal32_fast val) noexcept -> bool
+{
+    if (val.exponent_ <= static_cast<std::uint8_t>(detail::precision_v<decimal32> - 1))
+    {
+        return false;
+    }
+
+    return (val.significand_ != 0) && isfinite(val);
 }
 
 } // namespace decimal
