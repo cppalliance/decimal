@@ -101,6 +101,21 @@ public:
     {
         return static_cast<std::size_t>(1);
     }
+
+    // TODO(mborland): Remove and use the base implementation in io.hpp
+    template <typename charT, typename traits>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal32_fast& d) -> std::basic_ostream<charT, traits>&
+    {
+        os << d.significand_ << "e";
+        const auto biased_exp {d.biased_exponent()};
+        if (biased_exp > 0)
+        {
+            os << '+';
+        }
+        os << biased_exp;
+
+        return os;
+    }
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
