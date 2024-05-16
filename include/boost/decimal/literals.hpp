@@ -58,16 +58,6 @@ BOOST_DECIMAL_EXPORT constexpr auto operator  "" _df(unsigned long long v) -> de
     return decimal32{v};
 }
 
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _DF(long double v) -> decimal32
-{
-    return decimal32{v};
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _df(long double v) -> decimal32
-{
-    return decimal32{v};
-}
-
 BOOST_DECIMAL_EXPORT constexpr auto operator  "" _DD(const char* str) -> decimal64
 {
     decimal64 d;
@@ -106,16 +96,6 @@ BOOST_DECIMAL_EXPORT constexpr auto operator  "" _dd(unsigned long long v) -> de
     return decimal64{v};
 }
 
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _DD(long double v) -> decimal64
-{
-    return decimal64{v};
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _dd(long double v) -> decimal64
-{
-    return decimal64{v};
-}
-
 BOOST_DECIMAL_EXPORT constexpr auto operator  "" _DL(const char* str) -> decimal128
 {
     decimal128 d;
@@ -150,16 +130,6 @@ BOOST_DECIMAL_EXPORT constexpr auto operator  "" _DL(unsigned long long v) -> de
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto operator  "" _dl(unsigned long long v) -> decimal128
-{
-    return decimal128{v};
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _DL(long double v) -> decimal128
-{
-    return decimal128{v};
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _dl(long double v) -> decimal128
 {
     return decimal128{v};
 }
