@@ -51,6 +51,8 @@ private:
     }
 
 public:
+    constexpr decimal32_fast() noexcept : significand_{}, exponent_{} {}
+
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
     constexpr decimal32_fast(T1 coeff, T2 exp, bool sign = false) noexcept;
 
@@ -59,6 +61,11 @@ public:
 
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast(Float val) noexcept;
+
+    constexpr decimal32_fast(const decimal32_fast& val) noexcept = default;
+    constexpr decimal32_fast(decimal32_fast&& val) noexcept = default;
+    constexpr auto operator=(const decimal32_fast& val) noexcept -> decimal32_fast& = default;
+    constexpr auto operator=(decimal32_fast&& val) noexcept -> decimal32_fast& = default;
 
     // cmath functions that are easier as friends
     friend constexpr auto signbit(decimal32_fast val) noexcept -> bool;
@@ -82,10 +89,17 @@ public:
     // Binary arithmetic
     friend constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
+
+    // Dummy conversion
+    explicit constexpr operator std::size_t() const noexcept
+    {
+        return static_cast<std::size_t>(1);
+    }
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
 constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
+    : significand_ {}, exponent_ {}
 {
     using Unsigned_Integer = detail::make_unsigned_t<T1>;
 
@@ -129,6 +143,14 @@ constexpr decimal32_fast::decimal32_fast(Integer val) noexcept
     *this = decimal32_fast{static_cast<ConversionType>(val), 0};
 }
 
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast::decimal32_fast(Float val) noexcept
 {
@@ -146,6 +168,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast::decimal32_fast(Float val) noexcept
         *this = decimal32_fast {components.mantissa, components.exponent, components.sign};
     }
 }
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
 
 constexpr auto signbit(decimal32_fast val) noexcept -> bool
 {
