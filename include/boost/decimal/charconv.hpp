@@ -694,8 +694,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         *first++ = '0';
     }
 
-    const int abs_exp { (exp < 0) ? -exp : exp };
-
     return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, static_cast<std::uint32_t>(abs_exp), 10);
 }
 
