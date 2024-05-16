@@ -89,6 +89,7 @@ public:
     // Binary arithmetic
     friend constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
+    friend constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
 
     // Dummy conversion
     explicit constexpr operator std::size_t() const noexcept
@@ -352,6 +353,29 @@ constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     const auto result {sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
                                 sig_rhs, exp_rhs, rhs.isneg(),
                                 abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
+{
+    constexpr decimal32_fast zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize(sig_rhs, exp_rhs);
+
+    const auto result {mul_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
 }

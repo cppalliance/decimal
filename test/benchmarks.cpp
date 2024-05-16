@@ -378,7 +378,7 @@ int main()
     test_two_element_operation(dec64_vector, std::minus<>(), "Subtraction", "decimal64");
     test_two_element_operation(dec128_vector, std::minus<>(), "Subtraction", "decimal128");
     test_two_element_operation(dec32_fast_vector, std::minus<>(), "Subtraction", "dec32_fast");
-/*
+
     std::cout << "\n===== Multiplication =====\n";
 
     test_two_element_operation(float_vector, std::multiplies<>(), "Multiplication", "float");
@@ -386,6 +386,7 @@ int main()
     test_two_element_operation(dec32_vector, std::multiplies<>(), "Multiplication", "decimal32");
     test_two_element_operation(dec64_vector, std::multiplies<>(), "Multiplication", "decimal64");
     test_two_element_operation(dec128_vector, std::multiplies<>(), "Multiplication", "decimal128");
+    test_two_element_operation(dec32_fast_vector, std::multiplies<>(), "Multiplication", "dec32_fast");
 
     std::cout << "\n===== Division =====\n";
 
@@ -395,6 +396,7 @@ int main()
     test_two_element_operation(dec64_vector, std::divides<>(), "Division", "decimal64");
     test_two_element_operation(dec128_vector, std::divides<>(), "Division", "decimal128");
 
+/*
     std::cout << "\n===== sqrt =====\n";
 
     test_one_element_operation(float_vector, (float(*)(float))std::sqrt, "sqrt", "float");
