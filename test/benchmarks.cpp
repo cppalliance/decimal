@@ -27,6 +27,12 @@ using namespace std::chrono_literals;
 #  define BOOST_DECIMAL_NO_INLINE __attribute__ ((__noinline__))
 #elif defined(_MSC_VER)
 #  define BOOST_DECIMAL_NO_INLINE __declspec(noinline)
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wstringop-overread"
+#  define BOOST_DECIMAL_NO_INLINE __attribute__ ((__noinline__))
 #endif
 
 constexpr unsigned N = 2'000'000U;
