@@ -35,6 +35,21 @@ private:
         return significand_ < 0;
     }
 
+    constexpr auto full_significand() const noexcept -> std::int32_t
+    {
+        return significand_;
+    }
+
+    constexpr auto unbiased_exponent() const noexcept -> std::uint8_t
+    {
+        return exponent_;
+    }
+
+    constexpr auto biased_exponent() const noexcept -> std::int32_t
+    {
+        return static_cast<std::int32_t>(exponent_) - detail::bias_v<decimal32>;
+    }
+
 public:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
     constexpr decimal32_fast(T1 coeff, T2 exp, bool sign = false) noexcept;
