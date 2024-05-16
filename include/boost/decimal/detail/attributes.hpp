@@ -78,6 +78,7 @@ template <>
 BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto max_significand_v<decimal128> =
         uint128{UINT64_C(0b1111111111'1111111111'1111111111'1111111111'111111), UINT64_MAX};
 
+// sign + decimal digits + '.' + 'e' + '+/-' + max digits of exponent + null term
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto max_string_length_v = std::is_same<Dec, decimal32>::value ? 15 : 25;
 

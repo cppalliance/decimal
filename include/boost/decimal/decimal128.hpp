@@ -1439,7 +1439,7 @@ constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
         BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T2>::digits10 > std::numeric_limits<std::uint64_t>::digits10)
         {
-            if (rhs_sig >= detail::uint128 {500'000'000'000'000, 0})
+            if (rhs_sig >= detail::uint128 {UINT64_C(0xF684DF56C3E0), UINT64_C(0x1BC6C73200000000)})
             {
                 ++lhs_sig;
             }
@@ -1459,12 +1459,9 @@ constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (delta_exp <= 3)
     {
-        while (delta_exp > 0)
-        {
-            lhs_sig *= 10;
-            --delta_exp;
-            --lhs_exp;
-        }
+        lhs_sig *= detail::pow10(static_cast<detail::uint128>(delta_exp));
+        lhs_exp -= delta_exp;
+        delta_exp = 0;
     }
     else
     {
@@ -1475,8 +1472,8 @@ constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     while (delta_exp > 1)
     {
-        rhs_sig /= 10;
-        --delta_exp;
+        rhs_sig /= detail::pow10(static_cast<detail::uint128>(delta_exp - 1));
+        delta_exp = 1;
     }
 
     if (delta_exp == 1)
@@ -1539,8 +1536,8 @@ constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     while (delta_exp > 1)
     {
-        sig_smaller /= 10;
-        --delta_exp;
+        sig_smaller /= detail::pow10(static_cast<detail::uint128>(delta_exp - 1));
+        delta_exp = 1;
     }
 
     if (delta_exp == 1)

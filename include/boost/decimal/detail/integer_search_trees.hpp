@@ -166,6 +166,53 @@ constexpr auto num_digits(std::uint64_t x) noexcept -> int
 # pragma warning(disable: 4307) // MSVC 14.1 warns of intergral constant overflow
 #endif
 
+#if defined(__cpp_lib_array_constexpr) && __cpp_lib_array_constexpr >= 201603L
+
+template <typename T, std::size_t N>
+constexpr auto generate_array() noexcept -> std::array<T, N>
+{
+    std::array<T, N> values {};
+
+    values[0] = 1;
+    for (std::size_t i {1}; i < N; ++i)
+    {
+        values[i] = values[i - 1] * 10;
+    }
+
+    return values;
+}
+
+constexpr int num_digits(uint128 x) noexcept
+{
+    constexpr auto big_powers_of_10 = generate_array<boost::decimal::detail::uint128, 39>();
+
+    if (x == 0)
+    {
+        return 1;
+    }
+
+    std::uint32_t left = 0U;
+    std::uint32_t right = 38U;
+
+    while (left < right)
+    {
+        std::uint32_t mid = (left + right + 1U) / 2U;
+
+        if (x >= big_powers_of_10[mid])
+        {
+            left = mid;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+
+    return static_cast<int>(left + 1);
+}
+
+#else
+
 constexpr int num_digits(uint128 x) noexcept
 {
     if (x.high == 0)
@@ -189,6 +236,8 @@ constexpr int num_digits(uint128 x) noexcept
 
     return 1;
 }
+
+#endif // Constexpr array
 
 constexpr int num_digits(const uint256_t& x) noexcept
 {
@@ -222,6 +271,40 @@ constexpr int num_digits(const uint256_t& x) noexcept
 #endif
 
 #ifdef BOOST_DECIMAL_HAS_INT128
+
+#if defined(__cpp_lib_array_constexpr) && __cpp_lib_array_constexpr >= 201603L
+
+constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
+{
+    constexpr auto big_powers_of_10 = generate_array<boost::decimal::detail::uint128_t, 39>();
+
+    if (x == 0)
+    {
+        return 1;
+    }
+
+    std::uint32_t left = 0U;
+    std::uint32_t right = 38U;
+
+    while (left < right)
+    {
+        std::uint32_t mid = (left + right + 1U) / 2U;
+
+        if (x >= big_powers_of_10[mid])
+        {
+            left = mid;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+
+    return static_cast<int>(left + 1);
+}
+
+#else
+
 // Assume that if someone is using 128 bit ints they are favoring the top end of the range
 // Max value is 340,282,366,920,938,463,463,374,607,431,768,211,455 (39 digits)
 constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
@@ -290,7 +373,10 @@ constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
            (x >= powers_of_10[1])  ?  2 :
            (x >= powers_of_10[0])  ?  1 : 0;
 }
-#endif
+
+#endif // constexpr arrays
+
+#endif // Has int128
 
 } // namespace detail
 } // namespace decimal

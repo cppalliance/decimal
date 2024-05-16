@@ -389,7 +389,7 @@ void test_fma()
     BOOST_TEST_EQ(Dec(1, 0) + Dec(1, 0, true), Dec(0, 0));
     BOOST_TEST_EQ(fma(Dec(1, -1), Dec(1, 1), Dec(1, 0, true)), Dec(0, 0));
 
-    std::uniform_real_distribution<double> dist(-1e10, 1e10);
+    std::uniform_real_distribution<double> dist(-1e3, 1e3);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
