@@ -35,9 +35,9 @@ private:
         return significand_ < 0;
     }
 
-    constexpr auto full_significand() const noexcept -> std::int32_t
+    constexpr auto full_significand() const noexcept -> std::uint32_t
     {
-        return significand_;
+        return detail::make_positive_unsigned(significand_);
     }
 
     constexpr auto unbiased_exponent() const noexcept -> std::uint8_t
@@ -66,6 +66,10 @@ public:
     friend constexpr auto isnan(decimal32_fast val) noexcept -> bool;
     friend constexpr auto issignaling(decimal32_fast val) noexcept -> bool;
     friend constexpr auto isnormal(decimal32_fast val) noexcept -> bool;
+
+    // Comparison operators
+    friend constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
+    friend constexpr auto operator!=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
@@ -159,6 +163,22 @@ constexpr auto isnormal(decimal32_fast val) noexcept -> bool
     }
 
     return (val.significand_ != 0) && isfinite(val);
+}
+
+constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                            rhs.full_significand(), lhs.biased_exponent(), lhs.isneg());
+}
+
+constexpr auto operator!=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
+{
+    return !(lhs == rhs);
 }
 
 } // namespace decimal
