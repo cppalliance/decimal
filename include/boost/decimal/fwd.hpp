@@ -16,6 +16,7 @@ namespace decimal {
 class decimal32;
 class decimal64;
 class decimal128;
+class decimal32_fast;
 
 } // namespace decimal
 } // namespace boost
