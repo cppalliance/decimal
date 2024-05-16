@@ -114,16 +114,13 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
 
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
     const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal32>};
-    while (unsigned_coeff_digits > detail::precision_v<decimal32> + 1)
-    {
-        unsigned_coeff /= 10;
-        ++exp;
-        --unsigned_coeff_digits;
-    }
 
-    // Round as required
+    // Strip digits and round as required
     if (reduced)
     {
+        const auto digits_to_remove {static_cast<std::uint32_t>(unsigned_coeff_digits - (detail::precision_v<decimal32> + 1))};
+        unsigned_coeff /= detail::pow10(digits_to_remove);
+        exp += static_cast<std::uint8_t>(digits_to_remove);
         exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
     }
 
