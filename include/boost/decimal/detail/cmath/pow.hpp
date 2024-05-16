@@ -245,12 +245,10 @@ constexpr auto pow(T x, T a) noexcept
             }
             else if (fpc_a == FP_INFINITE)
             {
-                using std::abs;
-
                 result =
                     (
-                          (abs(x) < one) ? (signbit(a) ? std::numeric_limits<T>::infinity() : zero)
-                        : (abs(x) > one) ? (signbit(a) ? zero : std::numeric_limits<T>::infinity())
+                          (fabs(x) < one) ? (signbit(a) ? std::numeric_limits<T>::infinity() : zero)
+                        : (fabs(x) > one) ? (signbit(a) ? zero : std::numeric_limits<T>::infinity())
                         : one
                     );
             }

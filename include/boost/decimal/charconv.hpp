@@ -318,7 +318,9 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
 
     // Insert the exponent character
     *first++ = 'e';
-    const int abs_exp {std::abs(exp)};
+
+    const int abs_exp { (exp < 0) ? -exp : exp };
+
     if (exp < 0)
     {
         *first++ = '-';
@@ -383,7 +385,9 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
     if (integer_digits < 0)
     {
-        num_leading_zeros = std::abs(integer_digits);
+        const int abs_integer_digits { (integer_digits < 0) ? -integer_digits : integer_digits };
+
+        num_leading_zeros = abs_integer_digits;
         integer_digits = 0;
         append_leading_zeros = true;
     }
@@ -683,12 +687,16 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         *first++ = '+';
     }
 
-    if (std::abs(exp) < 10)
+    const int abs_exp { (exp < 0) ? -exp : exp };
+
+    if (abs_exp < 10)
     {
         *first++ = '0';
     }
 
-    return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, static_cast<std::uint32_t>(std::abs(exp)), 10);
+    const int abs_exp { (exp < 0) ? -exp : exp };
+
+    return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, static_cast<std::uint32_t>(abs_exp), 10);
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
