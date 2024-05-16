@@ -51,6 +51,7 @@ run ibm_add.cpp ;
 run link_1.cpp link_2.cpp link_3.cpp ;
 run quick.cpp ;
 run random_decimal32_comp.cpp ;
+run random_decimal32_fast_comp.cpp ;
 run random_decimal32_math.cpp ;
 run random_decimal64_comp.cpp ;
 run random_decimal64_math.cpp ;
