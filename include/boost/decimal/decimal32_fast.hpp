@@ -70,6 +70,10 @@ public:
     // Comparison operators
     friend constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
     friend constexpr auto operator!=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
+    friend constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
+    friend constexpr auto operator<=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
+    friend constexpr auto operator>(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
+    friend constexpr auto operator>=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
@@ -179,6 +183,58 @@ constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bo
 constexpr auto operator!=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
 {
     return !(lhs == rhs);
+}
+
+constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs) ||
+        (!lhs.isneg() && rhs.isneg()))
+    {
+        return false;
+    }
+    else if (lhs.isneg() && !rhs.isneg())
+    {
+        return true;
+    }
+    else if (isfinite(lhs) && isinf(rhs))
+    {
+        if (!signbit(rhs))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+constexpr auto operator<=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(rhs < lhs);
+}
+
+constexpr auto operator>(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
+{
+    return rhs < lhs;
+}
+
+constexpr auto operator>=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
 }
 
 } // namespace decimal
