@@ -74,6 +74,10 @@ public:
     friend constexpr auto operator<=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
     friend constexpr auto operator>(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
     friend constexpr auto operator>=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
+
+    // Unary operators
+    friend constexpr auto operator+(decimal32_fast rhs) -> decimal32_fast;
+    friend constexpr auto operator-(decimal32_fast lhs) -> decimal32_fast;
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
@@ -235,6 +239,17 @@ constexpr auto operator>=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bo
     }
 
     return !(lhs < rhs);
+}
+
+constexpr auto operator+(decimal32_fast rhs) -> decimal32_fast
+{
+    return rhs;
+}
+
+constexpr auto operator-(decimal32_fast rhs) -> decimal32_fast
+{
+    rhs.significand_ = -rhs.significand_;
+    return rhs;
 }
 
 } // namespace decimal
