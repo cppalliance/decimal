@@ -19,6 +19,13 @@
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
+template<typename T>
+constexpr auto make_me_constexpr_abs(T a) -> T { return ((a < T(0)) ? -a : a); }
+
+}
+
 // MSVC 14.1 warns of unary minus being applied to unsigned type from numeric_limits::min
 // 14.2 and on get it right
 #ifdef _MSC_VER
@@ -52,7 +59,7 @@ constexpr auto to_integral(Decimal val) noexcept
     auto result {static_cast<Conversion_Type>(val.full_significand())};
     auto expval {val.biased_exponent()};
 
-    if (std::abs(expval) >= 19)
+    if (detail::make_me_constexpr_abs(expval) >= 19)
     {
         result = 0;
     }
@@ -94,7 +101,7 @@ constexpr auto to_integral_128(Decimal val) noexcept
     auto sig {val.full_significand()};
     auto expval {val.biased_exponent()};
 
-    if (std::abs(expval) >= 38)
+    if (detail::make_me_constexpr_abs(expval) >= 38)
     {
         sig = 0;
     }
