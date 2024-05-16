@@ -50,6 +50,10 @@ private:
         return static_cast<std::int32_t>(exponent_) - detail::bias_v<decimal32>;
     }
 
+    constexpr decimal32_fast(std::int32_t sig, std::uint8_t exp) noexcept : significand_ {sig}, exponent_ {exp} {}
+
+    friend constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& q, decimal32_fast& r) noexcept -> void;
+
 public:
     constexpr decimal32_fast() noexcept : significand_{}, exponent_{} {}
 
@@ -90,6 +94,7 @@ public:
     friend constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
+    friend constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
 
     // Dummy conversion
     explicit constexpr operator std::size_t() const noexcept
@@ -378,6 +383,85 @@ constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     const auto result {mul_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& q, decimal32_fast& r) noexcept -> void
+{
+    const bool sign {lhs.isneg() != rhs.isneg()};
+
+    constexpr decimal32_fast zero {0, 0};
+    constexpr decimal32_fast nan {std::numeric_limits<std::int32_t>::min(), UINT8_C(0)};
+    constexpr decimal32_fast inf {std::numeric_limits<std::int32_t>::max(), UINT8_C(0)};
+
+    const auto lhs_fp {fpclassify(lhs)};
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+    {
+        q = nan;
+        r = nan;
+        return;
+    }
+
+    switch (lhs_fp)
+    {
+        case FP_INFINITE:
+            q = sign ? -inf : inf;
+            r = zero;
+            return;
+        case FP_ZERO:
+            q = sign ? -zero : zero;
+            r = sign ? -zero : zero;
+            return;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_ZERO:
+            q = inf;
+            r = zero;
+            return;
+        case FP_INFINITE:
+            q = sign ? -zero : zero;
+            r = lhs;
+            return;
+        default:
+            static_cast<void>(rhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize(sig_rhs, exp_rhs);
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "sig lhs: " << sig_lhs
+              << "\nexp lhs: " << exp_lhs
+              << "\nsig rhs: " << sig_rhs
+              << "\nexp rhs: " << exp_rhs << std::endl;
+    #endif
+
+    detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal32_components q_components {};
+
+    generic_div_impl(lhs_components, rhs_components, q_components);
+
+    q = decimal32_fast(q_components.sig, q_components.exp, q_components.sign);
+}
+
+constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
+{
+    decimal32_fast q {};
+    decimal32_fast r {};
+    div_impl(lhs, rhs, q, r);
+
+    return q;
 }
 
 } // namespace decimal

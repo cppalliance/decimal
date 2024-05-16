@@ -395,6 +395,7 @@ int main()
     test_two_element_operation(dec32_vector, std::divides<>(), "Division", "decimal32");
     test_two_element_operation(dec64_vector, std::divides<>(), "Division", "decimal64");
     test_two_element_operation(dec128_vector, std::divides<>(), "Division", "decimal128");
+    test_two_element_operation(dec32_fast_vector, std::divides<>(), "Division", "dec32_fast");
 
 /*
     std::cout << "\n===== sqrt =====\n";
