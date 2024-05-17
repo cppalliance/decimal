@@ -175,6 +175,12 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
     significand_ = static_cast<std::uint32_t>(reduced_coeff);
 
+    // Normalize the handling of zeros
+    if (significand_ == UINT32_C(0))
+    {
+        exp = 0;
+    }
+
     auto biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
     if (biased_exp > std::numeric_limits<std::uint8_t>::max())
     {
