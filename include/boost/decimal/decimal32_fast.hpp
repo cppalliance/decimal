@@ -96,6 +96,12 @@ public:
     friend constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
 
+    // Compound operators
+    constexpr auto operator+=(decimal32_fast rhs) noexcept -> decimal32_fast&;
+    constexpr auto operator-=(decimal32_fast rhs) noexcept -> decimal32_fast&;
+    constexpr auto operator*=(decimal32_fast rhs) noexcept -> decimal32_fast&;
+    constexpr auto operator/=(decimal32_fast rhs) noexcept -> decimal32_fast&;
+
     // Dummy conversion
     explicit constexpr operator std::size_t() const noexcept
     {
@@ -483,6 +489,30 @@ constexpr auto direct_init(std::int32_t significand, std::uint8_t exponent) noex
     val.exponent_ = exponent;
 
     return val;
+}
+
+constexpr auto decimal32_fast::operator+=(decimal32_fast rhs) noexcept -> decimal32_fast&
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr auto decimal32_fast::operator-=(decimal32_fast rhs) noexcept -> decimal32_fast&
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+constexpr auto decimal32_fast::operator*=(decimal32_fast rhs) noexcept -> decimal32_fast&
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+constexpr auto decimal32_fast::operator/=(decimal32_fast rhs) noexcept -> decimal32_fast&
+{
+    *this = *this / rhs;
+    return *this;
 }
 
 } // namespace decimal
