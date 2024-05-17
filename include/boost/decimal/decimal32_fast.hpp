@@ -35,7 +35,7 @@ private:
     std::uint8_t exponent_;
     bool sign_;
 
-    constexpr auto isneg() noexcept -> bool
+    constexpr auto isneg() const noexcept -> bool
     {
         return sign_;
     }
