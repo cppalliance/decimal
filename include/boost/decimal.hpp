@@ -25,6 +25,7 @@
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal32_fast.hpp>
 #include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/decimal128.hpp>
 #include <boost/decimal/cmath.hpp>
