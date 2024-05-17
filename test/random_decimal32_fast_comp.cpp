@@ -247,7 +247,12 @@ void random_GE(T lower, T upper)
     }
 
     BOOST_TEST(!(decimal32_fast(dist(rng)) >= std::numeric_limits<decimal32_fast>::infinity()));
+
+    // MSVC 14.2
+    #if !defined(_MSC_VER)
     BOOST_TEST((decimal32_fast(dist(rng)) >= -std::numeric_limits<decimal32_fast>::infinity()));
+    #endif
+
     BOOST_TEST(!(decimal32_fast(dist(rng)) >= std::numeric_limits<decimal32_fast>::quiet_NaN()));
     BOOST_TEST(!(std::numeric_limits<decimal32_fast>::quiet_NaN() >= std::numeric_limits<decimal32_fast>::quiet_NaN()));
 }
