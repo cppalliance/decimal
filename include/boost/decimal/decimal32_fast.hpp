@@ -31,9 +31,9 @@ private:
     // In regular decimal32 we have to decode the 24 bits of the significand and the 8 bits of the exp
     // Here we just use them directly at the cost of 2 extra bytes of internal state
 
-    std::uint32_t significand_;
-    std::uint8_t exponent_;
-    bool sign_;
+    std::uint32_t significand_ {};
+    std::uint8_t exponent_ {};
+    bool sign_ {};
 
     constexpr auto isneg() const noexcept -> bool
     {
@@ -159,19 +159,8 @@ public:
     friend constexpr auto direct_init(std::uint32_t significand, std::uint8_t exponent, bool sign) noexcept -> decimal32_fast;
 };
 
-constexpr auto direct_init(std::uint32_t significand, std::uint8_t exponent, bool sign = false) noexcept -> decimal32_fast
-{
-    decimal32_fast val {};
-    val.significand_ = significand;
-    val.exponent_ = exponent;
-    val.sign_ = sign;
-
-    return val;
-}
-
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
 constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
-    : significand_ {}, exponent_ {}, sign_ {}
 {
     using Unsigned_Integer = detail::make_unsigned_t<T1>;
 
@@ -215,7 +204,7 @@ template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, boo
 constexpr decimal32_fast::decimal32_fast(Integer val) noexcept
 {
     using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
-    *this = decimal32_fast{static_cast<ConversionType>(val), 0};
+    *this = decimal32_fast{static_cast<ConversionType>(val), 0, false};
 }
 
 #if defined(__clang__)
@@ -249,6 +238,16 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast::decimal32_fast(Float val) noexcept
 #elif defined(__GNUC__)
 #  pragma GCC diagnostic pop
 #endif
+
+constexpr auto direct_init(std::uint32_t significand, std::uint8_t exponent, bool sign = false) noexcept -> decimal32_fast
+{
+    decimal32_fast val;
+    val.significand_ = significand;
+    val.exponent_ = exponent;
+    val.sign_ = sign;
+
+    return val;
+}
 
 constexpr auto signbit(decimal32_fast val) noexcept -> bool
 {
