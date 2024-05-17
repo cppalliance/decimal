@@ -64,6 +64,9 @@ private:
     friend constexpr auto to_integral(Decimal val) noexcept
         BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept;
+
 public:
     constexpr decimal32_fast() noexcept : significand_{}, exponent_{}, sign_ {} {}
 
@@ -135,31 +138,7 @@ public:
     explicit constexpr operator detail::int128_t() const noexcept;
     explicit constexpr operator detail::uint128_t() const noexcept;
     #endif
-
-    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
-
-    // TODO(mborland): Remove and use the base implementation in io.hpp
-    template <typename charT, typename traits>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal32_fast& d) -> std::basic_ostream<charT, traits>&
-    {
-        if (d.sign_)
-        {
-            os << '-';
-        }
-
-        os << d.significand_ << "e";
-        const auto biased_exp {d.biased_exponent()};
-        if (biased_exp > 0)
-        {
-            os << '+';
-        }
-        os << biased_exp;
-
-        return os;
-    }
-
-    #endif
-
+    
     friend constexpr auto direct_init(std::uint32_t significand, std::uint8_t exponent, bool sign) noexcept -> decimal32_fast;
 };
 

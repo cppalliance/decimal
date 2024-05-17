@@ -26,12 +26,9 @@ namespace decimal {
 // If the conversion can not be performed returns UINT32_MAX and exp = 0
 BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto frexp10(T num, int* expptr) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
-           std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
-                std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>
 {
-    using ReturnType = std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
-                           std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>;
+    using ReturnType = std::conditional_t<std::is_same<T, decimal32>::value || std::is_same<T, decimal32_fast>::value, std::uint32_t,
+                       std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>;
 
     constexpr T zero {0, 0};
 

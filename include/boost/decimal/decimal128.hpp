@@ -575,10 +575,7 @@ public:
 
     // <cmath> functions that need to be friends
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto frexp10(T num, int* expptr) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
-            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
-                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>;
+    friend constexpr auto frexp10(T num, int* expptr) noexcept;
 
     friend constexpr auto copysignd128(decimal128 mag, decimal128 sgn) noexcept -> decimal128;
     friend constexpr auto scalblnd128(decimal128 num, long exp) noexcept -> decimal128;
