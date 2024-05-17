@@ -57,6 +57,13 @@ private:
 
     friend constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& q, decimal32_fast& r) noexcept -> void;
 
+    // Attempts conversion to integral type:
+    // If this is nan sets errno to EINVAL and returns 0
+    // If this is not representable sets errno to ERANGE and returns 0
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_integral(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
+
 public:
     constexpr decimal32_fast() noexcept : significand_{}, exponent_{}, sign_ {} {}
 
@@ -111,11 +118,23 @@ public:
     constexpr auto operator--() noexcept -> decimal32_fast&;
     constexpr auto operator--(int) noexcept -> decimal32_fast&;
 
-    // Dummy conversion
-    explicit constexpr operator std::size_t() const noexcept
-    {
-        return static_cast<std::size_t>(1);
-    }
+    // 3.2.2.4 Conversion to integral type
+    explicit constexpr operator bool() const noexcept;
+    explicit constexpr operator int() const noexcept;
+    explicit constexpr operator unsigned() const noexcept;
+    explicit constexpr operator long() const noexcept;
+    explicit constexpr operator unsigned long() const noexcept;
+    explicit constexpr operator long long() const noexcept;
+    explicit constexpr operator unsigned long long() const noexcept;
+    explicit constexpr operator std::int8_t() const noexcept;
+    explicit constexpr operator std::uint8_t() const noexcept;
+    explicit constexpr operator std::int16_t() const noexcept;
+    explicit constexpr operator std::uint16_t() const noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    explicit constexpr operator detail::int128_t() const noexcept;
+    explicit constexpr operator detail::uint128_t() const noexcept;
+    #endif
 
     // TODO(mborland): Remove and use the base implementation in io.hpp
     template <typename charT, typename traits>
@@ -166,7 +185,7 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
     // Strip digits and round as required
     if (reduced)
     {
-        const auto digits_to_remove {static_cast<std::uint32_t>(unsigned_coeff_digits - (detail::precision_v<decimal32> + 1))};
+        const auto digits_to_remove {static_cast<Unsigned_Integer>(unsigned_coeff_digits - (detail::precision_v<decimal32> + 1))};
         unsigned_coeff /= detail::pow10(digits_to_remove);
         exp += static_cast<std::uint8_t>(digits_to_remove);
         exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
@@ -559,6 +578,76 @@ constexpr auto decimal32_fast::operator--(int) noexcept -> decimal32_fast&
     return --(*this);
 }
 
+constexpr decimal32_fast::operator bool() const noexcept
+{
+    constexpr decimal32_fast zero {0, 0};
+    return *this != zero;
+}
+
+constexpr decimal32_fast::operator int() const noexcept
+{
+    return to_integral<decimal32_fast, int>(*this);
+}
+
+constexpr decimal32_fast::operator unsigned() const noexcept
+{
+    return to_integral<decimal32_fast, unsigned>(*this);
+}
+
+constexpr decimal32_fast::operator long() const noexcept
+{
+    return to_integral<decimal32_fast, long>(*this);
+}
+
+constexpr decimal32_fast::operator unsigned long() const noexcept
+{
+    return to_integral<decimal32_fast, unsigned long>(*this);
+}
+
+constexpr decimal32_fast::operator long long() const noexcept
+{
+    return to_integral<decimal32_fast, long long>(*this);
+}
+
+constexpr decimal32_fast::operator unsigned long long() const noexcept
+{
+    return to_integral<decimal32_fast, unsigned long long>(*this);
+}
+
+constexpr decimal32_fast::operator std::int8_t() const noexcept
+{
+    return to_integral<decimal32_fast, std::int8_t>(*this);
+}
+
+constexpr decimal32_fast::operator std::uint8_t() const noexcept
+{
+    return to_integral<decimal32_fast, std::uint8_t>(*this);
+}
+
+constexpr decimal32_fast::operator std::int16_t() const noexcept
+{
+    return to_integral<decimal32_fast, std::int16_t>(*this);
+}
+
+constexpr decimal32_fast::operator std::uint16_t() const noexcept
+{
+    return to_integral<decimal32_fast, std::uint16_t>(*this);
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr decimal32_fast::operator detail::int128_t() const noexcept
+{
+    return to_integral<decimal32_fast, detail::int128_t>(*this);
+}
+
+constexpr decimal32_fast::operator detail::uint128_t() const noexcept
+{
+    return to_integral<decimal32_fast, detail::uint128_t>(*this);
+}
+
+#endif
+
 } // namespace decimal
 } // namespace boost
 
@@ -566,7 +655,7 @@ namespace std {
 
 BOOST_DECIMAL_EXPORT template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal32>
+class numeric_limits<boost::decimal::decimal32_fast>
 #else
 struct numeric_limits<boost::decimal::decimal32_fast>
 #endif

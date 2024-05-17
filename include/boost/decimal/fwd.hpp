@@ -32,7 +32,7 @@ struct numeric_limits<boost::decimal::decimal32>;
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal32>;
+class numeric_limits<boost::decimal::decimal32_fast>;
 #else
 struct numeric_limits<boost::decimal::decimal32_fast>;
 #endif
