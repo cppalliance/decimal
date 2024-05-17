@@ -136,6 +136,8 @@ public:
     explicit constexpr operator detail::uint128_t() const noexcept;
     #endif
 
+    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+
     // TODO(mborland): Remove and use the base implementation in io.hpp
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal32_fast& d) -> std::basic_ostream<charT, traits>&
@@ -156,6 +158,8 @@ public:
         return os;
     }
 
+    #endif
+
     friend constexpr auto direct_init(std::uint32_t significand, std::uint8_t exponent, bool sign) noexcept -> decimal32_fast;
 };
 
@@ -175,7 +179,18 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
     if (reduced)
     {
         const auto digits_to_remove {static_cast<Unsigned_Integer>(unsigned_coeff_digits - (detail::precision_v<decimal32> + 1))};
-        unsigned_coeff /= detail::pow10(digits_to_remove);
+
+        #if defined(__GNUC__) && !defined(__clang__)
+        #  pragma GCC diagnostic push
+        #  pragma GCC diagnostic ignored "-Wconversion"
+        #endif
+
+        unsigned_coeff /= static_cast<Unsigned_Integer>(detail::pow10(digits_to_remove));
+
+        #if defined(__GNUC__) && !defined(__clang__)
+        #  pragma GCC diagnostic pop
+        #endif
+
         exp += static_cast<std::uint8_t>(digits_to_remove);
         exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
     }
