@@ -237,7 +237,7 @@ constexpr auto isinf(decimal32_fast val) noexcept -> bool
 
 constexpr auto isnan(decimal32_fast val) noexcept -> bool
 {
-    return val.significand_ == detail::d32_fast_qnan;
+    return val.significand_ == detail::d32_fast_qnan || val.significand_ == detail::d32_fast_snan;
 }
 
 constexpr auto issignaling(decimal32_fast val) noexcept -> bool
