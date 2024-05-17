@@ -14,9 +14,9 @@ namespace boost {
 namespace decimal {
 
 class decimal32;
+class decimal32_fast;
 class decimal64;
 class decimal128;
-class decimal32_fast;
 
 } // namespace decimal
 } // namespace boost
@@ -28,6 +28,13 @@ template <>
 class numeric_limits<boost::decimal::decimal32>;
 #else
 struct numeric_limits<boost::decimal::decimal32>;
+#endif
+
+template <>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal32>;
+#else
+struct numeric_limits<boost::decimal::decimal32_fast>;
 #endif
 
 template <>

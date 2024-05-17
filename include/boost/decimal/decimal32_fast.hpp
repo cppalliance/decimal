@@ -50,7 +50,7 @@ private:
         return static_cast<std::int32_t>(exponent_) - detail::bias_v<decimal32>;
     }
 
-    constexpr decimal32_fast(std::int32_t sig, std::uint8_t exp) noexcept : significand_ {sig}, exponent_ {exp} {}
+    friend constexpr auto direct_init(std::int32_t significand, std::uint8_t exponent) noexcept -> decimal32_fast;
 
     friend constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& q, decimal32_fast& r) noexcept -> void;
 
@@ -476,7 +476,73 @@ constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     return q;
 }
 
+constexpr auto direct_init(std::int32_t significand, std::uint8_t exponent) noexcept -> decimal32_fast
+{
+    decimal32_fast val {};
+    val.significand_ = significand;
+    val.exponent_ = exponent;
+
+    return val;
+}
+
 } // namespace decimal
 } // namespace boost
+
+namespace std {
+
+BOOST_DECIMAL_EXPORT template <>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal32>
+#else
+struct numeric_limits<boost::decimal::decimal32_fast>
+#endif
+{
+
+#ifdef _MSC_VER
+    public:
+#endif
+
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_signed = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_integer = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_exact = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_infinity = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = true;
+
+    // These members were deprecated in C++23
+    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_present;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = true;
+    #endif
+
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_indeterminate;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_modulo = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits = 7;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits10 = digits;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_digits10 = digits;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int radix = 10;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent = -95;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent10 = min_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent = 96;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent10 = max_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = numeric_limits<std::uint32_t>::traps;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = true;
+
+    // Member functions
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (min)        () -> boost::decimal::decimal32_fast { return {1, min_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (max)        () -> boost::decimal::decimal32_fast { return {9'999'999, max_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto lowest       () -> boost::decimal::decimal32_fast { return {-9'999'999, max_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto epsilon      () -> boost::decimal::decimal32_fast { return {1, -7}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto round_error  () -> boost::decimal::decimal32_fast { return epsilon(); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::decimal32_fast { return boost::decimal::direct_init(std::numeric_limits<std::int32_t>::max(), UINT8_C((0))); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::decimal32_fast { return boost::decimal::direct_init(std::numeric_limits<std::int32_t>::min(), UINT8_C((0))); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::decimal32_fast { return boost::decimal::direct_init(std::numeric_limits<std::int32_t>::min() + 1, UINT8_C((0))); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::decimal32_fast { return {1, boost::decimal::detail::etiny}; }
+};
+
+} // Namespace std
 
 #endif //BOOST_DECIMAL_DECIMAL32_FAST_HPP
