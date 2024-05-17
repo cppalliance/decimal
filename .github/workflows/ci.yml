@@ -77,13 +77,14 @@ jobs:
             os: ubuntu-22.04
             install:
               - g++-12-multilib
-          - toolset: gcc-13
-            cxxstd: "03,11,14,17,20,23"
-            address_model: 32,64
-            os: ubuntu-22.04
-            install:
-              - g++-13-multilib
-            cxxflags: -Wno-uninitialized
+          # Disabled for now. 22.04 dropped support and 24.04 has internal errors
+          #- toolset: gcc-13
+          #  cxxstd: "03,11,14,17,20,23"
+          #  address_model: 32,64
+          #  os: ubuntu-24.04
+          #  install:
+          #    - g++-13-multilib
+          #  cxxflags: -Wno-uninitialized
           - toolset: gcc-12
             cxxstd: "03-gnu,11-gnu,14-gnu,17-gnu,20-gnu,23-gnu"
             address_model: "32"
