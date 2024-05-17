@@ -186,8 +186,9 @@ void random_GT(T lower, T upper)
         }
     }
 
-    BOOST_TEST(!(decimal32_fast(dist(rng)) > std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST((decimal32_fast(dist(rng)) > -std::numeric_limits<decimal32_fast>::infinity()));
+    const auto inf = std::numeric_limits<decimal32_fast>::infinity();
+    BOOST_TEST(!(decimal32_fast(dist(rng)) > inf));
+    BOOST_TEST((decimal32_fast(dist(rng)) > -inf));
     BOOST_TEST(!(decimal32_fast(dist(rng)) > std::numeric_limits<decimal32_fast>::quiet_NaN()));
     BOOST_TEST(!(std::numeric_limits<decimal32_fast>::quiet_NaN() > std::numeric_limits<decimal32_fast>::quiet_NaN()));
 }

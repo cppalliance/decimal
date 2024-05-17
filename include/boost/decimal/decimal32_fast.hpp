@@ -284,14 +284,11 @@ constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> boo
     }
     else if (isfinite(lhs) && isinf(rhs))
     {
-        if (!signbit(rhs))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return !signbit(rhs);
+    }
+    else if (isinf(lhs) && isfinite(rhs))
+    {
+        return signbit(rhs);
     }
 
     return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
