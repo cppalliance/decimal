@@ -263,7 +263,7 @@ constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bo
     }
 
     return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                            rhs.full_significand(), lhs.biased_exponent(), lhs.isneg());
+                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
 constexpr auto operator!=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
