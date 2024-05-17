@@ -102,6 +102,12 @@ public:
     constexpr auto operator*=(decimal32_fast rhs) noexcept -> decimal32_fast&;
     constexpr auto operator/=(decimal32_fast rhs) noexcept -> decimal32_fast&;
 
+    // Increment and decrement
+    constexpr auto operator++() noexcept -> decimal32_fast&;
+    constexpr auto operator++(int) noexcept -> decimal32_fast&;
+    constexpr auto operator--() noexcept -> decimal32_fast&;
+    constexpr auto operator--(int) noexcept -> decimal32_fast&;
+
     // Dummy conversion
     explicit constexpr operator std::size_t() const noexcept
     {
@@ -513,6 +519,30 @@ constexpr auto decimal32_fast::operator/=(decimal32_fast rhs) noexcept -> decima
 {
     *this = *this / rhs;
     return *this;
+}
+
+constexpr auto decimal32_fast::operator++() noexcept -> decimal32_fast&
+{
+    constexpr decimal32_fast one(1, 0);
+    *this = *this + one;
+    return *this;
+}
+
+constexpr auto decimal32_fast::operator++(int) noexcept -> decimal32_fast&
+{
+    return ++(*this);
+}
+
+constexpr auto decimal32_fast::operator--() noexcept -> decimal32_fast&
+{
+    constexpr decimal32_fast one(1, 0);
+    *this = *this - one;
+    return *this;
+}
+
+constexpr auto decimal32_fast::operator--(int) noexcept -> decimal32_fast&
+{
+    return --(*this);
 }
 
 } // namespace decimal
