@@ -142,6 +142,9 @@ struct decimal128_components
 
 BOOST_DECIMAL_EXPORT class decimal128 final
 {
+public:
+    using significand_type = detail::uint128;
+
 private:
     detail::uint128 bits_ {};
 
@@ -575,7 +578,7 @@ public:
 
     // <cmath> functions that need to be friends
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto frexp10(T num, int* expptr) noexcept;
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
     friend constexpr auto copysignd128(decimal128 mag, decimal128 sgn) noexcept -> decimal128;
     friend constexpr auto scalblnd128(decimal128 num, long exp) noexcept -> decimal128;

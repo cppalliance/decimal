@@ -134,6 +134,9 @@ struct decimal32_components
 // 3.2.2 class decimal32
 BOOST_DECIMAL_EXPORT class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
 {
+public:
+    using significand_type = std::uint32_t;
+
 private:
 
     std::uint32_t bits_ {};
@@ -561,7 +564,7 @@ public:
 
     // Related to <cmath>
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto frexp10(T num, int* expptr) noexcept;
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
     friend constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32;
     friend constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32;

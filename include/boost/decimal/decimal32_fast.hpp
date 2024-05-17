@@ -27,6 +27,9 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::u
 
 class decimal32_fast final
 {
+public:
+    using significand_type = std::uint32_t;
+
 private:
     // In regular decimal32 we have to decode the 24 bits of the significand and the 8 bits of the exp
     // Here we just use them directly at the cost of 2 extra bytes of internal state
@@ -65,7 +68,7 @@ private:
         BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto frexp10(T num, int* expptr) noexcept;
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
 public:
     constexpr decimal32_fast() noexcept : significand_{}, exponent_{}, sign_ {} {}
@@ -138,7 +141,7 @@ public:
     explicit constexpr operator detail::int128_t() const noexcept;
     explicit constexpr operator detail::uint128_t() const noexcept;
     #endif
-    
+
     friend constexpr auto direct_init(std::uint32_t significand, std::uint8_t exponent, bool sign) noexcept -> decimal32_fast;
 };
 
