@@ -7,16 +7,12 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_LGAMMA_HPP
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
-#include <boost/decimal/detail/type_traits.hpp>
-#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/cmath/impl/lgamma_impl.hpp>
-#include <boost/decimal/detail/cmath/impl/taylor_series_result.hpp>
-#include <boost/decimal/detail/cmath/abs.hpp>
+#include <boost/decimal/detail/cmath/impl/tgamma_impl.hpp>
 #include <boost/decimal/detail/cmath/log.hpp>
 #include <boost/decimal/detail/cmath/sin.hpp>
-#include <boost/decimal/detail/cmath/sqrt.hpp>
-#include <boost/decimal/detail/cmath/tgamma.hpp>
-#include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/numbers.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -78,32 +74,34 @@ constexpr auto lgamma_impl(T x) noexcept
         }
         else
         {
-            constexpr T half         { 5, -1 };
-            constexpr T asymp_cutoff { 8, 0 };
+            constexpr int asymp_cutoff
+            {
+                  std::numeric_limits<T>::digits10 < 10 ? T { 2, 1 }
+                : std::numeric_limits<T>::digits10 < 20 ? T { 5, 1 }
+                :                                         T { 1, 2 }
+            };
 
-            if (x < half)
+            if (x < T { 1, -1 })
             {
                 // Perform the Taylor series expansion.
-                //result = detail::taylor_series_result(x, coefficient_table);
-                result = detail::lgamma_taylor_series_expansion(x);
 
-                result = x * fma(result, x, -numbers::egamma_v<T>);
-
-                result -= log(x);
+                result =   (x * fma(detail::lgamma_taylor_series_expansion(x), x, -numbers::egamma_v<T>))
+                         - log(x);
             }
-            else if (x < asymp_cutoff)
+            else if (x < T { asymp_cutoff })
             {
                 result = log(tgamma(x));
             }
             else
             {
+                // Perform the Laurent series expansion. Do note, however, that
+                // the coefficients of the Laurent asymptotic expansion are exactly
+                // the same as those used for the tgamma() function.
 
-                // Perform the Laurent series expansion.
-                const auto one_over_x = one / x;
+                constexpr T half { 5, -1 };
 
-                result = detail::lgamma_laurent_series_expansion(one_over_x);
-
-                result = (x * (log(x) - one)) + log(result / sqrt(x));
+                result =   (((x - half) * (log(x)) - x))
+                         + log(detail::tgamma_series_expansion_asymp(one / x));
             }
         }
     }
