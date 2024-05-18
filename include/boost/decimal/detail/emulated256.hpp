@@ -89,6 +89,8 @@ struct uint256_t
 
     friend constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
+    friend constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noexcept;
+
     friend constexpr uint256_t operator-(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
     constexpr uint256_t &operator-=(uint256_t v) noexcept;
@@ -208,37 +210,6 @@ constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexce
     }
 
     return temp;
-}
-
-constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept
-{
-    uint256_t result{};
-
-    uint128 products[4];
-
-    // Multiply the low parts.
-    uint128 product_low = static_cast<uint128>(lhs.low.low) * rhs.low.low;
-    products[0] = {uint64_t(product_low >> 64), uint64_t(product_low)};
-
-    // Multiply the mixed parts.
-    uint128 product_mid_low = static_cast<uint128>(lhs.low.high) * rhs.low.low;
-    uint128 product_mid_high = static_cast<uint128>(lhs.low.low) * rhs.low.high;
-    products[1] = {uint64_t((product_mid_low >> 64) + (product_mid_high >> 64)), uint64_t(product_mid_low + product_mid_high)};
-
-    // Multiply the high parts.
-    uint128 product_high = static_cast<uint128>(lhs.low.high) * rhs.low.high;
-    products[2] = {uint64_t(product_high >> 64), uint64_t(product_high)};
-
-    // Add the products, taking care of the carries.
-    bool carry = false;
-    result.low.add_with_carry(products[0], carry);
-    result.low.add_with_carry(uint128(products[1].low) << 64, carry);
-    result.high.add_with_carry(uint128(products[1].high, products[1].low) >> 64, carry);
-    result.high.add_with_carry(products[2], carry);
-
-    // Note: This does not handle overflow beyond 256 bits.
-
-    return result;
 }
 
 constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept
@@ -407,6 +378,46 @@ constexpr auto wide_integer_to_uint256(const wide_integer_uint256& src) -> uint2
     return dst;
 }
 
+constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept
+{
+    // Mash-Up: Use unrolled school-multiplication from wide-integer (requires limb-conversions on input/output).
+
+    auto lhs_wide = uint256_to_wide_integer(lhs);
+    auto rhs_wide = uint256_to_wide_integer(rhs);
+
+    wide_integer_uint256 result_wide { };
+
+    wide_integer_uint256::eval_multiply_n_by_n_to_lo_part(result_wide.representation().begin(),
+                                                          lhs_wide.crepresentation().cbegin(),
+                                                          rhs_wide.crepresentation().cbegin(),
+                                                          8U);
+
+    return wide_integer_to_uint256(result_wide);
+}
+
+constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noexcept
+{
+    const auto rhs_high = static_cast<std::uint32_t>(rhs >> 32U);
+
+    if (rhs_high == UINT32_C(0))
+    {
+        auto lhs_wide = uint256_to_wide_integer(lhs);
+
+        wide_integer_uint256 result_wide { };
+
+        wide_integer_uint256::eval_multiply_1d(result_wide.representation().begin(),
+                                               lhs_wide.crepresentation().cbegin(),
+                                               static_cast<std::uint32_t>(rhs),
+                                               8U);
+
+        return wide_integer_to_uint256(result_wide);
+    }
+    else
+    {
+        return lhs * uint256_t(rhs);
+    }
+}
+
 // Forward declaration of specialized division 256-bits / 64-bits.
 constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const std::uint64_t& divisor) noexcept;
 
@@ -548,24 +559,6 @@ constexpr uint256_t umul256(const T &x, const uint128 &y) noexcept
 constexpr uint256_t umul256(const uint128 &x, const uint128 &y) noexcept
 {
     return umul256_impl(x.high, x.low, y.high, y.low);
-}
-
-// Returns only the high 256 bits of a 256x256 multiplication
-constexpr uint256_t umul512_high256(const uint256_t &x, const uint256_t &y) noexcept
-{
-    const auto a = x.high;
-    const auto b = x.low;
-    const auto c = y.high;
-    const auto d = y.low;
-
-    const auto ac = umul256(a, c);
-    const auto bc = umul256(b, c);
-    const auto ad = umul256(a, d);
-    const auto bd = umul256(b, d);
-
-    const auto intermediate = (bd >> 128) + ad.high + bc.high;
-
-    return ac + (intermediate >> 128) + (ad >> 128) + (bc >> 128);
 }
 
 inline auto emulated256_to_buffer(char (&buffer)[ 128 ], uint256_t v)

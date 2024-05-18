@@ -590,6 +590,101 @@ public:
     }
   }
 
+  template<typename ResultIterator,
+           typename InputIteratorLeft>
+  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_multiply_1d(      ResultIterator                                                                   r,
+                                                                          InputIteratorLeft                                                                a,
+                                                                    const typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type b,
+                                                                    const unsigned_fast_type                                                               count) -> limb_type
+  {
+    using local_limb_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type;
+    using left_value_type = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type;
+
+    static_assert
+    (
+      (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<left_value_type>::digits),
+      "Error: Internals require same widths for left-right-result limb_types at the moment"
+    );
+
+    using local_double_limb_type =
+      typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<local_limb_type>::digits * 2)>::exact_unsigned_type;
+
+    auto carry = static_cast<local_double_limb_type>(UINT8_C(0));
+
+    if(b == static_cast<left_value_type>(UINT8_C(0)))
+    {
+      detail::fill_unsafe(r, detail::advance_and_point(r, count), static_cast<limb_type>(UINT8_C(0)));
+    }
+    else
+    {
+      const auto imax = count;
+
+      auto i = static_cast<unsigned_fast_type>(UINT8_C(0));
+
+      for( ; i < imax; ++i) // NOLINT(altera-id-dependent-backward-branch)
+      {
+        carry =
+          static_cast<local_double_limb_type>
+          (
+              carry
+            + static_cast<local_double_limb_type>(static_cast<local_double_limb_type>(*a++) * b)
+          );
+
+        *r++  = static_cast<local_limb_type>(carry);
+        carry = detail::make_hi<local_limb_type>(carry);
+      }
+    }
+
+    return static_cast<local_limb_type>(carry);
+  }
+
+  template<typename ResultIterator,
+           typename InputIteratorLeft,
+           typename InputIteratorRight>
+  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_multiply_n_by_n_to_lo_part(      ResultIterator     r,
+                                                                                         InputIteratorLeft  a,
+                                                                                         InputIteratorRight b,
+                                                                                   const unsigned_fast_type count) -> void
+  {
+    static_assert
+    (
+         (std::numeric_limits<typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
+      && (std::numeric_limits<typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
+      "Error: Internals require same widths for left-right-result limb_types at the moment"
+    );
+
+    using local_limb_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type;
+
+    using local_double_limb_type =
+      typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<local_limb_type>::digits * 2)>::exact_unsigned_type;
+
+    detail::fill_unsafe(r, detail::advance_and_point(r, count), static_cast<local_limb_type>(UINT8_C(0)));
+
+    for(auto i = static_cast<unsigned_fast_type>(UINT8_C(0)); i < count; ++i) // NOLINT(altera-id-dependent-backward-branch)
+    {
+      if(*a != static_cast<local_limb_type>(UINT8_C(0)))
+      {
+        auto carry = static_cast<local_double_limb_type>(UINT8_C(0));
+
+        auto r_i_plus_j = detail::advance_and_point(r, i); // NOLINT(llvm-qualified-auto,readability-qualified-auto)
+        auto bj         = b;                               // NOLINT(llvm-qualified-auto,readability-qualified-auto)
+
+        const auto jmax = static_cast<unsigned_fast_type>(count - i);
+
+        for(auto j = static_cast<unsigned_fast_type>(UINT8_C(0)); j < jmax; ++j) // NOLINT(altera-id-dependent-backward-branch)
+        {
+          carry = static_cast<local_double_limb_type>(carry + static_cast<local_double_limb_type>(static_cast<local_double_limb_type>(*a) * *bj++));
+          carry = static_cast<local_double_limb_type>(carry + *r_i_plus_j);
+
+          *r_i_plus_j++ = static_cast<local_limb_type>(carry);
+          carry         = detail::make_hi<local_limb_type>(carry);
+        }
+      }
+
+      ++a;
+    }
+  }
+
 private:
   representation_type values { };
 
@@ -601,8 +696,8 @@ private:
   template<typename InputIteratorLeftType,
            typename InputIteratorRightType>
   static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto compare_ranges(      InputIteratorLeftType  a,
-                                                          InputIteratorRightType b,
-                                                    const unsigned_fast_type     count) -> std::int_fast8_t
+                                                                        InputIteratorRightType b,
+                                                                  const unsigned_fast_type     count) -> std::int_fast8_t
   {
     auto n_return = static_cast<std::int_fast8_t>(INT8_C(0));
 
@@ -637,10 +732,10 @@ private:
            typename InputIteratorLeft,
            typename InputIteratorRight>
   static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_add_n(      ResultIterator     r,
-                                                      InputIteratorLeft  u,
-                                                      InputIteratorRight v,
-                                                const unsigned_fast_type count,
-                                                const limb_type          carry_in = static_cast<limb_type>(UINT8_C(0))) -> limb_type
+                                                                    InputIteratorLeft  u,
+                                                                    InputIteratorRight v,
+                                                              const unsigned_fast_type count,
+                                                              const limb_type          carry_in = static_cast<limb_type>(UINT8_C(0))) -> limb_type
   {
     auto carry_out = static_cast<std::uint_fast8_t>(carry_in);
 
@@ -679,10 +774,10 @@ private:
            typename InputIteratorLeft,
            typename InputIteratorRight>
   static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_subtract_n(      ResultIterator     r,
-                                                           InputIteratorLeft  u,
-                                                           InputIteratorRight v,
-                                                     const unsigned_fast_type count,
-                                                     const bool               has_borrow_in = false) -> bool
+                                                                         InputIteratorLeft  u,
+                                                                         InputIteratorRight v,
+                                                                   const unsigned_fast_type count,
+                                                                   const bool               has_borrow_in = false) -> bool
   {
     auto has_borrow_out =
       static_cast<std::uint_fast8_t>
@@ -728,58 +823,10 @@ private:
     return (has_borrow_out != static_cast<std::uint_fast8_t>(UINT8_C(0)));
   }
 
-  template<typename ResultIterator,
-           typename InputIteratorLeft>
-  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_multiply_1d(      ResultIterator                                                                   r,
-                                                            InputIteratorLeft                                                                a,
-                                                      const typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type b,
-                                                      const unsigned_fast_type                                                               count) -> limb_type
-  {
-    using local_limb_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type;
-    using left_value_type = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type;
-
-    static_assert
-    (
-      (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<left_value_type>::digits),
-      "Error: Internals require same widths for left-right-result limb_types at the moment"
-    );
-
-    using local_double_limb_type =
-      typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<local_limb_type>::digits * 2)>::exact_unsigned_type;
-
-    auto carry = static_cast<local_double_limb_type>(UINT8_C(0));
-
-    if(b == static_cast<left_value_type>(UINT8_C(0)))
-    {
-      detail::fill_unsafe(r, detail::advance_and_point(r, count), static_cast<limb_type>(UINT8_C(0)));
-    }
-    else
-    {
-      const auto imax = count;
-
-      auto i = static_cast<unsigned_fast_type>(UINT8_C(0));
-
-      for( ; i < imax; ++i) // NOLINT(altera-id-dependent-backward-branch)
-      {
-        carry =
-          static_cast<local_double_limb_type>
-          (
-              carry
-            + static_cast<local_double_limb_type>(static_cast<local_double_limb_type>(*a++) * b)
-          );
-
-        *r++  = static_cast<local_limb_type>(carry);
-        carry = detail::make_hi<local_limb_type>(carry);
-      }
-    }
-
-    return static_cast<local_limb_type>(carry);
-  }
-
   BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth_core(const unsigned_fast_type u_offset, // NOLINT(readability-function-cognitive-complexity)
-                                                     const unsigned_fast_type v_offset,
-                                                     const uintwide_t& other,
-                                                           uintwide_t& remainder) -> void
+                                                                   const unsigned_fast_type v_offset,
+                                                                   const uintwide_t& other,
+                                                                         uintwide_t& remainder) -> void
   {
     // Use Knuth's long division algorithm.
     // The loop-ordering of indices in Knuth's original
