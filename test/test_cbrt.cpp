@@ -26,12 +26,6 @@
 #include <chrono>
 #include <random>
 
-#if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && !defined(_WIN32)
-static constexpr auto N = static_cast<std::size_t>(128U); // Number of trials
-#else
-static constexpr auto N = static_cast<std::size_t>(128U >> 4U); // Number of trials
-#endif
-
 namespace local
 {
   template<typename IntegralTimePointType,
