@@ -135,7 +135,7 @@ namespace local
 
     std::mt19937_64 gen;
 
-    std::uniform_real_distribution<float_type> dist(1.01F, 1.04F);
+    std::uniform_real_distribution<float_type> dist(static_cast<float_type>(1.01L), static_cast<float_type>(1.04L));
 
     auto result_is_ok = true;
 
@@ -376,7 +376,7 @@ auto main() -> int
   }
 
   {
-    const auto result_sqrt128_is_ok   = local::test_sqrt_128(96);
+    const auto result_sqrt128_is_ok = local::test_sqrt_128(96);
 
     BOOST_TEST(result_sqrt128_is_ok);
 

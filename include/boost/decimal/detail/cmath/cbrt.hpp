@@ -28,7 +28,6 @@ constexpr auto cbrt_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero {0, 0};
-    constexpr T one {1, 0};
 
     T result { };
 
@@ -65,8 +64,6 @@ constexpr auto cbrt_impl(T x) noexcept
 
         const bool is_pure { static_cast<unsigned>(zeros_removal.trimmed_number) == 1U };
 
-        constexpr T one  { 1 };
-
         if(is_pure)
         {
             // Here, a pure power-of-10 argument gets a straightforward result.
@@ -76,7 +73,7 @@ constexpr auto cbrt_impl(T x) noexcept
 
             if (p10 == 0)
             {
-                result = one;
+                result = T { 1 };
             }
             else
             {
