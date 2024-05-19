@@ -46,6 +46,7 @@ int main()
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/core/lightweight_test.hpp>
+
 #include <array>
 #include <chrono>
 #include <random>
@@ -85,7 +86,7 @@ namespace local
 
   template <typename T,
             const std::size_t N>
-  constexpr auto generate_array() noexcept -> std::array<T, N>
+  auto generate_p10_array() noexcept -> std::array<T, N>
   {
     std::array<T, N> values { };
 
@@ -305,13 +306,11 @@ auto test_p10_mul_uint256_t() -> void
 {
   using local_uint256_t = boost::decimal::detail::uint256_t;
 
-  constexpr auto powers_of_10 = local::generate_array<local_uint256_t, static_cast<std::size_t>(UINT8_C(78))>();
+  auto powers_of_10 = local::generate_p10_array<local_uint256_t, static_cast<std::size_t>(UINT8_C(78))>();
 
   std::size_t idx { };
 
   std::string str_p10 { "1" };
-
-  bool result_is_ok { true };
 
   for(const auto& ui_val : powers_of_10)
   {
