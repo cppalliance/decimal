@@ -452,7 +452,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(768, 0.1L, 0.9L);
+    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(768, 0.01L, 0.9L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
@@ -474,7 +474,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(2048, 0.001L, 0.9L);
+    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(4096, 0.001L, 0.9L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
@@ -485,7 +485,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(3072, 2.1L, 78.9L);
+    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(4096, 2.1L, 78.9L);
 
     BOOST_TEST(result_tgamma_is_ok);
 
