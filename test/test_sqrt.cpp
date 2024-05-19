@@ -1,5 +1,5 @@
-// Copyright 2023 Matt Borland
-// Copyright 2023 Christopher Kormanyos
+// Copyright 2023 - 2024 Matt Borland
+// Copyright 2023 - 2024 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -112,13 +112,13 @@ namespace local
 
       if(!result_val_is_ok)
       {
-          // LCOV_EXCL_START
+        // LCOV_EXCL_START
         std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
         std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
         std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
-          // LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
       }
     }
 
@@ -138,6 +138,27 @@ namespace local
     std::uniform_real_distribution<float_type> dist(1.01F, 1.04F);
 
     auto result_is_ok = true;
+
+    {
+      int np = -20;
+
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(21)); ++i)
+      {
+        static_cast<void>(i);
+
+        const decimal_type arg_p10 { 1, np };
+
+        const decimal_type val_p10 = sqrt(arg_p10);
+
+        const auto result_val_p10_is_ok = val_p10 == decimal_type { 1, np / 2 };
+
+        np += 2;
+
+        BOOST_TEST(result_val_p10_is_ok);
+
+        result_is_ok = (result_val_p10_is_ok && result_is_ok);
+      }
+    }
 
     for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
     {
@@ -220,6 +241,88 @@ namespace local
     return result_is_ok;
   }
 
+  auto test_sqrt_128(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal128;
+
+    using str_ctrl_array_type = std::array<const char*, 41U>;
+
+    const str_ctrl_array_type ctrl_strings =
+    {{
+       // Table[N[Sqrt[123456 (10^n)], 36], {n, -20, 20, 1}]
+       "3.51363060095963986639333846404180558E-8",
+       "1.11110755554986664846214940411821923E-7",
+       "3.51363060095963986639333846404180558E-7",
+       "1.11110755554986664846214940411821923E-6",
+       "3.51363060095963986639333846404180558E-6",
+       "0.0000111110755554986664846214940411821923",
+       "0.0000351363060095963986639333846404180558",
+       "0.000111110755554986664846214940411821923",
+       "0.000351363060095963986639333846404180558",
+       "0.00111110755554986664846214940411821923",
+       "0.00351363060095963986639333846404180558",
+       "0.0111110755554986664846214940411821923",
+       "0.0351363060095963986639333846404180558",
+       "0.111110755554986664846214940411821923",
+       "0.351363060095963986639333846404180558",
+       "1.11110755554986664846214940411821923",
+       "3.51363060095963986639333846404180558",
+       "11.1110755554986664846214940411821923",
+       "35.1363060095963986639333846404180558",
+       "111.110755554986664846214940411821923",
+       "351.363060095963986639333846404180558",
+       "1111.10755554986664846214940411821923",
+       "3513.63060095963986639333846404180558",
+       "11111.0755554986664846214940411821923",
+       "35136.3060095963986639333846404180558",
+       "111110.755554986664846214940411821923",
+       "351363.060095963986639333846404180558",
+       "1.11110755554986664846214940411821923E6",
+       "3.51363060095963986639333846404180558E6",
+       "1.11110755554986664846214940411821923E7",
+       "3.51363060095963986639333846404180558E7",
+       "1.11110755554986664846214940411821923E8",
+       "3.51363060095963986639333846404180558E8",
+       "1.11110755554986664846214940411821923E9",
+       "3.51363060095963986639333846404180558E9",
+       "1.11110755554986664846214940411821923E10",
+       "3.51363060095963986639333846404180558E10",
+       "1.11110755554986664846214940411821923E11",
+       "3.51363060095963986639333846404180558E11",
+       "1.11110755554986664846214940411821923E12",
+       "3.51363060095963986639333846404180558E12",
+    }};
+
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> sqrt_values { };
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
+
+    int nx { -20 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
+    {
+      const decimal_type x_arg = decimal_type { 123456L, nx };
+
+      ++nx;
+
+      sqrt_values[i] = sqrt(x_arg);
+
+      static_cast<void>
+      (
+        from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+      );
+
+      const auto result_sqrt_is_ok = is_close_fraction(sqrt_values[i], ctrl_values[i], my_tol);
+
+      result_is_ok = (result_sqrt_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
 } // namespace local
 
 auto main() -> int
@@ -230,7 +333,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal32;
     using float_type   = float;
 
-    const auto result_small_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(64)), 1.0E-26L, 1.0E-01L);
+    const auto result_small_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E-26L, 1.0E-01L);
     const auto result_medium_is_ok = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 0.9E-01L, 1.1E+01L);
     const auto result_large_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E+01L, 1.0E+26L);
 
@@ -253,9 +356,9 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_small_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(32)), 1.0E-76L, 1.0E-01L);
-    const auto result_medium_is_ok = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(32)), 0.9E-01L, 1.1E+01L);
-    const auto result_large_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(32)), 1.0E+01L, 1.0E+76L);
+    const auto result_small_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E-76L, 1.0E-01L);
+    const auto result_medium_is_ok = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 0.9E-01L, 1.1E+01L);
+    const auto result_large_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E+01L, 1.0E+76L);
 
     BOOST_TEST(result_small_is_ok);
     BOOST_TEST(result_medium_is_ok);
@@ -270,6 +373,14 @@ auto main() -> int
     BOOST_TEST(result_edge_is_ok);
 
     result_is_ok = (result_edge_is_ok && result_is_ok);
+  }
+
+  {
+    const auto result_sqrt128_is_ok   = local::test_sqrt_128(96);
+
+    BOOST_TEST(result_sqrt128_is_ok);
+
+    result_is_ok = (result_sqrt128_is_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);

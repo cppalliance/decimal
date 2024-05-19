@@ -519,9 +519,7 @@ auto main() -> int
   }
 
   {
-    // TODO(ckormanyos) Can we reduce the tolerance on lgamma()-128?
-    // Can the approximation be done a bit better (Lanczos from Math?).
-    const auto result_lgamma128_is_ok   = local::test_lgamma_128(16'000'000);
+    const auto result_lgamma128_is_ok   = local::test_lgamma_128(8092);
 
     BOOST_TEST(result_lgamma128_is_ok);
 

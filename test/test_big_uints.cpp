@@ -86,7 +86,72 @@ namespace local
 
 template<typename BoostCtrlUint_Type,
          typename DecInternUint_Type>
-auto test_big_uints() -> void
+auto test_big_uints_mul() -> void
+{
+  using boost_ctrl_uint_type = BoostCtrlUint_Type;
+  using dec_intern_uint_type = DecInternUint_Type;
+
+  constexpr auto digits2 = std::numeric_limits<boost_ctrl_uint_type>::digits;
+
+  using random_engine_type = std::mt19937_64;
+  using bit_distribution_type = std::uniform_int_distribution<int>;
+
+  random_engine_type    rng(local::time_point<typename random_engine_type::result_type>());
+  bit_distribution_type bts(0, 1);
+
+  bool lhs_is_fixed_and_near_max = true;
+  bool rhs_is_fixed_and_variable = (!lhs_is_fixed_and_near_max);
+
+  for(auto trials = static_cast<int>(INT8_C(0)); trials < static_cast<int>(INT16_C(0x200)); ++trials)
+  {
+    for(auto digits_split  = static_cast<int>(INT8_C(98));
+             digits_split  > static_cast<int>(INT8_C(50));
+             digits_split -= static_cast<int>(INT8_C( 5)))
+    {
+      const auto split = static_cast<float>(static_cast<float>(digits_split) / 100.0F);
+
+      auto digits_lhs = static_cast<int>(digits2 - 1);
+      auto digits_rhs = static_cast<int>(static_cast<float>((1.0F - split) * digits2));
+
+      boost_ctrl_uint_type boost_ctrl_uint_lhs(1);
+      dec_intern_uint_type dec_intern_uint_lhs(1);
+      boost_ctrl_uint_type boost_ctrl_uint_rhs(1);
+      dec_intern_uint_type dec_intern_uint_rhs(1);
+
+      if(lhs_is_fixed_and_near_max)
+      {
+        boost_ctrl_uint_lhs <<= static_cast<unsigned>(digits2 - 1);
+        dec_intern_uint_lhs <<= static_cast<unsigned>(digits2 - 1);
+      }
+      else
+      {
+        for(int i = 1; i < digits_lhs; ++i) { const int next_bit = bts(rng); boost_ctrl_uint_lhs <<= 1; dec_intern_uint_lhs <<= 1; if(next_bit != 0) { boost_ctrl_uint_lhs |= boost_ctrl_uint_type(1); dec_intern_uint_lhs |= dec_intern_uint_type(1); } }
+      }
+
+      if(rhs_is_fixed_and_variable)
+      {
+        boost_ctrl_uint_rhs <<= static_cast<unsigned>(digits_rhs);
+        dec_intern_uint_rhs <<= static_cast<unsigned>(digits_rhs);
+      }
+      else
+      {
+        for(int i = 1; i < digits_rhs; ++i) { const int next_bit = bts(rng); boost_ctrl_uint_rhs <<= 1; dec_intern_uint_rhs <<= 1; if(next_bit != 0) { boost_ctrl_uint_rhs |= boost_ctrl_uint_type(1); dec_intern_uint_rhs |= dec_intern_uint_type(1); } }
+      }
+
+      lhs_is_fixed_and_near_max = (!lhs_is_fixed_and_near_max);
+      rhs_is_fixed_and_variable = (!rhs_is_fixed_and_variable);
+
+      const auto dec_intern_div = dec_intern_uint_lhs * dec_intern_uint_rhs;
+      const auto boost_ctrl_div = boost_ctrl_uint_lhs * boost_ctrl_uint_rhs;
+
+      BOOST_TEST(local::declexical_cast(dec_intern_div) == local::declexical_cast(boost_ctrl_div));
+    }
+  }
+}
+
+template<typename BoostCtrlUint_Type,
+         typename DecInternUint_Type>
+auto test_big_uints_div() -> void
 {
   using boost_ctrl_uint_type = BoostCtrlUint_Type;
   using dec_intern_uint_type = DecInternUint_Type;
@@ -149,7 +214,7 @@ auto test_big_uints() -> void
   }
 }
 
-auto test_spot_uint256_t() -> void
+auto test_spot_div_uint256_t() -> void
 {
   using boost_ctrl_uint_type = boost::multiprecision::uint256_t;
   using dec_intern_uint_type = boost::decimal::detail::uint256_t;
@@ -217,10 +282,13 @@ auto test_spot_uint256_t() -> void
 
 int main()
 {
-  test_big_uints<boost::multiprecision::uint128_t, boost::decimal::detail::uint128>();
-  test_big_uints<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
+  test_big_uints_mul<boost::multiprecision::uint128_t, boost::decimal::detail::uint128>();
+  test_big_uints_mul<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
 
-  test_spot_uint256_t();
+  test_big_uints_div<boost::multiprecision::uint128_t, boost::decimal::detail::uint128>();
+  test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
+
+  test_spot_div_uint256_t();
 
   return boost::report_errors();
 }
