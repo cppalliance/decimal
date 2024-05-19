@@ -380,6 +380,8 @@ constexpr auto wide_integer_to_uint256(const wide_integer_uint256& src) -> uint2
 
 constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
+    using local_unsigned_fast_type = ::boost::decimal::math::wide_integer::detail::unsigned_fast_type;
+
     // Mash-Up: Use unrolled school-multiplication from wide-integer (requires limb-conversions on input/output).
 
     auto lhs_wide = uint256_to_wide_integer(lhs);
@@ -390,14 +392,16 @@ constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexce
     wide_integer_uint256::eval_multiply_n_by_n_to_lo_part(result_wide.representation().begin(),
                                                           lhs_wide.crepresentation().cbegin(),
                                                           rhs_wide.crepresentation().cbegin(),
-                                                          8U);
+                                                          static_cast<local_unsigned_fast_type>(UINT8_C(8)));
 
     return wide_integer_to_uint256(result_wide);
 }
 
 constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noexcept
 {
-    const auto rhs_high = static_cast<std::uint32_t>(rhs >> 32U);
+    using local_unsigned_fast_type = ::boost::decimal::math::wide_integer::detail::unsigned_fast_type;
+
+    const auto rhs_high = static_cast<std::uint32_t>(rhs >> static_cast<unsigned>(UINT8_C(32)));
 
     wide_integer_uint256 result_wide { };
 
@@ -408,7 +412,7 @@ constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noe
         wide_integer_uint256::eval_multiply_1d(result_wide.representation().begin(),
                                                lhs_wide.crepresentation().cbegin(),
                                                static_cast<std::uint32_t>(rhs),
-                                               8U);
+                                               static_cast<local_unsigned_fast_type>(UINT8_C(8)));
     }
     else
     {
@@ -417,12 +421,10 @@ constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noe
         auto lhs_wide = uint256_to_wide_integer(lhs);
         auto rhs_wide = uint256_to_wide_integer(uint256_t(rhs));
 
-        wide_integer_uint256 result_wide { };
-
         wide_integer_uint256::eval_multiply_n_by_n_to_lo_part(result_wide.representation().begin(),
                                                               lhs_wide.crepresentation().cbegin(),
                                                               rhs_wide.crepresentation().cbegin(),
-                                                              8U);
+                                                              static_cast<local_unsigned_fast_type>(UINT8_C(8)));
     }
 
     return wide_integer_to_uint256(result_wide);
