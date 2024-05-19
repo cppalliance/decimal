@@ -184,11 +184,11 @@ namespace local
 
         if(np_mod3 == 0)
         {
-          result_val_p10_is_ok = (val_p10 == decimal_type { 1, np / 3 });
+          result_val_p10_is_ok = (val_p10 == decimal_type { 1, np_div3 });
         }
         else
         {
-          decimal_type val_p10_ctrl { 1, np / 3 };
+          decimal_type val_p10_ctrl { 1, np_div3 };
 
           switch (np_mod3)
           {

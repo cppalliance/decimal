@@ -82,7 +82,28 @@ namespace local
 
     return strm.str();
   }
-}
+
+  template <typename T,
+            const std::size_t N>
+  constexpr auto generate_array() noexcept -> std::array<T, N>
+  {
+    std::array<T, N> values { };
+
+    std::size_t index { 0 };
+
+    values[index] = T { 1 };
+
+    ++index;
+
+    for ( ; index < N; ++index)
+    {
+      values[index] = values[index - 1] * UINT64_C(10);
+    }
+
+    return values;
+  }
+
+} // namespace local
 
 template<typename BoostCtrlUint_Type,
          typename DecInternUint_Type>
@@ -280,6 +301,32 @@ auto test_spot_div_uint256_t() -> void
   }
 }
 
+auto test_p10_mul_uint256_t() -> void
+{
+  using local_uint256_t = boost::decimal::detail::uint256_t;
+
+  constexpr auto powers_of_10 = local::generate_array<local_uint256_t, static_cast<std::size_t>(UINT8_C(78))>();
+
+  std::size_t idx { };
+
+  std::string str_p10 { "1" };
+
+  bool result_is_ok { true };
+
+  for(const auto& ui_val : powers_of_10)
+  {
+    std::stringstream strm;
+
+    strm << ui_val;
+
+    BOOST_TEST(strm.str() == str_p10);
+
+    str_p10.push_back('0');
+
+    ++idx;
+  }
+}
+
 int main()
 {
   test_big_uints_mul<boost::multiprecision::uint128_t, boost::decimal::detail::uint128>();
@@ -289,6 +336,8 @@ int main()
   test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
 
   test_spot_div_uint256_t();
+
+  test_p10_mul_uint256_t();
 
   return boost::report_errors();
 }
