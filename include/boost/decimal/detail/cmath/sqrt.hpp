@@ -26,28 +26,21 @@ template <typename T>
 constexpr auto sqrt_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    constexpr T zero {0, 0};
+    const auto fpc = fpclassify(x);
 
     T result { };
 
-    if (isnan(x) || abs(x) == zero)
+    if ((fpc == FP_NAN) || (fpc == FP_ZERO))
     {
         result = x;
     }
-    else if (isinf(x))
-    {
-        if (signbit(x))
-        {
-            result = std::numeric_limits<T>::quiet_NaN();
-        }
-        else
-        {
-            result = x;
-        }
-    }
-    else if (x < zero)
+    else if (signbit(x))
     {
         result = std::numeric_limits<T>::quiet_NaN();
+    }
+    else if (fpc == FP_INFINITE)
+    {
+        result = std::numeric_limits<T>::infinity();
     }
     else
     {

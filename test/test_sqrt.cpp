@@ -142,7 +142,7 @@ namespace local
     {
       int np = -20;
 
-      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(21)); ++i)
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(41)); ++i)
       {
         static_cast<void>(i);
 
@@ -150,9 +150,28 @@ namespace local
 
         const decimal_type val_p10 = sqrt(arg_p10);
 
-        const auto result_val_p10_is_ok = val_p10 == decimal_type { 1, np / 2 };
+        bool result_val_p10_is_ok { };
 
-        np += 2;
+        const int np_mod2 = np % 2;
+
+        if(np_mod2 == 0)
+        {
+          result_val_p10_is_ok = (val_p10 == decimal_type { 1, np / 2 });
+        }
+        else if(np_mod2 == -1)
+        {
+          decimal_type val_p10_ctrl = decimal_type { 1, np / 2 } / boost::decimal::numbers::sqrt10_v<decimal_type>;
+
+          result_val_p10_is_ok = (val_p10 == val_p10_ctrl);
+        }
+        else if(np_mod2 == 1)
+        {
+          decimal_type val_p10_ctrl = decimal_type { 1, np / 2 } * boost::decimal::numbers::sqrt10_v<decimal_type>;
+
+          result_val_p10_is_ok = (val_p10 == val_p10_ctrl);
+        }
+
+        ++np;
 
         BOOST_TEST(result_val_p10_is_ok);
 

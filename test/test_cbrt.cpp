@@ -169,17 +169,50 @@ namespace local
     {
       int np = -33;
 
-      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(23)); ++i)
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(67)); ++i)
       {
         static_cast<void>(i);
 
         const decimal_type arg_p10 { 1, np };
 
-        const decimal_type val_p10 = cbrt(arg_p10);
+        decimal_type val_p10 = cbrt(arg_p10);
 
-        const auto result_val_p10_is_ok = val_p10 == decimal_type { 1, np / 3 };
+        bool result_val_p10_is_ok { };
 
-        np += 3;
+        const int np_mod3 = np % 3;
+        const int np_div3 = np / 3;
+
+        if(np_mod3 == 0)
+        {
+          result_val_p10_is_ok = (val_p10 == decimal_type { 1, np / 3 });
+        }
+        else
+        {
+          decimal_type val_p10_ctrl { 1, np / 3 };
+
+          switch (np_mod3)
+          {
+            case 2:
+                val_p10_ctrl *= boost::decimal::numbers::cbrt10_v<decimal_type>;
+                // fallthrough
+
+            case 1:
+                val_p10_ctrl *= boost::decimal::numbers::cbrt10_v<decimal_type>;
+                break;
+
+            case -2:
+                val_p10_ctrl /= boost::decimal::numbers::cbrt10_v<decimal_type>;
+                // fallthrough
+
+            case -1:
+                val_p10_ctrl /= boost::decimal::numbers::cbrt10_v<decimal_type>;
+                break;
+          }
+
+          result_val_p10_is_ok = (val_p10 == val_p10_ctrl);
+        }
+
+        ++np;
 
         BOOST_TEST(result_val_p10_is_ok);
 
