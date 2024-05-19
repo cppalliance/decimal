@@ -308,8 +308,6 @@ auto test_p10_mul_uint256_t() -> void
 
   auto powers_of_10 = local::generate_p10_array<local_uint256_t, static_cast<std::size_t>(UINT8_C(78))>();
 
-  std::size_t idx { };
-
   std::string str_p10 { "1" };
 
   for(const auto& ui_val : powers_of_10)
@@ -321,8 +319,6 @@ auto test_p10_mul_uint256_t() -> void
     BOOST_TEST(strm.str() == str_p10);
 
     str_p10.push_back('0');
-
-    ++idx;
   }
 }
 
