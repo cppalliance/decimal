@@ -394,7 +394,6 @@ void spot_check_addition(T a, T b, T res)
     }
 }
 
-/*
 void test_hash()
 {
     decimal32_fast one {1, 0};
@@ -402,7 +401,6 @@ void test_hash()
 
     BOOST_TEST_NE(std::hash<decimal32_fast>{}(one), std::hash<decimal32_fast>{}(zero));
 }
- */
 
 void test_shrink_significand()
 {
@@ -439,7 +437,7 @@ int main()
     test_multiplicatiom();
     // test_div_mod();
 
-    // test_hash();
+    test_hash();
 
     spot_check_addition(-1054191000, -920209700, -1974400700);
     spot_check_addition(353582500, -32044770, 321537730);
