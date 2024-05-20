@@ -61,6 +61,8 @@ private:
 
     friend constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& q, decimal32_fast& r) noexcept -> void;
 
+    friend constexpr auto mod_impl(decimal32_fast lhs, decimal32_fast rhs, const decimal32_fast& q, decimal32_fast& r) noexcept -> void;
+
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
@@ -115,12 +117,14 @@ public:
     friend constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
+    friend constexpr auto operator%(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
 
     // Compound operators
     constexpr auto operator+=(decimal32_fast rhs) noexcept -> decimal32_fast&;
     constexpr auto operator-=(decimal32_fast rhs) noexcept -> decimal32_fast&;
     constexpr auto operator*=(decimal32_fast rhs) noexcept -> decimal32_fast&;
     constexpr auto operator/=(decimal32_fast rhs) noexcept -> decimal32_fast&;
+    constexpr auto operator%=(decimal32_fast rhs) noexcept -> decimal32_fast&;
 
     // Increment and decrement
     constexpr auto operator++() noexcept -> decimal32_fast&;
@@ -523,6 +527,15 @@ constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& 
     q = decimal32_fast(q_components.sig, q_components.exp, q_components.sign);
 }
 
+constexpr auto mod_impl(decimal32_fast lhs, decimal32_fast rhs, const decimal32_fast& q, decimal32_fast& r) noexcept -> void
+{
+    constexpr decimal32_fast zero {0, 0};
+
+    // https://en.cppreference.com/w/cpp/numeric/math/fmod
+    auto q_trunc {q > zero ? floor(q) : ceil(q)};
+    r = lhs - (decimal32_fast(q_trunc) * rhs);
+}
+
 constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
 {
     decimal32_fast q {};
@@ -530,6 +543,22 @@ constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     div_impl(lhs, rhs, q, r);
 
     return q;
+}
+
+constexpr auto operator%(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
+{
+    decimal32_fast q {};
+    decimal32_fast r {};
+    div_impl(lhs, rhs, q, r);
+    mod_impl(lhs, rhs, q, r);
+
+    return r;
+}
+
+constexpr auto decimal32_fast::operator%=(decimal32_fast rhs) noexcept -> decimal32_fast&
+{
+    *this = *this % rhs;
+    return *this;
 }
 
 constexpr auto decimal32_fast::operator+=(decimal32_fast rhs) noexcept -> decimal32_fast&
