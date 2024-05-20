@@ -218,8 +218,8 @@ void test_addition()
     BOOST_TEST_EQ(small_num + big_num, big_num);
 
     // Case 2: Round the last digit of the significand
-    constexpr decimal32 full_length_num {1000000, 1};
-    constexpr decimal32 rounded_full_length_num(1000001, 1);
+    constexpr decimal32 full_length_num {1000000, 0};
+    constexpr decimal32 rounded_full_length_num {1000001, 0};
     constexpr decimal32 no_round(1, -1);
     constexpr decimal32 round(9, -1);
     BOOST_TEST_EQ(full_length_num + no_round, full_length_num);
