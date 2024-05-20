@@ -53,10 +53,10 @@ constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         exp_bigger -= 2;
     }
 
-    while (delta_exp > 1)
+    if (delta_exp > 1)
     {
-        sig_smaller /= 10;
-        --delta_exp;
+        sig_smaller /= pow10(delta_exp - 1);
+        delta_exp = 1;
     }
 
     if (delta_exp == 1)
@@ -66,16 +66,9 @@ constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     // Both of the significands are less than 9'999'999, so we can safely
     // cast them to signed 32-bit ints to calculate the new significand
-    std::int32_t new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
-
-    if (rhs_sign && !lhs_sign)
-    {
-        new_sig = static_cast<std::int32_t>(signed_sig_lhs) + static_cast<std::int32_t>(signed_sig_rhs);
-    }
-    else
-    {
-        new_sig = static_cast<std::int32_t>(signed_sig_lhs) - static_cast<std::int32_t>(signed_sig_rhs);
-    }
+    std::int32_t new_sig = (rhs_sign && !lhs_sign) ?
+            static_cast<std::int32_t>(signed_sig_lhs) + static_cast<std::int32_t>(signed_sig_rhs) :
+            static_cast<std::int32_t>(signed_sig_lhs) - static_cast<std::int32_t>(signed_sig_rhs);
 
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
     const auto new_sign {new_sig < 0};
