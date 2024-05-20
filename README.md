@@ -1,15 +1,19 @@
 # Decimal
+
 |                  | Master                                                                                                                                                            |   Develop   |
 |------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
 | Drone            | [![Build Status](https://drone.cpp.al/api/badges/cppalliance/decimal/status.svg?ref=refs/heads/master)](https://drone.cpp.al/cppalliance/decimal)                 | [![Build Status](https://drone.cpp.al/api/badges/cppalliance/decimal/status.svg?ref=refs/heads/develop)](https://drone.cpp.al/cppalliance/decimal) |
-| Github Actions | [![CI](https://github.com/cppalliance/decimal/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/ci.yml) | [![CI](https://github.com/cppalliance/decimal/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/ci.yml)
-| Codecov | [![codecov](https://codecov.io/gh/cppalliance/decimal/branch/master/graph/badge.svg?token=drvY8nnV5S)](https://codecov.io/gh/cppalliance/decimal)                 | [![codecov](https://codecov.io/gh/cppalliance/decimal/graph/badge.svg?token=drvY8nnV5S)](https://codecov.io/gh/cppalliance/decimal) |
-| Fuzzing | [![Fuzzing](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml) | [![Fuzzing](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml) |
+| Github Actions   | [![CI](https://github.com/cppalliance/decimal/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/ci.yml) | [![CI](https://github.com/cppalliance/decimal/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/ci.yml)
+| Codecov          | [![codecov](https://codecov.io/gh/cppalliance/decimal/branch/master/graph/badge.svg?token=drvY8nnV5S)](https://codecov.io/gh/cppalliance/decimal)                 | [![codecov](https://codecov.io/gh/cppalliance/decimal/graph/badge.svg?token=drvY8nnV5S)](https://codecov.io/gh/cppalliance/decimal) |
+| Fuzzing          | [![Fuzzing](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml) | [![Fuzzing](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml) |
 
 ---
 
-An implementation of IEEE 754 decimal floating point numbers.
-It is header only, and requires C++14
+Decimal is an implementation of IEEE-754:2008 decimal floating point numbers.
+See also [1].
+
+The library is is header-only, and requires C++14.
+It is compatible through C++17, 20, 23 and beyond.
 
 # Notice
 
@@ -21,28 +25,28 @@ This library is header only, and contains no dependencies.
 
 ## CMake
 
-````
+```sh
 git clone https://github.com/cppalliance/decimal
 cd decimal
 mkdir build && cd build
 cmake .. OR cmake .. -DCMAKE_INSTALL_PREFIX=/your/custom/path
 cmake --install .
-````
+```
 
 ## vcpkg
 
-````
+```sh
 git clone https://github.com/cppalliance/decimal
 cd decimal
 vcpkg install decimal --overlay-ports=ports/decimal 
-````
+```
 
 ## Conan
 
-````
+```sh
 git clone https://github.com/cppalliance/decimal
 conan create decimal/conan --build missing
-````
+```
 
 # Supported Platforms
 
@@ -56,7 +60,7 @@ Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, a
 
 Decimal provides 3 types: 
 
-````
+```cpp
 namespace boost {
 namespace decimal {
 
@@ -66,21 +70,24 @@ class decimal128;
 
 } //namespace decimal
 } //namespace boost
-````
+```
 
-These types operate like built-in floating point types, and have their own implementations of the STL functions (e.g. cmath, charconv, cstdlib, etc.).
+These types operate like built-in floating point types.
+They have their own implementations of the Standar-Library functions
+(e.g. like those found in `<cmath>`, `<charconv>`, `<cstdlib>`, etc.).
+
 The entire library can be conveniently included with `#include <boost/decimal.hpp>`
 
-Using the types is simple:
+Using the decimal types is simple.
 
-````
+```cpp
 #include <boost/decimal.hpp>
 #include <iostream>
 
 int main()
 {
     using boost::decimal::decimal32;
-    
+
     constexpr decimal32 a {2, -1}; // Constructs the number 0.2
     constexpr decimal32 b {1, -1}; // Constructs the number 0.1
     auto sum {a + b};
@@ -95,11 +102,12 @@ int main()
 
     return 0;
 }
-````
+```
 
-Same with using STL functions:
+This intuitive straightforwardness is the same when using Standard-Library
+functions (such as `<cmath>`-like functions).
 
-````
+```cpp
 #include <boost/decimal.hpp>
 #include <cassert>
 #include <cstring>
@@ -123,8 +131,13 @@ int main()
 
     return 0;
 }
-````
+```
 
 # Full Documentation
 
 The complete documentation can be found at: https://cppalliance.org/decimal/decimal.html
+
+## References
+
+[1] IEEE Computer Society. _IEEE_ _Standard_ _for_ _Floating-Point_ _Arithmetic_,
+IEEE Std 754-2008, August 29, 2008 (doi:10.1109/IEEESTD.2008.4610935).
