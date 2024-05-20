@@ -71,6 +71,9 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+    friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
+
 public:
     constexpr decimal32_fast() noexcept : significand_{}, exponent_{}, sign_ {} {}
 
@@ -142,6 +145,9 @@ public:
     explicit constexpr operator detail::int128_t() const noexcept;
     explicit constexpr operator detail::uint128_t() const noexcept;
     #endif
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr operator Decimal() const noexcept;
 
     friend constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign) noexcept -> decimal32_fast;
 };
@@ -643,6 +649,12 @@ constexpr decimal32_fast::operator detail::uint128_t() const noexcept
 }
 
 #endif
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal32_fast::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
+}
 
 } // namespace decimal
 } // namespace boost
