@@ -17,11 +17,12 @@ It is compatible through C++14, 17, 20, 23 and beyond.
 
 # Notice
 
-This library is not an official boost library, and is under active development.
+Decimal is under active development and is not an official boost library.
 
 # How To Use The Library
 
-This library is header only, and contains no dependencies.
+This library is header only. It contains no other dependencies.
+Simply `#include` it and use it.
 
 ## CMake
 
@@ -107,7 +108,7 @@ int main()
 ```
 
 This intuitive straightforwardness is the same when using Standard-Library
-functions (such as `<cmath>`-like functions).
+functions (such as STL functions, `<cmath>`-like functions and the like).
 
 ```cpp
 #include <boost/decimal.hpp>
