@@ -869,46 +869,46 @@ int main()
     random_addition(-5'000'000, 0);
     random_addition(-5'000'000L, 0L);
     random_addition(-5'000'000LL, 0LL);
-    //random_mixed_addition(-5'000'000, 0);
-    //random_mixed_addition(-5'000'000L, 0L);
-    //random_mixed_addition(-5'000'000LL, 0LL);
+    random_mixed_addition(-5'000'000, 0);
+    random_mixed_addition(-5'000'000L, 0L);
+    random_mixed_addition(-5'000'000LL, 0LL);
 
     // Only positive values
     random_subtraction(0, 5'000'000);
     random_subtraction(0L, 5'000'000L);
     random_subtraction(0LL, 5'000'000LL);
-    //random_mixed_subtraction(0, 5'000'000);
-    //random_mixed_subtraction(0L, 5'000'000L);
-    //random_mixed_subtraction(0LL, 5'000'000LL);
+    random_mixed_subtraction(0, 5'000'000);
+    random_mixed_subtraction(0L, 5'000'000L);
+    random_mixed_subtraction(0LL, 5'000'000LL);
 
     // Only two negative values
     random_subtraction(-5'000'000, 0);
     random_subtraction(-5'000'000L, 0L);
     random_subtraction(-5'000'000LL, 0LL);
-    //random_mixed_subtraction(-5'000'000, 0);
-    //random_mixed_subtraction(-5'000'000L, 0L);
-    //random_mixed_subtraction(-5'000'000LL, 0LL);
+    random_mixed_subtraction(-5'000'000, 0);
+    random_mixed_subtraction(-5'000'000L, 0L);
+    random_mixed_subtraction(-5'000'000LL, 0LL);
 
     // Mixed Values
     random_subtraction(-5'000'000, 5'000'000);
     random_subtraction(-5'000'000L, 5'000'000L);
     random_subtraction(-5'000'000LL, 5'000'000LL);
-    //random_mixed_subtraction(-5'000'000, 5'000'000);
-    //random_mixed_subtraction(-5'000'000L, 5'000'000L);
-    //random_mixed_subtraction(-5'000'000LL, 5'000'000LL);
+    random_mixed_subtraction(-5'000'000, 5'000'000);
+    random_mixed_subtraction(-5'000'000L, 5'000'000L);
+    random_mixed_subtraction(-5'000'000LL, 5'000'000LL);
 
     // Anything in range
     random_addition(-5'000'000, 5'000'000);
     random_addition(-5'000'000L, 5'000'000L);
     random_addition(-5'000'000LL, 5'000'000LL);
-    //random_mixed_addition(-5'000'000, 5'000'000);
-    //random_mixed_addition(-5'000'000L, 5'000'000L);
-    //random_mixed_addition(-5'000'000LL, 5'000'000LL);
+    random_mixed_addition(-5'000'000, 5'000'000);
+    random_mixed_addition(-5'000'000L, 5'000'000L);
+    random_mixed_addition(-5'000'000LL, 5'000'000LL);
 
     // Anything in the domain
-    //random_converted_addition(0, (std::numeric_limits<int>::max)() / 2);
-    //random_converted_addition((std::numeric_limits<int>::min)() / 2, 0);
-    //random_converted_addition((std::numeric_limits<int>::min)() / 2, (std::numeric_limits<int>::max)() / 2);
+    random_converted_addition(0, (std::numeric_limits<int>::max)() / 2);
+    random_converted_addition((std::numeric_limits<int>::min)() / 2, 0);
+    random_converted_addition((std::numeric_limits<int>::min)() / 2, (std::numeric_limits<int>::max)() / 2);
 
     // Positive values
     const auto sqrt_int_max = static_cast<int>(std::sqrt(static_cast<double>((std::numeric_limits<int>::max)())));
