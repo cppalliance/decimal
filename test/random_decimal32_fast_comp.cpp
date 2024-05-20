@@ -556,28 +556,28 @@ int main()
     random_EQ(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_EQ(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_EQ(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-/*
+
     random_mixed_EQ(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_mixed_EQ(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_mixed_EQ(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_mixed_EQ(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_EQ(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_EQ(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-*/
+
     random_NE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_NE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_NE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_NE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_NE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_NE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-/*
+
     random_mixed_NE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_mixed_NE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_mixed_NE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_mixed_NE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_NE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_NE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-*/
+
 /*
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     random_SPACESHIP(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
