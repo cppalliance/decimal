@@ -175,7 +175,7 @@ namespace local
         std::cerr << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
-        // LCOV_EXCL_START
+        // LCOV_EXCL_STOP
       }
     }
 

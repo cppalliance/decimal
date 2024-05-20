@@ -642,10 +642,150 @@ public:
   template<typename ResultIterator,
            typename InputIteratorLeft,
            typename InputIteratorRight>
-  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_multiply_n_by_n_to_lo_part(      ResultIterator     r,
-                                                                                         InputIteratorLeft  a,
-                                                                                         InputIteratorRight b,
-                                                                                   const unsigned_fast_type count) -> void
+  static constexpr auto eval_multiply_n_by_n_to_lo_part_128(      ResultIterator     r,
+                                                                  InputIteratorLeft  a,
+                                                                  InputIteratorRight b,
+                                                            const unsigned_fast_type count) -> void
+  {
+    static_cast<void>(count);
+
+    using local_limb_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type;
+
+    static_assert
+    (
+         (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
+      && (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
+      "Error: Internals require same widths for left-right-result limb_types at the moment"
+    );
+
+    using local_double_limb_type =
+      typename detail::uint_type_helper<static_cast<size_t>(static_cast<int>(std::numeric_limits<local_limb_type>::digits * static_cast<int>(INT8_C(2))))>::exact_unsigned_type;
+
+    using result_difference_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::difference_type;
+    using left_difference_type   = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::difference_type;
+    using left_value_type        = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type;
+    using right_difference_type  = typename detail::iterator_detail::iterator_traits<InputIteratorRight>::difference_type;
+
+    // The algorithm has been derived from the polynomial multiplication.
+    // After the multiplication terms of equal order are grouped
+    // together and retained up to order(3). The carries from the
+    // multiplications are included when adding up the terms.
+    // The results of the intermediate multiplications are stored
+    // in local variables in memory.
+
+    //   Column[CoefficientList[Expand[(a0 + a1 x + a2 x^2 + a3 x^3) (b0 + b1 x + b2 x^2 + b3 x^3)], x]]
+    //   a0b0
+    //   a1b0 + a0b1
+    //   a2b0 + a1b1 + a0b2
+    //   a3b0 + a2b1 + a1b2 + a0b3
+
+    // See also Wolfram Alpha at:
+    // https://www.wolframalpha.com/input/?i=Column%5BCoefficientList%5B+++Expand%5B%28a0+%2B+a1+x+%2B+a2+x%5E2+%2B+a3+x%5E3%29+%28b0+%2B+b1+x+%2B+b2+x%5E2+%2B+b3+x%5E3%29%5D%2C++++x%5D%5D
+    // ... and take the upper half of the pyramid.
+
+    // Performance improvement:
+    //   (old) kops_per_sec: 33173.50
+    //   (new) kops_per_sec: 95069.43
+
+    local_double_limb_type r1 { };
+    local_double_limb_type r2 { };
+
+    const auto a0b0 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(0)) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0)))));
+    const auto a0b1 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(0)) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1)))));
+    const auto a1b0 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(1)) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0)))));
+    const auto a1b1 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(1)) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1)))));
+
+    // One special case is considered, the case of multiplication
+    // of the form BITS/2 * BITS/2 = BITS. In this case, the algorithm
+    // can be significantly simplified by using only the 'lower-halves'
+    // of the data.
+    if(    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) == static_cast<left_value_type>(UINT8_C(0))) && (*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2))) == static_cast<left_value_type>(UINT8_C(0)))
+        && (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(3))) == static_cast<left_value_type>(UINT8_C(0))) && (*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(3))) == static_cast<left_value_type>(UINT8_C(0))))
+    {
+      r1    = static_cast<local_double_limb_type>
+              (
+                static_cast<local_double_limb_type>
+                (
+                  detail::make_hi<local_limb_type>(a0b0) // LCOV_EXCL_LINE
+                )
+                + detail::make_lo<local_limb_type>(a1b0)
+                + detail::make_lo<local_limb_type>(a0b1)
+              )
+              ;
+      r2    = static_cast<local_double_limb_type>
+              (
+                static_cast<local_double_limb_type>
+                (
+                  detail::make_hi<local_limb_type>(r1) // LCOV_EXCL_LINE
+                )
+                + detail::make_lo<local_limb_type>(a1b1)
+                + detail::make_hi<local_limb_type>(a0b1)
+                + detail::make_hi<local_limb_type>(a1b0)
+              )
+              ;
+      *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(3)))
+            = static_cast<local_limb_type>
+              (
+                  detail::make_hi<local_limb_type>(r2)
+                + detail::make_hi<local_limb_type>(a1b1)
+              )
+              ;
+    }
+    else
+    {
+      const auto a0b2 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2)))));
+      const auto a2b0 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0)))));
+
+      r1    = static_cast<local_double_limb_type>
+              (
+                static_cast<local_double_limb_type>
+                (
+                  detail::make_hi<local_limb_type>(a0b0)
+                )
+                + detail::make_lo<local_limb_type>(a1b0)
+                + detail::make_lo<local_limb_type>(a0b1)
+              )
+              ;
+      r2    = static_cast<local_double_limb_type>
+              (
+                static_cast<local_double_limb_type>
+                (
+                  detail::make_hi<local_limb_type>(r1)
+                )
+                + detail::make_lo<local_limb_type>(a2b0)
+                + detail::make_lo<local_limb_type>(a1b1)
+                + detail::make_lo<local_limb_type>(a0b2)
+                + detail::make_hi<local_limb_type>(a1b0)
+                + detail::make_hi<local_limb_type>(a0b1)
+              )
+              ;
+      *detail::advance_and_point(r, static_cast<result_difference_type>(3))
+            = static_cast<local_limb_type>
+              (
+                  detail::make_hi<local_limb_type>(r2)
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(3))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(1))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(3)))))
+                + detail::make_hi<local_limb_type>(a2b0)
+                + detail::make_hi<local_limb_type>(a1b1)
+                + detail::make_hi<local_limb_type>(a0b2)
+              )
+              ;
+    }
+
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(0))) = static_cast<local_limb_type>(a0b0);
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(1))) = static_cast<local_limb_type>(r1);
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(2))) = static_cast<local_limb_type>(r2);
+  }
+
+  template<typename ResultIterator,
+           typename InputIteratorLeft,
+           typename InputIteratorRight>
+  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_multiply_n_by_n_to_lo_part_256(      ResultIterator     r,
+                                                                                             InputIteratorLeft  a,
+                                                                                             InputIteratorRight b,
+                                                                                       const unsigned_fast_type count) -> void
   {
     static_cast<void>(count);
 

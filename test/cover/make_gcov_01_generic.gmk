@@ -7,8 +7,8 @@
 # -----------------------------------------------------------------------------
 
 # cd /mnt/c/MyGitRepos/cppalliance/decimal/test/cover
-# make prepare -f make_gcov_01_generic.gmk MY_ALL_COV=0 MY_BOOST_ROOT=/mnt/c/boost/boost_1_83_0 MY_CC=g++
-# make gcov -f make_gcov_01_generic.gmk --jobs=8 MY_ALL_COV=0 MY_BOOST_ROOT=/mnt/c/boost/boost_1_83_0 MY_CC=g++
+# make prepare -f make_gcov_01_generic.gmk MY_ALL_COV=0 MY_BOOST_ROOT=/mnt/c/boost/boost_1_85_0 MY_CC=g++
+# make gcov -f make_gcov_01_generic.gmk --jobs=8 MY_ALL_COV=0 MY_BOOST_ROOT=/mnt/c/boost/boost_1_85_0 MY_CC=g++
 
 all: gcov
 

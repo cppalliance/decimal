@@ -389,10 +389,10 @@ constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexce
 
     wide_integer_uint256 result_wide { };
 
-    wide_integer_uint256::eval_multiply_n_by_n_to_lo_part(result_wide.representation().begin(),
-                                                          lhs_wide.crepresentation().cbegin(),
-                                                          rhs_wide.crepresentation().cbegin(),
-                                                          static_cast<local_unsigned_fast_type>(UINT8_C(8)));
+    wide_integer_uint256::eval_multiply_n_by_n_to_lo_part_256(result_wide.representation().begin(),
+                                                              lhs_wide.crepresentation().cbegin(),
+                                                              rhs_wide.crepresentation().cbegin(),
+                                                              static_cast<local_unsigned_fast_type>(UINT8_C(8)));
 
     return wide_integer_to_uint256(result_wide);
 }
@@ -405,10 +405,10 @@ constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noe
 
     wide_integer_uint256 result_wide { };
 
+    const auto lhs_wide = uint256_to_wide_integer(lhs);
+
     if (rhs_high == UINT32_C(0))
     {
-        auto lhs_wide = uint256_to_wide_integer(lhs);
-
         wide_integer_uint256::eval_multiply_1d(result_wide.representation().begin(),
                                                lhs_wide.crepresentation().cbegin(),
                                                static_cast<std::uint32_t>(rhs),
@@ -418,13 +418,12 @@ constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noe
     {
         // Mash-Up: Use unrolled school-multiplication from wide-integer (requires limb-conversions on input/output).
 
-        auto lhs_wide = uint256_to_wide_integer(lhs);
         auto rhs_wide = uint256_to_wide_integer(uint256_t(rhs));
 
-        wide_integer_uint256::eval_multiply_n_by_n_to_lo_part(result_wide.representation().begin(),
-                                                              lhs_wide.crepresentation().cbegin(),
-                                                              rhs_wide.crepresentation().cbegin(),
-                                                              static_cast<local_unsigned_fast_type>(UINT8_C(8)));
+        wide_integer_uint256::eval_multiply_n_by_n_to_lo_part_256(result_wide.representation().begin(),
+                                                                  lhs_wide.crepresentation().cbegin(),
+                                                                  rhs_wide.crepresentation().cbegin(),
+                                                                  static_cast<local_unsigned_fast_type>(UINT8_C(8)));
     }
 
     return wide_integer_to_uint256(result_wide);
