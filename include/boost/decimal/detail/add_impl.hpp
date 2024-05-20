@@ -14,8 +14,8 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-template <typename ReturnType, typename T, typename T2>
-constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+template <typename ReturnType, typename T1, typename T2>
+constexpr auto add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                         T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
     const bool sign {lhs_sign};
@@ -44,26 +44,6 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
         return {static_cast<std::uint32_t>(lhs_sig), lhs_exp, lhs_sign};
     }
-    else if (delta_exp == detail::precision + 1)
-    {
-        // Only need to see if we need to add one to the
-        // significand of the bigger value
-        //
-        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
-
-        if (rhs_sig >= UINT32_C(5'000'000))
-        {
-            ++lhs_sig;
-        }
-
-        #ifdef BOOST_DECIMAL_DEBUG_ADD
-        std::cerr << "New sig: " << lhs_sig
-                  << "\nNew exp: " << lhs_exp
-                  << "\nNew neg: " << lhs_sign << std::endl;
-        #endif
-
-        return {static_cast<std::uint32_t>(lhs_sig), lhs_exp, lhs_sign};
-    }
 
     // The two numbers can be added together without special handling
     //
@@ -71,26 +51,22 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     // 32-bit signed int can have 9 digits and our normalized significand has 7
     if (delta_exp <= 2)
     {
-        while (delta_exp > 0)
-        {
-            lhs_sig *= 10;
-            --delta_exp;
-            --lhs_exp;
-        }
+        lhs_sig *= pow10(static_cast<T1>(delta_exp));
+        lhs_exp -= delta_exp;
+        delta_exp = 0;
     }
     else
     {
         lhs_sig *= 100;
         delta_exp -= 2;
         lhs_exp -=2;
-    }
 
-    while (delta_exp > 1)
-    {
-        rhs_sig /= 10;
-        --delta_exp;
+        if (delta_exp > 1)
+        {
+            rhs_sig /= pow10(static_cast<T2>(delta_exp - 1));
+            delta_exp = 1;
+        }
     }
-
 
     if (delta_exp == 1)
     {
@@ -112,8 +88,8 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {res_sig, new_exp, sign};
 }
 
-}
-}
-}
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif //BOOST_DECIMAL_DETAIL_ADD_IMPL_HPP
