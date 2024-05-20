@@ -302,7 +302,6 @@ void test_multiplicatiom()
     BOOST_TEST(isnan(qnan_val * inf_val));
 }
 
-/*
 void test_div_mod()
 {
     constexpr decimal32_fast zero {0, 0};
@@ -347,7 +346,6 @@ void test_div_mod()
     BOOST_TEST(isinf(inf_val / 1));
     BOOST_TEST_EQ(1 / inf_val, zero);
 }
-*/
 
 template <typename T>
 void test_construct_from_integer()
@@ -435,7 +433,7 @@ int main()
     test_addition();
     test_subtraction();
     test_multiplicatiom();
-    // test_div_mod();
+    test_div_mod();
 
     test_hash();
 
