@@ -35,6 +35,7 @@
 #include <boost/decimal/detail/add_impl.hpp>
 #include <boost/decimal/detail/sub_impl.hpp>
 #include <boost/decimal/detail/mul_impl.hpp>
+#include <boost/decimal/detail/div_impl.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -170,8 +171,6 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
-    friend constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
-                                           detail::decimal32_components& q) noexcept -> void;
     friend constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
     friend constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, const decimal32& q, decimal32& r) noexcept -> void;
 
@@ -1680,43 +1679,6 @@ constexpr auto decimal32::operator*=(Decimal rhs) noexcept
     return *this;
 }
 
-constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
-                                detail::decimal32_components& q) noexcept -> void
-{
-    bool sign {lhs.sign != rhs.sign};
-
-    // If rhs is greater than we need to offset the significands to get the correct values
-    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    const auto big_sig_lhs {static_cast<std::uint64_t>(lhs.sig) * detail::powers_of_10[detail::precision]};
-    lhs.exp -= detail::precision;
-
-    auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(rhs.sig)};
-    auto res_exp {lhs.exp - rhs.exp};
-
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > std::numeric_limits<std::uint32_t>::digits10)
-    {
-        res_sig /= detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint32_t>::digits10));
-        res_exp += sig_dig - std::numeric_limits<std::uint32_t>::digits10;
-    }
-
-    const auto res_sig_32 {static_cast<std::uint32_t>(res_sig)};
-
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "\nres sig: " << res_sig_32
-              << "\nres exp: " << res_exp << std::endl;
-    #endif
-
-    if (res_sig_32 == 0)
-    {
-        sign = false;
-    }
-
-    // Let the constructor handle shrinking it back down and rounding correctly
-    q = detail::decimal32_components{res_sig_32, res_exp, sign};
-}
-
 constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
 {
     // Check pre-conditions
@@ -1783,7 +1745,7 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
     detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
     detail::decimal32_components q_components {};
 
-    generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::generic_div_impl(lhs_components, rhs_components, q_components);
 
     q = decimal32(q_components.sig, q_components.exp, q_components.sign);
 }
@@ -1845,7 +1807,7 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
     detail::decimal32_components rhs_components {detail::shrink_significand(detail::make_positive_unsigned(rhs), exp_rhs), exp_rhs, rhs < 0};
     detail::decimal32_components q_components {};
 
-    generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::generic_div_impl(lhs_components, rhs_components, q_components);
 
     return decimal32(q_components.sig, q_components.exp, q_components.sign);
 }
@@ -1888,7 +1850,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
     detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
     detail::decimal32_components q_components {};
 
-    generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::generic_div_impl(lhs_components, rhs_components, q_components);
 
     return decimal32(q_components.sig, q_components.exp, q_components.sign);
 }

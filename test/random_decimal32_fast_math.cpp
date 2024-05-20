@@ -946,30 +946,30 @@ int main()
     random_division(0L, 5'000L);
     random_division(0LL, 5'000LL);
     random_division(0, sqrt_int_max);
-    //random_mixed_division(0, 5'000);
-    //random_mixed_division(0L, 5'000L);
-    //random_mixed_division(0LL, 5'000LL);
-    //random_mixed_division(0, sqrt_int_max);
+    random_mixed_division(0, 5'000);
+    random_mixed_division(0L, 5'000L);
+    random_mixed_division(0LL, 5'000LL);
+    random_mixed_division(0, sqrt_int_max);
 
     // Only negative values
     random_division(-5'000, 0);
     random_division(-5'000L, 0L);
     random_division(-5'000LL, 0LL);
     random_division(-sqrt_int_max, 0);
-    //random_mixed_division(-5'000, 0);
-    //random_mixed_division(-5'000L, 0L);
-    //random_mixed_division(-5'000LL, 0LL);
-    //random_mixed_division(-sqrt_int_max, 0);
+    random_mixed_division(-5'000, 0);
+    random_mixed_division(-5'000L, 0L);
+    random_mixed_division(-5'000LL, 0LL);
+    random_mixed_division(-sqrt_int_max, 0);
 
     // Mixed values
     random_division(-5'000, 5'000);
     random_division(-5'000L, 5'000L);
     random_division(-5'000LL, 5'000LL);
     random_division(-sqrt_int_max, sqrt_int_max);
-    //random_mixed_division(-5'000, 5'000);
-    //random_mixed_division(-5'000L, 5'000L);
-    //random_mixed_division(-5'000LL, 5'000LL);
-    //random_mixed_division(-sqrt_int_max, sqrt_int_max);
+    random_mixed_division(-5'000, 5'000);
+    random_mixed_division(-5'000L, 5'000L);
+    random_mixed_division(-5'000LL, 5'000LL);
+    random_mixed_division(-sqrt_int_max, sqrt_int_max);
 
     /*
     // Bitwise operators

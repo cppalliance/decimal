@@ -13,6 +13,7 @@
 #include <boost/decimal/detail/add_impl.hpp>
 #include <boost/decimal/detail/sub_impl.hpp>
 #include <boost/decimal/detail/mul_impl.hpp>
+#include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <limits>
 #include <cstdint>
@@ -237,6 +238,14 @@ public:
 
     template <typename Integer>
     friend constexpr auto operator*(Integer lhs, decimal32_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast);
+
+    template <typename Integer>
+    friend constexpr auto operator/(decimal32_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast);
+
+    template <typename Integer>
+    friend constexpr auto operator/(Integer lhs, decimal32_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast);
 
     // Compound operators
@@ -970,6 +979,93 @@ constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     div_impl(lhs, rhs, q, r);
 
     return q;
+}
+
+template <typename Integer>
+constexpr auto operator/(decimal32_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
+{
+    // Check pre-conditions
+    constexpr decimal32_fast zero {0, 0};
+    constexpr decimal32_fast nan {direct_init(detail::d32_fast_qnan, UINT8_C(0), false)};
+    constexpr decimal32_fast inf {direct_init(detail::d32_fast_inf, UINT8_C(0), false)};
+
+    const bool sign {lhs.isneg() != (rhs < 0)};
+
+    const auto lhs_fp {fpclassify(lhs)};
+
+    switch (lhs_fp)
+    {
+        case FP_NAN:
+            return nan;
+        case FP_INFINITE:
+            return inf;
+        case FP_ZERO:
+            return sign ? -zero : zero;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    if (rhs == 0)
+    {
+        return sign ? -inf : inf;
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize(sig_lhs, exp_lhs);
+
+    const detail::decimal32_fast_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    std::int32_t exp_rhs {};
+    const detail::decimal32_fast_components rhs_components {detail::shrink_significand<std::uint_fast32_t>(detail::make_positive_unsigned(rhs), exp_rhs), exp_rhs, rhs < 0};
+    detail::decimal32_fast_components q_components {};
+
+    detail::generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return {q_components.sig, q_components.exp, q_components.sign};
+}
+
+template <typename Integer>
+constexpr auto operator/(Integer lhs, decimal32_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
+{
+    // Check pre-conditions
+    constexpr decimal32_fast zero {0, 0};
+    constexpr decimal32_fast nan {direct_init(detail::d32_fast_qnan, UINT8_C(0), false)};
+    constexpr decimal32_fast inf {direct_init(detail::d32_fast_inf, UINT8_C(0), false)};
+
+    const bool sign {(lhs < 0) != rhs.isneg()};
+
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (rhs_fp == FP_NAN)
+    {
+        return nan;
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_INFINITE:
+            return sign ? -zero : zero;
+        case FP_ZERO:
+            return sign ? -inf : inf;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize(sig_rhs, exp_rhs);
+
+    std::int32_t lhs_exp {};
+    const auto lhs_sig {detail::make_positive_unsigned(detail::shrink_significand<std::uint_fast32_t>(lhs, lhs_exp))};
+    const detail::decimal32_fast_components lhs_components {lhs_sig, lhs_exp, lhs < 0};
+    const detail::decimal32_fast_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal32_fast_components q_components {};
+
+    detail::generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return {q_components.sig, q_components.exp, q_components.sign};
 }
 
 constexpr auto operator%(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
