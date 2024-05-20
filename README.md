@@ -13,7 +13,7 @@ Decimal is an implementation of IEEE-754:2008 decimal floating point numbers.
 See also [1].
 
 The library is is header-only, and requires C++14.
-It is compatible through C++17, 20, 23 and beyond.
+It is compatible through C++14, 17, 20, 23 and beyond.
 
 # Notice
 
@@ -50,7 +50,9 @@ conan create decimal/conan --build missing
 
 # Supported Platforms
 
-Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon), and Windows (x86_64) with the following compilers:
+Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64),
+macOS (x86_64, and Apple Silicon), and Windows (x86_64)
+with the following compilers:
 
 * GCC 7 and later
 * Clang 6 and later
@@ -58,7 +60,7 @@ Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, a
 
 # Synopsis
 
-Decimal provides 3 types: 
+Decimal provides 3 types:
 
 ```cpp
 namespace boost {
@@ -73,7 +75,7 @@ class decimal128;
 ```
 
 These types operate like built-in floating point types.
-They have their own implementations of the Standar-Library functions
+They have their own implementations of the Standard-Library functions
 (e.g. like those found in `<cmath>`, `<charconv>`, `<cstdlib>`, etc.).
 
 The entire library can be conveniently included with `#include <boost/decimal.hpp>`
@@ -140,4 +142,4 @@ The complete documentation can be found at: https://cppalliance.org/decimal/deci
 ## References
 
 [1] IEEE Computer Society. _IEEE_ _Standard_ _for_ _Floating-Point_ _Arithmetic_,
-IEEE Std 754-2008, August 29, 2008 (doi:10.1109/IEEESTD.2008.4610935).
+Std. IEEE:754-2008, August 29, 2008 (doi:10.1109/IEEESTD.2008.4610935).
