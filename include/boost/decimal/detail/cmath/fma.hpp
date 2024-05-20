@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_IMPL_FMA_HPP
 
 #include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal32_fast.hpp>
 #include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/decimal128.hpp>
 #include <boost/decimal/detail/config.hpp>
@@ -32,7 +33,7 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
     auto exp_rhs {y.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    auto mul_result {mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
+    auto mul_result {detail::mul_impl<detail::decimal32_components>(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
     const decimal32 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
 
     const auto res_add {detail::check_non_finite(dec_result, z)};
