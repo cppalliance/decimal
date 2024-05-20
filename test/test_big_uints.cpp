@@ -172,8 +172,13 @@ auto test_big_uints_mul() -> void
       }
       else
       {
-        const std::uint64_t dec_intern_rhs_64 = static_cast<std::uint64_t>(dec_intern_uint_rhs);
-        const std::uint64_t boost_ctrl_rhs_64 = static_cast<std::uint64_t>(boost_ctrl_uint_rhs);
+        const auto dec_intern_rhs_64 =
+          static_cast<std::uint64_t>
+          (
+            static_cast<::boost::decimal::detail::uint128>(dec_intern_uint_rhs)
+          );
+
+        const auto boost_ctrl_rhs_64 = static_cast<std::uint64_t>(boost_ctrl_uint_rhs);
 
         BOOST_TEST_EQ(dec_intern_rhs_64, boost_ctrl_rhs_64);
 
