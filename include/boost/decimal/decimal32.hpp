@@ -134,6 +134,9 @@ struct decimal32_components
 // 3.2.2 class decimal32
 BOOST_DECIMAL_EXPORT class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
 {
+public:
+    using significand_type = std::uint32_t;
+
 private:
 
     std::uint32_t bits_ {};
@@ -561,10 +564,7 @@ public:
 
     // Related to <cmath>
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto frexp10(T num, int* expptr) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
-            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
-                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>;
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
     friend constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32;
     friend constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32;
@@ -848,7 +848,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                   << "\nNew neg: " << lhs_sign << std::endl;
         #endif
 
-        return {lhs_sig, lhs_exp, lhs_sign};
+        return {static_cast<std::uint32_t>(lhs_sig), lhs_exp, lhs_sign};
     }
     else if (delta_exp == detail::precision + 1)
     {
@@ -868,7 +868,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                   << "\nNew neg: " << lhs_sign << std::endl;
         #endif
 
-        return {lhs_sig, lhs_exp, lhs_sign};
+        return {static_cast<std::uint32_t>(lhs_sig), lhs_exp, lhs_sign};
     }
 
     // The two numbers can be added together without special handling
@@ -974,11 +974,11 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (rhs_sign && !lhs_sign)
     {
-        new_sig = signed_sig_lhs + signed_sig_rhs;
+        new_sig = static_cast<std::int32_t>(signed_sig_lhs) + static_cast<std::int32_t>(signed_sig_rhs);
     }
     else
     {
-        new_sig = signed_sig_lhs - signed_sig_rhs;
+        new_sig = static_cast<std::int32_t>(signed_sig_lhs) - static_cast<std::int32_t>(signed_sig_rhs);
     }
 
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};

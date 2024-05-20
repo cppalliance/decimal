@@ -65,6 +65,20 @@ struct hash<boost::decimal::decimal128>
 #  pragma GCC diagnostic pop
 #endif
 
+BOOST_DECIMAL_EXPORT template <>
+struct hash<boost::decimal::decimal32_fast>
+{
+    // Need to convert into decimal32 then apply our memcpy
+    auto operator()(const boost::decimal::decimal32_fast& v) const noexcept -> std::size_t
+    {
+        boost::decimal::decimal32 v_32 {v};
+        std::uint32_t bits;
+        std::memcpy(&bits, &v_32, sizeof(std::uint32_t));
+
+        return std::hash<std::uint32_t>{}(bits);
+    }
+};
+
 }
 
 #endif //BOOST_DECIMAL_HASH_HPP

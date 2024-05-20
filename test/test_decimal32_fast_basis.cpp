@@ -302,7 +302,6 @@ void test_multiplicatiom()
     BOOST_TEST(isnan(qnan_val * inf_val));
 }
 
-/*
 void test_div_mod()
 {
     constexpr decimal32_fast zero {0, 0};
@@ -347,7 +346,6 @@ void test_div_mod()
     BOOST_TEST(isinf(inf_val / 1));
     BOOST_TEST_EQ(1 / inf_val, zero);
 }
-*/
 
 template <typename T>
 void test_construct_from_integer()
@@ -394,7 +392,6 @@ void spot_check_addition(T a, T b, T res)
     }
 }
 
-/*
 void test_hash()
 {
     decimal32_fast one {1, 0};
@@ -402,7 +399,6 @@ void test_hash()
 
     BOOST_TEST_NE(std::hash<decimal32_fast>{}(one), std::hash<decimal32_fast>{}(zero));
 }
- */
 
 void test_shrink_significand()
 {
@@ -437,9 +433,9 @@ int main()
     test_addition();
     test_subtraction();
     test_multiplicatiom();
-    // test_div_mod();
+    test_div_mod();
 
-    // test_hash();
+    test_hash();
 
     spot_check_addition(-1054191000, -920209700, -1974400700);
     spot_check_addition(353582500, -32044770, 321537730);

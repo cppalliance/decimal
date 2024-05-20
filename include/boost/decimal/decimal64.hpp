@@ -132,6 +132,9 @@ struct decimal64_components
 
 BOOST_DECIMAL_EXPORT class decimal64 final
 {
+public:
+    using significand_type = std::uint64_t;
+
 private:
 
     std::uint64_t bits_ {};
@@ -563,10 +566,7 @@ public:
 
     // <cmath> functions that need to be friends
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto frexp10(T num, int* expptr) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
-            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
-                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>;
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
     friend constexpr auto copysignd64(decimal64 mag, decimal64 sgn) noexcept -> decimal64;
     friend constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64;
