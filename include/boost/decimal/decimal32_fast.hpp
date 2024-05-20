@@ -12,6 +12,7 @@
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/add_impl.hpp>
 #include <boost/decimal/detail/sub_impl.hpp>
+#include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <limits>
 #include <cstdint>
@@ -27,6 +28,8 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::u
 
 struct decimal32_fast_components
 {
+    using sig_type = std::uint_fast32_t;
+
     std::uint_fast32_t sig;
     std::int32_t exp;
     bool sign;
@@ -226,6 +229,14 @@ public:
 
     template <typename Integer>
     friend constexpr auto operator-(Integer lhs, decimal32_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast);
+
+    template <typename Integer>
+    friend constexpr auto operator*(decimal32_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast);
+
+    template <typename Integer>
+    friend constexpr auto operator*(Integer lhs, decimal32_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast);
 
     // Compound operators
@@ -833,9 +844,44 @@ constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    const auto result {mul_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
+    const auto result {detail::mul_impl<detail::decimal32_fast_components>(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator*(decimal32_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
+{
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return lhs;
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize(sig_lhs, exp_lhs);
+    auto lhs_components {detail::decimal32_fast_components{sig_lhs, exp_lhs, lhs.isneg()}};
+
+    auto sig_rhs {rhs};
+    std::int32_t exp_rhs {0};
+    detail::normalize(sig_rhs, exp_rhs);
+    auto unsigned_sig_rhs {detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs)};
+    auto rhs_components {detail::decimal32_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+
+    const auto result {detail::mul_impl<detail::decimal32_fast_components>(
+                                                        lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                                        rhs_components.sig, rhs_components.exp, rhs_components.sign
+                                                     )};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator*(Integer lhs, decimal32_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
+{
+    return rhs * lhs;
 }
 
 constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& q, decimal32_fast& r) noexcept -> void

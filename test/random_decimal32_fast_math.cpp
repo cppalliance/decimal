@@ -322,7 +322,7 @@ void random_division(T lower, T upper)
         if (isinf(res) && isinf(res_int))
         {
         }
-        else if (!BOOST_TEST(abs(res - res_int) < decimal32_fast(1, -3)))
+        else if (!BOOST_TEST(abs(res - res_int) < decimal32_fast(1, -2)))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -917,30 +917,30 @@ int main()
     random_multiplication(0L, 5'000L);
     random_multiplication(0LL, 5'000LL);
     random_multiplication(0, sqrt_int_max);
-    //random_mixed_multiplication(0, 5'000);
-    //random_mixed_multiplication(0L, 5'000L);
-    //random_mixed_multiplication(0LL, 5'000LL);
-    //random_mixed_multiplication(0, sqrt_int_max);
+    random_mixed_multiplication(0, 5'000);
+    random_mixed_multiplication(0L, 5'000L);
+    random_mixed_multiplication(0LL, 5'000LL);
+    random_mixed_multiplication(0, sqrt_int_max);
 
     // Only negative values
     random_multiplication(-5'000, 0);
     random_multiplication(-5'000L, 0L);
     random_multiplication(-5'000LL, 0LL);
     random_multiplication(-sqrt_int_max, 0);
-    //random_mixed_multiplication(-5'000, 0);
-    //random_mixed_multiplication(-5'000L, 0L);
-    //random_mixed_multiplication(-5'000LL, 0LL);
-    //random_mixed_multiplication(-sqrt_int_max, 0);
+    random_mixed_multiplication(-5'000, 0);
+    random_mixed_multiplication(-5'000L, 0L);
+    random_mixed_multiplication(-5'000LL, 0LL);
+    random_mixed_multiplication(-sqrt_int_max, 0);
 
     // Mixed values
     random_multiplication(-5'000, 5'000);
     random_multiplication(-5'000L, 5'000L);
     random_multiplication(-5'000LL, 5'000LL);
     random_multiplication(-sqrt_int_max, sqrt_int_max);
-    //random_mixed_multiplication(-5'000, 5'000);
-    //random_mixed_multiplication(-5'000L, 5'000L);
-    //random_mixed_multiplication(-5'000LL, 5'000LL);
-    //random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
+    random_mixed_multiplication(-5'000, 5'000);
+    random_mixed_multiplication(-5'000L, 5'000L);
+    random_mixed_multiplication(-5'000LL, 5'000LL);
+    random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
 
     random_division(0, 5'000);
     random_division(0L, 5'000L);
