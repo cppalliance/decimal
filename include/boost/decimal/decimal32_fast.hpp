@@ -19,20 +19,24 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = std::numeric_limits<std::uint32_t>::max();
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = std::numeric_limits<std::uint32_t>::max() - 1;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::uint32_t>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = std::numeric_limits<std::uint_fast32_t>::max();
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = std::numeric_limits<std::uint_fast32_t>::max() - 1;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::uint_fast32_t>::max() - 2;
 
 }
 
 class decimal32_fast final
 {
+public:
+    using significand_type = std::uint_fast32_t;
+
 private:
     // In regular decimal32 we have to decode the 24 bits of the significand and the 8 bits of the exp
-    // Here we just use them directly at the cost of 2 extra bytes of internal state
+    // Here we just use them directly at the cost of at least 2 extra bytes of internal state
+    // since the fast integer types will be at least 32 and 8 bits respectively
 
-    std::uint32_t significand_ {};
-    std::uint8_t exponent_ {};
+    std::uint_fast32_t significand_ {};
+    std::uint_fast8_t exponent_ {};
     bool sign_ {};
 
     constexpr auto isneg() const noexcept -> bool
@@ -40,12 +44,12 @@ private:
         return sign_;
     }
 
-    constexpr auto full_significand() const noexcept -> std::uint32_t
+    constexpr auto full_significand() const noexcept -> std::uint_fast32_t
     {
         return significand_;
     }
 
-    constexpr auto unbiased_exponent() const noexcept -> std::uint8_t
+    constexpr auto unbiased_exponent() const noexcept -> std::uint_fast8_t
     {
         return exponent_;
     }
@@ -57,12 +61,20 @@ private:
 
     friend constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& q, decimal32_fast& r) noexcept -> void;
 
+    friend constexpr auto mod_impl(decimal32_fast lhs, decimal32_fast rhs, const decimal32_fast& q, decimal32_fast& r) noexcept -> void;
+
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
     template <typename Decimal, typename TargetType>
     friend constexpr auto to_integral(Decimal val) noexcept
         BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+    friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
 public:
     constexpr decimal32_fast() noexcept : significand_{}, exponent_{}, sign_ {} {}
@@ -105,12 +117,14 @@ public:
     friend constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
+    friend constexpr auto operator%(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
 
     // Compound operators
     constexpr auto operator+=(decimal32_fast rhs) noexcept -> decimal32_fast&;
     constexpr auto operator-=(decimal32_fast rhs) noexcept -> decimal32_fast&;
     constexpr auto operator*=(decimal32_fast rhs) noexcept -> decimal32_fast&;
     constexpr auto operator/=(decimal32_fast rhs) noexcept -> decimal32_fast&;
+    constexpr auto operator%=(decimal32_fast rhs) noexcept -> decimal32_fast&;
 
     // Increment and decrement
     constexpr auto operator++() noexcept -> decimal32_fast&;
@@ -136,31 +150,10 @@ public:
     explicit constexpr operator detail::uint128_t() const noexcept;
     #endif
 
-    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr operator Decimal() const noexcept;
 
-    // TODO(mborland): Remove and use the base implementation in io.hpp
-    template <typename charT, typename traits>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal32_fast& d) -> std::basic_ostream<charT, traits>&
-    {
-        if (d.sign_)
-        {
-            os << '-';
-        }
-
-        os << d.significand_ << "e";
-        const auto biased_exp {d.biased_exponent()};
-        if (biased_exp > 0)
-        {
-            os << '+';
-        }
-        os << biased_exp;
-
-        return os;
-    }
-
-    #endif
-
-    friend constexpr auto direct_init(std::uint32_t significand, std::uint8_t exponent, bool sign) noexcept -> decimal32_fast;
+    friend constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign) noexcept -> decimal32_fast;
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
@@ -191,12 +184,11 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
         #  pragma GCC diagnostic pop
         #endif
 
-        exp += static_cast<std::uint8_t>(digits_to_remove);
+        exp += static_cast<std::uint_fast8_t>(digits_to_remove);
         exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
     }
 
-    auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
-    significand_ = static_cast<std::uint32_t>(reduced_coeff);
+    significand_ = static_cast<std::uint_fast32_t>(unsigned_coeff);
 
     // Normalize the handling of zeros
     if (significand_ == UINT32_C(0))
@@ -204,14 +196,14 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
         exp = 0;
     }
 
-    auto biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
+    auto biased_exp {static_cast<std::uint_fast32_t>(exp + detail::bias)};
     if (biased_exp > std::numeric_limits<std::uint8_t>::max())
     {
         significand_ = detail::d32_fast_inf;
     }
     else
     {
-        exponent_ = static_cast<std::uint8_t>(biased_exp);
+        exponent_ = static_cast<std::uint_fast8_t>(biased_exp);
     }
 }
 
@@ -254,7 +246,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast::decimal32_fast(Float val) noexcept
 #  pragma GCC diagnostic pop
 #endif
 
-constexpr auto direct_init(std::uint32_t significand, std::uint8_t exponent, bool sign = false) noexcept -> decimal32_fast
+constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign = false) noexcept -> decimal32_fast
 {
     decimal32_fast val;
     val.significand_ = significand;
@@ -526,13 +518,22 @@ constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& 
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
-    detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal32_components lhs_components {static_cast<std::uint32_t>(sig_lhs), exp_lhs, lhs.isneg()};
+    detail::decimal32_components rhs_components {static_cast<std::uint32_t>(sig_rhs), exp_rhs, rhs.isneg()};
     detail::decimal32_components q_components {};
 
     generic_div_impl(lhs_components, rhs_components, q_components);
 
     q = decimal32_fast(q_components.sig, q_components.exp, q_components.sign);
+}
+
+constexpr auto mod_impl(decimal32_fast lhs, decimal32_fast rhs, const decimal32_fast& q, decimal32_fast& r) noexcept -> void
+{
+    constexpr decimal32_fast zero {0, 0};
+
+    // https://en.cppreference.com/w/cpp/numeric/math/fmod
+    auto q_trunc {q > zero ? floor(q) : ceil(q)};
+    r = lhs - (decimal32_fast(q_trunc) * rhs);
 }
 
 constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
@@ -542,6 +543,22 @@ constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     div_impl(lhs, rhs, q, r);
 
     return q;
+}
+
+constexpr auto operator%(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
+{
+    decimal32_fast q {};
+    decimal32_fast r {};
+    div_impl(lhs, rhs, q, r);
+    mod_impl(lhs, rhs, q, r);
+
+    return r;
+}
+
+constexpr auto decimal32_fast::operator%=(decimal32_fast rhs) noexcept -> decimal32_fast&
+{
+    *this = *this % rhs;
+    return *this;
 }
 
 constexpr auto decimal32_fast::operator+=(decimal32_fast rhs) noexcept -> decimal32_fast&
@@ -662,6 +679,12 @@ constexpr decimal32_fast::operator detail::uint128_t() const noexcept
 
 #endif
 
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal32_fast::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
+}
+
 } // namespace decimal
 } // namespace boost
 
@@ -705,7 +728,7 @@ struct numeric_limits<boost::decimal::decimal32_fast>
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent10 = min_exponent;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent = 96;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent10 = max_exponent;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = numeric_limits<std::uint32_t>::traps;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = numeric_limits<std::uint_fast32_t>::traps;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = true;
 
     // Member functions

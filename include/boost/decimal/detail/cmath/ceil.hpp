@@ -27,8 +27,7 @@ BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto ceil BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    using DivType = std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
-                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>;
+    using DivType = typename T::significand_type;
 
     constexpr T zero {0, 0};
     constexpr T one {1, 0};
