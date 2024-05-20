@@ -8,7 +8,10 @@
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
