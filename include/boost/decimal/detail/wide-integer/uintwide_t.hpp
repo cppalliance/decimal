@@ -516,11 +516,12 @@ public:
   using const_reverse_iterator = typename representation_type::const_reverse_iterator;
 
   // Provide a user interface to the internal data representation.
-                         BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto  representation()       ->       representation_type& { return values; }
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto crepresentation() const -> const representation_type& { return values; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD
+  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto  representation()       ->       representation_type& { return values; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD
+  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto crepresentation() const -> const representation_type& { return values; }
 
-  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth(const uintwide_t& other,
-                                                      uintwide_t& remainder) -> void
+  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth(const uintwide_t& other, uintwide_t& remainder) -> void
   {
     using local_uint_index_type = unsigned_fast_type;
 
@@ -590,6 +591,489 @@ public:
     }
   }
 
+  template<typename ResultIterator,
+           typename InputIteratorLeft>
+  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_multiply_1d(      ResultIterator                                                                   r,
+                                                                          InputIteratorLeft                                                                a,
+                                                                    const typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type b,
+                                                                    const unsigned_fast_type                                                               count) -> limb_type
+  {
+    using local_limb_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type;
+    using left_value_type = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type;
+
+    static_assert
+    (
+      (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<left_value_type>::digits),
+      "Error: Internals require same widths for left-right-result limb_types at the moment"
+    );
+
+    using local_double_limb_type =
+      typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<local_limb_type>::digits * 2)>::exact_unsigned_type;
+
+    auto carry = static_cast<local_double_limb_type>(UINT8_C(0));
+
+    if(b == static_cast<left_value_type>(UINT8_C(0)))
+    {
+      detail::fill_unsafe(r, detail::advance_and_point(r, count), static_cast<limb_type>(UINT8_C(0)));
+    }
+    else
+    {
+      const auto imax = count;
+
+      auto i = static_cast<unsigned_fast_type>(UINT8_C(0));
+
+      for( ; i < imax; ++i) // NOLINT(altera-id-dependent-backward-branch)
+      {
+        carry =
+          static_cast<local_double_limb_type>
+          (
+              carry
+            + static_cast<local_double_limb_type>(static_cast<local_double_limb_type>(*a++) * b)
+          );
+
+        *r++  = static_cast<local_limb_type>(carry);
+        carry = detail::make_hi<local_limb_type>(carry);
+      }
+    }
+
+    return static_cast<local_limb_type>(carry);
+  }
+
+  template<typename ResultIterator,
+           typename InputIteratorLeft,
+           typename InputIteratorRight>
+  static constexpr auto eval_multiply_n_by_n_to_lo_part_128(      ResultIterator     r,
+                                                                  InputIteratorLeft  a,
+                                                                  InputIteratorRight b,
+                                                            const unsigned_fast_type count) -> void
+  {
+    static_cast<void>(count);
+
+    using local_limb_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type;
+
+    static_assert
+    (
+         (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
+      && (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
+      "Error: Internals require same widths for left-right-result limb_types at the moment"
+    );
+
+    using local_double_limb_type =
+      typename detail::uint_type_helper<static_cast<size_t>(static_cast<int>(std::numeric_limits<local_limb_type>::digits * static_cast<int>(INT8_C(2))))>::exact_unsigned_type;
+
+    using result_difference_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::difference_type;
+    using left_difference_type   = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::difference_type;
+    using left_value_type        = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type;
+    using right_difference_type  = typename detail::iterator_detail::iterator_traits<InputIteratorRight>::difference_type;
+
+    // The algorithm has been derived from the polynomial multiplication.
+    // After the multiplication terms of equal order are grouped
+    // together and retained up to order(3). The carries from the
+    // multiplications are included when adding up the terms.
+    // The results of the intermediate multiplications are stored
+    // in local variables in memory.
+
+    //   Column[CoefficientList[Expand[(a0 + a1 x + a2 x^2 + a3 x^3) (b0 + b1 x + b2 x^2 + b3 x^3)], x]]
+    //   a0b0
+    //   a1b0 + a0b1
+    //   a2b0 + a1b1 + a0b2
+    //   a3b0 + a2b1 + a1b2 + a0b3
+
+    // See also Wolfram Alpha at:
+    // https://www.wolframalpha.com/input/?i=Column%5BCoefficientList%5B+++Expand%5B%28a0+%2B+a1+x+%2B+a2+x%5E2+%2B+a3+x%5E3%29+%28b0+%2B+b1+x+%2B+b2+x%5E2+%2B+b3+x%5E3%29%5D%2C++++x%5D%5D
+    // ... and take the upper half of the pyramid.
+
+    // Performance improvement:
+    //   (old) kops_per_sec: 33173.50
+    //   (new) kops_per_sec: 95069.43
+
+    local_double_limb_type r1 { };
+    local_double_limb_type r2 { };
+
+    const auto a0b0 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(0)) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0)))));
+    const auto a0b1 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(0)) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1)))));
+    const auto a1b0 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(1)) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0)))));
+    const auto a1b1 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(1)) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1)))));
+
+    // One special case is considered, the case of multiplication
+    // of the form BITS/2 * BITS/2 = BITS. In this case, the algorithm
+    // can be significantly simplified by using only the 'lower-halves'
+    // of the data.
+    if(    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) == static_cast<left_value_type>(UINT8_C(0))) && (*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2))) == static_cast<left_value_type>(UINT8_C(0)))
+        && (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(3))) == static_cast<left_value_type>(UINT8_C(0))) && (*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(3))) == static_cast<left_value_type>(UINT8_C(0))))
+    {
+      r1    = static_cast<local_double_limb_type>
+              (
+                static_cast<local_double_limb_type>
+                (
+                  detail::make_hi<local_limb_type>(a0b0) // LCOV_EXCL_LINE
+                )
+                + detail::make_lo<local_limb_type>(a1b0)
+                + detail::make_lo<local_limb_type>(a0b1)
+              )
+              ;
+      r2    = static_cast<local_double_limb_type>
+              (
+                static_cast<local_double_limb_type>
+                (
+                  detail::make_hi<local_limb_type>(r1) // LCOV_EXCL_LINE
+                )
+                + detail::make_lo<local_limb_type>(a1b1)
+                + detail::make_hi<local_limb_type>(a0b1)
+                + detail::make_hi<local_limb_type>(a1b0)
+              )
+              ;
+      *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(3)))
+            = static_cast<local_limb_type>
+              (
+                  detail::make_hi<local_limb_type>(r2)
+                + detail::make_hi<local_limb_type>(a1b1)
+              )
+              ;
+    }
+    else
+    {
+      const auto a0b2 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2)))));
+      const auto a2b0 = static_cast<local_double_limb_type>(*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0)))));
+
+      r1    = static_cast<local_double_limb_type>
+              (
+                static_cast<local_double_limb_type>
+                (
+                  detail::make_hi<local_limb_type>(a0b0)
+                )
+                + detail::make_lo<local_limb_type>(a1b0)
+                + detail::make_lo<local_limb_type>(a0b1)
+              )
+              ;
+      r2    = static_cast<local_double_limb_type>
+              (
+                static_cast<local_double_limb_type>
+                (
+                  detail::make_hi<local_limb_type>(r1)
+                )
+                + detail::make_lo<local_limb_type>(a2b0)
+                + detail::make_lo<local_limb_type>(a1b1)
+                + detail::make_lo<local_limb_type>(a0b2)
+                + detail::make_hi<local_limb_type>(a1b0)
+                + detail::make_hi<local_limb_type>(a0b1)
+              )
+              ;
+      *detail::advance_and_point(r, static_cast<result_difference_type>(3))
+            = static_cast<local_limb_type>
+              (
+                  detail::make_hi<local_limb_type>(r2)
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(3))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(1))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(3)))))
+                + detail::make_hi<local_limb_type>(a2b0)
+                + detail::make_hi<local_limb_type>(a1b1)
+                + detail::make_hi<local_limb_type>(a0b2)
+              )
+              ;
+    }
+
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(0))) = static_cast<local_limb_type>(a0b0);
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(1))) = static_cast<local_limb_type>(r1);
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(2))) = static_cast<local_limb_type>(r2);
+  }
+
+  template<typename ResultIterator,
+           typename InputIteratorLeft,
+           typename InputIteratorRight>
+  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_multiply_n_by_n_to_lo_part_256(      ResultIterator     r,
+                                                                                             InputIteratorLeft  a,
+                                                                                             InputIteratorRight b,
+                                                                                       const unsigned_fast_type count) -> void
+  {
+    static_cast<void>(count);
+
+    static_assert
+    (
+          (std::numeric_limits<typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
+      && (std::numeric_limits<typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
+      "Error: Internals require same widths for left-right-result limb_types at the moment"
+    );
+
+    using local_limb_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type;
+
+    using local_double_limb_type =
+      typename detail::uint_type_helper<static_cast<size_t>(static_cast<int>(std::numeric_limits<local_limb_type>::digits * static_cast<int>(INT8_C(2))))>::exact_unsigned_type;
+
+    using result_difference_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::difference_type;
+    using left_difference_type   = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::difference_type;
+    using left_value_type        = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type;
+    using right_difference_type  = typename detail::iterator_detail::iterator_traits<InputIteratorRight>::difference_type;
+
+    // The algorithm has been derived from the polynomial multiplication.
+    // After the multiplication terms of equal order are grouped
+    // together and retained up to order(3). The carries from the
+    // multiplications are included when adding up the terms.
+    // The results of the intermediate multiplications are stored
+    // in local variables in memory.
+
+    //   Column[CoefficientList[Expand[(a0 + a1 x + a2 x^2 + a3 x^3 + a4 x^4 + a5 x^5 + a6 x^6 + a7 x^7) (b0 + b1 x + b2 x^2 + b3 x^3 + b4 x^4 + b5 x^5 + b6 x^6 + b7 x^7)], x]]
+    //   a0b0
+    //   a1b0 + a0b1
+    //   a2b0 + a1b1 + a0b2
+    //   a3b0 + a2b1 + a1b2 + a0b3
+    //   a4b0 + a3b1 + a2b2 + a1b3 + a0b4
+    //   a5b0 + a4b1 + a3b2 + a2b3 + a1b4 + a0b5
+    //   a6b0 + a5b1 + a4b2 + a3b3 + a2b4 + a1b5 + a0b6
+    //   a7b0 + a6b1 + a5b2 + a4b3 + a3b4 + a2b5 + a1b6 + a0b7
+
+    // See also Wolfram Alpha at:
+    // https://www.wolframalpha.com/input/?i=Column%5BCoefficientList%5B+++Expand%5B%28a0+%2B+a1+x+%2B+a2+x%5E2+%2B+a3+x%5E3%29+%28b0+%2B+b1+x+%2B+b2+x%5E2+%2B+b3+x%5E3%29%5D%2C++++x%5D%5D
+    // ... and take the upper half of the pyramid.
+
+    const local_double_limb_type a0b0 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0))));
+
+    const local_double_limb_type a1b0 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(1))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0))));
+    const local_double_limb_type a0b1 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1))));
+
+    const local_double_limb_type a2b0 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0))));
+    const local_double_limb_type a1b1 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(1))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1))));
+    const local_double_limb_type a0b2 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2))));
+
+    const local_double_limb_type a3b0 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(3))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0))));
+    const local_double_limb_type a2b1 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1))));
+    const local_double_limb_type a1b2 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(1))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2))));
+    const local_double_limb_type a0b3 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(3))));
+
+    const local_double_limb_type a3b1 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(3))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1))));
+    const local_double_limb_type a2b2 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2))));
+    const local_double_limb_type a1b3 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(1))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(3))));
+
+    const local_double_limb_type a3b2 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(3))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2))));
+    const local_double_limb_type a2b3 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(3))));
+
+    const local_double_limb_type a3b3 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(3))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(3))));
+
+          local_double_limb_type rd1 { };
+          local_double_limb_type rd2 { };
+          local_double_limb_type rd3 { };
+          local_double_limb_type rd4 { };
+          local_double_limb_type rd5 { };
+          local_double_limb_type rd6 { };
+
+    // One special case is considered, the case of multiplication
+    // of the form BITS/2 * BITS/2 = BITS. In this case, the algorithm
+    // can be significantly simplified by using only the 'lower-halves'
+    // of the data.
+    if(    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(7))) == static_cast<left_value_type>(UINT8_C(0))) && (*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(7))) == static_cast<left_value_type>(UINT8_C(0)))
+        && (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(6))) == static_cast<left_value_type>(UINT8_C(0))) && (*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(6))) == static_cast<left_value_type>(UINT8_C(0)))
+        && (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(5))) == static_cast<left_value_type>(UINT8_C(0))) && (*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(5))) == static_cast<left_value_type>(UINT8_C(0)))
+        && (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(4))) == static_cast<left_value_type>(UINT8_C(0))) && (*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(4))) == static_cast<left_value_type>(UINT8_C(0))))
+    {
+      rd1   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(a0b0)
+              )
+              + detail::make_lo<local_limb_type>(a1b0)
+              + detail::make_lo<local_limb_type>(a0b1)
+              ;
+
+      rd2   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(rd1)
+              )
+              + detail::make_lo<local_limb_type>(a2b0)
+              + detail::make_lo<local_limb_type>(a1b1)
+              + detail::make_lo<local_limb_type>(a0b2)
+              + detail::make_hi<local_limb_type>(a1b0)
+              + detail::make_hi<local_limb_type>(a0b1)
+              ;
+
+      rd3   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(rd2)
+              )
+              + detail::make_lo<local_limb_type>(a3b0)
+              + detail::make_lo<local_limb_type>(a2b1)
+              + detail::make_lo<local_limb_type>(a1b2)
+              + detail::make_lo<local_limb_type>(a0b3)
+              + detail::make_hi<local_limb_type>(a2b0)
+              + detail::make_hi<local_limb_type>(a1b1)
+              + detail::make_hi<local_limb_type>(a0b2)
+              ;
+
+      rd4   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(rd3)
+              )
+              + detail::make_lo<local_limb_type>(a3b1)
+              + detail::make_lo<local_limb_type>(a2b2)
+              + detail::make_lo<local_limb_type>(a1b3)
+              + detail::make_hi<local_limb_type>(a3b0)
+              + detail::make_hi<local_limb_type>(a2b1)
+              + detail::make_hi<local_limb_type>(a1b2)
+              + detail::make_hi<local_limb_type>(a0b3)
+              ;
+
+      rd5   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(rd4)
+              )
+              + detail::make_lo<local_limb_type>(a3b2)
+              + detail::make_lo<local_limb_type>(a2b3)
+              + detail::make_hi<local_limb_type>(a3b1)
+              + detail::make_hi<local_limb_type>(a2b2)
+              + detail::make_hi<local_limb_type>(a1b3)
+              ;
+
+      rd6   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(rd5)
+              )
+              + detail::make_lo<local_limb_type>(a3b3)
+              + detail::make_hi<local_limb_type>(a3b2)
+              + detail::make_hi<local_limb_type>(a2b3)
+              ;
+
+      *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(7)))
+            = static_cast<local_limb_type>
+              (
+                  detail::make_hi<local_limb_type>(rd6)
+                + detail::make_hi<local_limb_type>(a3b3)
+              )
+              ;
+    }
+    else
+    {
+      const local_double_limb_type a4b0 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(4))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0))));
+      const local_double_limb_type a0b4 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(4))));
+
+      const local_double_limb_type a5b0 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(5))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0))));
+      const local_double_limb_type a4b1 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(4))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1))));
+
+      const local_double_limb_type a1b4 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(1))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(4))));
+      const local_double_limb_type a0b5 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(5))));
+
+      const local_double_limb_type a6b0 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(6))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0))));
+      const local_double_limb_type a5b1 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(5))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1))));
+
+      const local_double_limb_type a4b2 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(4))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2))));
+      const local_double_limb_type a2b4 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(4))));
+
+      const local_double_limb_type a1b5 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(1))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(5))));
+      const local_double_limb_type a0b6 = *detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(6))));
+
+      rd1   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(a0b0)
+              )
+              + detail::make_lo<local_limb_type>(a1b0)
+              + detail::make_lo<local_limb_type>(a0b1)
+              ;
+
+      rd2   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(rd1)
+              )
+              + detail::make_lo<local_limb_type>(a2b0)
+              + detail::make_lo<local_limb_type>(a1b1)
+              + detail::make_lo<local_limb_type>(a0b2)
+              + detail::make_hi<local_limb_type>(a1b0)
+              + detail::make_hi<local_limb_type>(a0b1)
+              ;
+
+      rd3   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(rd2)
+              )
+              + detail::make_lo<local_limb_type>(a3b0)
+              + detail::make_lo<local_limb_type>(a2b1)
+              + detail::make_lo<local_limb_type>(a1b2)
+              + detail::make_lo<local_limb_type>(a0b3)
+              + detail::make_hi<local_limb_type>(a2b0)
+              + detail::make_hi<local_limb_type>(a1b1)
+              + detail::make_hi<local_limb_type>(a0b2)
+              ;
+
+      rd4   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(rd3)
+              )
+              + detail::make_lo<local_limb_type>(a4b0)
+              + detail::make_lo<local_limb_type>(a3b1)
+              + detail::make_lo<local_limb_type>(a2b2)
+              + detail::make_lo<local_limb_type>(a1b3)
+              + detail::make_lo<local_limb_type>(a0b4)
+              + detail::make_hi<local_limb_type>(a3b0)
+              + detail::make_hi<local_limb_type>(a2b1)
+              + detail::make_hi<local_limb_type>(a1b2)
+              + detail::make_hi<local_limb_type>(a0b3)
+              ;
+
+      rd5   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(rd4)
+              )
+              + detail::make_lo<local_limb_type>(a5b0)
+              + detail::make_lo<local_limb_type>(a4b1)
+              + detail::make_lo<local_limb_type>(a3b2)
+              + detail::make_lo<local_limb_type>(a2b3)
+              + detail::make_lo<local_limb_type>(a1b4)
+              + detail::make_lo<local_limb_type>(a0b5)
+              + detail::make_hi<local_limb_type>(a4b0)
+              + detail::make_hi<local_limb_type>(a3b1)
+              + detail::make_hi<local_limb_type>(a2b2)
+              + detail::make_hi<local_limb_type>(a1b3)
+              + detail::make_hi<local_limb_type>(a0b4)
+              ;
+
+      rd6   = static_cast<local_double_limb_type>
+              (
+                detail::make_hi<local_limb_type>(rd5)
+              )
+              + detail::make_lo<local_limb_type>(a6b0)
+              + detail::make_lo<local_limb_type>(a5b1)
+              + detail::make_lo<local_limb_type>(a4b2)
+              + detail::make_lo<local_limb_type>(a3b3)
+              + detail::make_lo<local_limb_type>(a2b4)
+              + detail::make_lo<local_limb_type>(a1b5)
+              + detail::make_lo<local_limb_type>(a0b6)
+              + detail::make_hi<local_limb_type>(a5b0)
+              + detail::make_hi<local_limb_type>(a4b1)
+              + detail::make_hi<local_limb_type>(a3b2)
+              + detail::make_hi<local_limb_type>(a2b3)
+              + detail::make_hi<local_limb_type>(a1b4)
+              + detail::make_hi<local_limb_type>(a0b5)
+              ;
+
+      *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(7)))
+            = static_cast<local_limb_type>
+              (
+                  detail::make_hi<local_limb_type>(rd6)
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(7))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(0)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(6))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(1)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(5))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(2)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(4))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(3)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(3))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(4)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(2))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(5)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(1))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(6)))))
+                + static_cast<local_limb_type>    (*detail::advance_and_point(a, static_cast<left_difference_type>(INT8_C(0))) * static_cast<local_double_limb_type>(*detail::advance_and_point(b, static_cast<right_difference_type>(INT8_C(7)))))
+                + detail::make_hi<local_limb_type>(a6b0)
+                + detail::make_hi<local_limb_type>(a5b1)
+                + detail::make_hi<local_limb_type>(a4b2)
+                + detail::make_hi<local_limb_type>(a3b3)
+                + detail::make_hi<local_limb_type>(a2b4)
+                + detail::make_hi<local_limb_type>(a1b5)
+                + detail::make_hi<local_limb_type>(a0b6)
+              )
+              ;
+    }
+
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(0))) = static_cast<local_limb_type>(a0b0);
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(1))) = static_cast<local_limb_type>(rd1);
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(2))) = static_cast<local_limb_type>(rd2);
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(3))) = static_cast<local_limb_type>(rd3);
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(4))) = static_cast<local_limb_type>(rd4);
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(5))) = static_cast<local_limb_type>(rd5);
+    *detail::advance_and_point(r, static_cast<result_difference_type>(INT8_C(6))) = static_cast<local_limb_type>(rd6);
+  }
+
 private:
   representation_type values { };
 
@@ -601,8 +1085,8 @@ private:
   template<typename InputIteratorLeftType,
            typename InputIteratorRightType>
   static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto compare_ranges(      InputIteratorLeftType  a,
-                                                          InputIteratorRightType b,
-                                                    const unsigned_fast_type     count) -> std::int_fast8_t
+                                                                        InputIteratorRightType b,
+                                                                  const unsigned_fast_type     count) -> std::int_fast8_t
   {
     auto n_return = static_cast<std::int_fast8_t>(INT8_C(0));
 
@@ -637,10 +1121,10 @@ private:
            typename InputIteratorLeft,
            typename InputIteratorRight>
   static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_add_n(      ResultIterator     r,
-                                                      InputIteratorLeft  u,
-                                                      InputIteratorRight v,
-                                                const unsigned_fast_type count,
-                                                const limb_type          carry_in = static_cast<limb_type>(UINT8_C(0))) -> limb_type
+                                                                    InputIteratorLeft  u,
+                                                                    InputIteratorRight v,
+                                                              const unsigned_fast_type count,
+                                                              const limb_type          carry_in = static_cast<limb_type>(UINT8_C(0))) -> limb_type
   {
     auto carry_out = static_cast<std::uint_fast8_t>(carry_in);
 
@@ -679,10 +1163,10 @@ private:
            typename InputIteratorLeft,
            typename InputIteratorRight>
   static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_subtract_n(      ResultIterator     r,
-                                                           InputIteratorLeft  u,
-                                                           InputIteratorRight v,
-                                                     const unsigned_fast_type count,
-                                                     const bool               has_borrow_in = false) -> bool
+                                                                         InputIteratorLeft  u,
+                                                                         InputIteratorRight v,
+                                                                   const unsigned_fast_type count,
+                                                                   const bool               has_borrow_in = false) -> bool
   {
     auto has_borrow_out =
       static_cast<std::uint_fast8_t>
@@ -728,58 +1212,10 @@ private:
     return (has_borrow_out != static_cast<std::uint_fast8_t>(UINT8_C(0)));
   }
 
-  template<typename ResultIterator,
-           typename InputIteratorLeft>
-  static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_multiply_1d(      ResultIterator                                                                   r,
-                                                            InputIteratorLeft                                                                a,
-                                                      const typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type b,
-                                                      const unsigned_fast_type                                                               count) -> limb_type
-  {
-    using local_limb_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type;
-    using left_value_type = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type;
-
-    static_assert
-    (
-      (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<left_value_type>::digits),
-      "Error: Internals require same widths for left-right-result limb_types at the moment"
-    );
-
-    using local_double_limb_type =
-      typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<local_limb_type>::digits * 2)>::exact_unsigned_type;
-
-    auto carry = static_cast<local_double_limb_type>(UINT8_C(0));
-
-    if(b == static_cast<left_value_type>(UINT8_C(0)))
-    {
-      detail::fill_unsafe(r, detail::advance_and_point(r, count), static_cast<limb_type>(UINT8_C(0)));
-    }
-    else
-    {
-      const auto imax = count;
-
-      auto i = static_cast<unsigned_fast_type>(UINT8_C(0));
-
-      for( ; i < imax; ++i) // NOLINT(altera-id-dependent-backward-branch)
-      {
-        carry =
-          static_cast<local_double_limb_type>
-          (
-              carry
-            + static_cast<local_double_limb_type>(static_cast<local_double_limb_type>(*a++) * b)
-          );
-
-        *r++  = static_cast<local_limb_type>(carry);
-        carry = detail::make_hi<local_limb_type>(carry);
-      }
-    }
-
-    return static_cast<local_limb_type>(carry);
-  }
-
   BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth_core(const unsigned_fast_type u_offset, // NOLINT(readability-function-cognitive-complexity)
-                                                     const unsigned_fast_type v_offset,
-                                                     const uintwide_t& other,
-                                                           uintwide_t& remainder) -> void
+                                                                   const unsigned_fast_type v_offset,
+                                                                   const uintwide_t& other,
+                                                                         uintwide_t& remainder) -> void
   {
     // Use Knuth's long division algorithm.
     // The loop-ordering of indices in Knuth's original

@@ -828,90 +828,6 @@ constexpr auto uint128::operator--(int) noexcept -> uint128
     return --(*this);
 }
 
-constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
-{
-    const auto a = static_cast<std::uint64_t>(lhs.low >> 32);
-    const auto b = static_cast<std::uint64_t>(lhs.low & UINT32_MAX);
-    const auto c = static_cast<std::uint64_t>(rhs.low >> 32);
-    const auto d = static_cast<std::uint64_t>(rhs.low & UINT32_MAX);
-
-    uint128 result { lhs.high * rhs.low + lhs.low * rhs.high + a * c, b * d };
-    result += uint128(a * d) << 32;
-    result += uint128(b * c) << 32;
-    return result;
-}
-
-// TODO(mborland): Can be replaced by intrinsics at runtime
-constexpr auto multiply_64_64(std::uint64_t a, std::uint64_t b) -> uint128
-{
-    std::uint64_t a_low = a & UINT32_MAX;
-    std::uint64_t a_high = a >> 32;
-    std::uint64_t b_low = b & UINT32_MAX;
-    std::uint64_t b_high = b >> 32;
-
-    std::uint64_t low_product = a_low * b_low;
-    std::uint64_t mid_product1 = a_high * b_low;
-    std::uint64_t mid_product2 = a_low * b_high;
-    std::uint64_t high_product = a_high * b_high;
-
-    std::uint64_t mid_sum = (low_product >> 32) + (mid_product1 & UINT32_MAX) + mid_product2;
-    std::uint64_t high = high_product + (mid_product1 >> 32) + (mid_sum >> 32);
-    std::uint64_t low = (mid_sum << 32) | (low_product & UINT32_MAX);
-
-    return {high, low};
-}
-
-constexpr auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
-{
-    auto low = multiply_64_64(lhs.low, rhs);
-    auto high = multiply_64_64(lhs.high, rhs);
-
-    uint128 result;
-    result.low = low.low;
-    result.high = low.high + high.low;
-    if (result.high < low.high)
-    {
-        high.high += 1; // Handle overflow
-    }
-    result.high += high.high;
-
-    return result;
-}
-
-constexpr auto uint128::operator*=(uint128 v) noexcept -> uint128&
-{
-    *this = *this * v;
-    return *this;
-}
-
-constexpr auto uint128::operator*=(std::uint64_t v) noexcept -> uint128&
-{
-    *this = *this * v;
-    return *this;
-}
-
-constexpr auto high_bit(uint128 v) noexcept -> int
-{
-    if (v.high != 0)
-    {
-        #ifdef BOOST_DECIMAL_HAS_STDBIT
-        return 127 - std::countl_zero(v.high);
-        #else
-        return 127 - countl_zero(v.high);
-        #endif
-    }
-    else if (v.low != 0)
-    {
-        #ifdef BOOST_DECIMAL_HAS_STDBIT
-        return 63 - std::countl_zero(v.low);
-        #else
-        return 63 - countl_zero(v.low);
-        #endif
-    }
-
-    return 0;
-}
-
 using wide_integer_uint128 = ::boost::decimal::math::wide_integer::uint128_t;
 
 constexpr auto uint128_to_wide_integer(const uint128& src) -> wide_integer_uint128
@@ -955,6 +871,105 @@ constexpr auto wide_integer_to_uint128(const wide_integer_uint128& src) -> uint1
         );
 
     return dst;
+}
+
+constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
+{
+    const auto a = static_cast<std::uint64_t>(lhs.low >> 32);
+    const auto b = static_cast<std::uint64_t>(lhs.low & UINT32_MAX);
+    const auto c = static_cast<std::uint64_t>(rhs.low >> 32);
+    const auto d = static_cast<std::uint64_t>(rhs.low & UINT32_MAX);
+
+    uint128 result { lhs.high * rhs.low + lhs.low * rhs.high + a * c, b * d };
+    result += uint128(a * d) << 32;
+    result += uint128(b * c) << 32;
+    return result;
+}
+
+// TODO(mborland): Can be replaced by intrinsics at runtime
+constexpr auto multiply_64_64(std::uint64_t a, std::uint64_t b) -> uint128
+{
+    std::uint64_t a_low = a & UINT32_MAX;
+    std::uint64_t a_high = a >> 32;
+    std::uint64_t b_low = b & UINT32_MAX;
+    std::uint64_t b_high = b >> 32;
+
+    std::uint64_t low_product = a_low * b_low;
+    std::uint64_t mid_product1 = a_high * b_low;
+    std::uint64_t mid_product2 = a_low * b_high;
+    std::uint64_t high_product = a_high * b_high;
+
+    std::uint64_t mid_sum = (low_product >> 32) + (mid_product1 & UINT32_MAX) + mid_product2;
+    std::uint64_t high = high_product + (mid_product1 >> 32) + (mid_sum >> 32);
+    std::uint64_t low = (mid_sum << 32) | (low_product & UINT32_MAX);
+
+    return {high, low};
+}
+
+constexpr auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
+{
+    using local_unsigned_fast_type = ::boost::decimal::math::wide_integer::detail::unsigned_fast_type;
+
+    const auto rhs_high = static_cast<std::uint32_t>(rhs >> static_cast<unsigned>(UINT8_C(32)));
+
+    wide_integer_uint128 result_wide { };
+
+    const auto lhs_wide = uint128_to_wide_integer(lhs);
+
+    if (rhs_high == UINT32_C(0))
+    {
+        wide_integer_uint128::eval_multiply_1d(result_wide.representation().begin(),
+                                               lhs_wide.crepresentation().cbegin(),
+                                               static_cast<std::uint32_t>(rhs),
+                                               static_cast<local_unsigned_fast_type>(UINT8_C(4)));
+    }
+    else
+    {
+        // Mash-Up: Use unrolled school-multiplication from wide-integer (requires limb-conversions on input/output).
+
+        auto rhs_wide = uint128_to_wide_integer(uint128(rhs));
+
+        wide_integer_uint128::eval_multiply_n_by_n_to_lo_part_128(result_wide.representation().begin(),
+                                                                  lhs_wide.crepresentation().cbegin(),
+                                                                  rhs_wide.crepresentation().cbegin(),
+                                                                  static_cast<local_unsigned_fast_type>(UINT8_C(4)));
+    }
+
+    return wide_integer_to_uint128(result_wide);
+}
+
+constexpr auto uint128::operator*=(uint128 v) noexcept -> uint128&
+{
+    *this = *this * v;
+    return *this;
+}
+
+constexpr auto uint128::operator*=(std::uint64_t v) noexcept -> uint128&
+{
+    *this = *this * v;
+    return *this;
+}
+
+constexpr auto high_bit(uint128 v) noexcept -> int
+{
+    if (v.high != 0)
+    {
+        #ifdef BOOST_DECIMAL_HAS_STDBIT
+        return 127 - std::countl_zero(v.high);
+        #else
+        return 127 - countl_zero(v.high);
+        #endif
+    }
+    else if (v.low != 0)
+    {
+        #ifdef BOOST_DECIMAL_HAS_STDBIT
+        return 63 - std::countl_zero(v.low);
+        #else
+        return 63 - countl_zero(v.low);
+        #endif
+    }
+
+    return 0;
 }
 
 constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& remainder) noexcept -> void

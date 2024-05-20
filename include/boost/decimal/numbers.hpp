@@ -106,6 +106,27 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION decimal128 sqrt3_v<decimal128> =
                                                                                                             UINT64_C(8437766544231453518)}, -33};
 
 BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
+BOOST_DECIMAL_CONSTEXPR_VARIABLE Dec sqrt10_v = Dec{UINT64_C(3162277660168379332), -18};
+
+BOOST_DECIMAL_EXPORT template <>
+BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION decimal128 sqrt10_v<decimal128> = decimal128{detail::uint128{UINT64_C(171427415457846),
+                                                                                                             UINT64_C(13450487317535253574)}, -33};
+
+BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
+BOOST_DECIMAL_CONSTEXPR_VARIABLE Dec cbrt2_v = Dec{UINT64_C(1259921049894873165), -18};
+
+BOOST_DECIMAL_EXPORT template <>
+BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION decimal128 cbrt2_v<decimal128> = decimal128{detail::uint128{UINT64_C(68300456972811),
+                                                                                                            UINT64_C(17628749411094165652)}, -33};
+
+BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
+BOOST_DECIMAL_CONSTEXPR_VARIABLE Dec cbrt10_v = Dec{UINT64_C(2154434690031883722), -18};
+
+BOOST_DECIMAL_EXPORT template <>
+BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION decimal128 cbrt10_v<decimal128> = decimal128{detail::uint128{UINT64_C(116792138570535),
+                                                                                                             UINT64_C(2467411419527284790)}, -33};
+
+BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 BOOST_DECIMAL_CONSTEXPR_VARIABLE Dec inv_sqrt2_v = Dec{UINT64_C(7071067811865475244), -19};
 
 BOOST_DECIMAL_EXPORT template <>
@@ -144,6 +165,9 @@ BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto ln2 {ln2_v<decimal64>
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto ln10 {ln10_v<decimal64>};
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto sqrt2 {sqrt2_v<decimal64>};
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto sqrt3 {sqrt3_v<decimal64>};
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto sqrt10 {sqrt10_v<decimal64>};
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto cbrt2 {cbrt2_v<decimal64>};
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto cbrt10 {cbrt10_v<decimal64>};
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto inv_sqrt2 {inv_sqrt2_v<decimal64>};
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto inv_sqrt3 {inv_sqrt3_v<decimal64>};
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR_VARIABLE auto egamma {egamma_v<decimal64>};
