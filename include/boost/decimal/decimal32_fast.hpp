@@ -508,8 +508,8 @@ constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& 
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
-    detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal32_components lhs_components {static_cast<std::uint32_t>(sig_lhs), exp_lhs, lhs.isneg()};
+    detail::decimal32_components rhs_components {static_cast<std::uint32_t>(sig_rhs), exp_rhs, rhs.isneg()};
     detail::decimal32_components q_components {};
 
     generic_div_impl(lhs_components, rhs_components, q_components);

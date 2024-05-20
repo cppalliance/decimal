@@ -848,7 +848,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                   << "\nNew neg: " << lhs_sign << std::endl;
         #endif
 
-        return {lhs_sig, lhs_exp, lhs_sign};
+        return {static_cast<std::uint32_t>(lhs_sig), lhs_exp, lhs_sign};
     }
     else if (delta_exp == detail::precision + 1)
     {
@@ -868,7 +868,7 @@ constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                   << "\nNew neg: " << lhs_sign << std::endl;
         #endif
 
-        return {lhs_sig, lhs_exp, lhs_sign};
+        return {static_cast<std::uint32_t>(lhs_sig), lhs_exp, lhs_sign};
     }
 
     // The two numbers can be added together without special handling
@@ -974,11 +974,11 @@ constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     if (rhs_sign && !lhs_sign)
     {
-        new_sig = signed_sig_lhs + signed_sig_rhs;
+        new_sig = static_cast<std::int32_t>(signed_sig_lhs) + static_cast<std::int32_t>(signed_sig_rhs);
     }
     else
     {
-        new_sig = signed_sig_lhs - signed_sig_rhs;
+        new_sig = static_cast<std::int32_t>(signed_sig_lhs) - static_cast<std::int32_t>(signed_sig_rhs);
     }
 
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
