@@ -102,6 +102,13 @@ namespace local
         static_cast<float_type>(range_hi)
       };
 
+    auto dis_sign =
+      std::uniform_int_distribution<int>
+      {
+        static_cast<int>(INT8_C(0)),
+        static_cast<int>(INT8_C(1))
+      };
+
     auto result_is_ok = true;
 
     auto trials = static_cast<std::uint32_t>(UINT8_C(0));
@@ -114,8 +121,10 @@ namespace local
 
     for( ; trials < count; ++trials)
     {
-      const auto x_flt = dis(gen);
-      const auto x_dec = static_cast<decimal_type>(x_flt);
+      const bool is_neg = (dis_sign(gen) == 1);
+
+      const float_type   x_flt = (is_neg ? -dis(gen) : dis(gen));
+      const decimal_type x_dec = static_cast<decimal_type>(x_flt);
 
       using std::cbrt;
 
@@ -220,16 +229,26 @@ namespace local
       }
     }
 
-    decimal_type inf {std::numeric_limits<decimal_type>::infinity() * static_cast<int>(dist(gen))};
-    decimal_type nan {std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<int>(dist(gen))};
-    decimal_type zero {0 * static_cast<int>(dist(gen))};
-    decimal_type neg_num {-static_cast<int>(dist(gen))};
-    BOOST_TEST(isinf(cbrt(inf)));
-    BOOST_TEST(isnan(cbrt(-inf)));
-    BOOST_TEST(isnan(cbrt(nan)));
-    BOOST_TEST(isnan(cbrt(-nan)));
-    BOOST_TEST_EQ(cbrt(zero), zero);
-    BOOST_TEST(isnan(cbrt(neg_num)));
+    {
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
+      {
+        static_cast<void>(i);
+
+        const decimal_type inf     { std::numeric_limits<decimal_type>::infinity() * static_cast<int>(dist(gen)) };
+        const decimal_type nan     { std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<int>(dist(gen)) };
+        const decimal_type zero    { decimal_type { 0 } * static_cast<int>(dist(gen)) };
+        const decimal_type neg_arg { -static_cast<int>(dist(gen)) };
+
+        BOOST_TEST(isinf(cbrt(inf)));
+        BOOST_TEST(isinf(cbrt(-inf)));
+        BOOST_TEST(isnan(cbrt(nan)));
+        BOOST_TEST(isnan(cbrt(-nan)));
+
+        BOOST_TEST_EQ(cbrt(zero), zero);
+        BOOST_TEST_EQ(cbrt(-zero), -zero);
+        BOOST_TEST_EQ(cbrt(neg_arg), -cbrt(-neg_arg));
+      }
+    }
 
     return result_is_ok;
   }

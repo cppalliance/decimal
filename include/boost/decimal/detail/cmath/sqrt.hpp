@@ -56,7 +56,7 @@ constexpr auto sqrt_impl(T x) noexcept
 
         const bool is_pure { static_cast<unsigned>(zeros_removal.trimmed_number) == 1U };
 
-        constexpr T one  { 1 };
+        constexpr T one { 1 };
 
         if(is_pure)
         {
@@ -71,13 +71,15 @@ constexpr auto sqrt_impl(T x) noexcept
             }
             else
             {
+                const int p10_mod2 = (p10 % 2);
+
                 result = T { 1, p10 / 2 };
 
-                if ((p10 % 2) == 1)
+                if (p10_mod2 == 1)
                 {
                     result *= numbers::sqrt10_v<T>;
                 }
-                else if ((p10 % 2) == -1)
+                else if (p10_mod2 == -1)
                 {
                     result /= numbers::sqrt10_v<T>;
                 }
@@ -94,6 +96,9 @@ constexpr auto sqrt_impl(T x) noexcept
             // at argument x = 1/2. This results in slightly more than 2 decimal digits
             // of accuracy over the interval 1/10 <= x < 1.
 
+            // See also WolframAlpha at:
+            //   https://www.wolframalpha.com/input?i=FullSimplify%5BPadeApproximant%5BSqrt%5Bx%5D%2C+%7Bx%2C+1%2F2%2C+%7B2%2C+2%7D%7D%5D%5D
+
             // PadeApproximant[Sqrt[x], {x, 1/2, {2, 2}}]
             // FullSimplify[%]
 
@@ -108,8 +113,8 @@ constexpr auto sqrt_impl(T x) noexcept
             constexpr T five { 5 };
 
             result =
-                  (one + gx * (one + gx) * 20)
-                / (5 * numbers::sqrt2_v<T> + gx * (4 * numbers::sqrt2_v<T>) * (five + gx));
+                  (one + gx * ((one + gx) * 20))
+                / (numbers::sqrt2_v<T> * ((gx * 4) * (five + gx) + five));
 
             // Perform 2, 3 or 4 Newton-Raphson iterations depending on precision.
             // Note from above, we start with slightly more than 2 decimal digits
@@ -128,13 +133,17 @@ constexpr auto sqrt_impl(T x) noexcept
 
             if (exp10val != 0)
             {
+                // Rescale the result if necessary.
+
+                const int exp10val_mod2 = (exp10val % 2);
+
                 result *= T { 1, exp10val / 2 };
 
-                if ((exp10val % 2) == 1)
+                if (exp10val_mod2 == 1)
                 {
                     result *= numbers::sqrt10_v<T>;
                 }
-                else if ((exp10val % 2) == -1)
+                else if (exp10val_mod2 == -1)
                 {
                     result /= numbers::sqrt10_v<T>;
                 }
