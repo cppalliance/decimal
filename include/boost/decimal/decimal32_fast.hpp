@@ -97,7 +97,7 @@ private:
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
 public:
-    constexpr decimal32_fast() noexcept : significand_{}, exponent_{}, sign_ {} {}
+    constexpr decimal32_fast() noexcept {}
 
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
     constexpr decimal32_fast(T1 coeff, T2 exp, bool sign = false) noexcept;
@@ -106,7 +106,7 @@ public:
     constexpr decimal32_fast(Integer coeff) noexcept;
 
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
-    BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast(Float val) noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast(Float val) noexcept;
 
     constexpr decimal32_fast(const decimal32_fast& val) noexcept = default;
     constexpr decimal32_fast(decimal32_fast&& val) noexcept = default;
