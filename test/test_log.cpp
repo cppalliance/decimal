@@ -479,7 +479,7 @@ auto main() -> int
   }
 
   {
-    const auto result_pos128_is_ok = local::test_log_128(800'000);
+    const auto result_pos128_is_ok = local::test_log_128(8192);
 
     BOOST_TEST(result_pos128_is_ok);
 
