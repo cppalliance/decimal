@@ -861,9 +861,9 @@ int main()
     random_addition(0, 5'000'000);
     random_addition(0L, 5'000'000L);
     random_addition(0LL, 5'000'000LL);
-    //random_mixed_addition(0, 5'000'000);
-    //random_mixed_addition(0L, 5'000'000L);
-    //random_mixed_addition(0LL, 5'000'000LL);
+    random_mixed_addition(0, 5'000'000);
+    random_mixed_addition(0L, 5'000'000L);
+    random_mixed_addition(0LL, 5'000'000LL);
 
     // Only two negative values
     random_addition(-5'000'000, 0);

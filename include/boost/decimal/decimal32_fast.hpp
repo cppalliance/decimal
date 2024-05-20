@@ -10,6 +10,8 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/attributes.hpp>
+#include <boost/decimal/detail/add_impl.hpp>
+#include <boost/decimal/detail/sub_impl.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <limits>
 #include <cstdint>
@@ -22,6 +24,13 @@ namespace detail {
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = std::numeric_limits<std::uint_fast32_t>::max();
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = std::numeric_limits<std::uint_fast32_t>::max() - 1;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::uint_fast32_t>::max() - 2;
+
+struct decimal32_fast_components
+{
+    std::uint_fast32_t sig;
+    std::int32_t exp;
+    bool sign;
+};
 
 }
 
@@ -201,6 +210,15 @@ public:
     friend constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator/(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator%(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
+
+    // Mixed type binary arithmetic
+    template <typename Integer>
+    friend constexpr auto operator+(decimal32_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast);
+
+    template <typename Integer>
+    friend constexpr auto operator+(Integer lhs, decimal32_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast);
 
     // Compound operators
     constexpr auto operator+=(decimal32_fast rhs) noexcept -> decimal32_fast&;
@@ -626,9 +644,67 @@ constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    const auto result {add_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
+    const auto result {detail::add_impl<detail::decimal32_fast_components>(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator+(decimal32_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
+{
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return lhs;
+    }
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && (rhs < 0))
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+    bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize(sig_lhs, exp_lhs);
+
+    auto lhs_components {detail::decimal32_fast_components{sig_lhs, exp_lhs, lhs.isneg()}};
+    auto sig_rhs {rhs};
+    std::int32_t exp_rhs {0};
+    detail::normalize(sig_rhs, exp_rhs);
+    auto unsigned_sig_rhs = detail::shrink_significand<std::uint_fast32_t>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    auto rhs_components {detail::decimal32_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs_components, rhs_components);
+        lhs_bigger = !lhs_bigger;
+        abs_lhs_bigger = !abs_lhs_bigger;
+    }
+
+    detail::decimal32_fast_components result {};
+
+    if (!lhs_components.sign && rhs_components.sign)
+    {
+        result = detail::sub_impl<detail::decimal32_fast_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                                                     rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                                                                     abs_lhs_bigger);
+    }
+    else
+    {
+        result = detail::add_impl<detail::decimal32_fast_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                                                     rhs_components.sig, rhs_components.exp, rhs_components.sign);
+    }
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator+(Integer lhs, decimal32_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
+{
+    return rhs + lhs;
 }
 
 constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
@@ -656,9 +732,9 @@ constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    const auto result {sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
-                                sig_rhs, exp_rhs, rhs.isneg(),
-                                abs_lhs_bigger)};
+    const auto result {detail::sub_impl<detail::decimal32_fast_components>(sig_lhs, exp_lhs, lhs.isneg(),
+                                                                                                         sig_rhs, exp_rhs, rhs.isneg(),
+                                                                                                         abs_lhs_bigger)};
 
     return {result.sig, result.exp, result.sign};
 }
