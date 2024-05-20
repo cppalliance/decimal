@@ -161,6 +161,22 @@ public:
     friend constexpr auto operator<=(Integer lhs, decimal32_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
+    template <typename Integer>
+    friend constexpr auto operator>(decimal32_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    template <typename Integer>
+    friend constexpr auto operator>(Integer lhs, decimal32_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    template <typename Integer>
+    friend constexpr auto operator>=(decimal32_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    template <typename Integer>
+    friend constexpr auto operator>=(Integer lhs, decimal32_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
     // Unary operators
     friend constexpr auto operator+(decimal32_fast rhs) noexcept -> decimal32_fast;
     friend constexpr auto operator-(decimal32_fast lhs) noexcept -> decimal32_fast;
@@ -458,6 +474,34 @@ constexpr auto operator<=(Integer lhs, decimal32_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return isnan(rhs) ? false : !(rhs < lhs);
+}
+
+template <typename Integer>
+constexpr auto operator>(decimal32_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    return isnan(lhs) ? false : rhs < lhs;
+}
+
+template <typename Integer>
+constexpr auto operator>(Integer lhs, decimal32_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    return isnan(rhs) ? false : rhs < lhs;
+}
+
+template <typename Integer>
+constexpr auto operator>=(decimal32_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    return isnan(lhs) ? false : !(lhs < rhs);
+}
+
+template <typename Integer>
+constexpr auto operator>=(Integer lhs, decimal32_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    return isnan(rhs) ? false : !(lhs < rhs);
 }
 
 constexpr auto operator+(decimal32_fast rhs) noexcept -> decimal32_fast
