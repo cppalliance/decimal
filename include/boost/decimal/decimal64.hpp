@@ -1002,8 +1002,6 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
         case detail::d64_comb_01_mask:
             expval = UINT64_C(0b0100000000);
             break;
-        default:
-            BOOST_DECIMAL_UNREACHABLE;
     }
 
     expval |= (bits_ & detail::d64_exponent_mask) >> detail::d64_significand_bits;

@@ -638,8 +638,6 @@ constexpr auto decimal128::unbiased_exponent() const noexcept -> std::uint64_t
         case detail::d128_comb_01_mask.high:
             expval = UINT64_C(0b01000000000000);
             break;
-        default:
-            BOOST_DECIMAL_UNREACHABLE;
     }
 
     expval |= (bits_.high & detail::d128_exponent_mask.high) >> high_word_significand_bits;

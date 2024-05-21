@@ -1360,8 +1360,6 @@ constexpr auto decimal32::unbiased_exponent() const noexcept -> std::uint32_t
         case detail::d32_comb_01_mask:
             expval = UINT32_C(0b01000000);
             break;
-        default:
-            BOOST_DECIMAL_UNREACHABLE;
     }
 
     expval |= (bits_ & detail::d32_exponent_mask) >> detail::d32_significand_bits;
