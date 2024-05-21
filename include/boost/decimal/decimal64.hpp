@@ -2353,6 +2353,7 @@ constexpr auto copysignd64(decimal64 mag, decimal64 sgn) noexcept -> decimal64
     return mag;
 }
 
+/*
 constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
 {
     // First calculate x * y without rounding
@@ -2417,6 +2418,7 @@ constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal
 
     return {result.sig, result.exp, result.sign};
 }
+*/
 
 } //namespace decimal
 } //namespace boost
