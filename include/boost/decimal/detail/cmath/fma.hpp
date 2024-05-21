@@ -152,6 +152,11 @@ constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal
     return {result.sig, result.exp, result.sign};
 }
 
+constexpr auto fmad128(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
+{
+    return x * y + z;
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
     return fmad32(x, y, z);
