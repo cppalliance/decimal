@@ -622,11 +622,12 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     // If the coeff is not in range make it so
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
     const bool reduced {unsigned_coeff_digits > detail::precision};
-    while (unsigned_coeff_digits > detail::precision + 1)
+    if (unsigned_coeff_digits > detail::precision + 1)
     {
-        unsigned_coeff /= 10;
-        ++exp;
-        --unsigned_coeff_digits;
+        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision + 1)};
+        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+        exp += digits_to_remove;
+        unsigned_coeff_digits -= digits_to_remove;
     }
 
     // Round as required
