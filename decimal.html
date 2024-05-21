@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.22">
+<meta name="generator" content="Asciidoctor 2.0.23">
 <title>Decimal: IEEE 754 Decimal Floating Point Numbers</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -583,6 +583,7 @@ pre.rouge .gs {
 <li><a href="#decimal128_description">Description</a></li>
 </ul>
 </li>
+<li><a href="#literals">Literals Support</a></li>
 <li><a href="#numbers">Numeric Constants</a>
 <ul class="sectlevel2">
 <li><a href="#numbers_overview">Overview</a></li>
@@ -753,6 +754,7 @@ pre.rouge .gs {
 </li>
 </ul>
 </li>
+<li><a href="#reference">References</a></li>
 <li><a href="#copyright">Copyright and License</a></li>
 </ul>
 </div>
@@ -772,7 +774,7 @@ The library is header-only, has no dependencies, and requires C++14.</p>
 <h3 id="overview_motivation">Motivation</h3>
 <div class="paragraph">
 <p>Current C++ floating point types store the significand (often incorrectly referred to as the mantissa) as binary digits.
-Famously this leads to rounding errors: <a href="https://0.30000000000000004.com" class="bare">https://0.30000000000000004.com</a>.
+Famously this leads to representation errors: <a href="https://0.30000000000000004.com" class="bare">https://0.30000000000000004.com</a>.
 Decimal floating point numbers avoid this issue by storing the significand in base-10 (decimal).
 The other major difference between binary and decimal floating point types is that the latter allows for multiple representations of the same number.
 For example 1e5 could also be stored as 0.1e6, 0.01e7, so on and so forth.
@@ -783,7 +785,8 @@ These are referred to as cohorts which binary does not have as there is only one
 <h3 id="overview_use_cases">Use Cases</h3>
 <div class="paragraph">
 <p>The use case for Decimal Floating Point numbers is where rounding errors are significantly impactful such as finance.
-In applications where integer or fixed-point arithmetic are used to combat this issue Decimal Floating Point numbers can provide a significantly greater range of values.</p>
+In applications where integer or fixed-point arithmetic are used to combat this issue Decimal Floating Point numbers can provide a significantly greater range of values.
+For example, while a fixed-point representation that allocates 8 decimal digits and 2 decimal places can represent the numbers 123456.78, 8765.43, 123.00, and so on, a floating-point representation with 8 decimal digits could also represent 1.2345678, 1234567.8, 0.000012345678, 12345678000000000, and so on.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1093,16 +1096,6 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal64</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal128</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="c1">// Literals</span>
-<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DF</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
-<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_df</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
-
-<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DF</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
-<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dF</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
-
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DF</span><span class="p">(</span><span class="kt">long</span> <span class="kt">double</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dF</span><span class="p">(</span><span class="kt">long</span> <span class="kt">double</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
-
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
@@ -1203,14 +1196,6 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal32</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal128</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
-
-<span class="c1">// Literals</span>
-<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DD</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
-<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dd</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
-<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DD</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
-<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dd</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DD</span><span class="p">(</span><span class="kt">long</span> <span class="kt">double</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dd</span><span class="p">(</span><span class="kt">long</span> <span class="kt">double</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
 
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
@@ -1313,18 +1298,58 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal32</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal64</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="c1">// Literals</span>
+<span class="p">}</span> <span class="c1">//namespace decimal</span>
+<span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="literals">Literals Support</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following literals are offered to construct each of the types:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DF</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_df</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
+
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DF</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dF</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
+
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DD</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dd</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
+
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DD</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dd</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
+
 <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DL</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128</span>
 <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dl</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128</span>
+
 <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DL</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128</span>
 <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dl</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128</span>
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DL</span><span class="p">(</span><span class="kt">long</span> <span class="kt">double</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128</span>
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dl</span><span class="p">(</span><span class="kt">long</span> <span class="kt">double</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128</span>
 
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
 </div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+<code>0.2_DF</code> is equivalent to calling <code>decimal32{2, -1}</code>.
+These are different from calling <code>decimal32{0.2}</code> which converts from a floating-point value which may or may not be exactly represented.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -1334,7 +1359,7 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <div class="sect2">
 <h3 id="numbers_overview">Overview</h3>
 <div class="paragraph">
-<p>Contains all constants provided by C++20&#8217;s <code>&lt;numbers&gt;</code> specialized for the decimal types. These does not require C++20.</p>
+<p>Contains all constants provided by C++20&#8217;s <code>&lt;numbers&gt;</code> specialized for the decimal types. These do not require C++20.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1369,7 +1394,16 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <p>sqrt3_v - sqrt(3)</p>
 </li>
 <li>
+<p>sqrt10_v - sqrt(10)</p>
+</li>
+<li>
 <p>inv_sqrt3_v - 1 / sqrt(3)</p>
+</li>
+<li>
+<p>cbrt2_v - cbrt(2)</p>
+</li>
+<li>
+<p>cbrt10_v - cbrt(10)</p>
 </li>
 <li>
 <p>egamma_v - <a href="https://en.wikipedia.org/wiki/Euler%27s_constant">Euler–Mascheroni constant</a></p>
@@ -1380,7 +1414,7 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 </ul>
 </div>
 <div class="paragraph">
-<p>There are also non-template variables that provide the constant as a decimal32 type.</p>
+<p>There are also non-template variables that provide the constant as a decimal64 type.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1423,10 +1457,19 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">static</span> <span class="k">constexpr</span> <span class="n">Decimal</span> <span class="n">sqrt3_v</span><span class="p">;</span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="n">Decimal</span> <span class="n">sqrt10_v</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
 <span class="k">static</span> <span class="k">constexpr</span> <span class="n">Decimal</span> <span class="n">inv_sqrt2_v</span><span class="p">;</span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
 <span class="k">static</span> <span class="k">constexpr</span> <span class="n">Decimal</span> <span class="n">inv_sqrt3_v</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="n">Decimal</span> <span class="n">cbrt2_v</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="n">Decimal</span> <span class="n">cbrt10_v</span><span class="p">;</span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
 <span class="k">static</span> <span class="k">constexpr</span> <span class="n">Decimal</span> <span class="n">egamma_v</span><span class="p">;</span>
@@ -1434,20 +1477,23 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
 <span class="k">static</span> <span class="k">constexpr</span> <span class="n">Decimal</span> <span class="n">phi_v</span><span class="p">;</span>
 
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">e</span> <span class="p">{</span><span class="n">e_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">log2e</span> <span class="p">{</span><span class="n">log2e_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">log10e</span> <span class="p">{</span><span class="n">log10e_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">pi</span> <span class="p">{</span><span class="n">pi_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">inv_pi</span> <span class="p">{</span><span class="n">inv_pi_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">inv_sqrtpi</span> <span class="p">{</span><span class="n">inv_sqrtpi_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">ln2</span> <span class="p">{</span><span class="n">ln2_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">ln10</span> <span class="p">{</span><span class="n">ln10_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">sqrt2</span> <span class="p">{</span><span class="n">sqrt2_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">sqrt3</span> <span class="p">{</span><span class="n">sqrt3_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">inv_sqrt2</span> <span class="p">{</span><span class="n">inv_sqrt2_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">inv_sqrt3</span> <span class="p">{</span><span class="n">inv_sqrt3_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">egamma</span> <span class="p">{</span><span class="n">egamma_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
-<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">phi</span> <span class="p">{</span><span class="n">phi_v</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">e</span> <span class="p">{</span><span class="n">e_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">log2e</span> <span class="p">{</span><span class="n">log2e_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">log10e</span> <span class="p">{</span><span class="n">log10e_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">pi</span> <span class="p">{</span><span class="n">pi_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">inv_pi</span> <span class="p">{</span><span class="n">inv_pi_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">inv_sqrtpi</span> <span class="p">{</span><span class="n">inv_sqrtpi_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">ln2</span> <span class="p">{</span><span class="n">ln2_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">ln10</span> <span class="p">{</span><span class="n">ln10_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">sqrt2</span> <span class="p">{</span><span class="n">sqrt2_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">sqrt3</span> <span class="p">{</span><span class="n">sqrt3_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">sqrt10</span> <span class="p">{</span><span class="n">sqrt10_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">inv_sqrt2</span> <span class="p">{</span><span class="n">inv_sqrt2_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">inv_sqrt3</span> <span class="p">{</span><span class="n">inv_sqrt3_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">cbrt2</span> <span class="p">{</span><span class="n">cbrt2_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">cbrt10</span> <span class="p">{</span><span class="n">cbrt10_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">egamma</span> <span class="p">{</span><span class="n">egamma_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
+<span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">phi</span> <span class="p">{</span><span class="n">phi_v</span><span class="o">&lt;</span><span class="n">decimal64</span><span class="o">&gt;</span><span class="p">};</span>
 
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
@@ -2160,6 +2206,21 @@ The significand is normalized to the number of digits of precision the type has 
 <div class="paragraph">
 <p>The following functions analogous to those from <a href="https://en.cppreference.com/w/cpp/header/charconv">&lt;charconv&gt;</a> are provided:</p>
 </div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+<code>std::from_chars</code> has an open issue with LWG here: <a href="https://cplusplus.github.io/LWG/lwg-active.html#3081" class="bare">https://cplusplus.github.io/LWG/lwg-active.html#3081</a>.
+The standard for &lt;charconv&gt; does not distinguish between underflow and overflow like strtod does.
+<code>boost::decimal::from_chars</code> modifies <code>value</code> in order to communicate this to the user in a divergence from the standard.
+This behavior is the same as that of <a href="https://www.boost.org/doc/libs/master/libs/charconv/doc/html/charconv.html#from_chars_usage_notes_for_from_chars_for_floating_point_types"><code>boost::charconv::from_chars_erange</code></a>.
+</td>
+</tr>
+</table>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
@@ -2236,6 +2297,49 @@ The significand is normalized to the number of digits of precision the type has 
 <p>C++20 support with: <code>std::is_constant_evaluated()</code></p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>The library offers an additional feature for sizing buffers without specified precision and in general format</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span>
+<span class="k">struct</span> <span class="nc">limits</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">max_chars</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">}</span> <span class="c1">//namespace decimal</span>
+<span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The member can then be used to size buffers such as:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/decimal.hpp&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="k">namespace</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="p">;</span>
+
+    <span class="n">decimal32</span> <span class="n">val</span> <span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">};</span>
+
+    <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="n">limits</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">max_chars</span><span class="p">];</span>
+
+    <span class="k">auto</span> <span class="n">r_to</span> <span class="o">=</span> <span class="n">to_chars</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">buffer</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span> <span class="n">val</span><span class="p">);</span>
+    <span class="o">*</span><span class="n">r_to</span><span class="p">.</span><span class="n">ptr</span> <span class="o">=</span> <span class="sc">'\0'</span><span class="p">;</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">buffer</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span></code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -3640,6 +3744,36 @@ Conversion operators and constructors are available for all decimal types should
 </div>
 </div>
 <div class="sect1">
+<h2 id="reference">References</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following books, papers and blog posts serve as the basis for the algorithms used in the library:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Michael F. Cowlishaw <a href="https://www.cs.tufts.edu/~nr/cs257/archive/mike-cowlishaw/decimal-arith.pdf"><em>Decimal Floating-Point: Algorism(sic) for Computers</em></a>, Proceedings of the 16th IEEE Symposium on Computer Arithmetic, 2003</p>
+</li>
+<li>
+<p>Donald E. Knuth, <em>The Art of Computer Programming Volume 2 Seminumerical Algorithms</em>, 3rd edition, 1998</p>
+</li>
+<li>
+<p>Jean-Michel Muller, <em>Elementary Functions</em>, 3rd edition, 2010</p>
+</li>
+<li>
+<p>Jean-Michel Muller, et. al., <em>Handbook of Floating-Point Arithmetic</em>, 2000</p>
+</li>
+<li>
+<p>John F. Hart, et. al.,  <em>Computer Approximations</em>, 1968</p>
+</li>
+<li>
+<p>IEEE, <em>IEEE Standard for Floating-Point Arithmetic</em>, 2019</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="copyright">Copyright and License</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -3651,7 +3785,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-04-26 11:04:32 +0200
+Last updated 2024-05-21 11:38:11 +0200
 </div>
 </div>
 <style>
