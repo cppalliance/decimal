@@ -16,18 +16,23 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
+namespace impl {
+
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t powers_of_10[20] =
 {
-         UINT64_C(1), UINT64_C(10), UINT64_C(100), UINT64_C(1000), UINT64_C(10000), UINT64_C(100000), UINT64_C(1000000),
-         UINT64_C(10000000), UINT64_C(100000000), UINT64_C(1000000000), UINT64_C(10000000000), UINT64_C(100000000000),
-         UINT64_C(1000000000000), UINT64_C(10000000000000), UINT64_C(100000000000000), UINT64_C(1000000000000000),
-         UINT64_C(10000000000000000), UINT64_C(100000000000000000), UINT64_C(1000000000000000000), UINT64_C(10000000000000000000)
- };
+    UINT64_C(1), UINT64_C(10), UINT64_C(100), UINT64_C(1000), UINT64_C(10000), UINT64_C(100000), UINT64_C(1000000),
+    UINT64_C(10000000), UINT64_C(100000000), UINT64_C(1000000000), UINT64_C(10000000000), UINT64_C(100000000000),
+    UINT64_C(1000000000000), UINT64_C(10000000000000), UINT64_C(100000000000000), UINT64_C(1000000000000000),
+    UINT64_C(10000000000000000), UINT64_C(100000000000000000), UINT64_C(1000000000000000000),
+    UINT64_C(10000000000000000000)
+};
+
+} // namespace impl
 
 template <typename T>
 constexpr auto pow10(T n) noexcept -> T
 {
-    return static_cast<T>(powers_of_10[static_cast<std::size_t>(n)]);
+    return static_cast<T>(impl::powers_of_10[static_cast<std::size_t>(n)]);
 }
 
 template <>
@@ -36,12 +41,12 @@ constexpr auto pow10(detail::uint128 n) noexcept -> detail::uint128
     detail::uint128 res {1};
     if (n <= 19)
     {
-        res = powers_of_10[static_cast<std::size_t>(n)];
+        res = impl::powers_of_10[static_cast<std::size_t>(n)];
     }
     else
     {
-        res = powers_of_10[static_cast<std::size_t>(19)];
-        res *= powers_of_10[static_cast<std::size_t>(n - 19)];
+        res = impl::powers_of_10[static_cast<std::size_t>(19)];
+        res *= impl::powers_of_10[static_cast<std::size_t>(n - 19)];
     }
 
     return res;
@@ -55,12 +60,12 @@ constexpr auto pow10(detail::uint128_t n) noexcept -> detail::uint128_t
     detail::uint128_t res {1};
     if (n <= 19)
     {
-        res = powers_of_10[static_cast<std::size_t>(n)];
+        res = impl::powers_of_10[static_cast<std::size_t>(n)];
     }
     else
     {
-        res = powers_of_10[static_cast<std::size_t>(19)];
-        res *= powers_of_10[static_cast<std::size_t>(n - 19)];
+        res = impl::powers_of_10[static_cast<std::size_t>(19)];
+        res *= impl::powers_of_10[static_cast<std::size_t>(n - 19)];
     }
 
     return res;
