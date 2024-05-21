@@ -627,17 +627,19 @@ constexpr auto decimal128::unbiased_exponent() const noexcept -> std::uint64_t
 
     const auto exp_comb_bits {(bits_.high & detail::d128_comb_11_mask.high)};
 
-    if (exp_comb_bits == detail::d128_comb_11_mask.high)
+    switch (exp_comb_bits)
     {
-        expval = (bits_.high & detail::d128_comb_11_mask.high) >> (high_word_significand_bits + 1);
-    }
-    else if (exp_comb_bits == detail::d128_comb_10_mask.high)
-    {
-        expval = UINT64_C(0b10000000000000);
-    }
-    else if (exp_comb_bits == detail::d128_comb_01_mask.high)
-    {
-        expval = UINT64_C(0b01000000000000);
+        case detail::d128_comb_11_mask.high:
+            expval = (bits_.high & detail::d128_comb_11_mask.high) >> (high_word_significand_bits + 1);
+            break;
+        case detail::d128_comb_10_mask.high:
+            expval = UINT64_C(0b10000000000000);
+            break;
+        case detail::d128_comb_01_mask.high:
+            expval = UINT64_C(0b01000000000000);
+            break;
+        default:
+            BOOST_DECIMAL_UNREACHABLE;
     }
 
     expval |= (bits_.high & detail::d128_exponent_mask.high) >> high_word_significand_bits;
@@ -657,14 +659,9 @@ constexpr auto decimal128::full_significand() const noexcept -> detail::uint128
     if ((bits_.high & detail::d128_comb_11_mask.high) == detail::d128_comb_11_mask.high)
     {
         // Only need the one bit of T because the other 3 are implied 0s
-        if ((bits_.high & detail::d128_comb_11_significand_bits.high) == detail::d128_comb_11_significand_bits.high)
-        {
-            significand = detail::uint128{0b10010000000000000000000000000000000000000000000000,0};
-        }
-        else
-        {
-            significand = detail::uint128{0b10000000000000000000000000000000000000000000000000,0};
-        }
+        significand = (bits_.high & detail::d128_comb_11_significand_bits.high) == detail::d128_comb_11_significand_bits.high ?
+            detail::uint128{0b10010000000000000000000000000000000000000000000000,0} :
+            detail::uint128{0b10000000000000000000000000000000000000000000000000,0};
     }
     else
     {

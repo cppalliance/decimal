@@ -991,18 +991,19 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
 
     const auto exp_comb_bits {(bits_ & detail::d64_comb_11_mask)};
 
-    if (exp_comb_bits == detail::d64_comb_11_mask)
+    switch (exp_comb_bits)
     {
-        // bits 2 and 3 are the exp part of the combination field
-        expval = (bits_ & detail::d64_comb_11_exp_bits) >> (detail::d64_significand_bits + 1);
-    }
-    else if (exp_comb_bits == detail::d64_comb_10_mask)
-    {
-        expval = UINT64_C(0b1000000000);
-    }
-    else if (exp_comb_bits == detail::d64_comb_01_mask)
-    {
-        expval = UINT64_C(0b0100000000);
+        case detail::d64_comb_11_mask:
+            expval = (bits_ & detail::d64_comb_11_exp_bits) >> (detail::d64_significand_bits + 1);
+            break;
+        case detail::d64_comb_10_mask:
+            expval = UINT64_C(0b1000000000);
+            break;
+        case detail::d64_comb_01_mask:
+            expval = UINT64_C(0b0100000000);
+            break;
+        default:
+            BOOST_DECIMAL_UNREACHABLE;
     }
 
     expval |= (bits_ & detail::d64_exponent_mask) >> detail::d64_significand_bits;
@@ -1022,14 +1023,9 @@ constexpr auto decimal64::full_significand() const noexcept -> std::uint64_t
     if ((bits_ & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
     {
         // Only need the one bit of T because the other 3 are implied
-        if ((bits_ & detail::d64_comb_11_significand_bits) == detail::d64_comb_11_significand_bits)
-        {
-            significand = UINT64_C(0b1001'0000000000'0000000000'0000000000'0000000000'0000000000);
-        }
-        else
-        {
-            significand = UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000);
-        }
+        significand = (bits_ & detail::d64_comb_11_significand_bits) == detail::d64_comb_11_significand_bits ?
+            UINT64_C(0b1001'0000000000'0000000000'0000000000'0000000000'0000000000) :
+            UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000);
     }
     else
     {
