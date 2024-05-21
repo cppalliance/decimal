@@ -81,7 +81,7 @@ constexpr auto lgamma_impl(T x) noexcept
                 :                                         T { 1, 2 }
             };
 
-            if (x < T { 1, -1 })
+            if (x < T { 2, -1 })
             {
                 // Perform the Taylor series expansion.
 
