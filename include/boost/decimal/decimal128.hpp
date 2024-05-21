@@ -745,7 +745,18 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     if (unsigned_coeff_digits > detail::precision_v<decimal128> + 1)
     {
         const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal128> + 1)};
+
+        #if defined(__GNUC__) && !defined(__clang__)
+        #  pragma GCC diagnostic push
+        #  pragma GCC diagnostic ignored "-Wconversion"
+        #endif
+
         unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+
+        #if defined(__GNUC__) && !defined(__clang__)
+        #  pragma GCC diagnostic pop
+        #endif
+
         exp += digits_to_remove;
         unsigned_coeff_digits -= digits_to_remove;
     }
