@@ -359,16 +359,6 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     ),
 
     macos_pipeline(
-        "MacOS 10.15 Xcode 12.2 UBSAN",
-        { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,2a' } + ubsan,
-    ),
-
-    macos_pipeline(
-        "MacOS 10.15 Xcode 12.2 ASAN",
-        { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,2a' } + asan,
-    ),
-
-    macos_pipeline(
         "MacOS 12.4 Xcode 13.4.1 UBSAN",
         { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,20,2b' } + ubsan,
         xcode_version = "13.4.1", osx_version = "monterey", arch = "arm64",
