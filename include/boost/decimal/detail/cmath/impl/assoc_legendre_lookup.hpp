@@ -129,6 +129,109 @@ struct assoc_legendre_lookup {
          decimal32{UINT32_C(2725392),72},
     }};
 
+    static constexpr std::array<decimal32_fast, 100> d32_fast_values =
+    {{
+         decimal32_fast{UINT32_C(1000000),-6},
+         decimal32_fast{UINT32_C(1000000),-6},
+         decimal32_fast{UINT32_C(2000000),-6},
+         decimal32_fast{UINT32_C(3000000),-6},
+         decimal32_fast{UINT32_C(8000000),-6},
+         decimal32_fast{UINT32_C(1500000),-5},
+         decimal32_fast{UINT32_C(4800000),-5},
+         decimal32_fast{UINT32_C(1050000),-4},
+         decimal32_fast{UINT32_C(3840000),-4},
+         decimal32_fast{UINT32_C(9450000),-4},
+         decimal32_fast{UINT32_C(3840000),-3},
+         decimal32_fast{UINT32_C(1039500),-2},
+         decimal32_fast{UINT32_C(4608000),-2},
+         decimal32_fast{UINT32_C(1351350),-1},
+         decimal32_fast{UINT32_C(6451200),-1},
+         decimal32_fast{UINT32_C(2027025),0},
+         decimal32_fast{UINT32_C(1032192),1},
+         decimal32_fast{UINT32_C(3445943),1},
+         decimal32_fast{UINT32_C(1857946),2},
+         decimal32_fast{UINT32_C(6547291),2},
+         decimal32_fast{UINT32_C(3715891),3},
+         decimal32_fast{UINT32_C(1374931),4},
+         decimal32_fast{UINT32_C(8174961),4},
+         decimal32_fast{UINT32_C(3162341),5},
+         decimal32_fast{UINT32_C(1961991),6},
+         decimal32_fast{UINT32_C(7905854),6},
+         decimal32_fast{UINT32_C(5101175),7},
+         decimal32_fast{UINT32_C(2134580),8},
+         decimal32_fast{UINT32_C(1428329),9},
+         decimal32_fast{UINT32_C(6190283),9},
+         decimal32_fast{UINT32_C(4284987),10},
+         decimal32_fast{UINT32_C(1918988),11},
+         decimal32_fast{UINT32_C(1371196),12},
+         decimal32_fast{UINT32_C(6332660),12},
+         decimal32_fast{UINT32_C(4662066),13},
+         decimal32_fast{UINT32_C(2216431),14},
+         decimal32_fast{UINT32_C(1678344),15},
+         decimal32_fast{UINT32_C(8200795),15},
+         decimal32_fast{UINT32_C(6377707),16},
+         decimal32_fast{UINT32_C(3198310),17},
+         decimal32_fast{UINT32_C(2551083),18},
+         decimal32_fast{UINT32_C(1311307),19},
+         decimal32_fast{UINT32_C(1071455),20},
+         decimal32_fast{UINT32_C(5638620),20},
+         decimal32_fast{UINT32_C(4714401),21},
+         decimal32_fast{UINT32_C(2537379),22},
+         decimal32_fast{UINT32_C(2168624),23},
+         decimal32_fast{UINT32_C(1192568),24},
+         decimal32_fast{UINT32_C(1040940),25},
+         decimal32_fast{UINT32_C(5843584),25},
+         decimal32_fast{UINT32_C(5204698),26},
+         decimal32_fast{UINT32_C(2980228),27},
+         decimal32_fast{UINT32_C(2706443),28},
+         decimal32_fast{UINT32_C(1579521),29},
+         decimal32_fast{UINT32_C(1461479),30},
+         decimal32_fast{UINT32_C(8687364),30},
+         decimal32_fast{UINT32_C(8184284),31},
+         decimal32_fast{UINT32_C(4951798),32},
+         decimal32_fast{UINT32_C(4746885),33},
+         decimal32_fast{UINT32_C(2921561),34},
+         decimal32_fast{UINT32_C(2848131),35},
+         decimal32_fast{UINT32_C(1782152),36},
+         decimal32_fast{UINT32_C(1765841),37},
+         decimal32_fast{UINT32_C(1122756),38},
+         decimal32_fast{UINT32_C(1130138),39},
+         decimal32_fast{UINT32_C(7297912),39},
+         decimal32_fast{UINT32_C(7458913),40},
+         decimal32_fast{UINT32_C(4889601),41},
+         decimal32_fast{UINT32_C(5072061),42},
+         decimal32_fast{UINT32_C(3373825),43},
+         decimal32_fast{UINT32_C(3550443),44},
+         decimal32_fast{UINT32_C(2395416),45},
+         decimal32_fast{UINT32_C(2556319),46},
+         decimal32_fast{UINT32_C(1748653),47},
+         decimal32_fast{UINT32_C(1891676),48},
+         decimal32_fast{UINT32_C(1311490),49},
+         decimal32_fast{UINT32_C(1437674),50},
+         decimal32_fast{UINT32_C(1009847),51},
+         decimal32_fast{UINT32_C(1121385),52},
+         decimal32_fast{UINT32_C(7977794),52},
+         decimal32_fast{UINT32_C(8971083),53},
+         decimal32_fast{UINT32_C(6462013),54},
+         decimal32_fast{UINT32_C(7356288),55},
+         decimal32_fast{UINT32_C(5363471),56},
+         decimal32_fast{UINT32_C(6179282),57},
+         decimal32_fast{UINT32_C(4558950),58},
+         decimal32_fast{UINT32_C(5314183),59},
+         decimal32_fast{UINT32_C(3966287),60},
+         decimal32_fast{UINT32_C(4676481),61},
+         decimal32_fast{UINT32_C(3529995),62},
+         decimal32_fast{UINT32_C(4208833),63},
+         decimal32_fast{UINT32_C(3212296),64},
+         decimal32_fast{UINT32_C(3872126),65},
+         decimal32_fast{UINT32_C(2987435),66},
+         decimal32_fast{UINT32_C(3639799),67},
+         decimal32_fast{UINT32_C(2838063),68},
+         decimal32_fast{UINT32_C(3494207),69},
+         decimal32_fast{UINT32_C(2752921),70},
+         decimal32_fast{UINT32_C(3424322),71},
+         decimal32_fast{UINT32_C(2725392),72},
+     }};
 
     static constexpr std::array<decimal64, 100> d64_values =
     {{
@@ -350,6 +453,9 @@ constexpr std::array<decimal64, 100> assoc_legendre_lookup<b>::d64_values;
 template <bool b>
 constexpr std::array<decimal128, 100> assoc_legendre_lookup<b>::d128_values;
 
+template <bool b>
+constexpr std::array<decimal32_fast, 100> assoc_legendre_lookup<b>::d32_fast_values;
+
 #endif
 
 using assoc_legendre_lookup_table = assoc_legendre_lookup<true>;
@@ -363,6 +469,12 @@ template <>
 constexpr auto assoc_legendre_p0_lookup<decimal32>(unsigned n) -> decimal32
 {
     return assoc_legendre_detail::assoc_legendre_lookup_table::d32_values[static_cast<std::size_t>(n)];
+}
+
+template <>
+constexpr auto assoc_legendre_p0_lookup<decimal32_fast>(unsigned n) -> decimal32_fast
+{
+    return assoc_legendre_detail::assoc_legendre_lookup_table::d32_fast_values[static_cast<std::size_t>(n)];
 }
 
 template <>
