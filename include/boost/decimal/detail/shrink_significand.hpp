@@ -30,7 +30,7 @@ constexpr auto shrink_significand(Integer sig, std::int32_t& exp) noexcept -> Ta
 
     if (sig_dig > max_digits)
     {
-        unsigned_sig /= static_cast<Unsigned_Integer>(powers_of_10[static_cast<std::size_t>(sig_dig - max_digits)]);
+        unsigned_sig /= pow10(static_cast<Unsigned_Integer>(sig_dig - max_digits));
         exp += sig_dig - max_digits;
     }
 
