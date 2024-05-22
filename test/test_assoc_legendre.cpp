@@ -229,5 +229,7 @@ int main()
     throw;
     #endif
 
+    test<decimal32_fast>();
+
     return boost::report_errors();
 }

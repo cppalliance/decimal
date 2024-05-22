@@ -93,6 +93,7 @@ void test_defaults()
 int main()
 {
     test_constants<decimal32>();
+    test_constants<decimal32_fast>();
     test_constants<decimal64>();
     test_constants<decimal128>();
     test_defaults();
