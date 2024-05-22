@@ -348,26 +348,31 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
     sign_ = isneg;
     Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
 
+    // If the coeff is not in range make it so
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
-    const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal32>};
-
-    // Strip digits and round as required
-    if (reduced)
+    const bool reduced {unsigned_coeff_digits > detail::precision};
+    if (unsigned_coeff_digits > detail::precision + 1)
     {
-        const auto digits_to_remove {static_cast<Unsigned_Integer>(unsigned_coeff_digits - (detail::precision_v<decimal32> + 1))};
+        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision + 1)};
 
         #if defined(__GNUC__) && !defined(__clang__)
         #  pragma GCC diagnostic push
         #  pragma GCC diagnostic ignored "-Wconversion"
         #endif
 
-        unsigned_coeff /= static_cast<Unsigned_Integer>(detail::pow10(digits_to_remove));
+        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
 
         #if defined(__GNUC__) && !defined(__clang__)
         #  pragma GCC diagnostic pop
         #endif
 
-        exp += static_cast<std::uint_fast8_t>(digits_to_remove);
+        exp += digits_to_remove;
+        unsigned_coeff_digits -= digits_to_remove;
+    }
+
+    // Round as required
+    if (reduced)
+    {
         exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
     }
 
