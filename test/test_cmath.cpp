@@ -482,7 +482,7 @@ void test_fdim()
 template <typename Dec>
 void test_ilogb()
 {
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value)
     {
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), 101);
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), 102);
@@ -506,7 +506,7 @@ void test_ilogb()
 template <typename Dec>
 void test_logb()
 {
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value)
     {
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), Dec(101));
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), Dec(102));
@@ -530,7 +530,7 @@ void test_logb()
 template <typename Dec>
 void test_sqrt()
 {
-    using comp_type = std::conditional_t<std::is_same<Dec, decimal32>::value, float, double>;
+    using comp_type = std::conditional_t<std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value, float, double>;
     std::uniform_real_distribution<comp_type> dist(0, 1e5);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
