@@ -83,9 +83,6 @@ private:
     friend constexpr auto to_integral(Decimal val) noexcept
         BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
-
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
@@ -300,6 +297,14 @@ public:
     explicit constexpr operator Decimal() const noexcept;
 
     friend constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign) noexcept -> decimal32_fast;
+
+    // <cmath> or extensions that need to be friends
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
+
+    friend constexpr auto copysignd32f(decimal32_fast mag, decimal32_fast sgn) noexcept -> decimal32_fast;
+    friend constexpr auto scalbnd32f(decimal32_fast num, int exp) noexcept -> decimal32_fast;
+    friend constexpr auto scalblnd32f(decimal32_fast num, long exp) noexcept -> decimal32_fast;
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
@@ -1255,6 +1260,31 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::
 constexpr decimal32_fast::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);
+}
+
+constexpr auto scalblnd32f(decimal32_fast num, long exp) noexcept -> decimal32_fast
+{
+    constexpr decimal32_fast zero {0, 0};
+
+    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    {
+        return num;
+    }
+
+    num = decimal32_fast(num.significand_, num.biased_exponent() + exp, num.sign_);
+
+    return num;
+}
+
+constexpr auto scalbnd32f(decimal32_fast num, int expval) noexcept -> decimal32_fast
+{
+    return scalblnd32f(num, static_cast<long>(expval));
+}
+
+constexpr auto copysignd32f(decimal32_fast mag, decimal32_fast sgn) noexcept -> decimal32_fast
+{
+    mag.sign_ = sgn.sign_;
+    return mag;
 }
 
 } // namespace decimal
