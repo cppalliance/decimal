@@ -1284,6 +1284,16 @@ int main()
     test_islessequal<decimal32>();
     test_islessgreater<decimal32>();
     test_isunordered<decimal32>();
+
+    test_fmax<decimal32_fast>();
+    test_isgreater<decimal32_fast>();
+    test_isgreaterequal<decimal32_fast>();
+    test_fmin<decimal32_fast>();
+    test_isless<decimal32_fast>();
+    test_islessequal<decimal32_fast>();
+    test_islessgreater<decimal32_fast>();
+    test_isunordered<decimal32_fast>();
+
     test_fmax<decimal64>();
     test_isgreater<decimal64>();
     test_isgreaterequal<decimal64>();
@@ -1292,6 +1302,7 @@ int main()
     test_islessequal<decimal64>();
     test_islessgreater<decimal64>();
     test_isunordered<decimal64>();
+
     test_fmax<decimal128>();
     test_isgreater<decimal128>();
     test_isgreaterequal<decimal128>();
@@ -1304,9 +1315,15 @@ int main()
     test_floor<decimal32>();
     test_ceil<decimal32>();
     test_trunc<decimal32>();
+
+    test_floor<decimal32_fast>();
+    test_ceil<decimal32_fast>();
+    test_trunc<decimal32_fast>();
+
     test_floor<decimal64>();
     test_ceil<decimal64>();
     test_trunc<decimal64>();
+
     test_floor<decimal128>();
     test_ceil<decimal128>();
     test_trunc<decimal128>();
@@ -1314,6 +1331,11 @@ int main()
     test_frexp10<decimal32>();
     test_scalbn<decimal32>();
     test_scalbln<decimal32>();
+
+    test_frexp10<decimal32_fast>();
+    test_scalbn<decimal32_fast>();
+    test_scalbln<decimal32_fast>();
+
     test_frexp10<decimal64>();
     test_scalbn<decimal64>();
     test_scalbln<decimal64>();
