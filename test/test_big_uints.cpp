@@ -261,6 +261,23 @@ auto test_big_uints_div() -> void
   }
 }
 
+auto test_various_spots() -> void
+{
+  using local_uint128_type = boost::decimal::detail::uint128;
+
+  local_uint128_type low_0 { UINT64_C(0), (std::numeric_limits<std::uint64_t>::max)() };
+  local_uint128_type low_1 { UINT64_C(1), (std::numeric_limits<std::uint64_t>::max)() };
+
+  const local_uint128_type low_0_old { low_0 };
+
+  ++low_0;
+  ++low_1;
+
+  BOOST_TEST_EQ(static_cast<std::uint64_t>(low_0), UINT64_C(0));
+  BOOST_TEST_EQ(static_cast<std::uint64_t>(low_1), UINT64_C(0));
+  BOOST_TEST(low_0 > low_0_old);
+}
+
 auto test_spot_div_uint256_t() -> void
 {
   using boost_ctrl_uint_type = boost::multiprecision::uint256_t;
@@ -398,6 +415,8 @@ int main()
 
   test_big_uints_div<boost::multiprecision::uint128_t, boost::decimal::detail::uint128  >();
   test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
+
+  test_various_spots();
 
   test_spot_div_uint256_t();
 

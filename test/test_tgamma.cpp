@@ -588,8 +588,8 @@ auto main() -> int
   }
 
   {
-    const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo(8192);
-    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi(0x10000);
+    const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo(4096);
+    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi(4096);
 
     BOOST_TEST(result_tgamma128_lo_is_ok);
     BOOST_TEST(result_tgamma128_hi_is_ok);

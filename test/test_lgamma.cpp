@@ -530,7 +530,7 @@ auto main() -> int
   }
 
   {
-    const auto result_lgamma128_is_ok   = local::test_lgamma_128(8092);
+    const auto result_lgamma128_is_ok   = local::test_lgamma_128(4096);
 
     BOOST_TEST(result_lgamma128_is_ok);
 

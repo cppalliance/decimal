@@ -76,9 +76,9 @@ constexpr auto lgamma_impl(T x) noexcept
         {
             constexpr int asymp_cutoff
             {
-                  std::numeric_limits<T>::digits10 < 10 ? T { 2, 1 }
-                : std::numeric_limits<T>::digits10 < 20 ? T { 5, 1 }
-                :                                         T { 1, 2 }
+                  std::numeric_limits<T>::digits10 < 10 ? T {  2, 1 } //  20
+                : std::numeric_limits<T>::digits10 < 20 ? T {  5, 1 } //  50
+                :                                         T { 15, 1 } // 150
             };
 
             if (x < T { 2, -1 })

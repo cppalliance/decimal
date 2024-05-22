@@ -886,26 +886,6 @@ constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
     return result;
 }
 
-// TODO(mborland): Can be replaced by intrinsics at runtime
-constexpr auto multiply_64_64(std::uint64_t a, std::uint64_t b) -> uint128
-{
-    std::uint64_t a_low = a & UINT32_MAX;
-    std::uint64_t a_high = a >> 32;
-    std::uint64_t b_low = b & UINT32_MAX;
-    std::uint64_t b_high = b >> 32;
-
-    std::uint64_t low_product = a_low * b_low;
-    std::uint64_t mid_product1 = a_high * b_low;
-    std::uint64_t mid_product2 = a_low * b_high;
-    std::uint64_t high_product = a_high * b_high;
-
-    std::uint64_t mid_sum = (low_product >> 32) + (mid_product1 & UINT32_MAX) + mid_product2;
-    std::uint64_t high = high_product + (mid_product1 >> 32) + (mid_sum >> 32);
-    std::uint64_t low = (mid_sum << 32) | (low_product & UINT32_MAX);
-
-    return {high, low};
-}
-
 constexpr auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
 {
     using local_unsigned_fast_type = ::boost::decimal::math::wide_integer::detail::unsigned_fast_type;
