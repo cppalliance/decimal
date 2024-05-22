@@ -329,6 +329,14 @@ public:
     friend constexpr auto copysignd32f(decimal32_fast mag, decimal32_fast sgn) noexcept -> decimal32_fast;
     friend constexpr auto scalbnd32f(decimal32_fast num, int exp) noexcept -> decimal32_fast;
     friend constexpr auto scalblnd32f(decimal32_fast num, long exp) noexcept -> decimal32_fast;
+
+    template <typename T>
+    friend constexpr auto ilogb(T d) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int);
+
+    template <typename T>
+    friend constexpr auto logb(T num) noexcept
+        BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T);
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
