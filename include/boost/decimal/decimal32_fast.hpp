@@ -329,6 +329,7 @@ public:
     friend constexpr auto copysignd32f(decimal32_fast mag, decimal32_fast sgn) noexcept -> decimal32_fast;
     friend constexpr auto scalbnd32f(decimal32_fast num, int exp) noexcept -> decimal32_fast;
     friend constexpr auto scalblnd32f(decimal32_fast num, long exp) noexcept -> decimal32_fast;
+    friend constexpr auto fmad32f(decimal32_fast x, decimal32_fast y, decimal32_fast z) noexcept -> decimal32_fast;
 
     template <typename T>
     friend constexpr auto ilogb(T d) noexcept
