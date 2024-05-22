@@ -136,6 +136,9 @@ void test_acos()
 
     for (std::size_t n {}; n < max_iter; ++n)
     {
+        // decimal32_fast does not have a lossless fma
+        constexpr int tol = std::is_same<decimal32_fast, Dec>::value ? 400 : 100;
+
         std::uniform_real_distribution<float> range_5( 0.5F, 0.9999F);
         const auto val1 {range_5(rng)};
         Dec d1 {val1};
@@ -144,14 +147,16 @@ void test_acos()
         auto ret_dec {static_cast<float>(acos(d1))};
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
-        if (!BOOST_TEST(distance < 100))
+        if (!BOOST_TEST(distance < tol))
         {
             // LCOV_EXCL_START
-            std::cerr << "Val 1: " << val1
+            std::cerr << std::setprecision(std::numeric_limits<Dec>::digits10)
+                      << "Val 1: " << val1
                       << "\nDec 1: " << d1
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
-                      << "\nEps: " << distance << std::endl;
+                      << "\nEps: " << distance
+                      << "\nLoop #: " << n << std::endl;
             // LCOV_EXCL_STOP
         }
     }
@@ -167,6 +172,8 @@ int main()
 {
     test_acos<decimal32>();
     test_acos<decimal64>();
+
+    test_acos<decimal32_fast>();
 
     return boost::report_errors();
 }
