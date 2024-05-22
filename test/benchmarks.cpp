@@ -27,6 +27,12 @@ using namespace std::chrono_literals;
 #  define BOOST_DECIMAL_NO_INLINE __attribute__ ((__noinline__))
 #elif defined(_MSC_VER)
 #  define BOOST_DECIMAL_NO_INLINE __declspec(noinline)
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wstringop-overread"
+#  define BOOST_DECIMAL_NO_INLINE __attribute__ ((__noinline__))
 #endif
 
 constexpr unsigned N = 2'000'000U;
@@ -344,6 +350,8 @@ int main()
     const auto dec64_vector = generate_random_vector<decimal64>();
     const auto dec128_vector = generate_random_vector<decimal128>();
 
+    const auto dec32_fast_vector = generate_random_vector<decimal32_fast>();
+
     std::cout << "===== Comparisons =====\n";
 
     test_comparisons(float_vector, "float");
@@ -351,6 +359,7 @@ int main()
     test_comparisons(dec32_vector, "decimal32");
     test_comparisons(dec64_vector, "decimal64");
     test_comparisons(dec128_vector, "decimal128");
+    test_comparisons(dec32_fast_vector, "dec32_fast");
 
     std::cout << "\n===== Addition =====\n";
 
@@ -359,6 +368,7 @@ int main()
     test_two_element_operation(dec32_vector, std::plus<>(), "Addition", "decimal32");
     test_two_element_operation(dec64_vector, std::plus<>(), "Addition", "decimal64");
     test_two_element_operation(dec128_vector, std::plus<>(), "Addition", "decimal128");
+    test_two_element_operation(dec32_fast_vector, std::plus<>(), "Addition", "dec32_fast");
 
     std::cout << "\n===== Subtraction =====\n";
 
@@ -367,6 +377,7 @@ int main()
     test_two_element_operation(dec32_vector, std::minus<>(), "Subtraction", "decimal32");
     test_two_element_operation(dec64_vector, std::minus<>(), "Subtraction", "decimal64");
     test_two_element_operation(dec128_vector, std::minus<>(), "Subtraction", "decimal128");
+    test_two_element_operation(dec32_fast_vector, std::minus<>(), "Subtraction", "dec32_fast");
 
     std::cout << "\n===== Multiplication =====\n";
 
@@ -375,6 +386,7 @@ int main()
     test_two_element_operation(dec32_vector, std::multiplies<>(), "Multiplication", "decimal32");
     test_two_element_operation(dec64_vector, std::multiplies<>(), "Multiplication", "decimal64");
     test_two_element_operation(dec128_vector, std::multiplies<>(), "Multiplication", "decimal128");
+    test_two_element_operation(dec32_fast_vector, std::multiplies<>(), "Multiplication", "dec32_fast");
 
     std::cout << "\n===== Division =====\n";
 
@@ -383,7 +395,9 @@ int main()
     test_two_element_operation(dec32_vector, std::divides<>(), "Division", "decimal32");
     test_two_element_operation(dec64_vector, std::divides<>(), "Division", "decimal64");
     test_two_element_operation(dec128_vector, std::divides<>(), "Division", "decimal128");
+    test_two_element_operation(dec32_fast_vector, std::divides<>(), "Division", "dec32_fast");
 
+/*
     std::cout << "\n===== sqrt =====\n";
 
     test_one_element_operation(float_vector, (float(*)(float))std::sqrt, "sqrt", "float");
@@ -410,7 +424,7 @@ int main()
     test_from_chars<decimal64>(true, "decimal64");
     test_from_chars<decimal128>(false, "decimal128");
     test_from_chars<decimal128>(true, "decimal128");
-
+*/
     std::cout << std::endl;
 
     return 1;

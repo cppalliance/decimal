@@ -93,6 +93,11 @@ BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* la
     return detail::from_chars_general_impl(first, last, value, fmt);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal32_fast& value, chars_format fmt = chars_format::general) noexcept
+{
+    return detail::from_chars_general_impl(first, last, value, fmt);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal64& value, chars_format fmt = chars_format::general) noexcept
 {
     return detail::from_chars_general_impl(first, last, value, fmt);
@@ -318,7 +323,9 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
 
     // Insert the exponent character
     *first++ = 'e';
-    const int abs_exp {std::abs(exp)};
+
+    const int abs_exp { (exp < 0) ? -exp : exp };
+
     if (exp < 0)
     {
         *first++ = '-';
@@ -383,7 +390,9 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
     if (integer_digits < 0)
     {
-        num_leading_zeros = std::abs(integer_digits);
+        const int abs_integer_digits { (integer_digits < 0) ? -integer_digits : integer_digits };
+
+        num_leading_zeros = abs_integer_digits;
         integer_digits = 0;
         append_leading_zeros = true;
     }
@@ -683,12 +692,14 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         *first++ = '+';
     }
 
-    if (std::abs(exp) < 10)
+    const int abs_exp { (exp < 0) ? -exp : exp };
+
+    if (abs_exp < 10)
     {
         *first++ = '0';
     }
 
-    return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, static_cast<std::uint32_t>(std::abs(exp)), 10);
+    return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, static_cast<std::uint32_t>(abs_exp), 10);
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
@@ -772,6 +783,26 @@ BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* la
     return detail::to_chars_impl(first, last, value, fmt, precision);
 }
 
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32_fast value) noexcept -> to_chars_result
+{
+    return detail::to_chars_impl(first, last, value);
+}
+
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32_fast value, chars_format fmt) noexcept -> to_chars_result
+{
+    return detail::to_chars_impl(first, last, value, fmt);
+}
+
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32_fast value, chars_format fmt, int precision) noexcept -> to_chars_result
+{
+    if (precision < 0)
+    {
+        precision = 6;
+    }
+
+    return detail::to_chars_impl(first, last, value, fmt, precision);
+}
+
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value) noexcept -> to_chars_result
 {
     return detail::to_chars_impl(first, last, value);
@@ -811,6 +842,18 @@ BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* la
 
     return detail::to_chars_impl(first, last, value, fmt, precision);
 }
+
+template <typename T>
+struct limits
+{
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_chars = boost::decimal::detail::max_string_length_v<T>;
+};
+
+#if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
+
+template <typename T> BOOST_DECIMAL_ATTRIBUTE_UNUSED constexpr int limits<T>::max_chars;
+
+#endif
 
 } //namespace decimal
 } //namespace boost

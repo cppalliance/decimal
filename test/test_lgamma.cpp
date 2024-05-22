@@ -53,16 +53,30 @@ namespace local
 
     auto result_is_ok = bool { };
 
+    NumericType delta { };
+
     if(b == static_cast<NumericType>(0))
     {
-      result_is_ok = (fabs(a - b) < tol);
+      delta = fabs(a - b); // LCOV_EXCL_LINE
+
+      result_is_ok = (delta < tol); // LCOV_EXCL_LINE
     }
     else
     {
-      const auto delta = fabs(1 - (a / b));
+      delta = fabs(1 - (a / b));
 
       result_is_ok = (delta < tol);
     }
+
+    // LCOV_EXCL_START
+    if (!result_is_ok)
+    {
+      std::cerr << std::setprecision(std::numeric_limits<NumericType>::digits10) << "a: " << a
+                << "\nb: " << b
+                << "\ndelta: " << delta
+                << "\ntol: " << tol << std::endl;
+    }
+    // LCOV_EXCL_STOP
 
     return result_is_ok;
   }
@@ -343,6 +357,76 @@ namespace local
 
     return result_is_ok;
   }
+
+  auto test_lgamma_128(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal128;
+
+    using str_ctrl_array_type = std::array<const char*, 21U>;
+
+    const str_ctrl_array_type ctrl_strings =
+    {{
+       // Table[N[Log[Gamma[(100 n + 10 n + 1)/100]], 36], {n, 0, 20, 1}]
+       "4.59947987804202172251394541100874809",
+       "-0.0540386340818523935917550731681660590",
+       "0.102418994503958632699253052937769400",
+       "0.997464457272922372053206167365619618",
+       "2.32975308729902926366841147898554568",
+       "3.97393485962892204454162289923259731",
+       "5.86078226284320941736299492331704683",
+       "7.94629710737608673894522918391574878",
+       "10.2000180598708079077541397082157801",
+       "12.5995970196581001223988397360238569",
+       "15.1279348557753769796480417309555140",
+       "17.7715247207270252174494824518277843",
+       "20.5194267289921636545853277538118495",
+       "23.3625991972628192905542283017434866",
+       "26.2934437604612886905683626700964367",
+       "29.3054851520909703460851836031022652",
+       "32.3931392288932864648032352458271232",
+       "35.5515407902467593660096806067295711",
+       "38.7764130861225208432040187016879672",
+       "42.0639671128620105436453477946728445",
+       "45.4108226536777051814945280596645578",
+    }};
+
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> tg_values   { };
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
+
+    int nx { 0 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
+    {
+      const decimal_type x_arg =
+        decimal_type
+        {
+            decimal_type { 1, 2 } * nx
+          + decimal_type { 1, 1 } * nx
+          + 1
+        }
+        / decimal_type { 1, 2 };
+
+      ++nx;
+
+      tg_values[i] = lgamma(x_arg);
+
+      static_cast<void>
+      (
+        from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+      );
+
+      const auto result_lgamma_is_ok = is_close_fraction(tg_values[i], ctrl_values[i], my_tol);
+
+      result_is_ok = (result_lgamma_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
 } // namespace local
 
 auto main() -> int
@@ -353,7 +437,7 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_special_issue385_is_ok   = local::test_special_issue385<decimal_type, float_type>(4096);
+    const auto result_special_issue385_is_ok = local::test_special_issue385<decimal_type, float_type>(4096);
 
     BOOST_TEST(result_special_issue385_is_ok);
 
@@ -397,15 +481,37 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto result_tgamma_is_ok = local::test_lgamma<decimal_type, float_type>(4096, 2.1L, 123.4L);
+    const auto result_lgamma_is_ok = local::test_lgamma<decimal_type, float_type>(4096, 0.1L, 0.9L);
 
-    BOOST_TEST(result_tgamma_is_ok);
+    BOOST_TEST(result_lgamma_is_ok);
 
-    result_is_ok = (result_tgamma_is_ok && result_is_ok);
+    result_is_ok = (result_lgamma_is_ok && result_is_ok);
   }
 
   {
-    const auto result_neg32_is_ok = local::test_lgamma_neg32(1024);
+    using decimal_type = boost::decimal::decimal64;
+    using float_type   = double;
+
+    const auto result_lgamma_is_ok = local::test_lgamma<decimal_type, float_type>(4096, 1.1L, 1.9L);
+
+    BOOST_TEST(result_lgamma_is_ok);
+
+    result_is_ok = (result_lgamma_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal64;
+    using float_type   = double;
+
+    const auto result_lgamma_is_ok = local::test_lgamma<decimal_type, float_type>(4096, 2.1L, 123.4L);
+
+    BOOST_TEST(result_lgamma_is_ok);
+
+    result_is_ok = (result_lgamma_is_ok && result_is_ok);
+  }
+
+  {
+    const auto result_neg32_is_ok = local::test_lgamma_neg32(2048);
 
     BOOST_TEST(result_neg32_is_ok);
 
@@ -421,6 +527,14 @@ auto main() -> int
     BOOST_TEST(result_edge_is_ok);
 
     result_is_ok = (result_edge_is_ok && result_is_ok);
+  }
+
+  {
+    const auto result_lgamma128_is_ok   = local::test_lgamma_128(8092);
+
+    BOOST_TEST(result_lgamma128_is_ok);
+
+    result_is_ok = (result_lgamma128_is_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);

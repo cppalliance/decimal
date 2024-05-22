@@ -51,7 +51,13 @@ constexpr auto to_integral(Decimal val) noexcept
 
     auto result {static_cast<Conversion_Type>(val.full_significand())};
     auto expval {val.biased_exponent()};
-    if (expval > 0)
+    const auto abs_exp_val {detail::make_positive_unsigned(expval)};
+
+    if (abs_exp_val >= 19)
+    {
+        result = 0;
+    }
+    else if (expval > 0)
     {
         result *= detail::pow10<Conversion_Type>(static_cast<Conversion_Type>(expval));
     }
@@ -88,7 +94,13 @@ constexpr auto to_integral_128(Decimal val) noexcept
 
     auto sig {val.full_significand()};
     auto expval {val.biased_exponent()};
-    if (expval > 0)
+    const auto abs_exp_val {detail::make_positive_unsigned(expval)};
+
+    if (abs_exp_val >= 38)
+    {
+        sig = 0;
+    }
+    else if (expval > 0)
     {
         sig *= detail::pow10<detail::uint128>(expval);
     }

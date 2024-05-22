@@ -32,6 +32,10 @@
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
+#include <boost/decimal/detail/add_impl.hpp>
+#include <boost/decimal/detail/sub_impl.hpp>
+#include <boost/decimal/detail/mul_impl.hpp>
+#include <boost/decimal/detail/div_impl.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -117,6 +121,8 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_big_combination_field_mask = 
 
 struct decimal32_components
 {
+    using sig_type = std::uint32_t;
+
     std::uint32_t sig;
     std::int32_t exp;
     bool sign;
@@ -134,6 +140,9 @@ struct decimal32_components
 // 3.2.2 class decimal32
 BOOST_DECIMAL_EXPORT class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
 {
+public:
+    using significand_type = std::uint32_t;
+
 private:
 
     std::uint32_t bits_ {};
@@ -162,8 +171,6 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
-    friend constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
-                                           detail::decimal32_components& q) noexcept -> void;
     friend constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void;
     friend constexpr auto mod_impl(decimal32 lhs, decimal32 rhs, const decimal32& q, decimal32& r) noexcept -> void;
 
@@ -199,19 +206,6 @@ private:
     friend constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
-
-    template <typename T, typename T2>
-    friend constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components;
-
-    template <typename T, typename T2>
-    friend constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
-                                   bool abs_lhs_bigger) noexcept -> detail::decimal32_components;
-
-    template <typename T, typename T2>
-    friend constexpr auto mul_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components;
 
 public:
     // 3.2.2.1 construct/copy/destroy:
@@ -561,10 +555,7 @@ public:
 
     // Related to <cmath>
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto frexp10(T num, int* expptr) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
-            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
-                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>;
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
     friend constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32;
     friend constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32;
@@ -631,11 +622,23 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     // If the coeff is not in range make it so
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
     const bool reduced {unsigned_coeff_digits > detail::precision};
-    while (unsigned_coeff_digits > detail::precision + 1)
+    if (unsigned_coeff_digits > detail::precision + 1)
     {
-        unsigned_coeff /= 10;
-        ++exp;
-        --unsigned_coeff_digits;
+        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision + 1)};
+
+        #if defined(__GNUC__) && !defined(__clang__)
+        #  pragma GCC diagnostic push
+        #  pragma GCC diagnostic ignored "-Wconversion"
+        #endif
+
+        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+
+        #if defined(__GNUC__) && !defined(__clang__)
+        #  pragma GCC diagnostic pop
+        #endif
+
+        exp += digits_to_remove;
+        unsigned_coeff_digits -= digits_to_remove;
     }
 
     // Round as required
@@ -820,174 +823,6 @@ constexpr auto operator-(decimal32 rhs) noexcept-> decimal32
     return rhs;
 }
 
-template <typename T, typename T2>
-constexpr auto add_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components
-{
-    const bool sign {lhs_sign};
-
-    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-
-    #ifdef BOOST_DECIMAL_DEBUG_ADD
-    std::cerr << "Starting sig lhs: " << lhs_sig
-              << "\nStarting exp lhs: " << lhs_exp
-              << "\nStarting sig rhs: " << rhs_sig
-              << "\nStarting exp rhs: " << rhs_exp << std::endl;
-    #endif
-
-    if (delta_exp > detail::precision + 1)
-    {
-        // If the difference in exponents is more than the digits of accuracy
-        // we return the larger of the two
-        //
-        // e.g. 1e20 + 1e-20 = 1e20
-
-        #ifdef BOOST_DECIMAL_DEBUG_ADD
-        std::cerr << "New sig: " << lhs_sig
-                  << "\nNew exp: " << lhs_exp
-                  << "\nNew neg: " << lhs_sign << std::endl;
-        #endif
-
-        return {lhs_sig, lhs_exp, lhs_sign};
-    }
-    else if (delta_exp == detail::precision + 1)
-    {
-        // Only need to see if we need to add one to the
-        // significand of the bigger value
-        //
-        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
-
-        if (rhs_sig >= UINT32_C(5'000'000))
-        {
-            ++lhs_sig;
-        }
-
-        #ifdef BOOST_DECIMAL_DEBUG_ADD
-        std::cerr << "New sig: " << lhs_sig
-                  << "\nNew exp: " << lhs_exp
-                  << "\nNew neg: " << lhs_sign << std::endl;
-        #endif
-
-        return {lhs_sig, lhs_exp, lhs_sign};
-    }
-
-    // The two numbers can be added together without special handling
-    //
-    // If we can add to the lhs sig rather than dividing we can save some precision
-    // 32-bit signed int can have 9 digits and our normalized significand has 7
-    if (delta_exp <= 2)
-    {
-        while (delta_exp > 0)
-        {
-            lhs_sig *= 10;
-            --delta_exp;
-            --lhs_exp;
-        }
-    }
-    else
-    {
-        lhs_sig *= 100;
-        delta_exp -= 2;
-        lhs_exp -=2;
-    }
-
-    while (delta_exp > 1)
-    {
-        rhs_sig /= 10;
-        --delta_exp;
-    }
-
-
-    if (delta_exp == 1)
-    {
-        detail::fenv_round(rhs_sig, rhs_sign);
-    }
-
-    // Cast the results to signed types so that we can apply a sign at the end if necessary
-    // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
-    const auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig)};
-    const auto new_exp {lhs_exp};
-    const auto res_sig {detail::make_positive_unsigned(new_sig)};
-
-    #ifdef BOOST_DECIMAL_DEBUG_ADD
-    std::cerr << "Final sig lhs: " << lhs_sig
-              << "\nFinal sig rhs: " << rhs_sig
-              << "\nResult sig: " << new_sig << std::endl;
-    #endif
-
-    return {res_sig, new_exp, sign};
-}
-
-template <typename T, typename T2>
-constexpr auto sub_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
-                        bool abs_lhs_bigger) noexcept -> detail::decimal32_components
-{
-    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-    auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
-    auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
-
-    if (delta_exp > detail::precision + 1)
-    {
-        // If the difference in exponents is more than the digits of accuracy
-        // we return the larger of the two
-        //
-        // e.g. 1e20 - 1e-20 = 1e20
-        return abs_lhs_bigger ? detail::decimal32_components{detail::shrink_significand(lhs_sig, lhs_exp), lhs_exp, false} :
-                                detail::decimal32_components{detail::shrink_significand(rhs_sig, rhs_exp), rhs_exp, true};
-    }
-
-    // The two numbers can be subtracted together without special handling
-
-    auto& sig_bigger {abs_lhs_bigger ? signed_sig_lhs : signed_sig_rhs};
-    auto& exp_bigger {abs_lhs_bigger ? lhs_exp : rhs_exp};
-    auto& sig_smaller {abs_lhs_bigger ? signed_sig_rhs : signed_sig_lhs};
-    auto& smaller_sign {abs_lhs_bigger ? rhs_sign : lhs_sign};
-
-    if (delta_exp == 1)
-    {
-        sig_bigger *= 10;
-        --delta_exp;
-        --exp_bigger;
-    }
-    else if (delta_exp >= 2)
-    {
-        sig_bigger *= 100;
-        delta_exp -= 2;
-        exp_bigger -= 2;
-    }
-
-    while (delta_exp > 1)
-    {
-        sig_smaller /= 10;
-        --delta_exp;
-    }
-
-    if (delta_exp == 1)
-    {
-        detail::fenv_round(sig_smaller, smaller_sign);
-    }
-
-    // Both of the significands are less than 9'999'999, so we can safely
-    // cast them to signed 32-bit ints to calculate the new significand
-    std::int32_t new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
-
-    if (rhs_sign && !lhs_sign)
-    {
-        new_sig = signed_sig_lhs + signed_sig_rhs;
-    }
-    else
-    {
-        new_sig = signed_sig_lhs - signed_sig_rhs;
-    }
-
-    const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
-    const auto new_sign {new_sig < 0};
-    const auto res_sig {detail::make_positive_unsigned(new_sig)};
-
-    return {res_sig, new_exp, new_sign};
-}
-
 // We use kahan summation here where applicable
 // https://en.wikipedia.org/wiki/Kahan_summation_algorithm
 // NOLINTNEXTLINE : If addition is actually subtraction than change operator and vice versa
@@ -1026,7 +861,7 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    const auto result {add_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
+    const auto result {detail::add_impl<detail::decimal32_components>(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -1069,14 +904,14 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
 
     if (!lhs_components.sign && rhs_components.sign)
     {
-        result = sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                          rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                          abs_lhs_bigger);
+        result = detail::sub_impl<detail::decimal32_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                                                rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                                                                abs_lhs_bigger);
     }
     else
     {
-        result = add_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                          rhs_components.sig, rhs_components.exp, rhs_components.sign);
+        result = detail::add_impl<detail::decimal32_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                                                rhs_components.sig, rhs_components.exp, rhs_components.sign);
     }
 
     return decimal32(result.sig, result.exp, result.sign);
@@ -1149,9 +984,9 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    const auto result {sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
-                                sig_rhs, exp_rhs, rhs.isneg(),
-                                abs_lhs_bigger)};
+    const auto result {detail::sub_impl<detail::decimal32_components>(sig_lhs, exp_lhs, lhs.isneg(),
+                                                                                                sig_rhs, exp_rhs, rhs.isneg(),
+                                                                                                abs_lhs_bigger)};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -1183,7 +1018,7 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
     auto unsigned_sig_rhs = detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs);
     auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
-    const auto result {sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+    const auto result {detail::sub_impl<detail::decimal32_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                 rhs_components.sig, rhs_components.exp, rhs_components.sign,
                                 abs_lhs_bigger)};
 
@@ -1217,9 +1052,9 @@ constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
     detail::normalize(sig_rhs, exp_rhs);
     auto rhs_components {detail::decimal32_components{sig_rhs, exp_rhs, rhs.isneg()}};
 
-    const auto result {sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                                abs_lhs_bigger)};
+    const auto result {detail::sub_impl<detail::decimal32_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                                                                                 rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                                                                                                 abs_lhs_bigger)};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -1513,18 +1348,18 @@ constexpr auto decimal32::unbiased_exponent() const noexcept -> std::uint32_t
 
     const auto exp_comb_bits {(bits_ & detail::d32_comb_11_mask)};
 
-    if (exp_comb_bits == detail::d32_comb_11_mask)
+    switch (exp_comb_bits)
     {
-        // bits 2 and 3 are the exp part of the combination field
-        expval = (bits_ & detail::d32_comb_11_exp_bits) >> (detail::d32_significand_bits + 1);
-    }
-    else if (exp_comb_bits == detail::d32_comb_10_mask)
-    {
-        expval = UINT32_C(0b10000000);
-    }
-    else if (exp_comb_bits == detail::d32_comb_01_mask)
-    {
-        expval = UINT32_C(0b01000000);
+        case detail::d32_comb_11_mask:
+            // bits 2 and 3 are the exp part of the combination field
+            expval = (bits_ & detail::d32_comb_11_exp_bits) >> (detail::d32_significand_bits + 1);
+            break;
+        case detail::d32_comb_10_mask:
+            expval = UINT32_C(0b10000000);
+            break;
+        case detail::d32_comb_01_mask:
+            expval = UINT32_C(0b01000000);
+            break;
     }
 
     expval |= (bits_ & detail::d32_exponent_mask) >> detail::d32_significand_bits;
@@ -1551,14 +1386,9 @@ constexpr auto decimal32::full_significand() const noexcept -> std::uint32_t
     if ((bits_ & detail::d32_comb_11_mask) == detail::d32_comb_11_mask)
     {
         // Only need the one bit of T because the other 3 are implied
-        if ((bits_ & detail::d32_comb_11_significand_bits) == detail::d32_comb_11_significand_bits)
-        {
-            significand = UINT32_C(0b1001'0000000000'0000000000);
-        }
-        else
-        {
-            significand = UINT32_C(0b1000'0000000000'0000000000);
-        }
+        significand = (bits_ & detail::d32_comb_11_significand_bits) == detail::d32_comb_11_significand_bits ?
+                      UINT32_C(0b1001'0000000000'0000000000) :
+                      UINT32_C(0b1000'0000000000'0000000000);
     }
     else
     {
@@ -1777,50 +1607,6 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal32 rhs) noexcept -> std::uint3
     return bits;
 }
 
-template <typename T, typename T2>
-constexpr auto mul_impl(T lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal32_components
-{
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "sig lhs: " << sig_lhs
-              << "\nexp lhs: " << exp_lhs
-              << "\nsig rhs: " << sig_rhs
-              << "\nexp rhs: " << exp_rhs;
-    #endif
-
-    bool sign {lhs_sign != rhs_sign};
-
-    // Once we have the normalized significands and exponents all we have to do is
-    // multiply the significands and add the exponents
-    //
-    // We use a 64 bit resultant significand because the two 23-bit unsigned significands will always fit
-
-    auto res_sig {static_cast<std::uint64_t>(lhs_sig) * static_cast<std::uint64_t>(rhs_sig)};
-    auto res_exp {lhs_exp + rhs_exp};
-
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > 9)
-    {
-        res_sig /= detail::pow10(static_cast<std::uint64_t>(sig_dig - 9));
-        res_exp += sig_dig - 9;
-    }
-
-    const auto res_sig_32 {static_cast<std::uint32_t>(res_sig)};
-
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "\nres sig: " << res_sig_32
-              << "\nres exp: " << res_exp << std::endl;
-    #endif
-
-    if (res_sig_32 == 0)
-    {
-        sign = false;
-    }
-
-    return {res_sig_32, res_exp, sign};
-}
-
 constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     constexpr decimal32 zero {0, 0};
@@ -1839,7 +1625,7 @@ constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    const auto result {mul_impl(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
+    const auto result {detail::mul_impl<detail::decimal32_components>(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -1864,7 +1650,8 @@ constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept
     auto unsigned_sig_rhs {detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs)};
     auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
-    const auto result {mul_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+    const auto result {detail::mul_impl<detail::decimal32_components>(
+                                lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                 rhs_components.sig, rhs_components.exp, rhs_components.sign)};
 
     return {result.sig, result.exp, result.sign};
@@ -1897,43 +1684,6 @@ constexpr auto decimal32::operator*=(Decimal rhs) noexcept
 {
     *this = *this * rhs;
     return *this;
-}
-
-constexpr auto generic_div_impl(detail::decimal32_components lhs, detail::decimal32_components rhs,
-                                detail::decimal32_components& q) noexcept -> void
-{
-    bool sign {lhs.sign != rhs.sign};
-
-    // If rhs is greater than we need to offset the significands to get the correct values
-    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    const auto big_sig_lhs {static_cast<std::uint64_t>(lhs.sig) * detail::powers_of_10[detail::precision]};
-    lhs.exp -= detail::precision;
-
-    auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(rhs.sig)};
-    auto res_exp {lhs.exp - rhs.exp};
-
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > std::numeric_limits<std::uint32_t>::digits10)
-    {
-        res_sig /= detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint32_t>::digits10));
-        res_exp += sig_dig - std::numeric_limits<std::uint32_t>::digits10;
-    }
-
-    const auto res_sig_32 {static_cast<std::uint32_t>(res_sig)};
-
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "\nres sig: " << res_sig_32
-              << "\nres exp: " << res_exp << std::endl;
-    #endif
-
-    if (res_sig_32 == 0)
-    {
-        sign = false;
-    }
-
-    // Let the constructor handle shrinking it back down and rounding correctly
-    q = detail::decimal32_components{res_sig_32, res_exp, sign};
 }
 
 constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
@@ -2002,7 +1752,7 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
     detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
     detail::decimal32_components q_components {};
 
-    generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::generic_div_impl(lhs_components, rhs_components, q_components);
 
     q = decimal32(q_components.sig, q_components.exp, q_components.sign);
 }
@@ -2064,7 +1814,7 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
     detail::decimal32_components rhs_components {detail::shrink_significand(detail::make_positive_unsigned(rhs), exp_rhs), exp_rhs, rhs < 0};
     detail::decimal32_components q_components {};
 
-    generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::generic_div_impl(lhs_components, rhs_components, q_components);
 
     return decimal32(q_components.sig, q_components.exp, q_components.sign);
 }
@@ -2107,7 +1857,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
     detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
     detail::decimal32_components q_components {};
 
-    generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::generic_div_impl(lhs_components, rhs_components, q_components);
 
     return decimal32(q_components.sig, q_components.exp, q_components.sign);
 }
@@ -2398,71 +2148,6 @@ constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 {
     mag.edit_sign(sgn.isneg());
     return mag;
-}
-
-constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
-{
-    // First calculate x * y without rounding
-    constexpr decimal32 zero {0, 0};
-
-    const auto res {detail::check_non_finite(x, y)};
-    if (res != zero)
-    {
-        return res;
-    }
-
-    auto sig_lhs {x.full_significand()};
-    auto exp_lhs {x.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
-
-    auto sig_rhs {y.full_significand()};
-    auto exp_rhs {y.biased_exponent()};
-    detail::normalize(sig_rhs, exp_rhs);
-
-    auto mul_result {mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
-    const decimal32 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
-
-    const auto res_add {detail::check_non_finite(dec_result, z)};
-    if (res_add != zero)
-    {
-        return res_add;
-    }
-
-    bool lhs_bigger {dec_result > z};
-    if (dec_result.isneg() && z.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-    bool abs_lhs_bigger {abs(dec_result) > abs(z)};
-
-    detail::normalize(mul_result.sig, mul_result.exp);
-
-    auto sig_z {z.full_significand()};
-    auto exp_z {z.biased_exponent()};
-    detail::normalize(sig_z, exp_z);
-    detail::decimal32_components z_components {sig_z, exp_z, z.isneg()};
-
-    if (!lhs_bigger)
-    {
-        detail::swap(mul_result, z_components);
-        abs_lhs_bigger = !abs_lhs_bigger;
-    }
-
-    detail::decimal32_components result {};
-
-    if (!mul_result.sign && z_components.sign)
-    {
-        result = sub_impl(mul_result.sig, mul_result.exp, mul_result.sign,
-                          z_components.sig, z_components.exp, z_components.sign,
-                          abs_lhs_bigger);
-    }
-    else
-    {
-        result = add_impl(mul_result.sig, mul_result.exp, mul_result.sign,
-                          z_components.sig, z_components.exp, z_components.sign);
-    }
-
-    return {result.sig, result.exp, result.sign};
 }
 
 } // namespace decimal

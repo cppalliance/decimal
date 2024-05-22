@@ -12,6 +12,11 @@ https://www.boost.org/LICENSE_1_0.txt
 
 The following functions analogous to those from https://en.cppreference.com/w/cpp/header/charconv[<charconv>] are provided:
 
+IMPORTANT: `std::from_chars` has an open issue with LWG here: https://cplusplus.github.io/LWG/lwg-active.html#3081.
+The standard for <charconv> does not distinguish between underflow and overflow like strtod does.
+`boost::decimal::from_chars` modifies `value` in order to communicate this to the user in a divergence from the standard.
+This behavior is the same as that of https://www.boost.org/doc/libs/master/libs/charconv/doc/html/charconv.html#from_chars_usage_notes_for_from_chars_for_floating_point_types[`boost::charconv::from_chars_erange`].
+
 [source, c++]
 ----
 namespace boost {
@@ -67,3 +72,44 @@ NOTE: `BOOST_DECIMAL_CONSTEXPR` is defined if:
  - `\\__GNUC__` >= 9
  - Compiler has: `__builtin_is_constant_evaluated()`
  - C++20 support with: `std::is_constant_evaluated()`
+
+The library offers an additional feature for sizing buffers without specified precision and in general format
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
+template <typename T>
+struct limits
+{
+    static constexpr int max_chars;
+}
+
+} //namespace decimal
+} //namespace boost
+----
+
+The member can then be used to size buffers such as:
+
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <iostream>
+
+int main()
+{
+    using namespace boost::decimal;
+
+    decimal32 val {5, -1};
+
+    char buffer[limits<T>::max_chars];
+
+    auto r_to = to_chars(buffer, buffer + sizeof(buffer), val);
+    *r_to.ptr = '\0';
+
+    std::cout << buffer << std::endl;
+
+    return 0;
+}
+
+----

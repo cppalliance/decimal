@@ -864,7 +864,7 @@ void test_erfc<decimal128>()
             std::cerr << "Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
-            // LCOV_EXCL_START
+            // LCOV_EXCL_STOP
         }
     }
 

@@ -339,7 +339,7 @@ auto main() -> int
 
   const auto result_pos64_is_ok = local::test_expm1_64(64);
 
-  const auto result_pos128_is_ok = local::test_expm1_128(400'000);
+  const auto result_pos128_is_ok = local::test_expm1_128(8192);
 
   BOOST_TEST(result_pos_is_ok);
   BOOST_TEST(result_neg_is_ok);

@@ -132,6 +132,9 @@ struct decimal64_components
 
 BOOST_DECIMAL_EXPORT class decimal64 final
 {
+public:
+    using significand_type = std::uint64_t;
+
 private:
 
     std::uint64_t bits_ {};
@@ -563,10 +566,7 @@ public:
 
     // <cmath> functions that need to be friends
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto frexp10(T num, int* expptr) noexcept
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<T>,
-            std::conditional_t<std::is_same<T, decimal32>::value, std::uint32_t,
-                    std::conditional_t<std::is_same<T, decimal64>::value, std::uint64_t, detail::uint128>>>;
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
     friend constexpr auto copysignd64(decimal64 mag, decimal64 sgn) noexcept -> decimal64;
     friend constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64;
@@ -629,11 +629,23 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     // If the coeff is not in range make it so
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
     const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal64>};
-    while (unsigned_coeff_digits > detail::precision_v<decimal64> + 1)
+    if (unsigned_coeff_digits > detail::precision_v<decimal64> + 1)
     {
-        unsigned_coeff /= 10;
-        ++exp;
-        --unsigned_coeff_digits;
+        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal64> + 1)};
+
+        #if defined(__GNUC__) && !defined(__clang__)
+        #  pragma GCC diagnostic push
+        #  pragma GCC diagnostic ignored "-Wconversion"
+        #endif
+
+        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+
+        #if defined(__GNUC__) && !defined(__clang__)
+        #  pragma GCC diagnostic pop
+        #endif
+
+        exp += digits_to_remove;
+        unsigned_coeff_digits -= digits_to_remove;
     }
 
     // Round as required
@@ -979,18 +991,17 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
 
     const auto exp_comb_bits {(bits_ & detail::d64_comb_11_mask)};
 
-    if (exp_comb_bits == detail::d64_comb_11_mask)
+    switch (exp_comb_bits)
     {
-        // bits 2 and 3 are the exp part of the combination field
-        expval = (bits_ & detail::d64_comb_11_exp_bits) >> (detail::d64_significand_bits + 1);
-    }
-    else if (exp_comb_bits == detail::d64_comb_10_mask)
-    {
-        expval = UINT64_C(0b1000000000);
-    }
-    else if (exp_comb_bits == detail::d64_comb_01_mask)
-    {
-        expval = UINT64_C(0b0100000000);
+        case detail::d64_comb_11_mask:
+            expval = (bits_ & detail::d64_comb_11_exp_bits) >> (detail::d64_significand_bits + 1);
+            break;
+        case detail::d64_comb_10_mask:
+            expval = UINT64_C(0b1000000000);
+            break;
+        case detail::d64_comb_01_mask:
+            expval = UINT64_C(0b0100000000);
+            break;
     }
 
     expval |= (bits_ & detail::d64_exponent_mask) >> detail::d64_significand_bits;
@@ -1010,14 +1021,9 @@ constexpr auto decimal64::full_significand() const noexcept -> std::uint64_t
     if ((bits_ & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
     {
         // Only need the one bit of T because the other 3 are implied
-        if ((bits_ & detail::d64_comb_11_significand_bits) == detail::d64_comb_11_significand_bits)
-        {
-            significand = UINT64_C(0b1001'0000000000'0000000000'0000000000'0000000000'0000000000);
-        }
-        else
-        {
-            significand = UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000);
-        }
+        significand = (bits_ & detail::d64_comb_11_significand_bits) == detail::d64_comb_11_significand_bits ?
+            UINT64_C(0b1001'0000000000'0000000000'0000000000'0000000000'0000000000) :
+            UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000);
     }
     else
     {
@@ -2339,71 +2345,6 @@ constexpr auto copysignd64(decimal64 mag, decimal64 sgn) noexcept -> decimal64
 {
     mag.edit_sign(sgn.isneg());
     return mag;
-}
-
-constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
-{
-    // First calculate x * y without rounding
-    constexpr decimal64 zero {0, 0};
-
-    const auto res {detail::check_non_finite(x, y)};
-    if (res != zero)
-    {
-        return res;
-    }
-
-    auto sig_lhs {x.full_significand()};
-    auto exp_lhs {x.biased_exponent()};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
-
-    auto sig_rhs {y.full_significand()};
-    auto exp_rhs {y.biased_exponent()};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
-
-    auto mul_result {d64_mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
-    const decimal64 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
-
-    const auto res_add {detail::check_non_finite(dec_result, z)};
-    if (res_add != zero)
-    {
-        return res_add;
-    }
-
-    bool lhs_bigger {dec_result > z};
-    if (dec_result.isneg() && z.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-    bool abs_lhs_bigger {abs(dec_result) > abs(z)};
-
-    detail::normalize<decimal64>(mul_result.sig, mul_result.exp);
-
-    auto sig_z {z.full_significand()};
-    auto exp_z {z.biased_exponent()};
-    detail::normalize<decimal64>(sig_z, exp_z);
-    detail::decimal64_components z_components {sig_z, exp_z, z.isneg()};
-
-    if (!lhs_bigger)
-    {
-        detail::swap(mul_result, z_components);
-        abs_lhs_bigger = !abs_lhs_bigger;
-    }
-
-    detail::decimal64_components result {};
-
-    if (!mul_result.sign && z_components.sign)
-    {
-        result = d64_sub_impl(mul_result.sig, mul_result.exp, mul_result.sign,
-                              z_components.sig, z_components.exp, z_components.sign,
-                              abs_lhs_bigger);
-    }
-    else
-    {
-        result = d64_add_impl(mul_result.sig, mul_result.exp, mul_result.sign,
-                              z_components.sig, z_components.exp, z_components.sign);
-    }
-
-    return {result.sig, result.exp, result.sign};
 }
 
 } //namespace decimal

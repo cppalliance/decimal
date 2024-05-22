@@ -1,0 +1,41 @@
+////
+Copyright 2023 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#literals]
+= Literals Support
+:idprefix: literals_
+
+The following literals are offered to construct each of the types:
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
+constexpr auto operator  "" _DF(const char* str) -> decimal32
+constexpr auto operator  "" _df(const char* str) -> decimal32
+
+constexpr auto operator  "" _DF(unsigned long long v) -> decimal32
+constexpr auto operator  "" _dF(unsigned long long v) -> decimal32
+
+constexpr auto operator  "" _DD(const char* str) -> decimal64
+constexpr auto operator  "" _dd(const char* str) -> decimal64
+
+constexpr auto operator  "" _DD(unsigned long long v) -> decimal64
+constexpr auto operator  "" _dd(unsigned long long v) -> decimal64
+
+constexpr auto operator  "" _DL(const char* str) -> decimal128
+constexpr auto operator  "" _dl(const char* str) -> decimal128
+
+constexpr auto operator  "" _DL(unsigned long long v) -> decimal128
+constexpr auto operator  "" _dl(unsigned long long v) -> decimal128
+
+} //namespace decimal
+} //namespace boost
+----
+
+IMPORTANT: `0.2_DF` is equivalent to calling `decimal32{2, -1}`.
+These are different from calling `decimal32{0.2}` which converts from a floating-point value which may or may not be exactly represented.
