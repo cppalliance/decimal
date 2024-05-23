@@ -135,8 +135,8 @@ void test_quantize()
     using sig_type = typename Dec::significand_type;
 
     std::uniform_int_distribution<std::uint64_t> sig(1'000'000, 9'999'999);
-    std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<Dec>::min_exponent10 + 19,
-                                                    std::numeric_limits<Dec>::max_exponent10 - 19);
+    std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<Dec>::min_exponent10 + std::numeric_limits<Dec>::digits10 + 1,
+                                                    std::numeric_limits<Dec>::max_exponent10 - std::numeric_limits<Dec>::digits10 - 1);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
