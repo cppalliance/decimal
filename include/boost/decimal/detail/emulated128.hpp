@@ -743,9 +743,14 @@ constexpr auto uint128::operator^=(uint128 v) noexcept -> uint128&
 
 constexpr auto uint128::operator+=(std::uint64_t n) noexcept -> uint128&
 {
-    auto sum = low + n;
-    high += (sum < low ? 1 : 0);
-    low = sum;
+    const std::uint64_t new_low { low + n };
+
+    if (new_low < low)
+    {
+        ++high;
+    }
+
+    low = new_low;
 
     return *this;
 }
@@ -771,14 +776,9 @@ constexpr auto uint128::operator+=(uint128 v) noexcept -> uint128&
 
 constexpr auto uint128::operator++() noexcept -> uint128&
 {
-    if (this->low == UINT64_MAX)
+    if (++low == UINT64_C(0))
     {
-        this->low = 0;
-        ++this->high;
-    }
-    else
-    {
-        ++this->low;
+        ++high;
     }
 
     return *this;

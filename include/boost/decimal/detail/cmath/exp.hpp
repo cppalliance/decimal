@@ -47,7 +47,7 @@ constexpr auto exp_impl(T x) noexcept
         }
         else if (fpc == FP_NAN)
         {
-            result = std::numeric_limits<T>::quiet_NaN();
+            result = x;
         }
     } // LCOV_EXCL_LINE
     else
