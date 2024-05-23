@@ -83,6 +83,8 @@
 namespace boost {
 namespace decimal {
 
+// Overloads for all the functions that are implemented individually as friends
+
 BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal32 num, int expval) noexcept -> decimal32
 {
     return scalbnd32(num, expval);
@@ -148,6 +150,11 @@ BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal32 lhs, decimal32 rhs) no
     return samequantumd32(lhs, rhs);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
+{
+    return samequantumd32f(lhs, rhs);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal64 lhs, decimal64 rhs) noexcept -> bool
 {
     return samequantumd64(lhs, rhs);
@@ -163,6 +170,11 @@ BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal32 x) noexcept -> int
     return quantexpd32(x);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal32_fast x) noexcept -> int
+{
+    return quantexpd32f(x);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal64 x) noexcept -> int
 {
     return quantexpd64(x);
@@ -176,6 +188,11 @@ BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal128 x) noexcept -> int
 BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     return quantized32(lhs, rhs);
+}
+
+BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
+{
+    return quantized32f(lhs, rhs);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
