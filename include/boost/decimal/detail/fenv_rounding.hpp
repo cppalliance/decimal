@@ -81,46 +81,46 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         ++exp;
 
         // Default rounding mode
-        if (round == rounding_mode::fe_dec_to_nearest_from_zero)
+        switch (round)
         {
-            if (trailing_num >= 5)
-            {
-                ++val;
-            }
-        }
-        else if (round == rounding_mode::fe_dec_downward)
-        {
-            if (trailing_num >= 5 && is_neg)
-            {
-                ++val;
-            }
-        }
-        else if (round == rounding_mode::fe_dec_to_nearest)
-        {
-            // Round to even
-            if (trailing_num == 5)
-            {
-                if (val % 2 == 1)
+            case rounding_mode::fe_dec_to_nearest_from_zero:
+                if (trailing_num >= 5)
                 {
                     ++val;
                 }
-            }
-            // ... or nearest
-            else if (trailing_num > 5)
-            {
-                ++val;
-            }
-        }
-        else if (round == rounding_mode::fe_dec_toward_zero)
-        {
-            // Do nothing
-        }
-        else // rounding_mode::fe_dec_upward
-        {
-            if (!is_neg && trailing_num != 0)
-            {
-                ++val;
-            }
+                break;
+            case rounding_mode::fe_dec_downward:
+                if (trailing_num >= 5 && is_neg)
+                {
+                    ++val;
+                }
+                break;
+            case rounding_mode::fe_dec_to_nearest:
+                // Round to even
+                if (trailing_num == 5)
+                {
+                    if (val % 2 == 1)
+                    {
+                        ++val;
+                    }
+                }
+                // ... or nearest
+                else if (trailing_num > 5)
+                {
+                    ++val;
+                }
+                break;
+            case rounding_mode::fe_dec_toward_zero:
+                // Do nothing
+                break;
+            case rounding_mode::fe_dec_upward:
+                if (!is_neg && trailing_num != 0)
+                {
+                    ++val;
+                }
+                break;
+            default:
+                BOOST_DECIMAL_UNREACHABLE;
         }
 
 
