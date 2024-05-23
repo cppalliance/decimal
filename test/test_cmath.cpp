@@ -479,6 +479,12 @@ void test_fdim()
     BOOST_TEST_EQ(fdim(Dec(1), Dec(1)), Dec(0));
 }
 
+// Macro if constexpr throws warning in C++14 mode
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4127)
+#endif
+
 template <typename Dec>
 void test_ilogb()
 {
@@ -526,6 +532,10 @@ void test_logb()
     BOOST_TEST_EQ(logb(std::numeric_limits<Dec>::infinity()), std::numeric_limits<Dec>::infinity());
     BOOST_TEST(isnan(logb(std::numeric_limits<Dec>::quiet_NaN())));
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 template <typename Dec>
 void test_sqrt()
