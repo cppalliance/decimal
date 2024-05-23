@@ -173,10 +173,10 @@ constexpr auto generate_array() noexcept -> std::array<T, N>
 {
     std::array<T, N> values {};
 
-    values[0] = 1;
+    values[0] = T{1};
     for (std::size_t i {1}; i < N; ++i)
     {
-        values[i] = values[i - 1] * 10;
+        values[i] = values[i - 1] * UINT64_C(10);
     }
 
     return values;
@@ -239,6 +239,39 @@ constexpr int num_digits(uint128 x) noexcept
 
 #endif // Constexpr array
 
+#if defined(__cpp_lib_array_constexpr) && __cpp_lib_array_constexpr >= 201603L
+
+constexpr int num_digits(const uint256_t& x) noexcept
+{
+    constexpr auto big_powers_of_10 = generate_array<boost::decimal::detail::uint256_t, 79>();
+
+    if (x.high == UINT64_C(0) && x.low == UINT64_C(0))
+    {
+        return 1;
+    }
+
+    std::uint32_t left = 0U;
+    std::uint32_t right = 78U;
+
+    while (left < right)
+    {
+        std::uint32_t mid = (left + right + 1U) / 2U;
+
+        if (x >= big_powers_of_10[mid])
+        {
+            left = mid;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+
+    return static_cast<int>(left + 1);
+}
+
+#else
+
 constexpr int num_digits(const uint256_t& x) noexcept
 {
     if (x.high == 0)
@@ -265,6 +298,8 @@ constexpr int num_digits(const uint256_t& x) noexcept
 
     return 1;
 }
+
+#endif // Constexpr arrays
 
 #ifdef _MSC_VER
 # pragma warning(pop)
