@@ -304,6 +304,30 @@ auto test_various_spots() -> void
 
     BOOST_TEST_EQ(lowest_low, UINT64_C(0));
   }
+
+  std::uniform_int_distribution<int> n_dist(1, 4);
+
+  for(auto trials = static_cast<int>(INT8_C(0)); trials < static_cast<int>(INT8_C(0x8)); ++trials)
+  {
+    static_cast<void>(trials);
+
+    local_uint128_type low { UINT64_C(0), lower_dist(rng) };
+
+    for(auto idx = static_cast<int>(INT8_C(0)); idx < static_cast<int>(INT8_C(0x10)); ++idx)
+    {
+      static_cast<void>(idx);
+
+      const local_uint128_type low_old { low };
+
+      const int n_add = n_dist(rng);
+
+      low += static_cast<std::uint64_t>(n_add);
+
+      const std::uint64_t new_low { static_cast<std::uint64_t>(low) };
+
+      BOOST_TEST((low > low_old) && ((low - n_add) == low_old));
+    }
+  }
 }
 
 auto test_spot_div_uint256_t() -> void
