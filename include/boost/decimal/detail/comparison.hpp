@@ -110,8 +110,6 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, typename 
 constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool
 {
-    const bool both_neg {lhs_sign && rhs_sign};
-
     // Normalize the significands and exponents
     using sig_type = typename DecimalType::significand_type;
 
@@ -121,48 +119,26 @@ constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     detail::normalize<DecimalType>(new_lhs_sig, lhs_exp);
     detail::normalize<DecimalType>(new_rhs_sig, rhs_exp);
 
-    if (new_lhs_sig == 0 && new_rhs_sig != 0)
+    if (new_lhs_sig == 0 || new_rhs_sig == 0)
     {
-        return (!rhs_sign);
+        if (new_lhs_sig == 0 && new_rhs_sig == 0)
+        {
+            return false;
+        }
+        return new_lhs_sig == 0 ? !rhs_sign : lhs_sign;
     }
-    else if (new_lhs_sig != 0 && new_rhs_sig == 0)
+
+    if (lhs_sign != rhs_sign)
     {
         return lhs_sign;
     }
-    else if (new_lhs_sig == 0 && new_rhs_sig == 0)
+
+    if (lhs_exp != rhs_exp)
     {
-        return false;
+        return lhs_sign ? lhs_exp > rhs_exp : lhs_exp < rhs_exp;
     }
-    else if (both_neg)
-    {
-        if (lhs_exp > rhs_exp)
-        {
-            return true;
-        }
-        else if (lhs_exp < rhs_exp)
-        {
-            return false;
-        }
-        else
-        {
-            return (new_lhs_sig > new_rhs_sig);
-        }
-    }
-    else
-    {
-        if ((lhs_exp < rhs_exp) && (new_lhs_sig != static_cast<T1>(0)))
-        {
-            return true;
-        }
-        else if (lhs_exp > rhs_exp)
-        {
-            return false;
-        }
-        else
-        {
-            return (new_lhs_sig < new_rhs_sig);
-        }
-    }
+
+    return lhs_sign ? new_lhs_sig > new_rhs_sig : new_lhs_sig < new_rhs_sig;
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
