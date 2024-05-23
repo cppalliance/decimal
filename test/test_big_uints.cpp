@@ -323,8 +323,6 @@ auto test_various_spots() -> void
 
       low += static_cast<std::uint64_t>(n_add);
 
-      const std::uint64_t new_low { static_cast<std::uint64_t>(low) };
-
       BOOST_TEST((low > low_old) && ((low - n_add) == low_old));
     }
   }
