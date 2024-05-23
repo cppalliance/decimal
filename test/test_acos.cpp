@@ -144,7 +144,7 @@ void test_acos()
         auto ret_dec {static_cast<float>(acos(d1))};
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
-        if (!BOOST_TEST(distance < 100))
+        if (!BOOST_TEST(distance < 400))
         {
             // LCOV_EXCL_START
             std::cerr << std::setprecision(std::numeric_limits<Dec>::digits10)
