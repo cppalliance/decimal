@@ -21,10 +21,10 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_zero { 0, 0 }; return my_zero; }
-template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_one  { 1, 0 }; return my_one; }
-template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_inf  { std::numeric_limits<decimal_type>::infinity() };  return my_inf; }
-template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_nan  { std::numeric_limits<decimal_type>::quiet_NaN() }; return my_nan; }
+template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_zero_val { 0, 0 }; return my_zero_val; }
+template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_one_val  { 1, 0 }; return my_one_val; }
+template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_inf_val  { std::numeric_limits<decimal_type>::infinity() };  return my_inf_val; }
+template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_nan_val  { std::numeric_limits<decimal_type>::quiet_NaN() }; return my_nan_val; }
 
 namespace local
 {

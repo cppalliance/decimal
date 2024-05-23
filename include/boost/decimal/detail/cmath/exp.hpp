@@ -43,20 +43,13 @@ constexpr auto exp_impl(T x) noexcept
     {
         if (fpc == FP_INFINITE)
         {
-            if (signbit(x))
-            {
-                result = zero;
-            }
-            else
-            {
-                result = x;
-            }
+            result = (signbit(x) ? zero : std::numeric_limits<T>::infinity());
         }
         else if (fpc == FP_NAN)
         {
             result = x;
         }
-    }
+    } // LCOV_EXCL_LINE
     else
     {
         if (signbit(x))
