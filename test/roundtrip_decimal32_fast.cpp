@@ -225,6 +225,11 @@ void test_roundtrip_float_stream()
     }
 }
 
+#if defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wconversion"
+#endif
+
 void test_roundtrip_conversion_decimal64()
 {
     std::mt19937_64 rng(42);
@@ -246,6 +251,10 @@ void test_roundtrip_conversion_decimal64()
         }
     }
 }
+
+#if defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
 
 int main()
 {
