@@ -265,17 +265,45 @@ auto test_various_spots() -> void
 {
   using local_uint128_type = boost::decimal::detail::uint128;
 
-  local_uint128_type low_0 { UINT64_C(0), (std::numeric_limits<std::uint64_t>::max)() };
-  local_uint128_type low_1 { UINT64_C(1), (std::numeric_limits<std::uint64_t>::max)() };
+  std::uniform_int_distribution<std::uint64_t>
+    lower_dist
+    (
+      UINT64_C(0xFFFFFFFFFFFFFFF8),
+      (std::numeric_limits<std::uint64_t>::max)()
+    );
 
-  const local_uint128_type low_0_old { low_0 };
+  using random_engine_type = std::mt19937_64;
 
-  ++low_0;
-  ++low_1;
+  random_engine_type rng(local::time_point<typename random_engine_type::result_type>());
 
-  BOOST_TEST_EQ(static_cast<std::uint64_t>(low_0), UINT64_C(0));
-  BOOST_TEST_EQ(static_cast<std::uint64_t>(low_1), UINT64_C(0));
-  BOOST_TEST(low_0 > low_0_old);
+  for(auto trials = static_cast<int>(INT8_C(0)); trials < static_cast<int>(INT8_C(0x8)); ++trials)
+  {
+    static_cast<void>(trials);
+
+    std::uint64_t lowest_low { (std::numeric_limits<std::uint64_t>::max)() };
+
+    local_uint128_type low { UINT64_C(0), lower_dist(rng) };
+
+    for(auto idx = static_cast<int>(INT8_C(0)); idx < static_cast<int>(INT8_C(0x10)); ++idx)
+    {
+      static_cast<void>(idx);
+
+      const local_uint128_type low_old { low };
+
+      ++low;
+
+      const std::uint64_t new_low { static_cast<std::uint64_t>(low) };
+
+      if(new_low < lowest_low)
+      {
+        lowest_low = new_low;
+      }
+
+      BOOST_TEST(low > low_old);
+    }
+
+    BOOST_TEST_EQ(lowest_low, UINT64_C(0));
+  }
 }
 
 auto test_spot_div_uint256_t() -> void
