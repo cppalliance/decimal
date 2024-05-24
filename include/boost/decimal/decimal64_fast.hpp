@@ -134,6 +134,10 @@ public:
     friend constexpr auto operator>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
     friend constexpr auto operator>=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
 
+    // Unary Operators
+    friend constexpr auto operator+(decimal64_fast val) noexcept -> decimal64_fast;
+    friend constexpr auto operator-(decimal64_fast val) noexcept -> decimal64_fast;
+
     // TODO(mborland): Fix with STL bindings and delete
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64_fast& d) -> std::basic_ostream<charT, traits>&
@@ -356,6 +360,17 @@ constexpr auto operator>=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bo
     }
 
     return !(lhs < rhs);
+}
+
+constexpr auto operator+(decimal64_fast val) noexcept -> decimal64_fast
+{
+    return val;
+}
+
+constexpr auto operator-(decimal64_fast val) noexcept -> decimal64_fast
+{
+    val.sign_ = !val.sign_;
+    return val;
 }
 
 } // namespace decimal
