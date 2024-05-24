@@ -133,6 +133,21 @@ public:
     friend constexpr auto operator<=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
     friend constexpr auto operator>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
     friend constexpr auto operator>=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
+
+    // TODO(mborland): Fix with STL bindings and delete
+    template <typename charT, typename traits>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64_fast& d) -> std::basic_ostream<charT, traits>&
+    {
+        os << d.significand_ << "e";
+        const auto biased_exp {d.biased_exponent()};
+        if (biased_exp > 0)
+        {
+            os << '+';
+        }
+        os << biased_exp;
+
+        return os;
+    }
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
