@@ -82,6 +82,20 @@ public:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
     #endif
     constexpr decimal64_fast(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_INTEGRAL Integer>
+    #else
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+    #endif
+    constexpr decimal64_fast(Integer val) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_REAL Float>
+    #else
+    template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
+    #endif
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast(Float val) noexcept;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -138,6 +152,53 @@ constexpr decimal64_fast::decimal64_fast(T1 coeff, T2 exp, bool sign) noexcept
         exponent_ = static_cast<exponent_type>(biased_exp);
     }
 }
+
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_INTEGRAL Integer>
+#else
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
+#endif
+constexpr decimal64_fast::decimal64_fast(Integer val) noexcept
+{
+    using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
+    *this = decimal64_fast{static_cast<ConversionType>(val), 0, false};
+}
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_REAL Float>
+#else
+template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
+#endif
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::decimal64_fast(Float val) noexcept
+{
+    if (val != val)
+    {
+        significand_ = detail::d64_fast_qnan;
+    }
+    else if (val == std::numeric_limits<Float>::infinity() || val == -std::numeric_limits<Float>::infinity())
+    {
+        significand_ = detail::d64_fast_inf;
+    }
+    else
+    {
+        const auto components {detail::ryu::floating_point_to_fd128(val)};
+        *this = decimal64_fast {components.mantissa, components.exponent, components.sign};
+    }
+}
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
 
 } // namespace decimal
 } // namespace boost
