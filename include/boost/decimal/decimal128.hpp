@@ -627,17 +627,17 @@ constexpr auto decimal128::unbiased_exponent() const noexcept -> std::uint64_t
 
     const auto exp_comb_bits {(bits_.high & detail::d128_comb_11_mask.high)};
 
-    if (exp_comb_bits == detail::d128_comb_11_mask.high)
+    switch (exp_comb_bits)
     {
-        expval = (bits_.high & detail::d128_comb_11_mask.high) >> (high_word_significand_bits + 1);
-    }
-    else if (exp_comb_bits == detail::d128_comb_10_mask.high)
-    {
-        expval = UINT64_C(0b10000000000000);
-    }
-    else if (exp_comb_bits == detail::d128_comb_01_mask.high)
-    {
-        expval = UINT64_C(0b01000000000000);
+        case detail::d128_comb_11_mask.high:
+            expval = (bits_.high & detail::d128_comb_11_mask.high) >> (high_word_significand_bits + 1);
+            break;
+        case detail::d128_comb_10_mask.high:
+            expval = UINT64_C(0b10000000000000);
+            break;
+        case detail::d128_comb_01_mask.high:
+            expval = UINT64_C(0b01000000000000);
+            break;
     }
 
     expval |= (bits_.high & detail::d128_exponent_mask.high) >> high_word_significand_bits;
@@ -657,14 +657,9 @@ constexpr auto decimal128::full_significand() const noexcept -> detail::uint128
     if ((bits_.high & detail::d128_comb_11_mask.high) == detail::d128_comb_11_mask.high)
     {
         // Only need the one bit of T because the other 3 are implied 0s
-        if ((bits_.high & detail::d128_comb_11_significand_bits.high) == detail::d128_comb_11_significand_bits.high)
-        {
-            significand = detail::uint128{0b10010000000000000000000000000000000000000000000000,0};
-        }
-        else
-        {
-            significand = detail::uint128{0b10000000000000000000000000000000000000000000000000,0};
-        }
+        significand = (bits_.high & detail::d128_comb_11_significand_bits.high) == detail::d128_comb_11_significand_bits.high ?
+            detail::uint128{0b10010000000000000000000000000000000000000000000000,0} :
+            detail::uint128{0b10000000000000000000000000000000000000000000000000,0};
     }
     else
     {
@@ -742,11 +737,23 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     // If the coeff is not in range make it so
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
     const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal128>};
-    while (unsigned_coeff_digits > detail::precision_v<decimal128> + 1)
+    if (unsigned_coeff_digits > detail::precision_v<decimal128> + 1)
     {
-        unsigned_coeff /= 10;
-        ++exp;
-        --unsigned_coeff_digits;
+        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal128> + 1)};
+
+        #if defined(__GNUC__) && !defined(__clang__)
+        #  pragma GCC diagnostic push
+        #  pragma GCC diagnostic ignored "-Wconversion"
+        #endif
+
+        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+
+        #if defined(__GNUC__) && !defined(__clang__)
+        #  pragma GCC diagnostic pop
+        #endif
+
+        exp += digits_to_remove;
+        unsigned_coeff_digits -= digits_to_remove;
     }
 
     // Round as required
@@ -2405,75 +2412,6 @@ constexpr auto scalblnd128(decimal128 num, long exp) noexcept -> decimal128
 constexpr auto scalbnd128(decimal128 num, int expval) noexcept -> decimal128
 {
     return scalblnd128(num, static_cast<long>(expval));
-}
-
-constexpr auto fmad128(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
-{
-    // First calculate x * y without rounding
-    constexpr decimal128 zero {0, 0};
-
-    const auto res {detail::check_non_finite(x, y)};
-    if (res != zero)
-    {
-        return res;
-    }
-
-    auto sig_lhs {x.full_significand()};
-    auto exp_lhs {x.biased_exponent()};
-    detail::normalize<decimal128>(sig_lhs, exp_lhs);
-
-    auto sig_rhs {y.full_significand()};
-    auto exp_rhs {y.biased_exponent()};
-    detail::normalize<decimal128>(sig_rhs, exp_rhs);
-
-    auto mul_result {d128_mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
-    const decimal128 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
-
-    return dec_result + z;
-
-    /*
-    const auto res_add {detail::check_non_finite(dec_result, z)};
-    if (res_add != zero)
-    {
-        return res_add;
-    }
-
-    bool lhs_bigger {dec_result > z};
-    if (dec_result.isneg() && z.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-    bool abs_lhs_bigger {abs(dec_result) > abs(z)};
-
-    detail::normalize<decimal128>(mul_result.sig, mul_result.exp);
-
-    auto sig_z {z.full_significand()};
-    auto exp_z {z.biased_exponent()};
-    detail::normalize<decimal128>(sig_z, exp_z);
-    detail::decimal128_components z_components {sig_z, exp_z, z.isneg()};
-
-    if (!lhs_bigger)
-    {
-        detail::swap(mul_result, z_components);
-        abs_lhs_bigger = !abs_lhs_bigger;
-    }
-
-    detail::decimal128_components result {};
-
-    if (!mul_result.sign && z_components.sign)
-    {
-        result = d128_sub_impl(mul_result.sig, mul_result.exp, mul_result.sign,
-                               z_components.sig, z_components.exp, z_components.sign,
-                               abs_lhs_bigger);
-    }
-    else
-    {
-        result = d128_add_impl(mul_result.sig, mul_result.exp, mul_result.sign,
-                               z_components.sig, z_components.exp, z_components.sign);
-    }
-
-    return {result.sig, result.exp, result.sign};
-    */
 }
 
 } //namespace decimal

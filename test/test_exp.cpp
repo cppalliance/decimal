@@ -128,13 +128,13 @@ namespace local
 
       if(!result_val_is_ok)
       {
-          // LCOV_EXCL_START
+        // LCOV_EXCL_START
         std::cerr << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
         std::cerr << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
         std::cerr << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
 
         break;
-          // LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
       }
     }
 
@@ -177,9 +177,11 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_inf_pos = exp(std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)));
+      const decimal_type arg_inf { std::numeric_limits<decimal_type>::infinity() * static_cast<decimal_type>(dist(gen)) };
 
-      const auto result_val_inf_pos_is_ok = isinf(val_inf_pos);
+      const auto val_inf_pos = exp(arg_inf);
+
+      const auto result_val_inf_pos_is_ok = (fpclassify(val_inf_pos) == FP_INFINITE);
 
       BOOST_TEST(result_val_inf_pos_is_ok);
 

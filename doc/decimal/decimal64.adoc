@@ -83,14 +83,6 @@ explicit constexpr operator std::bfloat16_t() const noexcept;
 explicit constexpr operator decimal32() const noexcept;
 explicit constexpr operator decimal128() const noexcept;
 
-// Literals
-constexpr auto operator  "" _DD(const char* str) -> decimal64
-constexpr auto operator  "" _dd(const char* str) -> decimal64
-constexpr auto operator  "" _DD(unsigned long long v) -> decimal64
-constexpr auto operator  "" _dd(unsigned long long v) -> decimal64
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _DD(long double v) -> decimal64
-BOOST_DECIMAL_CXX20_CONSTEXPR auto operator  "" _dd(long double v) -> decimal64
-
 } //namespace decimal
 } //namespace boost
 

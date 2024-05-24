@@ -81,9 +81,9 @@ constexpr auto tgamma_impl(T x) noexcept
             {
                 constexpr int asymp_cutoff
                 {
-                      std::numeric_limits<T>::digits10 < 10 ? T { 2, 1 }
-                    : std::numeric_limits<T>::digits10 < 20 ? T { 5, 1 }
-                    :                                         T { 1, 2 }
+                      std::numeric_limits<T>::digits10 < 10 ? T {  2, 1 } //  20
+                    : std::numeric_limits<T>::digits10 < 20 ? T {  5, 1 } //  50
+                    :                                         T { 15, 1 } // 150
                 };
 
                 if (x < T { asymp_cutoff })
@@ -108,7 +108,7 @@ constexpr auto tgamma_impl(T x) noexcept
                 {
                     // Use large-argument asymptotic expansion.
 
-                    const T prefix { exp(-x) * pow(x, x - T { 5, -1 }) };
+                    const T prefix { exp(((x  - T { 5, -1 }) * log(x)) - x) };
 
                     result =  prefix * detail::tgamma_series_expansion_asymp(one / x);
                 }

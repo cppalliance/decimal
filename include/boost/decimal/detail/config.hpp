@@ -276,4 +276,12 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_INLINE_VARIABLE static
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#  define BOOST_DECIMAL_UNREACHABLE __builtin_unreachable()
+#elif defined(_MSC_VER)
+#  define BOOST_DECIMAL_UNREACHABLE __assume(0)
+#else
+#  define BOOST_DECIMAL_UNREACHABLE std::abort()
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
