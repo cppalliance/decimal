@@ -44,6 +44,20 @@ struct asin_table_imp
          decimal32 {UINT64_C(73651618860008751), -27}
      }};
 
+    static constexpr std::array<decimal32_fast, 11> d32_fast_coeffs = {{
+        decimal32_fast {UINT64_C(263887099755925), -15},
+        decimal32_fast {UINT64_C(43491393212832818), -17, true},
+        decimal32_fast {UINT64_C(38559884786102105), -17},
+        decimal32_fast {UINT64_C(13977130653211101), -17, true},
+        decimal32_fast {UINT64_C(54573213517731915), -18},
+        decimal32_fast {UINT64_C(64851743877986187), -18},
+        decimal32_fast {UINT64_C(11606701725692841), -19},
+        decimal32_fast {UINT64_C(16658989049586517), -17},
+        decimal32_fast {UINT64_C(25906093603686159), -22},
+        decimal32_fast {UINT64_C(99999996600828589), -17},
+        decimal32_fast {UINT64_C(73651618860008751), -27}
+    }};
+
     // 20th degree remez polynomial calculated from 0, 0.5
     // Estimated max error: 6.0872797932519911178133457751215133e-19
     static constexpr std::array<decimal64, 21> d64_coeffs = {{
@@ -128,6 +142,9 @@ constexpr std::array<decimal64, 21> asin_table_imp<b>::d64_coeffs;
 template <bool b>
 constexpr std::array<decimal128, 41> asin_table_imp<b>::d128_coeffs;
 
+template <bool b>
+constexpr std::array<decimal32_fast, 11> asin_table_imp<b>::d32_fast_coeffs;
+
 #endif
 
 using asin_table = asin_table_imp<true>;
@@ -141,6 +158,12 @@ template <>
 constexpr auto asin_series<decimal32>(decimal32 x) noexcept
 {
     return remez_series_result(x, asin_detail::asin_table::d32_coeffs);
+}
+
+template <>
+constexpr auto asin_series<decimal32_fast>(decimal32_fast x) noexcept
+{
+    return remez_series_result(x, asin_detail::asin_table::d32_fast_coeffs);
 }
 
 template <>

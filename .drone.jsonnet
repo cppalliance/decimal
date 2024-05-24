@@ -187,16 +187,30 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     ),
 
     linux_pipeline(
-        "Linux 24.04 GCC 14 32/64",
+        "Linux 24.04 GCC 14 32",
         "cppalliance/droneubuntu2404:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++-14', CXXSTD: '03,11,14,17,20,23', ADDRMD: '32,64', CXXFLAGS: "-fexcess-precision=fast" },
+        { TOOLSET: 'gcc', COMPILER: 'g++-14', CXXSTD: '03,11,14,17,20,23', ADDRMD: '32', CXXFLAGS: "-fexcess-precision=fast" },
         "g++-14-multilib",
     ),
 
     linux_pipeline(
-        "Linux 24.04 GCC 14 GNU 32/64",
+        "Linux 24.04 GCC 14 64",
         "cppalliance/droneubuntu2404:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++-14', CXXSTD: '03,11,14,17,20,23', ADDRMD: '32,64', CXXFLAGS: "-fexcess-precision=fast", CXXSTDDIALECT: "gnu" },
+        { TOOLSET: 'gcc', COMPILER: 'g++-14', CXXSTD: '03,11,14,17,20,23', ADDRMD: '64', CXXFLAGS: "-fexcess-precision=fast" },
+        "g++-14-multilib",
+    ),
+
+    linux_pipeline(
+        "Linux 24.04 GCC 14 GNU 32",
+        "cppalliance/droneubuntu2404:1",
+        { TOOLSET: 'gcc', COMPILER: 'g++-14', CXXSTD: '03,11,14,17,20,23', ADDRMD: '32', CXXFLAGS: "-fexcess-precision=fast", CXXSTDDIALECT: "gnu" },
+        "g++-14-multilib",
+    ),
+
+    linux_pipeline(
+        "Linux 24.04 GCC 14 GNU 64",
+        "cppalliance/droneubuntu2404:1",
+        { TOOLSET: 'gcc', COMPILER: 'g++-14', CXXSTD: '03,11,14,17,20,23', ADDRMD: '64', CXXFLAGS: "-fexcess-precision=fast", CXXSTDDIALECT: "gnu" },
         "g++-14-multilib",
     ),
 
@@ -356,16 +370,6 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
         { TOOLSET: 'clang', COMPILER: 'clang++-18', CXXSTD: '03,11,14,17,20,2b' },
         "clang-18",
         ["deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main"],
-    ),
-
-    macos_pipeline(
-        "MacOS 10.15 Xcode 12.2 UBSAN",
-        { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,2a' } + ubsan,
-    ),
-
-    macos_pipeline(
-        "MacOS 10.15 Xcode 12.2 ASAN",
-        { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,2a' } + asan,
     ),
 
     macos_pipeline(

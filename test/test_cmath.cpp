@@ -479,10 +479,16 @@ void test_fdim()
     BOOST_TEST_EQ(fdim(Dec(1), Dec(1)), Dec(0));
 }
 
+// Macro if constexpr throws warning in C++14 mode
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4127)
+#endif
+
 template <typename Dec>
 void test_ilogb()
 {
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value)
     {
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), 101);
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), 102);
@@ -506,7 +512,7 @@ void test_ilogb()
 template <typename Dec>
 void test_logb()
 {
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value)
     {
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), Dec(101));
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), Dec(102));
@@ -527,10 +533,14 @@ void test_logb()
     BOOST_TEST(isnan(logb(std::numeric_limits<Dec>::quiet_NaN())));
 }
 
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
+
 template <typename Dec>
 void test_sqrt()
 {
-    using comp_type = std::conditional_t<std::is_same<Dec, decimal32>::value, float, double>;
+    using comp_type = std::conditional_t<std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value, float, double>;
     std::uniform_real_distribution<comp_type> dist(0, 1e5);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
@@ -1284,6 +1294,16 @@ int main()
     test_islessequal<decimal32>();
     test_islessgreater<decimal32>();
     test_isunordered<decimal32>();
+
+    test_fmax<decimal32_fast>();
+    test_isgreater<decimal32_fast>();
+    test_isgreaterequal<decimal32_fast>();
+    test_fmin<decimal32_fast>();
+    test_isless<decimal32_fast>();
+    test_islessequal<decimal32_fast>();
+    test_islessgreater<decimal32_fast>();
+    test_isunordered<decimal32_fast>();
+
     test_fmax<decimal64>();
     test_isgreater<decimal64>();
     test_isgreaterequal<decimal64>();
@@ -1292,6 +1312,7 @@ int main()
     test_islessequal<decimal64>();
     test_islessgreater<decimal64>();
     test_isunordered<decimal64>();
+
     test_fmax<decimal128>();
     test_isgreater<decimal128>();
     test_isgreaterequal<decimal128>();
@@ -1304,9 +1325,15 @@ int main()
     test_floor<decimal32>();
     test_ceil<decimal32>();
     test_trunc<decimal32>();
+
+    test_floor<decimal32_fast>();
+    test_ceil<decimal32_fast>();
+    test_trunc<decimal32_fast>();
+
     test_floor<decimal64>();
     test_ceil<decimal64>();
     test_trunc<decimal64>();
+
     test_floor<decimal128>();
     test_ceil<decimal128>();
     test_trunc<decimal128>();
@@ -1314,6 +1341,11 @@ int main()
     test_frexp10<decimal32>();
     test_scalbn<decimal32>();
     test_scalbln<decimal32>();
+
+    test_frexp10<decimal32_fast>();
+    test_scalbn<decimal32_fast>();
+    test_scalbln<decimal32_fast>();
+
     test_frexp10<decimal64>();
     test_scalbn<decimal64>();
     test_scalbln<decimal64>();
@@ -1325,28 +1357,36 @@ int main()
     test_copysign<decimal64>();
 
     test_fma<decimal32>();
+    test_fma<decimal32_fast>();
     test_fma<decimal64>();
     test_fma<decimal128>();
 
     test_modf<decimal32>();
+    test_modf<decimal32_fast>();
     test_modf<decimal64>();
 
     test_fdim<decimal32>();
+    test_fdim<decimal32_fast>();
     test_fdim<decimal64>();
 
     test_ilogb<decimal32>();
+    test_ilogb<decimal32_fast>();
     test_ilogb<decimal64>();
     test_ilogb<decimal128>();
 
     test_logb<decimal32>();
+    test_logb<decimal32_fast>();
     test_logb<decimal64>();
     test_logb<decimal128>();
 
     test_sqrt<decimal32>();
+    test_sqrt<decimal32_fast>();
     test_sqrt<decimal64>();
 
     test_two_val_hypot<decimal32>();
     test_three_val_hypot<decimal32>();
+    test_two_val_hypot<decimal32_fast>();
+    test_three_val_hypot<decimal32_fast>();
     test_two_val_hypot<decimal64>();
     test_three_val_hypot<decimal64>();
 
@@ -1362,6 +1402,12 @@ int main()
     test_lrint<decimal32>();
     test_llrint<decimal32>();
     test_nearbyint<decimal32>();
+
+    test_rint<decimal32_fast>();
+    test_lrint<decimal32_fast>();
+    test_llrint<decimal32_fast>();
+    test_nearbyint<decimal32_fast>();
+
     test_rint<decimal64>();
     test_lrint<decimal64>();
     test_llrint<decimal64>();
@@ -1370,19 +1416,30 @@ int main()
     test_round<decimal32>();
     test_lround<decimal32>();
     test_llround<decimal32>();
+
+    test_round<decimal32_fast>();
+    test_lround<decimal32_fast>();
+    test_llround<decimal32_fast>();
+
     test_round<decimal64>();
     test_lround<decimal64>();
     test_llround<decimal64>();
 
     test_nextafter<decimal32>();
     test_nexttoward<decimal32>();
+
+    test_nextafter<decimal32_fast>();
+    test_nexttoward<decimal32_fast>();
+
     test_nextafter<decimal64>();
     test_nexttoward<decimal64>();
 
     test_pow<decimal32>();
+    test_pow<decimal32_fast>();
     test_pow<decimal64>();
 
     test_exp2<decimal32>();
+    test_exp2<decimal32_fast>();
     test_exp2<decimal64>();
 
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
@@ -1392,9 +1449,11 @@ int main()
     #endif
 
     test_log2<decimal32>();
+    test_log2<decimal32_fast>();
     test_log2<decimal64>();
 
     test_log10<decimal32>();
+    test_log10<decimal32_fast>();
     test_log10<decimal64>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)

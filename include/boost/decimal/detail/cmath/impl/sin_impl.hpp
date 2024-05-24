@@ -37,6 +37,16 @@ struct sin_table_imp {
         decimal32 {UINT64_C(60055992690454536), -24}
      }};
 
+    static constexpr std::array<decimal32_fast, 6> d32_fast_coeffs =
+    {{
+         decimal32_fast {UINT64_C(76426704684128569), -19},
+         decimal32_fast {UINT64_C(8163484279370784), -19},
+         decimal32_fast {UINT64_C(16704305092800237), -17, true},
+         decimal32_fast {UINT64_C(74622903795259856), -21},
+         decimal32_fast {UINT64_C(9999946918542727), -16},
+         decimal32_fast {UINT64_C(60055992690454536), -24}
+     }};
+
     // 11th Degree Remez Polynomial
     // Estimated max error: 5.2301715421592162270336342660001217e-18
     static constexpr std::array<decimal64, 12> d64_coeffs =
@@ -94,6 +104,9 @@ constexpr std::array<decimal64, 12> sin_table_imp<b>::d64_coeffs;
 template <bool b>
 constexpr std::array<decimal128, 21> sin_table_imp<b>::d128_coeffs;
 
+template <bool b>
+constexpr std::array<decimal32_fast, 6> sin_table_imp<b>::d32_fast_coeffs;
+
 #endif
 
 using sin_table = sin_table_imp<true>;
@@ -109,6 +122,15 @@ constexpr auto sin_series_expansion<decimal32>(decimal32 x) noexcept
     const auto b_neg = signbit(x);
     x = abs(x);
     auto result = remez_series_result(x, sin_detail::sin_table::d32_coeffs);
+    return b_neg ? -result : result;
+}
+
+template <>
+constexpr auto sin_series_expansion<decimal32_fast>(decimal32_fast x) noexcept
+{
+    const auto b_neg = signbit(x);
+    x = abs(x);
+    auto result = remez_series_result(x, sin_detail::sin_table::d32_fast_coeffs);
     return b_neg ? -result : result;
 }
 

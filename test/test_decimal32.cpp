@@ -447,21 +447,21 @@ void test_construct_from_float()
     decimal32 float_one(T(1));
     if(!BOOST_TEST_EQ(one, float_one))
     {
-        debug_pattern(float_one);
+        debug_pattern(float_one); // LCOV_EXCL_LINE
     }
 
     constexpr decimal32 fraction(12345, -4);
     decimal32 float_frac(T(1.2345));
     if(!BOOST_TEST_EQ(fraction, float_frac))
     {
-        debug_pattern(float_frac);
+        debug_pattern(float_frac); // LCOV_EXCL_LINE
     }
 
     constexpr decimal32 neg_frac(98123, -4, true);
     decimal32 neg_float_frac(T(-9.8123));
     if(!BOOST_TEST_EQ(neg_frac, neg_float_frac))
     {
-        debug_pattern(neg_float_frac);
+        debug_pattern(neg_float_frac); // LCOV_EXCL_LINE
     }
 }
 

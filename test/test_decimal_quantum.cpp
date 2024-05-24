@@ -12,6 +12,8 @@
 #include <climits>
 #include <cmath>
 #include <cerrno>
+#include <iostream>
+#include <iomanip>
 
 using namespace boost::decimal;
 
@@ -92,11 +94,15 @@ void test_quantexp()
 
         if (static_cast<std::uint32_t>(i) + detail::bias_v<Dec> > detail::max_biased_exp_v<Dec>)
         {
-            if (!BOOST_TEST_EQ(quantexp(val1), detail::max_biased_exp_v<Dec>))
+            // Fast decimals have no concept of subnormals
+            BOOST_IF_CONSTEXPR (!std::is_same<Dec, decimal32_fast>::value)
             {
-                // LCOV_EXCL_START
-                std::cerr << "Val: " << val1 << std::endl;
-                // LCOV_EXCL_STOP
+                if (!BOOST_TEST_EQ(quantexp(val1), detail::max_biased_exp_v<Dec>))
+                {
+                    // LCOV_EXCL_START
+                    std::cerr << "Val: " << val1 << std::endl;
+                    // LCOV_EXCL_STOP
+                }
             }
         }
         else
@@ -126,17 +132,22 @@ void test_nonfinite_quantexp()
 template <typename Dec>
 void test_quantize()
 {
-    std::uniform_int_distribution<std::int64_t> sig(1'000'000, 9'999'999);
-    std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<Dec>::min_exponent10 + 19,
-                                                    std::numeric_limits<Dec>::max_exponent10 - 19);
+    using sig_type = typename Dec::significand_type;
+
+    std::uniform_int_distribution<std::uint64_t> sig(1'000'000, 9'999'999);
+    std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<Dec>::min_exponent10 + std::numeric_limits<Dec>::digits10 + 1,
+                                                    std::numeric_limits<Dec>::max_exponent10 - std::numeric_limits<Dec>::digits10 - 1);
 
     constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
-        const auto sig1 {sig(rng)};
-        const auto sig2 {sig(rng)};
-        const auto exp1 {exp(rng)};
-        const auto exp2 {exp(rng)};
+        auto sig1 {static_cast<sig_type>(sig(rng))};
+        auto sig2 {static_cast<sig_type>(sig(rng))};
+        auto exp1 {exp(rng)};
+        auto exp2 {exp(rng)};
+
+        detail::normalize<Dec>(sig1, exp1);
+        detail::normalize<Dec>(sig1, exp1);
 
         const Dec val1 {sig1, exp1};
         const Dec val2 {sig2, exp2};
@@ -145,9 +156,13 @@ void test_quantize()
 
         if (!BOOST_TEST_EQ(quantize(val1, val2), quantized_val))
         {
-            std::cerr << "Val 1: " << val1
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<Dec>::digits10)
+                      << "Val 1: " << val1
                       << "\nVal 2: " << val2
-                      << "\nQuant: " << quantized_val << std::endl;
+                      << "\nQuant: " << quantized_val
+                      << "\n Func: " << quantize(val1, val2) << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -176,6 +191,13 @@ int main()
     test_nonfinite_quantexp<decimal32>();
     test_quantize<decimal32>();
     test_nonfinite_quantize<decimal32>();
+
+    test_same_quantum<decimal32_fast>();
+    test_nonfinite_samequantum<decimal32_fast>();
+    test_quantexp<decimal32_fast>();
+    test_nonfinite_quantexp<decimal32_fast>();
+    test_quantize<decimal32_fast>();
+    test_nonfinite_quantize<decimal32_fast>();
 
     test_same_quantum<decimal64>();
     test_nonfinite_samequantum<decimal64>();

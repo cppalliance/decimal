@@ -29,6 +29,8 @@ private:
     using d64_coeffs_t  = std::array<decimal64,  14>;
     using d128_coeffs_t = std::array<decimal128, 32>;
 
+    using d32_fast_coeffs_t = std::array<decimal32_fast, 10>;
+
 public:
     static constexpr d32_coeffs_t d32_coeffs =
     {{
@@ -48,6 +50,25 @@ public:
         ::boost::decimal::decimal32 { UINT64_C(2787876201220259352), - 19 - 5 }, // * x^9
         ::boost::decimal::decimal32 { UINT64_C(2780855729673643225), - 19 - 6 }, // * x^10
     }};
+
+    static constexpr d32_fast_coeffs_t d32_fast_coeffs =
+    {{
+         // Specifically derive a polynomial expansion for Exp[x] - 1 for this work.
+         //   Table[{x, Exp[x] - 1}, {x, -Log[2], Log[2], 1/60}]
+         //   N[%, 48]
+         //   Fit[%, {x, x^2, x^3, x^4, x^5, x^6, x^7, x^8, x^9, x^10}, x]
+
+         ::boost::decimal::decimal32_fast { UINT64_C(1000000000005449334), - 19 + 1 }, // * x
+         ::boost::decimal::decimal32_fast { UINT64_C(5000000000003881336), - 19 - 0 }, // * x^2
+         ::boost::decimal::decimal32_fast { UINT64_C(1666666664242981149), - 19 - 0 }, // * x^3
+         ::boost::decimal::decimal32_fast { UINT64_C(4166666665026072773), - 19 - 1 }, // * x^4
+         ::boost::decimal::decimal32_fast { UINT64_C(8333336317448167991), - 19 - 2 }, // * x^5
+         ::boost::decimal::decimal32_fast { UINT64_C(1388889096793935619), - 19 - 2 }, // * x^6
+         ::boost::decimal::decimal32_fast { UINT64_C(1983978347911205530), - 19 - 3 }, // * x^7
+         ::boost::decimal::decimal32_fast { UINT64_C(2480049494648544583), - 19 - 4 }, // * x^8
+         ::boost::decimal::decimal32_fast { UINT64_C(2787876201220259352), - 19 - 5 }, // * x^9
+         ::boost::decimal::decimal32_fast { UINT64_C(2780855729673643225), - 19 - 6 }, // * x^10
+     }};
 
     static constexpr d64_coeffs_t d64_coeffs =
     {{
@@ -124,6 +145,9 @@ constexpr typename expm1_table_imp<b>::d64_coeffs_t expm1_table_imp<b>::d64_coef
 template <bool b>
 constexpr typename expm1_table_imp<b>::d128_coeffs_t expm1_table_imp<b>::d128_coeffs;
 
+template <bool b>
+constexpr typename expm1_table_imp<b>::d32_fast_coeffs_t expm1_table_imp<b>::d32_fast_coeffs;
+
 #endif
 
 } //namespace expm1_detail
@@ -137,6 +161,12 @@ template <>
 constexpr auto expm1_series_expansion<decimal32>(decimal32 x) noexcept
 {
     return taylor_series_result(x, expm1_table::d32_coeffs);
+}
+
+template <>
+constexpr auto expm1_series_expansion<decimal32_fast>(decimal32_fast x) noexcept
+{
+    return taylor_series_result(x, expm1_table::d32_fast_coeffs);
 }
 
 template <>
