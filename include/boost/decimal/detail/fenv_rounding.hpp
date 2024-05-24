@@ -119,8 +119,10 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
                     ++val;
                 }
                 break;
+            // LCOV_EXCL_START
             default:
                 BOOST_DECIMAL_UNREACHABLE;
+            // LCOV_EXCL_STOP
         }
 
 
