@@ -1318,7 +1318,8 @@ constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::de
 
     // If rhs is greater than we need to offset the significands to get the correct values
     // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.sig) * detail::powers_of_10[detail::precision_v<decimal64>]};
+    constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64>))};
+    const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.sig) * tens_needed};
     lhs.exp -= detail::precision_v<decimal64>;
 
     auto res_sig {big_sig_lhs / static_cast<unsigned_int128_type>(rhs.sig)};
