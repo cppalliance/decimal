@@ -96,6 +96,15 @@ public:
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     #endif
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast(Float val) noexcept;
+
+    friend constexpr auto direct_init(significand_type significand, exponent_type exponent, bool sign) noexcept -> decimal64_fast;
+
+    // Classification functions
+    friend constexpr auto signbit(decimal64_fast val) noexcept -> bool;
+    friend constexpr auto isinf(decimal64_fast val) noexcept -> bool;
+    friend constexpr auto isnan(decimal64_fast val) noexcept -> bool;
+    friend constexpr auto issignaling(decimal64_fast val) noexcept -> bool;
+    friend constexpr auto isnormal(decimal64_fast val) noexcept -> bool;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -199,6 +208,47 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::decimal64_fast(Float val) noexcept
 #elif defined(__GNUC__)
 #  pragma GCC diagnostic pop
 #endif
+
+constexpr auto direct_init(decimal64_fast::significand_type significand, decimal64_fast::exponent_type exponent, bool sign) noexcept -> decimal64_fast
+{
+    decimal64_fast val {};
+    val.significand_ = significand;
+    val.exponent_ = exponent;
+    val.sign_ = sign;
+
+    return val;
+}
+
+constexpr auto signbit(decimal64_fast val) noexcept -> bool
+{
+    return val.sign_;
+}
+
+constexpr auto isinf(decimal64_fast val) noexcept -> bool
+{
+    return val.significand_ == detail::d64_fast_inf;
+}
+
+constexpr auto isnan(decimal64_fast val) noexcept -> bool
+{
+    return val.significand_ == detail::d64_fast_qnan ||
+           val.significand_ == detail::d64_fast_snan;
+}
+
+constexpr auto issignaling(decimal64_fast val) noexcept -> bool
+{
+    return val.significand_ == detail::d64_fast_snan;
+}
+
+constexpr auto isnormal(decimal64_fast val) noexcept -> bool
+{
+    if (val.exponent_ <= static_cast<decimal64_fast::exponent_type>(detail::precision_v<decimal64> - 1))
+    {
+        return false;
+    }
+
+    return (val.significand_ != 0) && isfinite(val);
+}
 
 } // namespace decimal
 } // namespace boost
