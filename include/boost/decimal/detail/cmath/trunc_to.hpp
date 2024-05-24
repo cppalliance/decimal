@@ -25,7 +25,7 @@ namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto trunc_to(T val, int precision = 0) noexcept
-BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr auto biggest_val {1 / std::numeric_limits<T>::epsilon()};
 
