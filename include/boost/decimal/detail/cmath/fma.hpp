@@ -76,7 +76,7 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
     }
     else
     {
-        result = d64_add_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+        result = detail::d64_add_impl<detail::decimal64_components>(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
                               z_components.sig, z_components.exp, z_components.sign);
     }
 

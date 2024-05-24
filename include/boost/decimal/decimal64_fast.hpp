@@ -138,6 +138,8 @@ public:
     friend constexpr auto operator+(decimal64_fast val) noexcept -> decimal64_fast;
     friend constexpr auto operator-(decimal64_fast val) noexcept -> decimal64_fast;
 
+    // Basic arithmetic operators
+
     // TODO(mborland): Fix with STL bindings and delete
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64_fast& d) -> std::basic_ostream<charT, traits>&

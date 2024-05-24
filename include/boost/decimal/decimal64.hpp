@@ -34,6 +34,7 @@
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
+#include <boost/decimal/detail/add_impl.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -118,6 +119,8 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_significand_mask = 
 
 struct decimal64_components
 {
+    using sig_type = std::uint64_t;
+
     std::uint64_t sig;
     std::int32_t exp;
     bool sign;
@@ -193,10 +196,10 @@ private:
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
-    template <typename T1, typename T2>
+    template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
     friend constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept
-                                       -> detail::decimal64_components;
+                                       -> ReturnType;
 
     template <typename T1, typename T2>
     friend constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
@@ -1106,86 +1109,6 @@ constexpr auto operator-(decimal64 rhs) noexcept-> decimal64
     return rhs;
 }
 
-template<typename T1, typename T2>
-constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components
-{
-    const bool sign {lhs_sign};
-
-    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-
-    if (delta_exp > detail::precision_v<decimal64> + 1)
-    {
-        // If the difference in exponents is more than the digits of accuracy
-        // we return the larger of the two
-        //
-        // e.g. 1e20 + 1e-20 = 1e20
-
-        return {lhs_sig, lhs_exp, lhs_sign};
-    }
-    else if (delta_exp == detail::precision_v<decimal64> + 1)
-    {
-        // Only need to see if we need to add one to the
-        // significand of the bigger value
-        //
-        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
-
-        if (rhs_sig >= UINT64_C(5'000'000'000'000'000))
-        {
-            ++lhs_sig;
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
-        else
-        {
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
-    }
-
-    // The two numbers can be added together without special handling
-    //
-    // If we can add to the lhs sig rather than dividing we can save some precision
-    // 64-bit sign int can have 19 digits, and our normalized significand has 16
-    if (delta_exp <= 3)
-    {
-        while (delta_exp > 0)
-        {
-            lhs_sig *= 10;
-            --delta_exp;
-            --lhs_exp;
-        }
-    }
-    else
-    {
-        lhs_sig *= 1000;
-        delta_exp -= 3;
-        lhs_exp -= 3;
-    }
-
-    while (delta_exp > 1)
-    {
-        rhs_sig /= 10;
-        --delta_exp;
-    }
-
-    if (delta_exp == 1)
-    {
-        detail::fenv_round<decimal64>(rhs_sig, rhs_sign);
-    }
-
-    // Both of the significands are well under 64-bits, so we can fit them into int64_t without issue
-    const auto new_sig {static_cast<std::uint64_t>(lhs_sig) + static_cast<std::uint64_t>(rhs_sig)};
-    const auto new_exp {lhs_exp};
-    const auto res_sig {detail::make_positive_unsigned(new_sig)};
-
-    #ifdef BOOST_DECIMAL_DEBUG_ADD
-    std::cerr << "Res Sig: " << new_sig
-              << "\nRes Exp: " << new_exp
-              << "\nRes Neg: " << sign << std::endl;
-    #endif
-
-    return {res_sig, new_exp, sign};
-}
-
 template <typename T1, typename T2>
 constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                             T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
@@ -1459,7 +1382,7 @@ constexpr auto operator+(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
 
-    const auto result {d64_add_impl(lhs_sig, lhs_exp, lhs.isneg(),
+    const auto result {detail::d64_add_impl<detail::decimal64_components>(lhs_sig, lhs_exp, lhs.isneg(),
                                     rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
@@ -1516,7 +1439,7 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
     }
     else
     {
-        result = d64_add_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+        result = detail::d64_add_impl<detail::decimal64_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                               rhs_components.sig, rhs_components.exp, rhs_components.sign);
     }
 
