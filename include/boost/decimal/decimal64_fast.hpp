@@ -73,6 +73,26 @@ private:
         return static_cast<std::int32_t>(exponent_) - detail::bias_v<decimal64>;
     }
 
+    // Equality template between any integer type and decimal32
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
+    friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
+    friend constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                             detail::is_decimal_floating_point_v<Decimal2>), bool>;
+
+    // Template to compare operator< for any integer type and decimal32
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
+    friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
+    friend constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                             detail::is_decimal_floating_point_v<Decimal2>), bool>;
+
 public:
     constexpr decimal64_fast() noexcept = default;
 
@@ -105,6 +125,14 @@ public:
     friend constexpr auto isnan(decimal64_fast val) noexcept -> bool;
     friend constexpr auto issignaling(decimal64_fast val) noexcept -> bool;
     friend constexpr auto isnormal(decimal64_fast val) noexcept -> bool;
+
+    // Comparison operator
+    friend constexpr auto operator==(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
+    friend constexpr auto operator!=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
+    friend constexpr auto operator<(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
+    friend constexpr auto operator<=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
+    friend constexpr auto operator>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
+    friend constexpr auto operator>=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -248,6 +276,71 @@ constexpr auto isnormal(decimal64_fast val) noexcept -> bool
     }
 
     return (val.significand_ != 0) && isfinite(val);
+}
+
+constexpr auto operator==(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+constexpr auto operator!=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+{
+    return !(lhs == rhs);
+}
+
+constexpr auto operator<(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs) ||
+        (!lhs.isneg() && rhs.isneg()))
+    {
+        return false;
+    }
+    else if (lhs.isneg() && !rhs.isneg())
+    {
+        return true;
+    }
+    else if (isfinite(lhs) && isinf(rhs))
+    {
+        return !signbit(rhs);
+    }
+    else if (isinf(lhs) && isfinite(rhs))
+    {
+        return signbit(rhs);
+    }
+
+    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+constexpr auto operator<=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(rhs < lhs);
+}
+
+constexpr auto operator>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+{
+    return rhs < lhs;
+}
+
+constexpr auto operator>=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+{
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+
+    return !(lhs < rhs);
 }
 
 } // namespace decimal
