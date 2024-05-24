@@ -80,6 +80,77 @@ constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {res_sig, new_exp, new_sign};
 }
 
+template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
+                            bool abs_lhs_bigger) noexcept -> ReturnType
+{
+    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
+    auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
+    auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
+
+    if (delta_exp > detail::precision_v<decimal64> + 1)
+    {
+        // If the difference in exponents is more than the digits of accuracy
+        // we return the larger of the two
+        //
+        // e.g. 1e20 - 1e-20 = 1e20
+        return abs_lhs_bigger ? ReturnType{detail::shrink_significand<std::uint64_t>(lhs_sig, lhs_exp), lhs_exp, false} :
+               ReturnType{detail::shrink_significand<std::uint64_t>(rhs_sig, rhs_exp), rhs_exp, true};
+    }
+
+    // The two numbers can be subtracted together without special handling
+
+    auto& sig_bigger {abs_lhs_bigger ? signed_sig_lhs : signed_sig_rhs};
+    auto& exp_bigger {abs_lhs_bigger ? lhs_exp : rhs_exp};
+    auto& sig_smaller {abs_lhs_bigger ? signed_sig_rhs : signed_sig_lhs};
+    auto& smaller_sign {abs_lhs_bigger ? rhs_sign : lhs_sign};
+
+    if (delta_exp == 1)
+    {
+        sig_bigger *= 10;
+        --delta_exp;
+        --exp_bigger;
+    }
+    else if (delta_exp >= 2)
+    {
+        sig_bigger *= 100;
+        delta_exp -= 2;
+        exp_bigger -= 2;
+    }
+
+    while (delta_exp > 1)
+    {
+        sig_smaller /= 10;
+        --delta_exp;
+    }
+
+    if (delta_exp == 1)
+    {
+        detail::fenv_round<decimal64>(sig_smaller, smaller_sign);
+    }
+
+    // Both of the significands are less than 9'999'999'999'999'999, so we can safely
+    // cast them to signed 64-bit ints to calculate the new significand
+    std::int64_t new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
+
+    if (rhs_sign && !lhs_sign)
+    {
+        new_sig = signed_sig_lhs + signed_sig_rhs;
+    }
+    else
+    {
+        new_sig = signed_sig_lhs - signed_sig_rhs;
+    }
+
+    const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
+    const auto new_sign {new_sig < 0};
+    const auto res_sig {detail::make_positive_unsigned(new_sig)};
+
+    return {res_sig, new_exp, new_sign};
+}
+
+
 }
 }
 }
