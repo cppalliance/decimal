@@ -20,30 +20,30 @@ void test()
     constexpr T validation_val_6 {UINT32_C(123457), 1};
     constexpr T validation_val_7 {test_val};
 
-    BOOST_TEST_EQ(trunc(test_val, 0), trunc(test_val));
-    BOOST_TEST_EQ(trunc(test_val, 1), validation_val_1);
-    BOOST_TEST_EQ(trunc(test_val, 2), validation_val_2);
-    BOOST_TEST_EQ(trunc(test_val, 3), validation_val_3);
-    BOOST_TEST_EQ(trunc(test_val, 4), validation_val_4);
-    BOOST_TEST_EQ(trunc(test_val, 5), validation_val_5);
-    BOOST_TEST_EQ(trunc(test_val, 6), validation_val_6);
-    BOOST_TEST_EQ(trunc(test_val, 7), validation_val_7);
-    BOOST_TEST_EQ(trunc(test_val, 100), test_val);
+    BOOST_TEST_EQ(trunc_to(test_val, 0), trunc_to(test_val));
+    BOOST_TEST_EQ(trunc_to(test_val, 1), validation_val_1);
+    BOOST_TEST_EQ(trunc_to(test_val, 2), validation_val_2);
+    BOOST_TEST_EQ(trunc_to(test_val, 3), validation_val_3);
+    BOOST_TEST_EQ(trunc_to(test_val, 4), validation_val_4);
+    BOOST_TEST_EQ(trunc_to(test_val, 5), validation_val_5);
+    BOOST_TEST_EQ(trunc_to(test_val, 6), validation_val_6);
+    BOOST_TEST_EQ(trunc_to(test_val, 7), validation_val_7);
+    BOOST_TEST_EQ(trunc_to(test_val, 100), test_val);
 
     // Non-finite values
     for (int i = 0; i < 10; ++i)
     {
-        BOOST_TEST(isinf(trunc(std::numeric_limits<T>::infinity(), i)));
-        BOOST_TEST(isnan(trunc(std::numeric_limits<T>::quiet_NaN(), i)));
-        BOOST_TEST(isnan(trunc(std::numeric_limits<T>::signaling_NaN(), i)));
-        BOOST_TEST_EQ(trunc(T{0}, i), T{0});
+        BOOST_TEST(isinf(trunc_to(std::numeric_limits<T>::infinity(), i)));
+        BOOST_TEST(isnan(trunc_to(std::numeric_limits<T>::quiet_NaN(), i)));
+        BOOST_TEST(isnan(trunc_to(std::numeric_limits<T>::signaling_NaN(), i)));
+        BOOST_TEST_EQ(trunc_to(T{0}, i), T{0});
     }
 
     // Big value
     constexpr T big_val {1, 20};
     for (int i = 0; i < 10; ++i)
     {
-        BOOST_TEST_EQ(trunc(big_val, i), big_val);
+        BOOST_TEST_EQ(trunc_to(big_val, i), big_val);
     }
 }
 
