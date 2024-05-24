@@ -29,6 +29,8 @@ private:
     using d64_coeffs_t  = std::array<decimal64,   9>;
     using d128_coeffs_t = std::array<decimal128, 17>;
 
+    using d32_fast_coeffs_t = std::array<decimal32_fast, 6>;
+
 public:
     static constexpr d32_coeffs_t d32_coeffs =
     {{
@@ -41,6 +43,18 @@ public:
          ::boost::decimal::decimal32 { UINT64_C(2505210838544171878), - 19 -  7 }, // * x^11
          ::boost::decimal::decimal32 { UINT64_C(1605904383682161460), - 19 -  9 }, // * x^13
     }};
+
+    static constexpr d32_fast_coeffs_t d32_fast_coeffs =
+    {{
+         // Series[Sinh[x], {x, 0, 13}]
+         //            (1),                                                        // * x
+         ::boost::decimal::decimal32_fast { UINT64_C(1666666666666666667), - 19 -  0 }, // * x^3
+         ::boost::decimal::decimal32_fast { UINT64_C(8333333333333333333), - 19 -  2 }, // * x^5
+         ::boost::decimal::decimal32_fast { UINT64_C(1984126984126984127), - 19 -  3 }, // * x^7
+         ::boost::decimal::decimal32_fast { UINT64_C(2755731922398589065), - 19 -  5 }, // * x^9
+         ::boost::decimal::decimal32_fast { UINT64_C(2505210838544171878), - 19 -  7 }, // * x^11
+         ::boost::decimal::decimal32_fast { UINT64_C(1605904383682161460), - 19 -  9 }, // * x^13
+     }};
 
     static constexpr d64_coeffs_t d64_coeffs =
     {{
@@ -92,6 +106,9 @@ constexpr typename sinh_table_imp<b>::d64_coeffs_t sinh_table_imp<b>::d64_coeffs
 template <bool b>
 constexpr typename sinh_table_imp<b>::d128_coeffs_t sinh_table_imp<b>::d128_coeffs;
 
+template <bool b>
+constexpr typename sinh_table_imp<b>::d32_fast_coeffs_t sinh_table_imp<b>::d32_fast_coeffs;
+
 #endif
 
 } //namespace sinh_detail
@@ -105,6 +122,12 @@ template <>
 constexpr auto sinh_series_expansion<decimal32>(decimal32 z2) noexcept
 {
     return taylor_series_result(z2, sinh_table::d32_coeffs);
+}
+
+template <>
+constexpr auto sinh_series_expansion<decimal32_fast>(decimal32_fast z2) noexcept
+{
+    return taylor_series_result(z2, sinh_table::d32_fast_coeffs);
 }
 
 template <>

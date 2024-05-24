@@ -712,7 +712,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
     }
 
     auto abs_value = abs(value);
-    constexpr auto max_fractional_value = std::is_same<TargetDecimalType, decimal32>::value ? TargetDecimalType{1, 7} :
+    constexpr auto max_fractional_value = std::is_same<TargetDecimalType, decimal32>::value || std::is_same<TargetDecimalType, decimal32_fast>::value ? TargetDecimalType{1, 7} :
                                           std::is_same<TargetDecimalType, decimal64>::value ? TargetDecimalType{1, 16} :
                                                                                               TargetDecimalType{1, 34};
 

@@ -77,6 +77,7 @@ int main()
 {
     test<decimal32>();
     test<decimal64>();
+    test<decimal32_fast>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test<decimal128>();

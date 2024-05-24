@@ -29,6 +29,8 @@ struct lgamma_taylor_series_imp
     using d64_coeffs_t  = std::array<decimal64,  27>;
     using d128_coeffs_t = std::array<decimal128, 44>;
 
+    using d32_fast_coeffs_t = std::array<decimal32_fast, 17>;
+
     static constexpr d32_coeffs_t d32_coeffs =
     {{
         // Use a Taylor series expansion of the logarithm of the gamma function.
@@ -52,6 +54,31 @@ struct lgamma_taylor_series_imp
         + decimal32 { UINT64_C(6250095514121304074), - 19 - 1 },   // x^16
         - decimal32 { UINT64_C(5882397865868458234), - 19 - 1 },   // x^17
         + decimal32 { UINT64_C(5555576762740361110), - 19 - 1 },   // x^18
+     }};
+
+    static constexpr d32_fast_coeffs_t d32_fast_coeffs =
+    {{
+         // Use a Taylor series expansion of the logarithm of the gamma function.
+         // N[Series[Log[Gamma[x]], {x, 0, 18}], 19]
+         //         log(1/x)
+         //        -EulerGamma                                      // * x
+         + decimal32_fast { UINT64_C(8224670334241132182), - 19 - 0 },   // x^2
+         - decimal32_fast { UINT64_C(4006856343865314285), - 19 - 0 },   // x^3
+         + decimal32_fast { UINT64_C(2705808084277845479), - 19 - 0 },   // x^4
+         - decimal32_fast { UINT64_C(2073855510286739853), - 19 - 0 },   // x^5
+         + decimal32_fast { UINT64_C(1695571769974081900), - 19 - 0 },   // x^6
+         - decimal32_fast { UINT64_C(1440498967688461181), - 19 - 0 },   // x^7
+         + decimal32_fast { UINT64_C(1255096695247430424), - 19 - 0 },   // x^8
+         - decimal32_fast { UINT64_C(1113342658695646905), - 19 - 0 },   // x^9
+         + decimal32_fast { UINT64_C(1000994575127818085), - 19 - 0 },   // x^10
+         - decimal32_fast { UINT64_C(9095401714582904223), - 19 - 1 },   // x^11
+         + decimal32_fast { UINT64_C(8335384054610900402), - 19 - 1 },   // x^12
+         - decimal32_fast { UINT64_C(7693251641135219147), - 19 - 1 },   // x^13
+         + decimal32_fast { UINT64_C(7143294629536133606), - 19 - 1 },   // x^14
+         - decimal32_fast { UINT64_C(6666870588242046803), - 19 - 1 },   // x^15
+         + decimal32_fast { UINT64_C(6250095514121304074), - 19 - 1 },   // x^16
+         - decimal32_fast { UINT64_C(5882397865868458234), - 19 - 1 },   // x^17
+         + decimal32_fast { UINT64_C(5555576762740361110), - 19 - 1 },   // x^18
      }};
 
     static constexpr d64_coeffs_t d64_coeffs =
@@ -153,6 +180,9 @@ constexpr typename lgamma_taylor_series_imp<b>::d64_coeffs_t lgamma_taylor_serie
 template <bool b>
 constexpr typename lgamma_taylor_series_imp<b>::d128_coeffs_t lgamma_taylor_series_imp<b>::d128_coeffs;
 
+template <bool b>
+constexpr typename lgamma_taylor_series_imp<b>::d32_fast_coeffs_t lgamma_taylor_series_imp<b>::d32_fast_coeffs;
+
 #endif
 
 } //namespace lgamma_detail
@@ -166,6 +196,12 @@ template <>
 constexpr auto lgamma_taylor_series_expansion<decimal32>(decimal32 x) noexcept
 {
     return taylor_series_result(x, lgamma_taylor_series_table::d32_coeffs);
+}
+
+template <>
+constexpr auto lgamma_taylor_series_expansion<decimal32_fast>(decimal32_fast x) noexcept
+{
+    return taylor_series_result(x, lgamma_taylor_series_table::d32_fast_coeffs);
 }
 
 template <>

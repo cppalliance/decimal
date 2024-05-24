@@ -83,8 +83,9 @@ private:
     friend constexpr auto to_integral(Decimal val) noexcept
         BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
+    template <typename Decimal, typename TargetType>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_floating_point_v, TargetType, TargetType);
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
@@ -296,10 +297,52 @@ public:
     explicit constexpr operator detail::uint128_t() const noexcept;
     #endif
 
+    // 3.2.6 Conversion to floating-point type
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_FLOAT16
+    explicit constexpr operator std::float16_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT32
+    explicit constexpr operator std::float32_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT64
+    explicit constexpr operator std::float64_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+    explicit constexpr operator std::bfloat16_t() const noexcept;
+    #endif
+
+
+    // Conversion to other decimal type
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
     friend constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign) noexcept -> decimal32_fast;
+
+    // <cmath> or extensions that need to be friends
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
+
+    friend constexpr auto copysignd32f(decimal32_fast mag, decimal32_fast sgn) noexcept -> decimal32_fast;
+    friend constexpr auto scalbnd32f(decimal32_fast num, int exp) noexcept -> decimal32_fast;
+    friend constexpr auto scalblnd32f(decimal32_fast num, long exp) noexcept -> decimal32_fast;
+    friend constexpr auto fmad32f(decimal32_fast x, decimal32_fast y, decimal32_fast z) noexcept -> decimal32_fast;
+
+    template <typename T>
+    friend constexpr auto ilogb(T d) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int);
+
+    template <typename T>
+    friend constexpr auto logb(T num) noexcept
+        BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T);
+
+    // Specific decimal functionality
+    friend constexpr auto samequantumd32f(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
+    friend constexpr auto quantexpd32f(decimal32_fast x) noexcept -> int;
+    friend constexpr auto quantized32f(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
@@ -311,26 +354,31 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
     sign_ = isneg;
     Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
 
+    // If the coeff is not in range make it so
     auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
-    const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal32>};
-
-    // Strip digits and round as required
-    if (reduced)
+    const bool reduced {unsigned_coeff_digits > detail::precision};
+    if (unsigned_coeff_digits > detail::precision + 1)
     {
-        const auto digits_to_remove {static_cast<Unsigned_Integer>(unsigned_coeff_digits - (detail::precision_v<decimal32> + 1))};
+        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision + 1)};
 
         #if defined(__GNUC__) && !defined(__clang__)
         #  pragma GCC diagnostic push
         #  pragma GCC diagnostic ignored "-Wconversion"
         #endif
 
-        unsigned_coeff /= static_cast<Unsigned_Integer>(detail::pow10(digits_to_remove));
+        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
 
         #if defined(__GNUC__) && !defined(__clang__)
         #  pragma GCC diagnostic pop
         #endif
 
-        exp += static_cast<std::uint_fast8_t>(digits_to_remove);
+        exp += digits_to_remove;
+        unsigned_coeff_digits -= digits_to_remove;
+    }
+
+    // Round as required
+    if (reduced)
+    {
         exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
     }
 
@@ -1251,10 +1299,144 @@ constexpr decimal32_fast::operator detail::uint128_t() const noexcept
 
 #endif
 
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast::operator float() const noexcept
+{
+    return to_float<decimal32_fast, float>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast::operator double() const noexcept
+{
+    return to_float<decimal32_fast, double>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast::operator long double() const noexcept
+{
+    // TODO(mborland): Don't have an exact way of converting to various long doubles
+    return static_cast<long double>(to_float<decimal32_fast, double>(*this));
+}
+
+#ifdef BOOST_DECIMAL_HAS_FLOAT16
+constexpr decimal32_fast::operator std::float16_t() const noexcept
+{
+    return static_cast<std::float16_t>(to_float<decimal32_fast, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT32
+constexpr decimal32_fast::operator std::float32_t() const noexcept
+{
+    return static_cast<std::float32_t>(to_float<decimal32_fast, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT64
+constexpr decimal32_fast::operator std::float64_t() const noexcept
+{
+    return static_cast<std::float64_t>(to_float<decimal32_fast, double>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+constexpr decimal32_fast::operator std::bfloat16_t() const noexcept
+{
+    return static_cast<std::bfloat16_t>(to_float<decimal32_fast, float>(*this));
+}
+#endif
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
 constexpr decimal32_fast::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);
+}
+
+constexpr auto scalblnd32f(decimal32_fast num, long exp) noexcept -> decimal32_fast
+{
+    constexpr decimal32_fast zero {0, 0};
+
+    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    {
+        return num;
+    }
+
+    num = decimal32_fast(num.significand_, num.biased_exponent() + exp, num.sign_);
+
+    return num;
+}
+
+constexpr auto scalbnd32f(decimal32_fast num, int expval) noexcept -> decimal32_fast
+{
+    return scalblnd32f(num, static_cast<long>(expval));
+}
+
+constexpr auto copysignd32f(decimal32_fast mag, decimal32_fast sgn) noexcept -> decimal32_fast
+{
+    mag.sign_ = sgn.sign_;
+    return mag;
+}
+
+// Effects: determines if the quantum exponents of x and y are the same.
+// If both x and y are NaN, or infinity, they have the same quantum exponents;
+// if exactly one operand is infinity or exactly one operand is NaN, they do not have the same quantum exponents.
+// The samequantum functions raise no exception.
+constexpr auto samequantumd32f(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
+{
+    const auto lhs_fp {fpclassify(lhs)};
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if ((lhs_fp == FP_NAN && rhs_fp == FP_NAN) || (lhs_fp == FP_INFINITE && rhs_fp == FP_INFINITE))
+    {
+        return true;
+    }
+    if ((lhs_fp == FP_NAN || rhs_fp == FP_INFINITE) || (rhs_fp == FP_NAN || lhs_fp == FP_INFINITE))
+    {
+        return false;
+    }
+
+    return lhs.unbiased_exponent() == rhs.unbiased_exponent();
+}
+
+// Effects: if x is finite, returns its quantum exponent.
+// Otherwise, a domain error occurs and INT_MIN is returned.
+constexpr auto quantexpd32f(decimal32_fast x) noexcept -> int
+{
+    if (!isfinite(x))
+    {
+        return INT_MIN;
+    }
+
+    return static_cast<int>(x.unbiased_exponent());
+}
+
+// Returns: a number that is equal in value (except for any rounding) and sign to x,
+// and which has an exponent set to be equal to the exponent of y.
+// If the exponent is being increased, the value is correctly rounded according to the current rounding mode;
+// if the result does not have the same value as x, the "inexact" floating-point exception is raised.
+// If the exponent is being decreased and the significand of the result has more digits than the type would allow,
+// the "invalid" floating-point exception is raised and the result is NaN.
+// If one or both operands are NaN the result is NaN.
+// Otherwise, if only one operand is infinity, the "invalid" floating-point exception is raised and the result is NaN.
+// If both operands are infinity, the result is DEC_INFINITY, with the same sign as x, converted to the type of x.
+// The quantize functions do not signal underflow.
+constexpr auto quantized32f(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
+{
+    // Return the correct type of nan
+    if (isnan(lhs))
+    {
+        return lhs;
+    }
+    else if (isnan(rhs))
+    {
+        return rhs;
+    }
+
+    // If one is infinity then return a signaling NAN
+    if (isinf(lhs) != isinf(rhs))
+    {
+        return direct_init(detail::d32_fast_snan, UINT8_C(0));
+    }
+    else if (isinf(lhs) && isinf(rhs))
+    {
+        return lhs;
+    }
+
+    return {lhs.full_significand(), rhs.biased_exponent(), lhs.isneg()};
 }
 
 } // namespace decimal
@@ -1284,8 +1466,8 @@ struct numeric_limits<boost::decimal::decimal32_fast>
 
     // These members were deprecated in C++23
     #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_present;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = false;
     #endif
 
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_indeterminate;
@@ -1312,7 +1494,9 @@ struct numeric_limits<boost::decimal::decimal32_fast>
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::decimal32_fast { return boost::decimal::direct_init(boost::decimal::detail::d32_fast_inf, UINT8_C((0))); }
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::decimal32_fast { return boost::decimal::direct_init(boost::decimal::detail::d32_fast_qnan, UINT8_C((0))); }
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::decimal32_fast { return boost::decimal::direct_init(boost::decimal::detail::d32_fast_snan, UINT8_C((0))); }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::decimal32_fast { return {1, boost::decimal::detail::etiny}; }
+
+    // With denorm absent returns the same value as min
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::decimal32_fast { return {1, min_exponent}; }
 };
 
 } // Namespace std

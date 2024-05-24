@@ -125,6 +125,7 @@ int main()
 {
     test<decimal32>();
     test<decimal64>();
+    test<decimal32_fast>();
 
     spot_test(2.36174F, 0.427896F);
 

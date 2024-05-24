@@ -184,5 +184,7 @@ int main()
     test_asin<decimal128>();
     #endif
 
+    test_asin<decimal32_fast>();
+
     return boost::report_errors();
 }

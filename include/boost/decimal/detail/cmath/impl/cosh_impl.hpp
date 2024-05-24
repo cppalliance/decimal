@@ -29,6 +29,8 @@ private:
     using d64_coeffs_t  = std::array<decimal64,   9>;
     using d128_coeffs_t = std::array<decimal128, 17>;
 
+    using d32_fast_coeffs_t = std::array<decimal32_fast, 6>;
+
 public:
     static constexpr d32_coeffs_t d32_coeffs =
     {{
@@ -41,6 +43,18 @@ public:
          ::boost::decimal::decimal32 { UINT64_C(2755731922398589065), - 19 -  6 }, // * x^12
          ::boost::decimal::decimal32 { UINT64_C(2087675698786809898), - 19 -  8 }, // * x^12
     }};
+
+    static constexpr d32_fast_coeffs_t d32_fast_coeffs =
+    {{
+         // Series[Cosh[x], {x, 0, 12}]
+         //            (1),                                                        // * 1
+         ::boost::decimal::decimal32_fast { 5, -1 },                                    // * x^2
+         ::boost::decimal::decimal32_fast { UINT64_C(4166666666666666667), - 19 -  1 }, // * x^6
+         ::boost::decimal::decimal32_fast { UINT64_C(1388888888888888889), - 19 -  2 }, // * x^8
+         ::boost::decimal::decimal32_fast { UINT64_C(2480158730158730159), - 19 -  4 }, // * x^10
+         ::boost::decimal::decimal32_fast { UINT64_C(2755731922398589065), - 19 -  6 }, // * x^12
+         ::boost::decimal::decimal32_fast { UINT64_C(2087675698786809898), - 19 -  8 }, // * x^12
+     }};
 
     static constexpr d64_coeffs_t d64_coeffs =
     {{
@@ -92,6 +106,9 @@ constexpr typename cosh_table_imp<b>::d64_coeffs_t cosh_table_imp<b>::d64_coeffs
 template <bool b>
 constexpr typename cosh_table_imp<b>::d128_coeffs_t cosh_table_imp<b>::d128_coeffs;
 
+template <bool b>
+constexpr typename cosh_table_imp<b>::d32_fast_coeffs_t cosh_table_imp<b>::d32_fast_coeffs;
+
 #endif
 
 } //namespace cosh_detail
@@ -117,6 +134,12 @@ template <>
 constexpr auto cosh_series_expansion<decimal128>(decimal128 z2) noexcept
 {
     return taylor_series_result(z2, cosh_table::d128_coeffs);
+}
+
+template <>
+constexpr auto cosh_series_expansion<decimal32_fast>(decimal32_fast z2) noexcept
+{
+    return taylor_series_result(z2, cosh_table::d32_fast_coeffs);
 }
 
 } //namespace detail

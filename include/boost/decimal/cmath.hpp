@@ -70,6 +70,7 @@
 #include <boost/decimal/detail/cmath/legendre.hpp>
 #include <boost/decimal/detail/cmath/assoc_legendre.hpp>
 #include <boost/decimal/detail/cmath/ellint_1.hpp>
+#include <boost/decimal/detail/cmath/trunc_to.hpp>
 #include <boost/decimal/numbers.hpp>
 
 // Macros from 3.6.2
@@ -84,9 +85,16 @@
 namespace boost {
 namespace decimal {
 
+// Overloads for all the functions that are implemented individually as friends
+
 BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal32 num, int expval) noexcept -> decimal32
 {
     return scalbnd32(num, expval);
+}
+
+BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal32_fast num, int expval) noexcept -> decimal32_fast
+{
+    return scalbnd32f(num, expval);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal64 num, int expval) noexcept -> decimal64
@@ -104,6 +112,11 @@ BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal32 num, long expval) noexcept
     return scalblnd32(num, expval);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal32_fast num, long expval) noexcept -> decimal32_fast
+{
+    return scalblnd32f(num, expval);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal64 num, long expval) noexcept -> decimal64
 {
     return scalblnd64(num, expval);
@@ -117,6 +130,11 @@ BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal128 num, long expval) noexcep
 BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 {
     return copysignd32(mag, sgn);
+}
+
+BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal32_fast mag, decimal32_fast sgn) noexcept -> decimal32_fast
+{
+    return copysignd32f(mag, sgn);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal64 mag, decimal64 sgn) noexcept -> decimal64
@@ -134,6 +152,11 @@ BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal32 lhs, decimal32 rhs) no
     return samequantumd32(lhs, rhs);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
+{
+    return samequantumd32f(lhs, rhs);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal64 lhs, decimal64 rhs) noexcept -> bool
 {
     return samequantumd64(lhs, rhs);
@@ -149,6 +172,11 @@ BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal32 x) noexcept -> int
     return quantexpd32(x);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal32_fast x) noexcept -> int
+{
+    return quantexpd32f(x);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal64 x) noexcept -> int
 {
     return quantexpd64(x);
@@ -162,6 +190,11 @@ BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal128 x) noexcept -> int
 BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     return quantized32(lhs, rhs);
+}
+
+BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
+{
+    return quantized32f(lhs, rhs);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal64 lhs, decimal64 rhs) noexcept -> decimal64

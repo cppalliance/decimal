@@ -352,26 +352,26 @@ constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
            (x >= digits_23) ? 23 :
            (x >= digits_22) ? 22 :
            (x >= digits_21) ? 21 :
-           (x >= powers_of_10[19]) ? 20 :
-           (x >= powers_of_10[18]) ? 19 :
-           (x >= powers_of_10[17]) ? 18 :
-           (x >= powers_of_10[16]) ? 17 :
-           (x >= powers_of_10[15]) ? 16 :
-           (x >= powers_of_10[14]) ? 15 :
-           (x >= powers_of_10[13]) ? 14 :
-           (x >= powers_of_10[12]) ? 13 :
-           (x >= powers_of_10[11]) ? 12 :
-           (x >= powers_of_10[10]) ? 11 :
-           (x >= powers_of_10[9])  ? 10 :
-           (x >= powers_of_10[8])  ?  9 :
-           (x >= powers_of_10[7])  ?  8 :
-           (x >= powers_of_10[6])  ?  7 :
-           (x >= powers_of_10[5])  ?  6 :
-           (x >= powers_of_10[4])  ?  5 :
-           (x >= powers_of_10[3])  ?  4 :
-           (x >= powers_of_10[2])  ?  3 :
-           (x >= powers_of_10[1])  ?  2 :
-           (x >= powers_of_10[0])  ?  1 : 0;
+           (x >= impl::powers_of_10[19]) ? 20 :
+           (x >= impl::powers_of_10[18]) ? 19 :
+           (x >= impl::powers_of_10[17]) ? 18 :
+           (x >= impl::powers_of_10[16]) ? 17 :
+           (x >= impl::powers_of_10[15]) ? 16 :
+           (x >= impl::powers_of_10[14]) ? 15 :
+           (x >= impl::powers_of_10[13]) ? 14 :
+           (x >= impl::powers_of_10[12]) ? 13 :
+           (x >= impl::powers_of_10[11]) ? 12 :
+           (x >= impl::powers_of_10[10]) ? 11 :
+           (x >= impl::powers_of_10[9])  ? 10 :
+           (x >= impl::powers_of_10[8])  ?  9 :
+           (x >= impl::powers_of_10[7])  ?  8 :
+           (x >= impl::powers_of_10[6])  ?  7 :
+           (x >= impl::powers_of_10[5])  ?  6 :
+           (x >= impl::powers_of_10[4])  ?  5 :
+           (x >= impl::powers_of_10[3])  ?  4 :
+           (x >= impl::powers_of_10[2])  ?  3 :
+           (x >= impl::powers_of_10[1])  ?  2 :
+           (x >= impl::powers_of_10[0])  ?  1 : 0;
 }
 
 #endif // constexpr arrays
