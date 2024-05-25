@@ -6,11 +6,15 @@
 #ifndef BOOST_DECIMAL_DETAIL_CMATH_RIEMANN_ZETA_HPP
 #define BOOST_DECIMAL_DETAIL_CMATH_RIEMANN_ZETA_HPP
 
-#include <boost/decimal/fwd.hpp>
-#include <boost/decimal/detail/type_traits.hpp>
-#include <boost/decimal/detail/concepts.hpp>
-#include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
+#include <boost/decimal/detail/cmath/impl/riemann_zeta_impl.hpp>
+#include <boost/decimal/detail/cmath/log10.hpp>
+#include <boost/decimal/detail/cmath/pow.hpp>
+#include <boost/decimal/detail/cmath/sin.hpp>
+#include <boost/decimal/detail/cmath/tgamma.hpp>
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/numbers.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
@@ -30,6 +34,8 @@ constexpr auto riemann_zeta_impl(T x) noexcept
 
     constexpr T one  { 1, 0 };
 
+    const bool is_neg { signbit(x) };
+
     T result { };
 
     if (fpc == FP_ZERO)
@@ -40,7 +46,7 @@ constexpr auto riemann_zeta_impl(T x) noexcept
     {
         if (fpc == FP_INFINITE)
         {
-            result = (signbit(x) ? -std::numeric_limits<T>::infinity() : one);
+            result = (is_neg ? -std::numeric_limits<T>::infinity() : one);
         }
         else
         {
@@ -49,8 +55,135 @@ constexpr auto riemann_zeta_impl(T x) noexcept
     }
     else
     {
-        // TODO(ckormanyos) Implement the Riemann-zeta function.
-        result = T { 0 };
+        if (is_neg)
+        {
+            // Handle Riemann-zeta reflection.
+            const T two_pi_term = pow(numbers::pi_v<T> * 2, x) / numbers::pi_v<T>;
+            const T chi         = (two_pi_term * sin((numbers::pi_v<T> * x) / 2)) * tgamma(one - x);
+
+            result = chi * riemann_zeta(one - x);
+        }
+        else
+        {
+            constexpr int asymp_cutoff
+            {
+                  std::numeric_limits<T>::digits10 < 10 ? T {  2, 1 } //  20
+                : std::numeric_limits<T>::digits10 < 20 ? T {  5, 1 } //  50
+                :                                         T { 15, 1 } // 150
+            };
+
+            if(x > asymp_cutoff)
+            {
+                result = one;
+            }
+            else if(x > T { 99, -2 } && x < T { 101, -2 })
+            {
+                if(x > one || x < one)
+                {
+                    // Use a Taylor series near the discontinuity at x=1.
+
+                    const T dx { x - one };
+
+                    result = one / dx + detail::riemann_zeta_series_expansion(dx);
+                }
+                else
+                {
+                    result = std::numeric_limits<T>::quiet_NaN();
+                }
+            }
+            else
+            {
+                // Test the conditions for the expansion of the product of primes. Set up a
+                // test for the product of primes. The expansion in the product of primes can
+                // be used if the number of prime-power terms remains reasonably small.
+                // This test for being reasonably "small" is checked in relation
+                // to the precision of the type and the size of primes available in the table.
+
+                using prime_table_type = detail::prime_table_t<T>;
+
+                constexpr std::size_t n_primes = std::tuple_size<prime_table_type>::value;
+
+                constexpr T lg10_max_prime { log10(detail::prime_table<T>::primes[n_primes - 1U]) };
+
+                if((x * lg10_max_prime) > std::numeric_limits<T>::digits10)
+                {
+                    // Perform the product of primes.
+                    result = one;
+
+                    for(std::size_t p = static_cast<std::size_t>(UINT8_C(0)); p < n_primes; ++p)
+                    {
+                      const T prime_p_pow_s = pow(detail::prime_table<T>::primes[p], x);
+
+                      const T pps_term { prime_p_pow_s / (prime_p_pow_s - one) };
+
+                      if((pps_term - one) < std::numeric_limits<T>::epsilon())
+                      {
+                        break;
+                      }
+
+                      result *= pps_term;
+                    }
+                }
+                else
+                {
+                    // Use the accelerated alternating converging series for Zeta as shown in:
+                    // http://numbers.computation.free.fr/Constants/Miscellaneous/zetaevaluations.html
+                    // taken from P. Borwein, "An Efficient Algorithm for the Riemann Zeta Function",
+                    // January 1995.
+
+                    // Compute the coefficients dk in a loop and calculate the zeta function sum
+                    // within the same loop on the fly.
+
+                    // Set up the factorials and powers for the calculation of the coefficients dk.
+                    // Note that j = n at this stage in the calculation. Also note that the value of
+                    // dn is equal to the value of d0 at the end of the loop.
+
+                    // Use N = (digits * 1.45) + {|imag(s)| * 1.1}
+                    constexpr int nd { static_cast<int>(std::numeric_limits<T>::digits10 * 1.5F) };
+
+                    bool neg_term = ((nd % 2) == 0);
+
+                    T n_plus_j_minus_one_fact = riemann_zeta_factorial<T>((nd + nd) - 1);
+                    T four_pow_j              = pow(T { 4 }, nd);
+                    T n_minus_j_fact          = one;
+                    T two_j_fact              = n_plus_j_minus_one_fact * (2 * nd);
+
+                    T dn = (n_plus_j_minus_one_fact * four_pow_j) / (n_minus_j_fact * two_j_fact);
+
+                    T jps = pow(T { nd }, x);
+
+                    result = ((!neg_term) ? dn : -dn) / jps;
+
+                    for(auto j = nd - 1; j >= 0; --j)
+                    {
+                      const bool j_is_zero = (j == 0);
+
+                      const int two_jp1_two_j = ((2 * j) + 1) * (2 * ((!j_is_zero) ? j : 1));
+
+                      n_plus_j_minus_one_fact /= (nd + j);
+                      four_pow_j              /= 4;
+                      n_minus_j_fact          *= (nd - j);
+                      two_j_fact              /= two_jp1_two_j;
+
+                      dn += ((n_plus_j_minus_one_fact * four_pow_j) / (n_minus_j_fact * two_j_fact));
+
+                      if(!j_is_zero)
+                      {
+                        // Increment the zeta function sum.
+                        jps = pow(T { j }, x);
+
+                        neg_term = (!neg_term);
+
+                        result += ((!neg_term) ? dn : -dn) / jps;
+                      }
+                    }
+
+                    const T two_pow_one_minus_s { pow(T { 2 }, one - x) };
+
+                    result /= (dn * (one - two_pow_one_minus_s));
+                }
+            }
+        }
     }
 
     return result;

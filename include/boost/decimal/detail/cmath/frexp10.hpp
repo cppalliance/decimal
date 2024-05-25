@@ -21,8 +21,9 @@ namespace boost {
 namespace decimal {
 
 // Returns the normalized significand and exponent to be cohort agnostic
-// Returns num in the range [1'000'000, 9'999'999]
-//
+// Returns num in the range
+//   [1e06, 1e06 - 1] for decimal32
+//   [1e15, 1e15 - 1] for decimal64
 // If the conversion can not be performed returns UINT32_MAX and exp = 0
 BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type
