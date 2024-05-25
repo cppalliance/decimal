@@ -152,7 +152,7 @@ constexpr auto riemann_zeta_series_expansion<decimal128>(decimal128 x) noexcept
 }
 
 template<typename T>
-using prime_table_t = riemann_zeta_detail::prime_table_imp<true, T>::prime_table_t;
+using prime_table_t = typename riemann_zeta_detail::prime_table_imp<true, T>::prime_table_t;
 
 template<typename T>
 using prime_table = riemann_zeta_detail::prime_table_imp<true, T>;
