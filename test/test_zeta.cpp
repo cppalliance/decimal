@@ -105,7 +105,7 @@ namespace local
     auto dis_r =
       std::uniform_real_distribution<float_type>
       {
-        static_cast<float_type>(1.001L),
+        static_cast<float_type>(1.005L),
         static_cast<float_type>(12.3)
       };
 
