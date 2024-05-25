@@ -189,7 +189,7 @@ int main()
     {
         using decimal_type = ::boost::decimal::decimal32;
 
-        const bool result_rz32_is_ok = local::test_riemann_zeta<decimal_type, float>(768);
+        const bool result_rz32_is_ok = local::test_riemann_zeta<decimal_type, float>(2048);
 
         result_is_ok = (result_rz32_is_ok && result_is_ok);
 
@@ -199,7 +199,7 @@ int main()
     {
         using decimal_type = ::boost::decimal::decimal64;
 
-        const bool result_rz64_is_ok = local::test_riemann_zeta<decimal_type, double>(2048);
+        const bool result_rz64_is_ok = local::test_riemann_zeta<decimal_type, double>(8192);
 
         result_is_ok = (result_rz64_is_ok && result_is_ok);
 
