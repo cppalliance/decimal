@@ -92,7 +92,7 @@ namespace local
   }
 
   template<typename DecimalType, typename FloatType>
-  auto test_riemann_zeta(const int tol_factor) -> bool
+  auto test_riemann_zeta(const int tol_factor, const long double range_lo, const long double range_hi) -> bool
   {
     using decimal_type = DecimalType;
     using float_type   = FloatType;
@@ -102,11 +102,11 @@ namespace local
 
     gen.seed(time_point<typename std::mt19937_64::result_type>());
 
-    auto dis_r =
+    auto dis =
       std::uniform_real_distribution<float_type>
       {
-        static_cast<float_type>(1.005L),
-        static_cast<float_type>(12.3)
+        static_cast<float_type>(range_lo),
+        static_cast<float_type>(range_hi)
       };
 
     bool result_is_ok { true };
@@ -121,7 +121,7 @@ namespace local
 
     for( ; trials < count; ++trials)
     {
-      const auto x_flt = dis_r(gen);
+      const auto x_flt = dis(gen);
       const auto x_dec = static_cast<decimal_type>(x_flt);
 
       const auto val_flt = boost::math::zeta(x_flt);
@@ -180,41 +180,185 @@ auto test_riemann_zeta_edge() -> void
   }
 }
 
+auto test_riemann_zeta_128_lo(const int tol_factor) -> bool
+{
+  using decimal_type = boost::decimal::decimal128;
+
+  using str_ctrl_array_type = std::array<const char*, 3U>;
+
+  const str_ctrl_array_type ctrl_strings =
+  {{
+      // Table[N[Zeta[1 + n/1000], 36], {n, 5, 7, 1}]
+      "200.577579622956683652084654605524346",
+      "167.244319052140751595350397994287573",
+      "143.434867995431699170218293588670480",
+  }};
+
+  std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> rz_values   { };
+  std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
+
+  int nx { 5 };
+
+  bool result_is_ok { true };
+
+  const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+  for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
+  {
+    const decimal_type x_arg =
+      decimal_type
+      {
+          decimal_type { 1 }
+        + decimal_type { nx, -3 }
+      };
+
+      ++nx;
+
+      rz_values[i] = riemann_zeta(x_arg);
+
+      static_cast<void>
+      (
+        from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+      );
+
+    const auto result_rz_is_ok = is_close_fraction(rz_values[i], ctrl_values[i], my_tol);
+
+    result_is_ok = (result_rz_is_ok && result_is_ok);
+  }
+
+  return result_is_ok;
+}
+
+auto test_riemann_zeta_128_hi(const int tol_factor) -> bool
+{
+  using decimal_type = boost::decimal::decimal128;
+
+  using str_ctrl_array_type = std::array<const char*, 9U>;
+
+  const str_ctrl_array_type ctrl_strings =
+  {{
+      // Table[N[Zeta[n + n/10], 36], {n, 1, 9, 1}]
+      "10.5844484649508098263864007917355230",
+      "1.49054325650689350825344649551165452",
+      "1.15194479472077368855082683374115056",
+      "1.05928172597983541766404502818685201",
+      "1.02520457995468569459240582819540529",
+      "1.01116101415427096427312532266653516",
+      "1.00504987929596499812178165124883599",
+      "1.00231277790982194674469422849347780",
+      "1.00106679698357801585766465214764188",
+  }};
+
+  std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> rz_values   { };
+  std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
+
+  int nx { 1 };
+
+  bool result_is_ok { true };
+
+  const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+  for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
+  {
+    const decimal_type x_arg =
+      decimal_type
+      {
+          decimal_type { nx }
+        + decimal_type { nx, -1 }
+      };
+
+      ++nx;
+
+      rz_values[i] = riemann_zeta(x_arg);
+
+      static_cast<void>
+      (
+        from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+      );
+
+    const auto result_rz_is_ok = is_close_fraction(rz_values[i], ctrl_values[i], my_tol);
+
+    result_is_ok = (result_rz_is_ok && result_is_ok);
+  }
+
+  return result_is_ok;
+}
+
 } // namespace local
 
 int main()
 {
-    bool result_is_ok { true };
+  bool result_is_ok { true };
 
-    {
-        using decimal_type = ::boost::decimal::decimal32;
+  {
+      using decimal_type = ::boost::decimal::decimal32;
 
-        const bool result_rz32_is_ok = local::test_riemann_zeta<decimal_type, float>(2048);
+      const bool result_rz32_is_ok = local::test_riemann_zeta<decimal_type, float>(128, 1.1L, 5.6L);
 
-        result_is_ok = (result_rz32_is_ok && result_is_ok);
+      result_is_ok = (result_rz32_is_ok && result_is_ok);
 
-        BOOST_TEST(result_is_ok);
-    }
+      BOOST_TEST(result_is_ok);
+  }
 
-    {
-        using decimal_type = ::boost::decimal::decimal64;
+  {
+      using decimal_type = ::boost::decimal::decimal32;
 
-        const bool result_rz64_is_ok = local::test_riemann_zeta<decimal_type, double>(8192);
+      const bool result_rz32_is_ok = local::test_riemann_zeta<decimal_type, float>(1024, 1.005L, 1.1L);
 
-        result_is_ok = (result_rz64_is_ok && result_is_ok);
+      result_is_ok = (result_rz32_is_ok && result_is_ok);
 
-        BOOST_TEST(result_is_ok);
-    }
+      BOOST_TEST(result_is_ok);
+  }
 
-    {
-        using decimal_type = ::boost::decimal::decimal32;
+  {
+      using decimal_type = ::boost::decimal::decimal32;
 
-        local::test_riemann_zeta_edge<decimal_type, float>();
+      const bool result_rz32_is_ok = local::test_riemann_zeta<decimal_type, float>(512, -3.6L, -2.3L);
 
-        BOOST_TEST(result_is_ok);
-    }
+      result_is_ok = (result_rz32_is_ok && result_is_ok);
 
-    static_cast<void>(result_is_ok);
+      BOOST_TEST(result_is_ok);
+  }
 
-    return boost::report_errors();
+  {
+      using decimal_type = ::boost::decimal::decimal64;
+
+      const bool result_rz64_is_ok = local::test_riemann_zeta<decimal_type, double>(256, 1.1L, 12.3L);
+
+      result_is_ok = (result_rz64_is_ok && result_is_ok);
+
+      BOOST_TEST(result_is_ok);
+  }
+
+  {
+      using decimal_type = ::boost::decimal::decimal64;
+
+      const bool result_rz64_is_ok = local::test_riemann_zeta<decimal_type, double>(1024, 1.005L, 1.1L);
+
+      result_is_ok = (result_rz64_is_ok && result_is_ok);
+
+      BOOST_TEST(result_is_ok);
+  }
+
+  {
+      using decimal_type = ::boost::decimal::decimal32;
+
+      local::test_riemann_zeta_edge<decimal_type, float>();
+
+      BOOST_TEST(result_is_ok);
+  }
+
+  {
+    const auto result_rz_128_lo_is_ok   = local::test_riemann_zeta_128_lo(4096);
+    const auto result_rz_128_hi_is_ok   = local::test_riemann_zeta_128_hi(4096);
+
+    BOOST_TEST(result_rz_128_lo_is_ok);
+    BOOST_TEST(result_rz_128_hi_is_ok);
+
+    result_is_ok = (result_rz_128_lo_is_ok && result_rz_128_hi_is_ok && result_is_ok);
+  }
+
+  result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
+
+  return (result_is_ok ? 0 : -1);
 }

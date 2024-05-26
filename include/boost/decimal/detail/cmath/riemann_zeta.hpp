@@ -58,10 +58,12 @@ constexpr auto riemann_zeta_impl(T x) noexcept
         if (is_neg)
         {
             // Handle Riemann-zeta reflection.
-            const T two_pi_term = pow(numbers::pi_v<T> * 2, x) / numbers::pi_v<T>;
-            const T chi         = (two_pi_term * sin((numbers::pi_v<T> * x) / 2)) * tgamma(one - x);
 
-            result = chi * riemann_zeta(one - x);
+            const T dmx         { one - x };
+            const T two_pi_term { pow(numbers::pi_v<T> * 2, x) / numbers::pi_v<T> };
+            const T chi         { (two_pi_term * sin((numbers::pi_v<T> * x) / 2)) * tgamma(dmx) };
+
+            result = chi * riemann_zeta(dmx);
         }
         else
         {
@@ -74,20 +76,24 @@ constexpr auto riemann_zeta_impl(T x) noexcept
 
             if(x > asymp_cutoff)
             {
+                // Check the argument is large and then simply return 1.
+
                 result = one;
             }
-            else if(x > T { 99, -2 } && x < T { 101, -2 })
+            else if((x > T { 99, -2 }) && (x < T { 101, -2 }))
             {
-                if(x > one || x < one)
+                if((x > one) || (x < one))
                 {
                     // Use a Taylor series near the discontinuity at x=1.
 
                     const T dx { x - one };
 
-                    result = one / dx + detail::riemann_zeta_series_expansion(dx);
+                    result = (one / dx) + detail::riemann_zeta_series_expansion(dx);
                 }
                 else
                 {
+                    // The argument is exaclty one. The result is complex-infinity.
+
                     result = std::numeric_limits<T>::quiet_NaN();
                 }
             }
@@ -103,7 +109,7 @@ constexpr auto riemann_zeta_impl(T x) noexcept
 
                 constexpr std::size_t n_primes = std::tuple_size<prime_table_type>::value;
 
-                constexpr T lg10_max_prime { log10(detail::prime_table<T>::primes[n_primes - 1U]) };
+                const T lg10_max_prime { log10(detail::prime_table<T>::primes[n_primes - 1U]) };
 
                 if((x * lg10_max_prime) > std::numeric_limits<T>::digits10)
                 {
@@ -138,12 +144,15 @@ constexpr auto riemann_zeta_impl(T x) noexcept
                     // Note that j = n at this stage in the calculation. Also note that the value of
                     // dn is equal to the value of d0 at the end of the loop.
 
-                    // Use N = (digits * 1.45) + {|imag(s)| * 1.1}
+                    // Use nd = (digits * 1.45) + {|imag(s)| * 1.1}
+                    // Here we have, however, only real valued arguments so this
+                    // is streamlined a tad. Also instead of 1.45, we simply use 1.5.
+
                     constexpr int nd { static_cast<int>(std::numeric_limits<T>::digits10 * 1.5F) };
 
-                    bool neg_term = ((nd % 2) == 0);
+                    bool neg_term { (nd % 2) == 0 };
 
-                    T n_plus_j_minus_one_fact = riemann_zeta_factorial<T>((nd + nd) - 1);
+                    T n_plus_j_minus_one_fact = riemann_zeta_factorial<T>(2 * nd - 1);
                     T four_pow_j              = pow(T { 4 }, nd);
                     T n_minus_j_fact          = one;
                     T two_j_fact              = n_plus_j_minus_one_fact * (2 * nd);
@@ -156,9 +165,9 @@ constexpr auto riemann_zeta_impl(T x) noexcept
 
                     for(auto j = nd - 1; j >= 0; --j)
                     {
-                      const bool j_is_zero = (j == 0);
+                      const bool j_is_zero { j == 0 };
 
-                      const int two_jp1_two_j = ((2 * j) + 1) * (2 * ((!j_is_zero) ? j : 1));
+                      const int two_jp1_two_j { ((2 * j) + 1) * (2 * ((!j_is_zero) ? j : 1)) };
 
                       n_plus_j_minus_one_fact /= (nd + j);
                       four_pow_j              /= 4;
