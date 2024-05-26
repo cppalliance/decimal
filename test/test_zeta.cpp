@@ -33,6 +33,10 @@
 #include <iostream>
 #include <random>
 
+template<typename DecimalType> auto my_zero() -> DecimalType&;
+template<typename DecimalType> auto my_nan () -> DecimalType&;
+template<typename DecimalType> auto my_inf () -> DecimalType&;
+
 namespace local
 {
   template<typename IntegralTimePointType,
@@ -149,13 +153,17 @@ namespace local
   }
 
 template<typename DecimalType, typename FloatType>
-auto test_riemann_zeta_edge() -> void
+auto test_riemann_zeta_edge() -> bool
 {
   using decimal_type = DecimalType;
   using float_type   = FloatType;
 
+  bool result_is_ok { true };
+
   {
     std::mt19937_64 gen;
+
+    gen.seed(time_point<typename std::mt19937_64::result_type>());
 
     std::uniform_real_distribution<float_type> dist(static_cast<float_type>(1.1L), static_cast<float_type>(101.1L));
 
@@ -163,21 +171,37 @@ auto test_riemann_zeta_edge() -> void
     {
       static_cast<void>(i);
 
-      const decimal_type inf  { std::numeric_limits<decimal_type>::infinity() * static_cast<int>(dist(gen)) };
-      const decimal_type nan  { std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<int>(dist(gen)) };
-      const decimal_type zero { decimal_type { 0 } * static_cast<int>(dist(gen)) };
+      {
+        const decimal_type inf  { ::my_inf <decimal_type>() * decimal_type(dist(gen)) };
 
-      BOOST_TEST_EQ(riemann_zeta(inf), decimal_type { 1 } );
-      BOOST_TEST   (isinf(riemann_zeta(-inf)) && signbit(riemann_zeta(-inf)));
-      BOOST_TEST   (isnan(riemann_zeta(nan)));
-      BOOST_TEST   (isnan(riemann_zeta(-nan)));
-      BOOST_TEST   (isnan(riemann_zeta(decimal_type { 1 })));
+        bool result_inf_is_ok { };
 
-      const decimal_type minus_half { -5, -1 };
+        result_inf_is_ok = (riemann_zeta(inf) == decimal_type { 1 } ); result_is_ok = (result_inf_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
+        result_inf_is_ok = (   isinf(riemann_zeta(-inf))
+                            && signbit(riemann_zeta(-inf)));           result_is_ok = (result_inf_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
+      }
 
-      BOOST_TEST_EQ(riemann_zeta(zero), minus_half);
+      {
+        const decimal_type nan  { ::my_nan <decimal_type>() * decimal_type(dist(gen)) };
+
+        bool result_nan_is_ok { };
+
+        result_nan_is_ok = (isnan(riemann_zeta(nan)));                 result_is_ok = (result_nan_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
+        result_nan_is_ok = (isnan(riemann_zeta(-nan)));                result_is_ok = (result_nan_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
+        result_nan_is_ok = (isnan(riemann_zeta(decimal_type { 1 })));  result_is_ok = (result_nan_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
+      }
+
+      {
+        const decimal_type zero { ::my_zero<decimal_type>() * decimal_type(dist(gen)) };
+
+        const decimal_type minus_half { -5, -1 };
+
+        const bool result_zero_is_ok = (riemann_zeta(zero) == minus_half); result_is_ok = (result_zero_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
+      }
     }
   }
+
+  return result_is_ok;
 }
 
 auto test_riemann_zeta_128_lo(const int tol_factor) -> bool
@@ -293,6 +317,15 @@ int main()
   {
       using decimal_type = ::boost::decimal::decimal32;
 
+      const bool result_edge_is_ok = local::test_riemann_zeta_edge<decimal_type, float>();
+
+      result_is_ok = (result_edge_is_ok && result_is_ok);
+
+      BOOST_TEST(result_is_ok);
+  }
+  {
+      using decimal_type = ::boost::decimal::decimal32;
+
       const bool result_rz32_is_ok = local::test_riemann_zeta<decimal_type, float>(128, 1.1L, 5.6L);
 
       result_is_ok = (result_rz32_is_ok && result_is_ok);
@@ -341,14 +374,6 @@ int main()
   }
 
   {
-      using decimal_type = ::boost::decimal::decimal32;
-
-      local::test_riemann_zeta_edge<decimal_type, float>();
-
-      BOOST_TEST(result_is_ok);
-  }
-
-  {
     const auto result_rz_128_lo_is_ok   = local::test_riemann_zeta_128_lo(4096);
     const auto result_rz_128_hi_is_ok   = local::test_riemann_zeta_128_hi(4096);
 
@@ -362,3 +387,7 @@ int main()
 
   return (result_is_ok ? 0 : -1);
 }
+
+template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_zero { 0 }; return val_zero; }
+template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_nan  { std::numeric_limits<decimal_type>::quiet_NaN() }; return val_nan; }
+template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_inf  { std::numeric_limits<decimal_type>::infinity() }; return val_inf; }
