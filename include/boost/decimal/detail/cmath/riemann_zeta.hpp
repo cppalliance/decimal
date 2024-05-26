@@ -44,14 +44,7 @@ constexpr auto riemann_zeta_impl(T x) noexcept
     }
     else if (fpc != FP_NORMAL)
     {
-        if (fpc == FP_INFINITE)
-        {
-            result = (is_neg ? -std::numeric_limits<T>::infinity() : one);
-        }
-        else
-        {
-            result = x;
-        }
+        result = ((fpc == FP_INFINITE) ? (is_neg ? -std::numeric_limits<T>::infinity() : one) : x);
     }
     else
     {

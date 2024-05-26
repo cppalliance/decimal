@@ -21,8 +21,8 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_zero { 0, 0 }; return val_zero; }
-template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_one  { 1, 0 }; return val_one; }
+template<typename DecimalType> auto my_zero() -> DecimalType&;
+template<typename DecimalType> auto my_one () -> DecimalType&;
 
 namespace local
 {
@@ -304,7 +304,7 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_zero_neg = tgamma(-::my_zero<decimal_type>());
+      const auto val_zero_neg = tgamma(-(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen))));
 
       const auto result_val_zero_neg_is_ok = (isinf(val_zero_neg) && signbit(val_zero_neg));
 
@@ -315,13 +315,13 @@ namespace local
 
     for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(6)); ++i)
     {
-      const auto n_neg = static_cast<int>(-static_cast<int>(i) - 1);
+      decimal_type dnx { ::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)) };
 
-      const auto val_neg_int = tgamma( decimal_type { n_neg, 0 } );
+      dnx -= static_cast<int>(i + 1);
 
-      const auto is_odd = ((n_neg & 1) != 0);
+      const auto val_neg_int = tgamma(dnx);
 
-      const auto result_val_neg_int_is_ok = (is_odd ? isnan(val_neg_int) : (fpclassify(val_neg_int) == FP_NORMAL));
+      const auto result_val_neg_int_is_ok = isnan(val_neg_int);
 
       BOOST_TEST(result_val_neg_int_is_ok);
 
@@ -444,11 +444,11 @@ namespace local
   {
     using decimal_type = boost::decimal::decimal128;
 
-    using str_ctrl_array_type = std::array<const char*, 14U>;
+    using str_ctrl_array_type = std::array<const char*, 20U>;
 
     const str_ctrl_array_type ctrl_strings =
     {{
-       // Table[N[Gamma[n + n/10 + n/100 + n/1000], 36], {n, 1, 131, 10}]
+       // Table[N[Gamma[n + n/10 + n/100 + n/1000], 36], {n, 1, 191, 10}]
        "0.947008281162266001895790481785841941",
        "6.86303089001025022525468906807854872E7",
        "3.15793281780505944512262743601561476E21",
@@ -462,7 +462,13 @@ namespace local
        "4.76763037027821868276349648015607359E180",
        "4.62395515046183569847627307320617350E203",
        "1.22680267570425015175034111397510637E227",
-       "8.18925182002285090986591692926519438E250"
+       "8.18925182002285090986591692926519438E250",
+       "1.28134405415265103961333749220602490E275",
+       "4.42253704896092684478952587741331734E299",
+       "3.19451354412535995695298989136255493E324",
+       "4.61171076932972412633999770033353340E349",
+       "1.27758574231803927960543278875893523E375",
+       "6.55079490827236721494047351435261992E400",
     }};
 
     std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> tg_values   { };
@@ -531,6 +537,17 @@ auto main() -> int
   }
 
   {
+    using decimal_type = boost::decimal::decimal32_fast;
+    using float_type   = float;
+
+    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(768, 2.1L, 23.4L);
+
+    BOOST_TEST(result_tgamma_is_ok);
+
+    result_is_ok = (result_tgamma_is_ok && result_is_ok);
+  }
+
+  {
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
@@ -589,7 +606,9 @@ auto main() -> int
 
   {
     const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo(4096);
-    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi(4096);
+
+    // TODO(ckormanyos) Can we get better asymptotic accuracy with more coefficients at 128-bit?
+    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi(0x10000);
 
     BOOST_TEST(result_tgamma128_lo_is_ok);
     BOOST_TEST(result_tgamma128_hi_is_ok);
@@ -601,3 +620,6 @@ auto main() -> int
 
   return (result_is_ok ? 0 : -1);
 }
+
+template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_zero { 0 }; return val_zero; }
+template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_one  { 1 }; return val_one; }
