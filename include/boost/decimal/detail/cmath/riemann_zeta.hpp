@@ -80,7 +80,7 @@ constexpr auto riemann_zeta_impl(T x) noexcept
 
                 result = one;
             }
-            else if((x > T { 99, -2 }) && (x < T { 101, -2 }))
+            else if((x > T { 9, -1 }) && (x < T { 11, -1 }))
             {
                 if((x > one) || (x < one))
                 {

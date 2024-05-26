@@ -48,10 +48,38 @@ template <bool b>
 struct riemann_zeta_table_imp
 {
 private:
-    using d64_coeffs_t  = std::array<decimal64,  10>;
-    using d128_coeffs_t = std::array<decimal128, 15>;
+    using d32_coeffs_t      = std::array<decimal32,        7>;
+    using d32_fast_coeffs_t = std::array<decimal32_fast,   7>;
+    using d64_coeffs_t      = std::array<decimal64,       10>;
+    using d128_coeffs_t     = std::array<decimal128,      15>;
 
 public:
+    static constexpr d32_coeffs_t d32_coeffs =
+    {{
+        // N[Series[Zeta[x], {x, 1, 6}], 19]
+
+        +::boost::decimal::decimal32 { UINT64_C(5772156649015328606), - 19 -  0 }, // EulerGamma
+        +::boost::decimal::decimal32 { UINT64_C(7281584548367672486), - 19 -  1 }, // * (x - 1)
+        -::boost::decimal::decimal32 { UINT64_C(4845181596436159242), - 19 -  2 }, // * (x - 1)^2
+        -::boost::decimal::decimal32 { UINT64_C(3423057367172243110), - 19 -  3 }, // * (x - 1)^3
+        +::boost::decimal::decimal32 { UINT64_C(9689041939447083573), - 19 -  4 }, // * (x - 1)^4
+        -::boost::decimal::decimal32 { UINT64_C(6611031810842189181), - 19 -  5 }, // * (x - 1)^5
+        -::boost::decimal::decimal32 { UINT64_C(3316240908752772359), - 19 -  6 }, // * (x - 1)^6
+     }};
+
+    static constexpr d32_fast_coeffs_t d32_fast_coeffs =
+    {{
+        // N[Series[Zeta[x], {x, 1, 6}], 19]
+
+        +::boost::decimal::decimal32_fast { UINT64_C(5772156649015328606), - 19 -  0 }, // EulerGamma
+        +::boost::decimal::decimal32_fast { UINT64_C(7281584548367672486), - 19 -  1 }, // * (x - 1)
+        -::boost::decimal::decimal32_fast { UINT64_C(4845181596436159242), - 19 -  2 }, // * (x - 1)^2
+        -::boost::decimal::decimal32_fast { UINT64_C(3423057367172243110), - 19 -  3 }, // * (x - 1)^3
+        +::boost::decimal::decimal32_fast { UINT64_C(9689041939447083573), - 19 -  4 }, // * (x - 1)^4
+        -::boost::decimal::decimal32_fast { UINT64_C(6611031810842189181), - 19 -  5 }, // * (x - 1)^5
+        -::boost::decimal::decimal32_fast { UINT64_C(3316240908752772359), - 19 -  6 }, // * (x - 1)^6
+     }};
+
     static constexpr d64_coeffs_t d64_coeffs =
     {{
         // N[Series[Zeta[x], {x, 1, 9}], 19]
@@ -93,6 +121,12 @@ public:
 #if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
 
 template <bool b>
+constexpr typename riemann_zeta_table_imp<b>::d32_coeffs_t riemann_zeta_table_imp<b>::d32_coeffs;
+
+template <bool b>
+constexpr typename riemann_zeta_table_imp<b>::d32_fast_coeffs_t riemann_zeta_table_imp<b>::d32_fast_coeffs;
+
+template <bool b>
 constexpr typename riemann_zeta_table_imp<b>::d64_coeffs_t riemann_zeta_table_imp<b>::d64_coeffs;
 
 template <bool b>
@@ -113,45 +147,90 @@ constexpr auto riemann_zeta_series_or_pade_expansion(T x) noexcept;
 template <>
 constexpr auto riemann_zeta_series_or_pade_expansion<decimal32>(decimal32 x) noexcept
 {
-    const decimal32 top =
-              (decimal32 { UINT64_C(7025346442393055904), -19 + 1 }
-        + x * (decimal32 { UINT64_C(6331631438687936980), -19 + 1 }
-        + x *  decimal32 { UINT64_C(1671529107642800378), -19 + 1 }));
+    constexpr decimal32 one { 1 };
 
-    const decimal32 bot =
-              (decimal32 { UINT64_C(1402850698872379326), -19 + 2, true }
-        + x * (decimal32 { UINT64_C(1302850698872379326), -19 + 2 }
-        + x *  decimal32 { 1 }));
+    const decimal32 dx { x - one };
 
-    return top / bot;
+    if (fabs(dx) < decimal32 { 5, - 2 })
+    {
+        return one / dx + taylor_series_result(dx, riemann_zeta_table::d32_coeffs);
+    }
+    else
+    {
+        const decimal32 top =
+                  (decimal32 { UINT64_C(7025346442393055904), -19 + 1 }
+            + x * (decimal32 { UINT64_C(6331631438687936980), -19 + 1 }
+            + x *  decimal32 { UINT64_C(1671529107642800378), -19 + 1 }));
+
+        const decimal32 bot =
+                  (decimal32 { UINT64_C(1402850698872379326), -19 + 2, true }
+            + x * (decimal32 { UINT64_C(1302850698872379326), -19 + 2 }
+            + x *  decimal32 { 1 }));
+
+        return top / bot;
+    }
 }
 
 template <>
 constexpr auto riemann_zeta_series_or_pade_expansion<decimal32_fast>(decimal32_fast x) noexcept
 {
-    const decimal32_fast top =
-              (decimal32_fast { UINT64_C(7025346442393055904), -19 + 1 }
-        + x * (decimal32_fast { UINT64_C(6331631438687936980), -19 + 1 }
-        + x *  decimal32_fast { UINT64_C(1671529107642800378), -19 + 1 }));
+    constexpr decimal32_fast one { 1 };
 
-    const decimal32_fast bot =
-              (decimal32_fast { UINT64_C(1402850698872379326), -19 + 2, true }
-        + x * (decimal32_fast { UINT64_C(1302850698872379326), -19 + 2 }
-        + x *  decimal32_fast { 1 }));
+    const decimal32_fast dx { x - one };
 
-    return top / bot;
+    if (fabs(dx) < decimal32_fast { 5, -2 })
+    {
+        return one / dx + taylor_series_result(dx, riemann_zeta_table::d32_fast_coeffs);
+    }
+    else
+    {
+        const decimal32_fast top =
+                  (decimal32_fast { UINT64_C(7025346442393055904), -19 + 1 }
+            + x * (decimal32_fast { UINT64_C(6331631438687936980), -19 + 1 }
+            + x *  decimal32_fast { UINT64_C(1671529107642800378), -19 + 1 }));
+
+        const decimal32_fast bot =
+                  (decimal32_fast { UINT64_C(1402850698872379326), -19 + 2, true }
+            + x * (decimal32_fast { UINT64_C(1302850698872379326), -19 + 2 }
+            + x *  decimal32_fast { 1 }));
+
+        return top / bot;
+    }
 }
 
 template <>
 constexpr auto riemann_zeta_series_or_pade_expansion<decimal64>(decimal64 x) noexcept
 {
-    // TODO(ckormanyos) Consider using a Pade approximation for 64-bit.
-
     constexpr decimal64 one { 1 };
 
     const decimal64 dx { x - one };
 
-    return one / dx + taylor_series_result(dx, riemann_zeta_table::d64_coeffs);
+    if (fabs(dx) < decimal64 { 5, -2 })
+    {
+        return one / dx + taylor_series_result(dx, riemann_zeta_table::d64_coeffs);
+    }
+    else
+    {
+        constexpr decimal64 c0 { UINT64_C(4124764818173475125), - 19 + 5 };
+        constexpr decimal64 c1 { UINT64_C(4582078064035558510), - 19 + 5 };
+        constexpr decimal64 c2 { UINT64_C(1806662427082674333), - 19 + 5 };
+        constexpr decimal64 c3 { UINT64_C(3281232347201801441), - 19 + 4 };
+        constexpr decimal64 c4 { UINT64_C(3092253262304078300), - 19 + 3 };
+        constexpr decimal64 c5 { UINT64_C(1985384224421766402), - 19 + 2 };
+        constexpr decimal64 c6 { UINT64_C(1016070109033501213), - 19 + 1 };
+
+        constexpr decimal64 d0 { UINT64_C(8249529636338921254), - 19 + 5, true };
+        constexpr decimal64 d1 { UINT64_C(5997465199121809585), - 19 + 5 };
+        constexpr decimal64 d2 { UINT64_C(1915568444415559307), - 19 + 5 };
+        constexpr decimal64 d3 { UINT64_C(3021354370625514285), - 19 + 4 };
+        constexpr decimal64 d4 { UINT64_C(3227310996533313801), - 19 + 3 };
+        constexpr decimal64 d5 { UINT64_C(1987445773667795184), - 19 + 2 };
+
+        const decimal64 top { c0 + x * (c1 + x * (c2 + x * (c3 + x * (c4 + x * (c5+ x * c6))))) };
+        const decimal64 bot { d0 + x * (d1 + x * (d2 + x * (d3 + x * (d4 + x * (d5 + x))))) };
+
+        return top / bot;
+    }
 }
 
 template <>
