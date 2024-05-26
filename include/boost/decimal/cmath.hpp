@@ -45,6 +45,7 @@
 #include <boost/decimal/detail/cmath/pow.hpp>
 #include <boost/decimal/detail/cmath/remainder.hpp>
 #include <boost/decimal/detail/cmath/remquo.hpp>
+#include <boost/decimal/detail/cmath/riemann_zeta.hpp>
 #include <boost/decimal/detail/cmath/rint.hpp>
 #include <boost/decimal/detail/cmath/round.hpp>
 #include <boost/decimal/detail/cmath/sin.hpp>

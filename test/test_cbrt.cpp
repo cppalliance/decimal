@@ -3,12 +3,6 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <random>
-
 #include <boost/decimal.hpp>
 
 #if defined(__clang__)
@@ -21,9 +15,10 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-#include <boost/core/lightweight_test.hpp>
-
 #include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <limits>
 #include <random>
 
 namespace local

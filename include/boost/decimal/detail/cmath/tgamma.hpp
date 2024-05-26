@@ -33,31 +33,33 @@ constexpr auto tgamma_impl(T x) noexcept
 
     const auto is_pure_int = (nx == x);
 
+    const bool is_neg = signbit(x);
+
     const auto fpc = fpclassify(x);
 
     if (fpc != FP_NORMAL)
     {
         if (fpc == FP_ZERO)
         {
-            result = (signbit(x) ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::infinity());
+            result = (is_neg ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::infinity());
         }
         else if(fpc == FP_INFINITE)
         {
-            result = (signbit(x) ? std::numeric_limits<T>::quiet_NaN() : std::numeric_limits<T>::infinity());
+            result = (is_neg ? std::numeric_limits<T>::quiet_NaN() : std::numeric_limits<T>::infinity());
         }
         else
         {
             result = x;
         }
     }
-    else if ((nx < 0) && is_pure_int && ((nx & 1) != 0))
+    else if (is_neg && is_pure_int)
     {
         // Pure negative integer argument.
         result = std::numeric_limits<T>::quiet_NaN();
     }
     else
     {
-        if (signbit(x))
+        if (is_neg)
         {
             // Reflection for negative argument.
             const auto ga = tgamma(-x);
