@@ -84,11 +84,9 @@ constexpr auto riemann_zeta_impl(T x) noexcept
             {
                 if((x > one) || (x < one))
                 {
-                    // Use a Taylor series near the discontinuity at x=1.
+                    // Use a Taylor series (or Pade approximation) near the discontinuity at x=1.
 
-                    const T dx { x - one };
-
-                    result = (one / dx) + detail::riemann_zeta_series_expansion(dx);
+                    result = detail::riemann_zeta_series_or_pade_expansion(x);
                 }
                 else
                 {
