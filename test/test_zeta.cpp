@@ -160,45 +160,64 @@ auto test_riemann_zeta_edge() -> bool
 
   bool result_is_ok { true };
 
+  std::mt19937_64 gen;
+
+  gen.seed(time_point<typename std::mt19937_64::result_type>());
+
+  std::uniform_real_distribution<float_type> dist(static_cast<float_type>(1.1L), static_cast<float_type>(101.1L));
+
+  for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
   {
-    std::mt19937_64 gen;
+    static_cast<void>(i);
 
-    gen.seed(time_point<typename std::mt19937_64::result_type>());
-
-    std::uniform_real_distribution<float_type> dist(static_cast<float_type>(1.1L), static_cast<float_type>(101.1L));
-
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(10)); ++i)
     {
-      static_cast<void>(i);
+      const decimal_type inf  { ::my_inf <decimal_type>() * decimal_type(dist(gen)) };
 
-      {
-        const decimal_type inf  { ::my_inf <decimal_type>() * decimal_type(dist(gen)) };
+      bool result_inf_is_ok { };
 
-        bool result_inf_is_ok { };
+      result_inf_is_ok = (riemann_zeta(inf) == decimal_type { 1 } );
+      result_is_ok = (result_inf_is_ok && result_is_ok);
+      BOOST_TEST(result_is_ok);
 
-        result_inf_is_ok = (riemann_zeta(inf) == decimal_type { 1 } ); result_is_ok = (result_inf_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
-        result_inf_is_ok = (   isinf(riemann_zeta(-inf))
-                            && signbit(riemann_zeta(-inf)));           result_is_ok = (result_inf_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
-      }
-
-      {
-        const decimal_type nan  { ::my_nan <decimal_type>() * decimal_type(dist(gen)) };
-
-        bool result_nan_is_ok { };
-
-        result_nan_is_ok = (isnan(riemann_zeta(nan)));                 result_is_ok = (result_nan_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
-        result_nan_is_ok = (isnan(riemann_zeta(-nan)));                result_is_ok = (result_nan_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
-        result_nan_is_ok = (isnan(riemann_zeta(decimal_type { 1 })));  result_is_ok = (result_nan_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
-      }
-
-      {
-        const decimal_type zero { ::my_zero<decimal_type>() * decimal_type(dist(gen)) };
-
-        const decimal_type minus_half { -5, -1 };
-
-        const bool result_zero_is_ok = (riemann_zeta(zero) == minus_half); result_is_ok = (result_zero_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
-      }
+      result_inf_is_ok =
+      (
+        isinf(riemann_zeta(-inf)) && signbit(riemann_zeta(-inf))
+      );
+      result_is_ok = (result_inf_is_ok && result_is_ok);
+      BOOST_TEST(result_is_ok);
     }
+
+    {
+      const decimal_type nan  { ::my_nan <decimal_type>() * decimal_type(dist(gen)) };
+
+      bool result_nan_is_ok { };
+
+      result_nan_is_ok = (isnan(riemann_zeta(nan)));                 result_is_ok = (result_nan_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
+      result_nan_is_ok = (isnan(riemann_zeta(-nan)));                result_is_ok = (result_nan_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
+      result_nan_is_ok = (isnan(riemann_zeta(decimal_type { 1 })));  result_is_ok = (result_nan_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
+    }
+
+    {
+      const decimal_type zero { ::my_zero<decimal_type>() * decimal_type(dist(gen)) };
+
+      const decimal_type minus_half { -5, -1 };
+
+      const bool result_zero_is_ok = (riemann_zeta(zero) == minus_half); result_is_ok = (result_zero_is_ok && result_is_ok); BOOST_TEST(result_is_ok);
+    }
+  }
+
+  for(auto n = static_cast<unsigned>(UINT8_C(2)); n < static_cast<unsigned>(UINT8_C(6)); ++n)
+  {
+    using ::boost::decimal::riemann_zeta;
+
+    const decimal_type rzf = riemann_zeta(static_cast<decimal_type>(n));
+    const decimal_type rzn = riemann_zeta<decimal_type>(n);
+
+    const bool result_n_or_f_is_ok = (rzf == rzn);
+
+    result_is_ok = (result_n_or_f_is_ok && result_is_ok);
+
+    BOOST_TEST(result_is_ok);
   }
 
   return result_is_ok;

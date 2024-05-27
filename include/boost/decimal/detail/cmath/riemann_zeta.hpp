@@ -40,6 +40,8 @@ constexpr auto riemann_zeta_impl(T x) noexcept
 
     if (fpc == FP_ZERO)
     {
+        // The value of riemann_zeta(0) is 1/2.
+
         result = T { 5, -1, true };
     }
     else if (fpc != FP_NORMAL)
@@ -69,12 +71,15 @@ constexpr auto riemann_zeta_impl(T x) noexcept
 
             if(x > asymp_cutoff)
             {
-                // Check the argument is large and then simply return 1.
+                // For large argument the power series is irrelevant.
+                // In such cases, simply return 1.
 
                 result = one;
             }
             else if((x > T { 9, -1 }) && (x < T { 11, -1 }))
             {
+                // Arguments near +1 receive special treatment.
+
                 if((x > one) || (x < one))
                 {
                     // Use a Taylor series (or Pade approximation) near the discontinuity at x=1.
@@ -210,6 +215,30 @@ constexpr auto riemann_zeta(T x) noexcept
     #endif
 
     return static_cast<T>(detail::riemann_zeta_impl(static_cast<evaluation_type>(x)));
+}
+
+BOOST_DECIMAL_EXPORT template <typename T, typename IntegralType>
+constexpr auto riemann_zeta(IntegralType n) noexcept
+    BOOST_DECIMAL_REQUIRES_TWO(detail::is_decimal_floating_point_v, T, std::is_integral_v, IntegralType)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    // TODO(ckormanyos) COnsider making an integral-argument specialization.
+    // Some exact values are know and some simplifications are possible.
+
+    return static_cast<T>(detail::riemann_zeta_impl(static_cast<evaluation_type>(n)));
 }
 
 } //namespace decimal

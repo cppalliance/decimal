@@ -23,6 +23,7 @@
 
 template<typename DecimalType> auto my_zero() -> DecimalType&;
 template<typename DecimalType> auto my_one () -> DecimalType&;
+template<typename DecimalType> auto my_nan () -> DecimalType&;
 
 namespace local
 {
@@ -239,6 +240,8 @@ namespace local
 
     std::mt19937_64 gen;
 
+    gen.seed(time_point<typename std::mt19937_64::result_type>());
+
     std::uniform_real_distribution<float_type>
       dist
       (
@@ -248,11 +251,11 @@ namespace local
 
     auto result_is_ok = true;
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
     {
       static_cast<void>(i);
 
-      const auto val_nan = tgamma(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+      const auto val_nan = tgamma(::my_nan<decimal_type>() * static_cast<decimal_type>(dist(gen)));
 
       const auto result_val_nan_is_ok = isnan(val_nan);
 
@@ -444,11 +447,11 @@ namespace local
   {
     using decimal_type = boost::decimal::decimal128;
 
-    using str_ctrl_array_type = std::array<const char*, 20U>;
+    using str_ctrl_array_type = std::array<const char*, 23U>;
 
     const str_ctrl_array_type ctrl_strings =
     {{
-       // Table[N[Gamma[n + n/10 + n/100 + n/1000], 36], {n, 1, 191, 10}]
+       // Table[N[Gamma[n + n/10 + n/100 + n/1000], 36], {n, 1, 221, 10}]
        "0.947008281162266001895790481785841941",
        "6.86303089001025022525468906807854872E7",
        "3.15793281780505944512262743601561476E21",
@@ -469,6 +472,9 @@ namespace local
        "4.61171076932972412633999770033353340E349",
        "1.27758574231803927960543278875893523E375",
        "6.55079490827236721494047351435261992E400",
+       "6.01906299656231025481256209731706244E426",
+       "9.62614024174757375775890458257288037E452",
+       "2.60989891797040728048724526392884050E479",
     }};
 
     std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> tg_values   { };
@@ -606,9 +612,7 @@ auto main() -> int
 
   {
     const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo(4096);
-
-    // TODO(ckormanyos) Can we get better asymptotic accuracy with more coefficients at 128-bit?
-    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi(0x10000);
+    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi(0x20'000);
 
     BOOST_TEST(result_tgamma128_lo_is_ok);
     BOOST_TEST(result_tgamma128_hi_is_ok);
@@ -623,3 +627,4 @@ auto main() -> int
 
 template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_zero { 0 }; return val_zero; }
 template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_one  { 1 }; return val_one; }
+template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_nan  { std::numeric_limits<decimal_type>::quiet_NaN() }; return val_nan; }
