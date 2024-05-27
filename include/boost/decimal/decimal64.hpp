@@ -1970,14 +1970,7 @@ constexpr auto operator<(decimal64 lhs, decimal64 rhs) noexcept -> bool
     }
     else if (isfinite(lhs) && isinf(rhs))
     {
-        if (!rhs.isneg())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return !rhs.isneg();
     }
 
     return less_parts_impl<decimal64>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
