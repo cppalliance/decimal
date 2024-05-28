@@ -204,6 +204,8 @@ public:
     friend constexpr auto operator/(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
     friend constexpr auto operator%(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
 
+    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+
     // TODO(mborland): Fix with STL bindings and delete
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64_fast& d) -> std::basic_ostream<charT, traits>&
@@ -218,6 +220,8 @@ public:
 
         return os;
     }
+
+    #endif
 
     // Cmath friend functions
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
