@@ -35,7 +35,9 @@
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
 #include <boost/decimal/detail/add_impl.hpp>
+#include <boost/decimal/detail/sub_impl.hpp>
 #include <boost/decimal/detail/mul_impl.hpp>
+#include <boost/decimal/detail/div_impl.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -1110,45 +1112,6 @@ constexpr auto operator-(decimal64 rhs) noexcept-> decimal64
     return rhs;
 }
 
-constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::decimal64_components rhs,
-                                    detail::decimal64_components& q) noexcept -> void
-{
-    #ifdef BOOST_DECIMAL_HAS_INT128
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
-    #endif
-
-    bool sign {lhs.sign != rhs.sign};
-
-    // If rhs is greater than we need to offset the significands to get the correct values
-    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64>))};
-    const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.sig) * tens_needed};
-    lhs.exp -= detail::precision_v<decimal64>;
-
-    auto res_sig {big_sig_lhs / static_cast<unsigned_int128_type>(rhs.sig)};
-    auto res_exp {lhs.exp - rhs.exp};
-
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
-    {
-        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
-        res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
-    }
-
-    const auto res_sig_64 {static_cast<std::uint64_t>(res_sig)};
-
-    if (res_sig_64 == 0)
-    {
-        sign = false;
-    }
-
-    // Let the constructor handle shrinking it back down and rounding correctly
-    q = detail::decimal64_components{res_sig_64, res_exp, sign};
-}
-
 constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal64& r) noexcept -> void
 {
     // Check pre-conditions
@@ -1215,7 +1178,7 @@ constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal6
     detail::decimal64_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
     detail::decimal64_components q_components {};
 
-    d64_generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
 
     q = decimal64(q_components.sig, q_components.exp, q_components.sign);
 }
