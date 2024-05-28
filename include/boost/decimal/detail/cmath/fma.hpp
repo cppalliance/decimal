@@ -214,13 +214,13 @@ constexpr auto fmad32f(decimal32_fast x, decimal32_fast y, decimal32_fast z) noe
 
     if (!promoted_mul_result.sign && z_components.sign)
     {
-        result = d64_sub_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+        result = detail::d64_sub_impl<detail::decimal64_components>(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
                               z_components.sig, z_components.exp, z_components.sign,
                               abs_lhs_bigger);
     }
     else
     {
-        result = d64_add_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+        result = detail::d64_add_impl<detail::decimal64_components>(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
                               z_components.sig, z_components.exp, z_components.sign);
     }
 
