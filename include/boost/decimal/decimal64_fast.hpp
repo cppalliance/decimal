@@ -283,6 +283,14 @@ public:
     friend constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
 
+    template <typename Integer>
+    friend constexpr auto operator*(decimal64_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+
+    template <typename Integer>
+    friend constexpr auto operator*(Integer lhs, decimal64_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
     // TODO(mborland): Fix with STL bindings and delete
@@ -1053,6 +1061,41 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
                                                                           rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator*(decimal64_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+{
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return lhs;
+    }
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+    auto lhs_components {detail::decimal64_fast_components{lhs_sig, lhs_exp, lhs.isneg()}};
+
+    auto rhs_sig {static_cast<decimal64_fast::significand_type>(detail::make_positive_unsigned(rhs))};
+    std::int32_t rhs_exp {0};
+    detail::normalize<decimal64>(rhs_sig, rhs_exp);
+    auto unsigned_sig_rhs {detail::shrink_significand<decimal64_fast::significand_type>(detail::make_positive_unsigned(rhs_sig), rhs_exp)};
+    auto rhs_components {detail::decimal64_fast_components{unsigned_sig_rhs, rhs_exp, (rhs < 0)}};
+
+    const auto result {detail::d64_mul_impl<detail::decimal64_fast_components>(
+            lhs_components.sig, lhs_components.exp, lhs_components.sign,
+            rhs_components.sig, rhs_components.exp, rhs_components.sign
+            )};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator*(Integer lhs, decimal64_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+{
+    return rhs * lhs;
 }
 
 constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal64_fast& q, decimal64_fast& r) noexcept -> void

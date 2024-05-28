@@ -890,25 +890,25 @@ int main()
     random_multiplication(0, 5'000);
     random_multiplication(0LL, 5'000LL);
     random_multiplication(0, sqrt_int_max);
-    //random_mixed_multiplication(0, 5'000);
-    //random_mixed_multiplication(0LL, 5'000LL);
-    //random_mixed_multiplication(0, sqrt_int_max);
+    random_mixed_multiplication(0, 5'000);
+    random_mixed_multiplication(0LL, 5'000LL);
+    random_mixed_multiplication(0, sqrt_int_max);
 
     // Negative
     random_multiplication(-5'000, 0);
     random_multiplication(-5'000LL, 0LL);
     random_multiplication(-sqrt_int_max, 0);
-    //random_mixed_multiplication(-5'000, 0);
-    //random_mixed_multiplication(-5'000LL, 0LL);
-    //random_mixed_multiplication(-sqrt_int_max, 0);
+    random_mixed_multiplication(-5'000, 0);
+    random_mixed_multiplication(-5'000LL, 0LL);
+    random_mixed_multiplication(-sqrt_int_max, 0);
 
     // Mixed
     random_multiplication(-5'000, 5'000);
     random_multiplication(-5'000LL, 5'000LL);
     random_multiplication(-sqrt_int_max, sqrt_int_max);
-    //random_mixed_multiplication(-5'000, 5'000);
-    //random_mixed_multiplication(-5'000LL, 5'000LL);
-    //random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
+    random_mixed_multiplication(-5'000, 5'000);
+    random_mixed_multiplication(-5'000LL, 5'000LL);
+    random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
 
     // Division
 
