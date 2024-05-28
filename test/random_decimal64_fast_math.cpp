@@ -850,20 +850,20 @@ int main()
     // Only positive values
     random_addition(0, 5'000'000);
     random_addition(0LL, 4'000'000'000'000LL);
-    //random_mixed_addition(0, 5'000'000);
-    //random_mixed_addition(0LL, 4'000'000'000'000LL);
+    random_mixed_addition(0, 5'000'000);
+    random_mixed_addition(0LL, 4'000'000'000'000LL);
 
     // Only two negative values
     random_addition(-5'000'000, 0);
     random_addition(-4'000'000'000'000LL, 0LL);
-    //random_mixed_addition(-5'000'000, 0);
-    //random_mixed_addition(-4'000'000'000'000LL, 0LL);
+    random_mixed_addition(-5'000'000, 0);
+    random_mixed_addition(-4'000'000'000'000LL, 0LL);
 
     // Mixed values
     random_addition(-5'000'000, 5'000'000);
     random_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
-    //random_mixed_addition(-5'000'000, 5'000'000);
-    //random_mixed_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
+    random_mixed_addition(-5'000'000, 5'000'000);
+    random_mixed_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
 
     // Subtraction
     random_subtraction(0, 5'000'000);
