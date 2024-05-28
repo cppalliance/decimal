@@ -514,14 +514,12 @@ int main()
     random_LE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_LE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
 
-    /*
     random_mixed_LE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_mixed_LE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_mixed_LE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_mixed_LE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_LE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_LE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-    */
 
     random_GT(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_GT(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
