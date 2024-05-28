@@ -104,6 +104,16 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
+    friend constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal64_fast& q, decimal64_fast& r) noexcept -> void;
+
+    template <typename T>
+    friend constexpr auto ilogb(T d) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int);
+
+    template <typename T>
+    friend constexpr auto logb(T num) noexcept
+        BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T);
+
 public:
     constexpr decimal64_fast() noexcept = default;
 
@@ -191,6 +201,8 @@ public:
     friend constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
     friend constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
     friend constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
+    friend constexpr auto operator/(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
+    friend constexpr auto operator%(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
 
     // TODO(mborland): Fix with STL bindings and delete
     template <typename charT, typename traits>
@@ -206,6 +218,10 @@ public:
 
         return os;
     }
+
+    // Cmath friend functions
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -643,6 +659,106 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
                                                                           rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal64_fast& q, decimal64_fast& r) noexcept -> void
+{
+    // Check pre-conditions
+    constexpr decimal64_fast zero {0, 0};
+    constexpr decimal64_fast nan {boost::decimal::direct_init(boost::decimal::detail::d64_fast_snan, 0, false)};
+    constexpr decimal64_fast inf {boost::decimal::direct_init(boost::decimal::detail::d64_fast_inf, 0, false)};
+
+    const bool sign {lhs.isneg() != rhs.isneg()};
+
+    const auto lhs_fp {fpclassify(lhs)};
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+    {
+        q = nan;
+        r = nan;
+        return;
+    }
+
+    switch (lhs_fp)
+    {
+        case FP_INFINITE:
+            q = sign ? -inf : inf;
+            r = zero;
+            return;
+        case FP_ZERO:
+            q = sign ? -zero : zero;
+            r = sign ? -zero : zero;
+            return;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_ZERO:
+            q = inf;
+            r = zero;
+            return;
+        case FP_INFINITE:
+            q = sign ? -zero : zero;
+            r = lhs;
+            return;
+        default:
+            static_cast<void>(rhs);
+    }
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize<decimal64>(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize<decimal64>(sig_rhs, exp_rhs);
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "sig lhs: " << sig_lhs
+              << "\nexp lhs: " << exp_lhs
+              << "\nsig rhs: " << sig_rhs
+              << "\nexp rhs: " << exp_rhs << std::endl;
+    #endif
+
+    detail::decimal64_fast_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    detail::decimal64_fast_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal64_fast_components q_components {};
+
+    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
+
+    q = decimal64_fast(q_components.sig, q_components.exp, q_components.sign);
+}
+
+constexpr auto d64_fast_mod_impl(decimal64_fast lhs, decimal64_fast rhs, const decimal64_fast& q, decimal64_fast& r) noexcept -> void
+{
+    constexpr decimal64_fast zero {0, 0};
+
+    // https://en.cppreference.com/w/cpp/numeric/math/fmod
+    auto q_trunc {q > zero ? floor(q) : ceil(q)};
+    r = lhs - (decimal64_fast(q_trunc) * rhs);
+}
+
+constexpr auto operator/(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
+{
+    decimal64_fast q {};
+    decimal64_fast r {};
+
+    d64_fast_div_impl(lhs, rhs, q, r);
+
+    return q;
+}
+
+constexpr auto operator%(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
+{
+    decimal64_fast q {};
+    decimal64_fast r {};
+    d64_fast_div_impl(lhs, rhs, q, r);
+    d64_fast_mod_impl(lhs, rhs, q, r);
+
+    return r;
 }
 
 } // namespace decimal
