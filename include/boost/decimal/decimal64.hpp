@@ -34,6 +34,10 @@
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
+#include <boost/decimal/detail/add_impl.hpp>
+#include <boost/decimal/detail/sub_impl.hpp>
+#include <boost/decimal/detail/mul_impl.hpp>
+#include <boost/decimal/detail/div_impl.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -118,6 +122,8 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_significand_mask = 
 
 struct decimal64_components
 {
+    using sig_type = std::uint64_t;
+
     std::uint64_t sig;
     std::int32_t exp;
     bool sign;
@@ -192,23 +198,6 @@ private:
     friend constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
-
-    template <typename T1, typename T2>
-    friend constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                       T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept
-                                       -> detail::decimal64_components;
-
-    template <typename T1, typename T2>
-    friend constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                       T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
-                                       bool abs_lhs_bigger) noexcept -> detail::decimal64_components;
-
-    template <typename T1, typename T2>
-    friend constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                       T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components;
-
-    friend constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::decimal64_components rhs,
-                                               detail::decimal64_components& q) noexcept -> void;
 
     friend constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal64& r) noexcept -> void;
 
@@ -1106,244 +1095,6 @@ constexpr auto operator-(decimal64 rhs) noexcept-> decimal64
     return rhs;
 }
 
-template<typename T1, typename T2>
-constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components
-{
-    const bool sign {lhs_sign};
-
-    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-
-    if (delta_exp > detail::precision_v<decimal64> + 1)
-    {
-        // If the difference in exponents is more than the digits of accuracy
-        // we return the larger of the two
-        //
-        // e.g. 1e20 + 1e-20 = 1e20
-
-        return {lhs_sig, lhs_exp, lhs_sign};
-    }
-    else if (delta_exp == detail::precision_v<decimal64> + 1)
-    {
-        // Only need to see if we need to add one to the
-        // significand of the bigger value
-        //
-        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
-
-        if (rhs_sig >= UINT64_C(5'000'000'000'000'000))
-        {
-            ++lhs_sig;
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
-        else
-        {
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
-    }
-
-    // The two numbers can be added together without special handling
-    //
-    // If we can add to the lhs sig rather than dividing we can save some precision
-    // 64-bit sign int can have 19 digits, and our normalized significand has 16
-    if (delta_exp <= 3)
-    {
-        while (delta_exp > 0)
-        {
-            lhs_sig *= 10;
-            --delta_exp;
-            --lhs_exp;
-        }
-    }
-    else
-    {
-        lhs_sig *= 1000;
-        delta_exp -= 3;
-        lhs_exp -= 3;
-    }
-
-    while (delta_exp > 1)
-    {
-        rhs_sig /= 10;
-        --delta_exp;
-    }
-
-    if (delta_exp == 1)
-    {
-        detail::fenv_round<decimal64>(rhs_sig, rhs_sign);
-    }
-
-    // Both of the significands are well under 64-bits, so we can fit them into int64_t without issue
-    const auto new_sig {static_cast<std::uint64_t>(lhs_sig) + static_cast<std::uint64_t>(rhs_sig)};
-    const auto new_exp {lhs_exp};
-    const auto res_sig {detail::make_positive_unsigned(new_sig)};
-
-    #ifdef BOOST_DECIMAL_DEBUG_ADD
-    std::cerr << "Res Sig: " << new_sig
-              << "\nRes Exp: " << new_exp
-              << "\nRes Neg: " << sign << std::endl;
-    #endif
-
-    return {res_sig, new_exp, sign};
-}
-
-template <typename T1, typename T2>
-constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
-                            bool abs_lhs_bigger) noexcept -> detail::decimal64_components
-{
-    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-    auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
-    auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
-
-    if (delta_exp > detail::precision_v<decimal64> + 1)
-    {
-        // If the difference in exponents is more than the digits of accuracy
-        // we return the larger of the two
-        //
-        // e.g. 1e20 - 1e-20 = 1e20
-        return abs_lhs_bigger ? detail::decimal64_components{detail::shrink_significand<std::uint64_t>(lhs_sig, lhs_exp), lhs_exp, false} :
-                                detail::decimal64_components{detail::shrink_significand<std::uint64_t>(rhs_sig, rhs_exp), rhs_exp, true};
-    }
-
-    // The two numbers can be subtracted together without special handling
-
-    auto& sig_bigger {abs_lhs_bigger ? signed_sig_lhs : signed_sig_rhs};
-    auto& exp_bigger {abs_lhs_bigger ? lhs_exp : rhs_exp};
-    auto& sig_smaller {abs_lhs_bigger ? signed_sig_rhs : signed_sig_lhs};
-    auto& smaller_sign {abs_lhs_bigger ? rhs_sign : lhs_sign};
-
-    if (delta_exp == 1)
-    {
-        sig_bigger *= 10;
-        --delta_exp;
-        --exp_bigger;
-    }
-    else if (delta_exp >= 2)
-    {
-        sig_bigger *= 100;
-        delta_exp -= 2;
-        exp_bigger -= 2;
-    }
-
-    while (delta_exp > 1)
-    {
-        sig_smaller /= 10;
-        --delta_exp;
-    }
-
-    if (delta_exp == 1)
-    {
-        detail::fenv_round<decimal64>(sig_smaller, smaller_sign);
-    }
-
-    // Both of the significands are less than 9'999'999'999'999'999, so we can safely
-    // cast them to signed 64-bit ints to calculate the new significand
-    std::int64_t new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
-
-    if (rhs_sign && !lhs_sign)
-    {
-        new_sig = signed_sig_lhs + signed_sig_rhs;
-    }
-    else
-    {
-        new_sig = signed_sig_lhs - signed_sig_rhs;
-    }
-
-    const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
-    const auto new_sign {new_sig < 0};
-    const auto res_sig {detail::make_positive_unsigned(new_sig)};
-
-    return {res_sig, new_exp, new_sign};
-}
-
-template <typename T1, typename T2>
-constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components
-{
-    #ifdef BOOST_DECIMAL_HAS_INT128
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
-    #endif
-
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "sig lhs: " << sig_lhs
-              << "\nexp lhs: " << exp_lhs
-              << "\nsig rhs: " << sig_rhs
-              << "\nexp rhs: " << exp_rhs;
-    #endif
-
-    bool sign {lhs_sign != rhs_sign};
-
-    // Once we have the normalized significands and exponents all we have to do is
-    // multiply the significands and add the exponents
-
-    auto res_sig {static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)};
-    auto res_exp {lhs_exp + rhs_exp};
-
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
-    {
-        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
-        res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
-    }
-
-    const auto res_sig_64 {static_cast<std::uint64_t>(res_sig)};
-
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "\nres sig: " << res_sig_64
-              << "\nres exp: " << res_exp << std::endl;
-    #endif
-
-    // Always return positive zero
-    if (res_sig_64 == 0)
-    {
-        sign = false;
-    }
-
-    return {res_sig_64, res_exp, sign};
-}
-
-constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::decimal64_components rhs,
-                                    detail::decimal64_components& q) noexcept -> void
-{
-    #ifdef BOOST_DECIMAL_HAS_INT128
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
-    #endif
-
-    bool sign {lhs.sign != rhs.sign};
-
-    // If rhs is greater than we need to offset the significands to get the correct values
-    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64>))};
-    const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.sig) * tens_needed};
-    lhs.exp -= detail::precision_v<decimal64>;
-
-    auto res_sig {big_sig_lhs / static_cast<unsigned_int128_type>(rhs.sig)};
-    auto res_exp {lhs.exp - rhs.exp};
-
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
-    {
-        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
-        res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
-    }
-
-    const auto res_sig_64 {static_cast<std::uint64_t>(res_sig)};
-
-    if (res_sig_64 == 0)
-    {
-        sign = false;
-    }
-
-    // Let the constructor handle shrinking it back down and rounding correctly
-    q = detail::decimal64_components{res_sig_64, res_exp, sign};
-}
-
 constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal64& r) noexcept -> void
 {
     // Check pre-conditions
@@ -1410,7 +1161,7 @@ constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal6
     detail::decimal64_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
     detail::decimal64_components q_components {};
 
-    d64_generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
 
     q = decimal64(q_components.sig, q_components.exp, q_components.sign);
 }
@@ -1459,7 +1210,7 @@ constexpr auto operator+(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
 
-    const auto result {d64_add_impl(lhs_sig, lhs_exp, lhs.isneg(),
+    const auto result {detail::d64_add_impl<detail::decimal64_components>(lhs_sig, lhs_exp, lhs.isneg(),
                                     rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
@@ -1510,13 +1261,13 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
 
     if (!lhs_components.sign && rhs_components.sign)
     {
-        result = d64_sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+        result = detail::d64_sub_impl<detail::decimal64_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                               rhs_components.sig, rhs_components.exp, rhs_components.sign,
                               abs_lhs_bigger);
     }
     else
     {
-        result = d64_add_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+        result = detail::d64_add_impl<detail::decimal64_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                               rhs_components.sig, rhs_components.exp, rhs_components.sign);
     }
 
@@ -1556,7 +1307,7 @@ constexpr auto operator-(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
 
-    const auto result {d64_sub_impl(sig_lhs, exp_lhs, lhs.isneg(),
+    const auto result {detail::d64_sub_impl<detail::decimal64_components>(sig_lhs, exp_lhs, lhs.isneg(),
                                     sig_rhs, exp_rhs, rhs.isneg(),
                                     abs_lhs_bigger)};
 
@@ -1590,7 +1341,7 @@ constexpr auto operator-(decimal64 lhs, Integer rhs) noexcept
     auto unsigned_sig_rhs = detail::shrink_significand<std::uint64_t>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
     auto rhs_components {detail::decimal64_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
-    const auto result {d64_sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+    const auto result {detail::d64_sub_impl<detail::decimal64_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                     rhs_components.sig, rhs_components.exp, rhs_components.sign,
                                     abs_lhs_bigger)};
 
@@ -1624,7 +1375,7 @@ constexpr auto operator-(Integer lhs, decimal64 rhs) noexcept
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
     auto rhs_components {detail::decimal64_components{sig_rhs, exp_rhs, rhs.isneg()}};
 
-    const auto result {d64_sub_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+    const auto result {detail::d64_sub_impl<detail::decimal64_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                     rhs_components.sig, rhs_components.exp, rhs_components.sign,
                                     abs_lhs_bigger)};
 
@@ -1649,7 +1400,7 @@ constexpr auto operator*(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
 
-    const auto result {d64_mul_impl(lhs_sig, lhs_exp, lhs.isneg(),
+    const auto result {detail::d64_mul_impl<detail::decimal64_components>(lhs_sig, lhs_exp, lhs.isneg(),
                                     rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
@@ -1675,7 +1426,7 @@ constexpr auto operator*(decimal64 lhs, Integer rhs) noexcept
     auto unsigned_sig_rhs {detail::shrink_significand<std::uint64_t>(detail::make_positive_unsigned(rhs_sig), rhs_exp)};
     auto rhs_components {detail::decimal64_components{unsigned_sig_rhs, rhs_exp, (rhs < 0)}};
 
-    const auto result {d64_mul_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+    const auto result {detail::d64_mul_impl<detail::decimal64_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                     rhs_components.sig, rhs_components.exp, rhs_components.sign)};
 
     return {result.sig, result.exp, result.sign};
@@ -1738,7 +1489,7 @@ constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept
     detail::decimal64_components rhs_components {detail::shrink_significand<std::uint64_t>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
     detail::decimal64_components q_components {};
 
-    d64_generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
 
     return decimal64(q_components.sig, q_components.exp, q_components.sign);
 }
@@ -1779,7 +1530,7 @@ constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept
     detail::decimal64_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
     detail::decimal64_components q_components {};
 
-    d64_generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
 
     return decimal64(q_components.sig, q_components.exp, q_components.sign);
 }
