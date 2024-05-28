@@ -188,6 +188,14 @@ public:
     friend constexpr auto operator<=(Integer lhs, decimal64_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
+    template <typename Integer>
+    friend constexpr auto operator>(decimal64_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    template <typename Integer>
+    friend constexpr auto operator>(Integer lhs, decimal64_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
     // Conversions
     explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
@@ -532,6 +540,20 @@ constexpr auto operator<=(Integer lhs, decimal64_fast rhs) noexcept
 }
 
 constexpr auto operator>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+{
+    return rhs < lhs;
+}
+
+template <typename Integer>
+constexpr auto operator>(decimal64_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    return rhs < lhs;
+}
+
+template <typename Integer>
+constexpr auto operator>(Integer lhs, decimal64_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return rhs < lhs;
 }
