@@ -163,6 +163,23 @@ public:
     explicit constexpr operator detail::uint128_t() const noexcept;
     #endif
 
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_FLOAT16
+    explicit constexpr operator std::float16_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT32
+    explicit constexpr operator std::float32_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT64
+    explicit constexpr operator std::float64_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+    explicit constexpr operator std::bfloat16_t() const noexcept;
+    #endif
+
     // Unary Operators
     friend constexpr auto operator+(decimal64_fast val) noexcept -> decimal64_fast;
     friend constexpr auto operator-(decimal64_fast val) noexcept -> decimal64_fast;
@@ -474,6 +491,47 @@ constexpr decimal64_fast::operator detail::uint128_t() const noexcept
     return to_integral<decimal64_fast, detail::uint128_t>(*this);
 }
 
+#endif // BOOST_DECIMAL_HAS_INT128
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::operator float() const noexcept
+{
+    return to_float<decimal64_fast, float>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::operator double() const noexcept
+{
+    return to_float<decimal64_fast, double>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::operator long double() const noexcept
+{
+    // TODO(mborland): Don't have an exact way of converting to various long doubles
+    return static_cast<long double>(to_float<decimal64_fast, double>(*this));
+}
+
+#ifdef BOOST_DECIMAL_HAS_FLOAT16
+constexpr decimal64_fast::operator std::float16_t() const noexcept
+{
+    return static_cast<std::float16_t>(to_float<decimal64_fast, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT32
+constexpr decimal64_fast::operator std::float32_t() const noexcept
+{
+    return static_cast<std::float32_t>(to_float<decimal64_fast, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT64
+constexpr decimal64_fast::operator std::float64_t() const noexcept
+{
+    return static_cast<std::float64_t>(to_float<decimal64_fast, double>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+constexpr decimal64_fast::operator std::bfloat16_t() const noexcept
+{
+    return static_cast<std::bfloat16_t>(to_float<decimal64_fast, float>(*this));
+}
 #endif
 
 constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
