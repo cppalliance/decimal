@@ -251,8 +251,8 @@ constexpr decimal64_fast::decimal64_fast(T1 coeff, T2 exp, bool sign) noexcept
         exp = 0;
     }
 
-    auto biased_exp {static_cast<std::uint_fast32_t>(exp + detail::bias)};
-    if (biased_exp > std::numeric_limits<std::uint8_t>::max())
+    const auto biased_exp {static_cast<std::uint_fast32_t>(exp + detail::bias_v<decimal64>)};
+    if (biased_exp > std::numeric_limits<std::uint16_t>::max())
     {
         significand_ = detail::d64_fast_inf;
     }
