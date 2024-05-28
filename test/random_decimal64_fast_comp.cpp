@@ -542,14 +542,12 @@ int main()
     random_GE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_GE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
 
-    /*
     random_mixed_GE(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_mixed_GE(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
     random_mixed_GE(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     random_mixed_GE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_GE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_GE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
-    */
 
     random_EQ(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_EQ(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
