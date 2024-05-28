@@ -190,6 +190,7 @@ public:
     // Basic arithmetic operators
     friend constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
     friend constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
+    friend constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
 
     // TODO(mborland): Fix with STL bindings and delete
     template <typename charT, typename traits>
@@ -616,6 +617,30 @@ constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
                                                                             sig_rhs, exp_rhs, rhs.isneg(),
                                                                             abs_lhs_bigger
                                                                             )};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
+{
+    constexpr decimal64_fast zero {0, 0};
+
+    const auto non_finite {detail::check_non_finite(lhs, rhs)};
+    if (non_finite != zero)
+    {
+        return non_finite;
+    }
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    detail::normalize<decimal64>(rhs_sig, rhs_exp);
+
+    const auto result {detail::d64_mul_impl<detail::decimal64_fast_components>(lhs_sig, lhs_exp, lhs.isneg(),
+                                                                          rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
 }
