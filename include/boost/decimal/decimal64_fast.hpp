@@ -138,7 +138,7 @@ public:
     #endif
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast(Float val) noexcept;
 
-    friend constexpr auto direct_init(significand_type significand, exponent_type exponent, bool sign) noexcept -> decimal64_fast;
+    friend constexpr auto direct_init_d64(decimal64_fast::significand_type significand, decimal64_fast::exponent_type exponent, bool sign) noexcept -> decimal64_fast;
 
     // Classification functions
     friend constexpr auto signbit(decimal64_fast val) noexcept -> bool;
@@ -326,7 +326,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::decimal64_fast(Float val) noexcept
 #  pragma GCC diagnostic pop
 #endif
 
-constexpr auto direct_init(decimal64_fast::significand_type significand, decimal64_fast::exponent_type exponent, bool sign) noexcept -> decimal64_fast
+constexpr auto direct_init_d64(decimal64_fast::significand_type significand, decimal64_fast::exponent_type exponent, bool sign) noexcept -> decimal64_fast
 {
     decimal64_fast val {};
     val.significand_ = significand;
@@ -665,8 +665,8 @@ constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal
 {
     // Check pre-conditions
     constexpr decimal64_fast zero {0, 0};
-    constexpr decimal64_fast nan {boost::decimal::direct_init(boost::decimal::detail::d64_fast_snan, 0, false)};
-    constexpr decimal64_fast inf {boost::decimal::direct_init(boost::decimal::detail::d64_fast_inf, 0, false)};
+    constexpr decimal64_fast nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
+    constexpr decimal64_fast inf {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_inf, 0, false)};
 
     const bool sign {lhs.isneg() != rhs.isneg()};
 
@@ -812,9 +812,12 @@ struct numeric_limits<boost::decimal::decimal64_fast>
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto lowest       () -> boost::decimal::decimal64_fast { return {-9'999'999'999'999'999, max_exponent}; }
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto epsilon      () -> boost::decimal::decimal64_fast { return {1, -16}; }
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto round_error  () -> boost::decimal::decimal64_fast { return epsilon(); }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::decimal64_fast { return boost::decimal::direct_init(boost::decimal::detail::d64_fast_inf, 0, false); }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::decimal64_fast { return boost::decimal::direct_init(boost::decimal::detail::d64_fast_qnan, 0, false); }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::decimal64_fast { return boost::decimal::direct_init(boost::decimal::detail::d64_fast_snan, 0, false); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::decimal64_fast { return boost::decimal::direct_init_d64(
+                boost::decimal::detail::d64_fast_inf, 0, false); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::decimal64_fast { return boost::decimal::direct_init_d64(
+                boost::decimal::detail::d64_fast_qnan, 0, false); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::decimal64_fast { return boost::decimal::direct_init_d64(
+                boost::decimal::detail::d64_fast_snan, 0, false); }
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::decimal64_fast { return {1, boost::decimal::detail::etiny_v<boost::decimal::decimal64>}; }
 };
 
