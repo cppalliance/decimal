@@ -180,6 +180,9 @@ public:
     explicit constexpr operator std::bfloat16_t() const noexcept;
     #endif
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr operator Decimal() const noexcept;
+
     // Unary Operators
     friend constexpr auto operator+(decimal64_fast val) noexcept -> decimal64_fast;
     friend constexpr auto operator-(decimal64_fast val) noexcept -> decimal64_fast;
@@ -534,6 +537,12 @@ constexpr decimal64_fast::operator std::bfloat16_t() const noexcept
 }
 #endif
 
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal64_fast::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
+}
+
 constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
 {
     constexpr decimal64_fast zero {0, 0};
@@ -569,7 +578,7 @@ constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
 
-    const auto result {detail::d64_add_impl<detail::decimal64_components>(
+    const auto result {detail::d64_add_impl<detail::decimal64_fast_components>(
                                                                           lhs_sig, lhs_exp, lhs.isneg(),
                                                                           rhs_sig, rhs_exp, rhs.isneg()
                                                                           )};
@@ -602,7 +611,7 @@ constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
 
-    const auto result {detail::d64_sub_impl<detail::decimal64_components>(
+    const auto result {detail::d64_sub_impl<detail::decimal64_fast_components>(
                                                                             sig_lhs, exp_lhs, lhs.isneg(),
                                                                             sig_rhs, exp_rhs, rhs.isneg(),
                                                                             abs_lhs_bigger
