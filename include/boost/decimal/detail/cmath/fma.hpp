@@ -102,7 +102,7 @@ constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal
     auto exp_rhs {y.biased_exponent()};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
 
-    auto mul_result {d64_mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
+    auto mul_result {detail::d64_mul_impl<detail::decimal64_components>(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
     const decimal64 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
 
     const auto res_add {detail::check_non_finite(dec_result, z)};

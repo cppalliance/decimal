@@ -35,6 +35,7 @@
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
 #include <boost/decimal/detail/add_impl.hpp>
+#include <boost/decimal/detail/mul_impl.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -206,9 +207,9 @@ private:
                                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
                                        bool abs_lhs_bigger) noexcept -> ReturnType;
 
-    template <typename T1, typename T2>
+    template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
     friend constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                       T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components;
+                                       T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType;
 
     friend constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::decimal64_components rhs,
                                                detail::decimal64_components& q) noexcept -> void;
@@ -1109,55 +1110,6 @@ constexpr auto operator-(decimal64 rhs) noexcept-> decimal64
     return rhs;
 }
 
-template <typename T1, typename T2>
-constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal64_components
-{
-    #ifdef BOOST_DECIMAL_HAS_INT128
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
-    #endif
-
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "sig lhs: " << sig_lhs
-              << "\nexp lhs: " << exp_lhs
-              << "\nsig rhs: " << sig_rhs
-              << "\nexp rhs: " << exp_rhs;
-    #endif
-
-    bool sign {lhs_sign != rhs_sign};
-
-    // Once we have the normalized significands and exponents all we have to do is
-    // multiply the significands and add the exponents
-
-    auto res_sig {static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)};
-    auto res_exp {lhs_exp + rhs_exp};
-
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
-    {
-        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
-        res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
-    }
-
-    const auto res_sig_64 {static_cast<std::uint64_t>(res_sig)};
-
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "\nres sig: " << res_sig_64
-              << "\nres exp: " << res_exp << std::endl;
-    #endif
-
-    // Always return positive zero
-    if (res_sig_64 == 0)
-    {
-        sign = false;
-    }
-
-    return {res_sig_64, res_exp, sign};
-}
-
 constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::decimal64_components rhs,
                                     detail::decimal64_components& q) noexcept -> void
 {
@@ -1502,7 +1454,7 @@ constexpr auto operator*(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
 
-    const auto result {d64_mul_impl(lhs_sig, lhs_exp, lhs.isneg(),
+    const auto result {detail::d64_mul_impl<detail::decimal64_components>(lhs_sig, lhs_exp, lhs.isneg(),
                                     rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
@@ -1528,7 +1480,7 @@ constexpr auto operator*(decimal64 lhs, Integer rhs) noexcept
     auto unsigned_sig_rhs {detail::shrink_significand<std::uint64_t>(detail::make_positive_unsigned(rhs_sig), rhs_exp)};
     auto rhs_components {detail::decimal64_components{unsigned_sig_rhs, rhs_exp, (rhs < 0)}};
 
-    const auto result {d64_mul_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+    const auto result {detail::d64_mul_impl<detail::decimal64_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                     rhs_components.sig, rhs_components.exp, rhs_components.sign)};
 
     return {result.sig, result.exp, result.sign};
