@@ -778,7 +778,7 @@ namespace std {
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal64_fast>;
+class numeric_limits<boost::decimal::decimal64_fast>
 #else
 struct numeric_limits<boost::decimal::decimal64_fast>
 #endif
