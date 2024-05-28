@@ -139,6 +139,8 @@ public:
     friend constexpr auto operator-(decimal64_fast val) noexcept -> decimal64_fast;
 
     // Basic arithmetic operators
+    friend constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
+    friend constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
 
     // TODO(mborland): Fix with STL bindings and delete
     template <typename charT, typename traits>
@@ -373,6 +375,83 @@ constexpr auto operator-(decimal64_fast val) noexcept -> decimal64_fast
 {
     val.sign_ = !val.sign_;
     return val;
+}
+
+constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
+{
+    constexpr decimal64_fast zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && rhs.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+
+    // Ensure that lhs is always the larger for ease of impl
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs, rhs);
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs - abs(rhs);
+    }
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    detail::normalize<decimal64>(rhs_sig, rhs_exp);
+
+    const auto result {detail::d64_add_impl<detail::decimal64_components>(
+                                                                          lhs_sig, lhs_exp, lhs.isneg(),
+                                                                          rhs_sig, rhs_exp, rhs.isneg()
+                                                                          )};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
+{
+    constexpr decimal64_fast zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize<decimal64>(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize<decimal64>(sig_rhs, exp_rhs);
+
+    const auto result {detail::d64_sub_impl<detail::decimal64_components>(
+                                                                            sig_lhs, exp_lhs, lhs.isneg(),
+                                                                            sig_rhs, exp_rhs, rhs.isneg(),
+                                                                            abs_lhs_bigger
+                                                                            )};
+
+    return {result.sig, result.exp, result.sign};
 }
 
 } // namespace decimal
