@@ -204,6 +204,19 @@ public:
     friend constexpr auto operator>=(Integer lhs, decimal64_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
+    // C++20 Spaceship operator
+    #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+    friend constexpr auto operator<=>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> std::partial_ordering;
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(decimal64_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering);
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(Integer lhs, decimal64_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering);
+    #endif
+
     // Conversions
     explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
@@ -600,6 +613,67 @@ constexpr auto operator>=(Integer lhs, decimal64_fast rhs) noexcept
     return !(lhs < rhs);
 }
 
+#ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+
+constexpr auto operator<=>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> std::partial_ordering
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+template <typename Integer>
+constexpr auto operator<=>(decimal64_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+template <typename Integer>
+constexpr auto operator<=>(Integer lhs, decimal64_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+#endif // BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 
 constexpr auto operator+(decimal64_fast val) noexcept -> decimal64_fast
 {
