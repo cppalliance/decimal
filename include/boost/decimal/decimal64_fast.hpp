@@ -172,6 +172,14 @@ public:
     friend constexpr auto operator!=(Integer lhs, decimal64_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
+    template <typename Integer>
+    friend constexpr auto operator<(decimal64_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    template <typename Integer>
+    friend constexpr auto operator<(Integer lhs, decimal64_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
     // Conversions
     explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
@@ -460,6 +468,25 @@ constexpr auto operator<(decimal64_fast lhs, decimal64_fast rhs) noexcept -> boo
 
     return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+}
+
+template <typename Integer>
+constexpr auto operator<(decimal64_fast lhs, Integer rhs) noexcept
+BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    return less_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator<(Integer lhs, decimal64_fast rhs) noexcept
+BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    if (isnan(rhs))
+    {
+        return false;
+    }
+
+    return !less_impl(rhs, lhs) && lhs != rhs;
 }
 
 constexpr auto operator<=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
