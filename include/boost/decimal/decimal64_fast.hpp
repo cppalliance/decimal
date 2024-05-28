@@ -245,22 +245,28 @@ constexpr decimal64_fast::decimal64_fast(T1 coeff, T2 exp, bool sign) noexcept
     const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal64>};
 
     // Strip digits and round as required
-    if (reduced)
+    if (unsigned_coeff_digits > detail::precision_v<decimal64> + 1)
     {
-        const auto digits_to_remove {static_cast<Unsigned_Integer>(unsigned_coeff_digits - (detail::precision_v<decimal64> + 1))};
+        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal64> + 1)};
 
         #if defined(__GNUC__) && !defined(__clang__)
         #  pragma GCC diagnostic push
         #  pragma GCC diagnostic ignored "-Wconversion"
         #endif
 
-        unsigned_coeff /= static_cast<Unsigned_Integer>(detail::pow10(digits_to_remove));
+        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
 
         #if defined(__GNUC__) && !defined(__clang__)
         #  pragma GCC diagnostic pop
         #endif
 
-        exp += static_cast<exponent_type>(digits_to_remove);
+        exp += digits_to_remove;
+        unsigned_coeff_digits -= digits_to_remove;
+    }
+
+    // Round as required
+    if (reduced)
+    {
         exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
     }
 
