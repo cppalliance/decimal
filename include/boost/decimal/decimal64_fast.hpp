@@ -291,6 +291,14 @@ public:
     friend constexpr auto operator*(Integer lhs, decimal64_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
 
+    template <typename Integer>
+    friend constexpr auto operator/(decimal64_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+
+    template <typename Integer>
+    friend constexpr auto operator/(Integer lhs, decimal64_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
     // TODO(mborland): Fix with STL bindings and delete
@@ -1186,6 +1194,93 @@ constexpr auto operator/(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     d64_fast_div_impl(lhs, rhs, q, r);
 
     return q;
+}
+
+template <typename Integer>
+constexpr auto operator/(decimal64_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+{
+    // Check pre-conditions
+    constexpr decimal64_fast zero {0, 0};
+    constexpr decimal64_fast nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
+    constexpr decimal64_fast inf {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_inf, 0, false)};
+
+    const bool sign {lhs.isneg() != (rhs < 0)};
+
+    const auto lhs_fp {fpclassify(lhs)};
+
+    switch (lhs_fp)
+    {
+        case FP_NAN:
+            return nan;
+        case FP_INFINITE:
+            return inf;
+        case FP_ZERO:
+            return sign ? -zero : zero;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    if (rhs == 0)
+    {
+        return sign ? -inf : inf;
+    }
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+
+    detail::decimal64_fast_components lhs_components {lhs_sig, lhs_exp, lhs.isneg()};
+
+    auto rhs_sig {static_cast<decimal64_fast::significand_type>(detail::make_positive_unsigned(rhs))};
+    std::int32_t rhs_exp {};
+    detail::decimal64_fast_components rhs_components {detail::shrink_significand<decimal64_fast::significand_type>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
+    detail::decimal64_fast_components q_components {};
+
+    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return {q_components.sig, q_components.exp, q_components.sign};
+}
+
+template <typename Integer>
+constexpr auto operator/(Integer lhs, decimal64_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+{
+    // Check pre-conditions
+    constexpr decimal64_fast zero {0, 0};
+    constexpr decimal64_fast nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
+    constexpr decimal64_fast inf {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_inf, 0, false)};
+
+    const bool sign {(lhs < 0) != rhs.isneg()};
+
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (rhs_fp == FP_NAN)
+    {
+        return nan;
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_INFINITE:
+            return sign ? -zero : zero;
+        case FP_ZERO:
+            return sign ? -inf : inf;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    detail::normalize<decimal64>(rhs_sig, rhs_exp);
+
+    detail::decimal64_fast_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
+    detail::decimal64_fast_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
+    detail::decimal64_fast_components q_components {};
+
+    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
+
+    return {q_components.sig, q_components.exp, q_components.sign};
 }
 
 constexpr auto operator%(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
