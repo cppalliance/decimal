@@ -199,23 +199,6 @@ private:
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
-    template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-    friend constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                       T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept
-                                       -> ReturnType;
-
-    template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-    friend constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                       T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
-                                       bool abs_lhs_bigger) noexcept -> ReturnType;
-
-    template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-    friend constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                       T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType;
-
-    friend constexpr auto d64_generic_div_impl(detail::decimal64_components lhs, detail::decimal64_components rhs,
-                                               detail::decimal64_components& q) noexcept -> void;
-
     friend constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal64& r) noexcept -> void;
 
     friend constexpr auto d64_mod_impl(decimal64 lhs, decimal64 rhs, const decimal64& q, decimal64& r) noexcept -> void;
@@ -1506,7 +1489,7 @@ constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept
     detail::decimal64_components rhs_components {detail::shrink_significand<std::uint64_t>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
     detail::decimal64_components q_components {};
 
-    d64_generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
 
     return decimal64(q_components.sig, q_components.exp, q_components.sign);
 }
@@ -1547,7 +1530,7 @@ constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept
     detail::decimal64_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
     detail::decimal64_components q_components {};
 
-    d64_generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
 
     return decimal64(q_components.sig, q_components.exp, q_components.sign);
 }
