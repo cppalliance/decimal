@@ -93,6 +93,17 @@ private:
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_integral(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
+
+    template <typename Decimal, typename TargetType>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_floating_point_v, TargetType, TargetType);
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+    friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
+
 public:
     constexpr decimal64_fast() noexcept = default;
 
@@ -133,6 +144,24 @@ public:
     friend constexpr auto operator<=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
     friend constexpr auto operator>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
     friend constexpr auto operator>=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
+
+    // Conversions
+    explicit constexpr operator bool() const noexcept;
+    explicit constexpr operator int() const noexcept;
+    explicit constexpr operator unsigned() const noexcept;
+    explicit constexpr operator long() const noexcept;
+    explicit constexpr operator unsigned long() const noexcept;
+    explicit constexpr operator long long() const noexcept;
+    explicit constexpr operator unsigned long long() const noexcept;
+    explicit constexpr operator std::int8_t() const noexcept;
+    explicit constexpr operator std::uint8_t() const noexcept;
+    explicit constexpr operator std::int16_t() const noexcept;
+    explicit constexpr operator std::uint16_t() const noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    explicit constexpr operator detail::int128_t() const noexcept;
+    explicit constexpr operator detail::uint128_t() const noexcept;
+    #endif
 
     // Unary Operators
     friend constexpr auto operator+(decimal64_fast val) noexcept -> decimal64_fast;
@@ -376,6 +405,76 @@ constexpr auto operator-(decimal64_fast val) noexcept -> decimal64_fast
     val.sign_ = !val.sign_;
     return val;
 }
+
+constexpr decimal64_fast::operator bool() const noexcept
+{
+    constexpr decimal64_fast zero {0, 0};
+    return *this != zero;
+}
+
+constexpr decimal64_fast::operator int() const noexcept
+{
+    return to_integral<decimal64_fast, int>(*this);
+}
+
+constexpr decimal64_fast::operator unsigned() const noexcept
+{
+    return to_integral<decimal64_fast, unsigned>(*this);
+}
+
+constexpr decimal64_fast::operator long() const noexcept
+{
+    return to_integral<decimal64_fast, long>(*this);
+}
+
+constexpr decimal64_fast::operator unsigned long() const noexcept
+{
+    return to_integral<decimal64_fast, unsigned long>(*this);
+}
+
+constexpr decimal64_fast::operator long long() const noexcept
+{
+    return to_integral<decimal64_fast, long long>(*this);
+}
+
+constexpr decimal64_fast::operator unsigned long long() const noexcept
+{
+    return to_integral<decimal64_fast, unsigned long long>(*this);
+}
+
+constexpr decimal64_fast::operator std::int8_t() const noexcept
+{
+    return to_integral<decimal64_fast, std::int8_t>(*this);
+}
+
+constexpr decimal64_fast::operator std::uint8_t() const noexcept
+{
+    return to_integral<decimal64_fast, std::uint8_t>(*this);
+}
+
+constexpr decimal64_fast::operator std::int16_t() const noexcept
+{
+    return to_integral<decimal64_fast, std::int16_t>(*this);
+}
+
+constexpr decimal64_fast::operator std::uint16_t() const noexcept
+{
+    return to_integral<decimal64_fast, std::uint16_t>(*this);
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr decimal64_fast::operator detail::int128_t() const noexcept
+{
+    return to_integral<decimal64_fast, detail::int128_t>(*this);
+}
+
+constexpr decimal64_fast::operator detail::uint128_t() const noexcept
+{
+    return to_integral<decimal64_fast, detail::uint128_t>(*this);
+}
+
+#endif
 
 constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
 {
