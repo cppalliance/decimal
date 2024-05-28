@@ -275,6 +275,14 @@ public:
     friend constexpr auto operator+(Integer lhs, decimal64_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
 
+    template <typename Integer>
+    friend constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+
+    template <typename Integer>
+    friend constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
     // TODO(mborland): Fix with STL bindings and delete
@@ -876,10 +884,10 @@ constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
     detail::normalize<decimal64>(sig_lhs, exp_lhs);
     auto lhs_components {detail::decimal64_fast_components{sig_lhs, exp_lhs, lhs.isneg()}};
 
-    auto sig_rhs {static_cast<std::uint_fast64_t>(detail::make_positive_unsigned(rhs))};
+    auto sig_rhs {static_cast<decimal64_fast::significand_type>(detail::make_positive_unsigned(rhs))};
     std::int32_t exp_rhs {0};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs = detail::shrink_significand<std::uint_fast64_t>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    auto unsigned_sig_rhs = detail::shrink_significand<decimal64_fast::significand_type>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
     auto rhs_components {detail::decimal64_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     if (!lhs_bigger)
@@ -949,6 +957,76 @@ constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
                                                                             sig_rhs, exp_rhs, rhs.isneg(),
                                                                             abs_lhs_bigger
                                                                             )};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+{
+    if (isinf(lhs) || isnan(lhs))
+    {
+        return lhs;
+    }
+
+    if (!lhs.isneg() && (rhs < 0))
+    {
+        return lhs + detail::make_positive_unsigned(rhs);
+    }
+
+    const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize<decimal64>(sig_lhs, exp_lhs);
+    auto lhs_components {detail::decimal64_fast_components{sig_lhs, exp_lhs, lhs.isneg()}};
+
+    auto sig_rhs {static_cast<decimal64_fast::significand_type>(detail::make_positive_unsigned(rhs))};
+    std::int32_t exp_rhs {0};
+    detail::normalize<decimal64>(sig_rhs, exp_rhs);
+    auto unsigned_sig_rhs = detail::shrink_significand<decimal64_fast::significand_type>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    auto rhs_components {detail::decimal64_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+
+    const auto result {detail::d64_sub_impl<detail::decimal64_fast_components>(
+                                                        lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                                        rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                                                        abs_lhs_bigger)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+{
+    if (isinf(rhs) || isnan(rhs))
+    {
+        return rhs;
+    }
+
+    if (lhs >= 0 && rhs.isneg())
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool abs_lhs_bigger {detail::make_positive_unsigned(lhs) > abs(rhs)};
+
+    auto sig_lhs {static_cast<decimal64_fast::significand_type>(detail::make_positive_unsigned(lhs))};
+    std::int32_t exp_lhs {0};
+    detail::normalize<decimal64>(sig_lhs, exp_lhs);
+    auto unsigned_sig_lhs = detail::shrink_significand<decimal64_fast::significand_type>(detail::make_positive_unsigned(sig_lhs), exp_lhs);
+    auto lhs_components {detail::decimal64_fast_components{unsigned_sig_lhs, exp_lhs, (lhs < 0)}};
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize<decimal64>(sig_rhs, exp_rhs);
+    auto rhs_components {detail::decimal64_fast_components{sig_rhs, exp_rhs, rhs.isneg()}};
+
+    const auto result {detail::d64_sub_impl<detail::decimal64_fast_components>(
+                                                        lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                                        rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                                                        abs_lhs_bigger)};
 
     return {result.sig, result.exp, result.sign};
 }
