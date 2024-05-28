@@ -301,6 +301,7 @@ public:
 
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
+    // LCOV_EXCL_START
     // TODO(mborland): Fix with STL bindings and delete
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64_fast& d) -> std::basic_ostream<charT, traits>&
@@ -315,6 +316,7 @@ public:
 
         return os;
     }
+    // LCOV_EXCL_STOP
 
     #endif
 
