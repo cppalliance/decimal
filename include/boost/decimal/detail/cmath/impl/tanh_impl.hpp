@@ -29,7 +29,8 @@ private:
     using d64_coeffs_t  = std::array<decimal64,  11>;
     using d128_coeffs_t = std::array<decimal128, 22>;
 
-    using d32_fast_coeffs_t = std::array<decimal32_fast, 7>;
+    using d32_fast_coeffs_t = std::array<decimal32_fast,  7>;
+    using d64_fast_coeffs_t = std::array<decimal64_fast, 11>;
 
 public:
     static constexpr d32_coeffs_t d32_coeffs =
@@ -75,6 +76,23 @@ public:
          -::boost::decimal::decimal64 { UINT64_C(3927832388331683405), - 19 - 4 }  // * x^23
      }};
 
+    static constexpr d64_fast_coeffs_t d64_fast_coeffs =
+    {{
+         // Series[Tanh[x], {x, 0, 23}]
+         //            (1),                                                        // * x
+         -::boost::decimal::decimal64_fast { UINT64_C(3333333333333333333), - 19 - 0 }, // * x^3
+         +::boost::decimal::decimal64_fast { UINT64_C(1333333333333333333), - 19 - 0 }, // * x^5
+         -::boost::decimal::decimal64_fast { UINT64_C(5396825396825396825), - 19 - 1 }, // * x^7
+         +::boost::decimal::decimal64_fast { UINT64_C(2186948853615520282), - 19 - 1 }, // * x^9
+         -::boost::decimal::decimal64_fast { UINT64_C(8863235529902196569), - 19 - 2 }, // * x^11
+         +::boost::decimal::decimal64_fast { UINT64_C(3592128036572481017), - 19 - 2 }, // * x^13
+         -::boost::decimal::decimal64_fast { UINT64_C(1455834387051318268), - 19 - 2 }, // * x^15
+         +::boost::decimal::decimal64_fast { UINT64_C(5900274409455859814), - 19 - 3 }, // * x^17
+         -::boost::decimal::decimal64_fast { UINT64_C(2391291142435524815), - 19 - 3 }  // * x^19
+         +::boost::decimal::decimal64_fast { UINT64_C(9691537956929450326), - 19 - 4 }  // * x^21
+         -::boost::decimal::decimal64_fast { UINT64_C(3927832388331683405), - 19 - 4 }  // * x^23
+     }};
+
     static constexpr d128_coeffs_t d128_coeffs =
     {{
          // Series[Tanh[x], {x, 0, 45}]
@@ -118,6 +136,9 @@ constexpr typename tanh_table_imp<b>::d128_coeffs_t tanh_table_imp<b>::d128_coef
 template <bool b>
 constexpr typename tanh_table_imp<b>::d32_fast_coeffs_t tanh_table_imp<b>::d32_fast_coeffs;
 
+template <bool b>
+constexpr typename tanh_table_imp<b>::d64_fast_coeffs_t tanh_table_imp<b>::d64_fast_coeffs;
+
 #endif
 
 } //namespace tanh_detail
@@ -143,6 +164,12 @@ template <>
 constexpr auto tanh_series_expansion<decimal64>(decimal64 z2) noexcept
 {
     return taylor_series_result(z2, tanh_table::d64_coeffs);
+}
+
+template <>
+constexpr auto tanh_series_expansion<decimal64_fast>(decimal64_fast z2) noexcept
+{
+    return taylor_series_result(z2, tanh_table::d64_fast_coeffs);
 }
 
 template <>
