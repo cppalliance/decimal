@@ -30,6 +30,7 @@ private:
     using d128_coeffs_t = std::array<decimal128, 21>;
 
     using d32_fast_coeffs_t = std::array<decimal32_fast, 8>;
+    using d64_fast_coeffs_t = std::array<decimal64_fast, 11>;
 
 public:
     static constexpr d32_coeffs_t d32_coeffs =
@@ -61,6 +62,23 @@ public:
      }};
 
     static constexpr d64_coeffs_t d64_coeffs =
+    {{
+         // Series[Log[(1 + (z/2))/(1 - (z/2))], {z, 0, 23}]
+         //            (1),                                                       // * z
+         ::boost::decimal::decimal64 { UINT64_C(8333333333333333333), - 19 - 1 }, // * z^3
+         ::boost::decimal::decimal64 { UINT64_C(1250000000000000000), - 19 - 1 }, // * z^5
+         ::boost::decimal::decimal64 { UINT64_C(2232142857142857143), - 19 - 2 }, // * z^7
+         ::boost::decimal::decimal64 { UINT64_C(4340277777777777778), - 19 - 3 }, // * z^9
+         ::boost::decimal::decimal64 { UINT64_C(8877840909090909091), - 19 - 4 }, // * z^11
+         ::boost::decimal::decimal64 { UINT64_C(1878004807692307692), - 19 - 4 }, // * z^13
+         ::boost::decimal::decimal64 { UINT64_C(4069010416666666667), - 19 - 5 }, // * z^15
+         ::boost::decimal::decimal64 { UINT64_C(8975758272058823529), - 19 - 6 }, // * z^17
+         ::boost::decimal::decimal64 { UINT64_C(2007735402960526316), - 19 - 6 }, // * z^19
+         ::boost::decimal::decimal64 { UINT64_C(4541306268601190476), - 19 - 7 }, // * z^21
+         ::boost::decimal::decimal64 { UINT64_C(1036602517832880435), - 19 - 7 }, // * z^23
+     }};
+
+    static constexpr d64_fast_coeffs_t d64_fast_coeffs =
     {{
          // Series[Log[(1 + (z/2))/(1 - (z/2))], {z, 0, 23}]
          //            (1),                                                       // * z
@@ -119,6 +137,9 @@ constexpr typename log_table_imp<b>::d128_coeffs_t log_table_imp<b>::d128_coeffs
 template <bool b>
 constexpr typename log_table_imp<b>::d32_fast_coeffs_t log_table_imp<b>::d32_fast_coeffs;
 
+template <bool b>
+constexpr typename log_table_imp<b>::d64_fast_coeffs_t log_table_imp<b>::d64_fast_coeffs;
+
 #endif
 
 } //namespace log_detail
@@ -144,6 +165,12 @@ template <>
 constexpr auto log_series_expansion<decimal64>(decimal64 z2) noexcept
 {
     return taylor_series_result(z2, log_table::d64_coeffs);
+}
+
+template <>
+constexpr auto log_series_expansion<decimal64_fast>(decimal64_fast z2) noexcept
+{
+    return taylor_series_result(z2, log_table::d64_fast_coeffs);
 }
 
 template <>
