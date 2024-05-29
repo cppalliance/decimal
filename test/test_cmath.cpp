@@ -493,7 +493,7 @@ void test_ilogb()
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), 101);
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), 102);
     }
-    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal64>::value)
+    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal64>::value || std::is_same<Dec, decimal64_fast>::value)
     {
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), 398);
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), 399);
@@ -517,7 +517,7 @@ void test_logb()
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), Dec(101));
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), Dec(102));
     }
-    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal64>::value)
+    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal64>::value || std::is_same<Dec, decimal64_fast>::value)
     {
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), Dec(398));
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), Dec(399));
