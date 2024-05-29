@@ -324,7 +324,10 @@ public:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
+    friend constexpr auto copysignd64f(decimal64_fast mag, decimal64_fast sgn) noexcept -> decimal64_fast;
     friend constexpr auto fmad64f(decimal64_fast x, decimal64_fast y, decimal64_fast z) noexcept -> decimal64_fast;
+    friend constexpr auto scalbnd64f(decimal64_fast num, int exp) noexcept -> decimal64_fast;
+    friend constexpr auto scalblnd64f(decimal64_fast num, long exp) noexcept -> decimal64_fast;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -1295,6 +1298,31 @@ constexpr auto operator%(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     d64_fast_mod_impl(lhs, rhs, q, r);
 
     return r;
+}
+
+constexpr auto scalblnd64f(decimal64_fast num, long exp) noexcept -> decimal64_fast
+{
+    constexpr decimal64_fast zero {0, 0};
+
+    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    {
+        return num;
+    }
+
+    num = decimal64_fast(num.significand_, num.biased_exponent() + exp, num.sign_);
+
+    return num;
+}
+
+constexpr auto scalbnd64f(decimal64_fast num, int expval) noexcept -> decimal64_fast
+{
+    return scalblnd64f(num, static_cast<long>(expval));
+}
+
+constexpr auto copysignd64f(decimal64_fast mag, decimal64_fast sgn) noexcept -> decimal64_fast
+{
+    mag.sign_ = sgn.sign_;
+    return mag;
 }
 
 } // namespace decimal
