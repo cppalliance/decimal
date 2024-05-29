@@ -337,6 +337,110 @@ struct assoc_legendre_lookup {
          decimal64{UINT64_C(2725392139750730),63},
     }};
 
+    static constexpr std::array<decimal64_fast, 100> d64_fast_values =
+    {{
+         decimal64_fast{UINT64_C(1000000000000000),-15},
+         decimal64_fast{UINT64_C(1000000000000000),-15},
+         decimal64_fast{UINT64_C(2000000000000000),-15},
+         decimal64_fast{UINT64_C(3000000000000000),-15},
+         decimal64_fast{UINT64_C(8000000000000000),-15},
+         decimal64_fast{UINT64_C(1500000000000000),-14},
+         decimal64_fast{UINT64_C(4800000000000000),-14},
+         decimal64_fast{UINT64_C(1050000000000000),-13},
+         decimal64_fast{UINT64_C(3840000000000000),-13},
+         decimal64_fast{UINT64_C(9450000000000000),-13},
+         decimal64_fast{UINT64_C(3840000000000000),-12},
+         decimal64_fast{UINT64_C(1039500000000000),-11},
+         decimal64_fast{UINT64_C(4608000000000000),-11},
+         decimal64_fast{UINT64_C(1351350000000000),-10},
+         decimal64_fast{UINT64_C(6451200000000000),-10},
+         decimal64_fast{UINT64_C(2027025000000000),-9},
+         decimal64_fast{UINT64_C(1032192000000000),-8},
+         decimal64_fast{UINT64_C(3445942500000000),-8},
+         decimal64_fast{UINT64_C(1857945600000000),-7},
+         decimal64_fast{UINT64_C(6547290750000000),-7},
+         decimal64_fast{UINT64_C(3715891200000000),-6},
+         decimal64_fast{UINT64_C(1374931057500000),-5},
+         decimal64_fast{UINT64_C(8174960640000000),-5},
+         decimal64_fast{UINT64_C(3162341432250000),-4},
+         decimal64_fast{UINT64_C(1961990553600000),-3},
+         decimal64_fast{UINT64_C(7905853580625000),-3},
+         decimal64_fast{UINT64_C(5101175439360000),-2},
+         decimal64_fast{UINT64_C(2134580466768750),-1},
+         decimal64_fast{UINT64_C(1428329123020800),0},
+         decimal64_fast{UINT64_C(6190283353629375),0},
+         decimal64_fast{UINT64_C(4284987369062400),1},
+         decimal64_fast{UINT64_C(1918987839625106),2},
+         decimal64_fast{UINT64_C(1371195958099968),3},
+         decimal64_fast{UINT64_C(6332659870762850),3},
+         decimal64_fast{UINT64_C(4662066257539891),4},
+         decimal64_fast{UINT64_C(2216430954766998),5},
+         decimal64_fast{UINT64_C(1678343852714361),6},
+         decimal64_fast{UINT64_C(8200794532637892),6},
+         decimal64_fast{UINT64_C(6377706640314571),7},
+         decimal64_fast{UINT64_C(3198309867728778),8},
+         decimal64_fast{UINT64_C(2551082656125829),9},
+         decimal64_fast{UINT64_C(1311307045768799),10},
+         decimal64_fast{UINT64_C(1071454715572848),11},
+         decimal64_fast{UINT64_C(5638620296805835),11},
+         decimal64_fast{UINT64_C(4714400748520531),12},
+         decimal64_fast{UINT64_C(2537379133562626),13},
+         decimal64_fast{UINT64_C(2168624344319444),14},
+         decimal64_fast{UINT64_C(1192568192774434),15},
+         decimal64_fast{UINT64_C(1040939685273333),16},
+         decimal64_fast{UINT64_C(5843584144594727),16},
+         decimal64_fast{UINT64_C(5204698426366666),17},
+         decimal64_fast{UINT64_C(2980227913743311),18},
+         decimal64_fast{UINT64_C(2706443181710667),19},
+         decimal64_fast{UINT64_C(1579520794283955),20},
+         decimal64_fast{UINT64_C(1461479318123760),21},
+         decimal64_fast{UINT64_C(8687364368561751),21},
+         decimal64_fast{UINT64_C(8184284181493056),22},
+         decimal64_fast{UINT64_C(4951797690080198),23},
+         decimal64_fast{UINT64_C(4746884825265972),24},
+         decimal64_fast{UINT64_C(2921560637147317),25},
+         decimal64_fast{UINT64_C(2848130895159583),26},
+         decimal64_fast{UINT64_C(1782151988659863),27},
+         decimal64_fast{UINT64_C(1765841154998942),28},
+         decimal64_fast{UINT64_C(1122755752855714),29},
+         decimal64_fast{UINT64_C(1130138339199323),30},
+         decimal64_fast{UINT64_C(7297912393562140),30},
+         decimal64_fast{UINT64_C(7458913038715529),31},
+         decimal64_fast{UINT64_C(4889601303686634),32},
+         decimal64_fast{UINT64_C(5072060866326560),33},
+         decimal64_fast{UINT64_C(3373824899543778),34},
+         decimal64_fast{UINT64_C(3550442606428592),35},
+         decimal64_fast{UINT64_C(2395415678676082),36},
+         decimal64_fast{UINT64_C(2556318676628587),37},
+         decimal64_fast{UINT64_C(1748653445433540),38},
+         decimal64_fast{UINT64_C(1891675820705154),39},
+         decimal64_fast{UINT64_C(1311490084075155),40},
+         decimal64_fast{UINT64_C(1437673623735917),41},
+         decimal64_fast{UINT64_C(1009847364737869),42},
+         decimal64_fast{UINT64_C(1121385426514015),43},
+         decimal64_fast{UINT64_C(7977794181429167),43},
+         decimal64_fast{UINT64_C(8971083412112120),44},
+         decimal64_fast{UINT64_C(6462013286957625),45},
+         decimal64_fast{UINT64_C(7356288397931940),46},
+         decimal64_fast{UINT64_C(5363471028174829),47},
+         decimal64_fast{UINT64_C(6179282254262830),48},
+         decimal64_fast{UINT64_C(4558950373948605),49},
+         decimal64_fast{UINT64_C(5314182738666033),50},
+         decimal64_fast{UINT64_C(3966286825335287),51},
+         decimal64_fast{UINT64_C(4676480810026109),52},
+         decimal64_fast{UINT64_C(3529995274548405),53},
+         decimal64_fast{UINT64_C(4208832729023498),54},
+         decimal64_fast{UINT64_C(3212295699839048),55},
+         decimal64_fast{UINT64_C(3872126110701619),56},
+         decimal64_fast{UINT64_C(2987435000850315),57},
+         decimal64_fast{UINT64_C(3639798544059521),58},
+         decimal64_fast{UINT64_C(2838063250807799),59},
+         decimal64_fast{UINT64_C(3494206602297140),60},
+         decimal64_fast{UINT64_C(2752921353283565),61},
+         decimal64_fast{UINT64_C(3424322470251197),62},
+         decimal64_fast{UINT64_C(2725392139750730),63},
+     }};
+
     static constexpr std::array<decimal128, 100> d128_values =
     {{
          decimal128{detail::uint128{UINT64_C(54210108624275),UINT64_C(4089650035136921600)},-33},
@@ -456,6 +560,10 @@ constexpr std::array<decimal128, 100> assoc_legendre_lookup<b>::d128_values;
 template <bool b>
 constexpr std::array<decimal32_fast, 100> assoc_legendre_lookup<b>::d32_fast_values;
 
+template <bool b>
+constexpr std::array<decimal64_fast, 100> assoc_legendre_lookup<b>::d64_fast_values;
+
+
 #endif
 
 using assoc_legendre_lookup_table = assoc_legendre_lookup<true>;
@@ -481,6 +589,12 @@ template <>
 constexpr auto assoc_legendre_p0_lookup<decimal64>(unsigned n) -> decimal64
 {
     return assoc_legendre_detail::assoc_legendre_lookup_table::d64_values[static_cast<std::size_t>(n)];
+}
+
+template <>
+constexpr auto assoc_legendre_p0_lookup<decimal64_fast>(unsigned n) -> decimal64_fast
+{
+    return assoc_legendre_detail::assoc_legendre_lookup_table::d64_fast_values[static_cast<std::size_t>(n)];
 }
 
 template <>
