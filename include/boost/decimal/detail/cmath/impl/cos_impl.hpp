@@ -72,6 +72,23 @@ struct cos_table_imp
         decimal64 {UINT64_C(9999999999999999999), -19}
     }};
 
+    static constexpr std::array<decimal64_fast, 13> d64_fast_coeffs =
+    {{
+         decimal64_fast {UINT64_C(1922641020040661424), -27},
+         decimal64_fast {UINT64_C(4960385936049718134), -28},
+         decimal64_fast {UINT64_C(2763064713566851512), -25, true},
+         decimal64_fast {UINT64_C(6633276621376137827), -28},
+         decimal64_fast {UINT64_C(2480119161297283187), -23},
+         decimal64_fast {UINT64_C(1600210781837650114), -28},
+         decimal64_fast {UINT64_C(1388888932852646133), -21, true},
+         decimal64_fast {UINT64_C(8054772849254568869), -30},
+         decimal64_fast {UINT64_C(4166666666572238908), -20},
+         decimal64_fast {UINT64_C(6574164404618517322), -32},
+         decimal64_fast {UINT64_C(5000000000000023748), -19, true},
+         decimal64_fast {UINT64_C(3367952043014273196), -35},
+         decimal64_fast {UINT64_C(9999999999999999999), -19}
+     }};
+
     // 20th Degree Remez Polynomial from 0 to pi / 4
     // Estimated max error: 2.1310510195548626186539810165524781e-35
     static constexpr std::array<decimal128, 21> d128_coeffs =
@@ -114,6 +131,9 @@ constexpr std::array<decimal128, 21> cos_table_imp<b>::d128_coeffs;
 template <bool b>
 constexpr std::array<decimal32_fast, 9> cos_table_imp<b>::d32_fast_coeffs;
 
+template <bool b>
+constexpr std::array<decimal64_fast, 13> cos_table_imp<b>::d64_fast_coeffs;
+
 #endif
 
 using cos_table = cos_table_imp<true>;
@@ -139,6 +159,12 @@ template <>
 constexpr auto cos_series_expansion<decimal64>(decimal64 x) noexcept
 {
     return remez_series_result(x, cos_detail::cos_table::d64_coeffs);
+}
+
+template <>
+constexpr auto cos_series_expansion<decimal64_fast>(decimal64_fast x) noexcept
+{
+    return remez_series_result(x, cos_detail::cos_table::d64_fast_coeffs);
 }
 
 template <>

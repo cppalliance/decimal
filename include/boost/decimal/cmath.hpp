@@ -102,6 +102,11 @@ BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal64 num, int expval) noexcept -
     return scalbnd64(num, expval);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal64_fast num, int expval) noexcept -> decimal64_fast
+{
+    return scalbnd64f(num, expval);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal128 num, int expval) noexcept -> decimal128
 {
     return scalbnd128(num, expval);
@@ -122,6 +127,11 @@ BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal64 num, long expval) noexcept
     return scalblnd64(num, expval);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal64_fast num, long expval) noexcept -> decimal64_fast
+{
+    return scalblnd64f(num, expval);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal128 num, long expval) noexcept -> decimal128
 {
     return scalblnd128(num, expval);
@@ -140,6 +150,11 @@ BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal32_fast mag, decimal32_fast 
 BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal64 mag, decimal64 sgn) noexcept -> decimal64
 {
     return copysignd64(mag, sgn);
+}
+
+BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal64_fast mag, decimal64_fast sgn) noexcept -> decimal64_fast
+{
+    return copysignd64f(mag, sgn);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal128 mag, decimal128 sgn) noexcept -> decimal128

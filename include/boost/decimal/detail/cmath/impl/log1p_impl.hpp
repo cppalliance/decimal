@@ -30,6 +30,7 @@ private:
     using d128_coeffs_t = std::array<decimal128, 36>;
 
     using d32_fast_coeffs_t = std::array<decimal32_fast, 12>;
+    using d64_fast_coeffs_t = std::array<decimal64_fast, 20>;
 
 public:
     static constexpr d32_coeffs_t d32_coeffs =
@@ -94,6 +95,32 @@ public:
           boost::decimal::decimal64 { UINT64_C(4761904761904761905), -19 - 1 }, // * z^21
      }};
 
+    static constexpr d64_fast_coeffs_t d64_fast_coeffs =
+    {{
+         // Series[Log[1 + x], {x, 0, 21}]
+         //            (1),                                                     // * z
+         -boost::decimal::decimal64_fast { 5, -1 },                                  // * z^2
+          boost::decimal::decimal64_fast { UINT64_C(3333333333333333333), -19 },     // * z^3
+         -boost::decimal::decimal64_fast { 25, -2 },                                 // * z^4
+          boost::decimal::decimal64_fast { 2, -1 },                                  // * z^5
+         -boost::decimal::decimal64_fast { UINT64_C(1666666666666666667), -19 },     // * z^6
+          boost::decimal::decimal64_fast { UINT64_C(1428571428571428571), -19 },     // * z^7
+         -boost::decimal::decimal64_fast { 125, -3 },                                // * z^8
+          boost::decimal::decimal64_fast { UINT64_C(1111111111111111111), -19 },     // * z^9
+         -boost::decimal::decimal64_fast { 1, -1 },                                  // * z^10
+          boost::decimal::decimal64_fast { UINT64_C(9090909090909090909), -19 - 1 }, // * z^11
+         -boost::decimal::decimal64_fast { UINT64_C(8333333333333333333), -19 - 1 }, // * z^12
+          boost::decimal::decimal64_fast { UINT64_C(7692307692307692308), -19 - 1 }, // * z^13
+         -boost::decimal::decimal64_fast { UINT64_C(7142857142857142857), -19 - 1 }, // * z^14
+          boost::decimal::decimal64_fast { UINT64_C(6666666666666666667), -19 - 1 }, // * z^15
+         -boost::decimal::decimal64_fast { UINT64_C(6250000000000000000), -19 - 1 }, // * z^16
+          boost::decimal::decimal64_fast { UINT64_C(5882352941176470588), -19 - 1 }, // * z^17
+         -boost::decimal::decimal64_fast { UINT64_C(5555555555555555556), -19 - 1 }, // * z^18
+          boost::decimal::decimal64_fast { UINT64_C(5263157894736842105), -19 - 1 }, // * z^19
+         -boost::decimal::decimal64_fast { 5, -2 },                                  // * z^20
+          boost::decimal::decimal64_fast { UINT64_C(4761904761904761905), -19 - 1 }, // * z^21
+     }};
+
     static constexpr d128_coeffs_t d128_coeffs =
     {{
          // Series[Log[(1 + (z/2))/(1 - (z/2))], {z, 0, 43}]
@@ -151,6 +178,10 @@ constexpr typename log1p_table_imp<b>::d128_coeffs_t log1p_table_imp<b>::d128_co
 template <bool b>
 constexpr typename log1p_table_imp<b>::d32_fast_coeffs_t log1p_table_imp<b>::d32_fast_coeffs;
 
+template <bool b>
+constexpr typename log1p_table_imp<b>::d64_fast_coeffs_t log1p_table_imp<b>::d64_fast_coeffs;
+
+
 #endif
 
 } //namespace log1p_detail
@@ -176,6 +207,12 @@ template <>
 constexpr auto log1p_series_expansion<decimal64>(decimal64 z2) noexcept
 {
     return taylor_series_result(z2, log1p_table::d64_coeffs);
+}
+
+template <>
+constexpr auto log1p_series_expansion<decimal64_fast>(decimal64_fast z2) noexcept
+{
+    return taylor_series_result(z2, log1p_table::d64_fast_coeffs);
 }
 
 template <>
