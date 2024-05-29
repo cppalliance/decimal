@@ -30,6 +30,7 @@ private:
     using d128_coeffs_t = std::array<decimal128, 32>;
 
     using d32_fast_coeffs_t = std::array<decimal32_fast, 10>;
+    using d64_fast_coeffs_t = std::array<decimal64_fast, 14>;
 
 public:
     static constexpr d32_coeffs_t d32_coeffs =
@@ -93,6 +94,29 @@ public:
         ::boost::decimal::decimal64 { UINT64_C(1154399218598221557), - 19 - 10 }  // * x^14
      }};
 
+    static constexpr d64_fast_coeffs_t d64_fast_coeffs =
+    {{
+         // Specifically derive a polynomial expansion for Exp[x] - 1 for this work.
+         //   Table[{x, Exp[x] - 1}, {x, -Log[2], Log[2], 1/60}]
+         //   N[%, 48]
+         //   Fit[%, {x, x^2, x^3, x^4, x^5, x^6, x^7, x^8, x^9, x^10, x^11, x^12, x^13, x^14}, x]
+
+         ::boost::decimal::decimal64_fast { UINT64_C(1000000000000000003), - 19 +  1 }, // * x
+         ::boost::decimal::decimal64_fast { UINT64_C(4999999999999999998), - 19 -  0 }, // * x^2
+         ::boost::decimal::decimal64_fast { UINT64_C(1666666666666664035), - 19 -  0 }, // * x^3
+         ::boost::decimal::decimal64_fast { UINT64_C(4166666666666666934), - 19 -  1 }, // * x^4
+         ::boost::decimal::decimal64_fast { UINT64_C(8333333333339521841), - 19 -  2 }, // * x^5
+         ::boost::decimal::decimal64_fast { UINT64_C(1388888888888953513), - 19 -  2 }, // * x^6
+         ::boost::decimal::decimal64_fast { UINT64_C(1984126983488689186), - 19 -  3 }, // * x^7
+         ::boost::decimal::decimal64_fast { UINT64_C(2480158730001499149), - 19 -  4 }, // * x^8
+         ::boost::decimal::decimal64_fast { UINT64_C(2755732258782898252), - 19 -  5 }, // * x^9
+         ::boost::decimal::decimal64_fast { UINT64_C(2755732043147979013), - 19 -  6 }, // * x^10
+         ::boost::decimal::decimal64_fast { UINT64_C(2505116286861719378), - 19 -  7 }, // * x^11
+         ::boost::decimal::decimal64_fast { UINT64_C(2087632598463662328), - 19 -  8 }, // * x^12
+         ::boost::decimal::decimal64_fast { UINT64_C(1619385892296180390), - 19 -  9 }, // * x^13
+         ::boost::decimal::decimal64_fast { UINT64_C(1154399218598221557), - 19 - 10 }  // * x^14
+     }};
+
     static constexpr d128_coeffs_t d128_coeffs =
     {{
         // Specifically derive a polynomial expansion for Exp[x] - 1 for this work.
@@ -148,6 +172,9 @@ constexpr typename expm1_table_imp<b>::d128_coeffs_t expm1_table_imp<b>::d128_co
 template <bool b>
 constexpr typename expm1_table_imp<b>::d32_fast_coeffs_t expm1_table_imp<b>::d32_fast_coeffs;
 
+template <bool b>
+constexpr typename expm1_table_imp<b>::d64_fast_coeffs_t expm1_table_imp<b>::d64_fast_coeffs;
+
 #endif
 
 } //namespace expm1_detail
@@ -173,6 +200,12 @@ template <>
 constexpr auto expm1_series_expansion<decimal64>(decimal64 x) noexcept
 {
     return taylor_series_result(x, expm1_table::d64_coeffs);
+}
+
+template <>
+constexpr auto expm1_series_expansion<decimal64_fast>(decimal64_fast x) noexcept
+{
+    return taylor_series_result(x, expm1_table::d64_fast_coeffs);
 }
 
 template <>
