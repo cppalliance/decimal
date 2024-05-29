@@ -51,6 +51,7 @@ private:
     using d32_coeffs_t      = std::array<decimal32,        7>;
     using d32_fast_coeffs_t = std::array<decimal32_fast,   7>;
     using d64_coeffs_t      = std::array<decimal64,       10>;
+    using d64_fast_coeffs_t = std::array<decimal64_fast,  10>;
     using d128_coeffs_t     = std::array<decimal128,      15>;
 
 public:
@@ -94,6 +95,22 @@ public:
         +::boost::decimal::decimal64 { UINT64_C(1046209458447918742), - 19 -  6 }, // * (x - 1)^7
         -::boost::decimal::decimal64 { UINT64_C(8733218100273797361), - 19 -  8 }, // * (x - 1)^8
         +::boost::decimal::decimal64 { UINT64_C(9478277782762358956), - 19 - 10 }, // * (x - 1)^9
+     }};
+
+    static constexpr d64_fast_coeffs_t d64_fast_coeffs =
+    {{
+         // N[Series[Zeta[x], {x, 1, 9}], 19]
+
+         +::boost::decimal::decimal64_fast { UINT64_C(5772156649015328606), - 19 -  0 }, // EulerGamma
+         +::boost::decimal::decimal64_fast { UINT64_C(7281584548367672486), - 19 -  1 }, // * (x - 1)
+         -::boost::decimal::decimal64_fast { UINT64_C(4845181596436159242), - 19 -  2 }, // * (x - 1)^2
+         -::boost::decimal::decimal64_fast { UINT64_C(3423057367172243110), - 19 -  3 }, // * (x - 1)^3
+         +::boost::decimal::decimal64_fast { UINT64_C(9689041939447083573), - 19 -  4 }, // * (x - 1)^4
+         -::boost::decimal::decimal64_fast { UINT64_C(6611031810842189181), - 19 -  5 }, // * (x - 1)^5
+         -::boost::decimal::decimal64_fast { UINT64_C(3316240908752772359), - 19 -  6 }, // * (x - 1)^6
+         +::boost::decimal::decimal64_fast { UINT64_C(1046209458447918742), - 19 -  6 }, // * (x - 1)^7
+         -::boost::decimal::decimal64_fast { UINT64_C(8733218100273797361), - 19 -  8 }, // * (x - 1)^8
+         +::boost::decimal::decimal64_fast { UINT64_C(9478277782762358956), - 19 - 10 }, // * (x - 1)^9
      }};
 
     static constexpr d128_coeffs_t d128_coeffs =
@@ -228,6 +245,41 @@ constexpr auto riemann_zeta_series_or_pade_expansion<decimal64>(decimal64 x) noe
 
         const decimal64 top { c0 + x * (c1 + x * (c2 + x * (c3 + x * (c4 + x * (c5+ x * c6))))) };
         const decimal64 bot { d0 + x * (d1 + x * (d2 + x * (d3 + x * (d4 + x * (d5 + x))))) };
+
+        return top / bot;
+    }
+}
+
+template <>
+constexpr auto riemann_zeta_series_or_pade_expansion<decimal64_fast>(decimal64_fast x) noexcept
+{
+    constexpr decimal64_fast one { 1 };
+
+    const decimal64_fast dx { x - one };
+
+    if (fabs(dx) < decimal64_fast { 5, -2 })
+    {
+        return one / dx + taylor_series_result(dx, riemann_zeta_table::d64_fast_coeffs);
+    }
+    else
+    {
+        constexpr decimal64_fast c0 { UINT64_C(4124764818173475125), - 19 + 5 };
+        constexpr decimal64_fast c1 { UINT64_C(4582078064035558510), - 19 + 5 };
+        constexpr decimal64_fast c2 { UINT64_C(1806662427082674333), - 19 + 5 };
+        constexpr decimal64_fast c3 { UINT64_C(3281232347201801441), - 19 + 4 };
+        constexpr decimal64_fast c4 { UINT64_C(3092253262304078300), - 19 + 3 };
+        constexpr decimal64_fast c5 { UINT64_C(1985384224421766402), - 19 + 2 };
+        constexpr decimal64_fast c6 { UINT64_C(1016070109033501213), - 19 + 1 };
+
+        constexpr decimal64_fast d0 { UINT64_C(8249529636338921254), - 19 + 5, true };
+        constexpr decimal64_fast d1 { UINT64_C(5997465199121809585), - 19 + 5 };
+        constexpr decimal64_fast d2 { UINT64_C(1915568444415559307), - 19 + 5 };
+        constexpr decimal64_fast d3 { UINT64_C(3021354370625514285), - 19 + 4 };
+        constexpr decimal64_fast d4 { UINT64_C(3227310996533313801), - 19 + 3 };
+        constexpr decimal64_fast d5 { UINT64_C(1987445773667795184), - 19 + 2 };
+
+        const decimal64_fast top { c0 + x * (c1 + x * (c2 + x * (c3 + x * (c4 + x * (c5+ x * c6))))) };
+        const decimal64_fast bot { d0 + x * (d1 + x * (d2 + x * (d3 + x * (d4 + x * (d5 + x))))) };
 
         return top / bot;
     }
