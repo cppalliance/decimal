@@ -168,19 +168,19 @@ public:
 #if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
 
 template <bool b>
-constexpr typename asin_table_imp<b>::d32_coeffs_t d32 asin_table_imp<b>::d32_coeffs;
+constexpr typename asin_table_imp<b>::d32_coeffs_t asin_table_imp<b>::d32_coeffs;
 
 template <bool b>
-constexpr asin_table_imp<b>::d64_coeffs_t asin_table_imp<b>::d64_coeffs;
+constexpr typename asin_table_imp<b>::d64_coeffs_t asin_table_imp<b>::d64_coeffs;
 
 template <bool b>
-constexpr asin_table_imp<b>::d128_coeffs_t asin_table_imp<b>::d128_coeffs;
+constexpr typename asin_table_imp<b>::d128_coeffs_t asin_table_imp<b>::d128_coeffs;
 
 template <bool b>
-constexpr asin_table_imp<b>::d32_fast_coeffs_t asin_table_imp<b>::d32_fast_coeffs;
+constexpr typename asin_table_imp<b>::d32_fast_coeffs_t asin_table_imp<b>::d32_fast_coeffs;
 
 template <bool b>
-constexpr asin_table_imp<b>::d64_fast_coeffs_t asin_table_imp<b>::d64_fast_coeffs;
+constexpr typename asin_table_imp<b>::d64_fast_coeffs_t asin_table_imp<b>::d64_fast_coeffs;
 
 #endif
 
