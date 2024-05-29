@@ -305,6 +305,23 @@ public:
     constexpr auto operator*=(decimal64_fast rhs) noexcept -> decimal64_fast&;
     constexpr auto operator/=(decimal64_fast rhs) noexcept -> decimal64_fast&;
 
+    // Mixed type compound operators
+    template <typename Integer>
+    constexpr auto operator+=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&);
+
+    template <typename Integer>
+    constexpr auto operator-=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&);
+
+    template <typename Integer>
+    constexpr auto operator*=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&);
+
+    template <typename Integer>
+    constexpr auto operator/=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&);
+
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
     // LCOV_EXCL_START
@@ -1325,6 +1342,38 @@ constexpr auto decimal64_fast::operator*=(decimal64_fast rhs) noexcept -> decima
 }
 
 constexpr auto decimal64_fast::operator/=(decimal64_fast rhs) noexcept -> decimal64_fast &
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal64_fast::operator+=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&)
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal64_fast::operator-=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&)
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal64_fast::operator*=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&)
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal64_fast::operator/=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&)
 {
     *this = *this / rhs;
     return *this;
