@@ -322,6 +322,12 @@ public:
     constexpr auto operator/=(Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&);
 
+    // Increment and decrement
+    constexpr auto operator++() noexcept -> decimal64_fast&;
+    constexpr auto operator++(int) noexcept -> decimal64_fast&;
+    constexpr auto operator--() noexcept -> decimal64_fast&;
+    constexpr auto operator--(int) noexcept -> decimal64_fast&;
+
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
     // LCOV_EXCL_START
@@ -1377,6 +1383,30 @@ constexpr auto decimal64_fast::operator/=(Integer rhs) noexcept
 {
     *this = *this / rhs;
     return *this;
+}
+
+constexpr auto decimal64_fast::operator++() noexcept -> decimal64_fast&
+{
+    constexpr decimal64_fast one {1, 0};
+    *this = *this + one;
+    return *this;
+}
+
+constexpr auto decimal64_fast::operator++(int) noexcept -> decimal64_fast&
+{
+    return ++(*this);
+}
+
+constexpr auto decimal64_fast::operator--() noexcept -> decimal64_fast&
+{
+    constexpr decimal64_fast one {1, 0};
+    *this = *this - one;
+    return *this;
+}
+
+constexpr auto decimal64_fast::operator--(int) noexcept -> decimal64_fast&
+{
+    return --(*this);
 }
 
 constexpr auto scalblnd64f(decimal64_fast num, long exp) noexcept -> decimal64_fast
