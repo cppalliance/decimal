@@ -235,8 +235,8 @@ constexpr auto riemann_zeta(IntegralType n) noexcept
 
     #endif
 
-    // TODO(ckormanyos) COnsider making an integral-argument specialization.
-    // Some exact values are know and some simplifications are possible.
+    // TODO(ckormanyos) Consider making an integral-argument specialization.
+    // Some exact values are known. Some simplifications for small-n are possible.
 
     return static_cast<T>(detail::riemann_zeta_impl(static_cast<evaluation_type>(n)));
 }
