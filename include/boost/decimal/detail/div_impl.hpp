@@ -50,6 +50,44 @@ constexpr auto generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept -> vo
     q = T{res_sig_32, res_exp, sign};
 }
 
+template <typename T>
+constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept -> void
+{
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    #else
+    using unsigned_int128_type = boost::decimal::detail::uint128;
+    #endif
+
+    bool sign {lhs.sign != rhs.sign};
+
+    // If rhs is greater than we need to offset the significands to get the correct values
+    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
+    constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64>))};
+    const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.sig) * tens_needed};
+
+    auto res_sig {big_sig_lhs / static_cast<unsigned_int128_type>(rhs.sig)};
+    auto res_exp {(lhs.exp - detail::precision_v<decimal64>) - rhs.exp};
+
+    const auto sig_dig {detail::num_digits(res_sig)};
+
+    if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
+    {
+        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
+        res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
+    }
+
+    const auto res_sig_64 {static_cast<std::uint64_t>(res_sig)};
+
+    if (res_sig_64 == 0)
+    {
+        sign = false;
+    }
+
+    // Let the constructor handle shrinking it back down and rounding correctly
+    q = T{res_sig_64, res_exp, sign};
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost

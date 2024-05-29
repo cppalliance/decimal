@@ -70,13 +70,13 @@ constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal
 
     if (!promoted_mul_result.sign && z_components.sign)
     {
-        result = d64_sub_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+        result = detail::d64_sub_impl<detail::decimal64_components>(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
                               z_components.sig, z_components.exp, z_components.sign,
                               abs_lhs_bigger);
     }
     else
     {
-        result = d64_add_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+        result = detail::d64_add_impl<detail::decimal64_components>(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
                               z_components.sig, z_components.exp, z_components.sign);
     }
 
@@ -102,7 +102,7 @@ constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal
     auto exp_rhs {y.biased_exponent()};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
 
-    auto mul_result {d64_mul_impl(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
+    auto mul_result {detail::d64_mul_impl<detail::decimal64_components>(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
     const decimal64 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
 
     const auto res_add {detail::check_non_finite(dec_result, z)};
@@ -214,13 +214,13 @@ constexpr auto fmad32f(decimal32_fast x, decimal32_fast y, decimal32_fast z) noe
 
     if (!promoted_mul_result.sign && z_components.sign)
     {
-        result = d64_sub_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+        result = detail::d64_sub_impl<detail::decimal64_components>(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
                               z_components.sig, z_components.exp, z_components.sign,
                               abs_lhs_bigger);
     }
     else
     {
-        result = d64_add_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+        result = detail::d64_add_impl<detail::decimal64_components>(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
                               z_components.sig, z_components.exp, z_components.sign);
     }
 

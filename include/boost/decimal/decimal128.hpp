@@ -1206,14 +1206,7 @@ constexpr auto operator<(decimal128 lhs, decimal128 rhs) noexcept -> bool
     }
     else if (isfinite(lhs) && isinf(rhs))
     {
-        if (!rhs.isneg())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return !rhs.isneg();
     }
 
     return less_parts_impl<decimal128>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
