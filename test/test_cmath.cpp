@@ -1313,6 +1313,15 @@ int main()
     test_islessgreater<decimal64>();
     test_isunordered<decimal64>();
 
+    test_fmax<decimal64_fast>();
+    test_isgreater<decimal64_fast>();
+    test_isgreaterequal<decimal64_fast>();
+    test_fmin<decimal64_fast>();
+    test_isless<decimal64_fast>();
+    test_islessequal<decimal64_fast>();
+    test_islessgreater<decimal64_fast>();
+    test_isunordered<decimal64_fast>();
+
     test_fmax<decimal128>();
     test_isgreater<decimal128>();
     test_isgreaterequal<decimal128>();
@@ -1334,6 +1343,10 @@ int main()
     test_ceil<decimal64>();
     test_trunc<decimal64>();
 
+    test_floor<decimal64_fast>();
+    test_ceil<decimal64_fast>();
+    test_trunc<decimal64_fast>();
+
     test_floor<decimal128>();
     test_ceil<decimal128>();
     test_trunc<decimal128>();
@@ -1350,6 +1363,10 @@ int main()
     test_scalbn<decimal64>();
     test_scalbln<decimal64>();
 
+    test_frexp10<decimal64_fast>();
+    test_scalbn<decimal64_fast>();
+    test_scalbln<decimal64_fast>();
+
     test_div_fmod<decimal32>();
     test_div_fmod<decimal64>();
 
@@ -1359,29 +1376,35 @@ int main()
     test_fma<decimal32>();
     test_fma<decimal32_fast>();
     test_fma<decimal64>();
+    test_fma<decimal64_fast>();
     test_fma<decimal128>();
 
     test_modf<decimal32>();
     test_modf<decimal32_fast>();
     test_modf<decimal64>();
+    test_modf<decimal64_fast>();
 
     test_fdim<decimal32>();
     test_fdim<decimal32_fast>();
     test_fdim<decimal64>();
+    test_fdim<decimal64_fast>();
 
     test_ilogb<decimal32>();
     test_ilogb<decimal32_fast>();
     test_ilogb<decimal64>();
+    test_ilogb<decimal64_fast>();
     test_ilogb<decimal128>();
 
     test_logb<decimal32>();
     test_logb<decimal32_fast>();
     test_logb<decimal64>();
+    test_logb<decimal64_fast>();
     test_logb<decimal128>();
 
     test_sqrt<decimal32>();
     test_sqrt<decimal32_fast>();
     test_sqrt<decimal64>();
+    test_sqrt<decimal64_fast>();
 
     test_two_val_hypot<decimal32>();
     test_three_val_hypot<decimal32>();
@@ -1389,6 +1412,8 @@ int main()
     test_three_val_hypot<decimal32_fast>();
     test_two_val_hypot<decimal64>();
     test_three_val_hypot<decimal64>();
+    test_two_val_hypot<decimal64_fast>();
+    test_three_val_hypot<decimal64_fast>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_two_val_hypot<decimal128>();
@@ -1413,6 +1438,11 @@ int main()
     test_llrint<decimal64>();
     test_nearbyint<decimal64>();
 
+    test_rint<decimal64_fast>();
+    test_lrint<decimal64_fast>();
+    test_llrint<decimal64_fast>();
+    test_nearbyint<decimal64_fast>();
+
     test_round<decimal32>();
     test_lround<decimal32>();
     test_llround<decimal32>();
@@ -1425,6 +1455,10 @@ int main()
     test_lround<decimal64>();
     test_llround<decimal64>();
 
+    test_round<decimal64_fast>();
+    test_lround<decimal64_fast>();
+    test_llround<decimal64_fast>();
+
     test_nextafter<decimal32>();
     test_nexttoward<decimal32>();
 
@@ -1434,9 +1468,13 @@ int main()
     test_nextafter<decimal64>();
     test_nexttoward<decimal64>();
 
+    test_nextafter<decimal64_fast>();
+    test_nexttoward<decimal64_fast>();
+
     test_pow<decimal32>();
     test_pow<decimal32_fast>();
     test_pow<decimal64>();
+    test_pow<decimal64_fast>();
 
     test_exp2<decimal32>();
     test_exp2<decimal32_fast>();
@@ -1451,10 +1489,12 @@ int main()
     test_log2<decimal32>();
     test_log2<decimal32_fast>();
     test_log2<decimal64>();
+    test_log2<decimal64_fast>();
 
     test_log10<decimal32>();
     test_log10<decimal32_fast>();
     test_log10<decimal64>();
+    test_log10<decimal64_fast>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_log2<decimal128>();
