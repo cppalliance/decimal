@@ -30,6 +30,7 @@ private:
     using d128_coeffs_t = std::array<decimal128, 17>;
 
     using d32_fast_coeffs_t = std::array<decimal32_fast, 6>;
+    using d64_fast_coeffs_t = std::array<decimal64_fast, 9>;
 
 public:
     static constexpr d32_coeffs_t d32_coeffs =
@@ -71,6 +72,21 @@ public:
          ::boost::decimal::decimal64 { UINT64_C(1561920696858622646), - 19 - 15 }  // * x^18
      }};
 
+    static constexpr d64_fast_coeffs_t d64_fast_coeffs =
+    {{
+         // Series[Cosh[x], {x, 0, 18}]
+         //            (1),                                                             // * 1
+         ::boost::decimal::decimal64_fast { 5, -1 },                                    // * x^2
+         ::boost::decimal::decimal64_fast { UINT64_C(4166666666666666667), - 19 -  1 }, // * x^4
+         ::boost::decimal::decimal64_fast { UINT64_C(1388888888888888889), - 19 -  2 }, // * x^6
+         ::boost::decimal::decimal64_fast { UINT64_C(2480158730158730159), - 19 -  4 }, // * x^8
+         ::boost::decimal::decimal64_fast { UINT64_C(2755731922398589065), - 19 -  6 }, // * x^10
+         ::boost::decimal::decimal64_fast { UINT64_C(2087675698786809898), - 19 -  8 }, // * x^12
+         ::boost::decimal::decimal64_fast { UINT64_C(1147074559772972471), - 19 - 10 }, // * x^14
+         ::boost::decimal::decimal64_fast { UINT64_C(4779477332387385297), - 19 - 13 }, // * x^16
+         ::boost::decimal::decimal64_fast { UINT64_C(1561920696858622646), - 19 - 15 }  // * x^18
+     }};
+
     static constexpr d128_coeffs_t d128_coeffs =
     {{
          // Series[Cosh[x], {x, 0, 34}]
@@ -109,6 +125,9 @@ constexpr typename cosh_table_imp<b>::d128_coeffs_t cosh_table_imp<b>::d128_coef
 template <bool b>
 constexpr typename cosh_table_imp<b>::d32_fast_coeffs_t cosh_table_imp<b>::d32_fast_coeffs;
 
+template <bool b>
+constexpr typename cosh_table_imp<b>::d64_fast_coeffs_t cosh_table_imp<b>::d64_fast_coeffs;
+
 #endif
 
 } //namespace cosh_detail
@@ -140,6 +159,12 @@ template <>
 constexpr auto cosh_series_expansion<decimal32_fast>(decimal32_fast z2) noexcept
 {
     return taylor_series_result(z2, cosh_table::d32_fast_coeffs);
+}
+
+template <>
+constexpr auto cosh_series_expansion<decimal64_fast>(decimal64_fast z2) noexcept
+{
+    return taylor_series_result(z2, cosh_table::d64_fast_coeffs);
 }
 
 } //namespace detail
