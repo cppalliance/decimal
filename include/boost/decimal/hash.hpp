@@ -79,6 +79,21 @@ struct hash<boost::decimal::decimal32_fast>
     }
 };
 
+BOOST_DECIMAL_EXPORT template <>
+struct hash<boost::decimal::decimal64_fast>
+{
+    // Since the underlying type is a std::uint64_t we will rely on its hash function from the STL
+    // First we convert to a decimal64 so they will have the same hash value
+    auto operator()(const boost::decimal::decimal64_fast& v) const noexcept -> std::size_t
+    {
+        boost::decimal::decimal64 v_64 {v};
+        std::uint64_t bits;
+        std::memcpy(&bits, &v_64, sizeof(std::uint64_t));
+
+        return std::hash<std::uint64_t>{}(bits);
+    }
+};
+
 }
 
 #endif //BOOST_DECIMAL_HASH_HPP
