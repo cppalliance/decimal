@@ -573,6 +573,11 @@ pre.rouge .gs {
 <li><a href="#decimal32_description">Description</a></li>
 </ul>
 </li>
+<li><a href="#decimal32_fast">Decimal32_fast</a>
+<ul class="sectlevel2">
+<li><a href="#decimal32_fast_description">Description</a></li>
+</ul>
+</li>
 <li><a href="#decimal64">Decimal64</a>
 <ul class="sectlevel2">
 <li><a href="#decimal64_description">Description</a></li>
@@ -618,6 +623,7 @@ pre.rouge .gs {
 <li><a href="#cmath_quantexp">quantexp</a></li>
 <li><a href="#cmath_quantized">quantized</a></li>
 <li><a href="#cmath_frexp10">frexp10</a></li>
+<li><a href="#cmath_trunc_to">trunc_to</a></li>
 </ul>
 </li>
 </ul>
@@ -1081,6 +1087,109 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <span class="k">constexpr</span> <span class="n">decimal32</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">-=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
 <span class="k">constexpr</span> <span class="n">decimal32</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
 <span class="k">constexpr</span> <span class="n">decimal32</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">/=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+
+<span class="c1">// 3.2.6 Conversion to floating-point type</span>
+<span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">operator</span> <span class="kt">float</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">operator</span> <span class="kt">double</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">operator</span> <span class="kt">long</span> <span class="kt">double</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// The following are available assuming a C++23 compiler that provides the header &lt;stdfloat&gt;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">float16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">float32_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">float64_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">bfloat16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal64</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal128</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="p">}</span> <span class="c1">//namespace decimal</span>
+<span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="decimal32_fast">Decimal32_fast</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="decimal32_fast_description">Description</h3>
+<div class="paragraph">
+<p><code>decimal32_fast</code> has the same ranges of values and representations as <code>decimal32</code> but with greater performance.
+The performance changes by being non-IEEE 754 compliant so that the value does not have to be decoded from bits, but is instead directly represented internal to the type.
+As is often the case this trades space for time by having greater storage width requirements.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Storage width - At least 48bits (<code>std::uint_fast32_t</code> + <code>std::uint_fast8_t</code> + <code>bool</code>)</p>
+</li>
+<li>
+<p>Precision - 7 decimal digits (not bits like binary)</p>
+</li>
+<li>
+<p>Max exponent - 96</p>
+</li>
+<li>
+<p>Max Value - 9.999999e96</p>
+</li>
+<li>
+<p>Smallest normalized value - 1.000000e-95</p>
+</li>
+<li>
+<p>Smallest subnormal - 1e-101</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/decimal/decimal32_fast.hpp&gt;</span><span class="cp">
+</span>
+<span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="c1">// Paragraph numbers are from ISO/IEC DTR 24733</span>
+
+<span class="c1">// 3.2.2.1 construct/copy/destroy</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span><span class="p">()</span> <span class="k">noexcept</span> <span class="o">=</span> <span class="k">default</span><span class="p">;</span>
+
+<span class="c1">// 3.2.2.2 Conversion form floating-point type</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Float</span><span class="p">&gt;</span>
+<span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">decimal32_fast</span><span class="p">(</span><span class="n">Float</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// 3.2.2.3 Conversion from integral type</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Integer</span><span class="p">&gt;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="n">decimal32_fast</span><span class="p">(</span><span class="n">Integer</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Integral1</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">Integral2</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span><span class="p">(</span><span class="n">Integral1</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">Integral2</span> <span class="n">exp</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">sign</span> <span class="o">=</span> <span class="nb">false</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Integral</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">Integeral</span><span class="o">&amp;</span> <span class="n">RHS</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// 3.2.2.4 Conversion to integral type</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">int</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">unsigned</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">long</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">unsigned</span> <span class="kt">long</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">long</span> <span class="kt">long</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="kt">int8_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint8_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="kt">int16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// 3.2.2.5 increment and decrement operators:</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">++</span><span class="p">();</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span>  <span class="k">operator</span><span class="o">++</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">--</span><span class="p">();</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span>  <span class="k">operator</span><span class="o">--</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+
+<span class="c1">// 3.2.2.6 compound assignment:</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">+=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">-=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">/=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
 
 <span class="c1">// 3.2.6 Conversion to floating-point type</span>
 <span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">operator</span> <span class="kt">float</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
@@ -2161,6 +2270,19 @@ They are also all constexpr with C++14 unlike the built-in floating point types 
 <div class="paragraph">
 <p>This function is very similar to <a href="https://en.cppreference.com/w/cpp/numeric/math/frexp">frexp</a>, but returns the significand and an integral power of 10 since the <code>FLT_RADIX</code> of this type is 10.
 The significand is normalized to the number of digits of precision the type has (e.g. for decimal32 it is [1'000'000, 9'999'999]).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cmath_trunc_to">trunc_to</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">Decimal</span> <span class="nf">trunc_to</span><span class="p">(</span><span class="n">Decimal</span> <span class="n">val</span><span class="p">,</span> <span class="kt">int</span> <span class="n">precision</span> <span class="o">=</span> <span class="mi">0</span><span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The function returns the decimal type with number of fractional digits equal to the value of precision.
+<code>trunc_to</code> is similar to <a href="https://en.cppreference.com/w/cpp/numeric/math/trunc">trunc</a>, and with the default precision argument of 0 it is identical.</p>
 </div>
 </div>
 </div>
@@ -3785,7 +3907,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-05-21 11:38:11 +0200
+Last updated 2024-05-30 09:47:46 +0200
 </div>
 </div>
 <style>
