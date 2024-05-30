@@ -205,18 +205,28 @@ int main()
 {
     test_from_chars_scientific<decimal32>();
     test_from_chars_scientific<decimal64>();
+    test_from_chars_scientific<decimal32_fast>();
+    test_from_chars_scientific<decimal64_fast>();
 
     test_from_chars_fixed<decimal32>();
     test_from_chars_fixed<decimal64>();
+    test_from_chars_fixed<decimal32_fast>();
+    test_from_chars_fixed<decimal64_fast>();
 
     test_from_chars_general<decimal32>();
     test_from_chars_general<decimal64>();
+    test_from_chars_general<decimal32_fast>();
+    test_from_chars_general<decimal64_fast>();
 
     test_non_finite_values<decimal32>();
     test_non_finite_values<decimal64>();
+    test_non_finite_values<decimal32_fast>();
+    test_non_finite_values<decimal64_fast>();
 
     test_hex_values<decimal32>();
     test_hex_values<decimal64>();
+    test_hex_values<decimal32_fast>();
+    test_hex_values<decimal64_fast>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_from_chars_scientific<decimal128>();
