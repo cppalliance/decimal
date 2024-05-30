@@ -18,6 +18,7 @@ https://www.boost.org/LICENSE_1_0.txt
 include::decimal/overview.adoc[]
 include::decimal/generic_decimal.adoc[]
 include::decimal/decimal32.adoc[]
+include::decimal/decimal32_fast.adoc[]
 include::decimal/decimal64.adoc[]
 include::decimal/decimal128.adoc[]
 include::decimal/literals.adoc[]
