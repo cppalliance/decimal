@@ -1,5 +1,5 @@
-// Copyright 2023 Matt Borland
-// Copyright 2023 Christopher Kormanyos
+// Copyright 2023 - 2024 Matt Borland
+// Copyright 2023 - 2024 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -45,43 +45,61 @@ constexpr auto sin_impl(T x) noexcept
     }
     else
     {
-        // Perform argument reduction and subsequent computation of the result.
+        result = T { };
 
-        // Given x = k * (pi/2) + r, compute n = (k % 4).
-
-        // | n |  sin(x) |  cos(x) |  sin(x)/cos(x) |
-        // |----------------------------------------|
-        // | 0 |  sin(r) |  cos(r) |  sin(r)/cos(r) |
-        // | 1 |  cos(r) | -sin(r) | -cos(r)/sin(r) |
-        // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
-        // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
-
-        #if (defined(_MSC_VER) && (_MSC_VER < 1920))
-        const auto my_pi_half = numbers::pi_v<T> / 2;
-        #else
-        constexpr auto my_pi_half = numbers::pi_v<T> / 2;
-        #endif
-
-        int k { };
-        auto r { remquo(x, my_pi_half, &k) };
-
-        const auto n = static_cast<unsigned>(k % 4);
-
-        switch(n)
+        if(x > static_cast<int>(INT8_C(0)))
         {
-            case 3U:
-                result = -detail::cos_series_expansion(r);
-                break;
-            case 2U:
-                result = -detail::sin_series_expansion(r);
-                break;
-            case 1U:
+            // Perform argument reduction and subsequent scaling of the result.
+
+            // Given x = k * (pi/2) + r, compute n = (k % 4).
+
+            // | n |  sin(x) |  cos(x) |  sin(x)/cos(x) |
+            // |----------------------------------------|
+            // | 0 |  sin(r) |  cos(r) |  sin(r)/cos(r) |
+            // | 1 |  cos(r) | -sin(r) | -cos(r)/sin(r) |
+            // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
+            // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
+
+            constexpr T my_pi_half { numbers::pi_v<T> / 2 };
+
+            const auto k = static_cast<unsigned>(x / my_pi_half);
+            const auto n = static_cast<unsigned>(k % static_cast<unsigned>(UINT8_C(4)));
+
+            auto r = x - (my_pi_half * k);
+
+            constexpr T half { 5, -1 };
+
+            const bool do_scaling { x > half };
+
+            if(do_scaling)
+            {
+                // Reduce the argument with factors of three.
+                r /= static_cast<unsigned>(UINT8_C(3));
+            }
+
+            switch(n)
+            {
+              case static_cast<unsigned>(UINT8_C(1)):
+              case static_cast<unsigned>(UINT8_C(3)):
                 result = detail::cos_series_expansion(r);
                 break;
-            case 0U:
-            default:
+              case static_cast<unsigned>(UINT8_C(0)):
+              case static_cast<unsigned>(UINT8_C(2)):
+              default:
                 result = detail::sin_series_expansion(r);
                 break;
+            }
+
+            if(do_scaling)
+            {
+                result *= (static_cast<unsigned>(UINT8_C(3)) - ((result * result) * static_cast<unsigned>(UINT8_C(4))));
+            }
+
+            if(signbit(result)) { result = -result; }
+
+            const auto b_neg = (n > static_cast<unsigned>(UINT8_C(1)));
+
+            if(b_neg) { result = -result; }
         }
     }
 

@@ -52,7 +52,7 @@ constexpr auto tgamma_impl(T x) noexcept
             result = x;
         }
     }
-    else if (is_neg && is_pure_int)
+    else if (is_pure_int && is_neg)
     {
         // Pure negative integer argument.
         result = std::numeric_limits<T>::quiet_NaN();
@@ -62,9 +62,8 @@ constexpr auto tgamma_impl(T x) noexcept
         if (is_neg)
         {
             // Reflection for negative argument.
-            const auto ga = tgamma(-x);
 
-            result = -numbers::pi_v<T> / ((x * ga) * sin(numbers::pi_v<T> * x));
+            result = -numbers::pi_v<T> / ((x * tgamma(-x)) * sin(numbers::pi_v<T> * x));
         }
         else
         {
@@ -83,14 +82,14 @@ constexpr auto tgamma_impl(T x) noexcept
             {
                 constexpr int asymp_cutoff
                 {
-                      std::numeric_limits<T>::digits10 < 10 ? T {  2, 1 } //  20
-                    : std::numeric_limits<T>::digits10 < 20 ? T {  5, 1 } //  50
-                    :                                         T { 15, 1 } // 150
+                      std::numeric_limits<T>::digits10 < 10 ? T { 2, 1 } // 20
+                    : std::numeric_limits<T>::digits10 < 20 ? T { 4, 1 } // 40
+                    :                                         T { 9, 1 } // 90
                 };
 
                 if (x < T { asymp_cutoff })
                 {
-                    T r { 1 };
+                    T r { one };
 
                     T z { x };
 

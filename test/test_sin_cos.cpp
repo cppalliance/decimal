@@ -1,4 +1,5 @@
 // Copyright 2024 Matt Borland
+// Copyright 2024 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -145,6 +146,221 @@ void print_value(T value, const char* str)
               << "\nExp: " << ptr << "\n" << std::endl;
 }
 
+namespace local
+{
+  template<typename NumericType>
+  auto is_close_fraction(const NumericType& a,
+                         const NumericType& b,
+                         const NumericType& tol) noexcept -> bool
+  {
+    using std::fabs;
+
+    auto result_is_ok = bool { };
+
+    NumericType delta { };
+
+    if(b == static_cast<NumericType>(0))
+    {
+      delta = fabs(a - b); // LCOV_EXCL_LINE
+
+      result_is_ok = (delta < tol); // LCOV_EXCL_LINE
+    }
+    else
+    {
+      delta = fabs(1 - (a / b));
+
+      result_is_ok = (delta < tol);
+    }
+
+    // LCOV_EXCL_START
+    if (!result_is_ok)
+    {
+      std::cerr << std::setprecision(std::numeric_limits<NumericType>::digits10) << "a: " << a
+                << "\nb: " << b
+                << "\ndelta: " << delta
+                << "\ntol: " << tol << std::endl;
+    }
+    // LCOV_EXCL_STOP
+
+    return result_is_ok;
+  }
+
+  auto test_sin_128(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal128;
+
+    using str_ctrl_array_type = std::array<const char*, 41U>;
+
+    const str_ctrl_array_type ctrl_strings =
+    {{
+       // Table[N[Sin[n + n/10], 36], {n, -20, 20, 1}]
+       "0.00885130929040387592169025681577233246",
+       "-0.887157528692350427205640661441011342",
+       "-0.813673737507104955433222744609065147",
+       "0.148999025814198104343982890664237216",
+       "0.948844497918124441518161248410867044",
+       "0.711785342369123065842340834512896188",
+       "-0.303118356745702602523931087729992333",
+       "-0.986771964274613470590033455846296362",
+       "-0.592073514707223565308069810796062123",
+       "0.449647464534601151267544078200296711",
+       "0.999990206550703457051564899025522107",
+       "0.457535893775321044413818107505363926",
+       "-0.584917192891762253530931311812375128",
+       "-0.988168233877000368552393618723663021",
+       "-0.311541363513378174354985105592593697",
+       "0.705540325570391906231919175522070079",
+       "0.951602073889515954035392333380387684",
+       "0.157745694143248382011654277602482371",
+       "-0.808496403819590184304036910416119065",
+       "-0.891207360061435339951802577871703538",
+       "0",
+       "0.891207360061435339951802577871703538",
+       "0.808496403819590184304036910416119065",
+       "-0.157745694143248382011654277602482371",
+       "-0.951602073889515954035392333380387684",
+       "-0.705540325570391906231919175522070079",
+       "0.311541363513378174354985105592593697",
+       "0.988168233877000368552393618723663021",
+       "0.584917192891762253530931311812375128",
+       "-0.457535893775321044413818107505363926",
+       "-0.999990206550703457051564899025522107",
+       "-0.449647464534601151267544078200296711",
+       "0.592073514707223565308069810796062123",
+       "0.986771964274613470590033455846296362",
+       "0.303118356745702602523931087729992333",
+       "-0.711785342369123065842340834512896188",
+       "-0.948844497918124441518161248410867044",
+       "-0.148999025814198104343982890664237216",
+       "0.813673737507104955433222744609065147",
+       "0.887157528692350427205640661441011342",
+       "-0.00885130929040387592169025681577233246",
+    }};
+
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> sin_values  { };
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
+
+    int nx { -20 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
+    {
+      const decimal_type x_arg =
+        decimal_type
+        {
+            decimal_type { nx }
+          + decimal_type { nx, -1 }
+        };
+
+        ++nx;
+
+        sin_values[i] = sin(x_arg);
+
+        static_cast<void>
+        (
+          from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+        );
+
+      const auto result_sin_is_ok = is_close_fraction(sin_values[i], ctrl_values[i], my_tol);
+
+      result_is_ok = (result_sin_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
+  auto test_cos_128(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal128;
+
+    using str_ctrl_array_type = std::array<const char*, 41U>;
+
+    const str_ctrl_array_type ctrl_strings =
+    {{
+       // Table[N[Cos[n + n/10], 36], {n, -20, 20, 1}]
+       "-0.999960826394637126454174739212693774",
+       "-0.461466704415910626922141930570155132",
+       "0.581321811814436275127478838749985834",
+       "0.988837342694145995574183803962615751",
+       "0.315743754919241977341902454154186407",
+       "-0.702397057502713532361560769391904267",
+       "-0.952952916887180197669329573420619689",
+       "-0.162114436499717558295988827296285793",
+       "0.805883957640450316780870877627822774",
+       "0.893206111509322690144989864397000805",
+       "0.00442569798805078574835502472394157323",
+       "-0.889191152625361054634438698689106779",
+       "-0.811093014061655562889085504219324484",
+       "0.153373862037864525977384239572053515",
+       "0.950232591958529466219737721668197376",
+       "0.708669774291260000027421181325843735",
+       "-0.307332869978419683119139742217712371",
+       "-0.987479769908864883936591051102853311",
+       "-0.588501117255345708524142612654928416",
+       "0.453596121425577387771370051784716122",
+       "1",
+       "0.453596121425577387771370051784716122",
+       "-0.588501117255345708524142612654928416",
+       "-0.987479769908864883936591051102853311",
+       "-0.307332869978419683119139742217712371",
+       "0.708669774291260000027421181325843735",
+       "0.950232591958529466219737721668197376",
+       "0.153373862037864525977384239572053515",
+       "-0.811093014061655562889085504219324484",
+       "-0.889191152625361054634438698689106779",
+       "0.00442569798805078574835502472394157323",
+       "0.893206111509322690144989864397000805",
+       "0.805883957640450316780870877627822774",
+       "-0.162114436499717558295988827296285793",
+       "-0.952952916887180197669329573420619689",
+       "-0.702397057502713532361560769391904267",
+       "0.315743754919241977341902454154186407",
+       "0.988837342694145995574183803962615751",
+       "0.581321811814436275127478838749985834",
+       "-0.461466704415910626922141930570155132",
+       "-0.999960826394637126454174739212693774",
+    }};
+
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> cos_values  { };
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
+
+    int nx { -20 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
+    {
+      const decimal_type x_arg =
+        decimal_type
+        {
+            decimal_type { nx }
+          + decimal_type { nx, -1 }
+        };
+
+        ++nx;
+
+        cos_values[i] = cos(x_arg);
+
+        static_cast<void>
+        (
+          from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+        );
+
+      const auto result_cos_is_ok = is_close_fraction(cos_values[i], ctrl_values[i], my_tol);
+
+      result_is_ok = (result_cos_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
+} // namespace local
+
 int main()
 {
     #ifdef BOOST_DECIMAL_GENERATE_CONSTANT_SIGS
@@ -199,13 +415,20 @@ int main()
 
     test_sin<decimal32>();
     test_cos<decimal32>();
+    test_sin<decimal32_fast>();
+    test_cos<decimal32_fast>();
     test_sin<decimal64>();
     test_cos<decimal64>();
+    test_sin<decimal64_fast>();
+    test_cos<decimal64_fast>();
 
-    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    //test_sin<decimal128>();
-    //test_cos<decimal128>();
-    #endif
+    {
+        const auto result_sin128_is_ok = local::test_sin_128(0x8'000);
+        const auto result_cos128_is_ok = local::test_cos_128(0x8'000);
+
+        BOOST_TEST(result_sin128_is_ok);
+        BOOST_TEST(result_cos128_is_ok);
+    }
 
     return boost::report_errors();
 }
