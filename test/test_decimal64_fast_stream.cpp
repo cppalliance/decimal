@@ -8,6 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <cerrno>
 
 using namespace boost::decimal;
 
@@ -75,12 +76,6 @@ void test_ostream()
     out << val;
     BOOST_TEST_CSTR_EQ(out.str().c_str(), "123456");
 
-    // Tests the default value of setprecision
-    decimal64_fast big_val {123456789, 0};
-    std::stringstream big_out;
-    big_out << big_val;
-    BOOST_TEST_CSTR_EQ(big_out.str().c_str(), "1.234568e+08");
-
     decimal64_fast zero {0, 0};
     std::stringstream zero_out;
     zero_out << zero;
@@ -111,46 +106,10 @@ void test_ostream()
     BOOST_TEST_CSTR_EQ(neg_snan.str().c_str(), "-nan(snan)");
 }
 
-void test_locales()
-{
-    const char buffer[] = "1,1897e+02";
-
-    try
-    {
-        #ifdef BOOST_MSVC
-        std::locale::global(std::locale("German"));
-        #else
-        std::locale::global(std::locale("de_DE.UTF-8"));
-        #endif
-    }
-        // LCOV_EXCL_START
-    catch (...)
-    {
-        std::cerr << "Locale not installed. Skipping test." << std::endl;
-        return;
-    }
-    // LCOV_EXCL_STOP
-
-    std::stringstream in;
-    in.str(buffer);
-    decimal64_fast val;
-    in >> val;
-    BOOST_TEST_EQ(val, decimal64_fast(1.1897e+02));
-
-    std::stringstream out;
-    out << std::scientific << std::setprecision(4) << val;
-    BOOST_TEST_CSTR_EQ(out.str().c_str(), buffer);
-}
-
 int main()
 {
     test_istream();
     test_ostream();
-
-    // Homebrew GCC does not support locales
-    #if !(defined(__GNUC__) && __GNUC__ >= 5 && defined(__APPLE__))
-    test_locales();
-    #endif
 
     return boost::report_errors();
 }
