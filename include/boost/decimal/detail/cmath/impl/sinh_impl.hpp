@@ -30,6 +30,7 @@ private:
     using d128_coeffs_t = std::array<decimal128, 17>;
 
     using d32_fast_coeffs_t = std::array<decimal32_fast, 6>;
+    using d64_fast_coeffs_t = std::array<decimal64_fast, 9>;
 
 public:
     static constexpr d32_coeffs_t d32_coeffs =
@@ -71,6 +72,21 @@ public:
          ::boost::decimal::decimal64 { UINT64_C(8220635246624329717), - 19 - 17 }  // * x^19
      }};
 
+    static constexpr d64_fast_coeffs_t d64_fast_coeffs =
+    {{
+         // Series[Sinh[x], {x, 0, 19}]
+         //            (1),                                                        // * x
+         ::boost::decimal::decimal64_fast { UINT64_C(1666666666666666667), - 19 -  0 }, // * x^3
+         ::boost::decimal::decimal64_fast { UINT64_C(8333333333333333333), - 19 -  2 }, // * x^5
+         ::boost::decimal::decimal64_fast { UINT64_C(1984126984126984127), - 19 -  3 }, // * x^7
+         ::boost::decimal::decimal64_fast { UINT64_C(2755731922398589065), - 19 -  5 }, // * x^9
+         ::boost::decimal::decimal64_fast { UINT64_C(2505210838544171878), - 19 -  7 }, // * x^11
+         ::boost::decimal::decimal64_fast { UINT64_C(1605904383682161460), - 19 -  9 }, // * x^13
+         ::boost::decimal::decimal64_fast { UINT64_C(7647163731819816476), - 19 - 12 }, // * x^15
+         ::boost::decimal::decimal64_fast { UINT64_C(2811457254345520763), - 19 - 14 }, // * x^17
+         ::boost::decimal::decimal64_fast { UINT64_C(8220635246624329717), - 19 - 17 }  // * x^19
+     }};
+
     static constexpr d128_coeffs_t d128_coeffs =
     {{
          // Series[Sinh[x], {x, 0, 34}]
@@ -109,6 +125,9 @@ constexpr typename sinh_table_imp<b>::d128_coeffs_t sinh_table_imp<b>::d128_coef
 template <bool b>
 constexpr typename sinh_table_imp<b>::d32_fast_coeffs_t sinh_table_imp<b>::d32_fast_coeffs;
 
+template <bool b>
+constexpr typename sinh_table_imp<b>::d64_fast_coeffs_t sinh_table_imp<b>::d64_fast_coeffs;
+
 #endif
 
 } //namespace sinh_detail
@@ -134,6 +153,12 @@ template <>
 constexpr auto sinh_series_expansion<decimal64>(decimal64 z2) noexcept
 {
     return taylor_series_result(z2, sinh_table::d64_coeffs);
+}
+
+template <>
+constexpr auto sinh_series_expansion<decimal64_fast>(decimal64_fast z2) noexcept
+{
+    return taylor_series_result(z2, sinh_table::d64_fast_coeffs);
 }
 
 template <>

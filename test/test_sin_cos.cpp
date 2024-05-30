@@ -419,6 +419,8 @@ int main()
     test_cos<decimal32_fast>();
     test_sin<decimal64>();
     test_cos<decimal64>();
+    test_sin<decimal64_fast>();
+    test_cos<decimal64_fast>();
 
     {
         const auto result_sin128_is_ok = local::test_sin_128(0x8'000);

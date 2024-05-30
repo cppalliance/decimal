@@ -64,6 +64,22 @@ struct sin_table_imp {
         decimal64 {UINT64_C(1000000000000001896), -18},
         decimal64 {UINT64_C(5230171542159216227), -36, true}
     }};
+
+    static constexpr std::array<decimal64_fast, 12> d64_fast_coeffs =
+    {{
+         decimal64_fast {UINT64_C(2306518628003855678), -26, true},
+         decimal64_fast {UINT64_C(5453073257634027470), -27, true},
+         decimal64_fast {UINT64_C(2762996699568163845), -24},
+         decimal64_fast {UINT64_C(5023027013521532307), -27, true},
+         decimal64_fast {UINT64_C(1984096861383546182), -22, true},
+         decimal64_fast {UINT64_C(1026912296061211491), -27, true},
+         decimal64_fast {UINT64_C(8333333562151404340), -21},
+         decimal64_fast {UINT64_C(3217043986646625014), -29, true},
+         decimal64_fast {UINT64_C(1666666666640042905), -19, true},
+         decimal64_fast {UINT64_C(1135995742940218051), -31, true},
+         decimal64_fast {UINT64_C(1000000000000001896), -18},
+         decimal64_fast {UINT64_C(5230171542159216227), -36, true}
+     }};
 };
 
 #if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
@@ -76,6 +92,9 @@ constexpr std::array<decimal64, 12> sin_table_imp<b>::d64_coeffs;
 
 template <bool b>
 constexpr std::array<decimal32_fast, 6> sin_table_imp<b>::d32_fast_coeffs;
+
+template <bool b>
+constexpr std::array<decimal64_fast, 12> sin_table_imp<b>::d64_fast_coeffs;
 
 #endif
 
@@ -110,6 +129,15 @@ constexpr auto sin_series_expansion<decimal64>(decimal64 x) noexcept
     const auto b_neg = signbit(x);
     x = abs(x);
     auto result = remez_series_result(x, sin_detail::sin_table::d64_coeffs);
+    return b_neg ? -result : result;
+}
+
+template <>
+constexpr auto sin_series_expansion<decimal64_fast>(decimal64_fast x) noexcept
+{
+    const auto b_neg = signbit(x);
+    x = abs(x);
+    auto result = remez_series_result(x, sin_detail::sin_table::d64_fast_coeffs);
     return b_neg ? -result : result;
 }
 

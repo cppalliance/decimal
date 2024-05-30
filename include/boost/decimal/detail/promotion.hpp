@@ -49,6 +49,12 @@ struct decimal_val<decimal64>
 };
 
 template <>
+struct decimal_val<decimal64_fast>
+{
+    static constexpr int value = 65;
+};
+
+template <>
 struct decimal_val<decimal128>
 {
     static constexpr int value = 128;

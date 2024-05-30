@@ -29,12 +29,14 @@ struct tgamma_table_imp
     using d128_coeffs_t = std::array<decimal128, 45>;
 
     using d32_fast_coeffs_t = std::array<decimal32_fast, 15>;
+    using d64_fast_coeffs_t = std::array<decimal64_fast, 36>;
 
     using d32_coeffs_asymp_t  = std::array<decimal32,  10>;
     using d64_coeffs_asymp_t  = std::array<decimal64,  15>;
     using d128_coeffs_asymp_t = std::array<decimal128, 30>;
 
     using d32_fast_coeffs_asymp_t = std::array<decimal32_fast, 10>;
+    using d64_fast_coeffs_asymp_t = std::array<decimal64_fast, 15>;
 
     static constexpr d32_coeffs_t d32_coeffs =
     {{
@@ -137,6 +139,37 @@ struct tgamma_table_imp
          +::boost::decimal::decimal64 { UINT64_C(1'186'692'254'751'600'333), - 19 - 17 }, // * z^27
     }};
 
+    static constexpr d64_fast_coeffs_t d64_fast_coeffs =
+    {{
+         // N[Series[1/Gamma[z], {z, 0, 27}], 19]
+         +::boost::decimal::decimal64_fast { UINT64_C(5'772'156'649'015'328'606), - 19 - 0  }, // * z^2
+         -::boost::decimal::decimal64_fast { UINT64_C(6'558'780'715'202'538'811), - 19 - 0  }, // * z^3
+         -::boost::decimal::decimal64_fast { UINT64_C(4'200'263'503'409'523'553), - 19 - 1  }, // * z^4
+         +::boost::decimal::decimal64_fast { UINT64_C(1'665'386'113'822'914'895), - 19 - 0  }, // * z^5
+         -::boost::decimal::decimal64_fast { UINT64_C(4'219'773'455'554'433'675), - 19 - 1  }, // * z^6
+         -::boost::decimal::decimal64_fast { UINT64_C(9'621'971'527'876'973'562), - 19 - 2  }, // * z^7
+         +::boost::decimal::decimal64_fast { UINT64_C(7'218'943'246'663'099'542), - 19 - 2  }, // * z^8
+         -::boost::decimal::decimal64_fast { UINT64_C(1'165'167'591'859'065'112), - 19 - 2  }, // * z^9
+         -::boost::decimal::decimal64_fast { UINT64_C(2'152'416'741'149'509'728), - 19 - 3  }, // * z^10
+         +::boost::decimal::decimal64_fast { UINT64_C(1'280'502'823'881'161'862), - 19 - 3  }, // * z^11
+         -::boost::decimal::decimal64_fast { UINT64_C(2'013'485'478'078'823'866), - 19 - 4  }, // * z^12
+         -::boost::decimal::decimal64_fast { UINT64_C(1'250'493'482'142'670'657), - 19 - 5  }, // * z^13
+         +::boost::decimal::decimal64_fast { UINT64_C(1'133'027'231'981'695'882), - 19 - 5  }, // * z^14
+         -::boost::decimal::decimal64_fast { UINT64_C(2'056'338'416'977'607'103), - 19 - 6  }, // * z^15
+         +::boost::decimal::decimal64_fast { UINT64_C(6'116'095'104'481'415'818), - 19 - 8  }, // * z^16
+         +::boost::decimal::decimal64_fast { UINT64_C(5'002'007'644'469'222'930), - 19 - 8  }, // * z^17
+         -::boost::decimal::decimal64_fast { UINT64_C(1'181'274'570'487'020'145), - 19 - 8  }, // * z^18
+         +::boost::decimal::decimal64_fast { UINT64_C(1'043'426'711'691'100'510), - 19 - 9  }, // * z^19
+         +::boost::decimal::decimal64_fast { UINT64_C(7'782'263'439'905'071'254), - 19 - 11 }, // * z^20
+         -::boost::decimal::decimal64_fast { UINT64_C(3'696'805'618'642'205'708), - 19 - 11 }, // * z^21
+         +::boost::decimal::decimal64_fast { UINT64_C(5'100'370'287'454'475'979), - 19 - 12 }, // * z^22
+         -::boost::decimal::decimal64_fast { UINT64_C(2'058'326'053'566'506'783), - 19 - 13 }, // * z^23
+         -::boost::decimal::decimal64_fast { UINT64_C(5'348'122'539'423'017'982), - 19 - 14 }, // * z^24
+         +::boost::decimal::decimal64_fast { UINT64_C(1'226'778'628'238'260'790), - 19 - 14 }, // * z^25
+         -::boost::decimal::decimal64_fast { UINT64_C(1'181'259'301'697'458'770), - 19 - 15 }, // * z^26
+         +::boost::decimal::decimal64_fast { UINT64_C(1'186'692'254'751'600'333), - 19 - 17 }, // * z^27
+     }};
+
     static constexpr d64_coeffs_asymp_t d64_coeffs_asymp =
     {{
          // N[Series[Gamma[x] Sqrt[x], {x, Infinity, 14}], 19]
@@ -156,6 +189,26 @@ struct tgamma_table_imp
          +::boost::decimal::decimal64 { UINT64_C(1605085033194459600), - 19 - 1  }, // / x^13
          +::boost::decimal::decimal64 { UINT64_C(1353992280159094113), - 19 - 2  }, // / x^14
     }};
+
+    static constexpr d64_fast_coeffs_asymp_t d64_fast_coeffs_asymp =
+    {{
+         // N[Series[Gamma[x] Sqrt[x], {x, Infinity, 14}], 19]
+         +::boost::decimal::decimal64_fast { UINT64_C(2506628274631000502), - 19 + 1  },
+         +::boost::decimal::decimal64_fast { UINT64_C(2088856895525833752), - 19 - 0  }, // / x
+         +::boost::decimal::decimal64_fast { UINT64_C(8703570398024307300), - 19 - 2  }, // / x^2
+         -::boost::decimal::decimal64_fast { UINT64_C(6721090474029881748), - 19 - 2  }, // / x^3
+         -::boost::decimal::decimal64_fast { UINT64_C(5752012381101712348), - 19 - 3  }, // / x^4
+         +::boost::decimal::decimal64_fast { UINT64_C(1965294881583203064), - 19 - 2  }, // / x^5
+         +::boost::decimal::decimal64_fast { UINT64_C(1747825212045591212), - 19 - 3  }, // / x^6
+         -::boost::decimal::decimal64_fast { UINT64_C(1484341135158276145), - 19 - 2  }, // / x^7
+         -::boost::decimal::decimal64_fast { UINT64_C(1296375732112554321), - 19 - 3  }, // / x^8
+         +::boost::decimal::decimal64_fast { UINT64_C(2104311229753206373), - 19 - 2  }, // / x^9
+         +::boost::decimal::decimal64_fast { UINT64_C(1805999456555504364), - 19 - 3  }, // / x^10
+         -::boost::decimal::decimal64_fast { UINT64_C(4798785670546346063), - 19 - 2  }, // / x^11
+         -::boost::decimal::decimal64_fast { UINT64_C(4073678593815251825), - 19 - 3  }, // / x^12
+         +::boost::decimal::decimal64_fast { UINT64_C(1605085033194459600), - 19 - 1  }, // / x^13
+         +::boost::decimal::decimal64_fast { UINT64_C(1353992280159094113), - 19 - 2  }, // / x^14
+     }};
 
     static constexpr d128_coeffs_t d128_coeffs =
     {{
@@ -251,12 +304,14 @@ template <bool b> constexpr typename tgamma_table_imp<b>::d64_coeffs_t  tgamma_t
 template <bool b> constexpr typename tgamma_table_imp<b>::d128_coeffs_t tgamma_table_imp<b>::d128_coeffs;
 
 template <bool b> constexpr typename tgamma_table_imp<b>::d32_fast_coeffs_t tgamma_table_imp<b>::d32_fast_coeffs;
+template <bool b> constexpr typename tgamma_table_imp<b>::d64_fast_coeffs_t tgamma_table_imp<b>::d64_fast_coeffs;
 
 template <bool b> constexpr typename tgamma_table_imp<b>::d32_coeffs_asymp_t  tgamma_table_imp<b>::d32_coeffs_asymp;
 template <bool b> constexpr typename tgamma_table_imp<b>::d64_coeffs_asymp_t  tgamma_table_imp<b>::d64_coeffs_asymp;
 template <bool b> constexpr typename tgamma_table_imp<b>::d128_coeffs_asymp_t tgamma_table_imp<b>::d128_coeffs_asymp;
 
 template <bool b> constexpr typename tgamma_table_imp<b>::d32_fast_coeffs_asymp_t tgamma_table_imp<b>::d32_fast_coeffs_asymp;
+template <bool b> constexpr typename tgamma_table_imp<b>::d64_fast_coeffs_asymp_t tgamma_table_imp<b>::d64_fast_coeffs_asymp;
 
 #endif
 
@@ -286,6 +341,12 @@ constexpr auto tgamma_series_expansion<decimal64>(decimal64 z) noexcept
 }
 
 template <>
+constexpr auto tgamma_series_expansion<decimal64_fast>(decimal64_fast z) noexcept
+{
+    return taylor_series_result(z, tgamma_table::d64_fast_coeffs);
+}
+
+template <>
 constexpr auto tgamma_series_expansion<decimal128>(decimal128 z) noexcept
 {
     return taylor_series_result(z, tgamma_table::d128_coeffs);
@@ -310,6 +371,12 @@ template <>
 constexpr auto tgamma_series_expansion_asymp<decimal64>(decimal64 z) noexcept
 {
     return taylor_series_result(z, tgamma_table::d64_coeffs_asymp);
+}
+
+template <>
+constexpr auto tgamma_series_expansion_asymp<decimal64_fast>(decimal64_fast z) noexcept
+{
+    return taylor_series_result(z, tgamma_table::d64_fast_coeffs_asymp);
 }
 
 template <>
