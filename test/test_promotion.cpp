@@ -99,5 +99,14 @@ int main()
     static_assert(std::is_same<detail::promote_args_t<decimal32, decimal32_fast, decimal64>, decimal64>::value, "False");
     static_assert(std::is_same<detail::promote_args_t<decimal32_fast, decimal32, decimal32_fast>, decimal32_fast>::value, "False");
 
+    static_assert(std::is_same<detail::promote_args_t<decimal32, decimal64_fast>, decimal64_fast>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal64_fast, decimal32>, decimal64_fast>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal64, decimal64_fast>, decimal64_fast>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal64_fast, decimal64>, decimal64_fast>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal128, decimal64_fast>, decimal128>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal64_fast, decimal128>, decimal128>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal32, decimal64_fast, decimal64>, decimal64_fast>::value, "False");
+    static_assert(std::is_same<detail::promote_args_t<decimal64_fast, decimal32, decimal64_fast>, decimal64_fast>::value, "False");
+
     return 0;
 }
