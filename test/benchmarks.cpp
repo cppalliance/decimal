@@ -351,6 +351,7 @@ int main()
     const auto dec128_vector = generate_random_vector<decimal128>();
 
     const auto dec32_fast_vector = generate_random_vector<decimal32_fast>();
+    const auto dec64_fast_vector = generate_random_vector<decimal64_fast>();
 
     std::cout << "===== Comparisons =====\n";
 
@@ -360,6 +361,7 @@ int main()
     test_comparisons(dec64_vector, "decimal64");
     test_comparisons(dec128_vector, "decimal128");
     test_comparisons(dec32_fast_vector, "dec32_fast");
+    test_comparisons(dec64_fast_vector, "dec64_fast");
 
     std::cout << "\n===== Addition =====\n";
 
@@ -369,6 +371,7 @@ int main()
     test_two_element_operation(dec64_vector, std::plus<>(), "Addition", "decimal64");
     test_two_element_operation(dec128_vector, std::plus<>(), "Addition", "decimal128");
     test_two_element_operation(dec32_fast_vector, std::plus<>(), "Addition", "dec32_fast");
+    test_two_element_operation(dec64_fast_vector, std::plus<>(), "Addition", "dec64_fast");
 
     std::cout << "\n===== Subtraction =====\n";
 
@@ -378,6 +381,7 @@ int main()
     test_two_element_operation(dec64_vector, std::minus<>(), "Subtraction", "decimal64");
     test_two_element_operation(dec128_vector, std::minus<>(), "Subtraction", "decimal128");
     test_two_element_operation(dec32_fast_vector, std::minus<>(), "Subtraction", "dec32_fast");
+    test_two_element_operation(dec64_fast_vector, std::minus<>(), "Subtraction", "dec64_fast");
 
     std::cout << "\n===== Multiplication =====\n";
 
@@ -387,6 +391,7 @@ int main()
     test_two_element_operation(dec64_vector, std::multiplies<>(), "Multiplication", "decimal64");
     test_two_element_operation(dec128_vector, std::multiplies<>(), "Multiplication", "decimal128");
     test_two_element_operation(dec32_fast_vector, std::multiplies<>(), "Multiplication", "dec32_fast");
+    test_two_element_operation(dec64_fast_vector, std::multiplies<>(), "Multiplication", "dec64_fast");
 
     std::cout << "\n===== Division =====\n";
 
@@ -396,6 +401,7 @@ int main()
     test_two_element_operation(dec64_vector, std::divides<>(), "Division", "decimal64");
     test_two_element_operation(dec128_vector, std::divides<>(), "Division", "decimal128");
     test_two_element_operation(dec32_fast_vector, std::divides<>(), "Division", "dec32_fast");
+    test_two_element_operation(dec64_fast_vector, std::divides<>(), "Division", "dec64_fast");
 
 /*
     std::cout << "\n===== sqrt =====\n";
