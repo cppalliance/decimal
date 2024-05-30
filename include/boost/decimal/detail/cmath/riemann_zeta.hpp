@@ -219,7 +219,7 @@ constexpr auto riemann_zeta(T x) noexcept
 
 BOOST_DECIMAL_EXPORT template <typename T, typename IntegralType>
 constexpr auto riemann_zeta(IntegralType n) noexcept
-    -> typename std::enable_if<detail::is_decimal_floating_point_v<T> && std::is_integral<IntegralType>::value, T>::type
+    BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, T, std::is_integral_v, IntegralType, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
 
