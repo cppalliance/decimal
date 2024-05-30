@@ -63,7 +63,7 @@ constexpr auto to_integral(Decimal val) noexcept
     }
     else if (expval < 0)
     {
-        result /= detail::pow10<Conversion_Type>(detail::make_positive_unsigned(expval));
+        result /= detail::pow10<Conversion_Type>(abs_exp_val);
     }
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)
@@ -106,7 +106,7 @@ constexpr auto to_integral_128(Decimal val) noexcept
     }
     else if (expval < 0)
     {
-        sig /= detail::pow10<detail::uint128>(detail::make_positive_unsigned(expval));
+        sig /= detail::pow10<detail::uint128>(abs_exp_val);
     }
 
     auto result {static_cast<TargetType>(sig)};
