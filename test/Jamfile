@@ -87,6 +87,8 @@ run test_decimal32_fast_basis.cpp ;
 run test_decimal32_fast_stream.cpp ;
 run test_decimal32_stream.cpp ;
 run test_decimal64_basis.cpp ;
+run test_decimal64_fast_basis.cpp ;
+run test_decimal64_fast_stream.cpp ;
 run test_decimal64_stream.cpp ;
 run test_decimal128_basis.cpp ;
 run test_decimal_quantum.cpp ;

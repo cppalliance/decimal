@@ -103,6 +103,11 @@ BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* la
     return detail::from_chars_general_impl(first, last, value, fmt);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal64_fast& value, chars_format fmt = chars_format::general) noexcept
+{
+    return detail::from_chars_general_impl(first, last, value, fmt);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal128& value, chars_format fmt = chars_format::general) noexcept
 {
     return detail::from_chars_general_impl(first, last, value, fmt);
@@ -713,7 +718,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
 
     auto abs_value = abs(value);
     constexpr auto max_fractional_value = std::is_same<TargetDecimalType, decimal32>::value || std::is_same<TargetDecimalType, decimal32_fast>::value ? TargetDecimalType{1, 7} :
-                                          std::is_same<TargetDecimalType, decimal64>::value ? TargetDecimalType{1, 16} :
+                                          std::is_same<TargetDecimalType, decimal64>::value || std::is_same<TargetDecimalType, decimal64_fast>::value ? TargetDecimalType{1, 16} :
                                                                                               TargetDecimalType{1, 34};
 
     constexpr auto min_fractional_value = TargetDecimalType{1, -4};
@@ -814,6 +819,26 @@ BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* la
 }
 
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value, chars_format fmt, int precision) noexcept -> to_chars_result
+{
+    if (precision < 0)
+    {
+        precision = 6;
+    }
+
+    return detail::to_chars_impl(first, last, value, fmt, precision);
+}
+
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64_fast value) noexcept -> to_chars_result
+{
+    return detail::to_chars_impl(first, last, value);
+}
+
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64_fast value, chars_format fmt) noexcept -> to_chars_result
+{
+    return detail::to_chars_impl(first, last, value, fmt);
+}
+
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64_fast value, chars_format fmt, int precision) noexcept -> to_chars_result
 {
     if (precision < 0)
     {

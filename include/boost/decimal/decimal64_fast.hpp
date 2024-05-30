@@ -327,28 +327,7 @@ public:
     constexpr auto operator++(int) noexcept -> decimal64_fast&;
     constexpr auto operator--() noexcept -> decimal64_fast&;
     constexpr auto operator--(int) noexcept -> decimal64_fast&;
-
-    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
-
-    // LCOV_EXCL_START
-    // TODO(mborland): Fix with STL bindings and delete
-    template <typename charT, typename traits>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal64_fast& d) -> std::basic_ostream<charT, traits>&
-    {
-        os << d.significand_ << "e";
-        const auto biased_exp {d.biased_exponent()};
-        if (biased_exp > 0)
-        {
-            os << '+';
-        }
-        os << biased_exp;
-
-        return os;
-    }
-    // LCOV_EXCL_STOP
-
-    #endif
-
+    
     // Cmath friend functions
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
