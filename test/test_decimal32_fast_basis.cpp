@@ -164,7 +164,13 @@ void test_unary_arithmetic()
 {
     constexpr decimal32_fast one(0b1, -100);
     BOOST_TEST(+one == one);
-    BOOST_TEST(-one != one);
+    if (!BOOST_TEST(-one != one))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "One: " << one
+                  << "\nNeg: " << -one << std::endl;
+        // LCOV_EXCL_STOP
+    }
 }
 
 void test_addition()
