@@ -728,9 +728,9 @@ constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     }
 
     const auto result {detail::add_impl<detail::decimal32_fast_components>(
-                                                        lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-                                                        rhs.significand_, rhs.biased_exponent(), rhs.sign_
-                                                        )};
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_
+            )};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -806,9 +806,11 @@ constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
 
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
-    const auto result {detail::sub_impl<detail::decimal32_fast_components>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-                                                                                                         rhs.significand_, rhs.biased_exponent(), rhs.sign_,
-                                                                                                         abs_lhs_bigger)};
+    const auto result {detail::sub_impl<detail::decimal32_fast_components>(
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
+            abs_lhs_bigger
+            )};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -838,9 +840,9 @@ constexpr auto operator-(decimal32_fast lhs, Integer rhs) noexcept
     auto rhs_components {detail::decimal32_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     const auto result {detail::sub_impl<detail::decimal32_fast_components>(
-                                                        lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                                        rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                                                        abs_lhs_bigger)};
+            lhs_components.sig, lhs_components.exp, lhs_components.sign,
+            rhs_components.sig, rhs_components.exp, rhs_components.sign,
+            abs_lhs_bigger)};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -870,9 +872,10 @@ constexpr auto operator-(Integer lhs, decimal32_fast rhs) noexcept
     auto rhs_components {detail::decimal32_fast_components{rhs.significand_, rhs.biased_exponent(), rhs.isneg()}};
 
     const auto result {detail::sub_impl<detail::decimal32_fast_components>(
-                                                          lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                                          rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                                                          abs_lhs_bigger)};
+            lhs_components.sig, lhs_components.exp, lhs_components.sign,
+            rhs_components.sig, rhs_components.exp, rhs_components.sign,
+            abs_lhs_bigger
+            )};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -887,15 +890,10 @@ constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
         return res;
     }
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize(sig_rhs, exp_rhs);
-
-    const auto result {detail::mul_impl<detail::decimal32_fast_components>(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
+    const auto result {detail::mul_impl<detail::decimal32_fast_components>(
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_
+            )};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -909,10 +907,7 @@ constexpr auto operator*(decimal32_fast lhs, Integer rhs) noexcept
         return lhs;
     }
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
-    auto lhs_components {detail::decimal32_fast_components{sig_lhs, exp_lhs, lhs.isneg()}};
+    auto lhs_components {detail::decimal32_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.sign_}};
 
     auto sig_rhs {rhs};
     std::int32_t exp_rhs {0};
@@ -921,9 +916,9 @@ constexpr auto operator*(decimal32_fast lhs, Integer rhs) noexcept
     auto rhs_components {detail::decimal32_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     const auto result {detail::mul_impl<detail::decimal32_fast_components>(
-                                                        lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                                        rhs_components.sig, rhs_components.exp, rhs_components.sign
-                                                     )};
+            lhs_components.sig, lhs_components.exp, lhs_components.sign,
+            rhs_components.sig, rhs_components.exp, rhs_components.sign
+            )};
 
     return {result.sig, result.exp, result.sign};
 }
