@@ -42,7 +42,7 @@
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && !defined(_MSC_VER)
 static constexpr auto N = static_cast<std::size_t>(64U); // Number of trials
 #else
-static constexpr auto N = static_cast<std::size_t>(0x10000U); // Number of trials
+static constexpr auto N = static_cast<std::size_t>(8U); // Number of trials
 #endif
 
 static std::mt19937_64 rng(42);
