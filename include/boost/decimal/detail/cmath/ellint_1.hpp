@@ -63,7 +63,7 @@ constexpr auto agm(T  phi,
   // sample code therein. However, the Mathematica argument convention with
   // (k^2 --> m) is used, as described in Stephen Wolfram's Mathematica Book,
   // 4th Ed., Ch. 3.2.11, Page 773.
-  
+
   // Make use of the following properties:
   // F(z + pi*j | m) = F(z | m) + 2j pi K(m)
   // E(z + pi*j | m) = E(z | m) + 2j pi E(m)
@@ -154,14 +154,14 @@ constexpr auto agm(T  phi,
 
       if(order10 < -std::numeric_limits<T>::digits10 / 2 - 1)
       {
-        if(k < half)
-        {
-          break;
-        }
-        else
-        {
-          if(n > 1)
+        constexpr T near_one { 9 , -1 };
 
+        // TODO(ckormanyos) There should be a better way to formulate this logic.
+        // TODO(ckormanyos) Use a Taylor series or perturbative expansion for phi close to 1.
+        if(    (mk < half)
+           || ((mk < near_one) && (n > 1))
+           ||                     (n > 3))
+        {
           break;
         }
       }

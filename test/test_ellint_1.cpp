@@ -42,7 +42,7 @@
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && !defined(_MSC_VER)
 static constexpr auto N = static_cast<std::size_t>(64U); // Number of trials
 #else
-static constexpr auto N = static_cast<std::size_t>(8U); // Number of trials
+static constexpr auto N = static_cast<std::size_t>(0x10000U); // Number of trials
 #endif
 
 static std::mt19937_64 rng(42);
@@ -52,7 +52,7 @@ using namespace boost::decimal;
 template <typename T>
 void test_comp_ellint()
 {
-    std::uniform_real_distribution<float> dist(-0.99F, 0.99F);
+    std::uniform_real_distribution<float> dist(-0.995F, 0.995F);
 
     constexpr auto local_N = std::is_same<T, decimal128>::value ? N / 4 : N;
     for (std::size_t i {}; i < local_N; ++i)
@@ -64,7 +64,7 @@ void test_comp_ellint()
         const auto dec_res {static_cast<float>(comp_ellint_1(dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(std::abs(distance) < 100))
+        if (!BOOST_TEST(std::abs(distance) < 30))
         {
             // LCOV_EXCL_START
             std::cerr << "arg: " << dec_val
@@ -93,7 +93,7 @@ void test_ellint()
         const auto dec_res {static_cast<float>(ellint_1(k_dec_val, phi_dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(std::abs(distance) < 100))
+        if (!BOOST_TEST(std::abs(distance) < 30))
         {
             // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
