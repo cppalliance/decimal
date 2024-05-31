@@ -496,8 +496,26 @@ constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> boo
         return signbit(rhs);
     }
 
-    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+    if (lhs.significand_ == 0 || rhs.significand_ == 0)
+    {
+        if (lhs.significand_ == 0 && rhs.significand_ == 0)
+        {
+            return false;
+        }
+        return lhs.significand_ == 0 ? !rhs.sign_ : lhs.sign_;
+    }
+
+    if (lhs.sign_ != rhs.sign_)
+    {
+        return lhs.sign_;
+    }
+
+    if (lhs.exponent_ != rhs.exponent_)
+    {
+        return lhs.sign_ ? lhs.exponent_ > rhs.exponent_ : lhs.exponent_ < rhs.exponent_;
+    }
+
+    return lhs.sign_ ? lhs.significand_ > rhs.significand_ : lhs.significand_ < rhs.significand_;
 }
 
 constexpr auto operator<=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
