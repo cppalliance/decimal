@@ -5,6 +5,8 @@
 #ifndef BOOST_DECIMAL_DETAIL_DIV_IMPL_HPP
 #define BOOST_DECIMAL_DETAIL_DIV_IMPL_HPP
 
+#include <boost/decimal/detail/config.hpp>
+
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
 #include <cstdint>
@@ -15,7 +17,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept -> void
+BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept -> void
 {
     bool sign {lhs.sign != rhs.sign};
 
