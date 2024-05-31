@@ -349,7 +349,14 @@ public:
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
 constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
 {
+    // Older compilers have issues with conversions from __uint128, so we skip all that and use our uint128
+    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__GNUC__) || (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10)) && (!defined(__clang__) || (defined(__clang__) && __clang_major__ < 13))
+    using Unsigned_Integer_1 = detail::make_unsigned_t<T1>;
+    using Unsigned_Integer = std::conditional_t<std::is_same<Unsigned_Integer_1, detail::uint128_t>::value, detail::uint128, Unsigned_Integer_1>;
+    #else
     using Unsigned_Integer = detail::make_unsigned_t<T1>;
+    #endif
+
     using Basis_Unsigned_Integer = std::conditional_t<std::numeric_limits<Unsigned_Integer>::digits10 < std::numeric_limits<significand_type>::digits10, significand_type, Unsigned_Integer>;
 
     const bool isneg {coeff < static_cast<T1>(0) || sign};
