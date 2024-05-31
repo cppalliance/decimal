@@ -19,7 +19,7 @@ void test()
     {
         const T val {dist(rng)};
         const auto bits {to_bid(val)};
-        const T return_val {from_bid(bits)};
+        const T return_val {from_bid<T>(bits)};
         BOOST_TEST_EQ(val, return_val);
     }
 }
@@ -28,6 +28,8 @@ int main()
 {
     test<decimal32_fast>();
     test<decimal64_fast>();
+
+    test<decimal32>();
 
     return boost::report_errors();
 }
