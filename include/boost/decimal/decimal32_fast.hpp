@@ -727,15 +727,10 @@ constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
         return lhs - abs(rhs);
     }
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize(sig_rhs, exp_rhs);
-
-    const auto result {detail::add_impl<detail::decimal32_fast_components>(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
+    const auto result {detail::add_impl<detail::decimal32_fast_components>(
+                                                        lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                                        rhs.significand_, rhs.biased_exponent(), rhs.sign_
+                                                        )};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -758,19 +753,17 @@ constexpr auto operator+(decimal32_fast lhs, Integer rhs) noexcept
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
 
     auto lhs_components {detail::decimal32_fast_components{sig_lhs, exp_lhs, lhs.isneg()}};
     auto sig_rhs {rhs};
     std::int32_t exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs = detail::shrink_significand<std::uint_fast32_t>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    auto unsigned_sig_rhs = detail::shrink_significand<decimal32_fast::significand_type>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
     auto rhs_components {detail::decimal32_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     if (!lhs_bigger)
     {
         detail::swap(lhs_components, rhs_components);
-        lhs_bigger = !lhs_bigger;
         abs_lhs_bigger = !abs_lhs_bigger;
     }
 
