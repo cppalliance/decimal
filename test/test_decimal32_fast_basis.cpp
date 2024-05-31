@@ -430,7 +430,9 @@ int main()
     test_construct_from_float<float>();
     test_construct_from_float<double>();
     test_construct_from_float<long double>();
-    #ifdef BOOST_DECIMAL_HAS_FLOAT128
+
+    // Clang < 13 yields failures from conversion
+    #if defined(BOOST_DECIMAL_HAS_FLOAT128) && (!defined(__clang_major__) || __clang_major__ >= 13)
     test_construct_from_float<__float128>();
     #endif
 
