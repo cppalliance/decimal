@@ -976,14 +976,6 @@ constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& 
             static_cast<void>(rhs);
     }
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize(sig_rhs, exp_rhs);
-
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "sig lhs: " << sig_lhs
               << "\nexp lhs: " << exp_lhs
@@ -991,13 +983,13 @@ constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& 
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    detail::decimal32_components lhs_components {static_cast<std::uint32_t>(sig_lhs), exp_lhs, lhs.isneg()};
-    detail::decimal32_components rhs_components {static_cast<std::uint32_t>(sig_rhs), exp_rhs, rhs.isneg()};
-    detail::decimal32_components q_components {};
+    // We promote to uint64 since the significands are currently 32-bits
+    // By appending enough zeros to the LHS we end up finding what we need anyway
+    const auto big_sig_lhs {static_cast<std::uint_fast64_t>(lhs.significand_) * detail::pow10(static_cast<std::uint_fast64_t>(detail::precision_v<decimal32>))};
+    const auto res_sig {big_sig_lhs / static_cast<std::uint_fast64_t>(rhs.significand_)};
+    const auto res_exp {(lhs.biased_exponent() - detail::precision_v<decimal32>) - rhs.biased_exponent()};
 
-    generic_div_impl(lhs_components, rhs_components, q_components);
-
-    q = decimal32_fast(q_components.sig, q_components.exp, q_components.sign);
+    q = decimal32_fast(res_sig, res_exp, lhs.sign_ != rhs.sign_);
 }
 
 constexpr auto mod_impl(decimal32_fast lhs, decimal32_fast rhs, const decimal32_fast& q, decimal32_fast& r) noexcept -> void
@@ -1048,13 +1040,9 @@ constexpr auto operator/(decimal32_fast lhs, Integer rhs) noexcept
         return sign ? -inf : inf;
     }
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
-
-    const detail::decimal32_fast_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    const detail::decimal32_fast_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.sign_};
     std::int32_t exp_rhs {};
-    const detail::decimal32_fast_components rhs_components {detail::shrink_significand<std::uint_fast32_t>(detail::make_positive_unsigned(rhs), exp_rhs), exp_rhs, rhs < 0};
+    const detail::decimal32_fast_components rhs_components {detail::shrink_significand<decimal32_fast::significand_type>(detail::make_positive_unsigned(rhs), exp_rhs), exp_rhs, rhs < 0};
     detail::decimal32_fast_components q_components {};
 
     detail::generic_div_impl(lhs_components, rhs_components, q_components);
@@ -1090,14 +1078,10 @@ constexpr auto operator/(Integer lhs, decimal32_fast rhs) noexcept
             static_cast<void>(lhs);
     }
 
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize(sig_rhs, exp_rhs);
-
     std::int32_t lhs_exp {};
-    const auto lhs_sig {detail::make_positive_unsigned(detail::shrink_significand<std::uint_fast32_t>(lhs, lhs_exp))};
+    const auto lhs_sig {detail::make_positive_unsigned(detail::shrink_significand<decimal32_fast::significand_type>(lhs, lhs_exp))};
     const detail::decimal32_fast_components lhs_components {lhs_sig, lhs_exp, lhs < 0};
-    const detail::decimal32_fast_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    const detail::decimal32_fast_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.isneg()};
     detail::decimal32_fast_components q_components {};
 
     detail::generic_div_impl(lhs_components, rhs_components, q_components);
