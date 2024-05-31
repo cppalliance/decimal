@@ -19,8 +19,8 @@ namespace decimal {
 namespace detail {
 
 template <typename ReturnType, typename T1, typename T2>
-constexpr auto mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
+BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "sig lhs: " << sig_lhs
@@ -40,12 +40,9 @@ constexpr auto mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     auto res_exp {lhs_exp + rhs_exp};
 
     const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > 9)
-    {
-        res_sig /= detail::pow10(static_cast<std::uint64_t>(sig_dig - 9));
-        res_exp += sig_dig - 9;
-    }
+    constexpr auto max_dig {std::numeric_limits<std::uint32_t>::digits10};
+    res_sig /= detail::pow10(static_cast<std::uint64_t>(sig_dig - max_dig));
+    res_exp += sig_dig - max_dig;
 
     const auto res_sig_32 {static_cast<typename ReturnType::sig_type>(res_sig)};
 
