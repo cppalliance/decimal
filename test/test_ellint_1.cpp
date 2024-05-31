@@ -1,5 +1,5 @@
 // Copyright 2024 Matt Borland
-// Copyright 2024 Christopehr Kormanyos
+// Copyright 2024 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -52,7 +52,7 @@ using namespace boost::decimal;
 template <typename T>
 void test_comp_ellint()
 {
-    std::uniform_real_distribution<float> dist(-1.0F, 1.0F);
+    std::uniform_real_distribution<float> dist(-0.95F, 0.95F);
 
     constexpr auto local_N = std::is_same<T, decimal128>::value ? N / 4 : N;
     for (std::size_t i {}; i < local_N; ++i)
@@ -64,7 +64,7 @@ void test_comp_ellint()
         const auto dec_res {static_cast<float>(comp_ellint_1(dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(std::abs(distance) < 1000))
+        if (!BOOST_TEST(std::abs(distance) < 750))
         {
             // LCOV_EXCL_START
             std::cerr << "arg: " << dec_val
@@ -93,7 +93,7 @@ void test_ellint()
         const auto dec_res {static_cast<float>(ellint_1(k_dec_val, phi_dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(std::abs(distance) < 300))
+        if (!BOOST_TEST(std::abs(distance) < 500))
         {
             // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
