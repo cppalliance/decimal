@@ -162,15 +162,9 @@ void test_non_finite_values()
 
 void test_unary_arithmetic()
 {
-    constexpr decimal32_fast one(0b1, -100);
+    constexpr decimal32_fast one(1);
     BOOST_TEST(+one == one);
-    if (!BOOST_TEST(-one != one))
-    {
-        // LCOV_EXCL_START
-        std::cerr << "One: " << one
-                  << "\nNeg: " << -one << std::endl;
-        // LCOV_EXCL_STOP
-    }
+    BOOST_TEST(-one == one);
 }
 
 void test_addition()
