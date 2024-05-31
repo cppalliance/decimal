@@ -561,8 +561,8 @@ public:
     friend constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32;
 
     // BID conversion functions
-    BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d32(decimal32 val) noexcept -> std::uint32_t;
-    BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d32(std::uint32_t bits) noexcept -> decimal32;
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d32(decimal32 val) noexcept -> std::uint32_t;
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d32(std::uint32_t bits) noexcept -> decimal32;
 
     // These can be made public only for debugging matters
 #ifndef BOOST_DECIMAL_DEBUG_MEMBERS

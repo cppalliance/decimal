@@ -563,8 +563,8 @@ public:
     friend constexpr auto scalblnd64(decimal64 num, long exp) noexcept -> decimal64;
 
     // Conversion functions
-    BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d64(decimal64 val) noexcept -> std::uint64_t;
-    BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d64(std::uint64_t bits) noexcept -> decimal64;
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d64(decimal64 val) noexcept -> std::uint64_t;
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d64(std::uint64_t bits) noexcept -> decimal64;
 };
 
 #if defined(__GNUC__) && __GNUC__ >= 8
