@@ -1,4 +1,4 @@
-//  Copyright (c) 2006 Xiaogang Zhang, 2015 John Maddock
+//  Copyright 2002 2011, 2024 Christopher Kormanyos
 //  Copyright 2024 Matt Borland
 //  Use, modification and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
@@ -8,12 +8,12 @@
 #define BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
 
 #include <boost/decimal/fwd.hpp>
-#include <boost/decimal/detail/cmath/impl/ellint_rf.hpp>
-#include <boost/decimal/detail/cmath/impl/evaluate_polynomial.hpp>
-#include <boost/decimal/detail/cmath/round.hpp>
+#include <boost/decimal/detail/cmath/atan.hpp>
 #include <boost/decimal/detail/cmath/fabs.hpp>
-#include <boost/decimal/detail/cmath/fmod.hpp>
-#include <boost/decimal/detail/cmath/cos.hpp>
+#include <boost/decimal/detail/cmath/log.hpp>
+#include <boost/decimal/detail/cmath/sin.hpp>
+#include <boost/decimal/detail/cmath/sqrt.hpp>
+#include <boost/decimal/detail/cmath/tan.hpp>
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
@@ -29,121 +29,259 @@ namespace decimal {
 
 namespace detail {
 
-/*
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto ellint_k_imp(T k, const std::integral_constant<int, 0>&) -> T;
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto ellint_k_imp(T k, const std::integral_constant<int, 1>&) -> T;
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto ellint_k_imp(T k, const std::integral_constant<int, 2>&) -> T;
+namespace elliptic_series {
 
-using precision_tag_type = std::integral_constant<int,
-std::is_same<T, decimal32>::value ? 0 :
-std::is_same<T, decimal64>::value ? 1 : 2>;
-*/
-
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto ellint_k_imp(T k) -> T
+template <typename T>
+constexpr auto ellint_decimal_order(T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-   if (abs(k) >= 1)
-   {
-      return std::numeric_limits<T>::signaling_NaN();
-   }
+    int n { };
 
-   constexpr T x {0};
-   T y {1 - k * k};
-   constexpr T z {1};
+    const T fr10 = frexp10(x, &n);
 
-   return ellint_impl::ellint_rf_imp(x, y, z);
-}
-
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto ellint_f_impl(T phi, T k) noexcept -> T
-{
-    constexpr T half_pi {numbers::pi_v<T> / 2};
-
-    bool invert {false};
-    if (phi < 0)
+    constexpr int order_bias
     {
-        phi = fabs(phi);
-        invert = true;
-    }
+          std::numeric_limits<T>::digits10 < 10 ?  6
+        : std::numeric_limits<T>::digits10 < 20 ? 15
+        :                                         33
+    };
 
-    T result {};
-
-    if (isinf(phi))
-    {
-        return std::numeric_limits<T>::signaling_NaN();
-    }
-
-    if(phi > 1 / std::numeric_limits<T>::epsilon())
-    {
-        // Phi is so large that phi%pi is necessarily zero (or garbage),
-        // just return the second part of the duplication formula:
-        result = 2 * phi * ellint_k_imp(k) / numbers::pi_v<T>;
-    }
-    else
-    {
-        // Carlson's algorithm works only for |phi| <= pi/2,
-        // use the integrand's periodicity to normalize phi
-        //
-        // Xiaogang's original code used a cast to long long here
-        // but that fails if T has more digits than a long long,
-        // so rewritten to use fmod instead:
-        //
-        T rphi = fmod(phi, half_pi);
-        T m = round((phi - rphi) / half_pi);
-        int s = 1;
-
-        if (fmod(m, T{2}) > T{5, -1})
-        {
-            m += 1;
-            s = -1;
-            rphi = half_pi - rphi;
-        }
-
-        T sinp = sin(rphi);
-        sinp *= sinp;
-
-        if (sinp * k * k >= 1)
-        {
-            return std::numeric_limits<T>::signaling_NaN();
-        }
-
-        T cosp = cos(rphi);
-        cosp *= cosp;
-        if (sinp > (std::numeric_limits<T>::min)())
-        {
-            BOOST_DECIMAL_ASSERT(rphi != 0); // precondition, can't be true if sin(rphi) != 0.
-            //
-            // Use http://dlmf.nist.gov/19.25#E5, note that
-            // c-1 simplifies to cot^2(rphi) which avoid cancellation:
-            //
-            T c = 1 / sinp;
-            result = static_cast<T>(s * ellint_impl::ellint_rf_imp(cosp / sinp, c - k * k, c));
-        }
-        else
-        {
-            result = s * sin(rphi);
-        }
-
-        if(m != 0)
-        {
-            result += m * ellint_k_imp(k);
-        }
-    }
-
-    return invert ? -result : result;
+    return n + order_bias;
 }
 
 template <typename T>
-constexpr auto comp_ellint_1_impl(T k) noexcept
+constexpr auto agm(T  phi,
+                   T  m,
+                   T& Fpm,
+                   T& Km,
+                   T* const pEm  = nullptr,
+                   T* const pEpm = nullptr) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, void)
+{
+  // Use the AGM algorithm as described in Computation of Special Functions,
+  // Zhang & Jin, 18.3.2, pages 663-665. The implementation is based on the
+  // sample code therein. However, the Mathematica argument convention with
+  // (k^2 --> m) is used, as described in Stephen Wolfram's Mathematica Book,
+  // 4th Ed., Ch. 3.2.11, Page 773.
+  
+  // Make use of the following properties:
+  // F(z + pi*k | m) = F(z | m) + 2k pi K(m)
+  // E(z + pi*k | m) = E(z | m) + 2k pi E(m)
+
+  // as well as:
+  // F(-z | m) = -F(z | m)
+  // E(-z | m) = -E(z | m)
+
+  // The calculations which are needed for EllipticE(...) are only performed if
+  // the results from these will actually be used, in other words only if non-zero
+  // pointers pEm or pEpm have been supplied to this subroutine.
+
+  // Note that there is special handling for the angular argument phi if this
+  // argument is equal to pi/2.
+
+  auto fpc_m = fpclassify(m);
+
+  constexpr T my_pi_half { numbers::pi_v<T> / 2 };
+
+  const bool phi_is_pi_half = (phi == my_pi_half);
+
+  T zero { 0 };
+  T one  { 1 };
+
+  if(fpc_m == FP_ZERO)
+  {
+    Fpm = phi;
+    Km  = my_pi_half;
+
+    if(pEpm != nullptr) { *pEpm = phi; }
+    if(pEm  != nullptr) { *pEm  = my_pi_half; }
+  }
+  else if(m == one)
+  {
+    if(pEm != nullptr) { *pEm = one; }
+
+    Km = std::numeric_limits<T>::quiet_NaN();
+
+    const T sp = sin(phi);
+
+    Fpm = phi_is_pi_half ? std::numeric_limits<T>::quiet_NaN()
+                         : log((one + sp) / (one - sp)) / 2;
+
+    if(pEpm != nullptr) { *pEpm = phi_is_pi_half ? one : sp; }
+  }
+  else
+  {
+    T a0    = one;
+    T b0    = sqrt(one - m); // Mathematica argument convention
+    T phi_n = phi;
+    T p2    = one;
+
+    T an;
+
+    const bool m_neg = signbit(m);
+    const T    mk    = sqrt(fabs(m));
+
+    const bool has_e { ((pEm  != nullptr) || (pEpm != nullptr)) };
+
+    T cn_2ncn_inner_prod      = (has_e ? ((!m_neg) ? mk : -mk) * (mk / 2) : zero);
+    T sin_phi_n_cn_inner_prod = zero;
+
+    for(int n = 1; n < 64; ++n)
+    {
+      an = (a0 + b0) / 2;
+
+      if(!phi_is_pi_half) { phi_n += atan((b0 / a0) * tan(phi_n)); }
+
+      const T cn_term = (a0 - b0) / 2;
+
+      if(has_e)
+      {
+        cn_2ncn_inner_prod += (cn_term * cn_term) * p2;
+
+        if(pEpm != nullptr)
+        {
+          const T spn_term = ((!phi_is_pi_half) ? sin(phi_n) : zero);
+
+          sin_phi_n_cn_inner_prod += (cn_term * spn_term);
+        }
+      }
+
+      p2 *= 2;
+
+      const auto order10 = ellint_decimal_order(cn_term);
+
+      if(order10 <= -std::numeric_limits<T>::digits10 / 2)
+      {
+        break;
+      }
+
+      b0 = sqrt(a0 * b0);
+      a0 = an;
+
+      if(!phi_is_pi_half)
+      {
+        constexpr T half { 5 , -1 };
+
+        phi_n += numbers::pi_v<T> * static_cast<int>((phi_n / numbers::pi_v<T>) + half);
+      }
+    }
+
+    const T one_over_an = one / an;
+
+    Fpm = phi_n * one_over_an;
+
+    if(!phi_is_pi_half) { Fpm /= p2; }
+
+    Km = my_pi_half * one_over_an;
+
+    if(has_e)
+    {
+      const T one_minus_cn_2ncn_inner_prod_half = one - cn_2ncn_inner_prod;
+
+      if(pEm != nullptr)
+      {
+        *pEm = Km * one_minus_cn_2ncn_inner_prod_half;
+      }
+
+      if(pEpm != nullptr)
+      {
+        *pEpm = (Fpm * one_minus_cn_2ncn_inner_prod_half) +  sin_phi_n_cn_inner_prod;
+      }
+    }
+  }
+}
+
+} // namespace elliptic_series
+
+template <typename T>
+constexpr auto ellint_1_impl(T m, T phi) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-   return detail::ellint_k_imp(k);
+  constexpr T one { 1 };
+
+  if(fabs(m) > one)
+  {
+    return std::numeric_limits<T>::quiet_NaN();
+  }
+  else
+  {
+    if(signbit(phi))
+    {
+      return -ellint_1_impl(-phi, m);
+    }
+    else
+    {
+      T    k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
+      T    phi_scaled = phi - (k_pi * numbers::pi_v<T>);
+      bool b_neg      = false;
+
+      constexpr T my_pi_half { numbers::pi_v<T> / 2 };
+
+      if(phi_scaled > my_pi_half)
+      {
+        ++k_pi;
+        phi_scaled = -(phi_scaled - numbers::pi_v<T>);
+        b_neg      = true;
+      }
+
+      T Fpm, Km;
+
+      elliptic_series::agm(phi_scaled, m, Fpm, Km);
+
+      if(b_neg)
+      {
+        Fpm = -Fpm;
+      }
+
+      return Fpm + ((k_pi * Km) * 2);
+    }
+  }
+}
+
+template <typename T>
+constexpr auto comp_ellint_1_impl(T m) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+  constexpr T one { 1 };
+
+  if(fabs(m) > one)
+  {
+    return std::numeric_limits<T>::quiet_NaN();
+  }
+  else
+  {
+    T Fpm, Km;
+
+    constexpr T zero { 0 };
+
+    elliptic_series::agm(zero, m, Fpm, Km);
+
+    return Km;
+  }
 }
 
 } //namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto ellint_1(T k, T phi) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128>;
+
+    #endif
+
+    return static_cast<T>(detail::ellint_1_impl(static_cast<evaluation_type>(k * k), static_cast<evaluation_type>(phi)));
+}
 
 BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto comp_ellint_1(T k) noexcept
@@ -163,19 +301,8 @@ constexpr auto comp_ellint_1(T k) noexcept
 
     #endif
 
-    return static_cast<T>(detail::comp_ellint_1_impl(static_cast<evaluation_type>(k)));
+    return static_cast<T>(detail::comp_ellint_1_impl(static_cast<evaluation_type>(k * k)));
 }
-
-/*
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
-constexpr auto ellint_1(T1 k, T2 phi) noexcept
-   -> std::enable_if_t<detail::is_decimal_floating_point_v<T1> &&
-                       detail::is_decimal_floating_point_v<T2>, detail::promote_args_t<T1, T2>>
-{
-   using promoted_type = detail::promote_args_t<T1, T2>;
-   return detail::ellint_f_impl(static_cast<promoted_type>(phi), static_cast<promoted_type>(k));
-}
-*/
 
 } //namespace decimal
 } //namespace boost

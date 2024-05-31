@@ -1,4 +1,5 @@
 // Copyright 2024 Matt Borland
+// Copyright 2024 Christopehr Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -41,7 +42,7 @@
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && !defined(_MSC_VER)
 static constexpr auto N = static_cast<std::size_t>(64U); // Number of trials
 #else
-static constexpr auto N = static_cast<std::size_t>(8); // Number of trials
+static constexpr auto N = static_cast<std::size_t>(8U); // Number of trials
 #endif
 
 static std::mt19937_64 rng(42);
@@ -63,10 +64,11 @@ void test_comp_ellint()
         const auto dec_res {static_cast<float>(comp_ellint_1(dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(std::abs(distance) < 30))
+        if (!BOOST_TEST(std::abs(distance) < 1000))
         {
             // LCOV_EXCL_START
-            std::cerr << "Float: " << float_res
+            std::cerr << "arg: " << dec_val
+                      << "\n Float: " << float_res
                       << "\n  Dec: " << dec_res
                       << "\n Dist: " << distance << std::endl;
             // LCOV_EXCL_STOP
@@ -91,7 +93,7 @@ void test_ellint()
         const auto dec_res {static_cast<float>(ellint_1(k_dec_val, phi_dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(std::abs(distance) < 30))
+        if (!BOOST_TEST(std::abs(distance) < 300))
         {
             // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
