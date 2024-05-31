@@ -15,7 +15,7 @@
 namespace boost {
 namespace decimal {
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal32 val) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal32 val) noexcept -> std::uint32_t
 {
     return to_bid_d32(val);
 }
@@ -23,6 +23,11 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal32 val) noexcept
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal32_fast val) noexcept -> std::uint32_t
 {
     return to_bid_d32f(val);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal64 val) noexcept -> std::uint64_t
+{
+    return to_bid_d64(val);
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal64_fast val) noexcept -> std::uint64_t
@@ -48,6 +53,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid(std::uint64_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     return from_bid_d64f(bits);
+}
+
+template <>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid<decimal64>(std::uint64_t bits) noexcept -> decimal64
+{
+    return from_bid_d64(bits);
 }
 
 } // namespace decimal

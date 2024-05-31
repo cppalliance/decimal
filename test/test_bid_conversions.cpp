@@ -30,6 +30,7 @@ int main()
     test<decimal64_fast>();
 
     test<decimal32>();
+    test<decimal64>();
 
     return boost::report_errors();
 }
