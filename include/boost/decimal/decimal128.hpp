@@ -584,6 +584,9 @@ public:
     friend constexpr auto scalblnd128(decimal128 num, long exp) noexcept -> decimal128;
     friend constexpr auto scalbnd128(decimal128 num, int exp) noexcept -> decimal128;
     friend constexpr auto fmad128(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128;
+
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d128(decimal128 val) noexcept -> detail::uint128;
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d128(detail::uint128 bits) noexcept -> decimal128;
 };
 
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
@@ -2405,6 +2408,18 @@ constexpr auto scalblnd128(decimal128 num, long exp) noexcept -> decimal128
 constexpr auto scalbnd128(decimal128 num, int expval) noexcept -> decimal128
 {
     return scalblnd128(num, static_cast<long>(expval));
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d128(decimal128 val) noexcept -> detail::uint128
+{
+    const auto bits {detail::bit_cast<detail::uint128>(val)};
+    return bits;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d128(detail::uint128 bits) noexcept -> decimal128
+{
+    const auto val {detail::bit_cast<decimal128>(bits)};
+    return val;
 }
 
 } //namespace decimal

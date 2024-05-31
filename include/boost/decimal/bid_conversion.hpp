@@ -35,6 +35,11 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal64_fast val) noexcept -> std::u
     return to_bid_d64f(val);
 }
 
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal128 val) noexcept -> detail::uint128
+{
+    return to_bid_d128(val);
+}
+
 template <typename T = decimal32_fast>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid(std::uint32_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
@@ -59,6 +64,13 @@ template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid<decimal64>(std::uint64_t bits) noexcept -> decimal64
 {
     return from_bid_d64(bits);
+}
+
+template <typename T = decimal128>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid(detail::uint128 bits) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    return from_bid_d128(bits);
 }
 
 } // namespace decimal
