@@ -1,6 +1,6 @@
 ﻿# -----------------------------------------------------------------------------
-#  Copyright Matt Borland 2023.
-#  Copyright Christopher Kormanyos 2023.
+#  Copyright 2023 - 2024 Matt Borland.
+#  Copyright 2023 - 2024 Christopher Kormanyos.
 #  Distributed under the Boost Software License,
 #  Version 1.0. (See accompanying file LICENSE_1_0.txt
 #  or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,10 +28,25 @@ endif
 
 CXXFLAGS     = -march=native                                                   \
                -mtune=native                                                   \
-               -O1                                                             \
+               -O0                                                             \
                -Wextra                                                         \
                -Wall                                                           \
                -fno-inline-functions                                           \
+               -fauto-inc-dec                                                  \
+               -fcombine-stack-adjustments                                     \
+               -fcompare-elim                                                  \
+               -fcprop-registers                                               \
+               -fdce                                                           \
+               -fdefer-pop                                                     \
+               -fdse                                                           \
+               -fif-conversion                                                 \
+               -fif-conversion2                                                \
+               -fipa-pure-const                                                \
+               -fipa-profile                                                   \
+               -fipa-reference                                                 \
+               -fmerge-constants                                               \
+               -fshrink-wrap                                                   \
+               -fsplit-wide-types                                              \
                -fprofile-arcs                                                  \
                -ftest-coverage
 
