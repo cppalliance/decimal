@@ -37,7 +37,7 @@ constexpr auto ellint_decimal_order(T x) noexcept
 {
     int n { };
 
-    const T fr10 = frexp10(x, &n);
+    static_cast<void>(frexp10(x, &n));
 
     constexpr int order_bias
     {
