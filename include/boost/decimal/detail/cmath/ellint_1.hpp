@@ -51,7 +51,7 @@ constexpr auto ellint_decimal_order(T x) noexcept
 
 template <typename T>
 constexpr auto agm(T  phi,
-                   T  m,
+                   T  k,
                    T& Fpm,
                    T& Km,
                    T* const pEm  = nullptr,
@@ -65,8 +65,8 @@ constexpr auto agm(T  phi,
   // 4th Ed., Ch. 3.2.11, Page 773.
   
   // Make use of the following properties:
-  // F(z + pi*k | m) = F(z | m) + 2k pi K(m)
-  // E(z + pi*k | m) = E(z | m) + 2k pi E(m)
+  // F(z + pi*j | m) = F(z | m) + 2j pi K(m)
+  // E(z + pi*j | m) = E(z | m) + 2j pi E(m)
 
   // as well as:
   // F(-z | m) = -F(z | m)
@@ -79,7 +79,7 @@ constexpr auto agm(T  phi,
   // Note that there is special handling for the angular argument phi if this
   // argument is equal to pi/2.
 
-  auto fpc_m = fpclassify(m);
+  auto fpc_m = fpclassify(k);
 
   constexpr T my_pi_half { numbers::pi_v<T> / 2 };
 
@@ -96,7 +96,7 @@ constexpr auto agm(T  phi,
     if(pEpm != nullptr) { *pEpm = phi; }
     if(pEm  != nullptr) { *pEm  = my_pi_half; }
   }
-  else if(m == one)
+  else if(k == one)
   {
     if(pEm != nullptr) { *pEm = one; }
 
@@ -111,22 +111,24 @@ constexpr auto agm(T  phi,
   }
   else
   {
+    constexpr T half { 5 , -1 };
+
     T a0    = one;
-    T b0    = sqrt(one - m); // Mathematica argument convention
+    T b0    = sqrt(one - (k * k)); // Mathematica argument convention
     T phi_n = phi;
     T p2    = one;
 
     T an;
 
-    const bool m_neg = signbit(m);
-    const T    mk    = sqrt(fabs(m));
+    const bool m_neg = signbit(k);
+    const T    mk    = fabs(k);
 
     const bool has_e { ((pEm  != nullptr) || (pEpm != nullptr)) };
 
     T cn_2ncn_inner_prod      = (has_e ? ((!m_neg) ? mk : -mk) * (mk / 2) : zero);
     T sin_phi_n_cn_inner_prod = zero;
 
-    for(int n = 1; n < 64; ++n)
+    for(int n = 1; n < 16; ++n)
     {
       an = (a0 + b0) / 2;
 
@@ -150,9 +152,18 @@ constexpr auto agm(T  phi,
 
       const auto order10 = ellint_decimal_order(cn_term);
 
-      if(order10 <= -std::numeric_limits<T>::digits10 / 2)
+      if(order10 < -std::numeric_limits<T>::digits10 / 2 - 1)
       {
-        break;
+        if(k < half)
+        {
+          break;
+        }
+        else
+        {
+          if(n > 1)
+
+          break;
+        }
       }
 
       b0 = sqrt(a0 * b0);
@@ -160,8 +171,6 @@ constexpr auto agm(T  phi,
 
       if(!phi_is_pi_half)
       {
-        constexpr T half { 5 , -1 };
-
         phi_n += numbers::pi_v<T> * static_cast<int>((phi_n / numbers::pi_v<T>) + half);
       }
     }
@@ -280,7 +289,7 @@ constexpr auto ellint_1(T k, T phi) noexcept
 
     #endif
 
-    return static_cast<T>(detail::ellint_1_impl(static_cast<evaluation_type>(k * k), static_cast<evaluation_type>(phi)));
+    return static_cast<T>(detail::ellint_1_impl(static_cast<evaluation_type>(k), static_cast<evaluation_type>(phi)));
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
@@ -301,7 +310,7 @@ constexpr auto comp_ellint_1(T k) noexcept
 
     #endif
 
-    return static_cast<T>(detail::comp_ellint_1_impl(static_cast<evaluation_type>(k * k)));
+    return static_cast<T>(detail::comp_ellint_1_impl(static_cast<evaluation_type>(k)));
 }
 
 } //namespace decimal
