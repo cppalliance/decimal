@@ -51,7 +51,7 @@ constexpr auto ellint_decimal_order(T x) noexcept
 
 template <typename T>
 constexpr auto agm(T  phi,
-                   T  k,
+                   T  mk,
                    T& Fpm,
                    T& Km,
                    T* const pEm  = nullptr,
@@ -79,7 +79,7 @@ constexpr auto agm(T  phi,
   // Note that there is special handling for the angular argument phi if this
   // argument is equal to pi/2.
 
-  auto fpc_m = fpclassify(k);
+  auto fpc_m = fpclassify(mk);
 
   constexpr T my_pi_half { numbers::pi_v<T> / 2 };
 
@@ -96,7 +96,7 @@ constexpr auto agm(T  phi,
     if(pEpm != nullptr) { *pEpm = phi; }
     if(pEm  != nullptr) { *pEm  = my_pi_half; }
   }
-  else if(k == one)
+  else if(mk == one)
   {
     if(pEm != nullptr) { *pEm = one; }
 
@@ -114,18 +114,15 @@ constexpr auto agm(T  phi,
     constexpr T half { 5 , -1 };
 
     T a0    = one;
-    T b0    = sqrt(one - (k * k)); // Mathematica argument convention
+    T b0    = sqrt(one - mk * mk);
     T phi_n = phi;
     T p2    = one;
 
     T an;
 
-    const bool m_neg = signbit(k);
-    const T    mk    = fabs(k);
-
     const bool has_e { ((pEm  != nullptr) || (pEpm != nullptr)) };
 
-    T cn_2ncn_inner_prod      = (has_e ? ((!m_neg) ? mk : -mk) * (mk / 2) : zero);
+    T cn_2ncn_inner_prod      = (has_e ? (mk * mk) / 2 : zero);
     T sin_phi_n_cn_inner_prod = zero;
 
     for(int n = 1; n < 16; ++n)
@@ -152,15 +149,15 @@ constexpr auto agm(T  phi,
 
       const auto order10 = ellint_decimal_order(cn_term);
 
-      if(order10 < -std::numeric_limits<T>::digits10 / 2 - 1)
+      //if(order10 <= -std::numeric_limits<T>::digits10 / 2)
       {
         constexpr T near_one { 9 , -1 };
 
         // TODO(ckormanyos) There should be a better way to formulate this logic.
-        // TODO(ckormanyos) Use a Taylor series or perturbative expansion for phi close to 1.
-        if(    (mk < half)
-           || ((mk < near_one) && (n > 1))
-           ||                     (n > 3))
+        // TODO(ckormanyos) Use a Taylor series or similar approx. for m near 1.
+        if(   ((mk < half)     && (n > 2))
+           || ((mk < near_one) && (n > 3))
+           ||                     (n > 4))
         {
           break;
         }
@@ -216,7 +213,7 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
   {
     if(signbit(phi))
     {
-      return -ellint_1_impl(-phi, m);
+      return -ellint_1_impl(m, -phi);
     }
     else
     {
