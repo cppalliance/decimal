@@ -50,19 +50,23 @@ constexpr auto agm(T  phi,
                    T* const pEpm = nullptr) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, void)
 {
-  // Use the AGM algorithm as described in Computation of Special Functions,
+  // Use the AGM algorithm implemented in e_float:
+  // C.M. Kormanyos, "Algorithm 910: A Portable C++ Multiple-Precision
+  // System for Special-Function Calculations", ACM TOMS (37) 4, February 2011.
+
+  // See also the AGM algorithm as described in "Computation of Special Functions",
   // Zhang & Jin, 18.3.2, pages 663-665. The implementation is based on the
   // sample code therein. However, the Mathematica argument convention with
   // (k^2 --> m) is used, as described in Stephen Wolfram's Mathematica Book,
   // 4th Ed., Ch. 3.2.11, Page 773.
 
   // Make use of the following properties:
-  // F(z + pi*j | m) = F(z | m) + 2j pi K(m)
-  // E(z + pi*j | m) = E(z | m) + 2j pi E(m)
+  // F(m | phi + pi*j) = F(m) + 2j * K(m)
+  // E(m | phi + pi*j) = E(m) + 2j * E(m)
 
-  // as well as:
-  // F(-z | m) = -F(z | m)
-  // E(-z | m) = -E(z | m)
+  // as well as (reflection of phi):
+  // F(m, -phi) = -F(m, phi)
+  // E(m, -phi) = -E(m, phi)
 
   // The calculations which are needed for EllipticE(...) are only performed if
   // the results from these will actually be used, in other words only if non-zero

@@ -37,7 +37,7 @@
 #include <cmath>
 
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-static constexpr auto N = static_cast<std::size_t>(64U);
+static constexpr auto N = static_cast<std::size_t>(0x64U);
 #else
 static constexpr auto N = static_cast<std::size_t>(8U);
 #endif
@@ -80,20 +80,11 @@ void test_ellint()
     std::uniform_real_distribution<float> dist_phi(-1.0F, 1.0F);
 
     constexpr auto local_N = std::is_same<T, decimal128>::value ? N / 4 : N;
+
     for (std::size_t i {}; i < local_N; ++i)
     {
-        float phi_val_try { };
-
-        using std::fabs;
-
-        do
-        {
-          phi_val_try = dist_phi(rng);
-        }
-        while(fabs(phi_val_try) < 0.01F);
-
         const auto k_val {dist_k(rng)};
-        const auto phi_val {phi_val_try};
+        const auto phi_val {dist_phi(rng)};
 
         const T k_dec_val {k_val};
         const T phi_dec_val {phi_val};
@@ -117,13 +108,14 @@ int main()
 {
     test_comp_ellint<decimal32>();
     test_comp_ellint<decimal64>();
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+    test_comp_ellint<decimal128>();
+    #endif
 
     test_ellint<decimal32>();
     test_ellint<decimal64>();
-
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    //test_comp_ellint<decimal128>();
-    //test_ellint<decimal128>();
+    test_ellint<decimal128>();
     #endif
 
     return boost::report_errors();

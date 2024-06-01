@@ -36,44 +36,73 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 {
   constexpr T one { 1 };
 
+  T result { };
+
   if(fabs(m) > one)
   {
-    return std::numeric_limits<T>::quiet_NaN();
+    result = std::numeric_limits<T>::quiet_NaN();
   }
   else
   {
     if(signbit(phi))
     {
-      return -ellint_1_impl(m, -phi);
+      result = -ellint_1_impl(m, -phi);
     }
     else
     {
-      constexpr T my_pi_half { numbers::pi_v<T> / 2 };
-
-      T k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
-      T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
-
-      const bool b_neg { phi_scaled > my_pi_half };
-
-      if(b_neg)
+      constexpr int small_phi_order
       {
-        ++k_pi;
+            std::numeric_limits<T>::digits10 < 10 ?  3
+          : std::numeric_limits<T>::digits10 < 20 ?  5
+          :                                         10
+      };
 
-        phi_scaled = -(phi_scaled - numbers::pi_v<T>);
-      }
-
-      T Fpm, Km;
-
-      detail::ellint_detail::elliptic_series::agm(phi_scaled, m, Fpm, Km);
-
-      if(b_neg)
+      if (phi < T { 5, -small_phi_order })
       {
-        Fpm = -Fpm;
-      }
+        // Normal[Series[EllipticF[phi, m m], {phi, 0, 8}]]
+        // Together[%]
+        // Then manually edit the interior field to regain HornersForm[poly, phi].
 
-      return Fpm + ((k_pi * Km) * 2);
+        const T phi_sq { phi * phi };
+
+        const T msq { m * m };
+
+        const T k { signbit(m) ? -msq : msq };
+
+        result = (phi * (5040 + phi_sq * (k * 840 + phi_sq * (k * (-168 + k * 378) + k * (16 + k * phi_sq * (-180 + k * 225)))))) / 5040;
+      }
+      else
+      {
+        constexpr T my_pi_half { numbers::pi_v<T> / 2 };
+
+        T k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
+        T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
+
+        const bool b_neg { phi_scaled > my_pi_half };
+
+        if(b_neg)
+        {
+          ++k_pi;
+
+          phi_scaled = -(phi_scaled - numbers::pi_v<T>);
+        }
+
+        T Fpm { };
+        T Km  { };
+
+        detail::ellint_detail::elliptic_series::agm(phi_scaled, m, Fpm, Km);
+
+        if(b_neg)
+        {
+          Fpm = -Fpm;
+        }
+
+        result = Fpm + ((k_pi * Km) * 2);
+      }
     }
   }
+
+  return result;
 }
 
 template <typename T>
