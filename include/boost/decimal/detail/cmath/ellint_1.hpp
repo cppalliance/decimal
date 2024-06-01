@@ -117,7 +117,7 @@ constexpr auto agm(T  phi,
     T b0    = sqrt(one - mk * mk);
     T phi_n = phi;
 
-    std::uint16_t p2 { UINT16_C(1) };
+    std::uint32_t p2 { UINT32_C(1) };
 
     T an { };
 
@@ -126,7 +126,7 @@ constexpr auto agm(T  phi,
     T cn_2ncn_inner_prod      = (has_e ? (mk * mk) / 2 : zero);
     T sin_phi_n_cn_inner_prod = zero;
 
-    for(int n = 1; n < std::numeric_limits<std::uint16_t>::digits; ++n)
+    for(int n = 1; n < std::numeric_limits<std::uint32_t>::digits; ++n)
     {
       an = (a0 + b0) / 2;
 
@@ -136,7 +136,7 @@ constexpr auto agm(T  phi,
 
       if(has_e)
       {
-        cn_2ncn_inner_prod += ((cn_term * cn_term) * static_cast<std::uint32_t>(p2));
+        cn_2ncn_inner_prod += ((cn_term * cn_term) * p2);
 
         if(pEpm != nullptr)
         {
@@ -146,7 +146,7 @@ constexpr auto agm(T  phi,
         }
       }
 
-      p2 <<= 1U;
+      p2 = static_cast<std::uint32_t>(p2 << 1U);
 
       //const auto order10 = ellint_decimal_order(cn_term);
 
@@ -220,17 +220,18 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
     }
     else
     {
-      T    k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
-      T    phi_scaled = phi - (k_pi * numbers::pi_v<T>);
-      bool b_neg      = false;
-
       constexpr T my_pi_half { numbers::pi_v<T> / 2 };
 
-      if(phi_scaled > my_pi_half)
+      T k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
+      T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
+
+      const bool b_neg { phi_scaled > my_pi_half };
+
+      if(b_neg)
       {
         ++k_pi;
+
         phi_scaled = -(phi_scaled - numbers::pi_v<T>);
-        b_neg      = true;
       }
 
       T Fpm, Km;
