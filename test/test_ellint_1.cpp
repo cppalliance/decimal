@@ -49,7 +49,7 @@ using namespace boost::decimal;
 template <typename T>
 void test_comp_ellint()
 {
-    std::uniform_real_distribution<float> dist(-0.95F, 0.95F);
+    std::uniform_real_distribution<float> dist(-0.995F, 0.995F);
 
     constexpr auto local_N = std::is_same<T, decimal128>::value ? N / 4 : N;
     for (std::size_t i {}; i < local_N; ++i)
@@ -76,10 +76,11 @@ void test_comp_ellint()
 template <typename T>
 void test_ellint()
 {
-    std::uniform_real_distribution<float> dist_k  (-0.95F, 0.95F);
+    std::uniform_real_distribution<float> dist_k  (-0.995F, 0.995F);
     std::uniform_real_distribution<float> dist_phi(-1.0F, 1.0F);
 
     constexpr auto local_N = std::is_same<T, decimal128>::value ? N / 4 : N;
+
     for (std::size_t i {}; i < local_N; ++i)
     {
         const auto k_val {dist_k(rng)};
@@ -105,6 +106,19 @@ void test_ellint()
 
 int main()
 {
+    #if 0
+    {
+        using decimal_type = decimal128;
+
+        const decimal_type k_arg   { decimal_type { 1 } / 3 };
+        const decimal_type phi_arg { decimal_type { 1 } / 7 };
+
+        const decimal_type ellint_1_val = ellint_1(k_arg, phi_arg);
+
+        std::cout << "ellint_1_val: " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << ellint_1_val << std::endl;
+    }
+    #endif
+
     test_comp_ellint<decimal32>();
     test_comp_ellint<decimal64>();
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)

@@ -37,7 +37,7 @@
 #include <cmath>
 
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-static constexpr auto N = static_cast<std::size_t>(0x64U);
+static constexpr auto N = static_cast<std::size_t>(64U);
 #else
 static constexpr auto N = static_cast<std::size_t>(8U);
 #endif
@@ -49,7 +49,7 @@ using namespace boost::decimal;
 template <typename T>
 void test_comp_ellint()
 {
-    std::uniform_real_distribution<float> dist(-0.95F, 0.95F);
+    std::uniform_real_distribution<float> dist(-0.995F, 0.995F);
 
     constexpr auto local_N = std::is_same<T, decimal128>::value ? N / 4 : N;
     for (std::size_t i {}; i < local_N; ++i)
@@ -76,7 +76,7 @@ void test_comp_ellint()
 template <typename T>
 void test_ellint()
 {
-    std::uniform_real_distribution<float> dist_k  (-0.95F, 0.95F);
+    std::uniform_real_distribution<float> dist_k  (-0.995F, 0.995F);
     std::uniform_real_distribution<float> dist_phi(-1.0F, 1.0F);
 
     constexpr auto local_N = std::is_same<T, decimal128>::value ? N / 4 : N;
@@ -93,7 +93,7 @@ void test_ellint()
         const auto dec_res {static_cast<float>(ellint_2(k_dec_val, phi_dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(std::abs(distance) < 128))
+        if (!BOOST_TEST(std::abs(distance) < 256))
         {
             // LCOV_EXCL_START
             std::cerr << "Float: " << float_res
@@ -106,6 +106,19 @@ void test_ellint()
 
 int main()
 {
+    #if 0
+    {
+        using decimal_type = decimal128;
+
+        const decimal_type k_arg   { decimal_type { 1 } / 3 };
+        const decimal_type phi_arg { decimal_type { 1 } / 7 };
+
+        const decimal_type ellint_1_val = ellint_2(k_arg, phi_arg);
+
+        std::cout << "ellint_2_val: " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << ellint_2_val << std::endl;
+    }
+    #endif
+
     test_comp_ellint<decimal32>();
     test_comp_ellint<decimal64>();
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)

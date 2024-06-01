@@ -1,5 +1,5 @@
 // Copyright 2024 Matt Borland
-// Copyright 2024 Christopher Kormanyos
+// Copyright 2002 - 2011, 2024 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -109,9 +109,9 @@ constexpr auto agm(T  phi,
   {
     constexpr T half { 5 , -1 };
 
-    T a0    = one;
-    T b0    = sqrt(one - mk * mk);
-    T phi_n = phi;
+    T a0    { one };
+    T b0    { sqrt(one - mk * mk) };
+    T phi_n { phi };
 
     std::uint32_t p2 { UINT32_C(1) };
 
@@ -150,10 +150,9 @@ constexpr auto agm(T  phi,
       // And the condition should depend on some actual values of iteration terms in
       // relation to the decimal digits of the type.
 
-      // TODO(ckormanyos) Use a Taylor series or similar approx. for phi near 0.
       // TODO(ckormanyos) Use a Taylor series or similar approx. for m near 1.
 
-      const int iter_low_limit = (mk < half) ? 2 : (mk < near_one) ? 3 : 4;
+      const int iter_low_limit = (mk < half) ? 3 : (mk < near_one) ? 4 : 5;
 
       if(n > iter_low_limit)
       {
@@ -169,7 +168,7 @@ constexpr auto agm(T  phi,
       }
     }
 
-    const T one_over_an = one / an;
+    const T one_over_an { one / an };
 
     Fpm = phi_n * one_over_an;
 
