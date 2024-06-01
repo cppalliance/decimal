@@ -116,16 +116,17 @@ constexpr auto agm(T  phi,
     T a0    = one;
     T b0    = sqrt(one - mk * mk);
     T phi_n = phi;
-    T p2    = one;
 
-    T an;
+    std::uint16_t p2 { UINT16_C(1) };
+
+    T an { };
 
     const bool has_e { ((pEm  != nullptr) || (pEpm != nullptr)) };
 
     T cn_2ncn_inner_prod      = (has_e ? (mk * mk) / 2 : zero);
     T sin_phi_n_cn_inner_prod = zero;
 
-    for(int n = 1; n < 16; ++n)
+    for(int n = 1; n < std::numeric_limits<std::uint16_t>::digits; ++n)
     {
       an = (a0 + b0) / 2;
 
@@ -145,16 +146,18 @@ constexpr auto agm(T  phi,
         }
       }
 
-      p2 *= 2;
+      p2 <<= 1U;
 
-      const auto order10 = ellint_decimal_order(cn_term);
+      //const auto order10 = ellint_decimal_order(cn_term);
 
       //if(order10 <= -std::numeric_limits<T>::digits10 / 2)
       {
         constexpr T near_one { 9 , -1 };
 
         // TODO(ckormanyos) There should be a better way to formulate this logic.
+        // TODO(ckormanyos) Use a Taylor series or similar approx. for phi near 0.
         // TODO(ckormanyos) Use a Taylor series or similar approx. for m near 1.
+
         if(   ((mk < half)     && (n > 2))
            || ((mk < near_one) && (n > 3))
            ||                     (n > 4))
