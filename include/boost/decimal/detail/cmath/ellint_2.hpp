@@ -4,8 +4,8 @@
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
-#define BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
+#ifndef BOOST_DECIMAL_DETAIL_CMATH_ELLINT_2_HPP
+#define BOOST_DECIMAL_DETAIL_CMATH_ELLINT_2_HPP
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/cmath/impl/ellint_impl.hpp>
@@ -31,7 +31,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto ellint_1_impl(T m, T phi) noexcept
+constexpr auto ellint_2_impl(T m, T phi) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
   constexpr T one { 1 };
@@ -44,7 +44,7 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
   {
     if(signbit(phi))
     {
-      return -ellint_1_impl(m, -phi);
+      return -ellint_2(m, -phi);
     }
     else
     {
@@ -62,22 +62,25 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
         phi_scaled = -(phi_scaled - numbers::pi_v<T>);
       }
 
-      T Fpm, Km;
+      T Fpm { };
+      T Km  { };
+      T Em  { };
+      T Epm { };
 
-      detail::ellint_detail::elliptic_series::agm(phi_scaled, m, Fpm, Km);
+      detail::ellint_detail::elliptic_series::agm(phi_scaled, m, Fpm, Km, &Em, &Epm);
 
       if(b_neg)
       {
-        Fpm = -Fpm;
+        Epm = -Epm;
       }
 
-      return Fpm + ((k_pi * Km) * 2);
+      return Epm + ((k_pi * Em) * 2);
     }
   }
 }
 
 template <typename T>
-constexpr auto comp_ellint_1_impl(T m) noexcept
+constexpr auto comp_ellint_2_impl(T m) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
   constexpr T one { 1 };
@@ -90,19 +93,20 @@ constexpr auto comp_ellint_1_impl(T m) noexcept
   {
     T Fpm { };
     T Km  { };
+    T Em  { };
 
     constexpr T zero { 0 };
 
-    detail::ellint_detail::elliptic_series::agm(zero, m, Fpm, Km);
+    detail::ellint_detail::elliptic_series::agm(zero, m, Fpm, Km, &Em);
 
-    return Km;
+    return Em;
   }
 }
 
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto ellint_1(T k, T phi) noexcept
+constexpr auto ellint_2(T k, T phi) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -119,11 +123,11 @@ constexpr auto ellint_1(T k, T phi) noexcept
 
     #endif
 
-    return static_cast<T>(detail::ellint_1_impl(static_cast<evaluation_type>(k), static_cast<evaluation_type>(phi)));
+    return static_cast<T>(detail::ellint_2_impl(static_cast<evaluation_type>(k), static_cast<evaluation_type>(phi)));
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto comp_ellint_1(T k) noexcept
+constexpr auto comp_ellint_2(T k) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -140,10 +144,10 @@ constexpr auto comp_ellint_1(T k) noexcept
 
     #endif
 
-    return static_cast<T>(detail::comp_ellint_1_impl(static_cast<evaluation_type>(k)));
+    return static_cast<T>(detail::comp_ellint_2_impl(static_cast<evaluation_type>(k)));
 }
 
 } //namespace decimal
 } //namespace boost
 
-#endif //BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
+#endif //BOOST_DECIMAL_DETAIL_CMATH_ELLINT_2_HPP

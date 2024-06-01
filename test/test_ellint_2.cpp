@@ -28,7 +28,7 @@
 #  endif
 #endif
 
-#include <boost/math/special_functions/ellint_1.hpp>
+#include <boost/math/special_functions/ellint_2.hpp>
 #include <boost/math/special_functions/next.hpp>
 #include <boost/core/lightweight_test.hpp>
 
@@ -57,8 +57,8 @@ void test_comp_ellint()
         const auto val {dist(rng)};
         const T dec_val {val};
 
-        const auto float_res {boost::math::ellint_1(val)};
-        const auto dec_res {static_cast<float>(comp_ellint_1(dec_val))};
+        const auto float_res {boost::math::ellint_2(val)};
+        const auto dec_res {static_cast<float>(comp_ellint_2(dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
         if (!BOOST_TEST(std::abs(distance) < 64))
@@ -98,8 +98,8 @@ void test_ellint()
         const T k_dec_val {k_val};
         const T phi_dec_val {phi_val};
 
-        const auto float_res {boost::math::ellint_1(k_val, phi_val)};
-        const auto dec_res {static_cast<float>(ellint_1(k_dec_val, phi_dec_val))};
+        const auto float_res {boost::math::ellint_2(k_val, phi_val)};
+        const auto dec_res {static_cast<float>(ellint_2(k_dec_val, phi_dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
         if (!BOOST_TEST(std::abs(distance) < 128))

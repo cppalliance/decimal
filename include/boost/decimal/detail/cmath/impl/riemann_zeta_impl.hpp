@@ -154,7 +154,7 @@ constexpr typename prime_table_imp<b, T>::prime_table_t prime_table_imp<b, T>::p
 
 #endif
 
-} //namespace lgamma_detail
+} //namespace riemann_zeta_detail
 
 using riemann_zeta_table = riemann_zeta_detail::riemann_zeta_table_imp<true>;
 
