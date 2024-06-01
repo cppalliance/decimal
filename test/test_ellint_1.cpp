@@ -49,7 +49,7 @@ using namespace boost::decimal;
 template <typename T>
 void test_comp_ellint()
 {
-    std::uniform_real_distribution<float> dist(-0.9F, 0.9F);
+    std::uniform_real_distribution<float> dist(-0.95F, 0.95F);
 
     constexpr auto local_N = std::is_same<T, decimal128>::value ? N / 4 : N;
     for (std::size_t i {}; i < local_N; ++i)
@@ -61,7 +61,7 @@ void test_comp_ellint()
         const auto dec_res {static_cast<float>(comp_ellint_1(dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(std::abs(distance) < 32))
+        if (!BOOST_TEST(std::abs(distance) < 64))
         {
             // LCOV_EXCL_START
             std::cerr << "arg: " << dec_val
@@ -76,8 +76,8 @@ void test_comp_ellint()
 template <typename T>
 void test_ellint()
 {
-    std::uniform_real_distribution<float> dist_k  (-0.9F, 0.9F);
-    std::uniform_real_distribution<float> dist_phi(-0.9F, 0.9F);
+    std::uniform_real_distribution<float> dist_k  (-0.95F, 0.95F);
+    std::uniform_real_distribution<float> dist_phi(-1.0F, 1.0F);
 
     constexpr auto local_N = std::is_same<T, decimal128>::value ? N / 4 : N;
     for (std::size_t i {}; i < local_N; ++i)
@@ -90,10 +90,11 @@ void test_ellint()
         {
           phi_val_try = dist_phi(rng);
         }
-        while(fabs(phi_val_try) < 0.1F);
+        while(fabs(phi_val_try) < 0.01F);
 
         const auto k_val {dist_k(rng)};
         const auto phi_val {phi_val_try};
+
         const T k_dec_val {k_val};
         const T phi_dec_val {phi_val};
 

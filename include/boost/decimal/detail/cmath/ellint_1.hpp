@@ -136,7 +136,7 @@ constexpr auto agm(T  phi,
 
       if(has_e)
       {
-        cn_2ncn_inner_prod += (cn_term * cn_term) * p2;
+        cn_2ncn_inner_prod += ((cn_term * cn_term) * static_cast<std::uint32_t>(p2));
 
         if(pEpm != nullptr)
         {
