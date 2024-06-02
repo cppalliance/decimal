@@ -55,63 +55,64 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
   {
     result = std::numeric_limits<T>::quiet_NaN();
   }
+  else if(signbit(phi))
+  {
+    result = -ellint_1_impl(m, -phi);
+  }
+  else if(signbit(m))
+  {
+    result = ellint_1_impl(-m, phi);
+  }
   else
   {
-    if(signbit(phi))
+    constexpr int small_phi_order
     {
-      result = -ellint_1_impl(m, -phi);
+          std::numeric_limits<T>::digits10 < 10 ? 2
+        : std::numeric_limits<T>::digits10 < 20 ? 4
+        :                                         8
+    };
+
+    if (phi < T { 1, -small_phi_order })
+    {
+      // PadeApproximant[EllipticF[phi, m2], {phi, 0, {4, 3}}]
+      // FullSimplify[%]
+      // Then manually edit the interior field to regain HornerForm[poly, phi].
+
+      const T phi_sq { phi * phi };
+
+      const T m2 { (!signbit(m)) ? (m * m) : -(m * m) };
+
+      const T top { phi * (-60 + (-12 + 17 * m2) * phi_sq) };
+      const T bot { -60 + 3 * (-4 + 9 * m2) * phi_sq };
+
+      result = top / bot;
     }
     else
     {
-      constexpr int small_phi_order
+      constexpr T my_pi_half { numbers::pi_v<T> / 2 };
+
+      T k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
+      T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
+
+      const bool b_neg { phi_scaled > my_pi_half };
+
+      if(b_neg)
       {
-            std::numeric_limits<T>::digits10 < 10 ? 2
-          : std::numeric_limits<T>::digits10 < 20 ? 4
-          :                                         8
-      };
+        ++k_pi;
 
-      if (phi < T { 1, -small_phi_order })
-      {
-        // PadeApproximant[EllipticF[phi, m2], {phi, 0, {4, 3}}]
-        // Together[%]
-        // Then manually edit the interior field to regain HornerForm[poly, phi].
-
-        const T phi_sq { phi * phi };
-
-        const T m2 { (!signbit(m)) ? (m * m) : -(m * m) };
-
-        const T top { phi * (-60 + (-12 + 17 * m2) * phi_sq) };
-        const T bot { -60 + 3 * (-4 + 9 * m2) * phi_sq };
-
-        result = top / bot;
+        phi_scaled = -(phi_scaled - numbers::pi_v<T>);
       }
-      else
+
+      T Km { };
+
+      detail::ellint_detail::elliptic_series::agm(phi_scaled, m, result, Km);
+
+      if(b_neg)
       {
-        constexpr T my_pi_half { numbers::pi_v<T> / 2 };
-
-        T k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
-        T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
-
-        const bool b_neg { phi_scaled > my_pi_half };
-
-        if(b_neg)
-        {
-          ++k_pi;
-
-          phi_scaled = -(phi_scaled - numbers::pi_v<T>);
-        }
-
-        T Km { };
-
-        detail::ellint_detail::elliptic_series::agm(phi_scaled, m, result, Km);
-
-        if(b_neg)
-        {
-          result = -result;
-        }
-
-        result += ((k_pi * Km) * 2);
+        result = -result;
       }
+
+      result += ((k_pi * Km) * 2);
     }
   }
 
@@ -122,7 +123,6 @@ template <typename T>
 constexpr auto comp_ellint_1_impl(T m) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-  constexpr T zero { 0 };
   constexpr T one  { 1 };
 
   T result { };
@@ -143,6 +143,8 @@ constexpr auto comp_ellint_1_impl(T m) noexcept
   }
   else
   {
+    constexpr T zero { 0 };
+
     T Fpm { };
 
     detail::ellint_detail::elliptic_series::agm(zero, m, Fpm, result);

@@ -38,71 +38,83 @@ constexpr auto ellint_2_impl(T m, T phi) noexcept
 
   T result { };
 
-  if(fabs(m) > one)
+  const auto fpc_m   = fpclassify(m);
+  const auto fpc_phi = fpclassify(phi);
+
+  if((fpc_m == FP_ZERO) && (fpc_phi == FP_NORMAL))
+  {
+    result = phi;
+  }
+  else if((fpc_phi == FP_ZERO) && (fpc_m == FP_NORMAL))
+  {
+    constexpr T zero { 0 };
+
+    result = zero;
+  }
+  else if((fabs(m) > one) || (fpc_phi != FP_NORMAL) || (fpc_m != FP_NORMAL))
   {
     result = std::numeric_limits<T>::quiet_NaN();
   }
+  else if(signbit(phi))
+  {
+    result = -ellint_2_impl(m, -phi);
+  }
+  else if(signbit(m))
+  {
+    result = ellint_2_impl(-m, phi);
+  }
   else
   {
-    if(signbit(phi))
+    constexpr int small_phi_order
     {
-      result = -ellint_2(m, -phi);
+          std::numeric_limits<T>::digits10 < 10 ? 2
+        : std::numeric_limits<T>::digits10 < 20 ? 4
+        :                                         8
+    };
+
+    if (phi < T { 1, -small_phi_order })
+    {
+      // PadeApproximant[EllipticE[phi, m2], {phi, 0, {4, 3}}]
+      // FullSimplify[%]
+      // Then manually edit the interior field to regain HornerForm[poly, phi].
+
+      const T phi_sq { phi * phi };
+
+      const T m2 { (!signbit(m)) ? (m * m) : -(m * m) };
+
+      const T top { phi * (-60 + (-12 + 19 * m2) * phi_sq) };
+      const T bot { -60 + 3 * (-4 + 3 * m2) * phi_sq };
+
+      result = top / bot;
     }
     else
     {
-      constexpr int small_phi_order
+      constexpr T my_pi_half { numbers::pi_v<T> / 2 };
+
+      T k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
+      T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
+
+      const bool b_neg { phi_scaled > my_pi_half };
+
+      if(b_neg)
       {
-            std::numeric_limits<T>::digits10 < 10 ?  3
-          : std::numeric_limits<T>::digits10 < 20 ?  5
-          :                                         10
-      };
+        ++k_pi;
 
-      if (phi < T { 5, -small_phi_order })
-      {
-        // Normal[Series[EllipticE[phi, m m], {phi, 0, 8}]]
-        // Together[%]
-        // Then manually edit the interior field to regain HornerForm[poly, phi].
-
-        const T phi_sq { phi * phi };
-
-        const T msq { m * m };
-
-        const T k   { signbit(m) ? -msq : msq };
-        const T ksq { k * k };
-        const T kcb { k * ksq };
-
-        result = (phi * (5040 + phi_sq * (-840 * k + phi_sq * (168 * k - 126 * ksq + phi_sq * (-16 * k + 60 * ksq - 45 * kcb))))) / 5040;
+        phi_scaled = -(phi_scaled - numbers::pi_v<T>);
       }
-      else
+
+      T Fpm { };
+      T Km  { };
+      T Em  { };
+
+      detail::ellint_detail::elliptic_series::agm(phi_scaled, m, Fpm, Km, &Em, &result);
+
+      if(b_neg)
       {
-        constexpr T my_pi_half { numbers::pi_v<T> / 2 };
-
-        T k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
-        T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
-
-        const bool b_neg { phi_scaled > my_pi_half };
-
-        if(b_neg)
-        {
-          ++k_pi;
-
-          phi_scaled = -(phi_scaled - numbers::pi_v<T>);
-        }
-
-        T Fpm { };
-        T Km  { };
-        T Em  { };
-        T Epm { };
-
-        detail::ellint_detail::elliptic_series::agm(phi_scaled, m, Fpm, Km, &Em, &Epm);
-
-        if(b_neg)
-        {
-          Epm = -Epm;
-        }
-
-        result = Epm + ((k_pi * Em) * 2);
+        result = -result;
       }
+
+      result += ((k_pi * Em) * 2);
     }
   }
 
@@ -113,24 +125,35 @@ template <typename T>
 constexpr auto comp_ellint_2_impl(T m) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-  constexpr T one { 1 };
+  constexpr T one  { 1 };
 
-  if(fabs(m) > one)
+  T result { };
+
+  const auto fpc_m   = fpclassify(m);
+
+  if(fpc_m == FP_ZERO)
   {
-    return std::numeric_limits<T>::quiet_NaN();
+    result = numbers::pi_v<T> / 2;
+  }
+  else if((fabs(m) > one) || (fpc_m != FP_NORMAL))
+  {
+    result = std::numeric_limits<T>::quiet_NaN();
+  }
+  else if(signbit(m))
+  {
+    result = comp_ellint_2_impl(-m);
   }
   else
   {
-    T Fpm { };
-    T Km  { };
-    T Em  { };
-
     constexpr T zero { 0 };
 
-    detail::ellint_detail::elliptic_series::agm(zero, m, Fpm, Km, &Em);
+    T Fpm { };
+    T Km  { };
 
-    return Em;
+    detail::ellint_detail::elliptic_series::agm(zero, m, Fpm, Km, &result);
   }
+
+  return result;
 }
 
 } //namespace detail

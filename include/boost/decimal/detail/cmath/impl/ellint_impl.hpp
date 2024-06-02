@@ -83,15 +83,7 @@ constexpr auto agm(T  phi,
 
   constexpr T one  { 1 };
 
-  if(fpc_m == FP_ZERO)
-  {
-    Fpm = phi;
-    Km  = my_pi_half;
-
-    if(pEpm != nullptr) { *pEpm = phi; }
-    if(pEm  != nullptr) { *pEm  = my_pi_half; }
-  }
-  else if(mk == one)
+  if(mk == one)
   {
     if(pEm != nullptr) { *pEm = one; }
 
