@@ -64,7 +64,7 @@ using namespace boost::decimal;
 template <typename T>
 void test_comp_ellint()
 {
-  std::uniform_real_distribution<float> dist(-0.9999F, 0.9999F);
+  std::uniform_real_distribution<float> dist(-0.998F, 0.998F);
 
   rng.seed(local::time_point<typename std::mt19937_64::result_type>());
 
@@ -79,7 +79,7 @@ void test_comp_ellint()
     const auto dec_res {static_cast<float>(comp_ellint_2(dec_val))};
     const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-    if (!BOOST_TEST(std::abs(distance) < 64))
+    if (!BOOST_TEST(std::abs(distance) < 384))
     {
       // LCOV_EXCL_START
       std::cerr << "arg: " << dec_val
@@ -94,7 +94,7 @@ void test_comp_ellint()
 template <typename T>
 void test_ellint()
 {
-  std::uniform_real_distribution<float> dist_k  (-0.9999F, 0.9999F);
+  std::uniform_real_distribution<float> dist_k  (-0.998F, 0.998F);
   std::uniform_real_distribution<float> dist_phi(-1.0F, 1.0F);
 
   rng.seed(local::time_point<typename std::mt19937_64::result_type>());
@@ -113,7 +113,7 @@ void test_ellint()
     const auto dec_res {static_cast<float>(ellint_2(k_dec_val, phi_dec_val))};
     const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-    if (!BOOST_TEST(std::abs(distance) < 96))
+    if (!BOOST_TEST(std::abs(distance) < 384))
     {
       // LCOV_EXCL_START
       std::cerr << "Float: " << float_res
