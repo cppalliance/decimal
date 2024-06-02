@@ -75,11 +75,9 @@ constexpr auto agm(T  phi,
   // Note that there is special handling for the angular argument phi if this
   // argument is equal to pi/2.
 
-  auto fpc_m = fpclassify(mk);
-
   constexpr T my_pi_half { numbers::pi_v<T> / 2 };
 
-  const bool phi_is_pi_half = (phi == my_pi_half);
+  const bool phi_is_pi_half { phi == my_pi_half };
 
   constexpr T one  { 1 };
 
@@ -136,17 +134,26 @@ constexpr auto agm(T  phi,
 
       p2 = static_cast<std::uint32_t>(p2 << 1U);
 
-      constexpr T near_one { 9 , -1 };
+      constexpr T frac_00 { 80, -2 };
+      constexpr T frac_01 { 90, -2 };
+      constexpr T frac_02 { 99, -2 };
 
       // TODO(ckormanyos) There should be a better way to formulate the break condition.
       // And the condition should depend on some actual values of iteration terms in
       // relation to the decimal digits of the type.
 
-      // TODO(ckormanyos) Use a Taylor series or similar approx. for m near 1.
+      const int iter_low_limit =
+        (mk < frac_00) ? 2 :
+        (mk < frac_01) ? 4 :
+        (mk < frac_02) ? 5 :
+                         6;
 
-      const int iter_low_limit = (mk < half) ? 3 : (mk < near_one) ? 4 : 5;
+      constexpr int iter_low_limit_adder =
+          std::numeric_limits<T>::digits10 < 10 ? 0
+        : std::numeric_limits<T>::digits10 < 20 ? 1
+        :                                         2;
 
-      if(n > iter_low_limit)
+      if(n > (iter_low_limit + iter_low_limit_adder))
       {
         break;
       }
