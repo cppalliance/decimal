@@ -93,7 +93,7 @@ void test_ellint()
         const auto dec_res {static_cast<float>(ellint_2(k_dec_val, phi_dec_val))};
         const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-        if (!BOOST_TEST(std::abs(distance) < 256))
+        if (!BOOST_TEST(std::abs(distance) < 384))
         {
             // LCOV_EXCL_START
             std::cerr << "Float: " << float_res

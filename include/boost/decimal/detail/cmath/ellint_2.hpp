@@ -61,7 +61,7 @@ constexpr auto ellint_2_impl(T m, T phi) noexcept
       {
         // Normal[Series[EllipticE[phi, m m], {phi, 0, 8}]]
         // Together[%]
-        // Then manually edit the interior field to regain HornersForm[poly, phi].
+        // Then manually edit the interior field to regain HornerForm[poly, phi].
 
         const T phi_sq { phi * phi };
 

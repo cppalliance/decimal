@@ -38,7 +38,20 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 
   T result { };
 
-  if(fabs(m) > one)
+  const auto fpc_m   = fpclassify(m);
+  const auto fpc_phi = fpclassify(phi);
+
+  if((fpc_m == FP_ZERO) && (fpc_phi == FP_NORMAL))
+  {
+    result = phi;
+  }
+  else if((fpc_phi == FP_ZERO) && (fpc_m == FP_NORMAL))
+  {
+    constexpr T zero { 0 };
+
+    result = zero;
+  }
+  else if((fabs(m) > one) || (fpc_phi != FP_NORMAL) || (fpc_m != FP_NORMAL))
   {
     result = std::numeric_limits<T>::quiet_NaN();
   }
@@ -52,24 +65,25 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
     {
       constexpr int small_phi_order
       {
-            std::numeric_limits<T>::digits10 < 10 ?  3
-          : std::numeric_limits<T>::digits10 < 20 ?  5
-          :                                         10
+            std::numeric_limits<T>::digits10 < 10 ? 2
+          : std::numeric_limits<T>::digits10 < 20 ? 4
+          :                                         8
       };
 
-      if (phi < T { 5, -small_phi_order })
+      if (phi < T { 1, -small_phi_order })
       {
-        // Normal[Series[EllipticF[phi, m m], {phi, 0, 8}]]
+        // PadeApproximant[EllipticF[phi, m2], {phi, 0, {4, 3}}]
         // Together[%]
-        // Then manually edit the interior field to regain HornersForm[poly, phi].
+        // Then manually edit the interior field to regain HornerForm[poly, phi].
 
         const T phi_sq { phi * phi };
 
-        const T msq { m * m };
+        const T m2 { (!signbit(m)) ? (m * m) : -(m * m) };
 
-        const T k { signbit(m) ? -msq : msq };
+        const T top { phi * (-60 + (-12 + 17 * m2) * phi_sq) };
+        const T bot { -60 + 3 * (-4 + 9 * m2) * phi_sq };
 
-        result = (phi * (5040 + phi_sq * (k * 840 + phi_sq * (k * (-168 + k * 378) + k * (16 + k * phi_sq * (-180 + k * 225)))))) / 5040;
+        result = top / bot;
       }
       else
       {
@@ -87,17 +101,16 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
           phi_scaled = -(phi_scaled - numbers::pi_v<T>);
         }
 
-        T Fpm { };
-        T Km  { };
+        T Km { };
 
-        detail::ellint_detail::elliptic_series::agm(phi_scaled, m, Fpm, Km);
+        detail::ellint_detail::elliptic_series::agm(phi_scaled, m, result, Km);
 
         if(b_neg)
         {
-          Fpm = -Fpm;
+          result = -result;
         }
 
-        result = Fpm + ((k_pi * Km) * 2);
+        result += ((k_pi * Km) * 2);
       }
     }
   }
@@ -109,23 +122,33 @@ template <typename T>
 constexpr auto comp_ellint_1_impl(T m) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-  constexpr T one { 1 };
+  constexpr T zero { 0 };
+  constexpr T one  { 1 };
 
-  if(fabs(m) > one)
+  T result { };
+
+  const auto fpc_m   = fpclassify(m);
+
+  if(fpc_m == FP_ZERO)
   {
-    return std::numeric_limits<T>::quiet_NaN();
+    result = numbers::pi_v<T> / 2;
+  }
+  else if((fabs(m) > one) || (fpc_m != FP_NORMAL))
+  {
+    result = std::numeric_limits<T>::quiet_NaN();
+  }
+  else if(signbit(m))
+  {
+    result = comp_ellint_1_impl(-m);
   }
   else
   {
     T Fpm { };
-    T Km  { };
 
-    constexpr T zero { 0 };
-
-    detail::ellint_detail::elliptic_series::agm(zero, m, Fpm, Km);
-
-    return Km;
+    detail::ellint_detail::elliptic_series::agm(zero, m, Fpm, result);
   }
+
+  return result;
 }
 
 } //namespace detail

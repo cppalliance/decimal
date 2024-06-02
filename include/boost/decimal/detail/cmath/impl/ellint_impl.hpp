@@ -81,8 +81,7 @@ constexpr auto agm(T  phi,
 
   const bool phi_is_pi_half = (phi == my_pi_half);
 
-  T zero { 0 };
-  T one  { 1 };
+  constexpr T one  { 1 };
 
   if(fpc_m == FP_ZERO)
   {
@@ -107,6 +106,7 @@ constexpr auto agm(T  phi,
   }
   else
   {
+    constexpr T zero { 0 };
     constexpr T half { 5 , -1 };
 
     T a0    { one };
@@ -187,7 +187,7 @@ constexpr auto agm(T  phi,
 
       if(pEpm != nullptr)
       {
-        *pEpm = (Fpm * one_minus_cn_2ncn_inner_prod_half) +  sin_phi_n_cn_inner_prod;
+        *pEpm = (Fpm * one_minus_cn_2ncn_inner_prod_half) + sin_phi_n_cn_inner_prod;
       }
     }
   }
