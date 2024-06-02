@@ -135,17 +135,17 @@ constexpr auto agm(T  phi,
       p2 = static_cast<std::uint32_t>(p2 << 1U);
 
       constexpr T frac_00 { 80, -2 };
-      constexpr T frac_01 { 90, -2 };
-      constexpr T frac_02 { 99, -2 };
+      constexpr T frac_01 { 85, -2 };
+      constexpr T frac_02 { 90, -2 };
+      constexpr T frac_03 { 99, -2 };
 
-      // TODO(ckormanyos) There should be a better way to formulate the break condition.
-      // And the condition should depend on some actual values of iteration terms in
-      // relation to the decimal digits of the type.
+      // Use empirically tabulated values to formulate the break condition.
 
       const int iter_low_limit =
         (mk < frac_00) ? 2 :
-        (mk < frac_01) ? 4 :
-        (mk < frac_02) ? 5 :
+        (mk < frac_01) ? 3 :
+        (mk < frac_02) ? 4 :
+        (mk < frac_03) ? 5 :
                          6;
 
       constexpr int iter_low_limit_adder =

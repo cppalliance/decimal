@@ -208,16 +208,16 @@ namespace local
 
       decimal_type arg_phi { index + 1, -1 };
 
-      const auto      ellint_2_k_zero =      ellint_2(arg_k_zero, arg_phi);
-      const auto comp_ellint_2_k_zero = comp_ellint_2(arg_k_zero);
+      const auto      ellint_k_zero =      ellint_2(arg_k_zero, arg_phi);
+      const auto comp_ellint_k_zero = comp_ellint_2(arg_k_zero);
 
-      const volatile auto result______ellint_2_k_zero_is_ok = (ellint_2_k_zero == arg_phi);
-      const volatile auto result_comp_ellint_2_k_zero_is_ok =  local::is_close_fraction(comp_ellint_2_k_zero, numbers::pi_v<decimal_type> / 2, std::numeric_limits<decimal_type>::epsilon() * 16);
+      const volatile auto result______ellint_k_zero_is_ok = (ellint_k_zero == arg_phi);
+      const volatile auto result_comp_ellint_k_zero_is_ok =  local::is_close_fraction(comp_ellint_k_zero, numbers::pi_v<decimal_type> / 2, std::numeric_limits<decimal_type>::epsilon() * 16);
 
-      BOOST_TEST(result______ellint_2_k_zero_is_ok);
-      BOOST_TEST(result_comp_ellint_2_k_zero_is_ok);
+      BOOST_TEST(result______ellint_k_zero_is_ok);
+      BOOST_TEST(result_comp_ellint_k_zero_is_ok);
 
-      result_is_ok = (result______ellint_2_k_zero_is_ok && result_comp_ellint_2_k_zero_is_ok && result_is_ok);
+      result_is_ok = (result______ellint_k_zero_is_ok && result_comp_ellint_k_zero_is_ok && result_is_ok);
     }
 
     for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
@@ -227,16 +227,16 @@ namespace local
 
       decimal_type arg_phi { index + 1, -1 };
 
-      const auto      ellint_2_k_too_large =      ellint_2(arg_k_too_large, arg_phi);
-      const auto comp_ellint_2_k_too_large = comp_ellint_2(arg_k_too_large);
+      const auto      ellint_k_too_large =      ellint_2(arg_k_too_large, arg_phi);
+      const auto comp_ellint_k_too_large = comp_ellint_2(arg_k_too_large);
 
-      const volatile auto result______ellint_2_k_too_large_is_ok = isnan(     ellint_2_k_too_large);
-      const volatile auto result_comp_ellint_2_k_too_large_is_ok = isnan(comp_ellint_2_k_too_large);
+      const volatile auto result______ellint_k_too_large_is_ok = isnan(     ellint_k_too_large);
+      const volatile auto result_comp_ellint_k_too_large_is_ok = isnan(comp_ellint_k_too_large);
 
-      BOOST_TEST(result______ellint_2_k_too_large_is_ok);
-      BOOST_TEST(result_comp_ellint_2_k_too_large_is_ok);
+      BOOST_TEST(result______ellint_k_too_large_is_ok);
+      BOOST_TEST(result_comp_ellint_k_too_large_is_ok);
 
-      result_is_ok = (result______ellint_2_k_too_large_is_ok && result_comp_ellint_2_k_too_large_is_ok && result_is_ok);
+      result_is_ok = (result______ellint_k_too_large_is_ok && result_comp_ellint_k_too_large_is_ok && result_is_ok);
     }
 
     for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
@@ -246,13 +246,13 @@ namespace local
       decimal_type arg_phi_zero { ::my_zero<decimal_type>() };
       arg_phi_zero *= static_cast<decimal_type>(dist(gen));
 
-      const auto ellint_2_phi_zero = ellint_2(arg_k_normal, arg_phi_zero);
+      const auto ellint_phi_zero = ellint_2(arg_k_normal, arg_phi_zero);
 
-      const volatile auto result_ellint_2_phi_zero_is_ok = (fpclassify(ellint_2_phi_zero) == FP_ZERO);
+      const volatile auto result_ellint_phi_zero_is_ok = (fpclassify(ellint_phi_zero) == FP_ZERO);
 
-      BOOST_TEST(result_ellint_2_phi_zero_is_ok);
+      BOOST_TEST(result_ellint_phi_zero_is_ok);
 
-      result_is_ok = (result_ellint_2_phi_zero_is_ok && result_is_ok);
+      result_is_ok = (result_ellint_phi_zero_is_ok && result_is_ok);
     }
 
     for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
@@ -265,13 +265,13 @@ namespace local
       decimal_type arg_phi_nan { ::my_nan<decimal_type>() };
       arg_phi_nan *= static_cast<decimal_type>(dist(gen));
 
-      const auto ellint_2_nan = ellint_2(arg_k_inf, arg_phi_nan);
+      const auto ellint_nan = ellint_2(arg_k_inf, arg_phi_nan);
 
-      const volatile auto result_ellint_2_nan_is_ok = isnan(ellint_2_nan);
+      const volatile auto result_ellint_nan_is_ok = isnan(ellint_nan);
 
-      BOOST_TEST(result_ellint_2_nan_is_ok);
+      BOOST_TEST(result_ellint_nan_is_ok);
 
-      result_is_ok = (result_ellint_2_nan_is_ok && result_is_ok);
+      result_is_ok = (result_ellint_nan_is_ok && result_is_ok);
     }
 
     return result_is_ok;
