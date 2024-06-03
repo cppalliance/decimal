@@ -303,7 +303,7 @@ using prime_table = riemann_zeta_detail::prime_table_imp<true, T>;
 
 template <typename T>
 constexpr auto riemann_zeta_decimal_order(T x) noexcept
-    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
 {
     int n { };
 
@@ -316,7 +316,7 @@ constexpr auto riemann_zeta_decimal_order(T x) noexcept
         :                                         33
     };
 
-    return n + order_bias;
+    return static_cast<int>(n + order_bias);
 }
 
 template <typename T>

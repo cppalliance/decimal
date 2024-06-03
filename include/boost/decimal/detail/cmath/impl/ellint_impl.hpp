@@ -24,24 +24,6 @@ namespace ellint_detail {
 namespace elliptic_series {
 
 template <typename T>
-constexpr auto ellint_decimal_order(T x) noexcept
-    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
-{
-    int n { };
-
-    static_cast<void>(frexp10(x, &n));
-
-    constexpr int order_bias
-    {
-          std::numeric_limits<T>::digits10 < 10 ?  6
-        : std::numeric_limits<T>::digits10 < 20 ? 15
-        :                                         33
-    };
-
-    return n + order_bias;
-}
-
-template <typename T>
 constexpr auto agm(T  phi,
                    T  mk,
                    T& Fpm,
@@ -112,6 +94,11 @@ constexpr auto agm(T  phi,
     T cn_2ncn_inner_prod      = (has_e ? (mk * mk) / 2 : zero);
     T sin_phi_n_cn_inner_prod = zero;
 
+    const T break_check =
+      {
+        1, -std::numeric_limits<T>::digits / 2
+      };
+
     for(int n = 1; n < std::numeric_limits<std::uint32_t>::digits; ++n)
     {
       an = (a0 + b0) / 2;
@@ -134,26 +121,7 @@ constexpr auto agm(T  phi,
 
       p2 = static_cast<std::uint32_t>(p2 << 1U);
 
-      constexpr T frac_00 { 80, -2 };
-      constexpr T frac_01 { 85, -2 };
-      constexpr T frac_02 { 90, -2 };
-      constexpr T frac_03 { 99, -2 };
-
-      // Use empirically tabulated values to formulate the break condition.
-
-      const int iter_low_limit =
-        (mk < frac_00) ? 2 :
-        (mk < frac_01) ? 3 :
-        (mk < frac_02) ? 4 :
-        (mk < frac_03) ? 5 :
-                         6;
-
-      constexpr int iter_low_limit_adder =
-          std::numeric_limits<T>::digits10 < 10 ? 0
-        : std::numeric_limits<T>::digits10 < 20 ? 1
-        :                                         2;
-
-      if(n > (iter_low_limit + iter_low_limit_adder))
+      if(fabs(cn_term) < break_check)
       {
         break;
       }
