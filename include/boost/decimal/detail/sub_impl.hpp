@@ -18,9 +18,9 @@ namespace decimal {
 namespace detail {
 
 template <typename ReturnType, typename T1, typename T2>
-constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
-                        bool abs_lhs_bigger) noexcept -> ReturnType
+BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
+                                                   bool abs_lhs_bigger) noexcept -> ReturnType
 {
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
     auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};

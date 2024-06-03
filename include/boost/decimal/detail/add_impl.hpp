@@ -18,8 +18,8 @@ namespace decimal {
 namespace detail {
 
 template <typename ReturnType, typename T1, typename T2>
-constexpr auto add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                        T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
+BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
     const bool sign {lhs_sign};
 
