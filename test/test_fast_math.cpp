@@ -176,5 +176,11 @@ int main()
     random_division<decimal32_fast>();
     test_comparisions<decimal32_fast>();
 
+    random_addition<decimal64>();
+    random_subtraction<decimal64>();
+    random_multiplication<decimal64>();
+    random_division<decimal64>();
+    test_comparisions<decimal64>();
+
     return boost::report_errors();
 }
