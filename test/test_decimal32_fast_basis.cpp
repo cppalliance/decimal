@@ -164,7 +164,7 @@ void test_unary_arithmetic()
 {
     constexpr decimal32_fast one(1);
     BOOST_TEST(+one == one);
-    BOOST_TEST(-one == one);
+    BOOST_TEST(-one != one);
 }
 
 void test_addition()
