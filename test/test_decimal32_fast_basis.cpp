@@ -168,7 +168,9 @@ void test_unary_arithmetic()
     {
         // LCOV_EXCL_START
         std::cerr << "One: " << one
-                  << "\nNeg: " << -one << std::endl;
+                  << "\nNeg: " << -one
+                  << "\n    Bid: " << to_bid(one)
+                  << "\nNeg Bid: " << to_bid(-one) << std::endl;
         // LCOV_EXCL_STOP
     }
 }
