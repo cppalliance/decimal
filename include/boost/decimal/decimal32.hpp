@@ -828,9 +828,9 @@ constexpr auto operator-(decimal32 rhs) noexcept-> decimal32
 // NOLINTNEXTLINE : If addition is actually subtraction than change operator and vice versa
 constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal32 zero {0, 0};
 
-    #ifndef BOOST_DECIMAL_FAST_MATH
     const auto res {detail::check_non_finite(lhs, rhs)};
     if (res != zero)
     {
@@ -965,9 +965,9 @@ constexpr auto decimal32::operator+=(Decimal rhs) noexcept
 // NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
 constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal32 zero {0, 0};
 
-    #ifndef BOOST_DECIMAL_FAST_MATH
     const auto res {detail::check_non_finite(lhs, rhs)};
     if (res != zero)
     {

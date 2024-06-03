@@ -1380,9 +1380,9 @@ constexpr decimal32_fast::operator Decimal() const noexcept
 
 constexpr auto scalblnd32f(decimal32_fast num, long exp) noexcept -> decimal32_fast
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal32_fast zero {0, 0};
 
-    #ifndef BOOST_DECIMAL_FAST_MATH
     if (num == zero || exp == 0 || isinf(num) || isnan(num))
     {
         return num;
