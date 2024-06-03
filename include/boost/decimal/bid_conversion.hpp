@@ -15,6 +15,70 @@
 namespace boost {
 namespace decimal {
 
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d32(decimal32 val) noexcept -> std::uint32_t
+{
+    const auto bits {detail::bit_cast<std::uint32_t>(val)};
+    return bits;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d32(std::uint32_t bits) noexcept -> decimal32
+{
+    const auto val {detail::bit_cast<decimal32>(bits)};
+    return val;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d32f(decimal32_fast val) noexcept -> std::uint32_t
+{
+    const decimal32 compliant_val {val};
+    const auto bits {detail::bit_cast<std::uint32_t>(compliant_val)};
+    return bits;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d32f(std::uint32_t bits) noexcept -> decimal32_fast
+{
+    const auto compliant_val {detail::bit_cast<decimal32>(bits)};
+    const decimal32_fast val {compliant_val};
+    return val;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d64(decimal64 val) noexcept -> std::uint64_t
+{
+    const auto bits {detail::bit_cast<std::uint64_t>(val)};
+    return bits;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d64(std::uint64_t bits) noexcept -> decimal64
+{
+    const auto val {detail::bit_cast<decimal64>(bits)};
+    return val;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d64f(decimal64_fast val) noexcept -> std::uint64_t
+{
+    const decimal64 compliant_val {val};
+    const auto bits {detail::bit_cast<std::uint64_t>(compliant_val)};
+    return bits;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d64f(std::uint64_t bits) noexcept -> decimal64_fast
+{
+    const auto compliant_val {detail::bit_cast<decimal64>(bits)};
+    const decimal64_fast val {compliant_val};
+    return val;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d128(decimal128 val) noexcept -> detail::uint128
+{
+    const auto bits {detail::bit_cast<detail::uint128>(val)};
+    return bits;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d128(detail::uint128 bits) noexcept -> decimal128
+{
+    const auto val {detail::bit_cast<decimal128>(bits)};
+    return val;
+}
+
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal32 val) noexcept -> std::uint32_t
 {
     return to_bid_d32(val);

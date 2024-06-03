@@ -560,10 +560,6 @@ public:
     friend constexpr auto scalbnd32(decimal32 num, int exp) noexcept -> decimal32;
     friend constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32;
 
-    // BID conversion functions
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d32(decimal32 val) noexcept -> std::uint32_t;
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d32(std::uint32_t bits) noexcept -> decimal32;
-
     // These can be made public only for debugging matters
 #ifndef BOOST_DECIMAL_DEBUG_MEMBERS
 private:
@@ -2145,18 +2141,6 @@ constexpr auto copysignd32(decimal32 mag, decimal32 sgn) noexcept -> decimal32
 {
     mag.edit_sign(sgn.isneg());
     return mag;
-}
-
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d32(decimal32 val) noexcept -> std::uint32_t
-{
-    const auto bits {detail::bit_cast<std::uint32_t>(val)};
-    return bits;
-}
-
-BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d32(std::uint32_t bits) noexcept -> decimal32
-{
-    const auto val {detail::bit_cast<decimal32>(bits)};
-    return val;
 }
 
 } // namespace decimal

@@ -561,10 +561,6 @@ public:
     friend constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64;
     friend constexpr auto scalbnd64(decimal64 num, int exp) noexcept -> decimal64;
     friend constexpr auto scalblnd64(decimal64 num, long exp) noexcept -> decimal64;
-
-    // Conversion functions
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d64(decimal64 val) noexcept -> std::uint64_t;
-    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d64(std::uint64_t bits) noexcept -> decimal64;
 };
 
 #if defined(__GNUC__) && __GNUC__ >= 8
@@ -2094,18 +2090,6 @@ constexpr auto copysignd64(decimal64 mag, decimal64 sgn) noexcept -> decimal64
 {
     mag.edit_sign(sgn.isneg());
     return mag;
-}
-
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d64(decimal64 val) noexcept -> std::uint64_t
-{
-    const auto bits {detail::bit_cast<std::uint64_t>(val)};
-    return bits;
-}
-
-BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d64(std::uint64_t bits) noexcept -> decimal64
-{
-    const auto val {detail::bit_cast<decimal64>(bits)};
-    return val;
 }
 
 } //namespace decimal

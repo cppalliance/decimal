@@ -336,10 +336,6 @@ public:
     friend constexpr auto fmad64f(decimal64_fast x, decimal64_fast y, decimal64_fast z) noexcept -> decimal64_fast;
     friend constexpr auto scalbnd64f(decimal64_fast num, int exp) noexcept -> decimal64_fast;
     friend constexpr auto scalblnd64f(decimal64_fast num, long exp) noexcept -> decimal64_fast;
-
-    // Conversion to complaint types
-    BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d64f(decimal64_fast val) noexcept -> std::uint64_t;
-    BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d64f(std::uint64_t bits) noexcept -> decimal64_fast;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -1415,20 +1411,6 @@ constexpr auto copysignd64f(decimal64_fast mag, decimal64_fast sgn) noexcept -> 
 {
     mag.sign_ = sgn.sign_;
     return mag;
-}
-
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d64f(decimal64_fast val) noexcept -> std::uint64_t
-{
-    const decimal64 compliant_val {val};
-    const auto bits {detail::bit_cast<std::uint64_t>(compliant_val)};
-    return bits;
-}
-
-BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d64f(std::uint64_t bits) noexcept -> decimal64_fast
-{
-    const auto compliant_val {detail::bit_cast<decimal64>(bits)};
-    const decimal64_fast val {compliant_val};
-    return val;
 }
 
 } // namespace decimal
