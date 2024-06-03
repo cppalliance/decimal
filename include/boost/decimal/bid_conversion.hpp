@@ -15,6 +15,11 @@
 namespace boost {
 namespace decimal {
 
+#if defined(__GNUC__) && __GNUC__ == 7
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wconversion"
+#endif
+
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d32(decimal32 val) noexcept -> std::uint32_t
 {
     const auto bits {detail::bit_cast<std::uint32_t>(val)};
@@ -136,6 +141,10 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid(detail::uint128 bits) noexcept
 {
     return from_bid_d128(bits);
 }
+
+#if defined(__GNUC__) && __GNUC__ == 7
+#  pragma GCC diagnostic pop
+#endif
 
 } // namespace decimal
 } // namespace boost
