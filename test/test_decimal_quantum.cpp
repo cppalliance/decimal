@@ -194,7 +194,9 @@ int main()
 
     test_same_quantum<decimal32_fast>();
     test_nonfinite_samequantum<decimal32_fast>();
-    test_quantexp<decimal32_fast>();
+    // Decimal32_fast normalizes its value in the constructor,
+    // so it will not match the values of the other types
+    //test_quantexp<decimal32_fast>();
     test_nonfinite_quantexp<decimal32_fast>();
     test_quantize<decimal32_fast>();
     test_nonfinite_quantize<decimal32_fast>();
