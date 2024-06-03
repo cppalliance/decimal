@@ -80,7 +80,7 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 
       const T phi_sq { phi * phi };
 
-      const T m2 { (!signbit(m)) ? (m * m) : -(m * m) };
+      const T m2 { (m * m) };
 
       const T top { phi * (-60 + (-12 + 17 * m2) * phi_sq) };
       const T bot { -60 + 3 * (-4 + 9 * m2) * phi_sq };

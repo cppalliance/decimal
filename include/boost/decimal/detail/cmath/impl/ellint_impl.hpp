@@ -94,10 +94,7 @@ constexpr auto agm(T  phi,
     T cn_2ncn_inner_prod      = (has_e ? (mk * mk) / 2 : zero);
     T sin_phi_n_cn_inner_prod = zero;
 
-    const T break_check =
-      {
-        1, -std::numeric_limits<T>::digits / 2
-      };
+    const T break_check { 9, -1 - (std::numeric_limits<T>::digits / 2) };
 
     for(int n = 1; n < std::numeric_limits<std::uint32_t>::digits; ++n)
     {
