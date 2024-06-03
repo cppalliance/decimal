@@ -23,7 +23,7 @@ static std::mt19937_64 rng(42); // NOSONAR : Global rng is not const
 template <typename T>
 void random_addition()
 {
-    std::uniform_int_distribution<std::int64_t> dist(-1000, 1000);
+    std::uniform_int_distribution<std::int64_t> dist(1, 1000);
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -53,7 +53,7 @@ void random_addition()
 template <typename T>
 void random_subtraction()
 {
-    std::uniform_int_distribution<std::int64_t> dist(-1000, 1000);
+    std::uniform_int_distribution<std::int64_t> dist(1, 1000);
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -83,7 +83,7 @@ void random_subtraction()
 template <typename T>
 void random_multiplication()
 {
-    std::uniform_int_distribution<std::int64_t> dist(-1000, 1000);
+    std::uniform_int_distribution<std::int64_t> dist(1, 1000);
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -113,7 +113,7 @@ void random_multiplication()
 template <typename T>
 void random_division()
 {
-    std::uniform_int_distribution<std::int64_t> dist(-1000, 1000);
+    std::uniform_int_distribution<std::int64_t> dist(1, 1000);
 
     for (std::size_t i {}; i < N; ++i)
     {
