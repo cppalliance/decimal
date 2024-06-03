@@ -140,12 +140,41 @@ void random_division()
     }
 }
 
+template <typename T>
+void test_comparisions()
+{
+    std::uniform_int_distribution<std::int64_t> dist(-1000, 1000);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const T val1 {dist(rng)};
+        const T val2 {dist(rng)};
+
+        const T dec1 {val1};
+        const T dec2 {val2};
+
+        BOOST_TEST_EQ(val1 == val2, dec1 == dec2);
+        BOOST_TEST_EQ(val1 != val2, dec1 != dec2);
+        BOOST_TEST_EQ(val1 < val2, dec1 < dec2);
+        BOOST_TEST_EQ(val1 <= val2, dec1 <= dec2);
+        BOOST_TEST_EQ(val1 > val2, dec1 > dec2);
+        BOOST_TEST_EQ(val1 >= val2, dec1 >= dec2);
+    }
+}
+
 int main()
 {
     random_addition<decimal32>();
     random_subtraction<decimal32>();
     random_multiplication<decimal32>();
     random_division<decimal32>();
+    test_comparisions<decimal32>();
+
+    random_addition<decimal32_fast>();
+    random_subtraction<decimal32_fast>();
+    random_multiplication<decimal32_fast>();
+    random_division<decimal32_fast>();
+    test_comparisions<decimal32_fast>();
 
     return boost::report_errors();
 }
