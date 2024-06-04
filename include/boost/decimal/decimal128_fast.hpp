@@ -106,6 +106,10 @@ public:
     friend constexpr auto isnan(decimal128_fast val) noexcept -> bool;
     friend constexpr auto issignaling(decimal128_fast val) noexcept -> bool;
     friend constexpr auto isnormal(decimal128_fast val) noexcept -> bool;
+
+    // Comparison operators
+    friend constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
+    friend constexpr auto operator!=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -195,6 +199,7 @@ template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, b
 #endif
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_fast::decimal128_fast(Float val) noexcept
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (val != val)
     {
         significand_ = detail::d128_fast_qnan;
@@ -204,6 +209,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_fast::decimal128_fast(Float val) noexce
         significand_ = detail::d128_fast_inf;
     }
     else
+    #endif
     {
         const auto components {detail::ryu::floating_point_to_fd128(val)};
         *this = decimal128_fast {components.mantissa, components.exponent, components.sign};
@@ -257,6 +263,23 @@ constexpr auto isnormal(decimal128_fast val) noexcept -> bool
     return (val.significand_ != 0) && isfinite(val);
 }
 
+constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+    #endif
+
+    return equal_parts_impl(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                            rhs.significand_, rhs.biased_exponent(), rhs.sign_);
+}
+
+constexpr auto operator!=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
+{
+    return !(lhs == rhs);
+}
 
 } // namespace decimal
 } // namespace boost
