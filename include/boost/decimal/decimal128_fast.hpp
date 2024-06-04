@@ -151,7 +151,7 @@ public:
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 #else
-template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
+template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
 #endif
 constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
 {
@@ -212,7 +212,7 @@ constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_INTEGRAL Integer>
 #else
-template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 #endif
 constexpr decimal128_fast::decimal128_fast(Integer val) noexcept
 {
