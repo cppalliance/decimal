@@ -188,5 +188,13 @@ int main()
     random_division<decimal64_fast>();
     test_comparisions<decimal64_fast>();
 
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+    random_addition<decimal128>();
+    random_subtraction<decimal128>();
+    random_multiplication<decimal128>();
+    random_division<decimal128>();
+    test_comparisions<decimal128>();
+    #endif
+
     return boost::report_errors();
 }
