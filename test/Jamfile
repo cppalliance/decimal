@@ -101,6 +101,7 @@ run test_erf.cpp ;
 run test_exp.cpp ;
 compile-fail test_explicit_floats.cpp ;
 run test_expm1.cpp ;
+run test_fast_math.cpp ;
 run test_fenv.cpp ;
 run test_fixed_width_trunc.cpp ;
 run test_float_conversion.cpp ;
