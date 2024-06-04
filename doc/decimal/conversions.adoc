@@ -1,0 +1,53 @@
+////
+Copyright 2024 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#conversions]
+= Fast Type Conversions
+:idprefix: conversions_
+
+Since we have non-IEEE 754 compliant types we offer a set of functions that allow their conversion to and from the IEEE 754 compliant BID layout.
+These functions allow lossless conversion with more compact storage.
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
+namespace detail {
+
+struct uint128
+{
+    std::uint64_t hi;
+    std::uint64_t lo;
+};
+
+} // namespace detail
+
+BOOST_DECIMAL_CXX20_CONSTEXPR std::uint32_t to_bid_d32(decimal32 val) noexcept;
+
+BOOST_DECIMAL_CXX20_CONSTEXPR std::uint32_t to_bid_d32f(decimal32_fast val) noexcept;
+
+BOOST_DECIMAL_CXX20_CONSTEXPR std::uint64_t to_bid_d64(decimal64 val) noexcept;
+
+BOOST_DECIMAL_CXX20_CONSTEXPR std::uint64_t to_bid_d64f(decimal64_fast val) noexcept;
+
+BOOST_DECIMAL_CXX20_CONSTEXPR detail::uint128 to_bid_d128(decimal128 val) noexcept;
+
+template <typename T>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(T val) noexcept;
+
+template <typename T = decimal32_fast>
+BOOST_DECIMAL_CXX20_CONSTEXPR T from_bid(std::uint32_t bits) noexcept;
+
+template <typename T = decimal64_fast>
+BOOST_DECIMAL_CXX20_CONSTEXPR T from_bid(std::uint64_t bits) noexcept;
+
+template <typename T = decimal128>
+BOOST_DECIMAL_CXX20_CONSTEXPR T from_bid(detail::uint128 bits) noexcept;
+
+} // namespace decimal
+} // namespace boost
+----
