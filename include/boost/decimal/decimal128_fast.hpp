@@ -99,6 +99,13 @@ public:
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_fast(Float val) noexcept;
 
     friend constexpr auto direct_init_d128(significand_type significand, exponent_type exponent, bool sign) noexcept -> decimal128_fast;
+
+    // Classification functions
+    friend constexpr auto signbit(decimal128_fast val) noexcept -> bool;
+    friend constexpr auto isinf(decimal128_fast val) noexcept -> bool;
+    friend constexpr auto isnan(decimal128_fast val) noexcept -> bool;
+    friend constexpr auto issignaling(decimal128_fast val) noexcept -> bool;
+    friend constexpr auto isnormal(decimal128_fast val) noexcept -> bool;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -218,6 +225,38 @@ constexpr auto direct_init_d128(decimal128_fast::significand_type significand, d
 
     return val;
 }
+
+constexpr auto signbit(decimal128_fast val) noexcept -> bool
+{
+    return val.sign_;
+}
+
+constexpr auto isinf(decimal128_fast val) noexcept -> bool
+{
+    return val.significand_ == detail::d128_fast_inf;
+}
+
+constexpr auto isnan(decimal128_fast val) noexcept -> bool
+{
+    return val.significand_ == detail::d128_fast_qnan ||
+           val.significand_ == detail::d128_fast_snan;
+}
+
+constexpr auto issignaling(decimal128_fast val) noexcept -> bool
+{
+    return val.significand_ == detail::d128_fast_snan;
+}
+
+constexpr auto isnormal(decimal128_fast val) noexcept -> bool
+{
+    if (val.exponent_ <= static_cast<decimal128_fast::exponent_type>(detail::precision_v<decimal128> - 1))
+    {
+        return false;
+    }
+
+    return (val.significand_ != 0) && isfinite(val);
+}
+
 
 } // namespace decimal
 } // namespace boost
