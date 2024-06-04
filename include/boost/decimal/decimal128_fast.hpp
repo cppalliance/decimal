@@ -74,6 +74,10 @@ private:
         return static_cast<std::int32_t>(exponent_) - detail::bias_v<decimal128>;
     }
 
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_integral_128(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
@@ -123,6 +127,25 @@ public:
     friend constexpr auto operator+(decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast;
 
+    // Conversions
+    explicit constexpr operator bool() const noexcept;
+    explicit constexpr operator int() const noexcept;
+    explicit constexpr operator unsigned() const noexcept;
+    explicit constexpr operator long() const noexcept;
+    explicit constexpr operator unsigned long() const noexcept;
+    explicit constexpr operator long long() const noexcept;
+    explicit constexpr operator unsigned long long() const noexcept;
+    explicit constexpr operator std::int8_t() const noexcept;
+    explicit constexpr operator std::uint8_t() const noexcept;
+    explicit constexpr operator std::int16_t() const noexcept;
+    explicit constexpr operator std::uint16_t() const noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    explicit constexpr operator detail::int128_t() const noexcept;
+    explicit constexpr operator detail::uint128_t() const noexcept;
+    #endif
+
+
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
     // LCOV_EXCL_START
@@ -167,7 +190,7 @@ constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
     // Strip digits
     if (unsigned_coeff_digits > detail::precision_v<decimal128> + 1)
     {
-        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal64> + 1)};
+        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal128> + 1)};
 
         #if defined(__GNUC__) && !defined(__clang__)
         #  pragma GCC diagnostic push
@@ -413,6 +436,76 @@ constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast
     rhs.sign_ = !rhs.sign_;
     return rhs;
 }
+
+constexpr decimal128_fast::operator bool() const noexcept
+{
+    constexpr decimal128_fast zero {0, 0};
+    return *this != zero;
+}
+
+constexpr decimal128_fast::operator int() const noexcept
+{
+    return to_integral_128<decimal128_fast, int>(*this);
+}
+
+constexpr decimal128_fast::operator unsigned() const noexcept
+{
+    return to_integral_128<decimal128_fast, unsigned>(*this);
+}
+
+constexpr decimal128_fast::operator long() const noexcept
+{
+    return to_integral_128<decimal128_fast, long>(*this);
+}
+
+constexpr decimal128_fast::operator unsigned long() const noexcept
+{
+    return to_integral_128<decimal128_fast, unsigned long>(*this);
+}
+
+constexpr decimal128_fast::operator long long() const noexcept
+{
+    return to_integral_128<decimal128_fast, long long>(*this);
+}
+
+constexpr decimal128_fast::operator unsigned long long() const noexcept
+{
+    return to_integral_128<decimal128_fast, unsigned long long>(*this);
+}
+
+constexpr decimal128_fast::operator std::int8_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, std::int8_t>(*this);
+}
+
+constexpr decimal128_fast::operator std::uint8_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, std::uint8_t>(*this);
+}
+
+constexpr decimal128_fast::operator std::int16_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, std::int16_t>(*this);
+}
+
+constexpr decimal128_fast::operator std::uint16_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, std::uint16_t>(*this);
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr decimal128_fast::operator detail::int128_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, detail::int128_t>(*this);
+}
+
+constexpr decimal128_fast::operator detail::uint128_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, detail::uint128_t>(*this);
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
 
 } // namespace decimal
 } // namespace boost
