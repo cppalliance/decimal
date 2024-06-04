@@ -118,6 +118,10 @@ public:
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     constexpr auto operator<=>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> std::partial_ordering;
     #endif
+
+    // Unary arithmetic operators
+    friend constexpr auto operator+(decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -374,6 +378,17 @@ constexpr auto operator<=>(const decimal128_fast& lhs, const decimal128_fast& rh
 }
 
 #endif
+
+constexpr auto operator+(decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    return rhs;
+}
+
+constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    rhs.sign_ = !rhs.sign_;
+    return rhs;
+}
 
 } // namespace decimal
 } // namespace boost
