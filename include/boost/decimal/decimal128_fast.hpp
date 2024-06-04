@@ -83,6 +83,13 @@ public:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
     #endif
     constexpr decimal128_fast(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_INTEGRAL Integer>
+    #else
+    template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+    #endif
+    constexpr decimal128_fast(Integer val) noexcept;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -144,6 +151,17 @@ constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
     {
         exponent_ = biased_exp;
     }
+}
+
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_INTEGRAL Integer>
+#else
+template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
+#endif
+constexpr decimal128_fast::decimal128_fast(Integer val) noexcept
+{
+    using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
+    *this = decimal128_fast{static_cast<ConversionType>(val), 0, false};
 }
 
 } // namespace decimal
