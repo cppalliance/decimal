@@ -116,7 +116,7 @@ public:
     friend constexpr auto operator>=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
 
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
-    constexpr auto operator<=>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> std::partial_ordering;
+    friend constexpr auto operator<=>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> std::partial_ordering;
     #endif
 
     // Unary arithmetic operators
