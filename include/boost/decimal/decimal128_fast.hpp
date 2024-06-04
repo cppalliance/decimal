@@ -114,6 +114,10 @@ public:
     friend constexpr auto operator<=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
     friend constexpr auto operator>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
     friend constexpr auto operator>=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
+
+    #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+    constexpr auto operator<=>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> std::partial_ordering;
+    #endif
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -348,6 +352,28 @@ constexpr auto operator>=(const decimal128_fast& lhs, const decimal128_fast& rhs
 
     return !(lhs < rhs);
 }
+
+#ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+
+constexpr auto operator<=>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> std::partial_ordering
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+#endif
 
 } // namespace decimal
 } // namespace boost
