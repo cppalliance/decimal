@@ -112,6 +112,8 @@ public:
     friend constexpr auto operator!=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
     friend constexpr auto operator<(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
     friend constexpr auto operator<=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
+    friend constexpr auto operator>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
+    friend constexpr auto operator>=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -330,6 +332,22 @@ constexpr auto operator<=(const decimal128_fast& lhs, const decimal128_fast& rhs
     return !(rhs < lhs);
 }
 
+constexpr auto operator>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
+{
+    return rhs < lhs;
+}
+
+constexpr auto operator>=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+    #endif
+
+    return !(lhs < rhs);
+}
 
 } // namespace decimal
 } // namespace boost
