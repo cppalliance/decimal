@@ -110,6 +110,8 @@ public:
     // Comparison operators
     friend constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
     friend constexpr auto operator!=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
+    friend constexpr auto operator<(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
+    friend constexpr auto operator<=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -280,6 +282,54 @@ constexpr auto operator!=(const decimal128_fast& lhs, const decimal128_fast& rhs
 {
     return !(lhs == rhs);
 }
+
+constexpr auto operator<(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
+{
+#ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(lhs) || isnan(rhs) ||
+        (!lhs.isneg() && rhs.isneg()))
+    {
+        return false;
+    }
+    else if (lhs.isneg() && !rhs.isneg())
+    {
+        return true;
+    }
+    else if (isfinite(lhs) && isinf(rhs))
+    {
+        return !signbit(rhs);
+    }
+    else if (isinf(lhs) && isfinite(rhs))
+    {
+        return signbit(rhs);
+    }
+#else
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return false;
+    }
+    else if (lhs.isneg() && !rhs.isneg())
+    {
+        return true;
+    }
+#endif
+
+    return less_parts_impl(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                           rhs.significand_, rhs.biased_exponent(), rhs.sign_);
+}
+
+constexpr auto operator<=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+    #endif
+
+    return !(rhs < lhs);
+}
+
 
 } // namespace decimal
 } // namespace boost
