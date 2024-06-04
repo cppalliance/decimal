@@ -78,6 +78,13 @@ private:
     friend constexpr auto to_integral_128(Decimal val) noexcept
         BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
 
+    template <typename Decimal, typename TargetType>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_floating_point_v, TargetType, TargetType);
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+        friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
@@ -145,6 +152,25 @@ public:
     explicit constexpr operator detail::uint128_t() const noexcept;
     #endif
 
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_FLOAT16
+    explicit constexpr operator std::float16_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT32
+    explicit constexpr operator std::float32_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT64
+    explicit constexpr operator std::float64_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+    explicit constexpr operator std::bfloat16_t() const noexcept;
+    #endif
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr operator Decimal() const noexcept;
 
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
@@ -506,6 +532,52 @@ constexpr decimal128_fast::operator detail::uint128_t() const noexcept
 }
 
 #endif // BOOST_DECIMAL_HAS_INT128
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_fast::operator float() const noexcept
+{
+    return to_float<decimal128_fast, float>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_fast::operator double() const noexcept
+{
+    return to_float<decimal128_fast, double>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_fast::operator long double() const noexcept
+{
+    return to_float<decimal128_fast, long double>(*this);
+}
+
+#ifdef BOOST_DECIMAL_HAS_FLOAT16
+constexpr decimal128_fast::operator std::float16_t() const noexcept
+{
+    return static_cast<std::float16_t>(to_float<decimal128_fast, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT32
+constexpr decimal128_fast::operator std::float32_t() const noexcept
+{
+    return static_cast<std::float32_t>(to_float<decimal128_fast, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT64
+constexpr decimal128_fast::operator std::float64_t() const noexcept
+{
+    return static_cast<std::float64_t>(to_float<decimal128_fast, double>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+constexpr decimal128_fast::operator std::bfloat16_t() const noexcept
+{
+    return static_cast<std::bfloat16_t>(to_float<decimal128_fast, float>(*this));
+}
+#endif
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal128_fast::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
+}
 
 } // namespace decimal
 } // namespace boost
