@@ -425,6 +425,7 @@ template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, b
 #endif
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::decimal64_fast(Float val) noexcept
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (val != val)
     {
         significand_ = detail::d64_fast_qnan;
@@ -434,6 +435,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::decimal64_fast(Float val) noexcept
         significand_ = detail::d64_fast_inf;
     }
     else
+    #endif
     {
         const auto components {detail::ryu::floating_point_to_fd128(val)};
         *this = decimal64_fast {components.mantissa, components.exponent, components.sign};
@@ -489,10 +491,12 @@ constexpr auto isnormal(decimal64_fast val) noexcept -> bool
 
 constexpr auto operator==(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
                             rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
@@ -533,6 +537,7 @@ constexpr auto operator!=(Integer lhs, decimal64_fast rhs) noexcept
 
 constexpr auto operator<(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs) ||
         (!lhs.isneg() && rhs.isneg()))
     {
@@ -550,6 +555,16 @@ constexpr auto operator<(decimal64_fast lhs, decimal64_fast rhs) noexcept -> boo
     {
         return signbit(rhs);
     }
+    #else
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return false;
+    }
+    else if (lhs.isneg() && !rhs.isneg())
+    {
+        return true;
+    }
+    #endif
 
     return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
@@ -566,20 +581,24 @@ template <typename Integer>
 constexpr auto operator<(Integer lhs, decimal64_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !less_impl(rhs, lhs) && lhs != rhs;
 }
 
 constexpr auto operator<=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(rhs < lhs);
 }
@@ -588,10 +607,12 @@ template <typename Integer>
 constexpr auto operator<=(decimal64_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs))
     {
         return false;
     }
+    #endif
 
     return !(rhs < lhs);
 }
@@ -600,10 +621,12 @@ template <typename Integer>
 constexpr auto operator<=(Integer lhs, decimal64_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(rhs < lhs);
 }
@@ -629,10 +652,12 @@ constexpr auto operator>(Integer lhs, decimal64_fast rhs) noexcept
 
 constexpr auto operator>=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(lhs < rhs);
 }
@@ -641,10 +666,12 @@ template <typename Integer>
 constexpr auto operator>=(decimal64_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs))
     {
         return false;
     }
+    #endif
 
     return !(lhs < rhs);
 }
@@ -653,10 +680,12 @@ template <typename Integer>
 constexpr auto operator>=(Integer lhs, decimal64_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(lhs < rhs);
 }
@@ -853,6 +882,7 @@ constexpr decimal64_fast::operator Decimal() const noexcept
 
 constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal64_fast zero {0, 0};
 
     const auto res {detail::check_non_finite(lhs, rhs)};
@@ -860,6 +890,7 @@ constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     {
         return res;
     }
+    #endif
 
     bool lhs_bigger {lhs > rhs};
     if (lhs.isneg() && rhs.isneg())
@@ -898,10 +929,12 @@ template <typename Integer>
 constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
         return lhs;
     }
+    #endif
 
     bool lhs_bigger {lhs > rhs};
     if (lhs.isneg() && (rhs < 0))
@@ -960,6 +993,7 @@ constexpr auto operator+(Integer lhs, decimal64_fast rhs) noexcept
 
 constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal64_fast zero {0, 0};
 
     const auto res {detail::check_non_finite(lhs, rhs)};
@@ -967,6 +1001,7 @@ constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     {
         return res;
     }
+    #endif
 
     if (!lhs.isneg() && rhs.isneg())
     {
@@ -996,10 +1031,12 @@ template <typename Integer>
 constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(lhs) || isnan(lhs))
     {
         return lhs;
     }
+    #endif
 
     if (!lhs.isneg() && (rhs < 0))
     {
@@ -1031,10 +1068,12 @@ template <typename Integer>
 constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(rhs) || isnan(rhs))
     {
         return rhs;
     }
+    #endif
 
     if (lhs >= 0 && rhs.isneg())
     {
@@ -1064,6 +1103,7 @@ constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
 
 constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal64_fast zero {0, 0};
 
     const auto non_finite {detail::check_non_finite(lhs, rhs)};
@@ -1071,6 +1111,7 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     {
         return non_finite;
     }
+    #endif
 
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
@@ -1090,10 +1131,12 @@ template <typename Integer>
 constexpr auto operator*(decimal64_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
         return lhs;
     }
+    #endif
 
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
@@ -1123,6 +1166,7 @@ constexpr auto operator*(Integer lhs, decimal64_fast rhs) noexcept
 
 constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal64_fast& q, decimal64_fast& r) noexcept -> void
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64_fast zero {0, 0};
     constexpr decimal64_fast nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
@@ -1167,6 +1211,9 @@ constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal
         default:
             static_cast<void>(rhs);
     }
+    #else
+    static_cast<void>(r);
+    #endif
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
@@ -1215,6 +1262,7 @@ template <typename Integer>
 constexpr auto operator/(decimal64_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64_fast zero {0, 0};
     constexpr decimal64_fast nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
@@ -1240,6 +1288,7 @@ constexpr auto operator/(decimal64_fast lhs, Integer rhs) noexcept
     {
         return sign ? -inf : inf;
     }
+    #endif
 
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
@@ -1261,6 +1310,7 @@ template <typename Integer>
 constexpr auto operator/(Integer lhs, decimal64_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64_fast zero {0, 0};
     constexpr decimal64_fast nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
@@ -1284,6 +1334,7 @@ constexpr auto operator/(Integer lhs, decimal64_fast rhs) noexcept
         default:
             static_cast<void>(lhs);
     }
+    #endif
 
     auto rhs_sig {rhs.full_significand()};
     auto rhs_exp {rhs.biased_exponent()};
@@ -1390,12 +1441,14 @@ constexpr auto decimal64_fast::operator--(int) noexcept -> decimal64_fast&
 
 constexpr auto scalblnd64f(decimal64_fast num, long exp) noexcept -> decimal64_fast
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal64_fast zero {0, 0};
 
     if (num == zero || exp == 0 || isinf(num) || isnan(num))
     {
         return num;
     }
+    #endif
 
     num = decimal64_fast(num.significand_, num.biased_exponent() + exp, num.sign_);
 
