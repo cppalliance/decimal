@@ -378,4 +378,61 @@ constexpr auto operator<=>(const decimal128_fast& lhs, const decimal128_fast& rh
 } // namespace decimal
 } // namespace boost
 
+namespace std {
+
+BOOST_DECIMAL_EXPORT template<>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal128_fast>
+#else
+struct numeric_limits<boost::decimal::decimal128_fast>
+#endif
+{
+
+#ifdef _MSC_VER
+    public:
+#endif
+
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_signed = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_integer = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_exact = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_infinity = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = true;
+
+    // These members were deprecated in C++23
+    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_present;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = true;
+    #endif
+
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_indeterminate;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_modulo = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  digits = 34;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  digits10 = digits;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  max_digits10 = digits;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  radix = 10;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  min_exponent = -6142;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  min_exponent10 = min_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  max_exponent = 6145;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  max_exponent10 = max_exponent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = numeric_limits<std::uint64_t>::traps;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = true;
+
+    // Member functions
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (min)        () -> boost::decimal::decimal128_fast { return {1, min_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (max)        () -> boost::decimal::decimal128_fast { return {boost::decimal::detail::uint128{UINT64_C(999'999'999'999'999), UINT64_C(9'999'999'999'999'999'999)}, max_exponent}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto lowest       () -> boost::decimal::decimal128_fast { return {boost::decimal::detail::uint128{UINT64_C(999'999'999'999'999), UINT64_C(9'999'999'999'999'999'999)}, max_exponent, true}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto epsilon      () -> boost::decimal::decimal128_fast { return {1, -34}; }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto round_error  () -> boost::decimal::decimal128_fast { return epsilon(); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::decimal128_fast { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_inf, 0, false); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::decimal128_fast { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_qnan, 0, false); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::decimal128_fast { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_snan, 0, false); }
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::decimal128_fast { return {1, boost::decimal::detail::etiny_v<boost::decimal::decimal128>}; }
+};
+
+}
+
 #endif //BOOST_DECIMAL_DECIMAL128_FAST_HPP
