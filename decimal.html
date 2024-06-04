@@ -588,6 +588,7 @@ pre.rouge .gs {
 <li><a href="#decimal128_description">Description</a></li>
 </ul>
 </li>
+<li><a href="#conversions">Fast Type Conversions</a></li>
 <li><a href="#literals">Literals Support</a></li>
 <li><a href="#numbers">Numeric Constants</a>
 <ul class="sectlevel2">
@@ -1410,6 +1411,56 @@ As is often the case this trades space for time by having greater storage width 
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conversions">Fast Type Conversions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Since we have non-IEEE 754 compliant types we offer a set of functions that allow their conversion to and from the IEEE 754 compliant BID layout.
+These functions allow lossless conversion with more compact storage.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="k">namespace</span> <span class="n">detail</span> <span class="p">{</span>
+
+<span class="k">struct</span> <span class="nc">uint128</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">hi</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">lo</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="p">}</span> <span class="c1">// namespace detail</span>
+
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">to_bid_d32</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">to_bid_d32f</span><span class="p">(</span><span class="n">decimal32_fast</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">to_bid_d64</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">to_bid_d64f</span><span class="p">(</span><span class="n">decimal64_fast</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">to_bid_d128</span><span class="p">(</span><span class="n">decimal128</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span>
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="n">to_bid</span><span class="p">(</span><span class="n">T</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span> <span class="o">=</span> <span class="n">decimal32_fast</span><span class="p">&gt;</span>
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">T</span> <span class="n">from_bid</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span> <span class="o">=</span> <span class="n">decimal64_fast</span><span class="p">&gt;</span>
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">T</span> <span class="n">from_bid</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span> <span class="o">=</span> <span class="n">decimal128</span><span class="p">&gt;</span>
+<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">T</span> <span class="n">from_bid</span><span class="p">(</span><span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="p">}</span> <span class="c1">// namespace decimal</span>
+<span class="p">}</span> <span class="c1">// namespace boost</span></code></pre>
 </div>
 </div>
 </div>
@@ -2947,6 +2998,14 @@ This option is not recommended, but can be useful if you want to use specific fu
 <span class="k">const</span> <span class="k">auto</span> <span class="n">res</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">acos</span><span class="p">(</span><span class="n">test_val</span><span class="p">);</span></code></pre>
 </div>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>BOOST_DECIMAL_FAST_MATH</code> performs optimizations similar to that of the <code>-ffast-math</code> compiler flag such as removing all checks for non-finite values.
+This flag increases the performance of the basis operations (e.g. add, sub, mul, div, and comparisons) by up to 20%.</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -3907,7 +3966,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-05-30 09:47:46 +0200
+Last updated 2024-06-04 09:44:16 +0200
 </div>
 </div>
 <style>
