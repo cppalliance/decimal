@@ -97,6 +97,8 @@ public:
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     #endif
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_fast(Float val) noexcept;
+
+    friend constexpr auto direct_init_d128(significand_type significand, exponent_type exponent, bool sign) noexcept -> decimal128_fast;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -206,6 +208,16 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_fast::decimal128_fast(Float val) noexce
 #elif defined(__GNUC__)
 #  pragma GCC diagnostic pop
 #endif
+
+constexpr auto direct_init_d128(decimal128_fast::significand_type significand, decimal128_fast::exponent_type exponent, bool sign) noexcept -> decimal128_fast
+{
+    decimal128_fast val {};
+    val.significand_ = significand;
+    val.exponent_ = exponent;
+    val.sign_ = sign;
+
+    return val;
+}
 
 } // namespace decimal
 } // namespace boost
