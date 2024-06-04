@@ -122,6 +122,30 @@ public:
     // Unary arithmetic operators
     friend constexpr auto operator+(decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast;
+
+    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
+
+    // LCOV_EXCL_START
+    // TODO(mborland): Fix with STL bindings and delete
+    template <typename charT, typename traits>
+    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128_fast& d) -> std::basic_ostream<charT, traits>&
+    {
+        os << d.significand_ << "e";
+        const auto biased_exp {d.biased_exponent()};
+        if (biased_exp > 0)
+        {
+            os << '+';
+        }
+        os << biased_exp;
+
+        return os;
+    }
+    // LCOV_EXCL_STOP
+
+    #endif
+
+
+    // LCOV_EXCL_STOP
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
