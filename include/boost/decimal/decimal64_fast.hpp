@@ -1497,7 +1497,7 @@ struct numeric_limits<boost::decimal::decimal64_fast>
     #endif
 
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_indeterminate;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = false;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_modulo = false;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int  digits = 16;
