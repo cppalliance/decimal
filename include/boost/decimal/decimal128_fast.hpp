@@ -87,6 +87,26 @@ private:
 
     friend constexpr auto d128f_div_impl(decimal128_fast lhs, decimal128_fast rhs, decimal128_fast& q, decimal128_fast& r) noexcept -> void;
 
+    // Equality template between any integer type and decimal128
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
+    friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
+    friend constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                             detail::is_decimal_floating_point_v<Decimal2>), bool>;
+
+    // Template to compare operator< for any integer type and decimal128
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
+    friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
+    friend constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
+        -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
+                             detail::is_decimal_floating_point_v<Decimal2>), bool>;
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
@@ -131,6 +151,23 @@ public:
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
     friend constexpr auto operator<=>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> std::partial_ordering;
     #endif
+
+    // Mixed comparison operators
+    template <typename Integer>
+    friend constexpr auto operator==(decimal128_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    template <typename Integer>
+    friend constexpr auto operator==(Integer lhs, decimal128_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    template <typename Integer>
+    friend constexpr auto operator!=(decimal128_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    template <typename Integer>
+    friend constexpr auto operator!=(Integer lhs, decimal128_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     // Unary arithmetic operators
     friend constexpr auto operator+(decimal128_fast rhs) noexcept -> decimal128_fast;
@@ -380,7 +417,35 @@ constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs
                             rhs.significand_, rhs.biased_exponent(), rhs.sign_);
 }
 
+template <typename Integer>
+constexpr auto operator==(decimal128_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    return mixed_equality_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator==(Integer lhs, decimal128_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    return mixed_equality_impl(rhs, lhs);
+}
+
 constexpr auto operator!=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
+{
+    return !(lhs == rhs);
+}
+
+template <typename Integer>
+constexpr auto operator!=(decimal128_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    return !(lhs == rhs);
+}
+
+template <typename Integer>
+constexpr auto operator!=(Integer lhs, decimal128_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return !(lhs == rhs);
 }
