@@ -74,6 +74,19 @@ private:
         return static_cast<std::int32_t>(exponent_) - detail::bias_v<decimal128>;
     }
 
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_integral_128(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
+
+    template <typename Decimal, typename TargetType>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_floating_point_v, TargetType, TargetType);
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
+        friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
+
+    friend constexpr auto d128f_div_impl(decimal128_fast lhs, decimal128_fast rhs, decimal128_fast& q, decimal128_fast& r) noexcept -> void;
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
@@ -123,6 +136,55 @@ public:
     friend constexpr auto operator+(decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast;
 
+    // Binary arithmetic operators
+    friend constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator/(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator%(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+
+    // Conversions
+    explicit constexpr operator bool() const noexcept;
+    explicit constexpr operator int() const noexcept;
+    explicit constexpr operator unsigned() const noexcept;
+    explicit constexpr operator long() const noexcept;
+    explicit constexpr operator unsigned long() const noexcept;
+    explicit constexpr operator long long() const noexcept;
+    explicit constexpr operator unsigned long long() const noexcept;
+    explicit constexpr operator std::int8_t() const noexcept;
+    explicit constexpr operator std::uint8_t() const noexcept;
+    explicit constexpr operator std::int16_t() const noexcept;
+    explicit constexpr operator std::uint16_t() const noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    explicit constexpr operator detail::int128_t() const noexcept;
+    explicit constexpr operator detail::uint128_t() const noexcept;
+    #endif
+
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_FLOAT16
+    explicit constexpr operator std::float16_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT32
+    explicit constexpr operator std::float32_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_FLOAT64
+    explicit constexpr operator std::float64_t() const noexcept;
+    #endif
+    #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+    explicit constexpr operator std::bfloat16_t() const noexcept;
+    #endif
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    explicit constexpr operator Decimal() const noexcept;
+
+    // <cmath> functions that are better as friends
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
+
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
     // LCOV_EXCL_START
@@ -130,6 +192,15 @@ public:
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128_fast& d) -> std::basic_ostream<charT, traits>&
     {
+        if (d.sign_)
+        {
+            os << "-";
+        }
+        else
+        {
+            os << "+";
+        }
+
         os << d.significand_ << "e";
         const auto biased_exp {d.biased_exponent()};
         if (biased_exp > 0)
@@ -143,9 +214,6 @@ public:
     // LCOV_EXCL_STOP
 
     #endif
-
-
-    // LCOV_EXCL_STOP
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -167,7 +235,7 @@ constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
     // Strip digits
     if (unsigned_coeff_digits > detail::precision_v<decimal128> + 1)
     {
-        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal64> + 1)};
+        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal128> + 1)};
 
         #if defined(__GNUC__) && !defined(__clang__)
         #  pragma GCC diagnostic push
@@ -412,6 +480,335 @@ constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast
 {
     rhs.sign_ = !rhs.sign_;
     return rhs;
+}
+
+constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    constexpr decimal128_fast zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+    #endif
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && rhs.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+
+    // Ensure that lhs is always the larger for ease of impl
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs, rhs);
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs - abs(rhs);
+    }
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    detail::normalize<decimal64>(rhs_sig, rhs_exp);
+
+    const auto result {detail::d128_add_impl<detail::decimal128_fast_components>(
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_)};
+
+    return {result.sig, result.exp, result.sign};
+};
+
+constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    constexpr decimal128_fast zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+    #endif
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize<decimal64>(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize<decimal64>(sig_rhs, exp_rhs);
+
+    const auto result {detail::d128_sub_impl<detail::decimal128_fast_components>(
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
+            abs_lhs_bigger
+    )};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    constexpr decimal128_fast zero {0, 0};
+
+    const auto non_finite {detail::check_non_finite(lhs, rhs)};
+    if (non_finite != zero)
+    {
+        return non_finite;
+    }
+    #endif
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    const auto lhs_zeros {detail::remove_trailing_zeros(lhs_sig)};
+    lhs_sig = lhs_zeros.trimmed_number;
+    lhs_exp += static_cast<std::int32_t>(lhs_zeros.number_of_removed_zeros);
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    const auto rhs_zeros {detail::remove_trailing_zeros(rhs_sig)};
+    rhs_sig = rhs_zeros.trimmed_number;
+    rhs_exp += static_cast<std::int32_t>(rhs_zeros.number_of_removed_zeros);
+
+    const auto result {detail::d128_mul_impl<detail::decimal128_components>(
+            lhs_sig, lhs_exp, lhs.isneg(),
+            rhs_sig, rhs_exp, rhs.isneg())};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto d128f_div_impl(decimal128_fast lhs, decimal128_fast rhs, decimal128_fast& q, decimal128_fast& r) noexcept -> void
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    // Check pre-conditions
+    constexpr decimal128_fast zero {0, 0};
+    constexpr decimal128_fast nan {boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_qnan, 0, false)};
+    constexpr decimal128_fast inf {boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_inf, 0, false)};
+
+    const bool sign {lhs.isneg() != rhs.isneg()};
+
+    const auto lhs_fp {fpclassify(lhs)};
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+    {
+        q = nan;
+        r = nan;
+        return;
+    }
+
+    switch (lhs_fp)
+    {
+        case FP_INFINITE:
+            q = sign ? -inf : inf;
+            r = zero;
+            return;
+        case FP_ZERO:
+            q = sign ? -zero : zero;
+            r = sign ? -zero : zero;
+            return;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_ZERO:
+            q = inf;
+            r = zero;
+            return;
+        case FP_INFINITE:
+            q = sign ? -zero : zero;
+            r = lhs;
+            return;
+        default:
+            static_cast<void>(rhs);
+    }
+    #else
+    static_cast<void>(r);
+    #endif
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize<decimal128>(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize<decimal128>(sig_rhs, exp_rhs);
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "sig lhs: " << sig_lhs
+              << "\nexp lhs: " << exp_lhs
+              << "\nsig rhs: " << sig_rhs
+              << "\nexp rhs: " << exp_rhs << std::endl;
+    #endif
+
+    detail::decimal128_fast_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    detail::decimal128_fast_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal128_fast_components q_components {};
+
+    detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
+
+    q = decimal128_fast(q_components.sig, q_components.exp, q_components.sign);
+}
+
+constexpr auto d128f_mod_impl(decimal128_fast lhs, decimal128_fast rhs, const decimal128_fast& q, decimal128_fast& r) -> void
+{
+    constexpr decimal128_fast zero {0, 0};
+
+    auto q_trunc {q > zero ? floor(q) : ceil(q)};
+    r = lhs - (decimal128_fast(q_trunc) * rhs);
+};
+
+constexpr auto operator/(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    decimal128_fast q {};
+    decimal128_fast r {};
+    d128f_div_impl(lhs, rhs, q, r);
+
+    return q;
+};
+
+constexpr auto operator%(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    decimal128_fast q {};
+    decimal128_fast r {};
+    d128f_div_impl(lhs, rhs, q, r);
+    d128f_mod_impl(lhs, rhs, q, r);
+
+    return r;
+};
+
+constexpr decimal128_fast::operator bool() const noexcept
+{
+    constexpr decimal128_fast zero {0, 0};
+    return *this != zero;
+}
+
+constexpr decimal128_fast::operator int() const noexcept
+{
+    return to_integral_128<decimal128_fast, int>(*this);
+}
+
+constexpr decimal128_fast::operator unsigned() const noexcept
+{
+    return to_integral_128<decimal128_fast, unsigned>(*this);
+}
+
+constexpr decimal128_fast::operator long() const noexcept
+{
+    return to_integral_128<decimal128_fast, long>(*this);
+}
+
+constexpr decimal128_fast::operator unsigned long() const noexcept
+{
+    return to_integral_128<decimal128_fast, unsigned long>(*this);
+}
+
+constexpr decimal128_fast::operator long long() const noexcept
+{
+    return to_integral_128<decimal128_fast, long long>(*this);
+}
+
+constexpr decimal128_fast::operator unsigned long long() const noexcept
+{
+    return to_integral_128<decimal128_fast, unsigned long long>(*this);
+}
+
+constexpr decimal128_fast::operator std::int8_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, std::int8_t>(*this);
+}
+
+constexpr decimal128_fast::operator std::uint8_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, std::uint8_t>(*this);
+}
+
+constexpr decimal128_fast::operator std::int16_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, std::int16_t>(*this);
+}
+
+constexpr decimal128_fast::operator std::uint16_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, std::uint16_t>(*this);
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr decimal128_fast::operator detail::int128_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, detail::int128_t>(*this);
+}
+
+constexpr decimal128_fast::operator detail::uint128_t() const noexcept
+{
+    return to_integral_128<decimal128_fast, detail::uint128_t>(*this);
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_fast::operator float() const noexcept
+{
+    return to_float<decimal128_fast, float>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_fast::operator double() const noexcept
+{
+    return to_float<decimal128_fast, double>(*this);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_fast::operator long double() const noexcept
+{
+    return to_float<decimal128_fast, long double>(*this);
+}
+
+#ifdef BOOST_DECIMAL_HAS_FLOAT16
+constexpr decimal128_fast::operator std::float16_t() const noexcept
+{
+    return static_cast<std::float16_t>(to_float<decimal128_fast, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT32
+constexpr decimal128_fast::operator std::float32_t() const noexcept
+{
+    return static_cast<std::float32_t>(to_float<decimal128_fast, float>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_FLOAT64
+constexpr decimal128_fast::operator std::float64_t() const noexcept
+{
+    return static_cast<std::float64_t>(to_float<decimal128_fast, double>(*this));
+}
+#endif
+#ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
+constexpr decimal128_fast::operator std::bfloat16_t() const noexcept
+{
+    return static_cast<std::bfloat16_t>(to_float<decimal128_fast, float>(*this));
+}
+#endif
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+constexpr decimal128_fast::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
 }
 
 } // namespace decimal

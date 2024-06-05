@@ -139,14 +139,16 @@ constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal
 
     if (!promoted_mul_result.sign && z_components.sign)
     {
-        result = d128_sub_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                               z_components.sig, z_components.exp, z_components.sign,
-                               abs_lhs_bigger);
+        result = detail::d128_sub_impl<detail::decimal128_components>(
+                        promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+                        z_components.sig, z_components.exp, z_components.sign,
+                        abs_lhs_bigger);
     }
     else
     {
-        result = d128_add_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                               z_components.sig, z_components.exp, z_components.sign);
+        result = detail::d128_add_impl<detail::decimal128_components>(
+                        promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+                        z_components.sig, z_components.exp, z_components.sign);
     }
 
     return {result.sig, result.exp, result.sign};
@@ -283,14 +285,16 @@ constexpr auto fmad64f(decimal64_fast x, decimal64_fast y, decimal64_fast z) noe
 
     if (!promoted_mul_result.sign && z_components.sign)
     {
-        result = d128_sub_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                               z_components.sig, z_components.exp, z_components.sign,
-                               abs_lhs_bigger);
+        result = detail::d128_sub_impl<detail::decimal128_components>(
+                        promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+                        z_components.sig, z_components.exp, z_components.sign,
+                        abs_lhs_bigger);
     }
     else
     {
-        result = d128_add_impl(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                               z_components.sig, z_components.exp, z_components.sign);
+        result = detail::d128_add_impl<detail::decimal128_components>(
+                        promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
+                        z_components.sig, z_components.exp, z_components.sign);
     }
 
     return {result.sig, result.exp, result.sign};
