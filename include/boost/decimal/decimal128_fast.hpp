@@ -169,6 +169,22 @@ public:
     friend constexpr auto operator!=(Integer lhs, decimal128_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
+    template <typename Integer>
+    friend constexpr auto operator<(decimal128_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    template <typename Integer>
+    friend constexpr auto operator<(Integer lhs, decimal128_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    template <typename Integer>
+    friend constexpr auto operator<=(decimal128_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    template <typename Integer>
+    friend constexpr auto operator<=(Integer lhs, decimal128_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
     // Unary arithmetic operators
     friend constexpr auto operator+(decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast;
@@ -485,10 +501,59 @@ constexpr auto operator<(const decimal128_fast& lhs, const decimal128_fast& rhs)
                            rhs.significand_, rhs.biased_exponent(), rhs.sign_);
 }
 
+template <typename Integer>
+constexpr auto operator<(decimal128_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    return less_impl(lhs, rhs);
+}
+
+template <typename Integer>
+constexpr auto operator<(Integer lhs, decimal128_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(rhs))
+    {
+        return false;
+    }
+    #endif
+
+    return !less_impl(rhs, lhs) && lhs != rhs;
+}
+
 constexpr auto operator<=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+    #endif
+
+    return !(rhs < lhs);
+}
+
+template <typename Integer>
+constexpr auto operator<=(decimal128_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(lhs))
+    {
+        return false;
+    }
+    #endif
+
+    return !(rhs < lhs);
+}
+
+template <typename Integer>
+constexpr auto operator<=(Integer lhs, decimal128_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(rhs))
     {
         return false;
     }
