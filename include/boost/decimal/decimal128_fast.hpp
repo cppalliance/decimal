@@ -237,6 +237,14 @@ public:
     friend constexpr auto operator-(Integer lhs, decimal128_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast);
 
+    template <typename Integer>
+    friend constexpr auto operator*(decimal128_fast lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast);
+
+    template <typename Integer>
+    friend constexpr auto operator*(Integer lhs, decimal128_fast rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast);
+
     // Conversions
     explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
@@ -987,6 +995,46 @@ constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
             rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator*(decimal128_fast lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast)
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(lhs) || isinf(lhs))
+    {
+        return lhs;
+    }
+    #endif
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    const auto lhs_zeros {detail::remove_trailing_zeros(lhs_sig)};
+    lhs_sig = lhs_zeros.trimmed_number;
+    lhs_exp += static_cast<std::int32_t>(lhs_zeros.number_of_removed_zeros);
+    auto lhs_components {detail::decimal128_fast_components{lhs_sig, lhs_exp, lhs.isneg()}};
+
+    auto rhs_sig {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    std::int32_t rhs_exp {0};
+    const auto rhs_zeros {detail::remove_trailing_zeros(rhs_sig)};
+    rhs_sig = rhs_zeros.trimmed_number;
+    rhs_exp += static_cast<std::int32_t>(rhs_zeros.number_of_removed_zeros);
+    auto unsigned_sig_rhs {detail::make_positive_unsigned(rhs_sig)};
+    auto rhs_components {detail::decimal128_fast_components{unsigned_sig_rhs, rhs_exp, (rhs < 0)}};
+
+    const auto result {detail::d128_mul_impl<detail::decimal128_fast_components>(
+            lhs_components.sig, lhs_components.exp, lhs_components.sign,
+            rhs_components.sig, rhs_components.exp, rhs_components.sign)};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+template <typename Integer>
+constexpr auto operator*(Integer lhs, decimal128_fast rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast)
+{
+    return rhs * lhs;
 }
 
 constexpr auto d128f_div_impl(decimal128_fast lhs, decimal128_fast rhs, decimal128_fast& q, decimal128_fast& r) noexcept -> void
