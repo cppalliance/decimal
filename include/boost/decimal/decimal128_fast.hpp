@@ -137,6 +137,7 @@ public:
     // Binary arithmetic operators
     friend constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
 
     // Conversions
     explicit constexpr operator bool() const noexcept;
@@ -183,6 +184,15 @@ public:
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128_fast& d) -> std::basic_ostream<charT, traits>&
     {
+        if (d.sign_)
+        {
+            os << "-";
+        }
+        else
+        {
+            os << "+";
+        }
+
         os << d.significand_ << "e";
         const auto biased_exp {d.biased_exponent()};
         if (biased_exp > 0)
@@ -543,6 +553,37 @@ constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             abs_lhs_bigger
     )};
+
+    return {result.sig, result.exp, result.sign};
+}
+
+constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    constexpr decimal128_fast zero {0, 0};
+
+    const auto non_finite {detail::check_non_finite(lhs, rhs)};
+    if (non_finite != zero)
+    {
+        return non_finite;
+    }
+    #endif
+
+    auto lhs_sig {lhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    const auto lhs_zeros {detail::remove_trailing_zeros(lhs_sig)};
+    lhs_sig = lhs_zeros.trimmed_number;
+    lhs_exp += static_cast<std::int32_t>(lhs_zeros.number_of_removed_zeros);
+
+    auto rhs_sig {rhs.full_significand()};
+    auto rhs_exp {rhs.biased_exponent()};
+    const auto rhs_zeros {detail::remove_trailing_zeros(rhs_sig)};
+    rhs_sig = rhs_zeros.trimmed_number;
+    rhs_exp += static_cast<std::int32_t>(rhs_zeros.number_of_removed_zeros);
+
+    const auto result {detail::d128_mul_impl<detail::decimal128_components>(
+            lhs_sig, lhs_exp, lhs.isneg(),
+            rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
 }
