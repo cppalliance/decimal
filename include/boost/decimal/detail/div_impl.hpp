@@ -90,6 +90,35 @@ constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept -
     q = T{res_sig_64, res_exp, sign};
 }
 
+template <typename T>
+constexpr auto d128_generic_div_impl(T lhs, T rhs, T& q) noexcept -> void
+{
+    bool sign {lhs.sign != rhs.sign};
+
+    const auto big_sig_lhs {detail::uint256_t(lhs.sig) * detail::uint256_t(pow10(detail::uint128(detail::precision_v<decimal128>)))};
+    lhs.exp -= detail::precision_v<decimal128>;
+
+    auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
+    auto res_exp {lhs.exp - rhs.exp};
+
+    const auto sig_dig {detail::num_digits(res_sig)};
+
+    if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
+    {
+        const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
+        res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
+        res_exp += digit_delta;
+    }
+
+    if (res_sig == 0)
+    {
+        sign = false;
+    }
+
+    // Let the constructor handle shrinking it back down and rounding correctly
+    q = T {res_sig.low, res_exp, sign};
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost

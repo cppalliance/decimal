@@ -33,6 +33,10 @@
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/floor.hpp>
 #include <boost/decimal/detail/cmath/ceil.hpp>
+#include <boost/decimal/detail/add_impl.hpp>
+#include <boost/decimal/detail/sub_impl.hpp>
+#include <boost/decimal/detail/mul_impl.hpp>
+#include <boost/decimal/detail/div_impl.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -202,9 +206,6 @@ private:
     friend constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
-
-    friend constexpr auto d128_generic_div_imp(detail::decimal128_components lhs, detail::decimal128_components rhs,
-                                               detail::decimal128_components& q) noexcept -> void;
 
     friend constexpr auto d128_div_impl(decimal128 lhs, decimal128 rhs, decimal128& q, decimal128& r) noexcept -> void;
 
@@ -1430,35 +1431,6 @@ std::ostream& operator<<( std::ostream& os, boost::decimal::detail::uint128_t v 
 #  pragma warning(disable: 4127) // If constexpr macro only works for C++17 and above
 #endif
 
-constexpr auto d128_generic_div_impl(detail::decimal128_components lhs, detail::decimal128_components rhs,
-                                     detail::decimal128_components& q) noexcept -> void
-{
-    bool sign {lhs.sign != rhs.sign};
-
-    const auto big_sig_lhs {detail::uint256_t(lhs.sig) * detail::uint256_t(pow10(detail::uint128(detail::precision_v<decimal128>)))};
-    lhs.exp -= detail::precision_v<decimal128>;
-
-    auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
-    auto res_exp {lhs.exp - rhs.exp};
-
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
-    {
-        const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
-        res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
-        res_exp += digit_delta;
-    }
-
-    if (res_sig == 0)
-    {
-        sign = false;
-    }
-
-    // Let the constructor handle shrinking it back down and rounding correctly
-    q = detail::decimal128_components{res_sig.low, res_exp, sign};
-}
-
 constexpr auto d128_div_impl(decimal128 lhs, decimal128 rhs, decimal128& q, decimal128& r) noexcept -> void
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -1529,7 +1501,7 @@ constexpr auto d128_div_impl(decimal128 lhs, decimal128 rhs, decimal128& q, deci
     detail::decimal128_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
     detail::decimal128_components q_components {};
 
-    d128_generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
 
     q = decimal128(q_components.sig, q_components.exp, q_components.sign);
 }
@@ -1899,7 +1871,7 @@ constexpr auto operator/(decimal128 lhs, Integer rhs) noexcept
     detail::decimal128_components rhs_components {rhs_sig, rhs_exp, rhs < 0};
     detail::decimal128_components q_components {};
 
-    d128_generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
 
     return decimal128(q_components.sig, q_components.exp, q_components.sign);
 }
@@ -1942,7 +1914,7 @@ constexpr auto operator/(Integer lhs, decimal128 rhs) noexcept
     detail::decimal128_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
     detail::decimal128_components q_components {};
 
-    d128_generic_div_impl(lhs_components, rhs_components, q_components);
+    detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
 
     return decimal128(q_components.sig, q_components.exp, q_components.sign);
 }
