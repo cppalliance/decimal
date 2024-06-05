@@ -85,6 +85,8 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
         friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
+    friend constexpr auto d128f_div_impl(decimal128_fast lhs, decimal128_fast rhs, decimal128_fast& q, decimal128_fast& r) noexcept -> void;
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
@@ -138,6 +140,7 @@ public:
     friend constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator/(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
 
     // Conversions
     explicit constexpr operator bool() const noexcept;
@@ -587,6 +590,90 @@ constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
 
     return {result.sig, result.exp, result.sign};
 }
+
+constexpr auto d128f_div_impl(decimal128_fast lhs, decimal128_fast rhs, decimal128_fast& q, decimal128_fast& r) noexcept -> void
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    // Check pre-conditions
+    constexpr decimal128_fast zero {0, 0};
+    constexpr decimal128_fast nan {boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_qnan, 0, false)};
+    constexpr decimal128_fast inf {boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_inf, 0, false)};
+
+    const bool sign {lhs.isneg() != rhs.isneg()};
+
+    const auto lhs_fp {fpclassify(lhs)};
+    const auto rhs_fp {fpclassify(rhs)};
+
+    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+    {
+        q = nan;
+        r = nan;
+        return;
+    }
+
+    switch (lhs_fp)
+    {
+        case FP_INFINITE:
+            q = sign ? -inf : inf;
+            r = zero;
+            return;
+        case FP_ZERO:
+            q = sign ? -zero : zero;
+            r = sign ? -zero : zero;
+            return;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_ZERO:
+            q = inf;
+            r = zero;
+            return;
+        case FP_INFINITE:
+            q = sign ? -zero : zero;
+            r = lhs;
+            return;
+        default:
+            static_cast<void>(rhs);
+    }
+    #else
+    static_cast<void>(r);
+    #endif
+
+    auto sig_lhs {lhs.full_significand()};
+    auto exp_lhs {lhs.biased_exponent()};
+    detail::normalize<decimal128>(sig_lhs, exp_lhs);
+
+    auto sig_rhs {rhs.full_significand()};
+    auto exp_rhs {rhs.biased_exponent()};
+    detail::normalize<decimal128>(sig_rhs, exp_rhs);
+
+    #ifdef BOOST_DECIMAL_DEBUG
+    std::cerr << "sig lhs: " << sig_lhs
+              << "\nexp lhs: " << exp_lhs
+              << "\nsig rhs: " << sig_rhs
+              << "\nexp rhs: " << exp_rhs << std::endl;
+    #endif
+
+    detail::decimal128_fast_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+    detail::decimal128_fast_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal128_fast_components q_components {};
+
+    detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
+
+    q = decimal128_fast(q_components.sig, q_components.exp, q_components.sign);
+}
+
+constexpr auto operator/(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    decimal128_fast q {};
+    decimal128_fast r {};
+    d128f_div_impl(lhs, rhs, q, r);
+
+    return q;
+};
 
 constexpr decimal128_fast::operator bool() const noexcept
 {
