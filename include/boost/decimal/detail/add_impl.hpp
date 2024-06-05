@@ -170,6 +170,87 @@ constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {new_sig, new_exp, sign};
 }
 
+template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
+                             T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
+{
+    const bool sign {lhs_sign};
+
+    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
+
+    if (delta_exp > detail::precision_v<decimal128> + 1)
+    {
+        // If the difference in exponents is more than the digits of accuracy
+        // we return the larger of the two
+        //
+        // e.g. 1e20 + 1e-20 = 1e20
+
+        return {lhs_sig, lhs_exp, lhs_sign};
+    }
+    else if (delta_exp == detail::precision_v<decimal128> + 1)
+    {
+        // Only need to see if we need to add one to the
+        // significand of the bigger value
+        //
+        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
+
+        BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T2>::digits10 > std::numeric_limits<std::uint64_t>::digits10)
+        {
+            if (rhs_sig >= detail::uint128 {UINT64_C(0xF684DF56C3E0), UINT64_C(0x1BC6C73200000000)})
+            {
+                ++lhs_sig;
+            }
+
+            return {lhs_sig, lhs_exp, lhs_sign};
+        }
+        else
+        {
+            return {lhs_sig, lhs_exp, lhs_sign};
+        }
+    }
+
+    // The two numbers can be added together without special handling
+    //
+    // If we can add to the lhs sig rather than dividing we can save some precision
+    // 64-bit sign int can have 19 digits, and our normalized significand has 16
+
+    if (delta_exp <= 3)
+    {
+        lhs_sig *= detail::pow10(static_cast<detail::uint128>(delta_exp));
+        lhs_exp -= delta_exp;
+        delta_exp = 0;
+    }
+    else
+    {
+        lhs_sig *= 1000;
+        delta_exp -= 3;
+        lhs_exp -= 3;
+    }
+
+    while (delta_exp > 1)
+    {
+        rhs_sig /= detail::pow10(static_cast<detail::uint128>(delta_exp - 1));
+        delta_exp = 1;
+    }
+
+    if (delta_exp == 1)
+    {
+        detail::fenv_round<decimal128>(rhs_sig, rhs_sign);
+    }
+
+    const auto new_sig {static_cast<typename ReturnType::sig_type>(lhs_sig) +
+                        static_cast<typename ReturnType::sig_type>(rhs_sig)};
+    const auto new_exp {lhs_exp};
+
+    #ifdef BOOST_DECIMAL_DEBUG_ADD_128
+    std::cerr << "Res Sig: " << static_cast<detail::uint128_t>(new_sig)
+              << "\nRes Exp: " << new_exp
+              << "\nRes Neg: " << sign << std::endl;
+    #endif
+
+    return {new_sig, new_exp, sign};
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost

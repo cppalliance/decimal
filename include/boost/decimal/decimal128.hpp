@@ -128,6 +128,8 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE uint128 d128_big_combination_field_mask {UINT64
 
 struct decimal128_components
 {
+    using sig_type = uint128;
+
     uint128 sig {};
     std::int32_t exp {};
     bool sign {};
@@ -200,11 +202,6 @@ private:
     friend constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
-
-    template <typename T1, typename T2>
-    constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                 T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept
-                                 -> detail::decimal128_components;
 
     template <typename T1, typename T2>
     constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
@@ -1443,90 +1440,6 @@ std::ostream& operator<<( std::ostream& os, boost::decimal::detail::uint128_t v 
 #endif
 
 template <typename T1, typename T2>
-constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                             T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal128_components
-{
-    const bool sign {lhs_sign};
-
-    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-
-    if (delta_exp > detail::precision_v<decimal128> + 1)
-    {
-        // If the difference in exponents is more than the digits of accuracy
-        // we return the larger of the two
-        //
-        // e.g. 1e20 + 1e-20 = 1e20
-
-        return {lhs_sig, lhs_exp, lhs_sign};
-    }
-    else if (delta_exp == detail::precision_v<decimal128> + 1)
-    {
-        // Only need to see if we need to add one to the
-        // significand of the bigger value
-        //
-        // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
-
-        BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T2>::digits10 > std::numeric_limits<std::uint64_t>::digits10)
-        {
-            if (rhs_sig >= detail::uint128 {UINT64_C(0xF684DF56C3E0), UINT64_C(0x1BC6C73200000000)})
-            {
-                ++lhs_sig;
-            }
-
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
-        else
-        {
-            return {lhs_sig, lhs_exp, lhs_sign};
-        }
-    }
-
-    // The two numbers can be added together without special handling
-    //
-    // If we can add to the lhs sig rather than dividing we can save some precision
-    // 64-bit sign int can have 19 digits, and our normalized significand has 16
-
-    if (delta_exp <= 3)
-    {
-        lhs_sig *= detail::pow10(static_cast<detail::uint128>(delta_exp));
-        lhs_exp -= delta_exp;
-        delta_exp = 0;
-    }
-    else
-    {
-        lhs_sig *= 1000;
-        delta_exp -= 3;
-        lhs_exp -= 3;
-    }
-
-    while (delta_exp > 1)
-    {
-        rhs_sig /= detail::pow10(static_cast<detail::uint128>(delta_exp - 1));
-        delta_exp = 1;
-    }
-
-    if (delta_exp == 1)
-    {
-        detail::fenv_round<decimal128>(rhs_sig, rhs_sign);
-    }
-
-    // Convert both of the significands to unsigned types, so we can use intrinsics
-    // in the uint128 implementation
-    const auto unsigned_lhs_sig {detail::make_positive_unsigned(lhs_sig)};
-    const auto unsigned_rhs_sig {detail::make_positive_unsigned(rhs_sig)};
-    const auto new_sig {static_cast<detail::uint128>(unsigned_lhs_sig + unsigned_rhs_sig)};
-    const auto new_exp {lhs_exp};
-
-    #ifdef BOOST_DECIMAL_DEBUG_ADD_128
-    std::cerr << "Res Sig: " << static_cast<detail::uint128_t>(new_sig)
-              << "\nRes Exp: " << new_exp
-              << "\nRes Neg: " << sign << std::endl;
-    #endif
-
-    return {new_sig, new_exp, sign};
-}
-
-template <typename T1, typename T2>
 constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                              T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
                              bool abs_lhs_bigger) noexcept -> detail::decimal128_components
@@ -1785,7 +1698,8 @@ constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
               << "\nrhs exp: " << rhs_exp << std::endl;
     #endif
 
-    const auto result {d128_add_impl(lhs_sig, lhs_exp, lhs.isneg(),
+    const auto result {detail::d128_add_impl<detail::decimal128_components>(
+                                     lhs_sig, lhs_exp, lhs.isneg(),
                                      rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
@@ -1844,8 +1758,9 @@ constexpr auto operator+(decimal128 lhs, Integer rhs) noexcept
     }
     else
     {
-        result = d128_add_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                               rhs_components.sig, rhs_components.exp, rhs_components.sign);
+        result = detail::d128_add_impl<detail::decimal128_components>(
+                lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                rhs_components.sig, rhs_components.exp, rhs_components.sign);
     }
 
     return decimal128(result.sig, result.exp, result.sign);
