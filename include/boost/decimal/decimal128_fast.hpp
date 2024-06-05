@@ -148,10 +148,6 @@ public:
     friend constexpr auto operator>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
     friend constexpr auto operator>=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
 
-    #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
-    friend constexpr auto operator<=>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> std::partial_ordering;
-    #endif
-
     // Mixed comparison operators
     template <typename Integer>
     friend constexpr auto operator==(decimal128_fast lhs, Integer rhs) noexcept
@@ -200,6 +196,18 @@ public:
     template <typename Integer>
     friend constexpr auto operator>=(Integer lhs, decimal128_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
+
+    #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
+    friend constexpr auto operator<=>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> std::partial_ordering;
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(const decimal128_fast& lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering);
+
+    template <typename Integer>
+    friend constexpr auto operator<=>(Integer lhs, const decimal128_fast& rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering);
+    #endif
 
     // Unary arithmetic operators
     friend constexpr auto operator+(decimal128_fast rhs) noexcept -> decimal128_fast;
@@ -640,6 +648,46 @@ BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 
 constexpr auto operator<=>(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> std::partial_ordering
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+template <typename Integer>
+constexpr auto operator<=>(const decimal128_fast& lhs, Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
+{
+    if (lhs < rhs)
+    {
+        return std::partial_ordering::less;
+    }
+    else if (lhs > rhs)
+    {
+        return std::partial_ordering::greater;
+    }
+    else if (lhs == rhs)
+    {
+        return std::partial_ordering::equivalent;
+    }
+
+    return std::partial_ordering::unordered;
+}
+
+template <typename Integer>
+constexpr auto operator<=>(Integer lhs, const decimal128_fast& rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
 {
     if (lhs < rhs)
     {
