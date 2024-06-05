@@ -141,6 +141,7 @@ public:
     friend constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator/(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator%(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
 
     // Conversions
     explicit constexpr operator bool() const noexcept;
@@ -180,6 +181,10 @@ public:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
+    // <cmath> functions that are better as friends
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
+
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
     // LCOV_EXCL_START
@@ -209,9 +214,6 @@ public:
     // LCOV_EXCL_STOP
 
     #endif
-
-
-    // LCOV_EXCL_STOP
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -666,6 +668,14 @@ constexpr auto d128f_div_impl(decimal128_fast lhs, decimal128_fast rhs, decimal1
     q = decimal128_fast(q_components.sig, q_components.exp, q_components.sign);
 }
 
+constexpr auto d128f_mod_impl(decimal128_fast lhs, decimal128_fast rhs, const decimal128_fast& q, decimal128_fast& r) -> void
+{
+    constexpr decimal128_fast zero {0, 0};
+
+    auto q_trunc {q > zero ? floor(q) : ceil(q)};
+    r = lhs - (decimal128_fast(q_trunc) * rhs);
+};
+
 constexpr auto operator/(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
 {
     decimal128_fast q {};
@@ -673,6 +683,16 @@ constexpr auto operator/(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
     d128f_div_impl(lhs, rhs, q, r);
 
     return q;
+};
+
+constexpr auto operator%(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    decimal128_fast q {};
+    decimal128_fast r {};
+    d128f_div_impl(lhs, rhs, q, r);
+    d128f_mod_impl(lhs, rhs, q, r);
+
+    return r;
 };
 
 constexpr decimal128_fast::operator bool() const noexcept
