@@ -60,6 +60,7 @@ run random_decimal64_fast_math.cpp ;
 run random_decimal64_math.cpp ;
 run random_decimal128_comp.cpp ;
 run random_decimal128_fast_comp.cpp ;
+run random_decimal128_fast_math.cpp ;
 run random_decimal128_math.cpp ;
 run random_mixed_decimal_comp.cpp ;
 run random_mixed_decimal_math.cpp ;
