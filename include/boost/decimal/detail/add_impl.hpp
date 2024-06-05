@@ -170,6 +170,11 @@ constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {new_sig, new_exp, sign};
 }
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4127) // If constexpr macro only works for C++17 and above
+#endif
+
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                              T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
@@ -250,6 +255,10 @@ constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
     return {new_sig, new_exp, sign};
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 } // namespace detail
 } // namespace decimal
