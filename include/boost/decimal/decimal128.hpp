@@ -203,10 +203,6 @@ private:
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
-    template <typename T1, typename T2>
-    constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                 T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal128_components;
-
     friend constexpr auto d128_generic_div_imp(detail::decimal128_components lhs, detail::decimal128_components rhs,
                                                detail::decimal128_components& q) noexcept -> void;
 
@@ -1434,34 +1430,6 @@ std::ostream& operator<<( std::ostream& os, boost::decimal::detail::uint128_t v 
 #  pragma warning(disable: 4127) // If constexpr macro only works for C++17 and above
 #endif
 
-template <typename T1, typename T2>
-constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                             T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> detail::decimal128_components
-{
-    bool sign {lhs_sign != rhs_sign};
-
-    // Once we have the normalized significands and exponents all we have to do is
-    // multiply the significands and add the exponents
-    auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
-    auto res_exp {lhs_exp + rhs_exp};
-
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
-    {
-        const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
-        res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
-        res_exp += digit_delta;
-    }
-
-    if (res_sig == 0)
-    {
-        sign = false;
-    }
-
-    return {res_sig.low, res_exp, sign};
-}
-
 constexpr auto d128_generic_div_impl(detail::decimal128_components lhs, detail::decimal128_components rhs,
                                      detail::decimal128_components& q) noexcept -> void
 {
@@ -1832,8 +1800,9 @@ constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     rhs_sig = rhs_zeros.trimmed_number;
     rhs_exp += static_cast<std::int32_t>(rhs_zeros.number_of_removed_zeros);
 
-    const auto result {d128_mul_impl(lhs_sig, lhs_exp, lhs.isneg(),
-                                     rhs_sig, rhs_exp, rhs.isneg())};
+    const auto result {detail::d128_mul_impl<detail::decimal128_components>(
+            lhs_sig, lhs_exp, lhs.isneg(),
+            rhs_sig, rhs_exp, rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -1864,8 +1833,9 @@ constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
     auto unsigned_sig_rhs {detail::make_positive_unsigned(rhs_sig)};
     auto rhs_components {detail::decimal128_components{unsigned_sig_rhs, rhs_exp, (rhs < 0)}};
 
-    const auto result {d128_mul_impl(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                     rhs_components.sig, rhs_components.exp, rhs_components.sign)};
+    const auto result {detail::d128_mul_impl<detail::decimal128_components>(
+            lhs_components.sig, lhs_components.exp, lhs_components.sign,
+            rhs_components.sig, rhs_components.exp, rhs_components.sign)};
 
     return {result.sig, result.exp, result.sign};
 }
