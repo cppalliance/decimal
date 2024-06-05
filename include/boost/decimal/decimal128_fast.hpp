@@ -134,6 +134,10 @@ public:
     friend constexpr auto operator+(decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast;
 
+    // Binary arithmetic operators
+    friend constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+
     // Conversions
     explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
@@ -461,6 +465,70 @@ constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast
 {
     rhs.sign_ = !rhs.sign_;
     return rhs;
+}
+
+constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    constexpr decimal128_fast zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+    #endif
+
+    bool lhs_bigger {lhs > rhs};
+    if (lhs.isneg() && rhs.isneg())
+    {
+        lhs_bigger = !lhs_bigger;
+    }
+
+    // Ensure that lhs is always the larger for ease of impl
+    if (!lhs_bigger)
+    {
+        detail::swap(lhs, rhs);
+    }
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs - abs(rhs);
+    }
+
+    const auto result {detail::d128_add_impl<detail::decimal128_fast_components>(
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_)};
+
+    return {result.sig, result.exp, result.sign};
+};
+
+constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    constexpr decimal128_fast zero {0, 0};
+
+    const auto res {detail::check_non_finite(lhs, rhs)};
+    if (res != zero)
+    {
+        return res;
+    }
+    #endif
+
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return lhs + (-rhs);
+    }
+
+    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
+
+    const auto result {detail::d128_sub_impl<detail::decimal128_fast_components>(
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
+            abs_lhs_bigger
+    )};
+
+    return {result.sig, result.exp, result.sign};
 }
 
 constexpr decimal128_fast::operator bool() const noexcept
