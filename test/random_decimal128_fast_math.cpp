@@ -336,7 +336,7 @@ void random_division(T lower, T upper)
     BOOST_TEST(isnan(decimal128_fast(dist(rng)) / std::numeric_limits<decimal128_fast>::quiet_NaN()));
     BOOST_TEST(isinf(decimal128_fast(dist(rng)) / decimal128_fast(0)));
 }
-/*
+
 template <typename T>
 void random_mixed_division(T lower, T upper)
 {
@@ -391,7 +391,8 @@ void random_mixed_division(T lower, T upper)
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
-                      << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
+                      << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2)
+                      << "\nDist: " << abs(res - res_int) << std::endl;
             // LCOV_EXCL_STOP
         }
     }
@@ -406,7 +407,7 @@ void random_mixed_division(T lower, T upper)
     BOOST_TEST(isinf(decimal128_fast(dist(rng)) / 0));
     BOOST_TEST(isinf(val1 / zero));
 }
-
+/*
 void random_and()
 {
     std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
@@ -920,25 +921,25 @@ int main()
     random_division(0, 5'000);
     random_division(0LL, 5'000LL);
     random_division(0, sqrt_int_max);
-    //random_mixed_division(0, 5'000);
-    //random_mixed_division(0LL, 5'000LL);
-    //random_mixed_division(0, sqrt_int_max);
+    random_mixed_division(0, 5'000);
+    random_mixed_division(0LL, 5'000LL);
+    random_mixed_division(0, sqrt_int_max);
 
     // Negative
     random_division(-5'000, 0);
     random_division(-5'000LL, 0LL);
     random_division(-sqrt_int_max, 0);
-    //random_mixed_division(-5'000, 0);
-    //random_mixed_division(-5'000LL, 0LL);
-    //random_mixed_division(-sqrt_int_max, 0);
+    random_mixed_division(-5'000, 0);
+    random_mixed_division(-5'000LL, 0LL);
+    random_mixed_division(-sqrt_int_max, 0);
 
     // Mixed
     random_division(-5'000, 5'000);
     random_division(-5'000LL, 5'000LL);
     random_division(-sqrt_int_max, sqrt_int_max);
-    //random_mixed_division(-5'000, 5'000);
-    //random_mixed_division(-5'000LL, 5'000LL);
-    //random_mixed_division(-sqrt_int_max, sqrt_int_max);
+    random_mixed_division(-5'000, 5'000);
+    random_mixed_division(-5'000LL, 5'000LL);
+    random_mixed_division(-sqrt_int_max, sqrt_int_max);
 
     // Spot checked values
     spot_check_sub(945501, 80);
