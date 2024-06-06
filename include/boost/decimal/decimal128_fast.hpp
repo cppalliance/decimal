@@ -554,8 +554,8 @@ constexpr auto operator<(const decimal128_fast& lhs, const decimal128_fast& rhs)
     }
 #endif
 
-    return less_parts_impl(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-                           rhs.significand_, rhs.biased_exponent(), rhs.sign_);
+    return less_parts_impl<decimal128>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                       rhs.significand_, rhs.biased_exponent(), rhs.sign_);
 }
 
 template <typename Integer>
