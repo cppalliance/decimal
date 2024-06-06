@@ -72,7 +72,7 @@ void random_addition(T lower, T upper)
     BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() + decimal128_fast{0,0}));
     BOOST_TEST(isnan(decimal128_fast{0,0} + std::numeric_limits<decimal128_fast>::quiet_NaN()));
 }
-/*
+
 template <typename T>
 void random_mixed_addition(T lower, T upper)
 {
@@ -107,7 +107,6 @@ void random_mixed_addition(T lower, T upper)
     BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() + dist(rng)));
     BOOST_TEST(isnan(dist(rng) + std::numeric_limits<decimal128_fast>::quiet_NaN()));
 }
-*/
 
 template <typename T>
 void random_subtraction(T lower, T upper)
@@ -144,7 +143,6 @@ void random_subtraction(T lower, T upper)
     BOOST_TEST(isnan(decimal128_fast{0,0} - std::numeric_limits<decimal128_fast>::quiet_NaN()));
 }
 
-/*
 template <typename T>
 void random_mixed_subtraction(T lower, T upper)
 {
@@ -203,7 +201,6 @@ void random_mixed_subtraction(T lower, T upper)
     BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() - dist(rng)));
     BOOST_TEST(isnan(dist(rng) - std::numeric_limits<decimal128_fast>::quiet_NaN()));
 }
-*/
 
 template <typename T>
 void spot_check_sub(T lhs, T rhs)
@@ -266,7 +263,6 @@ void random_multiplication(T lower, T upper)
     BOOST_TEST(isnan(decimal128_fast(dist(rng)) * std::numeric_limits<decimal128_fast>::quiet_NaN()));
 }
 
-/*
 template <typename T>
 void random_mixed_multiplication(T lower, T upper)
 {
@@ -282,6 +278,12 @@ void random_mixed_multiplication(T lower, T upper)
 
         const decimal128_fast res {dec1 * dec2};
         const decimal128_fast res_int {val1 * val2};
+
+        // Integers don't have a concept of negative 0
+        if (val1 * val2 == 0)
+        {
+            continue;
+        }
 
         if (!BOOST_TEST_EQ(res, res_int))
         {
@@ -301,7 +303,6 @@ void random_mixed_multiplication(T lower, T upper)
     BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * dist(rng)));
     BOOST_TEST(isnan(dist(rng) * std::numeric_limits<decimal128_fast>::quiet_NaN()));
 }
-*/
 
 template <typename T>
 void random_division(T lower, T upper)
@@ -341,7 +342,7 @@ void random_division(T lower, T upper)
     BOOST_TEST(isnan(decimal128_fast(dist(rng)) / std::numeric_limits<decimal128_fast>::quiet_NaN()));
     BOOST_TEST(isinf(decimal128_fast(dist(rng)) / decimal128_fast(0)));
 }
-/*
+
 template <typename T>
 void random_mixed_division(T lower, T upper)
 {
@@ -396,7 +397,8 @@ void random_mixed_division(T lower, T upper)
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
-                      << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
+                      << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2)
+                      << "\nDist: " << abs(res - res_int) << std::endl;
             // LCOV_EXCL_STOP
         }
     }
@@ -411,7 +413,7 @@ void random_mixed_division(T lower, T upper)
     BOOST_TEST(isinf(decimal128_fast(dist(rng)) / 0));
     BOOST_TEST(isinf(val1 / zero));
 }
-
+/*
 void random_and()
 {
     std::uniform_int_distribution<std::uint64_t> dist(0, 9'999'999'999'999'999);
@@ -859,38 +861,38 @@ int main()
     // Only positive values
     random_addition(0, 5'000'000);
     random_addition(0LL, 4'000'000'000'000LL);
-    //random_mixed_addition(0, 5'000'000);
-    //random_mixed_addition(0LL, 4'000'000'000'000LL);
+    random_mixed_addition(0, 5'000'000);
+    random_mixed_addition(0LL, 4'000'000'000'000LL);
 
     // Only two negative values
     random_addition(-5'000'000, 0);
     random_addition(-4'000'000'000'000LL, 0LL);
-    //random_mixed_addition(-5'000'000, 0);
-    //random_mixed_addition(-4'000'000'000'000LL, 0LL);
+    random_mixed_addition(-5'000'000, 0);
+    random_mixed_addition(-4'000'000'000'000LL, 0LL);
 
     // Mixed values
     random_addition(-5'000'000, 5'000'000);
     random_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
-    //random_mixed_addition(-5'000'000, 5'000'000);
-    //random_mixed_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
+    random_mixed_addition(-5'000'000, 5'000'000);
+    random_mixed_addition(-5'000'000'000'000LL, 5'000'000'000'000LL);
 
     // Subtraction
     random_subtraction(0, 5'000'000);
     random_subtraction(0LL, 4'000'000'000'000LL);
-    //random_mixed_subtraction(0, 5'000'000);
-    //random_mixed_subtraction(0LL, 4'000'000'000'000LL);
+    random_mixed_subtraction(0, 5'000'000);
+    random_mixed_subtraction(0LL, 4'000'000'000'000LL);
 
     // Only two negative values
     random_subtraction(-5'000'000, 0);
     random_subtraction(-4'000'000'000'000LL, 0LL);
-    //random_mixed_subtraction(-5'000'000, 0);
-    //random_mixed_subtraction(-4'000'000'000'000LL, 0LL);
+    random_mixed_subtraction(-5'000'000, 0);
+    random_mixed_subtraction(-4'000'000'000'000LL, 0LL);
 
     // Mixed values
     random_subtraction(-5'000'000, 5'000'000);
     random_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
-    //random_mixed_subtraction(-5'000'000, 5'000'000);
-    //random_mixed_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
+    random_mixed_subtraction(-5'000'000, 5'000'000);
+    random_mixed_subtraction(-4'000'000'000'000LL, 4'000'000'000'000LL);
 
     // Multiplication
     const auto sqrt_int_max = static_cast<int>(std::sqrt(static_cast<double>((std::numeric_limits<int>::max)())));
@@ -899,25 +901,25 @@ int main()
     random_multiplication(0, 5'000);
     random_multiplication(0LL, 5'000LL);
     random_multiplication(0, sqrt_int_max);
-    //random_mixed_multiplication(0, 5'000);
-    //random_mixed_multiplication(0LL, 5'000LL);
-    //random_mixed_multiplication(0, sqrt_int_max);
+    random_mixed_multiplication(0, 5'000);
+    random_mixed_multiplication(0LL, 5'000LL);
+    random_mixed_multiplication(0, sqrt_int_max);
 
     // Negative
     random_multiplication(-5'000, 0);
     random_multiplication(-5'000LL, 0LL);
     random_multiplication(-sqrt_int_max, 0);
-    //random_mixed_multiplication(-5'000, 0);
-    //random_mixed_multiplication(-5'000LL, 0LL);
-    //random_mixed_multiplication(-sqrt_int_max, 0);
+    random_mixed_multiplication(-5'000, 0);
+    random_mixed_multiplication(-5'000LL, 0LL);
+    random_mixed_multiplication(-sqrt_int_max, 0);
 
     // Mixed
     random_multiplication(-5'000, 5'000);
     random_multiplication(-5'000LL, 5'000LL);
     random_multiplication(-sqrt_int_max, sqrt_int_max);
-    //random_mixed_multiplication(-5'000, 5'000);
-    //random_mixed_multiplication(-5'000LL, 5'000LL);
-    //random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
+    random_mixed_multiplication(-5'000, 5'000);
+    random_mixed_multiplication(-5'000LL, 5'000LL);
+    random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
 
     // Division
 
@@ -925,25 +927,25 @@ int main()
     random_division(0, 5'000);
     random_division(0LL, 5'000LL);
     random_division(0, sqrt_int_max);
-    //random_mixed_division(0, 5'000);
-    //random_mixed_division(0LL, 5'000LL);
-    //random_mixed_division(0, sqrt_int_max);
+    random_mixed_division(0, 5'000);
+    random_mixed_division(0LL, 5'000LL);
+    random_mixed_division(0, sqrt_int_max);
 
     // Negative
     random_division(-5'000, 0);
     random_division(-5'000LL, 0LL);
     random_division(-sqrt_int_max, 0);
-    //random_mixed_division(-5'000, 0);
-    //random_mixed_division(-5'000LL, 0LL);
-    //random_mixed_division(-sqrt_int_max, 0);
+    random_mixed_division(-5'000, 0);
+    random_mixed_division(-5'000LL, 0LL);
+    random_mixed_division(-sqrt_int_max, 0);
 
     // Mixed
     random_division(-5'000, 5'000);
     random_division(-5'000LL, 5'000LL);
     random_division(-sqrt_int_max, sqrt_int_max);
-    //random_mixed_division(-5'000, 5'000);
-    //random_mixed_division(-5'000LL, 5'000LL);
-    //random_mixed_division(-sqrt_int_max, sqrt_int_max);
+    random_mixed_division(-5'000, 5'000);
+    random_mixed_division(-5'000LL, 5'000LL);
+    random_mixed_division(-sqrt_int_max, sqrt_int_max);
 
     // Spot checked values
     spot_check_sub(945501, 80);
