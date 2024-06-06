@@ -782,11 +782,11 @@ constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
 
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+    detail::normalize<decimal128>(lhs_sig, lhs_exp);
 
     auto rhs_sig {rhs.full_significand()};
     auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize<decimal64>(rhs_sig, rhs_exp);
+    detail::normalize<decimal128>(rhs_sig, rhs_exp);
 
     const auto result {detail::d128_add_impl<detail::decimal128_fast_components>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
@@ -885,11 +885,11 @@ constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
+    detail::normalize<decimal128>(sig_lhs, exp_lhs);
 
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
+    detail::normalize<decimal128>(sig_rhs, exp_rhs);
 
     const auto result {detail::d128_sub_impl<detail::decimal128_fast_components>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
