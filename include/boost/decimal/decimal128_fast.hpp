@@ -295,6 +295,11 @@ public:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
+    friend constexpr auto copysignd128f(decimal128_fast mag, decimal128_fast sgn) noexcept -> decimal128_fast;
+    friend constexpr auto scalblnd128f(decimal128_fast num, long exp) noexcept -> decimal128_fast;
+    friend constexpr auto scalbnd128f(decimal128_fast num, int exp) noexcept -> decimal128_fast;
+    friend constexpr auto fmad128f(decimal128_fast x, decimal128_fast y, decimal128 z) noexcept -> decimal128;
+
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
     // LCOV_EXCL_START
@@ -1352,6 +1357,33 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::
 constexpr decimal128_fast::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);
+}
+
+constexpr auto copysignd128f(decimal128_fast mag, decimal128_fast sgn) noexcept -> decimal128_fast
+{
+    mag.sign_ = sgn.sign_;
+    return mag;
+}
+
+constexpr auto scalblnd128f(decimal128_fast num, long exp) noexcept -> decimal128_fast
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    constexpr decimal128_fast zero {0, 0};
+
+    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    {
+        return num;
+    }
+    #endif
+
+    num.exponent_ = num.biased_exponent() + exp;
+
+    return num;
+}
+
+constexpr auto scalbnd128f(decimal128_fast num, int exp) noexcept -> decimal128_fast
+{
+    return scalblnd128f(num, static_cast<long>(exp));
 }
 
 } // namespace decimal

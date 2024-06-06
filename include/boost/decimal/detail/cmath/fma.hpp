@@ -300,6 +300,11 @@ constexpr auto fmad64f(decimal64_fast x, decimal64_fast y, decimal64_fast z) noe
     return {result.sig, result.exp, result.sign};
 }
 
+constexpr auto fmad128f(decimal128_fast x, decimal128_fast y, decimal128_fast z) noexcept -> decimal128_fast
+{
+    return x * y + z;
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
     return fmad32(x, y, z);
@@ -323,6 +328,11 @@ BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32_fast x, decimal32_fast y, deci
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal64_fast x, decimal64_fast y, decimal64_fast z) noexcept -> decimal64_fast
 {
     return fmad64f(x, y, z);
+}
+
+BOOST_DECIMAL_EXPORT constexpr auto fma(decimal128_fast x, decimal128_fast y, decimal128_fast z) noexcept -> decimal128_fast
+{
+    return fmad128f(x, y, z);
 }
 
 } //namespace decimal
