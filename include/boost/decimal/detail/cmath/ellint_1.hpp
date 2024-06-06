@@ -65,15 +65,15 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
   }
   else
   {
-    constexpr int small_phi_order
-    {
-          std::numeric_limits<T>::digits10 < 10 ? 1
-        : std::numeric_limits<T>::digits10 < 20 ? 2
-        :                                         5
-    };
+    constexpr T small_phi_limit =
+          std::numeric_limits<T>::digits10 < 10 ? T { 5, -2 }
+        : std::numeric_limits<T>::digits10 < 20 ? T { 1, -2 }
+        :                                         T { 1, -4 };
 
-    if (phi < T { 1, -small_phi_order })
+    if (phi < small_phi_limit)
     {
+      // TODO(ckormanyos) Extend the Pade approximant to orders { 5, 4 }.
+
       // PadeApproximant[EllipticF[phi, m2], {phi, 0, {4, 4}}]
       // FullSimplify[%]
       // HornerForm[Numerator[Out[2]], phi]
