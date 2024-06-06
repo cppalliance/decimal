@@ -1457,7 +1457,7 @@ constexpr auto scalblnd128f(decimal128_fast num, long exp) noexcept -> decimal12
     }
     #endif
 
-    num.exponent_ = num.biased_exponent() + exp;
+    num.exponent_ = static_cast<decimal128_fast::exponent_type>(static_cast<long>(num.biased_exponent()) + exp);
 
     return num;
 }
