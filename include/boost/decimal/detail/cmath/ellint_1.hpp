@@ -67,23 +67,25 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
   {
     constexpr int small_phi_order
     {
-          std::numeric_limits<T>::digits10 < 10 ? 2
-        : std::numeric_limits<T>::digits10 < 20 ? 4
-        :                                         8
+          std::numeric_limits<T>::digits10 < 10 ? 1
+        : std::numeric_limits<T>::digits10 < 20 ? 2
+        :                                         5
     };
 
     if (phi < T { 1, -small_phi_order })
     {
-      // PadeApproximant[EllipticF[phi, m2], {phi, 0, {4, 3}}]
+      // PadeApproximant[EllipticF[phi, m2], {phi, 0, {4, 4}}]
       // FullSimplify[%]
+      // HornerForm[Numerator[Out[2]], phi]
+      // HornerForm[Denominator[Out[2]], phi]
       // Then manually edit the interior field to regain HornerForm[poly, phi].
 
       const T phi_sq { phi * phi };
 
       const T m2 { (m * m) };
 
-      const T top { phi * (-60 + (-12 + 17 * m2) * phi_sq) };
-      const T bot { -60 + 3 * (-4 + 9 * m2) * phi_sq };
+      const T top { phi * (-10080 + 14280 * m2 + (-960 + m2 * (7440 - 7340 * m2)) * phi_sq) };
+      const T bot { -10080 + 14280 * m2 + phi_sq * (-960 + m2 * (9120 - 9720 * m2) + m2 * (-176 - 288 * m2 + 549 * (m2 * m2)) * phi_sq) };
 
       result = top / bot;
     }

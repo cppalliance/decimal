@@ -37,6 +37,7 @@
 #include <iostream>
 #include <limits>
 #include <random>
+#include <sstream>
 #include <string>
 
 template<typename DecimalType> auto my_zero() -> DecimalType&;
@@ -64,14 +65,17 @@ using namespace boost::decimal;
 template <typename T>
 void test_comp_ellint()
 {
-  std::uniform_real_distribution<float> dist(-0.998F, 0.998F);
-
-  rng.seed(local::time_point<typename std::mt19937_64::result_type>());
+  std::uniform_real_distribution<float> dist(-0.999F, 0.999F);
 
   constexpr auto local_N = N;
 
   for (std::size_t i {}; i < local_N; ++i)
   {
+    if((i % 0x10000U) == 0U)
+    {
+      rng.seed(local::time_point<typename std::mt19937_64::result_type>());
+    }
+
     const auto val {dist(rng)};
     const T dec_val {val};
 
@@ -79,13 +83,17 @@ void test_comp_ellint()
     const auto dec_res {static_cast<float>(comp_ellint_1(dec_val))};
     const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-    if (!BOOST_TEST(std::abs(distance) < 384))
+    if (!BOOST_TEST(std::abs(distance) < 128))
     {
       // LCOV_EXCL_START
-      std::cerr << "arg: " << dec_val
-                << "\n Float: " << float_res
-                << "\n  Dec: " << dec_res
-                << "\n Dist: " << distance << std::endl;
+      std::stringstream strm;
+
+      strm <<   "arg  : " << std::setprecision(std::numeric_limits<T>::digits10) << dec_val
+           << "\nFloat: " << std::setprecision(std::numeric_limits<T>::digits10) << float_res
+           << "\nDec  : " << std::setprecision(std::numeric_limits<T>::digits10) << dec_res
+           << "\nDist : " << std::setprecision(std::numeric_limits<T>::digits10) << distance;
+
+      std::cerr << strm.str() << std::endl;
       // LCOV_EXCL_STOP
     }
   }
@@ -94,15 +102,18 @@ void test_comp_ellint()
 template <typename T>
 void test_ellint()
 {
-  std::uniform_real_distribution<float> dist_k  (-0.998F, 0.998F);
-  std::uniform_real_distribution<float> dist_phi(-1.0F, 1.0F);
-
-  rng.seed(local::time_point<typename std::mt19937_64::result_type>());
+  std::uniform_real_distribution<float> dist_k  (-0.999F, 0.999F);
+  std::uniform_real_distribution<float> dist_phi(-0.99999F, 0.99999F);
 
   constexpr auto local_N = N;
 
   for (std::size_t i {}; i < local_N; ++i)
   {
+    if((i % 0x10000U) == 0U)
+    {
+      rng.seed(local::time_point<typename std::mt19937_64::result_type>());
+    }
+
     const auto k_val {dist_k(rng)};
     const auto phi_val {dist_phi(rng)};
 
@@ -113,12 +124,18 @@ void test_ellint()
     const auto dec_res {static_cast<float>(ellint_1(k_dec_val, phi_dec_val))};
     const auto distance {boost::math::float_distance(float_res, dec_res)};
 
-    if (!BOOST_TEST(std::abs(distance) < 384))
+    if (!BOOST_TEST(std::abs(distance) < 128))
     {
       // LCOV_EXCL_START
-      std::cerr << "Float: " << float_res
-                << "\n  Dec: " << dec_res
-                << "\n Dist: " << distance << std::endl;
+      std::stringstream strm;
+
+      strm <<   "arg_k  : " << std::setprecision(std::numeric_limits<T>::digits10) << k_dec_val
+           << "\narg_phi: " << std::setprecision(std::numeric_limits<T>::digits10) << phi_dec_val
+           << "\nFloat  : " << std::setprecision(std::numeric_limits<T>::digits10) << float_res
+           << "\nDec    : " << std::setprecision(std::numeric_limits<T>::digits10) << dec_res
+           << "\nDist   : " << std::setprecision(std::numeric_limits<T>::digits10) << distance;
+
+      std::cerr << strm.str() << std::endl;
       // LCOV_EXCL_STOP
     }
   }
@@ -281,11 +298,13 @@ namespace local
   {
     using decimal_type = boost::decimal::decimal64;
 
-    using val_ctrl_array_type = std::array<double, 5U>;
+    using val_ctrl_array_type = std::array<double, 7U>;
 
     const val_ctrl_array_type ctrl_values =
     {{
-      // Table[N[EllipticF[10^(-n), (1/3)^2], 17], {n, 5, 9, 1}]
+      // Table[N[EllipticF[10^(-n), (1/3)^2], 17], {n, 3, 9, 1}]
+      0.0010000000185185157,
+      0.00010000000001851852,
       0.000010000000000018519,
       1.0000000000000185E-6,
       1.0000000000000002E-7,
@@ -295,7 +314,7 @@ namespace local
 
     std::array<decimal_type, std::tuple_size<val_ctrl_array_type>::value> ellint_1_values { };
 
-    int nx { 5 };
+    int nx { 3 };
 
     bool result_is_ok { true };
 
@@ -303,7 +322,7 @@ namespace local
 
     for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<val_ctrl_array_type>::value; ++i)
     {
-      // Table[N[EllipticF[10^(-n), (1/3)^2], 17], {n, 5, 9, 1}]
+      // Table[N[EllipticF[10^(-n), (1/3)^2], 17], {n, 3, 9, 1}]
 
       const decimal_type phi_arg = { 1, -nx };
 
