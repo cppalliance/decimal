@@ -279,6 +279,12 @@ void random_mixed_multiplication(T lower, T upper)
         const decimal128_fast res {dec1 * dec2};
         const decimal128_fast res_int {val1 * val2};
 
+        // Integers don't have a concept of negative 0
+        if (val1 * val2 == 0)
+        {
+            continue;
+        }
+
         if (!BOOST_TEST_EQ(res, res_int))
         {
             // LCOV_EXCL_START
