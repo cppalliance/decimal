@@ -60,6 +60,12 @@ struct decimal_val<decimal128>
     static constexpr int value = 128;
 };
 
+template <>
+struct decimal_val<decimal128_fast>
+{
+    static constexpr int value = 129;
+};
+
 template <typename T>
 constexpr int decimal_val_v = decimal_val<T>::value;
 
