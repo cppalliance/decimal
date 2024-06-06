@@ -182,6 +182,7 @@ int main()
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_asin<decimal128>();
+    test_asin<decimal128_fast>();
     #endif
 
     test_asin<decimal32_fast>();

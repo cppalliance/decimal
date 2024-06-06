@@ -253,6 +253,31 @@ public:
     friend constexpr auto operator/(Integer lhs, decimal128_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast);
 
+    // Compound Arithmetic Operators
+    constexpr auto operator+=(decimal128_fast rhs) noexcept -> decimal128_fast&;
+
+    template <typename Integer>
+    constexpr auto operator+=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&);
+
+    constexpr auto operator-=(decimal128_fast rhs) noexcept -> decimal128_fast&;
+
+    template <typename Integer>
+    constexpr auto operator-=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&);
+
+    constexpr auto operator*=(decimal128_fast rhs) noexcept -> decimal128_fast&;
+
+    template <typename Integer>
+    constexpr auto operator*=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&);
+
+    constexpr auto operator/=(decimal128_fast rhs) noexcept -> decimal128_fast&;
+
+    template <typename Integer>
+    constexpr auto operator/=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&);
+
     // Conversions
     explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
@@ -1242,6 +1267,62 @@ constexpr auto operator%(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
 
     return r;
 };
+
+constexpr auto decimal128_fast::operator+=(decimal128_fast rhs) noexcept -> decimal128_fast&
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal128_fast::operator+=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&)
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr auto decimal128_fast::operator-=(decimal128_fast rhs) noexcept -> decimal128_fast&
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal128_fast::operator-=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&)
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+constexpr auto decimal128_fast::operator*=(decimal128_fast rhs) noexcept -> decimal128_fast&
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal128_fast::operator*=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&)
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+constexpr auto decimal128_fast::operator/=(decimal128_fast rhs) noexcept -> decimal128_fast&
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal128_fast::operator/=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&)
+{
+    *this = *this / rhs;
+    return *this;
+}
 
 constexpr decimal128_fast::operator bool() const noexcept
 {
