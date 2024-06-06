@@ -18,6 +18,7 @@ class decimal32_fast;
 class decimal64;
 class decimal64_fast;
 class decimal128;
+class decimal128_fast;
 
 } // namespace decimal
 } // namespace boost
@@ -57,6 +58,13 @@ template <>
 class numeric_limits<boost::decimal::decimal128>;
 #else
 struct numeric_limits<boost::decimal::decimal128>;
+#endif
+
+template <>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal128_fast>;
+#else
+struct numeric_limits<boost::decimal::decimal128_fast>;
 #endif
 
 } // Namespace std
