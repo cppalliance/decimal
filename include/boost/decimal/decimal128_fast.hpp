@@ -1024,6 +1024,7 @@ constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
     }
     #endif
 
+    // TODO(mborland): Is trimming the zeros really necessary? Doesn't seem like it
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
     const auto lhs_zeros {detail::remove_trailing_zeros(lhs_sig)};

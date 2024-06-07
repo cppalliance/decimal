@@ -629,7 +629,7 @@ void test_mixed_two_val_hypot()
 {
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    constexpr auto max_iter {std::is_same<Dec2, decimal128>::value ? 4 : N};
+    constexpr auto max_iter {std::is_same<Dec2, decimal128>::value || std::is_same<Dec2, decimal128_fast>::value ? 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};

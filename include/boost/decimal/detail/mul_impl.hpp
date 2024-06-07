@@ -137,6 +137,7 @@ constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         sign = false;
     }
 
+    BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0,0));
     return {res_sig.low, res_exp, sign};
 }
 
