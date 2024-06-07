@@ -1432,6 +1432,9 @@ int main()
     test_three_val_hypot<decimal64_fast>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+    test_sqrt<decimal128>();
+    test_sqrt<decimal128_fast>();
+
     test_two_val_hypot<decimal128>();
     test_three_val_hypot<decimal128>();
     test_mixed_two_val_hypot<decimal64, decimal128>();
