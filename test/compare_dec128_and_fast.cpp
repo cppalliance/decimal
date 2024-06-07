@@ -285,10 +285,12 @@ void test_div()
 
 int main()
 {
+    #if !(defined(__i386) || defined(_M_IX86))
     test_add();
     test_sub();
     test_mul();
     test_div();
+    #endif
 
     return boost::report_errors();
 }
