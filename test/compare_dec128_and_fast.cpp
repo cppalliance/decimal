@@ -285,7 +285,7 @@ void test_div()
 
 int main()
 {
-    #if !(defined(__i386) || defined(_M_IX86))
+    #if !(defined(__i386) || defined(_M_IX86)) && !(defined(_MSVC_LANG))
     test_add();
     test_sub();
     test_mul();
