@@ -458,26 +458,28 @@ jobs:
             cxxstd: "14,17,20,latest"
             addrmd: "32"
             os: windows-2019
-          - toolset: msvc-14.3
-            cxxstd: "14,17,20,latest"
-            addrmd: "32"
-            os: windows-2022
+          # B2 does not work with MSVC 17.10. Once it's updated we can re-enable these tests
+          # Still covered in drone
+          #- toolset: msvc-14.3
+          #  cxxstd: "14,17,20,latest"
+          #  addrmd: "32"
+          #  os: windows-2022
           - toolset: msvc-14.2
             cxxstd: "14,17,20,latest"
             addrmd: "64"
             os: windows-2019
-          - toolset: msvc-14.3
-            cxxstd: "14,17,20,latest"
-            addrmd: "64"
-            os: windows-2022
-          - toolset: clang-win
-            cxxstd: "14,17,latest"
-            addrmd: "32"
-            os: windows-2022
-          - toolset: clang-win
-            cxxstd: "14,17,latest"
-            addrmd: "64"
-            os: windows-2022
+          #- toolset: msvc-14.3
+          #  cxxstd: "14,17,20,latest"
+          #  addrmd: "64"
+          #  os: windows-2022
+          #- toolset: clang-win
+          #  cxxstd: "14,17,latest"
+          #  addrmd: "32"
+          #  os: windows-2022
+          #- toolset: clang-win
+          #  cxxstd: "14,17,latest"
+          #  addrmd: "64"
+          #  os: windows-2022
           - toolset: gcc
             cxxstd: "03,11,14,17,2a"
             addrmd: "64"
