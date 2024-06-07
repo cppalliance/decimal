@@ -332,36 +332,6 @@ public:
     friend constexpr auto scalblnd128f(decimal128_fast num, long exp) noexcept -> decimal128_fast;
     friend constexpr auto scalbnd128f(decimal128_fast num, int exp) noexcept -> decimal128_fast;
     friend constexpr auto fmad128f(decimal128_fast x, decimal128_fast y, decimal128 z) noexcept -> decimal128;
-
-    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
-
-    // LCOV_EXCL_START
-    // TODO(mborland): Fix with STL bindings and delete
-    template <typename charT, typename traits>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128_fast& d) -> std::basic_ostream<charT, traits>&
-    {
-        if (d.sign_)
-        {
-            os << "-";
-        }
-        else
-        {
-            os << "+";
-        }
-
-        os << d.significand_ << "e";
-        const auto biased_exp {d.biased_exponent()};
-        if (biased_exp > 0)
-        {
-            os << '+';
-        }
-        os << biased_exp;
-
-        return os;
-    }
-    // LCOV_EXCL_STOP
-
-    #endif
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS

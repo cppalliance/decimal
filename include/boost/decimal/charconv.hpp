@@ -113,6 +113,11 @@ BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* la
     return detail::from_chars_general_impl(first, last, value, fmt);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal128_fast& value, chars_format fmt = chars_format::general) noexcept
+{
+    return detail::from_chars_general_impl(first, last, value, fmt);
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 // to_chars and implementation
 // ---------------------------------------------------------------------------------------------------------------------
@@ -242,7 +247,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     int exp {};
     auto significand {frexp10(value, &exp)};
 
-    using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, uint128, std::uint64_t>;
+    using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value || std::is_same<TargetDecimalType, decimal128_fast>::value, uint128, std::uint64_t>;
     auto significand_digits = num_digits(significand);
     exp += significand_digits - 1;
     bool append_zeros = false;
@@ -473,7 +478,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         }
     }
 
-    using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, uint128, std::uint64_t>;
+    using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value ||
+                                         std::is_same<TargetDecimalType, decimal128_fast>::value, uint128, std::uint64_t>;
     auto r = to_chars_integer_impl<uint_type, uint_type>(first, last, significand, 10);
 
     if (BOOST_DECIMAL_UNLIKELY(!r))
@@ -579,7 +585,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value, int precision = -1) noexcept -> to_chars_result
 {
-    using Unsigned_Integer = std::conditional_t<!std::is_same<TargetDecimalType, decimal128>::value, std::uint64_t, uint128>;
+    using Unsigned_Integer = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value ||
+                                                std::is_same<TargetDecimalType, decimal128_fast>::value, uint128, std::uint64_t>;
 
     if (signbit(value))
     {
@@ -859,6 +866,26 @@ BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* la
 }
 
 BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128 value, chars_format fmt, int precision) noexcept -> to_chars_result
+{
+    if (precision < 0)
+    {
+        precision = 6;
+    }
+
+    return detail::to_chars_impl(first, last, value, fmt, precision);
+}
+
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128_fast value) noexcept -> to_chars_result
+{
+    return detail::to_chars_impl(first, last, value);
+}
+
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128_fast value, chars_format fmt) noexcept -> to_chars_result
+{
+    return detail::to_chars_impl(first, last, value, fmt);
+}
+
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128_fast value, chars_format fmt, int precision) noexcept -> to_chars_result
 {
     if (precision < 0)
     {
