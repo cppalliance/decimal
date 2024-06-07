@@ -144,7 +144,7 @@ void test_sub()
 
         const decimal128_fast dec128_fast_1 {val1};
         const decimal128_fast dec128_fast_2 {val2};
-        const decimal128_fast dec128_fast_res {dec128_fast_1 + dec128_fast_2};
+        const decimal128_fast dec128_fast_res {dec128_fast_1 - dec128_fast_2};
 
         if (!BOOST_TEST_EQ(static_cast<double>(dec128_res), static_cast<double>(dec128_fast_res)))
         {
@@ -176,7 +176,7 @@ void test_mul()
 
         const decimal128_fast dec128_fast_1 {val1};
         const decimal128_fast dec128_fast_2 {val2};
-        const decimal128_fast dec128_fast_res {dec128_fast_1 + dec128_fast_2};
+        const decimal128_fast dec128_fast_res {dec128_fast_1 * dec128_fast_2};
 
         if (!BOOST_TEST_EQ(static_cast<double>(dec128_res), static_cast<double>(dec128_fast_res)))
         {
@@ -205,7 +205,7 @@ void test_mul()
 
         const decimal128_fast dec128_fast_1 {val1};
         const decimal128_fast dec128_fast_2 {val2};
-        const decimal128_fast dec128_fast_res {dec128_fast_1 + dec128_fast_2};
+        const decimal128_fast dec128_fast_res {dec128_fast_1 * dec128_fast_2};
 
         if (!BOOST_TEST_EQ(static_cast<double>(dec128_res), static_cast<double>(dec128_fast_res)))
         {
@@ -237,7 +237,7 @@ void test_div()
 
         const decimal128_fast dec128_fast_1 {val1};
         const decimal128_fast dec128_fast_2 {val2};
-        const decimal128_fast dec128_fast_res {dec128_fast_1 + dec128_fast_2};
+        const decimal128_fast dec128_fast_res {dec128_fast_1 / dec128_fast_2};
 
         if (!BOOST_TEST_EQ(static_cast<double>(dec128_res), static_cast<double>(dec128_fast_res)))
         {
@@ -266,7 +266,7 @@ void test_div()
 
         const decimal128_fast dec128_fast_1 {val1};
         const decimal128_fast dec128_fast_2 {val2};
-        const decimal128_fast dec128_fast_res {dec128_fast_1 + dec128_fast_2};
+        const decimal128_fast dec128_fast_res {dec128_fast_1 / dec128_fast_2};
 
         if (!BOOST_TEST_EQ(static_cast<double>(dec128_res), static_cast<double>(dec128_fast_res)))
         {
