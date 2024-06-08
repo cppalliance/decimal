@@ -789,8 +789,8 @@ constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
     detail::normalize<decimal128>(rhs_sig, rhs_exp);
 
     const auto result {detail::d128_add_impl<detail::decimal128_fast_components>(
-            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_)};
+            lhs_sig, lhs_exp, lhs.sign_,
+            rhs_sig, rhs_exp, rhs.sign_)};
 
     return {result.sig, result.exp, result.sign};
 };
