@@ -483,8 +483,6 @@ namespace local
 
 int main()
 {
-  static_cast<void>(loops);
-
   test_comp_ellint<decimal32, float>();
   test_comp_ellint<decimal64, double>();
 

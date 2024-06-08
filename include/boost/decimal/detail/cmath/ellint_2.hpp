@@ -107,7 +107,7 @@ constexpr auto ellint_2_impl(T m, T phi) noexcept
       T Km  { };
       T Em  { };
 
-      detail::ellint_detail::elliptic_series::agm(phi_scaled, m, Fpm, Km, &Em, &result);
+      detail::ellint_detail::elliptic_series::agm(phi_scaled, m * m, Fpm, Km, &Em, &result);
 
       if(b_neg)
       {
@@ -150,7 +150,7 @@ constexpr auto comp_ellint_2_impl(T m) noexcept
     T Fpm { };
     T Km  { };
 
-    detail::ellint_detail::elliptic_series::agm(zero, m, Fpm, Km, &result);
+    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, Km, &result);
   }
 
   return result;
