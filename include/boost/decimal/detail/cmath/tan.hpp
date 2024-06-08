@@ -47,40 +47,7 @@ constexpr auto tan(T x) noexcept
     }
     else
     {
-        // Perform argument reduction and subsequent computation of the result.
-
-        // Given x = k * (pi/2) + r, compute n = (k % 4).
-
-        // | n |  sin(x) |  cos(x) |  sin(x)/cos(x) |
-        // |----------------------------------------|
-        // | 0 |  sin(r) |  cos(r) |  sin(r)/cos(r) |
-        // | 1 |  cos(r) | -sin(r) | -cos(r)/sin(r) |
-        // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
-        // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
-
-        #if (defined(_MSC_VER) && (_MSC_VER < 1920))
-        const auto my_pi_half = numbers::pi_v<T> / 2;
-        #else
-        constexpr auto my_pi_half = numbers::pi_v<T> / 2;
-        #endif
-
-        int k { };
-        auto r { remquo(x, my_pi_half, &k) };
-
-        const auto n = static_cast<unsigned>(k % 4);
-
-        switch(n)
-        {
-            case 1U:
-            case 3U:
-                result = -detail::cos_series_expansion(r) / detail::sin_series_expansion(r);
-                break;
-            case 0U:
-            case 2U:
-            default:
-                result = detail::sin_series_expansion(r) / detail::cos_series_expansion(r);
-                break;
-        }
+        result = sin(x) / cos(x);
     }
 
     return result;

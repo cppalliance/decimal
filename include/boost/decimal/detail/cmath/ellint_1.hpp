@@ -66,26 +66,27 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
   else
   {
     constexpr T small_phi_limit =
-          std::numeric_limits<T>::digits10 < 10 ? T { 5, -2 }
+          std::numeric_limits<T>::digits10 < 10 ? T { 1, -2 }
         : std::numeric_limits<T>::digits10 < 20 ? T { 1, -2 }
         :                                         T { 1, -4 };
 
     if (phi < small_phi_limit)
     {
-      // TODO(ckormanyos) Extend the Pade approximant to orders { 5, 4 }.
-
-      // PadeApproximant[EllipticF[phi, m2], {phi, 0, {4, 4}}]
+      // PadeApproximant[EllipticF[phi, m2], {phi, 0, {6, 5}}]
       // FullSimplify[%]
       // HornerForm[Numerator[Out[2]], phi]
       // HornerForm[Denominator[Out[2]], phi]
-      // Then manually edit the interior field to regain HornerForm[poly, phi].
+
+      // Then further collect factors of m2 in the numerator
+      // and denominator manually with HornerForm[poly, m],
+      // and finally get close to C-language form with CForm[].
 
       const T phi_sq { phi * phi };
 
       const T m2 { (m * m) };
 
-      const T top { phi * (-10080 + 14280 * m2 + (-960 + m2 * (7440 - 7340 * m2)) * phi_sq) };
-      const T bot { -10080 + 14280 * m2 + phi_sq * (-960 + m2 * (9120 - 9720 * m2) + m2 * (-176 - 288 * m2 + 549 * (m2 * m2)) * phi_sq) };
+      const T top { phi*(-2661120 + m2*(-4354560 + 8300880*m2) + phi_sq*(-349440 + m2*(-262080 + (6683040 - 6460020*m2)*m2) + (-19200 + m2*(-263296 + m2*(997488 + m2*(-1325988 + 621441*m2))))*phi_sq)) };
+      const T bot { -2661120 + m2*(-4354560 + 8300880*m2) + phi_sq*(-349440 + m2*(181440 + (7408800 - 7843500*m2)*m2) + (-19200 + m2*(-293760 + m2*(1021680 + m2*(-1957500 + 1306125*m2))))*phi_sq) };
 
       result = top / bot;
     }
@@ -93,7 +94,8 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
     {
       constexpr T my_pi_half { numbers::pi_v<T> / 2 };
 
-      T k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
+      int k_pi = static_cast<int>(phi / numbers::pi_v<T>);
+
       T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
 
       const bool b_neg { phi_scaled > my_pi_half };
@@ -107,7 +109,7 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 
       T Km { };
 
-      detail::ellint_detail::elliptic_series::agm(phi_scaled, m, result, Km);
+      detail::ellint_detail::elliptic_series::agm(phi_scaled, m * m, result, Km);
 
       if(b_neg)
       {
@@ -149,7 +151,7 @@ constexpr auto comp_ellint_1_impl(T m) noexcept
 
     T Fpm { };
 
-    detail::ellint_detail::elliptic_series::agm(zero, m, Fpm, result);
+    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, result);
   }
 
   return result;

@@ -25,7 +25,7 @@ namespace elliptic_series {
 
 template <typename T>
 constexpr auto agm(T  phi,
-                   T  mk,
+                   T  m2,
                    T& Fpm,
                    T& Km,
                    T* const pEm  = nullptr,
@@ -63,7 +63,7 @@ constexpr auto agm(T  phi,
 
   constexpr T one  { 1 };
 
-  if(mk == one)
+  if(m2 == one)
   {
     if(pEm != nullptr) { *pEm = one; }
 
@@ -82,7 +82,7 @@ constexpr auto agm(T  phi,
     constexpr T half { 5 , -1 };
 
     T a0    { one };
-    T b0    { sqrt(one - mk * mk) };
+    T b0    { sqrt(one - m2) };
     T phi_n { phi };
 
     std::uint32_t p2 { UINT32_C(1) };
@@ -91,12 +91,12 @@ constexpr auto agm(T  phi,
 
     const bool has_e { ((pEm  != nullptr) || (pEpm != nullptr)) };
 
-    T cn_2ncn_inner_prod      = (has_e ? (mk * mk) / 2 : zero);
+    T cn_2ncn_inner_prod      = (has_e ? m2 / 2 : zero);
     T sin_phi_n_cn_inner_prod = zero;
 
     const T break_check { 9, -1 - (std::numeric_limits<T>::digits / 2) };
 
-    for(int n = 1; n < std::numeric_limits<std::uint32_t>::digits; ++n)
+    for(int n = 0; n < std::numeric_limits<std::uint32_t>::digits; ++n)
     {
       an = (a0 + b0) / 2;
 
@@ -132,13 +132,11 @@ constexpr auto agm(T  phi,
       }
     }
 
-    const T one_over_an { one / an };
-
-    Fpm = phi_n * one_over_an;
+    Fpm = phi_n / an;
 
     if(!phi_is_pi_half) { Fpm /= p2; }
 
-    Km = my_pi_half * one_over_an;
+    Km = my_pi_half / an;
 
     if(has_e)
     {

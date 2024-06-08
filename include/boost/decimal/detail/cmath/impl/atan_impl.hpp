@@ -91,50 +91,18 @@ struct atan_table_imp
          ::boost::decimal::decimal32_fast { UINT64_C(99999999877886492), -17 },
          ::boost::decimal::decimal32_fast { UINT64_C(23032664387910606), -29 },
      }};
-
-    static constexpr std::array<::boost::decimal::decimal64, 11> d64_coeffs =
-    {{
-        ::boost::decimal::decimal64 { UINT64_C(61037779951304161), -18, true },
-        ::boost::decimal::decimal64 { UINT64_C(10723099589331457), -17 },
-        ::boost::decimal::decimal64 { UINT64_C(22515613909953665), -18 },
-        ::boost::decimal::decimal64 { UINT64_C(15540713402718176), -17, true },
-        ::boost::decimal::decimal64 { UINT64_C(35999727706986597), -19 },
-        ::boost::decimal::decimal64 { UINT64_C(19938867353282852), -17 },
-        ::boost::decimal::decimal64 { UINT64_C(62252075283915644), -22 },
-        ::boost::decimal::decimal64 { UINT64_C(33333695504913247), -17, true },
-        ::boost::decimal::decimal64 { UINT64_C(10680927642397763), -24 },
-        ::boost::decimal::decimal64 { UINT64_C(99999999877886492), -17 },
-        ::boost::decimal::decimal64 { UINT64_C(23032664387910606), -29 },
-    }};
-
-    static constexpr std::array<::boost::decimal::decimal64_fast, 11> d64_fast_coeffs =
-    {{
-         ::boost::decimal::decimal64_fast { UINT64_C(61037779951304161), -18, true },
-         ::boost::decimal::decimal64_fast { UINT64_C(10723099589331457), -17 },
-         ::boost::decimal::decimal64_fast { UINT64_C(22515613909953665), -18 },
-         ::boost::decimal::decimal64_fast { UINT64_C(15540713402718176), -17, true },
-         ::boost::decimal::decimal64_fast { UINT64_C(35999727706986597), -19 },
-         ::boost::decimal::decimal64_fast { UINT64_C(19938867353282852), -17 },
-         ::boost::decimal::decimal64_fast { UINT64_C(62252075283915644), -22 },
-         ::boost::decimal::decimal64_fast { UINT64_C(33333695504913247), -17, true },
-         ::boost::decimal::decimal64_fast { UINT64_C(10680927642397763), -24 },
-         ::boost::decimal::decimal64_fast { UINT64_C(99999999877886492), -17 },
-         ::boost::decimal::decimal64_fast { UINT64_C(23032664387910606), -29 },
-     }};
 };
 
 #if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
 
-template <bool b> constexpr std::array<decimal32, 11> atan_table_imp<b>::d32_coeffs;
+template <bool b> constexpr std::array<decimal32,      11> atan_table_imp<b>::d32_coeffs;
 template <bool b> constexpr std::array<decimal32_fast, 11> atan_table_imp<b>::d32_fast_coeffs;
-template <bool b> constexpr std::array<decimal64, 11> atan_table_imp<b>::d64_coeffs;
-template <bool b> constexpr std::array<decimal64_fast, 11> atan_table_imp<b>::d64_fast_coeffs;
 
-template <bool b> constexpr std::array<decimal32,  3> atan_table_imp<b>::d32_atan_values;
-template <bool b> constexpr std::array<decimal32_fast,  3> atan_table_imp<b>::d32_fast_atan_values;
-template <bool b> constexpr std::array<decimal64,  3> atan_table_imp<b>::d64_atan_values;
-template <bool b> constexpr std::array<decimal64_fast,  3> atan_table_imp<b>::d64_fast_atan_values;
-template <bool b> constexpr std::array<decimal128,  3> atan_table_imp<b>::d128_atan_values;
+template <bool b> constexpr std::array<decimal32,      3> atan_table_imp<b>::d32_atan_values;
+template <bool b> constexpr std::array<decimal32_fast, 3> atan_table_imp<b>::d32_fast_atan_values;
+template <bool b> constexpr std::array<decimal64,      3> atan_table_imp<b>::d64_atan_values;
+template <bool b> constexpr std::array<decimal64_fast, 3> atan_table_imp<b>::d64_fast_atan_values;
+template <bool b> constexpr std::array<decimal128,     3> atan_table_imp<b>::d128_atan_values;
 
 #endif
 
@@ -149,10 +117,83 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto atan_values(std::size_t idx) noexcept -> T;
 
 template <> constexpr auto atan_series<decimal32> (decimal32 x) noexcept { return remez_series_result(x, atan_detail::atan_table::d32_coeffs); }
-template <> constexpr auto atan_series<decimal64> (decimal64 x) noexcept { return remez_series_result(x, atan_detail::atan_table::d64_coeffs); }
 
 template <> constexpr auto atan_series<decimal32_fast> (decimal32_fast x) noexcept { return remez_series_result(x, atan_detail::atan_table::d32_fast_coeffs); }
-template <> constexpr auto atan_series<decimal64_fast> (decimal64_fast x) noexcept { return remez_series_result(x, atan_detail::atan_table::d64_fast_coeffs); }
+
+template <>
+constexpr auto atan_series<decimal64>(decimal64 x) noexcept
+{
+#if 0
+    // PadeApproximant[ArcTan[x]/x, {x, 0, {12, 12}}]
+    // FullSimplify[%]
+    // HornerForm[Numerator[Out[2]]]
+    // HornerForm[Denominator[Out[2]]]
+
+    const decimal64 x2 { x * x };
+
+    const decimal64
+        top
+        {
+                    decimal64 { UINT64_C( 58561878375) }
+            + x2 * (decimal64 { UINT64_C(163192434405) }
+            + x2 * (decimal64 { UINT64_C(169269290190) }
+            + x2 * (decimal64 { UINT64_C(80191217106) }
+            + x2 * (decimal64 { UINT64_C(16979477515) }
+            + x2 * (decimal64 { UINT32_C(1296036105) }
+            + x2 *  decimal64 { UINT32_C(15728640) })))))
+        };
+
+    const decimal64
+        bot
+        {
+                    decimal64 { UINT64_C(58561878375) }
+            + x2 * (decimal64 { UINT64_C(182713060530) }
+            + x2 * (decimal64 { UINT64_C(218461268025) }
+            + x2 * (decimal64 { UINT64_C(124835010300) }
+            + x2 * (decimal64 { UINT64_C(34493884425) }
+            + x2 * (decimal64 { UINT32_C(4058104050) }
+            + x2 *  decimal64 { UINT32_C(135270135) })))))
+        };
+#else
+    // PadeApproximant[ArcTan[x]/x, {x, 0, {18, 18}}]
+    // FullSimplify[%]
+    // HornerForm[Numerator[Out[2]]]
+    // HornerForm[Denominator[Out[2]]]
+
+    const decimal64 x2 { x * x };
+
+    const decimal64
+        top
+        {
+                    decimal64 { UINT64_C(21427381364263875) }
+            + x2 * (decimal64 { UINT64_C(91886788553059500) }
+            + x2 * (decimal64 { UINT64_C(163675410390191700) }
+            + x2 * (decimal64 { UINT64_C(156671838074852100) }
+            + x2 * (decimal64 { UINT64_C(87054123957610810) }
+            + x2 * (decimal64 { UINT64_C(28283323008669300) }
+            + x2 * (decimal64 { UINT64_C(5134145876036100) }
+            + x2 * (decimal64 { UINT64_C(463911017673180) }
+            + x2 * (decimal64 { UINT64_C(16016872057515) }
+            + x2 *  decimal64 { UINT64_C(90194313216) }))))))))
+        };
+
+    const decimal64
+        bot
+        {
+                    decimal64 { UINT64_C(21427381364263875) }
+            + x2 * (decimal64 { UINT64_C(99029249007814125) }
+            + x2 * (decimal64 { UINT64_C(192399683786610300) }
+            + x2 * (decimal64 { UINT64_C(204060270682768500) }
+            + x2 * (decimal64 { UINT64_C(128360492848838250) }
+            + x2 * (decimal64 { UINT64_C(48688462804731750) }
+            + x2 * (decimal64 { UINT64_C(10819658401051500) }
+            + x2 * (decimal64 { UINT64_C(1298359008126180) }
+            + x2 * (decimal64 { UINT64_C(70562989572075) }
+            + x2 *  decimal64 { UINT64_C(1120047453525) }))))))))
+        };
+#endif
+    return (x * top) / bot;
+}
 
 template <>
 constexpr auto atan_series<decimal128>(decimal128 x) noexcept
