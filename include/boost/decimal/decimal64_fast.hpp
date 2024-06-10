@@ -929,10 +929,7 @@ constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
     }
     bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
-    auto lhs_components {detail::decimal64_fast_components{sig_lhs, exp_lhs, lhs.isneg()}};
+    auto lhs_components {detail::decimal64_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
 
     auto sig_rhs {static_cast<decimal64_fast::significand_type>(detail::make_positive_unsigned(rhs))};
     std::int32_t exp_rhs {0};
@@ -1023,10 +1020,7 @@ constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
 
     const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
-    auto lhs_components {detail::decimal64_fast_components{sig_lhs, exp_lhs, lhs.isneg()}};
+    auto lhs_components {detail::decimal64_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
 
     auto sig_rhs {static_cast<decimal64_fast::significand_type>(detail::make_positive_unsigned(rhs))};
     std::int32_t exp_rhs {0};
@@ -1066,10 +1060,7 @@ constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
     auto unsigned_sig_lhs = detail::shrink_significand<decimal64_fast::significand_type>(detail::make_positive_unsigned(sig_lhs), exp_lhs);
     auto lhs_components {detail::decimal64_fast_components{unsigned_sig_lhs, exp_lhs, (lhs < 0)}};
 
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
-    auto rhs_components {detail::decimal64_fast_components{sig_rhs, exp_rhs, rhs.isneg()}};
+    auto rhs_components {detail::decimal64_fast_components{rhs.significand_, rhs.biased_exponent(), rhs.isneg()}};
 
     const auto result {detail::d64_sub_impl<detail::decimal64_fast_components>(
                                                         lhs_components.sig, lhs_components.exp, lhs_components.sign,
@@ -1115,10 +1106,7 @@ constexpr auto operator*(decimal64_fast lhs, Integer rhs) noexcept
     }
     #endif
 
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal64>(lhs_sig, lhs_exp);
-    auto lhs_components {detail::decimal64_fast_components{lhs_sig, lhs_exp, lhs.isneg()}};
+    auto lhs_components {detail::decimal64_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
 
     auto rhs_sig {static_cast<decimal64_fast::significand_type>(detail::make_positive_unsigned(rhs))};
     std::int32_t rhs_exp {0};
