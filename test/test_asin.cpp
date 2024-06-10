@@ -76,7 +76,7 @@ void test_asin()
         auto ret_val {std::asin(val1)};
         auto ret_dec {static_cast<float>(asin(d1))};
 
-        if (isinf(ret_dec))
+        if (std::isinf(ret_dec))
         {
             std::cerr << "INF: " << d1 << " iter: n = " << n << std::endl;
         }
