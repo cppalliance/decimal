@@ -44,6 +44,7 @@ class decimal64_fast final
 public:
     using significand_type = std::uint_fast64_t;
     using exponent_type = std::uint_fast16_t;
+    using biased_exponent_type = std::int32_t;
 
 private:
     // In regular decimal64 we have to decode the significand end exponent
@@ -58,19 +59,19 @@ private:
         return sign_;
     }
 
-    constexpr auto full_significand() const noexcept -> std::uint_fast64_t
+    constexpr auto full_significand() const noexcept -> significand_type
     {
         return significand_;
     }
 
-    constexpr auto unbiased_exponent() const noexcept -> std::uint_fast16_t
+    constexpr auto unbiased_exponent() const noexcept -> exponent_type
     {
         return exponent_;
     }
 
-    constexpr auto biased_exponent() const noexcept -> std::int32_t
+    constexpr auto biased_exponent() const noexcept -> biased_exponent_type
     {
-        return static_cast<std::int32_t>(exponent_) - detail::bias_v<decimal64>;
+        return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal64>;
     }
 
     // Equality template between any integer type and decimal32
@@ -345,50 +346,33 @@ template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> &
 #endif
 constexpr decimal64_fast::decimal64_fast(T1 coeff, T2 exp, bool sign) noexcept
 {
+    // Older compilers have issues with conversions from __uint128, so we skip all that and use our uint128
+    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__GNUC__) || (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10)) && (!defined(__clang__) || (defined(__clang__) && __clang_major__ < 13))
+    using Unsigned_Integer_1 = detail::make_unsigned_t<T1>;
+    using Unsigned_Integer = std::conditional_t<std::is_same<Unsigned_Integer_1, detail::uint128_t>::value, detail::uint128, Unsigned_Integer_1>;
+    #else
     using Unsigned_Integer = detail::make_unsigned_t<T1>;
+    #endif
+
+    using Basis_Unsigned_Integer = std::conditional_t<std::numeric_limits<Unsigned_Integer>::digits10 < std::numeric_limits<significand_type>::digits10, significand_type, Unsigned_Integer>;
 
     const bool isneg {coeff < static_cast<T1>(0) || sign};
     sign_ = isneg;
-    Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
+    auto unsigned_coeff {static_cast<Basis_Unsigned_Integer>(detail::make_positive_unsigned(coeff))};
 
-    auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
-    const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal64>};
-
-    // Strip digits and round as required
-    if (unsigned_coeff_digits > detail::precision_v<decimal64> + 1)
-    {
-        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal64> + 1)};
-
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic push
-        #  pragma GCC diagnostic ignored "-Wconversion"
-        #endif
-
-        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
-
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic pop
-        #endif
-
-        exp += digits_to_remove;
-        unsigned_coeff_digits -= digits_to_remove;
-    }
-
-    // Round as required
-    if (reduced)
-    {
-        exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
-    }
+    // Normalize the value, so we don't have to worrya bout it with operations
+    detail::normalize<decimal64>(unsigned_coeff, exp, sign);
 
     significand_ = static_cast<significand_type>(unsigned_coeff);
 
     // Normalize the handling of zeros
-    if (significand_ == UINT32_C(0))
+    if (significand_ == UINT64_C(0))
     {
         exp = 0;
     }
 
     const auto biased_exp {static_cast<std::uint_fast32_t>(exp + detail::bias_v<decimal64>)};
+
     if (biased_exp > detail::max_biased_exp_v<decimal64>)
     {
         significand_ = detail::d64_fast_inf;
