@@ -1199,13 +1199,21 @@ constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    detail::decimal64_fast_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.sign_};
-    detail::decimal64_fast_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.sign_};
-    detail::decimal64_fast_components q_components {};
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    #else
+    using unsigned_int128_type = boost::decimal::detail::uint128;
+    #endif
 
-    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
+    // If rhs is greater than we need to offset the significands to get the correct values
+    // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
+    constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64>))};
+    const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.significand_) * tens_needed};
 
-    q = decimal64_fast(q_components.sig, q_components.exp, q_components.sign);
+    const auto res_sig {big_sig_lhs / static_cast<unsigned_int128_type>(rhs.significand_)};
+    const auto res_exp {(lhs.biased_exponent() - detail::precision_v<decimal64>) - rhs.biased_exponent()};
+
+    q = decimal64_fast{res_sig, res_exp, sign};
 }
 
 constexpr auto d64_fast_mod_impl(decimal64_fast lhs, decimal64_fast rhs, const decimal64_fast& q, decimal64_fast& r) noexcept -> void
