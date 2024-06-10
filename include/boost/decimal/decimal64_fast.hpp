@@ -482,8 +482,9 @@ constexpr auto operator==(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bo
     }
     #endif
 
-    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+    return lhs.sign_ == rhs.sign_ &&
+           lhs.exponent_ == rhs.exponent_ &&
+           lhs.significand_ == rhs.significand_;
 }
 
 template <typename Integer>
