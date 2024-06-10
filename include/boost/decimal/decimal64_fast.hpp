@@ -523,36 +523,45 @@ constexpr auto operator!=(Integer lhs, decimal64_fast rhs) noexcept
 constexpr auto operator<(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs) ||
-        (!lhs.isneg() && rhs.isneg()))
+    if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
-    else if (lhs.isneg() && !rhs.isneg())
-    {
-        return true;
-    }
-    else if (isfinite(lhs) && isinf(rhs))
-    {
-        return !signbit(rhs);
-    }
-    else if (isinf(lhs) && isfinite(rhs))
-    {
-        return signbit(rhs);
-    }
-    #else
+    #endif
+
     if (!lhs.isneg() && rhs.isneg())
     {
         return false;
     }
-    else if (lhs.isneg() && !rhs.isneg())
+
+    if (lhs.isneg() && !rhs.isneg())
     {
         return true;
     }
+
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isfinite(lhs) && isinf(rhs))
+    {
+        return !signbit(rhs);
+    }
+
+    if (isinf(lhs) && isfinite(rhs))
+    {
+        return signbit(rhs);
+    }
     #endif
 
-    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+    if (lhs.significand_ == 0 || rhs.significand_ == 0)
+    {
+        return lhs.significand_ == 0 ? !rhs.sign_ : lhs.sign_;
+    }
+
+    if (lhs.exponent_ != rhs.exponent_)
+    {
+        return lhs.sign_ ? lhs.exponent_ > rhs.exponent_ : lhs.exponent_ < rhs.exponent_;
+    }
+
+    return lhs.sign_ ? lhs.significand_ > rhs.significand_ : lhs.significand_ < rhs.significand_;
 }
 
 template <typename Integer>
