@@ -996,19 +996,11 @@ constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
 
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
-
     const auto result {detail::d64_sub_impl<detail::decimal64_fast_components>(
-                                                                            sig_lhs, exp_lhs, lhs.isneg(),
-                                                                            sig_rhs, exp_rhs, rhs.isneg(),
-                                                                            abs_lhs_bigger
-                                                                            )};
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
+            abs_lhs_bigger
+            )};
 
     return {result.sig, result.exp, result.sign};
 }
