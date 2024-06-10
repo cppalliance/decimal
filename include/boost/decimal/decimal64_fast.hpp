@@ -1192,14 +1192,6 @@ constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal
     static_cast<void>(r);
     #endif
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
-
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "sig lhs: " << sig_lhs
               << "\nexp lhs: " << exp_lhs
@@ -1207,8 +1199,8 @@ constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    detail::decimal64_fast_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
-    detail::decimal64_fast_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
+    detail::decimal64_fast_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.sign_};
+    detail::decimal64_fast_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.sign_};
     detail::decimal64_fast_components q_components {};
 
     detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
