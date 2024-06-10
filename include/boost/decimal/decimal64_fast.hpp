@@ -1091,18 +1091,17 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    auto res_sig {static_cast<unsigned_int128_type>(lhs.significand_) * static_cast<unsigned_int128_type>(rhs.significand_)};
+    #else
+    auto res_sig {detail::umul128(lhs.significand_, rhs.significand_)};
+    #endif
 
-    auto rhs_sig {rhs.full_significand()};
-    auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize<decimal64>(rhs_sig, rhs_exp);
+    auto res_exp {lhs.biased_exponent() + rhs.biased_exponent()};
+    bool sign {lhs.sign_ != rhs.sign_ && res_sig != 0};
 
-    const auto result {detail::d64_mul_impl<detail::decimal64_fast_components>(lhs_sig, lhs_exp, lhs.isneg(),
-                                                                          rhs_sig, rhs_exp, rhs.isneg())};
-
-    return {result.sig, result.exp, result.sign};
+    return {res_sig, res_exp, sign};
 }
 
 template <typename Integer>
