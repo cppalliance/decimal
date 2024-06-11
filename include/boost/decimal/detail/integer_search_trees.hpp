@@ -307,109 +307,30 @@ constexpr int num_digits(const uint256_t& x) noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-#if defined(__cpp_lib_array_constexpr) && __cpp_lib_array_constexpr >= 201603L
-
-constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
-{
-    constexpr auto big_powers_of_10 = generate_array<boost::decimal::detail::uint128_t, 39>();
-
-    if (x == 0)
-    {
-        return 1;
-    }
-
-    std::uint32_t left = 0U;
-    std::uint32_t right = 38U;
-
-    while (left < right)
-    {
-        std::uint32_t mid = (left + right + 1U) / 2U;
-
-        if (x >= big_powers_of_10[mid])
-        {
-            left = mid;
-        }
-        else
-        {
-            right = mid - 1;
-        }
-    }
-
-    return static_cast<int>(left + 1);
-}
-
-#else
+static constexpr std::uint_fast8_t guess[] = {
+        0 ,0 ,0 ,0 , 1 ,1 ,1 , 2 ,2 ,2 ,
+        3 ,3 ,3 ,3 , 4 ,4 ,4 , 5 ,5 ,5 ,
+        6 ,6 ,6 ,6 , 7 ,7 ,7 , 8 ,8 ,8 ,
+        9 ,9 ,9 ,9 , 10,10,10, 11,11,11,
+        12,12,12,12, 13,13,13, 14,14,14,
+        15,15,15,15, 16,16,16, 17,17,17,
+        18,18,18,18, 19
+};
 
 // Assume that if someone is using 128 bit ints they are favoring the top end of the range
 // Max value is 340,282,366,920,938,463,463,374,607,431,768,211,455 (39 digits)
 constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
 {
-    // There is no literal for boost::decimal::detail::uint128_t, so we need to calculate them using the max value of the
-    // std::uint64_t powers of 10
-    constexpr boost::decimal::detail::uint128_t digits_39 = static_cast<boost::decimal::detail::uint128_t>(UINT64_C(10000000000000000000)) * 
-                                              static_cast<boost::decimal::detail::uint128_t>(UINT64_C(10000000000000000000));
+    const auto high = static_cast<std::uint64_t>(x >> 64);
 
-    constexpr boost::decimal::detail::uint128_t digits_38 = digits_39 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_37 = digits_38 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_36 = digits_37 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_35 = digits_36 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_34 = digits_35 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_33 = digits_34 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_32 = digits_33 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_31 = digits_32 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_30 = digits_31 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_29 = digits_30 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_28 = digits_29 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_27 = digits_28 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_26 = digits_27 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_25 = digits_26 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_24 = digits_25 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_23 = digits_24 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_22 = digits_23 / 10;
-    constexpr boost::decimal::detail::uint128_t digits_21 = digits_22 / 10;
+    if (high != 0)
+    {
+        const auto digits {guess[64 - countl_zero(high)]};
+        return 19 + digits + (x >= impl::powers_of_10[digits]);
+    }
 
-    return (x >= digits_39) ? 39 :
-           (x >= digits_38) ? 38 :
-           (x >= digits_37) ? 37 :
-           (x >= digits_36) ? 36 :
-           (x >= digits_35) ? 35 :
-           (x >= digits_34) ? 34 :
-           (x >= digits_33) ? 33 :
-           (x >= digits_32) ? 32 :
-           (x >= digits_31) ? 31 :
-           (x >= digits_30) ? 30 :
-           (x >= digits_29) ? 29 :
-           (x >= digits_28) ? 28 :
-           (x >= digits_27) ? 27 :
-           (x >= digits_26) ? 26 :
-           (x >= digits_25) ? 25 :
-           (x >= digits_24) ? 24 :
-           (x >= digits_23) ? 23 :
-           (x >= digits_22) ? 22 :
-           (x >= digits_21) ? 21 :
-           (x >= impl::powers_of_10[19]) ? 20 :
-           (x >= impl::powers_of_10[18]) ? 19 :
-           (x >= impl::powers_of_10[17]) ? 18 :
-           (x >= impl::powers_of_10[16]) ? 17 :
-           (x >= impl::powers_of_10[15]) ? 16 :
-           (x >= impl::powers_of_10[14]) ? 15 :
-           (x >= impl::powers_of_10[13]) ? 14 :
-           (x >= impl::powers_of_10[12]) ? 13 :
-           (x >= impl::powers_of_10[11]) ? 12 :
-           (x >= impl::powers_of_10[10]) ? 11 :
-           (x >= impl::powers_of_10[9])  ? 10 :
-           (x >= impl::powers_of_10[8])  ?  9 :
-           (x >= impl::powers_of_10[7])  ?  8 :
-           (x >= impl::powers_of_10[6])  ?  7 :
-           (x >= impl::powers_of_10[5])  ?  6 :
-           (x >= impl::powers_of_10[4])  ?  5 :
-           (x >= impl::powers_of_10[3])  ?  4 :
-           (x >= impl::powers_of_10[2])  ?  3 :
-           (x >= impl::powers_of_10[1])  ?  2 :
-           (x >= impl::powers_of_10[0])  ?  1 : 0;
+    return num_digits(static_cast<std::uint64_t>(x));
 }
-
-#endif // constexpr arrays
 
 #endif // Has int128
 
