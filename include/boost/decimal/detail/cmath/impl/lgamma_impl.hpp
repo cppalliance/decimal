@@ -29,8 +29,9 @@ struct lgamma_taylor_series_imp
     using d64_coeffs_t  = std::array<decimal64,  27>;
     using d128_coeffs_t = std::array<decimal128, 44>;
 
-    using d32_fast_coeffs_t = std::array<decimal32_fast, 17>;
-    using d64_fast_coeffs_t = std::array<decimal64_fast, 27>;
+    using d32_fast_coeffs_t  = std::array<decimal32_fast,  17>;
+    using d64_fast_coeffs_t  = std::array<decimal64_fast,  27>;
+    using d128_fast_coeffs_t = std::array<decimal128_fast, 44>;
 
     static constexpr d32_coeffs_t d32_coeffs =
     {{
@@ -203,6 +204,58 @@ struct lgamma_taylor_series_imp
         + decimal128 { detail::uint128 { UINT64_C(123204792327905), UINT64_C(4326111080777755730)  }, -35 }, // x^44
         - decimal128 { detail::uint128 { UINT64_C(120466908053948), UINT64_C(6659042857988127932)  }, -35 }, // x^45
     }};
+
+    static constexpr d128_fast_coeffs_t d128_fast_coeffs =
+    {{
+        // Use a Taylor series expansion of the logarithm of the gamma function.
+        // N[Series[Log[Gamma[x]], {x, 0, 46}], 36]
+        //         log(1/x)
+        //        -EulerGamma                                                                             // * x
+        + decimal128_fast { detail::uint128 { UINT64_C(445860272218065), UINT64_C(14203420802908087080) }, -34 }, // x^2
+        - decimal128_fast { detail::uint128 { UINT64_C(217212117642804), UINT64_C(17657476868182733566) }, -34 }, // x^3
+        + decimal128_fast { detail::uint128 { UINT64_C(146682150165144), UINT64_C(868910464649280216)   }, -34 }, // x^4
+        - decimal128_fast { detail::uint128 { UINT64_C(112423932483695), UINT64_C(16359302115292012940) }, -34 }, // x^5
+        + decimal128_fast { detail::uint128 { UINT64_C(91917129830549),  UINT64_C(10691428771700534346) }, -34 }, // x^6
+        - decimal128_fast { detail::uint128 { UINT64_C(78089605511547),  UINT64_C(14820105259104989758) }, -34 }, // x^7
+        + decimal128_fast { detail::uint128 { UINT64_C(68038928183332),  UINT64_C(1064388729383271304)  }, -34 }, // x^8
+        - decimal128_fast { detail::uint128 { UINT64_C(60354426463930),  UINT64_C(7248291600601936245)  }, -34 }, // x^9
+        + decimal128_fast { detail::uint128 { UINT64_C(54264024649989),  UINT64_C(4473690885429568095)  }, -34 }, // x^10
+        - decimal128_fast { detail::uint128 { UINT64_C(493062714928958), UINT64_C(6174527806367053599)  }, -35 }, // x^11
+        + decimal128_fast { detail::uint128 { UINT64_C(451862075025508), UINT64_C(9914131103541110236)  }, -35 }, // x^12
+        - decimal128_fast { detail::uint128 { UINT64_C(417052007139823), UINT64_C(15614141522487214162) }, -35 }, // x^13
+        + decimal128_fast { detail::uint128 { UINT64_C(387238777802355), UINT64_C(11643663834403323860) }, -35 }, // x^14
+        - decimal128_fast { detail::uint128 { UINT64_C(361411778772587), UINT64_C(34493970254387038)    }, -35 }, // x^15
+        + decimal128_fast { detail::uint128 { UINT64_C(338818356732611), UINT64_C(3351583636956848354)  }, -35 }, // x^16
+        - decimal128_fast { detail::uint128 { UINT64_C(318885427279933), UINT64_C(15984063291116028642) }, -35 }, // x^17
+        + decimal128_fast { detail::uint128 { UINT64_C(301168419778654), UINT64_C(4924861572478909706)  }, -35 }, // x^18
+        - decimal128_fast { detail::uint128 { UINT64_C(285316905624704), UINT64_C(10127525246402845676) }, -35 }, // x^19
+        + decimal128_fast { detail::uint128 { UINT64_C(271050801693303), UINT64_C(9350577868080165772)  }, -35 }, // x^20
+        - decimal128_fast { detail::uint128 { UINT64_C(258143497518401), UINT64_C(2808067049374616864)  }, -35 }, // x^21
+        + decimal128_fast { detail::uint128 { UINT64_C(246409643412285), UINT64_C(14764422888076943740) }, -35 }, // x^22
+        - decimal128_fast { detail::uint128 { UINT64_C(235696152553045), UINT64_C(678353819689262840)   }, -35 }, // x^23
+        + decimal128_fast { detail::uint128 { UINT64_C(225875466065173), UINT64_C(8075483572721697962)  }, -35 }, // x^24
+        - decimal128_fast { detail::uint128 { UINT64_C(216840440959705), UINT64_C(9932733544470621540)  }, -35 }, // x^25
+        + decimal128_fast { detail::uint128 { UINT64_C(208500420892654), UINT64_C(6216313969171226926)  }, -35 }, // x^26
+        - decimal128_fast { detail::uint128 { UINT64_C(200778181585848), UINT64_C(10737065351264354832) }, -35 }, // x^27
+        + decimal128_fast { detail::uint128 { UINT64_C(193607531522235), UINT64_C(12111991390268743970) }, -35 }, // x^28
+        - decimal128_fast { detail::uint128 { UINT64_C(186931409397414), UINT64_C(9391433164642506256)  }, -35 }, // x^29
+        + decimal128_fast { detail::uint128 { UINT64_C(180700362249208), UINT64_C(11251075665678452422) }, -35 }, // x^30
+        - decimal128_fast { detail::uint128 { UINT64_C(174871318224254), UINT64_C(7048097254153902066)  }, -35 }, // x^31
+        + decimal128_fast { detail::uint128 { UINT64_C(169406589490303), UINT64_C(3772465895856270802)  }, -35 }, // x^32
+        - decimal128_fast { detail::uint128 { UINT64_C(164273056456321), UINT64_C(10547878619739699804) }, -35 }, // x^33
+        + decimal128_fast { detail::uint128 { UINT64_C(159441495963031), UINT64_C(6975690319727375544)  }, -35 }, // x^34
+        - decimal128_fast { detail::uint128 { UINT64_C(154886024645294), UINT64_C(2350345999520845736)  }, -35 }, // x^35
+        + decimal128_fast { detail::uint128 { UINT64_C(150583635069622), UINT64_C(8350573461615823988)  }, -35 }, // x^36
+        - decimal128_fast { detail::uint128 { UINT64_C(146513807093701), UINT64_C(14073039848059635994) }, -35 }, // x^37
+        + decimal128_fast { detail::uint128 { UINT64_C(142658180590716), UINT64_C(17328619387130735144) }, -35 }, // x^38
+        - decimal128_fast { detail::uint128 { UINT64_C(139000278524035), UINT64_C(8482044796809236580)  }, -35 }, // x^39
+        + decimal128_fast { detail::uint128 { UINT64_C(135525271560811), UINT64_C(5788192050685000054)  }, -35 }, // x^40
+        - decimal128_fast { detail::uint128 { UINT64_C(132219777132438), UINT64_C(13209900018467184292) }, -35 }, // x^41
+        + decimal128_fast { detail::uint128 { UINT64_C(129071687200684), UINT64_C(11755517601068760186) }, -35 }, // x^42
+        - decimal128_fast { detail::uint128 { UINT64_C(126070020056468), UINT64_C(6206529728400242912)  }, -35 }, // x^43
+        + decimal128_fast { detail::uint128 { UINT64_C(123204792327905), UINT64_C(4326111080777755730)  }, -35 }, // x^44
+        - decimal128_fast { detail::uint128 { UINT64_C(120466908053948), UINT64_C(6659042857988127932)  }, -35 }, // x^45
+    }};
 };
 
 #if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
@@ -259,6 +312,12 @@ template <>
 constexpr auto lgamma_taylor_series_expansion<decimal128>(decimal128 x) noexcept
 {
     return taylor_series_result(x, lgamma_taylor_series_table::d128_coeffs);
+}
+
+template <>
+constexpr auto lgamma_taylor_series_expansion<decimal128_fast>(decimal128_fast x) noexcept
+{
+    return taylor_series_result(x, lgamma_taylor_series_table::d128_fast_coeffs);
 }
 
 } //namespace detail

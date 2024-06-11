@@ -544,6 +544,110 @@ struct assoc_legendre_lookup {
          decimal128{detail::uint128{UINT64_C(185632893076863),UINT64_C(16002051557646139392)},44},
          decimal128{detail::uint128{UINT64_C(147743803939632),UINT64_C(16999359510947954688)},45},
     }};
+
+    static constexpr std::array<decimal128_fast, 100> d128_fast_values =
+    {{
+             decimal128_fast{detail::uint128{UINT64_C(54210108624275),UINT64_C(4089650035136921600)},-33},
+             decimal128_fast{detail::uint128{UINT64_C(54210108624275),UINT64_C(4089650035136921600)},-33},
+             decimal128_fast{detail::uint128{UINT64_C(108420217248550),UINT64_C(8179300070273843200)},-33},
+             decimal128_fast{detail::uint128{UINT64_C(162630325872825),UINT64_C(12268950105410764800)},-33},
+             decimal128_fast{detail::uint128{UINT64_C(433680868994201),UINT64_C(14270456207385821184)},-33},
+             decimal128_fast{detail::uint128{UINT64_C(81315162936412),UINT64_C(15357847089560158208)},-32},
+             decimal128_fast{detail::uint128{UINT64_C(260208521396521),UINT64_C(1183576094947672064)},-32},
+             decimal128_fast{detail::uint128{UINT64_C(56920614055488),UINT64_C(18129190592175931392)},-31},
+             decimal128_fast{detail::uint128{UINT64_C(208166817117216),UINT64_C(15704256134925778944)},-31},
+             decimal128_fast{detail::uint128{UINT64_C(512285526499400),UINT64_C(15588762739906969600)},-31},
+             decimal128_fast{detail::uint128{UINT64_C(208166817117216),UINT64_C(15704256134925778944)},-30},
+             decimal128_fast{detail::uint128{UINT64_C(56351407914934),UINT64_C(1714763901389766656)},-29},
+             decimal128_fast{detail::uint128{UINT64_C(249800180540660),UINT64_C(4087712102943293440)},-29},
+             decimal128_fast{detail::uint128{UINT64_C(73256830289414),UINT64_C(5918541886548606976)},-28},
+             decimal128_fast{detail::uint128{UINT64_C(349720252756924),UINT64_C(5722796944120610816)},-28},
+             decimal128_fast{detail::uint128{UINT64_C(109885245434121),UINT64_C(8877812829822910464)},-27},
+             decimal128_fast{detail::uint128{UINT64_C(55955240441107),UINT64_C(16410912532975321088)},-26},
+             decimal128_fast{detail::uint128{UINT64_C(186804917238006),UINT64_C(9558258588586082304)},-26},
+             decimal128_fast{detail::uint128{UINT64_C(100719432793994),UINT64_C(3714200856162205696)},-25},
+             decimal128_fast{detail::uint128{UINT64_C(354929342752212),UINT64_C(7092644874087825408)},-25},
+             decimal128_fast{detail::uint128{UINT64_C(201438865587988),UINT64_C(7428401712324411392)},-24},
+             decimal128_fast{detail::uint128{UINT64_C(74535161977964),UINT64_C(11081762341887410176)},-23},
+             decimal128_fast{detail::uint128{UINT64_C(443165504293574),UINT64_C(8963786137629884416)},-23},
+             decimal128_fast{detail::uint128{UINT64_C(171430872549318),UINT64_C(10730658127373402112)},-22},
+             decimal128_fast{detail::uint128{UINT64_C(106359721030457),UINT64_C(16170834169050431488)},-21},
+             decimal128_fast{detail::uint128{UINT64_C(428577181373296),UINT64_C(8379901244723953664)},-21},
+             decimal128_fast{detail::uint128{UINT64_C(276535274679190),UINT64_C(8840029506853928960)},-20},
+             decimal128_fast{detail::uint128{UINT64_C(115715838970790),UINT64_C(786833810178703360)},-19},
+             decimal128_fast{detail::uint128{UINT64_C(77429876910173),UINT64_C(6164557076661010432)},-18},
+             decimal128_fast{detail::uint128{UINT64_C(335575933015291),UINT64_C(2281818049518239744)},-18},
+             decimal128_fast{detail::uint128{UINT64_C(232289630730520),UINT64_C(46927156273479680)},-17},
+             decimal128_fast{detail::uint128{UINT64_C(104028539234740),UINT64_C(4531179850829660160)},-16},
+             decimal128_fast{detail::uint128{UINT64_C(74332681833766),UINT64_C(7393714319491334144)},-15},
+             decimal128_fast{detail::uint128{UINT64_C(343294179474642),UINT64_C(14492893507737878528)},-15},
+             decimal128_fast{detail::uint128{UINT64_C(252731118234805),UINT64_C(13870582242044805120)},-14},
+             decimal128_fast{detail::uint128{UINT64_C(120152962816124),UINT64_C(18085233579304943616)},-13},
+             decimal128_fast{detail::uint128{UINT64_C(90983202564530),UINT64_C(1344060792394219520)},-12},
+             decimal128_fast{detail::uint128{UINT64_C(444565962419662),UINT64_C(8765783207557726208)},-12},
+             decimal128_fast{detail::uint128{UINT64_C(345736169745214),UINT64_C(5067431011098034176)},-11},
+             decimal128_fast{detail::uint128{UINT64_C(173380725343668),UINT64_C(6359069384215232512)},-10},
+             decimal128_fast{detail::uint128{UINT64_C(138294467898085),UINT64_C(13195018848664944640)},-9},
+             decimal128_fast{detail::uint128{UINT64_C(71086097390904),UINT64_C(418609158683099136)},-8},
+             decimal128_fast{detail::uint128{UINT64_C(58083676517196),UINT64_C(37884694326411264)},-7},
+             decimal128_fast{detail::uint128{UINT64_C(305670218780887),UINT64_C(5649368197079236608)},-7},
+             decimal128_fast{detail::uint128{UINT64_C(255568176675662),UINT64_C(7345390284520030208)},-6},
+             decimal128_fast{detail::uint128{UINT64_C(137551598451399),UINT64_C(5159227299742089216)},-5},
+             decimal128_fast{detail::uint128{UINT64_C(117561361270804),UINT64_C(13111186449208180736)},-4},
+             decimal128_fast{detail::uint128{UINT64_C(64649251272157),UINT64_C(12369611189944844288)},-3},
+             decimal128_fast{detail::uint128{UINT64_C(56429453409986),UINT64_C(4705629969723162624)},-2},
+             decimal128_fast{detail::uint128{UINT64_C(316781331233572),UINT64_C(10224885831713947648)},-2},
+             decimal128_fast{detail::uint128{UINT64_C(282147267049931),UINT64_C(5081405774906261504)},-1},
+             decimal128_fast{detail::uint128{UINT64_C(161558478929122),UINT64_C(279603433535438848)},0},
+             decimal128_fast{detail::uint128{UINT64_C(146716578865964),UINT64_C(5035940291796402176)},1},
+             decimal128_fast{detail::uint128{UINT64_C(85625993832434),UINT64_C(12193040908422086656)},2},
+             decimal128_fast{detail::uint128{UINT64_C(79226952587620),UINT64_C(12939584438847406080)},3},
+             decimal128_fast{detail::uint128{UINT64_C(470942966078390),UINT64_C(11871492775192821760)},3},
+             decimal128_fast{detail::uint128{UINT64_C(443670934490675),UINT64_C(18241440636416819200)},4},
+             decimal128_fast{detail::uint128{UINT64_C(268437490664682),UINT64_C(12230774103972773888)},5},
+             decimal128_fast{detail::uint128{UINT64_C(257329142004592),UINT64_C(876663532266979328)},6},
+             decimal128_fast{detail::uint128{UINT64_C(158378119492162),UINT64_C(14405919469353566208)},7},
+             decimal128_fast{detail::uint128{UINT64_C(154397485202755),UINT64_C(4415346934102097920)},8},
+             decimal128_fast{detail::uint128{UINT64_C(96610652890219),UINT64_C(5497196943037956096)},9},
+             decimal128_fast{detail::uint128{UINT64_C(95726440825708),UINT64_C(4374189506514255872)},10},
+             decimal128_fast{detail::uint128{UINT64_C(60864711320838),UINT64_C(2767831751902625792)},11},
+             decimal128_fast{detail::uint128{UINT64_C(61264922128453),UINT64_C(5053090573014269952)},12},
+             decimal128_fast{detail::uint128{UINT64_C(395620623585447),UINT64_C(18290906387367067648)},12},
+             decimal128_fast{detail::uint128{UINT64_C(404348486047791),UINT64_C(11054304893442719744)},13},
+             decimal128_fast{detail::uint128{UINT64_C(265065817802250),UINT64_C(3047067801944064000)},14},
+             decimal128_fast{detail::uint128{UINT64_C(274956970512498),UINT64_C(5583318038695903232)},15},
+             decimal128_fast{detail::uint128{UINT64_C(182895414283552),UINT64_C(11365848820196179968)},16},
+             decimal128_fast{detail::uint128{UINT64_C(192469879358748),UINT64_C(14976369071312863232)},17},
+             decimal128_fast{detail::uint128{UINT64_C(129855744141322),UINT64_C(6569013136442523648)},18},
+             decimal128_fast{detail::uint128{UINT64_C(138578313138299),UINT64_C(2926418338913058816)},19},
+             decimal128_fast{detail::uint128{UINT64_C(94794693223165),UINT64_C(5842184234025615360)},20},
+             decimal128_fast{detail::uint128{UINT64_C(102547951722341),UINT64_C(6951703029960146944)},21},
+             decimal128_fast{detail::uint128{UINT64_C(71096019917373),UINT64_C(18166696230801375232)},22},
+             decimal128_fast{detail::uint128{UINT64_C(77936443308979),UINT64_C(8194773354563239936)},23},
+             decimal128_fast{detail::uint128{UINT64_C(54743935336377),UINT64_C(17966172353196064768)},24},
+             decimal128_fast{detail::uint128{UINT64_C(60790425781003),UINT64_C(17768904542259249152)},25},
+             decimal128_fast{detail::uint128{UINT64_C(432477089157385),UINT64_C(17869576296394915840)},25},
+             decimal128_fast{detail::uint128{UINT64_C(486323406248031),UINT64_C(11424027822107131904)},26},
+             decimal128_fast{detail::uint128{UINT64_C(350306442217482),UINT64_C(11437345189023449088)},27},
+             decimal128_fast{detail::uint128{UINT64_C(398785193123386),UINT64_C(268591251376308224)},28},
+             decimal128_fast{detail::uint128{UINT64_C(290754347040510),UINT64_C(10849801151312035840)},29},
+             decimal128_fast{detail::uint128{UINT64_C(334979562223644),UINT64_C(4552835228846391296)},30},
+             decimal128_fast{detail::uint128{UINT64_C(247141194984434),UINT64_C(348958941760454656)},31},
+             decimal128_fast{detail::uint128{UINT64_C(288082423512334),UINT64_C(593959245014368256)},32},
+             decimal128_fast{detail::uint128{UINT64_C(215012839636457),UINT64_C(11152705842083135488)},33},
+             decimal128_fast{detail::uint128{UINT64_C(253512532690853),UINT64_C(17753688683425431552)},34},
+             decimal128_fast{detail::uint128{UINT64_C(191361427276447),UINT64_C(4960287299552411648)},35},
+             decimal128_fast{detail::uint128{UINT64_C(228161279421768),UINT64_C(10074296592970022912)},36},
+             decimal128_fast{detail::uint128{UINT64_C(174138898821566),UINT64_C(18167854379349049344)},37},
+             decimal128_fast{detail::uint128{UINT64_C(209908377068027),UINT64_C(1491785473100218368)},38},
+             decimal128_fast{detail::uint128{UINT64_C(161949175904057),UINT64_C(5819123247094693888)},39},
+             decimal128_fast{detail::uint128{UINT64_C(197313874443945),UINT64_C(8022041092723834880)},40},
+             decimal128_fast{detail::uint128{UINT64_C(153851717108854),UINT64_C(8045178695796391936)},41},
+             decimal128_fast{detail::uint128{UINT64_C(189421319466187),UINT64_C(11630508263756791808)},42},
+             decimal128_fast{detail::uint128{UINT64_C(149236165595588),UINT64_C(14983586082932129792)},43},
+             decimal128_fast{detail::uint128{UINT64_C(185632893076863),UINT64_C(16002051557646139392)},44},
+             decimal128_fast{detail::uint128{UINT64_C(147743803939632),UINT64_C(16999359510947954688)},45},
+     }};
 };
 
 #if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
@@ -563,6 +667,8 @@ constexpr std::array<decimal32_fast, 100> assoc_legendre_lookup<b>::d32_fast_val
 template <bool b>
 constexpr std::array<decimal64_fast, 100> assoc_legendre_lookup<b>::d64_fast_values;
 
+template <bool b>
+constexpr std::array<decimal128_fast, 100> assoc_legendre_lookup<b>::d128_fast_values;
 
 #endif
 
@@ -601,6 +707,12 @@ template <>
 constexpr auto assoc_legendre_p0_lookup<decimal128>(unsigned n) -> decimal128
 {
     return assoc_legendre_detail::assoc_legendre_lookup_table::d128_values[static_cast<std::size_t>(n)];
+}
+
+template <>
+constexpr auto assoc_legendre_p0_lookup<decimal128_fast>(unsigned n) -> decimal128_fast
+{
+    return assoc_legendre_detail::assoc_legendre_lookup_table::d128_fast_values[static_cast<std::size_t>(n)];
 }
 
 } //namespace detail
