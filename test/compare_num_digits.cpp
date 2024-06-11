@@ -194,12 +194,46 @@ int main()
 }
 
 /*
-Output as run on Apple M1 with -march=native -O3 -std=c++23
+Output on Apple M1 with Clang-18
 ====== BEGIN OUTPUT ======
-        Naive: 2400667 ns (s=440000)
-Binary Search: 2287125 ns (s=440000)
-Linear Search: 2047792 ns (s=440000)
-          Log: 1982542 ns (s=440000)
+        Naive: 2328125 ns (s=440000)
+Binary Search: 1883042 ns (s=440000)
+Linear Search: 1669042 ns (s=440000)
+          Log: 1690542 ns (s=440000)
+
+
+EXIT STATUS: 1
+====== END OUTPUT ======
+
+Output on Apple M1 with GCC-14
+====== BEGIN OUTPUT ======
+        Naive: 716000 ns (s=440000)
+Binary Search: 410000 ns (s=440000)
+Linear Search: 473000 ns (s=440000)
+          Log: 400000 ns (s=440000)
+
+
+EXIT STATUS: 1
+====== END OUTPUT ======
+
+Output on x86_64 from CI with GCC-14
+====== BEGIN OUTPUT ======
+        Naive: 1259225 ns (s=440000)
+Binary Search: 890099 ns (s=440000)
+Linear Search: 971391 ns (s=440000)
+          Log: 828716 ns (s=440000)
+
+
+EXIT STATUS: 1
+====== END OUTPUT ======
+
+Output on x86_64 from CI with Clang-18
+====== BEGIN OUTPUT ======
+        Naive: 1946074 ns (s=440000)
+Binary Search: 912493 ns (s=440000)
+Linear Search: 1045009 ns (s=440000)
+          Log: 707485 ns (s=440000)
+
 
 EXIT STATUS: 1
 ====== END OUTPUT ======
