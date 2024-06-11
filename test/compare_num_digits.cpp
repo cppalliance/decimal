@@ -9,6 +9,8 @@
 #include <cassert>
 #include <boost/decimal/detail/countl.hpp>
 
+#ifdef BOOST_DECIMAL_RUN_NUM_DIGITS
+
 template <typename Func>
 void test(Func f, const char* title)
 {
@@ -192,6 +194,16 @@ int main()
 
     return 1;
 }
+
+#else
+
+int main()
+{
+    std::cout << "Num digits comp not run" << std::endl;
+    return 1;
+}
+
+#endif
 
 /*
 Output on Apple M1 with Clang-18
