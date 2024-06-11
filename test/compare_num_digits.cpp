@@ -160,11 +160,6 @@ constexpr auto linear_search(std::uint32_t x) noexcept -> int
     return r;
 }
 
-constexpr auto base_two_dig(std::uint32_t x) noexcept -> int
-{
-    return x ? 32 - boost::decimal::detail::countl_zero(x) : 0;
-}
-
 static constexpr std::uint8_t guess[33] = {
         0, 0, 0, 0, 1, 1, 1, 2, 2, 2,
         3, 3, 3, 3, 4, 4, 4, 5, 5, 5,
@@ -179,7 +174,7 @@ static constexpr std::uint32_t tens[] = {
 
 constexpr auto log2_digits(std::uint32_t x) -> int
 {
-    const auto digits {guess[base_two_dig(x)]};
+    const auto digits {guess[32 - boost::decimal::detail::countl_zero(x)]};
     return digits + (x >= tens[digits]);
 }
 
