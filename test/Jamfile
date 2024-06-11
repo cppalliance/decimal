@@ -43,6 +43,7 @@ project : requirements
 
 run-fail benchmarks.cpp ;
 run compare_dec128_and_fast.cpp ;
+run-fail compare_num_digits.cpp ;
 compile-fail concepts_test.cpp ;
 run github_issue_426.cpp ;
 run github_issue_448.cpp ;
