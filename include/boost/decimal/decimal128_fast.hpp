@@ -107,6 +107,14 @@ private:
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
+    template <typename T>
+    friend constexpr auto ilogb(T d) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int);
+
+    template <typename T>
+    friend constexpr auto logb(T num) noexcept
+        BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T);
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
@@ -253,6 +261,31 @@ public:
     friend constexpr auto operator/(Integer lhs, decimal128_fast rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast);
 
+    // Compound Arithmetic Operators
+    constexpr auto operator+=(decimal128_fast rhs) noexcept -> decimal128_fast&;
+
+    template <typename Integer>
+    constexpr auto operator+=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&);
+
+    constexpr auto operator-=(decimal128_fast rhs) noexcept -> decimal128_fast&;
+
+    template <typename Integer>
+    constexpr auto operator-=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&);
+
+    constexpr auto operator*=(decimal128_fast rhs) noexcept -> decimal128_fast&;
+
+    template <typename Integer>
+    constexpr auto operator*=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&);
+
+    constexpr auto operator/=(decimal128_fast rhs) noexcept -> decimal128_fast&;
+
+    template <typename Integer>
+    constexpr auto operator/=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&);
+
     // Conversions
     explicit constexpr operator bool() const noexcept;
     explicit constexpr operator int() const noexcept;
@@ -295,35 +328,10 @@ public:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
-    #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
-
-    // LCOV_EXCL_START
-    // TODO(mborland): Fix with STL bindings and delete
-    template <typename charT, typename traits>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const decimal128_fast& d) -> std::basic_ostream<charT, traits>&
-    {
-        if (d.sign_)
-        {
-            os << "-";
-        }
-        else
-        {
-            os << "+";
-        }
-
-        os << d.significand_ << "e";
-        const auto biased_exp {d.biased_exponent()};
-        if (biased_exp > 0)
-        {
-            os << '+';
-        }
-        os << biased_exp;
-
-        return os;
-    }
-    // LCOV_EXCL_STOP
-
-    #endif
+    friend constexpr auto copysignd128f(decimal128_fast mag, decimal128_fast sgn) noexcept -> decimal128_fast;
+    friend constexpr auto scalblnd128f(decimal128_fast num, long exp) noexcept -> decimal128_fast;
+    friend constexpr auto scalbnd128f(decimal128_fast num, int exp) noexcept -> decimal128_fast;
+    friend constexpr auto fmad128f(decimal128_fast x, decimal128_fast y, decimal128 z) noexcept -> decimal128;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -986,6 +994,7 @@ constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
     }
     #endif
 
+    // TODO(mborland): Is trimming the zeros really necessary? Doesn't seem like it
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
     const auto lhs_zeros {detail::remove_trailing_zeros(lhs_sig)};
@@ -1238,6 +1247,62 @@ constexpr auto operator%(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
     return r;
 };
 
+constexpr auto decimal128_fast::operator+=(decimal128_fast rhs) noexcept -> decimal128_fast&
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal128_fast::operator+=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&)
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr auto decimal128_fast::operator-=(decimal128_fast rhs) noexcept -> decimal128_fast&
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal128_fast::operator-=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&)
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+constexpr auto decimal128_fast::operator*=(decimal128_fast rhs) noexcept -> decimal128_fast&
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal128_fast::operator*=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&)
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+constexpr auto decimal128_fast::operator/=(decimal128_fast rhs) noexcept -> decimal128_fast&
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+template <typename Integer>
+constexpr auto decimal128_fast::operator/=(Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast&)
+{
+    *this = *this / rhs;
+    return *this;
+}
+
 constexpr decimal128_fast::operator bool() const noexcept
 {
     constexpr decimal128_fast zero {0, 0};
@@ -1352,6 +1417,33 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::
 constexpr decimal128_fast::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);
+}
+
+constexpr auto copysignd128f(decimal128_fast mag, decimal128_fast sgn) noexcept -> decimal128_fast
+{
+    mag.sign_ = sgn.sign_;
+    return mag;
+}
+
+constexpr auto scalblnd128f(decimal128_fast num, long exp) noexcept -> decimal128_fast
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    constexpr decimal128_fast zero {0, 0};
+
+    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    {
+        return num;
+    }
+    #endif
+
+    num.exponent_ = static_cast<decimal128_fast::exponent_type>(static_cast<long>(num.biased_exponent()) + exp);
+
+    return num;
+}
+
+constexpr auto scalbnd128f(decimal128_fast num, int exp) noexcept -> decimal128_fast
+{
+    return scalblnd128f(num, static_cast<long>(exp));
 }
 
 } // namespace decimal

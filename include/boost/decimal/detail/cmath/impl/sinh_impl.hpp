@@ -29,8 +29,9 @@ private:
     using d64_coeffs_t  = std::array<decimal64,   9>;
     using d128_coeffs_t = std::array<decimal128, 17>;
 
-    using d32_fast_coeffs_t = std::array<decimal32_fast, 6>;
-    using d64_fast_coeffs_t = std::array<decimal64_fast, 9>;
+    using d32_fast_coeffs_t  = std::array<decimal32_fast,  6>;
+    using d64_fast_coeffs_t  = std::array<decimal64_fast,  9>;
+    using d128_fast_coeffs_t = std::array<decimal128_fast, 17>;
 
 public:
     static constexpr d32_coeffs_t d32_coeffs =
@@ -109,6 +110,29 @@ public:
          ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(62430180495565),  UINT64_C(13726064643322746782) }, -70 }, // * x^33
          ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(524623365508955), UINT64_C(15360627863698201590) }, -74 }, // * x^35
     }};
+
+    static constexpr d128_fast_coeffs_t d128_fast_coeffs =
+    {{
+         // Series[Sinh[x], {x, 0, 34}]
+         //            (1),                                                                                                                   // * x
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(90350181040458),  UINT64_C(12964998083131386532) }, -34 }, // * x^3
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(451750905202293), UINT64_C(9484758194528277842)  }, -36 }, // * x^5
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(107559739333879), UINT64_C(7528774067376128516)  }, -37 }, // * x^7
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(149388526852610), UINT64_C(5332535073103080820)  }, -39 }, // * x^9
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(135807751684191), UINT64_C(3170782423392841514)  }, -41 }, // * x^11
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(87056251079609),  UINT64_C(13384395342406417346) }, -43 }, // * x^13
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(414553576569570), UINT64_C(2246069003855862950)  }, -46 }, // * x^15
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(152409403150577), UINT64_C(4623619737181327888)  }, -48 }, // * x^17
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(445641529680050), UINT64_C(8125571139796411480)  }, -51 }, // * x^19
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(106105126114297), UINT64_C(13354072793200296588) }, -53 }, // * x^21
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(209693925127070), UINT64_C(11079921506407677690) }, -56 }, // * x^23
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(349489875211784), UINT64_C(6168706461539761736)  }, -59 }, // * x^25
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(497848825088011), UINT64_C(16092452014289198134) }, -62 }, // * x^27
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(61311431661085),  UINT64_C(3799242275031630472)  }, -64 }, // * x^29
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(65926270603317),  UINT64_C(7853896396813382020)  }, -67 }, // * x^31
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(62430180495565),  UINT64_C(13726064643322746782) }, -70 }, // * x^33
+         ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(524623365508955), UINT64_C(15360627863698201590) }, -74 }, // * x^35
+    }};
 };
 
 #if !(defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L) && (!defined(_MSC_VER) || _MSC_VER != 1900)
@@ -127,6 +151,9 @@ constexpr typename sinh_table_imp<b>::d32_fast_coeffs_t sinh_table_imp<b>::d32_f
 
 template <bool b>
 constexpr typename sinh_table_imp<b>::d64_fast_coeffs_t sinh_table_imp<b>::d64_fast_coeffs;
+
+template <bool b>
+constexpr typename sinh_table_imp<b>::d128_fast_coeffs_t sinh_table_imp<b>::d128_fast_coeffs;
 
 #endif
 
@@ -165,6 +192,12 @@ template <>
 constexpr auto sinh_series_expansion<decimal128>(decimal128 z2) noexcept
 {
     return taylor_series_result(z2, sinh_table::d128_coeffs);
+}
+
+template <>
+constexpr auto sinh_series_expansion<decimal128_fast>(decimal128_fast z2) noexcept
+{
+    return taylor_series_result(z2, sinh_table::d128_fast_coeffs);
 }
 
 } //namespace detail
