@@ -388,7 +388,7 @@ void generate_powers_of_10()
 {
     detail::uint128 x {1};
 
-    for (std::uint64_t i {1}; i < 39; ++i)
+    for (std::uint64_t i {1}; i < 41; ++i)
     {
         std::cerr << "uint128 {UINT64_C(" << x.high << "), UINT64_C(" << x.low << ")}," << std::endl;
         x *= UINT64_C(10);
