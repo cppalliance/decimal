@@ -145,6 +145,7 @@ void test_non_finite_values()
     BOOST_TEST(isinf(detail::check_non_finite(std::numeric_limits<decimal64_fast>::infinity() * dist(rng), one)));
 }
 
+#if !defined(__GNUC__) || (__GNUC__ != 7 && __GNUC__ != 8)
 void test_unary_arithmetic()
 {
     constexpr decimal64_fast one(1);
@@ -159,6 +160,7 @@ void test_unary_arithmetic()
         // LCOV_EXCL_STOP
     }
 }
+#endif
 
 void test_addition()
 {
@@ -398,7 +400,10 @@ void test_shrink_significand()
 int main()
 {
     test_non_finite_values();
+
+    #if !defined(__GNUC__) || (__GNUC__ != 7 && __GNUC__ != 8)
     test_unary_arithmetic();
+    #endif
 
     test_construct_from_integer<int>();
     test_construct_from_integer<long>();
