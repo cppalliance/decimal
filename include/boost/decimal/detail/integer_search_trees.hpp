@@ -262,55 +262,12 @@ static constexpr std::uint_fast8_t guess[] = {
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-static constexpr uint128_t builtin_128_pow10[] = {
-        uint128_t(1),
-        uint128_t(10),
-        uint128_t(100),
-        uint128_t(1000),
-        uint128_t(10000),
-        uint128_t(100000),
-        uint128_t(1000000),
-        uint128_t(10000000),
-        uint128_t(100000000),
-        uint128_t(1000000000),
-        uint128_t(10000000000),
-        uint128_t(100000000000),
-        uint128_t(1000000000000),
-        uint128_t(10000000000000),
-        uint128_t(100000000000000),
-        uint128_t(1000000000000000),
-        uint128_t(10000000000000000),
-        uint128_t(100000000000000000),
-        uint128_t(1000000000000000000),
-        uint128_t(10000000000000000000ULL),
-        (uint128_t(7766279631452241920ULL) << 64) | uint128_t(5),
-        (uint128_t(3875820019684212736ULL) << 64) | uint128_t(54),
-        (uint128_t(1864712049423024128ULL) << 64) | uint128_t(542),
-        (uint128_t(200376420520689664ULL) << 64) | uint128_t(5421),
-        (uint128_t(2003764205206896640ULL) << 64) | uint128_t(54210),
-        (uint128_t(1590897978359414784ULL) << 64) | uint128_t(542101),
-        (uint128_t(15908979783594147840ULL) << 64) | uint128_t(5421010),
-        (uint128_t(11515845246265065472ULL) << 64) | uint128_t(54210108),
-        (uint128_t(4477988020393345024ULL) << 64) | uint128_t(542101086),
-        (uint128_t(7886392056514347008ULL) << 64) | uint128_t(5421010862),
-        (uint128_t(5076944270305263616ULL) << 64) | uint128_t(54210108624),
-        (uint128_t(13875954555633532928ULL) << 64) | uint128_t(542101086242),
-        (uint128_t(9632337040368467968ULL) << 64) | uint128_t(5421010862427),
-        (uint128_t(4089650035136921600ULL) << 64) | uint128_t(54210108624275),
-        (uint128_t(4003012203950112768ULL) << 64) | uint128_t(542101086242752),
-        (uint128_t(3136633892082024448ULL) << 64) | uint128_t(5421010862427522),
-        (uint128_t(12919594847110692864ULL) << 64) | uint128_t(54210108624275221),
-        (uint128_t(68739955140067328ULL) << 64) | uint128_t(542101086242752217),
-        (uint128_t(687399551400673280ULL) << 64) | uint128_t(5421010862427522170ULL),
-        (uint128_t(6873995514006732800ULL) << 64) | uint128_t(17316620476856118468ULL)
-};
-
-static_assert(sizeof(builtin_128_pow10) == sizeof(boost::decimal::detail::uint128_t) * 40, "Should have 10^0 to 10^39");
-
 // Assume that if someone is using 128 bit ints they are favoring the top end of the range
 // Max value is 340,282,366,920,938,463,463,374,607,431,768,211,455 (39 digits)
 constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
 {
+    using impl::builtin_128_pow10;
+
     if (x >= builtin_128_pow10[20]) {
         if (x >= builtin_128_pow10[30]) {
             if (x >= builtin_128_pow10[35]) {
@@ -402,54 +359,10 @@ constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
 
 #endif // Has int128
 
-static constexpr uint128 emulated_128_pow10[] =
-{
-        uint128 {UINT64_C(0), UINT64_C(1)},
-        uint128 {UINT64_C(0), UINT64_C(10)},
-        uint128 {UINT64_C(0), UINT64_C(100)},
-        uint128 {UINT64_C(0), UINT64_C(1000)},
-        uint128 {UINT64_C(0), UINT64_C(10000)},
-        uint128 {UINT64_C(0), UINT64_C(100000)},
-        uint128 {UINT64_C(0), UINT64_C(1000000)},
-        uint128 {UINT64_C(0), UINT64_C(10000000)},
-        uint128 {UINT64_C(0), UINT64_C(100000000)},
-        uint128 {UINT64_C(0), UINT64_C(1000000000)},
-        uint128 {UINT64_C(0), UINT64_C(10000000000)},
-        uint128 {UINT64_C(0), UINT64_C(100000000000)},
-        uint128 {UINT64_C(0), UINT64_C(1000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(10000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(100000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(1000000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(10000000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(100000000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(1000000000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(10000000000000000000)},
-        uint128 {UINT64_C(5), UINT64_C(7766279631452241920)},
-        uint128 {UINT64_C(54), UINT64_C(3875820019684212736)},
-        uint128 {UINT64_C(542), UINT64_C(1864712049423024128)},
-        uint128 {UINT64_C(5421), UINT64_C(200376420520689664)},
-        uint128 {UINT64_C(54210), UINT64_C(2003764205206896640)},
-        uint128 {UINT64_C(542101), UINT64_C(1590897978359414784)},
-        uint128 {UINT64_C(5421010), UINT64_C(15908979783594147840)},
-        uint128 {UINT64_C(54210108), UINT64_C(11515845246265065472)},
-        uint128 {UINT64_C(542101086), UINT64_C(4477988020393345024)},
-        uint128 {UINT64_C(5421010862), UINT64_C(7886392056514347008)},
-        uint128 {UINT64_C(54210108624), UINT64_C(5076944270305263616)},
-        uint128 {UINT64_C(542101086242), UINT64_C(13875954555633532928)},
-        uint128 {UINT64_C(5421010862427), UINT64_C(9632337040368467968)},
-        uint128 {UINT64_C(54210108624275), UINT64_C(4089650035136921600)},
-        uint128 {UINT64_C(542101086242752), UINT64_C(4003012203950112768)},
-        uint128 {UINT64_C(5421010862427522), UINT64_C(3136633892082024448)},
-        uint128 {UINT64_C(54210108624275221), UINT64_C(12919594847110692864)},
-        uint128 {UINT64_C(542101086242752217), UINT64_C(68739955140067328)},
-        uint128 {UINT64_C(5421010862427522170), UINT64_C(687399551400673280)},
-        uint128 {UINT64_C(17316620476856118468), UINT64_C(6873995514006732800)},
-};
-
-static_assert(sizeof(emulated_128_pow10) == sizeof(uint128) * 40, "Should have 10^0 to 10^39");
-
 constexpr auto num_digits(const uint128& x) noexcept -> int
 {
+    using impl::emulated_128_pow10;
+
     if (x >= emulated_128_pow10[20]) {
         if (x >= emulated_128_pow10[30]) {
             if (x >= emulated_128_pow10[35]) {
