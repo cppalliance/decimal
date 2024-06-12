@@ -250,106 +250,114 @@ constexpr int num_digits(const uint256_t& x) noexcept
 # pragma warning(pop)
 #endif
 
-static constexpr std::uint_fast8_t guess[] = {
-    0 ,0 ,0 ,0 , 1 ,1 ,1 , 2 ,2 ,2 ,
-    3 ,3 ,3 ,3 , 4 ,4 ,4 , 5 ,5 ,5 ,
-    6 ,6 ,6 ,6 , 7 ,7 ,7 , 8 ,8 ,8 ,
-    9 ,9 ,9 ,9 , 10,10,10, 11,11,11,
-    12,12,12,12, 13,13,13, 14,14,14,
-    15,15,15,15, 16,16,16, 17,17,17,
-    18,18,18,18, 19
-};
-
 #ifdef BOOST_DECIMAL_HAS_INT128
 
 // Assume that if someone is using 128 bit ints they are favoring the top end of the range
 // Max value is 340,282,366,920,938,463,463,374,607,431,768,211,455 (39 digits)
-constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
+constexpr auto num_digits(const boost::decimal::detail::uint128_t& x) noexcept -> int
 {
     using impl::builtin_128_pow10;
 
-    if (x >= builtin_128_pow10[20]) {
-        if (x >= builtin_128_pow10[30]) {
-            if (x >= builtin_128_pow10[35]) {
-                if (x >= builtin_128_pow10[38]) {
-                    if (x >= builtin_128_pow10[39]) return 40;
-                    return 39;
-                } else {
-                    if (x >= builtin_128_pow10[37]) return 38;
-                    if (x >= builtin_128_pow10[36]) return 37;
-                    return 36;
+    if (static_cast<std::uint64_t>(x << 64) == UINT64_C(0))
+    {
+        return num_digits(static_cast<std::uint64_t>(x));
+    }
+
+    if (x >= builtin_128_pow10[30])
+    {
+        if (x >= builtin_128_pow10[35])
+        {
+            if (x >= builtin_128_pow10[38])
+            {
+                if (x >= builtin_128_pow10[39])
+                {
+                    return 40;
                 }
-            } else {
-                if (x >= builtin_128_pow10[33]) {
-                    if (x >= builtin_128_pow10[34]) return 35;
-                    return 34;
-                } else {
-                    if (x >= builtin_128_pow10[31]) return 32;
-                    if (x >= builtin_128_pow10[32]) return 33;
-                    return 31;
-                }
+                return 39;
             }
-        } else {
-            if (x >= builtin_128_pow10[25]) {
-                if (x >= builtin_128_pow10[28]) {
-                    if (x >= builtin_128_pow10[29]) return 30;
-                    return 29;
-                } else {
-                    if (x >= builtin_128_pow10[27]) return 28;
-                    if (x >= builtin_128_pow10[26]) return 27;
-                    return 26;
+            else
+            {
+                if (x >= builtin_128_pow10[37])
+                {
+                    return 38;
                 }
-            } else {
-                if (x >= builtin_128_pow10[23]) {
-                    if (x >= builtin_128_pow10[24]) return 25;
-                    return 24;
-                } else {
-                    if (x >= builtin_128_pow10[22]) return 23;
-                    if (x >= builtin_128_pow10[21]) return 22;
-                    return 21;
+                if (x >= builtin_128_pow10[36])
+                {
+                    return 37;
                 }
+                return 36;
             }
         }
-    } else {
-        if (x >= builtin_128_pow10[10]) {
-            if (x >= builtin_128_pow10[15]) {
-                if (x >= builtin_128_pow10[18]) {
-                    if (x >= builtin_128_pow10[19]) return 20;
-                    return 19;
-                } else {
-                    if (x >= builtin_128_pow10[17]) return 18;
-                    if (x >= builtin_128_pow10[16]) return 17;
-                    return 16;
+        else
+        {
+            if (x >= builtin_128_pow10[33])
+            {
+                if (x >= builtin_128_pow10[34])
+                {
+                    return 35;
                 }
-            } else {
-                if (x >= builtin_128_pow10[13]) {
-                    if (x >= builtin_128_pow10[14]) return 15;
-                    return 14;
-                } else {
-                    if (x >= builtin_128_pow10[12]) return 13;
-                    if (x >= builtin_128_pow10[11]) return 12;
-                    return 11;
-                }
+                return 34;
             }
-        } else {
-            if (x >= builtin_128_pow10[5]) {
-                if (x >= builtin_128_pow10[8]) {
-                    if (x >= builtin_128_pow10[9]) return 10;
-                    return 9;
-                } else {
-                    if (x >= builtin_128_pow10[7]) return 8;
-                    if (x >= builtin_128_pow10[6]) return 7;
-                    return 6;
+            else
+            {
+                if (x >= builtin_128_pow10[31])
+                {
+                    return 32;
                 }
-            } else {
-                if (x >= builtin_128_pow10[3]) {
-                    if (x >= builtin_128_pow10[4]) return 5;
-                    return 4;
-                } else {
-                    if (x >= builtin_128_pow10[2]) return 3;
-                    if (x >= builtin_128_pow10[1]) return 2;
-                    return 1;
+                if (x >= builtin_128_pow10[32])
+                {
+                    return 33;
                 }
+                return 31;
+            }
+        }
+    }
+    else
+    {
+        if (x >= builtin_128_pow10[25])
+        {
+            if (x >= builtin_128_pow10[28])
+            {
+                if (x >= builtin_128_pow10[29])
+                {
+                    return 30;
+                }
+                return 29;
+            }
+            else
+            {
+                if (x >= builtin_128_pow10[27])
+                {
+                    return 28;
+                }
+                if (x >= builtin_128_pow10[26])
+                {
+                    return 27;
+                }
+                return 26;
+            }
+        }
+        else
+        {
+            if (x >= builtin_128_pow10[23])
+            {
+                if (x >= builtin_128_pow10[24])
+                {
+                    return 25;
+                }
+                return 24;
+            }
+            else
+            {
+                if (x >= builtin_128_pow10[22])
+                {
+                    return 23;
+                }
+                if (x >= builtin_128_pow10[21])
+                {
+                    return 22;
+                }
+                return 21;
             }
         }
     }
@@ -363,50 +371,108 @@ constexpr auto num_digits(const uint128& x) noexcept -> int
 {
     using impl::emulated_128_pow10;
 
-    if (x >= emulated_128_pow10[20]) {
-        if (x >= emulated_128_pow10[30]) {
-            if (x >= emulated_128_pow10[35]) {
-                if (x >= emulated_128_pow10[38]) {
-                    if (x >= emulated_128_pow10[39]) return 40;
-                    return 39;
-                } else {
-                    if (x >= emulated_128_pow10[37]) return 38;
-                    if (x >= emulated_128_pow10[36]) return 37;
-                    return 36;
+    if (x.high == 0)
+    {
+        return num_digits(x.low);
+    }
+
+    if (x >= emulated_128_pow10[30])
+    {
+        if (x >= emulated_128_pow10[35])
+        {
+            if (x >= emulated_128_pow10[38])
+            {
+                if (x >= emulated_128_pow10[39])
+                {
+                    return 40;
                 }
-            } else {
-                if (x >= emulated_128_pow10[33]) {
-                    if (x >= emulated_128_pow10[34]) return 35;
-                    return 34;
-                } else {
-                    if (x >= emulated_128_pow10[31]) return 32;
-                    if (x >= emulated_128_pow10[32]) return 33;
-                    return 31;
-                }
+                return 39;
             }
-        } else {
-            if (x >= emulated_128_pow10[25]) {
-                if (x >= emulated_128_pow10[28]) {
-                    if (x >= emulated_128_pow10[29]) return 30;
-                    return 29;
-                } else {
-                    if (x >= emulated_128_pow10[27]) return 28;
-                    if (x >= emulated_128_pow10[26]) return 27;
-                    return 26;
+            else
+            {
+                if (x >= emulated_128_pow10[37])
+                {
+                    return 38;
                 }
-            } else {
-                if (x >= emulated_128_pow10[23]) {
-                    if (x >= emulated_128_pow10[24]) return 25;
-                    return 24;
-                } else {
-                    if (x >= emulated_128_pow10[22]) return 23;
-                    if (x >= emulated_128_pow10[21]) return 22;
-                    return 21;
+                if (x >= emulated_128_pow10[36])
+                {
+                    return 37;
                 }
+                return 36;
             }
         }
-    } else {
-        return num_digits(x.low);
+        else
+        {
+            if (x >= emulated_128_pow10[33])
+            {
+                if (x >= emulated_128_pow10[34])
+                {
+                    return 35;
+                }
+                return 34;
+            }
+            else
+            {
+                if (x >= emulated_128_pow10[31])
+                {
+                    return 32;
+                }
+                if (x >= emulated_128_pow10[32])
+                {
+                    return 33;
+                }
+                return 31;
+            }
+        }
+    }
+    else
+    {
+        if (x >= emulated_128_pow10[25])
+        {
+            if (x >= emulated_128_pow10[28])
+            {
+                if (x >= emulated_128_pow10[29])
+                {
+                    return 30;
+                }
+                return 29;
+            }
+            else
+            {
+                if (x >= emulated_128_pow10[27])
+                {
+                    return 28;
+                }
+                if (x >= emulated_128_pow10[26])
+                {
+                    return 27;
+                }
+                return 26;
+            }
+        }
+        else
+        {
+            if (x >= emulated_128_pow10[23])
+            {
+                if (x >= emulated_128_pow10[24])
+                {
+                    return 25;
+                }
+                return 24;
+            }
+            else
+            {
+                if (x >= emulated_128_pow10[22])
+                {
+                    return 23;
+                }
+                if (x >= emulated_128_pow10[21])
+                {
+                    return 22;
+                }
+                return 21;
+            }
+        }
     }
 
     return 0;
