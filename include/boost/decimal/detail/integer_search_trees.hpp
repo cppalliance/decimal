@@ -264,7 +264,7 @@ static constexpr std::uint_fast8_t guess[] = {
 
 // Assume that if someone is using 128 bit ints they are favoring the top end of the range
 // Max value is 340,282,366,920,938,463,463,374,607,431,768,211,455 (39 digits)
-constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
+constexpr auto num_digits(const boost::decimal::detail::uint128_t& x) noexcept -> int
 {
     constexpr auto uint64_t_dig {std::numeric_limits<std::uint64_t>::digits10};
     constexpr auto uint64_t_bits {64};
