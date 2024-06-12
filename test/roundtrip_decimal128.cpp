@@ -383,6 +383,19 @@ void test_roundtrip_conversion_decimal32()
     }
 }
 
+#ifdef BOOST_DECIMAL_GENERATE_POW10
+void generate_powers_of_10()
+{
+    detail::uint128 x {1};
+
+    for (std::uint64_t i {1}; i < 39; ++i)
+    {
+        std::cerr << "uint128 {UINT64_C(" << x.high << "), UINT64_C(" << x.low << ")}," << std::endl;
+        x *= UINT64_C(10);
+    }
+}
+#endif
+
 int main()
 {
     test_conversion_to_integer<int>();
@@ -466,6 +479,10 @@ int main()
 
     test_spot(1.0655323219581014e+307);
     test_spot(9.46262809540089e+306);
+
+    #ifdef BOOST_DECIMAL_GENERATE_POW10
+    generate_powers_of_10();
+    #endif
 
     return boost::report_errors();
 }
