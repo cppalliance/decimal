@@ -268,13 +268,13 @@ constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
 {
     const auto high = static_cast<std::uint64_t>(x >> 64);
 
-    if (high != 0)
+    if (high == 0)
     {
-        const auto digits {guess[64 - countl_zero(high)]};
-        return 19 + digits + (x >= impl::powers_of_10[digits]);
+        return num_digits(static_cast<std::uint64_t>(x));
     }
 
-    return num_digits(static_cast<std::uint64_t>(x));
+    const auto digits {guess[64 - countl_zero(high)]};
+    return 19 + digits + (x >= impl::powers_of_10[digits]);
 }
 
 #endif // Has int128
@@ -330,19 +330,18 @@ constexpr auto num_digits(const uint128& x) noexcept -> int
     constexpr auto uint64_t_dig {std::numeric_limits<std::uint64_t>::digits10};
     constexpr auto uint64_t_bits {64};
 
-    if (x.high != 0)
+    if (x.high == UINT64_C(0))
     {
-        const auto digits {guess[uint64_t_bits - countl_zero(x.high)]};
-        auto ret_val {uint64_t_dig + digits + (x >= correction_powers_of_10[digits])};
-
-        // We need to make sure that deviations in the number of digits in the low word
-        // (e.g. 18 or 20 decimal digits) are compensated for.
-        ret_val += static_cast<int>(x > correction_powers_of_10[ret_val]);
-
-        return ret_val;
+        return num_digits(x.low);
     }
 
-    const auto ret_val {num_digits(x.low)};
+    const auto digits {guess[uint64_t_bits - countl_zero(x.high)]};
+    auto ret_val {uint64_t_dig + digits + (x >= correction_powers_of_10[digits])};
+
+    // We need to make sure that deviations in the number of digits in the low word
+    // (e.g. 18 or 20 decimal digits) are compensated for.
+    ret_val += static_cast<int>(x > correction_powers_of_10[ret_val]);
+
     return ret_val;
 }
 
