@@ -337,10 +337,7 @@ constexpr auto num_digits(const uint128& x) noexcept -> int
 
         // We need to make sure that deviations in the number of digits in the low word
         // (e.g. 18 or 20 decimal digits) are compensated for.
-        if (x > correction_powers_of_10[ret_val])
-        {
-            ret_val++;
-        }
+        ret_val += static_cast<int>(x > correction_powers_of_10[ret_val]);
 
         return ret_val;
     }

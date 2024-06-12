@@ -680,12 +680,7 @@ constexpr auto operator!=(uint128 lhs, uint128 rhs) noexcept -> bool
 
 constexpr auto operator<(uint128 lhs, uint128 rhs) noexcept -> bool
 {
-    if (lhs.high == rhs.high)
-    {
-        return lhs.low < rhs.low;
-    }
-
-    return lhs.high < rhs.high;
+    return lhs.high == rhs.high ? lhs.low < rhs.low : lhs.high < rhs.high;
 }
 
 constexpr auto operator<=(uint128 lhs, uint128 rhs) noexcept -> bool
