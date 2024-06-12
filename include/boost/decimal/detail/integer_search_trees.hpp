@@ -493,47 +493,7 @@ constexpr auto num_digits(const uint128& x) noexcept -> int
             }
         }
     } else {
-        if (x >= emulated_128_pow10[10]) {
-            if (x >= emulated_128_pow10[15]) {
-                if (x >= emulated_128_pow10[18]) {
-                    if (x >= emulated_128_pow10[19]) return 20;
-                    return 19;
-                } else {
-                    if (x >= emulated_128_pow10[17]) return 18;
-                    if (x >= emulated_128_pow10[16]) return 17;
-                    return 16;
-                }
-            } else {
-                if (x >= emulated_128_pow10[13]) {
-                    if (x >= emulated_128_pow10[14]) return 15;
-                    return 14;
-                } else {
-                    if (x >= emulated_128_pow10[12]) return 13;
-                    if (x >= emulated_128_pow10[11]) return 12;
-                    return 11;
-                }
-            }
-        } else {
-            if (x >= emulated_128_pow10[5]) {
-                if (x >= emulated_128_pow10[8]) {
-                    if (x >= emulated_128_pow10[9]) return 10;
-                    return 9;
-                } else {
-                    if (x >= emulated_128_pow10[7]) return 8;
-                    if (x >= emulated_128_pow10[6]) return 7;
-                    return 6;
-                }
-            } else {
-                if (x >= emulated_128_pow10[3]) {
-                    if (x >= emulated_128_pow10[4]) return 5;
-                    return 4;
-                } else {
-                    if (x >= emulated_128_pow10[2]) return 3;
-                    if (x >= emulated_128_pow10[1]) return 2;
-                    return 1;
-                }
-            }
-        }
+        return num_digits(x.low);
     }
 
     return 0;
