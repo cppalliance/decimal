@@ -305,6 +305,30 @@ void test_roundtrip_float_stream()
     }
 }
 
+template <typename T>
+void test_spot(T val)
+{
+    const decimal128 first_val {val};
+    const T first_val_flt {static_cast<T>(first_val)};
+    std::stringstream ss;
+    ss << std::setprecision(std::numeric_limits<decimal128>::digits10);
+    ss << first_val;
+    decimal128 return_val {};
+    ss >> return_val;
+    const T return_val_flt {static_cast<T>(return_val)};
+
+    if (!BOOST_TEST_EQ(first_val, return_val) || !BOOST_TEST_EQ(first_val_flt, return_val_flt))
+    {
+        // LCOV_EXCL_START
+        std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                  << "Val: " << first_val
+                  << "\nInt Val: " << first_val_flt
+                  << "\nRet: " << return_val
+                  << "\nInt Ret: " << return_val_flt << std::endl;
+        // LCOV_EXCL_STOP
+    }
+}
+
 template <>
 void test_roundtrip_float_stream<long double>()
 {
@@ -439,6 +463,9 @@ int main()
     #endif
 
     test_roundtrip_conversion_decimal32();
+
+    test_spot(1.0655323219581014e+307);
+    test_spot(9.46262809540089e+306);
 
     return boost::report_errors();
 }
