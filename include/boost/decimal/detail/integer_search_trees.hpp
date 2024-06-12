@@ -18,7 +18,9 @@
 #include <limits>
 #endif
 
-namespace boost { namespace decimal { namespace detail {
+namespace boost {
+namespace decimal {
+namespace detail {
 
 // Generic solution
 template <typename T>
@@ -182,23 +184,24 @@ constexpr auto generate_array() noexcept -> std::array<T, N>
     return values;
 }
 
-constexpr int num_digits(uint128 x) noexcept
-{
-    constexpr auto big_powers_of_10 = generate_array<boost::decimal::detail::uint128, 39>();
+#else
 
-    if (x == 0)
+constexpr int num_digits(const uint128& x) noexcept
+{
+    if (x.high == UINT64_C(0))
     {
-        return 1;
+        return num_digits(x.low);
     }
 
-    std::uint32_t left = 0U;
+    // We start left at 19 because we already eliminated the high word being 0
+    std::uint32_t left = 19U;
     std::uint32_t right = 38U;
 
     while (left < right)
     {
         std::uint32_t mid = (left + right + 1U) / 2U;
 
-        if (x >= big_powers_of_10[mid])
+        if (x >= impl::emulated_128_pow10[mid])
         {
             left = mid;
         }
@@ -209,32 +212,6 @@ constexpr int num_digits(uint128 x) noexcept
     }
 
     return static_cast<int>(left + 1);
-}
-
-#else
-
-constexpr int num_digits(uint128 x) noexcept
-{
-    if (x.high == 0)
-    {
-        return num_digits(x.low);
-    }
-
-    constexpr uint128 digits_39 = static_cast<uint128>(UINT64_C(10000000000000000000)) *
-                                  static_cast<uint128>(UINT64_C(10000000000000000000));
-    uint128 current_power_of_10 = digits_39;
-
-    for (int i = 39; i > 0; --i)
-    {
-        if (x >= current_power_of_10)
-        {
-            return i;
-        }
-
-        current_power_of_10 /= 10U;
-    }
-
-    return 1;
 }
 
 #endif // Constexpr array
