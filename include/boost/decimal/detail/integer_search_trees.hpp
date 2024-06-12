@@ -190,9 +190,9 @@ constexpr int num_digits(const uint256_t& x) noexcept
 {
     constexpr auto big_powers_of_10 = generate_array<boost::decimal::detail::uint256_t, 79>();
 
-    if (x.high == UINT64_C(0) && x.low == UINT64_C(0))
+    if (x.high == uint128{0, 0})
     {
-        return 1;
+        return num_digits(x.low);
     }
 
     std::uint32_t left = 0U;
@@ -266,64 +266,26 @@ static constexpr std::uint_fast8_t guess[] = {
 // Max value is 340,282,366,920,938,463,463,374,607,431,768,211,455 (39 digits)
 constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
 {
-    const auto high = static_cast<std::uint64_t>(x >> 64);
+    constexpr auto uint64_t_dig {std::numeric_limits<std::uint64_t>::digits10};
+    constexpr auto uint64_t_bits {64};
+    const auto high {static_cast<std::uint64_t>(x >> 64)};
 
-    if (high == 0)
+    if (high == UINT64_C(0))
     {
         return num_digits(static_cast<std::uint64_t>(x));
     }
 
-    const auto digits {guess[64 - countl_zero(high)]};
-    return 19 + digits + (x >= impl::powers_of_10[digits]);
+    const auto digits {guess[uint64_t_bits - countl_zero(high)]};
+    auto ret_val {uint64_t_dig + digits + (x >= impl::builtin_128_pow10[digits])};
+
+    // We need to make sure that deviations in the number of digits in the low word
+    // (e.g. 18 or 20 decimal digits) are compensated for.
+    ret_val += static_cast<int>(x >= impl::builtin_128_pow10[ret_val]);
+
+    return ret_val;
 }
 
 #endif // Has int128
-
-static constexpr uint128 correction_powers_of_10[] =
-{
-        uint128 {UINT64_C(0), UINT64_C(1)},
-        uint128 {UINT64_C(0), UINT64_C(10)},
-        uint128 {UINT64_C(0), UINT64_C(100)},
-        uint128 {UINT64_C(0), UINT64_C(1000)},
-        uint128 {UINT64_C(0), UINT64_C(10000)},
-        uint128 {UINT64_C(0), UINT64_C(100000)},
-        uint128 {UINT64_C(0), UINT64_C(1000000)},
-        uint128 {UINT64_C(0), UINT64_C(10000000)},
-        uint128 {UINT64_C(0), UINT64_C(100000000)},
-        uint128 {UINT64_C(0), UINT64_C(1000000000)},
-        uint128 {UINT64_C(0), UINT64_C(10000000000)},
-        uint128 {UINT64_C(0), UINT64_C(100000000000)},
-        uint128 {UINT64_C(0), UINT64_C(1000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(10000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(100000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(1000000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(10000000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(100000000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(1000000000000000000)},
-        uint128 {UINT64_C(0), UINT64_C(10000000000000000000)},
-        uint128 {UINT64_C(5), UINT64_C(7766279631452241920)},
-        uint128 {UINT64_C(54), UINT64_C(3875820019684212736)},
-        uint128 {UINT64_C(542), UINT64_C(1864712049423024128)},
-        uint128 {UINT64_C(5421), UINT64_C(200376420520689664)},
-        uint128 {UINT64_C(54210), UINT64_C(2003764205206896640)},
-        uint128 {UINT64_C(542101), UINT64_C(1590897978359414784)},
-        uint128 {UINT64_C(5421010), UINT64_C(15908979783594147840)},
-        uint128 {UINT64_C(54210108), UINT64_C(11515845246265065472)},
-        uint128 {UINT64_C(542101086), UINT64_C(4477988020393345024)},
-        uint128 {UINT64_C(5421010862), UINT64_C(7886392056514347008)},
-        uint128 {UINT64_C(54210108624), UINT64_C(5076944270305263616)},
-        uint128 {UINT64_C(542101086242), UINT64_C(13875954555633532928)},
-        uint128 {UINT64_C(5421010862427), UINT64_C(9632337040368467968)},
-        uint128 {UINT64_C(54210108624275), UINT64_C(4089650035136921600)},
-        uint128 {UINT64_C(542101086242752), UINT64_C(4003012203950112768)},
-        uint128 {UINT64_C(5421010862427522), UINT64_C(3136633892082024448)},
-        uint128 {UINT64_C(54210108624275221), UINT64_C(12919594847110692864)},
-        uint128 {UINT64_C(542101086242752217), UINT64_C(68739955140067328)},
-        uint128 {UINT64_C(5421010862427522170), UINT64_C(687399551400673280)},
-        uint128 {UINT64_C(17316620476856118468), UINT64_C(6873995514006732800)},
-};
-
-static_assert(sizeof(correction_powers_of_10) == sizeof(uint128) * 40, "Should have 10^0 to 10^39");
 
 constexpr auto num_digits(const uint128& x) noexcept -> int
 {
@@ -336,11 +298,11 @@ constexpr auto num_digits(const uint128& x) noexcept -> int
     }
 
     const auto digits {guess[uint64_t_bits - countl_zero(x.high)]};
-    auto ret_val {uint64_t_dig + digits + (x >= correction_powers_of_10[digits])};
+    auto ret_val {uint64_t_dig + digits + (x >= impl::emulated_128_pow10[digits])};
 
     // We need to make sure that deviations in the number of digits in the low word
     // (e.g. 18 or 20 decimal digits) are compensated for.
-    ret_val += static_cast<int>(x > correction_powers_of_10[ret_val]);
+    ret_val += static_cast<int>(x >= impl::emulated_128_pow10[ret_val]);
 
     return ret_val;
 }
