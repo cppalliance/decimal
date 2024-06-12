@@ -262,24 +262,147 @@ static constexpr std::uint_fast8_t guess[] = {
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
+static constexpr uint128_t builtin_128_pow10[] = {
+        uint128_t(1),
+        uint128_t(10),
+        uint128_t(100),
+        uint128_t(1000),
+        uint128_t(10000),
+        uint128_t(100000),
+        uint128_t(1000000),
+        uint128_t(10000000),
+        uint128_t(100000000),
+        uint128_t(1000000000),
+        uint128_t(10000000000),
+        uint128_t(100000000000),
+        uint128_t(1000000000000),
+        uint128_t(10000000000000),
+        uint128_t(100000000000000),
+        uint128_t(1000000000000000),
+        uint128_t(10000000000000000),
+        uint128_t(100000000000000000),
+        uint128_t(1000000000000000000),
+        uint128_t(10000000000000000000ULL),
+        (uint128_t(7766279631452241920ULL) << 64) | uint128_t(5),
+        (uint128_t(3875820019684212736ULL) << 64) | uint128_t(54),
+        (uint128_t(1864712049423024128ULL) << 64) | uint128_t(542),
+        (uint128_t(200376420520689664ULL) << 64) | uint128_t(5421),
+        (uint128_t(2003764205206896640ULL) << 64) | uint128_t(54210),
+        (uint128_t(1590897978359414784ULL) << 64) | uint128_t(542101),
+        (uint128_t(15908979783594147840ULL) << 64) | uint128_t(5421010),
+        (uint128_t(11515845246265065472ULL) << 64) | uint128_t(54210108),
+        (uint128_t(4477988020393345024ULL) << 64) | uint128_t(542101086),
+        (uint128_t(7886392056514347008ULL) << 64) | uint128_t(5421010862),
+        (uint128_t(5076944270305263616ULL) << 64) | uint128_t(54210108624),
+        (uint128_t(13875954555633532928ULL) << 64) | uint128_t(542101086242),
+        (uint128_t(9632337040368467968ULL) << 64) | uint128_t(5421010862427),
+        (uint128_t(4089650035136921600ULL) << 64) | uint128_t(54210108624275),
+        (uint128_t(4003012203950112768ULL) << 64) | uint128_t(542101086242752),
+        (uint128_t(3136633892082024448ULL) << 64) | uint128_t(5421010862427522),
+        (uint128_t(12919594847110692864ULL) << 64) | uint128_t(54210108624275221),
+        (uint128_t(68739955140067328ULL) << 64) | uint128_t(542101086242752217),
+        (uint128_t(687399551400673280ULL) << 64) | uint128_t(5421010862427522170ULL),
+        (uint128_t(6873995514006732800ULL) << 64) | uint128_t(17316620476856118468ULL)
+};
+
+static_assert(sizeof(builtin_128_pow10) == sizeof(boost::decimal::detail::uint128_t) * 40, "Should have 10^0 to 10^39");
+
 // Assume that if someone is using 128 bit ints they are favoring the top end of the range
 // Max value is 340,282,366,920,938,463,463,374,607,431,768,211,455 (39 digits)
 constexpr auto num_digits(boost::decimal::detail::uint128_t x) noexcept -> int
 {
-    const auto high = static_cast<std::uint64_t>(x >> 64);
-
-    if (high != 0)
-    {
-        const auto digits {guess[64 - countl_zero(high)]};
-        return 19 + digits + (x >= impl::powers_of_10[digits]);
+    if (x >= builtin_128_pow10[20]) {
+        if (x >= builtin_128_pow10[30]) {
+            if (x >= builtin_128_pow10[35]) {
+                if (x >= builtin_128_pow10[38]) {
+                    if (x >= builtin_128_pow10[39]) return 40;
+                    return 39;
+                } else {
+                    if (x >= builtin_128_pow10[37]) return 38;
+                    if (x >= builtin_128_pow10[36]) return 37;
+                    return 36;
+                }
+            } else {
+                if (x >= builtin_128_pow10[33]) {
+                    if (x >= builtin_128_pow10[34]) return 35;
+                    return 34;
+                } else {
+                    if (x >= builtin_128_pow10[31]) return 32;
+                    if (x >= builtin_128_pow10[32]) return 33;
+                    return 31;
+                }
+            }
+        } else {
+            if (x >= builtin_128_pow10[25]) {
+                if (x >= builtin_128_pow10[28]) {
+                    if (x >= builtin_128_pow10[29]) return 30;
+                    return 29;
+                } else {
+                    if (x >= builtin_128_pow10[27]) return 28;
+                    if (x >= builtin_128_pow10[26]) return 27;
+                    return 26;
+                }
+            } else {
+                if (x >= builtin_128_pow10[23]) {
+                    if (x >= builtin_128_pow10[24]) return 25;
+                    return 24;
+                } else {
+                    if (x >= builtin_128_pow10[22]) return 23;
+                    if (x >= builtin_128_pow10[21]) return 22;
+                    return 21;
+                }
+            }
+        }
+    } else {
+        if (x >= builtin_128_pow10[10]) {
+            if (x >= builtin_128_pow10[15]) {
+                if (x >= builtin_128_pow10[18]) {
+                    if (x >= builtin_128_pow10[19]) return 20;
+                    return 19;
+                } else {
+                    if (x >= builtin_128_pow10[17]) return 18;
+                    if (x >= builtin_128_pow10[16]) return 17;
+                    return 16;
+                }
+            } else {
+                if (x >= builtin_128_pow10[13]) {
+                    if (x >= builtin_128_pow10[14]) return 15;
+                    return 14;
+                } else {
+                    if (x >= builtin_128_pow10[12]) return 13;
+                    if (x >= builtin_128_pow10[11]) return 12;
+                    return 11;
+                }
+            }
+        } else {
+            if (x >= builtin_128_pow10[5]) {
+                if (x >= builtin_128_pow10[8]) {
+                    if (x >= builtin_128_pow10[9]) return 10;
+                    return 9;
+                } else {
+                    if (x >= builtin_128_pow10[7]) return 8;
+                    if (x >= builtin_128_pow10[6]) return 7;
+                    return 6;
+                }
+            } else {
+                if (x >= builtin_128_pow10[3]) {
+                    if (x >= builtin_128_pow10[4]) return 5;
+                    return 4;
+                } else {
+                    if (x >= builtin_128_pow10[2]) return 3;
+                    if (x >= builtin_128_pow10[1]) return 2;
+                    return 1;
+                }
+            }
+        }
     }
 
-    return num_digits(static_cast<std::uint64_t>(x));
+    return 0;
 }
 
 #endif // Has int128
 
-static constexpr uint128 correction_powers_of_10[] =
+static constexpr uint128 emulated_128_pow10[] =
 {
         uint128 {UINT64_C(0), UINT64_C(1)},
         uint128 {UINT64_C(0), UINT64_C(10)},
@@ -323,27 +446,97 @@ static constexpr uint128 correction_powers_of_10[] =
         uint128 {UINT64_C(17316620476856118468), UINT64_C(6873995514006732800)},
 };
 
-static_assert(sizeof(correction_powers_of_10) == sizeof(uint128) * 40, "Should have 10^0 to 10^39");
+static_assert(sizeof(emulated_128_pow10) == sizeof(uint128) * 40, "Should have 10^0 to 10^39");
 
 constexpr auto num_digits(const uint128& x) noexcept -> int
 {
-    constexpr auto uint64_t_dig {std::numeric_limits<std::uint64_t>::digits10};
-    constexpr auto uint64_t_bits {64};
-
-    if (x.high != 0)
-    {
-        const auto digits {guess[uint64_t_bits - countl_zero(x.high)]};
-        auto ret_val {uint64_t_dig + digits + (x >= correction_powers_of_10[digits])};
-
-        // We need to make sure that deviations in the number of digits in the low word
-        // (e.g. 18 or 20 decimal digits) are compensated for.
-        ret_val += static_cast<int>(x > correction_powers_of_10[ret_val]);
-
-        return ret_val;
+    if (x >= emulated_128_pow10[20]) {
+        if (x >= emulated_128_pow10[30]) {
+            if (x >= emulated_128_pow10[35]) {
+                if (x >= emulated_128_pow10[38]) {
+                    if (x >= emulated_128_pow10[39]) return 40;
+                    return 39;
+                } else {
+                    if (x >= emulated_128_pow10[37]) return 38;
+                    if (x >= emulated_128_pow10[36]) return 37;
+                    return 36;
+                }
+            } else {
+                if (x >= emulated_128_pow10[33]) {
+                    if (x >= emulated_128_pow10[34]) return 35;
+                    return 34;
+                } else {
+                    if (x >= emulated_128_pow10[31]) return 32;
+                    if (x >= emulated_128_pow10[32]) return 33;
+                    return 31;
+                }
+            }
+        } else {
+            if (x >= emulated_128_pow10[25]) {
+                if (x >= emulated_128_pow10[28]) {
+                    if (x >= emulated_128_pow10[29]) return 30;
+                    return 29;
+                } else {
+                    if (x >= emulated_128_pow10[27]) return 28;
+                    if (x >= emulated_128_pow10[26]) return 27;
+                    return 26;
+                }
+            } else {
+                if (x >= emulated_128_pow10[23]) {
+                    if (x >= emulated_128_pow10[24]) return 25;
+                    return 24;
+                } else {
+                    if (x >= emulated_128_pow10[22]) return 23;
+                    if (x >= emulated_128_pow10[21]) return 22;
+                    return 21;
+                }
+            }
+        }
+    } else {
+        if (x >= emulated_128_pow10[10]) {
+            if (x >= emulated_128_pow10[15]) {
+                if (x >= emulated_128_pow10[18]) {
+                    if (x >= emulated_128_pow10[19]) return 20;
+                    return 19;
+                } else {
+                    if (x >= emulated_128_pow10[17]) return 18;
+                    if (x >= emulated_128_pow10[16]) return 17;
+                    return 16;
+                }
+            } else {
+                if (x >= emulated_128_pow10[13]) {
+                    if (x >= emulated_128_pow10[14]) return 15;
+                    return 14;
+                } else {
+                    if (x >= emulated_128_pow10[12]) return 13;
+                    if (x >= emulated_128_pow10[11]) return 12;
+                    return 11;
+                }
+            }
+        } else {
+            if (x >= emulated_128_pow10[5]) {
+                if (x >= emulated_128_pow10[8]) {
+                    if (x >= emulated_128_pow10[9]) return 10;
+                    return 9;
+                } else {
+                    if (x >= emulated_128_pow10[7]) return 8;
+                    if (x >= emulated_128_pow10[6]) return 7;
+                    return 6;
+                }
+            } else {
+                if (x >= emulated_128_pow10[3]) {
+                    if (x >= emulated_128_pow10[4]) return 5;
+                    return 4;
+                } else {
+                    if (x >= emulated_128_pow10[2]) return 3;
+                    if (x >= emulated_128_pow10[1]) return 2;
+                    return 1;
+                }
+            }
+        }
     }
 
-    const auto ret_val {num_digits(x.low)};
-    return ret_val;
+    return 0;
 }
 
 } // namespace detail
