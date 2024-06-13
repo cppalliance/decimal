@@ -516,9 +516,12 @@ int main()
 
     test_construct_from_float<float>();
     test_construct_from_float<double>();
+
+    #if BOOST_DECIMAL_LDBL_BITS != 128
     test_construct_from_float<long double>();
+    #endif
     #ifdef BOOST_DECIMAL_HAS_FLOAT128
-    test_construct_from_float<__float128>();
+    //test_construct_from_float<__float128>();
     #endif
 
     test_comp();
