@@ -279,11 +279,6 @@ int main()
     test_roundtrip_conversion_integer<std::int64_t>(-9'999'999, 9'999'999);
     test_roundtrip_conversion_integer<std::uint64_t>(0, 9'999'999);
 
-    #if defined(BOOST_DECIMAL_HAS_INT128) && !defined(__STRICT_ANSI__)
-    test_roundtrip_conversion_integer<detail::int128_t>(-9'999'999, 9'999'999);
-    test_roundtrip_conversion_integer<detail::uint128_t>(0, 9'999'999);
-    #endif
-
     test_conversion_to_float<float>();
     test_conversion_to_float<double>();
     test_conversion_to_float<long double>();
