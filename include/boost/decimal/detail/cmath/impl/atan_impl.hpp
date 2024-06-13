@@ -67,13 +67,6 @@ struct atan_table_imp
          ::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(532773544924935), UINT64_C(16408933314882201700) }, -34 }, // atan_three_halves
     }};
 
-    static constexpr std::array<::boost::decimal::decimal128, 3> d128_atan_values =
-    {{
-        ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(251343872473191), UINT64_C(15780610568723885484) }, -34 }, // atan_half
-        ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(425765197510819), UINT64_C(5970600460659265246)  }, -34 }, // atan_one
-        ::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(532773544924935), UINT64_C(16408933314882201700) }, -34 }, // atan_three_halves
-    }};
-
     // 10th degree remez polynomial calculated from 0, 0.4375
     // Estimated max error: 2.3032664387910605e-12
     static constexpr std::array<::boost::decimal::decimal32, 11> d32_coeffs =
