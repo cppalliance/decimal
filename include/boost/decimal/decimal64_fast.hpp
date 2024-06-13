@@ -1082,7 +1082,7 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-    #if defined(__clang_major__) && __clang_major__ < 9
+    #if defined(__clang_major__) && __clang_major__ < 13
 
     const auto result {detail::d64_mul_impl<detail::decimal64_components>(
                         lhs.significand_, lhs.biased_exponent(), lhs.isneg(),
