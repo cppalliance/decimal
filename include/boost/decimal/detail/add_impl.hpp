@@ -132,29 +132,26 @@ constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     // 64-bit sign int can have 19 digits, and our normalized significand has 16
     if (delta_exp <= 3)
     {
-        while (delta_exp > 0)
-        {
-            lhs_sig *= 10;
-            --delta_exp;
-            --lhs_exp;
-        }
+        lhs_sig *= pow10(static_cast<T1>(delta_exp));
+        lhs_exp -= delta_exp;
+        delta_exp = 0;
     }
     else
     {
         lhs_sig *= 1000;
         delta_exp -= 3;
         lhs_exp -= 3;
-    }
 
-    while (delta_exp > 1)
-    {
-        rhs_sig /= 10;
-        --delta_exp;
-    }
+        if (delta_exp > 1)
+        {
+            rhs_sig /= pow10(static_cast<T2>(delta_exp - 1));
+            delta_exp = 1;
+        }
 
-    if (delta_exp == 1)
-    {
-        detail::fenv_round<decimal64>(rhs_sig, rhs_sign);
+        if (delta_exp == 1)
+        {
+            detail::fenv_round<decimal64>(rhs_sig, rhs_sign);
+        }
     }
 
     // Both of the significands are well under 64-bits, so we can fit them into int64_t without issue
