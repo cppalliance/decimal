@@ -32,20 +32,29 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 8764
-| 1.577
+| 8587
+| 1.376
 | `double`
-| 5559
+| 6240
 | 1.000
 | `decimal32`
-| 276,124
-| 49.672
+| 275,597
+| 44.166
 | `decimal64`
-| 355,999
-| 64.760
+| 296,929
+| 47.587
 | `decimal128`
-| 989,028
-| 177.915
+| 821,847
+| 131.706
+| `decimal32_fast`
+| 99,664
+| 15.972
+| `decimal64_fast`
+| 102,132
+| 16.367
+| `decimal128_fast`
+| 1,427,647
+| 228.790
 |===
 
 == Basic Operations
@@ -62,20 +71,29 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 2113
-| 0.739
+| 2705
+| 0.859
 | `double`
-| 2860
+| 3148
 | 1.000
 | `decimal32`
-| 353,836
-| 123.719
+| 351,505
+| 111.660
 | `decimal64`
-| 409,098
-| 143.041
+| 359,425
+| 114.176
 | `decimal128`
-| 2,418,039
-| 845.468
+| 1,446,674
+| 459.553
+| `decimal32_fast`
+| 146,873
+| 46.656
+| `decimal64_fast`
+| 139,294
+| 44.248
+| `decimal128_fast`
+| 1,351,882
+| 429.442
 |===
 
 ==== Subtraction
@@ -83,20 +101,29 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 1782
-| 1.061
+| 3339
+| 2.014
 | `double`
-| 1680
+| 1658
 | 1.000
 | `decimal32`
-| 293,927
-| 174.957
+| 267,646
+| 161.427
 | `decimal64`
-| 329,425
-| 196.086
+| 303,589
+| 183.106
 | `decimal128`
-| 1,527,261
-| 909.084
+| 954,211
+| 575.519
+| `decimal32_fast`
+| 147,112
+| 88.729
+| `decimal64_fast`
+| 145,606
+| 87.820
+| `decimal128_fast`
+| 894,695
+| 539.623
 |===
 
 ==== Multiplication
@@ -104,20 +131,29 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 1691
-| 0.979
+| 1646
+| 0.957
 | `double`
-| 1728
+| 1720
 | 1.000
 | `decimal32`
-| 309,117
-| 178.887
+| 313,219
+| 182.104
 | `decimal64`
-| 408,010
-| 236.117
+| 583,818
+| 339.429
 | `decimal128`
-| 2,506,105
-| 1450.292
+| 1,881,936
+| 1094.149
+| `decimal32_fast`
+| 86,093
+| 50.054
+| `decimal64_fast`
+| 333,582
+| 193.943
+| `decimal128_fast`
+| 1,822,921
+| 1059.838
 |===
 
 ==== Division
@@ -125,20 +161,29 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 2058
-| 0.846
+| 2120
+| 0.547
 | `double`
-| 2434
+| 3874
 | 1.000
 | `decimal32`
-| 304,852
-| 125.247
+| 307,337
+| 79.333
 | `decimal64`
-| 519,990
-| 213.636
+| 447,910
+| 115.620
 | `decimal128`
-| 3,534,909
-| 1452.304
+| 2,544,798
+| 656.892
+| `decimal32_fast`
+| 105,796
+| 27.309
+| `decimal64_fast`
+| 291,671
+| 75.289
+| `decimal128_fast`
+| 292,556
+| 75.518
 |===
 
 == Selected Special Functions
