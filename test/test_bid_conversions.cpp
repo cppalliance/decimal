@@ -33,6 +33,7 @@ int main()
     test<decimal64>();
 
     test<decimal128>();
+    test<decimal128_fast>();
 
     return boost::report_errors();
 }
