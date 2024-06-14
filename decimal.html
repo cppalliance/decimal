@@ -588,6 +588,11 @@ pre.rouge .gs {
 <li><a href="#decimal128_description">Description</a></li>
 </ul>
 </li>
+<li><a href="#decimal128_fast">Decimal128_fast</a>
+<ul class="sectlevel2">
+<li><a href="#decimal128_fast_description">Description</a></li>
+</ul>
+</li>
 <li><a href="#conversions">Fast Type Conversions</a></li>
 <li><a href="#literals">Literals Support</a></li>
 <li><a href="#numbers">Numeric Constants</a>
@@ -1320,7 +1325,7 @@ As is often the case this trades space for time by having greater storage width 
 <div class="sect2">
 <h3 id="decimal128_description">Description</h3>
 <div class="paragraph">
-<p>Decimal64 is the 128-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6</p>
+<p>Decimal128 is the 128-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1393,6 +1398,109 @@ As is often the case this trades space for time by having greater storage width 
 <span class="k">constexpr</span> <span class="n">decimal128</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">-=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
 <span class="k">constexpr</span> <span class="n">decimal128</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
 <span class="k">constexpr</span> <span class="n">decimal128</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">/=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+
+<span class="c1">// 3.2.6 Conversion to floating-point type</span>
+<span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">operator</span> <span class="kt">float</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">operator</span> <span class="kt">double</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">operator</span> <span class="kt">long</span> <span class="kt">double</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// The following are available assuming a C++23 compiler that provides the header &lt;stdfloat&gt;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">float16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">float32_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">float64_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">bfloat16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal32</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal64</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="p">}</span> <span class="c1">//namespace decimal</span>
+<span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="decimal128_fast">Decimal128_fast</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="decimal128_fast_description">Description</h3>
+<div class="paragraph">
+<p><code>decimal128_fast</code> has the same ranges of values and representations as <code>decimal128_fast</code> but with greater performance.
+The performance changes by being non-IEEE 754 compliant so that the value does not have to be decoded from bits, but is instead directly represented internal to the type.
+As is often the case this trades space for time by having greater storage width requirements.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Storage width - 128 bits</p>
+</li>
+<li>
+<p>Precision - 34 decimal digits (not bits like binary)</p>
+</li>
+<li>
+<p>Max exponent - 6145</p>
+</li>
+<li>
+<p>Max Value - 9.99999&#8230;&#8203;e6145</p>
+</li>
+<li>
+<p>Smallest normalized value - 1.0000&#8230;&#8203;e-6142</p>
+</li>
+<li>
+<p>Smallest subnormal - 1e-6176</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/decimal/decimal128_fast.hpp&gt;</span><span class="cp">
+</span>
+<span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="c1">// Paragraph numbers are from ISO/IEC DTR 24733</span>
+
+<span class="c1">// 3.2.4.1 construct/copy/destroy</span>
+<span class="k">constexpr</span> <span class="n">decimal128_fast</span><span class="p">()</span> <span class="k">noexcept</span> <span class="o">=</span> <span class="k">default</span><span class="p">;</span>
+
+<span class="c1">// 3.2.4.2 Conversion form floating-point type</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Float</span><span class="p">&gt;</span>
+<span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">decimal128_fast</span><span class="p">(</span><span class="n">Float</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// 3.2.4.3 Conversion from integral type</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Integer</span><span class="p">&gt;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="n">decimal128_fast</span><span class="p">(</span><span class="n">Integer</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Integral1</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">Integral2</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">decimal128_fast</span><span class="p">(</span><span class="n">Integral1</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">Integral2</span> <span class="n">exp</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">sign</span> <span class="o">=</span> <span class="nb">false</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Integral</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">decimal128_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">Integeral</span><span class="o">&amp;</span> <span class="n">RHS</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// 3.2.4.4 Conversion to integral type</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">int</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">unsigned</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">long</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">unsigned</span> <span class="kt">long</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">long</span> <span class="kt">long</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="kt">int8_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint8_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="kt">int16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint16_t</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// 3.2.4.5 increment and decrement operators:</span>
+<span class="k">constexpr</span> <span class="n">decimal128_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">++</span><span class="p">();</span>
+<span class="k">constexpr</span> <span class="n">decimal128_fast</span>  <span class="k">operator</span><span class="o">++</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+<span class="k">constexpr</span> <span class="n">decimal128_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">--</span><span class="p">();</span>
+<span class="k">constexpr</span> <span class="n">decimal128_fast</span>  <span class="k">operator</span><span class="o">--</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+
+<span class="c1">// 3.2.4.6 compound assignment:</span>
+<span class="k">constexpr</span> <span class="n">decimal128_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">+=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+<span class="k">constexpr</span> <span class="n">decimal128_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">-=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+<span class="k">constexpr</span> <span class="n">decimal128_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
+<span class="k">constexpr</span> <span class="n">decimal128_fast</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">/=</span><span class="p">(</span><span class="n">RHS</span> <span class="n">rhs</span><span class="p">);</span>
 
 <span class="c1">// 3.2.6 Conversion to floating-point type</span>
 <span class="k">explicit</span> <span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">operator</span> <span class="kt">float</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
@@ -3319,28 +3427,43 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8764</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.577</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8587</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.376</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5559</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6240</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">276,124</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">49.672</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">275,597</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">44.166</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">355,999</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">64.760</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">296,929</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">47.587</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">989,028</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">177.915</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">821,847</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">131.706</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">99,664</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15.972</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">102,132</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16.367</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,427,647</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">228.790</p></td>
 </tr>
 </tbody>
 </table>
@@ -3373,28 +3496,43 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2113</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.739</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2705</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.859</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2860</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3148</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">353,836</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">123.719</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">351,505</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">111.660</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">409,098</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">143.041</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">359,425</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">114.176</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,418,039</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">845.468</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,446,674</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">459.553</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">146,873</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">46.656</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">139,294</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">44.248</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,351,882</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">429.442</p></td>
 </tr>
 </tbody>
 </table>
@@ -3415,28 +3553,43 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1782</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.061</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3339</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.014</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1680</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1658</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">293,927</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">174.957</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">267,646</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">161.427</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">329,425</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">196.086</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">303,589</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">183.106</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,527,261</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">909.084</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">954,211</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">575.519</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">147,112</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">88.729</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">145,606</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">87.820</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">894,695</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">539.623</p></td>
 </tr>
 </tbody>
 </table>
@@ -3457,28 +3610,43 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1691</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.979</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1646</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.957</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1728</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1720</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">309,117</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">178.887</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">313,219</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">182.104</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">408,010</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">236.117</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">583,818</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">339.429</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,506,105</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1450.292</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,881,936</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1094.149</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">86,093</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50.054</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">333,582</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">193.943</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,822,921</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1059.838</p></td>
 </tr>
 </tbody>
 </table>
@@ -3499,28 +3667,43 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2058</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.846</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2120</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.547</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2434</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3874</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">304,852</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">125.247</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">307,337</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">79.333</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">519,990</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">213.636</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">447,910</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">115.620</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3,534,909</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1452.304</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,544,798</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">656.892</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">105,796</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">27.309</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">291,671</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">75.289</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">292,556</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">75.518</p></td>
 </tr>
 </tbody>
 </table>
@@ -3966,7 +4149,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-06-04 09:44:16 +0200
+Last updated 2024-06-14 09:33:44 -0400
 </div>
 </div>
 <style>
