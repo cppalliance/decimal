@@ -84,6 +84,20 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d128(detail::uint128 bits) noexcept 
     return val;
 }
 
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d128f(decimal128_fast val) noexcept -> detail::uint128
+{
+    const decimal128 compliant_val {val};
+    const auto bits {detail::bit_cast<detail::uint128>(compliant_val)};
+    return bits;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d128f(detail::uint128 bits) noexcept -> decimal128_fast
+{
+    const auto compliant_val {detail::bit_cast<decimal128>(bits)};
+    const decimal128_fast val {compliant_val};
+    return val;
+}
+
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal32 val) noexcept -> std::uint32_t
 {
     return to_bid_d32(val);
@@ -107,6 +121,11 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal64_fast val) noexcept -> std::u
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal128 val) noexcept -> detail::uint128
 {
     return to_bid_d128(val);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(decimal128_fast val) noexcept -> detail::uint128
+{
+    return to_bid_d128f(val);
 }
 
 template <typename T = decimal32_fast>
@@ -135,9 +154,15 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid<decimal64>(std::uint64_t bits) noexc
     return from_bid_d64(bits);
 }
 
-template <typename T = decimal128>
+template <typename T = decimal128_fast>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid(detail::uint128 bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    return from_bid_d128f(bits);
+}
+
+template <>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid<decimal128>(detail::uint128 bits) noexcept -> decimal128
 {
     return from_bid_d128(bits);
 }
