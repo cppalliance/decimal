@@ -94,6 +94,29 @@ struct hash<boost::decimal::decimal64_fast>
     }
 };
 
-}
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
+BOOST_DECIMAL_EXPORT template <>
+struct hash<boost::decimal::decimal128_fast>
+{
+    // Take the xor of the two words and hash that
+    auto operator()(const boost::decimal::decimal128_fast& v) const noexcept -> std::size_t
+    {
+        boost::decimal::decimal128 v_128 {v};
+        boost::decimal::detail::uint128 bits;
+        std::memcpy(&bits, &v_128, sizeof(boost::decimal::detail::uint128));
+
+        return std::hash<std::uint64_t>{}(bits.high ^ bits.low);
+    }
+};
+
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
+
+} // namespace std
 
 #endif //BOOST_DECIMAL_HASH_HPP
