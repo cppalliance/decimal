@@ -72,6 +72,7 @@
 #include <boost/decimal/detail/cmath/legendre.hpp>
 #include <boost/decimal/detail/cmath/assoc_legendre.hpp>
 #include <boost/decimal/detail/cmath/trunc_to.hpp>
+#include <boost/decimal/detail/cmath/beta.hpp>
 #include <boost/decimal/numbers.hpp>
 
 // Macros from 3.6.2
@@ -113,6 +114,11 @@ BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal128 num, int expval) noexcept 
     return scalbnd128(num, expval);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto scalbn(decimal128_fast num, int expval) noexcept -> decimal128_fast
+{
+    return scalbnd128f(num, expval);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal32 num, long expval) noexcept -> decimal32
 {
     return scalblnd32(num, expval);
@@ -136,6 +142,11 @@ BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal64_fast num, long expval) noe
 BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal128 num, long expval) noexcept -> decimal128
 {
     return scalblnd128(num, expval);
+}
+
+BOOST_DECIMAL_EXPORT constexpr auto scalbln(decimal128_fast num, long expval) noexcept -> decimal128_fast
+{
+    return scalblnd128f(num, expval);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal32 mag, decimal32 sgn) noexcept -> decimal32
@@ -163,6 +174,11 @@ BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal128 mag, decimal128 sgn) noe
     return copysignd128(mag, sgn);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto copysign(decimal128_fast mag, decimal128_fast sgn) noexcept -> decimal128_fast
+{
+    return copysignd128f(mag, sgn);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     return samequantumd32(lhs, rhs);
@@ -181,6 +197,11 @@ BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal64 lhs, decimal64 rhs) no
 BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal128 lhs, decimal128 rhs) noexcept -> bool
 {
     return samequantumd128(lhs, rhs);
+}
+
+BOOST_DECIMAL_EXPORT constexpr auto samequantum(decimal128_fast lhs, decimal128_fast rhs) noexcept -> bool
+{
+    return samequantumd128f(lhs, rhs);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal32 x) noexcept -> int
@@ -203,6 +224,11 @@ BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal128 x) noexcept -> int
     return quantexpd128(x);
 }
 
+BOOST_DECIMAL_EXPORT constexpr auto quantexp(decimal128_fast x) noexcept -> int
+{
+    return quantexpd128f(x);
+}
+
 BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     return quantized32(lhs, rhs);
@@ -221,6 +247,11 @@ BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal64 lhs, decimal64 rhs) noexc
 BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
 {
     return quantized128(lhs, rhs);
+}
+
+BOOST_DECIMAL_EXPORT constexpr auto quantize(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+{
+    return quantized128f(lhs, rhs);
 }
 
 } // namespace decimal

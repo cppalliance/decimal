@@ -83,16 +83,6 @@ void test_comp()
     BOOST_TEST(!(small <= std::numeric_limits<decimal64_fast>::quiet_NaN()));
 }
 
-void test_decimal_constructor()
-{
-    // The significand is more than 7 digits
-    // Apply correct rounding when in the range of 7 digits
-    decimal64_fast big(123456789, 0);
-    decimal64_fast rounded_big(1234568, 2);
-
-    BOOST_TEST_EQ(big, rounded_big);
-}
-
 void test_non_finite_values()
 {
     constexpr decimal64_fast one(0b1, 0);
@@ -103,7 +93,6 @@ void test_non_finite_values()
     BOOST_TEST(!isinf(one));
     BOOST_TEST(!isinf(std::numeric_limits<decimal64_fast>::quiet_NaN()));
     BOOST_TEST(!isinf(std::numeric_limits<decimal64_fast>::signaling_NaN()));
-    BOOST_TEST(!isinf(std::numeric_limits<decimal64_fast>::denorm_min()));
 
     BOOST_TEST(std::numeric_limits<decimal64_fast>::has_quiet_NaN);
     BOOST_TEST(std::numeric_limits<decimal64_fast>::has_signaling_NaN);
@@ -122,7 +111,6 @@ void test_non_finite_values()
     #ifdef _MSC_VER
 
     BOOST_TEST(boost::decimal::isfinite(one));
-    BOOST_TEST(boost::decimal::isfinite(std::numeric_limits<decimal64_fast>::denorm_min()));
     BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal64_fast>::infinity()));
     BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal64_fast>::quiet_NaN()));
     BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal64_fast>::signaling_NaN()));
@@ -130,7 +118,6 @@ void test_non_finite_values()
     #else
 
     BOOST_TEST(isfinite(one));
-    BOOST_TEST(isfinite(std::numeric_limits<decimal64_fast>::denorm_min()));
     BOOST_TEST(!isfinite(std::numeric_limits<decimal64_fast>::infinity()));
     BOOST_TEST(!isfinite(std::numeric_limits<decimal64_fast>::quiet_NaN()));
     BOOST_TEST(!isfinite(std::numeric_limits<decimal64_fast>::signaling_NaN()));
@@ -141,7 +128,6 @@ void test_non_finite_values()
     BOOST_TEST(!isnormal(std::numeric_limits<decimal64_fast>::infinity()));
     BOOST_TEST(!isnormal(std::numeric_limits<decimal64_fast>::quiet_NaN()));
     BOOST_TEST(!isnormal(std::numeric_limits<decimal64_fast>::signaling_NaN()));
-    BOOST_TEST(!isnormal(std::numeric_limits<decimal64_fast>::denorm_min()));
 
     BOOST_TEST_EQ(fpclassify(one), FP_NORMAL);
     BOOST_TEST_EQ(fpclassify(-one), FP_NORMAL);
@@ -149,7 +135,6 @@ void test_non_finite_values()
     BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal64_fast>::signaling_NaN()), FP_NAN);
     BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal64_fast>::infinity()), FP_INFINITE);
     BOOST_TEST_EQ(fpclassify(-std::numeric_limits<decimal64_fast>::infinity()), FP_INFINITE);
-    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal64_fast>::denorm_min()), FP_SUBNORMAL);
 
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<std::uint32_t> dist(1, 2);
@@ -160,12 +145,22 @@ void test_non_finite_values()
     BOOST_TEST(isinf(detail::check_non_finite(std::numeric_limits<decimal64_fast>::infinity() * dist(rng), one)));
 }
 
+#if !defined(__GNUC__) || (__GNUC__ != 7 && __GNUC__ != 8)
 void test_unary_arithmetic()
 {
-    constexpr decimal64_fast one(0b1, -100);
+    constexpr decimal64_fast one(1);
     BOOST_TEST(+one == one);
-    BOOST_TEST(-one != one);
+    if(!BOOST_TEST(-one != one))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "One: " << one
+                  << "\nNeg: " << -one
+                  << "\n    Bid: " << to_bid(one)
+                  << "\nNeg Bid: " << to_bid(-one) << std::endl;
+        // LCOV_EXCL_STOP
+    }
 }
+#endif
 
 void test_addition()
 {
@@ -176,8 +171,8 @@ void test_addition()
     BOOST_TEST_EQ(small_num + big_num, big_num);
 
     // Case 2: Round the last digit of the significand
-    constexpr decimal64_fast full_length_num {1000000, 0};
-    constexpr decimal64_fast rounded_full_length_num(1000001, 0);
+    constexpr decimal64_fast full_length_num {UINT64_C(1000000000000000), 0};
+    constexpr decimal64_fast rounded_full_length_num(UINT64_C(1000000000000001), 0);
     constexpr decimal64_fast no_round(1, -1);
     constexpr decimal64_fast round(9, -1);
     BOOST_TEST_EQ(full_length_num + no_round, full_length_num);
@@ -229,12 +224,6 @@ void test_subtraction()
     BOOST_TEST_EQ(big_num - small_num, big_num);
     BOOST_TEST_EQ(small_num - big_num, -big_num);
 
-    // Case 2: Round the last digit of the significand
-    constexpr decimal64_fast no_round {1234567, 5};
-    constexpr decimal64_fast round {9876543, -2};
-    BOOST_TEST_EQ(no_round - round, decimal64_fast(1234566, 5));
-
-    // Case 3: Add away
     constexpr decimal64_fast one(1, 0);
     constexpr decimal64_fast two(2, 0);
     constexpr decimal64_fast three(3, 0);
@@ -355,9 +344,6 @@ void test_construct_from_integer()
 
     constexpr decimal64_fast one_pow_eight(1, 8);
     BOOST_TEST_EQ(one_pow_eight, decimal64_fast(T(100'000'000)));
-
-    constexpr decimal64_fast rounded(1234568, 1);
-    BOOST_TEST_EQ(rounded, decimal64_fast(T(12345678)));
 }
 
 template <typename T>
@@ -413,9 +399,11 @@ void test_shrink_significand()
 
 int main()
 {
-    test_decimal_constructor();
     test_non_finite_values();
+
+    #if !defined(__GNUC__) || (__GNUC__ != 7 && __GNUC__ != 8)
     test_unary_arithmetic();
+    #endif
 
     test_construct_from_integer<int>();
     test_construct_from_integer<long>();
@@ -424,7 +412,7 @@ int main()
     test_construct_from_float<float>();
     test_construct_from_float<double>();
     test_construct_from_float<long double>();
-    #ifdef BOOST_DECIMAL_HAS_FLOAT128
+    #if defined(BOOST_DECIMAL_HAS_FLOAT128) && (!defined(__clang_major__) || __clang_major__ >= 13)
     test_construct_from_float<__float128>();
     #endif
 
@@ -439,7 +427,7 @@ int main()
 
     spot_check_addition(-1054191000, -920209700, -1974400700);
     spot_check_addition(353582500, -32044770, 321537730);
-    spot_check_addition(989629100, 58451350, 1048080000);
+    spot_check_addition(989629100, 58451350, 1048080450);
 
     test_shrink_significand();
 

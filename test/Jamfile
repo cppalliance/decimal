@@ -79,6 +79,7 @@ run test_atan.cpp ;
 run test_atan2.cpp ;
 run test_atanh.cpp ;
 compile-fail test_bad_evaluation_method.cpp ;
+run test_beta.cpp ;
 run test_bid_conversions.cpp ;
 run test_big_uints.cpp ;
 run test_boost_math_univariate_stats.cpp ;

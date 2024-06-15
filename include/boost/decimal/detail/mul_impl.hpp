@@ -69,8 +69,10 @@ constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 {
     #ifdef BOOST_DECIMAL_HAS_INT128
     using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    constexpr auto comp_value {impl::builtin_128_pow10[31]};
     #else
     using unsigned_int128_type = boost::decimal::detail::uint128;
+    constexpr auto comp_value {impl::emulated_128_pow10[31]};
     #endif
 
     #ifdef BOOST_DECIMAL_DEBUG
@@ -88,13 +90,10 @@ constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     auto res_sig {static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > std::numeric_limits<std::uint64_t>::digits10)
-    {
-        res_sig /= static_cast<unsigned_int128_type>(detail::pow10(static_cast<std::uint64_t>(sig_dig - std::numeric_limits<std::uint64_t>::digits10)));
-        res_exp += sig_dig - std::numeric_limits<std::uint64_t>::digits10;
-    }
+    const auto sig_dig {res_sig >= comp_value ? 32 : 31};
+    constexpr auto max_dig {std::numeric_limits<std::uint64_t>::digits10};
+    res_sig /= detail::pow10(static_cast<unsigned_int128_type>(sig_dig - max_dig));
+    res_exp += sig_dig - max_dig;
 
     const auto res_sig_64 {static_cast<std::uint64_t>(res_sig)};
 
