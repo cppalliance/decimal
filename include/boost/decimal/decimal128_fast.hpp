@@ -781,17 +781,9 @@ constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
         return lhs - abs(rhs);
     }
 
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal128>(lhs_sig, lhs_exp);
-
-    auto rhs_sig {rhs.full_significand()};
-    auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize<decimal128>(rhs_sig, rhs_exp);
-
     const auto result {detail::d128_add_impl<detail::decimal128_fast_components>(
-            lhs_sig, lhs_exp, lhs.sign_,
-            rhs_sig, rhs_exp, rhs.sign_)};
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_)};
 
     return {result.sig, result.exp, result.sign};
 };
