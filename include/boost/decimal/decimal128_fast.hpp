@@ -806,10 +806,7 @@ constexpr auto operator+(decimal128_fast lhs, Integer rhs) noexcept
     }
     bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize<decimal128>(sig_lhs, exp_lhs);
-    auto lhs_components {detail::decimal128_fast_components{sig_lhs, exp_lhs, lhs.isneg()}};
+    auto lhs_components {detail::decimal128_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
 
     auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
     std::int32_t exp_rhs {0};
