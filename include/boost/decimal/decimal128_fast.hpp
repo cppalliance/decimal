@@ -351,50 +351,24 @@ template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> &
 #endif
 constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
 {
-    using Unsigned_Integer = detail::make_unsigned_t<T1>;
-
     const bool isneg {coeff < static_cast<T1>(0) || sign};
     sign_ = isneg;
-    Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
+    auto unsigned_coeff {static_cast<significand_type>(detail::make_positive_unsigned(coeff))};
 
-    auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
-    const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal128>};
+    // Normalize the significand in the constructor, so we don't have
+    // to calculate the number of digits for operationss
+    detail::normalize<decimal128>(unsigned_coeff, exp, sign);
 
-    // Strip digits
-    if (unsigned_coeff_digits > detail::precision_v<decimal128> + 1)
-    {
-        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal128> + 1)};
+    significand_ = unsigned_coeff;
 
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic push
-        #  pragma GCC diagnostic ignored "-Wconversion"
-        #endif
-
-        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
-
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic pop
-        #endif
-
-        exp += digits_to_remove;
-        unsigned_coeff_digits -= digits_to_remove;
-    }
-
-    // Round as required
-    if (reduced)
-    {
-        exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
-    }
-
-    significand_ = static_cast<significand_type>(unsigned_coeff);
-
-    // Normalize the handling of zeros
+    // Normalize the handling of 0
     if (significand_ == detail::uint128{UINT64_C(0), UINT64_C(0)})
     {
         exp = 0;
     }
 
     const auto biased_exp {static_cast<exponent_type>(exp + detail::bias_v<decimal128>)};
+
     if (biased_exp > detail::max_biased_exp_v<decimal128>)
     {
         significand_ = detail::d128_fast_inf;
