@@ -1072,7 +1072,7 @@ constexpr auto d128f_div_impl(decimal128_fast lhs, decimal128_fast rhs, decimal1
     #else
     static_cast<void>(r);
     #endif
-    
+
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "sig lhs: " << sig_lhs
               << "\nexp lhs: " << exp_lhs
@@ -1138,11 +1138,7 @@ constexpr auto operator/(decimal128_fast lhs, Integer rhs) noexcept
     }
     #endif
 
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal128>(lhs_sig, lhs_exp);
-
-    detail::decimal128_fast_components lhs_components {lhs_sig, lhs_exp, lhs.isneg()};
+    detail::decimal128_fast_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.isneg()};
 
     auto rhs_sig {detail::make_positive_unsigned(rhs)};
     std::int32_t rhs_exp {};
@@ -1184,12 +1180,8 @@ constexpr auto operator/(Integer lhs, decimal128_fast rhs) noexcept
     }
     #endif
 
-    auto rhs_sig {rhs.full_significand()};
-    auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize<decimal128>(rhs_sig, rhs_exp);
-
     detail::decimal128_fast_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
-    detail::decimal128_fast_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
+    detail::decimal128_fast_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.isneg()};
     detail::decimal128_fast_components q_components {};
 
     detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
