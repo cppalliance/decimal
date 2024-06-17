@@ -220,24 +220,23 @@ constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     {
         lhs_sig *= detail::pow10(static_cast<detail::uint128>(delta_exp));
         lhs_exp -= delta_exp;
-        delta_exp = 0;
     }
     else
     {
         lhs_sig *= 1000;
         delta_exp -= 3;
         lhs_exp -= 3;
-    }
 
-    while (delta_exp > 1)
-    {
-        rhs_sig /= detail::pow10(static_cast<detail::uint128>(delta_exp - 1));
-        delta_exp = 1;
-    }
+        if (delta_exp > 1)
+        {
+            rhs_sig /= pow10(static_cast<uint128>(delta_exp - 1));
+            delta_exp = 1;
+        }
 
-    if (delta_exp == 1)
-    {
-        detail::fenv_round<decimal128>(rhs_sig, rhs_sign);
+        if (delta_exp == 1)
+        {
+            detail::fenv_round<decimal128>(rhs_sig, rhs_sign);
+        }
     }
 
     const auto new_sig {static_cast<typename ReturnType::sig_type>(lhs_sig) +
