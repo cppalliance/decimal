@@ -53,8 +53,8 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | 102,132
 | 16.367
 | `decimal128_fast`
-| 1,427,647
-| 228.790
+| 146,302
+| 23.446
 |===
 
 == Basic Operations
@@ -92,8 +92,8 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | 139,294
 | 44.248
 | `decimal128_fast`
-| 1,351,882
-| 429.442
+| 707,308
+| 224.685
 |===
 
 ==== Subtraction
@@ -122,8 +122,8 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | 145,606
 | 87.820
 | `decimal128_fast`
-| 894,695
-| 539.623
+| 394,538
+| 2387.960
 |===
 
 ==== Multiplication
@@ -152,8 +152,8 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | 333,582
 | 193.943
 | `decimal128_fast`
-| 1,822,921
-| 1059.838
+| 1,269,429
+| 738.040
 |===
 
 ==== Division
@@ -182,8 +182,8 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | 291,671
 | 75.289
 | `decimal128_fast`
-| 292,556
-| 75.518
+| 302,003
+| 77.956
 |===
 
 == Selected Special Functions
