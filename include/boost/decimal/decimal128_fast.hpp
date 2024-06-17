@@ -351,9 +351,19 @@ template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> &
 #endif
 constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
 {
+    // Older compilers have issues with conversions from __uint128, so we skip all that and use our uint128
+    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__GNUC__) || (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10)) && (!defined(__clang__) || (defined(__clang__) && __clang_major__ < 13))
+    using Unsigned_Integer_1 = detail::make_unsigned_t<T1>;
+    using Unsigned_Integer = std::conditional_t<std::is_same<Unsigned_Integer_1, detail::uint128_t>::value, detail::uint128, Unsigned_Integer_1>;
+    #else
+    using Unsigned_Integer = detail::make_unsigned_t<T1>;
+    #endif
+
+    using Basis_Unsigned_Integer = std::conditional_t<std::numeric_limits<Unsigned_Integer>::digits10 < std::numeric_limits<significand_type>::digits10, significand_type, Unsigned_Integer>;
+
     const bool isneg {coeff < static_cast<T1>(0) || sign};
     sign_ = isneg;
-    auto unsigned_coeff {static_cast<significand_type>(detail::make_positive_unsigned(coeff))};
+    auto unsigned_coeff {static_cast<Basis_Unsigned_Integer>(detail::make_positive_unsigned(coeff))};
 
     // Normalize the significand in the constructor, so we don't have
     // to calculate the number of digits for operationss
@@ -478,8 +488,9 @@ constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs
     }
     #endif
 
-    return equal_parts_impl(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-                            rhs.significand_, rhs.biased_exponent(), rhs.sign_);
+    return lhs.sign_ == rhs.sign_ &&
+           lhs.exponent_ == rhs.exponent_ &&
+           lhs.significand_ == rhs.significand_;
 }
 
 template <typename Integer>
