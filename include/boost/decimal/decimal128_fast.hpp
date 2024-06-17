@@ -546,8 +546,17 @@ constexpr auto operator<(const decimal128_fast& lhs, const decimal128_fast& rhs)
     }
 #endif
 
-    return less_parts_impl<decimal128>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-                                       rhs.significand_, rhs.biased_exponent(), rhs.sign_);
+    if (lhs.significand_ == 0 || rhs.significand_ == 0)
+    {
+        return lhs.significand_ == 0 ? !rhs.sign_ : lhs.sign_;
+    }
+
+    if (lhs.exponent_ != rhs.exponent_)
+    {
+        return lhs.sign_ ? lhs.exponent_ > rhs.exponent_ : lhs.exponent_ < rhs.exponent_;
+    }
+
+    return lhs.sign_ ? lhs.significand_ > rhs.significand_ : lhs.significand_ < rhs.significand_;
 }
 
 template <typename Integer>
