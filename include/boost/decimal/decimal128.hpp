@@ -1762,15 +1762,11 @@ constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
 
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
-    const auto lhs_zeros {detail::remove_trailing_zeros(lhs_sig)};
-    lhs_sig = lhs_zeros.trimmed_number;
-    lhs_exp += static_cast<std::int32_t>(lhs_zeros.number_of_removed_zeros);
+    detail::normalize<decimal128>(lhs_sig, lhs_exp);
 
     auto rhs_sig {rhs.full_significand()};
     auto rhs_exp {rhs.biased_exponent()};
-    const auto rhs_zeros {detail::remove_trailing_zeros(rhs_sig)};
-    rhs_sig = rhs_zeros.trimmed_number;
-    rhs_exp += static_cast<std::int32_t>(rhs_zeros.number_of_removed_zeros);
+    detail::normalize<decimal128>(lhs_sig, lhs_exp);
 
     const auto result {detail::d128_mul_impl<detail::decimal128_components>(
             lhs_sig, lhs_exp, lhs.isneg(),
@@ -1792,18 +1788,13 @@ constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
 
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
-    const auto lhs_zeros {detail::remove_trailing_zeros(lhs_sig)};
-    lhs_sig = lhs_zeros.trimmed_number;
-    lhs_exp += static_cast<std::int32_t>(lhs_zeros.number_of_removed_zeros);
+    detail::normalize<decimal128>(lhs_sig, lhs_exp);
     auto lhs_components {detail::decimal128_components{lhs_sig, lhs_exp, lhs.isneg()}};
 
     auto rhs_sig {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
     std::int32_t rhs_exp {0};
-    const auto rhs_zeros {detail::remove_trailing_zeros(rhs_sig)};
-    rhs_sig = rhs_zeros.trimmed_number;
-    rhs_exp += static_cast<std::int32_t>(rhs_zeros.number_of_removed_zeros);
-    auto unsigned_sig_rhs {detail::make_positive_unsigned(rhs_sig)};
-    auto rhs_components {detail::decimal128_components{unsigned_sig_rhs, rhs_exp, (rhs < 0)}};
+    detail::normalize<decimal128>(rhs_sig, rhs_exp);
+    auto rhs_components {detail::decimal128_components{rhs_sig, rhs_exp, (rhs < 0)}};
 
     const auto result {detail::d128_mul_impl<detail::decimal128_components>(
             lhs_components.sig, lhs_components.exp, lhs_components.sign,
