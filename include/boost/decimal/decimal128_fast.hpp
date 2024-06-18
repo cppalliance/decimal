@@ -367,7 +367,7 @@ constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
 
     // Normalize the significand in the constructor, so we don't have
     // to calculate the number of digits for operationss
-    detail::normalize<decimal128>(unsigned_coeff, exp, sign);
+    detail::normalize<decimal128_fast>(unsigned_coeff, exp, sign);
 
     significand_ = unsigned_coeff;
 
