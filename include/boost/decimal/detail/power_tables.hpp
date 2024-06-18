@@ -226,6 +226,11 @@ constexpr auto pow10(detail::uint128 n) noexcept -> detail::uint128
     return impl::emulated_128_pow10[static_cast<std::size_t>(n.low)];
 }
 
+constexpr auto pow10(const uint256_t& n) noexcept -> uint256_t
+{
+    return impl::emulated_256_pow10[static_cast<std::size_t>(n.low.low)];
+}
+
 #ifdef BOOST_DECIMAL_HAS_INT128
 
 template <>
