@@ -122,14 +122,12 @@ constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
-    const auto sig_dig {detail::num_digits(res_sig)};
+    constexpr auto comp_value {impl::emulated_256_pow10[68]};
+    const auto sig_dig {res_sig >= comp_value ? 68 : 67};
 
-    if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
-    {
-        const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
-        res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
-        res_exp += digit_delta;
-    }
+    constexpr auto max_dig {std::numeric_limits<std::uint64_t>::digits10};
+    res_sig /= detail::pow10(static_cast<uint256_t>(sig_dig - max_dig));
+    res_exp += sig_dig - max_dig;
 
     if (res_sig == 0)
     {
