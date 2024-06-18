@@ -305,6 +305,28 @@ void random_mixed_multiplication(T lower, T upper)
 }
 
 template <typename T>
+void spot_check_mul(T val1, T val2)
+{
+    const decimal128_fast dec1 {val1};
+    const decimal128_fast dec2 {val2};
+
+    const decimal128_fast res {dec1 * dec2};
+    const decimal128_fast res_int {val1 * val2};
+
+    if (!BOOST_TEST_EQ(res, res_int))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "Val 1: " << val1
+                  << "\nDec 1: " << dec1
+                  << "\nVal 2: " << val2
+                  << "\nDec 2: " << dec2
+                  << "\nDec res: " << res
+                  << "\nInt res: " << decimal128_fast{val1 * val2} << std::endl;
+        // LCOV_EXCL_STOP
+    }
+};
+
+template <typename T>
 void random_division(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
@@ -965,6 +987,8 @@ int main()
     random_right_shift();
     random_mixed_right_shift();
     */
+
+    spot_check_mul(27625, 2977);
 
     return boost::report_errors();
 }
