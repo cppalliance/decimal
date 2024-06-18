@@ -973,22 +973,9 @@ constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
     }
     #endif
 
-    // TODO(mborland): Is trimming the zeros really necessary? Doesn't seem like it
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    const auto lhs_zeros {detail::remove_trailing_zeros(lhs_sig)};
-    lhs_sig = lhs_zeros.trimmed_number;
-    lhs_exp += static_cast<std::int32_t>(lhs_zeros.number_of_removed_zeros);
-
-    auto rhs_sig {rhs.full_significand()};
-    auto rhs_exp {rhs.biased_exponent()};
-    const auto rhs_zeros {detail::remove_trailing_zeros(rhs_sig)};
-    rhs_sig = rhs_zeros.trimmed_number;
-    rhs_exp += static_cast<std::int32_t>(rhs_zeros.number_of_removed_zeros);
-
     const auto result {detail::d128_mul_impl<detail::decimal128_components>(
-            lhs_sig, lhs_exp, lhs.isneg(),
-            rhs_sig, rhs_exp, rhs.isneg())};
+            lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg())};
 
     return {result.sig, result.exp, result.sign};
 }
