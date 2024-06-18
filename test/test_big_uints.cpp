@@ -458,6 +458,21 @@ auto test_big_uints_shl() -> void
   }
 }
 
+template <typename T>
+void test_digit_counting()
+{
+    constexpr auto max_power {std::is_same<T, boost::decimal::detail::uint256_t>::value ? 77 : 38 };
+
+    T current_power {1};
+    int current_digits {1};
+    for (int i {}; i <= max_power; ++i)
+    {
+        BOOST_TEST_EQ(num_digits(current_power), current_digits);
+        current_power = current_power * UINT64_C(10);
+        ++current_digits;
+    }
+}
+
 int main()
 {
   test_big_uints_mul<boost::multiprecision::uint128_t, boost::decimal::detail::uint128  >();
@@ -474,6 +489,9 @@ int main()
 
   test_big_uints_shl<boost::multiprecision::uint128_t, boost::decimal::detail::uint128  >();
   test_big_uints_shl<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
+
+  test_digit_counting<boost::decimal::detail::uint128>();
+  test_digit_counting<boost::decimal::detail::uint256_t>();
 
   return boost::report_errors();
 }
