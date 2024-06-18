@@ -1,0 +1,14 @@
+////
+Copyright 2024 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#fast_types]
+= Fast Types
+:idprefix: fast_types_
+
+Now that we have seen the three basic types as specified in IEEE-754 there are three additional adjacent types: `decimal32_fast`, `decimal64_fast`, and `decimal128_fast`.
+These types yield identical computational results, but with ~3x faster performance.
+These types make the classic tradeoff of space for time as they require more storage width than the IEEE 754 conformant type.
+
