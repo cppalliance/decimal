@@ -828,6 +828,7 @@ constexpr auto operator-(decimal32 rhs) noexcept-> decimal32
 // NOLINTNEXTLINE : If addition is actually subtraction than change operator and vice versa
 constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal32 zero {0, 0};
 
     const auto res {detail::check_non_finite(lhs, rhs)};
@@ -835,6 +836,7 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     {
         return res;
     }
+    #endif
 
     bool lhs_bigger {lhs > rhs};
     if (lhs.isneg() && rhs.isneg())
@@ -870,10 +872,12 @@ template <typename Integer>
 constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
         return lhs;
     }
+    #endif
 
     bool lhs_bigger {lhs > rhs};
     if (lhs.isneg() && (rhs < 0))
@@ -961,6 +965,7 @@ constexpr auto decimal32::operator+=(Decimal rhs) noexcept
 // NOLINTNEXTLINE : If subtraction is actually addition than use operator+ and vice versa
 constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal32 zero {0, 0};
 
     const auto res {detail::check_non_finite(lhs, rhs)};
@@ -968,6 +973,7 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     {
         return res;
     }
+    #endif
 
     if (!lhs.isneg() && rhs.isneg())
     {
@@ -995,10 +1001,12 @@ template <typename Integer>
 constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(lhs) || isnan(lhs))
     {
         return lhs;
     }
+    #endif
 
     if (!lhs.isneg() && (rhs < 0))
     {
@@ -1029,10 +1037,12 @@ template <typename Integer>
 constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(rhs) || isnan(rhs))
     {
         return rhs;
     }
+    #endif
 
     if (lhs >= 0 && rhs.isneg())
     {
@@ -1139,6 +1149,7 @@ constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept
 
 constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs) ||
         (!lhs.isneg() && rhs.isneg()))
     {
@@ -1150,15 +1161,18 @@ constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool
     }
     else if (isfinite(lhs) && isinf(rhs))
     {
-        if (!signbit(rhs))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return !rhs.isneg();
     }
+    #else
+    if (!lhs.isneg() && rhs.isneg())
+    {
+        return false;
+    }
+    else if (lhs.isneg() && !rhs.isneg())
+    {
+        return true;
+    }
+    #endif
 
     return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
@@ -1175,20 +1189,24 @@ template <typename Integer>
 constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !less_impl(rhs, lhs) && lhs != rhs;
 }
 
 constexpr auto operator<=(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(rhs < lhs);
 }
@@ -1197,10 +1215,12 @@ template <typename Integer>
 constexpr auto operator<=(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs))
     {
         return false;
     }
+    #endif
 
     return !(rhs < lhs);
 }
@@ -1209,10 +1229,12 @@ template <typename Integer>
 constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(rhs < lhs);
 }
@@ -1226,10 +1248,12 @@ template <typename Integer>
 constexpr auto operator>(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs))
     {
         return false;
     }
+    #endif
 
     return rhs < lhs;
 }
@@ -1238,20 +1262,24 @@ template <typename Integer>
 constexpr auto operator>(Integer lhs, decimal32 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return rhs < lhs;
 }
 
 constexpr auto operator>=(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(lhs < rhs);
 }
@@ -1260,10 +1288,12 @@ template <typename Integer>
 constexpr auto operator>=(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs))
     {
         return false;
     }
+    #endif
 
     return !(lhs < rhs);
 }
@@ -1272,10 +1302,12 @@ template <typename Integer>
 constexpr auto operator>=(Integer lhs, decimal32 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(lhs < rhs);
 }
@@ -1442,6 +1474,7 @@ template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, b
 #endif
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (val != val)
     {
         *this = boost::decimal::from_bits(boost::decimal::detail::d32_nan_mask);
@@ -1451,6 +1484,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
         *this = boost::decimal::from_bits(boost::decimal::detail::d32_inf_mask);
     }
     else
+    #endif
     {
         const auto components {detail::ryu::floating_point_to_fd128(val)};
 
@@ -1460,11 +1494,13 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32::decimal32(Float val) noexcept
                   << "\nSign: " << components.sign << std::endl;
         #endif
 
+        #ifndef BOOST_DECIMAL_FAST_MATH
         if (components.exponent > detail::emax)
         {
             *this = boost::decimal::from_bits(boost::decimal::detail::d32_inf_mask);
         }
         else
+        #endif
         {
             *this = decimal32 {components.mantissa, components.exponent, components.sign};
         }
@@ -1609,6 +1645,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal32 rhs) noexcept -> std::uint3
 
 constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal32 zero {0, 0};
 
     const auto res {detail::check_non_finite(lhs, rhs)};
@@ -1616,6 +1653,7 @@ constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     {
         return res;
     }
+    #endif
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
@@ -1634,10 +1672,12 @@ template <typename Integer>
 constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
         return lhs;
     }
+    #endif
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
@@ -1688,6 +1728,7 @@ constexpr auto decimal32::operator*=(Decimal rhs) noexcept
 
 constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r) noexcept -> void
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal32 zero {0, 0};
     constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::d32_snan_mask)};
@@ -1732,6 +1773,9 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
         default:
             static_cast<void>(rhs);
     }
+    #else
+    static_cast<void>(r);
+    #endif
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
@@ -1779,6 +1823,7 @@ template <typename Integer>
 constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal32 zero {0, 0};
     constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::d32_snan_mask)};
@@ -1804,6 +1849,7 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
     {
         return sign ? -inf : inf;
     }
+    #endif
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
@@ -1823,6 +1869,7 @@ template <typename Integer>
 constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal32 zero {0, 0};
     constexpr decimal32 nan {boost::decimal::from_bits(boost::decimal::detail::d32_snan_mask)};
@@ -1846,6 +1893,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
         default:
             static_cast<void>(lhs);
     }
+    #endif
 
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.biased_exponent()};
@@ -2061,6 +2109,7 @@ constexpr auto operator~(decimal32 lhs) noexcept -> decimal32
 // The samequantum functions raise no exception.
 constexpr auto samequantumd32(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
 
@@ -2072,6 +2121,7 @@ constexpr auto samequantumd32(decimal32 lhs, decimal32 rhs) noexcept -> bool
     {
         return false;
     }
+    #endif
 
     return lhs.unbiased_exponent() == rhs.unbiased_exponent();
 }
@@ -2081,10 +2131,12 @@ constexpr auto samequantumd32(decimal32 lhs, decimal32 rhs) noexcept -> bool
 // Otherwise, a domain error occurs and INT_MIN is returned.
 constexpr auto quantexpd32(decimal32 x) noexcept -> int
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (!isfinite(x))
     {
         return INT_MIN;
     }
+    #endif
 
     return static_cast<int>(x.unbiased_exponent());
 }
@@ -2102,6 +2154,7 @@ constexpr auto quantexpd32(decimal32 x) noexcept -> int
 // The quantize functions do not signal underflow.
 constexpr auto quantized32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     // Return the correct type of nan
     if (isnan(lhs))
     {
@@ -2121,18 +2174,21 @@ constexpr auto quantized32(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     {
         return lhs;
     }
+    #endif
 
     return {lhs.full_significand(), rhs.biased_exponent(), lhs.isneg()};
 }
 
 constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal32 zero {0, 0};
 
     if (num == zero || exp == 0 || isinf(num) || isnan(num))
     {
         return num;
     }
+    #endif
 
     num.edit_exponent(num.biased_exponent() + exp);
 

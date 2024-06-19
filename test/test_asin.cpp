@@ -42,8 +42,8 @@ using namespace boost::decimal;
 template <typename Dec>
 void test_asin()
 {
-    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? 2 : N};
-    constexpr auto tol {std::is_same<Dec, decimal128>::value ? 25000 : 50};
+    constexpr auto max_iter {std::is_same<Dec, decimal128>::value || std::is_same<Dec, decimal128_fast>::value ? 2 : N};
+    constexpr auto tol {std::is_same<Dec, decimal128>::value || std::is_same<Dec, decimal128_fast>::value ? 25000 : 50};
 
     for (std::size_t n {}; n < max_iter; ++n)
     {
@@ -75,6 +75,11 @@ void test_asin()
 
         auto ret_val {std::asin(val1)};
         auto ret_dec {static_cast<float>(asin(d1))};
+
+        if (std::isinf(ret_dec))
+        {
+            std::cerr << "INF: " << d1 << " iter: n = " << n << std::endl;
+        }
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};
         if (!BOOST_TEST(distance < tol))
@@ -183,6 +188,8 @@ int main()
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_asin<decimal128>();
     #endif
+
+    test_asin<decimal32_fast>();
 
     return boost::report_errors();
 }

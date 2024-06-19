@@ -14,6 +14,8 @@
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
+// LCOV_EXCL_START
+
 #include <ostream>
 
 static char* mini_to_chars( char (&buffer)[ 64 ], boost::decimal::detail::uint128_t v )
@@ -57,6 +59,8 @@ std::ostream& operator<<( std::ostream& os, boost::decimal::detail::int128_t v )
     os << p;
     return os;
 }
+
+// LCOV_EXCL_STOP
 
 #endif // #ifdef BOOST_HAS_INT128
 

@@ -21,8 +21,9 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_zero { 0, 0 }; return val_zero; }
-template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_one  { 1, 0 }; return val_one; }
+template<typename DecimalType> auto my_zero() -> DecimalType&;
+template<typename DecimalType> auto my_one () -> DecimalType&;
+template<typename DecimalType> auto my_nan () -> DecimalType&;
 
 namespace local
 {
@@ -239,6 +240,8 @@ namespace local
 
     std::mt19937_64 gen;
 
+    gen.seed(time_point<typename std::mt19937_64::result_type>());
+
     std::uniform_real_distribution<float_type>
       dist
       (
@@ -248,11 +251,11 @@ namespace local
 
     auto result_is_ok = true;
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
     {
       static_cast<void>(i);
 
-      const auto val_nan = tgamma(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+      const auto val_nan = tgamma(::my_nan<decimal_type>() * static_cast<decimal_type>(dist(gen)));
 
       const auto result_val_nan_is_ok = isnan(val_nan);
 
@@ -304,7 +307,7 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_zero_neg = tgamma(-::my_zero<decimal_type>());
+      const auto val_zero_neg = tgamma(-(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen))));
 
       const auto result_val_zero_neg_is_ok = (isinf(val_zero_neg) && signbit(val_zero_neg));
 
@@ -315,13 +318,13 @@ namespace local
 
     for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(6)); ++i)
     {
-      const auto n_neg = static_cast<int>(-static_cast<int>(i) - 1);
+      decimal_type dnx { ::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)) };
 
-      const auto val_neg_int = tgamma( decimal_type { n_neg, 0 } );
+      dnx -= static_cast<int>(i + 1);
 
-      const auto is_odd = ((n_neg & 1) != 0);
+      const auto val_neg_int = tgamma(dnx);
 
-      const auto result_val_neg_int_is_ok = (is_odd ? isnan(val_neg_int) : (fpclassify(val_neg_int) == FP_NORMAL));
+      const auto result_val_neg_int_is_ok = isnan(val_neg_int);
 
       BOOST_TEST(result_val_neg_int_is_ok);
 
@@ -385,7 +388,7 @@ namespace local
     return result_is_ok;
   }
 
-  auto test_tgamma_128(const int tol_factor) -> bool
+  auto test_tgamma_128_lo(const int tol_factor) -> bool
   {
     using decimal_type = boost::decimal::decimal128;
 
@@ -393,16 +396,16 @@ namespace local
 
     const str_ctrl_array_type ctrl_strings =
     {{
-       // Table[N[Gamma[(100 n + 10 n + 1)/100], 33], {n, 1, 9, 1}]
-       "0.947395504039301942134227647281424",
-       "1.10784755653406415338349971053114",
-       "2.71139823924390323650711692085896",
-       "10.2754040920152050479188001843206",
-       "53.1934282525008207389522379291890",
-       "350.998609824200588801455504140098",
-       "2825.09453680418713613816084109635",
-       "26903.6719467497675679082571845063",
-       "296439.082102472192334520537379648"
+       // Table[N[Gamma[n/10 + n/100], 36], {n, 1, 9, 1}]
+       "8.61268640035729038303843315710385452",
+       "4.15048157959277857782635113344664974",
+       "2.70720622261519104902052213245593595",
+       "2.01319332601838966777117106234059403",
+       "1.61612426873357513405845849344452552",
+       "1.36616419875147485749818904751902063",
+       "1.19969237367745339749375337490556205",
+       "1.08530778746771950916024031037404015",
+       "1.00587197964410779193412655924290279"
     }};
 
     std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> tg_values   { };
@@ -419,13 +422,82 @@ namespace local
       const decimal_type x_arg =
         decimal_type
         {
-            decimal_type { 1, 2 } * nx
-          + decimal_type { 1, 1 } * nx
-          + 1
-        }
-        / decimal_type { 1, 2 };
+            decimal_type { nx, -1 }
+          + decimal_type { nx, -2 }
+        };
 
         ++nx;
+
+        tg_values[i] = tgamma(x_arg);
+
+        static_cast<void>
+        (
+          from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
+        );
+
+      const auto result_tgamma_is_ok = is_close_fraction(tg_values[i], ctrl_values[i], my_tol);
+
+      result_is_ok = (result_tgamma_is_ok && result_is_ok);
+    }
+
+    return result_is_ok;
+  }
+
+  auto test_tgamma_128_hi(const int tol_factor) -> bool
+  {
+    using decimal_type = boost::decimal::decimal128;
+
+    using str_ctrl_array_type = std::array<const char*, 23U>;
+
+    const str_ctrl_array_type ctrl_strings =
+    {{
+       // Table[N[Gamma[n + n/10 + n/100 + n/1000], 36], {n, 1, 221, 10}]
+       "0.947008281162266001895790481785841941",
+       "6.86303089001025022525468906807854872E7",
+       "3.15793281780505944512262743601561476E21",
+       "4.09725124531962875389920397572482227E37",
+       "2.15936518595728901631037627967671095E55",
+       "1.81286283067020212427848823649632939E74",
+       "1.39061339788491577387400422516492967E94",
+       "6.73844979762045895677263594960237945E114",
+       "1.58535690838444528565837326081067457E136",
+       "1.48677291673153228216478665408262025E158",
+       "4.76763037027821868276349648015607359E180",
+       "4.62395515046183569847627307320617350E203",
+       "1.22680267570425015175034111397510637E227",
+       "8.18925182002285090986591692926519438E250",
+       "1.28134405415265103961333749220602490E275",
+       "4.42253704896092684478952587741331734E299",
+       "3.19451354412535995695298989136255493E324",
+       "4.61171076932972412633999770033353340E349",
+       "1.27758574231803927960543278875893523E375",
+       "6.55079490827236721494047351435261992E400",
+       "6.01906299656231025481256209731706244E426",
+       "9.62614024174757375775890458257288037E452",
+       "2.60989891797040728048724526392884050E479",
+    }};
+
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> tg_values   { };
+    std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> ctrl_values { };
+
+    int nx { 1 };
+
+    bool result_is_ok { true };
+
+    const decimal_type my_tol { std::numeric_limits<decimal_type>::epsilon() * static_cast<decimal_type>(tol_factor) };
+
+    for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
+    {
+      const decimal_type x_arg =
+        decimal_type
+        {
+            decimal_type { nx }
+          + decimal_type { nx, -1 }
+          + decimal_type { nx, -2 }
+          + decimal_type { nx, -3 }
+        };
+
+        nx += 10;
 
         tg_values[i] = tgamma(x_arg);
 
@@ -461,6 +533,17 @@ auto main() -> int
 
   {
     using decimal_type = boost::decimal::decimal32;
+    using float_type   = float;
+
+    const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(768, 2.1L, 23.4L);
+
+    BOOST_TEST(result_tgamma_is_ok);
+
+    result_is_ok = (result_tgamma_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal32_fast;
     using float_type   = float;
 
     const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(768, 2.1L, 23.4L);
@@ -528,14 +611,20 @@ auto main() -> int
   }
 
   {
-    const auto result_tgamma128_is_ok   = local::test_tgamma_128(8192);
+    const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo(4096);
+    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi(0x20'000);
 
-    BOOST_TEST(result_tgamma128_is_ok);
+    BOOST_TEST(result_tgamma128_lo_is_ok);
+    BOOST_TEST(result_tgamma128_hi_is_ok);
 
-    result_is_ok = (result_tgamma128_is_ok && result_is_ok);
+    result_is_ok = (result_tgamma128_lo_is_ok && result_tgamma128_hi_is_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 
   return (result_is_ok ? 0 : -1);
 }
+
+template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_zero { 0 }; return val_zero; }
+template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_one  { 1 }; return val_one; }
+template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_nan  { std::numeric_limits<decimal_type>::quiet_NaN() }; return val_nan; }

@@ -743,9 +743,14 @@ constexpr auto uint128::operator^=(uint128 v) noexcept -> uint128&
 
 constexpr auto uint128::operator+=(std::uint64_t n) noexcept -> uint128&
 {
-    auto sum = low + n;
-    high += (sum < low ? 1 : 0);
-    low = sum;
+    const std::uint64_t new_low { low + n };
+
+    if (new_low < low)
+    {
+        ++high;
+    }
+
+    low = new_low;
 
     return *this;
 }
@@ -771,14 +776,9 @@ constexpr auto uint128::operator+=(uint128 v) noexcept -> uint128&
 
 constexpr auto uint128::operator++() noexcept -> uint128&
 {
-    if (this->low == UINT64_MAX)
+    if (++low == UINT64_C(0))
     {
-        this->low = 0;
-        ++this->high;
-    }
-    else
-    {
-        ++this->low;
+        ++high;
     }
 
     return *this;
@@ -884,26 +884,6 @@ constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
     result += uint128(a * d) << 32;
     result += uint128(b * c) << 32;
     return result;
-}
-
-// TODO(mborland): Can be replaced by intrinsics at runtime
-constexpr auto multiply_64_64(std::uint64_t a, std::uint64_t b) -> uint128
-{
-    std::uint64_t a_low = a & UINT32_MAX;
-    std::uint64_t a_high = a >> 32;
-    std::uint64_t b_low = b & UINT32_MAX;
-    std::uint64_t b_high = b >> 32;
-
-    std::uint64_t low_product = a_low * b_low;
-    std::uint64_t mid_product1 = a_high * b_low;
-    std::uint64_t mid_product2 = a_low * b_high;
-    std::uint64_t high_product = a_high * b_high;
-
-    std::uint64_t mid_sum = (low_product >> 32) + (mid_product1 & UINT32_MAX) + mid_product2;
-    std::uint64_t high = high_product + (mid_product1 >> 32) + (mid_sum >> 32);
-    std::uint64_t low = (mid_sum << 32) | (low_product & UINT32_MAX);
-
-    return {high, low};
 }
 
 constexpr auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128

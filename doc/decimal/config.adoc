@@ -25,3 +25,6 @@ constexpr decimal64 half {5, -1};
 std::complex<decimal64> test_val {half, half};
 const auto res = std::acos(test_val);
 ----
+
+- `BOOST_DECIMAL_FAST_MATH` performs optimizations similar to that of the `-ffast-math` compiler flag such as removing all checks for non-finite values.
+This flag increases the performance of the basis operations (e.g. add, sub, mul, div, and comparisons) by up to 20%.

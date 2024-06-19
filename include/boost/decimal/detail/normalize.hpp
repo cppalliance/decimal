@@ -17,7 +17,7 @@ namespace detail {
 
 // Converts the significand to full precision to remove the effects of cohorts
 template <typename TargetDecimalType = decimal32, typename T1, typename T2>
-constexpr auto normalize(T1& significand, T2& exp) noexcept -> void
+constexpr auto normalize(T1& significand, T2& exp, bool sign = false) noexcept -> void
 {
     constexpr auto target_precision {detail::precision_v<TargetDecimalType>};
     const auto digits {num_digits(significand)};
@@ -32,9 +32,8 @@ constexpr auto normalize(T1& significand, T2& exp) noexcept -> void
     {
         const auto excess_digits {digits - (target_precision + 1)};
         significand /= pow10(static_cast<T1>(excess_digits));
-        exp += excess_digits;
         // Perform final rounding according to the fenv rounding mode
-        exp += detail::fenv_round<TargetDecimalType>(significand, significand < 0);
+        exp += detail::fenv_round<TargetDecimalType>(significand, sign || significand < 0) + excess_digits;
     }
 }
 

@@ -458,3 +458,14 @@ constexpr boost::decimal::detail::uint128 frexpd128(decimal128 num, int* expptr)
 
 This function is very similar to https://en.cppreference.com/w/cpp/numeric/math/frexp[frexp], but returns the significand and an integral power of 10 since the `FLT_RADIX` of this type is 10.
 The significand is normalized to the number of digits of precision the type has (e.g. for decimal32 it is [1'000'000, 9'999'999]).
+
+=== trunc_to
+
+[source, c++]
+----
+template <typename Decimal>
+constexpr Decimal trunc_to(Decimal val, int precision = 0);
+----
+
+The function returns the decimal type with number of fractional digits equal to the value of precision.
+`trunc_to` is similar to https://en.cppreference.com/w/cpp/numeric/math/trunc[trunc], and with the default precision argument of 0 it is identical.

@@ -19,6 +19,56 @@ namespace detail {
 
 namespace impl {
 
+// Assign explicit decimal values because the decimal32_fast size could be greater than that
+// of decimal64 even though the precision is worse
+
+template <typename T>
+struct decimal_val
+{
+    static constexpr int value = 0;
+};
+
+template <>
+struct decimal_val<decimal32>
+{
+    static constexpr int value = 32;
+};
+
+// Assign a higher value to the fast type for consistency of promotion
+// Side effect is the same calculation will be faster with the same precision
+template <>
+struct decimal_val<decimal32_fast>
+{
+    static constexpr int value = 33;
+};
+
+template <>
+struct decimal_val<decimal64>
+{
+    static constexpr int value = 64;
+};
+
+template <>
+struct decimal_val<decimal64_fast>
+{
+    static constexpr int value = 65;
+};
+
+template <>
+struct decimal_val<decimal128>
+{
+    static constexpr int value = 128;
+};
+
+template <>
+struct decimal_val<decimal128_fast>
+{
+    static constexpr int value = 129;
+};
+
+template <typename T>
+constexpr int decimal_val_v = decimal_val<T>::value;
+
 // Promotes a single argument to double if it is an integer type
 template<typename T>
 struct promote_arg
@@ -37,7 +87,7 @@ template<typename T1, typename T2>
 struct promote_2_args
 {
     using type = std::conditional_t<(is_decimal_floating_point_v<T1> && is_decimal_floating_point_v<T2>),
-                 std::conditional_t<(sizeof(T1) > sizeof(T2)), T1, T2>,
+                 std::conditional_t<(decimal_val_v<T1> > decimal_val_v<T2>), T1, T2>,
                  std::conditional_t<is_decimal_floating_point_v<T1>, T1,
                         std::conditional_t<is_decimal_floating_point_v<T2>, T2,
                                 std::conditional_t<(sizeof(promote_arg_t<T1>) > sizeof(promote_arg_t<T2>)),

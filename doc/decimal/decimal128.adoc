@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == Description
 
-Decimal64 is the 128-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6
+Decimal128 is the 128-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6
 
 - Storage width - 128 bits
 - Precision - 34 decimal digits (not bits like binary)

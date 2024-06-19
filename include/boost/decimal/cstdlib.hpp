@@ -1,4 +1,4 @@
-// Copyright 2023 Matt Borland
+// Copyright 2023 - 2024 Matt Borland
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -32,7 +32,8 @@ namespace detail {
 template <typename TargetDecimalType>
 inline auto strtod_calculation(const char* str, char** endptr, char* buffer, std::size_t str_length) noexcept -> TargetDecimalType
 {
-    using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, detail::uint128, std::uint64_t>;
+    using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value ||
+                                                std::is_same<TargetDecimalType, decimal128_fast>::value, detail::uint128, std::uint64_t>;
 
     std::memcpy(buffer, str, str_length);
     convert_string_to_c_locale(buffer);
@@ -199,6 +200,16 @@ BOOST_DECIMAL_EXPORT inline auto wcstod32(const wchar_t* str, wchar_t** endptr) 
     return detail::wcstod_impl<decimal32>(str, endptr);
 }
 
+BOOST_DECIMAL_EXPORT inline auto strtod32f(const char* str, char** endptr) noexcept -> decimal32_fast
+{
+    return detail::strtod_impl<decimal32_fast>(str, endptr);
+}
+
+BOOST_DECIMAL_EXPORT inline auto wcstod32f(const wchar_t* str, wchar_t** endptr) noexcept -> decimal32_fast
+{
+    return detail::wcstod_impl<decimal32_fast>(str, endptr);
+}
+
 BOOST_DECIMAL_EXPORT inline auto strtod64(const char* str, char** endptr) noexcept -> decimal64
 {
     return detail::strtod_impl<decimal64>(str, endptr);
@@ -209,6 +220,16 @@ BOOST_DECIMAL_EXPORT inline auto wcstod64(const wchar_t* str, wchar_t** endptr) 
     return detail::wcstod_impl<decimal64>(str, endptr);
 }
 
+BOOST_DECIMAL_EXPORT inline auto strtod64f(const char* str, char** endptr) noexcept -> decimal64_fast
+{
+    return detail::strtod_impl<decimal64_fast>(str, endptr);
+}
+
+BOOST_DECIMAL_EXPORT inline auto wcstod64f(const wchar_t* str, wchar_t** endptr) noexcept -> decimal64_fast
+{
+    return detail::wcstod_impl<decimal64_fast>(str, endptr);
+}
+
 BOOST_DECIMAL_EXPORT inline auto strtod128(const char* str, char** endptr) noexcept -> decimal128
 {
     return detail::strtod_impl<decimal128>(str, endptr);
@@ -217,6 +238,16 @@ BOOST_DECIMAL_EXPORT inline auto strtod128(const char* str, char** endptr) noexc
 BOOST_DECIMAL_EXPORT inline auto wcstod128(const wchar_t* str, wchar_t** endptr) noexcept -> decimal128
 {
     return detail::wcstod_impl<decimal128>(str, endptr);
+}
+
+BOOST_DECIMAL_EXPORT inline auto strtod128f(const char* str, char** endptr) noexcept -> decimal128_fast
+{
+    return detail::strtod_impl<decimal128_fast>(str, endptr);
+}
+
+BOOST_DECIMAL_EXPORT inline auto wcstod128f(const wchar_t* str, wchar_t** endptr) noexcept -> decimal128_fast
+{
+    return detail::wcstod_impl<decimal128_fast>(str, endptr);
 }
 
 } // namespace decimal

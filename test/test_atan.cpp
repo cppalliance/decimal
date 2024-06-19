@@ -375,6 +375,7 @@ int main()
 {
     test_atan<decimal32>();
     test_atan<decimal64>();
+    test_atan<decimal32_fast>();
 
     spot_test(0.344559F);
     spot_test(0.181179F);

@@ -522,12 +522,18 @@ constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept
 // Get the 256-bit result of multiplication of two 128-bit unsigned integers
 constexpr uint256_t umul256_impl(std::uint64_t a_high, std::uint64_t a_low, std::uint64_t b_high, std::uint64_t b_low) noexcept
 {
-    const auto low_product {static_cast<uint128>(a_low) * b_low};
-    const auto mid_product1 {static_cast<uint128>(a_low) * b_high};
-    const auto mid_product2 {static_cast<uint128>(a_high) * b_low};
-    const auto high_product {static_cast<uint128>(a_high) * b_high};
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    #else
+    using unsigned_int128_type = boost::decimal::detail::uint128;
+    #endif
 
-    uint128 carry {};
+    const auto low_product {static_cast<unsigned_int128_type>(a_low) * b_low};
+    const auto mid_product1 {static_cast<unsigned_int128_type>(a_low) * b_high};
+    const auto mid_product2 {static_cast<unsigned_int128_type>(a_high) * b_low};
+    const auto high_product {static_cast<unsigned_int128_type>(a_high) * b_high};
+
+    std::uint64_t carry {};
 
     const auto mid_combined {mid_product1 + mid_product2};
     if (mid_combined < mid_product1)

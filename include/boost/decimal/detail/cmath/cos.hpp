@@ -39,19 +39,15 @@ constexpr auto cos_impl(T x) noexcept
     {
         result = x;
     }
+    else if (signbit(x))
+    {
+        result = cos(-x);
+    }
     else
     {
-        x = abs(x);
-
-        if (x < std::numeric_limits<T>::epsilon())
+        if (x > std::numeric_limits<T>::epsilon())
         {
-            constexpr T one {1, 0};
-
-            result = one;
-        }
-        else
-        {
-            // Perform argument reduction and subsequent computation of the result.
+            // Perform argument reduction and subsequent scaling of the result.
 
             // Given x = k * (pi/2) + r, compute n = (k % 4).
 
@@ -62,33 +58,52 @@ constexpr auto cos_impl(T x) noexcept
             // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
             // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
 
-            #if (defined(_MSC_VER) && (_MSC_VER < 1920))
-            const auto my_pi_half = numbers::pi_v<T> / 2;
-            #else
-            constexpr auto my_pi_half = numbers::pi_v<T> / 2;
-            #endif
+            constexpr T my_pi_half { numbers::pi_v<T> / 2 };
 
-            int k {};
-            auto r { remquo(x, my_pi_half, &k) };
+            const auto k = static_cast<unsigned>(x / my_pi_half);
+            const auto n = static_cast<unsigned>(k % static_cast<unsigned>(UINT8_C(4)));
 
-            const auto n = static_cast<unsigned>(k % 4);
+            auto r = x - (my_pi_half * k);
+
+            constexpr T half { 5, -1 };
+
+            const bool do_scaling { x > half };
+
+            if(do_scaling)
+            {
+                // Reduce the argument with factors of three.
+                r /= static_cast<unsigned>(UINT8_C(3));
+            }
 
             switch(n)
             {
-                case 3U:
-                    result = detail::sin_series_expansion(r);
-                    break;
-                case 2U:
-                    result = -detail::cos_series_expansion(r);
-                    break;
-                case 1U:
-                    result = -detail::sin_series_expansion(r);
-                    break;
-                case 0U:
-                default:
-                    result = detail::cos_series_expansion(r);
-                    break;
+              case static_cast<unsigned>(UINT8_C(1)):
+              case static_cast<unsigned>(UINT8_C(3)):
+                result = detail::sin_series_expansion(r);
+                break;
+              case static_cast<unsigned>(UINT8_C(0)):
+              case static_cast<unsigned>(UINT8_C(2)):
+              default:
+                result = detail::cos_series_expansion(r);
+                break;
             }
+
+            if(do_scaling)
+            {
+                result *= (((result * result) * static_cast<unsigned>(UINT8_C(4))) - static_cast<unsigned>(UINT8_C(3)));
+            }
+
+            if(signbit(result)) { result = -result; }
+
+            const auto b_neg = ((n == static_cast<unsigned>(UINT8_C(1))) || (n == static_cast<unsigned>(UINT8_C(2))));
+
+            if(b_neg) { result = -result; }
+        }
+        else
+        {
+            constexpr T one { 1 };
+
+            result = one;
         }
     }
 

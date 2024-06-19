@@ -144,6 +144,12 @@ struct is_decimal_floating_point<decimal128> { static constexpr bool value = tru
 template <>
 struct is_decimal_floating_point<decimal32_fast> { static constexpr bool value = true; };
 
+template <>
+struct is_decimal_floating_point<decimal64_fast> { static constexpr bool value = true; };
+
+template <>
+struct is_decimal_floating_point<decimal128_fast> { static constexpr bool value = true; };
+
 template <typename T>
 constexpr bool is_decimal_floating_point<T>::value;
 

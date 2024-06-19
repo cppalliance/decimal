@@ -33,36 +33,37 @@ constexpr auto tgamma_impl(T x) noexcept
 
     const auto is_pure_int = (nx == x);
 
+    const bool is_neg = signbit(x);
+
     const auto fpc = fpclassify(x);
 
     if (fpc != FP_NORMAL)
     {
         if (fpc == FP_ZERO)
         {
-            result = (signbit(x) ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::infinity());
+            result = (is_neg ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::infinity());
         }
         else if(fpc == FP_INFINITE)
         {
-            result = (signbit(x) ? std::numeric_limits<T>::quiet_NaN() : std::numeric_limits<T>::infinity());
+            result = (is_neg ? std::numeric_limits<T>::quiet_NaN() : std::numeric_limits<T>::infinity());
         }
         else
         {
             result = x;
         }
     }
-    else if ((nx < 0) && is_pure_int && ((nx & 1) != 0))
+    else if (is_pure_int && is_neg)
     {
         // Pure negative integer argument.
         result = std::numeric_limits<T>::quiet_NaN();
     }
     else
     {
-        if (signbit(x))
+        if (is_neg)
         {
             // Reflection for negative argument.
-            const auto ga = tgamma(-x);
 
-            result = -numbers::pi_v<T> / ((x * ga) * sin(numbers::pi_v<T> * x));
+            result = -numbers::pi_v<T> / ((x * tgamma(-x)) * sin(numbers::pi_v<T> * x));
         }
         else
         {
@@ -81,14 +82,14 @@ constexpr auto tgamma_impl(T x) noexcept
             {
                 constexpr int asymp_cutoff
                 {
-                      std::numeric_limits<T>::digits10 < 10 ? T { 2, 1 }
-                    : std::numeric_limits<T>::digits10 < 20 ? T { 5, 1 }
-                    :                                         T { 1, 2 }
+                      std::numeric_limits<T>::digits10 < 10 ? T { 2, 1 } // 20
+                    : std::numeric_limits<T>::digits10 < 20 ? T { 4, 1 } // 40
+                    :                                         T { 9, 1 } // 90
                 };
 
                 if (x < T { asymp_cutoff })
                 {
-                    T r { 1 };
+                    T r { one };
 
                     T z { x };
 
@@ -108,7 +109,7 @@ constexpr auto tgamma_impl(T x) noexcept
                 {
                     // Use large-argument asymptotic expansion.
 
-                    const T prefix { exp(-x) * pow(x, x - T { 5, -1 }) };
+                    const T prefix { exp(((x  - T { 5, -1 }) * log(x)) - x) };
 
                     result =  prefix * detail::tgamma_series_expansion_asymp(one / x);
                 }

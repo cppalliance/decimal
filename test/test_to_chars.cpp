@@ -97,7 +97,7 @@ void test_small_values()
 template <typename T>
 void test_large_values()
 {
-    constexpr double max_value = std::is_same<decimal32, T>::value ? 1e80 : 1e200;
+    constexpr double max_value = std::is_same<decimal32, T>::value || std::is_same<decimal32_fast, T>::value ? 1e80 : 1e200;
     std::uniform_real_distribution<double> dist(-max_value, max_value);
 
     for (std::size_t i {}; i < N; ++i)
@@ -613,6 +613,30 @@ int main()
     test_hex_format<decimal128>();
     test_434_hex<decimal128>();
     #endif
+
+    test_non_finite_values<decimal32_fast>();
+    test_small_values<decimal32_fast>();
+    test_large_values<decimal32_fast>();
+    test_fixed_format<decimal32_fast>();
+    test_precision<decimal32_fast>();
+    test_buffer_overflow<decimal32_fast>();
+    zero_test<decimal32_fast>();
+    test_434_fixed<decimal32_fast>();
+    test_434_scientific<decimal32_fast>();
+    test_hex_format<decimal32_fast>();
+    test_434_hex<decimal32_fast>();
+
+    test_non_finite_values<decimal64_fast>();
+    test_small_values<decimal64_fast>();
+    test_large_values<decimal64_fast>();
+    test_fixed_format<decimal64_fast>();
+    test_precision<decimal64_fast>();
+    test_buffer_overflow<decimal64_fast>();
+    zero_test<decimal64_fast>();
+    test_434_fixed<decimal64_fast>();
+    test_434_scientific<decimal64_fast>();
+    test_hex_format<decimal64_fast>();
+    test_434_hex<decimal64_fast>();
 
     // Bugfixes
     test_value(decimal64{2657844750}, "2657844750", chars_format::general);

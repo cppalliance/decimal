@@ -41,26 +41,36 @@ BOOST_DECIMAL_EXPORT template <> struct is_arithmetic<boost::decimal::decimal32>
 BOOST_DECIMAL_EXPORT template <> struct is_arithmetic<boost::decimal::decimal64> : public true_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_arithmetic<boost::decimal::decimal128> : public true_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_arithmetic<boost::decimal::decimal32_fast> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_arithmetic<boost::decimal::decimal64_fast> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_arithmetic<boost::decimal::decimal128_fast> : public true_type {};
 
 BOOST_DECIMAL_EXPORT template <> struct is_fundamental<boost::decimal::decimal32> : public true_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_fundamental<boost::decimal::decimal64> : public true_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_fundamental<boost::decimal::decimal128> : public true_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_fundamental<boost::decimal::decimal32_fast> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_fundamental<boost::decimal::decimal64_fast> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_fundamental<boost::decimal::decimal128_fast> : public true_type {};
 
 BOOST_DECIMAL_EXPORT template <> struct is_scalar<boost::decimal::decimal32> : public true_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_scalar<boost::decimal::decimal64> : public true_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_scalar<boost::decimal::decimal128> : public true_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_scalar<boost::decimal::decimal32_fast> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_scalar<boost::decimal::decimal64_fast> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_scalar<boost::decimal::decimal128_fast> : public true_type {};
 
 BOOST_DECIMAL_EXPORT template <> struct is_class<boost::decimal::decimal32> : public false_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_class<boost::decimal::decimal64> : public false_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_class<boost::decimal::decimal128> : public false_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_class<boost::decimal::decimal32_fast> : public false_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_class<boost::decimal::decimal64_fast> : public false_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_class<boost::decimal::decimal128_fast> : public false_type {};
 
 BOOST_DECIMAL_EXPORT template <> struct is_pod<boost::decimal::decimal32> : public true_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_pod<boost::decimal::decimal64> : public true_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_pod<boost::decimal::decimal128> : public true_type {};
 BOOST_DECIMAL_EXPORT template <> struct is_pod<boost::decimal::decimal32_fast> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_pod<boost::decimal::decimal64_fast> : public true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_pod<boost::decimal::decimal128_fast> : public true_type {};
 
 
 } // namespace boost
@@ -92,6 +102,8 @@ BOOST_DECIMAL_EXPORT template <> struct is_decimal_floating_point<boost::decimal
 BOOST_DECIMAL_EXPORT template <> struct is_decimal_floating_point<boost::decimal::decimal64> : public decimal::detail::local_true_type{};
 BOOST_DECIMAL_EXPORT template <> struct is_decimal_floating_point<boost::decimal::decimal128> : public decimal::detail::local_true_type{};
 BOOST_DECIMAL_EXPORT template <> struct is_decimal_floating_point<boost::decimal::decimal32_fast> : public decimal::detail::local_true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_decimal_floating_point<boost::decimal::decimal64_fast> : public decimal::detail::local_true_type {};
+BOOST_DECIMAL_EXPORT template <> struct is_decimal_floating_point<boost::decimal::decimal128_fast> : public decimal::detail::local_true_type {};
 
 #if defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L
 BOOST_DECIMAL_EXPORT template <typename T>

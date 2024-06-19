@@ -3,12 +3,6 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <random>
-
 #include <boost/decimal.hpp>
 
 #if defined(__clang__)
@@ -21,9 +15,10 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-#include <boost/core/lightweight_test.hpp>
-
 #include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <limits>
 #include <random>
 
 namespace local
@@ -343,6 +338,29 @@ int main()
 
   {
     using decimal_type = boost::decimal::decimal32;
+    using float_type   = float;
+
+    const auto result_small_is_ok  = local::test_cbrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E-26L, 1.0E-01L);
+    const auto result_medium_is_ok = local::test_cbrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 0.9E-01L, 1.1E+01L);
+    const auto result_large_is_ok  = local::test_cbrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E+01L, 1.0E+26L);
+
+    BOOST_TEST(result_small_is_ok);
+    BOOST_TEST(result_medium_is_ok);
+    BOOST_TEST(result_large_is_ok);
+
+    const auto result_edge_is_ok = local::test_cbrt_edge<decimal_type, float_type>();
+
+    const auto result_ranges_is_ok = (result_small_is_ok && result_medium_is_ok && result_large_is_ok);
+
+    result_is_ok = (result_ranges_is_ok && result_is_ok);
+
+    BOOST_TEST(result_edge_is_ok);
+
+    result_is_ok = (result_edge_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal32_fast;
     using float_type   = float;
 
     const auto result_small_is_ok  = local::test_cbrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E-26L, 1.0E-01L);
