@@ -973,7 +973,7 @@ constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
     }
     #endif
 
-    const auto result {detail::d128_fast_mul_impl<detail::decimal128_components>(
+    const auto result {detail::d128_fast_mul_impl<detail::decimal128_fast_components>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), rhs.sign_)};
 
