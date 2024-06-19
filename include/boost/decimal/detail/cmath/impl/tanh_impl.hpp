@@ -168,6 +168,9 @@ constexpr typename tanh_table_imp<b>::d32_fast_coeffs_t tanh_table_imp<b>::d32_f
 template <bool b>
 constexpr typename tanh_table_imp<b>::d64_fast_coeffs_t tanh_table_imp<b>::d64_fast_coeffs;
 
+template <bool b>
+constexpr typename tanh_table_imp<b>::d128_fast_coeffs_t tanh_table_imp<b>::d128_fast_coeffs;
+
 #endif
 
 } //namespace tanh_detail
