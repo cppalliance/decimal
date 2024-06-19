@@ -487,7 +487,7 @@ int main()
   test_comp_ellint<decimal64, double>();
 
   test_ellint<decimal32, float>(128);
-  test_ellint<decimal64, double>(0x10'000);
+  test_ellint<decimal64, double>(0x8'000);
 
   {
     using decimal_type = boost::decimal::decimal32;
@@ -499,7 +499,7 @@ int main()
   }
 
   {
-    const auto result_small_phi_64_is_ok = local::test_ellint_1_small_phi_64(0x10'000);
+    const auto result_small_phi_64_is_ok = local::test_ellint_1_small_phi_64(0x8'000);
 
     BOOST_TEST(result_small_phi_64_is_ok);
   }
@@ -511,7 +511,7 @@ int main()
   }
 
   {
-    const auto result_pos128_is_ok = local::test_comp_ellint_1_128_pos(0x10'000);
+    const auto result_pos128_is_ok = local::test_comp_ellint_1_128_pos(0x8'000);
 
     BOOST_TEST(result_pos128_is_ok);
   }

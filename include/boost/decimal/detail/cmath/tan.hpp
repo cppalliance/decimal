@@ -47,7 +47,71 @@ constexpr auto tan(T x) noexcept
     }
     else
     {
-        result = sin(x) / cos(x);
+        // Perform argument reduction.
+
+        // Given x = k * (pi/2) + r, compute n = (k % 4).
+
+        // | n |  sin(x) |  cos(x) |  sin(x)/cos(x) |
+        // |----------------------------------------|
+        // | 0 |  sin(r) |  cos(r) |  sin(r)/cos(r) |
+        // | 1 |  cos(r) | -sin(r) | -cos(r)/sin(r) |
+        // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
+        // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
+
+        constexpr T my_pi_half { numbers::pi_v<T> / 2 };
+
+        const T two_x = x * 2;
+
+        const auto k = static_cast<unsigned>(two_x / numbers::pi_v<T>);
+        const auto n = static_cast<unsigned>(k % static_cast<unsigned>(UINT8_C(4)));
+
+        const T two_r { two_x - (numbers::pi_v<T> * k) };
+
+        const T r { two_r / 2 };
+
+        constexpr T cbrt_epsilon { cbrt(std::numeric_limits<T>::epsilon()) };
+
+        constexpr T one { 1 };
+        constexpr T two { 2 };
+
+        switch(n)
+        {
+            case static_cast<unsigned>(UINT8_C(1)):
+            case static_cast<unsigned>(UINT8_C(3)):
+            {
+                if (two_r < cbrt_epsilon)
+                {
+                    result = (two / two_r) - (two_r / 6) - (two_r * (two_r * two_r)) / 360;
+                }
+                else
+                {
+                    result = cos(r) / sin(r);
+                }
+
+                result = -result;
+
+                break;
+            }
+
+            case static_cast<unsigned>(UINT8_C(0)):
+            case static_cast<unsigned>(UINT8_C(2)):
+            default:
+            {
+                const T d2r { numbers::pi_v<T> - two_r };
+
+                if (d2r < cbrt_epsilon)
+                {
+                    result = (two / d2r) - (d2r / 6) - (d2r * (d2r * d2r)) / 360;
+                }
+                else
+                {
+                    result = sin(r) / cos(r);
+                }
+
+                break;
+            }
+        }
+        
     }
 
     return result;

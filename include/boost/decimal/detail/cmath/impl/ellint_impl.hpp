@@ -59,7 +59,7 @@ constexpr auto agm(T  phi,
 
   constexpr T my_pi_half { numbers::pi_v<T> / 2 };
 
-  const bool phi_is_pi_half { phi == my_pi_half };
+  bool phi_is_pi_half { phi == my_pi_half };
 
   constexpr T one  { 1 };
 
@@ -100,7 +100,12 @@ constexpr auto agm(T  phi,
     {
       an = (a0 + b0) / 2;
 
-      if(!phi_is_pi_half) { phi_n += atan((b0 / a0) * tan(phi_n)); }
+      if(!phi_is_pi_half)
+      {
+        const T atan_arg { (b0 * tan(phi_n)) / a0 };
+
+        phi_n += atan(atan_arg);
+      }
 
       const T cn_term = (a0 - b0) / 2;
 
