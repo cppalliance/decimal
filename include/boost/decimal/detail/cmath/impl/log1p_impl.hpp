@@ -225,6 +225,8 @@ constexpr typename log1p_table_imp<b>::d32_fast_coeffs_t log1p_table_imp<b>::d32
 template <bool b>
 constexpr typename log1p_table_imp<b>::d64_fast_coeffs_t log1p_table_imp<b>::d64_fast_coeffs;
 
+template <bool b>
+constexpr typename log1p_table_imp<b>::d128_fast_coeffs_t log1p_table_imp<b>::d128_fast_coeffs;
 
 #endif
 

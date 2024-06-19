@@ -104,7 +104,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto max_significand_v<decimal12
 
 template <>
 BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto max_significand_v<decimal128_fast> =
-        uint128{UINT64_C(0b1111111111'1111111111'1111111111'1111111111'111111), UINT64_MAX};
+        uint128{UINT64_C(542101086242752), UINT64_C(4003012203950112767)};
 
 // sign + decimal digits + '.' + 'e' + '+/-' + max digits of exponent + null term
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>

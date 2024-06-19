@@ -275,6 +275,9 @@ constexpr typename lgamma_taylor_series_imp<b>::d32_fast_coeffs_t lgamma_taylor_
 template <bool b>
 constexpr typename lgamma_taylor_series_imp<b>::d64_fast_coeffs_t lgamma_taylor_series_imp<b>::d64_fast_coeffs;
 
+template <bool b>
+constexpr typename lgamma_taylor_series_imp<b>::d128_fast_coeffs_t lgamma_taylor_series_imp<b>::d128_fast_coeffs;
+
 #endif
 
 } //namespace lgamma_detail
