@@ -59,7 +59,7 @@ constexpr auto agm(T  phi,
 
   constexpr T my_pi_half { numbers::pi_v<T> / 2 };
 
-  bool phi_is_pi_half { phi == my_pi_half };
+  const bool phi_is_pi_half { phi == my_pi_half };
 
   constexpr T one  { 1 };
 
