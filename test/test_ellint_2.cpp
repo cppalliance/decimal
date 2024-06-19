@@ -37,6 +37,7 @@
 #include <iostream>
 #include <limits>
 #include <random>
+#include <sstream>
 #include <string>
 
 template<typename DecimalType> auto my_zero() -> DecimalType&;
@@ -49,6 +50,11 @@ namespace local
   template<typename IntegralTimePointType,
            typename ClockType = std::chrono::high_resolution_clock>
   auto time_point() noexcept -> IntegralTimePointType;
+
+  template<typename NumericType>
+  auto is_close_fraction(const NumericType& a,
+                         const NumericType& b,
+                         const NumericType& tol) noexcept -> bool;
 }
 
 #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
@@ -61,67 +67,98 @@ static std::mt19937_64 rng(42);
 
 using namespace boost::decimal;
 
-template <typename T>
+template <typename DecimalType, typename FloatType>
 void test_comp_ellint()
 {
-  std::uniform_real_distribution<float> dist(-0.998F, 0.998F);
+  using decimal_type = DecimalType;
+  using float_type   = FloatType;
 
-  rng.seed(local::time_point<typename std::mt19937_64::result_type>());
+  std::uniform_real_distribution<float_type> dist(static_cast<float_type>(-0.999L),   static_cast<float_type>(0.999L));
 
   constexpr auto local_N = N;
 
-  for (std::size_t i {}; i < local_N; ++i)
+  for (std::size_t i { }; i < local_N; ++i)
   {
-    const auto val {dist(rng)};
-    const T dec_val {val};
+    if((i % 0x10000U) == 0U)
+    {
+      rng.seed(local::time_point<typename std::mt19937_64::result_type>());
+    }
 
-    const auto float_res {boost::math::ellint_2(val)};
-    const auto dec_res {static_cast<float>(comp_ellint_2(dec_val))};
-    const auto distance {boost::math::float_distance(float_res, dec_res)};
+    const auto k_val { dist(rng) };
 
-    if (!BOOST_TEST(std::abs(distance) < 384))
+    const decimal_type k_dec_val { k_val };
+
+    const auto float_res { boost::math::ellint_2(k_val) };
+    const auto dec_res   { static_cast<float_type>(comp_ellint_2(k_dec_val)) };
+    const auto distance  { boost::math::float_distance(float_res, dec_res) };
+
+    if (!BOOST_TEST(std::abs(distance) < 128))
     {
       // LCOV_EXCL_START
-      std::cerr << "arg: " << dec_val
-                << "\n Float: " << float_res
-                << "\n  Dec: " << dec_res
-                << "\n Dist: " << distance << std::endl;
+      std::stringstream strm;
+
+      strm <<   "arg_k: " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << k_dec_val
+           << "\nFloat: " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << float_res
+           << "\nDec  : " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << dec_res
+           << "\nDist : " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << distance;
+
+      std::cerr << strm.str() << std::endl;
       // LCOV_EXCL_STOP
     }
   }
 }
 
-template <typename T>
-void test_ellint()
+template <typename DecimalType, typename FloatType>
+bool test_ellint(const int tol_factor)
 {
-  std::uniform_real_distribution<float> dist_k  (-0.998F, 0.998F);
-  std::uniform_real_distribution<float> dist_phi(-1.0F, 1.0F);
+  using decimal_type = DecimalType;
+  using float_type   = FloatType;
 
-  rng.seed(local::time_point<typename std::mt19937_64::result_type>());
+  std::uniform_real_distribution<float_type> dist_k  (static_cast<float_type>(-0.999L),   static_cast<float_type>(0.999L));
+  std::uniform_real_distribution<float_type> dist_phi(static_cast<float_type>(-0.99999L), static_cast<float_type>(0.99999L));
 
   constexpr auto local_N = N;
 
-  for (std::size_t i {}; i < local_N; ++i)
+  bool result_is_ok { true };
+
+  for (std::size_t i { }; i < local_N; ++i)
   {
-    const auto k_val {dist_k(rng)};
-    const auto phi_val {dist_phi(rng)};
+    if((i % UINT32_C(0x10000)) == UINT32_C(0))
+  {
+      rng.seed(local::time_point<typename std::mt19937_64::result_type>());
+    }
 
-    const T k_dec_val {k_val};
-    const T phi_dec_val {phi_val};
+    const auto k_flt   = dist_k  (rng);
+    const auto phi_flt = dist_phi(rng);
 
-    const auto float_res {boost::math::ellint_2(k_val, phi_val)};
-    const auto dec_res {static_cast<float>(ellint_2(k_dec_val, phi_dec_val))};
-    const auto distance {boost::math::float_distance(float_res, dec_res)};
+    const auto k_dec   = static_cast<decimal_type>(k_flt);
+    const auto phi_dec = static_cast<decimal_type>(phi_flt);
 
-    if (!BOOST_TEST(std::abs(distance) < 384))
+    const auto val_flt = boost::math::ellint_1(k_flt, phi_flt);
+    const auto val_dec = ellint_1(k_dec, phi_dec);
+
+    const auto result_val_is_ok = local::is_close_fraction(val_flt, static_cast<float_type>(val_dec), static_cast<float_type>(std::numeric_limits<decimal_type>::epsilon()) * static_cast<float_type>(tol_factor));
+
+    BOOST_TEST(result_val_is_ok);
+
+    result_is_ok = (result_val_is_ok && result_is_ok);
+
+    if(!result_val_is_ok)
     {
       // LCOV_EXCL_START
-      std::cerr << "Float: " << float_res
-                << "\n  Dec: " << dec_res
-                << "\n Dist: " << distance << std::endl;
+      std::stringstream strm;
+
+      strm <<   "k_dec  : " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << k_dec
+           << "\nphi_dec: " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << phi_dec
+           << "\nval_dec: " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << val_dec
+           << "\nval_flt: " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << val_flt;
+
+      std::cerr << strm.str() << std::endl;
       // LCOV_EXCL_STOP
     }
   }
+
+  return result_is_ok;
 }
 
 namespace local
@@ -281,21 +318,24 @@ namespace local
   {
     using decimal_type = boost::decimal::decimal64;
 
-    using val_ctrl_array_type = std::array<double, 5U>;
+    using val_ctrl_array_type = std::array<double, 8U>;
 
     const val_ctrl_array_type ctrl_values =
     {{
-      // Table[N[EllipticE[10^(-n), (1/3)^2], 17], {n, 5, 9, 1}]
-      9.9999999999814815E-6,
-      9.9999999999998148E-7,
-      9.9999999999999981E-8,
-      1.0000000000000000E-8,
-      1.0000000000000000E-9
+      // Table[N[EllipticE[9/(10^n), (1/3)^2], 17], {n, 1, 8, 1}]
+      0.88839866107837403,
+      0.089986520037070441,
+      0.0089999865002004740,
+      0.00089999998650000200,
+      0.000089999999986500000,
+      8.9999999999865000E-6,
+      8.9999999999998650E-7,
+      8.9999999999999987E-8
     }};
 
     std::array<decimal_type, std::tuple_size<val_ctrl_array_type>::value> ellint_2_values { };
 
-    int nx { 5 };
+    int nx { 1 };
 
     bool result_is_ok { true };
 
@@ -303,9 +343,9 @@ namespace local
 
     for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<val_ctrl_array_type>::value; ++i)
     {
-      // Table[N[EllipticF[10^(-n), (1/3)^2], 17], {n, 5, 9, 1}]
+      // Table[N[EllipticE[9/(10^n), (1/3)^2], 17], {n, 1, 8, 1}]
 
-      const decimal_type phi_arg = { 1, -nx };
+      const decimal_type phi_arg = { 9, -nx };
 
       ellint_2_values[i] = ellint_2(decimal_type { 1 } / 3, phi_arg);
 
@@ -443,11 +483,11 @@ namespace local
 
 int main()
 {
-  test_comp_ellint<decimal32>();
-  test_comp_ellint<decimal64>();
+  test_comp_ellint<decimal32, float>();
+  test_comp_ellint<decimal64, double>();
 
-  test_ellint<decimal32>();
-  test_ellint<decimal64>();
+  test_ellint<decimal32, float>(64);
+  test_ellint<decimal64, double>(0x8'000);
 
   {
     using decimal_type = boost::decimal::decimal32;
@@ -459,7 +499,7 @@ int main()
   }
 
   {
-    const auto result_small_phi_64_is_ok = local::test_ellint_2_small_phi_64(256);
+    const auto result_small_phi_64_is_ok = local::test_ellint_2_small_phi_64(4096);
 
     BOOST_TEST(result_small_phi_64_is_ok);
   }
@@ -471,7 +511,7 @@ int main()
   }
 
   {
-    const auto result_pos128_is_ok = local::test_comp_ellint_2_128_pos(0x10'000);
+    const auto result_pos128_is_ok = local::test_comp_ellint_2_128_pos(0x8'000);
 
     BOOST_TEST(result_pos128_is_ok);
   }

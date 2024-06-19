@@ -486,7 +486,7 @@ int main()
   test_comp_ellint<decimal32, float>();
   test_comp_ellint<decimal64, double>();
 
-  test_ellint<decimal32, float>(128);
+  test_ellint<decimal32, float>(64);
   test_ellint<decimal64, double>(0x8'000);
 
   {
@@ -499,7 +499,7 @@ int main()
   }
 
   {
-    const auto result_small_phi_64_is_ok = local::test_ellint_1_small_phi_64(0x8'000);
+    const auto result_small_phi_64_is_ok = local::test_ellint_1_small_phi_64(4096);
 
     BOOST_TEST(result_small_phi_64_is_ok);
   }
