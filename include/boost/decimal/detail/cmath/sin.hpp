@@ -45,8 +45,6 @@ constexpr auto sin_impl(T x) noexcept
     }
     else
     {
-        result = T { };
-
         if(x > static_cast<int>(INT8_C(0)))
         {
             // Perform argument reduction and subsequent scaling of the result.

@@ -4,8 +4,8 @@
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
-#define BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
+#ifndef BOOST_DECIMAL_DETAIL_CMATH_ELLINT_2_HPP
+#define BOOST_DECIMAL_DETAIL_CMATH_ELLINT_2_HPP
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/cmath/impl/ellint_impl.hpp>
@@ -31,7 +31,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto ellint_1_impl(T m, T phi) noexcept
+constexpr auto ellint_2_impl(T m, T phi) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
   constexpr T one { 1 };
@@ -57,36 +57,33 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
   }
   else if(signbit(phi))
   {
-    result = -ellint_1_impl(m, -phi);
+    result = -ellint_2_impl(m, -phi);
   }
   else if(signbit(m))
   {
-    result = ellint_1_impl(-m, phi);
+    result = ellint_2_impl(-m, phi);
   }
   else
   {
-    constexpr T small_phi_limit =
-          std::numeric_limits<T>::digits10 < 10 ? T { 1, -2 }
-        : std::numeric_limits<T>::digits10 < 20 ? T { 1, -2 }
-        :                                         T { 1, -4 };
-
-    if (phi < small_phi_limit)
+    constexpr int small_phi_order
     {
-      // PadeApproximant[EllipticF[phi, m2], {phi, 0, {6, 5}}]
-      // FullSimplify[%]
-      // HornerForm[Numerator[Out[2]], phi]
-      // HornerForm[Denominator[Out[2]], phi]
+          std::numeric_limits<T>::digits10 < 10 ? 2
+        : std::numeric_limits<T>::digits10 < 20 ? 4
+        :                                         8
+    };
 
-      // Then further collect factors of m2 in the numerator
-      // and denominator manually with HornerForm[poly, m],
-      // and finally get close to C-language form with CForm[].
+    if (phi < T { 1, -small_phi_order })
+    {
+      // PadeApproximant[EllipticE[phi, m2], {phi, 0, {4, 3}}]
+      // FullSimplify[%]
+      // Then manually edit the interior field to regain HornerForm[poly, phi].
 
       const T phi_sq { phi * phi };
 
-      const T m2 { (m * m) };
+      const T m2 { (!signbit(m)) ? (m * m) : -(m * m) };
 
-      const T top { phi*(-2661120 + m2*(-4354560 + 8300880*m2) + phi_sq*(-349440 + m2*(-262080 + (6683040 - 6460020*m2)*m2) + (-19200 + m2*(-263296 + m2*(997488 + m2*(-1325988 + 621441*m2))))*phi_sq)) };
-      const T bot { -2661120 + m2*(-4354560 + 8300880*m2) + phi_sq*(-349440 + m2*(181440 + (7408800 - 7843500*m2)*m2) + (-19200 + m2*(-293760 + m2*(1021680 + m2*(-1957500 + 1306125*m2))))*phi_sq) };
+      const T top { phi * (-60 + (-12 + 19 * m2) * phi_sq) };
+      const T bot { -60 + 3 * (-4 + 3 * m2) * phi_sq };
 
       result = top / bot;
     }
@@ -94,8 +91,7 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
     {
       constexpr T my_pi_half { numbers::pi_v<T> / 2 };
 
-      int k_pi = static_cast<int>(phi / numbers::pi_v<T>);
-
+      T k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
       T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
 
       const bool b_neg { phi_scaled > my_pi_half };
@@ -107,16 +103,18 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
         phi_scaled = -(phi_scaled - numbers::pi_v<T>);
       }
 
-      T Km { };
+      T Fpm { };
+      T Km  { };
+      T Em  { };
 
-      detail::ellint_detail::elliptic_series::agm(phi_scaled, m * m, result, Km);
+      detail::ellint_detail::elliptic_series::agm(phi_scaled, m * m, Fpm, Km, &Em, &result);
 
       if(b_neg)
       {
         result = -result;
       }
 
-      result += ((k_pi * Km) * 2);
+      result += ((k_pi * Em) * 2);
     }
   }
 
@@ -124,7 +122,7 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 }
 
 template <typename T>
-constexpr auto comp_ellint_1_impl(T m) noexcept
+constexpr auto comp_ellint_2_impl(T m) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
   constexpr T one  { 1 };
@@ -143,15 +141,16 @@ constexpr auto comp_ellint_1_impl(T m) noexcept
   }
   else if(signbit(m))
   {
-    result = comp_ellint_1_impl(-m);
+    result = comp_ellint_2_impl(-m);
   }
   else
   {
     constexpr T zero { 0 };
 
     T Fpm { };
+    T Km  { };
 
-    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, result);
+    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, Km, &result);
   }
 
   return result;
@@ -160,7 +159,7 @@ constexpr auto comp_ellint_1_impl(T m) noexcept
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto ellint_1(T k, T phi) noexcept
+constexpr auto ellint_2(T k, T phi) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -177,11 +176,11 @@ constexpr auto ellint_1(T k, T phi) noexcept
 
     #endif
 
-    return static_cast<T>(detail::ellint_1_impl(static_cast<evaluation_type>(k), static_cast<evaluation_type>(phi)));
+    return static_cast<T>(detail::ellint_2_impl(static_cast<evaluation_type>(k), static_cast<evaluation_type>(phi)));
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto comp_ellint_1(T k) noexcept
+constexpr auto comp_ellint_2(T k) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -198,10 +197,10 @@ constexpr auto comp_ellint_1(T k) noexcept
 
     #endif
 
-    return static_cast<T>(detail::comp_ellint_1_impl(static_cast<evaluation_type>(k)));
+    return static_cast<T>(detail::comp_ellint_2_impl(static_cast<evaluation_type>(k)));
 }
 
 } //namespace decimal
 } //namespace boost
 
-#endif //BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
+#endif //BOOST_DECIMAL_DETAIL_CMATH_ELLINT_2_HPP

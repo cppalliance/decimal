@@ -3,13 +3,6 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <random>
-#include <string>
-
 #include <boost/decimal.hpp>
 
 #if defined(__clang__)
@@ -21,6 +14,13 @@
 #endif
 
 #include <boost/core/lightweight_test.hpp>
+
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+#include <random>
+#include <string>
 
 template<typename DecimalType> auto my_zero() -> DecimalType&;
 template<typename DecimalType> auto my_one () -> DecimalType&;
@@ -196,7 +196,12 @@ namespace local
 
     gen.seed(time_point<typename std::mt19937_64::result_type>());
 
-    std::uniform_real_distribution<float_type> dist(1.0F, 2.0F);
+    std::uniform_real_distribution<float_type>
+      dist
+      (
+        static_cast<float_type>(1.01L),
+        static_cast<float_type>(1.04L)
+      );
 
     volatile auto result_is_ok = true;
 
@@ -204,9 +209,12 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_zero = log10(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      decimal_type arg_zero { ::my_zero<decimal_type>() };
+      arg_zero *= static_cast<decimal_type>(dist(gen));
 
-      const volatile auto result_log_zero_is_ok = (isinf(log_zero) && (log_zero < ::my_zero<decimal_type>()));
+      const auto log_zero = log10(arg_zero);
+
+      const volatile auto result_log_zero_is_ok = (isinf(log_zero) && signbit(log_zero));
 
       BOOST_TEST(result_log_zero_is_ok);
 
@@ -217,9 +225,12 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_zero_minus = log10(-::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      decimal_type arg_zero { ::my_zero<decimal_type>() };
+      arg_zero *= static_cast<decimal_type>(dist(gen));
 
-      const volatile auto result_log_zero_minus_is_ok = (isinf(log_zero_minus) && (log_zero_minus < ::my_zero<decimal_type>()));
+      const auto log_zero_minus = log10(-arg_zero);
+
+      const volatile auto result_log_zero_minus_is_ok = (isinf(log_zero_minus) && signbit(log_zero_minus));
 
       BOOST_TEST(result_log_zero_minus_is_ok);
 
@@ -256,7 +267,10 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_inf = log10(::my_inf<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      decimal_type arg_inf { ::my_inf<decimal_type>() };
+      arg_inf *= static_cast<decimal_type>(dist(gen));
+
+      const auto log_inf = log10(arg_inf);
 
       const volatile auto result_log_inf_is_ok = isinf(log_inf);
 
@@ -269,7 +283,10 @@ namespace local
     {
       static_cast<void>(index);
 
-      const auto log_inf_minus = log10(-::my_inf<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      decimal_type arg_inf { ::my_inf<decimal_type>() };
+      arg_inf *= static_cast<decimal_type>(dist(gen));
+
+      const auto log_inf_minus = log10(-arg_inf);
 
       const volatile auto result_log_inf_minus_is_ok = isnan(log_inf_minus);
 
@@ -302,35 +319,35 @@ namespace local
 
     const str_ctrl_array_type ctrl_strings =
     {{
-       // Table[N[Log[10, 456 10^n], 36], {n, -3, 24, 1}]
-       "-0.341035157335565015527421936814476293",
-       "0.658964842664434984472578063185523707",
-       "1.65896484266443498447257806318552371",
+       // Table[N[Log[10, (456 + n) 10^n], 36], {n, -3, 24, 1}]
+       "-0.343901797987168125835899041407581902",
+       "0.657055852857103915316787859478165974",
+       "1.65801139665711240470498252181047160",
        "2.65896484266443498447257806318552371",
-       "3.65896484266443498447257806318552371",
-       "4.65896484266443498447257806318552371",
-       "5.65896484266443498447257806318552371",
-       "6.65896484266443498447257806318552371",
-       "7.65896484266443498447257806318552371",
-       "8.65896484266443498447257806318552371",
-       "9.65896484266443498447257806318552371",
-       "10.6589648426644349844725780631855237",
-       "11.6589648426644349844725780631855237",
-       "12.6589648426644349844725780631855237",
-       "13.6589648426644349844725780631855237",
-       "14.6589648426644349844725780631855237",
-       "15.6589648426644349844725780631855237",
-       "16.6589648426644349844725780631855237",
-       "17.6589648426644349844725780631855237",
-       "18.6589648426644349844725780631855237",
-       "19.6589648426644349844725780631855237",
-       "20.6589648426644349844725780631855237",
-       "21.6589648426644349844725780631855237",
-       "22.6589648426644349844725780631855237",
-       "23.6589648426644349844725780631855237",
-       "24.6589648426644349844725780631855237",
-       "25.6589648426644349844725780631855237",
-       "26.6589648426644349844725780631855237",
+       "3.65991620006985022235354614522047714",
+       "4.66086547800386918934166876025115190",
+       "5.66181268553726124042525360409368296",
+       "6.66275783168157407408151600697568258",
+       "7.66370092538964814507468181848742134",
+       "8.66464197555612550397118302781526877",
+       "9.66558099101795313567419310843870855",
+       "10.6665179805548808681878023418672271",
+       "11.6674529528899539217479931086490380",
+       "12.6683859166900001674028777302013524",
+       "13.6693168805661121630880510897799967",
+       "14.6702458530741240342240387539015451",
+       "15.6711728427150832648613478878187048",
+       "16.6720978579357174644142193994492006",
+       "17.6730209071288961740565090331523990",
+       "18.6739419986340877759018730687086233",
+       "19.6748611407378115671552881244722464",
+       "20.6757783416740850605035881844578580",
+       "21.6766936096248665711088556863079433",
+       "22.6776069527204931496798639423699593",
+       "23.6785183790401139202230480981374872",
+       "24.6794278966121188802154000548723851",
+       "25.6803355134145632200969639669623108",
+       "26.6812412373755872181499834821530874",
     }};
 
     std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> log_values { };
@@ -344,7 +361,7 @@ namespace local
 
     for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<str_ctrl_array_type>::value; ++i)
     {
-      const decimal_type x_arg { 456, nx };
+      const decimal_type x_arg { (456 + nx), nx };
 
       ++nx;
 
@@ -381,7 +398,29 @@ auto main() -> int
   }
 
   {
+    using decimal_type = boost::decimal::decimal32_fast;
+    using float_type   = float;
+
+    const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(128);
+
+    BOOST_TEST(test_log10_is_ok);
+
+    result_is_ok = (test_log10_is_ok && result_is_ok);
+  }
+
+  {
     using decimal_type = boost::decimal::decimal64;
+    using float_type   = double;
+
+    const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(512);
+
+    BOOST_TEST(test_log10_is_ok);
+
+    result_is_ok = (test_log10_is_ok && result_is_ok);
+  }
+
+  {
+    using decimal_type = boost::decimal::decimal64_fast;
     using float_type   = double;
 
     const auto test_log10_is_ok = local::test_log10<decimal_type, float_type>(512);
@@ -414,6 +453,17 @@ auto main() -> int
   }
 
   {
+    using decimal_type = boost::decimal::decimal64;
+    using float_type   = double;
+
+    const auto test_log10_edge_is_ok = local::test_log10_edge<decimal_type, float_type>();
+
+    BOOST_TEST(test_log10_edge_is_ok);
+
+    result_is_ok = (test_log10_edge_is_ok && result_is_ok);
+  }
+
+  {
     const auto result_pos128_is_ok = local::test_log10_128(8192);
 
     BOOST_TEST(result_pos128_is_ok);
@@ -426,32 +476,6 @@ auto main() -> int
   return (result_is_ok ? 0 : -1);
 }
 
-template<typename DecimalType>
-auto my_zero() -> DecimalType&
-{
-  using decimal_type = DecimalType;
-
-  static decimal_type val_zero { 0, 0 };
-
-  return val_zero;
-}
-
-template<typename DecimalType>
-auto my_one() -> DecimalType&
-{
-  using decimal_type = DecimalType;
-
-  static decimal_type val_one { 1, 0 };
-
-  return val_one;
-}
-
-template<typename DecimalType>
-auto my_inf() -> DecimalType&
-{
-  using decimal_type = DecimalType;
-
-  static decimal_type val_inf { std::numeric_limits<decimal_type>::infinity() };
-
-  return val_inf;
-}
+template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_zero { 0 }; return val_zero; }
+template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_one  { 1 }; return val_one; }
+template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_inf  { std::numeric_limits<decimal_type>::infinity() }; return val_inf; }

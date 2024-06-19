@@ -101,7 +101,7 @@ namespace local
         static_cast<float_type>(range_hi)
       };
 
-    auto result_is_ok = true;
+    bool result_is_ok { true };
 
     auto trials = static_cast<std::uint32_t>(UINT8_C(0));
 
