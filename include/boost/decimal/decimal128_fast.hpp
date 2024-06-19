@@ -973,9 +973,9 @@ constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
     }
     #endif
 
-    const auto result {detail::d128_mul_impl<detail::decimal128_components>(
-            lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg())};
+    const auto result {detail::d128_fast_mul_impl<detail::decimal128_components>(
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_)};
 
     return {result.sig, result.exp, result.sign};
 }
@@ -991,24 +991,13 @@ constexpr auto operator*(decimal128_fast lhs, Integer rhs) noexcept
     }
     #endif
 
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    const auto lhs_zeros {detail::remove_trailing_zeros(lhs_sig)};
-    lhs_sig = lhs_zeros.trimmed_number;
-    lhs_exp += static_cast<std::int32_t>(lhs_zeros.number_of_removed_zeros);
-    auto lhs_components {detail::decimal128_fast_components{lhs_sig, lhs_exp, lhs.isneg()}};
-
     auto rhs_sig {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
     std::int32_t rhs_exp {0};
-    const auto rhs_zeros {detail::remove_trailing_zeros(rhs_sig)};
-    rhs_sig = rhs_zeros.trimmed_number;
-    rhs_exp += static_cast<std::int32_t>(rhs_zeros.number_of_removed_zeros);
-    auto unsigned_sig_rhs {detail::make_positive_unsigned(rhs_sig)};
-    auto rhs_components {detail::decimal128_fast_components{unsigned_sig_rhs, rhs_exp, (rhs < 0)}};
+    detail::normalize<decimal128_fast>(rhs_sig, rhs_exp);
 
-    const auto result {detail::d128_mul_impl<detail::decimal128_fast_components>(
-            lhs_components.sig, lhs_components.exp, lhs_components.sign,
-            rhs_components.sig, rhs_components.exp, rhs_components.sign)};
+    const auto result {detail::d128_fast_mul_impl<detail::decimal128_fast_components>(
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            rhs_sig, rhs_exp, (rhs < 0))};
 
     return {result.sig, result.exp, result.sign};
 }
