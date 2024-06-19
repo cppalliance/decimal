@@ -134,8 +134,8 @@ bool test_ellint(const int tol_factor)
     const auto k_dec   = static_cast<decimal_type>(k_flt);
     const auto phi_dec = static_cast<decimal_type>(phi_flt);
 
-    const auto val_flt = boost::math::ellint_1(k_flt, phi_flt);
-    const auto val_dec = ellint_1(k_dec, phi_dec);
+    const auto val_flt = boost::math::ellint_2(k_flt, phi_flt);
+    const auto val_dec = ellint_2(k_dec, phi_dec);
 
     const auto result_val_is_ok = local::is_close_fraction(val_flt, static_cast<float_type>(val_dec), static_cast<float_type>(std::numeric_limits<decimal_type>::epsilon()) * static_cast<float_type>(tol_factor));
 
@@ -486,8 +486,8 @@ int main()
   test_comp_ellint<decimal32, float>();
   test_comp_ellint<decimal64, double>();
 
-  test_ellint<decimal32, float>(64);
-  test_ellint<decimal64, double>(0x8'000);
+  test_ellint<decimal32, float>(128);
+  test_ellint<decimal64, double>(0x10'000);
 
   {
     using decimal_type = boost::decimal::decimal32;
