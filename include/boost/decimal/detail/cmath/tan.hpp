@@ -58,8 +58,6 @@ constexpr auto tan(T x) noexcept
         // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
         // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
 
-        constexpr T my_pi_half { numbers::pi_v<T> / 2 };
-
         const T two_x = x * 2;
 
         const auto k = static_cast<unsigned>(two_x / numbers::pi_v<T>);
@@ -81,7 +79,9 @@ constexpr auto tan(T x) noexcept
             {
                 if (two_r < cbrt_epsilon)
                 {
-                    result = (two / two_r) - (two_r / 6) - (two_r * (two_r * two_r)) / 360;
+                    // Normal[Series[Cos[x/2]/Sin[x/2], {x, 0, 3}]]
+
+                    result = (two / two_r) - (two_r * (one + (two_r * two_r) / 60) / 6);
                 }
                 else
                 {
@@ -101,7 +101,9 @@ constexpr auto tan(T x) noexcept
 
                 if (d2r < cbrt_epsilon)
                 {
-                    result = (two / d2r) - (d2r / 6) - (d2r * (d2r * d2r)) / 360;
+                    // Use essentially the same series as shown above, but shifted via d2r.
+
+                    result = (two / d2r) - ((d2r * (one + (d2r * d2r) / 60)) / 6);
                 }
                 else
                 {
