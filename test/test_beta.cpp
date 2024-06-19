@@ -85,7 +85,7 @@ int main()
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test<decimal128>();
-    // test<decimal128_fast>();
+    test<decimal128_fast>();
     #endif
 
     return boost::report_errors();
