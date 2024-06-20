@@ -8,6 +8,7 @@
 #include <climits>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -58,15 +59,21 @@ void test_add()
 
         if (!BOOST_TEST_EQ(static_cast<double>(dec128_res), static_cast<double>(dec128_fast_res)))
         {
-            std::cerr << std::setprecision(35)
-                      << "Val 1: " << val1
-                      << "\nVal 2: " << val2
-                      << "\nDec 1: " << dec128_1
-                      << "\nDec 2: " << dec128_2
-                      << "\nDec Res: " << dec128_res
-                      << "\nDecfast 1: " << dec128_fast_1
-                      << "\nDecfast 2: " << dec128_fast_2
-                      << "\nDecfast res: " << dec128_fast_res << std::endl;
+            // LCOV_EXCL_START
+            std::stringstream strm;
+
+            strm << std::setprecision(35)
+                 <<   "Val 1: " << val1
+                 << "\nVal 2: " << val2
+                 << "\nDec 1: " << dec128_1
+                 << "\nDec 2: " << dec128_2
+                 << "\nDec Res: " << dec128_res
+                 << "\nDecfast 1: " << dec128_fast_1
+                 << "\nDecfast 2: " << dec128_fast_2
+                 << "\nDecfast res: " << dec128_fast_res;
+
+            std::cerr << strm.str() << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -87,15 +94,21 @@ void test_add()
 
         if (!BOOST_TEST_EQ(static_cast<double>(dec128_res), static_cast<double>(dec128_fast_res)))
         {
-            std::cerr << std::setprecision(35)
-                      << "Val 1: " << val1
-                      << "\nVal 2: " << val2
-                      << "\nDec 1: " << dec128_1
-                      << "\nDec 2: " << dec128_2
-                      << "\nDec Res: " << dec128_res
-                      << "\nDecfast 1: " << dec128_fast_1
-                      << "\nDecfast 2: " << dec128_fast_2
-                      << "\nDecfast res: " << dec128_fast_res << std::endl;
+            // LCOV_EXCL_START
+            std::stringstream strm;
+
+            strm << std::setprecision(35)
+                 <<   "Val 1: " << val1
+                 << "\nVal 2: " << val2
+                 << "\nDec 1: " << dec128_1
+                 << "\nDec 2: " << dec128_2
+                 << "\nDec Res: " << dec128_res
+                 << "\nDecfast 1: " << dec128_fast_1
+                 << "\nDecfast 2: " << dec128_fast_2
+                 << "\nDecfast res: " << dec128_fast_res;
+
+            std::cerr << strm.str() << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }
@@ -119,15 +132,21 @@ void test_sub()
 
         if (!BOOST_TEST_EQ(static_cast<double>(dec128_res), static_cast<double>(dec128_fast_res)))
         {
-            std::cerr << std::setprecision(35)
-                      << "Val 1: " << val1
-                      << "\nVal 2: " << val2
-                      << "\nDec 1: " << dec128_1
-                      << "\nDec 2: " << dec128_2
-                      << "\nDec Res: " << dec128_res
-                      << "\nDecfast 1: " << dec128_fast_1
-                      << "\nDecfast 2: " << dec128_fast_2
-                      << "\nDecfast res: " << dec128_fast_res << std::endl;
+            // LCOV_EXCL_START
+            std::stringstream strm;
+
+            strm << std::setprecision(35)
+                 <<   "Val 1: " << val1
+                 << "\nVal 2: " << val2
+                 << "\nDec 1: " << dec128_1
+                 << "\nDec 2: " << dec128_2
+                 << "\nDec Res: " << dec128_res
+                 << "\nDecfast 1: " << dec128_fast_1
+                 << "\nDecfast 2: " << dec128_fast_2
+                 << "\nDecfast res: " << dec128_fast_res;
+
+            std::cerr << strm.str() << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -148,15 +167,21 @@ void test_sub()
 
         if (!BOOST_TEST_EQ(static_cast<double>(dec128_res), static_cast<double>(dec128_fast_res)))
         {
-            std::cerr << std::setprecision(35)
-                      << "Val 1: " << val1
-                      << "\nVal 2: " << val2
-                      << "\nDec 1: " << dec128_1
-                      << "\nDec 2: " << dec128_2
-                      << "\nDec Res: " << dec128_res
-                      << "\nDecfast 1: " << dec128_fast_1
-                      << "\nDecfast 2: " << dec128_fast_2
-                      << "\nDecfast res: " << dec128_fast_res << std::endl;
+            // LCOV_EXCL_START
+            std::stringstream strm;
+
+            strm << std::setprecision(35)
+                 <<   "Val 1: " << val1
+                 << "\nVal 2: " << val2
+                 << "\nDec 1: " << dec128_1
+                 << "\nDec 2: " << dec128_2
+                 << "\nDec Res: " << dec128_res
+                 << "\nDecfast 1: " << dec128_fast_1
+                 << "\nDecfast 2: " << dec128_fast_2
+                 << "\nDecfast res: " << dec128_fast_res;
+
+            std::cerr << strm.str() << std::endl;
+            // LCOV_EXCL_STOP
         }
     }
 }

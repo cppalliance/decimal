@@ -67,26 +67,20 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
   {
     constexpr T small_phi_limit =
           std::numeric_limits<T>::digits10 < 10 ? T { 1, -2 }
-        : std::numeric_limits<T>::digits10 < 20 ? T { 1, -2 }
-        :                                         T { 1, -4 };
+        : std::numeric_limits<T>::digits10 < 20 ? T { 1, -3 }
+        :                                         T { 1, -5 };
 
     if (phi < small_phi_limit)
     {
-      // PadeApproximant[EllipticF[phi, m2], {phi, 0, {6, 5}}]
+      // PadeApproximant[EllipticF[phi, m2], {phi, 0, {4, 3}}]
       // FullSimplify[%]
-      // HornerForm[Numerator[Out[2]], phi]
-      // HornerForm[Denominator[Out[2]], phi]
-
-      // Then further collect factors of m2 in the numerator
-      // and denominator manually with HornerForm[poly, m],
-      // and finally get close to C-language form with CForm[].
 
       const T phi_sq { phi * phi };
 
-      const T m2 { (m * m) };
+      const T m2 { m * m };
 
-      const T top { phi*(-2661120 + m2*(-4354560 + 8300880*m2) + phi_sq*(-349440 + m2*(-262080 + (6683040 - 6460020*m2)*m2) + (-19200 + m2*(-263296 + m2*(997488 + m2*(-1325988 + 621441*m2))))*phi_sq)) };
-      const T bot { -2661120 + m2*(-4354560 + 8300880*m2) + phi_sq*(-349440 + m2*(181440 + (7408800 - 7843500*m2)*m2) + (-19200 + m2*(-293760 + m2*(1021680 + m2*(-1957500 + 1306125*m2))))*phi_sq) };
+      const T top { phi * (-60 + (-12 + 17 * m2) * phi_sq) };
+      const T bot { -60 + 3 * (-4 + 9 * m2) * phi_sq };
 
       result = top / bot;
     }
@@ -98,9 +92,9 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 
       T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
 
-      const bool b_neg { phi_scaled > my_pi_half };
+      const bool b_medium_phi_scale_and_negate { phi_scaled > my_pi_half };
 
-      if(b_neg)
+      if(b_medium_phi_scale_and_negate)
       {
         ++k_pi;
 
@@ -109,14 +103,21 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 
       T Km { };
 
-      detail::ellint_detail::elliptic_series::agm(phi_scaled, m * m, result, Km);
+      const T m2 { m * m };
 
-      if(b_neg)
+      const bool m2_is_one { m2 == one };
+
+      detail::ellint_detail::elliptic_series::agm(phi_scaled, m2, result, Km, static_cast<T*>(nullptr), static_cast<T*>(nullptr));
+
+      if(b_medium_phi_scale_and_negate)
       {
         result = -result;
       }
 
-      result += ((k_pi * Km) * 2);
+      if(!m2_is_one)
+      {
+        result += ((k_pi * Km) * 2);
+      }
     }
   }
 
@@ -151,7 +152,7 @@ constexpr auto comp_ellint_1_impl(T m) noexcept
 
     T Fpm { };
 
-    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, result);
+    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, result, static_cast<T*>(nullptr), static_cast<T*>(nullptr));
   }
 
   return result;

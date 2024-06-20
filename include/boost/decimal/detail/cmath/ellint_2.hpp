@@ -65,22 +65,19 @@ constexpr auto ellint_2_impl(T m, T phi) noexcept
   }
   else
   {
-    constexpr int small_phi_order
-    {
-          std::numeric_limits<T>::digits10 < 10 ? 2
-        : std::numeric_limits<T>::digits10 < 20 ? 4
-        :                                         8
-    };
+    constexpr T small_phi_limit =
+          std::numeric_limits<T>::digits10 < 10 ? T { 1, -2 }
+        : std::numeric_limits<T>::digits10 < 20 ? T { 1, -3 }
+        :                                         T { 1, -5 };
 
-    if (phi < T { 1, -small_phi_order })
+    if (phi < small_phi_limit)
     {
       // PadeApproximant[EllipticE[phi, m2], {phi, 0, {4, 3}}]
       // FullSimplify[%]
-      // Then manually edit the interior field to regain HornerForm[poly, phi].
 
       const T phi_sq { phi * phi };
 
-      const T m2 { (!signbit(m)) ? (m * m) : -(m * m) };
+      const T m2 { m * m };
 
       const T top { phi * (-60 + (-12 + 19 * m2) * phi_sq) };
       const T bot { -60 + 3 * (-4 + 3 * m2) * phi_sq };
@@ -91,12 +88,13 @@ constexpr auto ellint_2_impl(T m, T phi) noexcept
     {
       constexpr T my_pi_half { numbers::pi_v<T> / 2 };
 
-      T k_pi       = static_cast<int>(phi / numbers::pi_v<T>);
+      int k_pi = static_cast<int>(phi / numbers::pi_v<T>);
+
       T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
 
-      const bool b_neg { phi_scaled > my_pi_half };
+      const bool b_medium_phi_scale_and_negate { phi_scaled > my_pi_half };
 
-      if(b_neg)
+      if(b_medium_phi_scale_and_negate)
       {
         ++k_pi;
 
@@ -107,9 +105,11 @@ constexpr auto ellint_2_impl(T m, T phi) noexcept
       T Km  { };
       T Em  { };
 
-      detail::ellint_detail::elliptic_series::agm(phi_scaled, m * m, Fpm, Km, &Em, &result);
+      const T m2 { m * m };
 
-      if(b_neg)
+      detail::ellint_detail::elliptic_series::agm(phi_scaled, m2, Fpm, Km, &Em, &result);
+
+      if(b_medium_phi_scale_and_negate)
       {
         result = -result;
       }
@@ -150,7 +150,7 @@ constexpr auto comp_ellint_2_impl(T m) noexcept
     T Fpm { };
     T Km  { };
 
-    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, Km, &result);
+    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, Km, &result, static_cast<T*>(nullptr));
   }
 
   return result;

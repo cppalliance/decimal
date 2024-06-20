@@ -58,33 +58,68 @@ constexpr auto sin_impl(T x) noexcept
             // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
             // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
 
-            constexpr T my_pi_half { numbers::pi_v<T> / 2 };
+            const T two_x = x * 2;
 
-            const auto k = static_cast<unsigned>(x / my_pi_half);
+            const auto k = static_cast<unsigned>(two_x / numbers::pi_v<T>);
             const auto n = static_cast<unsigned>(k % static_cast<unsigned>(UINT8_C(4)));
 
-            auto r = x - (my_pi_half * k);
+            const T two_r { two_x - (numbers::pi_v<T> * k) };
 
-            constexpr T half { 5, -1 };
+            T r { two_r / 2 };
 
-            const bool do_scaling { x > half };
+            constexpr T one { 1 };
 
-            if(do_scaling)
-            {
-                // Reduce the argument with factors of three.
-                r /= static_cast<unsigned>(UINT8_C(3));
-            }
+            bool do_scaling { two_r > one };
+
+            constexpr T sqrt_epsilon { sqrt(std::numeric_limits<T>::epsilon()) };
 
             switch(n)
             {
-              case static_cast<unsigned>(UINT8_C(1)):
-              case static_cast<unsigned>(UINT8_C(3)):
-                result = detail::cos_series_expansion(r);
+                case static_cast<unsigned>(UINT8_C(1)):
+                case static_cast<unsigned>(UINT8_C(3)):
+                {
+                    const T d2r { numbers::pi_v<T> - two_r };
+
+                    if (d2r < sqrt_epsilon)
+                    {
+                        result = d2r * (one - (d2r * d2r) / 12) / 2;
+
+                        do_scaling = false;
+                    }
+                    else
+                    {
+                        if(do_scaling)
+                        {
+                            // Reduce the argument with one single factor of three.
+                            r /= static_cast<unsigned>(UINT8_C(3));
+                        }
+
+                        result = detail::cos_series_expansion(r);
+                    }
+                }
                 break;
-              case static_cast<unsigned>(UINT8_C(0)):
-              case static_cast<unsigned>(UINT8_C(2)):
-              default:
-                result = detail::sin_series_expansion(r);
+
+                case static_cast<unsigned>(UINT8_C(0)):
+                case static_cast<unsigned>(UINT8_C(2)):
+                default:
+                {
+                    if (two_r < sqrt_epsilon)
+                    {
+                        // Normal[Series[Sin[x/2], {x, 0, 3}]]
+
+                        result = (two_r * (one - (two_r * two_r) / 24)) / 2;
+                    }
+                    else
+                    {
+                        if(do_scaling)
+                        {
+                            // Reduce the argument with one single factor of three.
+                            r /= static_cast<unsigned>(UINT8_C(3));
+                        }
+
+                        result = detail::sin_series_expansion(r);
+                    }
+                }
                 break;
             }
 

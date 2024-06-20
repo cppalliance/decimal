@@ -170,8 +170,8 @@ constexpr auto sin_series_expansion<decimal128>(decimal128 x) noexcept
 
     const decimal128 x2 { x * x };
 
-    const decimal128 top { x * (c0 + x2 * (c1 + x2 * (c2 + x2 * (c3 + x2 * (c4 + x2 * (c5 + x2 *  c6)))))) };
-    const decimal128 bot { c0 + x2 * (d1 + x2 * (d2 + x2 * (d3 + x2 * (d4 + x2 * (d5 + x2 *  d6))))) };
+    const decimal128 top { x * (c0 + x2 * (c1 + x2 * (c2 + x2 * (c3 + x2 * (c4 + x2 * (c5 + x2 * c6)))))) };
+    const decimal128 bot {      c0 + x2 * (d1 + x2 * (d2 + x2 * (d3 + x2 * (d4 + x2 * (d5 + x2 * d6))))) };
 
     const decimal128 result { top / bot };
 
@@ -207,8 +207,8 @@ constexpr auto sin_series_expansion<decimal128_fast>(decimal128_fast x) noexcept
 
     const decimal128_fast x2 { x * x };
 
-    const decimal128_fast top { x * (c0 + x2 * (c1 + x2 * (c2 + x2 * (c3 + x2 * (c4 + x2 * (c5 + x2 *  c6)))))) };
-    const decimal128_fast bot { c0 + x2 * (d1 + x2 * (d2 + x2 * (d3 + x2 * (d4 + x2 * (d5 + x2 *  d6))))) };
+    const decimal128_fast top { x * (c0 + x2 * (c1 + x2 * (c2 + x2 * (c3 + x2 * (c4 + x2 * (c5 + x2 * c6)))))) };
+    const decimal128_fast bot {      c0 + x2 * (d1 + x2 * (d2 + x2 * (d3 + x2 * (d4 + x2 * (d5 + x2 * d6))))) };
 
     const decimal128_fast result { top / bot };
 

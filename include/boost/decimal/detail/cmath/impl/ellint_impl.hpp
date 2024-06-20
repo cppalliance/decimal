@@ -28,11 +28,17 @@ constexpr auto agm(T  phi,
                    T  m2,
                    T& Fpm,
                    T& Km,
-                   T* const pEm  = nullptr,
-                   T* const pEpm = nullptr) noexcept
+                   T* pEm,
+                   T* pEpm) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, void)
 {
-  // Use the AGM algorithm implemented in e_float:
+  // See Chapter/Section 19.8(i) Elliptic Integrals: Quadratic Transformations:
+  // Arithmetic Geometric Mean (AGM), pp. 492-493 of:
+  // F.W.J. Olver et al., NIST Handbook of Mathematical Functions,
+  // Cambridge University Press. The same can also be found
+  // online at https://dlmf.nist.gov/19.8
+
+  // In particular, use the AGM algorithm implemented in e_float:
   // C.M. Kormanyos, "Algorithm 910: A Portable C++ Multiple-Precision
   // System for Special-Function Calculations", ACM TOMS (37) 4, February 2011.
 
@@ -63,18 +69,28 @@ constexpr auto agm(T  phi,
 
   constexpr T one  { 1 };
 
+  const bool has_e { ((pEm  != nullptr) || (pEpm != nullptr)) };
+
   if(m2 == one)
   {
-    if(pEm != nullptr) { *pEm = one; }
-
     Km = std::numeric_limits<T>::quiet_NaN();
 
-    const T sp = sin(phi);
+    const T sp { sin(phi) };
 
-    Fpm = phi_is_pi_half ? std::numeric_limits<T>::quiet_NaN()
-                         : log((one + sp) / (one - sp)) / 2;
+    Fpm = phi_is_pi_half ? std::numeric_limits<T>::quiet_NaN() : log((one + sp) / (one - sp)) / 2;
 
-    if(pEpm != nullptr) { *pEpm = phi_is_pi_half ? one : sp; }
+    if(has_e)
+    {
+      if(pEm != nullptr)
+      {
+        *pEm = one;
+      }
+
+      if(pEpm != nullptr)
+      {
+        *pEpm = phi_is_pi_half ? one : sp;
+      }
+    }
   }
   else
   {
@@ -89,12 +105,10 @@ constexpr auto agm(T  phi,
 
     T an { };
 
-    const bool has_e { ((pEm  != nullptr) || (pEpm != nullptr)) };
-
     T cn_2ncn_inner_prod      = (has_e ? m2 / 2 : zero);
     T sin_phi_n_cn_inner_prod = zero;
 
-    const T break_check { 9, -1 - (std::numeric_limits<T>::digits / 2) };
+    const T break_check { b0 * T { 1, -1 - (std::numeric_limits<T>::digits / 2) } };
 
     for(int n = 0; n < std::numeric_limits<std::uint32_t>::digits; ++n)
     {
