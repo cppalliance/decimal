@@ -166,6 +166,32 @@ void test_hex_scientific()
     BOOST_TEST_EQ(significand, UINT64_C(80427));
 }
 
+template <typename T>
+void invalid_test()
+{
+    std::uint64_t significand {};
+    std::int64_t  exponent {};
+    bool sign {};
+
+    const char* invalid_inf = "in";
+    auto r1 = boost::decimal::detail::parser(invalid_inf, invalid_inf, sign, significand, exponent, boost::decimal::chars_format::general);
+    BOOST_TEST(r1.ec == std::errc::invalid_argument);
+
+    auto r2 = boost::decimal::detail::parser(invalid_inf, invalid_inf + std::strlen(invalid_inf), sign, significand, exponent, boost::decimal::chars_format::general);
+    BOOST_TEST(r2.ec == std::errc::invalid_argument);
+
+    const char* invalid_nan = "nan(ind)";
+    auto r3 = boost::decimal::detail::parser(invalid_nan, invalid_nan + 1, sign, significand, exponent, boost::decimal::chars_format::general);
+    BOOST_TEST(r3.ec == std::errc::invalid_argument);
+
+    auto r4 = boost::decimal::detail::parser(invalid_nan, invalid_nan + std::strlen(invalid_nan), sign, significand, exponent, boost::decimal::chars_format::general);
+    BOOST_TEST(r4.ec == std::errc::not_supported);
+
+    const char* bad_sci = "2.0000";
+    auto r5 = boost::decimal::detail::parser(bad_sci, bad_sci + std::strlen(bad_sci), sign, significand, exponent, boost::decimal::chars_format::scientific);
+    BOOST_TEST(r5.ec == std::errc::invalid_argument);
+}
+
 int main()
 {
     test_integer<float>();
@@ -183,6 +209,10 @@ int main()
     test_hex_scientific<float>();
     test_hex_scientific<double>();
     test_hex_scientific<long double>();
+
+    invalid_test<float>();
+    invalid_test<double>();
+    invalid_test<long double>();
 
     return boost::report_errors();
 }
