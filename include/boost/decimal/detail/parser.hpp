@@ -70,7 +70,7 @@ constexpr auto from_chars_dispatch(const char* first, const char* last, uint128_
 template <typename Unsigned_Integer, typename Integer>
 constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent, chars_format fmt = chars_format::general) noexcept -> from_chars_result
 {
-    if (first > last)
+    if (first >= last)
     {
         return {first, std::errc::invalid_argument};
     }
