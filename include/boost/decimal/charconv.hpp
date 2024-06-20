@@ -774,6 +774,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
             return to_chars_scientific_impl(first, last, value, fmt, precision);
         }
     }
+
+    // LCOV_EXCL_START
+    BOOST_DECIMAL_UNREACHABLE;
+    return to_chars_scientific_impl(first, last, value, fmt, precision);
+    // LCOV_EXCL_STOP
 }
 
 } //namespace detail
