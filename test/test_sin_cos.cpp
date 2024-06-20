@@ -185,9 +185,10 @@ namespace local
     return result_is_ok;
   }
 
+  template <typename T>
   auto test_sin_128(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128;
+    using decimal_type = T;
 
     using str_ctrl_array_type = std::array<const char*, 41U>;
 
@@ -272,9 +273,10 @@ namespace local
     return result_is_ok;
   }
 
+  template <typename T>
   auto test_cos_128(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128;
+    using decimal_type = T;
 
     using str_ctrl_array_type = std::array<const char*, 41U>;
 
@@ -423,8 +425,16 @@ int main()
     test_cos<decimal64_fast>();
 
     {
-        const auto result_sin128_is_ok = local::test_sin_128(0x8'000);
-        const auto result_cos128_is_ok = local::test_cos_128(0x8'000);
+        const auto result_sin128_is_ok = local::test_sin_128<decimal128>(0x8'000);
+        const auto result_cos128_is_ok = local::test_cos_128<decimal128>(0x8'000);
+
+        BOOST_TEST(result_sin128_is_ok);
+        BOOST_TEST(result_cos128_is_ok);
+    }
+
+    {
+        const auto result_sin128_is_ok = local::test_sin_128<decimal128_fast>(0x8'000);
+        const auto result_cos128_is_ok = local::test_cos_128<decimal128_fast>(0x8'000);
 
         BOOST_TEST(result_sin128_is_ok);
         BOOST_TEST(result_cos128_is_ok);
