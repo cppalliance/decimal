@@ -39,7 +39,8 @@ namespace detail {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 constexpr auto from_chars_general_impl(const char* first, const char* last, TargetDecimalType& value, chars_format fmt) noexcept -> from_chars_result
 {
-    using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, detail::uint128, std::uint64_t>;
+    using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value ||
+                                                std::is_same<TargetDecimalType, decimal128_fast>::value, detail::uint128, std::uint64_t>;
 
     if (first >= last)
     {
