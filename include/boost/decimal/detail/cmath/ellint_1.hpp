@@ -67,8 +67,8 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
   {
     constexpr T small_phi_limit =
           std::numeric_limits<T>::digits10 < 10 ? T { 1, -2 }
-        : std::numeric_limits<T>::digits10 < 20 ? T { 1, -2 }
-        :                                         T { 1, -4 };
+        : std::numeric_limits<T>::digits10 < 20 ? T { 1, -3 }
+        :                                         T { 1, -5 };
 
     if (phi < small_phi_limit)
     {
@@ -98,9 +98,9 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 
       T phi_scaled = phi - (k_pi * numbers::pi_v<T>);
 
-      const bool b_neg { phi_scaled > my_pi_half };
+      const bool b_medium_phi_scale_and_negate { phi_scaled > my_pi_half };
 
-      if(b_neg)
+      if(b_medium_phi_scale_and_negate)
       {
         ++k_pi;
 
@@ -109,14 +109,21 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 
       T Km { };
 
-      detail::ellint_detail::elliptic_series::agm(phi_scaled, m * m, result, Km);
+      const T m2 { m * m };
 
-      if(b_neg)
+      const bool m2_is_one { m2 == one };
+
+      detail::ellint_detail::elliptic_series::agm(phi_scaled, m2, result, Km, static_cast<T*>(nullptr), static_cast<T*>(nullptr));
+
+      if(b_medium_phi_scale_and_negate)
       {
         result = -result;
       }
 
-      result += ((k_pi * Km) * 2);
+      if(!m2_is_one)
+      {
+        result += ((k_pi * Km) * 2);
+      }
     }
   }
 
@@ -151,7 +158,7 @@ constexpr auto comp_ellint_1_impl(T m) noexcept
 
     T Fpm { };
 
-    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, result);
+    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, result, static_cast<T*>(nullptr), static_cast<T*>(nullptr));
   }
 
   return result;

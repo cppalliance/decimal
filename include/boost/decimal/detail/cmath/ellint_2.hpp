@@ -150,7 +150,7 @@ constexpr auto comp_ellint_2_impl(T m) noexcept
     T Fpm { };
     T Km  { };
 
-    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, Km, &result);
+    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, Km, &result, static_cast<T*>(nullptr));
   }
 
   return result;

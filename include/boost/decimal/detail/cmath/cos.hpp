@@ -1,5 +1,5 @@
-// Copyright 2023 Matt Borland
-// Copyright 2023 Christopher Kormanyos
+// Copyright 2023 - 2024 Matt Borland
+// Copyright 2023 - 2024 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -58,16 +58,18 @@ constexpr auto cos_impl(T x) noexcept
             // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
             // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
 
-            constexpr T my_pi_half { numbers::pi_v<T> / 2 };
+            const T two_x = x * 2;
 
-            const auto k = static_cast<unsigned>(x / my_pi_half);
+            const auto k = static_cast<unsigned>(two_x / numbers::pi_v<T>);
             const auto n = static_cast<unsigned>(k % static_cast<unsigned>(UINT8_C(4)));
 
-            auto r = x - (my_pi_half * k);
+            const T two_r { two_x - (numbers::pi_v<T> * k) };
+
+            T r { two_r / 2 };
 
             constexpr T half { 5, -1 };
 
-            const bool do_scaling { x > half };
+            const bool do_scaling { r > half };
 
             if(do_scaling)
             {
