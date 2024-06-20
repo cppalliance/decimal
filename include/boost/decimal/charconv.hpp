@@ -731,28 +731,26 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
 
     constexpr auto min_fractional_value = TargetDecimalType{1, -4};
 
-    if (fmt == chars_format::hex)
-    {
-        return to_chars_hex_impl(first, last, value, precision);
-    }
-
     // Unspecified precision so we always go with the shortest representation
     if (precision == -1)
     {
-        if (fmt == chars_format::general || fmt == chars_format::fixed)
+        switch (fmt)
         {
-            if (abs_value >= 1 && abs_value < max_fractional_value)
-            {
+            case chars_format::general:
+                if (abs_value >= 1 && abs_value < max_fractional_value)
+                {
+                    return to_chars_fixed_impl(first, last, value, fmt, precision);
+                }
+                else
+                {
+                    return to_chars_scientific_impl(first, last, value, fmt, precision);
+                }
+            case chars_format::fixed:
                 return to_chars_fixed_impl(first, last, value, fmt, precision);
-            }
-            else
-            {
+            case chars_format::scientific:
                 return to_chars_scientific_impl(first, last, value, fmt, precision);
-            }
-        }
-        else
-        {
-            return to_chars_scientific_impl(first, last, value, fmt, precision);
+            case chars_format::hex:
+                return to_chars_hex_impl(first, last, value, precision); // LCOV_EXCL_LINE unreachable
         }
     }
     else
@@ -766,6 +764,10 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
         if (fmt == chars_format::fixed)
         {
             return to_chars_fixed_impl(first, last, value, fmt, precision);
+        }
+        else if (fmt == chars_format::hex)
+        {
+            return to_chars_hex_impl(first, last, value, precision);
         }
         else
         {
