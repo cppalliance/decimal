@@ -97,7 +97,7 @@ struct uint256_t
 
     friend constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator/(uint256_t lhs, std::uint64_t rhs) noexcept;
+    friend constexpr uint256_t operator/(const uint256_t& lhs, std::uint64_t rhs) noexcept;
 
     constexpr uint256_t& operator/=(std::uint64_t rhs) noexcept;
 
@@ -430,14 +430,14 @@ constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noe
 }
 
 // Forward declaration of specialized division 256-bits / 64-bits.
-constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const std::uint64_t& divisor) noexcept;
+constexpr std::tuple<uint256_t, uint256_t> divide_with_rem(const uint256_t& dividend, const std::uint64_t& divisor) noexcept;
 
 // The division algorithm
 constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     if ((rhs.high.high == UINT64_C(0)) && (rhs.high.low == UINT64_C(0)) && (rhs.low.high == UINT64_C(0)) && (rhs.low.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))) && (rhs.low.low > (static_cast<std::uint64_t>(UINT64_C(0)))))
     {
-        return divide(lhs, rhs.low.low);
+        return divide_with_rem(lhs, rhs.low.low);
     }
     else
     {
@@ -457,7 +457,7 @@ constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& lhs, const ui
     }
 }
 
-constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& dividend, const std::uint64_t& divisor) noexcept
+constexpr std::tuple<uint256_t, uint256_t> divide_with_rem(const uint256_t& dividend, const std::uint64_t& divisor) noexcept
 {
     uint256_t quotient { { 0U, 0U }, { 0U, 0U }};
 
@@ -489,10 +489,28 @@ constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexce
     return std::get<0>(res);
 }
 
-constexpr uint256_t operator/(uint256_t lhs, std::uint64_t rhs) noexcept
+constexpr uint256_t operator/(const uint256_t& lhs, std::uint64_t rhs) noexcept
 {
-    const auto res {divide(lhs, rhs)};
-    return std::get<0>(res);
+    // Same code as divide_with_rem but skips the modulus step
+
+    uint256_t quotient { { 0U, 0U }, { 0U, 0U }};
+
+    uint128 current = lhs.high.high;
+    quotient.high.high = static_cast<std::uint64_t>(current / rhs);
+    auto remainder = static_cast<std::uint64_t>(current % rhs);
+
+    current = static_cast<uint128>(remainder) << 64U | lhs.high.low;
+    quotient.high.low = static_cast<std::uint64_t>(current / rhs);
+    remainder = static_cast<std::uint64_t>(current % rhs);
+
+    current = static_cast<uint128>(remainder) << 64U | lhs.low.high;
+    quotient.low.high = static_cast<std::uint64_t>(current / rhs);
+    remainder = static_cast<std::uint64_t>(current % rhs);
+
+    current = static_cast<uint128>(remainder) << 64U | lhs.low.low;
+    quotient.low.low = static_cast<std::uint64_t>(current / rhs);
+
+    return quotient;
 }
 
 constexpr uint256_t& uint256_t::operator/=(std::uint64_t rhs) noexcept
