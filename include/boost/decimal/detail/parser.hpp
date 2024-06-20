@@ -307,11 +307,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         {
             offset = significand_buffer_size - 1;
             i = significand_buffer_size;
-            if (significand_buffer[offset] == '5' ||
-                significand_buffer[offset] == '6' ||
-                significand_buffer[offset] == '7' ||
-                significand_buffer[offset] == '8' ||
-                significand_buffer[offset] == '9')
+            if (significand_buffer[offset] >= '5')
             {
                 round = true;
             }
