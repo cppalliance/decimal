@@ -72,21 +72,15 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 
     if (phi < small_phi_limit)
     {
-      // PadeApproximant[EllipticF[phi, m2], {phi, 0, {6, 5}}]
+      // PadeApproximant[EllipticF[phi, m2], {phi, 0, {4, 3}}]
       // FullSimplify[%]
-      // HornerForm[Numerator[Out[2]], phi]
-      // HornerForm[Denominator[Out[2]], phi]
-
-      // Then further collect factors of m2 in the numerator
-      // and denominator manually with HornerForm[poly, m],
-      // and finally get close to C-language form with CForm[].
 
       const T phi_sq { phi * phi };
 
-      const T m2 { (m * m) };
+      const T m2 { m * m };
 
-      const T top { phi*(-2661120 + m2*(-4354560 + 8300880*m2) + phi_sq*(-349440 + m2*(-262080 + (6683040 - 6460020*m2)*m2) + (-19200 + m2*(-263296 + m2*(997488 + m2*(-1325988 + 621441*m2))))*phi_sq)) };
-      const T bot { -2661120 + m2*(-4354560 + 8300880*m2) + phi_sq*(-349440 + m2*(181440 + (7408800 - 7843500*m2)*m2) + (-19200 + m2*(-293760 + m2*(1021680 + m2*(-1957500 + 1306125*m2))))*phi_sq) };
+      const T top { phi * (-60 + (-12 + 17 * m2) * phi_sq) };
+      const T bot { -60 + 3 * (-4 + 9 * m2) * phi_sq };
 
       result = top / bot;
     }
