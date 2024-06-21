@@ -42,7 +42,7 @@ constexpr auto acos_impl(T x) noexcept
 
     if (absx > 1)
     {
-        result = std::numeric_limits<T>::signaling_NaN();
+        result = std::numeric_limits<T>::quiet_NaN();
     }
     else if (x < T{5, -1, true})
     {
