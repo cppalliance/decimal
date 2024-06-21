@@ -913,11 +913,9 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
 
     if (!lhs_components.sign && rhs_components.sign)
     {
-        detail::decimal32_components result {};
-        result = detail::sub_impl<detail::decimal32_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                                                rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                                                                abs_lhs_bigger);
-        return decimal32(result.sig, result.exp, result.sign);
+        return detail::sub_impl<decimal32>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                           rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                                           abs_lhs_bigger);
     }
     else
     {
