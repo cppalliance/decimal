@@ -78,7 +78,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T1 lhs_sig, std::int32_t lhs_
 
     // Cast the results to signed types so that we can apply a sign at the end if necessary
     // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
-    const auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig)};
+    const auto new_sig {static_cast<typename ReturnType::significand_type>(lhs_sig + rhs_sig)};
     const auto new_exp {lhs_exp};
 
     #ifdef BOOST_DECIMAL_DEBUG_ADD
@@ -154,7 +154,8 @@ constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     }
 
     // Both of the significands are well under 64-bits, so we can fit them into int64_t without issue
-    const auto new_sig {static_cast<typename ReturnType::sig_type>(lhs_sig) + static_cast<typename ReturnType::sig_type>(rhs_sig)};
+    const auto new_sig {static_cast<typename ReturnType::significand_type>(lhs_sig) +
+                        static_cast<typename ReturnType::significand_type>(rhs_sig)};
     const auto new_exp {lhs_exp};
 
     #ifdef BOOST_DECIMAL_DEBUG_ADD

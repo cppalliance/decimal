@@ -122,7 +122,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_significand_mask = 
 
 struct decimal64_components
 {
-    using sig_type = std::uint64_t;
+    using significand_type = std::uint64_t;
 
     std::uint64_t sig;
     std::int32_t exp;
@@ -1215,10 +1215,8 @@ constexpr auto operator+(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
 
-    const auto result {detail::d64_add_impl<detail::decimal64_components>(lhs_sig, lhs_exp, lhs.isneg(),
-                                    rhs_sig, rhs_exp, rhs.isneg())};
-
-    return {result.sig, result.exp, result.sign};
+    return {detail::d64_add_impl<decimal64>(lhs_sig, lhs_exp, lhs.isneg(),
+                                            rhs_sig, rhs_exp, rhs.isneg())};
 }
 
 template <typename Integer>
@@ -1244,20 +1242,17 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
     detail::normalize<decimal64>(sig_lhs, exp_lhs);
     auto lhs_components {detail::decimal64_components{sig_lhs, exp_lhs, lhs.isneg()}};
 
-    auto sig_rhs {static_cast<std::uint64_t>(detail::make_positive_unsigned(rhs))};
+    auto sig_rhs {static_cast<detail::decimal64_components::significand_type>(detail::make_positive_unsigned(rhs))};
     std::int32_t exp_rhs {0};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs = detail::shrink_significand<std::uint64_t>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    auto unsigned_sig_rhs {static_cast<detail::decimal64_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
     auto rhs_components {detail::decimal64_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     if (!lhs_bigger)
     {
         detail::swap(lhs_components, rhs_components);
-        lhs_bigger = !lhs_bigger;
         abs_lhs_bigger = !abs_lhs_bigger;
     }
-
-    detail::decimal64_components result {};
 
     #ifdef BOOST_DECIMAL_DEBUG_ADD
     std::cerr << "Lhs sig: " << lhs_components.sig
@@ -1268,17 +1263,17 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
 
     if (!lhs_components.sign && rhs_components.sign)
     {
+        detail::decimal64_components result {};
         result = detail::d64_sub_impl<detail::decimal64_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                               rhs_components.sig, rhs_components.exp, rhs_components.sign,
                               abs_lhs_bigger);
+        return decimal64(result.sig, result.exp, result.sign);
     }
     else
     {
-        result = detail::d64_add_impl<detail::decimal64_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                              rhs_components.sig, rhs_components.exp, rhs_components.sign);
+        return detail::d64_add_impl<decimal64>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                               rhs_components.sig, rhs_components.exp, rhs_components.sign);
     }
-
-    return decimal64(result.sig, result.exp, result.sign);
 }
 
 template <typename Integer>

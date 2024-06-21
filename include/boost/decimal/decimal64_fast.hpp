@@ -30,7 +30,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_snan = std::numeric_limits<std::u
 
 struct decimal64_fast_components
 {
-    using sig_type = std::uint_fast64_t;
+    using significand_type = std::uint_fast64_t;
 
     std::uint_fast64_t sig;
     std::int32_t exp;
@@ -903,12 +903,10 @@ constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
         return lhs - abs(rhs);
     }
 
-    const auto result {detail::d64_add_impl<detail::decimal64_fast_components>(
+    return {detail::d64_add_impl<decimal64_fast>(
               lhs.significand_, lhs.biased_exponent(), lhs.sign_,
               rhs.significand_, rhs.biased_exponent(), rhs.sign_
               )};
-
-    return {result.sig, result.exp, result.sign};
 }
 
 template <typename Integer>
@@ -931,10 +929,10 @@ constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
 
     auto lhs_components {detail::decimal64_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
 
-    auto sig_rhs {static_cast<decimal64_fast::significand_type>(detail::make_positive_unsigned(rhs))};
+    auto sig_rhs {static_cast<detail::decimal64_fast_components::significand_type>(detail::make_positive_unsigned(rhs))};
     std::int32_t exp_rhs {0};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs = detail::shrink_significand<decimal64_fast::significand_type>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    auto unsigned_sig_rhs {static_cast<detail::decimal64_fast_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
     auto rhs_components {detail::decimal64_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     if (!lhs_bigger)
@@ -942,8 +940,6 @@ constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
         detail::swap(lhs_components, rhs_components);
         abs_lhs_bigger = !abs_lhs_bigger;
     }
-
-    detail::decimal64_fast_components result {};
 
     #ifdef BOOST_DECIMAL_DEBUG_ADD
     std::cerr << "Lhs sig: " << lhs_components.sig
@@ -954,17 +950,17 @@ constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
 
     if (!lhs_components.sign && rhs_components.sign)
     {
+        detail::decimal64_fast_components result {};
         result = detail::d64_sub_impl<detail::decimal64_fast_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                                                          rhs_components.sig, rhs_components.exp, rhs_components.sign,
                                                                          abs_lhs_bigger);
+        return {result.sig, result.exp, result.sign};
     }
     else
     {
-        result = detail::d64_add_impl<detail::decimal64_fast_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                                                         rhs_components.sig, rhs_components.exp, rhs_components.sign);
+        return detail::d64_add_impl<decimal64_fast>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                                    rhs_components.sig, rhs_components.exp, rhs_components.sign);
     }
-
-    return {result.sig, result.exp, result.sign};
 }
 
 template <typename Integer>
