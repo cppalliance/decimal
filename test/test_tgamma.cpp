@@ -372,9 +372,10 @@ namespace local
     return result_is_ok;
   }
 
+  template<typename Dec64Type>
   auto test_tgamma_64(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal64;
+    using decimal_type = Dec64Type;
 
     using val_ctrl_array_type = std::array<double, 9U>;
 
@@ -481,9 +482,10 @@ namespace local
     return result_is_ok;
   }
 
+  template<typename Dec128Type>
   auto test_tgamma_128_hi(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128;
+    using decimal_type = Dec128Type;
 
     using str_ctrl_array_type = std::array<const char*, 23U>;
 
@@ -641,21 +643,26 @@ auto main() -> int
   }
 
   {
-    const auto result_tgamma64_is_ok   = local::test_tgamma_64(256);
+    const auto result_tgamma64______is_ok   = local::test_tgamma_64<boost::decimal::decimal64>(256);
+    const auto result_tgamma64_fast_is_ok   = local::test_tgamma_64<boost::decimal::decimal64_fast>(256);
 
-    BOOST_TEST(result_tgamma64_is_ok);
+    BOOST_TEST(result_tgamma64______is_ok);
+    BOOST_TEST(result_tgamma64_fast_is_ok);
 
-    result_is_ok = (result_tgamma64_is_ok && result_is_ok);
+    result_is_ok = (result_tgamma64______is_ok && result_tgamma64_fast_is_ok && result_is_ok);
   }
 
   {
     const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo(512);
-    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi(0x30'000);
+
+    const auto result_tgamma128_hi______is_ok   = local::test_tgamma_128_hi<boost::decimal::decimal128>(0x30'000);
+    const auto result_tgamma128_hi_fast_is_ok   = local::test_tgamma_128_hi<boost::decimal::decimal128_fast>(0x30'000);
 
     BOOST_TEST(result_tgamma128_lo_is_ok);
-    BOOST_TEST(result_tgamma128_hi_is_ok);
+    BOOST_TEST(result_tgamma128_hi______is_ok);
+    BOOST_TEST(result_tgamma128_hi_fast_is_ok);
 
-    result_is_ok = (result_tgamma128_lo_is_ok && result_tgamma128_hi_is_ok && result_is_ok);
+    result_is_ok = (result_tgamma128_lo_is_ok && result_tgamma128_hi______is_ok && result_tgamma128_hi_fast_is_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
