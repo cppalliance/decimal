@@ -31,7 +31,7 @@ constexpr auto tgamma_impl(T x) noexcept
 
     const auto nx = static_cast<int>(x);
 
-    const auto is_pure_int = (nx == x);
+    const auto is_pure_int = ((nx == x) && fabs(x) < T { (std::numeric_limits<int>::max)() });
 
     const bool is_neg = signbit(x);
 

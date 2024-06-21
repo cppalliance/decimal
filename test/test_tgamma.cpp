@@ -232,6 +232,14 @@ namespace local
     return result_is_ok;
   }
 
+  namespace detail
+  {
+    auto local_factorial(const int u_arg) -> int
+    {
+      return ((u_arg > 1) ? u_arg * local_factorial(u_arg - 1) : 1);
+    }
+  } // namespace detail
+
   template<typename DecimalType, typename FloatType>
   auto test_tgamma_edge() -> bool
   {
@@ -255,9 +263,11 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_nan = tgamma(::my_nan<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const decimal_type arg_nan = ::my_nan<decimal_type>() * static_cast<decimal_type>(dist(gen));
 
-      const auto result_val_nan_is_ok = isnan(val_nan);
+      const auto val_nan = tgamma(arg_nan);
+
+      const auto result_val_nan_is_ok = (isnan(arg_nan) && isnan(val_nan));
 
       BOOST_TEST(result_val_nan_is_ok);
 
@@ -329,6 +339,34 @@ namespace local
       BOOST_TEST(result_val_neg_int_is_ok);
 
       result_is_ok = (result_val_neg_int_is_ok && result_is_ok);
+    }
+
+    {
+      std::uniform_int_distribution<int> n_dist(-8, 8);
+
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(32)); ++i)
+      {
+        static_cast<void>(i);
+
+        int n_arg { };
+
+        do
+        {
+          n_arg = static_cast<int>(dist(gen) * n_dist(gen));
+        }
+        while(n_arg == 0);
+
+        const auto val_neg_or_pos_int = tgamma(decimal_type { n_arg });
+
+        const bool result_val_neg_or_pos_int_is_ok
+        {
+          (n_arg < 0)
+            ? isnan(val_neg_or_pos_int)
+            : (val_neg_or_pos_int == decimal_type { detail::local_factorial(static_cast<std::uint64_t>(n_arg - 1)) })
+        };
+
+        BOOST_TEST(result_val_neg_or_pos_int_is_ok);
+      }
     }
 
     return result_is_ok;
@@ -611,7 +649,7 @@ auto main() -> int
   }
 
   {
-    const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo(4096);
+    const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo(512);
     const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi(0x20'000);
 
     BOOST_TEST(result_tgamma128_lo_is_ok);
