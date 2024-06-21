@@ -43,7 +43,7 @@ constexpr auto assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_powe
 {
     if (x < -1 || x > 1 || l > 128)
     {
-        return std::numeric_limits<T>::signaling_NaN();
+        return std::numeric_limits<T>::quiet_NaN();
     }
     else if (isnan(x))
     {
