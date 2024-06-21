@@ -55,7 +55,7 @@ constexpr auto asin_impl(T x) noexcept
     }
     else
     {
-        result = std::numeric_limits<T>::signaling_NaN();
+        result = std::numeric_limits<T>::quiet_NaN();
     }
 
     // arcsin(-x) == -arcsin(x)
