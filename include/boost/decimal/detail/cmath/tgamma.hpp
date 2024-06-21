@@ -82,9 +82,9 @@ constexpr auto tgamma_impl(T x) noexcept
             {
                 constexpr int asymp_cutoff
                 {
-                      std::numeric_limits<T>::digits10 < 10 ? T { 2, 1 } // 20
-                    : std::numeric_limits<T>::digits10 < 20 ? T { 4, 1 } // 40
-                    :                                         T { 9, 1 } // 90
+                      std::numeric_limits<T>::digits10 < 10 ? T {  2, 1 } //  20
+                    : std::numeric_limits<T>::digits10 < 20 ? T {  6, 1 } //  60
+                    :                                         T { 12, 1 } // 120
                 };
 
                 if (x < T { asymp_cutoff })

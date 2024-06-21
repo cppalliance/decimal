@@ -34,11 +34,11 @@ struct tgamma_table_imp
 
     using d32_coeffs_asymp_t  = std::array<decimal32,  10>;
     using d64_coeffs_asymp_t  = std::array<decimal64,  15>;
-    using d128_coeffs_asymp_t = std::array<decimal128, 30>;
+    using d128_coeffs_asymp_t = std::array<decimal128, 22>;
 
     using d32_fast_coeffs_asymp_t  = std::array<decimal32_fast,  10>;
     using d64_fast_coeffs_asymp_t  = std::array<decimal64_fast,  15>;
-    using d128_fast_coeffs_asymp_t = std::array<decimal128_fast, 30>;
+    using d128_fast_coeffs_asymp_t = std::array<decimal128_fast, 22>;
 
     static constexpr d32_coeffs_t d32_coeffs =
     {{
@@ -287,14 +287,14 @@ struct tgamma_table_imp
         -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(189124322379112), UINT64_C(14090568112327257998) }, -33 },
         -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(158368431339348), UINT64_C(2168574764773383622)  }, -34 },
         +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(182057977444481), UINT64_C(3733389993208297254)  }, -32 },
-        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(152300056275284), UINT64_C(17612360680536377126) }, -33 },
-        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(213068958411016), UINT64_C(2976936113300142334)  }, -31 },
-        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(178115660634938), UINT64_C(17553310597074079872) }, -32 },
-        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(297934512372623), UINT64_C(8697957613905306402)  }, -30 },
-        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(248927979034058), UINT64_C(1995178765856766712)  }, -31 },
-        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(490558583154992), UINT64_C(14703601007071441008) }, -29 },
-        -::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(409702547605069), UINT64_C(12211101634789053596) }, -30 },
-        +::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(93943319594850),  UINT64_C(9012698938647704180)  }, -27 },
+        //+::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(152300056275284), UINT64_C(17612360680536377126) }, -33 },
+        //-::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(213068958411016), UINT64_C(2976936113300142334)  }, -31 },
+        //-::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(178115660634938), UINT64_C(17553310597074079872) }, -32 },
+        //+::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(297934512372623), UINT64_C(8697957613905306402)  }, -30 },
+        //+::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(248927979034058), UINT64_C(1995178765856766712)  }, -31 },
+        //-::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(490558583154992), UINT64_C(14703601007071441008) }, -29 },
+        //-::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(409702547605069), UINT64_C(12211101634789053596) }, -30 },
+        //+::boost::decimal::decimal128 { boost::decimal::detail::uint128 { UINT64_C(93943319594850),  UINT64_C(9012698938647704180)  }, -27 },
     }};
 
     static constexpr d128_fast_coeffs_t d128_fast_coeffs =
@@ -372,14 +372,14 @@ struct tgamma_table_imp
              -::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(189124322379112), UINT64_C(14090568112327257998) }, -33 },
              -::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(158368431339348), UINT64_C(2168574764773383622)  }, -34 },
              +::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(182057977444481), UINT64_C(3733389993208297254)  }, -32 },
-             +::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(152300056275284), UINT64_C(17612360680536377126) }, -33 },
-             -::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(213068958411016), UINT64_C(2976936113300142334)  }, -31 },
-             -::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(178115660634938), UINT64_C(17553310597074079872) }, -32 },
-             +::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(297934512372623), UINT64_C(8697957613905306402)  }, -30 },
-             +::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(248927979034058), UINT64_C(1995178765856766712)  }, -31 },
-             -::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(490558583154992), UINT64_C(14703601007071441008) }, -29 },
-             -::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(409702547605069), UINT64_C(12211101634789053596) }, -30 },
-             +::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(93943319594850),  UINT64_C(9012698938647704180)  }, -27 },
+             //+::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(152300056275284), UINT64_C(17612360680536377126) }, -33 },
+             //-::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(213068958411016), UINT64_C(2976936113300142334)  }, -31 },
+             //-::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(178115660634938), UINT64_C(17553310597074079872) }, -32 },
+             //+::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(297934512372623), UINT64_C(8697957613905306402)  }, -30 },
+             //+::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(248927979034058), UINT64_C(1995178765856766712)  }, -31 },
+             //-::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(490558583154992), UINT64_C(14703601007071441008) }, -29 },
+             //-::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(409702547605069), UINT64_C(12211101634789053596) }, -30 },
+             //+::boost::decimal::decimal128_fast { boost::decimal::detail::uint128 { UINT64_C(93943319594850),  UINT64_C(9012698938647704180)  }, -27 },
      }};
 
 };
