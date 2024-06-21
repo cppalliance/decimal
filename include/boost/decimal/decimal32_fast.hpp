@@ -29,7 +29,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::u
 
 struct decimal32_fast_components
 {
-    using sig_type = std::uint_fast32_t;
+    using significand_type = std::uint_fast32_t;
 
     std::uint_fast32_t sig;
     std::int32_t exp;
@@ -812,7 +812,7 @@ constexpr auto operator+(decimal32_fast lhs, Integer rhs) noexcept
     auto sig_rhs {rhs};
     std::int32_t exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs {static_cast<typename detail::decimal32_fast_components::sig_type>(detail::make_positive_unsigned(sig_rhs))};
+    auto unsigned_sig_rhs {static_cast<typename detail::decimal32_fast_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
     auto rhs_components {detail::decimal32_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     if (!lhs_bigger)

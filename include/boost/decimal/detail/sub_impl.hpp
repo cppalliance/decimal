@@ -49,22 +49,25 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_
         --delta_exp;
         --exp_bigger;
     }
-    else if (delta_exp >= 2)
+    else
     {
-        sig_bigger *= 100;
-        delta_exp -= 2;
-        exp_bigger -= 2;
-    }
+        if (delta_exp >= 2)
+        {
+            sig_bigger *= 100;
+            delta_exp -= 2;
+            exp_bigger -= 2;
+        }
 
-    if (delta_exp > 1)
-    {
-        sig_smaller /= pow10(delta_exp - 1);
-        delta_exp = 1;
-    }
+        if (delta_exp > 1)
+        {
+            sig_smaller /= pow10(delta_exp - 1);
+            delta_exp = 1;
+        }
 
-    if (delta_exp == 1)
-    {
-        detail::fenv_round(sig_smaller, smaller_sign);
+        if (delta_exp == 1)
+        {
+            detail::fenv_round(sig_smaller, smaller_sign);
+        }
     }
 
     // Both of the significands are less than 9'999'999, so we can safely

@@ -48,7 +48,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T1 lhs_sig, std::int32_t lhs_
     res_sig /= detail::pow10(static_cast<std::uint64_t>(sig_dig - max_dig));
     res_exp += sig_dig - max_dig;
 
-    const auto res_sig_32 {static_cast<typename ReturnType::sig_type>(res_sig)};
+    const auto res_sig_32 {static_cast<typename ReturnType::significand_type>(res_sig)};
 
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "\nres sig: " << res_sig_32
