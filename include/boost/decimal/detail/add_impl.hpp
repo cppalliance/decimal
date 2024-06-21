@@ -80,7 +80,6 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T1 lhs_sig, std::int32_t lhs_
     // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
     const auto new_sig {static_cast<std::int32_t>(lhs_sig + rhs_sig)};
     const auto new_exp {lhs_exp};
-    const auto res_sig {detail::make_positive_unsigned(new_sig)};
 
     #ifdef BOOST_DECIMAL_DEBUG_ADD
     std::cerr << "Final sig lhs: " << lhs_sig
@@ -88,7 +87,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T1 lhs_sig, std::int32_t lhs_
               << "\nResult sig: " << new_sig << std::endl;
     #endif
 
-    return {res_sig, new_exp, sign};
+    return {new_sig, new_exp, sign};
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>

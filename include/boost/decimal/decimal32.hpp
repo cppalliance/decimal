@@ -863,9 +863,8 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    const auto result {detail::add_impl<detail::decimal32_components>(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
-
-    return {result.sig, result.exp, result.sign};
+    return {detail::add_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
+                                        sig_rhs, exp_rhs, rhs.isneg())};
 }
 
 template <typename Integer>
@@ -894,31 +893,28 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
     auto sig_rhs {rhs};
     std::int32_t exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs = detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs);
+    auto unsigned_sig_rhs = static_cast<typename detail::decimal32_components::sig_type>(detail::make_positive_unsigned(sig_rhs));
     auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     if (!lhs_bigger)
     {
         detail::swap(lhs_components, rhs_components);
-        lhs_bigger = !lhs_bigger;
         abs_lhs_bigger = !abs_lhs_bigger;
     }
 
-    detail::decimal32_components result {};
-
     if (!lhs_components.sign && rhs_components.sign)
     {
+        detail::decimal32_components result {};
         result = detail::sub_impl<detail::decimal32_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                                                 rhs_components.sig, rhs_components.exp, rhs_components.sign,
                                                                 abs_lhs_bigger);
+        return decimal32(result.sig, result.exp, result.sign);
     }
     else
     {
-        result = detail::add_impl<detail::decimal32_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                                                rhs_components.sig, rhs_components.exp, rhs_components.sign);
+        return detail::add_impl<decimal32>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                           rhs_components.sig, rhs_components.exp, rhs_components.sign);
     }
-
-    return decimal32(result.sig, result.exp, result.sign);
 }
 
 template <typename Integer>
