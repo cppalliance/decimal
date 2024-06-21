@@ -123,9 +123,10 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_significand_mask = 
 struct decimal64_components
 {
     using significand_type = std::uint64_t;
+    using biased_exponent_type = std::int32_t;
 
-    std::uint64_t sig;
-    std::int32_t exp;
+    significand_type sig;
+    biased_exponent_type exp;
     bool sign;
 };
 
@@ -140,16 +141,18 @@ BOOST_DECIMAL_EXPORT class decimal64 final
 {
 public:
     using significand_type = std::uint64_t;
+    using exponent_type = std::uint64_t;
+    using biased_exponent_type = std::int32_t;
 
 private:
 
     std::uint64_t bits_ {};
 
     // Returns the un-biased (quantum) exponent
-    constexpr auto unbiased_exponent() const noexcept -> std::uint64_t;
+    constexpr auto unbiased_exponent() const noexcept -> exponent_type;
 
     // Returns the biased exponent
-    constexpr auto biased_exponent() const noexcept -> std::int32_t;
+    constexpr auto biased_exponent() const noexcept -> biased_exponent_type;
 
     // Allows direct editing of the exp
     template <typename T>
@@ -157,7 +160,7 @@ private:
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, T, void);
 
     // Returns the significand complete with the bits implied from the combination field
-    constexpr auto full_significand() const noexcept -> std::uint64_t;
+    constexpr auto full_significand() const noexcept -> significand_type;
     constexpr auto isneg() const noexcept -> bool;
     constexpr auto edit_sign(bool sign) noexcept -> void;
 
@@ -976,9 +979,9 @@ constexpr decimal64::operator std::bfloat16_t() const noexcept
 }
 #endif
 
-constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
+constexpr auto decimal64::unbiased_exponent() const noexcept -> exponent_type
 {
-    std::uint64_t expval {};
+    exponent_type expval {};
 
     const auto exp_comb_bits {(bits_ & detail::d64_comb_11_mask)};
 
@@ -1000,14 +1003,14 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> std::uint64_t
     return expval;
 }
 
-constexpr auto decimal64::biased_exponent() const noexcept -> std::int32_t
+constexpr auto decimal64::biased_exponent() const noexcept -> biased_exponent_type
 {
     return static_cast<std::int32_t>(unbiased_exponent()) - detail::bias_v<decimal64>;
 }
 
-constexpr auto decimal64::full_significand() const noexcept -> std::uint64_t
+constexpr auto decimal64::full_significand() const noexcept -> significand_type
 {
-    std::uint64_t significand {};
+    significand_type significand {};
 
     if ((bits_ & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
     {

@@ -31,9 +31,10 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_snan = std::numeric_limits<std::u
 struct decimal64_fast_components
 {
     using significand_type = std::uint_fast64_t;
+    using biased_exponent_type = std::int_fast32_t;
 
-    std::uint_fast64_t sig;
-    std::int32_t exp;
+    significand_type sig;
+    biased_exponent_type exp;
     bool sign;
 };
 
@@ -50,8 +51,8 @@ private:
     // In regular decimal64 we have to decode the significand end exponent
     // Here we will store them directly to avoid the overhead of decoding
 
-    std::uint_fast64_t significand_ {};
-    std::uint_fast16_t exponent_ {};
+    significand_type significand_ {};
+    exponent_type exponent_ {};
     bool sign_ {};
 
     constexpr auto isneg() const noexcept -> bool
