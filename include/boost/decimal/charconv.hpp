@@ -775,17 +775,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
         }
     }
 
-    #ifdef _MSC_VER
-    # pragma warning(push)
-    # pragma warning(disable: 4702) // Unreachable code
-    #endif
+    #ifndef _MSC_VER
     // LCOV_EXCL_START
     BOOST_DECIMAL_UNREACHABLE;
     return to_chars_scientific_impl(first, last, value, fmt, precision);
     // LCOV_EXCL_STOP
-
-    #ifdef _MSC_VER
-    # pragma warning(pop)
     #endif
 }
 
