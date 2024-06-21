@@ -39,13 +39,8 @@ namespace detail {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 constexpr auto from_chars_general_impl(const char* first, const char* last, TargetDecimalType& value, chars_format fmt) noexcept -> from_chars_result
 {
-    constexpr bool target_dec_128_bit
-    {
-         std::is_same<TargetDecimalType, decimal128>::value
-      || std::is_same<TargetDecimalType, decimal128_fast>::value
-    };
-
-    using significand_type = std::conditional_t<target_dec_128_bit, detail::uint128, std::uint64_t>;
+    using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value ||
+                                                std::is_same<TargetDecimalType, decimal128_fast>::value, detail::uint128, std::uint64_t>;
 
     if (first >= last)
     {
@@ -736,16 +731,13 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
 
     constexpr auto min_fractional_value = TargetDecimalType{1, -4};
 
-    if (fmt == chars_format::hex)
-    {
-        return to_chars_hex_impl(first, last, value, precision);
-    }
-
     // Unspecified precision so we always go with the shortest representation
     if (precision == -1)
     {
-        if (fmt == chars_format::general || fmt == chars_format::fixed)
+        switch (fmt)
         {
+            default:
+            case chars_format::general:
             if (abs_value >= 1 && abs_value < max_fractional_value)
             {
                 return to_chars_fixed_impl(first, last, value, fmt, precision);
@@ -754,10 +746,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
             {
                 return to_chars_scientific_impl(first, last, value, fmt, precision);
             }
-        }
-        else
-        {
+            case chars_format::fixed:
+                return to_chars_fixed_impl(first, last, value, fmt, precision);
+            case chars_format::scientific:
             return to_chars_scientific_impl(first, last, value, fmt, precision);
+            case chars_format::hex:
+                return to_chars_hex_impl(first, last, value, precision); // LCOV_EXCL_LINE unreachable
         }
     }
     else
@@ -772,11 +766,22 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
         {
             return to_chars_fixed_impl(first, last, value, fmt, precision);
         }
+        else if (fmt == chars_format::hex)
+        {
+            return to_chars_hex_impl(first, last, value, precision);
+        }
         else
         {
             return to_chars_scientific_impl(first, last, value, fmt, precision);
         }
     }
+
+    #ifndef _MSC_VER
+    // LCOV_EXCL_START
+    BOOST_DECIMAL_UNREACHABLE;
+    return to_chars_scientific_impl(first, last, value, fmt, precision);
+    // LCOV_EXCL_STOP
+    #endif
 }
 
 } //namespace detail

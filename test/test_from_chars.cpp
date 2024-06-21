@@ -101,6 +101,12 @@ void test_from_chars_fixed()
 
         T return_value;
         const auto r_dec = from_chars(buffer, buffer + std::strlen(buffer), return_value, chars_format::fixed);
+
+        if (!isfinite(return_value))
+        {
+            continue;
+        }
+
         const auto ret_value_float = static_cast<float>(return_value);
         const auto float_distance = std::abs(boost::math::float_distance(ret_value_float, val));
 

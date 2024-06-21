@@ -70,7 +70,7 @@ constexpr auto from_chars_dispatch(const char* first, const char* last, uint128_
 template <typename Unsigned_Integer, typename Integer>
 constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_Integer& significand, Integer& exponent, chars_format fmt = chars_format::general) noexcept -> from_chars_result
 {
-    if (first > last)
+    if (first >= last)
     {
         return {first, std::errc::invalid_argument};
     }
@@ -291,7 +291,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     else if (*next == exp_char || *next == capital_exp_char)
     {
         // Would be a number without a significand e.g. e+03
-        if (next == first)
+        if (next == first || fmt == chars_format::fixed)
         {
             return {next, std::errc::invalid_argument};
         }
@@ -307,11 +307,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         {
             offset = significand_buffer_size - 1;
             i = significand_buffer_size;
-            if (significand_buffer[offset] == '5' ||
-                significand_buffer[offset] == '6' ||
-                significand_buffer[offset] == '7' ||
-                significand_buffer[offset] == '8' ||
-                significand_buffer[offset] == '9')
+            if (significand_buffer[offset] >= '5')
             {
                 round = true;
             }
