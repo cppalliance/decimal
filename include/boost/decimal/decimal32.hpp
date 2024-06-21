@@ -142,6 +142,7 @@ BOOST_DECIMAL_EXPORT class decimal32 final // NOLINT(cppcoreguidelines-special-m
 {
 public:
     using significand_type = std::uint32_t;
+    using biased_exponent_type = std::int32_t;
 
 private:
 
@@ -151,7 +152,7 @@ private:
     constexpr auto unbiased_exponent() const noexcept -> std::uint32_t;
 
     // Returns the biased exponent
-    constexpr auto biased_exponent() const noexcept -> std::int32_t;
+    constexpr auto biased_exponent() const noexcept -> biased_exponent_type;
 
     // Returns the significand complete with the bits implied from the combination field
     constexpr auto full_significand() const noexcept -> std::uint32_t;
@@ -871,6 +872,8 @@ template <typename Integer>
 constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
+    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal32::significand_type>::digits10, decimal32::significand_type, detail::make_unsigned_t<Integer>>;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
@@ -883,17 +886,21 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
     {
         lhs_bigger = !lhs_bigger;
     }
-    bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+
+    // Make the significand type wide enough that it won't overflow during normalization
+    auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
+    bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
     detail::normalize(sig_lhs, exp_lhs);
-
     auto lhs_components {detail::decimal32_components{sig_lhs, exp_lhs, lhs.isneg()}};
-    auto sig_rhs {rhs};
-    std::int32_t exp_rhs {0};
+
+    decimal32::biased_exponent_type exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs = static_cast<typename detail::decimal32_components::significand_type>(detail::make_positive_unsigned(sig_rhs));
+
+    // Now that the rhs has been normalized it is guaranteed to fit into the decimal32 significand type
+    auto unsigned_sig_rhs {static_cast<typename detail::decimal32_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
     auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     if (!lhs_bigger)
@@ -1395,9 +1402,9 @@ constexpr auto decimal32::unbiased_exponent() const noexcept -> std::uint32_t
     return expval;
 }
 
-constexpr auto decimal32::biased_exponent() const noexcept -> std::int32_t
+constexpr auto decimal32::biased_exponent() const noexcept -> biased_exponent_type
 {
-    return static_cast<std::int32_t>(unbiased_exponent()) - detail::bias;
+    return static_cast<biased_exponent_type>(unbiased_exponent()) - detail::bias;
 }
 
 template <typename T>
