@@ -715,6 +715,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, static_cast<std::uint32_t>(abs_exp), 10);
 }
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4702) // Unreachable code
+#endif
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecimalType value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
 {
@@ -775,19 +780,14 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
         }
     }
 
-    #ifdef _MSC_VER
-    # pragma warning(push)
-    # pragma warning(disable: 4702) // Unreachable code
-    #endif
     // LCOV_EXCL_START
-    BOOST_DECIMAL_UNREACHABLE;
     return to_chars_scientific_impl(first, last, value, fmt, precision);
     // LCOV_EXCL_STOP
-
-    #ifdef _MSC_VER
-    # pragma warning(pop)
-    #endif
 }
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } //namespace detail
 
