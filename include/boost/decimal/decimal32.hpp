@@ -122,9 +122,10 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_big_combination_field_mask = 
 struct decimal32_components
 {
     using significand_type = std::uint32_t;
+    using biased_exponent_type = std::int32_t;
 
-    std::uint32_t sig;
-    std::int32_t exp;
+    significand_type sig;
+    biased_exponent_type exp;
     bool sign;
 };
 
@@ -142,6 +143,7 @@ BOOST_DECIMAL_EXPORT class decimal32 final // NOLINT(cppcoreguidelines-special-m
 {
 public:
     using significand_type = std::uint32_t;
+    using exponent_type = std::uint32_t;
     using biased_exponent_type = std::int32_t;
 
 private:
@@ -149,13 +151,13 @@ private:
     std::uint32_t bits_ {};
 
     // Returns the un-biased (quantum) exponent
-    constexpr auto unbiased_exponent() const noexcept -> std::uint32_t;
+    constexpr auto unbiased_exponent() const noexcept -> exponent_type ;
 
     // Returns the biased exponent
     constexpr auto biased_exponent() const noexcept -> biased_exponent_type;
 
     // Returns the significand complete with the bits implied from the combination field
-    constexpr auto full_significand() const noexcept -> std::uint32_t;
+    constexpr auto full_significand() const noexcept -> significand_type ;
     constexpr auto isneg() const noexcept -> bool;
 
     // Attempts conversion to integral type:
@@ -1377,9 +1379,9 @@ constexpr auto operator<=>(Integer lhs, decimal32 rhs) noexcept
 
 #endif
 
-constexpr auto decimal32::unbiased_exponent() const noexcept -> std::uint32_t
+constexpr auto decimal32::unbiased_exponent() const noexcept -> exponent_type
 {
-    std::uint32_t expval {};
+    exponent_type expval {};
 
     const auto exp_comb_bits {(bits_ & detail::d32_comb_11_mask)};
 
@@ -1414,9 +1416,9 @@ constexpr auto decimal32::edit_exponent(T expval) noexcept
     *this = decimal32(this->full_significand(), expval, this->isneg());
 }
 
-constexpr auto decimal32::full_significand() const noexcept -> std::uint32_t
+constexpr auto decimal32::full_significand() const noexcept -> significand_type
 {
-    std::uint32_t significand {};
+    significand_type significand {};
 
     if ((bits_ & detail::d32_comb_11_mask) == detail::d32_comb_11_mask)
     {

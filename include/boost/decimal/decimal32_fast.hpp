@@ -30,9 +30,10 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::u
 struct decimal32_fast_components
 {
     using significand_type = std::uint_fast32_t;
+    using biased_exponent_type = std::int_fast32_t;
 
-    std::uint_fast32_t sig;
-    std::int32_t exp;
+    significand_type sig;
+    biased_exponent_type exp;
     bool sign;
 };
 
@@ -43,14 +44,15 @@ class decimal32_fast final
 public:
     using significand_type = std::uint_fast32_t;
     using exponent_type = std::uint_fast8_t;
+    using biased_exponent_type = std::int_fast32_t;
 
 private:
     // In regular decimal32 we have to decode the 24 bits of the significand and the 8 bits of the exp
     // Here we just use them directly at the cost of at least 2 extra bytes of internal state
     // since the fast integer types will be at least 32 and 8 bits respectively
 
-    std::uint_fast32_t significand_ {};
-    std::uint_fast8_t exponent_ {};
+    significand_type significand_ {};
+    exponent_type exponent_ {};
     bool sign_ {};
 
     constexpr auto isneg() const noexcept -> bool
@@ -68,9 +70,9 @@ private:
         return exponent_;
     }
 
-    constexpr auto biased_exponent() const noexcept -> std::int32_t
+    constexpr auto biased_exponent() const noexcept -> biased_exponent_type
     {
-        return static_cast<std::int32_t>(exponent_) - detail::bias_v<decimal32>;
+        return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal32>;
     }
 
     friend constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& q, decimal32_fast& r) noexcept -> void;

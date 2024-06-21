@@ -17,11 +17,13 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-template <typename ReturnType, typename T1, typename T2>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
+template <typename ReturnType, typename T, typename U>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                   T rhs_sig, U rhs_exp, bool rhs_sign,
                                                    bool abs_lhs_bigger) noexcept -> ReturnType
 {
+    using sub_type = detail::make_signed_t<T>;
+
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
     auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
     auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
@@ -32,8 +34,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_
         // we return the larger of the two
         //
         // e.g. 1e20 - 1e-20 = 1e20
-        return abs_lhs_bigger ? ReturnType{detail::shrink_significand(lhs_sig, lhs_exp), lhs_exp, false} :
-                                ReturnType{detail::shrink_significand(rhs_sig, rhs_exp), rhs_exp, true};
+        return abs_lhs_bigger ? ReturnType{lhs_sig, lhs_exp, false} :
+                                ReturnType{rhs_sig, rhs_exp, true};
     }
 
     // The two numbers can be subtracted together without special handling
@@ -72,9 +74,9 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_
 
     // Both of the significands are less than 9'999'999, so we can safely
     // cast them to signed 32-bit ints to calculate the new significand
-    std::int32_t new_sig = (rhs_sign && !lhs_sign) ?
-            static_cast<std::int32_t>(signed_sig_lhs) + static_cast<std::int32_t>(signed_sig_rhs) :
-            static_cast<std::int32_t>(signed_sig_lhs) - static_cast<std::int32_t>(signed_sig_rhs);
+    const auto new_sig = (rhs_sign && !lhs_sign) ?
+            static_cast<sub_type>(signed_sig_lhs) + static_cast<sub_type>(signed_sig_rhs) :
+            static_cast<sub_type>(signed_sig_lhs) - static_cast<sub_type>(signed_sig_rhs);
 
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
     const auto new_sign {new_sig < 0};
