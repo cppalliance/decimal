@@ -67,10 +67,10 @@ void random_addition(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() + decimal128_fast{0,0}));
-    BOOST_TEST(isinf(decimal128_fast{0,0} + std::numeric_limits<decimal128_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() + decimal128_fast{0,0}));
-    BOOST_TEST(isnan(decimal128_fast{0,0} + std::numeric_limits<decimal128_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) + decimal128_fast{0,0}));
+    BOOST_TEST(isinf(decimal128_fast{0,0} + std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) + decimal128_fast{0,0}));
+    BOOST_TEST(isnan(decimal128_fast{0,0} + std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
 }
 
 template <typename T>
@@ -102,10 +102,10 @@ void random_mixed_addition(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() + dist(rng)));
-    BOOST_TEST(isinf(dist(rng) + std::numeric_limits<decimal128_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() + dist(rng)));
-    BOOST_TEST(isnan(dist(rng) + std::numeric_limits<decimal128_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) + dist(rng)));
+    BOOST_TEST(isinf(dist(rng) + std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) + dist(rng)));
+    BOOST_TEST(isnan(dist(rng) + std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
 }
 
 template <typename T>
@@ -137,10 +137,10 @@ void random_subtraction(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() - decimal128_fast{0,0}));
-    BOOST_TEST(isinf(decimal128_fast{0,0} - std::numeric_limits<decimal128_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() - decimal128_fast{0,0}));
-    BOOST_TEST(isnan(decimal128_fast{0,0} - std::numeric_limits<decimal128_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) - decimal128_fast{0,0}));
+    BOOST_TEST(isinf(decimal128_fast{0,0} - std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) - decimal128_fast{0,0}));
+    BOOST_TEST(isnan(decimal128_fast{0,0} - std::numeric_limits<decimal128_fast>::quiet_NaN()* T(dist(rng))));
 }
 
 template <typename T>
@@ -196,10 +196,10 @@ void random_mixed_subtraction(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() - dist(rng)));
-    BOOST_TEST(isinf(dist(rng) - std::numeric_limits<decimal128_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() - dist(rng)));
-    BOOST_TEST(isnan(dist(rng) - std::numeric_limits<decimal128_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) - dist(rng)));
+    BOOST_TEST(isinf(dist(rng) - std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) - dist(rng)));
+    BOOST_TEST(isnan(dist(rng) - std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
 }
 
 template <typename T>
@@ -257,10 +257,10 @@ void random_multiplication(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * decimal128_fast(dist(rng))));
-    BOOST_TEST(isinf(decimal128_fast(dist(rng)) * std::numeric_limits<decimal128_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * decimal128_fast(dist(rng))));
-    BOOST_TEST(isnan(decimal128_fast(dist(rng)) * std::numeric_limits<decimal128_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) * decimal128_fast(dist(rng))));
+    BOOST_TEST(isinf(decimal128_fast(dist(rng)) * std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) * decimal128_fast(dist(rng))));
+    BOOST_TEST(isnan(decimal128_fast(dist(rng)) * std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
 }
 
 template <typename T>
@@ -298,10 +298,10 @@ void random_mixed_multiplication(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * dist(rng)));
-    BOOST_TEST(isinf(dist(rng) * std::numeric_limits<decimal128_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * dist(rng)));
-    BOOST_TEST(isnan(dist(rng) * std::numeric_limits<decimal128_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) * dist(rng)));
+    BOOST_TEST(isinf(dist(rng) * std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) * dist(rng)));
+    BOOST_TEST(isnan(dist(rng) * std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
 }
 
 template <typename T>
@@ -358,11 +358,11 @@ void random_division(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() / decimal128_fast(dist(rng))));
-    BOOST_TEST(!isinf(decimal128_fast(dist(rng)) / std::numeric_limits<decimal128_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() / decimal128_fast(dist(rng))));
-    BOOST_TEST(isnan(decimal128_fast(dist(rng)) / std::numeric_limits<decimal128_fast>::quiet_NaN()));
-    BOOST_TEST(isinf(decimal128_fast(dist(rng)) / decimal128_fast(0)));
+    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) / decimal128_fast(dist(rng))));
+    BOOST_TEST(!isinf(decimal128_fast(dist(rng)) / std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) / decimal128_fast(dist(rng))));
+    BOOST_TEST(isnan(decimal128_fast(dist(rng)) / std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
+    BOOST_TEST(isinf(decimal128_fast(dist(rng)) / decimal128_fast(0) * T(dist(rng))));
 }
 
 template <typename T>
@@ -428,11 +428,11 @@ void random_mixed_division(T lower, T upper)
     // Edge cases
     const decimal128_fast val1 {dist(rng)};
     const decimal128_fast zero {0, 0};
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() / dist(rng)));
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() / dist(rng)));
-    BOOST_TEST(isnan(dist(rng) / std::numeric_limits<decimal128_fast>::quiet_NaN()));
-    BOOST_TEST_EQ(abs(dist(rng) / std::numeric_limits<decimal128_fast>::infinity()), zero);
-    BOOST_TEST(isinf(decimal128_fast(dist(rng)) / 0));
+    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) / dist(rng)));
+    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) / dist(rng)));
+    BOOST_TEST(isnan(dist(rng) / std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
+    BOOST_TEST_EQ(abs(dist(rng) / std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))), zero);
+    BOOST_TEST(isinf(decimal128_fast(dist(rng)) / 0 * dist(rng)));
     BOOST_TEST(isinf(val1 / zero));
 }
 /*
