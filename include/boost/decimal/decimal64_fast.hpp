@@ -1278,11 +1278,8 @@ constexpr auto operator/(decimal64_fast lhs, Integer rhs) noexcept
     auto rhs_sig {static_cast<decimal64_fast::significand_type>(detail::make_positive_unsigned(rhs))};
     std::int32_t rhs_exp {};
     detail::decimal64_fast_components rhs_components {detail::shrink_significand<decimal64_fast::significand_type>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
-    detail::decimal64_fast_components q_components {};
 
-    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
-
-    return {q_components.sig, q_components.exp, q_components.sign};
+    return detail::d64_generic_div_impl<decimal64_fast>(lhs_components, rhs_components);
 }
 
 template <typename Integer>
@@ -1321,11 +1318,8 @@ constexpr auto operator/(Integer lhs, decimal64_fast rhs) noexcept
 
     detail::decimal64_fast_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
     detail::decimal64_fast_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
-    detail::decimal64_fast_components q_components {};
 
-    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
-
-    return {q_components.sig, q_components.exp, q_components.sign};
+    return detail::d64_generic_div_impl<decimal64_fast>(lhs_components, rhs_components);
 }
 
 constexpr auto operator%(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast

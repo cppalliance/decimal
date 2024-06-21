@@ -1165,11 +1165,8 @@ constexpr auto d64_div_impl(decimal64 lhs, decimal64 rhs, decimal64& q, decimal6
 
     detail::decimal64_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
     detail::decimal64_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
-    detail::decimal64_components q_components {};
 
-    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
-
-    q = decimal64(q_components.sig, q_components.exp, q_components.sign);
+    q = detail::d64_generic_div_impl<decimal64>(lhs_components, rhs_components);
 }
 
 constexpr auto d64_mod_impl(decimal64 lhs, decimal64 rhs, const decimal64& q, decimal64& r) noexcept -> void
@@ -1509,11 +1506,8 @@ constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept
     auto rhs_sig {static_cast<std::uint64_t>(detail::make_positive_unsigned(rhs))};
     std::int32_t rhs_exp {};
     detail::decimal64_components rhs_components {detail::shrink_significand<std::uint64_t>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
-    detail::decimal64_components q_components {};
 
-    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
-
-    return decimal64(q_components.sig, q_components.exp, q_components.sign);
+    return detail::d64_generic_div_impl<decimal64>(lhs_components, rhs_components);
 }
 
 template <typename Integer>
@@ -1552,11 +1546,8 @@ constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept
 
     detail::decimal64_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
     detail::decimal64_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
-    detail::decimal64_components q_components {};
 
-    detail::d64_generic_div_impl(lhs_components, rhs_components, q_components);
-
-    return decimal64(q_components.sig, q_components.exp, q_components.sign);
+    return detail::d64_generic_div_impl<decimal64>(lhs_components, rhs_components);
 }
 
 constexpr auto operator%(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
