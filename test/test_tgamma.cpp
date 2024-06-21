@@ -344,7 +344,7 @@ namespace local
     {
       std::uniform_int_distribution<int> n_dist(-8, 8);
 
-      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(32)); ++i)
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(64)); ++i)
       {
         static_cast<void>(i);
 
@@ -362,7 +362,7 @@ namespace local
         {
           (n_arg < 0)
             ? isnan(val_neg_or_pos_int)
-            : (val_neg_or_pos_int == decimal_type { detail::local_factorial(static_cast<std::uint64_t>(n_arg - 1)) })
+            : (val_neg_or_pos_int == decimal_type { detail::local_factorial(n_arg - 1) })
         };
 
         BOOST_TEST(result_val_neg_or_pos_int_is_ok);
