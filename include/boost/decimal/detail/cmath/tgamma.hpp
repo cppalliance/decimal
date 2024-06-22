@@ -71,20 +71,20 @@ constexpr auto tgamma_impl(T x) noexcept
 
             if (is_pure_int)
             {
-                result = one;
+                result = one; // LCOV_EXCL_LINE
 
                 for(auto index = 2; index < nx; ++index)
                 {
-                    result *= index;
+                    result *= index; // LCOV_EXCL_LINE
                 }
             }
             else
             {
                 constexpr int asymp_cutoff
                 {
-                      std::numeric_limits<T>::digits10 < 10 ? T {  2, 1 } //  20
-                    : std::numeric_limits<T>::digits10 < 20 ? T {  6, 1 } //  60
-                    :                                         T { 12, 1 } // 120
+                      std::numeric_limits<T>::digits10 < 10 ? T { 2, 1 } // 20
+                    : std::numeric_limits<T>::digits10 < 20 ? T { 5, 1 } // 50
+                    :                                         T { 9, 1 } // 90
                 };
 
                 if (x < T { asymp_cutoff })
