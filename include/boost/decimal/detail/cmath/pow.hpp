@@ -34,39 +34,28 @@ constexpr auto pow(T b, IntegralType p) noexcept
 
     const auto fpc_x = fpclassify(b);
 
-    const auto p_is_integer_odd = (static_cast<local_integral_type>(p & 1) != static_cast<local_integral_type>(0));
+    const auto p_is_odd = (static_cast<local_integral_type>(p & 1) != static_cast<local_integral_type>(0));
 
-    if (fpc_x == FP_ZERO)
+    if (p == static_cast<local_integral_type>(0))
     {
-        if(p < static_cast<local_integral_type>(0))
-        {
-            // pow(  +0, exp), where exp is a negative odd integer, returns +infinity.
-            // pow(  -0, exp), where exp is a negative odd integer, returns +infinity.
-            // pow(+/-0, exp), where exp is a negative even integer, returns +infinity.
+        // pow(base, +/-0) returns 1 for any base, even when base is NaN.
 
-            result = std::numeric_limits<T>::infinity();
-        }
-        else if (p > static_cast<local_integral_type>(0))
-        {
-            // pow(  +0, exp), where exp is a positive odd integer, returns +0.
-            // pow(  -0, exp), where exp is a positive odd integer, returns -0.
-            // pow(+/-0, exp), where exp is a positive even integer, returns +0.
+        // Excluded from LCOV since it's apparently optimized away or otherwise
+        // missing from LCOV. Verified this line is covered in the unit tests.
 
-            if (p_is_integer_odd)
-            {
-                result = (signbit(b) ? -zero : zero);
-            }
-            else
-            {
-                result = zero;
-            }
-        }
-        else
-        {
-            // pow(base, +/-0) returns 1 for any base, even when base is NaN.
+        result = one; // LCOV_EXCL_LINE
+    }
+    else if (fpc_x == FP_ZERO)
+    {
+        // pow(  +0, exp), where exp is a negative odd  integer, returns +infinity.
+        // pow(  -0, exp), where exp is a negative odd  integer, returns +infinity.
+        // pow(+/-0, exp), where exp is a negative even integer, returns +infinity.
 
-            result = one;
-        }
+        // pow(  +0, exp), where exp is a positive odd  integer, returns +0.
+        // pow(  -0, exp), where exp is a positive odd  integer, returns -0.
+        // pow(+/-0, exp), where exp is a positive even integer, returns +0.
+
+        result = ((p < static_cast<local_integral_type>(0)) ? std::numeric_limits<T>::infinity() : ((p_is_odd && signbit(b)) ? -zero : zero));
     }
     else if (fpc_x == FP_INFINITE)
     {
@@ -77,97 +66,77 @@ constexpr auto pow(T b, IntegralType p) noexcept
                 // pow(-infinity, exp) returns -0 if exp is a negative odd integer.
                 // pow(-infinity, exp) returns +0 if exp is a negative even integer.
 
-                result = (p_is_integer_odd ? -zero : zero);
+                result = (p_is_odd ? -zero : zero);
             }
-            else if (p > static_cast<local_integral_type>(0))
+            else
             {
                 // pow(-infinity, exp) returns -infinity if exp is a positive odd integer.
                 // pow(-infinity, exp) returns +infinity if exp is a positive even integer.
 
-                result = (p_is_integer_odd ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::infinity());
-            }
-            else
-            {
-                result = one;
+                result = (p_is_odd ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::infinity());
             }
         }
         else
         {
-            if (p < static_cast<local_integral_type>(0))
-            {
-                // pow(+infinity, exp) returns +0 for any negative exp.
+            // pow(+infinity, exp) returns +0 for any negative exp.
+            // pow(+infinity, exp) returns +infinity for any positive exp.
 
-                result = zero;
-            }
-            else if (p > static_cast<local_integral_type>(0))
-            {
-                // pow(+infinity, exp) returns +infinity for any positive exp.
-
-                result = std::numeric_limits<T>::infinity();
-            }
-            else
-            {
-                result = one;
-            }
+            result = ((p < static_cast<local_integral_type>(0)) ? zero : std::numeric_limits<T>::infinity());
         }
     }
     else if (fpc_x != FP_NORMAL)
     {
-        result = ((p == static_cast<local_integral_type>(UINT8_C(0))) ? one : std::numeric_limits<T>::quiet_NaN());
+        // Excluded from LCOV since it's apparently optimized away or otherwise
+        // missing from LCOV. Verified this line is covered in the unit tests.
+
+        result = std::numeric_limits<T>::quiet_NaN(); // LCOV_EXCL_LINE
     }
     else
     {
         using local_unsigned_integral_type = std::make_unsigned_t<IntegralType>;
 
-        if (p == static_cast<local_integral_type>(UINT8_C(0)))
+        int exp10val { };
+
+        const auto bn { frexp10(b, &exp10val) };
+
+        const auto
+            zeros_removal
+            {
+                detail::remove_trailing_zeros(bn)
+            };
+
+        const bool is_pure { static_cast<int>(zeros_removal.trimmed_number) == 1 };
+
+        if(is_pure)
         {
-            result = one;
+            // Here, a pure power-of-10 argument (b) gets a pure integral result.
+            const int log10_val { exp10val + static_cast<int>(zeros_removal.number_of_removed_zeros) };
+
+            result = T { 1, static_cast<int>(log10_val * static_cast<int>(p)) };
         }
         else
         {
-            int exp10val { };
-
-            const auto bn { frexp10(b, &exp10val) };
-
-            const auto
-                zeros_removal
-                {
-                    detail::remove_trailing_zeros(bn)
-                };
-
-            const bool is_pure { static_cast<int>(zeros_removal.trimmed_number) == 1 };
-
-            if(is_pure)
+            BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<local_integral_type>::value)
             {
-                // Here, a pure power-of-10 argument (b) gets a pure integral result.
-                const int log10_val { exp10val + static_cast<int>(zeros_removal.number_of_removed_zeros) };
-
-                result = T { 1, static_cast<int>(log10_val * static_cast<int>(p)) };
-            }
-            else
-            {
-                BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<local_integral_type>::value)
+                if(p < static_cast<local_integral_type>(UINT8_C(0)))
                 {
-                    if(p < static_cast<local_integral_type>(UINT8_C(0)))
-                    {
-                        const auto up =
-                            static_cast<local_unsigned_integral_type>
-                            (
-                                  static_cast<local_unsigned_integral_type>(~p)
-                                + static_cast<local_unsigned_integral_type>(UINT8_C(1))
-                            );
+                    const auto up =
+                        static_cast<local_unsigned_integral_type>
+                        (
+                              static_cast<local_unsigned_integral_type>(~p)
+                            + static_cast<local_unsigned_integral_type>(UINT8_C(1))
+                        );
 
-                        result = one / detail::pow_n_impl(b, up);
-                    }
-                    else
-                    {
-                        result = detail::pow_n_impl(b, static_cast<local_unsigned_integral_type>(p));
-                    }
+                    result = one / detail::pow_n_impl(b, up);
                 }
                 else
                 {
                     result = detail::pow_n_impl(b, static_cast<local_unsigned_integral_type>(p));
                 }
+            }
+            else
+            {
+                result = detail::pow_n_impl(b, static_cast<local_unsigned_integral_type>(p));
             }
         }
     }
@@ -254,7 +223,7 @@ constexpr auto pow(T x, T a) noexcept
             }
             else
             {
-                const auto a_log_x = a * log(x);
+                const T a_log_x { a * log(x) };
 
                 result = exp(a_log_x);
             }

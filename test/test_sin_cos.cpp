@@ -265,7 +265,9 @@ namespace local
           from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
         );
 
-      const auto result_sin_is_ok = is_close_fraction(sin_values[i], ctrl_values[i], my_tol);
+      const decimal_type local_tol = ((ctrl_values[i] < decimal_type { 1, -1 }) ? my_tol * 16 : my_tol);
+
+      const auto result_sin_is_ok = is_close_fraction(sin_values[i], ctrl_values[i], local_tol);
 
       result_is_ok = (result_sin_is_ok && result_is_ok);
     }
@@ -353,7 +355,9 @@ namespace local
           from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
         );
 
-      const auto result_cos_is_ok = is_close_fraction(cos_values[i], ctrl_values[i], my_tol);
+      const decimal_type local_tol = ((ctrl_values[i] < decimal_type { 1, -1 }) ? my_tol * 16 : my_tol);
+
+      const auto result_cos_is_ok = is_close_fraction(cos_values[i], ctrl_values[i], local_tol);
 
       result_is_ok = (result_cos_is_ok && result_is_ok);
     }
@@ -425,16 +429,16 @@ int main()
     test_cos<decimal64_fast>();
 
     {
-        const auto result_sin128_is_ok = local::test_sin_128<decimal128>(0x8'000);
-        const auto result_cos128_is_ok = local::test_cos_128<decimal128>(0x8'000);
+        const auto result_sin128_is_ok = local::test_sin_128<decimal128>(0x800);
+        const auto result_cos128_is_ok = local::test_cos_128<decimal128>(0x800);
 
         BOOST_TEST(result_sin128_is_ok);
         BOOST_TEST(result_cos128_is_ok);
     }
 
     {
-        const auto result_sin128_is_ok = local::test_sin_128<decimal128_fast>(0x8'000);
-        const auto result_cos128_is_ok = local::test_cos_128<decimal128_fast>(0x8'000);
+        const auto result_sin128_is_ok = local::test_sin_128<decimal128_fast>(0x800);
+        const auto result_cos128_is_ok = local::test_cos_128<decimal128_fast>(0x800);
 
         BOOST_TEST(result_sin128_is_ok);
         BOOST_TEST(result_cos128_is_ok);
