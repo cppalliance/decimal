@@ -114,8 +114,8 @@ constexpr auto pow_2_impl(int e2) noexcept -> std::enable_if_t<detail::is_decima
     }
     else
     {
-        // Excluded from LCOV since it's apparently optimized away of otherwise
-        // missing from LCOV. Verified this line is well covered in the unit tests.
+        // Excluded from LCOV since it's apparently optimized away or otherwise
+        // missing from LCOV. Verified this line is covered in the unit tests.
 
         result = one; // LCOV_EXCL_LINE
     }

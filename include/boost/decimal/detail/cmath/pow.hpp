@@ -40,8 +40,8 @@ constexpr auto pow(T b, IntegralType p) noexcept
     {
         // pow(base, +/-0) returns 1 for any base, even when base is NaN.
 
-        // Excluded from LCOV since it's apparently optimized away of otherwise
-        // missing from LCOV. Verified this line is well covered in the unit tests.
+        // Excluded from LCOV since it's apparently optimized away or otherwise
+        // missing from LCOV. Verified this line is covered in the unit tests.
 
         result = one; // LCOV_EXCL_LINE
     }
@@ -86,8 +86,8 @@ constexpr auto pow(T b, IntegralType p) noexcept
     }
     else if (fpc_x != FP_NORMAL)
     {
-        // Excluded from LCOV since it's apparently optimized away of otherwise
-        // missing from LCOV. Verified this line is well covered in the unit tests.
+        // Excluded from LCOV since it's apparently optimized away or otherwise
+        // missing from LCOV. Verified this line is covered in the unit tests.
 
         result = std::numeric_limits<T>::quiet_NaN(); // LCOV_EXCL_LINE
     }
