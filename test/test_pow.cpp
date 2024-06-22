@@ -1150,7 +1150,7 @@ auto main() -> int
     const auto test_pow_pos_is_ok    = local::test_pow<decimal_type, float_type>(1024, false);
     const auto test_pow_is_neg_ok    = local::test_pow<decimal_type, float_type>(1024, true);
 
-    result_is_ok = (test_pow_pos_is_ok && test_pow_is_neg_ok && result_is_ok);
+    result_is_ok = (test_pow_edge_is_ok && test_pow_n_edge_is_ok && test_pow_pos_is_ok && test_pow_is_neg_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
