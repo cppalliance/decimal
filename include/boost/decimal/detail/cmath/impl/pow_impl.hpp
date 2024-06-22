@@ -36,11 +36,9 @@ constexpr auto pow_n_impl(T b, UnsignedIntegralType p) noexcept -> std::enable_i
                 result = b; result *= result; result *= b; break;
             case static_cast<local_unsigned_integral_type>(UINT8_C(2)):
                 result = b; result *= result; break;
+            default: // LCOV_EXCL_LINE
             case static_cast<local_unsigned_integral_type>(UINT8_C(1)):
                 result = b; break;
-            case static_cast<local_unsigned_integral_type>(UINT8_C(0)):
-            default:
-                result = one; break;
       }
     }
     else
@@ -116,7 +114,10 @@ constexpr auto pow_2_impl(int e2) noexcept -> std::enable_if_t<detail::is_decima
     }
     else
     {
-        result = one;
+        // Excluded from LCOV since it's apparently optimized away of otherwise
+        // missing from LCOV. Verified this line is well covered in the unit tests.
+
+        result = one; // LCOV_EXCL_LINE
     }
 
     return result;
