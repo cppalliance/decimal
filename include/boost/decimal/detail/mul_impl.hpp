@@ -107,6 +107,11 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
     auto res_sig {static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
+    if (res_sig == 0)
+    {
+        sign = false;
+    }
+
     return {res_sig, res_exp, sign};
 }
 
