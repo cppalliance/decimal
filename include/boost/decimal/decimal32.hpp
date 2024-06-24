@@ -36,6 +36,7 @@
 #include <boost/decimal/detail/sub_impl.hpp>
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
+#include <boost/decimal/detail/promote_significand.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -874,7 +875,7 @@ template <typename Integer>
 constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
-    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal32::significand_type>::digits10, decimal32::significand_type, detail::make_unsigned_t<Integer>>;
+    using promoted_significand_type = detail::promote_significand_t<decimal32, Integer>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
@@ -1002,7 +1003,7 @@ template <typename Integer>
 constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
-    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal32::significand_type>::digits10, decimal32::significand_type, detail::make_unsigned_t<Integer>>;
+    using promoted_significand_type = detail::promote_significand_t<decimal32, Integer>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(lhs) || isnan(lhs))
@@ -1036,7 +1037,7 @@ template <typename Integer>
 constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
-    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal32::significand_type>::digits10, decimal32::significand_type, detail::make_unsigned_t<Integer>>;
+    using promoted_significand_type = detail::promote_significand_t<decimal32, Integer>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(rhs) || isnan(rhs))
@@ -1660,15 +1661,16 @@ constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    const auto result {detail::mul_impl<detail::decimal32_components>(sig_lhs, exp_lhs, lhs.isneg(), sig_rhs, exp_rhs, rhs.isneg())};
-
-    return {result.sig, result.exp, result.sign};
+    return {detail::mul_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
+                                        sig_rhs, exp_rhs, rhs.isneg())};
 }
 
 template <typename Integer>
 constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
+    using promoted_significand_type = detail::promote_significand_t<decimal32, Integer>;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
@@ -1679,19 +1681,14 @@ constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
     detail::normalize(sig_lhs, exp_lhs);
-    auto lhs_components {detail::decimal32_components{sig_lhs, exp_lhs, lhs.isneg()}};
 
-    auto sig_rhs {rhs};
-    std::int32_t exp_rhs {0};
+    auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
+    decimal32::biased_exponent_type exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs {detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs)};
-    auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+    auto final_sig_rhs {static_cast<decimal32::significand_type>(sig_rhs)};
 
-    const auto result {detail::mul_impl<detail::decimal32_components>(
-                                lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                rhs_components.sig, rhs_components.exp, rhs_components.sign)};
-
-    return {result.sig, result.exp, result.sign};
+    return{detail::mul_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
+                                       final_sig_rhs, exp_rhs, (rhs < 0))};
 }
 
 template <typename Integer>
