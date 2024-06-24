@@ -30,16 +30,10 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
 {
     using mul_type = std::uint_fast64_t;
 
-    bool sign {lhs_sign != rhs_sign};
     auto res_sig {static_cast<mul_type>(lhs_sig) * static_cast<mul_type>(rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
-    if (res_sig == 0)
-    {
-        sign = false;
-    }
-
-    return {res_sig, res_exp, sign};
+    return {res_sig, res_exp, lhs_sign != rhs_sign && res_sig != 0};
 }
 
 template <typename ReturnType, typename T, typename U>
@@ -99,20 +93,13 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
     using unsigned_int128_type = boost::decimal::detail::uint128;
     #endif
 
-    bool sign {lhs_sign != rhs_sign};
-
     // Once we have the normalized significands and exponents all we have to do is
     // multiply the significands and add the exponents
 
     auto res_sig {static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
-    if (res_sig == 0)
-    {
-        sign = false;
-    }
-
-    return {res_sig, res_exp, sign};
+    return {res_sig, res_exp, lhs_sign != rhs_sign && res_sig != 0};
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
