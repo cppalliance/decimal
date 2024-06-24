@@ -10,6 +10,7 @@
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/emulated256.hpp>
+#include <boost/decimal/detail/power_tables.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -21,7 +22,7 @@ namespace detail {
 
 // Each type has two different multiplication impls
 // 1) Returns a decimal type and lets the constructor handle with shrinking the significand
-// 2)
+// 2) Returns a struct of the constituent components (used with FMAs)
 
 template <typename ReturnType, typename T, typename U>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
@@ -87,9 +88,32 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
     return {res_sig_32, res_exp, sign};
 }
 
-template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
+template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                       T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
+                                                       -> std::enable_if_t<detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
+{
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    #else
+    using unsigned_int128_type = boost::decimal::detail::uint128;
+    #endif
+
+    bool sign {lhs_sign != rhs_sign};
+
+    // Once we have the normalized significands and exponents all we have to do is
+    // multiply the significands and add the exponents
+
+    auto res_sig {static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)};
+    auto res_exp {lhs_exp + rhs_exp};
+
+    return {res_sig, res_exp, sign};
+}
+
+template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                       T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
+                                                       -> std::enable_if_t<!detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
 {
     #ifdef BOOST_DECIMAL_HAS_INT128
     using unsigned_int128_type = boost::decimal::detail::uint128_t;
@@ -115,11 +139,11 @@ constexpr auto d64_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     auto res_exp {lhs_exp + rhs_exp};
 
     const auto sig_dig {res_sig >= comp_value ? 32 : 31};
-    constexpr auto max_dig {std::numeric_limits<std::uint64_t>::digits10};
+    constexpr auto max_dig {std::numeric_limits<typename ReturnType::significand_type>::digits10};
     res_sig /= detail::pow10(static_cast<unsigned_int128_type>(sig_dig - max_dig));
     res_exp += sig_dig - max_dig;
 
-    const auto res_sig_64 {static_cast<std::uint64_t>(res_sig)};
+    const auto res_sig_64 {static_cast<typename ReturnType::significand_type>(res_sig)};
 
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "\nres sig: " << res_sig_64
