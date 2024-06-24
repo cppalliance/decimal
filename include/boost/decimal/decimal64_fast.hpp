@@ -991,13 +991,11 @@ constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
 
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
-    const auto result {detail::d64_sub_impl<detail::decimal64_fast_components>(
+    return {detail::d64_sub_impl<decimal64_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             abs_lhs_bigger
             )};
-
-    return {result.sig, result.exp, result.sign};
 }
 
 template <typename Integer>
