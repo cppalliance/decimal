@@ -169,6 +169,9 @@ template <bool b>
 constexpr typename riemann_zeta_table_imp<b>::d64_coeffs_t riemann_zeta_table_imp<b>::d64_coeffs;
 
 template <bool b>
+constexpr typename riemann_zeta_table_imp<b>::d64_fast_coeffs_t riemann_zeta_table_imp<b>::d64_fast_coeffs;
+
+template <bool b>
 constexpr typename riemann_zeta_table_imp<b>::d128_coeffs_t riemann_zeta_table_imp<b>::d128_coeffs;
 
 template <bool b>
