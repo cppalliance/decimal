@@ -1070,17 +1070,6 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-    #if defined(__clang_major__) && __clang_major__ < 13
-
-    const auto result {detail::d64_mul_impl<detail::decimal64_components>(
-                        lhs.significand_, lhs.biased_exponent(), lhs.isneg(),
-                        rhs.significand_, rhs.biased_exponent(), rhs.isneg()
-                        )};
-
-    return {result.sig, result.exp, result.sign};
-
-    #else
-
     #ifdef BOOST_DECIMAL_HAS_INT128
     using unsigned_int128_type = boost::decimal::detail::uint128_t;
     #else
@@ -1093,8 +1082,6 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     bool sign {lhs.sign_ != rhs.sign_ && res_sig != 0};
 
     return {res_sig, res_exp, sign};
-
-    #endif // Clang major check
 }
 
 template <typename Integer>
