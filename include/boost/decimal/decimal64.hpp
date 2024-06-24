@@ -38,6 +38,7 @@
 #include <boost/decimal/detail/sub_impl.hpp>
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
+#include <boost/decimal/detail/promote_significand.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -1226,7 +1227,7 @@ template <typename Integer>
 constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64)
 {
-    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal64::significand_type>::digits10, decimal64::significand_type, detail::make_unsigned_t<Integer>>;
+    using promoted_significand_type = detail::promote_significand_t<decimal64, Integer>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
@@ -1324,7 +1325,7 @@ template <typename Integer>
 constexpr auto operator-(decimal64 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64)
 {
-    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal64::significand_type>::digits10, decimal64::significand_type, detail::make_unsigned_t<Integer>>;
+    using promoted_significand_type = detail::promote_significand_t<decimal64, Integer>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(lhs) || isnan(lhs))
@@ -1358,7 +1359,7 @@ template <typename Integer>
 constexpr auto operator-(Integer lhs, decimal64 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64)
 {
-    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal64::significand_type>::digits10, decimal64::significand_type, detail::make_unsigned_t<Integer>>;
+    using promoted_significand_type = detail::promote_significand_t<decimal64, Integer>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(rhs) || isnan(rhs))
@@ -1408,16 +1409,16 @@ constexpr auto operator*(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
 
-    const auto result {detail::d64_mul_impl<detail::decimal64_components>(lhs_sig, lhs_exp, lhs.isneg(),
-                                    rhs_sig, rhs_exp, rhs.isneg())};
-
-    return {result.sig, result.exp, result.sign};
+    return {detail::d64_mul_impl<decimal64>(lhs_sig, lhs_exp, lhs.isneg(),
+                                            rhs_sig, rhs_exp, rhs.isneg())};
 }
 
 template <typename Integer>
 constexpr auto operator*(decimal64 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64)
 {
+    using promoted_significand_type = detail::promote_significand_t<decimal64, Integer>;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
@@ -1428,18 +1429,14 @@ constexpr auto operator*(decimal64 lhs, Integer rhs) noexcept
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
     detail::normalize<decimal64>(lhs_sig, lhs_exp);
-    auto lhs_components {detail::decimal64_components{lhs_sig, lhs_exp, lhs.isneg()}};
 
-    auto rhs_sig {static_cast<std::uint64_t>(detail::make_positive_unsigned(rhs))};
-    std::int32_t rhs_exp {0};
+    auto rhs_sig {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
+    decimal64::biased_exponent_type rhs_exp {0};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
-    auto unsigned_sig_rhs {detail::shrink_significand<std::uint64_t>(detail::make_positive_unsigned(rhs_sig), rhs_exp)};
-    auto rhs_components {detail::decimal64_components{unsigned_sig_rhs, rhs_exp, (rhs < 0)}};
+    const auto final_rhs_sig {static_cast<decimal64::significand_type>(rhs_sig)};
 
-    const auto result {detail::d64_mul_impl<detail::decimal64_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                    rhs_components.sig, rhs_components.exp, rhs_components.sign)};
-
-    return {result.sig, result.exp, result.sign};
+    return {detail::d64_mul_impl<decimal64>(lhs_sig, lhs_exp, lhs.isneg(),
+                                            final_rhs_sig, rhs_exp, (rhs < 0))};
 }
 
 template <typename Integer>
