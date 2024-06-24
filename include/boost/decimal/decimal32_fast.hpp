@@ -795,7 +795,7 @@ template <typename Integer>
 constexpr auto operator+(decimal32_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
 {
-    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal32::significand_type>::digits10, decimal32::significand_type, detail::make_unsigned_t<Integer>>;
+    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal32_fast::significand_type>::digits10, decimal32_fast::significand_type, detail::make_unsigned_t<Integer>>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
@@ -876,7 +876,7 @@ template <typename Integer>
 constexpr auto operator-(decimal32_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
 {
-    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal32::significand_type>::digits10, decimal32::significand_type, detail::make_unsigned_t<Integer>>;
+    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal32_fast::significand_type>::digits10, decimal32_fast::significand_type, detail::make_unsigned_t<Integer>>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(lhs) || isnan(lhs))
@@ -908,7 +908,7 @@ template <typename Integer>
 constexpr auto operator-(Integer lhs, decimal32_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
 {
-    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal32::significand_type>::digits10, decimal32::significand_type, detail::make_unsigned_t<Integer>>;
+    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal32_fast::significand_type>::digits10, decimal32_fast::significand_type, detail::make_unsigned_t<Integer>>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(rhs) || isnan(rhs))
