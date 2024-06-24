@@ -19,10 +19,34 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-template <typename ReturnType, typename T1, typename T2>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
+// Each type has two different multiplication impls
+// 1) Returns a decimal type and lets the constructor handle with shrinking the significand
+// 2)
+
+template <typename ReturnType, typename T, typename U>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
 {
+    using mul_type = std::uint_fast64_t;
+
+    bool sign {lhs_sign != rhs_sign};
+    auto res_sig {static_cast<mul_type>(lhs_sig) * static_cast<mul_type>(rhs_sig)};
+    auto res_exp {lhs_exp + rhs_exp};
+
+    if (res_sig == 0)
+    {
+        sign = false;
+    }
+
+    return {res_sig, res_exp, sign};
+}
+
+template <typename ReturnType, typename T, typename U>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
+{
+    using mul_type = std::uint_fast64_t;
+
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "sig lhs: " << sig_lhs
               << "\nexp lhs: " << exp_lhs
@@ -37,15 +61,15 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T1 lhs_sig, std::int32_t lhs_
     //
     // We use a 64 bit resultant significand because the two 23-bit unsigned significands will always fit
 
-    auto res_sig {static_cast<std::uint64_t>(lhs_sig) * static_cast<std::uint64_t>(rhs_sig)};
+    auto res_sig {static_cast<mul_type>(lhs_sig) * static_cast<mul_type>(rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
     // We don't need to use the regular binary search tree detail::num_digits(res_sig)
     // because we know that res_sig must be [1'000'000^2, 9'999'999^2] which only differ by one order
     // of magnitude in their number of digits
     const auto sig_dig {res_sig >= UINT64_C(10000000000000) ? 14 : 13};
-    constexpr auto max_dig {std::numeric_limits<std::uint32_t>::digits10};
-    res_sig /= detail::pow10(static_cast<std::uint64_t>(sig_dig - max_dig));
+    constexpr auto max_dig {std::numeric_limits<typename ReturnType::significand_type>::digits10};
+    res_sig /= detail::pow10(static_cast<mul_type>(sig_dig - max_dig));
     res_exp += sig_dig - max_dig;
 
     const auto res_sig_32 {static_cast<typename ReturnType::significand_type>(res_sig)};
