@@ -45,7 +45,7 @@ class decimal64_fast final
 public:
     using significand_type = std::uint_fast64_t;
     using exponent_type = std::uint_fast16_t;
-    using biased_exponent_type = std::int32_t;
+    using biased_exponent_type = std::int_fast32_t;
 
 private:
     // In regular decimal64 we have to decode the significand end exponent
@@ -914,6 +914,8 @@ template <typename Integer>
 constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
+    using promoted_significand_type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<decimal64_fast::significand_type>::digits10, decimal64_fast::significand_type, detail::make_unsigned_t<Integer>>;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
@@ -926,14 +928,14 @@ constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
     {
         lhs_bigger = !lhs_bigger;
     }
-    bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+    auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
+    bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     auto lhs_components {detail::decimal64_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
 
-    auto sig_rhs {static_cast<detail::decimal64_fast_components::significand_type>(detail::make_positive_unsigned(rhs))};
-    std::int32_t exp_rhs {0};
+    decimal64_fast::biased_exponent_type exp_rhs {0};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs {static_cast<detail::decimal64_fast_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
+    auto unsigned_sig_rhs {static_cast<detail::decimal64_fast_components::significand_type>(sig_rhs)};
     auto rhs_components {detail::decimal64_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     if (!lhs_bigger)
@@ -951,11 +953,9 @@ constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
 
     if (!lhs_components.sign && rhs_components.sign)
     {
-        detail::decimal64_fast_components result {};
-        result = detail::d64_sub_impl<detail::decimal64_fast_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                                                         rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                                                                         abs_lhs_bigger);
-        return {result.sig, result.exp, result.sign};
+        return detail::d64_sub_impl<decimal64_fast>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+                                                    rhs_components.sig, rhs_components.exp, rhs_components.sign,
+                                                    abs_lhs_bigger);
     }
     else
     {
