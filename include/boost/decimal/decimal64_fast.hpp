@@ -1091,7 +1091,7 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     auto res_sig {static_cast<unsigned_int128_type>(lhs.significand_) * static_cast<unsigned_int128_type>(rhs.significand_)};
 
     auto res_exp {lhs.biased_exponent() + rhs.biased_exponent()};
-    bool sign {lhs.sign_ != rhs.sign_ && res_sig != 0};
+    bool sign {lhs.sign_ != rhs.sign_};
 
     return {res_sig, res_exp, sign};
 

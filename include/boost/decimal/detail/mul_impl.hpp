@@ -33,7 +33,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
     const auto res_sig {static_cast<mul_type>(lhs_sig) * static_cast<mul_type>(rhs_sig)};
     const auto res_exp {lhs_exp + rhs_exp};
 
-    return {res_sig, res_exp, lhs_sign != rhs_sign && res_sig != static_cast<mul_type>(0)};
+    return {res_sig, res_exp, lhs_sign != rhs_sign};
 }
 
 template <typename ReturnType, typename T, typename U>
@@ -51,7 +51,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
     auto res_sig {(static_cast<mul_type>(lhs_sig) * static_cast<mul_type>(rhs_sig)) / pow10(static_cast<mul_type>(5))};
     auto res_exp {lhs_exp + rhs_exp + static_cast<U>(5)};
 
-    return {static_cast<std::uint32_t>(res_sig), res_exp, lhs_sign != rhs_sign && res_sig != static_cast<mul_type>(0)};
+    return {static_cast<std::uint32_t>(res_sig), res_exp, lhs_sign != rhs_sign};
 }
 
 template <typename ReturnType, typename T, typename U>
@@ -92,11 +92,6 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
               << "\nres exp: " << res_exp << std::endl;
     #endif
 
-    if (res_sig_32 == 0)
-    {
-        sign = false;
-    }
-
     return {res_sig_32, res_exp, sign};
 }
 
@@ -124,7 +119,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
     auto res_sig {(static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)) / pow10(static_cast<unsigned_int128_type>(13))};
     auto res_exp {lhs_exp + rhs_exp + static_cast<U>(13)};
 
-    return {static_cast<std::uint64_t>(res_sig), res_exp, lhs_sign != rhs_sign && res_sig != 0};
+    return {static_cast<std::uint64_t>(res_sig), res_exp, lhs_sign != rhs_sign};
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
@@ -167,12 +162,6 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
               << "\nres exp: " << res_exp << std::endl;
     #endif
 
-    // Always return positive zero
-    if (res_sig_64 == 0)
-    {
-        sign = false;
-    }
-
     return {res_sig_64, res_exp, sign};
 }
 
@@ -194,11 +183,6 @@ constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
         res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
         res_exp += digit_delta;
-    }
-
-    if (res_sig == 0)
-    {
-        sign = false;
     }
 
     BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0,0));
@@ -223,11 +207,6 @@ constexpr auto d128_fast_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     constexpr auto max_dig {std::numeric_limits<typename ReturnType::significand_type>::digits10};
     res_sig /= detail::pow10(static_cast<uint256_t>(sig_dig - max_dig));
     res_exp += sig_dig - max_dig;
-
-    if (res_sig == 0)
-    {
-        sign = false;
-    }
 
     BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0,0));
     return {res_sig.low, res_exp, sign};
