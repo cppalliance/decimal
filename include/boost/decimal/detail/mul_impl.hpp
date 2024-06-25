@@ -95,11 +95,17 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
 
     // Once we have the normalized significands and exponents all we have to do is
     // multiply the significands and add the exponents
+    //
+    // The constructor needs to calculate the number of digits in the significand which for uint128 is slow
+    // Since we know the value of res_sig is constrained to [(10^16)^2, (10^17 - 1)^2] which equates to
+    // either 31 or 32 decimal digits we can use a single division to make binary search occur with
+    // uint_fast64_t instead. 32 - 13 = 19 or 31 - 13 = 18 which are both still greater than
+    // digits10 + 1 for rounding which is 17 decimal digits
 
-    auto res_sig {static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)};
-    auto res_exp {lhs_exp + rhs_exp};
+    auto res_sig {(static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)) / pow10(static_cast<unsigned_int128_type>(13))};
+    auto res_exp {lhs_exp + rhs_exp + static_cast<U>(13)};
 
-    return {res_sig, res_exp, lhs_sign != rhs_sign && res_sig != 0};
+    return {static_cast<std::uint64_t>(res_sig), res_exp, lhs_sign != rhs_sign && res_sig != 0};
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
