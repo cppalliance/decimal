@@ -105,7 +105,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
                                                        T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
                                                        -> std::enable_if_t<detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
 {
-    #ifdef BOOST_DECIMAL_HAS_INT128
+    // Clang 6-12 yields incorrect results with builtin u128, so we force usage of our version
+    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || (__clang_major__) > 12)
     using unsigned_int128_type = boost::decimal::detail::uint128_t;
     #else
     using unsigned_int128_type = boost::decimal::detail::uint128;
