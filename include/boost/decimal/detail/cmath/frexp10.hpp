@@ -47,7 +47,7 @@ constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_t
     auto num_sig {num.full_significand()};
     detail::normalize<T>(num_sig, num_exp);
 
-    *expptr = num_exp;
+    *expptr = static_cast<int>(num_exp);
 
     return num_sig;
 }

@@ -17,9 +17,9 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-template <typename ReturnType, typename T1, typename T2>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
+template <typename ReturnType, typename T, typename U>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
     const bool sign {lhs_sign};
 
@@ -90,9 +90,9 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T1 lhs_sig, std::int32_t lhs_
     return {new_sig, new_exp, sign};
 }
 
-template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-constexpr auto d64_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
+template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
+constexpr auto d64_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                            T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
     const bool sign {lhs_sign};
 

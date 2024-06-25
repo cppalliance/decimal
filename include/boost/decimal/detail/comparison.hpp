@@ -55,6 +55,8 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL In
 constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>
 {
+    using exp_type = typename Decimal::biased_exponent_type;
+
     if (isnan(lhs) || isinf(lhs))
     {
         return false;
@@ -72,7 +74,7 @@ constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
     const auto rhs_significand {detail::make_positive_unsigned(rhs)};
 
     return equal_parts_impl<Decimal>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                                     rhs_significand, INT32_C(0), rhs_isneg);
+                                     rhs_significand, static_cast<exp_type>(0), rhs_isneg);
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
@@ -151,6 +153,8 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL In
 constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>
 {
+    using exp_type = typename Decimal::biased_exponent_type;
+
     if (isnan(lhs))
     {
         return false;
@@ -190,7 +194,7 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
     const auto rhs_significand {detail::make_positive_unsigned(rhs)};
 
     return less_parts_impl<Decimal>(lhs.full_significand(), lhs.biased_exponent(), lhs_sign,
-                                    rhs_significand, INT32_C(0), rhs_sign);
+                                    rhs_significand, static_cast<exp_type>(0), rhs_sign);
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal1, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal2>
