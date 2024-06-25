@@ -152,9 +152,10 @@ constexpr auto d64_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
     return {res_sig, new_exp, new_sign};
 }
 
-template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                             T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
+template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
+                               BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
+constexpr auto d128_sub_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
+                             T2 rhs_sig, U2 rhs_exp, bool rhs_sign,
                              bool abs_lhs_bigger) noexcept -> ReturnType
 {
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};

@@ -180,9 +180,10 @@ constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {res_sig.low, res_exp, sign};
 }
 
-template <typename ReturnType, typename T1, typename T2>
-constexpr auto d128_fast_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                  T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
+template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
+                               BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
+constexpr auto d128_fast_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
+                                  T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
     bool sign {lhs_sign != rhs_sign};
 
