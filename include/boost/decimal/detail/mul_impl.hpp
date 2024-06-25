@@ -148,7 +148,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
     // multiply the significands and add the exponents
 
     auto res_sig {static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)};
-    auto res_exp {lhs_exp + rhs_exp};
+    auto res_exp {static_cast<typename ReturnType::biased_exponent_type>(lhs_exp + rhs_exp)};
 
     const auto sig_dig {res_sig >= comp_value ? 32 : 31};
     constexpr auto max_dig {std::numeric_limits<typename ReturnType::significand_type>::digits10};
