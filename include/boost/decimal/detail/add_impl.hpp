@@ -54,7 +54,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T lhs_sig, U lhs_exp, bool lh
     // 32-bit signed int can have 9 digits and our normalized significand has 7
     if (delta_exp <= 2)
     {
-        lhs_sig *= pow10(static_cast<T1>(delta_exp));
+        lhs_sig *= pow10(static_cast<T>(delta_exp));
         lhs_exp -= delta_exp;
         delta_exp = 0;
     }
@@ -66,7 +66,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T lhs_sig, U lhs_exp, bool lh
 
         if (delta_exp > 1)
         {
-            rhs_sig /= pow10(static_cast<T2>(delta_exp - 1));
+            rhs_sig /= pow10(static_cast<T>(delta_exp - 1));
             delta_exp = 1;
         }
     }
@@ -131,7 +131,7 @@ constexpr auto d64_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
     // 64-bit sign int can have 19 digits, and our normalized significand has 16
     if (delta_exp <= 3)
     {
-        lhs_sig *= pow10(static_cast<T1>(delta_exp));
+        lhs_sig *= pow10(static_cast<T>(delta_exp));
         lhs_exp -= delta_exp;
         delta_exp = 0;
     }
@@ -143,7 +143,7 @@ constexpr auto d64_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
         if (delta_exp > 1)
         {
-            rhs_sig /= pow10(static_cast<T2>(delta_exp - 1));
+            rhs_sig /= pow10(static_cast<T>(delta_exp - 1));
             delta_exp = 1;
         }
 
@@ -239,8 +239,8 @@ constexpr auto d128_add_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         }
     }
 
-    const auto new_sig {static_cast<typename ReturnType::sig_type>(lhs_sig) +
-                        static_cast<typename ReturnType::sig_type>(rhs_sig)};
+    const auto new_sig {static_cast<typename ReturnType::significand_type>(lhs_sig) +
+                        static_cast<typename ReturnType::significand_type>(rhs_sig)};
     const auto new_exp {lhs_exp};
 
     #ifdef BOOST_DECIMAL_DEBUG_ADD_128

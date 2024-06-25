@@ -23,9 +23,10 @@
 namespace boost {
 namespace decimal {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-constexpr auto equal_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
+          BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
+constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
+                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> bool
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
@@ -112,9 +113,10 @@ constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
     return !(mixed_decimal_equality_impl(lhs, rhs));
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-constexpr auto less_parts_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                               T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> bool
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
+          BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
+constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
+                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> bool
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 

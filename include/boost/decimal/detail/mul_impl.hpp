@@ -194,7 +194,7 @@ constexpr auto d128_fast_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sig
     constexpr auto comp_value {impl::emulated_256_pow10[67]};
     const auto sig_dig {res_sig >= comp_value ? 68 : 67};
 
-    constexpr auto max_dig {std::numeric_limits<typename ReturnType::sig_type>::digits10};
+    constexpr auto max_dig {std::numeric_limits<typename ReturnType::significand_type>::digits10};
     res_sig /= detail::pow10(static_cast<uint256_t>(sig_dig - max_dig));
     res_exp += sig_dig - max_dig;
 
