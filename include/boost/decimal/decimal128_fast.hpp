@@ -31,10 +31,11 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan = std::numeric_limits<uint1
 
 struct decimal128_fast_components
 {
-    using sig_type = uint128;
+    using significand_type = uint128;
+    using biased_exponent_type = std::int_fast32_t;
 
-    uint128 sig;
-    std::int32_t exp;
+    significand_type sig;
+    biased_exponent_type exp;
     bool sign;
 };
 
@@ -45,6 +46,7 @@ class decimal128_fast final
 public:
     using significand_type = detail::uint128;
     using exponent_type = std::uint_fast32_t;
+    using biased_exponent_type = std::int_fast32_t;
 
 private:
     // Instead of having to encode and decode at every operation
@@ -69,9 +71,9 @@ private:
         return exponent_;
     }
 
-    constexpr auto biased_exponent() const noexcept -> std::int32_t
+    constexpr auto biased_exponent() const noexcept -> biased_exponent_type
     {
-        return static_cast<std::int32_t>(exponent_) - detail::bias_v<decimal128>;
+        return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal128>;
     }
 
     template <typename Decimal, typename TargetType>

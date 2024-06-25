@@ -132,10 +132,11 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE uint128 d128_big_combination_field_mask {UINT64
 
 struct decimal128_components
 {
-    using sig_type = uint128;
+    using significand_type = uint128;
+    using biased_exponent_type = std::int32_t;
 
-    uint128 sig {};
-    std::int32_t exp {};
+    significand_type sig {};
+    biased_exponent_type exp {};
     bool sign {};
 
     constexpr decimal128_components() = default;
@@ -150,6 +151,8 @@ BOOST_DECIMAL_EXPORT class decimal128 final
 {
 public:
     using significand_type = detail::uint128;
+    using exponent_type = std::uint64_t;
+    using biased_exponent_type = std::int32_t;
 
 private:
     detail::uint128 bits_ {};
