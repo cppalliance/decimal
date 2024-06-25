@@ -290,7 +290,7 @@ void test_multiplicatiom()
     constexpr decimal32_fast eight {8, 0};
 
     BOOST_TEST_EQ(zero * one, zero);
-    BOOST_TEST_EQ(zero * -one, zero);
+    BOOST_TEST_EQ(zero * -one, -zero);
     BOOST_TEST_EQ(one * two, two);
 
     decimal32_fast pow_two {1, 0};
