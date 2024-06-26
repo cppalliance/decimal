@@ -89,7 +89,7 @@
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
 #    include <x86intrin.h>
 #  endif
-#  define BOOST_DECIMAL_HAS_X86_INTRINSICS
+#  define BOOST_DECIMAL_HAS_X64_INTRINSICS
 #elif defined(__ARM_NEON__)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
 #    include <arm_neon.h>
