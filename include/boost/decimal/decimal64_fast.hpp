@@ -1227,6 +1227,9 @@ template <typename Integer>
 constexpr auto operator/(decimal64_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
+    using promoted_significand_type = detail::promote_significand_t<decimal64_fast, Integer>;
+    using exp_type = detail::decimal64_fast_components::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64_fast zero {0, 0};
@@ -1261,8 +1264,8 @@ constexpr auto operator/(decimal64_fast lhs, Integer rhs) noexcept
 
     detail::decimal64_fast_components lhs_components {lhs_sig, lhs_exp, lhs.isneg()};
 
-    auto rhs_sig {static_cast<decimal64_fast::significand_type>(detail::make_positive_unsigned(rhs))};
-    std::int32_t rhs_exp {};
+    auto rhs_sig {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
+    exp_type rhs_exp {};
     detail::decimal64_fast_components rhs_components {detail::shrink_significand<decimal64_fast::significand_type>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
 
     return detail::d64_generic_div_impl<decimal64_fast>(lhs_components, rhs_components);
@@ -1272,6 +1275,9 @@ template <typename Integer>
 constexpr auto operator/(Integer lhs, decimal64_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
+    using promoted_significand_type = detail::promote_significand_t<decimal64_fast, Integer>;
+    using exp_type = detail::decimal64_fast_components::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64_fast zero {0, 0};
@@ -1301,9 +1307,11 @@ constexpr auto operator/(Integer lhs, decimal64_fast rhs) noexcept
     auto rhs_sig {rhs.full_significand()};
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
-
-    detail::decimal64_fast_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
     detail::decimal64_fast_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
+
+    auto lhs_sig {static_cast<promoted_significand_type>(detail::make_positive_unsigned(lhs))};
+    exp_type lhs_exp {};
+    detail::decimal64_fast_components lhs_components {detail::shrink_significand<decimal64_fast::significand_type>(lhs_sig, lhs_exp), lhs_exp, lhs < 0};
 
     return detail::d64_generic_div_impl<decimal64_fast>(lhs_components, rhs_components);
 }

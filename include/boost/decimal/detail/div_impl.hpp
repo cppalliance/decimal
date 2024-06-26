@@ -45,7 +45,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T
 template <typename DecimalType, typename T>
 constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> DecimalType
 {
-    #ifdef BOOST_DECIMAL_HAS_INT128
+    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ > 13)
     using unsigned_int128_type = boost::decimal::detail::uint128_t;
     #else
     using unsigned_int128_type = boost::decimal::detail::uint128;
