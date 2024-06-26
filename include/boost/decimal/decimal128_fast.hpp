@@ -31,10 +31,11 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan = std::numeric_limits<uint1
 
 struct decimal128_fast_components
 {
-    using sig_type = uint128;
+    using significand_type = uint128;
+    using biased_exponent_type = std::int_fast32_t;
 
-    uint128 sig;
-    std::int32_t exp;
+    significand_type sig;
+    biased_exponent_type exp;
     bool sign;
 };
 
@@ -45,6 +46,7 @@ class decimal128_fast final
 public:
     using significand_type = detail::uint128;
     using exponent_type = std::uint_fast32_t;
+    using biased_exponent_type = std::int_fast32_t;
 
 private:
     // Instead of having to encode and decode at every operation
@@ -69,9 +71,9 @@ private:
         return exponent_;
     }
 
-    constexpr auto biased_exponent() const noexcept -> std::int32_t
+    constexpr auto biased_exponent() const noexcept -> biased_exponent_type
     {
-        return static_cast<std::int32_t>(exponent_) - detail::bias_v<decimal128>;
+        return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal128>;
     }
 
     template <typename Decimal, typename TargetType>
@@ -820,7 +822,7 @@ constexpr auto operator+(decimal128_fast lhs, Integer rhs) noexcept
     auto lhs_components {detail::decimal128_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
 
     auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
-    std::int32_t exp_rhs {0};
+    decimal128_fast::biased_exponent_type exp_rhs {0};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
     auto unsigned_sig_rhs = detail::make_positive_unsigned(sig_rhs);
     auto rhs_components {detail::decimal128_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
@@ -914,7 +916,7 @@ constexpr auto operator-(decimal128_fast lhs, Integer rhs) noexcept
     auto lhs_components {detail::decimal128_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
 
     auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
-    std::int32_t exp_rhs {0};
+    decimal128_fast::biased_exponent_type exp_rhs {0};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
     auto unsigned_sig_rhs {detail::make_positive_unsigned(sig_rhs)};
     auto rhs_components {detail::decimal128_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
@@ -946,7 +948,7 @@ constexpr auto operator-(Integer lhs, decimal128_fast rhs) noexcept
     const bool abs_lhs_bigger {detail::make_positive_unsigned(lhs) > abs(rhs)};
 
     auto sig_lhs {static_cast<detail::uint128>(detail::make_positive_unsigned(lhs))};
-    std::int32_t exp_lhs {0};
+    decimal128_fast::biased_exponent_type exp_lhs {0};
     detail::normalize<decimal128>(sig_lhs, exp_lhs);
     auto unsigned_sig_lhs {detail::make_positive_unsigned(sig_lhs)};
     auto lhs_components {detail::decimal128_fast_components{unsigned_sig_lhs, exp_lhs, (lhs < 0)}};
@@ -992,7 +994,7 @@ constexpr auto operator*(decimal128_fast lhs, Integer rhs) noexcept
     #endif
 
     auto rhs_sig {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
-    std::int32_t rhs_exp {0};
+    decimal128_fast::biased_exponent_type rhs_exp {0};
     detail::normalize<decimal128_fast>(rhs_sig, rhs_exp);
 
     const auto result {detail::d128_fast_mul_impl<detail::decimal128_fast_components>(
@@ -1128,7 +1130,7 @@ constexpr auto operator/(decimal128_fast lhs, Integer rhs) noexcept
     detail::decimal128_fast_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.isneg()};
 
     auto rhs_sig {detail::make_positive_unsigned(rhs)};
-    std::int32_t rhs_exp {};
+    decimal128_fast::biased_exponent_type rhs_exp {};
     detail::decimal128_fast_components rhs_components {rhs_sig, rhs_exp, rhs < 0};
     detail::decimal128_fast_components q_components {};
 

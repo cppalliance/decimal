@@ -68,7 +68,7 @@ void test_sin()
 
     BOOST_TEST(isinf(sin(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
     BOOST_TEST(isnan(sin(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
-    BOOST_TEST_EQ(sin(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(abs(sin(Dec(0) * Dec(dist(rng)))), Dec(0));
 
     // Check the phases of large positive/negative arguments.
     using std::atan;

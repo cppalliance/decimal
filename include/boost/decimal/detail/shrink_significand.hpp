@@ -19,8 +19,8 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-template <typename TargetType = std::uint32_t, typename Integer>
-constexpr auto shrink_significand(Integer sig, std::int32_t& exp) noexcept -> TargetType
+template <typename TargetType = std::uint32_t, typename Integer, typename Exp>
+constexpr auto shrink_significand(Integer sig, Exp& exp) noexcept -> TargetType
 {
     using Unsigned_Integer = make_unsigned_t<Integer>;
     constexpr auto max_digits {std::numeric_limits<TargetType>::digits10};

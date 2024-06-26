@@ -17,11 +17,13 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-template <typename ReturnType, typename T1, typename T2>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                                                   T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
+template <typename ReturnType, typename T, typename U>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                   T rhs_sig, U rhs_exp, bool rhs_sign,
                                                    bool abs_lhs_bigger) noexcept -> ReturnType
 {
+    using sub_type = std::int_fast32_t;
+
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
     auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
     auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
@@ -32,8 +34,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_
         // we return the larger of the two
         //
         // e.g. 1e20 - 1e-20 = 1e20
-        return abs_lhs_bigger ? ReturnType{detail::shrink_significand(lhs_sig, lhs_exp), lhs_exp, false} :
-                                ReturnType{detail::shrink_significand(rhs_sig, rhs_exp), rhs_exp, true};
+        return abs_lhs_bigger ? ReturnType{lhs_sig, lhs_exp, false} :
+                                ReturnType{rhs_sig, rhs_exp, true};
     }
 
     // The two numbers can be subtracted together without special handling
@@ -49,29 +51,32 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_
         --delta_exp;
         --exp_bigger;
     }
-    else if (delta_exp >= 2)
+    else
     {
-        sig_bigger *= 100;
-        delta_exp -= 2;
-        exp_bigger -= 2;
-    }
+        if (delta_exp >= 2)
+        {
+            sig_bigger *= 100;
+            delta_exp -= 2;
+            exp_bigger -= 2;
+        }
 
-    if (delta_exp > 1)
-    {
-        sig_smaller /= pow10(delta_exp - 1);
-        delta_exp = 1;
-    }
+        if (delta_exp > 1)
+        {
+            sig_smaller /= pow10(delta_exp - 1);
+            delta_exp = 1;
+        }
 
-    if (delta_exp == 1)
-    {
-        detail::fenv_round(sig_smaller, smaller_sign);
+        if (delta_exp == 1)
+        {
+            detail::fenv_round(sig_smaller, smaller_sign);
+        }
     }
 
     // Both of the significands are less than 9'999'999, so we can safely
     // cast them to signed 32-bit ints to calculate the new significand
-    std::int32_t new_sig = (rhs_sign && !lhs_sign) ?
-            static_cast<std::int32_t>(signed_sig_lhs) + static_cast<std::int32_t>(signed_sig_rhs) :
-            static_cast<std::int32_t>(signed_sig_lhs) - static_cast<std::int32_t>(signed_sig_rhs);
+    const auto new_sig = (rhs_sign && !lhs_sign) ?
+            static_cast<sub_type>(signed_sig_lhs) + static_cast<sub_type>(signed_sig_rhs) :
+            static_cast<sub_type>(signed_sig_lhs) - static_cast<sub_type>(signed_sig_rhs);
 
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
     const auto new_sign {new_sig < 0};
@@ -80,14 +85,16 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T1 lhs_sig, std::int32_t lhs_
     return {res_sig, new_exp, new_sign};
 }
 
-template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                            T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
+template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
+constexpr auto d64_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                            T rhs_sig, U rhs_exp, bool rhs_sign,
                             bool abs_lhs_bigger) noexcept -> ReturnType
 {
+    using sub_type = std::int_fast64_t;
+
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-    auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
-    auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
+    auto signed_sig_lhs {static_cast<sub_type>(detail::make_signed_value(lhs_sig, lhs_sign))};
+    auto signed_sig_rhs {static_cast<sub_type>(detail::make_signed_value(rhs_sig, rhs_sign))};
 
     if (delta_exp > detail::precision_v<decimal64> + 1)
     {
@@ -95,8 +102,8 @@ constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         // we return the larger of the two
         //
         // e.g. 1e20 - 1e-20 = 1e20
-        return abs_lhs_bigger ? ReturnType{detail::shrink_significand<std::uint64_t>(lhs_sig, lhs_exp), lhs_exp, false} :
-               ReturnType{detail::shrink_significand<std::uint64_t>(rhs_sig, rhs_exp), rhs_exp, true};
+        return abs_lhs_bigger ? ReturnType{lhs_sig, lhs_exp, false} :
+                                ReturnType{rhs_sig, rhs_exp, true};
     }
 
     // The two numbers can be subtracted together without special handling
@@ -112,36 +119,31 @@ constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
         --delta_exp;
         --exp_bigger;
     }
-    else if (delta_exp >= 2)
+    else
     {
-        sig_bigger *= 100;
-        delta_exp -= 2;
-        exp_bigger -= 2;
-    }
+        if (delta_exp >= 2)
+        {
+            sig_bigger *= 100;
+            delta_exp -= 2;
+            exp_bigger -= 2;
+        }
 
-    while (delta_exp > 1)
-    {
-        sig_smaller /= 10;
-        --delta_exp;
-    }
+        if (delta_exp > 1)
+        {
+            sig_smaller /= pow10<std::remove_reference_t<decltype(sig_smaller)>>(delta_exp - 1);
+            delta_exp = 1;
+        }
 
-    if (delta_exp == 1)
-    {
-        detail::fenv_round<decimal64>(sig_smaller, smaller_sign);
+        if (delta_exp == 1)
+        {
+            detail::fenv_round<decimal64>(sig_smaller, smaller_sign);
+        }
     }
 
     // Both of the significands are less than 9'999'999'999'999'999, so we can safely
     // cast them to signed 64-bit ints to calculate the new significand
-    std::int64_t new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
-
-    if (rhs_sign && !lhs_sign)
-    {
-        new_sig = signed_sig_lhs + signed_sig_rhs;
-    }
-    else
-    {
-        new_sig = signed_sig_lhs - signed_sig_rhs;
-    }
+    const sub_type new_sig {rhs_sign && !lhs_sign ? signed_sig_lhs + signed_sig_rhs :
+                                                    signed_sig_lhs - signed_sig_rhs};
 
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
     const auto new_sign {new_sig < 0};
@@ -150,9 +152,10 @@ constexpr auto d64_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {res_sig, new_exp, new_sign};
 }
 
-template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
-                             T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign,
+template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
+                               BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
+constexpr auto d128_sub_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
+                             T2 rhs_sig, U2 rhs_exp, bool rhs_sign,
                              bool abs_lhs_bigger) noexcept -> ReturnType
 {
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
@@ -221,8 +224,8 @@ constexpr auto d128_sub_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
     return {res_sig, new_exp, new_sign};
 }
 
-}
-}
-}
+} // namespace detail
+} // namespace decimal
+} // namespace boost
 
 #endif //BOOST_DECIMAL_DETAIL_SUB_IMPL_HPP

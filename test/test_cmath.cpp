@@ -778,7 +778,7 @@ void test_rint()
 
     BOOST_TEST(isinf(rint(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
     BOOST_TEST(isnan(rint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
-    BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(abs(rint(Dec(0) * Dec(dist(rng)))), Dec(0));
     BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
     BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, true));
 }
@@ -966,7 +966,7 @@ void test_nearbyint()
 
     BOOST_TEST(isinf(nearbyint(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
     BOOST_TEST(isnan(nearbyint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
-    BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(abs(nearbyint(Dec(0) * Dec(dist(rng)))), Dec(0));
     BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
     BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, true));
 }
@@ -1008,7 +1008,7 @@ void test_round()
 
     BOOST_TEST(isinf(round(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
     BOOST_TEST(isnan(round(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
-    BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(abs(round(Dec(0) * Dec(dist(rng)))), Dec(0));
     BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
     BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, false));
 }
