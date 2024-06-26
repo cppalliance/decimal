@@ -28,6 +28,7 @@ local linux_pipeline(name, image, environment, packages = "", sources = [], arch
         {
             name: "everything",
             image: image,
+            privileged: true,
             environment: environment,
             commands:
             [
