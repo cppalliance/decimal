@@ -24,5 +24,9 @@ python tools/boostdep/depinst/depinst.py -I example $LIBRARY
 ./bootstrap.sh
 ./b2 -d0 headers
 
+if [[ $(uname) == "Linux" ]]; then
+    echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
+fi
+
 echo "using $TOOLSET : : $COMPILER ;" > ~/user-config.jam
 ./b2 -j3 libs/$LIBRARY/test toolset=$TOOLSET cxxstd=$CXXSTD variant=debug,release ${ADDRMD:+address-model=$ADDRMD} ${UBSAN:+undefined-sanitizer=norecover debug-symbols=on} ${ASAN:+address-sanitizer=norecover debug-symbols=on} ${CXXFLAGS:+cxxflags=$CXXFLAGS} ${CXXSTDDIALECT:+cxxstd-dialect=$CXXSTDDIALECT} ${LINKFLAGS:+linkflags=$LINKFLAGS}
