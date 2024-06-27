@@ -1073,34 +1073,8 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-
-    #if defined(__clang_major__) && __clang_major__ < 13
-
-    const auto result {detail::d64_mul_impl<detail::decimal64_components>(
-                        lhs.significand_, lhs.biased_exponent(), lhs.isneg(),
-                        rhs.significand_, rhs.biased_exponent(), rhs.isneg()
-                        )};
-
-    return {result.sig, result.exp, result.sign};
-
-    #else
-
-    #ifdef BOOST_DECIMAL_HAS_INT128
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
-    #endif
-
-    auto res_sig {static_cast<unsigned_int128_type>(lhs.significand_) * static_cast<unsigned_int128_type>(rhs.significand_)};
-
-    // TODO(mborland): Insert division trick to get this into uint_fast64_t rather than u128 of sorts
-
-    auto res_exp {lhs.biased_exponent() + rhs.biased_exponent()};
-    bool sign {lhs.sign_ != rhs.sign_};
-
-    return {res_sig, res_exp, sign};
-
-    #endif
+    return detail::d64_mul_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                                rhs.significand_, rhs.biased_exponent(), rhs.sign_);
 }
 
 template <typename Integer>
