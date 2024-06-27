@@ -18,7 +18,7 @@ namespace decimal {
 namespace detail {
 
 template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto new_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
                                                        T rhs_sig, U rhs_exp, bool rhs_sign,
                                                        bool abs_lhs_bigger) noexcept -> ReturnType
 {

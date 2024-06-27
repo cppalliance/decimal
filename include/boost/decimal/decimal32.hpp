@@ -852,7 +852,7 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    return detail::new_add_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
+    return detail::d32_add_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
                                            sig_rhs, exp_rhs, rhs.isneg(),
                                            abs_lhs_bigger);
 }
@@ -887,7 +887,7 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
     auto unsigned_sig_rhs {static_cast<typename detail::decimal32_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
     auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
-    return detail::new_add_impl<decimal32>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+    return detail::d32_add_impl<decimal32>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                            rhs_components.sig, rhs_components.exp, rhs_components.sign,
                                            abs_lhs_bigger);
 }
