@@ -871,12 +871,6 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
     }
     #endif
 
-    bool lhs_bigger {lhs > rhs};
-    if (lhs.isneg() && (rhs < 0))
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-
     // Make the significand type wide enough that it won't overflow during normalization
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
     bool abs_lhs_bigger {abs(lhs) > sig_rhs};
@@ -893,23 +887,9 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
     auto unsigned_sig_rhs {static_cast<typename detail::decimal32_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
     auto rhs_components {detail::decimal32_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
-    if (!lhs_bigger)
-    {
-        detail::swap(lhs_components, rhs_components);
-        abs_lhs_bigger = !abs_lhs_bigger;
-    }
-
-    if (!lhs_components.sign && rhs_components.sign)
-    {
-        return detail::sub_impl<decimal32>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
+    return detail::new_add_impl<decimal32>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
                                            rhs_components.sig, rhs_components.exp, rhs_components.sign,
                                            abs_lhs_bigger);
-    }
-    else
-    {
-        return detail::add_impl<decimal32>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                           rhs_components.sig, rhs_components.exp, rhs_components.sign);
-    }
 }
 
 template <typename Integer>
