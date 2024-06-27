@@ -802,6 +802,8 @@ void test_lrint()
         // Difference in rounding mode at 0.5
         if (abs(ret_dec) == abs(ret_val) + 1)
         {
+            // LCOV_EXCL_START
+
             float iptr;
             const auto frac = std::modf(val1, &iptr);
             if (abs(abs(frac) - 0.5F) < 0.01F)
@@ -810,11 +812,11 @@ void test_lrint()
             }
             else
             {
-                // LCOV_EXCL_START
                 std::cerr << "Frac: " << frac
                           << "\nDist: " << std::fabs(frac - 0.5F) / std::numeric_limits<float>::epsilon() << std::endl;
-                // LCOV_EXCL_STOP
             }
+
+            // LCOV_EXCL_STOP
         }
 
         if (!BOOST_TEST_EQ(ret_val, ret_dec))
