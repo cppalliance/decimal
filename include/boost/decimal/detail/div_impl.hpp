@@ -81,7 +81,6 @@ constexpr auto d128_generic_div_impl(T lhs, T rhs, T& q) noexcept -> void
     auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
     auto res_exp {lhs.exp - rhs.exp};
 
-    // TODO(mborland): Since the values are normalized is sig_dig always near 34?
     const auto sig_dig {detail::num_digits(res_sig)};
 
     if (sig_dig > std::numeric_limits<detail::uint128>::digits10)

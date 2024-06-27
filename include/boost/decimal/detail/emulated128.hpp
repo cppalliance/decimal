@@ -757,15 +757,31 @@ constexpr auto uint128::operator+=(std::uint64_t n) noexcept -> uint128&
 
 constexpr auto operator+(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
-    const uint128 temp = {lhs.high + rhs.high, lhs.low + rhs.low};
-
-    // Need to carry a bit into rhs
-    if (temp.low < lhs.low)
+    #if (defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)) && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
+    if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs.low))
     {
-        return {temp.high + 1, temp.low};
-    }
+        // Branchless version can be executed on x64 machines when available
+        unsigned long long low {};
+        unsigned long long high {};
 
-    return temp;
+        const auto carry {_addcarry_u64(0, lhs.low, rhs.low, &low)};
+        _addcarry_u64(carry, lhs.high, rhs.high, &high);
+
+        return uint128{high, low};
+    }
+    else
+    #endif
+    {
+        uint128 temp {lhs.high + rhs.high, lhs.low + rhs.low};
+
+        // Need to carry a bit into rhs
+        if (temp.low < lhs.low)
+        {
+            ++temp.high;
+        }
+
+        return temp;
+    }
 }
 
 constexpr auto uint128::operator+=(uint128 v) noexcept -> uint128&
@@ -791,15 +807,31 @@ constexpr auto uint128::operator++(int) noexcept -> uint128
 
 constexpr auto operator-(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
-    const uint128 temp {lhs.high - rhs.high, lhs.low - rhs.low};
-
-    // Check for carry
-    if (lhs.low < rhs.low)
+    #if (defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)) && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
+    if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs.low))
     {
-        return {temp.high - 1, temp.low};
-    }
+        // Branchless version can be executed on x64 machines when available
+        unsigned long long low {};
+        unsigned long long high {};
 
-    return temp;
+        const auto carry {_subborrow_u64(0, lhs.low, rhs.low, &low)};
+        _subborrow_u64(carry, lhs.high, rhs.high, &high);
+
+        return uint128{high, low};
+    }
+    else
+    #endif
+    {
+        uint128 temp {lhs.high - rhs.high, lhs.low - rhs.low};
+
+        // Check for carry
+        if (lhs.low < rhs.low)
+        {
+            --temp.high;
+        }
+
+        return temp;
+    }
 }
 
 constexpr auto uint128::operator-=(uint128 v) noexcept -> uint128&

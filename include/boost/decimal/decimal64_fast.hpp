@@ -905,10 +905,10 @@ constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
         return lhs - abs(rhs);
     }
 
-    return {detail::d64_add_impl<decimal64_fast>(
+    return detail::d64_add_impl<decimal64_fast>(
               lhs.significand_, lhs.biased_exponent(), lhs.sign_,
               rhs.significand_, rhs.biased_exponent(), rhs.sign_
-              )};
+              );
 }
 
 template <typename Integer>
@@ -916,6 +916,7 @@ constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
     using promoted_significand_type = detail::promote_significand_t<decimal64_fast, Integer>;
+    using exp_type = decimal64_fast::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
@@ -934,7 +935,7 @@ constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
 
     auto lhs_components {detail::decimal64_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
 
-    decimal64_fast::biased_exponent_type exp_rhs {0};
+    exp_type exp_rhs {0};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
     auto unsigned_sig_rhs {static_cast<detail::decimal64_fast_components::significand_type>(sig_rhs)};
     auto rhs_components {detail::decimal64_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
@@ -991,11 +992,11 @@ constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
 
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
-    return {detail::d64_sub_impl<decimal64_fast>(
+    return detail::d64_sub_impl<decimal64_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             abs_lhs_bigger
-            )};
+            );
 }
 
 template <typename Integer>
@@ -1003,6 +1004,7 @@ constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
     using promoted_significand_type = detail::promote_significand_t<decimal64_fast, Integer>;
+    using exp_type = decimal64_fast::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(lhs) || isnan(lhs))
@@ -1019,13 +1021,13 @@ constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
     const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
 
-    decimal64_fast::biased_exponent_type exp_rhs {0};
+    exp_type exp_rhs {0};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
     const auto final_sig_rhs {static_cast<decimal64_fast::significand_type>(sig_rhs)};
 
-    return {detail::d64_sub_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+    return detail::d64_sub_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
                                                  final_sig_rhs, exp_rhs, (rhs < 0),
-                                                 abs_lhs_bigger)};
+                                                 abs_lhs_bigger);
 }
 
 template <typename Integer>
@@ -1033,6 +1035,7 @@ constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
     using promoted_significand_type = detail::promote_significand_t<decimal64_fast, Integer>;
+    using exp_type = decimal64_fast::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(rhs) || isnan(rhs))
@@ -1049,13 +1052,13 @@ constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
     auto sig_lhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(lhs))};
     const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
 
-    decimal64_fast::biased_exponent_type exp_lhs {0};
+    exp_type exp_lhs {0};
     detail::normalize<decimal64>(sig_lhs, exp_lhs);
     const auto final_sig_lhs {static_cast<decimal64_fast::significand_type>(sig_lhs)};
 
-    return {detail::d64_sub_impl<decimal64_fast>(final_sig_lhs, exp_lhs, (lhs < 0),
+    return detail::d64_sub_impl<decimal64_fast>(final_sig_lhs, exp_lhs, (lhs < 0),
                                                  rhs.significand_, rhs.biased_exponent(), rhs.sign_,
-                                                 abs_lhs_bigger)};
+                                                 abs_lhs_bigger);
 }
 
 constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
@@ -1070,32 +1073,8 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-
-    #if defined(__clang_major__) && __clang_major__ < 13
-
-    const auto result {detail::d64_mul_impl<detail::decimal64_components>(
-                        lhs.significand_, lhs.biased_exponent(), lhs.isneg(),
-                        rhs.significand_, rhs.biased_exponent(), rhs.isneg()
-                        )};
-
-    return {result.sig, result.exp, result.sign};
-
-    #else
-
-    #ifdef BOOST_DECIMAL_HAS_INT128
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
-    #endif
-
-    auto res_sig {static_cast<unsigned_int128_type>(lhs.significand_) * static_cast<unsigned_int128_type>(rhs.significand_)};
-
-    auto res_exp {lhs.biased_exponent() + rhs.biased_exponent()};
-    bool sign {lhs.sign_ != rhs.sign_};
-
-    return {res_sig, res_exp, sign};
-
-    #endif
+    return detail::d64_mul_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                                rhs.significand_, rhs.biased_exponent(), rhs.sign_);
 }
 
 template <typename Integer>
@@ -1103,6 +1082,7 @@ constexpr auto operator*(decimal64_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
 {
     using promoted_significand_type = detail::promote_significand_t<decimal64, Integer>;
+    using exp_type = decimal64_fast::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
@@ -1112,14 +1092,14 @@ constexpr auto operator*(decimal64_fast lhs, Integer rhs) noexcept
     #endif
 
     auto rhs_sig {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
-    decimal64_fast::biased_exponent_type rhs_exp {0};
+    exp_type rhs_exp {0};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
     auto final_rhs_sig {static_cast<decimal64_fast::significand_type>(rhs_sig)};
 
-    return {detail::d64_mul_impl<decimal64_fast>(
+    return detail::d64_mul_impl<decimal64_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             final_rhs_sig, rhs_exp, (rhs < 0)
-            )};
+            );
 }
 
 template <typename Integer>

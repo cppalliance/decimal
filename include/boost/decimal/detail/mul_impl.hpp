@@ -201,12 +201,8 @@ constexpr auto d128_fast_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
-    constexpr auto comp_value {impl::emulated_256_pow10[67]};
-    const auto sig_dig {res_sig >= comp_value ? 68 : 67};
-
-    constexpr auto max_dig {std::numeric_limits<typename ReturnType::significand_type>::digits10};
-    res_sig /= detail::pow10(static_cast<uint256_t>(sig_dig - max_dig));
-    res_exp += sig_dig - max_dig;
+    res_sig /= detail::pow10(static_cast<uint256_t>(30));
+    res_exp += 30;
 
     BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0,0));
     return {res_sig.low, res_exp, sign};

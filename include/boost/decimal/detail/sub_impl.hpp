@@ -158,6 +158,14 @@ constexpr auto d128_sub_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
                              T2 rhs_sig, U2 rhs_exp, bool rhs_sign,
                              bool abs_lhs_bigger) noexcept -> ReturnType
 {
+    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ > 13)
+    using sub_type = detail::int128_t;
+    #else
+    using sub_type = detail::int128;
+    #endif
+
+    using unsigned_sub_type = detail::make_unsigned_t<sub_type>;
+
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
 
     if (delta_exp > detail::precision_v<decimal128> + 1)
@@ -183,39 +191,31 @@ constexpr auto d128_sub_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
         --delta_exp;
         --exp_bigger;
     }
-    else if (delta_exp >= 2)
-    {
-        sig_bigger *= 100;
-        delta_exp -= 2;
-        exp_bigger -= 2;
-    }
-
-    while (delta_exp > 1)
-    {
-        sig_smaller /= detail::pow10(static_cast<detail::uint128>(delta_exp - 1));
-        delta_exp = 1;
-    }
-
-    if (delta_exp == 1)
-    {
-        detail::fenv_round<decimal128>(sig_smaller, smaller_sign);
-    }
-
-    auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
-    auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
-
-    // Both of the significands are less than 9'999'999'999'999'999, so we can safely
-    // cast them to signed 64-bit ints to calculate the new significand
-    detail::int128 new_sig {}; // NOLINT : Value is never used but can't leave uninitialized in constexpr function
-
-    if (rhs_sign && !lhs_sign)
-    {
-        new_sig = signed_sig_lhs + signed_sig_rhs;
-    }
     else
     {
-        new_sig = signed_sig_lhs - signed_sig_rhs;
+        if (delta_exp >= 2)
+        {
+            sig_bigger *= 100;
+            delta_exp -= 2;
+            exp_bigger -= 2;
+        }
+
+        if (delta_exp > 1)
+        {
+            sig_smaller /= pow10<std::remove_reference_t<decltype(sig_smaller)>>(delta_exp - 1);
+            delta_exp = 1;
+        }
+
+        if (delta_exp == 1)
+        {
+            detail::fenv_round<decimal128>(sig_smaller, smaller_sign);
+        }
     }
+
+    const auto signed_sig_lhs {detail::make_signed_value(static_cast<unsigned_sub_type>(lhs_sig), lhs_sign)};
+    const auto signed_sig_rhs {detail::make_signed_value(static_cast<unsigned_sub_type>(rhs_sig), rhs_sign)};
+
+    const auto new_sig {rhs_sign && !lhs_sign ? signed_sig_lhs + signed_sig_rhs : signed_sig_lhs - signed_sig_rhs};
 
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
     const auto new_sign {new_sig < 0};
