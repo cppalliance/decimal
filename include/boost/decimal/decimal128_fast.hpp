@@ -981,7 +981,7 @@ constexpr auto operator*(decimal128_fast lhs, Integer rhs) noexcept
     exp_type rhs_exp {0};
     detail::normalize<decimal128_fast>(rhs_sig, rhs_exp);
 
-    return detail::d128_fast_mul_impl<detail::decimal128_fast_components>(
+    return detail::d128_fast_mul_impl<decimal128_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs_sig, rhs_exp, (rhs < 0));
 }
@@ -1112,8 +1112,7 @@ constexpr auto operator/(decimal128_fast lhs, Integer rhs) noexcept
     detail::decimal128_fast_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.isneg()};
 
     auto rhs_sig {detail::make_positive_unsigned(rhs)};
-    decimal128_fast::biased_exponent_type rhs_exp {};
-    detail::decimal128_fast_components rhs_components {rhs_sig, rhs_exp, rhs < 0};
+    detail::decimal128_fast_components rhs_components {rhs_sig, 0, rhs < 0};
     detail::decimal128_fast_components q_components {};
 
     detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
