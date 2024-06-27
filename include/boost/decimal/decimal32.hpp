@@ -842,11 +842,6 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     }
     #endif
 
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs - abs(rhs);
-    }
-
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
     auto sig_lhs {lhs.full_significand()};
