@@ -1565,8 +1565,8 @@ constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
               << "\nrhs exp: " << rhs_exp << std::endl;
     #endif
 
-    return {detail::d128_add_impl<decimal128>(lhs_sig, lhs_exp, lhs.isneg(),
-                                              rhs_sig, rhs_exp, rhs.isneg())};
+    return detail::d128_add_impl<decimal128>(lhs_sig, lhs_exp, lhs.isneg(),
+                                              rhs_sig, rhs_exp, rhs.isneg());
 }
 
 template <typename Integer>
@@ -1663,18 +1663,18 @@ constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
 
-    const auto result {detail::d128_sub_impl<detail::decimal128_components>(
+    return {detail::d128_sub_impl<decimal128>(
             sig_lhs, exp_lhs, lhs.isneg(),
             sig_rhs, exp_rhs, rhs.isneg(),
             abs_lhs_bigger)};
-
-    return {result.sig, result.exp, result.sign};
 }
 
 template <typename Integer>
 constexpr auto operator-(decimal128 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128)
 {
+    using exp_type = decimal128::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(lhs) || isnan(lhs))
     {
@@ -1687,31 +1687,28 @@ constexpr auto operator-(decimal128 lhs, Integer rhs) noexcept
         return lhs + detail::make_positive_unsigned(rhs);
     }
 
-    const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+    auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
     detail::normalize<decimal128>(sig_lhs, exp_lhs);
-    auto lhs_components {detail::decimal128_components{sig_lhs, exp_lhs, lhs.isneg()}};
 
-    auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
-    std::int32_t exp_rhs {0};
+    exp_type exp_rhs {0};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs {detail::make_positive_unsigned(sig_rhs)};
-    auto rhs_components {detail::decimal128_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
-    const auto result {detail::d128_sub_impl<detail::decimal128_components>(
-            lhs_components.sig, lhs_components.exp, lhs_components.sign,
-            rhs_components.sig, rhs_components.exp, rhs_components.sign,
-            abs_lhs_bigger)};
-
-    return {result.sig, result.exp, result.sign};
+    return detail::d128_sub_impl<decimal128>(
+            sig_lhs, exp_lhs, lhs.isneg(),
+            sig_rhs, exp_rhs, (rhs < 0),
+            abs_lhs_bigger);
 }
 
 template <typename Integer>
 constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128)
 {
+    using exp_type = decimal128::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(rhs) || isnan(rhs))
     {
@@ -1724,25 +1721,20 @@ constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
         return lhs + (-rhs);
     }
 
-    const bool abs_lhs_bigger {detail::make_positive_unsigned(lhs) > abs(rhs)};
-
     auto sig_lhs {static_cast<detail::uint128>(detail::make_positive_unsigned(lhs))};
-    std::int32_t exp_lhs {0};
+    const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
+
+    exp_type exp_lhs {0};
     detail::normalize<decimal128>(sig_lhs, exp_lhs);
-    auto unsigned_sig_lhs {detail::make_positive_unsigned(sig_lhs)};
-    auto lhs_components {detail::decimal128_components{unsigned_sig_lhs, exp_lhs, (lhs < 0)}};
 
     auto sig_rhs {rhs.full_significand()};
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
-    auto rhs_components {detail::decimal128_components{sig_rhs, exp_rhs, rhs.isneg()}};
 
-    const auto result {detail::d128_sub_impl<detail::decimal128_components>(
-            lhs_components.sig, lhs_components.exp, lhs_components.sign,
-            rhs_components.sig, rhs_components.exp, rhs_components.sign,
-            abs_lhs_bigger)};
-
-    return {result.sig, result.exp, result.sign};
+    return detail::d128_sub_impl<decimal128>(
+            sig_lhs, exp_lhs, (lhs < 0),
+            sig_rhs, exp_rhs, rhs.isneg(),
+            abs_lhs_bigger);
 }
 
 constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
@@ -1769,9 +1761,9 @@ constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     rhs_sig = rhs_zeros.trimmed_number;
     rhs_exp += static_cast<std::int32_t>(rhs_zeros.number_of_removed_zeros);
 
-    return {detail::d128_mul_impl<decimal128>(
+    return detail::d128_mul_impl<decimal128>(
             lhs_sig, lhs_exp, lhs.isneg(),
-            rhs_sig, rhs_exp, rhs.isneg())};
+            rhs_sig, rhs_exp, rhs.isneg());
 }
 
 template <typename Integer>
@@ -1798,9 +1790,9 @@ constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
     rhs_sig = rhs_zeros.trimmed_number;
     const auto rhs_exp = static_cast<exp_type>(rhs_zeros.number_of_removed_zeros);
 
-    return {detail::d128_mul_impl<decimal128>(
+    return detail::d128_mul_impl<decimal128>(
             lhs_sig, lhs_exp, lhs.isneg(),
-            rhs_sig, rhs_exp, (rhs < 0))};
+            rhs_sig, rhs_exp, (rhs < 0));
 
 }
 
