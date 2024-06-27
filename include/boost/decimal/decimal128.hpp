@@ -1858,9 +1858,7 @@ constexpr auto operator/(decimal128 lhs, Integer rhs) noexcept
 
     detail::decimal128_components lhs_components {lhs_sig, lhs_exp, lhs.isneg()};
 
-    auto rhs_sig {detail::make_positive_unsigned(rhs)};
-    std::int32_t rhs_exp {};
-    detail::decimal128_components rhs_components {rhs_sig, rhs_exp, rhs < 0};
+    detail::decimal128_components rhs_components {detail::make_positive_unsigned(rhs), 0, rhs < 0};
     detail::decimal128_components q_components {};
 
     detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
