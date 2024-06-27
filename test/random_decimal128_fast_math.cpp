@@ -241,7 +241,7 @@ void random_multiplication(T lower, T upper)
 
         if (val1 * val2 == 0)
         {
-            continue;
+            continue; // LCOV_EXCL_LINE
         }
 
         if (!BOOST_TEST_EQ(res, res_int))
