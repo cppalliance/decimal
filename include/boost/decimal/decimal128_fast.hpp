@@ -881,19 +881,19 @@ constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
 
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
-    const auto result {detail::d128_sub_impl<detail::decimal128_fast_components>(
+    const auto result {detail::d128_sub_impl<decimal128_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             abs_lhs_bigger
     )};
-
-    return {result.sig, result.exp, result.sign};
 }
 
 template <typename Integer>
 constexpr auto operator-(decimal128_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast)
 {
+    using exp_type = decimal128_fast::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(lhs) || isnan(lhs))
     {
@@ -906,19 +906,15 @@ constexpr auto operator-(decimal128_fast lhs, Integer rhs) noexcept
         return lhs + detail::make_positive_unsigned(rhs);
     }
 
-    const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
-
-    auto lhs_components {detail::decimal128_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
-
     auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
-    decimal128_fast::biased_exponent_type exp_rhs {0};
+    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
+
+    exp_type exp_rhs {0};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs {detail::make_positive_unsigned(sig_rhs)};
-    auto rhs_components {detail::decimal128_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
     const auto result {detail::d128_sub_impl<detail::decimal128_fast_components>(
-            lhs_components.sig, lhs_components.exp, lhs_components.sign,
-            rhs_components.sig, rhs_components.exp, rhs_components.sign,
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            sig_rhs, exp_rhs, (rhs < 0),
             abs_lhs_bigger)};
 
     return {result.sig, result.exp, result.sign};
@@ -928,6 +924,8 @@ template <typename Integer>
 constexpr auto operator-(Integer lhs, decimal128_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128_fast)
 {
+    using exp_type = decimal128_fast::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(rhs) || isnan(rhs))
     {
@@ -940,22 +938,16 @@ constexpr auto operator-(Integer lhs, decimal128_fast rhs) noexcept
         return lhs + (-rhs);
     }
 
-    const bool abs_lhs_bigger {detail::make_positive_unsigned(lhs) > abs(rhs)};
-
     auto sig_lhs {static_cast<detail::uint128>(detail::make_positive_unsigned(lhs))};
-    decimal128_fast::biased_exponent_type exp_lhs {0};
+    const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
+
+    exp_type exp_lhs {0};
     detail::normalize<decimal128>(sig_lhs, exp_lhs);
-    auto unsigned_sig_lhs {detail::make_positive_unsigned(sig_lhs)};
-    auto lhs_components {detail::decimal128_fast_components{unsigned_sig_lhs, exp_lhs, (lhs < 0)}};
 
-    auto rhs_components {detail::decimal128_fast_components{rhs.significand_, rhs.biased_exponent(), rhs.isneg()}};
-
-    const auto result {detail::d128_sub_impl<detail::decimal128_fast_components>(
-            lhs_components.sig, lhs_components.exp, lhs_components.sign,
-            rhs_components.sig, rhs_components.exp, rhs_components.sign,
+    return {detail::d128_sub_impl<decimal128_fast>(
+            sig_lhs, exp_lhs, (lhs < 0),
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             abs_lhs_bigger)};
-
-    return {result.sig, result.exp, result.sign};
 }
 
 constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
