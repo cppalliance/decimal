@@ -22,9 +22,11 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, boo
                                                        T rhs_sig, U rhs_exp, bool rhs_sign,
                                                        bool abs_lhs_bigger) noexcept -> ReturnType
 {
+    using add_type = std::int_fast32_t;
+
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-    auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
-    auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
+    auto signed_sig_lhs {static_cast<add_type>(detail::make_signed_value(lhs_sig, lhs_sign))};
+    auto signed_sig_rhs {static_cast<add_type>(detail::make_signed_value(rhs_sig, rhs_sign))};
 
     #ifdef BOOST_DECIMAL_DEBUG_ADD
     std::cerr << "Starting sig lhs: " << lhs_sig
