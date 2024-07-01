@@ -764,8 +764,8 @@ constexpr auto operator+(uint128 lhs, uint128 rhs) noexcept -> uint128
         unsigned long long low {};
         unsigned long long high {};
 
-        const auto carry {_addcarryx_u64(0, lhs.low, rhs.low, &low)};
-        _addcarryx_u64(carry, lhs.high, rhs.high, &high);
+        const auto carry {BOOST_DECIMAL_ADD_CARRY(0, lhs.low, rhs.low, &low)};
+        BOOST_DECIMAL_ADD_CARRY(carry, lhs.high, rhs.high, &high);
 
         return uint128{high, low};
     }

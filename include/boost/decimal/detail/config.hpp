@@ -90,6 +90,11 @@
 #    include <x86intrin.h>
 #  endif
 #  define BOOST_DECIMAL_HAS_X64_INTRINSICS
+#  ifdef __ADX__
+#    define BOOST_DECIMAL_ADD_CARRY _addcarryx_u64
+#  else
+#    define BOOST_DECIMAL_ADD_CARRY _addcarry_u64
+#  endif
 #elif defined(__ARM_NEON__)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
 #    include <arm_neon.h>
