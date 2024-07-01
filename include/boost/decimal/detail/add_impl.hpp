@@ -340,6 +340,85 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     return {new_sig, new_exp, sign};
 }
 
+template <typename ReturnType, typename T, typename U>
+constexpr auto d128_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                             T rhs_sig, U rhs_exp, bool rhs_sign,
+                             bool abs_lhs_bigger) noexcept -> ReturnType
+{
+    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
+
+    #ifdef BOOST_DECIMAL_DEBUG_ADD
+    std::cerr << "Starting sig lhs: " << lhs_sig
+              << "\nStarting exp lhs: " << lhs_exp
+              << "\nStarting sig rhs: " << rhs_sig
+              << "\nStarting exp rhs: " << rhs_exp << std::endl;
+    #endif
+
+    if (delta_exp > detail::precision_v<decimal128> + 1)
+    {
+        // If the difference in exponents is more than the digits of accuracy
+        // we return the larger of the two
+        //
+        // e.g. 1e20 + 1e-20 = 1e20
+
+        return abs_lhs_bigger ? ReturnType{lhs_sig, lhs_exp, lhs_sign} :
+                                ReturnType{rhs_sig, rhs_exp, rhs_sign};
+    }
+
+    // The two numbers can be added together without special handling
+    //
+    // If we can add to the lhs sig rather than dividing we can save some precision
+    // 32-bit signed int can have 9 digits and our normalized significand has 7
+
+    auto& sig_bigger {abs_lhs_bigger ? lhs_sig : rhs_sig};
+    auto& exp_bigger {abs_lhs_bigger ? lhs_exp : rhs_exp};
+    auto& sig_smaller {abs_lhs_bigger ? rhs_sig : lhs_sig};
+    auto& sign_smaller {abs_lhs_bigger ? rhs_sign : lhs_sign};
+    auto& sign_bigger {abs_lhs_bigger ? lhs_sign : rhs_sign};
+
+    if (delta_exp <= 2)
+    {
+        sig_bigger *= pow10(static_cast<uint128>(delta_exp));
+        exp_bigger -= delta_exp;
+        delta_exp = 0;
+    }
+    else
+    {
+        sig_bigger *= 100;
+        delta_exp -= 2;
+        exp_bigger -= 2;
+
+        if (delta_exp > 1)
+        {
+            sig_smaller /= pow10(static_cast<uint128>(delta_exp - 1));
+            delta_exp = 1;
+        }
+
+        if (delta_exp == 1)
+        {
+            detail::fenv_round<decimal128>(sig_smaller, sign_smaller);
+        }
+    }
+
+    // Cast the results to signed types so that we can apply a sign at the end if necessary
+    // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
+    auto signed_sig_lhs {detail::make_signed_value(sig_bigger, sign_bigger)};
+    auto signed_sig_rhs {detail::make_signed_value(sig_smaller, sign_smaller)};
+
+    const auto new_sig {signed_sig_lhs + signed_sig_rhs};
+    const auto new_exp {exp_bigger};
+    const auto new_sign {new_sig < 0};
+    const auto res_sig {detail::make_positive_unsigned(new_sig)};
+
+    #ifdef BOOST_DECIMAL_DEBUG_ADD
+    std::cerr << "Final sig lhs: " << lhs_sig
+              << "\nFinal sig rhs: " << rhs_sig
+              << "\nResult sig: " << new_sig << std::endl;
+    #endif
+
+    return {res_sig, new_exp, new_sign};
+}
+
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #endif
