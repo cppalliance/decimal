@@ -1359,7 +1359,7 @@ constexpr auto operator+(const int128& lhs, const int128& rhs) noexcept -> int12
     }
 }
 
-constexpr auto operator-(const int128& lhs, int128& rhs) noexcept -> int128
+constexpr auto operator-(const int128& lhs, const int128& rhs) noexcept -> int128
 {
     const auto new_low {lhs.low - rhs.low};
     const auto new_high {lhs.high - rhs.high - static_cast<std::int64_t>(lhs.low < rhs.low)};
