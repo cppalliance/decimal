@@ -154,11 +154,11 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T lhs_sig, U lhs_exp, bool lh
             rhs_sig /= pow10(static_cast<T>(delta_exp - 1));
             delta_exp = 1;
         }
-    }
 
-    if (delta_exp == 1)
-    {
-        detail::fenv_round(rhs_sig, rhs_sign);
+        if (delta_exp == 1)
+        {
+            detail::fenv_round(rhs_sig, rhs_sign);
+        }
     }
 
     // Cast the results to signed types so that we can apply a sign at the end if necessary
