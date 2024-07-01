@@ -1335,7 +1335,7 @@ constexpr auto operator+(const int128& lhs, const int128& rhs) noexcept -> int12
         unsigned long long high {};
 
         const auto carry {BOOST_DECIMAL_ADD_CARRY(0, lhs.low, rhs.low, &low)};
-        BOOST_DECIMAL_ADD_CARRY(carry, lhs.high, rhs.high, &high);
+        BOOST_DECIMAL_ADD_CARRY(carry, static_cast<std::uint64_t>(lhs.high), static_cast<std::uint64_t>(rhs.high), &high);
 
         return {static_cast<std::int64_t>(high), low};
     }
@@ -1365,7 +1365,6 @@ constexpr auto operator-(const int128& lhs, const int128& rhs) noexcept -> int12
     const auto new_high {lhs.high - rhs.high - static_cast<std::int64_t>(lhs.low < rhs.low)};
     return int128{new_high, new_low};
 }
-
 
 template <>
 constexpr int countl_zero<uint128>(uint128 x) noexcept
