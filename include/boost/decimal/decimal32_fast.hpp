@@ -768,28 +768,11 @@ constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
         return res;
     }
     #endif
-
-    bool lhs_bigger {lhs > rhs};
-    if (lhs.isneg() && rhs.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-
-    // Ensure that lhs is always the larger for ease of implementation
-    if (!lhs_bigger)
-    {
-        detail::swap(lhs, rhs);
-    }
-
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs - abs(rhs);
-    }
-
-    return detail::add_impl<decimal32_fast>(
+    
+    return detail::d32_add_impl<decimal32_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_
-            );
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
+            (abs(lhs) > abs(rhs)));
 }
 
 template <typename Integer>
@@ -806,39 +789,16 @@ constexpr auto operator+(decimal32_fast lhs, Integer rhs) noexcept
     }
     #endif
 
-    bool lhs_bigger {lhs > rhs};
-    if (lhs.isneg() && (rhs < 0))
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
-    bool abs_lhs_bigger {abs(lhs) > sig_rhs};
-
-    auto lhs_components {detail::decimal32_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
+    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     exp_type exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs {static_cast<detail::decimal32_fast_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
-    auto rhs_components {detail::decimal32_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+    const auto final_sig_rhs {static_cast<detail::decimal32_fast_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
 
-    if (!lhs_bigger)
-    {
-        detail::swap(lhs_components, rhs_components);
-        abs_lhs_bigger = !abs_lhs_bigger;
-    }
-
-    if (!lhs_components.sign && rhs_components.sign)
-    {
-        return detail::sub_impl<decimal32_fast>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                                rhs_components.sig, rhs_components.exp, rhs_components.sign,
+    return detail::d32_add_impl<decimal32_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                                final_sig_rhs, exp_rhs, (rhs < 0),
                                                 abs_lhs_bigger);
-    }
-    else
-    {
-        return detail::add_impl<decimal32_fast>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                                rhs_components.sig, rhs_components.exp, rhs_components.sign);
-    }
 }
 
 template <typename Integer>

@@ -292,4 +292,8 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_FORCE_INLINE inline
 #endif
 
+#ifdef __FAST_MATH__
+#  define BOOST_DECIMAL_FAST_MATH
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
