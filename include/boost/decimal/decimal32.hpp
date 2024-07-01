@@ -944,11 +944,6 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     }
     #endif
 
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
-
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
     auto sig_lhs {lhs.full_significand()};
@@ -959,9 +954,9 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    return detail::sub_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
-                                       sig_rhs, exp_rhs, rhs.isneg(),
-                                       abs_lhs_bigger);
+    return detail::new_sub_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
+                                           sig_rhs, exp_rhs, rhs.isneg(),
+                                           abs_lhs_bigger);
 }
 
 template <typename Integer>
