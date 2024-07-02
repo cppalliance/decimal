@@ -1257,11 +1257,6 @@ constexpr auto operator-(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     }
     #endif
 
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
-
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
     auto sig_lhs {lhs.full_significand()};
@@ -1272,7 +1267,7 @@ constexpr auto operator-(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
 
-    return detail::d64_sub_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
+    return detail::new_d64_sub_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
                                            sig_rhs, exp_rhs, rhs.isneg(),
                                            abs_lhs_bigger);
 }
@@ -1291,11 +1286,6 @@ constexpr auto operator-(decimal64 lhs, Integer rhs) noexcept
     }
     #endif
 
-    if (!lhs.isneg() && (rhs < 0))
-    {
-        return lhs + detail::make_positive_unsigned(rhs);
-    }
-
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
     const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
@@ -1307,7 +1297,7 @@ constexpr auto operator-(decimal64 lhs, Integer rhs) noexcept
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
     const auto final_sig_rhs {static_cast<decimal64::significand_type>(sig_rhs)};
 
-    return detail::d64_sub_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
+    return detail::new_d64_sub_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
                                            final_sig_rhs, exp_rhs, (rhs < 0),
                                            abs_lhs_bigger);
 }
@@ -1326,11 +1316,6 @@ constexpr auto operator-(Integer lhs, decimal64 rhs) noexcept
     }
     #endif
 
-    if (lhs >= 0 && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
-
     auto sig_lhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(lhs))};
     const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
 
@@ -1342,7 +1327,7 @@ constexpr auto operator-(Integer lhs, decimal64 rhs) noexcept
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
 
-    return detail::d64_sub_impl<decimal64>(final_sig_lhs, exp_lhs, (lhs < 0),
+    return detail::new_d64_sub_impl<decimal64>(final_sig_lhs, exp_lhs, (lhs < 0),
                                            sig_rhs, exp_rhs, rhs.isneg(),
                                            abs_lhs_bigger);
 }
