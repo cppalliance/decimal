@@ -826,7 +826,7 @@ constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> d
     }
     #endif
 
-    return detail::new_d128_sub_impl<decimal128_fast>(
+    return detail::d128_sub_impl<decimal128_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             abs(lhs) > abs(rhs));
@@ -851,7 +851,7 @@ constexpr auto operator-(decimal128_fast lhs, Integer rhs) noexcept
     exp_type exp_rhs {0};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
 
-    return detail::new_d128_sub_impl<decimal128_fast>(
+    return detail::d128_sub_impl<decimal128_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             sig_rhs, exp_rhs, (rhs < 0),
             abs_lhs_bigger);
@@ -876,7 +876,7 @@ constexpr auto operator-(Integer lhs, decimal128_fast rhs) noexcept
     exp_type exp_lhs {0};
     detail::normalize<decimal128>(sig_lhs, exp_lhs);
 
-    return detail::new_d128_sub_impl<decimal128_fast>(
+    return detail::d128_sub_impl<decimal128_fast>(
             sig_lhs, exp_lhs, (lhs < 0),
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             abs_lhs_bigger);

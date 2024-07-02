@@ -1602,7 +1602,7 @@ constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
 
-    return detail::new_d128_sub_impl<decimal128>(
+    return detail::d128_sub_impl<decimal128>(
             sig_lhs, exp_lhs, lhs.isneg(),
             sig_rhs, exp_rhs, rhs.isneg(),
             abs(lhs) > abs(rhs));
@@ -1631,7 +1631,7 @@ constexpr auto operator-(decimal128 lhs, Integer rhs) noexcept
     exp_type exp_rhs {0};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
 
-    return detail::new_d128_sub_impl<decimal128>(
+    return detail::d128_sub_impl<decimal128>(
             sig_lhs, exp_lhs, lhs.isneg(),
             sig_rhs, exp_rhs, (rhs < 0),
             abs_lhs_bigger);
@@ -1660,7 +1660,7 @@ constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
 
-    return detail::new_d128_sub_impl<decimal128>(
+    return detail::d128_sub_impl<decimal128>(
             sig_lhs, exp_lhs, (lhs < 0),
             sig_rhs, exp_rhs, rhs.isneg(),
             abs_lhs_bigger);
