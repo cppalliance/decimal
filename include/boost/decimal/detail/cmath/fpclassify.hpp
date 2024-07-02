@@ -25,7 +25,13 @@ constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexc
 {
     constexpr T zero {0, 0};
 
-    if (isinf(rhs))
+    // Mark the normal branch as likely because even if we have a branch miss the non-finite code paths
+    // do very little whereas the FP_NORMAL case always proceeds further calculations
+    if (BOOST_DECIMAL_LIKELY(isnormal(rhs)))
+    {
+        return FP_NORMAL;
+    }
+    else if (isinf(rhs))
     {
         return FP_INFINITE;
     }
@@ -37,14 +43,8 @@ constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexc
     {
         return FP_ZERO;
     }
-    else if (!isnormal(rhs))
-    {
-        return FP_SUBNORMAL;
-    }
-    else
-    {
-        return FP_NORMAL;
-    }
+
+    return FP_SUBNORMAL;
 }
 
 } // namespace decimal
