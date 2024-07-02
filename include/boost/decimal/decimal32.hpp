@@ -840,12 +840,9 @@ constexpr auto operator-(decimal32 rhs) noexcept-> decimal32
 constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    constexpr decimal32 zero {0, 0};
-
-    const auto res {detail::check_non_finite(lhs, rhs)};
-    if (res != zero)
+    if (!isfinite(lhs) || !isfinite(rhs))
     {
-        return res;
+        return detail::check_non_finite(lhs, rhs);
     }
     #endif
 
@@ -872,7 +869,7 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
     using exp_type = decimal32::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isinf(lhs))
+    if (!isfinite(lhs))
     {
         return lhs;
     }
@@ -942,12 +939,9 @@ constexpr auto decimal32::operator+=(Decimal rhs) noexcept
 constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    constexpr decimal32 zero {0, 0};
-
-    const auto res {detail::check_non_finite(lhs, rhs)};
-    if (res != zero)
+    if (!isfinite(lhs) || !isfinite(rhs))
     {
-        return res;
+        return detail::check_non_finite(lhs, rhs);
     }
     #endif
 
@@ -974,7 +968,7 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
     using exp_type = decimal32::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isinf(lhs) || isnan(lhs))
+    if (!isfinite(lhs))
     {
         return lhs;
     }
@@ -1004,7 +998,7 @@ constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
     using exp_type = decimal32::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isinf(rhs) || isnan(rhs))
+    if (!isfinite(rhs))
     {
         return rhs;
     }
@@ -1603,12 +1597,9 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bits(decimal32 rhs) noexcept -> std::uint3
 constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    constexpr decimal32 zero {0, 0};
-
-    const auto res {detail::check_non_finite(lhs, rhs)};
-    if (res != zero)
+    if (!isfinite(lhs) || !isfinite(rhs))
     {
-        return res;
+        return detail::check_non_finite(lhs, rhs);
     }
     #endif
 
@@ -1632,7 +1623,7 @@ constexpr auto operator*(decimal32 lhs, Integer rhs) noexcept
     using exp_type = decimal32::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isinf(lhs))
+    if (!isfinite(lhs))
     {
         return lhs;
     }
@@ -2133,7 +2124,7 @@ constexpr auto scalblnd32(decimal32 num, long exp) noexcept -> decimal32
     #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal32 zero {0, 0};
 
-    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    if (num == zero || exp == 0 || !isfinite(num))
     {
         return num;
     }
