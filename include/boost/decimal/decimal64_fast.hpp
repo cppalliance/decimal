@@ -939,11 +939,11 @@ constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::new_d64_sub_impl<decimal64_fast>(
+    return detail::d64_sub_impl<decimal64_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             abs(lhs) > abs(rhs)
-            );
+    );
 }
 
 template <typename Integer>
@@ -967,9 +967,9 @@ constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
     const auto final_sig_rhs {static_cast<decimal64_fast::significand_type>(sig_rhs)};
 
-    return detail::new_d64_sub_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-                                                 final_sig_rhs, exp_rhs, (rhs < 0),
-                                                 abs_lhs_bigger);
+    return detail::d64_sub_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                                final_sig_rhs, exp_rhs, (rhs < 0),
+                                                abs_lhs_bigger);
 }
 
 template <typename Integer>
@@ -993,9 +993,9 @@ constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
     detail::normalize<decimal64>(sig_lhs, exp_lhs);
     const auto final_sig_lhs {static_cast<decimal64_fast::significand_type>(sig_lhs)};
 
-    return detail::new_d64_sub_impl<decimal64_fast>(final_sig_lhs, exp_lhs, (lhs < 0),
-                                                 rhs.significand_, rhs.biased_exponent(), rhs.sign_,
-                                                 abs_lhs_bigger);
+    return detail::d64_sub_impl<decimal64_fast>(final_sig_lhs, exp_lhs, (lhs < 0),
+                                                rhs.significand_, rhs.biased_exponent(), rhs.sign_,
+                                                abs_lhs_bigger);
 }
 
 constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
