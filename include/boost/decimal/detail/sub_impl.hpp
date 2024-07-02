@@ -128,7 +128,7 @@ constexpr auto d64_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
         if (delta_exp > 1)
         {
-            sig_smaller /= pow10<std::remove_reference_t<decltype(sig_smaller)>>(delta_exp - 1);
+            sig_smaller /= pow10<sub_type>(delta_exp - 1);
             delta_exp = 1;
         }
 
@@ -140,8 +140,7 @@ constexpr auto d64_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
     // Both of the significands are less than 9'999'999'999'999'999, so we can safely
     // cast them to signed 64-bit ints to calculate the new significand
-    const sub_type new_sig {rhs_sign && !lhs_sign ? signed_sig_lhs + signed_sig_rhs :
-                                                    signed_sig_lhs - signed_sig_rhs};
+    const auto new_sig {signed_sig_lhs - signed_sig_rhs};
 
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
     const auto new_sign {new_sig < 0};
@@ -150,10 +149,9 @@ constexpr auto d64_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
     return {res_sig, new_exp, new_sign};
 }
 
-template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
-                               BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
-constexpr auto d128_sub_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                             T2 rhs_sig, U2 rhs_exp, bool rhs_sign,
+template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
+constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                             T rhs_sig, U rhs_exp, bool rhs_sign,
                              bool abs_lhs_bigger) noexcept -> ReturnType
 {
     #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ > 13)
@@ -172,8 +170,8 @@ constexpr auto d128_sub_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
         // we return the larger of the two
         //
         // e.g. 1e20 - 1e-20 = 1e20
-        return abs_lhs_bigger ? ReturnType{detail::shrink_significand<detail::uint128>(lhs_sig, lhs_exp), lhs_exp, false} :
-                                ReturnType{detail::shrink_significand<detail::uint128>(rhs_sig, rhs_exp), rhs_exp, true};
+        return abs_lhs_bigger ? ReturnType{lhs_sig, lhs_exp, false} :
+                                ReturnType{rhs_sig, rhs_exp, true};
     }
 
     // The two numbers can be subtracted together without special handling
@@ -213,7 +211,7 @@ constexpr auto d128_sub_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     const auto signed_sig_lhs {detail::make_signed_value(static_cast<unsigned_sub_type>(lhs_sig), lhs_sign)};
     const auto signed_sig_rhs {detail::make_signed_value(static_cast<unsigned_sub_type>(rhs_sig), rhs_sign)};
 
-    const auto new_sig {rhs_sign && !lhs_sign ? signed_sig_lhs + signed_sig_rhs : signed_sig_lhs - signed_sig_rhs};
+    const auto new_sig {signed_sig_lhs - signed_sig_rhs};
 
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
     const auto new_sign {new_sig < 0};

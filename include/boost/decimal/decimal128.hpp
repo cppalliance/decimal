@@ -1594,13 +1594,6 @@ constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     }
     #endif
 
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
-
-    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
-
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
     detail::normalize<decimal128>(sig_lhs, exp_lhs);
@@ -1609,10 +1602,10 @@ constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
 
-    return {detail::d128_sub_impl<decimal128>(
+    return detail::d128_sub_impl<decimal128>(
             sig_lhs, exp_lhs, lhs.isneg(),
             sig_rhs, exp_rhs, rhs.isneg(),
-            abs_lhs_bigger)};
+            abs(lhs) > abs(rhs));
 }
 
 template <typename Integer>
@@ -1627,11 +1620,6 @@ constexpr auto operator-(decimal128 lhs, Integer rhs) noexcept
         return lhs;
     }
     #endif
-
-    if (!lhs.isneg() && (rhs < 0))
-    {
-        return lhs + detail::make_positive_unsigned(rhs);
-    }
 
     auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
     const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
@@ -1661,11 +1649,6 @@ constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
         return rhs;
     }
     #endif
-
-    if (lhs >= 0 && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
 
     auto sig_lhs {static_cast<detail::uint128>(detail::make_positive_unsigned(lhs))};
     const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
