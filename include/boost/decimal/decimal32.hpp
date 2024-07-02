@@ -944,11 +944,6 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     }
     #endif
 
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
-
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
     auto sig_lhs {lhs.full_significand()};
@@ -959,9 +954,9 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    return detail::sub_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
-                                       sig_rhs, exp_rhs, rhs.isneg(),
-                                       abs_lhs_bigger);
+    return detail::d32_sub_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
+                                           sig_rhs, exp_rhs, rhs.isneg(),
+                                           abs_lhs_bigger);
 }
 
 template <typename Integer>
@@ -978,11 +973,6 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
     }
     #endif
 
-    if (!lhs.isneg() && (rhs < 0))
-    {
-        return lhs + detail::make_positive_unsigned(rhs);
-    }
-
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
     const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
@@ -994,9 +984,9 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
     detail::normalize(sig_rhs, exp_rhs);
     auto final_sig_rhs {static_cast<decimal32::significand_type>(sig_rhs)};
 
-    return detail::sub_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
-                                       final_sig_rhs, exp_rhs, (rhs < 0),
-                                       abs_lhs_bigger);
+    return detail::d32_sub_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
+                                           final_sig_rhs, exp_rhs, (rhs < 0),
+                                           abs_lhs_bigger);
 }
 
 template <typename Integer>
@@ -1012,12 +1002,7 @@ constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
         return rhs;
     }
     #endif
-
-    if (lhs >= 0 && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
-
+    
     auto sig_lhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(lhs))};
     const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
 
@@ -1029,9 +1014,9 @@ constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    return detail::sub_impl<decimal32>(final_sig_lhs, exp_lhs, (lhs < 0),
-                                       sig_rhs, exp_rhs, rhs.isneg(),
-                                       abs_lhs_bigger);
+    return detail::d32_sub_impl<decimal32>(final_sig_lhs, exp_lhs, (lhs < 0),
+                                           sig_rhs, exp_rhs, rhs.isneg(),
+                                           abs_lhs_bigger);
 }
 
 constexpr auto decimal32::operator--() noexcept -> decimal32&

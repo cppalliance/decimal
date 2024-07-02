@@ -18,15 +18,15 @@ namespace decimal {
 namespace detail {
 
 template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                   T rhs_sig, U rhs_exp, bool rhs_sign,
-                                                   bool abs_lhs_bigger) noexcept -> ReturnType
+BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                       T rhs_sig, U rhs_exp, bool rhs_sign,
+                                                       bool abs_lhs_bigger) noexcept -> ReturnType
 {
     using sub_type = std::int_fast32_t;
 
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-    auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
-    auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
+    auto signed_sig_lhs {detail::make_signed_value(static_cast<sub_type>(lhs_sig), lhs_sign)};
+    auto signed_sig_rhs {detail::make_signed_value(static_cast<sub_type>(rhs_sig), rhs_sign)};
 
     if (delta_exp > detail::precision + 1)
     {
@@ -74,9 +74,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto sub_impl(T lhs_sig, U lhs_exp, bool lh
 
     // Both of the significands are less than 9'999'999, so we can safely
     // cast them to signed 32-bit ints to calculate the new significand
-    const auto new_sig = (rhs_sign && !lhs_sign) ?
-            static_cast<sub_type>(signed_sig_lhs) + static_cast<sub_type>(signed_sig_rhs) :
-            static_cast<sub_type>(signed_sig_lhs) - static_cast<sub_type>(signed_sig_rhs);
+    const auto new_sig {signed_sig_lhs - signed_sig_rhs};
 
     const auto new_exp {abs_lhs_bigger ? lhs_exp : rhs_exp};
     const auto new_sign {new_sig < 0};
