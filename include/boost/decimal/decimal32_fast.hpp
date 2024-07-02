@@ -820,11 +820,11 @@ constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::new_sub_impl<decimal32_fast>(
+    return detail::d32_sub_impl<decimal32_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             abs(lhs) > abs(rhs)
-            );
+    );
 }
 
 template <typename Integer>
@@ -849,7 +849,7 @@ constexpr auto operator-(decimal32_fast lhs, Integer rhs) noexcept
     detail::normalize(sig_rhs, exp_rhs);
     auto final_sig_rhs {static_cast<decimal32_fast::significand_type>(detail::make_positive_unsigned(sig_rhs))};
 
-    return detail::new_sub_impl<decimal32_fast>(
+    return detail::d32_sub_impl<decimal32_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             final_sig_rhs, exp_rhs, (rhs < 0),
             abs_lhs_bigger);
@@ -876,11 +876,11 @@ constexpr auto operator-(Integer lhs, decimal32_fast rhs) noexcept
     detail::normalize(sig_lhs, exp_lhs);
     auto final_sig_lhs {static_cast<decimal32_fast::significand_type>(detail::make_positive_unsigned(sig_lhs))};
 
-    return detail::new_sub_impl<decimal32_fast>(
+    return detail::d32_sub_impl<decimal32_fast>(
             final_sig_lhs, exp_lhs, (lhs < 0),
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             abs_lhs_bigger
-            );
+    );
 }
 
 constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast

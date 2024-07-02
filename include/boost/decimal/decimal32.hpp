@@ -954,7 +954,7 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    return detail::new_sub_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
+    return detail::d32_sub_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
                                            sig_rhs, exp_rhs, rhs.isneg(),
                                            abs_lhs_bigger);
 }
@@ -984,7 +984,7 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
     detail::normalize(sig_rhs, exp_rhs);
     auto final_sig_rhs {static_cast<decimal32::significand_type>(sig_rhs)};
 
-    return detail::new_sub_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
+    return detail::d32_sub_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
                                            final_sig_rhs, exp_rhs, (rhs < 0),
                                            abs_lhs_bigger);
 }
@@ -1014,7 +1014,7 @@ constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize(sig_rhs, exp_rhs);
 
-    return detail::new_sub_impl<decimal32>(final_sig_lhs, exp_lhs, (lhs < 0),
+    return detail::d32_sub_impl<decimal32>(final_sig_lhs, exp_lhs, (lhs < 0),
                                            sig_rhs, exp_rhs, rhs.isneg(),
                                            abs_lhs_bigger);
 }
