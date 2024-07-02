@@ -55,7 +55,8 @@
 
 #endif // BOOST_DECIMAL_BUILD_MODULE
 
-namespace boost { namespace decimal {
+namespace boost {
+namespace decimal {
 
 namespace detail {
 
@@ -314,6 +315,7 @@ public:
     friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
     friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
+    friend constexpr auto isfinite    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool;
 
     // 3.2.7 unary arithmetic operators:
     friend constexpr auto operator+(decimal32 rhs) noexcept -> decimal32;
@@ -800,6 +802,11 @@ constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 r
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
     return ((rhs.bits_ & detail::d32_nan_mask) == detail::d32_inf_mask);
+}
+
+constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
+{
+    return ((rhs.bits_ & detail::d32_inf_mask) != detail::d32_inf_mask);
 }
 
 constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
