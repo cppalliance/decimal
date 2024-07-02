@@ -1533,23 +1533,6 @@ constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     }
     #endif
 
-    bool lhs_bigger {lhs > rhs};
-    if (lhs.isneg() && rhs.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-
-    // Ensure that lhs is always the larger for ease of impl
-    if (!lhs_bigger)
-    {
-        detail::swap(lhs, rhs);
-    }
-
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs - abs(rhs);
-    }
-    
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
     detail::normalize<decimal128>(lhs_sig, lhs_exp);
@@ -1558,15 +1541,9 @@ constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal128>(rhs_sig, rhs_exp);
 
-    #ifdef BOOST_DECIMAL_DEBUG_ADD_128
-    std::cerr << "\nlhs sig: " << static_cast<detail::uint128_t>(lhs_sig)
-              << "\nlhs exp: " << lhs_exp
-              << "\nrhs sig: " << static_cast<detail::uint128_t>(rhs_sig)
-              << "\nrhs exp: " << rhs_exp << std::endl;
-    #endif
-
     return detail::d128_add_impl<decimal128>(lhs_sig, lhs_exp, lhs.isneg(),
-                                              rhs_sig, rhs_exp, rhs.isneg());
+                                             rhs_sig, rhs_exp, rhs.isneg(),
+                                             abs(lhs) > abs(rhs));
 }
 
 template <typename Integer>
@@ -1582,50 +1559,19 @@ constexpr auto operator+(decimal128 lhs, Integer rhs) noexcept
     }
     #endif
 
-    bool lhs_bigger {lhs > rhs};
-    if (lhs.isneg() && (rhs < 0))
-    {
-        lhs_bigger = !lhs_bigger;
-    }
     auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
     bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
     detail::normalize<decimal128>(sig_lhs, exp_lhs);
-    auto lhs_components {detail::decimal128_components{sig_lhs, exp_lhs, lhs.isneg()}};
 
     exp_type exp_rhs {0};
     detail::normalize<decimal128>(sig_rhs, exp_rhs);
-    auto rhs_components {detail::decimal128_components{sig_rhs, exp_rhs, (rhs < 0)}};
 
-    if (!lhs_bigger)
-    {
-        detail::swap(lhs_components, rhs_components);
-        lhs_bigger = !lhs_bigger;
-        abs_lhs_bigger = !abs_lhs_bigger;
-    }
-
-    #ifdef BOOST_DECIMAL_DEBUG_ADD
-    std::cerr << "Lhs sig: " << lhs_components.sig
-              << "\nLhs exp: " << lhs_components.exp
-              << "\nRhs sig: " << rhs_components.sig
-              << "\nRhs exp: " << rhs_components.exp << std::endl;
-    #endif
-
-    if (!lhs_components.sign && rhs_components.sign)
-    {
-        return detail::d128_sub_impl<decimal128>(
-                lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                abs_lhs_bigger);
-    }
-    else
-    {
-        return detail::d128_add_impl<decimal128>(
-                lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                rhs_components.sig, rhs_components.exp, rhs_components.sign);
-    }
+    return detail::d128_add_impl<decimal128>(sig_lhs, exp_lhs, lhs.isneg(),
+                                             sig_rhs, exp_rhs, (rhs < 0),
+                                             abs_lhs_bigger);
 }
 
 template <typename Integer>
