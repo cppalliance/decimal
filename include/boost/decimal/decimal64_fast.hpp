@@ -939,17 +939,10 @@ constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
-
-    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
-
-    return detail::d64_sub_impl<decimal64_fast>(
+    return detail::new_d64_sub_impl<decimal64_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
-            abs_lhs_bigger
+            abs(lhs) > abs(rhs)
             );
 }
 
@@ -967,11 +960,6 @@ constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
     }
     #endif
 
-    if (!lhs.isneg() && (rhs < 0))
-    {
-        return lhs + detail::make_positive_unsigned(rhs);
-    }
-
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
     const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
 
@@ -979,7 +967,7 @@ constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
     const auto final_sig_rhs {static_cast<decimal64_fast::significand_type>(sig_rhs)};
 
-    return detail::d64_sub_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+    return detail::new_d64_sub_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
                                                  final_sig_rhs, exp_rhs, (rhs < 0),
                                                  abs_lhs_bigger);
 }
@@ -998,11 +986,6 @@ constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
     }
     #endif
 
-    if (lhs >= 0 && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
-
     auto sig_lhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(lhs))};
     const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
 
@@ -1010,7 +993,7 @@ constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
     detail::normalize<decimal64>(sig_lhs, exp_lhs);
     const auto final_sig_lhs {static_cast<decimal64_fast::significand_type>(sig_lhs)};
 
-    return detail::d64_sub_impl<decimal64_fast>(final_sig_lhs, exp_lhs, (lhs < 0),
+    return detail::new_d64_sub_impl<decimal64_fast>(final_sig_lhs, exp_lhs, (lhs < 0),
                                                  rhs.significand_, rhs.biased_exponent(), rhs.sign_,
                                                  abs_lhs_bigger);
 }
