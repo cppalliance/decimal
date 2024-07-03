@@ -215,6 +215,10 @@ private:
     friend constexpr auto logb(T num) noexcept
         BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T);
 
+    // Micro-optimization: Nearly every call to isfinite in the basic operators is !isfinite.
+    // We can super easily combine this into a single op
+    friend constexpr auto not_finite(decimal64 rhs) noexcept -> bool;
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
@@ -1094,6 +1098,11 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs)
 constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
     return ((rhs.bits_ & detail::d64_inf_mask) != detail::d64_inf_mask);
+}
+
+constexpr auto not_finite(decimal64 rhs) noexcept -> bool
+{
+    return ((rhs.bits_ & detail::d64_inf_mask) == detail::d64_inf_mask);
 }
 
 constexpr auto operator+(decimal64 rhs) noexcept -> decimal64
