@@ -117,6 +117,8 @@ private:
     friend constexpr auto logb(T num) noexcept
         BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T);
 
+    friend constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool;
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
@@ -149,6 +151,7 @@ public:
     friend constexpr auto isnan(decimal128_fast val) noexcept -> bool;
     friend constexpr auto issignaling(decimal128_fast val) noexcept -> bool;
     friend constexpr auto isnormal(decimal128_fast val) noexcept -> bool;
+    friend constexpr auto isfinite(decimal128_fast val) noexcept -> bool;
 
     // Comparison operators
     friend constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
@@ -479,6 +482,16 @@ constexpr auto isnormal(decimal128_fast val) noexcept -> bool
     }
 
     return (val.significand_ != 0) && isfinite(val);
+}
+
+constexpr auto isfinite(decimal128_fast val) noexcept -> bool
+{
+    return val.significand_ < detail::d128_fast_snan;
+}
+
+constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool
+{
+    return val.significand_ >= detail::d128_fast_snan;
 }
 
 constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
