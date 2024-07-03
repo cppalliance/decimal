@@ -35,7 +35,7 @@ using namespace std::chrono_literals;
 #  define BOOST_DECIMAL_NO_INLINE __attribute__ ((__noinline__))
 #endif
 
-constexpr unsigned N = 2'000'000U;
+constexpr unsigned N = 20'000'000U;
 constexpr int K = 5;
 
 template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
