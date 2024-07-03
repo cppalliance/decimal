@@ -25,9 +25,9 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_inf = std::numeric_limits<uint128>::max();
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_inf = std::numeric_limits<uint128>::max() - 2;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_qnan = std::numeric_limits<uint128>::max() - 1;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan = std::numeric_limits<uint128>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan = std::numeric_limits<uint128>::max();
 
 struct decimal128_fast_components
 {
@@ -465,8 +465,7 @@ constexpr auto isinf(decimal128_fast val) noexcept -> bool
 
 constexpr auto isnan(decimal128_fast val) noexcept -> bool
 {
-    return val.significand_ == detail::d128_fast_qnan ||
-           val.significand_ == detail::d128_fast_snan;
+    return val.significand_ >= detail::d128_fast_qnan;
 }
 
 constexpr auto issignaling(decimal128_fast val) noexcept -> bool
@@ -486,12 +485,12 @@ constexpr auto isnormal(decimal128_fast val) noexcept -> bool
 
 constexpr auto isfinite(decimal128_fast val) noexcept -> bool
 {
-    return val.significand_ < detail::d128_fast_snan;
+    return val.significand_ < detail::d128_fast_inf;
 }
 
 constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool
 {
-    return val.significand_ >= detail::d128_fast_snan;
+    return val.significand_ >= detail::d128_fast_inf;
 }
 
 constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
