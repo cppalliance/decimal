@@ -318,6 +318,7 @@ public:
     friend constexpr auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
+    friend constexpr auto isfinite    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
 
     // 3.2.7 unary arithmetic operators:
     friend constexpr auto operator+(decimal64 rhs) noexcept -> decimal64;
@@ -1088,6 +1089,11 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs)
     }
 
     return (sig != 0) && isfinite(rhs);
+}
+
+constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
+{
+    return ((rhs.bits_ & detail::d64_inf_mask) != detail::d64_inf_mask);
 }
 
 constexpr auto operator+(decimal64 rhs) noexcept -> decimal64
