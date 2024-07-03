@@ -1538,12 +1538,9 @@ constexpr auto d128_mod_impl(decimal128 lhs, decimal128 rhs, const decimal128& q
 constexpr auto operator+(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    constexpr decimal128 zero {0, 0};
-
-    const auto res {detail::check_non_finite(lhs, rhs)};
-    if (res != zero)
+    if (not_finite(lhs) || not_finite(rhs))
     {
-        return res;
+        return detail::check_non_finite(lhs, rhs);
     }
     #endif
 
@@ -1567,7 +1564,7 @@ constexpr auto operator+(decimal128 lhs, Integer rhs) noexcept
     using exp_type = decimal128::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isinf(lhs))
+    if (not_finite(lhs))
     {
         return lhs;
     }
@@ -1599,12 +1596,9 @@ constexpr auto operator+(Integer lhs, decimal128 rhs) noexcept
 constexpr auto operator-(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    constexpr decimal128 zero {0, 0};
-
-    const auto res {detail::check_non_finite(lhs, rhs)};
-    if (res != zero)
+    if (not_finite(lhs) || not_finite(rhs))
     {
-        return res;
+        return detail::check_non_finite(lhs, rhs);
     }
     #endif
 
@@ -1629,7 +1623,7 @@ constexpr auto operator-(decimal128 lhs, Integer rhs) noexcept
     using exp_type = decimal128::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isinf(lhs) || isnan(lhs))
+    if (not_finite(lhs))
     {
         return lhs;
     }
@@ -1658,7 +1652,7 @@ constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
     using exp_type = decimal128::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isinf(rhs) || isnan(rhs))
+    if (not_finite(rhs))
     {
         return rhs;
     }
@@ -1683,12 +1677,9 @@ constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
 constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    constexpr decimal128 zero {0, 0};
-
-    const auto non_finite {detail::check_non_finite(lhs, rhs)};
-    if (non_finite != zero)
+    if (not_finite(lhs) || not_finite(rhs))
     {
-        return non_finite;
+        return detail::check_non_finite(lhs, rhs);
     }
     #endif
 
@@ -1716,7 +1707,7 @@ constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
     using exp_type = decimal128::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isinf(lhs))
+    if (not_finite(lhs))
     {
         return lhs;
     }
@@ -2160,7 +2151,7 @@ constexpr auto scalblnd128(decimal128 num, long exp) noexcept -> decimal128
     #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal128 zero {0, 0};
 
-    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    if (num == zero || exp == 0 || not_finite(num))
     {
         return num;
     }
