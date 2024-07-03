@@ -137,6 +137,7 @@ public:
     friend constexpr auto isnan(decimal32_fast val) noexcept -> bool;
     friend constexpr auto issignaling(decimal32_fast val) noexcept -> bool;
     friend constexpr auto isnormal(decimal32_fast val) noexcept -> bool;
+    friend constexpr auto isfinite(decimal32_fast val) noexcept -> bool;
 
     // Comparison operators
     friend constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
@@ -469,6 +470,11 @@ constexpr auto isnormal(decimal32_fast val) noexcept -> bool
     }
 
     return (val.significand_ != 0) && isfinite(val);
+}
+
+constexpr auto isfinite(decimal32_fast val) noexcept -> bool
+{
+    return val.significand_ < detail::d32_fast_snan;
 }
 
 constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
