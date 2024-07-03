@@ -8,6 +8,7 @@
 #include <iostream>
 #include <limits>
 #include <random>
+#include <sstream>
 
 #include <boost/decimal.hpp>
 
@@ -21,10 +22,10 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_zero_val { 0, 0 }; return my_zero_val; }
-template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_one_val  { 1, 0 }; return my_one_val; }
-template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_inf_val  { std::numeric_limits<decimal_type>::infinity() };  return my_inf_val; }
-template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_nan_val  { std::numeric_limits<decimal_type>::quiet_NaN() }; return my_nan_val; }
+template<typename DecimalType> auto my_zero() -> DecimalType&;
+template<typename DecimalType> auto my_one () -> DecimalType&;
+template<typename DecimalType> auto my_inf () -> DecimalType&;
+template<typename DecimalType> auto my_nan () -> DecimalType&;
 
 namespace local
 {
@@ -71,15 +72,20 @@ namespace local
       result_is_ok = (delta < tol);
     }
 
-    // LCOV_EXCL_START
     if (!result_is_ok)
     {
-      std::cerr << std::setprecision(std::numeric_limits<NumericType>::digits10) << "a: " << a
-                << "\nb: " << b
-                << "\ndelta: " << delta
-                << "\ntol: " << tol << std::endl;
+      // LCOV_EXCL_START
+      std::stringstream strm;
+
+      strm << std::setprecision(std::numeric_limits<NumericType>::digits10)
+           <<   "a    : " << a
+           << "\nb    : " << b
+           << "\ndelta: " << delta
+           << "\ntol  : " << tol;
+
+      std::cerr << strm.str() << std::endl;
+      // LCOV_EXCL_STOP
     }
-    // LCOV_EXCL_STOP
 
     return result_is_ok;
   }
@@ -194,63 +200,89 @@ namespace local
 
     gen.seed(time_point<typename std::mt19937_64::result_type>());
 
-    std::uniform_real_distribution<float_type> dist(1.0F, 2.0F);
+    std::uniform_real_distribution<float_type>
+      dist
+      {
+        static_cast<float_type>(1.01L),
+        static_cast<float_type>(1.04L)
+      };
 
     volatile auto result_is_ok = true;
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(8)); ++index)
     {
       static_cast<void>(index);
 
-      const auto log_zero = log(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const decimal_type arg_zero = ::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen));
 
-      const volatile auto result_log_zero_is_ok = (isinf(log_zero) && (log_zero < ::my_zero<decimal_type>()));
+      const auto log_zero = log(arg_zero);
+
+      const volatile bool result_log_zero_is_ok
+      {
+           (fpclassify(arg_zero) == FP_ZERO)
+        && isinf(log_zero)
+        && signbit(log_zero)
+      };
 
       BOOST_TEST(result_log_zero_is_ok);
 
       result_is_ok = (result_log_zero_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(8)); ++index)
     {
       static_cast<void>(index);
 
-      const auto log_zero_minus = log(-::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const decimal_type arg_zero_minus = -::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen));
 
-      const volatile auto result_log_zero_minus_is_ok = (isinf(log_zero_minus) && (log_zero_minus < ::my_zero<decimal_type>()));
+      const auto log_zero_minus = log(arg_zero_minus);
+
+      const volatile auto result_log_zero_minus_is_ok = (isinf(log_zero_minus) && signbit(log_zero_minus));
 
       BOOST_TEST(result_log_zero_minus_is_ok);
 
       result_is_ok = (result_log_zero_minus_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(8)); ++index)
     {
       static_cast<void>(index);
 
-      const auto log_one = log(::my_one<decimal_type>());
+      decimal_type arg_one =
+        static_cast<decimal_type>
+        (
+          static_cast<int>(::my_one<decimal_type>() * static_cast<decimal_type>(dist(gen)))
+        );
 
-      const volatile auto result_log_one_is_ok = (log_one == ::my_zero<decimal_type>());
+      const auto log_one = log(arg_one);
+
+      const volatile auto result_log_one_is_ok = ((arg_one == ::my_one<decimal_type>()) && (log_one == ::my_zero<decimal_type>()));
 
       BOOST_TEST(result_log_one_is_ok);
 
       result_is_ok = (result_log_one_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(8)); ++index)
     {
       static_cast<void>(index);
 
-      const auto log_one_minus = log(-::my_one<decimal_type>());
+      decimal_type arg_one_minus =
+        static_cast<decimal_type>
+        (
+          -static_cast<int>(::my_one<decimal_type>() * static_cast<decimal_type>(dist(gen)))
+        );
 
-      const volatile auto result_log_one_minus_is_ok = isnan(log_one_minus);
+      const auto log_one_minus = log(arg_one_minus);
+
+      const volatile auto result_log_one_minus_is_ok = ((-arg_one_minus == ::my_one<decimal_type>()) &&  isnan(log_one_minus));
 
       BOOST_TEST(result_log_one_minus_is_ok);
 
       result_is_ok = (result_log_one_minus_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(8)); ++index)
     {
       static_cast<void>(index);
 
@@ -263,7 +295,7 @@ namespace local
       result_is_ok = (result_log_inf_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(8)); ++index)
     {
       static_cast<void>(index);
 
@@ -276,22 +308,24 @@ namespace local
       result_is_ok = (result_log_inf_minus_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(8)); ++index)
     {
       static_cast<void>(index);
 
-      const auto log_nan = log(std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen)));
+      const decimal_type arg_nan = std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(dist(gen));
 
-      const volatile auto result_log_nan_is_ok = isnan(log_nan);
+      const decimal_type log_nan = log(arg_nan);
+
+      const volatile auto result_log_nan_is_ok = (isnan(arg_nan) && isnan(log_nan));
 
       BOOST_TEST(result_log_nan_is_ok);
 
       result_is_ok = (result_log_nan_is_ok && result_is_ok);
     }
 
-    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(4)); ++index)
+    for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(8)); ++index)
     {
-      const auto x_flt = static_cast<float>(1.4L + static_cast<long double>(index) / 10.0L);
+      const auto x_flt = static_cast<float_type>(1.4L + static_cast<long double>(index) / 20.0L);
       const auto x_dec = static_cast<decimal_type>(x_flt);
 
       using std::log;
@@ -299,7 +333,7 @@ namespace local
       const auto lg_flt = log(x_flt);
       const auto lg_dec = log(x_dec);
 
-      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float>(lg_dec), std::numeric_limits<float>::epsilon() * static_cast<float>(tol_factor));
+      const auto result_log_is_ok = is_close_fraction(lg_flt, static_cast<float_type>(lg_dec), std::numeric_limits<float_type>::epsilon() * static_cast<float_type>(tol_factor));
 
       BOOST_TEST(result_log_is_ok);
 
@@ -308,16 +342,16 @@ namespace local
 
     for(auto index = static_cast<unsigned>(UINT8_C(0)); index < static_cast<unsigned>(UINT8_C(9)); ++index)
     {
-      const auto x_flt = static_cast<float>(0.1L + static_cast<long double>(index) / 10.0L);
+      const auto x_flt = static_cast<float_type>(0.1L + static_cast<long double>(index) / 10.0L);
       const auto x_dec = static_cast<decimal_type>(x_flt);
 
       using std::log;
 
       const auto lg_flt          = log(x_flt);
       const auto lg_dec          = log(x_dec);
-      const auto lg_dec_as_float = static_cast<float>(lg_dec);
+      const auto lg_dec_as_float = static_cast<float_type>(lg_dec);
 
-      const auto result_log_is_ok = is_close_fraction(lg_flt, lg_dec_as_float, std::numeric_limits<float>::epsilon() * static_cast<float>(tol_factor));
+      const auto result_log_is_ok = is_close_fraction(lg_flt, lg_dec_as_float, std::numeric_limits<float_type>::epsilon() * static_cast<float_type>(tol_factor));
 
       BOOST_TEST(result_log_is_ok);
 
@@ -471,7 +505,7 @@ auto main() -> int
   }
 
   {
-    const auto result_pos64_is_ok = local::test_log_64(512);
+    const auto result_pos64_is_ok = local::test_log_64(256);
 
     BOOST_TEST(result_pos64_is_ok);
 
@@ -479,7 +513,7 @@ auto main() -> int
   }
 
   {
-    const auto result_pos128_is_ok = local::test_log_128(8192);
+    const auto result_pos128_is_ok = local::test_log_128(128);
 
     BOOST_TEST(result_pos128_is_ok);
 
@@ -490,3 +524,8 @@ auto main() -> int
 
   return (result_is_ok ? 0 : -1);
 }
+
+template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_zero_val { 0, 0 }; return my_zero_val; }
+template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_one_val  { 1, 0 }; return my_one_val; }
+template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_inf_val  { std::numeric_limits<decimal_type>::infinity() };  return my_inf_val; }
+template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_nan_val  { std::numeric_limits<decimal_type>::quiet_NaN() }; return my_nan_val; }

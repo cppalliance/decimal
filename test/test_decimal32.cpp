@@ -345,7 +345,7 @@ void test_multiplicatiom()
     constexpr decimal32 eight {8, 0};
 
     BOOST_TEST_EQ(zero * one, zero);
-    BOOST_TEST_EQ(zero * -one, zero);
+    BOOST_TEST_EQ(zero * -one, -zero);
     BOOST_TEST_EQ(one * two, two);
 
     decimal32 pow_two {1, 0};
@@ -536,6 +536,7 @@ int main()
     spot_check_addition(-1054191000, -920209700, -1974400700);
     spot_check_addition(353582500, -32044770, 321537730);
     spot_check_addition(989629100, 58451350, 1048080000);
+    spot_check_addition(-531, -2347236, -2347767);
 
     test_shrink_significand();
 

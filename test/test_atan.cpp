@@ -381,7 +381,7 @@ int main()
     spot_test(0.181179F);
 
     {
-        const auto result_pos128_is_ok = local::test_atan_128(8192);
+        const auto result_pos128_is_ok = local::test_atan_128(4096);
 
         BOOST_TEST(result_pos128_is_ok);
     }

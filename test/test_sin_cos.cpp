@@ -68,7 +68,7 @@ void test_sin()
 
     BOOST_TEST(isinf(sin(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
     BOOST_TEST(isnan(sin(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
-    BOOST_TEST_EQ(sin(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(abs(sin(Dec(0) * Dec(dist(rng)))), Dec(0));
 
     // Check the phases of large positive/negative arguments.
     using std::atan;
@@ -185,9 +185,10 @@ namespace local
     return result_is_ok;
   }
 
+  template <typename T>
   auto test_sin_128(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128;
+    using decimal_type = T;
 
     using str_ctrl_array_type = std::array<const char*, 41U>;
 
@@ -264,7 +265,9 @@ namespace local
           from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
         );
 
-      const auto result_sin_is_ok = is_close_fraction(sin_values[i], ctrl_values[i], my_tol);
+      const decimal_type local_tol = ((ctrl_values[i] < decimal_type { 1, -1 }) ? my_tol * 16 : my_tol);
+
+      const auto result_sin_is_ok = is_close_fraction(sin_values[i], ctrl_values[i], local_tol);
 
       result_is_ok = (result_sin_is_ok && result_is_ok);
     }
@@ -272,9 +275,10 @@ namespace local
     return result_is_ok;
   }
 
+  template <typename T>
   auto test_cos_128(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128;
+    using decimal_type = T;
 
     using str_ctrl_array_type = std::array<const char*, 41U>;
 
@@ -351,7 +355,9 @@ namespace local
           from_chars(ctrl_strings[i], ctrl_strings[i] + std::strlen(ctrl_strings[i]), ctrl_values[i])
         );
 
-      const auto result_cos_is_ok = is_close_fraction(cos_values[i], ctrl_values[i], my_tol);
+      const decimal_type local_tol = ((ctrl_values[i] < decimal_type { 1, -1 }) ? my_tol * 16 : my_tol);
+
+      const auto result_cos_is_ok = is_close_fraction(cos_values[i], ctrl_values[i], local_tol);
 
       result_is_ok = (result_cos_is_ok && result_is_ok);
     }
@@ -423,8 +429,16 @@ int main()
     test_cos<decimal64_fast>();
 
     {
-        const auto result_sin128_is_ok = local::test_sin_128(0x8'000);
-        const auto result_cos128_is_ok = local::test_cos_128(0x8'000);
+        const auto result_sin128_is_ok = local::test_sin_128<decimal128>(0x800);
+        const auto result_cos128_is_ok = local::test_cos_128<decimal128>(0x800);
+
+        BOOST_TEST(result_sin128_is_ok);
+        BOOST_TEST(result_cos128_is_ok);
+    }
+
+    {
+        const auto result_sin128_is_ok = local::test_sin_128<decimal128_fast>(0x800);
+        const auto result_cos128_is_ok = local::test_cos_128<decimal128_fast>(0x800);
 
         BOOST_TEST(result_sin128_is_ok);
         BOOST_TEST(result_cos128_is_ok);

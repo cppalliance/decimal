@@ -645,8 +645,8 @@ struct int128
     constexpr auto operator==(int rhs) const noexcept -> bool;
     constexpr auto operator>(int rhs) const noexcept -> bool;
 
-    friend constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128;
-    friend constexpr auto operator-(int128 lhs, int128 rhs) noexcept -> int128;
+    friend constexpr auto operator+(const int128& lhs, const int128& rhs) noexcept -> int128;
+    friend constexpr auto operator-(const int128& lhs, const int128& rhs) noexcept -> int128;
 
     #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     template <typename charT, typename traits>
@@ -757,15 +757,31 @@ constexpr auto uint128::operator+=(std::uint64_t n) noexcept -> uint128&
 
 constexpr auto operator+(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
-    const uint128 temp = {lhs.high + rhs.high, lhs.low + rhs.low};
-
-    // Need to carry a bit into rhs
-    if (temp.low < lhs.low)
+    #if (defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)) && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
+    if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs.low))
     {
-        return {temp.high + 1, temp.low};
-    }
+        // Branchless version can be executed on x64 machines when available
+        unsigned long long low {};
+        unsigned long long high {};
 
-    return temp;
+        const auto carry {BOOST_DECIMAL_ADD_CARRY(0, lhs.low, rhs.low, &low)};
+        BOOST_DECIMAL_ADD_CARRY(carry, lhs.high, rhs.high, &high);
+
+        return uint128{high, low};
+    }
+    else
+    #endif
+    {
+        uint128 temp {lhs.high + rhs.high, lhs.low + rhs.low};
+
+        // Need to carry a bit into rhs
+        if (temp.low < lhs.low)
+        {
+            ++temp.high;
+        }
+
+        return temp;
+    }
 }
 
 constexpr auto uint128::operator+=(uint128 v) noexcept -> uint128&
@@ -791,15 +807,31 @@ constexpr auto uint128::operator++(int) noexcept -> uint128
 
 constexpr auto operator-(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
-    const uint128 temp {lhs.high - rhs.high, lhs.low - rhs.low};
-
-    // Check for carry
-    if (lhs.low < rhs.low)
+    #if (defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)) && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
+    if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs.low))
     {
-        return {temp.high - 1, temp.low};
-    }
+        // Branchless version can be executed on x64 machines when available
+        unsigned long long low {};
+        unsigned long long high {};
 
-    return temp;
+        const auto carry {_subborrow_u64(0, lhs.low, rhs.low, &low)};
+        _subborrow_u64(carry, lhs.high, rhs.high, &high);
+
+        return uint128{high, low};
+    }
+    else
+    #endif
+    {
+        uint128 temp {lhs.high - rhs.high, lhs.low - rhs.low};
+
+        // Check for carry
+        if (lhs.low < rhs.low)
+        {
+            --temp.high;
+        }
+
+        return temp;
+    }
 }
 
 constexpr auto uint128::operator-=(uint128 v) noexcept -> uint128&
@@ -1294,20 +1326,45 @@ constexpr auto int128::operator>(int rhs) const noexcept -> bool
     return *this > static_cast<std::int64_t>(rhs);
 }
 
-constexpr auto operator+(int128 lhs, int128 rhs) noexcept -> int128
+constexpr auto operator+(const int128& lhs, const int128& rhs) noexcept -> int128
 {
-    const auto new_low {lhs.low + rhs.low};
-    const auto new_high {lhs.high + rhs.high + (new_low < lhs.low)};
-    return int128{new_high, new_low};
+    #if (defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)) && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
+    if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs.low))
+    {
+        unsigned long long low {};
+        unsigned long long high {};
+
+        const auto carry {BOOST_DECIMAL_ADD_CARRY(0, lhs.low, rhs.low, &low)};
+        BOOST_DECIMAL_ADD_CARRY(carry, static_cast<std::uint64_t>(lhs.high), static_cast<std::uint64_t>(rhs.high), &high);
+
+        return {static_cast<std::int64_t>(high), low};
+    }
+    #endif
+    {
+        #ifdef BOOST_DECIMAL_HAS_INT128
+
+        const auto lhs_full {(static_cast<__uint128_t>(lhs.high) << 64) | lhs.low};
+        const auto rhs_full {(static_cast<__uint128_t>(rhs.high) << 64) | rhs.low};
+        const auto result {lhs_full + rhs_full};
+
+        return {static_cast<std::int64_t>(result >> 64), static_cast<std::uint64_t>(result)};
+
+        #else
+
+        const auto new_low {lhs.low + rhs.low};
+        const auto new_high {lhs.high + rhs.high + static_cast<std::int64_t>(new_low < lhs.low)};
+        return int128{new_high, new_low};
+
+        #endif
+    }
 }
 
-constexpr auto operator-(int128 lhs, int128 rhs) noexcept -> int128
+constexpr auto operator-(const int128& lhs, const int128& rhs) noexcept -> int128
 {
     const auto new_low {lhs.low - rhs.low};
-    const auto new_high {lhs.high - rhs.high - (lhs.low < rhs.low ? 1 : 0)};
+    const auto new_high {lhs.high - rhs.high - static_cast<std::int64_t>(lhs.low < rhs.low)};
     return int128{new_high, new_low};
 }
-
 
 template <>
 constexpr int countl_zero<uint128>(uint128 x) noexcept

@@ -85,11 +85,21 @@
 #  else
 #    define BOOST_DECIMAL_HAS_MSVC_32BIT_INTRINSICS
 #  endif
+#  if defined(__ADX__) && defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
+#    define BOOST_DECIMAL_ADD_CARRY _addcarryx_u64
+#  elif defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
+#    define BOOST_DECIMAL_ADD_CARRY _addcarry_u64
+#  endif
 #elif defined(__x86_64__)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
 #    include <x86intrin.h>
 #  endif
-#  define BOOST_DECIMAL_HAS_X86_INTRINSICS
+#  define BOOST_DECIMAL_HAS_X64_INTRINSICS
+#  ifdef __ADX__
+#    define BOOST_DECIMAL_ADD_CARRY _addcarryx_u64
+#  else
+#    define BOOST_DECIMAL_ADD_CARRY _addcarry_u64
+#  endif
 #elif defined(__ARM_NEON__)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
 #    include <arm_neon.h>
@@ -290,6 +300,10 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_FORCE_INLINE __attribute__((always_inline)) inline
 #else
 #  define BOOST_DECIMAL_FORCE_INLINE inline
+#endif
+
+#ifdef __FAST_MATH__
+#  define BOOST_DECIMAL_FAST_MATH
 #endif
 
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP

@@ -1,5 +1,5 @@
-// Copyright 2023 Matt Borland
-// Copyright 2023 Christopher Kormanyos
+// Copyright 2023 - 2024 Matt Borland
+// Copyright 2023 - 2024 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -8,6 +8,7 @@
 #include <iostream>
 #include <limits>
 #include <random>
+#include <sstream>
 
 #include <boost/decimal.hpp>
 
@@ -20,11 +21,11 @@
 #endif
 #include <boost/core/lightweight_test.hpp>
 
-template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_zero { 0, 0 }; return my_val_zero; }
-template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_one  { 1, 0 }; return my_val_one; }
+template<typename DecimalType> auto my_zero() -> DecimalType&;
+template<typename DecimalType> auto my_one () -> DecimalType&;
 template<typename DecimalType> auto my_ten () -> DecimalType&;
-template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_inf  { std::numeric_limits<decimal_type>::infinity() };  return my_val_inf; }
-template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_nan  { std::numeric_limits<decimal_type>::quiet_NaN() }; return my_val_nan; }
+template<typename DecimalType> auto my_inf () -> DecimalType&;
+template<typename DecimalType> auto my_nan () -> DecimalType&;
 
 namespace local
 {
@@ -128,15 +129,19 @@ namespace local
 
       result_is_ok = (result_val_is_ok && result_is_ok);
 
+      BOOST_TEST(result_val_is_ok);
+
       if(!result_val_is_ok)
       {
         //LCOV_EXCL_START
-        std::cout << "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt   << std::endl;
-        std::cout << "a_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << a_flt   << std::endl;
-        std::cout << "val_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt << std::endl;
-        std::cout << "val_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec << std::endl;
+        std::stringstream strm;
 
-        break;
+        strm <<   "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt
+             << "\na_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << a_flt
+             << "\nval_flt: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_flt
+             << "\nval_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec;
+
+        std::cerr << strm.str();
         // LCOV_EXCL_STOP
       }
     }
@@ -400,16 +405,16 @@ namespace local
 
     using std::pow;
 
-    for(auto index = 0U; index < 4U; ++index)
+    for(auto index = 0U; index < 8U; ++index)
     {
       static_cast<void>(index);
 
-      const auto flt_near_one = dist(gen);
+      const auto flt_near_one =  dist(gen);
 
-      const auto dec_pos_pos = pow( std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one),  ::my_zero<decimal_type>());
-      const auto dec_pos_neg = pow( std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one), -::my_zero<decimal_type>());
-      const auto dec_neg_pos = pow(-std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one),  ::my_zero<decimal_type>());
-      const auto dec_neg_neg = pow(-std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one), -::my_zero<decimal_type>());
+      const auto dec_pos_pos = pow( std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one),  ::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const auto dec_pos_neg = pow( std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one), -::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const auto dec_neg_pos = pow(-std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one),  ::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const auto dec_neg_neg = pow(-std::numeric_limits<decimal_type>::quiet_NaN() * static_cast<decimal_type>(flt_near_one), -::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
 
       const auto flt_pos_pos = pow( std::numeric_limits<float_type>::quiet_NaN() * flt_near_one,  static_cast<float_type>(0.0L));
       const auto flt_pos_neg = pow( std::numeric_limits<float_type>::quiet_NaN() * flt_near_one, -static_cast<float_type>(0.0L));
@@ -429,7 +434,7 @@ namespace local
       result_is_ok = (result_pow_is_ok && result_is_ok);
     }
 
-    for(auto index = 0U; index < 4U; ++index)
+    for(auto index = 0U; index < 8U; ++index)
     {
       static_cast<void>(index);
 
@@ -458,16 +463,16 @@ namespace local
       result_is_ok = (result_pow_is_ok && result_is_ok);
     }
 
-    for(auto index = 0U; index < 4U; ++index)
+    for(auto index = 0U; index < 8U; ++index)
     {
       static_cast<void>(index);
 
       const auto flt_x = dist_x(gen);
 
-      const auto dec_pos_pos = pow(static_cast<decimal_type>( flt_x),  ::my_zero<decimal_type>());
-      const auto dec_pos_neg = pow(static_cast<decimal_type>( flt_x), -::my_zero<decimal_type>());
-      const auto dec_neg_pos = pow(static_cast<decimal_type>(-flt_x),  ::my_zero<decimal_type>());
-      const auto dec_neg_neg = pow(static_cast<decimal_type>(-flt_x), -::my_zero<decimal_type>());
+      const auto dec_pos_pos = pow(static_cast<decimal_type>( flt_x),  ::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const auto dec_pos_neg = pow(static_cast<decimal_type>( flt_x), -::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const auto dec_neg_pos = pow(static_cast<decimal_type>(-flt_x),  ::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const auto dec_neg_neg = pow(static_cast<decimal_type>(-flt_x), -::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
 
       const auto flt_pos_pos = pow( flt_x,  static_cast<float_type>(0.0L));
       const auto flt_pos_neg = pow( flt_x, -static_cast<float_type>(0.0L));
@@ -489,16 +494,16 @@ namespace local
 
     using std::isinf;
 
-    for(auto index = 0U; index < 4U; ++index)
+    for(auto index = 0U; index < 8U; ++index)
     {
       static_cast<void>(index);
 
       const float_type flt_a = dist_a(gen);
 
-      const auto dec_nrm_pos = pow(::my_zero<decimal_type>(),  static_cast<decimal_type>(flt_a));
-      const auto dec_nrm_neg = pow(::my_zero<decimal_type>(), -static_cast<decimal_type>(flt_a));
-      const auto dec_inf_pos = pow(::my_zero<decimal_type>(),  std::numeric_limits<decimal_type>::infinity());
-      const auto dec_inf_neg = pow(::my_zero<decimal_type>(), -std::numeric_limits<decimal_type>::infinity());
+      const auto dec_nrm_pos = pow(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)),  static_cast<decimal_type>(flt_a));
+      const auto dec_nrm_neg = pow(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)), -static_cast<decimal_type>(flt_a));
+      const auto dec_inf_pos = pow(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)),  std::numeric_limits<decimal_type>::infinity());
+      const auto dec_inf_neg = pow(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)), -std::numeric_limits<decimal_type>::infinity());
 
       const auto flt_nrm_pos = pow(static_cast<float_type>(0.0L),  flt_a);
       const auto flt_nrm_neg = pow(static_cast<float_type>(0.0L), -flt_a);
@@ -518,7 +523,7 @@ namespace local
       result_is_ok = (result_pow_is_ok && result_is_ok);
     }
 
-    for(auto index = 0U; index < 4U; ++index)
+    for(auto index = 0U; index < 8U; ++index)
     {
       using std::fpclassify;
 
@@ -549,10 +554,10 @@ namespace local
 
       const auto flt_x = dist_x(gen);
 
-      const auto dec_pos_pos = pow( static_cast<decimal_type>(flt_x),  ::my_zero<decimal_type>());
-      const auto dec_pos_neg = pow( static_cast<decimal_type>(flt_x), -::my_zero<decimal_type>());
-      const auto dec_neg_pos = pow(-static_cast<decimal_type>(flt_x),  ::my_zero<decimal_type>());
-      const auto dec_neg_neg = pow(-static_cast<decimal_type>(flt_x), -::my_zero<decimal_type>());
+      const auto dec_pos_pos = pow( static_cast<decimal_type>(flt_x),  ::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const auto dec_pos_neg = pow( static_cast<decimal_type>(flt_x), -::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const auto dec_neg_pos = pow(-static_cast<decimal_type>(flt_x),  ::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const auto dec_neg_neg = pow(-static_cast<decimal_type>(flt_x), -::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
 
       const auto flt_pos_pos = pow( flt_x,  static_cast<float_type>(0.0L));
       const auto flt_pos_neg = pow( flt_x, -static_cast<float_type>(0.0L));
@@ -660,7 +665,7 @@ namespace local
       result_is_ok = (result_pow_is_ok && result_is_ok);
     }
 
-    for(auto index = 0U; index < 4U; ++index)
+    for(auto index = 0U; index < 8U; ++index)
     {
       static_cast<void>(index);
 
@@ -742,6 +747,13 @@ namespace local
         static_cast<float_type>(1.04L)
       );
 
+    std::uniform_int_distribution<int>
+      dist_n
+      (
+        static_cast<int>(INT8_C(2)),
+        static_cast<int>(INT8_C(12))
+      );
+
     using std::fpclassify;
     using std::isinf;
     using std::pow;
@@ -749,9 +761,76 @@ namespace local
 
     auto result_is_ok = true;
 
+    for(auto index = 0U; index < 8U; ++index)
+    {
+      static_cast<void>(index);
+
+      const float_type   flt_x = dist  (gen);
+      const decimal_type dec_x = static_cast<decimal_type>(flt_x);
+
+      using std::pow;
+
+      const auto dec_nrm = pow(dec_x, 0);
+      const auto flt_nrm = pow(flt_x, 0);
+
+      const auto result_val_pow_zero_is_ok = ((dec_nrm == decimal_type { 1 }) && (flt_nrm == static_cast<float_type>(1.0L)));
+
+      BOOST_TEST(result_val_pow_zero_is_ok);
+
+      result_is_ok = (result_val_pow_zero_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 8U; ++index)
+    {
+      static_cast<void>(index);
+
+      const decimal_type arg_nan = ::my_nan<decimal_type>() * static_cast<decimal_type>(dist(gen));
+
+      const auto dec_pow_nan = pow(arg_nan, dist_n(gen));
+
+      const auto result_val_pow_nan_is_ok = (isnan(dec_pow_nan) && isnan(arg_nan));
+
+      BOOST_TEST(result_val_pow_nan_is_ok);
+
+      result_is_ok = (result_val_pow_nan_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 8U; ++index)
+    {
+      static_cast<void>(index);
+
+      const decimal_type arg_x_nrm  = static_cast<decimal_type>(dist(gen));
+      const decimal_type arg_p_zero = static_cast<decimal_type>(dist_n(gen)) * (::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const int          n_p_zero   = static_cast<int>(arg_p_zero);
+
+      const auto dec_pow_zero = pow(arg_x_nrm, n_p_zero);
+
+      const auto result_val_pow_zero_is_ok = ((dec_pow_zero == decimal_type { 1 }) && (n_p_zero == 0));
+
+      BOOST_TEST(result_val_pow_zero_is_ok);
+
+      result_is_ok = (result_val_pow_zero_is_ok && result_is_ok);
+    }
+
+    for(auto index = 0U; index < 8U; ++index)
+    {
+      static_cast<void>(index);
+
+      const decimal_type arg_p_zero = static_cast<decimal_type>(dist_n(gen)) * (::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const int          n_p_zero   = static_cast<int>(arg_p_zero);
+
+      const auto dec_pow2_zero = boost::decimal::detail::pow_2_impl<decimal_type>(n_p_zero);
+
+      const auto result_val_pow2_zero_is_ok = ((dec_pow2_zero == decimal_type { 1 }) && (n_p_zero == 0));
+
+      BOOST_TEST(result_val_pow2_zero_is_ok);
+
+      result_is_ok = (result_val_pow2_zero_is_ok && result_is_ok);
+    }
+
     for(auto index = static_cast<int>(UINT8_C(2)); index <= static_cast<int>(UINT8_C(10)); index += static_cast<int>(UINT8_C(2)))
     {
-      const auto dec_zero_pos = pow(::my_zero<decimal_type>(), decimal_type(index));
+      const auto dec_zero_pos = pow(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)), decimal_type(index));
       const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
 
       const auto result_val_zero_pos_is_ok =
@@ -767,7 +846,7 @@ namespace local
 
     for(auto index = static_cast<int>(UINT8_C(2)); index <= static_cast<int>(UINT8_C(10)); index += static_cast<int>(UINT8_C(2)))
     {
-      const auto dec_zero_neg = pow(-::my_zero<decimal_type>(), decimal_type(index));
+      const auto dec_zero_neg = pow(-::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)), decimal_type(index));
       const auto flt_zero_neg = pow(static_cast<float_type>(-0.0L), static_cast<float_type>(index));
 
       const auto result_val_zero_neg_is_ok =
@@ -783,7 +862,7 @@ namespace local
 
     for(auto index = static_cast<int>(UINT8_C(3)); index <= static_cast<int>(UINT8_C(11)); index += static_cast<int>(UINT8_C(2)))
     {
-      const auto dec_zero_pos = pow(::my_zero<decimal_type>(), decimal_type(index));
+      const auto dec_zero_pos = pow(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)), decimal_type(index));
       const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
 
       const auto result_val_zero_pos_is_ok =
@@ -799,7 +878,9 @@ namespace local
 
     for(auto index = static_cast<int>(UINT8_C(3)); index <= static_cast<int>(UINT8_C(11)); index += static_cast<int>(UINT8_C(2)))
     {
-      const auto dec_zero_neg = pow(-::my_zero<decimal_type>(), decimal_type(index));
+      const decimal_type arg_zero_neg = -(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+
+      const auto dec_zero_neg = pow(arg_zero_neg, decimal_type(index));
       const auto flt_zero_neg = pow(static_cast<float_type>(-0.0L), static_cast<float_type>(index));
 
       const auto result_val_zero_neg_is_ok =
@@ -815,7 +896,7 @@ namespace local
 
     for(auto index = static_cast<int>(INT8_C(-11)); index <= static_cast<int>(INT8_C(-3)); index += static_cast<int>(INT8_C(2)))
     {
-      const auto dec_zero_pos = pow(::my_zero<decimal_type>(), decimal_type(index));
+      const auto dec_zero_pos = pow(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)), decimal_type(index));
       const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
 
       const auto result_val_zero_pos_is_ok =
@@ -831,7 +912,7 @@ namespace local
 
     for(auto index = static_cast<int>(INT8_C(-11)); index <= static_cast<int>(INT8_C(-3)); index += static_cast<int>(INT8_C(2)))
     {
-      const auto dec_zero_neg = pow(-::my_zero<decimal_type>(), decimal_type(index));
+      const auto dec_zero_neg = pow(-::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)), decimal_type(index));
 
       const auto result_val_zero_neg_is_ok = (isinf(dec_zero_neg) && (!signbit(dec_zero_neg)));
 
@@ -842,7 +923,7 @@ namespace local
 
     for(auto index = static_cast<int>(INT8_C(-10)); index <= static_cast<int>(INT8_C(-2)); index += static_cast<int>(INT8_C(2)))
     {
-      const auto dec_zero_pos = pow(::my_zero<decimal_type>(), decimal_type(index));
+      const auto dec_zero_pos = pow(::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)), decimal_type(index));
       const auto flt_zero_pos = pow(static_cast<float_type>(0.0L), static_cast<float_type>(index));
 
       const auto result_val_zero_pos_is_ok =
@@ -858,7 +939,7 @@ namespace local
 
     for(auto index = static_cast<int>(INT8_C(-10)); index <= static_cast<int>(INT8_C(-2)); index += static_cast<int>(INT8_C(2)))
     {
-      const auto dec_zero_neg = pow(-::my_zero<decimal_type>(), decimal_type(index));
+      const auto dec_zero_neg = pow(-::my_zero<decimal_type>() * static_cast<decimal_type>(dist(gen)), decimal_type(index));
       const auto flt_zero_neg = pow(-static_cast<float_type>(0.0L), static_cast<float_type>(index));
 
       const auto result_val_zero_neg_is_ok =
@@ -872,7 +953,7 @@ namespace local
       result_is_ok = (result_val_zero_neg_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
     {
       static_cast<void>(i);
 
@@ -892,7 +973,7 @@ namespace local
       result_is_ok = (result_val_inf_neg_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
     {
       static_cast<void>(i);
 
@@ -912,7 +993,7 @@ namespace local
       result_is_ok = (result_val_inf_neg_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
     {
       static_cast<void>(i);
 
@@ -932,7 +1013,7 @@ namespace local
       result_is_ok = (result_val_inf_pos_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
     {
       static_cast<void>(i);
 
@@ -952,7 +1033,7 @@ namespace local
       result_is_ok = (result_val_inf_pos_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
     {
       static_cast<void>(i);
 
@@ -968,7 +1049,7 @@ namespace local
       result_is_ok = (result_val_inf_pos_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
     {
       static_cast<void>(i);
 
@@ -984,7 +1065,7 @@ namespace local
       result_is_ok = (result_val_inf_neg_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
     {
       static_cast<void>(i);
 
@@ -999,7 +1080,7 @@ namespace local
       result_is_ok = (result_val_near_pi_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
     {
       static_cast<void>(i);
 
@@ -1014,7 +1095,7 @@ namespace local
       result_is_ok = (result_val_nan_is_ok && result_is_ok);
     }
 
-    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(4)); ++i)
+    for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(8)); ++i)
     {
       static_cast<void>(i);
 
@@ -1031,15 +1112,6 @@ namespace local
 
     return result_is_ok;
   }
-}
-
-template<typename DecimalType> auto my_ten () -> DecimalType&
-{
-  using decimal_type = DecimalType;
-
-  static decimal_type my_val_ten  { 1, 1 };
-
-  return my_val_ten;
 }
 
 auto main() -> int
@@ -1073,13 +1145,21 @@ auto main() -> int
     using decimal_type = boost::decimal::decimal64;
     using float_type   = double;
 
-    const auto test_pow_pos_is_ok = local::test_pow<decimal_type, float_type>(1024, false);
-    const auto test_pow_is_neg_ok = local::test_pow<decimal_type, float_type>(1024, true);
+    const auto test_pow_edge_is_ok   = local::test_pow_edge  <decimal_type, float_type>();
+    const auto test_pow_n_edge_is_ok = local::test_pow_n_edge<decimal_type, float_type>(1024);
+    const auto test_pow_pos_is_ok    = local::test_pow<decimal_type, float_type>(1024, false);
+    const auto test_pow_is_neg_ok    = local::test_pow<decimal_type, float_type>(1024, true);
 
-    result_is_ok = (test_pow_pos_is_ok && test_pow_is_neg_ok && result_is_ok);
+    result_is_ok = (test_pow_edge_is_ok && test_pow_n_edge_is_ok && test_pow_pos_is_ok && test_pow_is_neg_ok && result_is_ok);
   }
 
   result_is_ok = ((boost::report_errors() == 0) && result_is_ok);
 
   return (result_is_ok ? 0 : -1);
 }
+
+template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_zero { 0, 0 }; return my_val_zero; }
+template<typename DecimalType> auto my_one () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_one  { 1, 0 }; return my_val_one; }
+template<typename DecimalType> auto my_ten () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_ten  { 1, 1 }; return my_val_ten; }
+template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_inf  { std::numeric_limits<decimal_type>::infinity() };  return my_val_inf; }
+template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type my_val_nan  { std::numeric_limits<decimal_type>::quiet_NaN() }; return my_val_nan; }

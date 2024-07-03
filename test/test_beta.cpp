@@ -72,8 +72,8 @@ void test()
         }
     }
 
-    BOOST_TEST(isnan(beta(T(1), std::numeric_limits<T>::quiet_NaN())));
-    BOOST_TEST(isnan(beta(std::numeric_limits<T>::quiet_NaN(), T(1))));
+    BOOST_TEST(isnan(beta(T(1), T(dist(rng)) * std::numeric_limits<T>::quiet_NaN())));
+    BOOST_TEST(isnan(beta(std::numeric_limits<T>::quiet_NaN() * T(dist(rng)), T(1))));
 }
 
 int main()
@@ -85,7 +85,7 @@ int main()
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test<decimal128>();
-    // test<decimal128_fast>();
+    test<decimal128_fast>();
     #endif
 
     return boost::report_errors();

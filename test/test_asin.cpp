@@ -78,7 +78,7 @@ void test_asin()
 
         if (std::isinf(ret_dec))
         {
-            std::cerr << "INF: " << d1 << " iter: n = " << n << std::endl;
+            std::cerr << "INF: " << d1 << " iter: n = " << n << std::endl; // LCOV_EXCL_LINE
         }
 
         const auto distance {std::fabs(boost::math::float_distance(ret_val, ret_dec))};

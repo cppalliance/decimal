@@ -249,6 +249,12 @@ void random_multiplication(T lower, T upper)
         const decimal32_fast res {dec1 * dec2};
         const decimal32_fast res_int {val1 * val2};
 
+        if (val1 * val2 == 0)
+        {
+            // Integers don't have signed 0 but decimal does
+            continue;
+        }
+
         if (!BOOST_TEST_EQ(res, res_int))
         {
             // LCOV_EXCL_START
@@ -283,6 +289,12 @@ void random_mixed_multiplication(T lower, T upper)
 
         const decimal32_fast res {dec1 * dec2};
         const decimal32_fast res_int {val1 * val2};
+
+        if (val1 * val2 == 0)
+        {
+            // Integers don't have signed 0 but decimal does
+            continue;
+        }
 
         if (!BOOST_TEST_EQ(res, res_int))
         {

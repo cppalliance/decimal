@@ -63,7 +63,7 @@ constexpr auto to_integral(Decimal val) noexcept
     }
     else if (expval < 0)
     {
-        result /= detail::pow10<Conversion_Type>(abs_exp_val);
+        result /= detail::pow10<Conversion_Type>(static_cast<Conversion_Type>(abs_exp_val));
     }
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<TargetType>::value)

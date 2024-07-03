@@ -27,9 +27,6 @@ template <typename T>
 constexpr auto log10_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    constexpr T zero { 0, 0 };
-    constexpr T one  { 1, 0 };
-
     T result { };
 
     const auto fpc = fpclassify(x);
@@ -38,13 +35,13 @@ constexpr auto log10_impl(T x) noexcept
     {
         result = -std::numeric_limits<T>::infinity();
     }
-    else if (signbit(x) || (fpc == FP_NAN))
+    else if (signbit(x))
     {
         result = std::numeric_limits<T>::quiet_NaN();
     }
-    else if (fpc == FP_INFINITE)
+    else if (fpc != FP_NORMAL)
     {
-        result = std::numeric_limits<T>::infinity();
+        result = x;
     }
     else
     {
@@ -69,6 +66,8 @@ constexpr auto log10_impl(T x) noexcept
         }
         else
         {
+            constexpr T one  { 1 };
+
             if (x < one)
             {
                 // Handle reflection.
@@ -111,10 +110,6 @@ constexpr auto log10_impl(T x) noexcept
                 }
 
                 result += static_cast<T>(exp10val);
-            }
-            else
-            {
-                result = zero;
             }
         }
     }

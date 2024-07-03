@@ -14,6 +14,7 @@
 #include <boost/decimal/detail/sub_impl.hpp>
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
+#include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <limits>
 #include <cstdint>
@@ -29,10 +30,11 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::u
 
 struct decimal32_fast_components
 {
-    using sig_type = std::uint_fast32_t;
+    using significand_type = std::uint_fast32_t;
+    using biased_exponent_type = std::int_fast32_t;
 
-    std::uint_fast32_t sig;
-    std::int32_t exp;
+    significand_type sig;
+    biased_exponent_type exp;
     bool sign;
 };
 
@@ -43,14 +45,15 @@ class decimal32_fast final
 public:
     using significand_type = std::uint_fast32_t;
     using exponent_type = std::uint_fast8_t;
+    using biased_exponent_type = std::int_fast32_t;
 
 private:
     // In regular decimal32 we have to decode the 24 bits of the significand and the 8 bits of the exp
     // Here we just use them directly at the cost of at least 2 extra bytes of internal state
     // since the fast integer types will be at least 32 and 8 bits respectively
 
-    std::uint_fast32_t significand_ {};
-    std::uint_fast8_t exponent_ {};
+    significand_type significand_ {};
+    exponent_type exponent_ {};
     bool sign_ {};
 
     constexpr auto isneg() const noexcept -> bool
@@ -68,9 +71,9 @@ private:
         return exponent_;
     }
 
-    constexpr auto biased_exponent() const noexcept -> std::int32_t
+    constexpr auto biased_exponent() const noexcept -> biased_exponent_type
     {
-        return static_cast<std::int32_t>(exponent_) - detail::bias_v<decimal32>;
+        return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal32>;
     }
 
     friend constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& q, decimal32_fast& r) noexcept -> void;
@@ -765,36 +768,20 @@ constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
         return res;
     }
     #endif
-
-    bool lhs_bigger {lhs > rhs};
-    if (lhs.isneg() && rhs.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-
-    // Ensure that lhs is always the larger for ease of implementation
-    if (!lhs_bigger)
-    {
-        detail::swap(lhs, rhs);
-    }
-
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs - abs(rhs);
-    }
-
-    const auto result {detail::add_impl<detail::decimal32_fast_components>(
+    
+    return detail::d32_add_impl<decimal32_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_
-            )};
-
-    return {result.sig, result.exp, result.sign};
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
+            (abs(lhs) > abs(rhs)));
 }
 
 template <typename Integer>
 constexpr auto operator+(decimal32_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
 {
+    using promoted_significand_type = detail::promote_significand_t<decimal32_fast, Integer>;
+    using exp_type = decimal32_fast::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
@@ -802,42 +789,16 @@ constexpr auto operator+(decimal32_fast lhs, Integer rhs) noexcept
     }
     #endif
 
-    bool lhs_bigger {lhs > rhs};
-    if (lhs.isneg() && (rhs < 0))
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-    bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+    auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
+    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
-    auto lhs_components {detail::decimal32_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
-
-    auto sig_rhs {rhs};
-    std::int32_t exp_rhs {0};
+    exp_type exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs = detail::shrink_significand<decimal32_fast::significand_type>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
-    auto rhs_components {detail::decimal32_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+    const auto final_sig_rhs {static_cast<detail::decimal32_fast_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
 
-    if (!lhs_bigger)
-    {
-        detail::swap(lhs_components, rhs_components);
-        abs_lhs_bigger = !abs_lhs_bigger;
-    }
-
-    detail::decimal32_fast_components result {};
-
-    if (!lhs_components.sign && rhs_components.sign)
-    {
-        result = detail::sub_impl<detail::decimal32_fast_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                                                     rhs_components.sig, rhs_components.exp, rhs_components.sign,
-                                                                     abs_lhs_bigger);
-    }
-    else
-    {
-        result = detail::add_impl<detail::decimal32_fast_components>(lhs_components.sig, lhs_components.exp, lhs_components.sign,
-                                                                     rhs_components.sig, rhs_components.exp, rhs_components.sign);
-    }
-
-    return {result.sig, result.exp, result.sign};
+    return detail::d32_add_impl<decimal32_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                                final_sig_rhs, exp_rhs, (rhs < 0),
+                                                abs_lhs_bigger);
 }
 
 template <typename Integer>
@@ -859,26 +820,20 @@ constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     }
     #endif
 
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
-
-    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
-
-    const auto result {detail::sub_impl<detail::decimal32_fast_components>(
+    return detail::d32_sub_impl<decimal32_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
-            abs_lhs_bigger
-            )};
-
-    return {result.sig, result.exp, result.sign};
+            abs(lhs) > abs(rhs)
+    );
 }
 
 template <typename Integer>
 constexpr auto operator-(decimal32_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
 {
+    using promoted_significand_type = detail::promote_significand_t<decimal32_fast, Integer>;
+    using exp_type = decimal32_fast::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(lhs) || isnan(lhs))
     {
@@ -886,33 +841,27 @@ constexpr auto operator-(decimal32_fast lhs, Integer rhs) noexcept
     }
     #endif
 
-    if (!lhs.isneg() && (rhs < 0))
-    {
-        return lhs + detail::make_positive_unsigned(rhs);
-    }
+    auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
 
-    const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
+    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
-    auto lhs_components {detail::decimal32_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.isneg()}};
-
-    auto sig_rhs {rhs};
-    std::int32_t exp_rhs {0};
+    exp_type exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs = detail::shrink_significand<decimal32_fast::significand_type>(detail::make_positive_unsigned(sig_rhs), exp_rhs);
-    auto rhs_components {detail::decimal32_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
+    auto final_sig_rhs {static_cast<decimal32_fast::significand_type>(detail::make_positive_unsigned(sig_rhs))};
 
-    const auto result {detail::sub_impl<detail::decimal32_fast_components>(
-            lhs_components.sig, lhs_components.exp, lhs_components.sign,
-            rhs_components.sig, rhs_components.exp, rhs_components.sign,
-            abs_lhs_bigger)};
-
-    return {result.sig, result.exp, result.sign};
+    return detail::d32_sub_impl<decimal32_fast>(
+            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+            final_sig_rhs, exp_rhs, (rhs < 0),
+            abs_lhs_bigger);
 }
 
 template <typename Integer>
 constexpr auto operator-(Integer lhs, decimal32_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
 {
+    using promoted_significand_type = detail::promote_significand_t<decimal32_fast, Integer>;
+    using exp_type = decimal32_fast::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(rhs) || isnan(rhs))
     {
@@ -920,28 +869,18 @@ constexpr auto operator-(Integer lhs, decimal32_fast rhs) noexcept
     }
     #endif
 
-    if (lhs >= 0 && rhs.isneg())
-    {
-        return lhs + (-rhs);
-    }
+    auto sig_lhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(lhs))};
+    const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
 
-    const bool abs_lhs_bigger {detail::make_positive_unsigned(lhs) > abs(rhs)};
-
-    auto sig_lhs {detail::make_positive_unsigned(lhs)};
-    std::int32_t exp_lhs {0};
+    exp_type exp_lhs {0};
     detail::normalize(sig_lhs, exp_lhs);
-    auto unsigned_sig_lhs = detail::shrink_significand<std::uint_fast32_t>(detail::make_positive_unsigned(sig_lhs), exp_lhs);
-    auto lhs_components {detail::decimal32_fast_components{unsigned_sig_lhs, exp_lhs, (lhs < 0)}};
+    auto final_sig_lhs {static_cast<decimal32_fast::significand_type>(detail::make_positive_unsigned(sig_lhs))};
 
-    auto rhs_components {detail::decimal32_fast_components{rhs.significand_, rhs.biased_exponent(), rhs.isneg()}};
-
-    const auto result {detail::sub_impl<detail::decimal32_fast_components>(
-            lhs_components.sig, lhs_components.exp, lhs_components.sign,
-            rhs_components.sig, rhs_components.exp, rhs_components.sign,
+    return detail::d32_sub_impl<decimal32_fast>(
+            final_sig_lhs, exp_lhs, (lhs < 0),
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             abs_lhs_bigger
-            )};
-
-    return {result.sig, result.exp, result.sign};
+    );
 }
 
 constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast
@@ -956,18 +895,19 @@ constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     }
     #endif
 
-    const auto result {detail::mul_impl<detail::decimal32_fast_components>(
+    return detail::mul_impl<decimal32_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), rhs.sign_
-            )};
-
-    return {result.sig, result.exp, result.sign};
+            );
 }
 
 template <typename Integer>
 constexpr auto operator*(decimal32_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
 {
+    using promoted_significand_type = detail::promote_significand_t<decimal32_fast, Integer>;
+    using exp_type = decimal32_fast::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
@@ -975,20 +915,16 @@ constexpr auto operator*(decimal32_fast lhs, Integer rhs) noexcept
     }
     #endif
 
-    auto lhs_components {detail::decimal32_fast_components{lhs.significand_, lhs.biased_exponent(), lhs.sign_}};
-
-    auto sig_rhs {rhs};
-    std::int32_t exp_rhs {0};
+    auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
+    exp_type exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
-    auto unsigned_sig_rhs {detail::shrink_significand(detail::make_positive_unsigned(sig_rhs), exp_rhs)};
-    auto rhs_components {detail::decimal32_fast_components{unsigned_sig_rhs, exp_rhs, (rhs < 0)}};
 
-    const auto result {detail::mul_impl<detail::decimal32_fast_components>(
-            lhs_components.sig, lhs_components.exp, lhs_components.sign,
-            rhs_components.sig, rhs_components.exp, rhs_components.sign
-            )};
+    // We don't know if the original value of rhs fits into the decimal32_fast significand type
+    // but once it's normalized it's guaranteed to fit
+    const auto final_sig_rhs {static_cast<decimal32_fast::significand_type>(sig_rhs)};
 
-    return {result.sig, result.exp, result.sign};
+    return detail::mul_impl<decimal32_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                             final_sig_rhs, exp_rhs, (rhs < 0));
 }
 
 template <typename Integer>
@@ -1086,6 +1022,8 @@ template <typename Integer>
 constexpr auto operator/(decimal32_fast lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
 {
+    using exp_type = decimal32_fast::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal32_fast zero {0, 0};
@@ -1115,19 +1053,18 @@ constexpr auto operator/(decimal32_fast lhs, Integer rhs) noexcept
     #endif
 
     const detail::decimal32_fast_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.sign_};
-    std::int32_t exp_rhs {};
+    exp_type exp_rhs {};
     const detail::decimal32_fast_components rhs_components {detail::shrink_significand<decimal32_fast::significand_type>(detail::make_positive_unsigned(rhs), exp_rhs), exp_rhs, rhs < 0};
-    detail::decimal32_fast_components q_components {};
 
-    detail::generic_div_impl(lhs_components, rhs_components, q_components);
-
-    return {q_components.sig, q_components.exp, q_components.sign};
+    return detail::generic_div_impl<decimal32_fast>(lhs_components, rhs_components);
 }
 
 template <typename Integer>
 constexpr auto operator/(Integer lhs, decimal32_fast rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32_fast)
 {
+    using exp_type = decimal32_fast::biased_exponent_type;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal32_fast zero {0, 0};
@@ -1154,15 +1091,12 @@ constexpr auto operator/(Integer lhs, decimal32_fast rhs) noexcept
     }
     #endif
 
-    std::int32_t lhs_exp {};
+    exp_type lhs_exp {};
     const auto lhs_sig {detail::make_positive_unsigned(detail::shrink_significand<decimal32_fast::significand_type>(lhs, lhs_exp))};
     const detail::decimal32_fast_components lhs_components {lhs_sig, lhs_exp, lhs < 0};
     const detail::decimal32_fast_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.isneg()};
-    detail::decimal32_fast_components q_components {};
 
-    detail::generic_div_impl(lhs_components, rhs_components, q_components);
-
-    return {q_components.sig, q_components.exp, q_components.sign};
+    return detail::generic_div_impl<decimal32_fast>(lhs_components, rhs_components);
 }
 
 constexpr auto operator%(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast

@@ -39,7 +39,7 @@ constexpr auto legendre_impl(unsigned l, T x) noexcept
 {
     if (x < -1 || x > 1 || l > 128)
     {
-        return std::numeric_limits<T>::signaling_NaN();
+        return std::numeric_limits<T>::quiet_NaN();
     }
     else if (isnan(x))
     {

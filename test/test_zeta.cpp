@@ -404,6 +404,26 @@ int main()
   }
 
   {
+    using decimal_type = ::boost::decimal::decimal64_fast;
+
+    const bool result_rz64_is_ok = local::test_riemann_zeta<decimal_type, double>(256, 1.1L, 12.3L);
+
+    result_is_ok = (result_rz64_is_ok && result_is_ok);
+
+    BOOST_TEST(result_is_ok);
+  }
+
+  {
+    using decimal_type = ::boost::decimal::decimal64_fast;
+
+    const bool result_rz64_is_ok = local::test_riemann_zeta<decimal_type, double>(1024, 1.01L, 1.1L);
+
+    result_is_ok = (result_rz64_is_ok && result_is_ok);
+
+    BOOST_TEST(result_is_ok);
+  }
+
+  {
     const auto result_rz_128_lo_is_ok   = local::test_riemann_zeta_128_lo(4096);
     const auto result_rz_128_hi_is_ok   = local::test_riemann_zeta_128_hi(4096);
 

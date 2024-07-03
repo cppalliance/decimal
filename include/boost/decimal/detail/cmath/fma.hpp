@@ -14,6 +14,7 @@
 namespace boost {
 namespace decimal {
 
+/*
 constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
     // First calculate x * y without rounding
@@ -304,35 +305,36 @@ constexpr auto fmad128f(decimal128_fast x, decimal128_fast y, decimal128_fast z)
 {
     return x * y + z;
 }
+*/
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
-    return fmad32(x, y, z);
+    return x * y + z;
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
 {
-    return fmad64(x, y, z);
+    return x * y + z;
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
 {
-    return fmad128(x, y, z);
+    return x * y + z;
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32_fast x, decimal32_fast y, decimal32_fast z) noexcept -> decimal32_fast
 {
-    return fmad32f(x, y, z);
+    return x * y + z;
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal64_fast x, decimal64_fast y, decimal64_fast z) noexcept -> decimal64_fast
 {
-    return fmad64f(x, y, z);
+    return x * y + z;
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal128_fast x, decimal128_fast y, decimal128_fast z) noexcept -> decimal128_fast
 {
-    return fmad128f(x, y, z);
+    return x * y + z;
 }
 
 } //namespace decimal

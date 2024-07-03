@@ -169,6 +169,9 @@ template <bool b>
 constexpr typename riemann_zeta_table_imp<b>::d64_coeffs_t riemann_zeta_table_imp<b>::d64_coeffs;
 
 template <bool b>
+constexpr typename riemann_zeta_table_imp<b>::d64_fast_coeffs_t riemann_zeta_table_imp<b>::d64_fast_coeffs;
+
+template <bool b>
 constexpr typename riemann_zeta_table_imp<b>::d128_coeffs_t riemann_zeta_table_imp<b>::d128_coeffs;
 
 template <bool b>
@@ -179,7 +182,7 @@ constexpr typename prime_table_imp<b, T>::prime_table_t prime_table_imp<b, T>::p
 
 #endif
 
-} //namespace lgamma_detail
+} //namespace riemann_zeta_detail
 
 using riemann_zeta_table = riemann_zeta_detail::riemann_zeta_table_imp<true>;
 
@@ -338,11 +341,11 @@ using prime_table = riemann_zeta_detail::prime_table_imp<true, T>;
 
 template <typename T>
 constexpr auto riemann_zeta_decimal_order(T x) noexcept
-    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
 {
     int n { };
 
-    const T fr10 = frexp10(x, &n);
+    static_cast<void>(frexp10(x, &n));
 
     constexpr int order_bias
     {
@@ -351,7 +354,7 @@ constexpr auto riemann_zeta_decimal_order(T x) noexcept
         :                                         33
     };
 
-    return n + order_bias;
+    return static_cast<int>(n + order_bias);
 }
 
 template <typename T>

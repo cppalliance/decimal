@@ -101,7 +101,7 @@ namespace local
         static_cast<float_type>(range_hi)
       };
 
-    auto result_is_ok = true;
+    bool result_is_ok { true };
 
     auto trials = static_cast<std::uint32_t>(UINT8_C(0));
 
@@ -232,6 +232,14 @@ namespace local
     return result_is_ok;
   }
 
+  namespace detail
+  {
+    auto local_factorial(const int u_arg) -> int
+    {
+      return ((u_arg > 1) ? u_arg * local_factorial(u_arg - 1) : 1);
+    }
+  } // namespace detail
+
   template<typename DecimalType, typename FloatType>
   auto test_tgamma_edge() -> bool
   {
@@ -255,9 +263,11 @@ namespace local
     {
       static_cast<void>(i);
 
-      const auto val_nan = tgamma(::my_nan<decimal_type>() * static_cast<decimal_type>(dist(gen)));
+      const decimal_type arg_nan = ::my_nan<decimal_type>() * static_cast<decimal_type>(dist(gen));
 
-      const auto result_val_nan_is_ok = isnan(val_nan);
+      const auto val_nan = tgamma(arg_nan);
+
+      const auto result_val_nan_is_ok = (isnan(arg_nan) && isnan(val_nan));
 
       BOOST_TEST(result_val_nan_is_ok);
 
@@ -331,27 +341,62 @@ namespace local
       result_is_ok = (result_val_neg_int_is_ok && result_is_ok);
     }
 
+    {
+      std::uniform_int_distribution<int> n_dist(-8, 8);
+
+      for(auto i = static_cast<unsigned>(UINT8_C(0)); i < static_cast<unsigned>(UINT8_C(64)); ++i)
+      {
+        static_cast<void>(i);
+
+        int n_arg { };
+
+        do
+        {
+          n_arg = static_cast<int>(dist(gen) * static_cast<float_type>(n_dist(gen)));
+        }
+        while(n_arg == 0);
+
+        const auto val_neg_or_pos_int = tgamma(decimal_type { n_arg });
+
+        const bool result_val_neg_or_pos_int_is_ok
+        {
+          (n_arg < 0)
+            ? isnan(val_neg_or_pos_int)
+            : (val_neg_or_pos_int == decimal_type { detail::local_factorial(n_arg - 1) })
+        };
+
+        BOOST_TEST(result_val_neg_or_pos_int_is_ok);
+      }
+    }
+
     return result_is_ok;
   }
 
+  template <typename T>
   auto test_tgamma_64(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal64;
+    using decimal_type = T;
 
-    using val_ctrl_array_type = std::array<double, 9U>;
+    using val_ctrl_array_type = std::array<double, 60U>;
 
     const val_ctrl_array_type ctrl_values =
     {{
-      // Table[N[Gamma[(100 n + 10 n + 1)/100], 17], {n, 1, 9, 1}]
-      0.94739550403930194,
-      1.1078475565340642,
-      2.7113982392439032,
-      10.275404092015205,
-      53.193428252500821,
-      350.99860982420059,
-      2825.0945368041871,
-      26903.671946749768,
-      296439.08210247219
+      // Table[N[Gamma[(100 n + 10 n + 1)/100], 17], {n, 1, 60, 1}]
+      0.94739550403930194,   1.1078475565340642,    2.7113982392439032,    10.275404092015205,
+      53.193428252500821,    350.99860982420059,    2825.0945368041871,    26903.671946749768,
+      296439.08210247219,    3.7151694808335262E6,  5.2248655724999539E7,  8.1559358315162481E8,
+      1.4003864963215806E10, 2.6248079659179476E11, 5.3359345146038291E12, 1.1699346902782403E14,
+      2.7532014421100241E15, 6.9244013329287960E16, 1.8541668152687476E18, 5.2682902901266819E19,
+      1.5835331811651831E21, 5.0214805711619419E22, 1.6757319939260139E24, 5.8716780788551005E25,
+      2.1557832390775697E27, 8.2776435856226462E28, 3.3182220048802434E30, 1.3864267823634387E32,
+      6.0287609578074943E33, 2.7245289064723745E35, 1.2779702086934696E37, 6.2142224585589752E38,
+      3.1289164966313044E40, 1.6295852062896416E42, 8.7699808502638695E43, 4.8724406933277294E45,
+      2.7921058920789799E47, 1.6488720717110485E49, 1.0026831646019886E51, 6.2738214998572616E52,
+      4.0362582629406399E54, 2.6681253193507199E56, 1.8110500898791038E58, 1.2614831726173141E60,
+      9.0115901683403914E61, 6.5984838519287425E63, 4.9496470750365049E65, 3.8015995515229523E67,
+      2.9881661824024275E69, 2.4026053841139002E71, 1.9751536921873138E73, 1.6594698969864635E75,
+      1.4243101914186081E77, 1.2483321800413105E79, 1.1168025043366527E81, 1.0194823058475096E83,
+      9.4925406490211214E84, 9.0122375942241500E86, 8.7213439289363091E88, 8.5998928589456410E90
     }};
 
     std::array<decimal_type, std::tuple_size<val_ctrl_array_type>::value> tgamma_values { };
@@ -364,7 +409,7 @@ namespace local
 
     for(auto i = static_cast<std::size_t>(UINT8_C(0)); i < std::tuple_size<val_ctrl_array_type>::value; ++i)
     {
-      // Table[N[Gamma[(100 n + 10 n + 1)/100], 17], {n, 1, 9, 1}]
+      // Table[N[Gamma[(100 n + 10 n + 1)/100], 17], {n, 1, 60, 1}]
 
       const decimal_type x_arg =
         decimal_type
@@ -388,9 +433,10 @@ namespace local
     return result_is_ok;
   }
 
+  template <typename T>
   auto test_tgamma_128_lo(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128;
+    using decimal_type = T;
 
     using str_ctrl_array_type = std::array<const char*, 9U>;
 
@@ -443,38 +489,39 @@ namespace local
     return result_is_ok;
   }
 
+  template <typename T>
   auto test_tgamma_128_hi(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128;
+    using decimal_type = T;
 
     using str_ctrl_array_type = std::array<const char*, 23U>;
 
     const str_ctrl_array_type ctrl_strings =
     {{
-       // Table[N[Gamma[n + n/10 + n/100 + n/1000], 36], {n, 1, 221, 10}]
+       // Table[N[Gamma[n + n/10 + n/100 + n/1000], 36], {n, 1, 441, 20}]
        "0.947008281162266001895790481785841941",
-       "6.86303089001025022525468906807854872E7",
        "3.15793281780505944512262743601561476E21",
-       "4.09725124531962875389920397572482227E37",
        "2.15936518595728901631037627967671095E55",
-       "1.81286283067020212427848823649632939E74",
        "1.39061339788491577387400422516492967E94",
-       "6.73844979762045895677263594960237945E114",
        "1.58535690838444528565837326081067457E136",
-       "1.48677291673153228216478665408262025E158",
        "4.76763037027821868276349648015607359E180",
-       "4.62395515046183569847627307320617350E203",
        "1.22680267570425015175034111397510637E227",
-       "8.18925182002285090986591692926519438E250",
        "1.28134405415265103961333749220602490E275",
-       "4.42253704896092684478952587741331734E299",
        "3.19451354412535995695298989136255493E324",
-       "4.61171076932972412633999770033353340E349",
        "1.27758574231803927960543278875893523E375",
-       "6.55079490827236721494047351435261992E400",
        "6.01906299656231025481256209731706244E426",
-       "9.62614024174757375775890458257288037E452",
        "2.60989891797040728048724526392884050E479",
+       "8.51153498603770804330189669764850875E532",
+       "1.76460777040308546845398824868757146E587",
+       "2.01724925451815400062695367380690106E642",
+       "1.12561640859759436167441986443132385E698",
+       "2.75837469111115413674841228540896619E754",
+       "2.70644159853332718255879815565112008E811",
+       "9.79944991798621476450972272345259980E868",
+       "1.21779441781389959514800894074337599E927",
+       "4.86790091463208550137913621125716144E985",
+       "5.90402771606488456073372829303791389E1044",
+       "2.06087672504774304998804920027460689E1104"
     }};
 
     std::array<decimal_type, std::tuple_size<str_ctrl_array_type>::value> tg_values   { };
@@ -497,7 +544,7 @@ namespace local
           + decimal_type { nx, -3 }
         };
 
-        nx += 10;
+        nx += 20;
 
         tg_values[i] = tgamma(x_arg);
 
@@ -603,7 +650,7 @@ auto main() -> int
   }
 
   {
-    const auto result_tgamma64_is_ok   = local::test_tgamma_64(256);
+    const auto result_tgamma64_is_ok   = local::test_tgamma_64<boost::decimal::decimal64>(4096);
 
     BOOST_TEST(result_tgamma64_is_ok);
 
@@ -611,8 +658,26 @@ auto main() -> int
   }
 
   {
-    const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo(4096);
-    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi(0x20'000);
+    const auto result_tgamma64_is_ok   = local::test_tgamma_64<boost::decimal::decimal64_fast>(4096);
+
+    BOOST_TEST(result_tgamma64_is_ok);
+
+    result_is_ok = (result_tgamma64_is_ok && result_is_ok);
+  }
+
+  {
+    const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo<boost::decimal::decimal128>(4096);
+    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi<boost::decimal::decimal128>(0x30'000);
+
+    BOOST_TEST(result_tgamma128_lo_is_ok);
+    BOOST_TEST(result_tgamma128_hi_is_ok);
+
+    result_is_ok = (result_tgamma128_lo_is_ok && result_tgamma128_hi_is_ok && result_is_ok);
+  }
+  
+  {
+    const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo<boost::decimal::decimal128_fast>(4096);
+    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi<boost::decimal::decimal128_fast>(0x30'000);
 
     BOOST_TEST(result_tgamma128_lo_is_ok);
     BOOST_TEST(result_tgamma128_hi_is_ok);

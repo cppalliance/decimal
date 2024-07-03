@@ -4,8 +4,8 @@
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
-#define BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
+#ifndef BOOST_DECIMAL_DETAIL_CMATH_ELLINT_2_HPP
+#define BOOST_DECIMAL_DETAIL_CMATH_ELLINT_2_HPP
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
 #include <boost/decimal/detail/cmath/impl/ellint_impl.hpp>
@@ -31,7 +31,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto ellint_1_impl(T m, T phi) noexcept
+constexpr auto ellint_2_impl(T m, T phi) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
   constexpr T one { 1 };
@@ -57,11 +57,11 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
   }
   else if(signbit(phi))
   {
-    result = -ellint_1_impl(m, -phi);
+    result = -ellint_2_impl(m, -phi);
   }
   else if(signbit(m))
   {
-    result = ellint_1_impl(-m, phi);
+    result = ellint_2_impl(-m, phi);
   }
   else
   {
@@ -72,15 +72,15 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 
     if (phi < small_phi_limit)
     {
-      // PadeApproximant[EllipticF[phi, m2], {phi, 0, {4, 3}}]
+      // PadeApproximant[EllipticE[phi, m2], {phi, 0, {4, 3}}]
       // FullSimplify[%]
 
       const T phi_sq { phi * phi };
 
       const T m2 { m * m };
 
-      const T top { phi * (-60 + (-12 + 17 * m2) * phi_sq) };
-      const T bot { -60 + 3 * (-4 + 9 * m2) * phi_sq };
+      const T top { phi * (-60 + (-12 + 19 * m2) * phi_sq) };
+      const T bot { -60 + 3 * (-4 + 3 * m2) * phi_sq };
 
       result = top / bot;
     }
@@ -101,23 +101,20 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
         phi_scaled = -(phi_scaled - numbers::pi_v<T>);
       }
 
-      T Km { };
+      T Fpm { };
+      T Km  { };
+      T Em  { };
 
       const T m2 { m * m };
 
-      const bool m2_is_one { m2 == one };
-
-      detail::ellint_detail::elliptic_series::agm(phi_scaled, m2, result, Km, static_cast<T*>(nullptr), static_cast<T*>(nullptr));
+      detail::ellint_detail::elliptic_series::agm(phi_scaled, m2, Fpm, Km, &Em, &result);
 
       if(b_medium_phi_scale_and_negate)
       {
         result = -result;
       }
 
-      if(!m2_is_one)
-      {
-        result += ((k_pi * Km) * 2);
-      }
+      result += ((k_pi * Em) * 2);
     }
   }
 
@@ -125,7 +122,7 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 }
 
 template <typename T>
-constexpr auto comp_ellint_1_impl(T m) noexcept
+constexpr auto comp_ellint_2_impl(T m) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
   constexpr T one  { 1 };
@@ -144,15 +141,16 @@ constexpr auto comp_ellint_1_impl(T m) noexcept
   }
   else if(signbit(m))
   {
-    result = comp_ellint_1_impl(-m);
+    result = comp_ellint_2_impl(-m);
   }
   else
   {
     constexpr T zero { 0 };
 
     T Fpm { };
+    T Km  { };
 
-    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, result, static_cast<T*>(nullptr), static_cast<T*>(nullptr));
+    detail::ellint_detail::elliptic_series::agm(zero, m * m, Fpm, Km, &result, static_cast<T*>(nullptr));
   }
 
   return result;
@@ -161,7 +159,7 @@ constexpr auto comp_ellint_1_impl(T m) noexcept
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto ellint_1(T k, T phi) noexcept
+constexpr auto ellint_2(T k, T phi) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -178,11 +176,11 @@ constexpr auto ellint_1(T k, T phi) noexcept
 
     #endif
 
-    return static_cast<T>(detail::ellint_1_impl(static_cast<evaluation_type>(k), static_cast<evaluation_type>(phi)));
+    return static_cast<T>(detail::ellint_2_impl(static_cast<evaluation_type>(k), static_cast<evaluation_type>(phi)));
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto comp_ellint_1(T k) noexcept
+constexpr auto comp_ellint_2(T k) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -199,10 +197,10 @@ constexpr auto comp_ellint_1(T k) noexcept
 
     #endif
 
-    return static_cast<T>(detail::comp_ellint_1_impl(static_cast<evaluation_type>(k)));
+    return static_cast<T>(detail::comp_ellint_2_impl(static_cast<evaluation_type>(k)));
 }
 
 } //namespace decimal
 } //namespace boost
 
-#endif //BOOST_DECIMAL_DETAIL_CMATH_ELLINT_1_HPP
+#endif //BOOST_DECIMAL_DETAIL_CMATH_ELLINT_2_HPP

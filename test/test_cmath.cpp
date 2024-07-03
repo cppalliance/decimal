@@ -778,7 +778,7 @@ void test_rint()
 
     BOOST_TEST(isinf(rint(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
     BOOST_TEST(isnan(rint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
-    BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(abs(rint(Dec(0) * Dec(dist(rng)))), Dec(0));
     BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
     BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, true));
 }
@@ -802,6 +802,8 @@ void test_lrint()
         // Difference in rounding mode at 0.5
         if (abs(ret_dec) == abs(ret_val) + 1)
         {
+            // LCOV_EXCL_START
+
             float iptr;
             const auto frac = std::modf(val1, &iptr);
             if (abs(abs(frac) - 0.5F) < 0.01F)
@@ -810,11 +812,11 @@ void test_lrint()
             }
             else
             {
-                // LCOV_EXCL_START
                 std::cerr << "Frac: " << frac
                           << "\nDist: " << std::fabs(frac - 0.5F) / std::numeric_limits<float>::epsilon() << std::endl;
-                // LCOV_EXCL_STOP
             }
+
+            // LCOV_EXCL_STOP
         }
 
         if (!BOOST_TEST_EQ(ret_val, ret_dec))
@@ -966,7 +968,7 @@ void test_nearbyint()
 
     BOOST_TEST(isinf(nearbyint(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
     BOOST_TEST(isnan(nearbyint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
-    BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(abs(nearbyint(Dec(0) * Dec(dist(rng)))), Dec(0));
     BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
     BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, true));
 }
@@ -1008,7 +1010,7 @@ void test_round()
 
     BOOST_TEST(isinf(round(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
     BOOST_TEST(isnan(round(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
-    BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng))), Dec(0));
+    BOOST_TEST_EQ(abs(round(Dec(0) * Dec(dist(rng)))), Dec(0));
     BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
     BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, false));
 }

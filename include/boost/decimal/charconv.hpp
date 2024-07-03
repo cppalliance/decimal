@@ -39,7 +39,8 @@ namespace detail {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 constexpr auto from_chars_general_impl(const char* first, const char* last, TargetDecimalType& value, chars_format fmt) noexcept -> from_chars_result
 {
-    using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value, detail::uint128, std::uint64_t>;
+    using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value ||
+                                                std::is_same<TargetDecimalType, decimal128_fast>::value, detail::uint128, std::uint64_t>;
 
     if (first >= last)
     {
@@ -714,6 +715,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, static_cast<std::uint32_t>(abs_exp), 10);
 }
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4702) // Unreachable code
+#endif
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecimalType value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
 {
@@ -730,28 +736,26 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
 
     constexpr auto min_fractional_value = TargetDecimalType{1, -4};
 
-    if (fmt == chars_format::hex)
-    {
-        return to_chars_hex_impl(first, last, value, precision);
-    }
-
     // Unspecified precision so we always go with the shortest representation
     if (precision == -1)
     {
-        if (fmt == chars_format::general || fmt == chars_format::fixed)
+        switch (fmt)
         {
-            if (abs_value >= 1 && abs_value < max_fractional_value)
-            {
+            case chars_format::general:
+                if (abs_value >= 1 && abs_value < max_fractional_value)
+                {
+                    return to_chars_fixed_impl(first, last, value, fmt, precision);
+                }
+                else
+                {
+                    return to_chars_scientific_impl(first, last, value, fmt, precision);
+                }
+            case chars_format::fixed:
                 return to_chars_fixed_impl(first, last, value, fmt, precision);
-            }
-            else
-            {
+            case chars_format::scientific:
                 return to_chars_scientific_impl(first, last, value, fmt, precision);
-            }
-        }
-        else
-        {
-            return to_chars_scientific_impl(first, last, value, fmt, precision);
+            case chars_format::hex:
+                return to_chars_hex_impl(first, last, value, precision); // LCOV_EXCL_LINE unreachable
         }
     }
     else
@@ -766,12 +770,24 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
         {
             return to_chars_fixed_impl(first, last, value, fmt, precision);
         }
+        else if (fmt == chars_format::hex)
+        {
+            return to_chars_hex_impl(first, last, value, precision);
+        }
         else
         {
             return to_chars_scientific_impl(first, last, value, fmt, precision);
         }
     }
+
+    // LCOV_EXCL_START
+    return to_chars_scientific_impl(first, last, value, fmt, precision);
+    // LCOV_EXCL_STOP
 }
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } //namespace detail
 

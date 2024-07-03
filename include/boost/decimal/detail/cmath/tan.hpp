@@ -47,7 +47,7 @@ constexpr auto tan(T x) noexcept
     }
     else
     {
-        // Perform argument reduction and subsequent computation of the result.
+        // Perform argument reduction.
 
         // Given x = k * (pi/2) + r, compute n = (k % 4).
 
@@ -58,29 +58,62 @@ constexpr auto tan(T x) noexcept
         // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
         // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
 
-        #if (defined(_MSC_VER) && (_MSC_VER < 1920))
-        const auto my_pi_half = numbers::pi_v<T> / 2;
-        #else
-        constexpr auto my_pi_half = numbers::pi_v<T> / 2;
-        #endif
+        const T two_x = x * 2;
 
-        int k { };
-        auto r { remquo(x, my_pi_half, &k) };
+        const auto k = static_cast<unsigned>(two_x / numbers::pi_v<T>);
+        const auto n = static_cast<unsigned>(k % static_cast<unsigned>(UINT8_C(4)));
 
-        const auto n = static_cast<unsigned>(k % 4);
+        const T two_r { two_x - (numbers::pi_v<T> * k) };
+
+        const T r { two_r / 2 };
+
+        constexpr T cbrt_epsilon { cbrt(std::numeric_limits<T>::epsilon()) };
+
+        constexpr T one { 1 };
+        constexpr T two { 2 };
 
         switch(n)
         {
-            case 1U:
-            case 3U:
-                result = -detail::cos_series_expansion(r) / detail::sin_series_expansion(r);
+            case static_cast<unsigned>(UINT8_C(1)):
+            case static_cast<unsigned>(UINT8_C(3)):
+            {
+                if (two_r < cbrt_epsilon)
+                {
+                    // Normal[Series[Cos[x/2]/Sin[x/2], {x, 0, 3}]]
+
+                    result = (two / two_r) - (two_r * (one + (two_r * two_r) / 60) / 6);
+                }
+                else
+                {
+                    result = cos(r) / sin(r);
+                }
+
+                result = -result;
+
                 break;
-            case 0U:
-            case 2U:
+            }
+
+            case static_cast<unsigned>(UINT8_C(0)):
+            case static_cast<unsigned>(UINT8_C(2)):
             default:
-                result = detail::sin_series_expansion(r) / detail::cos_series_expansion(r);
+            {
+                const T d2r { numbers::pi_v<T> - two_r };
+
+                if (d2r < cbrt_epsilon)
+                {
+                    // Use essentially the same series as shown above, but shifted via d2r.
+
+                    result = (two / d2r) - ((d2r * (one + (d2r * d2r) / 60)) / 6);
+                }
+                else
+                {
+                    result = sin(r) / cos(r);
+                }
+
                 break;
+            }
         }
+        
     }
 
     return result;
