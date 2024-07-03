@@ -117,6 +117,8 @@ private:
     friend constexpr auto logb(T num) noexcept
         BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T);
 
+    friend constexpr auto not_finite(decimal64_fast val) noexcept -> bool;
+
 public:
     constexpr decimal64_fast() noexcept = default;
 
@@ -149,6 +151,7 @@ public:
     friend constexpr auto isnan(decimal64_fast val) noexcept -> bool;
     friend constexpr auto issignaling(decimal64_fast val) noexcept -> bool;
     friend constexpr auto isnormal(decimal64_fast val) noexcept -> bool;
+    friend constexpr auto isfinite(decimal64_fast val) noexcept -> bool;
 
     // Comparison operator
     friend constexpr auto operator==(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
@@ -473,6 +476,16 @@ constexpr auto isnormal(decimal64_fast val) noexcept -> bool
     }
 
     return (val.significand_ != 0) && isfinite(val);
+}
+
+constexpr auto isfinite(decimal64_fast val) noexcept -> bool
+{
+    return val.significand_ < detail::d64_fast_snan;
+}
+
+constexpr auto not_finite(decimal64_fast val) noexcept -> bool
+{
+    return val.significand_ >= detail::d64_fast_snan;
 }
 
 constexpr auto operator==(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
