@@ -1101,27 +1101,16 @@ constexpr auto operator!=(Integer lhs, decimal32 rhs) noexcept
 constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs) ||
-        (!lhs.isneg() && rhs.isneg()))
+    if (!isfinite(lhs) || !isfinite(rhs))
     {
-        return false;
-    }
-    else if (lhs.isneg() && !rhs.isneg())
-    {
-        return true;
-    }
-    else if (isfinite(lhs) && isinf(rhs))
-    {
-        return !rhs.isneg();
-    }
-    #else
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return false;
-    }
-    else if (lhs.isneg() && !rhs.isneg())
-    {
-        return true;
+        if (isnan(lhs) || isnan(rhs))
+        {
+            return false;
+        }
+        else if (isfinite(lhs) && isinf(rhs))
+        {
+            return !rhs.isneg();
+        }
     }
     #endif
 
