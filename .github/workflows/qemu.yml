@@ -19,10 +19,6 @@ on:
       - fix/**
       - pr/**
 
-concurrency:
-  group: ${{format('{0}:{1}', github.repository, github.ref)}}
-  cancel-in-progress: true
-
 env:
   GIT_FETCH_JOBS: 8
   NET_RETRY_COUNT: 5
