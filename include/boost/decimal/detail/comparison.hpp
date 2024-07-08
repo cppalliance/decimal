@@ -14,6 +14,7 @@
 #include <boost/decimal/detail/shrink_significand.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/power_tables.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
@@ -26,7 +27,54 @@ namespace decimal {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> bool
+                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value, bool>
+{
+    using comp_type = std::uint_fast64_t;
+
+    BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
+    BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
+
+    // We con compare signs right away
+    if (lhs_sign != rhs_sign)
+    {
+        return false;
+    }
+
+    auto new_lhs_sig {static_cast<comp_type>(lhs_sig)};
+    auto new_rhs_sig {static_cast<comp_type>(rhs_sig)};
+
+    const auto delta_exp {lhs_exp - rhs_exp};
+
+    // Check the value of delta exp to avoid to large a value for pow10
+    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType>)
+    {
+        return false;
+    }
+
+    if (delta_exp >= 0)
+    {
+        new_lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp));
+    }
+    else
+    {
+        new_rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
+    }
+
+    #ifdef BOOST_DECIMAL_DEBUG_EQUAL
+    std::cerr << "Normalized Values"
+              << "\nlhs_sig: " << new_lhs_sig
+              << "\nlhs_exp: " << lhs_exp
+              << "\nrhs_sig: " << new_rhs_sig
+              << "\nrhs_exp: " << rhs_exp << std::endl;
+    #endif
+
+    return new_lhs_sig == new_rhs_sig;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
+          BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
+constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
+                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!std::is_same<DecimalType, decimal32>::value, bool>
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
