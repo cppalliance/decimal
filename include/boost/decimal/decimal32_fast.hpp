@@ -486,9 +486,9 @@ constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bo
     }
     #endif
 
-    return lhs.sign_ == rhs.sign_ &&
-           lhs.exponent_ == rhs.exponent_ &&
-           lhs.significand_ == rhs.significand_;
+    return (lhs.sign_ == rhs.sign_) &
+           (lhs.exponent_ == rhs.exponent_) &
+           (lhs.significand_ == rhs.significand_);
 }
 
 constexpr auto operator!=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
