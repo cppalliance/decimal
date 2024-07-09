@@ -73,7 +73,9 @@ jobs:
               else
                 pkgs+=" python libpython-dev"
               fi
-              apt-get -o Acquire::Retries=$NET_RETRY_COUNT install -y $pkgs
+              apt-get -o Acquire::Retries=$NET_RETRY_COUNT install -y $pkgs locales
+              sudo locale-gen de_DE.UTF-8
+              sudo update-locale
           fi
           # For jobs not compatible with ccache, use "ccache: no" in the matrix
           if [[ "${{ matrix.ccache }}" == "no" ]]; then
