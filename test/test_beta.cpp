@@ -57,7 +57,7 @@ void test()
         const auto dec_ret {boost::decimal::beta(static_cast<T>(x), static_cast<T>(y))};
         const auto dec_ret_double {static_cast<double>(dec_ret)};
 
-        if (!BOOST_TEST(abs(1.0 - (double_ret / dec_ret_double)) < 1e-5))
+        if (!BOOST_TEST(std::abs(1.0 - (double_ret / dec_ret_double)) < 1e-5))
         {
             // LCOV_EXCL_START
 
