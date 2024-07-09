@@ -66,7 +66,7 @@ void test()
                       << "\nY: " << y
                       << "\nBoost::Math: " << double_ret
                       << "\nDecimal val: " << dec_ret
-                      << "\nDist: " << abs(double_ret - dec_ret_double) / std::numeric_limits<double>::epsilon() << std::endl;
+                      << "\nDist: " << std::abs(double_ret - dec_ret_double) / std::numeric_limits<double>::epsilon() << std::endl;
 
             // LCOV_EXCL_STOP
         }
