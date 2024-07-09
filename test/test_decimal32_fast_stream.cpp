@@ -148,7 +148,7 @@ int main()
     test_ostream();
 
     // Homebrew GCC does not support locales
-    #if !(defined(__GNUC__) && __GNUC__ >= 5 && defined(__APPLE__))
+    #if !(defined(__GNUC__) && __GNUC__ >= 5 && defined(__APPLE__)) && !defined(BOOST_DECIMAL_QEMU_TEST)
     test_locales();
     #endif
 
