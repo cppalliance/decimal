@@ -499,22 +499,25 @@ constexpr auto operator!=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bo
 constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs) ||
-        (!lhs.isneg() && rhs.isneg()))
+    if (!isfinite(lhs) || !isfinite(rhs))
     {
-        return false;
-    }
-    else if (lhs.isneg() && !rhs.isneg())
-    {
-        return true;
-    }
-    else if (isfinite(lhs) && isinf(rhs))
-    {
-        return !signbit(rhs);
-    }
-    else if (isinf(lhs) && isfinite(rhs))
-    {
-        return signbit(rhs);
+        if (isnan(lhs) || isnan(rhs) ||
+            (!lhs.isneg() && rhs.isneg()))
+        {
+            return false;
+        }
+        else if (lhs.isneg() && !rhs.isneg())
+        {
+            return true;
+        }
+        else if (isfinite(lhs) && isinf(rhs))
+        {
+            return !signbit(rhs);
+        }
+        else if (isinf(lhs) && isfinite(rhs))
+        {
+            return signbit(rhs);
+        }
     }
     #else
     if (!lhs.isneg() && rhs.isneg())
