@@ -162,9 +162,43 @@ constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
+        BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
+constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
+                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value, bool>
+{
+    using comp_type = std::uint_fast64_t;
+
+    BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
+    BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
+
+    if (lhs_sign != rhs_sign)
+    {
+        return lhs_sign;
+    }
+
+    auto new_lhs_sig {static_cast<comp_type>(lhs_sig)};
+    auto new_rhs_sig {static_cast<comp_type>(rhs_sig)};
+
+    if (new_lhs_sig == UINT64_C(0) || new_rhs_sig == UINT64_C(0))
+    {
+        return (new_lhs_sig == new_rhs_sig) ? false : (new_lhs_sig == 0 ? !rhs_sign : lhs_sign);
+    }
+
+    detail::normalize<DecimalType>(new_lhs_sig, lhs_exp);
+    detail::normalize<DecimalType>(new_rhs_sig, rhs_exp);
+
+    if (lhs_exp != rhs_exp)
+    {
+        return lhs_sign ? lhs_exp > rhs_exp : lhs_exp < rhs_exp;
+    }
+
+    return lhs_sign ? new_lhs_sig > new_rhs_sig : new_lhs_sig < new_rhs_sig;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> bool
+                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!std::is_same<DecimalType, decimal32>::value, bool>
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
