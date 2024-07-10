@@ -1056,10 +1056,12 @@ constexpr auto decimal32::operator-=(Integer rhs) noexcept
 
 constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
                             rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
