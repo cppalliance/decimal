@@ -534,7 +534,11 @@ constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> boo
     {
         if (lhs.significand_ == 0 && rhs.significand_ == 0)
         {
+            #ifndef BOOST_DECIMAL_FAST_MATH
+            return lhs.sign_ && !rhs.sign_;
+            #else
             return false;
+            #endif
         }
         return lhs.significand_ == 0 ? !rhs.sign_ : lhs.sign_;
     }
