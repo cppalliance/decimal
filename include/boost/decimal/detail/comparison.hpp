@@ -106,10 +106,12 @@ constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
 {
     using exp_type = typename Decimal::biased_exponent_type;
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
         return false;
     }
+    #endif
 
     bool rhs_isneg {false};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
@@ -134,10 +136,12 @@ constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
     static_assert(!std::is_same<Decimal1, Decimal2>::value, "Equality of same type exists in simpler form");
     using Bigger_Decimal_Type = std::conditional_t<(sizeof(lhs) > sizeof(rhs)), Decimal1, Decimal2>;
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     const auto new_lhs = to_decimal<Bigger_Decimal_Type>(lhs);
     const auto new_rhs = to_decimal<Bigger_Decimal_Type>(rhs);
@@ -239,6 +243,7 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
 {
     using exp_type = typename Decimal::biased_exponent_type;
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs))
     {
         return false;
@@ -247,6 +252,7 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
     {
         return lhs.isneg();
     }
+    #endif
 
     bool lhs_sign {lhs.isneg()};
     bool rhs_sign {false};
@@ -288,7 +294,13 @@ constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
 {
     using Bigger_Decimal_Type = std::conditional_t<(sizeof(lhs) > sizeof(rhs)), Decimal1, Decimal2>;
 
-    if (isnan(lhs) || isnan(rhs) || (!lhs.isneg() && rhs.isneg()))
+
+    if (
+            #ifndef BOOST_DECIMAL_FAST_MATH
+            isnan(lhs) || isnan(rhs) ||
+            #endif
+            (!lhs.isneg() && rhs.isneg())
+        )
     {
         return false;
     }
@@ -296,6 +308,7 @@ constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
     {
         return true;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (boost::decimal::isfinite(lhs) && isinf(rhs))
     {
         if (!signbit(rhs))
@@ -307,6 +320,7 @@ constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
             return false;
         }
     }
+    #endif
 
     return less_parts_impl<Bigger_Decimal_Type>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
                                                 rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
@@ -325,10 +339,12 @@ constexpr auto operator<=(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(rhs < lhs);
 }
@@ -346,10 +362,12 @@ constexpr auto operator>=(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(lhs < rhs);
 }
