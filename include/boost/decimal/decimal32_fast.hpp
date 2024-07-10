@@ -519,15 +519,6 @@ constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> boo
             return signbit(rhs);
         }
     }
-    #else
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return false;
-    }
-    else if (lhs.isneg() && !rhs.isneg())
-    {
-        return true;
-    }
     #endif
 
     if (lhs.significand_ == 0 || rhs.significand_ == 0)
