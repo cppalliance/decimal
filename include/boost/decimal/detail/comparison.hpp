@@ -27,9 +27,9 @@ namespace decimal {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value, bool>
+                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal64>::value, bool>
 {
-    using comp_type = std::uint_fast64_t;
+    using comp_type = std::conditional_t<std::is_same<DecimalType, decimal32>::value, std::uint_fast32_t, std::uint_fast64_t>;
 
     BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
     BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
@@ -46,7 +46,9 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     const auto delta_exp {lhs_exp - rhs_exp};
 
     // Check the value of delta exp to avoid to large a value for pow10
-    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType>)
+    // Also if only one of the significands is 0 then we know the values have to be mismatched
+    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType> ||
+        ((new_lhs_sig == static_cast<comp_type>(0)) ^ (new_rhs_sig == static_cast<comp_type>(0))))
     {
         return false;
     }
@@ -74,7 +76,7 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!std::is_same<DecimalType, decimal32>::value, bool>
+                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!(std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal64>::value), bool>
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
@@ -106,10 +108,12 @@ constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
 {
     using exp_type = typename Decimal::biased_exponent_type;
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isinf(lhs))
     {
         return false;
     }
+    #endif
 
     bool rhs_isneg {false};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
@@ -134,10 +138,12 @@ constexpr auto mixed_decimal_equality_impl(Decimal1 lhs, Decimal2 rhs) noexcept
     static_assert(!std::is_same<Decimal1, Decimal2>::value, "Equality of same type exists in simpler form");
     using Bigger_Decimal_Type = std::conditional_t<(sizeof(lhs) > sizeof(rhs)), Decimal1, Decimal2>;
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     const auto new_lhs = to_decimal<Bigger_Decimal_Type>(lhs);
     const auto new_rhs = to_decimal<Bigger_Decimal_Type>(rhs);
@@ -164,7 +170,7 @@ constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
         BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value, bool>
+                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal64>::value, bool>
 {
     using comp_type = std::uint_fast64_t;
 
@@ -198,7 +204,7 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!std::is_same<DecimalType, decimal32>::value, bool>
+                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!(std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal64>::value), bool>
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
@@ -239,6 +245,7 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
 {
     using exp_type = typename Decimal::biased_exponent_type;
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs))
     {
         return false;
@@ -247,6 +254,7 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
     {
         return lhs.isneg();
     }
+    #endif
 
     bool lhs_sign {lhs.isneg()};
     bool rhs_sign {false};
@@ -288,7 +296,13 @@ constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
 {
     using Bigger_Decimal_Type = std::conditional_t<(sizeof(lhs) > sizeof(rhs)), Decimal1, Decimal2>;
 
-    if (isnan(lhs) || isnan(rhs) || (!lhs.isneg() && rhs.isneg()))
+
+    if (
+            #ifndef BOOST_DECIMAL_FAST_MATH
+            isnan(lhs) || isnan(rhs) ||
+            #endif
+            (!lhs.isneg() && rhs.isneg())
+        )
     {
         return false;
     }
@@ -296,6 +310,7 @@ constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
     {
         return true;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (boost::decimal::isfinite(lhs) && isinf(rhs))
     {
         if (!signbit(rhs))
@@ -307,6 +322,7 @@ constexpr auto mixed_decimal_less_impl(Decimal1 lhs, Decimal2 rhs) noexcept
             return false;
         }
     }
+    #endif
 
     return less_parts_impl<Bigger_Decimal_Type>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
                                                 rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
@@ -325,10 +341,12 @@ constexpr auto operator<=(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(rhs < lhs);
 }
@@ -346,10 +364,12 @@ constexpr auto operator>=(Decimal1 lhs, Decimal2 rhs) noexcept
     -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return !(lhs < rhs);
 }

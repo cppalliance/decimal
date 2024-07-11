@@ -538,37 +538,45 @@ constexpr auto operator!=(Integer lhs, decimal64_fast rhs) noexcept
 constexpr auto operator<(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs))
+    if (not_finite(lhs) || not_finite(rhs))
     {
-        return false;
+        if (isnan(lhs) || isnan(rhs) ||
+            (!lhs.isneg() && rhs.isneg()))
+        {
+            return false;
+        }
+        else if (lhs.isneg() && !rhs.isneg())
+        {
+            return true;
+        }
+        else if (isfinite(lhs) && isinf(rhs))
+        {
+            return !signbit(rhs);
+        }
+        else if (isinf(lhs) && isfinite(rhs))
+        {
+            return signbit(rhs);
+        }
     }
     #endif
 
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return false;
-    }
-
-    if (lhs.isneg() && !rhs.isneg())
-    {
-        return true;
-    }
-
-    #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isfinite(lhs) && isinf(rhs))
-    {
-        return !signbit(rhs);
-    }
-
-    if (isinf(lhs) && isfinite(rhs))
-    {
-        return signbit(rhs);
-    }
-    #endif
-
+    // Needed to correctly compare signed and unsigned zeros
     if (lhs.significand_ == 0 || rhs.significand_ == 0)
     {
+        if (lhs.significand_ == 0 && rhs.significand_ == 0)
+        {
+            #ifndef BOOST_DECIMAL_FAST_MATH
+            return lhs.sign_ && !rhs.sign_;
+            #else
+            return false;
+            #endif
+        }
         return lhs.significand_ == 0 ? !rhs.sign_ : lhs.sign_;
+    }
+
+    if (lhs.sign_ != rhs.sign_)
+    {
+        return lhs.sign_;
     }
 
     if (lhs.exponent_ != rhs.exponent_)
