@@ -43,6 +43,19 @@ void test_value(T val, const char* result)
 }
 
 template <typename T>
+void test_error_value(const char* input, chars_format format, int precision = -1)
+{
+    T val;
+    const auto r_from = from_chars(input, input + std::strlen(input), val, format);
+    BOOST_TEST(r_from);
+    std::cerr << "Val: " << val
+              << "\nIsneg: " << signbit(val) << std::endl;
+    char buffer[boost::decimal::limits<T>::max_chars] {};
+    const auto r_to = to_chars(buffer, buffer + sizeof(buffer), val, format, precision);
+    BOOST_TEST(r_to);
+}
+
+template <typename T>
 void test_non_finite_values()
 {
     std::uniform_real_distribution<float> dist(-1.0, 1.0);
@@ -647,6 +660,12 @@ int main()
 
     // See: https://github.com/cppalliance/decimal/issues/478
     test_value(std::numeric_limits<decimal32>::epsilon(), "1e-07");
+
+    // Value found from fuzzing
+    for (int precision = -1; precision < 10; ++precision)
+    {
+        test_error_value<decimal64>("e1000a00000000000000000000p06", chars_format::hex, precision);
+    }
 
     return boost::report_errors();
 }
