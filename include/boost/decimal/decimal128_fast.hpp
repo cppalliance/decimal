@@ -464,17 +464,17 @@ constexpr auto signbit(decimal128_fast val) noexcept -> bool
 
 constexpr auto isinf(decimal128_fast val) noexcept -> bool
 {
-    return val.significand_ == detail::d128_fast_inf;
+    return val.significand_.high == detail::d128_fast_inf_high_bits;
 }
 
 constexpr auto isnan(decimal128_fast val) noexcept -> bool
 {
-    return val.significand_ >= detail::d128_fast_qnan;
+    return val.significand_.high >= detail::d128_fast_qnan_high_bits;
 }
 
 constexpr auto issignaling(decimal128_fast val) noexcept -> bool
 {
-    return val.significand_ == detail::d128_fast_snan;
+    return val.significand_.high == detail::d128_fast_snan_high_bits;
 }
 
 constexpr auto isnormal(decimal128_fast val) noexcept -> bool
@@ -489,12 +489,12 @@ constexpr auto isnormal(decimal128_fast val) noexcept -> bool
 
 constexpr auto isfinite(decimal128_fast val) noexcept -> bool
 {
-    return val.significand_ < detail::d128_fast_inf;
+    return val.significand_.high < detail::d128_fast_inf_high_bits;
 }
 
 constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool
 {
-    return val.significand_ >= detail::d128_fast_inf;
+    return val.significand_.high >= detail::d128_fast_inf_high_bits;
 }
 
 constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
