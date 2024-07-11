@@ -48,7 +48,7 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     // Check the value of delta exp to avoid to large a value for pow10
     // Also if only one of the significands is 0 then we know the values have to be mismatched
     if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType> ||
-        (new_lhs_sig == static_cast<comp_type>(0) ^ new_rhs_sig == static_cast<comp_type>(0)))
+        ((new_lhs_sig == static_cast<comp_type>(0)) ^ (new_rhs_sig == static_cast<comp_type>(0))))
     {
         return false;
     }
