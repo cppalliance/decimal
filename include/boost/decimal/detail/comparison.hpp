@@ -27,9 +27,9 @@ namespace decimal {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal64>::value, bool>
+                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal64>::value || std::is_same<DecimalType, decimal128>::value, bool>
 {
-    using comp_type = std::conditional_t<std::is_same<DecimalType, decimal32>::value, std::uint_fast32_t, std::uint_fast64_t>;
+    using comp_type = typename DecimalType::significand_type;
 
     BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
     BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
@@ -76,7 +76,7 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!(std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal64>::value), bool>
+                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!(std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal64>::value || std::is_same<DecimalType, decimal128>::value), bool>
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
