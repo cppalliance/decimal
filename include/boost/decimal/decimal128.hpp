@@ -63,12 +63,15 @@ namespace detail {
 
 // See IEEE 754 section 3.5.2
 BOOST_DECIMAL_CONSTEXPR_VARIABLE uint128 d128_inf_mask {UINT64_C(0b0'11110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_inf_mask_high_bits {UINT64_C(0b0'11110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
 BOOST_DECIMAL_CONSTEXPR_VARIABLE uint128 d128_nan_mask {UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
 BOOST_DECIMAL_CONSTEXPR_VARIABLE uint128 d128_snan_mask {UINT64_C(0b0'11111'10000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
 BOOST_DECIMAL_CONSTEXPR_VARIABLE uint128 d128_comb_inf_mask {UINT64_C(0b0'11110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
 BOOST_DECIMAL_CONSTEXPR_VARIABLE uint128 d128_comb_nan_mask {UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
 BOOST_DECIMAL_CONSTEXPR_VARIABLE uint128 d128_exp_snan_mask {UINT64_C(0b0'00000'10000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
+
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_inf_mask_high_bits {UINT64_C(0b0'11110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_nan_mask_high_bits {UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_snan_mask_high_bits {UINT64_C(0b0'11111'10000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
 
 // Masks to update the significand based on the combination field
 // In these first three 00, 01, or 10 are the leading 2 bits of the exp
@@ -1107,17 +1110,17 @@ constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs)
 
 constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
-    return (rhs.bits_.high & detail::d128_nan_mask.high) == detail::d128_nan_mask.high;
+    return (rhs.bits_.high & detail::d128_nan_mask_high_bits) == detail::d128_nan_mask_high_bits;
 }
 
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
-    return ((rhs.bits_.high & detail::d128_nan_mask.high) == detail::d128_inf_mask.high);
+    return (rhs.bits_.high & detail::d128_nan_mask_high_bits) == detail::d128_inf_mask_high_bits;
 }
 
 constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
-    return (rhs.bits_.high & detail::d128_snan_mask.high) == detail::d128_snan_mask.high;
+    return (rhs.bits_.high & detail::d128_snan_mask_high_bits) == detail::d128_snan_mask_high_bits;
 }
 
 constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
@@ -1136,12 +1139,12 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs
 
 constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
-    return ((rhs.bits_.high & detail::d128_inf_mask_high_bits) != detail::d128_inf_mask_high_bits);
+    return (rhs.bits_.high & detail::d128_inf_mask_high_bits) != detail::d128_inf_mask_high_bits;
 }
 
 constexpr auto not_finite(decimal128 rhs) noexcept -> bool
 {
-    return ((rhs.bits_.high & detail::d128_inf_mask_high_bits) == detail::d128_inf_mask_high_bits);
+    return (rhs.bits_.high & detail::d128_inf_mask_high_bits) == detail::d128_inf_mask_high_bits;
 }
 
 constexpr auto operator+(decimal128 rhs) noexcept -> decimal128
@@ -1206,27 +1209,21 @@ constexpr auto operator!=(Integer lhs, decimal128 rhs) noexcept
 constexpr auto operator<(decimal128 lhs, decimal128 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs) ||
-        (!lhs.isneg() && rhs.isneg()))
+    if (not_finite(lhs) || not_finite(rhs))
     {
-        return false;
-    }
-    else if (lhs.isneg() && !rhs.isneg())
-    {
-        return true;
-    }
-    else if (isfinite(lhs) && isinf(rhs))
-    {
-        return !rhs.isneg();
-    }
-    #else
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return false;
-    }
-    else if (lhs.isneg() && !rhs.isneg())
-    {
-        return true;
+        if (isnan(lhs) || isnan(rhs) ||
+            (!lhs.isneg() && rhs.isneg()))
+        {
+            return false;
+        }
+        else if (lhs.isneg() && !rhs.isneg())
+        {
+            return true;
+        }
+        else if (isfinite(lhs) && isinf(rhs))
+        {
+            return !rhs.isneg();
+        }
     }
     #endif
 
