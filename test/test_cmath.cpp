@@ -1286,6 +1286,17 @@ void test_log10()
     }
 }
 
+template <typename T>
+void test_fpclassify()
+{
+    std::uniform_int_distribution<int> dist(1, 2);
+    BOOST_TEST_EQ(fpclassify(T(1) * dist(rng)), FP_NORMAL);
+    BOOST_TEST_EQ(fpclassify(std::numeric_limits<T>::infinity() * dist(rng)), FP_INFINITE);
+    BOOST_TEST_EQ(fpclassify(std::numeric_limits<T>::quiet_NaN() * dist(rng)), FP_NAN);
+    BOOST_TEST_EQ(fpclassify(T{0} * dist(rng)), FP_ZERO);
+    BOOST_TEST_EQ(fpclassify(-T{0} * dist(rng)), FP_ZERO);
+}
+
 int main()
 {
     test_fmax<decimal32>();
@@ -1528,6 +1539,14 @@ int main()
     test_log2<decimal128_fast>();
     test_log10<decimal128_fast>();
     #endif
+
+    test_fpclassify<decimal32>();
+    test_fpclassify<decimal64>();
+    test_fpclassify<decimal128>();
+
+    test_fpclassify<decimal32_fast>();
+    test_fpclassify<decimal64_fast>();
+    test_fpclassify<decimal128_fast>();
 
     return boost::report_errors();
 }
