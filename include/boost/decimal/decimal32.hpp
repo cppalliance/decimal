@@ -1144,9 +1144,20 @@ constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept
 constexpr auto operator<=(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs))
+    if (!isfinite(lhs) || !isfinite(rhs))
     {
-        return false;
+        if (isnan(lhs) || isnan(rhs))
+        {
+            return false;
+        }
+        if (isinf(lhs))
+        {
+            return signbit(lhs);
+        }
+        else if (isinf(rhs))
+        {
+            return !signbit(rhs);
+        }
     }
     #endif
 
@@ -1158,9 +1169,16 @@ constexpr auto operator<=(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs))
+    if (!isfinite(rhs))
     {
-        return false;
+        if (isnan(rhs))
+        {
+            return false;
+        }
+        else if (isinf(rhs))
+        {
+            return signbit(rhs);
+        }
     }
     #endif
 
@@ -1172,9 +1190,16 @@ constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(rhs))
+    if (!isfinite(rhs))
     {
-        return false;
+        if (isnan(rhs))
+        {
+            return false;
+        }
+        else if (isinf(rhs))
+        {
+            return !signbit(rhs);
+        }
     }
     #endif
 
@@ -1183,6 +1208,24 @@ constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept
 
 constexpr auto operator>(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (!isfinite(lhs) || !isfinite(rhs))
+    {
+        if (isnan(lhs) || isnan(rhs))
+        {
+            return false;
+        }
+        if (isinf(lhs))
+        {
+            return !signbit(lhs);
+        }
+        else if (isinf(rhs))
+        {
+            return signbit(rhs);
+        }
+    }
+    #endif
+
     return rhs < lhs;
 }
 
