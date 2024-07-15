@@ -205,7 +205,7 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
         }
         else
         {
-            return delta_exp > max_delta_diff;
+            return rhs_sign ? rhs_exp < lhs_exp : rhs_exp > lhs_exp;
         }
     }
 
