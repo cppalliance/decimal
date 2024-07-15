@@ -170,7 +170,7 @@ constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
         BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value, bool>
+                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign, bool normalized = false) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value, bool>
 {
     using comp_type = std::uint_fast64_t;
 
@@ -193,9 +193,20 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     const auto delta_exp {lhs_exp - rhs_exp};
     constexpr auto max_delta_diff {std::numeric_limits<std::uint_fast64_t>::digits10 - detail::precision_v<DecimalType>};
 
+    // If we can't do this correctly without normalization then do it and try again
     if (delta_exp > max_delta_diff || delta_exp < -max_delta_diff)
     {
-        return delta_exp > max_delta_diff;
+        if (!normalized)
+        {
+            detail::normalize(lhs_sig, lhs_exp);
+            detail::normalize(rhs_sig, rhs_exp);
+            return less_parts_impl(lhs_sig, lhs_exp, lhs_sign,
+                                   rhs_sig, rhs_exp, rhs_sign, true);
+        }
+        else
+        {
+            return delta_exp > max_delta_diff;
+        }
     }
 
     if (delta_exp >= 0)
