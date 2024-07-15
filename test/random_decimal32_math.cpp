@@ -1019,6 +1019,7 @@ int main()
     random_mixed_right_shift();
 
     spot_random_mixed_addition(-653573LL, 1391401LL);
+    spot_random_mixed_addition(894090LL, -1886315LL);
 
     return boost::report_errors();
 }
