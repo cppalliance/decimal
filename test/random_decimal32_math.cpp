@@ -109,6 +109,31 @@ void random_mixed_addition(T lower, T upper)
 }
 
 template <typename T>
+void spot_random_mixed_addition(T lhs, T rhs)
+{
+    const T val1 {lhs};
+    const T val2 {rhs};
+
+    const decimal32 dec1 {val1};
+    const T trunc_val_2 {static_cast<T>(decimal32(val2))};
+
+    const decimal32 res = dec1 + trunc_val_2;
+    const auto res_int = static_cast<T>(res);
+
+    if (!BOOST_TEST_EQ(res_int, val1 + val2))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "Val 1: " << val1
+                  << "\nDec 1: " << dec1
+                  << "\nVal 2: " << val2
+                  << "\nDec 2: " << trunc_val_2
+                  << "\nDec res: " << res
+                  << "\nInt res: " << val1 + val2 << std::endl;
+        // LCOV_EXCL_STOP
+    }
+}
+
+template <typename T>
 void random_converted_addition(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
@@ -992,6 +1017,8 @@ int main()
     random_mixed_left_shift();
     random_right_shift();
     random_mixed_right_shift();
+
+    spot_random_mixed_addition(-653573LL, 1391401LL);
 
     return boost::report_errors();
 }
