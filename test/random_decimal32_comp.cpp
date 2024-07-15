@@ -281,6 +281,23 @@ void random_mixed_GE(T lower, T upper)
 }
 
 template <typename T>
+void spot_test_mixed_ge(T lhs, T rhs)
+{
+    const decimal32 val1 {lhs};
+    const T val2 {static_cast<T>(decimal32(rhs))};
+
+    if (!BOOST_TEST_EQ(val1 >= val2, lhs >= rhs))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "  LHS: " << lhs
+                  << "\nLHS D: " << val1
+                  << "\n  RHS: " << rhs
+                  << "\nRHS D: " << val2 << std::endl;
+        // LCOV_EXCL_STOP
+    }
+}
+
+template <typename T>
 void random_EQ(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
@@ -542,6 +559,8 @@ int main()
     random_mixed_GE(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::max());
     random_mixed_GE(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_GE(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
+
+    spot_test_mixed_ge(UINT64_C(15984034765439402622), UINT64_C(1366685175759710132));
 
     random_EQ(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     random_EQ(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::max());
