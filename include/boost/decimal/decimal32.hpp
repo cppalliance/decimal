@@ -1144,13 +1144,25 @@ constexpr auto operator<(Integer lhs, decimal32 rhs) noexcept
 constexpr auto operator<=(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs))
+    if (!isfinite(lhs) || !isfinite(rhs))
     {
-        return false;
+        if (isnan(lhs) || isnan(rhs))
+        {
+            return false;
+        }
+        if (isinf(lhs))
+        {
+            return signbit(lhs);
+        }
+        else if (isinf(rhs))
+        {
+            return !signbit(rhs);
+        }
     }
     #endif
 
-    return !(rhs < lhs);
+    return !less_parts_impl(rhs.full_significand(), rhs.biased_exponent(), rhs.isneg(),
+                            lhs.full_significand(), lhs.biased_exponent(), lhs.isneg());
 }
 
 template <typename Integer>
@@ -1158,9 +1170,16 @@ constexpr auto operator<=(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs))
+    if (!isfinite(lhs))
     {
-        return false;
+        if (isnan(lhs))
+        {
+            return false;
+        }
+        else if (isinf(lhs))
+        {
+            return signbit(lhs);
+        }
     }
     #endif
 
@@ -1172,9 +1191,16 @@ constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(rhs))
+    if (!isfinite(rhs))
     {
-        return false;
+        if (isnan(rhs))
+        {
+            return false;
+        }
+        else if (isinf(rhs))
+        {
+            return !signbit(rhs);
+        }
     }
     #endif
 
@@ -1183,7 +1209,26 @@ constexpr auto operator<=(Integer lhs, decimal32 rhs) noexcept
 
 constexpr auto operator>(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
-    return rhs < lhs;
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (!isfinite(lhs) || !isfinite(rhs))
+    {
+        if (isnan(lhs) || isnan(rhs))
+        {
+            return false;
+        }
+        if (isinf(lhs))
+        {
+            return !signbit(lhs);
+        }
+        else if (isinf(rhs))
+        {
+            return signbit(rhs);
+        }
+    }
+    #endif
+
+    return less_parts_impl(rhs.full_significand(), rhs.biased_exponent(), rhs.isneg(),
+                           lhs.full_significand(), lhs.biased_exponent(), lhs.isneg());
 }
 
 template <typename Integer>
@@ -1223,7 +1268,8 @@ constexpr auto operator>=(decimal32 lhs, decimal32 rhs) noexcept -> bool
     }
     #endif
 
-    return !(lhs < rhs);
+    return !less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
 template <typename Integer>
