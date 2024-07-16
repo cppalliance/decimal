@@ -65,12 +65,6 @@ jobs:
       - name: Generate user config
         run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
-      - name: Config info install
-        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
-        working-directory: ../boost-root/libs/config/test
-      - name: Config info
-        run: ./config_info_travis
-        working-directory: ../boost-root/libs/config/test
       - name: Test
         run: ../../../b2 toolset=$TOOLSET
         working-directory: ../boost-root/libs/decimal/test
