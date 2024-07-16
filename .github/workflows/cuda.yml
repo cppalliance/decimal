@@ -48,11 +48,10 @@ jobs:
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Checkout Decimal
+        run: git clone -b develop https://github.com/cppalliance/decimal.git ../boost-root/libs/decimal
       - name: Update tools/boostdep
         run: git submodule update --init tools/boostdep
-        working-directory: ../boost-root
-      - name: Copy files
-        run: cp -r $GITHUB_WORKSPACE/* libs/decimal
         working-directory: ../boost-root
       - name: Install deps
         run: python tools/boostdep/depinst/depinst.py decimal
