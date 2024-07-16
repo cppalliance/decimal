@@ -485,7 +485,13 @@ constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bo
 
 constexpr auto operator!=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
 {
-    return !(lhs == rhs);
+    return
+            #ifndef BOOST_DECIMAL_FAST_MATH
+            isnan(lhs) || isnan(rhs) ||
+            #endif
+            (lhs.sign_ != rhs.sign_) ||
+            (lhs.exponent_ != rhs.exponent_) ||
+            (lhs.significand_ != rhs.significand_);
 }
 
 constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
