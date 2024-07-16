@@ -30,6 +30,8 @@ jobs:
         id: cuda-toolkit
         with:
           cuda: '12.5.0'
+          method: 'network'
+          sub-packages: '["nvcc"]'
 
       - name: Output CUDA information
         run: |
