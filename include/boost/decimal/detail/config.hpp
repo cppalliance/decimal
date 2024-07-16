@@ -306,4 +306,11 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_FAST_MATH
 #endif
 
+#ifdef __NVCC__
+#define BOOST_DECIMAL_HOST_DEVICE __host__ __device__
+#else
+#define BOOST_DECIMAL_HOST_DEVICE
+#endif
+
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
