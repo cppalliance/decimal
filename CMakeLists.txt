@@ -16,6 +16,14 @@ target_include_directories(boost_decimal INTERFACE include)
 
 target_compile_features(boost_decimal INTERFACE cxx_std_14)
 
+if(ENABLE_CUDA)
+    enable_language(CUDA)
+    set(CMAKE_CUDA_EXTENSIONS OFF)
+    if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+        set(CMAKE_CUDA_ARCHITECTURES native)
+    endif()
+endif()
+
 if(BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
 
     add_subdirectory(test)
