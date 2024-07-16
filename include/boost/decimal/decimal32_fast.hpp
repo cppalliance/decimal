@@ -464,12 +464,7 @@ constexpr auto issignaling(decimal32_fast val) noexcept -> bool
 
 constexpr auto isnormal(decimal32_fast val) noexcept -> bool
 {
-    if (val.exponent_ <= static_cast<std::uint8_t>(detail::precision_v<decimal32> - 1))
-    {
-        return false;
-    }
-
-    return (val.significand_ != 0) && isfinite(val);
+    return (val.significand_ != 0) && isfinite(val) && (val.exponent_ > static_cast<std::uint8_t>(detail::precision_v<decimal32> - 1));
 }
 
 constexpr auto isfinite(decimal32_fast val) noexcept -> bool
