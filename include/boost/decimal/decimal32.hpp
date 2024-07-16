@@ -1161,7 +1161,8 @@ constexpr auto operator<=(decimal32 lhs, decimal32 rhs) noexcept -> bool
     }
     #endif
 
-    return !(rhs < lhs);
+    return !less_parts_impl(rhs.full_significand(), rhs.biased_exponent(), rhs.isneg(),
+                            lhs.full_significand(), lhs.biased_exponent(), lhs.isneg());
 }
 
 template <typename Integer>
@@ -1267,7 +1268,8 @@ constexpr auto operator>=(decimal32 lhs, decimal32 rhs) noexcept -> bool
     }
     #endif
 
-    return !(lhs < rhs);
+    return !less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
 template <typename Integer>
