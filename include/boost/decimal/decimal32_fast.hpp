@@ -474,15 +474,12 @@ constexpr auto isfinite(decimal32_fast val) noexcept -> bool
 
 constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
 {
-    #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs))
-    {
-        return false;
-    }
-    #endif
-
-    return (lhs.sign_ == rhs.sign_) &
-           (lhs.exponent_ == rhs.exponent_) &
+    return
+           #ifndef BOOST_DECIMAL_FAST_MATH
+           !isnan(lhs) && !isnan(rhs) &&
+           #endif
+           (lhs.sign_ == rhs.sign_) &&
+           (lhs.exponent_ == rhs.exponent_) &&
            (lhs.significand_ == rhs.significand_);
 }
 
