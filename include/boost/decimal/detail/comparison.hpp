@@ -167,6 +167,36 @@ constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
     return !(mixed_decimal_equality_impl(lhs, rhs));
 }
 
+template <BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_type_less_parts_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                                    T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> bool
+{
+    if (lhs_sig == 0 || rhs_sig == 0)
+    {
+        if (lhs_sig == 0 && rhs_sig == 0)
+        {
+            #ifndef BOOST_DECIMAL_FAST_MATH
+            return lhs_sign && !rhs_sign;
+            #else
+            return false;
+            #endif
+        }
+        return lhs_sig == 0 ? !rhs_sign : lhs_sign;
+    }
+
+    if (lhs_sign != rhs_sign)
+    {
+        return lhs_sign;
+    }
+
+    if (lhs_exp != rhs_exp)
+    {
+        return lhs_sign ? lhs_exp > rhs_exp : lhs_exp < rhs_exp;
+    }
+
+    return lhs_sign ? lhs_sig > rhs_sig : lhs_sig < rhs_sig;
+}
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
         BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
