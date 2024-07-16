@@ -60,7 +60,7 @@ jobs:
           mkdir -p libs/$LIBRARY
           cp -r $GITHUB_WORKSPACE/* libs/$LIBRARY
           git submodule update --init tools/boostdep
-          python tools/boostdep/depinst/depinst.py --git_args "--jobs 3" $LIBRARY
+          python3 tools/boostdep/depinst/depinst.py --git_args "--jobs 3" $LIBRARY
 
       - name: Configure
         run: |
