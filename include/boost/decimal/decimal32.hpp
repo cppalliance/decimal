@@ -1169,15 +1169,15 @@ constexpr auto operator<=(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (!isfinite(rhs))
+    if (!isfinite(lhs))
     {
-        if (isnan(rhs))
+        if (isnan(lhs))
         {
             return false;
         }
-        else if (isinf(rhs))
+        else if (isinf(lhs))
         {
-            return signbit(rhs);
+            return signbit(lhs);
         }
     }
     #endif
