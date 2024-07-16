@@ -54,7 +54,7 @@ jobs:
         run: git submodule update --init tools/boostdep
         working-directory: ../boost-root
       - name: Install deps
-        run: python tools/boostdep/depinst/depinst.py decimal
+        run: python3 tools/boostdep/depinst/depinst.py decimal
         working-directory: ../boost-root
       - name: Bootstrap
         run: ./bootstrap.sh
