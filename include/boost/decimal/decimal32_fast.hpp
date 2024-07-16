@@ -526,13 +526,30 @@ constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> boo
 constexpr auto operator<=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs))
+    if (!isfinite(lhs) || !isfinite(rhs))
     {
-        return false;
+        if (isnan(lhs) || isnan(rhs) ||
+            (!lhs.isneg() && rhs.isneg()))
+        {
+            return false;
+        }
+        else if (lhs.isneg() && !rhs.isneg())
+        {
+            return true;
+        }
+        else if (isfinite(lhs) && isinf(rhs))
+        {
+            return !signbit(rhs);
+        }
+        else if (isinf(lhs) && isfinite(rhs))
+        {
+            return signbit(rhs);
+        }
     }
     #endif
 
-    return !(rhs < lhs);
+    return !fast_type_less_parts_impl(rhs.significand_, rhs.biased_exponent(), rhs.sign_,
+                                      lhs.significand_, lhs.biased_exponent(), lhs.sign_);
 }
 
 constexpr auto operator>(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
