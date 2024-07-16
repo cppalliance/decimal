@@ -432,7 +432,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast::decimal32_fast(Float val) noexcept
 #  pragma GCC diagnostic pop
 #endif
 
-constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign = false) noexcept -> decimal32_fast
+BOOST_DECIMAL_HOST_DEVICE constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign = false) noexcept -> decimal32_fast
 {
     decimal32_fast val;
     val.significand_ = significand;
@@ -442,27 +442,27 @@ constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exp
     return val;
 }
 
-constexpr auto signbit(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_HOST_DEVICE constexpr auto signbit(decimal32_fast val) noexcept -> bool
 {
     return val.sign_;
 }
 
-constexpr auto isinf(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_HOST_DEVICE constexpr auto isinf(decimal32_fast val) noexcept -> bool
 {
     return val.significand_ == detail::d32_fast_inf;
 }
 
-constexpr auto isnan(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_HOST_DEVICE constexpr auto isnan(decimal32_fast val) noexcept -> bool
 {
     return val.significand_ == detail::d32_fast_qnan || val.significand_ == detail::d32_fast_snan;
 }
 
-constexpr auto issignaling(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_HOST_DEVICE constexpr auto issignaling(decimal32_fast val) noexcept -> bool
 {
     return val.significand_ == detail::d32_fast_snan;
 }
 
-constexpr auto isnormal(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_HOST_DEVICE constexpr auto isnormal(decimal32_fast val) noexcept -> bool
 {
     if (val.exponent_ <= static_cast<std::uint8_t>(detail::precision_v<decimal32> - 1))
     {
@@ -472,7 +472,7 @@ constexpr auto isnormal(decimal32_fast val) noexcept -> bool
     return (val.significand_ != 0) && isfinite(val);
 }
 
-constexpr auto isfinite(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_HOST_DEVICE constexpr auto isfinite(decimal32_fast val) noexcept -> bool
 {
     return val.significand_ < detail::d32_fast_snan;
 }
