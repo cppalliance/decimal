@@ -464,12 +464,7 @@ constexpr auto issignaling(decimal32_fast val) noexcept -> bool
 
 constexpr auto isnormal(decimal32_fast val) noexcept -> bool
 {
-    if (val.exponent_ <= static_cast<std::uint8_t>(detail::precision_v<decimal32> - 1))
-    {
-        return false;
-    }
-
-    return (val.significand_ != 0) && isfinite(val);
+    return (val.significand_ != 0) && isfinite(val) && (val.exponent_ > static_cast<std::uint8_t>(detail::precision_v<decimal32> - 1));
 }
 
 constexpr auto isfinite(decimal32_fast val) noexcept -> bool
@@ -479,21 +474,24 @@ constexpr auto isfinite(decimal32_fast val) noexcept -> bool
 
 constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
 {
-    #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs))
-    {
-        return false;
-    }
-    #endif
-
-    return (lhs.sign_ == rhs.sign_) &
-           (lhs.exponent_ == rhs.exponent_) &
+    return
+           #ifndef BOOST_DECIMAL_FAST_MATH
+           !isnan(lhs) && !isnan(rhs) &&
+           #endif
+           (lhs.sign_ == rhs.sign_) &&
+           (lhs.exponent_ == rhs.exponent_) &&
            (lhs.significand_ == rhs.significand_);
 }
 
 constexpr auto operator!=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
 {
-    return !(lhs == rhs);
+    return
+            #ifndef BOOST_DECIMAL_FAST_MATH
+            isnan(lhs) || isnan(rhs) ||
+            #endif
+            (lhs.sign_ != rhs.sign_) ||
+            (lhs.exponent_ != rhs.exponent_) ||
+            (lhs.significand_ != rhs.significand_);
 }
 
 constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
@@ -521,42 +519,37 @@ constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> boo
     }
     #endif
 
-    if (lhs.significand_ == 0 || rhs.significand_ == 0)
-    {
-        if (lhs.significand_ == 0 && rhs.significand_ == 0)
-        {
-            #ifndef BOOST_DECIMAL_FAST_MATH
-            return lhs.sign_ && !rhs.sign_;
-            #else
-            return false;
-            #endif
-        }
-        return lhs.significand_ == 0 ? !rhs.sign_ : lhs.sign_;
-    }
-
-    if (lhs.sign_ != rhs.sign_)
-    {
-        return lhs.sign_;
-    }
-
-    if (lhs.exponent_ != rhs.exponent_)
-    {
-        return lhs.sign_ ? lhs.exponent_ > rhs.exponent_ : lhs.exponent_ < rhs.exponent_;
-    }
-
-    return lhs.sign_ ? lhs.significand_ > rhs.significand_ : lhs.significand_ < rhs.significand_;
+    return fast_type_less_parts_impl(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                     rhs.significand_, rhs.biased_exponent(), rhs.sign_);
 }
 
 constexpr auto operator<=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs))
+    if (!isfinite(lhs) || !isfinite(rhs))
     {
-        return false;
+        if (isnan(lhs) || isnan(rhs) ||
+            (!lhs.isneg() && rhs.isneg()))
+        {
+            return false;
+        }
+        else if (lhs.isneg() && !rhs.isneg())
+        {
+            return true;
+        }
+        else if (isfinite(lhs) && isinf(rhs))
+        {
+            return !signbit(rhs);
+        }
+        else if (isinf(lhs) && isfinite(rhs))
+        {
+            return signbit(rhs);
+        }
     }
     #endif
 
-    return !(rhs < lhs);
+    return !fast_type_less_parts_impl(rhs.significand_, rhs.biased_exponent(), rhs.sign_,
+                                      lhs.significand_, lhs.biased_exponent(), lhs.sign_);
 }
 
 constexpr auto operator>(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
@@ -567,13 +560,29 @@ constexpr auto operator>(decimal32_fast lhs, decimal32_fast rhs) noexcept -> boo
 constexpr auto operator>=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs))
+    if (!isfinite(lhs) || !isfinite(rhs))
     {
-        return false;
+        if (isnan(lhs) || isnan(rhs))
+        {
+            return false;
+        }
+        else if (lhs.isneg() && !rhs.isneg())
+        {
+            return false;
+        }
+        else if (isfinite(lhs) && isinf(rhs))
+        {
+            return signbit(rhs);
+        }
+        else if (isinf(lhs) && isfinite(rhs))
+        {
+            return !signbit(lhs);
+        }
     }
     #endif
 
-    return !(lhs < rhs);
+    return !fast_type_less_parts_impl(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                      rhs.significand_, rhs.biased_exponent(), rhs.sign_);
 }
 
 template <typename Integer>
