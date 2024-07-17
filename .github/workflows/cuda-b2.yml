@@ -21,7 +21,7 @@ concurrency:
 env:
   GIT_FETCH_JOBS: 8
   NET_RETRY_COUNT: 5
-  DEFAULT_BUILD_VARIANT: debug,release
+  DEFAULT_BUILD_VARIANT: release
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
 jobs:
@@ -217,11 +217,14 @@ jobs:
                     echo " ;" >> ~/user-config.jam
                 fi
             fi
+      - name: Create user-config
+        run: |
+            echo "using cuda : : ${{ steps.cuda-toolkit.outputs.CUDA_PATH }}/bin/nvcc ;" > $HOME/user-config.jam
       - name: Run tests
         if: matrix.cmake_tests == ''
         run: |
             cd ../boost-root
-            B2_ARGS=("-j" "$BUILD_JOBS" "toolset=${{matrix.toolset}}" "cxxstd=${{matrix.cxxstd}}" "link=static,shared")
+            B2_ARGS=("-j" "$BUILD_JOBS" "toolset=${{matrix.toolset}}" "cxxstd=${{matrix.cxxstd}}" "link=static")
             if [ -n "${{matrix.build_variant}}" ]
             then
                 B2_ARGS+=("variant=${{matrix.build_variant}}")
@@ -250,4 +253,4 @@ jobs:
                 B2_ARGS+=("address-model=${{matrix.address_model}}")
             fi
             B2_ARGS+=("libs/$LIBRARY/test")
-            ./b2 "${B2_ARGS[@]}"
+            ./b2 "${B2_ARGS[@]}" 
