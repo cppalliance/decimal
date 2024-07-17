@@ -219,7 +219,7 @@ jobs:
             fi
       - name: Create user-config
         run: |
-            echo "using cuda : : ${{ steps.cuda-toolkit.outputs.CUDA_PATH }}/bin/nvcc ;" > $HOME/user-config.jam
+            echo "using nvcc : : ${{ steps.cuda-toolkit.outputs.CUDA_PATH }}/bin/nvcc ;" > $HOME/user-config.jam
       - name: Run tests
         if: matrix.cmake_tests == ''
         run: |
