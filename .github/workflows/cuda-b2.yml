@@ -202,7 +202,7 @@ jobs:
             cp -r $GITHUB_WORKSPACE/* libs/$LIBRARY
             git submodule update --init tools/boostdep
             DEPINST_ARGS+=("$LIBRARY")
-            python tools/boostdep/depinst/depinst.py "${DEPINST_ARGS[@]}"
+            python3 tools/boostdep/depinst/depinst.py "${DEPINST_ARGS[@]}"
             if [ -z "${{matrix.cmake_tests}}" ]
             then
                 ./bootstrap.sh
