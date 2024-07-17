@@ -70,7 +70,7 @@ jobs:
         run: |
           cd ../boost-root
           mkdir __build__ && cd __build__
-          sudo cmake -DBOOST_INCLUDE_LIBRARIES=$LIBRARY -DBUILD_TESTING=ON -DCMAKE_CUDA_COMPILER=${{steps.cuda-toolkit.outputs.CUDA_PATH}} -DENABLE_CUDA=1 -DCMAKE_CUDA_ARCHITECTURES=70 ..
+          cmake -DBOOST_INCLUDE_LIBRARIES=$LIBRARY -DBUILD_TESTING=ON -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DENABLE_CUDA=1 -DCMAKE_CUDA_ARCHITECTURES=70 ..
 
       - name: Build tests
         run: |
