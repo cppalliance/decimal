@@ -348,9 +348,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<long double>(long dou
 
 #endif
 
-// On new ppc64le __float128 is an alias of long double
-// https://developers.redhat.com/articles/2023/05/16/benefits-fedora-38-long-double-transition-ppc64le?source=sso
-#if defined(BOOST_DECIMAL_HAS_FLOAT128) && !defined(__PPC64__)
+#if defined(BOOST_DECIMAL_HAS_FLOAT128)
 
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<__float128>(__float128 val) noexcept -> floating_decimal_128

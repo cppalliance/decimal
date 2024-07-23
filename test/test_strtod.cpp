@@ -274,7 +274,7 @@ int main()
     test_alloc<decimal64>();
 
     // Homebrew GCC does not support locales
-    #if !(defined(__GNUC__) && __GNUC__ >= 5 && defined(__APPLE__))
+    #if !(defined(__GNUC__) && __GNUC__ >= 5 && defined(__APPLE__)) && !defined(BOOST_DECIMAL_QEMU_TEST)
     test_locales<decimal32>();
     test_locales<decimal64>();
     test_locales<decimal128>();

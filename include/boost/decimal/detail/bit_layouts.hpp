@@ -110,7 +110,7 @@ struct IEEEl2bits
 #define BOOST_DECIMAL_LDBL_BITS 64
 
 #else // Unsupported long double representation
-#  define BOOST_MATH_UNSUPPORTED_LONG_DOUBLE
+#  define BOOST_DECIMAL_UNSUPPORTED_LONG_DOUBLE
 #endif
 
 struct IEEEbinary128

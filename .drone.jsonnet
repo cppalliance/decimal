@@ -99,20 +99,6 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
 [
 
     linux_pipeline(
-        "Linux 24.04 GCC 14 GNU 32 ASAN",
-        "cppalliance/droneubuntu2404:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++-14', CXXSTD: '03,11,14,17,20,23', ADDRMD: '32', CXXFLAGS: "-fexcess-precision=fast", CXXSTDDIALECT: "gnu" } + asan,
-        "g++-14-multilib",
-    ),
-
-    linux_pipeline(
-        "Linux 24.04 GCC 14 GNU 64 ASAN",
-        "cppalliance/droneubuntu2404:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++-14', CXXSTD: '03,11,14,17,20,23', ADDRMD: '64', CXXFLAGS: "-fexcess-precision=fast", CXXSTDDIALECT: "gnu" } + asan,
-        "g++-14-multilib",
-    ),
-
-    linux_pipeline(
         "Linux 18.04 GCC 8 32/64",
         "cppalliance/droneubuntu1804:1",
         { TOOLSET: 'gcc', COMPILER: 'g++-8', CXXSTD: '03,11,14,17', ADDRMD: '32,64' },

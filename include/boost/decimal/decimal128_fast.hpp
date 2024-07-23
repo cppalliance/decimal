@@ -25,9 +25,13 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_inf = std::numeric_limits<uint128>::max();
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_qnan = std::numeric_limits<uint128>::max() - 1;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan = std::numeric_limits<uint128>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_inf = uint128{UINT64_MAX - 2, UINT64_MAX};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_qnan = uint128{UINT64_MAX - 1, UINT64_MAX};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan = uint128{UINT64_MAX, UINT64_MAX};
+
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_inf_high_bits = UINT64_MAX - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_qnan_high_bits = UINT64_MAX - 1;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan_high_bits = UINT64_MAX;
 
 struct decimal128_fast_components
 {
@@ -117,6 +121,8 @@ private:
     friend constexpr auto logb(T num) noexcept
         BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T);
 
+    friend constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool;
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
@@ -149,6 +155,7 @@ public:
     friend constexpr auto isnan(decimal128_fast val) noexcept -> bool;
     friend constexpr auto issignaling(decimal128_fast val) noexcept -> bool;
     friend constexpr auto isnormal(decimal128_fast val) noexcept -> bool;
+    friend constexpr auto isfinite(decimal128_fast val) noexcept -> bool;
 
     // Comparison operators
     friend constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
@@ -457,18 +464,17 @@ constexpr auto signbit(decimal128_fast val) noexcept -> bool
 
 constexpr auto isinf(decimal128_fast val) noexcept -> bool
 {
-    return val.significand_ == detail::d128_fast_inf;
+    return val.significand_.high == detail::d128_fast_inf_high_bits;
 }
 
 constexpr auto isnan(decimal128_fast val) noexcept -> bool
 {
-    return val.significand_ == detail::d128_fast_qnan ||
-           val.significand_ == detail::d128_fast_snan;
+    return val.significand_.high >= detail::d128_fast_qnan_high_bits;
 }
 
 constexpr auto issignaling(decimal128_fast val) noexcept -> bool
 {
-    return val.significand_ == detail::d128_fast_snan;
+    return val.significand_.high == detail::d128_fast_snan_high_bits;
 }
 
 constexpr auto isnormal(decimal128_fast val) noexcept -> bool
@@ -479,6 +485,16 @@ constexpr auto isnormal(decimal128_fast val) noexcept -> bool
     }
 
     return (val.significand_ != 0) && isfinite(val);
+}
+
+constexpr auto isfinite(decimal128_fast val) noexcept -> bool
+{
+    return val.significand_.high < detail::d128_fast_inf_high_bits;
+}
+
+constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool
+{
+    return val.significand_.high >= detail::d128_fast_inf_high_bits;
 }
 
 constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
@@ -530,38 +546,46 @@ constexpr auto operator!=(Integer lhs, decimal128_fast rhs) noexcept
 
 constexpr auto operator<(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
 {
-#ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs) ||
-        (!lhs.isneg() && rhs.isneg()))
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (not_finite(lhs) || not_finite(rhs))
     {
-        return false;
+        if (isnan(lhs) || isnan(rhs) ||
+            (!lhs.isneg() && rhs.isneg()))
+        {
+            return false;
+        }
+        else if (lhs.isneg() && !rhs.isneg())
+        {
+            return true;
+        }
+        else if (isfinite(lhs) && isinf(rhs))
+        {
+            return !signbit(rhs);
+        }
+        else if (isinf(lhs) && isfinite(rhs))
+        {
+            return signbit(rhs);
+        }
     }
-    else if (lhs.isneg() && !rhs.isneg())
-    {
-        return true;
-    }
-    else if (isfinite(lhs) && isinf(rhs))
-    {
-        return !signbit(rhs);
-    }
-    else if (isinf(lhs) && isfinite(rhs))
-    {
-        return signbit(rhs);
-    }
-#else
-    if (!lhs.isneg() && rhs.isneg())
-    {
-        return false;
-    }
-    else if (lhs.isneg() && !rhs.isneg())
-    {
-        return true;
-    }
-#endif
+    #endif
 
+    // Needed to correctly compare signed and unsigned zeros
     if (lhs.significand_ == 0 || rhs.significand_ == 0)
     {
+        if (lhs.significand_ == 0 && rhs.significand_ == 0)
+        {
+            #ifndef BOOST_DECIMAL_FAST_MATH
+            return lhs.sign_ && !rhs.sign_;
+            #else
+            return false;
+            #endif
+        }
         return lhs.significand_ == 0 ? !rhs.sign_ : lhs.sign_;
+    }
+
+    if (lhs.sign_ != rhs.sign_)
+    {
+        return lhs.sign_;
     }
 
     if (lhs.exponent_ != rhs.exponent_)
@@ -768,12 +792,9 @@ constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast
 constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    constexpr decimal128_fast zero {0, 0};
-
-    const auto res {detail::check_non_finite(lhs, rhs)};
-    if (res != zero)
+    if (not_finite(lhs) || not_finite(rhs))
     {
-        return res;
+        return detail::check_non_finite(lhs, rhs);
     }
     #endif
 
@@ -790,7 +811,7 @@ constexpr auto operator+(decimal128_fast lhs, Integer rhs) noexcept
     using exp_type = decimal128_fast::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isinf(lhs))
+    if (not_finite(lhs))
     {
         return lhs;
     }
@@ -817,12 +838,9 @@ constexpr auto operator+(Integer lhs, decimal128_fast rhs) noexcept
 constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    constexpr decimal128_fast zero {0, 0};
-
-    const auto res {detail::check_non_finite(lhs, rhs)};
-    if (res != zero)
+    if (not_finite(lhs) || not_finite(rhs))
     {
-        return res;
+        return detail::check_non_finite(lhs, rhs);
     }
     #endif
 
@@ -839,7 +857,7 @@ constexpr auto operator-(decimal128_fast lhs, Integer rhs) noexcept
     using exp_type = decimal128_fast::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isinf(lhs) || isnan(lhs))
+    if (not_finite(lhs))
     {
         return lhs;
     }
@@ -864,7 +882,7 @@ constexpr auto operator-(Integer lhs, decimal128_fast rhs) noexcept
     using exp_type = decimal128_fast::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isinf(rhs) || isnan(rhs))
+    if (not_finite(rhs))
     {
         return rhs;
     }
@@ -885,12 +903,9 @@ constexpr auto operator-(Integer lhs, decimal128_fast rhs) noexcept
 constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    constexpr decimal128_fast zero {0, 0};
-
-    const auto non_finite {detail::check_non_finite(lhs, rhs)};
-    if (non_finite != zero)
+    if (not_finite(lhs) || not_finite(rhs))
     {
-        return non_finite;
+        return detail::check_non_finite(lhs, rhs);
     }
     #endif
 
@@ -906,7 +921,7 @@ constexpr auto operator*(decimal128_fast lhs, Integer rhs) noexcept
     using exp_type = decimal128_fast::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isinf(lhs))
+    if (not_finite(lhs))
     {
         return lhs;
     }
@@ -1287,7 +1302,7 @@ constexpr auto scalblnd128f(decimal128_fast num, long exp) noexcept -> decimal12
     #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal128_fast zero {0, 0};
 
-    if (num == zero || exp == 0 || isinf(num) || isnan(num))
+    if (num == zero || exp == 0 || not_finite(num))
     {
         return num;
     }
