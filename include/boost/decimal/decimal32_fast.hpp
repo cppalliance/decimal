@@ -6,6 +6,8 @@
 #define BOOST_DECIMAL_DECIMAL32_FAST_HPP
 
 #include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/numeric_limits.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
@@ -115,13 +117,13 @@ private:
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
 public:
-    constexpr decimal32_fast() noexcept {}
+    BOOST_DECIMAL_GPU_ENABLED constexpr decimal32_fast() noexcept {}
 
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
-    constexpr decimal32_fast(T1 coeff, T2 exp, bool sign = false) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED constexpr decimal32_fast(T1 coeff, T2 exp, bool sign = false) noexcept;
 
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
-    constexpr decimal32_fast(Integer coeff) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED constexpr decimal32_fast(Integer coeff) noexcept;
 
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast(Float val) noexcept;
@@ -132,12 +134,12 @@ public:
     constexpr auto operator=(decimal32_fast&& val) noexcept -> decimal32_fast& = default;
 
     // cmath functions that are easier as friends
-    friend constexpr auto signbit(decimal32_fast val) noexcept -> bool;
-    friend constexpr auto isinf(decimal32_fast val) noexcept -> bool;
-    friend constexpr auto isnan(decimal32_fast val) noexcept -> bool;
-    friend constexpr auto issignaling(decimal32_fast val) noexcept -> bool;
-    friend constexpr auto isnormal(decimal32_fast val) noexcept -> bool;
-    friend constexpr auto isfinite(decimal32_fast val) noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr auto signbit(decimal32_fast val) noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr auto isinf(decimal32_fast val) noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr auto isnan(decimal32_fast val) noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr auto issignaling(decimal32_fast val) noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr auto isnormal(decimal32_fast val) noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr auto isfinite(decimal32_fast val) noexcept -> bool;
 
     // Comparison operators
     friend constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool;
@@ -351,7 +353,7 @@ public:
 };
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
-constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
 {
     // Older compilers have issues with conversions from __uint128, so we skip all that and use our uint128
     #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__GNUC__) || (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10)) && (!defined(__clang__) || (defined(__clang__) && __clang_major__ < 13))
@@ -392,7 +394,7 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
 }
 
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
-constexpr decimal32_fast::decimal32_fast(Integer val) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr decimal32_fast::decimal32_fast(Integer val) noexcept
 {
     using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
     *this = decimal32_fast{static_cast<ConversionType>(val), 0, false};
@@ -442,32 +444,32 @@ constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exp
     return val;
 }
 
-constexpr auto signbit(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto signbit(decimal32_fast val) noexcept -> bool
 {
     return val.sign_;
 }
 
-constexpr auto isinf(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto isinf(decimal32_fast val) noexcept -> bool
 {
     return val.significand_ == detail::d32_fast_inf;
 }
 
-constexpr auto isnan(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto isnan(decimal32_fast val) noexcept -> bool
 {
     return val.significand_ == detail::d32_fast_qnan || val.significand_ == detail::d32_fast_snan;
 }
 
-constexpr auto issignaling(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto issignaling(decimal32_fast val) noexcept -> bool
 {
     return val.significand_ == detail::d32_fast_snan;
 }
 
-constexpr auto isnormal(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto isnormal(decimal32_fast val) noexcept -> bool
 {
     return (val.significand_ != 0) && isfinite(val) && (val.exponent_ > static_cast<std::uint8_t>(detail::precision_v<decimal32> - 1));
 }
 
-constexpr auto isfinite(decimal32_fast val) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto isfinite(decimal32_fast val) noexcept -> bool
 {
     return val.significand_ < detail::d32_fast_snan;
 }
