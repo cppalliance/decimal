@@ -306,4 +306,104 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_FAST_MATH
 #endif
 
+// GPU Options
+
+//
+// CUDA support:
+//
+
+#ifdef __CUDACC__
+#  define BOOST_DECIMAL_CUDA_ENABLED __host__ __device__
+#  define BOOST_DECIMAL_HAS_GPU_SUPPORT
+
+#  ifndef BOOST_DECIMAL_ENABLE_CUDA
+#    define BOOST_DECIMAL_ENABLE_CUDA
+#  endif
+
+// Device code can not handle exceptions
+#  ifndef BOOST_DECIMAL_NO_EXCEPTIONS
+#    define BOOST_DECIMAL_NO_EXCEPTIONS
+#  endif
+
+// We want to use force inline from CUDA instead of the host compiler
+#  undef BOOST_DECIMAL_FORCEINLINE
+#  define BOOST_DECIMAL_FORCEINLINE __forceinline__
+
+#elif defined(SYCL_LANGUAGE_VERSION)
+
+#  define BOOST_DECIMAL_SYCL_ENABLED SYCL_EXTERNAL
+#  define BOOST_DECIMAL_HAS_GPU_SUPPORT
+
+#  ifndef BOOST_DECIMAL_ENABLE_SYCL
+#    define BOOST_DECIMAL_ENABLE_SYCL
+#  endif
+
+#  ifndef BOOST_DECIMAL_NO_EXCEPTIONS
+#    define BOOST_DECIMAL_NO_EXCEPTIONS
+#  endif
+
+// spir64 does not support long double
+#  define BOOST_DECIMAL_NO_LONG_DOUBLE_MATH_FUNCTIONS
+#  define BOOST_DECIMAL_NO_REAL_CONCEPT_TESTS
+
+#  undef BOOST_DECIMAL_FORCEINLINE
+#  define BOOST_DECIMAL_FORCEINLINE inline
+
+#endif
+
+#ifndef BOOST_DECIMAL_CUDA_ENABLED
+#  define BOOST_DECIMAL_CUDA_ENABLED
+#endif
+
+#ifndef BOOST_DECIMAL_SYCL_ENABLED
+#  define BOOST_DECIMAL_SYCL_ENABLED
+#endif
+
+// Not all functions that allow CUDA allow SYCL (e.g. Recursion is disallowed by SYCL)
+#  define BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_CUDA_ENABLED BOOST_DECIMAL_SYCL_ENABLED
+
+// Additional functions that need replaced/marked up
+#ifdef BOOST_DECIMAL_HAS_GPU_SUPPORT
+template <class T>
+BOOST_DECIMAL_GPU_ENABLED constexpr void gpu_safe_swap(T& a, T& b) { T t(a); a = b; b = t; }
+template <class T>
+BOOST_DECIMAL_GPU_ENABLED constexpr T gpu_safe_min(const T& a, const T& b) { return a < b ? a : b; }
+template <class T>
+BOOST_DECIMAL_GPU_ENABLED constexpr T cuda_safe_max(const T& a, const T& b) { return a > b ? a : b; }
+
+#define BOOST_DECIMAL_GPU_SAFE_SWAP(a, b) gpu_safe_swap(a, b)
+#define BOOST_DECIMAL_GPU_SAFE_MIN(a, b) gpu_safe_min(a, b)
+#define BOOST_DECIMAL_GPU_SAFE_MAX(a, b) gpu_safe_max(a, b)
+
+#else
+
+#define BOOST_DECIMAL_GPU_SAFE_SWAP(a, b) std::swap(a, b)
+#define BOOST_DECIMAL_GPU_SAFE_MIN(a, b) (std::min)(a, b)
+#define BOOST_DECIMAL_GPU_SAFE_MAX(a, b) (std::max)(a, b)
+
+#endif
+
+// Static variables are not allowed with CUDA or C++20 modules
+// See if we can inline them instead
+
+#if defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L
+#  define BOOST_DECIMAL_STATIC_CONSTEXPR inline constexpr
+#  define BOOST_DECIMAL_STATIC static
+#  ifndef BOOST_DECIMAL_HAS_GPU_SUPPORT
+#    define BOOST_DECIMAL_STATIC_LOCAL_VARIABLE static
+#  else
+#    define BOOST_DECIMAL_STATIC_LOCAL_VARIABLE
+#  endif
+#else
+#  ifndef BOOST_DECIMAL_HAS_GPU_SUPPORT
+#    define BOOST_DECIMAL_STATIC_CONSTEXPR static constexpr
+#    define BOOST_DECIMAL_STATIC static
+#    define BOOST_DECIMAL_STATIC_LOCAL_VARIABLE
+#  else
+#    define BOOST_DECIMAL_STATIC_CONSTEXPR constexpr
+#    define BOOST_DECIMAL_STATIC constexpr
+#    define BOOST_DECIMAL_STATIC_LOCAL_VARIABLE static
+#  endif
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
