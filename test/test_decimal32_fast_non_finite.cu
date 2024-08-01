@@ -23,14 +23,14 @@ using float_type = boost::decimal::decimal32_fast;
  * CUDA Kernel Device code
  *
  */
-__global__ void cuda_test(const float_type *in, float_type *out, int numElements)
+__global__ void cuda_test(const float_type *in, int *out, int numElements)
 {
     using std::cos;
     int i = blockDim.x * blockIdx.x + threadIdx.x;
 
     if (i < numElements)
     {
-        out[i] = signbit(in[i]) + isinf(in[i]) + isnan(in[i]) + issignaling(in[i]) + isnormal(in[i]) + isfinite(in[i]);
+        out[i] = static_cast<int>(signbit(in[i]) + isinf(in[i]) + isnan(in[i]) + issignaling(in[i]) + isnormal(in[i]) + isfinite(in[i]));
     }
 }
 
@@ -50,7 +50,7 @@ int main(void)
     cuda_managed_ptr<float_type> input_vector(numElements);
 
     // Allocate the managed output vector C
-    cuda_managed_ptr<float_type> output_vector(numElements);
+    cuda_managed_ptr<int> output_vector(numElements);
 
     // Initialize the input vectors
     for (int i = 0; i < numElements; ++i)
@@ -79,12 +79,12 @@ int main(void)
     }
 
     // Verify that the result vector is correct
-    std::vector<float_type> results;
+    std::vector<int> results;
     results.reserve(numElements);
     w.reset();
     for(int i = 0; i < numElements; ++i)
     {
-       results.push_back(signbit(input_vector[i]) + isinf(input_vector[i]) + isnan(input_vector[i]) + issignaling(input_vector[i]) + isnormal(input_vector[i]) + isfinite(input_vector[i]));
+       results.push_back(static_cast<int>(signbit(input_vector[i]) + isinf(input_vector[i]) + isnan(input_vector[i]) + issignaling(input_vector[i]) + isnormal(input_vector[i]) + isfinite(input_vector[i])));
     }
     double t = w.elapsed();
     // check the results
