@@ -5,6 +5,8 @@
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#pragma nv_diag_suppress 186
+
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -15,7 +17,7 @@
 // For the CUDA runtime routines (prefixed with "cuda_")
 #include <cuda_runtime.h>
 
-using float_type = boost::decimal::decimal32;
+using float_type = boost::decimal::decimal32_fast;
 
 /**
  * CUDA Kernel Device code
@@ -28,7 +30,7 @@ __global__ void cuda_test(const float_type *in, float_type *out, int numElements
 
     if (i < numElements)
     {
-        out[i] = in[i] + in[i];
+        out[i] = signbit(in[i]) + isinf(in[i]) + isnan(in[i]) + issignaling(in[i]) + isnormal(in[i]) + isfinite(in[i]);
     }
 }
 
@@ -53,7 +55,7 @@ int main(void)
     // Initialize the input vectors
     for (int i = 0; i < numElements; ++i)
     {
-        input_vector[i] = static_cast<float_type>(rand()/(float_type)RAND_MAX);
+        input_vector[i] = static_cast<float_type>(rand());
     }
 
     // Launch the Vector Add CUDA Kernel
@@ -82,15 +84,17 @@ int main(void)
     w.reset();
     for(int i = 0; i < numElements; ++i)
     {
-       results.push_back(boost::math::expm1(input_vector[i] + input_vector[i]));
+       results.push_back(signbit(input_vector[i]) + isinf(input_vector[i]) + isnan(input_vector[i]) + issignaling(input_vector[i]) + isnormal(input_vector[i]) + isfinite(input_vector[i]));
     }
     double t = w.elapsed();
     // check the results
     for(int i = 0; i < numElements; ++i)
     {
-        if (boost::math::epsilon_difference(output_vector[i], results[i]) > 10)
+        if (output_vector[i] != results[i])
         {
-            std::cerr << "Result verification failed at element " << i << "!" << std::endl;
+            std::cerr << "Result verification failed at element " << i << "!\n"
+                      << "Cuda: " << output_vector[i] << '\n'
+                      << "Serial: " << results[i] << std::endl;
             return EXIT_FAILURE;
         }
     }
