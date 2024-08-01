@@ -204,7 +204,7 @@ BOOST_DECIMAL_GPU_ENABLED constexpr int num_digits(const uint256_t& x) noexcept
     }
 
     // 10^77
-    auto current_power_of_10 {uint256_t{uint128{UINT64_C(15930919111324522770), UINT64_C(5327493063679123134)}, uint128{UINT64_C(12292710897160462336), UINT64_C(0)}}};
+    uint256_t current_power_of_10 {uint128{UINT64_C(15930919111324522770), UINT64_C(5327493063679123134)}, uint128{UINT64_C(12292710897160462336), UINT64_C(0)}};
 
     for (int i = 78; i > 0; --i)
     {
