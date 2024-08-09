@@ -53,20 +53,20 @@ constexpr int countl_impl(unsigned long long x) noexcept
 
 #else
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE int index64[64] = {
-    0, 47,  1, 56, 48, 27,  2, 60,
-    57, 49, 41, 37, 28, 16,  3, 61,
-    54, 58, 35, 52, 50, 42, 21, 44,
-    38, 32, 29, 23, 17, 11,  4, 62,
-    46, 55, 26, 59, 40, 36, 15, 53,
-    34, 51, 20, 43, 31, 22, 10, 45,
-    25, 39, 14, 33, 19, 30,  9, 24,
-    13, 18,  8, 12,  7,  6,  5, 63
-};
-
 // See: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogDeBruijn
 BOOST_DECIMAL_GPU_ENABLED constexpr auto bit_scan_reverse(std::uint64_t bb) noexcept -> int
 {
+    constexpr int index64[64] = {
+        0, 47,  1, 56, 48, 27,  2, 60,
+        57, 49, 41, 37, 28, 16,  3, 61,
+        54, 58, 35, 52, 50, 42, 21, 44,
+        38, 32, 29, 23, 17, 11,  4, 62,
+        46, 55, 26, 59, 40, 36, 15, 53,
+        34, 51, 20, 43, 31, 22, 10, 45,
+        25, 39, 14, 33, 19, 30,  9, 24,
+        13, 18,  8, 12,  7,  6,  5, 63
+    };
+
     constexpr auto debruijn64 {UINT64_C(0x03f79d71b4cb0a89)};
 
     BOOST_DECIMAL_ASSERT(bb != 0);
