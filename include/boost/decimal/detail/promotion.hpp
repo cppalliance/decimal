@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_PROMOTION_HPP
 
 #include <boost/decimal/fwd.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -73,7 +74,7 @@ constexpr int decimal_val_v = decimal_val<T>::value;
 template<typename T>
 struct promote_arg
 {
-    using type = std::conditional_t<detail::is_integral_v<T>, double, T>;
+    using type = BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::conditional_t<detail::is_integral_v<T>, double, T>;
 };
 
 template<typename T>
@@ -86,11 +87,11 @@ using promote_arg_t = typename promote_arg<T>::type;
 template<typename T1, typename T2>
 struct promote_2_args
 {
-    using type = std::conditional_t<(is_decimal_floating_point_v<T1> && is_decimal_floating_point_v<T2>),
-                 std::conditional_t<(decimal_val_v<T1> > decimal_val_v<T2>), T1, T2>,
-                 std::conditional_t<is_decimal_floating_point_v<T1>, T1,
-                        std::conditional_t<is_decimal_floating_point_v<T2>, T2,
-                                std::conditional_t<(sizeof(promote_arg_t<T1>) > sizeof(promote_arg_t<T2>)),
+    using type = BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::conditional_t<(is_decimal_floating_point_v<T1> && is_decimal_floating_point_v<T2>),
+                 BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::conditional_t<(decimal_val_v<T1> > decimal_val_v<T2>), T1, T2>,
+                 BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::conditional_t<is_decimal_floating_point_v<T1>, T1,
+                        BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::conditional_t<is_decimal_floating_point_v<T2>, T2,
+                                BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::conditional_t<(sizeof(promote_arg_t<T1>) > sizeof(promote_arg_t<T2>)),
                                                     promote_arg_t<T1>, promote_arg_t<T2>>>>>;
 };
 
