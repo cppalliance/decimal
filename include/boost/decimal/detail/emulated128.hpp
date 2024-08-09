@@ -154,7 +154,7 @@ struct uint128
 
     // Conversion Operators
     #define INTEGER_CONVERSION_OPERATOR(expr) BOOST_DECIMAL_GPU_ENABLED explicit constexpr operator expr() const noexcept { return static_cast<expr>(low); }
-    #define   FLOAT_CONVERSION_OPERATOR(expr) BOOST_DECIMAL_GPU_ENABLED explicit           operator expr() const noexcept { return std::ldexp(static_cast<expr>(high), 64) + static_cast<expr>(low); }
+    #define   FLOAT_CONVERSION_OPERATOR(expr) BOOST_DECIMAL_GPU_ENABLED explicit           operator expr() const noexcept { using std::ldexp; return ldexp(static_cast<expr>(high), 64) + static_cast<expr>(low); }
 
     INTEGER_CONVERSION_OPERATOR(char)                   // NOLINT
     INTEGER_CONVERSION_OPERATOR(signed char)            // NOLINT
@@ -182,7 +182,10 @@ struct uint128
 
     FLOAT_CONVERSION_OPERATOR(float)        // NOLINT
     FLOAT_CONVERSION_OPERATOR(double)       // NOLINT
+
+    #ifndef BOOST_DECIMAL_NO_LONG_DOUBLE_MATH_FUNCTIONS
     FLOAT_CONVERSION_OPERATOR(long double)  // NOLINT
+    #endif
 
     #undef INTEGER_CONVERSION_OPERATOR
     #undef FLOAT_CONVERSION_OPERATOR
@@ -1392,34 +1395,34 @@ template <>
 struct numeric_limits<boost::decimal::detail::uint128>
 {
     // Member constants
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_signed = false;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_integer = true;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_exact = true;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_infinity = false;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = false;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_signed = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_integer = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_exact = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_infinity = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = false;
 
     // These members were deprecated in C++23
     #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = false;
     #endif
 
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_toward_zero;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = false;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_modulo = true;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits = 128;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits10 = 38;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_digits10 = 0;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int radix = 2;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent = 0;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent10 = 0;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent = 0;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent10 = 0;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
-    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_toward_zero;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = false;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_modulo = true;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits = 128;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits10 = 38;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_digits10 = 0;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int radix = 2;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent = 0;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent10 = 0;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent = 0;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent10 = 0;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = false;
 
     // Member functions
     BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (min)        () -> boost::decimal::detail::uint128 { return 0; }
