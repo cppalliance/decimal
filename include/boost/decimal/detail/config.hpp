@@ -409,4 +409,12 @@ BOOST_DECIMAL_GPU_ENABLED constexpr T cuda_safe_max(const T& a, const T& b) { re
 #  endif
 #endif
 
+#ifdef BOOST_DECIMAL_ENABLE_CUDA
+#  include <cuda/std/type_traits>
+#  define BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE cuda::std
+#else
+#  include <type_traits>
+#  define BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE std
+#endif 
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP

@@ -14,13 +14,6 @@
 #include <type_traits>
 #endif
 
-#ifdef BOOST_DECIMAL_ENABLE_CUDA
-#  include <cuda/std/type_traits>
-#  define BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE cuda::std
-#else
-#  define BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE std
-#endif 
-
 namespace boost {
 namespace decimal {
 namespace detail {
