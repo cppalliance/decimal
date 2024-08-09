@@ -24,7 +24,7 @@ BOOST_DECIMAL_EXPORT enum class rounding_mode : unsigned
     fe_dec_default = fe_dec_to_nearest_from_zero
 };
 
-#ifndef BOOST_DECIMAL_GPU_ENABLED
+#ifndef BOOST_DECIMAL_ENABLE_CUDA
 
 BOOST_DECIMAL_INLINE_VARIABLE rounding_mode _boost_decimal_global_rounding_mode {rounding_mode::fe_dec_default};
 
