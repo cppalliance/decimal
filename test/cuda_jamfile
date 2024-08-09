@@ -11,4 +11,5 @@ project : requirements
 
 # Basic Operations
 run test_decimal32_fast_addition.cu ;
+run test_decimal32_fast_sub.cu ;
 run test_decimal32_fast_non_finite.cu ;
