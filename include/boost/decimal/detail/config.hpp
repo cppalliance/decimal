@@ -349,6 +349,9 @@ typedef unsigned __int128 uint128_t;
 #  undef BOOST_DECIMAL_FORCEINLINE
 #  define BOOST_DECIMAL_FORCEINLINE inline
 
+// __int128 don't compile
+#  undef BOOST_DECIMAL_HAS_INT128
+
 #endif
 
 #ifndef BOOST_DECIMAL_CUDA_ENABLED
