@@ -165,7 +165,15 @@ public:
   using reference         = typename iterator_traits<iterator_type>::reference;
   using iterator_category = typename iterator_traits<iterator_type>::iterator_category;
 
+  #ifdef BOOST_DECIMAL_ENABLE_CUDA
+  #  pragma nv_diag_suppress 20012
+  #endif
+
   BOOST_DECIMAL_GPU_ENABLED constexpr reverse_iterator() = default;
+
+  #ifdef BOOST_DECIMAL_ENABLE_CUDA
+  #  pragma nv_diag_default 20012
+  #endif
 
   BOOST_DECIMAL_GPU_ENABLED explicit constexpr reverse_iterator(iterator_type x) : current(x) { }
 

@@ -40,6 +40,10 @@ namespace detail {
 #  pragma GCC diagnostic ignored "-Wreorder"
 #endif
 
+#ifdef BOOST_DECIMAL_ENABLE_CUDA
+#  pragma nv_diag_suppress 20012
+#endif
+
 // Compilers might support built-in 128-bit integer types. However, it seems that
 // emulating them with a pair of 64-bit integers actually produces a better code,
 // so we avoid using those built-ins. That said, they are still useful for
@@ -657,6 +661,10 @@ struct int128
     friend auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std::basic_ostream<charT, traits>&;
     #endif
 };
+
+#ifdef BOOST_DECIMAL_ENABLE_CUDA
+#  pragma nv_diag_default 20012
+#endif
 
 #if (defined(__GNUC__) && __GNUC__ >= 8) || (!defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE) && defined(__GNUC__))
 #  pragma GCC diagnostic pop

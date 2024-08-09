@@ -19,6 +19,10 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
+#ifdef BOOST_DECIMAL_ENABLE_CUDA
+#  pragma nv_diag_suppress 20012
+#endif
+
 struct uint256_t
 {
     uint128 high {};
@@ -115,6 +119,10 @@ struct uint256_t
 private:
     BOOST_DECIMAL_GPU_ENABLED friend constexpr int high_bit(uint256_t v) noexcept;
 };
+
+#ifdef BOOST_DECIMAL_ENABLE_CUDA
+#  pragma nv_diag_default 20012
+#endif
 
 BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator>>(uint256_t lhs, int amount) noexcept
 {
