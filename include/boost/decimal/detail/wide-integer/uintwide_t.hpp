@@ -19,6 +19,8 @@
 #define BOOST_DECIMAL_WIDE_INTEGER_NAMESPACE boost::decimal
 
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/numeric_limits.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cinttypes>
@@ -163,48 +165,48 @@ public:
   using reference         = typename iterator_traits<iterator_type>::reference;
   using iterator_category = typename iterator_traits<iterator_type>::iterator_category;
 
-  constexpr reverse_iterator() = default;
+  BOOST_DECIMAL_GPU_ENABLED constexpr reverse_iterator() = default;
 
-  explicit constexpr reverse_iterator(iterator_type x) : current(x) { }
+  BOOST_DECIMAL_GPU_ENABLED explicit constexpr reverse_iterator(iterator_type x) : current(x) { }
 
   template<typename other>
-  constexpr reverse_iterator(const reverse_iterator<other>& u) : current(u.current) { } // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+  BOOST_DECIMAL_GPU_ENABLED constexpr reverse_iterator(const reverse_iterator<other>& u) : current(u.current) { } // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto base() const -> iterator_type { return current; }
+  BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto base() const -> iterator_type { return current; }
 
-  constexpr auto operator* () const -> reference { iterator_type tmp = current; return *--tmp; }
-  constexpr auto operator->() const -> pointer   { return &(operator*()); }
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator* () const -> reference { iterator_type tmp = current; return *--tmp; }
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator->() const -> pointer   { return &(operator*()); }
 
-  constexpr auto operator++() -> reverse_iterator& { --current; return *this; }
-  constexpr auto operator--() -> reverse_iterator& { ++current; return *this; }
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator++() -> reverse_iterator& { --current; return *this; }
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator--() -> reverse_iterator& { ++current; return *this; }
 
-  constexpr auto operator++(int) -> reverse_iterator { reverse_iterator tmp = *this; --current; return tmp; }
-  constexpr auto operator--(int) -> reverse_iterator { reverse_iterator tmp = *this; ++current; return tmp; }
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator++(int) -> reverse_iterator { reverse_iterator tmp = *this; --current; return tmp; }
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator--(int) -> reverse_iterator { reverse_iterator tmp = *this; ++current; return tmp; }
 
-  constexpr auto operator+(typename reverse_iterator<iterator_type>::difference_type n) const -> reverse_iterator { return reverse_iterator(current - n); }
-  constexpr auto operator-(typename reverse_iterator<iterator_type>::difference_type n) const -> reverse_iterator { return reverse_iterator(current + n); }
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator+(typename reverse_iterator<iterator_type>::difference_type n) const -> reverse_iterator { return reverse_iterator(current - n); }
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator-(typename reverse_iterator<iterator_type>::difference_type n) const -> reverse_iterator { return reverse_iterator(current + n); }
 
-  constexpr auto operator+=(typename reverse_iterator<iterator_type>::difference_type n) -> reverse_iterator& { current -= n; return *this; }
-  constexpr auto operator-=(typename reverse_iterator<iterator_type>::difference_type n) -> reverse_iterator& { current += n; return *this; }
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator+=(typename reverse_iterator<iterator_type>::difference_type n) -> reverse_iterator& { current -= n; return *this; }
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator-=(typename reverse_iterator<iterator_type>::difference_type n) -> reverse_iterator& { current += n; return *this; }
 
-  constexpr auto operator[](typename reverse_iterator<iterator_type>::difference_type n) const -> reference { return current[-n - 1]; }
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator[](typename reverse_iterator<iterator_type>::difference_type n) const -> reference { return current[-n - 1]; }
 
 private:
   iterator_type current; // NOLINT(readability-identifier-naming)
 
-  friend constexpr auto operator< (const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current  > y.current); }
-  friend constexpr auto operator<=(const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current >= y.current); }
-  friend constexpr auto operator==(const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current == y.current); }
-  friend constexpr auto operator!=(const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current != y.current); }
-  friend constexpr auto operator>=(const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current <= y.current); }
-  friend constexpr auto operator> (const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current <  y.current); }
+  friend BOOST_DECIMAL_GPU_ENABLED constexpr auto operator< (const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current  > y.current); }
+  friend BOOST_DECIMAL_GPU_ENABLED constexpr auto operator<=(const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current >= y.current); }
+  friend BOOST_DECIMAL_GPU_ENABLED constexpr auto operator==(const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current == y.current); }
+  friend BOOST_DECIMAL_GPU_ENABLED constexpr auto operator!=(const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current != y.current); }
+  friend BOOST_DECIMAL_GPU_ENABLED constexpr auto operator>=(const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current <= y.current); }
+  friend BOOST_DECIMAL_GPU_ENABLED constexpr auto operator> (const reverse_iterator& x, const reverse_iterator& y) -> bool { return (x.current <  y.current); }
 
-  friend constexpr auto operator-(const reverse_iterator& x, const reverse_iterator& y) -> typename reverse_iterator::difference_type
+  friend BOOST_DECIMAL_GPU_ENABLED constexpr auto operator-(const reverse_iterator& x, const reverse_iterator& y) -> typename reverse_iterator::difference_type
   {
     return (y.current - x.current);
   }
 
-  friend constexpr auto operator+(typename reverse_iterator::difference_type n, const reverse_iterator& x) -> reverse_iterator
+  friend BOOST_DECIMAL_GPU_ENABLED constexpr auto operator+(typename reverse_iterator::difference_type n, const reverse_iterator& x) -> reverse_iterator
   {
     return reverse_iterator(x.current - n);
   }
@@ -215,7 +217,7 @@ private:
 // Use a local, constexpr, unsafe implementation of the fill-function.
 template<typename DestinationIterator,
          typename ValueType>
-constexpr auto fill_unsafe(DestinationIterator first, DestinationIterator last, ValueType val) -> void
+BOOST_DECIMAL_GPU_ENABLED constexpr auto fill_unsafe(DestinationIterator first, DestinationIterator last, ValueType val) -> void
 {
   while(first != last)
   {
@@ -228,7 +230,7 @@ constexpr auto fill_unsafe(DestinationIterator first, DestinationIterator last, 
 // Use a local, constexpr, unsafe implementation of the copy-function.
 template<typename InputIterator,
          typename DestinationIterator>
-constexpr auto copy_unsafe(InputIterator first, InputIterator last, DestinationIterator dest) -> DestinationIterator
+BOOST_DECIMAL_GPU_ENABLED constexpr auto copy_unsafe(InputIterator first, InputIterator last, DestinationIterator dest) -> DestinationIterator
 {
   while(first != last)
   {
@@ -268,59 +270,59 @@ public:
 
   static constexpr size_type static_size = N;
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto begin() -> iterator { return elems; }                 // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto end  () -> iterator { return elems + N; }             // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto begin() -> iterator { return elems; }                 // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto end  () -> iterator { return elems + N; }             // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto begin() const -> const_iterator { return elems; }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto end  () const -> const_iterator { return elems + N; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto begin() const -> const_iterator { return elems; }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto end  () const -> const_iterator { return elems + N; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto cbegin() const -> const_iterator { return elems; }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto cend  () const -> const_iterator { return elems + N; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto cbegin() const -> const_iterator { return elems; }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto cend  () const -> const_iterator { return elems + N; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto rbegin() -> reverse_iterator { return reverse_iterator(elems + N); }                    // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto rend  () -> reverse_iterator { return reverse_iterator(elems); }                        // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto rbegin() -> reverse_iterator { return reverse_iterator(elems + N); }                    // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto rend  () -> reverse_iterator { return reverse_iterator(elems); }                        // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto rbegin() const -> const_reverse_iterator { return const_reverse_iterator(elems + N); }  // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto rend  () const -> const_reverse_iterator { return const_reverse_iterator(elems); }      // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto rbegin() const -> const_reverse_iterator { return const_reverse_iterator(elems + N); }  // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto rend  () const -> const_reverse_iterator { return const_reverse_iterator(elems); }      // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto crbegin() const -> const_reverse_iterator { return const_reverse_iterator(elems + N); } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto crend  () const -> const_reverse_iterator { return const_reverse_iterator(elems); }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto crbegin() const -> const_reverse_iterator { return const_reverse_iterator(elems + N); } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto crend  () const -> const_reverse_iterator { return const_reverse_iterator(elems); }     // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto operator[](const size_type i)       -> reference       { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto operator[](const size_type i) const -> const_reference { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto operator[](const size_type i)       -> reference       { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto operator[](const size_type i) const -> const_reference { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto at(const size_type i)       -> reference       { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto at(const size_type i) const -> const_reference { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto at(const size_type i)       -> reference       { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto at(const size_type i) const -> const_reference { return elems[i]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto front()       -> reference       { return elems[static_cast<size_type>(UINT8_C(0))]; }
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto front() const -> const_reference { return elems[static_cast<size_type>(UINT8_C(0))]; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto front()       -> reference       { return elems[static_cast<size_type>(UINT8_C(0))]; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto front() const -> const_reference { return elems[static_cast<size_type>(UINT8_C(0))]; }
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto back()       -> reference       { return elems[static_cast<size_type>(N - static_cast<size_type>(UINT8_C(1)))]; }
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto back() const -> const_reference { return elems[static_cast<size_type>(N - static_cast<size_type>(UINT8_C(1)))]; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto back()       -> reference       { return elems[static_cast<size_type>(N - static_cast<size_type>(UINT8_C(1)))]; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto back() const -> const_reference { return elems[static_cast<size_type>(N - static_cast<size_type>(UINT8_C(1)))]; }
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD static constexpr auto size()     -> size_type { return N; }
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD static constexpr auto empty()    -> bool      { return false; }
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD static constexpr auto max_size() -> size_type { return N; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD static BOOST_DECIMAL_GPU_ENABLED constexpr auto size()     -> size_type { return N; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD static BOOST_DECIMAL_GPU_ENABLED constexpr auto empty()    -> bool      { return false; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD static BOOST_DECIMAL_GPU_ENABLED constexpr auto max_size() -> size_type { return N; }
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto data() const -> const_pointer { return elems; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto data()       -> pointer       { return elems; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto data() const -> const_pointer { return elems; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto data()       -> pointer       { return elems; } // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD constexpr auto c_array() -> pointer { return elems; }
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_GPU_ENABLED constexpr auto c_array() -> pointer { return elems; }
 
   template<typename T2>
-  constexpr auto operator=(const array_unsafe<T2, N>& y) -> array_unsafe&
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto operator=(const array_unsafe<T2, N>& y) -> array_unsafe&
   {
     copy_unsafe(y.begin(), y.end(), begin());
 
     return *this;
   }
 
-  constexpr auto assign(const value_type& value) -> void
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto assign(const value_type& value) -> void
   {
     fill_unsafe(elems, elems + N, value); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,cppcoreguidelines-pro-bounds-pointer-arithmetic)
   }
 
-  constexpr auto fill(const value_type& value) -> void
+  BOOST_DECIMAL_GPU_ENABLED constexpr auto fill(const value_type& value) -> void
   {
     assign(value);
   }
@@ -331,8 +333,8 @@ public:
 using size_t    = std::uint32_t;
 using ptrdiff_t = std::int32_t;
 
-static_assert((  (std::numeric_limits<size_t>::digits        >= std::numeric_limits<std::uint16_t>::digits)
-              && (std::numeric_limits<ptrdiff_t>::digits + 1 >= std::numeric_limits<std::uint16_t>::digits)),
+static_assert((  (boost::decimal::detail::numeric_limits<size_t>::digits        >= boost::decimal::detail::numeric_limits<std::uint16_t>::digits)
+              && (boost::decimal::detail::numeric_limits<ptrdiff_t>::digits + 1 >= boost::decimal::detail::numeric_limits<std::uint16_t>::digits)),
               "Error: size type and pointer difference type must be at least 16 bits in width (or wider)");
 
 template<const size_t Width2> struct verify_power_of_two // NOLINT(altera-struct-pack-align)
@@ -355,9 +357,9 @@ template<const size_t BitCount,
 struct uint_type_helper
 {
 private:
-  static constexpr auto bit_count   () -> size_t { return BitCount; }
-  static constexpr auto bit_count_lo() -> size_t { return static_cast<size_t>(UINT8_C(8)); }
-  static constexpr auto bit_count_hi() -> size_t { return static_cast<size_t>(UINT8_C(64)); }
+  static BOOST_DECIMAL_GPU_ENABLED constexpr auto bit_count   () -> size_t { return BitCount; }
+  static BOOST_DECIMAL_GPU_ENABLED constexpr auto bit_count_lo() -> size_t { return static_cast<size_t>(UINT8_C(8)); }
+  static BOOST_DECIMAL_GPU_ENABLED constexpr auto bit_count_hi() -> size_t { return static_cast<size_t>(UINT8_C(64)); }
 
   static_assert((   ((bit_count() >= bit_count_lo()) && (BitCount <= bit_count_hi())) // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
                  && (verify_power_of_two<bit_count()>::conditional_value)),
@@ -370,22 +372,22 @@ public:
   using fast_signed_type    = std::intmax_t;
 };
 
-template<const size_t BitCount> struct uint_type_helper<BitCount, std::enable_if_t<                                                  (BitCount <= static_cast<size_t>(UINT8_C(  8)))>> { using exact_unsigned_type = std::uint8_t;      using exact_signed_type = std::int8_t;     using fast_unsigned_type = std::uint_fast8_t;  using fast_signed_type = std::int_fast8_t;  };
-template<const size_t BitCount> struct uint_type_helper<BitCount, std::enable_if_t<(BitCount >= static_cast<size_t>(UINT8_C( 9))) && (BitCount <= static_cast<size_t>(UINT8_C( 16)))>> { using exact_unsigned_type = std::uint16_t;     using exact_signed_type = std::int16_t;    using fast_unsigned_type = std::uint_fast16_t; using fast_signed_type = std::int_fast16_t; };
-template<const size_t BitCount> struct uint_type_helper<BitCount, std::enable_if_t<(BitCount >= static_cast<size_t>(UINT8_C(17))) && (BitCount <= static_cast<size_t>(UINT8_C( 32)))>> { using exact_unsigned_type = std::uint32_t;     using exact_signed_type = std::int32_t;    using fast_unsigned_type = std::uint_fast32_t; using fast_signed_type = std::int_fast32_t; };
-template<const size_t BitCount> struct uint_type_helper<BitCount, std::enable_if_t<(BitCount >= static_cast<size_t>(UINT8_C(33))) && (BitCount <= static_cast<size_t>(UINT8_C( 64)))>> { using exact_unsigned_type = std::uint64_t;     using exact_signed_type = std::int64_t;    using fast_unsigned_type = std::uint_fast64_t; using fast_signed_type = std::int_fast64_t; };
+template<const size_t BitCount> struct uint_type_helper<BitCount, BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<                                                  (BitCount <= static_cast<size_t>(UINT8_C(  8)))>> { using exact_unsigned_type = std::uint8_t;      using exact_signed_type = std::int8_t;     using fast_unsigned_type = std::uint_fast8_t;  using fast_signed_type = std::int_fast8_t;  };
+template<const size_t BitCount> struct uint_type_helper<BitCount, BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<(BitCount >= static_cast<size_t>(UINT8_C( 9))) && (BitCount <= static_cast<size_t>(UINT8_C( 16)))>> { using exact_unsigned_type = std::uint16_t;     using exact_signed_type = std::int16_t;    using fast_unsigned_type = std::uint_fast16_t; using fast_signed_type = std::int_fast16_t; };
+template<const size_t BitCount> struct uint_type_helper<BitCount, BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<(BitCount >= static_cast<size_t>(UINT8_C(17))) && (BitCount <= static_cast<size_t>(UINT8_C( 32)))>> { using exact_unsigned_type = std::uint32_t;     using exact_signed_type = std::int32_t;    using fast_unsigned_type = std::uint_fast32_t; using fast_signed_type = std::int_fast32_t; };
+template<const size_t BitCount> struct uint_type_helper<BitCount, BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<(BitCount >= static_cast<size_t>(UINT8_C(33))) && (BitCount <= static_cast<size_t>(UINT8_C( 64)))>> { using exact_unsigned_type = std::uint64_t;     using exact_signed_type = std::int64_t;    using fast_unsigned_type = std::uint_fast64_t; using fast_signed_type = std::int_fast64_t; };
 
-using unsigned_fast_type = typename uint_type_helper<static_cast<size_t>(std::numeric_limits<size_t   >::digits + 0)>::fast_unsigned_type;
-using   signed_fast_type = typename uint_type_helper<static_cast<size_t>(std::numeric_limits<ptrdiff_t>::digits + 1)>::fast_signed_type;
+using unsigned_fast_type = typename uint_type_helper<static_cast<size_t>(boost::decimal::detail::numeric_limits<size_t   >::digits + 0)>::fast_unsigned_type;
+using   signed_fast_type = typename uint_type_helper<static_cast<size_t>(boost::decimal::detail::numeric_limits<ptrdiff_t>::digits + 1)>::fast_signed_type;
 
 template<typename InputIterator,
          typename IntegralType>
-constexpr auto advance_and_point(InputIterator it, IntegralType n) -> InputIterator
+BOOST_DECIMAL_GPU_ENABLED constexpr auto advance_and_point(InputIterator it, IntegralType n) -> InputIterator
 {
   using local_signed_integral_type =
-    std::conditional_t<std::is_signed<IntegralType>::value,
+    BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::conditional_t<BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::is_signed<IntegralType>::value,
                        IntegralType,
-                       typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<IntegralType>::digits)>::exact_signed_type>;
+                       typename detail::uint_type_helper<static_cast<size_t>(boost::decimal::detail::numeric_limits<IntegralType>::digits)>::exact_signed_type>;
 
   using local_difference_type = typename detail::iterator_detail::iterator_traits<InputIterator>::difference_type;
 
@@ -393,8 +395,8 @@ constexpr auto advance_and_point(InputIterator it, IntegralType n) -> InputItera
 }
 
 template<typename UnsignedShortType,
-         typename UnsignedLargeType = typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<UnsignedShortType>::digits * 2)>::exact_unsigned_type>
-constexpr auto make_lo(const UnsignedLargeType& u) -> UnsignedShortType
+         typename UnsignedLargeType = typename detail::uint_type_helper<static_cast<size_t>(boost::decimal::detail::numeric_limits<UnsignedShortType>::digits * 2)>::exact_unsigned_type>
+BOOST_DECIMAL_GPU_ENABLED constexpr auto make_lo(const UnsignedLargeType& u) -> UnsignedShortType
 {
   // From an unsigned integral input parameter of type UnsignedLargeType,
   // extract the low part of it. The type of the extracted
@@ -404,10 +406,10 @@ constexpr auto make_lo(const UnsignedLargeType& u) -> UnsignedShortType
   using local_ularge_type = UnsignedLargeType;
 
   // Compile-time checks.
-  static_assert((    ( std::numeric_limits<local_ushort_type>::is_integer)
-                 &&  ( std::numeric_limits<local_ularge_type>::is_integer)
-                 &&  (!std::numeric_limits<local_ushort_type>::is_signed)
-                 &&  (!std::numeric_limits<local_ularge_type>::is_signed)
+  static_assert((    ( boost::decimal::detail::numeric_limits<local_ushort_type>::is_integer)
+                 &&  ( boost::decimal::detail::numeric_limits<local_ularge_type>::is_integer)
+                 &&  (!boost::decimal::detail::numeric_limits<local_ushort_type>::is_signed)
+                 &&  (!boost::decimal::detail::numeric_limits<local_ularge_type>::is_signed)
                  &&  ((sizeof(local_ushort_type) * 2U) == sizeof(local_ularge_type))),
                  "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
 
@@ -415,8 +417,8 @@ constexpr auto make_lo(const UnsignedLargeType& u) -> UnsignedShortType
 }
 
 template<typename UnsignedShortType,
-         typename UnsignedLargeType = typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<UnsignedShortType>::digits * 2)>::exact_unsigned_type>
-constexpr auto make_hi(const UnsignedLargeType& u) -> UnsignedShortType
+         typename UnsignedLargeType = typename detail::uint_type_helper<static_cast<size_t>(boost::decimal::detail::numeric_limits<UnsignedShortType>::digits * 2)>::exact_unsigned_type>
+BOOST_DECIMAL_GPU_ENABLED constexpr auto make_hi(const UnsignedLargeType& u) -> UnsignedShortType
 {
   // From an unsigned integral input parameter of type UnsignedLargeType,
   // extract the high part of it. The type of the extracted
@@ -426,19 +428,19 @@ constexpr auto make_hi(const UnsignedLargeType& u) -> UnsignedShortType
   using local_ularge_type = UnsignedLargeType;
 
   // Compile-time checks.
-  static_assert((    ( std::numeric_limits<local_ushort_type>::is_integer)
-                 &&  ( std::numeric_limits<local_ularge_type>::is_integer)
-                 &&  (!std::numeric_limits<local_ushort_type>::is_signed)
-                 &&  (!std::numeric_limits<local_ularge_type>::is_signed)
+  static_assert((    ( boost::decimal::detail::numeric_limits<local_ushort_type>::is_integer)
+                 &&  ( boost::decimal::detail::numeric_limits<local_ularge_type>::is_integer)
+                 &&  (!boost::decimal::detail::numeric_limits<local_ushort_type>::is_signed)
+                 &&  (!boost::decimal::detail::numeric_limits<local_ularge_type>::is_signed)
                  &&  ((sizeof(local_ushort_type) * 2U) == sizeof(local_ularge_type))),
                  "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
 
-  return static_cast<local_ushort_type>(u >> static_cast<local_ushort_type>(std::numeric_limits<local_ushort_type>::digits));
+  return static_cast<local_ushort_type>(u >> static_cast<local_ushort_type>(boost::decimal::detail::numeric_limits<local_ushort_type>::digits));
 }
 
 template<typename UnsignedShortType,
-         typename UnsignedLargeType = typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<UnsignedShortType>::digits * 2)>::exact_unsigned_type>
-constexpr auto make_large(const UnsignedShortType& lo, const UnsignedShortType& hi) -> UnsignedLargeType
+         typename UnsignedLargeType = typename detail::uint_type_helper<static_cast<size_t>(boost::decimal::detail::numeric_limits<UnsignedShortType>::digits * 2)>::exact_unsigned_type>
+BOOST_DECIMAL_GPU_ENABLED constexpr auto make_large(const UnsignedShortType& lo, const UnsignedShortType& hi) -> UnsignedLargeType
 {
   // Create a composite unsigned integral value having type UnsignedLargeType.
   // Two constituents are used having type UnsignedShortType, whereby the
@@ -448,10 +450,10 @@ constexpr auto make_large(const UnsignedShortType& lo, const UnsignedShortType& 
   using local_ularge_type = UnsignedLargeType;
 
   // Compile-time checks.
-  static_assert((    ( std::numeric_limits<local_ushort_type>::is_integer)
-                 &&  ( std::numeric_limits<local_ularge_type>::is_integer)
-                 &&  (!std::numeric_limits<local_ushort_type>::is_signed)
-                 &&  (!std::numeric_limits<local_ularge_type>::is_signed)
+  static_assert((    ( boost::decimal::detail::numeric_limits<local_ushort_type>::is_integer)
+                 &&  ( boost::decimal::detail::numeric_limits<local_ularge_type>::is_integer)
+                 &&  (!boost::decimal::detail::numeric_limits<local_ushort_type>::is_signed)
+                 &&  (!boost::decimal::detail::numeric_limits<local_ularge_type>::is_signed)
                  &&  ((sizeof(local_ushort_type) * 2U) == sizeof(local_ularge_type))),
                  "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
 
@@ -460,7 +462,7 @@ constexpr auto make_large(const UnsignedShortType& lo, const UnsignedShortType& 
     (
         static_cast<local_ularge_type>
         (
-          static_cast<local_ularge_type>(hi) << static_cast<unsigned>(std::numeric_limits<UnsignedShortType>::digits)
+          static_cast<local_ularge_type>(hi) << static_cast<unsigned>(boost::decimal::detail::numeric_limits<UnsignedShortType>::digits)
         )
       | lo
     );
@@ -481,7 +483,7 @@ public:
   using limb_type = std::uint32_t;
 
   using double_limb_type =
-    typename detail::uint_type_helper<static_cast<size_t>(static_cast<int>(std::numeric_limits<limb_type>::digits * static_cast<int>(INT8_C(2))))>::exact_unsigned_type;
+    typename detail::uint_type_helper<static_cast<size_t>(static_cast<int>(boost::decimal::detail::numeric_limits<limb_type>::digits * static_cast<int>(INT8_C(2))))>::exact_unsigned_type;
 
   // Legacy ularge and ushort types. These are no longer used
   // in the class, but provided for legacy compatibility.
@@ -489,10 +491,10 @@ public:
   using ularge_type = double_limb_type;
 
   // More compile-time checks.
-  static_assert((    ( std::numeric_limits<limb_type>::is_integer)
-                 &&  ( std::numeric_limits<double_limb_type>::is_integer)
-                 &&  (!std::numeric_limits<limb_type>::is_signed)
-                 &&  (!std::numeric_limits<double_limb_type>::is_signed)
+  static_assert((    ( boost::decimal::detail::numeric_limits<limb_type>::is_integer)
+                 &&  ( boost::decimal::detail::numeric_limits<double_limb_type>::is_integer)
+                 &&  (!boost::decimal::detail::numeric_limits<limb_type>::is_signed)
+                 &&  (!boost::decimal::detail::numeric_limits<double_limb_type>::is_signed)
                  &&  ((sizeof(limb_type) * 2U) == sizeof(double_limb_type))),
                  "Error: Please check the characteristics of the template parameters UnsignedShortType and UnsignedLargeType");
 
@@ -503,7 +505,7 @@ public:
   static constexpr size_t number_of_limbs =
     static_cast<size_t>
     (
-      Width2 / static_cast<size_t>(std::numeric_limits<limb_type>::digits)
+      Width2 / static_cast<size_t>(boost::decimal::detail::numeric_limits<limb_type>::digits)
     );
 
   // The type of the internal data representation.
@@ -517,11 +519,14 @@ public:
 
   // Provide a user interface to the internal data representation.
   BOOST_DECIMAL_WIDE_INTEGER_NODISCARD
-  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto  representation()       ->       representation_type& { return values; }
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD
-  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto crepresentation() const -> const representation_type& { return values; }
+  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR 
+  BOOST_DECIMAL_GPU_ENABLED auto  representation()       ->       representation_type& { return values; }
 
-  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth(const uintwide_t& other, uintwide_t& remainder) -> void
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD
+  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR 
+  BOOST_DECIMAL_GPU_ENABLED auto crepresentation() const -> const representation_type& { return values; }
+
+  BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR BOOST_DECIMAL_GPU_ENABLED auto eval_divide_knuth(const uintwide_t& other, uintwide_t& remainder) -> void
   {
     using local_uint_index_type = unsigned_fast_type;
 
@@ -593,6 +598,7 @@ public:
 
   template<typename ResultIterator,
            typename InputIteratorLeft>
+  BOOST_DECIMAL_GPU_ENABLED
   static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_multiply_1d(      ResultIterator                                                                   r,
                                                                           InputIteratorLeft                                                                a,
                                                                     const typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type b,
@@ -603,12 +609,12 @@ public:
 
     static_assert
     (
-      (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<left_value_type>::digits),
+      (boost::decimal::detail::numeric_limits<local_limb_type>::digits == boost::decimal::detail::numeric_limits<left_value_type>::digits),
       "Error: Internals require same widths for left-right-result limb_types at the moment"
     );
 
     using local_double_limb_type =
-      typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<local_limb_type>::digits * 2)>::exact_unsigned_type;
+      typename detail::uint_type_helper<static_cast<size_t>(boost::decimal::detail::numeric_limits<local_limb_type>::digits * 2)>::exact_unsigned_type;
 
     auto carry = static_cast<local_double_limb_type>(UINT8_C(0));
 
@@ -642,6 +648,7 @@ public:
   template<typename ResultIterator,
            typename InputIteratorLeft,
            typename InputIteratorRight>
+  BOOST_DECIMAL_GPU_ENABLED
   static constexpr auto eval_multiply_n_by_n_to_lo_part_128(      ResultIterator     r,
                                                                   InputIteratorLeft  a,
                                                                   InputIteratorRight b,
@@ -653,13 +660,13 @@ public:
 
     static_assert
     (
-         (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
-      && (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
+         (boost::decimal::detail::numeric_limits<local_limb_type>::digits == boost::decimal::detail::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
+      && (boost::decimal::detail::numeric_limits<local_limb_type>::digits == boost::decimal::detail::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
       "Error: Internals require same widths for left-right-result limb_types at the moment"
     );
 
     using local_double_limb_type =
-      typename detail::uint_type_helper<static_cast<size_t>(static_cast<int>(std::numeric_limits<local_limb_type>::digits * static_cast<int>(INT8_C(2))))>::exact_unsigned_type;
+      typename detail::uint_type_helper<static_cast<size_t>(static_cast<int>(boost::decimal::detail::numeric_limits<local_limb_type>::digits * static_cast<int>(INT8_C(2))))>::exact_unsigned_type;
 
     using result_difference_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::difference_type;
     using left_difference_type   = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::difference_type;
@@ -782,6 +789,7 @@ public:
   template<typename ResultIterator,
            typename InputIteratorLeft,
            typename InputIteratorRight>
+  BOOST_DECIMAL_GPU_ENABLED
   static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_multiply_n_by_n_to_lo_part_256(      ResultIterator     r,
                                                                                              InputIteratorLeft  a,
                                                                                              InputIteratorRight b,
@@ -791,15 +799,15 @@ public:
 
     static_assert
     (
-          (std::numeric_limits<typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
-      && (std::numeric_limits<typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
+          (boost::decimal::detail::numeric_limits<typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type>::digits == boost::decimal::detail::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
+      && (boost::decimal::detail::numeric_limits<typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type>::digits == boost::decimal::detail::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
       "Error: Internals require same widths for left-right-result limb_types at the moment"
     );
 
     using local_limb_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::value_type;
 
     using local_double_limb_type =
-      typename detail::uint_type_helper<static_cast<size_t>(static_cast<int>(std::numeric_limits<local_limb_type>::digits * static_cast<int>(INT8_C(2))))>::exact_unsigned_type;
+      typename detail::uint_type_helper<static_cast<size_t>(static_cast<int>(boost::decimal::detail::numeric_limits<local_limb_type>::digits * static_cast<int>(INT8_C(2))))>::exact_unsigned_type;
 
     using result_difference_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::difference_type;
     using left_difference_type   = typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::difference_type;
@@ -1077,13 +1085,14 @@ public:
 private:
   representation_type values { };
 
-  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto compare(const uintwide_t& other) const -> std::int_fast8_t
+  BOOST_DECIMAL_WIDE_INTEGER_NODISCARD BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR BOOST_DECIMAL_GPU_ENABLED auto compare(const uintwide_t& other) const -> std::int_fast8_t
   {
     return compare_ranges(values.cbegin(), other.values.cbegin(), number_of_limbs);
   }
 
   template<typename InputIteratorLeftType,
            typename InputIteratorRightType>
+  BOOST_DECIMAL_GPU_ENABLED
   static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto compare_ranges(      InputIteratorLeftType  a,
                                                                         InputIteratorRightType b,
                                                                   const unsigned_fast_type     count) -> std::int_fast8_t
@@ -1120,6 +1129,7 @@ private:
   template<typename ResultIterator,
            typename InputIteratorLeft,
            typename InputIteratorRight>
+  BOOST_DECIMAL_GPU_ENABLED
   static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_add_n(      ResultIterator     r,
                                                                     InputIteratorLeft  u,
                                                                     InputIteratorRight v,
@@ -1132,13 +1142,13 @@ private:
 
     static_assert
     (
-         (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
-      && (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
+         (boost::decimal::detail::numeric_limits<local_limb_type>::digits == boost::decimal::detail::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
+      && (boost::decimal::detail::numeric_limits<local_limb_type>::digits == boost::decimal::detail::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
       "Error: Internals require same widths for left-right-result limb_types at the moment"
     );
 
     using local_double_limb_type =
-      typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<local_limb_type>::digits * 2)>::exact_unsigned_type;
+      typename detail::uint_type_helper<static_cast<size_t>(boost::decimal::detail::numeric_limits<local_limb_type>::digits * 2)>::exact_unsigned_type;
 
     using result_difference_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::difference_type;
 
@@ -1162,6 +1172,7 @@ private:
   template<typename ResultIterator,
            typename InputIteratorLeft,
            typename InputIteratorRight>
+  BOOST_DECIMAL_GPU_ENABLED
   static BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_subtract_n(      ResultIterator     r,
                                                                          InputIteratorLeft  u,
                                                                          InputIteratorRight v,
@@ -1179,13 +1190,13 @@ private:
 
     static_assert
     (
-         (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
-      && (std::numeric_limits<local_limb_type>::digits == std::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
+         (boost::decimal::detail::numeric_limits<local_limb_type>::digits == boost::decimal::detail::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorLeft>::value_type>::digits)
+      && (boost::decimal::detail::numeric_limits<local_limb_type>::digits == boost::decimal::detail::numeric_limits<typename detail::iterator_detail::iterator_traits<InputIteratorRight>::value_type>::digits),
       "Error: Internals require same widths for left-right-result limb_types at the moment"
     );
 
     using local_double_limb_type =
-      typename detail::uint_type_helper<static_cast<size_t>(std::numeric_limits<local_limb_type>::digits * 2)>::exact_unsigned_type;
+      typename detail::uint_type_helper<static_cast<size_t>(boost::decimal::detail::numeric_limits<local_limb_type>::digits * 2)>::exact_unsigned_type;
 
     using result_difference_type = typename detail::iterator_detail::iterator_traits<ResultIterator>::difference_type;
 
@@ -1212,6 +1223,7 @@ private:
     return (has_borrow_out != static_cast<std::uint_fast8_t>(UINT8_C(0)));
   }
 
+  BOOST_DECIMAL_GPU_ENABLED
   BOOST_DECIMAL_WIDE_INTEGER_CONSTEXPR auto eval_divide_knuth_core(const unsigned_fast_type u_offset, // NOLINT(readability-function-cognitive-complexity)
                                                                    const unsigned_fast_type v_offset,
                                                                    const uintwide_t& other,
@@ -1234,7 +1246,7 @@ private:
     const auto d =
       static_cast<limb_type>
       (
-          static_cast<double_limb_type>(static_cast<double_limb_type>(UINT8_C(1)) << static_cast<unsigned>(std::numeric_limits<limb_type>::digits))
+          static_cast<double_limb_type>(static_cast<double_limb_type>(UINT8_C(1)) << static_cast<unsigned>(boost::decimal::detail::numeric_limits<limb_type>::digits))
         / static_cast<double_limb_type>(static_cast<double_limb_type>(*detail::advance_and_point(other.values.cbegin(), static_cast<size_t>(static_cast<local_uint_index_type>(number_of_limbs - 1U) - v_offset))) + static_cast<limb_type>(1U))
       );
 
@@ -1311,13 +1323,13 @@ private:
       //     set q_hat = (u[j] * b + u[j + 1]) / v[1]
 
       const auto uj     = static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(static_cast<local_uint_index_type>(number_of_limbs + 1U) - 1U) - u_offset) - j);
-      const auto u_j_j1 = static_cast<double_limb_type>(static_cast<double_limb_type>(static_cast<double_limb_type>(*(uu.cbegin() + static_cast<size_t>(uj))) << static_cast<unsigned>(std::numeric_limits<limb_type>::digits)) + *(uu.cbegin() + static_cast<size_t>(uj - 1U)));
+      const auto u_j_j1 = static_cast<double_limb_type>(static_cast<double_limb_type>(static_cast<double_limb_type>(*(uu.cbegin() + static_cast<size_t>(uj))) << static_cast<unsigned>(boost::decimal::detail::numeric_limits<limb_type>::digits)) + *(uu.cbegin() + static_cast<size_t>(uj - 1U)));
 
       auto q_hat =
         static_cast<limb_type>
         (
           (*(uu.cbegin() + static_cast<size_t>(uj)) == vv_at_vj0)
-            ? (std::numeric_limits<limb_type>::max)()
+            ? (boost::decimal::detail::numeric_limits<limb_type>::max)()
             : static_cast<limb_type>(u_j_j1 / vv_at_vj0)
         );
 
@@ -1332,7 +1344,7 @@ private:
       {
         if(   (detail::make_hi<limb_type>(t) != static_cast<limb_type>(UINT8_C(0)))
             || (   static_cast<double_limb_type>(static_cast<double_limb_type>(vv_at_vj0_minus_one) * q_hat)
-                <= static_cast<double_limb_type>(static_cast<double_limb_type>(t << static_cast<unsigned>(std::numeric_limits<limb_type>::digits)) + *detail::advance_and_point(uu.cbegin(), static_cast<size_t>(uj - 2U)))))
+                <= static_cast<double_limb_type>(static_cast<double_limb_type>(t << static_cast<unsigned>(boost::decimal::detail::numeric_limits<limb_type>::digits)) + *detail::advance_and_point(uu.cbegin(), static_cast<size_t>(uj - 2U)))))
         {
           break;
         }
@@ -1437,7 +1449,7 @@ private:
                 *(uu.cbegin() + static_cast<size_t>(ul))
               + static_cast<double_limb_type>
                 (
-                  static_cast<double_limb_type>(previous_u) << static_cast<unsigned>(std::numeric_limits<limb_type>::digits)
+                  static_cast<double_limb_type>(previous_u) << static_cast<unsigned>(boost::decimal::detail::numeric_limits<limb_type>::digits)
                 )
             );
 
