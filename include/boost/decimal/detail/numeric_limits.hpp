@@ -18,6 +18,7 @@
 
 namespace boost {
 namespace decimal {
+namespace detail {
 
 template <typename T>
 struct numeric_limits : public std::numeric_limits<T> {};
@@ -458,6 +459,7 @@ struct numeric_limits<bool>
 
 #endif // BOOST_DECIMAL_HAS_GPU_SUPPORT
 
+} // namespace detail
 } // namespace decimal
 } // namespace boost
 
