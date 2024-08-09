@@ -57,27 +57,27 @@ struct uint128
     #endif
 
     // Constructors
-    constexpr uint128() noexcept = default;
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint128() noexcept = default;
 
-    constexpr uint128(const uint128& v) noexcept = default;
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint128(const uint128& v) noexcept = default;
 
-    constexpr uint128(uint128&& v) noexcept = default;
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint128(uint128&& v) noexcept = default;
 
     #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
-    constexpr uint128(std::uint64_t high_, std::uint64_t low_) noexcept : low {low_}, high {high_} {}
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint128(std::uint64_t high_, std::uint64_t low_) noexcept : low {low_}, high {high_} {}
     #else
-    constexpr uint128(std::uint64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint128(std::uint64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
     #endif
 
     #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
 
-    #define SIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : low {static_cast<std::uint64_t>(v)}, high {v < 0 ? UINT64_MAX : UINT64_C(0)} {}// NOLINT
-    #define UNSIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : low {static_cast<std::uint64_t>(v)}, high {} {} // NOLINT
+    #define SIGNED_CONSTRUCTOR(expr) BOOST_DECIMAL_GPU_ENABLED constexpr uint128(expr v) noexcept : low {static_cast<std::uint64_t>(v)}, high {v < 0 ? UINT64_MAX : UINT64_C(0)} {}// NOLINT
+    #define UNSIGNED_CONSTRUCTOR(expr) BOOST_DECIMAL_GPU_ENABLED constexpr uint128(expr v) noexcept : low {static_cast<std::uint64_t>(v)}, high {} {} // NOLINT
 
     #else
 
-    #define SIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : high {v < 0 ? UINT64_MAX : UINT64_C(0)}, low {static_cast<std::uint64_t>(v)} {}// NOLINT
-    #define UNSIGNED_CONSTRUCTOR(expr) constexpr uint128(expr v) noexcept : high {}, low {static_cast<std::uint64_t>(v)} {} // NOLINT
+    #define SIGNED_CONSTRUCTOR(expr) BOOST_DECIMAL_GPU_ENABLED constexpr uint128(expr v) noexcept : high {v < 0 ? UINT64_MAX : UINT64_C(0)}, low {static_cast<std::uint64_t>(v)} {}// NOLINT
+    #define UNSIGNED_CONSTRUCTOR(expr) BOOST_DECIMAL_GPU_ENABLED constexpr uint128(expr v) noexcept : high {}, low {static_cast<std::uint64_t>(v)} {} // NOLINT
 
     #endif
 
@@ -97,21 +97,21 @@ struct uint128
     #ifdef BOOST_DECIMAL_HAS_INT128
     #  if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
 
-    constexpr uint128(boost::decimal::detail::int128_t v) noexcept :  // NOLINT : Allow implicit conversions,
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint128(boost::decimal::detail::int128_t v) noexcept :  // NOLINT : Allow implicit conversions,
          low {static_cast<std::uint64_t>(static_cast<boost::decimal::detail::int128_t>(v) & ~UINT64_C(0))},
          high {static_cast<std::uint64_t>(v >> 64)} {}
 
-    constexpr uint128(boost::decimal::detail::uint128_t v) noexcept : // NOLINT : Allow implicit conversions
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint128(boost::decimal::detail::uint128_t v) noexcept : // NOLINT : Allow implicit conversions
         low {static_cast<std::uint64_t>(v & ~UINT64_C(0))},
         high {static_cast<std::uint64_t>(v >> 64)} {}
 
     #  else
 
-    constexpr uint128(boost::decimal::detail::int128_t v) noexcept :  // NOLINT : Allow implicit conversions,
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint128(boost::decimal::detail::int128_t v) noexcept :  // NOLINT : Allow implicit conversions,
          high {static_cast<std::uint64_t>(v >> 64)},
          low {static_cast<std::uint64_t>(static_cast<boost::decimal::detail::uint128_t>(v) & ~UINT64_C(0))} {}
 
-    constexpr uint128(boost::decimal::detail::uint128_t v) noexcept : // NOLINT : Allow implicit conversions
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint128(boost::decimal::detail::uint128_t v) noexcept : // NOLINT : Allow implicit conversions
         high {static_cast<std::uint64_t>(v >> 64)},
         low {static_cast<std::uint64_t>(v & ~UINT64_C(0))}{}
         
@@ -122,8 +122,8 @@ struct uint128
     #undef UNSIGNED_CONSTRUCTOR
 
     // Assignment Operators
-    #define   SIGNED_ASSIGNMENT_OPERATOR(expr) constexpr auto operator=(const expr& v) noexcept -> uint128& { high = v < 0 ? UINT64_MAX : UINT64_C(0); low = static_cast<std::uint64_t>(v); return *this; } // NOLINT
-    #define UNSIGNED_ASSIGNMENT_OPERATOR(expr) constexpr auto operator=(const expr& v) noexcept -> uint128& { high = 0U; low = static_cast<std::uint64_t>(v); return *this; } // NOLINT
+    #define   SIGNED_ASSIGNMENT_OPERATOR(expr) BOOST_DECIMAL_GPU_ENABLED constexpr auto operator=(const expr& v) noexcept -> uint128& { high = v < 0 ? UINT64_MAX : UINT64_C(0); low = static_cast<std::uint64_t>(v); return *this; } // NOLINT
+    #define UNSIGNED_ASSIGNMENT_OPERATOR(expr) BOOST_DECIMAL_GPU_ENABLED constexpr auto operator=(const expr& v) noexcept -> uint128& { high = 0U; low = static_cast<std::uint64_t>(v); return *this; } // NOLINT
 
     SIGNED_ASSIGNMENT_OPERATOR(char)                    // NOLINT
     SIGNED_ASSIGNMENT_OPERATOR(signed char)             // NOLINT
@@ -139,18 +139,18 @@ struct uint128
     UNSIGNED_ASSIGNMENT_OPERATOR(unsigned long long)    // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr auto operator=(const boost::decimal::detail::int128_t&  v) noexcept -> uint128& { *this = uint128(v); return *this; }
-    constexpr auto operator=(const boost::decimal::detail::uint128_t& v) noexcept -> uint128& { *this = uint128(v); return *this; }
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator=(const boost::decimal::detail::int128_t&  v) noexcept -> uint128& { *this = uint128(v); return *this; }
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator=(const boost::decimal::detail::uint128_t& v) noexcept -> uint128& { *this = uint128(v); return *this; }
     #endif
 
-    constexpr uint128& operator=(const uint128&) noexcept = default;
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint128& operator=(const uint128&) noexcept = default;
 
     #undef SIGNED_ASSIGNMENT_OPERATOR
     #undef UNSIGNED_ASSIGNMENT_OPERATOR
 
     // Conversion Operators
-    #define INTEGER_CONVERSION_OPERATOR(expr) explicit constexpr operator expr() const noexcept { return static_cast<expr>(low); }
-    #define   FLOAT_CONVERSION_OPERATOR(expr) explicit           operator expr() const noexcept { return std::ldexp(static_cast<expr>(high), 64) + static_cast<expr>(low); }
+    #define INTEGER_CONVERSION_OPERATOR(expr) BOOST_DECIMAL_GPU_ENABLED explicit constexpr operator expr() const noexcept { return static_cast<expr>(low); }
+    #define   FLOAT_CONVERSION_OPERATOR(expr) BOOST_DECIMAL_GPU_ENABLED explicit           operator expr() const noexcept { return std::ldexp(static_cast<expr>(high), 64) + static_cast<expr>(low); }
 
     INTEGER_CONVERSION_OPERATOR(char)                   // NOLINT
     INTEGER_CONVERSION_OPERATOR(signed char)            // NOLINT
@@ -164,11 +164,11 @@ struct uint128
     INTEGER_CONVERSION_OPERATOR(unsigned long)          // NOLINT
     INTEGER_CONVERSION_OPERATOR(unsigned long long)     // NOLINT
 
-    explicit constexpr operator bool() const noexcept { return high || low; }
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr operator bool() const noexcept { return high || low; }
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    explicit constexpr operator int128_t() noexcept { return (static_cast<int128_t>(high) << 64) + low; }
-    explicit constexpr operator uint128_t() const noexcept { return (static_cast<uint128_t>(high) << 64) + low; }
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr operator int128_t() noexcept { return (static_cast<int128_t>(high) << 64) + low; }
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr operator uint128_t() const noexcept { return (static_cast<uint128_t>(high) << 64) + low; }
     #endif
 
     #ifdef BOOST_DECIMAL_HAS_FLOAT128
@@ -184,14 +184,14 @@ struct uint128
     #undef FLOAT_CONVERSION_OPERATOR
 
     // Unary Operators
-    constexpr friend auto operator-(uint128 val) noexcept -> uint128;
-    constexpr friend auto operator+(uint128 val) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator-(uint128 val) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator+(uint128 val) noexcept -> uint128;
 
     // Comparison Operators
 
     // Equality
-    #define          INTEGER_OPERATOR_EQUAL(expr) constexpr friend auto operator==(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0 && rhs >= 0 && lhs.low == static_cast<std::uint64_t>(rhs); } // NOLINT
-    #define UNSIGNED_INTEGER_OPERATOR_EQUAL(expr) constexpr friend auto operator==(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0 && lhs.low == static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define          INTEGER_OPERATOR_EQUAL(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator==(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0 && rhs >= 0 && lhs.low == static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define UNSIGNED_INTEGER_OPERATOR_EQUAL(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator==(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0 && lhs.low == static_cast<std::uint64_t>(rhs); } // NOLINT
 
     INTEGER_OPERATOR_EQUAL(char)                        // NOLINT
     INTEGER_OPERATOR_EQUAL(signed char)                 // NOLINT
@@ -206,17 +206,17 @@ struct uint128
     UNSIGNED_INTEGER_OPERATOR_EQUAL(unsigned long long) // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend auto operator==(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return lhs == uint128(rhs); }
-    constexpr friend auto operator==(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return lhs == uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator==(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return lhs == uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator==(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return lhs == uint128(rhs); }
     #endif
 
-    constexpr friend auto operator==(uint128 lhs, uint128 rhs) noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator==(uint128 lhs, uint128 rhs) noexcept -> bool;
 
     #undef INTEGER_OPERATOR_EQUAL
     #undef UNSIGNED_INTEGER_OPERATOR_EQUAL
 
     // Inequality
-    #define INTEGER_OPERATOR_NOTEQUAL(expr) constexpr friend auto operator!=(uint128 lhs, expr rhs) noexcept -> bool { return !(lhs == rhs); } // NOLINT
+    #define INTEGER_OPERATOR_NOTEQUAL(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator!=(uint128 lhs, expr rhs) noexcept -> bool { return !(lhs == rhs); } // NOLINT
 
     INTEGER_OPERATOR_NOTEQUAL(char)                 // NOLINT
     INTEGER_OPERATOR_NOTEQUAL(signed char)          // NOLINT
@@ -231,17 +231,17 @@ struct uint128
     INTEGER_OPERATOR_NOTEQUAL(unsigned long long)   // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend auto operator!=(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return !(lhs == rhs); }
-    constexpr friend auto operator!=(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return !(lhs == rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator!=(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return !(lhs == rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator!=(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return !(lhs == rhs); }
     #endif
 
-    constexpr friend auto operator!=(uint128 lhs, uint128 rhs) noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator!=(uint128 lhs, uint128 rhs) noexcept -> bool;
 
     #undef INTEGER_OPERATOR_NOTEQUAL
 
     // Less than
-    #define          INTEGER_OPERATOR_LESS_THAN(expr) constexpr friend auto operator<(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && rhs > 0 && lhs.low < static_cast<std::uint64_t>(rhs); } // NOLINT
-    #define UNSIGNED_INTEGER_OPERATOR_LESS_THAN(expr) constexpr friend auto operator<(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && lhs.low < static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define          INTEGER_OPERATOR_LESS_THAN(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator<(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && rhs > 0 && lhs.low < static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define UNSIGNED_INTEGER_OPERATOR_LESS_THAN(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator<(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && lhs.low < static_cast<std::uint64_t>(rhs); } // NOLINT
 
     INTEGER_OPERATOR_LESS_THAN(char)                            // NOLINT
     INTEGER_OPERATOR_LESS_THAN(signed char)                     // NOLINT
@@ -256,18 +256,18 @@ struct uint128
     UNSIGNED_INTEGER_OPERATOR_LESS_THAN(unsigned long long)     // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend auto operator<(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return lhs < uint128(rhs); }
-    constexpr friend auto operator<(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return lhs < uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator<(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return lhs < uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator<(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return lhs < uint128(rhs); }
     #endif
 
-    constexpr friend auto operator<(uint128 lhs, uint128 rhs) noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator<(uint128 lhs, uint128 rhs) noexcept -> bool;
 
     #undef INTEGER_OPERATOR_LESS_THAN
     #undef UNSIGNED_INTEGER_OPERATOR_LESS_THAN
 
     // Less than or equal to
-    #define          INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(expr) constexpr friend auto operator<=(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && rhs >= 0 && lhs.low <= static_cast<std::uint64_t>(rhs); } // NOLINT
-    #define UNSIGNED_INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(expr) constexpr friend auto operator<=(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && lhs.low <= static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define          INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator<=(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && rhs >= 0 && lhs.low <= static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define UNSIGNED_INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator<=(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high == 0U && lhs.low <= static_cast<std::uint64_t>(rhs); } // NOLINT
 
     INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(char)                            // NOLINT
     INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(signed char)                     // NOLINT
@@ -282,18 +282,18 @@ struct uint128
     UNSIGNED_INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO(unsigned long long)     // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend auto operator<=(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return lhs <= uint128(rhs); }
-    constexpr friend auto operator<=(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return lhs <= uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator<=(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return lhs <= uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator<=(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return lhs <= uint128(rhs); }
     #endif
 
-    constexpr friend auto operator<=(uint128 lhs, uint128 rhs) noexcept -> bool ;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator<=(uint128 lhs, uint128 rhs) noexcept -> bool ;
 
     #undef INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO
     #undef UNSIGNED_INTEGER_OPERATOR_LESS_THAN_OR_EQUAL_TO
 
     // Greater than
-    #define          INTEGER_OPERATOR_GREATER_THAN(expr) constexpr friend auto operator>(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high > 0U || rhs < 0 || lhs.low > static_cast<std::uint64_t>(rhs); } // NOLINT
-    #define UNSIGNED_INTEGER_OPERATOR_GREATER_THAN(expr) constexpr friend auto operator>(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high > 0U || lhs.low > static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define          INTEGER_OPERATOR_GREATER_THAN(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator>(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high > 0U || rhs < 0 || lhs.low > static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define UNSIGNED_INTEGER_OPERATOR_GREATER_THAN(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator>(uint128 lhs, expr rhs) noexcept -> bool { return lhs.high > 0U || lhs.low > static_cast<std::uint64_t>(rhs); } // NOLINT
 
     INTEGER_OPERATOR_GREATER_THAN(char)                             // NOLINT
     INTEGER_OPERATOR_GREATER_THAN(signed char)                      // NOLINT
@@ -308,18 +308,18 @@ struct uint128
     UNSIGNED_INTEGER_OPERATOR_GREATER_THAN(unsigned long long)      // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend auto operator>(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return lhs > uint128(rhs); }
-    constexpr friend auto operator>(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return lhs > uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator>(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return lhs > uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator>(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return lhs > uint128(rhs); }
     #endif
 
-    constexpr friend auto operator>(uint128 lhs, uint128 rhs) noexcept -> bool ;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator>(uint128 lhs, uint128 rhs) noexcept -> bool ;
 
     #undef INTEGER_OPERATOR_GREATER_THAN
     #undef UNSIGNED_INTEGER_OPERATOR_GREATER_THAN
 
     // Greater than or equal to
-    #define          INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(expr) constexpr friend auto operator>=(uint128 lhs, expr rhs) noexcept  -> bool { return lhs.high > 0U || rhs < 0 || lhs.low >= static_cast<std::uint64_t>(rhs); } // NOLINT
-    #define UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(expr) constexpr friend auto operator>=(uint128 lhs, expr rhs) noexcept  -> bool { return lhs.high > 0U || lhs.low >= static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define          INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator>=(uint128 lhs, expr rhs) noexcept  -> bool { return lhs.high > 0U || rhs < 0 || lhs.low >= static_cast<std::uint64_t>(rhs); } // NOLINT
+    #define UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator>=(uint128 lhs, expr rhs) noexcept  -> bool { return lhs.high > 0U || lhs.low >= static_cast<std::uint64_t>(rhs); } // NOLINT
 
     INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(char)                             // NOLINT
     INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(signed char)                      // NOLINT
@@ -334,11 +334,11 @@ struct uint128
     UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(unsigned long long)      // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend auto operator>=(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return lhs >= uint128(rhs); }
-    constexpr friend auto operator>=(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return lhs >= uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator>=(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> bool { return lhs >= uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator>=(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> bool { return lhs >= uint128(rhs); }
     #endif
 
-    constexpr friend auto operator>=(uint128 lhs, uint128 rhs) noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator>=(uint128 lhs, uint128 rhs) noexcept -> bool;
 
     #undef INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO
     #undef UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO
@@ -346,10 +346,10 @@ struct uint128
     // Binary Operators
 
     // Not
-    constexpr friend auto operator~(uint128 v) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator~(uint128 v) noexcept -> uint128;
 
     // Or
-    #define INTEGER_BINARY_OPERATOR_OR(expr) constexpr friend auto operator|(uint128 lhs, expr rhs) noexcept -> uint128 { return {lhs.high, lhs.low | static_cast<std::uint64_t>(rhs)}; } // NOLINT
+    #define INTEGER_BINARY_OPERATOR_OR(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator|(uint128 lhs, expr rhs) noexcept -> uint128 { return {lhs.high, lhs.low | static_cast<std::uint64_t>(rhs)}; } // NOLINT
 
     INTEGER_BINARY_OPERATOR_OR(char)                // NOLINT
     INTEGER_BINARY_OPERATOR_OR(signed char)         // NOLINT
@@ -364,18 +364,18 @@ struct uint128
     INTEGER_BINARY_OPERATOR_OR(unsigned long long)  // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend auto operator|(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> uint128 { return lhs | uint128(rhs); }
-    constexpr friend auto operator|(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> uint128 { return lhs | uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator|(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> uint128 { return lhs | uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator|(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> uint128 { return lhs | uint128(rhs); }
     #endif
 
-    constexpr friend auto operator|(uint128 lhs, uint128 rhs) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator|(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr auto operator|=(uint128 v) noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator|=(uint128 v) noexcept -> uint128&;
 
     #undef INTEGER_BINARY_OPERATOR_OR
 
     // And
-    #define INTEGER_BINARY_OPERATOR_AND(expr) constexpr friend auto operator&(uint128 lhs, expr rhs) noexcept -> uint128 { return {lhs.high, lhs.low & static_cast<std::uint64_t>(rhs)}; } // NOLINT
+    #define INTEGER_BINARY_OPERATOR_AND(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator&(uint128 lhs, expr rhs) noexcept -> uint128 { return {lhs.high, lhs.low & static_cast<std::uint64_t>(rhs)}; } // NOLINT
 
     INTEGER_BINARY_OPERATOR_AND(char)                   // NOLINT
     INTEGER_BINARY_OPERATOR_AND(signed char)            // NOLINT
@@ -390,18 +390,18 @@ struct uint128
     INTEGER_BINARY_OPERATOR_AND(unsigned long long)     // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend auto operator&(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> uint128 { return lhs & uint128(rhs); }
-    constexpr friend auto operator&(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> uint128 { return lhs & uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator&(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> uint128 { return lhs & uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator&(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> uint128 { return lhs & uint128(rhs); }
     #endif
 
-    constexpr friend auto operator&(uint128 lhs, uint128 rhs) noexcept-> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator&(uint128 lhs, uint128 rhs) noexcept-> uint128;
 
-    constexpr auto operator&=(uint128 v) noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator&=(uint128 v) noexcept -> uint128&;
 
     #undef INTEGER_BINARY_OPERATOR_AND
 
     // Xor
-    #define INTEGER_BINARY_OPERATOR_XOR(expr) constexpr friend auto operator^(uint128 lhs, expr rhs) noexcept -> uint128 { return {lhs.high, lhs.low ^ static_cast<std::uint64_t>(rhs)}; } // NOLINT
+    #define INTEGER_BINARY_OPERATOR_XOR(expr) BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator^(uint128 lhs, expr rhs) noexcept -> uint128 { return {lhs.high, lhs.low ^ static_cast<std::uint64_t>(rhs)}; } // NOLINT
 
     INTEGER_BINARY_OPERATOR_XOR(char)                   // NOLINT
     INTEGER_BINARY_OPERATOR_XOR(signed char)            // NOLINT
@@ -416,18 +416,19 @@ struct uint128
     INTEGER_BINARY_OPERATOR_XOR(unsigned long long)     // NOLINT
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr friend auto operator^(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> uint128 { return lhs ^ uint128(rhs); }
-    constexpr friend auto operator^(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> uint128 { return lhs ^ uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator^(uint128 lhs, boost::decimal::detail::int128_t  rhs) noexcept -> uint128 { return lhs ^ uint128(rhs); }
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator^(uint128 lhs, boost::decimal::detail::uint128_t rhs) noexcept -> uint128 { return lhs ^ uint128(rhs); }
     #endif
 
-    constexpr friend auto operator^(uint128 lhs, uint128 rhs) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator^(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr auto operator^=(uint128 v) noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator^=(uint128 v) noexcept -> uint128&;
 
     #undef INTEGER_BINARY_OPERATOR_XOR
 
     // Left shift
     #define INTEGER_BINARY_OPERATOR_LEFT_SHIFT(expr)                                            \
+    BOOST_DECIMAL_GPU_ENABLED                                                                   \
     constexpr friend auto operator<<(uint128 lhs, expr rhs) noexcept -> uint128                 \
     {                                                                                           \
         if (rhs >= 64)                                                                          \
@@ -455,6 +456,7 @@ struct uint128
     INTEGER_BINARY_OPERATOR_LEFT_SHIFT(unsigned long long)      // NOLINT
 
     #define INTEGER_BINARY_OPERATOR_EQUALS_LEFT_SHIFT(expr)                     \
+    BOOST_DECIMAL_GPU_ENABLED                                                   \
     constexpr auto operator<<=(expr amount) noexcept -> uint128&                \
     {                                                                           \
         *this = *this << amount;                                                \
@@ -478,6 +480,7 @@ struct uint128
 
     // Right Shift
     #define INTEGER_BINARY_OPERATOR_RIGHT_SHIFT(expr)                                               \
+    BOOST_DECIMAL_GPU_ENABLED                                                                       \
     constexpr friend auto operator>>(uint128 lhs, expr amount) noexcept -> uint128                  \
     {                                                                                               \
         if (amount >= 64)                                                                           \
@@ -505,6 +508,7 @@ struct uint128
     INTEGER_BINARY_OPERATOR_RIGHT_SHIFT(unsigned long long)     // NOLINT
 
     #define INTEGER_BINARY_OPERATOR_EQUALS_RIGHT_SHIFT(expr)                        \
+    BOOST_DECIMAL_GPU_ENABLED                                                       \
     constexpr auto operator>>=(expr amount) noexcept -> uint128&                    \
     {                                                                               \
         *this = *this >> amount;                                                    \
@@ -527,50 +531,50 @@ struct uint128
     #undef INTEGER_BINARY_OPERATOR_EQUALS_RIGHT_SHIFT
 
     // Arithmetic operators (Add, sub, mul, div, mod)
-    constexpr auto operator+=(std::uint64_t n) noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator+=(std::uint64_t n) noexcept -> uint128&;
 
-    constexpr friend auto operator+(uint128 lhs, uint128 rhs) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator+(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr auto operator+=(uint128 v) noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator+=(uint128 v) noexcept -> uint128&;
 
-    constexpr auto operator++() noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator++() noexcept -> uint128&;
 
-    constexpr auto operator++(int) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator++(int) noexcept -> uint128;
 
-    constexpr friend auto operator-(uint128 lhs, uint128 rhs) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator-(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr auto operator-=(uint128 v) noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator-=(uint128 v) noexcept -> uint128&;
 
-    constexpr auto operator--() noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator--() noexcept -> uint128&;
 
-    constexpr auto operator--(int) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator--(int) noexcept -> uint128;
 
-    constexpr friend auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr friend auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128;
 
-    constexpr auto operator*=(uint128 v) noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator*=(uint128 v) noexcept -> uint128&;
 
-    constexpr auto operator*=(std::uint64_t v) noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator*=(std::uint64_t v) noexcept -> uint128&;
 
-    constexpr friend auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr friend auto operator/(uint128 lhs, std::uint64_t rhs) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator/(uint128 lhs, std::uint64_t rhs) noexcept -> uint128;
 
-    constexpr auto operator/=(uint128 v) noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator/=(uint128 v) noexcept -> uint128&;
 
-    constexpr friend auto operator%(uint128 lhs, uint128 rhs) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator%(uint128 lhs, uint128 rhs) noexcept -> uint128;
 
-    constexpr friend auto operator%(uint128 lhs, std::uint64_t rhs) noexcept -> uint128;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto operator%(uint128 lhs, std::uint64_t rhs) noexcept -> uint128;
 
-    constexpr auto operator%=(uint128 v) noexcept -> uint128&;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator%=(uint128 v) noexcept -> uint128&;
 
     #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     template <typename charT, typename traits>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&;
+    BOOST_DECIMAL_GPU_ENABLED friend auto operator<<(std::basic_ostream<charT, traits>& os, uint128 val) -> std::basic_ostream<charT, traits>&;
     #endif
 
-    constexpr void add_with_carry(const uint128& other, bool& carry)
+    BOOST_DECIMAL_GPU_ENABLED constexpr void add_with_carry(const uint128& other, bool& carry)
     {
         auto previous_low = static_cast<std::uint64_t>(low);
 
@@ -583,9 +587,9 @@ struct uint128
     }
 
 private:
-    constexpr friend auto high_bit(uint128 v) noexcept -> int;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto high_bit(uint128 v) noexcept -> int;
 
-    constexpr friend auto div_impl(uint128 lhs, uint128 rhs, uint128 &quotient, uint128 &remainder) noexcept -> void;
+    BOOST_DECIMAL_GPU_ENABLED constexpr friend auto div_impl(uint128 lhs, uint128 rhs, uint128 &quotient, uint128 &remainder) noexcept -> void;
 };
 
 struct int128
@@ -599,54 +603,54 @@ struct int128
     #endif
 
     // Constructors
-    constexpr int128() noexcept = default;
-    constexpr int128(const int128& v) noexcept = default;
-    constexpr int128(int128&& v) noexcept = default;
-    constexpr int128& operator=(const int128& v) = default;
+    BOOST_DECIMAL_GPU_ENABLED constexpr int128() noexcept = default;
+    BOOST_DECIMAL_GPU_ENABLED constexpr int128(const int128& v) noexcept = default;
+    BOOST_DECIMAL_GPU_ENABLED constexpr int128(int128&& v) noexcept = default;
+    BOOST_DECIMAL_GPU_ENABLED constexpr int128& operator=(const int128& v) = default;
 
     #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
-    constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : low {low_}, high {high_} {}
-    constexpr int128(const uint128& v) noexcept : low {v.low}, high {static_cast<std::int64_t>(v.high)} {}
-    explicit constexpr int128(std::uint64_t v) noexcept : low {v}, high {} {}
-    explicit constexpr int128(std::uint32_t v) noexcept : low {v}, high {} {}
-    explicit constexpr int128(std::uint16_t v) noexcept : low {v}, high {} {}
-    explicit constexpr int128(std::uint8_t v) noexcept : low {v}, high {} {}
-    explicit constexpr int128(std::int64_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
-    explicit constexpr int128(std::int32_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
-    explicit constexpr int128(std::int16_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
-    explicit constexpr int128(std::int8_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    BOOST_DECIMAL_GPU_ENABLED constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : low {low_}, high {high_} {}
+    BOOST_DECIMAL_GPU_ENABLED constexpr int128(const uint128& v) noexcept : low {v.low}, high {static_cast<std::int64_t>(v.high)} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::uint64_t v) noexcept : low {v}, high {} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::uint32_t v) noexcept : low {v}, high {} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::uint16_t v) noexcept : low {v}, high {} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::uint8_t v) noexcept : low {v}, high {} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::int64_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::int32_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::int16_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::int8_t v) noexcept : low{static_cast<std::uint64_t>(v)}, high{v < 0 ? -1 : 0} {}
     #else
-    constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
-    constexpr int128(const uint128& v) noexcept : high {static_cast<std::int64_t>(v.high)}, low {v.low} {}
-    explicit constexpr int128(std::uint64_t v) noexcept : high {}, low {v} {}
-    explicit constexpr int128(std::uint32_t v) noexcept : high {}, low {v} {}
-    explicit constexpr int128(std::uint16_t v) noexcept : high {}, low {v} {}
-    explicit constexpr int128(std::uint8_t v) noexcept : high {}, low {v} {}
-    explicit constexpr int128(std::int64_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
-    explicit constexpr int128(std::int32_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
-    explicit constexpr int128(std::int16_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
-    explicit constexpr int128(std::int8_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    BOOST_DECIMAL_GPU_ENABLED constexpr int128(std::int64_t high_, std::uint64_t low_) noexcept : high {high_}, low {low_} {}
+    BOOST_DECIMAL_GPU_ENABLED constexpr int128(const uint128& v) noexcept : high {static_cast<std::int64_t>(v.high)}, low {v.low} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::uint64_t v) noexcept : high {}, low {v} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::uint32_t v) noexcept : high {}, low {v} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::uint16_t v) noexcept : high {}, low {v} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::uint8_t v) noexcept : high {}, low {v} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::int64_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::int32_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::int16_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr int128(std::int8_t v) noexcept : high{v < 0 ? -1 : 0}, low{static_cast<std::uint64_t>(v)} {}
     #endif
 
-    explicit constexpr operator uint128() const noexcept;
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr operator uint128() const noexcept;
 
-    friend constexpr auto operator-(int128 rhs) noexcept -> int128;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr auto operator-(int128 rhs) noexcept -> int128;
 
-    constexpr auto operator<(int128 rhs) const noexcept -> bool;
-    constexpr auto operator>(int128 rhs) const noexcept -> bool;
-    constexpr auto operator<=(int128 rhs) const noexcept -> bool;
-    constexpr auto operator>=(int128 rhs) const noexcept -> bool;
-    constexpr auto operator==(int128 rhs) const noexcept -> bool;
-    constexpr auto operator!=(int128 rhs) const noexcept -> bool;
-    constexpr auto operator<(std::int64_t rhs) const noexcept -> bool;
-    constexpr auto operator==(std::int64_t rhs) const noexcept -> bool;
-    constexpr auto operator>(std::int64_t rhs) const noexcept -> bool;
-    constexpr auto operator<(int rhs) const noexcept -> bool;
-    constexpr auto operator==(int rhs) const noexcept -> bool;
-    constexpr auto operator>(int rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator<(int128 rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator>(int128 rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator<=(int128 rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator>=(int128 rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator==(int128 rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator!=(int128 rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator<(std::int64_t rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator==(std::int64_t rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator>(std::int64_t rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator<(int rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator==(int rhs) const noexcept -> bool;
+    BOOST_DECIMAL_GPU_ENABLED constexpr auto operator>(int rhs) const noexcept -> bool;
 
-    friend constexpr auto operator+(const int128& lhs, const int128& rhs) noexcept -> int128;
-    friend constexpr auto operator-(const int128& lhs, const int128& rhs) noexcept -> int128;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr auto operator+(const int128& lhs, const int128& rhs) noexcept -> int128;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr auto operator-(const int128& lhs, const int128& rhs) noexcept -> int128;
 
     #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     template <typename charT, typename traits>
@@ -658,27 +662,27 @@ struct int128
 #  pragma GCC diagnostic pop
 #endif
 
-constexpr auto operator-(uint128 val) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator-(uint128 val) noexcept -> uint128
 {
     return {~val.high + static_cast<std::uint64_t>(val.low == 0), ~val.low + 1};
 }
 
-constexpr auto operator+(uint128 val) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator+(uint128 val) noexcept -> uint128
 {
     return val;
 }
 
-constexpr auto operator==(uint128 lhs, uint128 rhs) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator==(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return lhs.high == rhs.high && lhs.low == rhs.low;
 }
 
-constexpr auto operator!=(uint128 lhs, uint128 rhs) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator!=(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return !(lhs == rhs);
 }
 
-constexpr auto operator<(uint128 lhs, uint128 rhs) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator<(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     if (lhs.high == rhs.high)
     {
@@ -688,60 +692,60 @@ constexpr auto operator<(uint128 lhs, uint128 rhs) noexcept -> bool
     return lhs.high < rhs.high;
 }
 
-constexpr auto operator<=(uint128 lhs, uint128 rhs) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator<=(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return !(rhs < lhs);
 }
 
-constexpr auto operator>(uint128 lhs, uint128 rhs) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator>(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return rhs < lhs;
 }
 
-constexpr auto operator>=(uint128 lhs, uint128 rhs) noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator>=(uint128 lhs, uint128 rhs) noexcept -> bool
 {
     return !(lhs < rhs);
 }
 
-constexpr auto operator~(uint128 v) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator~(uint128 v) noexcept -> uint128
 {
     return {~v.high, ~v.low};
 }
 
-constexpr auto operator|(uint128 lhs, uint128 rhs) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator|(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     return {lhs.high | rhs.high, lhs.low | rhs.low};
 }
 
-constexpr auto uint128::operator|=(uint128 v) noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator|=(uint128 v) noexcept -> uint128&
 {
     *this = *this | v;
     return *this;
 }
 
-constexpr auto operator&(uint128 lhs, uint128 rhs) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator&(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     return {lhs.high & rhs.high, lhs.low & rhs.low};
 }
 
-constexpr auto uint128::operator&=(uint128 v) noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator&=(uint128 v) noexcept -> uint128&
 {
     *this = *this & v;
     return *this;
 }
 
-constexpr auto operator^(uint128 lhs, uint128 rhs) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator^(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     return {lhs.high ^ rhs.high, lhs.low ^ rhs.low};
 }
 
-constexpr auto uint128::operator^=(uint128 v) noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator^=(uint128 v) noexcept -> uint128&
 {
     *this = *this ^ v;
     return *this;
 }
 
-constexpr auto uint128::operator+=(std::uint64_t n) noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator+=(std::uint64_t n) noexcept -> uint128&
 {
     const std::uint64_t new_low { low + n };
 
@@ -755,7 +759,7 @@ constexpr auto uint128::operator+=(std::uint64_t n) noexcept -> uint128&
     return *this;
 }
 
-constexpr auto operator+(uint128 lhs, uint128 rhs) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator+(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     #if (defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)) && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
     if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs.low))
@@ -784,13 +788,13 @@ constexpr auto operator+(uint128 lhs, uint128 rhs) noexcept -> uint128
     }
 }
 
-constexpr auto uint128::operator+=(uint128 v) noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator+=(uint128 v) noexcept -> uint128&
 {
     *this = *this + v;
     return *this;
 }
 
-constexpr auto uint128::operator++() noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator++() noexcept -> uint128&
 {
     if (++low == UINT64_C(0))
     {
@@ -800,12 +804,12 @@ constexpr auto uint128::operator++() noexcept -> uint128&
     return *this;
 }
 
-constexpr auto uint128::operator++(int) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator++(int) noexcept -> uint128
 {
     return ++(*this);
 }
 
-constexpr auto operator-(uint128 lhs, uint128 rhs) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator-(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     #if (defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)) && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
     if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs.low))
@@ -834,13 +838,13 @@ constexpr auto operator-(uint128 lhs, uint128 rhs) noexcept -> uint128
     }
 }
 
-constexpr auto uint128::operator-=(uint128 v) noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator-=(uint128 v) noexcept -> uint128&
 {
     *this = *this - v;
     return *this;
 }
 
-constexpr auto uint128::operator--() noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator--() noexcept -> uint128&
 {
     if (this->low == 0)
     {
@@ -855,20 +859,20 @@ constexpr auto uint128::operator--() noexcept -> uint128&
     return *this;
 }
 
-constexpr auto uint128::operator--(int) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator--(int) noexcept -> uint128
 {
     return --(*this);
 }
 
 using wide_integer_uint128 = ::boost::decimal::math::wide_integer::uint128_t;
 
-constexpr auto uint128_to_wide_integer(const uint128& src) -> wide_integer_uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128_to_wide_integer(const uint128& src) -> wide_integer_uint128
 {
     wide_integer_uint128 dst { };
 
     using local_limb_type = typename wide_integer_uint128::limb_type;
 
-    static_assert(sizeof(local_limb_type) == static_cast<std::size_t>(UINT8_C(4)) && std::is_same<local_limb_type, std::uint32_t>::value, "Error: Configuration of external wide-integer limbs not OK");
+    static_assert(sizeof(local_limb_type) == static_cast<std::size_t>(UINT8_C(4)) && BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::is_same<local_limb_type, std::uint32_t>::value, "Error: Configuration of external wide-integer limbs not OK");
 
     dst.representation()[static_cast<std::size_t>(UINT8_C(0))] = static_cast<local_limb_type>(src.low);
     dst.representation()[static_cast<std::size_t>(UINT8_C(1))] = static_cast<local_limb_type>(src.low >> static_cast<unsigned>(UINT8_C(32)));
@@ -878,7 +882,7 @@ constexpr auto uint128_to_wide_integer(const uint128& src) -> wide_integer_uint1
     return dst;
 }
 
-constexpr auto wide_integer_to_uint128(const wide_integer_uint128& src) -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto wide_integer_to_uint128(const wide_integer_uint128& src) -> uint128
 {
     uint128 dst { };
 
@@ -905,7 +909,7 @@ constexpr auto wide_integer_to_uint128(const wide_integer_uint128& src) -> uint1
     return dst;
 }
 
-constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     const auto a = static_cast<std::uint64_t>(lhs.low >> 32);
     const auto b = static_cast<std::uint64_t>(lhs.low & UINT32_MAX);
@@ -918,7 +922,7 @@ constexpr auto operator*(uint128 lhs, uint128 rhs) noexcept -> uint128
     return result;
 }
 
-constexpr auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
 {
     using local_unsigned_fast_type = ::boost::decimal::math::wide_integer::detail::unsigned_fast_type;
 
@@ -950,41 +954,33 @@ constexpr auto operator*(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
     return wide_integer_to_uint128(result_wide);
 }
 
-constexpr auto uint128::operator*=(uint128 v) noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator*=(uint128 v) noexcept -> uint128&
 {
     *this = *this * v;
     return *this;
 }
 
-constexpr auto uint128::operator*=(std::uint64_t v) noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator*=(std::uint64_t v) noexcept -> uint128&
 {
     *this = *this * v;
     return *this;
 }
 
-constexpr auto high_bit(uint128 v) noexcept -> int
+BOOST_DECIMAL_GPU_ENABLED constexpr auto high_bit(uint128 v) noexcept -> int
 {
     if (v.high != 0)
     {
-        #ifdef BOOST_DECIMAL_HAS_STDBIT
-        return 127 - std::countl_zero(v.high);
-        #else
         return 127 - countl_zero(v.high);
-        #endif
     }
     else if (v.low != 0)
     {
-        #ifdef BOOST_DECIMAL_HAS_STDBIT
-        return 63 - std::countl_zero(v.low);
-        #else
         return 63 - countl_zero(v.low);
-        #endif
     }
 
     return 0;
 }
 
-constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& remainder) noexcept -> void
+BOOST_DECIMAL_GPU_ENABLED constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& remainder) noexcept -> void
 {
     if ((rhs.high == UINT64_C(0)) && (rhs.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))) && (rhs.low > (static_cast<std::uint64_t>(UINT64_C(0x0)))))
     {
@@ -1023,7 +1019,7 @@ constexpr auto div_impl(uint128 lhs, uint128 rhs, uint128& quotient, uint128& re
     }
 }
 
-constexpr auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     uint128 quotient {0, 0};
     uint128 remainder {0, 0};
@@ -1032,7 +1028,7 @@ constexpr auto operator/(uint128 lhs, uint128 rhs) noexcept -> uint128
     return quotient;
 }
 
-constexpr auto operator/(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator/(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
 {
     uint128 quotient {0, 0};
     uint128 remainder {0, 0};
@@ -1041,13 +1037,13 @@ constexpr auto operator/(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
     return quotient;
 }
 
-constexpr auto uint128::operator/=(uint128 v) noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator/=(uint128 v) noexcept -> uint128&
 {
     *this = *this / v;
     return *this;
 }
 
-constexpr auto operator%(uint128 lhs, uint128 rhs) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator%(uint128 lhs, uint128 rhs) noexcept -> uint128
 {
     uint128 quotient {0, 0};
     uint128 remainder {0, 0};
@@ -1056,7 +1052,7 @@ constexpr auto operator%(uint128 lhs, uint128 rhs) noexcept -> uint128
     return remainder;
 }
 
-constexpr auto operator%(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator%(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
 {
     uint128 quotient {0, 0};
     uint128 remainder {0, 0};
@@ -1065,19 +1061,19 @@ constexpr auto operator%(uint128 lhs, std::uint64_t rhs) noexcept -> uint128
     return remainder;
 }
 
-constexpr auto uint128::operator%=(uint128 v) noexcept -> uint128&
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint128::operator%=(uint128 v) noexcept -> uint128&
 {
     *this = *this % v;
     return *this;
 }
 
-constexpr auto umul64(std::uint32_t x, std::uint32_t y) noexcept -> std::uint64_t
+BOOST_DECIMAL_GPU_ENABLED constexpr auto umul64(std::uint32_t x, std::uint32_t y) noexcept -> std::uint64_t
 {
     return x * static_cast<std::uint64_t>(y);
 }
 
 // Get 128-bit result of multiplication of two 64-bit unsigned integers.
-constexpr auto umul128(std::uint64_t x, std::uint64_t y) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto umul128(std::uint64_t x, std::uint64_t y) noexcept -> uint128
 {
     #if defined(BOOST_DECIMAL_HAS_INT128)
 
@@ -1104,7 +1100,7 @@ constexpr auto umul128(std::uint64_t x, std::uint64_t y) noexcept -> uint128
     #endif
 }
 
-constexpr auto umul128_upper64(std::uint64_t x, std::uint64_t y) noexcept -> std::uint64_t
+BOOST_DECIMAL_GPU_ENABLED constexpr auto umul128_upper64(std::uint64_t x, std::uint64_t y) noexcept -> std::uint64_t
 {
     #if defined(BOOST_DECIMAL_HAS_INT128)
     
@@ -1132,7 +1128,7 @@ constexpr auto umul128_upper64(std::uint64_t x, std::uint64_t y) noexcept -> std
 
 // Get upper 128-bits of multiplication of a 64-bit unsigned integer and a 128-bit
 // unsigned integer.
-constexpr auto umul192_upper128(std::uint64_t x, uint128 y) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto umul192_upper128(std::uint64_t x, uint128 y) noexcept -> uint128
 {
     auto r = umul128(x, y.high);
     r += umul128_upper64(x, y.low);
@@ -1141,7 +1137,7 @@ constexpr auto umul192_upper128(std::uint64_t x, uint128 y) noexcept -> uint128
 
 // Get upper 64-bits of multiplication of a 32-bit unsigned integer and a 64-bit
 // unsigned integer.
-constexpr auto umul96_upper64(std::uint32_t x, std::uint64_t y) noexcept -> std::uint64_t
+BOOST_DECIMAL_GPU_ENABLED constexpr auto umul96_upper64(std::uint32_t x, std::uint64_t y) noexcept -> std::uint64_t
 {
     #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
     
@@ -1162,7 +1158,7 @@ constexpr auto umul96_upper64(std::uint32_t x, std::uint64_t y) noexcept -> std:
 
 // Get lower 128-bits of multiplication of a 64-bit unsigned integer and a 128-bit
 // unsigned integer.
-constexpr auto umul192_lower128(std::uint64_t x, uint128 y) noexcept -> uint128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto umul192_lower128(std::uint64_t x, uint128 y) noexcept -> uint128
 {
     auto high = x * y.high;
     auto highlow = umul128(x, y.low);
@@ -1171,7 +1167,7 @@ constexpr auto umul192_lower128(std::uint64_t x, uint128 y) noexcept -> uint128
 
 // Get lower 64-bits of multiplication of a 32-bit unsigned integer and a 64-bit
 // unsigned integer.
-constexpr auto umul96_lower64(std::uint32_t x, std::uint64_t y) noexcept -> std::uint64_t
+BOOST_DECIMAL_GPU_ENABLED constexpr auto umul96_lower64(std::uint32_t x, std::uint64_t y) noexcept -> std::uint64_t
 {
     return x * y;
 }
@@ -1223,12 +1219,12 @@ inline auto operator<<(std::basic_ostream<charT, traits>& os, int128 val) -> std
 }
 #endif
 
-constexpr int128::operator uint128() const noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr int128::operator uint128() const noexcept
 {
     return {static_cast<std::uint64_t>(this->high), this->low};
 }
 
-constexpr auto operator-(int128 rhs) noexcept -> int128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator-(int128 rhs) noexcept -> int128
 {
     const auto new_low {~rhs.low + 1};
     const auto carry {static_cast<std::int64_t>(new_low == 0)};
@@ -1236,7 +1232,7 @@ constexpr auto operator-(int128 rhs) noexcept -> int128
     return int128{new_high, new_low};
 }
 
-constexpr auto int128::operator<(int128 rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator<(int128 rhs) const noexcept -> bool
 {
     if (high == rhs.high)
     {
@@ -1247,34 +1243,34 @@ constexpr auto int128::operator<(int128 rhs) const noexcept -> bool
 }
 
 // Greater-than operator
-constexpr auto int128::operator>(int128 rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator>(int128 rhs) const noexcept -> bool
 {
     return rhs < *this;
 }
 
 // Less-than or equal-to operator
-constexpr auto int128::operator<=(int128 rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator<=(int128 rhs) const noexcept -> bool
 {
     return !(*this > rhs);
 }
 
 // Greater-than or equal-to operator
-constexpr auto int128::operator>=(int128 rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator>=(int128 rhs) const noexcept -> bool
 {
     return !(*this < rhs);
 }
 
-constexpr auto int128::operator==(int128 rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator==(int128 rhs) const noexcept -> bool
 {
     return this->high == rhs.high && this->low == rhs.low;
 }
 
-constexpr auto int128::operator!=(int128 rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator!=(int128 rhs) const noexcept -> bool
 {
     return !(*this == rhs);
 }
 
-constexpr auto int128::operator==(std::int64_t rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator==(std::int64_t rhs) const noexcept -> bool
 {
     if (high == 0 && low == static_cast<std::uint64_t>(rhs))
     {
@@ -1288,7 +1284,7 @@ constexpr auto int128::operator==(std::int64_t rhs) const noexcept -> bool
     return false;
 }
 
-constexpr auto int128::operator<(std::int64_t rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator<(std::int64_t rhs) const noexcept -> bool
 {
     if (high < 0 && rhs >= 0)
     {
@@ -1306,27 +1302,27 @@ constexpr auto int128::operator<(std::int64_t rhs) const noexcept -> bool
     return false;
 }
 
-constexpr auto int128::operator>(std::int64_t rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator>(std::int64_t rhs) const noexcept -> bool
 {
     return !(*this == rhs) && !(*this < rhs);
 }
 
-constexpr auto int128::operator==(int rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator==(int rhs) const noexcept -> bool
 {
     return *this == static_cast<std::int64_t>(rhs);
 }
 
-constexpr auto int128::operator<(int rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator<(int rhs) const noexcept -> bool
 {
     return *this < static_cast<std::int64_t>(rhs);
 }
 
-constexpr auto int128::operator>(int rhs) const noexcept -> bool
+BOOST_DECIMAL_GPU_ENABLED constexpr auto int128::operator>(int rhs) const noexcept -> bool
 {
     return *this > static_cast<std::int64_t>(rhs);
 }
 
-constexpr auto operator+(const int128& lhs, const int128& rhs) noexcept -> int128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator+(const int128& lhs, const int128& rhs) noexcept -> int128
 {
     #if (defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)) && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
     if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs.low))
@@ -1359,7 +1355,7 @@ constexpr auto operator+(const int128& lhs, const int128& rhs) noexcept -> int12
     }
 }
 
-constexpr auto operator-(const int128& lhs, const int128& rhs) noexcept -> int128
+BOOST_DECIMAL_GPU_ENABLED constexpr auto operator-(const int128& lhs, const int128& rhs) noexcept -> int128
 {
     const auto new_low {lhs.low - rhs.low};
     const auto new_high {lhs.high - rhs.high - static_cast<std::int64_t>(lhs.low < rhs.low)};
@@ -1388,45 +1384,45 @@ template <>
 struct numeric_limits<boost::decimal::detail::uint128>
 {
     // Member constants
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_signed = false;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_integer = true;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_exact = true;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_infinity = false;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = false;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = false;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_specialized = true;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_signed = false;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_integer = true;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_exact = true;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_infinity = false;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_quiet_NaN = false;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_signaling_NaN = false;
 
     // These members were deprecated in C++23
     #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = false;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool has_denorm_loss = false;
     #endif
 
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_toward_zero;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = false;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_modulo = true;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits = 128;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits10 = 38;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_digits10 = 0;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int radix = 2;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent = 0;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent10 = 0;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent = 0;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent10 = 0;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = false;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr std::float_round_style round_style = std::round_toward_zero;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_iec559 = false;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_bounded = true;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool is_modulo = true;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits = 128;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int digits10 = 38;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_digits10 = 0;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int radix = 2;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent = 0;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int min_exponent10 = 0;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent = 0;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr int max_exponent10 = 0;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr bool tinyness_before = false;
 
     // Member functions
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (min)        () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto lowest       () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (max)        () -> boost::decimal::detail::uint128 { return {UINT64_MAX, UINT64_MAX}; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto epsilon      () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto round_error  () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::detail::uint128 { return 0; }
-    BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (min)        () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto lowest       () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto (max)        () -> boost::decimal::detail::uint128 { return {UINT64_MAX, UINT64_MAX}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto epsilon      () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto round_error  () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto infinity     () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto quiet_NaN    () -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto signaling_NaN() -> boost::decimal::detail::uint128 { return 0; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_ATTRIBUTE_UNUSED static constexpr auto denorm_min   () -> boost::decimal::detail::uint128 { return 0; }
 };
 
 } // namespace std
