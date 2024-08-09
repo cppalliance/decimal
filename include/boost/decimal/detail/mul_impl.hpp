@@ -129,10 +129,10 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
 {
     #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ > 13)
     using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    constexpr auto comp_value {impl::builtin_128_pow10[31]};
+    constexpr auto comp_value {pow10<unsigned_int128_type>(31)};
     #else
     using unsigned_int128_type = boost::decimal::detail::uint128;
-    constexpr auto comp_value {impl::emulated_128_pow10[31]};
+    constexpr auto comp_value {pow10<unsigned_int128_type>(31)};
     #endif
 
     #ifdef BOOST_DECIMAL_DEBUG

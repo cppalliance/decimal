@@ -183,7 +183,7 @@ BOOST_DECIMAL_GPU_ENABLED constexpr int num_digits(const uint128& x) noexcept
     {
         std::uint32_t mid = (left + right + 1U) / 2U;
 
-        if (x >= impl::emulated_128_pow10[mid])
+        if (x >= pow10<uint128>(mid))
         {
             left = mid;
         }
@@ -240,7 +240,7 @@ BOOST_DECIMAL_GPU_ENABLED constexpr auto num_digits(const uint128_t& x) noexcept
     {
         std::uint32_t mid = (left + right + 1U) / 2U;
 
-        if (x >= impl::emulated_128_pow10[mid])
+        if (x >= pow10<uint128_t>(mid))
         {
             left = mid;
         }
