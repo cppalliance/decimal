@@ -46,36 +46,6 @@
 #endif
 
 // Include intrinsics if available
-// This section allows us to disable any of the following independently.
-//   Use #define BOOST_DECIMAL_DISABLE_CASSERT to disable uses of assert.
-//   Use #define BOOST_DECIMAL_DISABLE_IOSTREAM to disable uses of I/O streaming.
-//   Use #define BOOST_DECIMAL_DISABLE_CLIB to disable uses of both assert as well as I/O streaming (and all oother heavyweight C-LIB artifacts).
-
-#if (!defined(BOOST_DECIMAL_DISABLE_CASSERT) && !defined(BOOST_DECIMAL_DISABLE_CLIB))
-#  ifndef BOOST_DECIMAL_BUILD_MODULE
-#    include <cassert>
-#  endif
-#endif
-
-#ifndef BOOST_DECIMAL_DISABLE_CASSERT
-#  define BOOST_DECIMAL_ASSERT(x) assert(x)
-#  define BOOST_DECIMAL_ASSERT_MSG(expr, msg) assert((expr)&&(msg))
-#else
-#  define BOOST_DECIMAL_ASSERT(x)
-#  define BOOST_DECIMAL_ASSERT_MSG(expr, msg)
-#endif
-
-#ifdef BOOST_DECIMAL_DISABLE_CLIB
-#  ifndef BOOST_DECIMAL_DISABLE_IOSTREAM
-#    define BOOST_DECIMAL_DISABLE_IOSTREAM
-#  endif
-#  ifndef BOOST_DECIMAL_DISABLE_CASSERT
-#    undef BOOST_DECIMAL_ASSERT
-#    define BOOST_DECIMAL_ASSERT(x)
-#  endif
-#endif
-
-// Include intrinsics if available
 #if defined(_MSC_VER)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
 #    include <intrin.h>
@@ -330,6 +300,7 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_FORCEINLINE __forceinline__
 
 #  define BOOST_DECIMAL_NO_LONG_DOUBLE_MATH_FUNCTIONS
+#  define BOOST_DECIMAL_DISABLE_CASSERT
 
 #elif defined(SYCL_LANGUAGE_VERSION)
 
@@ -425,5 +396,34 @@ BOOST_DECIMAL_GPU_ENABLED constexpr T cuda_safe_max(const T& a, const T& b) { re
 #  include <type_traits>
 #  define BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE std
 #endif 
+
+// This section allows us to disable any of the following independently.
+//   Use #define BOOST_DECIMAL_DISABLE_CASSERT to disable uses of assert.
+//   Use #define BOOST_DECIMAL_DISABLE_IOSTREAM to disable uses of I/O streaming.
+//   Use #define BOOST_DECIMAL_DISABLE_CLIB to disable uses of both assert as well as I/O streaming (and all oother heavyweight C-LIB artifacts).
+
+#if (!defined(BOOST_DECIMAL_DISABLE_CASSERT) && !defined(BOOST_DECIMAL_DISABLE_CLIB))
+#  ifndef BOOST_DECIMAL_BUILD_MODULE
+#    include <cassert>
+#  endif
+#endif
+
+#ifndef BOOST_DECIMAL_DISABLE_CASSERT
+#  define BOOST_DECIMAL_ASSERT(x) assert(x)
+#  define BOOST_DECIMAL_ASSERT_MSG(expr, msg) assert((expr)&&(msg))
+#else
+#  define BOOST_DECIMAL_ASSERT(x)
+#  define BOOST_DECIMAL_ASSERT_MSG(expr, msg)
+#endif
+
+#ifdef BOOST_DECIMAL_DISABLE_CLIB
+#  ifndef BOOST_DECIMAL_DISABLE_IOSTREAM
+#    define BOOST_DECIMAL_DISABLE_IOSTREAM
+#  endif
+#  ifndef BOOST_DECIMAL_DISABLE_CASSERT
+#    undef BOOST_DECIMAL_ASSERT
+#    define BOOST_DECIMAL_ASSERT(x)
+#  endif
+#endif
 
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
