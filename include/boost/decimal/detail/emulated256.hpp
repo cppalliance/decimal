@@ -494,7 +494,7 @@ BOOST_DECIMAL_GPU_ENABLED constexpr boost::decimal::tuple<uint256_t, uint256_t> 
 BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     const auto res {divide(lhs, rhs)};
-    return std::get<0>(res);
+    return boost::decimal::get<0>(res);
 }
 
 BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator/(const uint256_t& lhs, std::uint64_t rhs) noexcept
@@ -536,13 +536,13 @@ BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t& uint256_t::operator/=(const uint2
 BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator%(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     const auto res {divide(lhs, rhs)};
-    return std::get<1>(res);
+    return boost::decimal::get<1>(res);
 }
 
 BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept
 {
     const auto res {divide(lhs, uint256_t(rhs))};
-    return std::get<1>(res);
+    return boost::decimal::get<1>(res);
 }
 
 // Get the 256-bit result of multiplication of two 128-bit unsigned integers
@@ -643,45 +643,45 @@ template <>
 struct numeric_limits<boost::decimal::detail::uint256_t>
 {
     // Member constants
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool is_specialized = true;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool is_signed = false;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool is_integer = true;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool is_exact = true;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool has_infinity = false;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool has_quiet_NaN = false;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool has_signaling_NaN = false;
+    BOOST_DECIMAL_STATIC constexpr bool is_specialized = true;
+    BOOST_DECIMAL_STATIC constexpr bool is_signed = false;
+    BOOST_DECIMAL_STATIC constexpr bool is_integer = true;
+    BOOST_DECIMAL_STATIC constexpr bool is_exact = true;
+    BOOST_DECIMAL_STATIC constexpr bool has_infinity = false;
+    BOOST_DECIMAL_STATIC constexpr bool has_quiet_NaN = false;
+    BOOST_DECIMAL_STATIC constexpr bool has_signaling_NaN = false;
 
     // These members were deprecated in C++23
     #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
-    BOOST_DECIMAL_GPU_ENABLED static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool has_denorm_loss = false;
+    BOOST_DECIMAL_STATIC constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+    BOOST_DECIMAL_STATIC constexpr bool has_denorm_loss = false;
     #endif
 
-    BOOST_DECIMAL_GPU_ENABLED static constexpr std::float_round_style round_style = std::round_toward_zero;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool is_iec559 = false;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool is_bounded = true;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool is_modulo = true;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr int digits = 256;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr int digits10 = 76;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr int max_digits10 = 0;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr int radix = 2;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr int min_exponent = 0;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr int min_exponent10 = 0;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr int max_exponent = 0;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr int max_exponent10 = 0;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
-    BOOST_DECIMAL_GPU_ENABLED static constexpr bool tinyness_before = false;
+    BOOST_DECIMAL_STATIC constexpr std::float_round_style round_style = std::round_toward_zero;
+    BOOST_DECIMAL_STATIC constexpr bool is_iec559 = false;
+    BOOST_DECIMAL_STATIC constexpr bool is_bounded = true;
+    BOOST_DECIMAL_STATIC constexpr bool is_modulo = true;
+    BOOST_DECIMAL_STATIC constexpr int digits = 256;
+    BOOST_DECIMAL_STATIC constexpr int digits10 = 76;
+    BOOST_DECIMAL_STATIC constexpr int max_digits10 = 0;
+    BOOST_DECIMAL_STATIC constexpr int radix = 2;
+    BOOST_DECIMAL_STATIC constexpr int min_exponent = 0;
+    BOOST_DECIMAL_STATIC constexpr int min_exponent10 = 0;
+    BOOST_DECIMAL_STATIC constexpr int max_exponent = 0;
+    BOOST_DECIMAL_STATIC constexpr int max_exponent10 = 0;
+    BOOST_DECIMAL_STATIC constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
+    BOOST_DECIMAL_STATIC constexpr bool tinyness_before = false;
 
     // Member functions
-    BOOST_DECIMAL_GPU_ENABLED static constexpr boost::decimal::detail::uint256_t (min)() { return {0, 0}; }
-    BOOST_DECIMAL_GPU_ENABLED static constexpr boost::decimal::detail::uint256_t lowest() { return {0, 0}; }
-    BOOST_DECIMAL_GPU_ENABLED static constexpr boost::decimal::detail::uint256_t (max)() { return {{UINT64_MAX, UINT64_MAX}, {UINT64_MAX, UINT64_MAX}}; }
-    BOOST_DECIMAL_GPU_ENABLED static constexpr boost::decimal::detail::uint256_t epsilon() { return {0, 0}; }
-    BOOST_DECIMAL_GPU_ENABLED static constexpr boost::decimal::detail::uint256_t round_error() { return {0, 0}; }
-    BOOST_DECIMAL_GPU_ENABLED static constexpr boost::decimal::detail::uint256_t infinity() { return {0, 0}; }
-    BOOST_DECIMAL_GPU_ENABLED static constexpr boost::decimal::detail::uint256_t quiet_NaN() { return {0, 0}; }
-    BOOST_DECIMAL_GPU_ENABLED static constexpr boost::decimal::detail::uint256_t signaling_NaN() { return {0, 0}; }
-    BOOST_DECIMAL_GPU_ENABLED static constexpr boost::decimal::detail::uint256_t denorm_min() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t (min)() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t lowest() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t (max)() { return {{UINT64_MAX, UINT64_MAX}, {UINT64_MAX, UINT64_MAX}}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t epsilon() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t round_error() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t infinity() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t quiet_NaN() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t signaling_NaN() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t denorm_min() { return {0, 0}; }
 };
 
 } // Namespace std

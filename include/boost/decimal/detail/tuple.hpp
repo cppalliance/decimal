@@ -5,9 +5,9 @@
 #ifndef BOOST_DECIMAL_DETAIL_TUPLE_HPP
 #define BOOST_DECIMAL_DETAIL_TUPLE_HPP
 
-#include <boost/math/tools/config.hpp>
+#include <boost/decimal/detail/config.hpp>
 
-#ifdef BOOST_MATH_ENABLE_CUDA
+#ifdef BOOST_DECIMAL_ENABLE_CUDA
 
 #include <thrust/pair.h>
 #include <thrust/tuple.h>
