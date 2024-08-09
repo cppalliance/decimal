@@ -18,9 +18,10 @@ namespace decimal {
 namespace detail {
 
 template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                       T rhs_sig, U rhs_exp, bool rhs_sign,
-                                                       bool abs_lhs_bigger) noexcept -> ReturnType
+BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_FORCE_INLINE 
+constexpr auto d32_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                            T rhs_sig, U rhs_exp, bool rhs_sign,
+                            bool abs_lhs_bigger) noexcept -> ReturnType
 {
     using sub_type = std::int_fast32_t;
 
@@ -84,9 +85,9 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_sub_impl(T lhs_sig, U lhs_exp, boo
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
-constexpr auto d64_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                            T rhs_sig, U rhs_exp, bool rhs_sign,
-                            bool abs_lhs_bigger) noexcept -> ReturnType
+BOOST_DECIMAL_GPU_ENABLED constexpr auto d64_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                      T rhs_sig, U rhs_exp, bool rhs_sign,
+                                                      bool abs_lhs_bigger) noexcept -> ReturnType
 {
     using sub_type = std::int_fast64_t;
 
@@ -150,9 +151,9 @@ constexpr auto d64_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
-constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                             T rhs_sig, U rhs_exp, bool rhs_sign,
-                             bool abs_lhs_bigger) noexcept -> ReturnType
+BOOST_DECIMAL_GPU_ENABLED constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                       T rhs_sig, U rhs_exp, bool rhs_sign,
+                                                       bool abs_lhs_bigger) noexcept -> ReturnType
 {
     #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ > 13)
     using sub_type = detail::int128_t;
