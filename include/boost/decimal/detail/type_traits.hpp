@@ -10,8 +10,12 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 
-#if !defined(BOOST_DECIMAL_BUILD_MODULE) && !defined(BOOST_CUDA_ENABLE_CUDA)
+#if !defined(BOOST_DECIMAL_BUILD_MODULE) && !defined(BOOST_DECIMAL_ENABLE_CUDA)
 #include <type_traits>
+#endif
+
+#ifdef BOOST_DECIMAL_ENABLE_CUDA
+#include <cuda/std/type_traits>
 #endif
 
 namespace boost {
