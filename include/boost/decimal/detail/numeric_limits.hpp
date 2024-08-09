@@ -15,6 +15,7 @@
 #include <type_traits>
 #include <limits>
 #include <climits>
+#include <cfloat>
 
 namespace boost {
 namespace decimal {
