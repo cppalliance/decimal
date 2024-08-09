@@ -329,6 +329,8 @@ typedef unsigned __int128 uint128_t;
 #  undef BOOST_DECIMAL_FORCEINLINE
 #  define BOOST_DECIMAL_FORCEINLINE __forceinline__
 
+#  define BOOST_DECIMAL_NO_LONG_DOUBLE_MATH_FUNCTIONS
+
 #elif defined(SYCL_LANGUAGE_VERSION)
 
 #  define BOOST_DECIMAL_SYCL_ENABLED SYCL_EXTERNAL
@@ -344,7 +346,6 @@ typedef unsigned __int128 uint128_t;
 
 // spir64 does not support long double
 #  define BOOST_DECIMAL_NO_LONG_DOUBLE_MATH_FUNCTIONS
-#  define BOOST_DECIMAL_NO_REAL_CONCEPT_TESTS
 
 #  undef BOOST_DECIMAL_FORCEINLINE
 #  define BOOST_DECIMAL_FORCEINLINE inline
@@ -367,6 +368,10 @@ typedef unsigned __int128 uint128_t;
 
 // Additional functions that need replaced/marked up
 #ifdef BOOST_DECIMAL_HAS_GPU_SUPPORT
+namespace boost {
+namespace decimal {
+namespace detail {
+
 template <class T>
 BOOST_DECIMAL_GPU_ENABLED constexpr void gpu_safe_swap(T& a, T& b) { T t(a); a = b; b = t; }
 template <class T>
@@ -374,9 +379,13 @@ BOOST_DECIMAL_GPU_ENABLED constexpr T gpu_safe_min(const T& a, const T& b) { ret
 template <class T>
 BOOST_DECIMAL_GPU_ENABLED constexpr T cuda_safe_max(const T& a, const T& b) { return a > b ? a : b; }
 
-#define BOOST_DECIMAL_GPU_SAFE_SWAP(a, b) gpu_safe_swap(a, b)
-#define BOOST_DECIMAL_GPU_SAFE_MIN(a, b) gpu_safe_min(a, b)
-#define BOOST_DECIMAL_GPU_SAFE_MAX(a, b) gpu_safe_max(a, b)
+} // namespace detail
+} // namespace decimal
+} // namespace boost
+
+#define BOOST_DECIMAL_GPU_SAFE_SWAP(a, b) boost::decimal::detail::gpu_safe_swap(a, b)
+#define BOOST_DECIMAL_GPU_SAFE_MIN(a, b) boost::decimal::detail::gpu_safe_min(a, b)
+#define BOOST_DECIMAL_GPU_SAFE_MAX(a, b) boost::decimal::detail::gpu_safe_max(a, b)
 
 #else
 
