@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_NORMALIZE_HPP
 
 #include <boost/decimal/fwd.hpp>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/attributes.hpp>
@@ -17,7 +18,7 @@ namespace detail {
 
 // Converts the significand to full precision to remove the effects of cohorts
 template <typename TargetDecimalType = decimal32, typename T1, typename T2>
-constexpr auto normalize(T1& significand, T2& exp, bool sign = false) noexcept -> void
+BOOST_DECIMAL_GPU_ENABLED constexpr auto normalize(T1& significand, T2& exp, bool sign = false) noexcept -> void
 {
     constexpr auto target_precision {detail::precision_v<TargetDecimalType>};
     const auto digits {num_digits(significand)};

@@ -18,7 +18,7 @@ namespace detail {
 
 // Rounds the value provided and returns an offset of exponent values as required
 template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
-constexpr auto fenv_round(T& val, bool = false) noexcept -> int
+BOOST_DECIMAL_GPU_ENABLED constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 {
     using significand_type = std::conditional_t<std::is_same<TargetType, decimal128>::value || std::is_same<TargetType, decimal128_fast>::value, detail::uint128, int>;
 
@@ -44,7 +44,7 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 #else
 
 template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
-constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT(readability-function-cognitive-complexity)
+BOOST_DECIMAL_GPU_ENABLED constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT(readability-function-cognitive-complexity)
 {
     using significand_type = std::conditional_t<std::is_same<TargetType, decimal128>::value || std::is_same<TargetType, decimal128_fast>::value, detail::uint128, int>;
 

@@ -7,105 +7,109 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+#include <boost/decimal/detail/tuple.hpp>
 #include <boost/decimal/detail/wide-integer/uintwide_t.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
 #include <cmath>
-#include <tuple>
 #endif
 
 namespace boost {
 namespace decimal {
 namespace detail {
 
+#ifdef BOOST_DECIMAL_ENABLE_CUDA
+#  pragma nv_diag_suppress 20012
+#endif
+
 struct uint256_t
 {
     uint128 high {};
     uint128 low {};
 
-    constexpr uint256_t() = default;
-    constexpr uint256_t& operator=(const uint256_t& rhs) = default;
-    constexpr uint256_t(const uint256_t& rhs) = default;
-    explicit constexpr uint256_t(const uint128& rhs) : high {}, low {rhs} {}
-    constexpr uint256_t(const uint128& high_, const uint128& low_) : high {high_}, low {low_} {}
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t() = default;
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t& operator=(const uint256_t& rhs) = default;
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t(const uint256_t& rhs) = default;
+    BOOST_DECIMAL_GPU_ENABLED explicit constexpr uint256_t(const uint128& rhs) : high {}, low {rhs} {}
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t(const uint128& high_, const uint128& low_) : high {high_}, low {low_} {}
 
-    explicit operator uint128() const noexcept
+    BOOST_DECIMAL_GPU_ENABLED explicit operator uint128() const noexcept
     { 
         return this->low; 
     }
 
-    explicit operator std::size_t() const noexcept
+    BOOST_DECIMAL_GPU_ENABLED explicit operator std::size_t() const noexcept
     {
         return static_cast<std::size_t>(this->low);
     }
 
 
-    friend constexpr uint256_t operator>>(uint256_t lhs, int amount) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator>>(uint256_t lhs, int amount) noexcept;
 
-    constexpr uint256_t &operator>>=(int amount) noexcept
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t &operator>>=(int amount) noexcept
     {
         *this = *this >> amount;
         return *this;
     }
 
-    friend constexpr uint256_t operator<<(uint256_t lhs, int amount) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator<<(uint256_t lhs, int amount) noexcept;
 
-    constexpr uint256_t &operator<<=(int amount) noexcept
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t &operator<<=(int amount) noexcept
     {
         *this = *this << amount;
         return *this;
     }
 
-    friend constexpr uint256_t operator|(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator|(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    constexpr uint256_t &operator|=(uint256_t v) noexcept
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t &operator|=(uint256_t v) noexcept
     {
         *this = *this | v;
         return *this;
     }
 
-    friend constexpr uint256_t operator&(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator&(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator&(uint256_t lhs, uint128 rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator&(uint256_t lhs, uint128 rhs) noexcept;
 
-    friend constexpr bool operator==(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr bool operator==(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator==(uint256_t lhs, std::uint64_t rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr bool operator==(uint256_t lhs, std::uint64_t rhs) noexcept;
 
-    friend constexpr bool operator!=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr bool operator!=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator<(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr bool operator<(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator<=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr bool operator<=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator>(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr bool operator>(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr bool operator>=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr bool operator>=(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept;
 
-    friend constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noexcept;
 
-    friend constexpr uint256_t operator-(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator-(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    constexpr uint256_t &operator-=(uint256_t v) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t &operator-=(uint256_t v) noexcept;
 
-    friend constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator/(const uint256_t& lhs, std::uint64_t rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator/(const uint256_t& lhs, std::uint64_t rhs) noexcept;
 
-    constexpr uint256_t& operator/=(std::uint64_t rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t& operator/=(std::uint64_t rhs) noexcept;
 
-    constexpr uint256_t& operator/=(const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t& operator/=(const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator%(const uint256_t& lhs, const uint256_t& rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator%(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept;
 
     #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
     template <typename charT, typename traits>
@@ -113,10 +117,14 @@ struct uint256_t
     #endif
 
 private:
-    friend constexpr int high_bit(uint256_t v) noexcept;
+    BOOST_DECIMAL_GPU_ENABLED friend constexpr int high_bit(uint256_t v) noexcept;
 };
 
-constexpr uint256_t operator>>(uint256_t lhs, int amount) noexcept
+#ifdef BOOST_DECIMAL_ENABLE_CUDA
+#  pragma nv_diag_default 20012
+#endif
+
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator>>(uint256_t lhs, int amount) noexcept
 {
     if (amount >= 128)
     {
@@ -130,7 +138,7 @@ constexpr uint256_t operator>>(uint256_t lhs, int amount) noexcept
     return {lhs.high >> amount, (lhs.low >> amount) | (lhs.high << (128 - amount))};
 }
 
-constexpr uint256_t operator<<(uint256_t lhs, int amount) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator<<(uint256_t lhs, int amount) noexcept
 {
     if (amount >= 128)
     {
@@ -144,37 +152,37 @@ constexpr uint256_t operator<<(uint256_t lhs, int amount) noexcept
     return {(lhs.high << amount) | (lhs.low >> (128 - amount)), lhs.low << amount};
 }
 
-constexpr uint256_t operator|(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator|(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return {lhs.high | rhs.high, lhs.low | rhs.low};
 }
 
-constexpr uint256_t operator&(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator&(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return {lhs.high & rhs.high, lhs.low & rhs.low};
 }
 
-constexpr uint256_t operator&(uint256_t lhs, uint128 rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator&(uint256_t lhs, uint128 rhs) noexcept
 {
     return {lhs.high, lhs.low & rhs.low};
 }
 
-constexpr bool operator==(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr bool operator==(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return lhs.high == rhs.high && lhs.low == rhs.low;
 }
 
-constexpr bool operator==(uint256_t lhs, std::uint64_t rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr bool operator==(uint256_t lhs, std::uint64_t rhs) noexcept
 {
     return lhs.high == 0 && rhs != 0 && lhs.low == rhs;
 }
 
-constexpr bool operator!=(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr bool operator!=(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return !(lhs.high == rhs.high && lhs.low == rhs.low);
 }
 
-constexpr bool operator<(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr bool operator<(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     if (lhs.high == rhs.high)
     {
@@ -184,22 +192,22 @@ constexpr bool operator<(const uint256_t& lhs, const uint256_t& rhs) noexcept
     return lhs.high < rhs.high;
 }
 
-constexpr bool operator<=(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr bool operator<=(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return !(rhs < lhs);
 }
 
-constexpr bool operator>(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr bool operator>(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return rhs < lhs;
 }
 
-constexpr bool operator>=(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr bool operator>=(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     return !(lhs < rhs);
 }
 
-constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     const uint256_t temp = {lhs.high + rhs.high, lhs.low + rhs.low};
 
@@ -212,7 +220,7 @@ constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexce
     return temp;
 }
 
-constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept
 {
     const uint256_t temp = {lhs.high, lhs.low + rhs};
 
@@ -224,7 +232,7 @@ constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept
     return temp;
 }
 
-constexpr uint256_t operator-(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator-(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     const uint256_t temp {lhs.high - rhs.high, lhs.low - rhs.low};
 
@@ -237,13 +245,13 @@ constexpr uint256_t operator-(const uint256_t& lhs, const uint256_t& rhs) noexce
     return temp;
 }
 
-constexpr uint256_t &uint256_t::operator-=(uint256_t v) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t &uint256_t::operator-=(uint256_t v) noexcept
 {
     *this = *this - v;
     return *this;
 }
 
-constexpr int high_bit(uint256_t v) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr int high_bit(uint256_t v) noexcept
 {
     if (v.high != 0)
     {
@@ -258,7 +266,7 @@ constexpr int high_bit(uint256_t v) noexcept
 }
 
 // Function to compare two uint256_t numbers (returns -1, 0, or 1)
-constexpr int compare(const uint256_t& a, const uint256_t& b)
+BOOST_DECIMAL_GPU_ENABLED constexpr int compare(const uint256_t& a, const uint256_t& b)
 {
     if (a.high < b.high || (a.high == b.high && a.low < b.low))
     {
@@ -274,7 +282,7 @@ constexpr int compare(const uint256_t& a, const uint256_t& b)
 
 // The following are all needed for the division algorithm
 // Function to subtract two uint256_t numbers
-constexpr uint256_t subtract(const uint256_t& a, const uint256_t& b)
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t subtract(const uint256_t& a, const uint256_t& b)
 {
     uint256_t result;
     result.low = a.low - b.low;
@@ -288,7 +296,7 @@ constexpr uint256_t subtract(const uint256_t& a, const uint256_t& b)
 }
 
 // Function to left shift a uint256_t by one bit
-constexpr uint256_t left_shift(const uint256_t& a)
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t left_shift(const uint256_t& a)
 {
     uint256_t result;
     result.high = (a.high << 1) | (a.low >> (sizeof(uint128) * 8 - 1));
@@ -297,7 +305,7 @@ constexpr uint256_t left_shift(const uint256_t& a)
 }
 
 // Function to set a specific bit of a uint256_t
-constexpr void set_bit(uint256_t& a, int bit)
+BOOST_DECIMAL_GPU_ENABLED constexpr void set_bit(uint256_t& a, int bit)
 {
     if (bit >= 0 && bit < 128)
     {
@@ -311,7 +319,7 @@ constexpr void set_bit(uint256_t& a, int bit)
 
 using wide_integer_uint256 = ::boost::decimal::math::wide_integer::uint256_t;
 
-constexpr auto uint256_to_wide_integer(const uint256_t& src) -> wide_integer_uint256
+BOOST_DECIMAL_GPU_ENABLED constexpr auto uint256_to_wide_integer(const uint256_t& src) -> wide_integer_uint256
 {
     wide_integer_uint256 dst { };
 
@@ -331,7 +339,7 @@ constexpr auto uint256_to_wide_integer(const uint256_t& src) -> wide_integer_uin
     return dst;
 }
 
-constexpr auto wide_integer_to_uint256(const wide_integer_uint256& src) -> uint256_t
+BOOST_DECIMAL_GPU_ENABLED constexpr auto wide_integer_to_uint256(const wide_integer_uint256& src) -> uint256_t
 {
     uint256_t dst { };
 
@@ -378,7 +386,7 @@ constexpr auto wide_integer_to_uint256(const wide_integer_uint256& src) -> uint2
     return dst;
 }
 
-constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     using local_unsigned_fast_type = ::boost::decimal::math::wide_integer::detail::unsigned_fast_type;
 
@@ -397,7 +405,7 @@ constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexce
     return wide_integer_to_uint256(result_wide);
 }
 
-constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noexcept
 {
     using local_unsigned_fast_type = ::boost::decimal::math::wide_integer::detail::unsigned_fast_type;
 
@@ -430,10 +438,10 @@ constexpr uint256_t operator*(const uint256_t& lhs, const std::uint64_t rhs) noe
 }
 
 // Forward declaration of specialized division 256-bits / 64-bits.
-constexpr std::tuple<uint256_t, uint256_t> divide_with_rem(const uint256_t& dividend, const std::uint64_t& divisor) noexcept;
+BOOST_DECIMAL_GPU_ENABLED constexpr boost::decimal::tuple<uint256_t, uint256_t> divide_with_rem(const uint256_t& dividend, const std::uint64_t& divisor) noexcept;
 
 // The division algorithm
-constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr boost::decimal::tuple<uint256_t, uint256_t> divide(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     if ((rhs.high.high == UINT64_C(0)) && (rhs.high.low == UINT64_C(0)) && (rhs.low.high == UINT64_C(0)) && (rhs.low.low < (static_cast<std::uint64_t>(UINT64_C(0x100000000)))) && (rhs.low.low > (static_cast<std::uint64_t>(UINT64_C(0)))))
     {
@@ -457,7 +465,7 @@ constexpr std::tuple<uint256_t, uint256_t> divide(const uint256_t& lhs, const ui
     }
 }
 
-constexpr std::tuple<uint256_t, uint256_t> divide_with_rem(const uint256_t& dividend, const std::uint64_t& divisor) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr boost::decimal::tuple<uint256_t, uint256_t> divide_with_rem(const uint256_t& dividend, const std::uint64_t& divisor) noexcept
 {
     uint256_t quotient { { 0U, 0U }, { 0U, 0U }};
 
@@ -483,13 +491,13 @@ constexpr std::tuple<uint256_t, uint256_t> divide_with_rem(const uint256_t& divi
     };
 }
 
-constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator/(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     const auto res {divide(lhs, rhs)};
-    return std::get<0>(res);
+    return boost::decimal::get<0>(res);
 }
 
-constexpr uint256_t operator/(const uint256_t& lhs, std::uint64_t rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator/(const uint256_t& lhs, std::uint64_t rhs) noexcept
 {
     // Same code as divide_with_rem but skips the modulus step
 
@@ -513,32 +521,32 @@ constexpr uint256_t operator/(const uint256_t& lhs, std::uint64_t rhs) noexcept
     return quotient;
 }
 
-constexpr uint256_t& uint256_t::operator/=(std::uint64_t rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t& uint256_t::operator/=(std::uint64_t rhs) noexcept
 {
     *this = *this / rhs;
     return *this;
 }
 
-constexpr uint256_t& uint256_t::operator/=(const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t& uint256_t::operator/=(const uint256_t& rhs) noexcept
 {
     *this = *this / rhs;
     return *this;
 }
 
-constexpr uint256_t operator%(const uint256_t& lhs, const uint256_t& rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator%(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
     const auto res {divide(lhs, rhs)};
-    return std::get<1>(res);
+    return boost::decimal::get<1>(res);
 }
 
-constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept
 {
     const auto res {divide(lhs, uint256_t(rhs))};
-    return std::get<1>(res);
+    return boost::decimal::get<1>(res);
 }
 
 // Get the 256-bit result of multiplication of two 128-bit unsigned integers
-constexpr uint256_t umul256_impl(std::uint64_t a_high, std::uint64_t a_low, std::uint64_t b_high, std::uint64_t b_low) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t umul256_impl(std::uint64_t a_high, std::uint64_t a_low, std::uint64_t b_high, std::uint64_t b_low) noexcept
 {
     #ifdef BOOST_DECIMAL_HAS_INT128
     using unsigned_int128_type = boost::decimal::detail::uint128_t;
@@ -576,7 +584,7 @@ constexpr uint256_t umul256_impl(std::uint64_t a_high, std::uint64_t a_low, std:
 }
 
 template<typename T>
-constexpr uint256_t umul256(const T &x, const uint128 &y) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t umul256(const T &x, const uint128 &y) noexcept
 {
     static_assert(sizeof(T) == 16 && (!std::numeric_limits<T>::is_signed
             #ifdef BOOST_DECIMAL_HAS_INT128
@@ -591,7 +599,7 @@ constexpr uint256_t umul256(const T &x, const uint128 &y) noexcept
     return umul256_impl(a, b, y.high, y.low);
 }
 
-constexpr uint256_t umul256(const uint128 &x, const uint128 &y) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr uint256_t umul256(const uint128 &x, const uint128 &y) noexcept
 {
     return umul256_impl(x.high, x.low, y.high, y.low);
 }
@@ -635,45 +643,45 @@ template <>
 struct numeric_limits<boost::decimal::detail::uint256_t>
 {
     // Member constants
-    static constexpr bool is_specialized = true;
-    static constexpr bool is_signed = false;
-    static constexpr bool is_integer = true;
-    static constexpr bool is_exact = true;
-    static constexpr bool has_infinity = false;
-    static constexpr bool has_quiet_NaN = false;
-    static constexpr bool has_signaling_NaN = false;
+    BOOST_DECIMAL_STATIC constexpr bool is_specialized = true;
+    BOOST_DECIMAL_STATIC constexpr bool is_signed = false;
+    BOOST_DECIMAL_STATIC constexpr bool is_integer = true;
+    BOOST_DECIMAL_STATIC constexpr bool is_exact = true;
+    BOOST_DECIMAL_STATIC constexpr bool has_infinity = false;
+    BOOST_DECIMAL_STATIC constexpr bool has_quiet_NaN = false;
+    BOOST_DECIMAL_STATIC constexpr bool has_signaling_NaN = false;
 
     // These members were deprecated in C++23
     #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
-    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
-    static constexpr bool has_denorm_loss = false;
+    BOOST_DECIMAL_STATIC constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+    BOOST_DECIMAL_STATIC constexpr bool has_denorm_loss = false;
     #endif
 
-    static constexpr std::float_round_style round_style = std::round_toward_zero;
-    static constexpr bool is_iec559 = false;
-    static constexpr bool is_bounded = true;
-    static constexpr bool is_modulo = true;
-    static constexpr int digits = 256;
-    static constexpr int digits10 = 76;
-    static constexpr int max_digits10 = 0;
-    static constexpr int radix = 2;
-    static constexpr int min_exponent = 0;
-    static constexpr int min_exponent10 = 0;
-    static constexpr int max_exponent = 0;
-    static constexpr int max_exponent10 = 0;
-    static constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
-    static constexpr bool tinyness_before = false;
+    BOOST_DECIMAL_STATIC constexpr std::float_round_style round_style = std::round_toward_zero;
+    BOOST_DECIMAL_STATIC constexpr bool is_iec559 = false;
+    BOOST_DECIMAL_STATIC constexpr bool is_bounded = true;
+    BOOST_DECIMAL_STATIC constexpr bool is_modulo = true;
+    BOOST_DECIMAL_STATIC constexpr int digits = 256;
+    BOOST_DECIMAL_STATIC constexpr int digits10 = 76;
+    BOOST_DECIMAL_STATIC constexpr int max_digits10 = 0;
+    BOOST_DECIMAL_STATIC constexpr int radix = 2;
+    BOOST_DECIMAL_STATIC constexpr int min_exponent = 0;
+    BOOST_DECIMAL_STATIC constexpr int min_exponent10 = 0;
+    BOOST_DECIMAL_STATIC constexpr int max_exponent = 0;
+    BOOST_DECIMAL_STATIC constexpr int max_exponent10 = 0;
+    BOOST_DECIMAL_STATIC constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
+    BOOST_DECIMAL_STATIC constexpr bool tinyness_before = false;
 
     // Member functions
-    static constexpr boost::decimal::detail::uint256_t (min)() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256_t lowest() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256_t (max)() { return {{UINT64_MAX, UINT64_MAX}, {UINT64_MAX, UINT64_MAX}}; }
-    static constexpr boost::decimal::detail::uint256_t epsilon() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256_t round_error() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256_t infinity() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256_t quiet_NaN() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256_t signaling_NaN() { return {0, 0}; }
-    static constexpr boost::decimal::detail::uint256_t denorm_min() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t (min)() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t lowest() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t (max)() { return {{UINT64_MAX, UINT64_MAX}, {UINT64_MAX, UINT64_MAX}}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t epsilon() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t round_error() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t infinity() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t quiet_NaN() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t signaling_NaN() { return {0, 0}; }
+    BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_STATIC constexpr boost::decimal::detail::uint256_t denorm_min() { return {0, 0}; }
 };
 
 } // Namespace std

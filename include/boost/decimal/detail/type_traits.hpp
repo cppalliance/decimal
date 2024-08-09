@@ -10,7 +10,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 
-#ifndef BOOST_DECIMAL_BUILD_MODULE
+#if !defined(BOOST_DECIMAL_BUILD_MODULE) && !defined(BOOST_CUDA_ENABLE_CUDA)
 #include <type_traits>
 #endif
 
@@ -19,7 +19,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-struct is_signed { static constexpr bool value = std::is_signed<T>::value; };
+struct is_signed { static constexpr bool value = BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::is_signed<T>::value; };
 
 template <>
 struct is_signed<uint128> { static constexpr bool value = false; };
@@ -47,7 +47,7 @@ template <typename T>
 constexpr bool is_unsigned_v = !is_signed_v<T>;
 
 template <typename T>
-struct make_unsigned { using type = std::make_unsigned_t<T>; };
+struct make_unsigned { using type = BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::make_unsigned_t<T>; };
 
 template <>
 struct make_unsigned<uint128> { using type = uint128; };
@@ -69,7 +69,7 @@ template <typename T>
 using make_unsigned_t = typename make_unsigned<T>::type;
 
 template <typename T>
-struct make_signed { using type = std::make_signed_t<T>; };
+struct make_signed { using type = BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::make_signed_t<T>; };
 
 template <>
 struct make_signed<uint128> { using type = int128; };
@@ -91,7 +91,7 @@ template <typename T>
 using make_signed_t = typename make_signed<T>::type;
 
 template <typename T>
-struct is_integral { static constexpr bool value = std::is_integral<T>::value;};
+struct is_integral { static constexpr bool value = BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::is_integral<T>::value;};
 
 template <>
 struct is_integral<uint128> { static constexpr bool value = true; };
@@ -116,7 +116,7 @@ template <typename T>
 constexpr bool is_integral_v = is_integral<T>::value;
 
 template <typename T>
-struct is_floating_point { static constexpr bool value = std::is_floating_point<T>::value; };
+struct is_floating_point { static constexpr bool value = BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::is_floating_point<T>::value; };
 
 #ifdef BOOST_DECIMAL_HAS_FLOAT128
 template <>

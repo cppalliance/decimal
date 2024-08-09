@@ -7,8 +7,9 @@
 #define BOOST_DECIMAL_DETAIL_COUNTL_HPP
 
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/numeric_limits.hpp>
 
-#ifndef BOOST_DECIMAL_BUILD_MODULE
+#if !defined(BOOST_DECIMAL_BUILD_MODULE) && !defined(BOOST_DECIMAL_HAS_GPU_SUPPORT)
 #include <cstdint>
 #include <limits>
 #endif
@@ -16,9 +17,10 @@
 namespace boost {
 namespace decimal {
 namespace detail {
+
 namespace impl {
 
-#if BOOST_DECIMAL_HAS_BUILTIN(__builtin_clz)
+#if BOOST_DECIMAL_HAS_BUILTIN(__builtin_clz) && !defined(BOOST_DECIMAL_HAS_GPU_SUPPORT)
 
 constexpr int countl_impl(unsigned char x) noexcept
 {
@@ -63,7 +65,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE int index64[64] = {
 };
 
 // See: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogDeBruijn
-constexpr auto bit_scan_reverse(std::uint64_t bb) noexcept -> int
+BOOST_DECIMAL_GPU_ENABLED constexpr auto bit_scan_reverse(std::uint64_t bb) noexcept -> int
 {
     constexpr auto debruijn64 {UINT64_C(0x03f79d71b4cb0a89)};
 
@@ -80,9 +82,9 @@ constexpr auto bit_scan_reverse(std::uint64_t bb) noexcept -> int
 }
 
 template <typename T>
-constexpr int countl_impl(T x) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr int countl_impl(T x) noexcept
 {
-    return x ? bit_scan_reverse(static_cast<std::uint64_t>(x)) ^ 63 : std::numeric_limits<T>::digits;
+    return x ? bit_scan_reverse(static_cast<std::uint64_t>(x)) ^ 63 : boost::decimal::detail::numeric_limits<T>::digits;
 }
 
 #endif
@@ -90,9 +92,9 @@ constexpr int countl_impl(T x) noexcept
 } //namespace impl
 
 template <typename T>
-constexpr int countl_zero(T x) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr int countl_zero(T x) noexcept
 {
-    static_assert(std::numeric_limits<T>::is_integer && !std::numeric_limits<T>::is_signed,
+    static_assert(boost::decimal::detail::numeric_limits<T>::is_integer && !boost::decimal::detail::numeric_limits<T>::is_signed,
                   "Can only count with unsigned integers");
 
     return impl::countl_impl(x);

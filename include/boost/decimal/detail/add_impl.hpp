@@ -5,9 +5,12 @@
 #ifndef BOOST_DECIMAL_DETAIL_ADD_IMPL_HPP
 #define BOOST_DECIMAL_DETAIL_ADD_IMPL_HPP
 
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
+#include <boost/decimal/detail/numeric_limits.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -18,9 +21,10 @@ namespace decimal {
 namespace detail {
 
 template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                       T rhs_sig, U rhs_exp, bool rhs_sign,
-                                                       bool abs_lhs_bigger) noexcept -> ReturnType
+BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_FORCE_INLINE 
+constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                            T rhs_sig, U rhs_exp, bool rhs_sign,
+                            bool abs_lhs_bigger) noexcept -> ReturnType
 {
     using add_type = std::int_fast32_t;
 
@@ -64,7 +68,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, boo
 
     if (delta_exp <= 2)
     {
-        sig_bigger *= pow10(static_cast<std::remove_reference_t<decltype(sig_bigger)>>(delta_exp));
+        sig_bigger *= pow10(static_cast<BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::remove_reference_t<decltype(sig_bigger)>>(delta_exp));
         exp_bigger -= delta_exp;
         delta_exp = 0;
     }
@@ -76,7 +80,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, boo
 
         if (delta_exp > 1)
         {
-            sig_smaller /= pow10(static_cast<std::remove_reference_t<decltype(sig_smaller)>>(delta_exp - 1));
+            sig_smaller /= pow10(static_cast<BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::remove_reference_t<decltype(sig_smaller)>>(delta_exp - 1));
             delta_exp = 1;
         }
     }
@@ -103,8 +107,9 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, boo
 }
 
 template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> ReturnType
+BOOST_DECIMAL_FORCE_INLINE BOOST_DECIMAL_GPU_ENABLED
+constexpr auto add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                        T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
     const bool sign {lhs_sign};
 
@@ -176,9 +181,9 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T lhs_sig, U lhs_exp, bool lh
 }
 
 template <typename ReturnType, typename T, typename U>
-constexpr auto d64_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                            T rhs_sig, U rhs_exp, bool rhs_sign,
-                            bool abs_lhs_bigger) noexcept -> ReturnType
+BOOST_DECIMAL_GPU_ENABLED constexpr auto d64_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                      T rhs_sig, U rhs_exp, bool rhs_sign,
+                                                      bool abs_lhs_bigger) noexcept -> ReturnType
 {
     using add_type = std::int_fast64_t;
 
@@ -261,8 +266,8 @@ constexpr auto d64_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
                                BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
-constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                             T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> ReturnType
+BOOST_DECIMAL_GPU_ENABLED constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
+                                                       T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
     const bool sign {lhs_sign};
 
@@ -284,7 +289,7 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
         //
         // e.g. 1.234567e5 + 9.876543e-2 = 1.234568e5
 
-        BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T2>::digits10 > std::numeric_limits<std::uint64_t>::digits10)
+        BOOST_DECIMAL_IF_CONSTEXPR (boost::decimal::detail::numeric_limits<T2>::digits10 > boost::decimal::detail::numeric_limits<std::uint64_t>::digits10)
         {
             if (rhs_sig >= detail::uint128 {UINT64_C(0xF684DF56C3E0), UINT64_C(0x1BC6C73200000000)})
             {
@@ -341,9 +346,9 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 }
 
 template <typename ReturnType, typename T, typename U>
-constexpr auto d128_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                             T rhs_sig, U rhs_exp, bool rhs_sign,
-                             bool abs_lhs_bigger) noexcept -> ReturnType
+BOOST_DECIMAL_GPU_ENABLED constexpr auto d128_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                                                       T rhs_sig, U rhs_exp, bool rhs_sign,
+                                                       bool abs_lhs_bigger) noexcept -> ReturnType
 {
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
 
