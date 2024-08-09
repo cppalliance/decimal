@@ -18,7 +18,7 @@
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
-#include <limits>
+#include <boost/decimal/detail/numeric_limits.hpp>
 #include <cstdint>
 
 namespace boost {
@@ -26,9 +26,9 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = std::numeric_limits<std::uint_fast32_t>::max();
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = std::numeric_limits<std::uint_fast32_t>::max() - 1;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::uint_fast32_t>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = boost::decimal::detail::numeric_limits<std::uint_fast32_t>::max();
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = boost::decimal::detail::numeric_limits<std::uint_fast32_t>::max() - 1;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = boost::decimal::detail::numeric_limits<std::uint_fast32_t>::max() - 2;
 
 struct decimal32_fast_components
 {
