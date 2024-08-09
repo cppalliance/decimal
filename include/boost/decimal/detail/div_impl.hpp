@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_DIV_IMPL_HPP
 
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/numeric_limits.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
@@ -17,7 +18,7 @@ namespace decimal {
 namespace detail {
 
 template <typename DecimalType, typename T>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T& rhs) noexcept -> DecimalType
+BOOST_DECIMAL_FORCE_INLINE BOOST_DECIMAL_GPU_ENABLED constexpr auto generic_div_impl(const T& lhs, const T& rhs) noexcept -> DecimalType
 {
     bool sign {lhs.sign != rhs.sign};
 
@@ -43,7 +44,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T
 }
 
 template <typename DecimalType, typename T>
-constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> DecimalType
+BOOST_DECIMAL_GPU_ENABLED constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> DecimalType
 {
     #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ > 13)
     using unsigned_int128_type = boost::decimal::detail::uint128_t;
@@ -71,7 +72,7 @@ constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> Deci
 }
 
 template <typename T>
-constexpr auto d128_generic_div_impl(T lhs, T rhs, T& q) noexcept -> void
+BOOST_DECIMAL_GPU_ENABLED constexpr auto d128_generic_div_impl(T lhs, T rhs, T& q) noexcept -> void
 {
     bool sign {lhs.sign != rhs.sign};
 
@@ -83,9 +84,9 @@ constexpr auto d128_generic_div_impl(T lhs, T rhs, T& q) noexcept -> void
 
     const auto sig_dig {detail::num_digits(res_sig)};
 
-    if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
+    if (sig_dig > detail::numeric_limits<detail::uint128>::digits10)
     {
-        const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
+        const auto digit_delta {sig_dig - detail::numeric_limits<detail::uint128>::digits10};
         res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
         res_exp += digit_delta;
     }
