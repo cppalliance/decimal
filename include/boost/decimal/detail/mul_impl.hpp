@@ -5,6 +5,8 @@
 #ifndef BOOST_DECIMAL_DETAIL_MUL_IMPL_HPP
 #define BOOST_DECIMAL_DETAIL_MUL_IMPL_HPP
 
+#include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
@@ -25,8 +27,10 @@ namespace detail {
 // 2) Returns a struct of the constituent components (used with FMAs)
 
 template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<ReturnType, decimal32_fast>::value, ReturnType>
+BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_FORCE_INLINE 
+constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                        T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
+-> BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::is_same<ReturnType, decimal32_fast>::value, ReturnType>
 {
     using mul_type = std::uint_fast64_t;
 
@@ -37,8 +41,10 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
 }
 
 template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<ReturnType, decimal32>::value, ReturnType>
+BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_FORCE_INLINE constexpr auto
+mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+         T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
+-> BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::is_same<ReturnType, decimal32>::value, ReturnType>
 {
     using mul_type = std::uint_fast64_t;
 
@@ -55,8 +61,10 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
 }
 
 template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
+BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_FORCE_INLINE 
+constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                        T rhs_sig, U rhs_exp, bool rhs_sign) noexcept 
+-> BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<!detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
 {
     using mul_type = std::uint_fast64_t;
 
@@ -96,9 +104,10 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                       T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
-                                                       -> std::enable_if_t<detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
+BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_FORCE_INLINE
+constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                            T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
+-> BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
 {
     // Clang 6-12 yields incorrect results with builtin u128, so we force usage of our version
     #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || (__clang_major__) > 12)
@@ -123,16 +132,17 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                       T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
-                                                       -> std::enable_if_t<!detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
+BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_FORCE_INLINE 
+constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                            T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
+-> BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<!detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
 {
     #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ > 13)
     using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    constexpr auto comp_value {impl::builtin_128_pow10[31]};
+    constexpr auto comp_value {pow10<unsigned_int128_type>(31)};
     #else
     using unsigned_int128_type = boost::decimal::detail::uint128;
-    constexpr auto comp_value {impl::emulated_128_pow10[31]};
+    constexpr auto comp_value {pow10<unsigned_int128_type>(31)};
     #endif
 
     #ifdef BOOST_DECIMAL_DEBUG
@@ -166,6 +176,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
 }
 
 template <typename ReturnType, typename T1, typename T2>
+BOOST_DECIMAL_GPU_ENABLED
 constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
                              T2 rhs_sig, std::int32_t rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
@@ -191,6 +202,7 @@ constexpr auto d128_mul_impl(T1 lhs_sig, std::int32_t lhs_exp, bool lhs_sign,
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
                                BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
+BOOST_DECIMAL_GPU_ENABLED
 constexpr auto d128_fast_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
                                   T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {

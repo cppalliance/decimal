@@ -5,25 +5,22 @@
 #ifndef BOOST_DECIMAL_DETAIL_SHRINK_SIGNIFICAND_HPP
 #define BOOST_DECIMAL_DETAIL_SHRINK_SIGNIFICAND_HPP
 
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
-
-#ifndef BOOST_DECIMAL_BUILD_MODULE
-#include <limits>
-#include <type_traits>
-#endif
+#include <boost/decimal/detail/numeric_limits.hpp>
 
 namespace boost {
 namespace decimal {
 namespace detail {
 
 template <typename TargetType = std::uint32_t, typename Integer, typename Exp>
-constexpr auto shrink_significand(Integer sig, Exp& exp) noexcept -> TargetType
+BOOST_DECIMAL_GPU_ENABLED constexpr auto shrink_significand(Integer sig, Exp& exp) noexcept -> TargetType
 {
     using Unsigned_Integer = make_unsigned_t<Integer>;
-    constexpr auto max_digits {std::numeric_limits<TargetType>::digits10};
+    constexpr auto max_digits {boost::decimal::detail::numeric_limits<TargetType>::digits10};
 
     auto unsigned_sig {make_positive_unsigned(sig)};
     const auto sig_dig {num_digits(unsigned_sig)};

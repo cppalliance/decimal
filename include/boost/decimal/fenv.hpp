@@ -7,7 +7,7 @@
 
 #include <boost/decimal/detail/config.hpp>
 
-#ifndef BOOST_DECIMAL_BUILD_MODULE
+#if !defined(BOOST_DECIMAL_BUILD_MODULE) && !defined(BOOST_MATH_CUDA_ENABLED)
 #include <cfenv>
 #endif
 
@@ -24,6 +24,8 @@ BOOST_DECIMAL_EXPORT enum class rounding_mode : unsigned
     fe_dec_default = fe_dec_to_nearest_from_zero
 };
 
+#ifndef BOOST_DECIMAL_ENABLE_CUDA
+
 BOOST_DECIMAL_INLINE_VARIABLE rounding_mode _boost_decimal_global_rounding_mode {rounding_mode::fe_dec_default};
 
 BOOST_DECIMAL_EXPORT inline auto fegetround() noexcept -> rounding_mode
@@ -39,6 +41,22 @@ BOOST_DECIMAL_EXPORT inline auto fesetround(rounding_mode round) noexcept -> rou
     _boost_decimal_global_rounding_mode = round;
     return round;
 }
+
+#else
+
+// We can't maintain global state so always use the default rounding mode
+
+BOOST_DECIMAL_GPU_ENABLED inline auto fegetround() noexcept -> rounding_mode
+{
+    return rounding_mode::fe_dec_default;
+}
+
+BOOST_DECIMAL_GPU_ENABLED inline auto fesetround(rounding_mode) noexcept -> rounding_mode
+{
+    return rounding_mode::fe_dec_default;
+}
+
+#endif
 
 } // namespace decimal
 } // namespace boost

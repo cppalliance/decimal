@@ -46,36 +46,6 @@
 #endif
 
 // Include intrinsics if available
-// This section allows us to disable any of the following independently.
-//   Use #define BOOST_DECIMAL_DISABLE_CASSERT to disable uses of assert.
-//   Use #define BOOST_DECIMAL_DISABLE_IOSTREAM to disable uses of I/O streaming.
-//   Use #define BOOST_DECIMAL_DISABLE_CLIB to disable uses of both assert as well as I/O streaming (and all oother heavyweight C-LIB artifacts).
-
-#if (!defined(BOOST_DECIMAL_DISABLE_CASSERT) && !defined(BOOST_DECIMAL_DISABLE_CLIB))
-#  ifndef BOOST_DECIMAL_BUILD_MODULE
-#    include <cassert>
-#  endif
-#endif
-
-#ifndef BOOST_DECIMAL_DISABLE_CASSERT
-#  define BOOST_DECIMAL_ASSERT(x) assert(x)
-#  define BOOST_DECIMAL_ASSERT_MSG(expr, msg) assert((expr)&&(msg))
-#else
-#  define BOOST_DECIMAL_ASSERT(x)
-#  define BOOST_DECIMAL_ASSERT_MSG(expr, msg)
-#endif
-
-#ifdef BOOST_DECIMAL_DISABLE_CLIB
-#  ifndef BOOST_DECIMAL_DISABLE_IOSTREAM
-#    define BOOST_DECIMAL_DISABLE_IOSTREAM
-#  endif
-#  ifndef BOOST_DECIMAL_DISABLE_CASSERT
-#    undef BOOST_DECIMAL_ASSERT
-#    define BOOST_DECIMAL_ASSERT(x)
-#  endif
-#endif
-
-// Include intrinsics if available
 #if defined(_MSC_VER)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
 #    include <intrin.h>
@@ -304,6 +274,156 @@ typedef unsigned __int128 uint128_t;
 
 #ifdef __FAST_MATH__
 #  define BOOST_DECIMAL_FAST_MATH
+#endif
+
+// GPU Options
+
+//
+// CUDA support:
+//
+
+#ifdef __CUDACC__
+#  define BOOST_DECIMAL_CUDA_ENABLED __host__ __device__
+#  define BOOST_DECIMAL_HAS_GPU_SUPPORT
+
+#  ifndef BOOST_DECIMAL_ENABLE_CUDA
+#    define BOOST_DECIMAL_ENABLE_CUDA
+#  endif
+
+// Device code can not handle exceptions
+#  ifndef BOOST_DECIMAL_NO_EXCEPTIONS
+#    define BOOST_DECIMAL_NO_EXCEPTIONS
+#  endif
+
+// We want to use force inline from CUDA instead of the host compiler
+#  undef BOOST_DECIMAL_FORCEINLINE
+#  define BOOST_DECIMAL_FORCEINLINE __forceinline__
+
+#  define BOOST_DECIMAL_NO_LONG_DOUBLE_MATH_FUNCTIONS
+#  define BOOST_DECIMAL_DISABLE_CASSERT
+
+#elif defined(SYCL_LANGUAGE_VERSION)
+
+#  define BOOST_DECIMAL_SYCL_ENABLED SYCL_EXTERNAL
+#  define BOOST_DECIMAL_HAS_GPU_SUPPORT
+
+#  ifndef BOOST_DECIMAL_ENABLE_SYCL
+#    define BOOST_DECIMAL_ENABLE_SYCL
+#  endif
+
+#  ifndef BOOST_DECIMAL_NO_EXCEPTIONS
+#    define BOOST_DECIMAL_NO_EXCEPTIONS
+#  endif
+
+// spir64 does not support long double
+#  define BOOST_DECIMAL_NO_LONG_DOUBLE_MATH_FUNCTIONS
+
+#  undef BOOST_DECIMAL_FORCEINLINE
+#  define BOOST_DECIMAL_FORCEINLINE inline
+
+// __int128 don't compile
+#  undef BOOST_DECIMAL_HAS_INT128
+
+#endif
+
+#ifndef BOOST_DECIMAL_CUDA_ENABLED
+#  define BOOST_DECIMAL_CUDA_ENABLED
+#endif
+
+#ifndef BOOST_DECIMAL_SYCL_ENABLED
+#  define BOOST_DECIMAL_SYCL_ENABLED
+#endif
+
+// Not all functions that allow CUDA allow SYCL (e.g. Recursion is disallowed by SYCL)
+#  define BOOST_DECIMAL_GPU_ENABLED BOOST_DECIMAL_CUDA_ENABLED BOOST_DECIMAL_SYCL_ENABLED
+
+// Additional functions that need replaced/marked up
+#ifdef BOOST_DECIMAL_HAS_GPU_SUPPORT
+namespace boost {
+namespace decimal {
+namespace detail {
+
+template <class T>
+BOOST_DECIMAL_GPU_ENABLED constexpr void gpu_safe_swap(T& a, T& b) { T t(a); a = b; b = t; }
+template <class T>
+BOOST_DECIMAL_GPU_ENABLED constexpr T gpu_safe_min(const T& a, const T& b) { return a < b ? a : b; }
+template <class T>
+BOOST_DECIMAL_GPU_ENABLED constexpr T cuda_safe_max(const T& a, const T& b) { return a > b ? a : b; }
+
+} // namespace detail
+} // namespace decimal
+} // namespace boost
+
+#define BOOST_DECIMAL_GPU_SAFE_SWAP(a, b) boost::decimal::detail::gpu_safe_swap(a, b)
+#define BOOST_DECIMAL_GPU_SAFE_MIN(a, b) boost::decimal::detail::gpu_safe_min(a, b)
+#define BOOST_DECIMAL_GPU_SAFE_MAX(a, b) boost::decimal::detail::gpu_safe_max(a, b)
+
+#else
+
+#define BOOST_DECIMAL_GPU_SAFE_SWAP(a, b) std::swap(a, b)
+#define BOOST_DECIMAL_GPU_SAFE_MIN(a, b) (std::min)(a, b)
+#define BOOST_DECIMAL_GPU_SAFE_MAX(a, b) (std::max)(a, b)
+
+#endif
+
+// Static variables are not allowed with CUDA or C++20 modules
+// See if we can inline them instead
+
+#if defined(__cpp_inline_variables) && __cpp_inline_variables >= 201606L
+#  define BOOST_DECIMAL_STATIC_CONSTEXPR inline constexpr
+#  define BOOST_DECIMAL_STATIC static
+#  ifndef BOOST_DECIMAL_HAS_GPU_SUPPORT
+#    define BOOST_DECIMAL_STATIC_LOCAL_VARIABLE static
+#  else
+#    define BOOST_DECIMAL_STATIC_LOCAL_VARIABLE
+#  endif
+#else
+#  ifndef BOOST_DECIMAL_HAS_GPU_SUPPORT
+#    define BOOST_DECIMAL_STATIC_CONSTEXPR static constexpr
+#    define BOOST_DECIMAL_STATIC static
+#    define BOOST_DECIMAL_STATIC_LOCAL_VARIABLE
+#  else
+#    define BOOST_DECIMAL_STATIC_CONSTEXPR constexpr
+#    define BOOST_DECIMAL_STATIC constexpr
+#    define BOOST_DECIMAL_STATIC_LOCAL_VARIABLE static
+#  endif
+#endif
+
+#ifdef BOOST_DECIMAL_ENABLE_CUDA
+#  include <cuda/std/type_traits>
+#  define BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE cuda::std
+#else
+#  include <type_traits>
+#  define BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE std
+#endif 
+
+// This section allows us to disable any of the following independently.
+//   Use #define BOOST_DECIMAL_DISABLE_CASSERT to disable uses of assert.
+//   Use #define BOOST_DECIMAL_DISABLE_IOSTREAM to disable uses of I/O streaming.
+//   Use #define BOOST_DECIMAL_DISABLE_CLIB to disable uses of both assert as well as I/O streaming (and all oother heavyweight C-LIB artifacts).
+
+#if (!defined(BOOST_DECIMAL_DISABLE_CASSERT) && !defined(BOOST_DECIMAL_DISABLE_CLIB))
+#  ifndef BOOST_DECIMAL_BUILD_MODULE
+#    include <cassert>
+#  endif
+#endif
+
+#ifndef BOOST_DECIMAL_DISABLE_CASSERT
+#  define BOOST_DECIMAL_ASSERT(x) assert(x)
+#  define BOOST_DECIMAL_ASSERT_MSG(expr, msg) assert((expr)&&(msg))
+#else
+#  define BOOST_DECIMAL_ASSERT(x)
+#  define BOOST_DECIMAL_ASSERT_MSG(expr, msg)
+#endif
+
+#ifdef BOOST_DECIMAL_DISABLE_CLIB
+#  ifndef BOOST_DECIMAL_DISABLE_IOSTREAM
+#    define BOOST_DECIMAL_DISABLE_IOSTREAM
+#  endif
+#  ifndef BOOST_DECIMAL_DISABLE_CASSERT
+#    undef BOOST_DECIMAL_ASSERT
+#    define BOOST_DECIMAL_ASSERT(x)
+#  endif
 #endif
 
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP

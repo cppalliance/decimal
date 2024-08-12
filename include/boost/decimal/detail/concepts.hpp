@@ -5,6 +5,7 @@
 #ifndef BOOST_DECIMAL_DETAIL_CONCEPTS
 #define BOOST_DECIMAL_DETAIL_CONCEPTS
 
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 
@@ -413,23 +414,23 @@ concept execution_policy = std::is_execution_policy_v<std::remove_cvref_t<T>>;
 #endif
 
 #ifndef BOOST_DECIMAL_REQUIRES
-#  define BOOST_DECIMAL_REQUIRES(X, T) -> std::enable_if_t<X<T>, T>
+#  define BOOST_DECIMAL_REQUIRES(X, T) -> BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<X<T>, T>
 #endif
 
 #ifndef BOOST_DECIMAL_REQUIRES_TWO
-#  define BOOST_DECIMAL_REQUIRES_TWO(X1, T1, X2, T2) -> std::enable_if_t<X1<T1> && X2<T2>, detail::promote_args_t<T1, T2>>
+#  define BOOST_DECIMAL_REQUIRES_TWO(X1, T1, X2, T2) -> BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<X1<T1> && X2<T2>, detail::promote_args_t<T1, T2>>
 #endif
 
 #ifndef BOOST_DECIMAL_REQUIRES_TWO_RETURN
-#  define BOOST_DECIMAL_REQUIRES_TWO_RETURN(X1, T1, X2, T2, ReturnType) -> std::enable_if_t<X1<T1> && X2<T2>, ReturnType>
+#  define BOOST_DECIMAL_REQUIRES_TWO_RETURN(X1, T1, X2, T2, ReturnType) -> BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<X1<T1> && X2<T2>, ReturnType>
 #endif
 
 #ifndef BOOST_DECIMAL_REQUIRES_THREE
-#  define BOOST_DECIMAL_REQUIRES_THREE(X1, T1, X2, T2, X3, T3) -> std::enable_if_t<X1<T1> && X2<T2> && X3<T3>, detail::promote_args_t<T1, T2, T3>>
+#  define BOOST_DECIMAL_REQUIRES_THREE(X1, T1, X2, T2, X3, T3) -> BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<X1<T1> && X2<T2> && X3<T3>, detail::promote_args_t<T1, T2, T3>>
 #endif
 
 #ifndef BOOST_DECIMAL_REQUIRES_RETURN
-#  define BOOST_DECIMAL_REQUIRES_RETURN(X, T, ReturnType) -> std::enable_if_t<X<T>, ReturnType>
+#  define BOOST_DECIMAL_REQUIRES_RETURN(X, T, ReturnType) -> BOOST_DECIMAL_TYPE_TRAITS_NAMESPACE::enable_if_t<X<T>, ReturnType>
 #endif
 
 #endif //BOOST_DECIMAL_DETAIL_CONCEPTS

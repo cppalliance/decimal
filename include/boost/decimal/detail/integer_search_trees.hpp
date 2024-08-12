@@ -24,7 +24,7 @@ namespace detail {
 
 // Generic solution
 template <typename T>
-constexpr auto num_digits(T x) noexcept -> int
+BOOST_DECIMAL_GPU_ENABLED constexpr auto num_digits(T x) noexcept -> int
 {
     int digits = 0;
 
@@ -38,7 +38,7 @@ constexpr auto num_digits(T x) noexcept -> int
 }
 
 template <>
-constexpr auto num_digits(std::uint32_t x) noexcept -> int
+BOOST_DECIMAL_GPU_ENABLED constexpr auto num_digits(std::uint32_t x) noexcept -> int
 {
     if (x >= UINT32_C(10000))
     {
@@ -82,7 +82,7 @@ constexpr auto num_digits(std::uint32_t x) noexcept -> int
 }
 
 template <>
-constexpr auto num_digits(std::uint64_t x) noexcept -> int
+BOOST_DECIMAL_GPU_ENABLED constexpr auto num_digits(std::uint64_t x) noexcept -> int
 {
     if (x >= UINT64_C(10000000000))
     {
@@ -168,7 +168,7 @@ constexpr auto num_digits(std::uint64_t x) noexcept -> int
 # pragma warning(disable: 4307) // MSVC 14.1 warns of intergral constant overflow
 #endif
 
-constexpr int num_digits(const uint128& x) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr int num_digits(const uint128& x) noexcept
 {
     if (x.high == UINT64_C(0))
     {
@@ -183,7 +183,7 @@ constexpr int num_digits(const uint128& x) noexcept
     {
         std::uint32_t mid = (left + right + 1U) / 2U;
 
-        if (x >= impl::emulated_128_pow10[mid])
+        if (x >= pow10<uint128>(mid))
         {
             left = mid;
         }
@@ -196,7 +196,7 @@ constexpr int num_digits(const uint128& x) noexcept
     return static_cast<int>(left + 1);
 }
 
-constexpr int num_digits(const uint256_t& x) noexcept
+BOOST_DECIMAL_GPU_ENABLED constexpr int num_digits(const uint256_t& x) noexcept
 {
     if (x.high == 0)
     {
@@ -204,7 +204,7 @@ constexpr int num_digits(const uint256_t& x) noexcept
     }
 
     // 10^77
-    auto current_power_of_10 {uint256_t{uint128{UINT64_C(15930919111324522770), UINT64_C(5327493063679123134)}, uint128{UINT64_C(12292710897160462336), UINT64_C(0)}}};
+    uint256_t current_power_of_10 {uint128{UINT64_C(15930919111324522770), UINT64_C(5327493063679123134)}, uint128{UINT64_C(12292710897160462336), UINT64_C(0)}};
 
     for (int i = 78; i > 0; --i)
     {
@@ -225,7 +225,7 @@ constexpr int num_digits(const uint256_t& x) noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-constexpr auto num_digits(const uint128_t& x) noexcept -> int
+BOOST_DECIMAL_GPU_ENABLED constexpr auto num_digits(const uint128_t& x) noexcept -> int
 {
     if (static_cast<std::uint64_t>(x >> 64) == UINT64_C(0))
     {
@@ -240,7 +240,7 @@ constexpr auto num_digits(const uint128_t& x) noexcept -> int
     {
         std::uint32_t mid = (left + right + 1U) / 2U;
 
-        if (x >= impl::emulated_128_pow10[mid])
+        if (x >= pow10<uint128_t>(mid))
         {
             left = mid;
         }
