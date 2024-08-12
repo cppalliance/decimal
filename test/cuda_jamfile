@@ -15,7 +15,8 @@ project : requirements
 
 run test_decimal32_add.cu ;
 run test_decimal32_sub.cu ;
-run test_decimal32_mul.cu
+run test_decimal32_mul.cu ;
+run test_decimal32_div.cu ;
 
 # Fast Types
 

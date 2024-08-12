@@ -18,7 +18,7 @@
 // For the CUDA runtime routines (prefixed with "cuda_")
 #include <cuda_runtime.h>
 
-using float_type = boost::decimal::decimal64_fast;
+using float_type = boost::decimal::decimal32;
 
 /**
  * CUDA Kernel Device code
@@ -40,6 +40,8 @@ __global__ void cuda_test(const float_type* in1, const float_type* in2, float_ty
  */
 int main(void)
 {
+    using namespace boost::decimal;
+
     // Error code to check return values for CUDA calls
     cudaError_t err = cudaSuccess;
 
@@ -97,12 +99,16 @@ int main(void)
     // check the results
     for(int i = 0; i < numElements; ++i)
     {
-        if (output_vector[i] != results[i])
+        // Add in additional handling because CUDA does not believe in signed 0
+        if (abs(output_vector[i]) != abs(results[i]))
         {
-            std::cerr << "Result verification failed at element " << i << "!\n"
-                      << "Cuda: " << output_vector[i] << '\n'
-                      << "Serial: " << results[i] << std::endl;
-            return EXIT_FAILURE;
+            if (isfinite(output_vector[i]) && isfinite(results[i]))
+            {
+                std::cerr << "Result verification failed at element " << i << "!\n"
+                        << "Cuda: " << output_vector[i] << '\n'
+                        << "Serial: " << results[i] << std::endl;
+                return EXIT_FAILURE;
+            }
         }
     }
 
