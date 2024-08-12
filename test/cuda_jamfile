@@ -9,7 +9,16 @@ project : requirements
     [ requires cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction cxx14_variable_templates cxx14_constexpr ]
     ;
 
+# IEEE Types
+
 # Basic Operations
+
+run test_decimal32_add.cu ;
+
+# Fast Types
+
+# Basic Operations
+
 run test_decimal32_fast_add.cu ;
 run test_decimal64_fast_add.cu ;
 run test_decimal32_fast_div.cu ;
