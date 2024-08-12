@@ -61,7 +61,7 @@ with the following compilers:
 
 # Synopsis
 
-Decimal provides 3 types:
+Decimal provides 3 IEEE-754 compliant types:
 
 ```cpp
 namespace boost {
@@ -75,6 +75,21 @@ class decimal128;
 } //namespace boost
 ```
 
+It also provides three types with equivalent properties, 
+but with increased performance that comes at the cost of IEEE-754 conformance 
+and space requirements:
+
+```cpp
+namespace boost {
+namespace decimal {
+
+class decimal32_fast;
+class decimal64_fast;
+class decimal128_fast;
+
+} //namespace decimal
+} //namespace boost
+```
 These types operate like built-in floating point types.
 They have their own implementations of the Standard-Library functions
 (e.g. like those found in `<cmath>`, `<charconv>`, `<cstdlib>`, etc.).
