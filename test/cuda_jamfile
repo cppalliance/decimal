@@ -21,6 +21,7 @@ run test_decimal32_div.cu ;
 run test_decimal64_add.cu ;
 run test_decimal64_sub.cu ;
 run test_decimal64_mul.cu ;
+run test_decimal64_div.cu ;
 
 # Fast Types
 
