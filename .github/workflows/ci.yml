@@ -779,7 +779,7 @@ jobs:
         run: git submodule update --init tools/boostdep
         working-directory: ../boost-root
       - name: Copy files
-        run: cp -r $GITHUB_WORKSPACE/* libs/decimal
+        run: mkdir $GITHUB_WORKSPACE/* libs/decimal && cp -r $GITHUB_WORKSPACE/* libs/decimal
         working-directory: ../boost-root
       - name: Install deps
         run: python tools/boostdep/depinst/depinst.py decimal
