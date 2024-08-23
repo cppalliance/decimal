@@ -759,40 +759,40 @@ jobs:
         run: |
           source /opt/intel/oneapi/setvars.sh
           printenv >> $GITHUB_ENV
-      - name: Add repository
-        continue-on-error: true
-        id: addrepo
-        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
-      - name: Retry Add Repo
-        continue-on-error: true
-        id: retry1
-        if: steps.addrepo.outcome=='failure'
-        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
-      - name: Retry Add Repo 2
-        continue-on-error: true
-        id: retry2
-        if: steps.retry1.outcome=='failure'
-        run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
-      - name: Checkout main boost
-        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
-      - name: Update tools/boostdep
-        run: git submodule update --init tools/boostdep
-        working-directory: ../boost-root
-      - name: Copy files
-        run: mkdir $GITHUB_WORKSPACE/* libs/decimal && cp -r $GITHUB_WORKSPACE/* libs/decimal
-        working-directory: ../boost-root
-      - name: Install deps
-        run: python tools/boostdep/depinst/depinst.py decimal
-        working-directory: ../boost-root
-      - name: Bootstrap
-        run: ./bootstrap.sh
-        working-directory: ../boost-root
-      - name: Generate headers
-        run: ./b2 headers
-        working-directory: ../boost-root
-      - name: Generate user config
-        run: 'echo "using intel : : icpx : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
-        working-directory: ../boost-root
-      - name: Test
-        run: ../../../b2 toolset=intel ${{ matrix.suite }} linkflags=-ltbb
-        working-directory: ../boost-root/libs/decimal/test
+
+      - name: Setup Boost
+        run: |
+          echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
+          LIBRARY=${GITHUB_REPOSITORY#*/}
+          echo LIBRARY: $LIBRARY
+          echo "LIBRARY=$LIBRARY" >> $GITHUB_ENV
+          echo GITHUB_BASE_REF: $GITHUB_BASE_REF
+          echo GITHUB_REF: $GITHUB_REF
+          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
+          REF=${REF#refs/heads/}
+          echo REF: $REF
+          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
+          echo BOOST_BRANCH: $BOOST_BRANCH
+          cd ..
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          cd boost-root
+          mkdir -p libs/$LIBRARY
+          cp -r $GITHUB_WORKSPACE/* libs/$LIBRARY
+          git submodule update --init tools/boostdep
+          python tools/boostdep/depinst/depinst.py --git_args "--jobs 3" $LIBRARY
+
+      - name: Configure
+        run: |
+          cd ../boost-root
+          mkdir __build__ && cd __build__
+          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DBOOST_INCLUDE_LIBRARIES=$LIBRARY -DBUILD_TESTING=ON ..
+
+      - name: Build tests
+        run: |
+          cd ../boost-root/__build__
+          cmake --build . --target tests
+
+      - name: Run tests
+        run: |
+          cd ../boost-root/__build__
+          ctest --output-on-failure --no-tests=error
