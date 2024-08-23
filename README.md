@@ -51,13 +51,13 @@ conan create decimal/conan --build missing
 
 # Supported Platforms
 
-Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64),
-macOS (x86_64, and Apple Silicon), and Windows (x86_64)
-with the following compilers:
+Boost.Decimal is tested natively on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon), and Windows (x32 and x64);
+as well as emulated PPC64LE and STM32 using QEMU with the following compilers:
 
 * GCC 7 and later
 * Clang 6 and later
 * Visual Studio 2017 and later
+* Intel OneAPI DPC++
 
 # Synopsis
 
