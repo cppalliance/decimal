@@ -87,7 +87,7 @@ constexpr auto remove_trailing_zeros(std::uint64_t n) noexcept -> remove_trailin
     s = s * 2U + static_cast<std::size_t>(b);
     n = b ? r : n;
 
-    r = rotr<64>(n * UINT32_C(14757395258967641293), 1);
+    r = rotr<64>(n * UINT64_C(14757395258967641293), 1);
     b = r < UINT64_C(1844674407370955162);
     s = s * 2U + static_cast<std::size_t>(b);
     n = b ? r : n;
