@@ -8,7 +8,7 @@
 #include <time.h>
 #include <inttypes.h>
 
-#define K 2000000
+#define K 20000000
 #define N 5
 
 double float_rand(double min, double max)
@@ -136,21 +136,21 @@ __attribute__ ((__noinline__)) void test_comparisons_128(_Decimal128* data, cons
 
 typedef _Decimal32 (*operation_32)(_Decimal32, _Decimal32);
 
-_Decimal32 add_32(_Decimal32 a, _Decimal32 b)
+__attribute__ ((__noinline__)) _Decimal32 add_32(_Decimal32 a, _Decimal32 b)
 {
     return a + b;
 }
-_Decimal32 sub_32(_Decimal32 a, _Decimal32 b)
+__attribute__ ((__noinline__)) _Decimal32 sub_32(_Decimal32 a, _Decimal32 b)
 {
     return a - b;
 }
 
-_Decimal32 mul_32(_Decimal32 a, _Decimal32 b)
+__attribute__ ((__noinline__)) _Decimal32 mul_32(_Decimal32 a, _Decimal32 b)
 {
     return a * b;
 }
 
-_Decimal32 div_32(_Decimal32 a, _Decimal32 b)
+__attribute__ ((__noinline__)) _Decimal32 div_32(_Decimal32 a, _Decimal32 b)
 {
     return a / b;
 }
@@ -181,21 +181,22 @@ __attribute__ ((__noinline__)) void test_two_element_operation_32(_Decimal32* da
 
 typedef _Decimal64 (*operation_64)(_Decimal64, _Decimal64);
 
-_Decimal64 add_64(_Decimal64 a, _Decimal64 b)
+__attribute__ ((__noinline__)) _Decimal64 add_64(_Decimal64 a, _Decimal64 b)
 {
     return a + b;
 }
-_Decimal64 sub_64(_Decimal64 a, _Decimal64 b)
+
+__attribute__ ((__noinline__)) _Decimal64 sub_64(_Decimal64 a, _Decimal64 b)
 {
     return a - b;
 }
 
-_Decimal64 mul_64(_Decimal64 a, _Decimal64 b)
+__attribute__ ((__noinline__)) _Decimal64 mul_64(_Decimal64 a, _Decimal64 b)
 {
     return a * b;
 }
 
-_Decimal64 div_64(_Decimal64 a, _Decimal64 b)
+__attribute__ ((__noinline__)) _Decimal64 div_64(_Decimal64 a, _Decimal64 b)
 {
     return a / b;
 }
@@ -226,21 +227,22 @@ __attribute__ ((__noinline__)) void test_two_element_operation_64(_Decimal64* da
 
 typedef _Decimal128 (*operation_128)(_Decimal128, _Decimal128);
 
-_Decimal128 add_128(_Decimal128 a, _Decimal128 b)
+__attribute__ ((__noinline__)) _Decimal128 add_128(_Decimal128 a, _Decimal128 b)
 {
     return a + b;
 }
-_Decimal128 sub_128(_Decimal128 a, _Decimal128 b)
+
+__attribute__ ((__noinline__)) _Decimal128 sub_128(_Decimal128 a, _Decimal128 b)
 {
     return a - b;
 }
 
-_Decimal128 mul_128(_Decimal128 a, _Decimal128 b)
+__attribute__ ((__noinline__)) _Decimal128 mul_128(_Decimal128 a, _Decimal128 b)
 {
     return a * b;
 }
 
-_Decimal128 div_128(_Decimal128 a, _Decimal128 b)
+__attribute__ ((__noinline__)) _Decimal128 div_128(_Decimal128 a, _Decimal128 b)
 {
     return a / b;
 }
