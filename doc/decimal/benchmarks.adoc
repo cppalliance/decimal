@@ -25,6 +25,38 @@ An example on Linux with b2: `../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_
 The benchmark for comparisons generates a random vector containing 2,000,000 elements and does operations `>`, `>=`, `<`, `\<=`, `==`, and `!=` between `vec[i] and vec[i + 1]`.
 This is repeated 5 times to generate stable results.
 
+=== x64 Linux Results
+
+Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 35,581
+| 0.604
+| `double`
+| 58,848
+| 1.000
+| `decimal32`
+| 2,410,084
+| 40.954
+| `decimal64`
+| 4,233,175
+| 71.934
+| `decimal128`
+| 6,337,447
+| 107.692
+| `decimal32_fast`
+| 628,241
+| 10.676
+| `decimal64_fast`
+| 724,474
+| 12.311
+| `decimal128_fast`
+| 517,930
+| 8.801
+|===
+
 === M1 macOS Results
 
 Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
@@ -61,6 +93,130 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 
 The benchmark for these operations generates a random vector containing 2,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
 This is repeated 5 times to generate stable results.
+
+=== x64 Linux Results
+
+Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+
+==== Addition
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 54,566
+| 1.077
+| `double`
+| 50,640
+| 1.000
+| `decimal32`
+| 3,639,957
+| 71.879
+| `decimal64`
+| 4,172,318
+| 82.392
+| `decimal128`
+| 10,936,595
+| 215.968
+| `decimal32_fast`
+| 1,148,249
+| 22.675
+| `decimal64_fast`
+| 1,149,203
+| 22.694
+| `decimal128_fast`
+| 7,424,598
+| 146.615
+|===
+
+==== Subtraction
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 48,654
+| 0.912
+| `double`
+| 53,348
+| 1.000
+| `decimal32`
+| 2,850,709
+| 53.436
+| `decimal64`
+| 3,493,936
+| 65.493
+| `decimal128`
+| 10,492,728
+| 196.685
+| `decimal32_fast`
+| 1,012,199
+| 18.974
+| `decimal64_fast`
+| 1,055,476
+| 19.785
+| `decimal128_fast`
+| 2,114,185
+| 39.630
+|===
+
+==== Multiplication
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 53,405
+| 1.101
+| `double`
+| 48,497
+| 1.000
+| `decimal32`
+| 2,708,779
+| 55.855
+| `decimal64`
+| 2,761,465
+| 56.941
+| `decimal128`
+| 8,509,678
+| 175.468
+| `decimal32_fast`
+| 451,679
+| 9.313
+| `decimal64_fast`
+| 777,927
+| 16.041
+| `decimal128_fast`
+| 13,970,509
+| 288.070
+|===
+
+==== Division
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 58,955
+| 0.755
+| `double`
+| 78,046
+| 1.000
+| `decimal32`
+| 2,907,134
+| 37.249
+| `decimal64`
+| 3,464,841
+| 44.394
+| `decimal128`
+| 18,202,742
+| 233.231
+| `decimal32_fast`
+| 1,092,346
+| 13.996
+| `decimal64_fast`
+| 1,207,648
+| 15.474
+| `decimal128_fast`
+| 1,208,184
+| 15.480
+|===
 
 === M1 macOS Results
 
@@ -185,6 +341,9 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | 302,003
 | 77.956
 |===
+
+////
+These are not available for the built-ins so not deleting but also not incorporating
 
 == Selected Special Functions
 
@@ -377,3 +536,5 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | 3,108,380
 | 9.724
 |===
+
+////
