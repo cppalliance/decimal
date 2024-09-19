@@ -681,11 +681,6 @@ pre.rouge .gs {
 </ul>
 </li>
 <li><a href="#configuration">Configuration Macros</a></li>
-<li><a href="#type_traits">type_traits support</a>
-<ul class="sectlevel2">
-<li><a href="#type_traits_type_traits">&lt;type_traits&gt;</a></li>
-</ul>
-</li>
 <li><a href="#examples">Examples</a>
 <ul class="sectlevel2">
 <li><a href="#examples_construction_from_an_integer_and_exponent">Construction from an Integer and Exponent</a></li>
@@ -810,7 +805,8 @@ For example, while a fixed-point representation that allocates 8 decimal digits 
 <div class="sect2">
 <h3 id="overview_supported_compilers">Supported Compilers</h3>
 <div class="paragraph">
-<p>Boost.Decimal is tested on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon), and Windows with the following compilers:</p>
+<p>Boost.Decimal is tested natively on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon), and Windows (x32 and x64);
+as well as emulated PPC64LE and STM32 using QEMU with the following compilers:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -822,6 +818,9 @@ For example, while a fixed-point representation that allocates 8 decimal digits 
 </li>
 <li>
 <p>Visual Studio 2017 and later</p>
+</li>
+<li>
+<p>Intel OneAPI DPC++</p>
 </li>
 </ul>
 </div>
@@ -3236,76 +3235,6 @@ This flag increases the performance of the basis operations (e.g. add, sub, mul,
 </div>
 </div>
 <div class="sect1">
-<h2 id="type_traits">type_traits support</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="type_traits_type_traits">&lt;type_traits&gt;</h3>
-<div class="paragraph">
-<p>The following type traits from boost.type_traits have been overloaded for the decimal types:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
-
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_arithmetic</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_arithmetic</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_arithmetic</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_fundamental</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_fundamental</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_fundamental</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_scalar</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_scalar</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_scalar</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_class</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">false_type</span> <span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_class</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">false_type</span> <span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_class</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">false_type</span> <span class="p">{};</span>
-
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_pod</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_pod</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_pod</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span> <span class="p">{};</span>
-
-<span class="p">}</span> <span class="c1">// namespace boost</span></code></pre>
-</div>
-</div>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Caution</div>
-</td>
-<td class="content">
-These overloads only exist if &lt;boost/type_traits.hpp&gt; is installed.
-In a standalone environment they do not exist.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>An additional type_trait has been added <code>is_decimal_floating_point</code>, which is defined as follows:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
-
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_decimal_floating_point</span> <span class="o">:</span> <span class="k">public</span> <span class="n">false_type</span><span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_decimal_floating_point</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">T</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">is_decimal_floating_point</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_decimal_floating_point</span><span class="o">&lt;</span><span class="k">volatile</span> <span class="k">const</span> <span class="n">T</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">is_decimal_floating_point</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_decimal_floating_point</span><span class="o">&lt;</span><span class="k">volatile</span> <span class="n">T</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">is_decimal_floating_point</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{};</span>
-
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_decimal_floating_point</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span><span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_decimal_floating_point</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span><span class="p">{};</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span> <span class="k">struct</span> <span class="nc">is_decimal_floating_point</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span><span class="o">&gt;</span> <span class="o">:</span> <span class="k">public</span> <span class="n">true_type</span><span class="p">{};</span>
-
-<span class="p">}</span> <span class="c1">// namespace boost</span></code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="examples">Examples</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -4268,7 +4197,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-06-18 07:31:54 -0400
+Last updated 2024-09-04 09:44:26 -0400
 </div>
 </div>
 <style>
