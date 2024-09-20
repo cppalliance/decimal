@@ -24,6 +24,50 @@
 namespace boost {
 namespace decimal {
 
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool
+{
+    using comp_type = typename DecimalType::significand_type;
+
+    // Step 1: Check for NANs per IEEE 754
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+    #endif
+
+    // Step 3: Check signs
+    const auto lhs_neg {lhs.isneg()};
+    const auto rhs_neg {rhs.isneg()};
+
+    if (lhs_neg != rhs_neg)
+    {
+        return false;
+    }
+
+    // Step 4: Check the exponents
+    // If the difference is greater than we can represent in the significand than we can assume they are different
+    const auto lhs_exp {lhs.biased_exponent()};
+    const auto rhs_exp {rhs.biased_exponent()};
+
+    const auto delta_exp {lhs_exp - rhs_exp};
+
+    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType>)
+    {
+        return false;
+    }
+
+    // Step 5: Normalize the significand and compare
+    auto lhs_sig {lhs.full_significand()};
+    auto rhs_sig {rhs.full_significand()};
+
+    delta_exp >= 0 ? lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp)) :
+                     rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
+
+    return lhs_sig == rhs_sig;
+}
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,

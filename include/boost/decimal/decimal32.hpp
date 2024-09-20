@@ -212,6 +212,9 @@ private:
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto equality_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -1056,15 +1059,7 @@ constexpr auto decimal32::operator-=(Integer rhs) noexcept
 
 constexpr auto operator==(decimal32 lhs, decimal32 rhs) noexcept -> bool
 {
-    #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs))
-    {
-        return false;
-    }
-    #endif
-
-    return equal_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+    return equality_impl(lhs, rhs);
 }
 
 template <typename Integer>
