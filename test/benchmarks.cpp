@@ -378,8 +378,8 @@ int main()
 
     std::cout << "\n===== Subtraction =====\n";
 
-    test_two_element_operation(double_vector, std::minus<>(), "Subtraction", "double");
     test_two_element_operation(float_vector, std::minus<>(), "Subtraction", "float");
+    test_two_element_operation(double_vector, std::minus<>(), "Subtraction", "double");
     test_two_element_operation(dec32_vector, std::minus<>(), "Subtraction", "decimal32");
     test_two_element_operation(dec64_vector, std::minus<>(), "Subtraction", "decimal64");
     test_two_element_operation(dec128_vector, std::minus<>(), "Subtraction", "decimal128");
