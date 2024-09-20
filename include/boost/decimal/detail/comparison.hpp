@@ -241,6 +241,70 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_type_less_parts_impl(T lhs_sig, U
     return lhs_sign ? lhs_sig > rhs_sig : lhs_sig < rhs_sig;
 }
 
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool
+{
+    using comp_type = std::uint_fast64_t;
+
+    // Step 1: Handle our non-finite values in their own calling functions
+
+    // Step 2: Check if they are bitwise equal:
+    /*
+    if (lhs.bits_ == rhs.bits_)
+    {
+        return false;
+    }
+    */
+
+    // Step 3: Decode and compare signs first:
+    const auto lhs_sign {lhs.isneg()};
+    const auto rhs_sign {rhs.isneg()};
+
+    if (lhs_sign != rhs_sign)
+    {
+        return lhs_sign;
+    }
+
+    // Step 4: Decode the significand and do a trivial comp
+    auto lhs_sig {static_cast<comp_type>(lhs.full_significand())};
+    auto rhs_sig {static_cast<comp_type>(rhs.full_significand())};
+    if (lhs_sig == static_cast<comp_type>(0) || rhs_sig == static_cast<comp_type>(0))
+    {
+        return (lhs_sig == rhs_sig) ? false : (lhs_sig == static_cast<comp_type>(0) ? !rhs_sign : lhs_sign);
+    }
+
+    // Step 5: Decode the exponent and see if we can even compare the significands
+    auto lhs_exp {lhs.biased_exponent()};
+    auto rhs_exp {rhs.biased_exponent()};
+
+    const auto delta_exp {lhs_exp - rhs_exp};
+    constexpr auto max_delta_diff {std::numeric_limits<std::uint_fast64_t>::digits10 - detail::precision_v<DecimalType>};
+
+    if (delta_exp > max_delta_diff || delta_exp < -max_delta_diff)
+    {
+        return rhs_sign ? rhs_exp < lhs_exp : rhs_exp > lhs_exp;
+    }
+
+    // Step 6: Approximate normalization if we need to and then get the answer
+    if (delta_exp >= 0)
+    {
+        lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp));
+        lhs_exp -= delta_exp;
+    }
+    else
+    {
+        rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
+        rhs_exp += delta_exp;
+    }
+
+    if (lhs_exp != rhs_exp)
+    {
+        return lhs_sign ? lhs_exp > rhs_exp : lhs_exp < rhs_exp;
+    }
+
+    return lhs_sign ? lhs_sig > rhs_sig : lhs_sig < rhs_sig;
+}
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
         BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,

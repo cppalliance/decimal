@@ -215,6 +215,9 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto equality_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool;
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
@@ -1111,8 +1114,7 @@ constexpr auto operator<(decimal32 lhs, decimal32 rhs) noexcept -> bool
     }
     #endif
 
-    return less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                           rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+    return sequential_less_impl(lhs, rhs);
 }
 
 template <typename Integer>
@@ -1156,8 +1158,7 @@ constexpr auto operator<=(decimal32 lhs, decimal32 rhs) noexcept -> bool
     }
     #endif
 
-    return !less_parts_impl(rhs.full_significand(), rhs.biased_exponent(), rhs.isneg(),
-                            lhs.full_significand(), lhs.biased_exponent(), lhs.isneg());
+    return !sequential_less_impl(rhs, lhs);
 }
 
 template <typename Integer>
@@ -1222,8 +1223,7 @@ constexpr auto operator>(decimal32 lhs, decimal32 rhs) noexcept -> bool
     }
     #endif
 
-    return less_parts_impl(rhs.full_significand(), rhs.biased_exponent(), rhs.isneg(),
-                           lhs.full_significand(), lhs.biased_exponent(), lhs.isneg());
+    return sequential_less_impl(rhs, lhs);
 }
 
 template <typename Integer>
@@ -1263,8 +1263,7 @@ constexpr auto operator>=(decimal32 lhs, decimal32 rhs) noexcept -> bool
     }
     #endif
 
-    return !less_parts_impl(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                            rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+    return !sequential_less_impl(lhs, rhs);
 }
 
 template <typename Integer>
