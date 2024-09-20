@@ -22,7 +22,7 @@ An example on Linux with b2: `../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_
 
 == Comparisons
 
-The benchmark for comparisons generates a random vector containing 2,000,000 elements and does operations `>`, `>=`, `<`, `\<=`, `==`, and `!=` between `vec[i] and vec[i + 1]`.
+The benchmark for comparisons generates a random vector containing 20,000,000 elements and does operations `>`, `>=`, `<`, `\<=`, `==`, and `!=` between `vec[i] and vec[i + 1]`.
 This is repeated 5 times to generate stable results.
 
 === x64 Linux Results
@@ -68,39 +68,39 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 
 === M1 macOS Results
 
-Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew Clang 18.1.8
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 8587
-| 1.376
+| 146,976
+| 2.319
 | `double`
-| 6240
+| 63,382
 | 1.000
 | `decimal32`
-| 275,597
-| 44.166
+| 1,797,597
+| 28.361
 | `decimal64`
-| 296,929
-| 47.587
+| 2,799,376
+| 44.167
 | `decimal128`
-| 821,847
-| 131.706
+| 6,478,939
+| 102.220
 | `decimal32_fast`
-| 99,664
-| 15.972
+| 1,070,232
+| 16.885
 | `decimal64_fast`
-| 102,132
-| 16.367
+| 1,111,273
+| 17.533
 | `decimal128_fast`
-| 146,302
-| 23.446
+| 1,118,976
+| 17.654
 |===
 
 == Basic Operations
 
-The benchmark for these operations generates a random vector containing 2,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
+The benchmark for these operations generates a random vector containing 20,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
 This is repeated 5 times to generate stable results.
 
 === x64 Linux Results
@@ -272,29 +272,29 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 2705
-| 0.859
+| 16,685
+| 0.955
 | `double`
-| 3148
+| 17,476
 | 1.000
 | `decimal32`
-| 351,505
-| 111.660
+| 2,528,095
+| 144.661
 | `decimal64`
-| 359,425
-| 114.176
+| 2,713,507
+| 155.270
 | `decimal128`
-| 1,446,674
-| 459.553
+| 11,969,714
+| 684.923
 | `decimal32_fast`
-| 146,873
-| 46.656
+| 1,423,277
+| 81.442
 | `decimal64_fast`
-| 139,294
-| 44.248
+| 1,280,409
+| 73.267
 | `decimal128_fast`
-| 707,308
-| 224.685
+| 6,047,499
+| 346.046
 |===
 
 ==== Subtraction
@@ -302,29 +302,29 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 3339
-| 2.014
+| 16,302
+| 1.045
 | `double`
-| 1658
+| 17,033
 | 1.000
 | `decimal32`
-| 267,646
-| 161.427
+| 2,010,525
+| 118.037
 | `decimal64`
-| 303,589
-| 183.106
+| 2,237,729
+| 131.376
 | `decimal128`
-| 954,211
-| 575.519
+| 6,907,396
+| 405.530
 | `decimal32_fast`
-| 147,112
-| 88.729
+| 1,378,448
+| 80.928
 | `decimal64_fast`
-| 145,606
-| 87.820
+| 1,276,731
+| 74.956
 | `decimal128_fast`
-| 394,538
-| 2387.960
+| 2,970,586
+| 174.401
 |===
 
 ==== Multiplication
@@ -332,29 +332,29 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 1646
-| 0.957
+| 16,499
+| 0.926
 | `double`
-| 1720
+| 17,821
 | 1.000
 | `decimal32`
-| 313,219
-| 182.104
+| 1,951,504
+| 109.506
 | `decimal64`
-| 583,818
-| 339.429
+| 2,480,528
+| 139.191
 | `decimal128`
-| 1,881,936
-| 1094.149
+| 14,360,630
+| 805.826
 | `decimal32_fast`
-| 86,093
-| 50.054
+| 630,355
+| 35.371
 | `decimal64_fast`
-| 333,582
-| 193.943
+| 987,703
+| 55.424
 | `decimal128_fast`
-| 1,269,429
-| 738.040
+| 12,573,178
+| 705.526
 |===
 
 ==== Division
@@ -362,29 +362,29 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 2120
-| 0.547
+| 20,267
+| 0.841
 | `double`
-| 3874
+| 24,111
 | 1.000
 | `decimal32`
-| 307,337
-| 79.333
+| 1,757,506
+| 72.892
 | `decimal64`
-| 447,910
-| 115.620
+| 3,496,913
+| 145.033
 | `decimal128`
-| 2,544,798
-| 656.892
+| 20,017,989
+| 830.243
 | `decimal32_fast`
-| 105,796
-| 27.309
+| 846,727
+| 35.118
 | `decimal64_fast`
-| 291,671
-| 75.289
+| 2,484,985
+| 103.064
 | `decimal128_fast`
-| 302,003
-| 77.956
+| 2,490,175
+| 103.280
 |===
 
 ////
