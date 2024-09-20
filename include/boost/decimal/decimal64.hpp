@@ -1625,7 +1625,16 @@ constexpr auto decimal64::operator%=(decimal64 rhs) noexcept -> decimal64&
 
 constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
 {
-    return equality_impl(lhs, rhs);
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    // Check for IEEE requirement that nan != nan
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+    #endif
+
+    return equal_parts_impl<decimal64>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
+                                       rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
 }
 
 template <typename Integer>
