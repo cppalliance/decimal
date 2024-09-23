@@ -51,17 +51,18 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     const auto lhs_exp {lhs.biased_exponent()};
     const auto rhs_exp {rhs.biased_exponent()};
 
+    auto lhs_sig {lhs.full_significand()};
+    auto rhs_sig {rhs.full_significand()};
+
     const auto delta_exp {lhs_exp - rhs_exp};
 
-    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType>)
+    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType> ||
+        ((lhs_sig == static_cast<comp_type>(0)) ^ (rhs_sig == static_cast<comp_type>(0))))
     {
         return false;
     }
 
     // Step 5: Normalize the significand and compare
-    auto lhs_sig {lhs.full_significand()};
-    auto rhs_sig {rhs.full_significand()};
-
     delta_exp >= 0 ? lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp)) :
                      rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
 
