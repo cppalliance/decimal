@@ -219,6 +219,9 @@ private:
     // We can super easily combine this into a single op
     friend constexpr auto not_finite(decimal64 rhs) noexcept -> bool;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto equality_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool;
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
