@@ -222,6 +222,9 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto equality_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool;
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
@@ -1682,8 +1685,7 @@ constexpr auto operator<(decimal64 lhs, decimal64 rhs) noexcept -> bool
     }
     #endif
 
-    return less_parts_impl<decimal64>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                                      rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+    return sequential_less_impl(lhs, rhs);
 }
 
 template <typename Integer>

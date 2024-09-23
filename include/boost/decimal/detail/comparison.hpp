@@ -245,7 +245,13 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_type_less_parts_impl(T lhs_sig, U
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
 constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool
 {
-    using comp_type = std::uint_fast64_t;
+    using comp_type = std::conditional_t<std::is_same<DecimalType, decimal32>::value, std::uint_fast64_t,
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    detail::uint128_t
+    #else
+    detail::uint128
+    #endif
+    >;
 
     // Step 1: Handle our non-finite values in their own calling functions
 
@@ -279,7 +285,7 @@ constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -
     auto rhs_exp {rhs.biased_exponent()};
 
     const auto delta_exp {lhs_exp - rhs_exp};
-    constexpr auto max_delta_diff {std::numeric_limits<std::uint_fast64_t>::digits10 - detail::precision_v<DecimalType>};
+    constexpr auto max_delta_diff {std::numeric_limits<comp_type>::digits10 - detail::precision_v<DecimalType>};
 
     if (delta_exp > max_delta_diff || delta_exp < -max_delta_diff)
     {
