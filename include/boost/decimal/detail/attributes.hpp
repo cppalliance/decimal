@@ -8,6 +8,8 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/promotion.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
@@ -19,102 +21,119 @@ namespace decimal {
 namespace detail {
 
 // Values from IEEE 754-2019 table 3.6
+namespace impl {
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto storage_width_v() noexcept -> int
+{
+    return decimal_val_v<DecimalType> < 64 ? 32 :
+           decimal_val_v<DecimalType> < 128 ? 64 : 128;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto precision_v() noexcept -> int
+{
+    return decimal_val_v<DecimalType> < 64 ? 7 :
+           decimal_val_v<DecimalType> < 128 ? 16 : 34;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto bias_v() noexcept -> int
+{
+    return decimal_val_v<DecimalType> < 64 ? 101 :
+           decimal_val_v<DecimalType> < 128 ? 398 : 6176;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto max_biased_exp_v() noexcept -> int
+{
+    return decimal_val_v<DecimalType> < 64 ? 191 :
+           decimal_val_v<DecimalType> < 128 ? 767 : 12287;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto emax_v() noexcept -> int
+{
+    return decimal_val_v<DecimalType> < 64 ? 96 :
+           decimal_val_v<DecimalType> < 128 ? 384 : 6144;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto emin_v() noexcept -> int
+{
+    return decimal_val_v<DecimalType> < 64 ? -95 :
+           decimal_val_v<DecimalType> < 128 ? -383 : -6143;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto combination_field_width_v() noexcept -> int
+{
+    return decimal_val_v<DecimalType> < 64 ? 11 :
+           decimal_val_v<DecimalType> < 128 ? 13 : 17;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto trailing_significand_field_width_v() noexcept -> int
+{
+    return decimal_val_v<DecimalType> < 64 ? 20 :
+           decimal_val_v<DecimalType> < 128 ? 50 : 110;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<decimal_val_v<DecimalType> < 128, bool> = true>
+constexpr auto max_significand_v() noexcept
+{
+    return decimal_val_v<DecimalType> < 64 ? 9'999'999 : 9'999'999'999'999'999;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<decimal_val_v<DecimalType> >= 128, bool> = true>
+constexpr auto max_significand_v() noexcept
+{
+    return std::is_same<DecimalType, decimal128>::value ? uint128{UINT64_C(0b1111111111'1111111111'1111111111'1111111111'111111), UINT64_MAX} :
+                                                          uint128{UINT64_C(542101086242752), UINT64_C(4003012203950112767)};
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto max_string_length_v() noexcept -> int
+{
+    return decimal_val_v<DecimalType> < 64 ? 15 :
+           decimal_val_v<DecimalType> < 128 ? 25 : 41;
+}
+
+} // namespace impl
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto storage_width_v = std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value ? 32 : 64;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto storage_width_v<decimal128> = 128;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto storage_width_v<decimal128_fast> = 128;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto storage_width_v = impl::storage_width_v<Dec>();
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto precision_v = std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value ? 7 : 16;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto precision_v<decimal128> = 34;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto precision_v<decimal128_fast> = 34;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto precision_v = impl::precision_v<Dec>();
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto bias_v = std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value ? 101 : 398;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto bias_v<decimal128> = 6176;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto bias_v<decimal128_fast> = 6176;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto bias_v = impl::bias_v<Dec>();
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto max_biased_exp_v = std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value ? 191 : 767;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto max_biased_exp_v<decimal128> = 12287;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto max_biased_exp_v<decimal128_fast> = 12287;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto max_biased_exp_v = impl::max_biased_exp_v<Dec>();
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto emax_v = std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value ? 96 : 384;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto emax_v<decimal128> = 6144;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto emax_v<decimal128_fast> = 6144;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto emax_v = impl::emax_v<Dec>();
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto emin_v = std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value ? -95 : -383;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto emin_v<decimal128> = -6143;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto emin_v<decimal128_fast> = -6143;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto emin_v = impl::emin_v<Dec>();
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto etiny_v = -bias_v<Dec>;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto etiny_v = -impl::bias_v<Dec>();
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto combination_field_width_v = std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value ? 11 : 13;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto combination_field_width_v<decimal128> = 17;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto combination_field_width_v<decimal128_fast> = 17;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto combination_field_width_v = impl::combination_field_width_v<Dec>();
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto trailing_significand_field_width_v = std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value ? 20 : 50;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto trailing_significand_field_width_v<decimal128> = 110;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto trailing_significand_field_width_v<decimal128_fast> = 110;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto trailing_significand_field_width_v = impl::trailing_significand_field_width_v<Dec>();
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto max_significand_v = std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value ? 9'999'999 : 9'999'999'999'999'999;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto max_significand_v<decimal128> =
-        uint128{UINT64_C(0b1111111111'1111111111'1111111111'1111111111'111111), UINT64_MAX};
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto max_significand_v<decimal128_fast> =
-        uint128{UINT64_C(542101086242752), UINT64_C(4003012203950112767)};
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto max_significand_v = impl::max_significand_v<Dec>();
 
 // sign + decimal digits + '.' + 'e' + '+/-' + max digits of exponent + null term
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
-BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto max_string_length_v = std::is_same<Dec, decimal32>::value || std::is_same<Dec, decimal32_fast>::value ? 15 : 25;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto max_string_length_v<decimal128> = 41;
-
-template <>
-BOOST_DECIMAL_CONSTEXPR_VARIABLE_SPECIALIZATION auto max_string_length_v<decimal128_fast> = 41;
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto max_string_length_v = impl::max_string_length_v<Dec>();
 
 BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto storage_width {storage_width_v<decimal32>};
 BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto precision {precision_v<decimal32>};
