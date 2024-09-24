@@ -555,7 +555,7 @@ constexpr uint256_t umul256_impl(std::uint64_t a_high, std::uint64_t a_low, std:
     bool carry {mid_sum < mid_product1};
 
     const auto low_sum {low_product + (mid_sum << 64)};
-    carry += (low_sum < low_product);
+    carry |= (low_sum < low_product);
 
     uint256_t result {};
     result.low = low_sum;
