@@ -15,6 +15,7 @@
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
@@ -246,8 +247,14 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
 constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool
 {
     using comp_type = std::conditional_t<std::is_same<DecimalType, decimal32>::value, std::uint_fast64_t,
-    #ifdef BOOST_DECIMAL_HAS_INT128
-    detail::uint128_t
+    // GCC less than 10 in non-GNU mode, Clang < 10 and MinGW all have issues with the built-in u128,
+    // so use the emulated one
+    #if defined(BOOST_DECIMAL_HAS_INT128)
+    #if ( (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10) || (defined(__clang__) && __clang_major__ < 13) )
+        detail::uint128
+    #  else
+        detail::uint128_t
+    #  endif
     #else
     detail::uint128
     #endif
