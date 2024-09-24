@@ -264,7 +264,7 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_REDUCE_TEST_DEPTH
 #endif
 
-#ifdef __clang__
+#if defined(__clang__) && __clang_major__ < 19
 #  define BOOST_DECIMAL_CLANG_STATIC static
 #else
 #  define BOOST_DECIMAL_CLANG_STATIC
