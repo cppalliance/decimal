@@ -551,26 +551,15 @@ constexpr uint256_t umul256_impl(std::uint64_t a_high, std::uint64_t a_low, std:
     const auto mid_product2 {static_cast<unsigned_int128_type>(a_high) * b_low};
     const auto high_product {static_cast<unsigned_int128_type>(a_high) * b_high};
 
-    std::uint64_t carry {};
+    const auto mid_sum {mid_product1 + mid_product2};
+    bool carry {mid_sum < mid_product1};
 
-    const auto mid_combined {mid_product1 + mid_product2};
-    if (mid_combined < mid_product1)
-    {
-        carry = 1;
-    }
-
-    const auto mid_combined_high {mid_combined >> 64};
-    const auto mid_combined_low {mid_combined << 64};
-
-    const auto low_sum {low_product + mid_combined_low};
-    if (low_sum < low_product)
-    {
-        carry += 1;
-    }
+    const auto low_sum {low_product + (mid_sum << 64)};
+    carry += (low_sum < low_product);
 
     uint256_t result {};
     result.low = low_sum;
-    result.high = high_product + mid_combined_high + carry;
+    result.high = high_product + (mid_sum >> 64) + carry;
 
     return result;
 }
