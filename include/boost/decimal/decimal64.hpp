@@ -222,6 +222,9 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto equality_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool;
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
@@ -1625,16 +1628,7 @@ constexpr auto decimal64::operator%=(decimal64 rhs) noexcept -> decimal64&
 
 constexpr auto operator==(decimal64 lhs, decimal64 rhs) noexcept -> bool
 {
-    #ifndef BOOST_DECIMAL_FAST_MATH
-    // Check for IEEE requirement that nan != nan
-    if (isnan(lhs) || isnan(rhs))
-    {
-        return false;
-    }
-    #endif
-
-    return equal_parts_impl<decimal64>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                                       rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+    return equality_impl(lhs, rhs);
 }
 
 template <typename Integer>
@@ -1691,8 +1685,7 @@ constexpr auto operator<(decimal64 lhs, decimal64 rhs) noexcept -> bool
     }
     #endif
 
-    return less_parts_impl<decimal64>(lhs.full_significand(), lhs.biased_exponent(), lhs.isneg(),
-                                      rhs.full_significand(), rhs.biased_exponent(), rhs.isneg());
+    return sequential_less_impl(lhs, rhs);
 }
 
 template <typename Integer>

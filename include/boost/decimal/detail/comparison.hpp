@@ -15,6 +15,7 @@
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
@@ -51,17 +52,18 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     const auto lhs_exp {lhs.biased_exponent()};
     const auto rhs_exp {rhs.biased_exponent()};
 
+    auto lhs_sig {lhs.full_significand()};
+    auto rhs_sig {rhs.full_significand()};
+
     const auto delta_exp {lhs_exp - rhs_exp};
 
-    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType>)
+    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType> ||
+        ((lhs_sig == static_cast<comp_type>(0)) ^ (rhs_sig == static_cast<comp_type>(0))))
     {
         return false;
     }
 
     // Step 5: Normalize the significand and compare
-    auto lhs_sig {lhs.full_significand()};
-    auto rhs_sig {rhs.full_significand()};
-
     delta_exp >= 0 ? lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp)) :
                      rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
 
@@ -244,7 +246,19 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_type_less_parts_impl(T lhs_sig, U
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
 constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool
 {
-    using comp_type = std::uint_fast64_t;
+    using comp_type = std::conditional_t<std::is_same<DecimalType, decimal32>::value, std::uint_fast64_t,
+    // GCC less than 10 in non-GNU mode, Clang < 10 and MinGW all have issues with the built-in u128,
+    // so use the emulated one
+    #if defined(BOOST_DECIMAL_HAS_INT128)
+    #if ( (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10) || (defined(__clang__) && __clang_major__ < 13) )
+        detail::uint128
+    #  else
+        detail::uint128_t
+    #  endif
+    #else
+    detail::uint128
+    #endif
+    >;
 
     // Step 1: Handle our non-finite values in their own calling functions
 
@@ -278,7 +292,7 @@ constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -
     auto rhs_exp {rhs.biased_exponent()};
 
     const auto delta_exp {lhs_exp - rhs_exp};
-    constexpr auto max_delta_diff {std::numeric_limits<std::uint_fast64_t>::digits10 - detail::precision_v<DecimalType>};
+    constexpr auto max_delta_diff {std::numeric_limits<comp_type>::digits10 - detail::precision_v<DecimalType>};
 
     if (delta_exp > max_delta_diff || delta_exp < -max_delta_diff)
     {
