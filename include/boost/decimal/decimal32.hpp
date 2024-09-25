@@ -218,6 +218,10 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool;
 
+    template <typename DecimalType>
+    friend BOOST_DECIMAL_CXX20_CONSTEXPR auto to_dpd_d32(DecimalType val) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint32_t);
+
 public:
     // 3.2.2.1 construct/copy/destroy:
     constexpr decimal32() noexcept = default;
