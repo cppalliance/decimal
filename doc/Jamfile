@@ -1,10 +1,14 @@
 # Copyright 2017, 2018 Peter Dimov
+# Copyright 2024 Matt Borland
 # Distributed under the Boost Software License, Version 1.0.
 # https://www.boost.org/LICENSE_1_0.txt
 
 import asciidoctor ;
 
-html decimal.html : decimal.adoc ;
+html decimal.html : decimal.adoc
+    :   <use>/boost/boostlook//boostlook
+        <dependency>decimal-docinfo-footer.html
+    ;
 
 install html_ : decimal.html : <location>html ;
 
