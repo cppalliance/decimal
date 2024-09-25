@@ -18,7 +18,7 @@ namespace decimal {
 
 namespace detail {
 
-// See IEEE 754-2008 tables 3-3 and 3-4 for explanation
+// See IEEE 754-2008 table 3-4 for explanation
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint16_t dpd_table[1000] =
 {
     0x000, 0x001, 0x002, 0x003, 0x004, 0x005, 0x006, 0x007,
@@ -156,150 +156,179 @@ constexpr auto encode_dpd(std::uint8_t d0, std::uint8_t d1, std::uint8_t d2) -> 
     return dpd_table[bcd];
 }
 
-constexpr auto decode_dpd(std::uint32_t dpd, std::uint8_t &d2, std::uint8_t &d1, std::uint8_t &d0) -> void {
+constexpr auto decode_dpd(std::uint32_t dpd_bits, std::uint8_t &d3, std::uint8_t &d2, std::uint8_t &d1) -> void
+{
     // DPD decoding logic as per IEEE 754-2008
     std::uint8_t b[10] {};
     for (int i = 0; i < 10; ++i)
     {
-        b[i] = (dpd >> (9 - i)) & 0x1;
+        b[i] = (dpd_bits >> (9 - i)) & 0x1;
     }
 
-    std::uint8_t n[12] {};
-
-    if ((b[0] & b[1] & b[2]) == 0)
+    // See table 3.3 for the flow of decoding
+    // Values are b6, b7, b8, b3, b4
+    // 0XXXX
+    if (b[6] == 0U)
     {
-        // All digits are 0-7
-        n[0] = b[0];
-        n[1] = b[3];
-        n[2] = b[6];
-        n[3] = b[9];
-        n[4] = b[1];
-        n[5] = b[4];
-        n[6] = b[7];
-        n[7] = b[2];
-        n[8] = b[5];
-        n[9] = b[8];
-        n[10] = 0;
-        n[11] = 0;
+        d1 = 4U * b[0] + 2U * b[1] + b[2];
+        d2 = 4U * b[3] + 2U * b[4] + b[5];
+        d3 = 4U * b[7] + 2U * b[8] + b[9];
+    }
+    // 100XX
+    else if (b[6] == 1U && b[7] == 0U && b[8] == 0U)
+    {
+        d1 = 4U * b[0] + 2U * b[1] + b[2];
+        d2 = 4U * b[3] + 2U * b[4] + b[5];
+        d3 = 8U + b[9];
+    }
+    // 101XX
+    else if (b[6] == 1U && b[7] == 0U && b[8] == 1U)
+    {
+        d1 = 4U * b[0] + 2U * b[1] + b[2];
+        d2 = 8U + b[5];
+        d3 = 4U * b[3] + 2U * b[4] + b[9];
+    }
+    // 110XX
+    else if (b[6] == 1U && b[7] == 1U && b[8] == 0U)
+    {
+        d1 = 8U + b[2];
+        d2 = 4U * b[3] + 2U * b[4] + b[5];
+        d3 = 4U * b[0] + 2U * b[1] + b[9];
+    }
+    // 11100
+    else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 0U && b[4] == 0U)
+    {
+        d1 = 8U + b[2];
+        d2 = 8U + b[5];
+        d3 = 4U * b[0] + 2U * b[1] + b[9];
+    }
+    // 11101
+    else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 0U && b[4] == 1U)
+    {
+        d1 = 8U + b[2];
+        d2 = 4U * b[0] + 2U * b[1] + b[5];
+        d3 = 8U + b[9];
+    }
+    // 11110
+    else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 1U && b[4] == 0U)
+    {
+        d1 = 4U * b[0] + 2U * b[1] + b[2];
+        d2 = 8U + b[5];
+        d3 = 8U + b[9];
+    }
+    // 11111
+    else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 1U && b[4] == 1U)
+    {
+        d1 = 8U + b[2];
+        d2 = 8U + b[5];
+        d3 = 8U + b[9];
     }
     else
     {
-        // One or more digits are 8 or 9
-        const auto d {(b[0] << 2) | (b[1] << 1) | b[2]};
-        switch (d) {
-            case 1: // 001
-                n[0] = 1;
-                n[1] = b[3];
-                n[2] = b[6];
-                n[3] = b[9];
-                n[4] = 1;
-                n[5] = b[4];
-                n[6] = b[7];
-                n[7] = 0;
-                n[8] = b[5];
-                n[9] = b[8];
-                n[10] = 0;
-                n[11] = 0;
-                break;
-            case 2: // 010
-                n[0] = b[3];
-                n[1] = 1;
-                n[2] = b[6];
-                n[3] = b[9];
-                n[4] = b[4];
-                n[5] = 1;
-                n[6] = b[7];
-                n[7] = b[5];
-                n[8] = 0;
-                n[9] = b[8];
-                n[10] = 0;
-                n[11] = 0;
-                break;
-            case 3: // 011
-                n[0] = 1;
-                n[1] = 1;
-                n[2] = b[6];
-                n[3] = b[9];
-                n[4] = b[4];
-                n[5] = b[7];
-                n[6] = 0;
-                n[7] = b[5];
-                n[8] = b[8];
-                n[9] = 0;
-                n[10] = 0;
-                n[11] = 0;
-                break;
-            case 4: // 100
-                n[0] = b[3];
-                n[1] = b[6];
-                n[2] = 1;
-                n[3] = b[9];
-                n[4] = b[4];
-                n[5] = b[7];
-                n[6] = 1;
-                n[7] = b[5];
-                n[8] = b[8];
-                n[9] = 0;
-                n[10] = 0;
-                n[11] = 0;
-                break;
-            case 5: // 101
-                n[0] = 1;
-                n[1] = b[6];
-                n[2] = 1;
-                n[3] = b[9];
-                n[4] = b[4];
-                n[5] = 1;
-                n[6] = 1;
-                n[7] = b[5];
-                n[8] = b[8];
-                n[9] = 0;
-                n[10] = 0;
-                n[11] = 0;
-                break;
-            case 6: // 110
-                n[0] = b[3];
-                n[1] = 1;
-                n[2] = 1;
-                n[3] = b[9];
-                n[4] = b[4];
-                n[5] = b[7];
-                n[6] = 1;
-                n[7] = b[5];
-                n[8] = b[8];
-                n[9] = 0;
-                n[10] = 0;
-                n[11] = 0;
-                break;
-            case 7: // 111
-                n[0] = 1;
-                n[1] = 1;
-                n[2] = 1;
-                n[3] = b[9];
-                n[4] = b[4];
-                n[5] = 1;
-                n[6] = 1;
-                n[7] = b[5];
-                n[8] = b[8];
-                n[9] = 0;
-                n[10] = 0;
-                n[11] = 0;
-                break;
-            default:
-                // Should not occur
-                BOOST_DECIMAL_UNREACHABLE;
-                n[0] = n[1] = n[2] = n[3] = n[4] = n[5] = n[6] = n[7] = n[8] = n[9] = n[10] = n[11] = 0;
-                break;
-        }
+        BOOST_DECIMAL_UNREACHABLE;
     }
-
-    // Reconstruct decimal digits from BCD bits
-    d2 = static_cast<std::uint8_t>((n[0] << 3) | (n[1] << 2) | (n[2] << 1) | n[3]);
-    d1 = static_cast<std::uint8_t>((n[4] << 3) | (n[5] << 2) | (n[6] << 1) | n[7]);
-    d0 = static_cast<std::uint8_t>((n[8] << 3) | (n[9] << 2) | (n[10] << 1) | n[11]);
 }
 
 } // namespace detail
+
+template <typename DecimalType>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_dpd_d32(DecimalType val) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint32_t)
+{
+    static_assert(std::is_same<DecimalType, decimal32>::value ||
+                  std::is_same<DecimalType, decimal32_fast>::value, "The input must be a 32-bit decimal type");
+
+    // In the non-finite cases the encodings are the same
+    // 3.5.2.a and 3.5.2.b
+    if (!isfinite(val))
+    {
+        return to_bid(val);
+    }
+
+    return 0U;
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_dpd(decimal32 val) noexcept -> std::uint32_t
+{
+    return to_dpd_d32(val);
+}
+
+BOOST_DECIMAL_CXX20_CONSTEXPR auto to_dpd(decimal32_fast val) noexcept -> std::uint32_t
+{
+    return to_dpd_d32(val);
+}
+
+template <typename DecimalType = decimal32_fast>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_dpd_d32(std::uint32_t dpd) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
+{
+    // The bit lengths are the same as used in the standard bid format
+    const auto sign {(dpd & detail::d32_sign_mask) != 0};
+    const auto combination_field_bits {(dpd & detail::d32_combination_field_mask) >> 26U};
+    const auto exponent_field_bits {(dpd & detail::d32_exponent_mask) >> 20U};
+    const auto significand_bits {(dpd & detail::d32_significand_mask)};
+
+    // Case 1: 3.5.2.c.1.i
+    // Combination field bits are 110XX or 11110X
+    std::uint32_t d0 {};
+    std::uint32_t leading_biased_exp_bits {};
+    if (combination_field_bits >= 0b11000)
+    {
+        // d0 = 8 + G4
+        // Must be equal to 8 or 9
+        d0 = 8U + (combination_field_bits & 0b00001);
+        BOOST_DECIMAL_ASSERT(d0 == 8 || d0 == 9);
+
+        // leading exp bits are 2*G2 + G3
+        // Must be equal to 0, 1 or 2
+        leading_biased_exp_bits = 2U * ((combination_field_bits & 0b00100) >> 2U) + ((combination_field_bits & 0b00010) >> 1U);
+        BOOST_DECIMAL_ASSERT(leading_biased_exp_bits >= 0U && leading_biased_exp_bits <= 2U);
+    }
+    // Case 2: 3.5.2.c.1.ii
+    // Combination field bits are 0XXXX or 10XXX
+    else
+    {
+        // d0 = 4 * G2 + 2 * G3 + G4
+        // Must be in the range 0-7
+        d0 = 4U * ((combination_field_bits & 0b00100) >> 2U) + 2U * ((combination_field_bits & 0b00010) >> 1U) + combination_field_bits & 0b00001;
+        BOOST_DECIMAL_ASSERT(d0 >= 0 && d0 <= 7);
+
+        // Leading exp bits are 2 * G0 + G1
+        // Must be equal to 0, 1 or 2
+        leading_biased_exp_bits = 2U * ((combination_field_bits & 0b10000) >> 4U) + ((combination_field_bits & 0b01000) >> 3U);
+        BOOST_DECIMAL_ASSERT(leading_biased_exp_bits >= 0U && leading_biased_exp_bits <= 2U);
+    }
+
+    // Now that we have the bits we can calculate the exponents value
+    const auto complete_exp {(leading_biased_exp_bits << 6U) + exponent_field_bits};
+    const auto exp = complete_exp - detail::bias_v<DecimalType>;
+
+    // We can now decode the remainder of the significand to recover the value
+    std::uint8_t digits[7] {};
+    digits[6] = d0;
+    const auto first_half {significand_bits & 0b1111111111};
+    detail::decode_dpd(first_half, digits[2], digits[1], digits[0]);
+    const auto second_half {(significand_bits & 0b11111111110000000000) >> 10U};
+    BOOST_DECIMAL_ASSERT(second_half <= 0b1111111111);
+    detail::decode_dpd(second_half, digits[5], digits[4], digits[3]);
+
+    // Now we can assemble the significand
+    std::uint32_t significand {};
+    for (std::uint32_t i {}; i < 7U; ++i)
+    {
+        significand += digits[i] * detail::pow10(i);
+    }
+
+    return DecimalType{significand, exp, sign};
+}
+
+template <typename DecimalType = decimal32_fast>
+BOOST_DECIMAL_CXX20_CONSTEXPR auto from_dpd(std::uint32_t bits) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
+{
+    return from_dpd_d32<DecimalType>(bits);
+}
+
 
 } // namespace decimal
 } // namespace boost
