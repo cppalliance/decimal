@@ -156,6 +156,151 @@ constexpr auto encode_dpd(std::uint8_t d0, std::uint8_t d1, std::uint8_t d2) -> 
     return dpd_table[bcd];
 }
 
+constexpr auto decode_dpd(std::uint32_t dpd, std::uint8_t &d2, std::uint8_t &d1, std::uint8_t &d0) -> void {
+    // DPD decoding logic as per IEEE 754-2008
+    std::uint8_t b[10] {};
+    for (int i = 0; i < 10; ++i)
+    {
+        b[i] = (dpd >> (9 - i)) & 0x1;
+    }
+
+    std::uint8_t n[12] {};
+
+    if ((b[0] & b[1] & b[2]) == 0)
+    {
+        // All digits are 0-7
+        n[0] = b[0];
+        n[1] = b[3];
+        n[2] = b[6];
+        n[3] = b[9];
+        n[4] = b[1];
+        n[5] = b[4];
+        n[6] = b[7];
+        n[7] = b[2];
+        n[8] = b[5];
+        n[9] = b[8];
+        n[10] = 0;
+        n[11] = 0;
+    }
+    else
+    {
+        // One or more digits are 8 or 9
+        const auto d {(b[0] << 2) | (b[1] << 1) | b[2]};
+        switch (d) {
+            case 1: // 001
+                n[0] = 1;
+                n[1] = b[3];
+                n[2] = b[6];
+                n[3] = b[9];
+                n[4] = 1;
+                n[5] = b[4];
+                n[6] = b[7];
+                n[7] = 0;
+                n[8] = b[5];
+                n[9] = b[8];
+                n[10] = 0;
+                n[11] = 0;
+                break;
+            case 2: // 010
+                n[0] = b[3];
+                n[1] = 1;
+                n[2] = b[6];
+                n[3] = b[9];
+                n[4] = b[4];
+                n[5] = 1;
+                n[6] = b[7];
+                n[7] = b[5];
+                n[8] = 0;
+                n[9] = b[8];
+                n[10] = 0;
+                n[11] = 0;
+                break;
+            case 3: // 011
+                n[0] = 1;
+                n[1] = 1;
+                n[2] = b[6];
+                n[3] = b[9];
+                n[4] = b[4];
+                n[5] = b[7];
+                n[6] = 0;
+                n[7] = b[5];
+                n[8] = b[8];
+                n[9] = 0;
+                n[10] = 0;
+                n[11] = 0;
+                break;
+            case 4: // 100
+                n[0] = b[3];
+                n[1] = b[6];
+                n[2] = 1;
+                n[3] = b[9];
+                n[4] = b[4];
+                n[5] = b[7];
+                n[6] = 1;
+                n[7] = b[5];
+                n[8] = b[8];
+                n[9] = 0;
+                n[10] = 0;
+                n[11] = 0;
+                break;
+            case 5: // 101
+                n[0] = 1;
+                n[1] = b[6];
+                n[2] = 1;
+                n[3] = b[9];
+                n[4] = b[4];
+                n[5] = 1;
+                n[6] = 1;
+                n[7] = b[5];
+                n[8] = b[8];
+                n[9] = 0;
+                n[10] = 0;
+                n[11] = 0;
+                break;
+            case 6: // 110
+                n[0] = b[3];
+                n[1] = 1;
+                n[2] = 1;
+                n[3] = b[9];
+                n[4] = b[4];
+                n[5] = b[7];
+                n[6] = 1;
+                n[7] = b[5];
+                n[8] = b[8];
+                n[9] = 0;
+                n[10] = 0;
+                n[11] = 0;
+                break;
+            case 7: // 111
+                n[0] = 1;
+                n[1] = 1;
+                n[2] = 1;
+                n[3] = b[9];
+                n[4] = b[4];
+                n[5] = 1;
+                n[6] = 1;
+                n[7] = b[5];
+                n[8] = b[8];
+                n[9] = 0;
+                n[10] = 0;
+                n[11] = 0;
+                break;
+            default:
+                // Should not occur
+                BOOST_DECIMAL_UNREACHABLE;
+                n[0] = n[1] = n[2] = n[3] = n[4] = n[5] = n[6] = n[7] = n[8] = n[9] = n[10] = n[11] = 0;
+                break;
+        }
+    }
+
+    // Reconstruct decimal digits from BCD bits
+    d2 = static_cast<std::uint8_t>((n[0] << 3) | (n[1] << 2) | (n[2] << 1) | n[3]);
+    d1 = static_cast<std::uint8_t>((n[4] << 3) | (n[5] << 2) | (n[6] << 1) | n[7]);
+    d0 = static_cast<std::uint8_t>((n[8] << 3) | (n[9] << 2) | (n[10] << 1) | n[11]);
+}
+
+} // namespace detail
+
 } // namespace decimal
 } // namespace boost
 
