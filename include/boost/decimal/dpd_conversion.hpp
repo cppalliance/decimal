@@ -233,13 +233,13 @@ constexpr auto encode_dpd(std::uint8_t d1, std::uint8_t d2, std::uint8_t d3) -> 
     return result;
 }
 
-constexpr auto decode_dpd(std::uint32_t dpd_bits, std::uint8_t &d3, std::uint8_t &d2, std::uint8_t &d1) -> void
+constexpr auto decode_dpd(std::uint32_t dpd_bits, std::uint8_t& d3, std::uint8_t& d2, std::uint8_t& d1) -> void
 {
     // DPD decoding logic as per IEEE 754-2008
     std::uint8_t b[10] {};
     for (int i = 0; i < 10; ++i)
     {
-        b[i] = (dpd_bits >> (9 - i)) & 0b1;
+        b[i] = static_cast<std::uint8_t>((dpd_bits >> (9 - i)) & 0b1);
     }
 
     // See table 3.3 for the flow of decoding
@@ -247,58 +247,58 @@ constexpr auto decode_dpd(std::uint32_t dpd_bits, std::uint8_t &d3, std::uint8_t
     // 0XXXX
     if (b[6] == 0U)
     {
-        d1 = 4U * b[0] + 2U * b[1] + b[2];
-        d2 = 4U * b[3] + 2U * b[4] + b[5];
-        d3 = 4U * b[7] + 2U * b[8] + b[9];
+        d1 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[2]);
+        d2 = static_cast<std::uint8_t>((b[3] << 2U) + (b[4] << 1U) + b[5]);
+        d3 = static_cast<std::uint8_t>((b[7] << 2U) + (b[8] << 1U) + b[9]);
     }
     // 100XX
     else if (b[6] == 1U && b[7] == 0U && b[8] == 0U)
     {
-        d1 = 4U * b[0] + 2U * b[1] + b[2];
-        d2 = 4U * b[3] + 2U * b[4] + b[5];
-        d3 = 8U + b[9];
+        d1 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[2]);
+        d2 = static_cast<std::uint8_t>((b[3] << 2U) + (b[4] << 1U) + b[5]);
+        d3 = static_cast<std::uint8_t>(8) + b[9];
     }
     // 101XX
     else if (b[6] == 1U && b[7] == 0U && b[8] == 1U)
     {
-        d1 = 4U * b[0] + 2U * b[1] + b[2];
-        d2 = 8U + b[5];
-        d3 = 4U * b[3] + 2U * b[4] + b[9];
+        d1 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[2]);
+        d2 = static_cast<std::uint8_t>(8) + b[5];
+        d3 = static_cast<std::uint8_t>((b[3] << 2U) + (b[4] << 1U) + b[9]);
     }
     // 110XX
     else if (b[6] == 1U && b[7] == 1U && b[8] == 0U)
     {
-        d1 = 8U + b[2];
-        d2 = 4U * b[3] + 2U * b[4] + b[5];
-        d3 = 4U * b[0] + 2U * b[1] + b[9];
+        d1 = static_cast<std::uint8_t>(8) + b[2];
+        d2 = static_cast<std::uint8_t>((b[3] << 2U) + (b[4] << 1U) + b[5]);
+        d3 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[9]);
     }
     // 11100
     else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 0U && b[4] == 0U)
     {
-        d1 = 8U + b[2];
-        d2 = 8U + b[5];
-        d3 = 4U * b[0] + 2U * b[1] + b[9];
+        d1 = static_cast<std::uint8_t>(8) + b[2];
+        d2 = static_cast<std::uint8_t>(8) + b[5];
+        d3 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[9]);
     }
     // 11101
     else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 0U && b[4] == 1U)
     {
-        d1 = 8U + b[2];
-        d2 = 4U * b[0] + 2U * b[1] + b[5];
-        d3 = 8U + b[9];
+        d1 = static_cast<std::uint8_t>(8) + b[2];
+        d2 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[5]);
+        d3 = static_cast<std::uint8_t>(8) + b[9];
     }
     // 11110
     else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 1U && b[4] == 0U)
     {
-        d1 = 4U * b[0] + 2U * b[1] + b[2];
-        d2 = 8U + b[5];
-        d3 = 8U + b[9];
+        d1 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[2]);
+        d2 = static_cast<std::uint8_t>(8) + b[5];
+        d3 = static_cast<std::uint8_t>(8) + b[9];
     }
     // 11111
     else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 1U && b[4] == 1U)
     {
-        d1 = 8U + b[2];
-        d2 = 8U + b[5];
-        d3 = 8U + b[9];
+        d1 = static_cast<std::uint8_t>(8) + b[2];
+        d2 = static_cast<std::uint8_t>(8) + b[5];
+        d3 = static_cast<std::uint8_t>(8) + b[9];
     }
     else
     {
@@ -338,8 +338,8 @@ constexpr auto to_dpd_d32(DecimalType val) noexcept
     auto temp_sig {significand};
     for (int i = 6; i >= 0; --i)
     {
-        d[i] = temp_sig % 10;
-        temp_sig /= 10;
+        d[i] = static_cast<std::uint8_t>(temp_sig % 10U);
+        temp_sig /= 10U;
     }
     BOOST_DECIMAL_ASSERT(d[0] >= 0 && d[0] <= 9);
     BOOST_DECIMAL_ASSERT(temp_sig == 0);
@@ -466,7 +466,7 @@ constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
         // leading exp bits are 2*G2 + G3
         // Must be equal to 0, 1 or 2
         leading_biased_exp_bits = 2U * ((combination_field_bits & 0b00100) >> 2U) + ((combination_field_bits & 0b00010) >> 1U);
-        BOOST_DECIMAL_ASSERT(leading_biased_exp_bits >= 0U && leading_biased_exp_bits <= 2U);
+        BOOST_DECIMAL_ASSERT(leading_biased_exp_bits <= 2U);
     }
     // Case 2: 3.5.2.c.1.ii
     // Combination field bits are 0XXXX or 10XXX
@@ -475,12 +475,12 @@ constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
         // d0 = 4 * G2 + 2 * G3 + G4
         // Must be in the range 0-7
         d0 = combination_field_bits & 0b00111;
-        BOOST_DECIMAL_ASSERT(d0 >= 0 && d0 <= 7);
+        BOOST_DECIMAL_ASSERT(d0 <= 7);
 
         // Leading exp bits are 2 * G0 + G1
         // Must be equal to 0, 1 or 2
         leading_biased_exp_bits = (combination_field_bits & 0b11000) >> 3U;
-        BOOST_DECIMAL_ASSERT(leading_biased_exp_bits >= 0U && leading_biased_exp_bits <= 2U);
+        BOOST_DECIMAL_ASSERT(leading_biased_exp_bits <= 2U);
     }
 
     // Now that we have the bits we can calculate the exponents value
