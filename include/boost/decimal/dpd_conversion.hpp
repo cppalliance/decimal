@@ -29,8 +29,8 @@ constexpr auto encode_dpd(std::uint8_t d1, std::uint8_t d2, std::uint8_t d3) -> 
     const std::uint8_t b1[4] = {
             static_cast<std::uint8_t>((d1 & b0_mask) >> 3U),
             static_cast<std::uint8_t>((d1 & b1_mask) >> 2U),
-            static_cast<std::uint8_t>((d2 & b2_mask) >> 1U),
-            static_cast<std::uint8_t>((d3 & b3_mask))
+            static_cast<std::uint8_t>((d1 & b2_mask) >> 1U),
+            static_cast<std::uint8_t>((d1 & b3_mask))
     };
     BOOST_DECIMAL_ASSERT(b1[0] <= 1U && b1[1] <= 1U && b1[2] <= 1U && b1[3] <= 1);
 
@@ -226,7 +226,7 @@ constexpr auto encode_dpd(std::uint8_t d1, std::uint8_t d2, std::uint8_t d3) -> 
 
     for (std::uint16_t i {}; i < 10U; ++i)
     {
-        result |= (result_b[i] << i);
+        result |= (result_b[i] << (9 - i));
     }
 
     return result;
@@ -238,7 +238,7 @@ constexpr auto decode_dpd(std::uint32_t dpd_bits, std::uint8_t &d3, std::uint8_t
     std::uint8_t b[10] {};
     for (int i = 0; i < 10; ++i)
     {
-        b[i] = (dpd_bits >> (9 - i)) & 0x1;
+        b[i] = (dpd_bits >> (9 - i)) & 0b1;
     }
 
     // See table 3.3 for the flow of decoding
@@ -333,7 +333,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_dpd_d32(DecimalType val) noexcept
     }
 
     // Break the significand down into the 7 declets are needed
-    std::uint8_t d[std::numeric_limits<DecimalType>::digits10];
+    std::uint8_t d[std::numeric_limits<DecimalType>::digits10] {};
     auto temp_sig {significand};
     for (int i = 6; i >= 0; --i)
     {
@@ -341,6 +341,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_dpd_d32(DecimalType val) noexcept
         temp_sig /= 10;
     }
     BOOST_DECIMAL_ASSERT(d[0] >= 0 && d[0] <= 9);
+    BOOST_DECIMAL_ASSERT(temp_sig == 0);
 
     // We now need to capture what the leading two bits of the exponent are,
     // since they are stored in the combination field
