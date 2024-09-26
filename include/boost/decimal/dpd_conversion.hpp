@@ -259,7 +259,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_dpd_d32(DecimalType val) noexcept
     // Break the significand down into the 7 declets are needed
     std::uint8_t d[std::numeric_limits<DecimalType>::digits10];
     auto temp_sig {significand};
-    for (int i = 7; i >= 0; ++i)
+    for (int i = 6; i >= 0; --i)
     {
         d[i] = temp_sig % 10;
         temp_sig /= 10;
@@ -389,11 +389,11 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto from_dpd_d32(std::uint32_t dpd) noexcept
 
     // Now that we have the bits we can calculate the exponents value
     const auto complete_exp {(leading_biased_exp_bits << 6U) + exponent_field_bits};
-    const auto exp = complete_exp - detail::bias_v<DecimalType>;
+    const auto exp {static_cast<std::int32_t>(complete_exp) - detail::bias_v<DecimalType>};
 
     // We can now decode the remainder of the significand to recover the value
     std::uint8_t digits[7] {};
-    digits[6] = d0;
+    digits[6] = static_cast<std::uint8_t>(d0);
     const auto first_half {significand_bits & 0b1111111111};
     detail::decode_dpd(first_half, digits[2], digits[1], digits[0]);
     const auto second_half {(significand_bits & 0b11111111110000000000) >> 10U};
