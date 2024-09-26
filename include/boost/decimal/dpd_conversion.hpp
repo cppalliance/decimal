@@ -11,6 +11,7 @@
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
+#include <limits>
 #endif
 
 namespace boost {
@@ -427,6 +428,24 @@ template <typename DecimalType = decimal32_fast>
 constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
+    // First we check for non-finite values
+    // Since they are in the same initial format as BID it's easy to check with our existing masks
+    if ((dpd & detail::d32_inf_mask) == detail::d32_inf_mask)
+    {
+        if ((dpd & detail::d32_snan_mask) == detail::d32_snan_mask)
+        {
+            return std::numeric_limits<DecimalType>::signaling_NaN();
+        }
+        else if ((dpd & detail::d32_nan_mask) == detail::d32_nan_mask)
+        {
+            return std::numeric_limits<DecimalType>::quiet_NaN();
+        }
+        else
+        {
+            return std::numeric_limits<DecimalType>::infinity();
+        }
+    }
+
     // The bit lengths are the same as used in the standard bid format
     const auto sign {(dpd & detail::d32_sign_mask) != 0};
     const auto combination_field_bits {(dpd & detail::d32_combination_field_mask) >> 26U};
