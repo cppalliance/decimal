@@ -26,7 +26,7 @@ void test()
 
 int main()
 {
-    // test<decimal32>();
+    test<decimal32>();
     test<decimal32_fast>();
 
     return boost::report_errors();
