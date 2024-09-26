@@ -5,11 +5,12 @@ https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#conversions]
-= Fast Type Conversions
+= Bit Conversions
 :idprefix: conversions_
 
-Since we have non-IEEE 754 compliant types we offer a set of functions that allow their conversion to and from the IEEE 754 compliant BID layout.
-These functions allow lossless conversion with more compact storage.
+IEEE 754 specifies two different encodings for decimal floating point types: Binary Integer Significand Field (BID), and Densely Packed Decimal Significand Field (DPD).
+Internally this library is implemented in the BID format for the IEEE-754 compliant types.
+Should the user want to capture the bit format in BID or convert to DPD we offer a family of conversion functions: `to_bid`, `from_bid`, `to_dpd`, and `from_dpd` that allow conversion to or from the bit strings regardless of encoding.
 
 [source, c++]
 ----
@@ -25,6 +26,8 @@ struct uint128
 };
 
 } // namespace detail
+
+// ----- BID Conversions -----
 
 BOOST_DECIMAL_CXX20_CONSTEXPR std::uint32_t to_bid_d32(decimal32 val) noexcept;
 
@@ -47,6 +50,18 @@ BOOST_DECIMAL_CXX20_CONSTEXPR T from_bid(std::uint64_t bits) noexcept;
 
 template <typename T = decimal128>
 BOOST_DECIMAL_CXX20_CONSTEXPR T from_bid(detail::uint128 bits) noexcept;
+
+// ----- DPD Conversions -----
+
+constexpr std::uint32_t to_dpd_d32(decimal32 val) noexcept;
+
+constexpr std::uint32_t to_dpd_d32f(decimal32_fast val) noexcept;
+
+template <typename T>
+constexpr auto to_dpd(T val) noexcept;
+
+template <typename T = decimal32_fast>
+constexpr T from_dpd(std::uint32_t bits) noexcept;
 
 } // namespace decimal
 } // namespace boost
