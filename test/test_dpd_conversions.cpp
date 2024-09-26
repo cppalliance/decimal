@@ -9,6 +9,13 @@
 using namespace boost::decimal;
 
 template <typename T>
+T roundtrip(T val)
+{
+    const auto bits {to_dpd(val)};
+    return from_dpd<T>(bits);
+}
+
+template <typename T>
 void test()
 {
     std::mt19937_64 rng(42);
@@ -18,10 +25,17 @@ void test()
     for (std::size_t i {}; i < 1024; ++i)
     {
         const T val {dist(rng)};
-        const auto bits {to_dpd(val)};
-        const T return_val {from_dpd<T>(bits)};
+        const T return_val {roundtrip(val)};
         BOOST_TEST_EQ(val, return_val);
     }
+
+    // Non-finite values
+    BOOST_TEST(isinf(roundtrip(std::numeric_limits<T>::infinity())));
+    BOOST_TEST(isinf(roundtrip(-std::numeric_limits<T>::infinity())));
+    BOOST_TEST(isnan(roundtrip(std::numeric_limits<T>::quiet_NaN())));
+    BOOST_TEST(isnan(roundtrip(-std::numeric_limits<T>::quiet_NaN())));
+    BOOST_TEST(isnan(roundtrip(std::numeric_limits<T>::signaling_NaN())));
+    BOOST_TEST(isnan(roundtrip(-std::numeric_limits<T>::signaling_NaN())));
 }
 
 int main()
