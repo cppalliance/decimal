@@ -455,12 +455,12 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto from_dpd_d32(std::uint32_t dpd) noexcept
     {
         // d0 = 4 * G2 + 2 * G3 + G4
         // Must be in the range 0-7
-        d0 = 4U * ((combination_field_bits & 0b00100) >> 2U) + 2U * ((combination_field_bits & 0b00010) >> 1U) + combination_field_bits & 0b00001;
+        d0 = combination_field_bits & 0b00111;
         BOOST_DECIMAL_ASSERT(d0 >= 0 && d0 <= 7);
 
         // Leading exp bits are 2 * G0 + G1
         // Must be equal to 0, 1 or 2
-        leading_biased_exp_bits = 2U * ((combination_field_bits & 0b10000) >> 4U) + ((combination_field_bits & 0b01000) >> 3U);
+        leading_biased_exp_bits = (combination_field_bits & 0b11000) >> 3U;
         BOOST_DECIMAL_ASSERT(leading_biased_exp_bits >= 0U && leading_biased_exp_bits <= 2U);
     }
 
@@ -470,18 +470,18 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto from_dpd_d32(std::uint32_t dpd) noexcept
 
     // We can now decode the remainder of the significand to recover the value
     std::uint8_t digits[7] {};
-    digits[6] = static_cast<std::uint8_t>(d0);
-    const auto first_half {significand_bits & 0b1111111111};
-    detail::decode_dpd(first_half, digits[2], digits[1], digits[0]);
-    const auto second_half {(significand_bits & 0b11111111110000000000) >> 10U};
-    BOOST_DECIMAL_ASSERT(second_half <= 0b1111111111);
-    detail::decode_dpd(second_half, digits[5], digits[4], digits[3]);
+    digits[0] = static_cast<std::uint8_t>(d0);
+    const auto significand_low {significand_bits & 0b1111111111};
+    detail::decode_dpd(significand_low, digits[6], digits[5], digits[4]);
+    const auto significand_high {(significand_bits & 0b11111111110000000000) >> 10U};
+    BOOST_DECIMAL_ASSERT(significand_high <= 0b1111111111);
+    detail::decode_dpd(significand_high, digits[3], digits[2], digits[1]);
 
     // Now we can assemble the significand
     std::uint32_t significand {};
     for (std::uint32_t i {}; i < 7U; ++i)
     {
-        significand += digits[i] * detail::pow10(i);
+        significand += digits[i] * detail::pow10(6 - i);
     }
 
     return DecimalType{significand, exp, sign};
