@@ -32,6 +32,7 @@ constexpr auto encode_dpd(std::uint8_t d1, std::uint8_t d2, std::uint8_t d3) -> 
             static_cast<std::uint8_t>((d2 & b2_mask) >> 1U),
             static_cast<std::uint8_t>((d3 & b3_mask))
     };
+    BOOST_DECIMAL_ASSERT(b1[0] <= 1U && b1[1] <= 1U && b1[2] <= 1U && b1[3] <= 1);
 
     const std::uint8_t b2[4] = {
             static_cast<std::uint8_t>((d2 & b0_mask) >> 3U),
@@ -39,6 +40,7 @@ constexpr auto encode_dpd(std::uint8_t d1, std::uint8_t d2, std::uint8_t d3) -> 
             static_cast<std::uint8_t>((d2 & b2_mask) >> 1U),
             static_cast<std::uint8_t>((d2 & b3_mask))
     };
+    BOOST_DECIMAL_ASSERT(b2[0] <= 1U && b2[1] <= 1U && b2[2] <= 1U && b2[3] <= 1);
 
     const std::uint8_t b3[4] = {
             static_cast<std::uint8_t>((d3 & b0_mask) >> 3U),
@@ -46,10 +48,12 @@ constexpr auto encode_dpd(std::uint8_t d1, std::uint8_t d2, std::uint8_t d3) -> 
             static_cast<std::uint8_t>((d3 & b2_mask) >> 1U),
             static_cast<std::uint8_t>((d3 & b3_mask))
     };
+    BOOST_DECIMAL_ASSERT(b3[0] <= 1U && b3[1] <= 1U && b3[2] <= 1U && b3[3] <= 1);
 
     std::uint8_t result_b[10] {};
 
     const auto table_val {(b1[0] << 2) + (b2[0] << 1) + b3[0]};
+    BOOST_DECIMAL_ASSERT(table_val >= 0b000 && table_val <= 0b111);
 
     // Now that we have dissected the bits of d1, d2, and d3 we can use the lookup table from 3.4 to generate
     // all possible combinations
@@ -224,7 +228,7 @@ constexpr auto encode_dpd(std::uint8_t d1, std::uint8_t d2, std::uint8_t d3) -> 
     {
         result |= (result_b[i] << i);
     }
-    
+
     return result;
 }
 
