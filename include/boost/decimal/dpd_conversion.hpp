@@ -227,7 +227,7 @@ constexpr auto encode_dpd(std::uint8_t d1, std::uint8_t d2, std::uint8_t d3) -> 
 
     for (std::uint16_t i {}; i < 10U; ++i)
     {
-        result |= (result_b[i] << (9 - i));
+        result |= static_cast<std::uint16_t>(result_b[i] << (9 - i));
     }
 
     return result;
@@ -256,49 +256,49 @@ constexpr auto decode_dpd(std::uint32_t dpd_bits, std::uint8_t& d3, std::uint8_t
     {
         d1 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[2]);
         d2 = static_cast<std::uint8_t>((b[3] << 2U) + (b[4] << 1U) + b[5]);
-        d3 = static_cast<std::uint8_t>(8) + b[9];
+        d3 = static_cast<std::uint8_t>(8U + b[9]);
     }
     // 101XX
     else if (b[6] == 1U && b[7] == 0U && b[8] == 1U)
     {
         d1 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[2]);
-        d2 = static_cast<std::uint8_t>(8) + b[5];
+        d2 = static_cast<std::uint8_t>(8U + b[5]);
         d3 = static_cast<std::uint8_t>((b[3] << 2U) + (b[4] << 1U) + b[9]);
     }
     // 110XX
     else if (b[6] == 1U && b[7] == 1U && b[8] == 0U)
     {
-        d1 = static_cast<std::uint8_t>(8) + b[2];
+        d1 = static_cast<std::uint8_t>(8U + b[2]);
         d2 = static_cast<std::uint8_t>((b[3] << 2U) + (b[4] << 1U) + b[5]);
         d3 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[9]);
     }
     // 11100
     else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 0U && b[4] == 0U)
     {
-        d1 = static_cast<std::uint8_t>(8) + b[2];
-        d2 = static_cast<std::uint8_t>(8) + b[5];
+        d1 = static_cast<std::uint8_t>(8U + b[2]);
+        d2 = static_cast<std::uint8_t>(8U + b[5]);
         d3 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[9]);
     }
     // 11101
     else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 0U && b[4] == 1U)
     {
-        d1 = static_cast<std::uint8_t>(8) + b[2];
+        d1 = static_cast<std::uint8_t>(8U + b[2]);
         d2 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[5]);
-        d3 = static_cast<std::uint8_t>(8) + b[9];
+        d3 = static_cast<std::uint8_t>(8U + b[9]);
     }
     // 11110
     else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 1U && b[4] == 0U)
     {
         d1 = static_cast<std::uint8_t>((b[0] << 2U) + (b[1] << 1U) + b[2]);
-        d2 = static_cast<std::uint8_t>(8) + b[5];
-        d3 = static_cast<std::uint8_t>(8) + b[9];
+        d2 = static_cast<std::uint8_t>(8U + b[5]);
+        d3 = static_cast<std::uint8_t>(8U + b[9]);
     }
     // 11111
     else if (b[6] == 1U && b[7] == 1U && b[8] == 1U && b[3] == 1U && b[4] == 1U)
     {
-        d1 = static_cast<std::uint8_t>(8) + b[2];
-        d2 = static_cast<std::uint8_t>(8) + b[5];
-        d3 = static_cast<std::uint8_t>(8) + b[9];
+        d1 = static_cast<std::uint8_t>(8U + b[2]);
+        d2 = static_cast<std::uint8_t>(8U + b[5]);
+        d3 = static_cast<std::uint8_t>(8U + b[9]);
     }
     else
     {
