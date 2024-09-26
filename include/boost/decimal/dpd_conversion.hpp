@@ -308,7 +308,7 @@ constexpr auto decode_dpd(std::uint32_t dpd_bits, std::uint8_t &d3, std::uint8_t
 } // namespace detail
 
 template <typename DecimalType>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_dpd_d32(DecimalType val) noexcept
+constexpr auto to_dpd_d32(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint32_t)
 {
     static_assert(std::is_same<DecimalType, decimal32>::value ||
@@ -413,18 +413,18 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_dpd_d32(DecimalType val) noexcept
     return dpd;
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_dpd(decimal32 val) noexcept -> std::uint32_t
+constexpr auto to_dpd(decimal32 val) noexcept -> std::uint32_t
 {
     return to_dpd_d32(val);
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_dpd(decimal32_fast val) noexcept -> std::uint32_t
+constexpr auto to_dpd(decimal32_fast val) noexcept -> std::uint32_t
 {
     return to_dpd_d32(val);
 }
 
 template <typename DecimalType = decimal32_fast>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto from_dpd_d32(std::uint32_t dpd) noexcept
+constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     // The bit lengths are the same as used in the standard bid format
@@ -488,7 +488,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto from_dpd_d32(std::uint32_t dpd) noexcept
 }
 
 template <typename DecimalType = decimal32_fast>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto from_dpd(std::uint32_t bits) noexcept
+constexpr auto from_dpd(std::uint32_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     return from_dpd_d32<DecimalType>(bits);
