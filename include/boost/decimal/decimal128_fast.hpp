@@ -123,6 +123,10 @@ private:
 
     friend constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool;
 
+    template <typename DecimalType>
+    friend constexpr auto to_dpd_d128(DecimalType val) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, detail::uint128);
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
