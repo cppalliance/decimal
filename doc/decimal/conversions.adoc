@@ -45,19 +45,28 @@ constexpr std::uint64_t to_bid_d64f(decimal64_fast val) noexcept;
 
 constexpr decimal64_fast from_bid_d64f(std::uint64_t bits) noexcept;
 
-BOOST_DECIMAL_CXX20_CONSTEXPR detail::uint128 to_bid_d128(decimal128 val) noexcept;
+constexpr detail::uint128 to_bid_d128(decimal128 val) noexcept;
+
+constexpr decimal128 from_bid_d128(detail::uint128 bits) noexcept;
+
+// Automatic detection if your platform has built-in unsigned __int128 or not to enable/disable the overload
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr decimal128 from_bid_d128(unsigned __int128 bits) noexcept;
+
+#endif // BOOST_DECIMAL_HAS_INT128
 
 template <typename T>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(T val) noexcept;
+constexpr auto to_bid(T val) noexcept;
 
 template <typename T = decimal32_fast>
 constexpr T from_bid(std::uint32_t bits) noexcept;
 
 template <typename T = decimal64_fast>
-BOOST_DECIMAL_CXX20_CONSTEXPR T from_bid(std::uint64_t bits) noexcept;
+constexpr T from_bid(std::uint64_t bits) noexcept;
 
 template <typename T = decimal128>
-BOOST_DECIMAL_CXX20_CONSTEXPR T from_bid(detail::uint128 bits) noexcept;
+constexpr T from_bid(detail::uint128 bits) noexcept;
 
 // ----- DPD Conversions -----
 

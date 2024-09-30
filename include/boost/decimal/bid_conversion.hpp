@@ -66,17 +66,22 @@ constexpr auto from_bid_d64f(std::uint64_t bits) noexcept -> decimal64_fast
     return val;
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d128(decimal128 val) noexcept -> detail::uint128
+constexpr auto to_bid_d128(decimal128 val) noexcept -> detail::uint128
 {
-    const auto bits {detail::bit_cast<detail::uint128>(val)};
-    return bits;
+    return val.bits_;
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d128(detail::uint128 bits) noexcept -> decimal128
+constexpr auto from_bid_d128(detail::uint128 bits) noexcept -> decimal128
 {
-    const auto val {detail::bit_cast<decimal128>(bits)};
-    return val;
+    return from_bits(bits);
 }
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+constexpr auto from_bits_d128(detail::uint128_t bits) noexcept -> decimal128
+{
+    return from_bits(bits);
+}
+#endif
 
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d128f(decimal128_fast val) noexcept -> detail::uint128
 {
