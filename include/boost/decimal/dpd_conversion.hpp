@@ -421,16 +421,6 @@ constexpr auto to_dpd_d32(DecimalType val) noexcept
     return dpd;
 }
 
-constexpr auto to_dpd(decimal32 val) noexcept -> std::uint32_t
-{
-    return to_dpd_d32(val);
-}
-
-constexpr auto to_dpd(decimal32_fast val) noexcept -> std::uint32_t
-{
-    return to_dpd_d32(val);
-}
-
 template <typename DecimalType = decimal32_fast>
 constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
@@ -512,14 +502,6 @@ constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
 
     return DecimalType{significand, exp, sign};
 }
-
-template <typename DecimalType = decimal32_fast>
-constexpr auto from_dpd(std::uint32_t bits) noexcept
-    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
-{
-    return from_dpd_d32<DecimalType>(bits);
-}
-
 
 template <typename DecimalType>
 constexpr auto to_dpd_d64(DecimalType val) noexcept
@@ -732,6 +714,27 @@ constexpr auto to_dpd(decimal64 val) -> std::uint64_t
 constexpr auto to_dpd(decimal64_fast val) -> std::uint64_t
 {
     return to_dpd_d64(val);
+}
+
+template <typename DecimalType>
+constexpr auto to_dpd(DecimalType val) noexcept
+{
+    static_assert(detail::is_decimal_floating_point_v<DecimalType>, "Must be a decimal floating point type.");
+    return to_dpd(val);
+}
+
+template <typename DecimalType = decimal32_fast>
+constexpr auto from_dpd(std::uint32_t bits) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
+{
+    return from_dpd_d32<DecimalType>(bits);
+}
+
+template <typename DecimalType = decimal64_fast>
+constexpr auto from_dpd(std::uint64_t bits) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
+{
+    return from_dpd_d64<DecimalType>(bits);
 }
 
 } // namespace decimal
