@@ -38,10 +38,28 @@ void test()
     BOOST_TEST(isnan(roundtrip(-std::numeric_limits<T>::signaling_NaN())));
 }
 
+template <typename T>
+void test_float_range()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_real_distribution<float> dist(std::numeric_limits<float>::min(),
+                                               std::numeric_limits<float>::max());
+
+    for (std::size_t i {}; i < 1024; ++i)
+    {
+        const T val {dist(rng)};
+        const T return_val {roundtrip(val)};
+        BOOST_TEST_EQ(val, return_val);
+    }
+}
+
 int main()
 {
     test<decimal32>();
     test<decimal32_fast>();
+
+    test_float_range<decimal32>();
+    test_float_range<decimal32_fast>();
 
     return boost::report_errors();
 }
