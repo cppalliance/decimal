@@ -114,6 +114,10 @@ private:
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
+    template <typename DecimalType>
+    friend constexpr auto to_dpd_d32(DecimalType val) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint32_t);
+
 public:
     constexpr decimal32_fast() noexcept {}
 
