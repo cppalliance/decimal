@@ -225,6 +225,10 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool;
 
+    friend constexpr auto to_bid_d64(decimal64 val) noexcept -> std::uint64_t;
+
+    friend constexpr auto from_bid_d64(std::uint64_t bits) noexcept -> decimal64;
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;

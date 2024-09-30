@@ -43,16 +43,14 @@ constexpr auto from_bid_d32f(std::uint32_t bits) noexcept -> decimal32_fast
     return val;
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d64(decimal64 val) noexcept -> std::uint64_t
+constexpr auto to_bid_d64(decimal64 val) noexcept -> std::uint64_t
 {
-    const auto bits {detail::bit_cast<std::uint64_t>(val)};
-    return bits;
+    return val.bits_;
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d64(std::uint64_t bits) noexcept -> decimal64
+constexpr auto from_bid_d64(std::uint64_t bits) noexcept -> decimal64
 {
-    const auto val {detail::bit_cast<decimal64>(bits)};
-    return val;
+    return from_bits(bits);
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d64f(decimal64_fast val) noexcept -> std::uint64_t
