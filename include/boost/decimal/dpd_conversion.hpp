@@ -8,6 +8,7 @@
 #include <boost/decimal/bid_conversion.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -694,6 +695,117 @@ constexpr auto from_dpd_d64(std::uint64_t dpd) noexcept
     }
 
     return DecimalType{significand, exp, sign};
+}
+
+template <typename DecimalType>
+constexpr auto to_dpd_d128(DecimalType val) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, detail::uint128)
+{
+    static_assert(std::is_same<DecimalType, decimal128>::value ||
+                  std::is_same<DecimalType, decimal128_fast>::value, "The input must be a 128-bit decimal type");
+
+    // In the non-finite cases the encodings are the same
+    // 3.5.2.a and 3.5.2.b
+    if (!isfinite(val))
+    {
+        return to_bid(val);
+    }
+
+    const auto sign {val.isneg()};
+    const auto exp {val.unbiased_exponent()};
+    const auto significand {val.full_significand()};
+
+    detail::uint128 dpd {};
+
+    // Set the sign bit as applicable
+    if (sign)
+    {
+        dpd.high |= detail::d128_sign_mask.high;
+    }
+
+    constexpr int num_digits {std::numeric_limits<DecimalType>::digits10};
+    std::uint8_t d[num_digits] {};
+    auto temp_sig {significand};
+    for (int i = num_digits - 1; i >= 0; --i)
+    {
+        d[i] = static_cast<std::uint8_t>(temp_sig % 10U);
+        temp_sig /= 10U;
+    }
+    BOOST_DECIMAL_ASSERT(d[0] >= 0 && d[0] <= 9);
+    BOOST_DECIMAL_ASSERT(temp_sig == 0);
+
+    constexpr std::uint64_t leading_two_exp_bits_mask {0b11000000000000};
+    const auto leading_two_bits {(exp & leading_two_exp_bits_mask) >> 12U};
+    constexpr std::uint64_t trailing_exp_bits_mask {0b00111111111111};
+    const auto trailing_exp_bits {(exp & trailing_exp_bits_mask)};
+
+    std::uint64_t combination_field_bits {};
+
+    // Now based on what the value of d[0] and the leading bits of exp are we can set the value of the combination field
+    // See 3.5.2.c.1
+    // If d0 is 8 or 9 then we follow section i
+    if (d[0] >= 8)
+    {
+        const auto d0_is_nine {d[0] == 9};
+        switch (leading_two_bits)
+        {
+            case 0U:
+                combination_field_bits = d0_is_nine ? 0b11001 : 0b11000;
+                break;
+            case 1U:
+                combination_field_bits = d0_is_nine ? 0b11011 : 0b11010;
+                break;
+            case 2U:
+                combination_field_bits = d0_is_nine ? 0b11101 : 0b11100;
+                break;
+                // LCOV_EXCL_START
+            default:
+                BOOST_DECIMAL_UNREACHABLE;
+                // LCOV_EXCL_STOP
+        }
+    }
+        // If d0 is 0 to 7 then we follow section II
+    else
+    {
+        // In here the value of d[0] = 4*G2 + 2*G3 + G4
+        const auto d0_mask {static_cast<std::uint64_t>(d[0])};
+        switch (leading_two_bits)
+        {
+            case 0U:
+                // 00XXX
+                combination_field_bits |= d0_mask;
+                break;
+            case 1U:
+                // 01XXX
+                combination_field_bits = 0b01000;
+                combination_field_bits |= d0_mask;
+                break;
+            case 2U:
+                // 10XXX
+                combination_field_bits = 0b10000;
+                combination_field_bits |= d0_mask;
+                break;
+                // LCOV_EXCL_START
+            default:
+                BOOST_DECIMAL_UNREACHABLE;
+                // LCOV_EXCL_STOP
+        }
+    }
+
+    // Write the now know combination field and trailing exp bits to the result
+    dpd.high |= (combination_field_bits << 58U);
+    dpd.high |= (trailing_exp_bits << 46U);
+
+    // Now we have to encode all 10 of the declets
+    int offset {9};
+    for (std::size_t i {1}; i < num_digits - 1; i += 3U)
+    {
+        const auto declet {static_cast<detail::uint128>(detail::encode_dpd(d[i], d[i + 1], d[i + 2]))};
+        dpd |= (declet << (10 * offset));
+        --offset;
+    }
+
+    return dpd;
 }
 
 constexpr auto to_dpd(decimal32 val) noexcept -> std::uint32_t

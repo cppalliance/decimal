@@ -236,6 +236,10 @@ private:
     friend constexpr auto from_bid_d128(detail::uint128_t bits) noexcept -> decimal128;
     #endif
 
+    template <typename DecimalType>
+    friend constexpr auto to_dpd_d128(DecimalType val) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, detail::uint128);
+
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
