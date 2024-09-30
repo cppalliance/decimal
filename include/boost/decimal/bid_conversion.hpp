@@ -77,7 +77,7 @@ constexpr auto from_bid_d128(detail::uint128 bits) noexcept -> decimal128
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
-constexpr auto from_bits_d128(detail::uint128_t bits) noexcept -> decimal128
+constexpr auto from_bid_d128(detail::uint128_t bits) noexcept -> decimal128
 {
     return from_bits(bits);
 }
