@@ -218,6 +218,10 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool;
 
+    friend constexpr auto to_bid_d32(decimal32 val) noexcept -> std::uint32_t;
+
+    friend constexpr auto from_bid_d32(std::uint32_t bits) noexcept -> decimal32;
+
     template <typename DecimalType>
     friend constexpr auto to_dpd_d32(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint32_t);

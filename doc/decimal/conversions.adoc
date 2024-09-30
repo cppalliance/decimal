@@ -29,7 +29,7 @@ struct uint128
 
 // ----- BID Conversions -----
 
-BOOST_DECIMAL_CXX20_CONSTEXPR std::uint32_t to_bid_d32(decimal32 val) noexcept;
+constexpr std::uint32_t to_bid_d32(decimal32 val) noexcept;
 
 BOOST_DECIMAL_CXX20_CONSTEXPR std::uint32_t to_bid_d32f(decimal32_fast val) noexcept;
 
@@ -43,7 +43,7 @@ template <typename T>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid(T val) noexcept;
 
 template <typename T = decimal32_fast>
-BOOST_DECIMAL_CXX20_CONSTEXPR T from_bid(std::uint32_t bits) noexcept;
+constexpr T from_bid(std::uint32_t bits) noexcept;
 
 template <typename T = decimal64_fast>
 BOOST_DECIMAL_CXX20_CONSTEXPR T from_bid(std::uint64_t bits) noexcept;

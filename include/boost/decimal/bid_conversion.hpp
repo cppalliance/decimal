@@ -20,16 +20,14 @@ namespace decimal {
 #  pragma GCC diagnostic ignored "-Wconversion"
 #endif
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d32(decimal32 val) noexcept -> std::uint32_t
+constexpr auto to_bid_d32(decimal32 val) noexcept -> std::uint32_t
 {
-    const auto bits {detail::bit_cast<std::uint32_t>(val)};
-    return bits;
+    return val.bits_;
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d32(std::uint32_t bits) noexcept -> decimal32
+constexpr auto from_bid_d32(std::uint32_t bits) noexcept -> decimal32
 {
-    const auto val {detail::bit_cast<decimal32>(bits)};
-    return val;
+    return from_bits(bits);
 }
 
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d32f(decimal32_fast val) noexcept -> std::uint32_t
