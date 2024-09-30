@@ -521,6 +521,127 @@ constexpr auto from_dpd(std::uint32_t bits) noexcept
 }
 
 
+template <typename DecimalType>
+constexpr auto to_dpd_d64(DecimalType val) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint64_t)
+{
+    static_assert(std::is_same<DecimalType, decimal64>::value ||
+                  std::is_same<DecimalType, decimal64_fast>::value, "The input must be a 64-bit decimal type");
+
+    // In the non-finite cases the encodings are the same
+    // 3.5.2.a and 3.5.2.b
+    if (!isfinite(val))
+    {
+        return to_bid(val);
+    }
+
+    const auto sign {val.isneg()};
+    const auto exp {val.unbiased_exponent()};
+    const auto significand {val.full_significand()};
+
+    std::uint64_t dpd {};
+    // Set the sign bit as applicable
+    if (sign)
+    {
+        dpd |= detail::d64_sign_mask;
+    }
+
+    std::uint8_t d[std::numeric_limits<DecimalType>::digits10] {};
+    auto temp_sig {significand};
+    for (int i = 15; i >= 0; --i)
+    {
+        d[i] = static_cast<std::uint8_t>(temp_sig % 10U);
+        temp_sig /= 10U;
+    }
+    BOOST_DECIMAL_ASSERT(d[0] >= 0 && d[0] <= 9);
+    BOOST_DECIMAL_ASSERT(temp_sig == 0);
+
+    constexpr std::uint64_t leading_two_exp_bits_mask {0b1100000000};
+    const auto leading_two_bits {(exp & leading_two_exp_bits_mask) >> 8U};
+    BOOST_DECIMAL_ASSERT(leading_two_bits >= 0 && leading_two_bits <= 2);
+    constexpr std::uint64_t trailing_exp_bits_mask {0b0011111111};
+    const auto trailing_exp_bits {(exp & trailing_exp_bits_mask)};
+
+    std::uint64_t combination_field_bits {};
+
+    // Now based on what the value of d[0] and the leading bits of exp are we can set the value of the combination field
+    // See 3.5.2.c.1
+    // If d0 is 8 or 9 then we follow section i
+    if (d[0] >= 8)
+    {
+        const auto d0_is_nine {d[0] == 9};
+        switch (leading_two_bits)
+        {
+            case 0U:
+                combination_field_bits = d0_is_nine ? 0b11001 : 0b11000;
+                break;
+            case 1U:
+                combination_field_bits = d0_is_nine ? 0b11011 : 0b11010;
+                break;
+            case 2U:
+                combination_field_bits = d0_is_nine ? 0b11101 : 0b11100;
+                break;
+            // LCOV_EXCL_START
+            default:
+                BOOST_DECIMAL_UNREACHABLE;
+            // LCOV_EXCL_STOP
+        }
+    }
+    // If d0 is 0 to 7 then we follow section II
+    else
+    {
+        // In here the value of d[0] = 4*G2 + 2*G3 + G4
+        const auto d0_mask {static_cast<std::uint64_t>(d[0])};
+        switch (leading_two_bits)
+        {
+            case 0U:
+                // 00XXX
+                combination_field_bits |= d0_mask;
+                break;
+            case 1U:
+                // 01XXX
+                combination_field_bits = 0b01000;
+                combination_field_bits |= d0_mask;
+                break;
+            case 2U:
+                // 10XXX
+                combination_field_bits = 0b10000;
+                combination_field_bits |= d0_mask;
+                break;
+            // LCOV_EXCL_START
+            default:
+                BOOST_DECIMAL_UNREACHABLE;
+            // LCOV_EXCL_STOP
+        }
+    }
+
+    // Write the now known combination field and trailing exp bits to the result
+    dpd |= (combination_field_bits << 58U);
+    dpd |= (trailing_exp_bits << 50U);
+
+    // Now we need to encode all the declets
+    // Once we have the declet right it into the result
+    int offset {4};
+    for (std::size_t i {1}; i < 15; i += 3U)
+    {
+        const auto declet {static_cast<std::uint64_t>(detail::encode_dpd(d[i], d[i + 1], d[i + 2]))};
+        dpd |= (declet << (10 * offset));
+        --offset;
+    }
+
+    return dpd;
+}
+
+constexpr auto to_dpd(decimal64 val) -> std::uint64_t
+{
+    return to_dpd_d64(val);
+}
+
+constexpr auto to_dpd(decimal64_fast val) -> std::uint64_t
+{
+    return to_dpd_d64(val);
+}
+
 } // namespace decimal
 } // namespace boost
 

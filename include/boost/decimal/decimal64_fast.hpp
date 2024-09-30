@@ -119,6 +119,10 @@ private:
 
     friend constexpr auto not_finite(decimal64_fast val) noexcept -> bool;
 
+    template <typename DecimalType>
+    friend constexpr auto to_dpd_d64(DecimalType val) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint64_t);
+
 public:
     constexpr decimal64_fast() noexcept = default;
 

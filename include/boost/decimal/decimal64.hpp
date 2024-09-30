@@ -229,6 +229,10 @@ private:
 
     friend constexpr auto from_bid_d64(std::uint64_t bits) noexcept -> decimal64;
 
+    template <typename DecimalType>
+    friend constexpr auto to_dpd_d64(DecimalType val) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint64_t);
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
