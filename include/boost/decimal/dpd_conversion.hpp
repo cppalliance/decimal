@@ -637,7 +637,7 @@ constexpr auto from_dpd_d64(std::uint64_t dpd) noexcept
     }
 
     // The bit lengths are the same as used in the standard bid format
-    const auto sign {(dpd & detail::d32_sign_mask) != 0};
+    const auto sign {(dpd & detail::d64_sign_mask) != 0};
     const auto combination_field_bits {(dpd & detail::d64_combination_field_mask) >> 58U};
     const auto exponent_field_bits {(dpd & detail::d64_exponent_mask) >> 50U};
     auto significand_bits {(dpd & detail::d64_significand_mask)};
