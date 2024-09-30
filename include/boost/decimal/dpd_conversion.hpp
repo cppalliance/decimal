@@ -632,6 +632,98 @@ constexpr auto to_dpd_d64(DecimalType val) noexcept
     return dpd;
 }
 
+template <typename DecimalType = decimal64_fast>
+constexpr auto from_dpd_d64(std::uint64_t dpd) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
+{
+    // First we check for non-finite values
+    // Since they are in the same initial format as BID it's easy to check with our existing masks
+    if ((dpd & detail::d64_inf_mask) == detail::d64_inf_mask)
+    {
+        if ((dpd & detail::d64_snan_mask) == detail::d64_snan_mask)
+        {
+            return std::numeric_limits<DecimalType>::signaling_NaN();
+        }
+        else if ((dpd & detail::d64_nan_mask) == detail::d64_nan_mask)
+        {
+            return std::numeric_limits<DecimalType>::quiet_NaN();
+        }
+        else
+        {
+            return std::numeric_limits<DecimalType>::infinity();
+        }
+    }
+
+    // The bit lengths are the same as used in the standard bid format
+    const auto sign {(dpd & detail::d32_sign_mask) != 0};
+    const auto combination_field_bits {(dpd & detail::d64_combination_field_mask) >> 58U};
+    const auto exponent_field_bits {(dpd & detail::d64_exponent_mask) >> 50U};
+    auto significand_bits {(dpd & detail::d64_significand_mask)};
+
+    // Case 1: 3.5.2.c.1.i
+    // Combination field bits are 110XX or 11110X
+    std::uint64_t d0 {};
+    std::uint64_t leading_biased_exp_bits {};
+    if (combination_field_bits >= 0b11000)
+    {
+        // d0 = 8 + G4
+        // Must be equal to 8 or 9
+        d0 = 8U + (combination_field_bits & 0b00001);
+        BOOST_DECIMAL_ASSERT(d0 == 8 || d0 == 9);
+
+        // leading exp bits are 2*G2 + G3
+        // Must be equal to 0, 1 or 2
+        leading_biased_exp_bits = 2U * ((combination_field_bits & 0b00100) >> 2U) + ((combination_field_bits & 0b00010) >> 1U);
+        BOOST_DECIMAL_ASSERT(leading_biased_exp_bits <= 2U);
+    }
+        // Case 2: 3.5.2.c.1.ii
+        // Combination field bits are 0XXXX or 10XXX
+    else
+    {
+        // d0 = 4 * G2 + 2 * G3 + G4
+        // Must be in the range 0-7
+        d0 = combination_field_bits & 0b00111;
+        BOOST_DECIMAL_ASSERT(d0 <= 7);
+
+        // Leading exp bits are 2 * G0 + G1
+        // Must be equal to 0, 1 or 2
+        leading_biased_exp_bits = (combination_field_bits & 0b11000) >> 3U;
+        BOOST_DECIMAL_ASSERT(leading_biased_exp_bits <= 2U);
+    }
+
+    // Now that we have the bits we can calculate the exponents value
+    const auto complete_exp {(leading_biased_exp_bits << 8U) + exponent_field_bits};
+    const auto exp {static_cast<std::int32_t>(complete_exp) - detail::bias_v<DecimalType>};
+
+    // We can now decode the remainder of the significand to recover the value
+    std::uint8_t digits[16] {};
+    digits[0] = static_cast<std::uint8_t>(d0);
+    for (int i = 15; i > 0; i -= 3)
+    {
+        const auto declet_bits {static_cast<std::uint32_t>(significand_bits & 0b1111111111)};
+        significand_bits >>= 10U;
+        detail::decode_dpd(declet_bits, digits[i], digits[i - 1], digits[i - 2]);
+    }
+
+    std::uint64_t significand {};
+    for (std::uint64_t i {}; i < 16U; ++i)
+    {
+        significand += digits[i] * detail::pow10(15 - i);
+    }
+
+    return DecimalType{significand, exp, sign};
+}
+
+constexpr auto to_dpd(decimal32 val) noexcept -> std::uint32_t
+{
+    return to_dpd_d32(val);
+}
+
+constexpr auto to_dpd(decimal32_fast val) noexcept -> std::uint32_t
+{
+    return to_dpd_d32(val);
+}
+
 constexpr auto to_dpd(decimal64 val) -> std::uint64_t
 {
     return to_dpd_d64(val);
