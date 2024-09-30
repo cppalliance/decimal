@@ -660,7 +660,7 @@ pre.rouge .gs {
 <li><a href="#decimal128_fast_description">Description</a></li>
 </ul>
 </li>
-<li><a href="#conversions">Fast Type Conversions</a></li>
+<li><a href="#conversions">Bit Conversions</a></li>
 <li><a href="#literals">Literals Support</a></li>
 <li><a href="#numbers">Numeric Constants</a>
 <ul class="sectlevel2">
@@ -1669,11 +1669,12 @@ As is often the case this trades space for time by having greater storage width 
 </div>
 </div>
 <div class="sect1">
-<h2 id="conversions">Fast Type Conversions</h2>
+<h2 id="conversions">Bit Conversions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Since we have non-IEEE 754 compliant types we offer a set of functions that allow their conversion to and from the IEEE 754 compliant BID layout.
-These functions allow lossless conversion with more compact storage.</p>
+<p>IEEE 754 specifies two different encodings for decimal floating point types: Binary Integer Significand Field (BID), and Densely Packed Decimal Significand Field (DPD).
+Internally this library is implemented in the BID format for the IEEE-754 compliant types.
+Should the user want to capture the bit format in BID or convert to DPD we offer a family of conversion functions: <code>to_bid</code>, <code>from_bid</code>, <code>to_dpd</code>, and <code>from_dpd</code> that allow conversion to or from the bit strings regardless of encoding.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1690,28 +1691,88 @@ These functions allow lossless conversion with more compact storage.</p>
 
 <span class="p">}</span> <span class="c1">// namespace detail</span>
 
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">to_bid_d32</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="c1">// ----- BID Conversions -----</span>
 
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">to_bid_d32f</span><span class="p">(</span><span class="n">decimal32_fast</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">to_bid_d32</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">to_bid_d64</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="n">decimal32</span> <span class="n">from_bid_d32</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">to_bid_d64f</span><span class="p">(</span><span class="n">decimal64_fast</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">to_bid_d32f</span><span class="p">(</span><span class="n">decimal32_fast</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">to_bid_d128</span><span class="p">(</span><span class="n">decimal128</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="n">decimal32_fast</span> <span class="n">from_bid_d32f</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
+<span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">to_bid_d64</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">constexpr</span> <span class="n">decimal64</span> <span class="n">from_bid_d64</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">to_bid_d64f</span><span class="p">(</span><span class="n">decimal64_fast</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">constexpr</span> <span class="n">decimal64_fast</span> <span class="n">from_bid_d64f</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">constexpr</span> <span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">to_bid_d128</span><span class="p">(</span><span class="n">decimal128</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">constexpr</span> <span class="n">decimal128</span> <span class="n">from_bid_d128</span><span class="p">(</span><span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="c1">// Automatic detection if your platform has built-in unsigned __int128 or not to enable/disable the overload</span>
+<span class="cp">#ifdef BOOST_DECIMAL_HAS_INT128
+</span>
+<span class="k">constexpr</span> <span class="n">decimal128</span> <span class="n">from_bid_d128</span><span class="p">(</span><span class="kt">unsigned</span> <span class="n">__int128</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="cp">#endif // BOOST_DECIMAL_HAS_INT128
+</span>
+<span class="k">constexpr</span> <span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">to_bid_d128f</span><span class="p">(</span><span class="n">decimal128_fast</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">constexpr</span> <span class="n">decimal128</span> <span class="n">from_bid_d128f</span><span class="p">(</span><span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="cp">#ifdef BOOST_DECIMAL_HAS_INT128
+</span>
+<span class="k">constexpr</span> <span class="n">decimal128</span> <span class="n">from_bid_d128f</span><span class="p">(</span><span class="kt">unsigned</span> <span class="n">__int128</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="cp">#endif // BOOST_DECIMAL_HAS_INT128
+</span>
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span>
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="k">auto</span> <span class="n">to_bid</span><span class="p">(</span><span class="n">T</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="n">to_bid</span><span class="p">(</span><span class="n">T</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span> <span class="o">=</span> <span class="n">decimal32_fast</span><span class="p">&gt;</span>
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">T</span> <span class="n">from_bid</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="n">T</span> <span class="n">from_bid</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span> <span class="o">=</span> <span class="n">decimal64_fast</span><span class="p">&gt;</span>
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">T</span> <span class="n">from_bid</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="n">T</span> <span class="n">from_bid</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span> <span class="o">=</span> <span class="n">decimal128</span><span class="p">&gt;</span>
-<span class="n">BOOST_DECIMAL_CXX20_CONSTEXPR</span> <span class="n">T</span> <span class="n">from_bid</span><span class="p">(</span><span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="k">constexpr</span> <span class="n">T</span> <span class="n">from_bid</span><span class="p">(</span><span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
+<span class="c1">// ----- DPD Conversions -----</span>
+
+<span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">to_dpd_d32</span><span class="p">(</span><span class="n">decimal32</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">to_dpd_d32f</span><span class="p">(</span><span class="n">decimal32_fast</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">to_dpd_d64</span><span class="p">(</span><span class="n">decimal64</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">to_dpd_d64f</span><span class="p">(</span><span class="n">decimal64_fast</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">constexpr</span> <span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">to_dpd_d128</span><span class="p">(</span><span class="n">decimal128</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">constexpr</span> <span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">to_dpd_d128f</span><span class="p">(</span><span class="n">decimal128_fast</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="n">to_dpd</span><span class="p">(</span><span class="n">T</span> <span class="n">val</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span> <span class="o">=</span> <span class="n">decimal32_fast</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">T</span> <span class="n">from_dpd</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span> <span class="o">=</span> <span class="n">decimal64_fast</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">T</span> <span class="n">from_dpd</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span> <span class="o">=</span> <span class="n">decimal128_fast</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">T</span> <span class="n">from_dpd</span><span class="p">(</span><span class="n">detail</span><span class="o">::</span><span class="n">uint128</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="cp">#ifdef BOOST_DECIMAL_HAS_INT128
+</span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span> <span class="o">=</span> <span class="n">decimal128_fast</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">T</span> <span class="n">from_dpd</span><span class="p">(</span><span class="kt">unsigned</span> <span class="n">__int128</span> <span class="n">bits</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+<span class="cp">#endif
+</span>
 <span class="p">}</span> <span class="c1">// namespace decimal</span>
 <span class="p">}</span> <span class="c1">// namespace boost</span></code></pre>
 </div>
@@ -4228,7 +4289,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-23 15:29:59 -0400
+Last updated 2024-09-25 09:57:03 -0400
 </div>
 </div>
 <style>
