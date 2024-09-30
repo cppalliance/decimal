@@ -11,7 +11,7 @@ using namespace boost::decimal;
 template <typename T>
 T roundtrip(T val)
 {
-    const auto bits {to_dpd(val)};
+    const auto bits {to_dpd<T>(val)};
     return from_dpd<T>(bits);
 }
 
@@ -41,9 +41,12 @@ void test()
 template <typename T>
 void test_float_range()
 {
+    using float_type = std::conditional_t<std::is_same<T, decimal32>::value ||
+                                          std::is_same<T, decimal32_fast>::value, float, double>;
+
     std::mt19937_64 rng(42);
-    std::uniform_real_distribution<float> dist(std::numeric_limits<float>::min(),
-                                               std::numeric_limits<float>::max());
+    std::uniform_real_distribution<float_type> dist(std::numeric_limits<float_type>::min(),
+                                                    std::numeric_limits<float_type>::max());
 
     for (std::size_t i {}; i < 1024; ++i)
     {
@@ -60,6 +63,12 @@ int main()
 
     test_float_range<decimal32>();
     test_float_range<decimal32_fast>();
+
+    test<decimal64>();
+    test<decimal64_fast>();
+
+    test_float_range<decimal64>();
+    test_float_range<decimal64_fast>();
 
     return boost::report_errors();
 }
