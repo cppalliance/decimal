@@ -84,11 +84,30 @@ constexpr std::uint32_t to_dpd_d32(decimal32 val) noexcept;
 
 constexpr std::uint32_t to_dpd_d32f(decimal32_fast val) noexcept;
 
+constexpr std::uint64_t to_dpd_d64(decimal64 val) noexcept;
+
+constexpr std::uint64_t to_dpd_d64f(decimal64_fast val) noexcept;
+
+constexpr detail::uint128 to_dpd_d128(decimal128 val) noexcept;
+
+constexpr detail::uint128 to_dpd_d128f(decimal128_fast val) noexcept;
+
 template <typename T>
 constexpr auto to_dpd(T val) noexcept;
 
 template <typename T = decimal32_fast>
 constexpr T from_dpd(std::uint32_t bits) noexcept;
+
+template <typename T = decimal64_fast>
+constexpr T from_dpd(std::uint64_t bits) noexcept;
+
+template <typename T = decimal128_fast>
+constexpr T from_dpd(detail::uint128 bits) noexcept;
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+template <typename T = decimal128_fast>
+constexpr T from_dpd(unsigned __int128 bits) noexcept;
+#endif
 
 } // namespace decimal
 } // namespace boost
