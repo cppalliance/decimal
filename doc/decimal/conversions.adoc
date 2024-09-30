@@ -31,7 +31,11 @@ struct uint128
 
 constexpr std::uint32_t to_bid_d32(decimal32 val) noexcept;
 
-BOOST_DECIMAL_CXX20_CONSTEXPR std::uint32_t to_bid_d32f(decimal32_fast val) noexcept;
+constexpr decimal32 from_bid_d32(std::uint32_t bits) noexcept;
+
+constexpr std::uint32_t to_bid_d32f(decimal32_fast val) noexcept;
+
+constexpr decimal32_fast from_bid_d32f(std::uint32_t bits) noexcept;
 
 BOOST_DECIMAL_CXX20_CONSTEXPR std::uint64_t to_bid_d64(decimal64 val) noexcept;
 

@@ -30,16 +30,15 @@ constexpr auto from_bid_d32(std::uint32_t bits) noexcept -> decimal32
     return from_bits(bits);
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto to_bid_d32f(decimal32_fast val) noexcept -> std::uint32_t
+constexpr auto to_bid_d32f(decimal32_fast val) noexcept -> std::uint32_t
 {
     const decimal32 compliant_val {val};
-    const auto bits {detail::bit_cast<std::uint32_t>(compliant_val)};
-    return bits;
+    return to_bid_d32(compliant_val);
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR auto from_bid_d32f(std::uint32_t bits) noexcept -> decimal32_fast
+constexpr auto from_bid_d32f(std::uint32_t bits) noexcept -> decimal32_fast
 {
-    const auto compliant_val {detail::bit_cast<decimal32>(bits)};
+    const auto compliant_val {from_bid_d32(bits)};
     const decimal32_fast val {compliant_val};
     return val;
 }
