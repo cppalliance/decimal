@@ -135,6 +135,12 @@ constexpr auto to_bid(decimal128_fast val) noexcept -> detail::uint128
     return to_bid_d128f(val);
 }
 
+template <typename T>
+constexpr auto to_bid(T val) noexcept
+{
+    return to_bid(val);
+}
+
 template <typename T = decimal32_fast>
 constexpr auto from_bid(std::uint32_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)

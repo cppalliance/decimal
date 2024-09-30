@@ -18,7 +18,7 @@ void test()
     for (std::size_t i {}; i < 1024; ++i)
     {
         const T val {dist(rng)};
-        const auto bits {to_bid(val)};
+        const auto bits {to_bid<T>(val)};
         const T return_val {from_bid<T>(bits)};
         BOOST_TEST_EQ(val, return_val);
     }
