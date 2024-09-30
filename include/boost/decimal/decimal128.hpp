@@ -228,6 +228,14 @@ private:
 
     friend constexpr auto not_finite(decimal128 rhs) noexcept -> bool;
 
+    friend constexpr auto to_bid_d128(decimal128 val) noexcept -> detail::uint128;
+
+    friend constexpr auto from_bid_d128(detail::uint128 bits) noexcept -> decimal128;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    friend constexpr auto from_bid_d128(detail::uint128_t bits) noexcept -> decimal128;
+    #endif
+
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;
