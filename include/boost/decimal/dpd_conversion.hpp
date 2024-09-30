@@ -802,12 +802,12 @@ constexpr auto to_dpd_d128(DecimalType val) noexcept
     dpd.high |= (combination_field_bits << 58U);
     dpd.high |= (trailing_exp_bits << 46U);
 
-    // Now we have to encode all 10 of the declets
-    int offset {9};
+    // Now we have to encode all 11 of the declets
+    int offset {10};
     for (std::size_t i {1}; i < num_digits - 1; i += 3U)
     {
         const auto declet {static_cast<detail::uint128>(detail::encode_dpd(d[i], d[i + 1], d[i + 2]))};
-        dpd |= (declet << (10 * offset));
+        dpd |= detail::uint128(declet << (10 * offset));
         --offset;
     }
 
@@ -892,7 +892,7 @@ constexpr auto from_dpd_d128(detail::uint128 dpd) noexcept
     detail::uint128 significand {};
     for (int i {}; i < num_digits; ++i)
     {
-        significand += static_cast<detail::uint128>(digits[i]) * detail::pow10(static_cast<detail::uint128>(num_digits - i));
+        significand += static_cast<detail::uint128>(digits[i]) * detail::pow10(static_cast<detail::uint128>((num_digits - 1) - i));
     }
 
     return DecimalType{significand, exp, sign};
