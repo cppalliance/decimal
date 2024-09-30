@@ -41,7 +41,9 @@ constexpr std::uint64_t to_bid_d64(decimal64 val) noexcept;
 
 constexpr decimal64 from_bid_d64(std::uint64_t bits) noexcept;
 
-BOOST_DECIMAL_CXX20_CONSTEXPR std::uint64_t to_bid_d64f(decimal64_fast val) noexcept;
+constexpr std::uint64_t to_bid_d64f(decimal64_fast val) noexcept;
+
+constexpr decimal64_fast from_bid_d64f(std::uint64_t bits) noexcept;
 
 BOOST_DECIMAL_CXX20_CONSTEXPR detail::uint128 to_bid_d128(decimal128 val) noexcept;
 
