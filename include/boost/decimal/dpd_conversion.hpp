@@ -217,9 +217,10 @@ constexpr auto encode_dpd(std::uint8_t d1, std::uint8_t d2, std::uint8_t d3) -> 
             result_b[8] = static_cast<std::uint8_t>(1);
             result_b[9] = b3[3];
             break;
-
+        // LCOV_EXCL_START
         default:
             BOOST_DECIMAL_UNREACHABLE;
+        // LCOV_EXCL_STOP
     }
 
     // Now that we have the bit pattern of the result we need to write it into uint16_t and return the result
@@ -300,10 +301,12 @@ constexpr auto decode_dpd(std::uint32_t dpd_bits, std::uint8_t& d3, std::uint8_t
         d2 = static_cast<std::uint8_t>(8U + b[5]);
         d3 = static_cast<std::uint8_t>(8U + b[9]);
     }
+    // LCOV_EXCL_START
     else
     {
         BOOST_DECIMAL_UNREACHABLE;
     }
+    // LCOV_EXCL_STOP
 }
 
 } // namespace detail
@@ -371,8 +374,10 @@ constexpr auto to_dpd_d32(DecimalType val) noexcept
             case 2U:
                 combination_field_bits = d0_is_nine ? 0b11101 : 0b11100;
                 break;
+            // LCOV_EXCL_START
             default:
                 BOOST_DECIMAL_UNREACHABLE;
+            // LCOV_EXCL_STOP
         }
     }
     // If d0 is 0 to 7 then we follow section II
@@ -396,8 +401,10 @@ constexpr auto to_dpd_d32(DecimalType val) noexcept
                 combination_field_bits = 0b10000;
                 combination_field_bits |= d0_mask;
                 break;
+            // LCOV_EXCL_START
             default:
                 BOOST_DECIMAL_UNREACHABLE;
+            // LCOV_EXCL_STOP
         }
     }
 
