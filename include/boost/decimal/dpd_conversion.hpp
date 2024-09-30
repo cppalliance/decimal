@@ -730,7 +730,7 @@ constexpr auto to_dpd_d128(DecimalType val) noexcept
     }
 
     constexpr int num_digits {std::numeric_limits<DecimalType>::digits10};
-    std::uint8_t d[num_digits] {};
+    std::uint8_t d[static_cast<std::size_t>(num_digits)] {};
     auto temp_sig {significand};
     for (int i = num_digits - 1; i >= 0; --i)
     {
@@ -880,7 +880,7 @@ constexpr auto from_dpd_d128(detail::uint128 dpd) noexcept
 
     // We can now decode the remainder of the significand to recover the value
     constexpr auto num_digits {std::numeric_limits<DecimalType>::digits10};
-    std::uint8_t digits[num_digits] {};
+    std::uint8_t digits[static_cast<std::size_t>(num_digits)] {};
     digits[0] = static_cast<std::uint8_t>(d0);
     for (int i = num_digits - 1; i > 0; i -= 3)
     {
