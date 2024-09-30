@@ -426,6 +426,9 @@ template <typename DecimalType = decimal32_fast>
 constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
+    static_assert(std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal32_fast>::value,
+                  "Target decimal type must be 32-bits");
+
     // First we check for non-finite values
     // Since they are in the same initial format as BID it's easy to check with our existing masks
     if ((dpd & detail::d32_inf_mask) == detail::d32_inf_mask)
@@ -619,6 +622,9 @@ template <typename DecimalType = decimal64_fast>
 constexpr auto from_dpd_d64(std::uint64_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
+    static_assert(std::is_same<DecimalType, decimal64>::value || std::is_same<DecimalType, decimal64_fast>::value,
+                  "Target decimal type must be 64-bits");
+
     // First we check for non-finite values
     // Since they are in the same initial format as BID it's easy to check with our existing masks
     if ((dpd & detail::d64_inf_mask) == detail::d64_inf_mask)
