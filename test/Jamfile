@@ -148,6 +148,7 @@ run test_zeta.cpp ;
 # Run the examples too
 run ../examples/adl.cpp ;
 run ../examples/basic_construction.cpp ;
+run ../examples/bit_conversions.cpp ;
 run ../examples/charconv.cpp ;
 run ../examples/literals.cpp ;
 run ../examples/rounding_mode.cpp ;
