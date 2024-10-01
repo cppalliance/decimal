@@ -70,5 +70,11 @@ int main()
     test_float_range<decimal64>();
     test_float_range<decimal64_fast>();
 
+    test<decimal128>();
+    test<decimal128_fast>();
+
+    test_float_range<decimal128>();
+    test_float_range<decimal128_fast>();
+
     return boost::report_errors();
 }
