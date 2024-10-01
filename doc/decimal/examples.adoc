@@ -92,6 +92,12 @@ int main()
     return 0;
 }
 ----
+Output:
+----
+ Initial Value: 0.25
+Returned Value: 0.25
+----
+
 
 == Rounding Mode
 [source, c++]
