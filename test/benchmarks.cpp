@@ -3,8 +3,13 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#if defined(__GNUC__) && __GNUC__ > 5
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#  pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 #include <boost/decimal.hpp>
-#include <boost/charconv.hpp>
 #include <chrono>
 #include <random>
 #include <vector>
@@ -16,6 +21,15 @@
 #include <cstring>
 
 #ifdef BOOST_DECIMAL_RUN_BENCHMARKS
+
+#if __cplusplus >= 201703L
+#if __has_include(<charconv>)
+#  include <charconv>
+#    if defined(__cpp_lib_to_chars) && __cpp_lib_to_chars >= 201611L
+#      define BOOST_DECIMAL_BENCHMARK_CHARCONV
+#    endif
+#endif
+#endif
 
 using namespace boost::decimal;
 using namespace std::chrono_literals;
@@ -165,8 +179,10 @@ static BOOST_DECIMAL_NO_INLINE void init_input_data( std::vector<T>& data )
     }
 }
 
+#ifdef BOOST_DECIMAL_BENCHMARK_CHARCONV
+
 template <typename T, std::enable_if_t<!std::is_floating_point<T>::value, bool> = true>
-static BOOST_NOINLINE void test_boost_to_chars( std::vector<T> const& data, bool general, char const* label, int precision, const char* type )
+static BOOST_DECIMAL_NO_INLINE void test_boost_to_chars( std::vector<T> const& data, bool general, char const* label, int precision, const char* type )
 {
     auto t1 = std::chrono::steady_clock::now();
 
@@ -191,11 +207,11 @@ static BOOST_NOINLINE void test_boost_to_chars( std::vector<T> const& data, bool
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cout << "boost::decimal::to_chars<" << std::left << std::setw(11) << type << ">,  " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cout << "boost::decimal::to_chars<" << std::left << std::setw(11) << type << ">, " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
-static BOOST_NOINLINE void test_boost_to_chars( std::vector<T> const& data, bool general, char const* label, int precision, const char* type )
+static BOOST_DECIMAL_NO_INLINE void test_boost_to_chars( std::vector<T> const& data, bool general, char const* label, int precision, const char* type )
 {
     auto t1 = std::chrono::steady_clock::now();
 
@@ -207,11 +223,11 @@ static BOOST_NOINLINE void test_boost_to_chars( std::vector<T> const& data, bool
 
         for( auto x: data )
         {
-            boost::charconv::chars_format fmt = general? boost::charconv::chars_format::general: boost::charconv::chars_format::scientific;
+            std::chars_format fmt = general ? std::chars_format::general : std::chars_format::scientific;
 
             auto r = precision == 0?
-                     boost::charconv::to_chars( buffer, buffer + sizeof( buffer ), x, fmt ):
-                     boost::charconv::to_chars( buffer, buffer + sizeof( buffer ), x, fmt, precision );
+                     std::to_chars( buffer, buffer + sizeof( buffer ), x, fmt ):
+                     std::to_chars( buffer, buffer + sizeof( buffer ), x, fmt, precision );
 
             s += static_cast<std::size_t>( r.ptr - buffer );
             s += static_cast<unsigned char>( buffer[0] );
@@ -220,7 +236,7 @@ static BOOST_NOINLINE void test_boost_to_chars( std::vector<T> const& data, bool
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cout << "boost::charconv::to_chars<" << std::left << std::setw(11) << type << ">, " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cout << "            std::to_chars<" << std::left << std::setw(10) << type << ">, " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 
@@ -254,7 +270,7 @@ BOOST_DECIMAL_NO_INLINE void init_from_chars_input_data( std::vector<std::string
         if( !isfinite(x) ) continue;
 
         char buffer[ 64 ];
-        auto r = boost::charconv::to_chars( buffer, buffer + sizeof( buffer ), x, general? boost::charconv::chars_format::general: boost::charconv::chars_format::scientific );
+        auto r = std::to_chars( buffer, buffer + sizeof( buffer ), x, general? std::chars_format::general: std::chars_format::scientific );
 
         std::string y( buffer, r.ptr );
         data.push_back( y );
@@ -299,7 +315,7 @@ BOOST_DECIMAL_NO_INLINE void test_boost_from_chars( std::vector<std::string> con
         for( auto const& x: data )
         {
             T y;
-            auto r = boost::charconv::from_chars( x.data(), x.data() + x.size(), y, general? boost::charconv::chars_format::general: boost::charconv::chars_format::scientific );
+            auto r = std::from_chars( x.data(), x.data() + x.size(), y, general ? std::chars_format::general : std::chars_format::scientific );
 
             s = static_cast<std::size_t>(r.ec);
         }
@@ -307,7 +323,7 @@ BOOST_DECIMAL_NO_INLINE void test_boost_from_chars( std::vector<std::string> con
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cout << "boost::charconv::from_chars<" << std::left << std::setw(11) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cout << "           std::from_chars<" << std::left << std::setw(11) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T, std::enable_if_t<!std::is_floating_point<T>::value, bool> = true>
@@ -329,7 +345,7 @@ BOOST_DECIMAL_NO_INLINE void test_boost_from_chars( std::vector<std::string> con
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cout << "boost::decimal::from_chars<" << std::left << std::setw(11) << type << ">,  " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cout << "boost::decimal::from_chars<" << std::left << std::setw(11) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T>
@@ -341,6 +357,8 @@ void test_from_chars(bool general, const char* type)
     char const* label = general? "general   ": "scientific";
     test_boost_from_chars<T>( data, general, label, type );
 }
+
+#endif
 
 int main()
 {
@@ -409,7 +427,7 @@ int main()
     test_two_element_operation(dec64_fast_vector, std::divides<>(), "Division", "dec64_fast");
     test_two_element_operation(dec64_fast_vector, std::divides<>(), "Division", "dec128_fast");
 
-/*
+#if 0
     std::cout << "\n===== sqrt =====\n";
 
     test_one_element_operation(float_vector, (float(*)(float))std::sqrt, "sqrt", "float");
@@ -417,13 +435,15 @@ int main()
     test_one_element_operation(dec32_vector, (decimal32(*)(decimal32))sqrt, "sqrt", "decimal32");
     test_one_element_operation(dec64_vector, (decimal64(*)(decimal64))sqrt, "sqrt", "decimal64");
     test_one_element_operation(dec128_vector, (decimal128(*)(decimal128))sqrt, "sqrt", "decimal128");
-
+#endif
+#ifdef BOOST_DECIMAL_BENCHMARK_CHARCONV
     std::cout << "\n===== <charconv> to_chars =====\n";
     test_to_chars<float>("float");
     test_to_chars<double>("double");
     test_to_chars<decimal32>("decimal32");
     test_to_chars<decimal64>("decimal64");
-    test_to_chars<decimal128>("decimal128");
+    test_to_chars<decimal32_fast>("dec32_fast");
+    test_to_chars<decimal64_fast>("dec64_fast");
 
     std::cout << "\n===== <charconv> from_chars =====\n";
     test_from_chars<float>(false, "float");
@@ -434,9 +454,11 @@ int main()
     test_from_chars<decimal32>(true, "decimal32");
     test_from_chars<decimal64>(false, "decimal64");
     test_from_chars<decimal64>(true, "decimal64");
-    test_from_chars<decimal128>(false, "decimal128");
-    test_from_chars<decimal128>(true, "decimal128");
-*/
+    test_from_chars<decimal32>(false, "dec32_fast");
+    test_from_chars<decimal32>(true, "dec32_fast");
+    test_from_chars<decimal64>(false, "dec64_fast");
+    test_from_chars<decimal64>(true, "dec64_fast");
+#endif
     std::cout << std::endl;
 
     return 1;
