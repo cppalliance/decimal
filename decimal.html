@@ -44,32 +44,50 @@
 /*----------------- Root Variables - Start -----------------*/
 
 :root {
+  --bl-primary-color: rgb(255, 159, 0);
+  --bl-header-height: 2.5rem;
+
+  /* Light Theme Variables */
+  --light-bl-background: rgb(255, 255, 255);
+  --light-bl-caret-svg: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24px'%20viewBox='0%20-960%20960%20960'%20width='24px'%20fill='%23000000'%3E%3Cpath%20d='M320-200v-560l440%20280-440%20280Z'/%3E%3C/svg%3E");
+  --light-bl-card-background-color: rgb(255, 255, 255);
+  --light-bl-code-background: rgb(255, 255, 255);
+  --light-bl-code-border-color: rgb(220, 220, 220);
+  --light-bl-code-text-color: inherit;
+  --light-bl-link-color: rgb(0, 90, 156);
+  --light-bl-link-hover-color: rgba(0, 90, 156, 0.7);
+  --light-bl-hljs-attribute-color: rgb(70, 130, 180);
+  --light-bl-hljs-doctag-color: rgb(221, 17, 68);
+  --light-bl-hljs-keyword-color: rgb(51, 51, 51);
+  --light-bl-hljs-number-color: rgb(0, 128, 128);
+  --light-bl-hljs-section-color: rgb(153, 0, 0);
+  --light-bl-nav-link-color: rgb(0, 0, 0);
   --light-bl-pasteboard-color: rgb(209, 213, 219);
   --light-bl-pre-background: rgb(248, 248, 248);
+  --light-bl-primary-color: rgb(255, 159, 0);
+  --light-bl-quote-background: rgb(255, 255, 255);
   --light-bl-table-border-color: rgb(232, 232, 232);
   --light-bl-table-head-background: rgb(248, 248, 248);
-  --light-bl-background: rgb(255, 255, 255);
-  --light-bl-card-background-color: rgb(255, 255, 255);
-  --light-bl-cyan-color: rgb(0, 90, 156);
-  --light-bl-quote-background: rgb(250, 250, 250);
-  --light-bl-quote-background: rgb(255, 255, 255);
-  --light-bl-code-background: rgb(255, 255, 255);
-  --light-bl-code-border-color: rgb(220 220 220);
-  --light-bl-code-text-color: inherit;
-  --dark-bl-quote-background: rgb(11, 59, 82);
+
+  /* Dark Theme Variables */
   --dark-bl-border-color: rgb(209, 228, 242);
-  --dark-bl-text-color: rgb(209, 228, 242);
-  --dark-bl-quote-word-color: rgb(209, 228, 242);
-  --dark-bl-tabpanel-background: rgb(28, 50, 59);
-  --dark-bl-hljs-keyword-color: rgb(173, 216, 230);
-  --dark-bl-hljs-number-color: rgb(72, 209, 204);
-  --dark-bl-hljs-doctag-color: rgb(255, 99, 132);
-  --dark-bl-hljs-section-color: rgb(255, 69, 58);
-  --dark-bl-hljs-attribute-color: rgb(70, 130, 180);
-  --dark-bl-pagination-color: rgb(200, 200, 200);
+  --dark-bl-caret-svg: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24px'%20viewBox='0%20-960%20960%20960'%20width='24px'%20fill='%23ccc'%3E%3Cpath%20d='M320-200v-560l440%20280-440%20280Z'/%3E%3C/svg%3E");
   --dark-bl-code-background: rgb(20, 20, 20);
   --dark-bl-code-border-color: transparent;
   --dark-bl-code-text-color: rgb(255, 255, 255);
+  --dark-bl-link-color: rgb(125 211 252);
+  --dark-bl-link-hover-color: rgb(100, 160, 210);
+  --dark-bl-hljs-attribute-color: rgb(70, 130, 180);
+  --dark-bl-hljs-doctag-color: rgb(255, 99, 132);
+  --dark-bl-hljs-keyword-color: rgb(173, 216, 230);
+  --dark-bl-hljs-number-color: rgb(72, 209, 204);
+  --dark-bl-hljs-section-color: rgb(255, 69, 58);
+  --dark-bl-nav-link-color: rgb(0, 0, 0);
+  --dark-bl-pagination-color: rgb(200, 200, 200);
+  --dark-bl-quote-background: rgb(11, 59, 82);
+  --dark-bl-quote-word-color: rgb(209, 228, 242);
+  --dark-bl-tabpanel-background: rgb(28, 50, 59);
+  --dark-bl-text-color: rgb(209, 228, 242);
 }
 
 /*----------------- Root Variables - End -----------------*/
@@ -77,37 +95,48 @@
 /*----------------- HTML Variables - Start -----------------*/
 
 html {
-  --bl-quote-background: var(--light-bl-quote-background);
+  --bl-background: var(--light-bl-background);
+  --bl-caret-svg: var(--light-bl-caret-svg);
+  --bl-card-background-color: var(--light-bl-card-background-color);
   --bl-code-background: var(--light-bl-code-background);
   --bl-code-border-color: var(--light-bl-code-border-color);
-  --bl-quote-background: var(--light-bl-quote-background);
-  --bl-code-background: var(--light-bl-code-background);
-  --bl-code-border-color: var(--light-bl-code-border-color);
+  --bl-code-text-color: var(--light-bl-code-text-color);
+  --bl-hljs-doctag-color: var(--light-bl-hljs-doctag-color);
+  --bl-hljs-attribute-color: var(--light-bl-hljs-attribute-color);
+  --bl-hljs-keyword-color: var(--light-bl-hljs-keyword-color);
+  --bl-hljs-number-color: var(--light-bl-hljs-number-color);
+  --bl-hljs-section-color: var(--light-bl-hljs-section-color);
+  --bl-link-color: var(--light-bl-link-color);
+  --bl-link-hover-color: var(--light-bl-link-hover-color);
+  --bl-nav-link-color: var(--light-bl-nav-link-color);
   --bl-pasteboard-color: var(--light-bl-pasteboard-color);
   --bl-pre-background: var(--light-bl-pre-background);
+  --bl-quote-background: var(--light-bl-quote-background);
   --bl-table-border-color: var(--light-bl-table-border-color);
   --bl-table-head-background: var(--light-bl-table-head-background);
-  --bl-background: var(--light-bl-background);
-  --bl-card-background-color: var(--light-bl-card-background-color);
-  --bl-link-color: var(--light-bl-cyan-color);
-  --bl-code-text-color: var(--light-bl-code-text-color);
+  
 }
 
 html.dark {
-  --bl-quote-background: var(--dark-bl-quote-background);
+  --bl-border-color: var(--dark-bl-border-color);
+  --bl-caret-svg: var(--dark-bl-caret-svg);
   --bl-code-background: var(--dark-bl-code-background);
   --bl-code-border-color: var(--dark-bl-code-border-color);
-  --bl-border-color: var(--dark-bl-border-color);
-  --bl-text-color: var(--dark-bl-text-color);
-  --bl-quote-word-color: var(--dark-bl-quote-word-color);
-  --bl-tabpanel-background: var(--dark-bl-tabpanel-background);
+  --bl-code-text-color: var(--dark-bl-code-text-color);
+  --bl-hljs-attribute-color: var(--dark-bl-hljs-attribute-color);
+  --bl-hljs-doctag-color: var(--dark-bl-hljs-doctag-color);
   --bl-hljs-keyword-color: var(--dark-bl-hljs-keyword-color);
   --bl-hljs-number-color: var(--dark-bl-hljs-number-color);
-  --bl-hljs-doctag-color: var(--dark-bl-hljs-doctag-color);
   --bl-hljs-section-color: var(--dark-bl-hljs-section-color);
-  --bl-hljs-attribute-color: var(--dark-bl-hljs-attribute-color);
+  --bl-link-color: var(--dark-bl-link-color);
+  --bl-link-hover-color: var(--dark-bl-link-hover-color);
+  --bl-nav-link-color: var(--dark-bl-nav-link-color);
   --bl-pagination-color: var(--dark-bl-pagination-color);
-  --bl-code-text-color: var(--dark-bl-code-text-color);
+  --bl-quote-background: var(--dark-bl-quote-background);
+  --bl-quote-word-color: var(--dark-bl-quote-word-color);
+  --bl-tabpanel-background: var(--dark-bl-tabpanel-background);
+  --bl-text-color: var(--dark-bl-text-color);
+
 }
 
 /*----------------- HTML Variables - End -----------------*/
@@ -115,7 +144,7 @@ html.dark {
 /*----------------- Font-Face Declarations start -----------------*/
 
 @font-face {
-  font-family: "Noto Sans";
+  font-family: "Noto Sans Display";
   font-style: normal;
   font-weight: normal;
   font-stretch: semi-condensed;
@@ -126,7 +155,7 @@ html.dark {
 }
 
 @font-face {
-  font-family: "Noto Sans";
+  font-family: "Noto Sans Italic";
   font-style: italic;
   font-weight: normal;
   font-stretch: semi-condensed;
@@ -180,7 +209,8 @@ p, h1, h2, h3, h4, h5, h6 {
 /*----------------- Global Styles for .boostlook start -----------------*/
 
 .boostlook {
-  font-family: "Noto Sans" !important;
+  font-family: "Noto Sans Display" !important;
+  font-stretch: condensed;
 }
 
 .boostlook h1,
@@ -206,13 +236,20 @@ p, h1, h2, h3, h4, h5, h6 {
   font-size: 1rem;
   margin: 1em 0em; 
 }
-.boostlook a {
+
+.boostlook a, 
+.boostlook .doc a {
   color: var(--bl-link-color);
   text-decoration: none;
 }
-.boostlook a:hover {
-  text-decoration: underline;
+
+.boostlook a:hover,
+.boostlook .doc a:hover {
+  color: var(--bl-link-hover-color);
+  cursor: pointer;
+  text-decoration: none;
 }
+
 .boostlook code {
   font-family: "Noto Sans Mono", monospace;
 }
@@ -276,7 +313,6 @@ p, h1, h2, h3, h4, h5, h6 {
   color: var(--bl-hljs-section-color);
 }
 
-.boostlook p a:link,
 .boostlook p a:visited,
 .boostlook table a,
 .boostlook .pagination a {
@@ -292,7 +328,6 @@ p, h1, h2, h3, h4, h5, h6 {
 .boostlook nav.pagination span::before {
   color: var(--bl-pagination-color);
 }
-
 
 /*----------------- Global Styles for .boostlook end -----------------*/
 
@@ -460,8 +495,27 @@ html.toc-hidden .boostlook:not(:has(.doc)) {
 
 /*----------------- Styles specific to Antora Templates start -----------------*/
 
+/* Typography */
+.boostlook .doc,
+.boostlook .doc i {
+  font-family: "Noto Sans Display";
+}
+
 .boostlook .nav-menu .title {
   font-size: 1.5rem;
+}
+
+.boostlook .breadcrumbs ul li {
+  font-size: 0.875rem !important;
+}
+
+/* Navigation Menu */
+.boostlook .nav-panel-menu {
+  overflow: visible;
+}
+
+.boostlook .nav-menu {
+  padding-left: 1rem;
 }
 
 .boostlook .nav-menu > .nav-list > .nav-list {
@@ -476,13 +530,64 @@ html.toc-hidden .boostlook:not(:has(.doc)) {
   line-height: 1.5;
 }
 
-.boostlook .breadcrumbs ul li {
-  font-size: 0.875rem !important;
+.boostlook .nav-link,
+.boostlook .nav-menu a{
+  cursor: pointer;
+  color: var(--bl-nav-link-color);
+  margin-right: -0.5rem;
 }
 
+.boostlook .nav-link:hover,
+.boostlook .nav-menu a:hover {
+  color: var(--bl-link-hover-color);
+}
+
+.boostlook .nav-text { 
+  color: #828282;
+}
+
+/* Active Page Indicator */
+.boostlook .nav-list .is-current-page.is-active {
+  position: relative;
+}
+
+.boostlook .is-current-page.is-active::before {
+  content: "";
+  position: absolute;
+  top: 38%;
+  width: 16px;
+  height: 16px;
+  margin-left: -1.25rem;
+  background-image: var(--bl-caret-svg);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 16px;
+}
+
+/* Breadcrumbs */
+.boostlook .breadcrumbs {
+  display: block;
+}
+
+.boostlook .breadcrumbs ul li:first-of-type {
+  display: flex;
+}
+
+/* Code Block */
 .boostlook .doc .content pre code {
-  background-color: var(--bl-code-background) !important;
-  border-color: var(--bl-code-border-color) !important;
+  background-color: var(--bl-code-background);
+  border-color: var(--bl-code-border-color);
+}
+
+/* Layout */
+.boostlook .article .content {
+  gap: 1rem;
+}
+
+/* Table of Contents */
+.boostlook .toc .toc-menu a {
+  border-left: 0;
+  padding: .25rem 0 0 0;
 }
 
 /*----------------- Styles specific to Antora Templates end -----------------*/
@@ -758,6 +863,7 @@ pre.rouge .gs {
 <li><a href="#benchmarks_comparisons">Comparisons</a>
 <ul class="sectlevel3">
 <li><a href="#benchmarks_x64_linux_results">x64 Linux Results</a></li>
+<li><a href="#benchmarks_x64_windows_results">x64 Windows Results</a></li>
 <li><a href="#benchmarks_m1_macos_results">M1 macOS Results</a></li>
 </ul>
 </li>
@@ -771,12 +877,38 @@ pre.rouge .gs {
 <li><a href="#benchmarks_division">Division</a></li>
 </ul>
 </li>
-<li><a href="#benchmarks_m1_macos_results_2">M1 macOS Results</a>
+<li><a href="#benchmarks_x64_windows_results_2">x64 Windows Results</a>
 <ul class="sectlevel4">
 <li><a href="#benchmarks_addition_2">Addition</a></li>
 <li><a href="#benchmarks_subtraction_2">Subtraction</a></li>
 <li><a href="#benchmarks_multiplication_2">Multiplication</a></li>
 <li><a href="#benchmarks_division_2">Division</a></li>
+</ul>
+</li>
+<li><a href="#benchmarks_m1_macos_results_2">M1 macOS Results</a>
+<ul class="sectlevel4">
+<li><a href="#benchmarks_addition_3">Addition</a></li>
+<li><a href="#benchmarks_subtraction_3">Subtraction</a></li>
+<li><a href="#benchmarks_multiplication_3">Multiplication</a></li>
+<li><a href="#benchmarks_division_3">Division</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#benchmarks_charconv"><code>&lt;charconv&gt;</code></a>
+<ul class="sectlevel3">
+<li><a href="#benchmarks_from_chars"><code>from_chars</code></a>
+<ul class="sectlevel4">
+<li><a href="#benchmarks_from_chars_general"><code>from_chars</code> general</a></li>
+<li><a href="#benchmarks_from_chars_scientific"><code>from_chars</code> scientific</a></li>
+</ul>
+</li>
+<li><a href="#benchmarks_to_chars"><code>to_chars</code></a>
+<ul class="sectlevel4">
+<li><a href="#benchmarks_to_chars_general_shortest_representation"><code>to_chars</code> general shortest representation</a></li>
+<li><a href="#benchmarks_to_chars_general_6_digits_of_precision"><code>to_chars</code> general 6-digits of precision</a></li>
+<li><a href="#benchmarks_to_chars_scientific_shortest_representation"><code>to_chars</code> scientific shortest representation</a></li>
+<li><a href="#benchmarks_to_chars_scientific_6_digits_of_precision"><code>to_chars</code> scientific 6-digits of precision</a></li>
 </ul>
 </li>
 </ul>
@@ -3563,58 +3695,118 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">35,581</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">34,814</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0.604</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">58,848</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">57,644</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,410,084</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">40.954</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,163,595</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">37.534</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">4,233,175</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">71.934</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,633,923</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">45.693</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">6,337,447</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">107.692</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,064,630</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">105.208</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">628,241</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10.676</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">613,626</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.645</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">724,474</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">12.311</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">693,390</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12.029</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">517,930</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8.801</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">628,596</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.905</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal32</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">893,375</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">15.181</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15.498</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal64</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">496,127</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8.431</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8.607</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal128</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1,143,636</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">19.434</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">19.840</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_x64_windows_results">x64 Windows Results</h4>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">182,707</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.943</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">193,737</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,097,942</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15.990</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,697,948</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">24.249</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">17,267,609</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">89.129</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">809,847</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.180</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,043,657</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.387</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">888,053</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.584</p></td>
 </tr>
 </tbody>
 </table>
@@ -3638,43 +3830,43 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">146,976</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2.319</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">131,803</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.060</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">63,382</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">63,981</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,797,597</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">28.361</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,052,770</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">32.084</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,799,376</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">44.167</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,701,290</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">42.220</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">6,478,939</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">102.220</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,545,490</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">86.674</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,070,232</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">16.885</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">728,146</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11.381</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,111,273</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">17.533</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">611,866</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9.563</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,118,976</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">17.654</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">714,586</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11.169</p></td>
 </tr>
 </tbody>
 </table>
@@ -3685,6 +3877,11 @@ This is repeated 5 times to generate stable results.</p>
 <div class="paragraph">
 <p>The benchmark for these operations generates a random vector containing 20,000,000 elements and does operations <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> between <code>vec[i] and vec[i + 1]</code>.
 This is repeated 5 times to generate stable results.</p>
+</div>
+<div class="paragraph">
+<p>As discussed in the design of the fast types the significand is stored in normalized form so that we do not have to worry about the effects of cohorts.
+Unfortunately this means that <code>decimal128_fast</code> multiplication is always carried out internally at 256-bit size whereas <code>decimal128</code> contains heuristics in <code>operator*</code> to avoid 256-bit multiplication when it is not needed (i.e. the resultant significand is less than or equal to 128-bits).
+This causes multiplication of <code>decimal128_fast</code> to be ~1.72x slower than <code>decimal128</code>, but all other operators leave us with a geometric average runtime under 1.00 for <code>decimal128_fast</code> / <code>decimal128</code> so we accept this tradeoff.</p>
 </div>
 <div class="sect3">
 <h4 id="benchmarks_x64_linux_results_2">x64 Linux Results</h4>
@@ -3707,58 +3904,58 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">54,566</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.077</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">55,811</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.062</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">50,640</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">52,531</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3,639,957</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">71.879</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,653,456</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50.512</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">4,172,318</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">82.392</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,254,833</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">61.960</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10,936,595</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">215.968</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10,479,050</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">199.483</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,148,249</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">22.675</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,371,022</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">26.100</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,149,203</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">22.694</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,370,192</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">26.083</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">7,424,598</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">146.615</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7,197,718</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">137.018</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal32</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2,997,658</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">50.939</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">57.065</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal64</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2,129,898</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">36.193</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">40.546</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal128</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3,056,979</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">51.947</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">58.194</p></td>
 </tr>
 </tbody>
 </table>
@@ -3779,58 +3976,58 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">48,654</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.912</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">53,362</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.083</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">53,348</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">49,242</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,850,709</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">53.436</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,054,535</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">41.723</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3,493,936</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">65.493</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,507,709</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50.926</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10,492,728</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">196.685</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,554,139</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">112.793</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,012,199</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">18.974</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,050,225</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">21.328</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,055,476</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">19.785</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,048,560</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">21.294</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,114,185</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">39.630</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,073,580</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">42.110</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal32</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2,006,964</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">37.620</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">40.757</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal64</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1,324,796</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">24.833</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">26.904</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal128</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2,783,553</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">52.177</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">56.528</p></td>
 </tr>
 </tbody>
 </table>
@@ -3851,58 +4048,58 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">53,405</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.101</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">53,469</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.093</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">48,497</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">48,903</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,708,779</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">55.855</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,993,989</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">40.774</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,761,465</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">56.941</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,766,602</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">56.573</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8,509,678</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">175.468</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,796,346</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">98.079</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">451,679</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">9.313</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,117,727</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">22.856</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">777,927</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">16.041</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,369,834</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28.011</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">13,970,509</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">288.070</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8,139,518</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">166.442</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal32</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2,507,998</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">51.714</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">51.285</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal64</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2,414,864</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">49.794</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">49.381</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal128</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">6,248,956</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">128.852</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">127.783</p></td>
 </tr>
 </tbody>
 </table>
@@ -3923,67 +4120,67 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">58,955</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.755</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">59,003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.756</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">78,046</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">78,078</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,907,134</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">37.249</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,250,186</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28.820</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3,464,841</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">44.394</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,816,014</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">36.067</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">18,202,742</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">233.231</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18,320,634</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">234.645</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,092,346</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">13.996</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,123,428</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">14.389</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,207,648</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">15.474</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,258,004</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16.112</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,208,184</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">15.480</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,243,024</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15.920</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal32</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5,002,197</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">64.093</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64.067</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal64</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2,961,731</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">37.900</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">37.933</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GCC <code>_Decimal128</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10,095,995</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">129.360</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">129.307</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect3">
-<h4 id="benchmarks_m1_macos_results_2">M1 macOS Results</h4>
+<h4 id="benchmarks_x64_windows_results_2">x64 Windows Results</h4>
 <div class="paragraph">
-<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4</p>
+<p>Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4</p>
 </div>
 <div class="sect4">
 <h5 id="benchmarks_addition_2">Addition</h5>
@@ -4001,43 +4198,43 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">16,685</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.955</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">67,019</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.974</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">17,476</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">68,820</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,528,095</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">144.661</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,994,405</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">43.511</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,713,507</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">155.270</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,531,755</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65.849</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">11,969,714</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">684.923</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">25,209,554</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">366.311</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,423,277</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">81.442</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,066,728</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30.031</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,280,409</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">73.267</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,667,169</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">53.286</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">6,047,499</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">346.046</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11,213,280</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">162.936</p></td>
 </tr>
 </tbody>
 </table>
@@ -4058,43 +4255,43 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">16,302</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.045</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60,912</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.976</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">17,033</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">62,409</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,010,525</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">118.037</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,132,613</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50.194</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,237,729</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">131.376</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,864,498</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">61.992</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">6,907,396</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">405.530</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">17,210,173</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">275.764</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,378,448</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">80.928</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,028,429</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">32.502</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,276,731</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">74.956</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,017,419</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">48.349</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,970,586</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">174.401</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,557,846</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">89.055</p></td>
 </tr>
 </tbody>
 </table>
@@ -4115,43 +4312,43 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">16,499</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.926</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60,742</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.969</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">17,821</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">62,658</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,951,504</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">109.506</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,029,689</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">32.393</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,480,528</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">139.191</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8,805,524</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">140.533</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">14,360,630</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">805.826</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15,519,053</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">247.689</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">630,355</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">35.371</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,573,280</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">25.109</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">987,703</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">55.424</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7,650,156</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">122.094</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">12,573,178</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">705.526</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16,874,890</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">269.317</p></td>
 </tr>
 </tbody>
 </table>
@@ -4172,46 +4369,1228 @@ This is repeated 5 times to generate stable results.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">20,267</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.841</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">75,437</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.936</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">24,111</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">80,559</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1,757,506</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">72.892</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,832,016</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">45.198</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3,496,913</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">145.033</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11,640,789</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">185.783</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">20,017,989</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">830.243</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">32,470,044</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">518.211</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">846,727</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">35.118</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,660,332</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">26.498</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,484,985</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">103.064</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11,266,972</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">179.817</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2,490,175</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">103.280</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11,201,820</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">178.777</p></td>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_m1_macos_results_2">M1 macOS Results</h4>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4</p>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_addition_3">Addition</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">43,056</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.295</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">33,238</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,146,032</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">94.652</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,963,788</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">89.169</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10,125,221</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">304.628</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,685,360</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50.706</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,886,022</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">56.743</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,893,049</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">207.385</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_subtraction_3">Subtraction</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">43,013</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.295</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">33,204</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,385,896</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">71.586</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,759,536</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">83.108</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,560,295</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">167.459</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,228,630</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">37.002</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,312,815</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">39.538</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,869,005</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">86.405</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_multiplication_3">Multiplication</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">42,634</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.293</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">32,970</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,826,351</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">85.725</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,268,243</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">99.128</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,654,643</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">141.178</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,614,365</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">48.965</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,417,646</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">73.329</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8,017,934</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">243.189</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_division_3">Division</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">46,030</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.351</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">34,078</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,649,922</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">77.760</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,721,028</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">109.192</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">19,559,739</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">573.970</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,436,099</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">42.142</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,593,573</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">76.107</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal128_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,594,426</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">76.132</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="benchmarks_charconv"><code>&lt;charconv&gt;</code></h3>
+<div class="paragraph">
+<p>Parsing and serializing number exactly is one of the key features of decimal floating point types, so we must compare the performance of <code>&lt;charconv&gt;</code>. For all the following the results compare against STL provided <code>&lt;charconv&gt;</code> for 20,000,000 conversions.
+Since <code>&lt;charconv&gt;</code> is fully implemented in software for each type the performance gap between built-in <code>float</code> and <code>double</code> vs <code>decimal32</code> and <code>decimal64</code> is significantly smaller (or the decimal performance is better) than the hardware vs software performance gap seen above for basic operations.</p>
+</div>
+<div class="paragraph">
+<p>To run these benchmarks yourself you will need a compiler with complete implementation of <code>&lt;charconv&gt;</code> and to run the benchmarks under C++17 or higher.
+At the time of writing this is limited to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>GCC 11 or newer</p>
+</li>
+<li>
+<p>MSVC 19.24 or newer</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These benchmarks are automatically disabled if your compiler does not provide feature complete <code>&lt;charconv&gt;</code> or if the language standard is set to C++14.</p>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_from_chars"><code>from_chars</code></h4>
+<div class="sect4">
+<h5 id="benchmarks_from_chars_general"><code>from_chars</code> general</h5>
+<div class="sect5">
+<h6 id="benchmarks_x64_linux_results_3">x64 Linux Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10,308,818</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.551</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18,692,513</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,301,003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.177</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,580,001</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.245</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,321,788</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.178</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,591,311</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.246</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_x64_windows_results_3">x64 Windows Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8,577,201</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.410</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20,903,459</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,602,771</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.220</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,332,730</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.255</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,932,622</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.188</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,614,476</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.269</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_m1_macos_results_3">M1 macOS Results</h6>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,556,533</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.965</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,648,485</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,201,545</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.209</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,775,487</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.803</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,196,724</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.207</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,762,636</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.798</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_from_chars_scientific"><code>from_chars</code> scientific</h5>
+<div class="sect5">
+<h6 id="benchmarks_x64_linux_results_4">x64 Linux Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10,363,219</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.554</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18,677,179</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,296,877</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.177</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,500,127</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.241</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,381,651</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.181</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,496,194</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.241</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_x64_windows_results_4">x64 Windows Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8,170,079</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.439</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18,626,905</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,927,882</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.211</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,668,246</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.304</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,904,457</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.210</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,302,174</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.285</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_m1_macos_results_4">M1 macOS Results</h6>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,651,707</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.986</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,690,166</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,153,821</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.172</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,726,009</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.926</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,726,009</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.757</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,693,387</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.747</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="benchmarks_to_chars"><code>to_chars</code></h4>
+<div class="sect4">
+<h5 id="benchmarks_to_chars_general_shortest_representation"><code>to_chars</code> general shortest representation</h5>
+<div class="sect5">
+<h6 id="benchmarks_x64_linux_results_5">x64 Linux Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,839,146</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.841</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,374,946</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,253,304</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.260</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,885,679</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.040</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,453,957</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.320</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7,827,910</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.319</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_x64_windows_results_5">x64 Windows Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,108,053</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.823</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,774,811</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,127,529</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.623</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8,582,256</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.273</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7,639,470</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.024</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11,564,222</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.064</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_m1_macos_results_5">M1 macOS Results</h6>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,917,920</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.849</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,435,671</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,636,747</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.350</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,680,800</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.653</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,675,951</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.361</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,900,272</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.717</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_to_chars_general_6_digits_of_precision"><code>to_chars</code> general 6-digits of precision</h5>
+<div class="sect5">
+<h6 id="benchmarks_x64_linux_results_6">x64 Linux Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,226,353</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.957</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,458,987</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,782,692</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.693</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,368,162</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.983</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,611,498</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.662</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,025,340</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.104</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_x64_windows_results_6">x64 Windows Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,873,775</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.929</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,322,448</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,493,981</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.869</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7,849,419</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.215</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,516,633</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.031</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8,065,516</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.276</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_m1_macos_results_6">M1 macOS Results</h6>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,320,719</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.962</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,572,846</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,133,466</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.629</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,106,989</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.929</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,458,534</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.526</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,997,442</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.912</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_to_chars_scientific_shortest_representation"><code>to_chars</code> scientific shortest representation</h5>
+<div class="sect5">
+<h6 id="benchmarks_x64_linux_results_7">x64 Linux Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,835,528</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.849</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,338,216</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,887,451</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.865</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,218,195</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.563</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,033,115</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.909</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,103,323</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.828</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_x64_windows_results_7">x64 Windows Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,047,827</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.814</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,742,344</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,103,661</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.097</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6,721,570</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.796</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,542,470</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.214</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8,694,813</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.323</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_m1_macos_results_7">M1 macOS Results</h6>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,814,527</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.817</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,442,930</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,048,663</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.885</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,786,216</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.010</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,813,360</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.817</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,082,146</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.186</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="benchmarks_to_chars_scientific_6_digits_of_precision"><code>to_chars</code> scientific 6-digits of precision</h5>
+<div class="sect5">
+<h6 id="benchmarks_x64_linux_results_8">x64 Linux Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,686,460</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.938</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,993,886</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,919,727</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.585</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,157,802</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.833</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,052,228</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.611</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,597,538</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.121</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_x64_windows_results_8">x64 Windows Results</h6>
+<div class="paragraph">
+<p>Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,734,517</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.970</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,880,384</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,879,496</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.795</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,614,452</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.150</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,445,619</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.911</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7,375,520</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.511</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="benchmarks_m1_macos_results_8">M1 macOS Results</h6>
+<div class="paragraph">
+<p>Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime (us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ratio to <code>double</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,636,010</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.952</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,922,301</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3,048,058</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.515</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,140,604</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.868</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal32_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,821,707</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.476</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>decimal64_fast</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5,525,549</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.933</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -4289,7 +5668,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-25 09:57:03 -0400
+Last updated 2024-09-30 17:12:31 -0400
 </div>
 </div>
 <style>
