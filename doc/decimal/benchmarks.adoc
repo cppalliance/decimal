@@ -590,6 +590,32 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | 0.246
 |===
 
+===== x64 Windows Results
+
+Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 8,577,201
+| 0.410
+| `double`
+| 20,903,459
+| 1.000
+| `decimal32`
+| 4,602,771
+| 0.220
+| `decimal64`
+| 5,332,730
+| 0.255
+| `decimal32_fast`
+| 3,932,622
+| 0.188
+| `decimal64_fast`
+| 5,614,476
+| 0.269
+|===
+
 ===== M1 macOS Results
 
 Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
@@ -642,6 +668,32 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `decimal64_fast`
 | 4,496,194
 | 0.241
+|===
+
+===== x64 Windows Results
+
+Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 8,170,079
+| 0.439
+| `double`
+| 18,626,905
+| 1.000
+| `decimal32`
+| 3,927,882
+| 0.211
+| `decimal64`
+| 5,668,246
+| 0.304
+| `decimal32_fast`
+| 3,904,457
+| 0.210
+| `decimal64_fast`
+| 5,302,174
+| 0.285
 |===
 
 ===== M1 macOS Results
@@ -700,6 +752,32 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | 2.319
 |===
 
+===== x64 Windows Results
+
+Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 3,108,053
+| 0.823
+| `double`
+| 3,774,811
+| 1.000
+| `decimal32`
+| 6,127,529
+| 1.623
+| `decimal64`
+| 8,582,256
+| 2.273
+| `decimal32_fast`
+| 7,639,470
+| 2.024
+| `decimal64_fast`
+| 11,564,222
+| 3.064
+|===
+
 ===== M1 macOS Results
 
 Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
@@ -752,6 +830,32 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `decimal64_fast`
 | 6,025,340
 | 1.104
+|===
+
+===== x64 Windows Results
+
+Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 5,873,775
+| 0.929
+| `double`
+| 6,322,448
+| 1.000
+| `decimal32`
+| 5,493,981
+| 0.869
+| `decimal64`
+| 7,849,419
+| 1.215
+| `decimal32_fast`
+| 6,516,633
+| 1.031
+| `decimal64_fast`
+| 8,065,516
+| 1.276
 |===
 
 ===== M1 macOS Results
@@ -808,6 +912,32 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | 1.828
 |===
 
+===== x64 Windows Results
+
+Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 3,047,827
+| 0.814
+| `double`
+| 3,742,344
+| 1.000
+| `decimal32`
+| 4,103,661
+| 1.097
+| `decimal64`
+| 6,721,570
+| 1.796
+| `decimal32_fast`
+| 4,542,470
+| 1.214
+| `decimal64_fast`
+| 8,694,813
+| 2.323
+|===
+
 ===== M1 macOS Results
 
 Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
@@ -860,6 +990,32 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `decimal64_fast`
 | 5,597,538
 | 1.121
+|===
+
+===== x64 Windows Results
+
+Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 4,734,517
+| 0.970
+| `double`
+| 4,880,384
+| 1.000
+| `decimal32`
+| 3,879,496
+| 0.795
+| `decimal64`
+| 5,614,452
+| 1.150
+| `decimal32_fast`
+| 4,445,619
+| 0.911
+| `decimal64_fast`
+| 7,375,520
+| 1.511
 |===
 
 ===== M1 macOS Results
