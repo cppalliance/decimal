@@ -387,199 +387,187 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | 103.280
 |===
 
-////
-These are not available for the built-ins so not deleting but also not incorporating
-
-== Selected Special Functions
-
-The benchmark for these operations generates a random vector containing 2,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
-This is repeated 5 times to generate stable results.
-
-=== M1 macOS Results
-
-Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
-
-==== SQRT
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 2021
-| 0.626
-| `double`
-| 3229
-| 1.000
-| `decimal32`
-| 4,826,066
-| 1494.601
-| `decimal64`
-| 7,780,637
-| 2409.612
-| `decimal128`
-| 100,269,145
-| 31052.693
-|===
-
 == `<charconv>`
 
-For all the following the results compare against https://github.com/boostorg/charconv[boost.charconv] for 10'000'000 conversions.
+Parsing and serializing number exactly is one of the key features of decimal floating point types, so we must compare the performance of `<charconv>`. For all the following the results compare against STL provided `<charconv>` for 20,000,000 conversions.
+Since `<charconv>` is fully implemented in software for each type the performance gap between built-in `float` and `double` vs `decimal32` and `decimal64` is significantly smaller (or the decimal performance is better) than the hardware vs software performance gap seen above for basic operations.
 
-=== `from_chars` general
+To run these benchmarks yourself you will need a compiler with complete implementation of `<charconv>` and to run the benchmarks under C++17 or higher.
+At the time of writing this is limited to:
 
-==== M1 macOS Results
+- GCC 11 or newer
+- MSVC 19.24 or newer
 
-Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+These benchmarks are automatically disabled if your compiler does not provide feature complete `<charconv>` or if the language standard is set to C++14.
 
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 235,816
-| 0.953
-| `double`
-| 247,307
-| 1.000
-| `decimal32`
-| 366,682
-| 1.483
-| `decimal64`
-| 485,965
-| 1.965
-// Decimal128 was two orders of magnitude faster. I expect an issue
-//| `decimal128`
-//| 275,779,340
-//| 73267.60
-|===
+=== `from_chars`
 
-NOTE: `decimal128` is currently absent due to results showing it is 2 orders of magnitude faster than the others.
-This should not be the case so will be investigated.
+==== `from_chars` general
 
-=== `from_chars` scientific
+===== M1 macOS Results
 
-==== M1 macOS Results
-
-Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 241,893
-| 0.975
+| 2,556,533
+| 0.965
 | `double`
-| 247,975
+| 2,648,485
 | 1.000
 | `decimal32`
-| 358,189
-| 1.444
+| 3,201,545
+| 1.209
 | `decimal64`
-| 477,574
+| 4,775,487
+| 1.803
+| `decimal32_fast`
+| 3,196,724
+| 1.207
+| `decimal64_fast`
+| 4,762,636
+| 1.798
+|===
+
+==== `from_chars` scientific
+
+===== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 2,651,707
+| 0.986
+| `double`
+| 2,690,166
+| 1.000
+| `decimal32`
+| 3,153,821
+| 1.172
+| `decimal64`
+| 4,726,009
 | 1.926
-// Decimal128 was two orders of magnitude faster. I expect an issue
-//| `decimal128`
-//| 275,779,340
-//| 73267.60
+| `decimal32_fast`
+| 4,726,009
+| 1.757
+| `decimal64_fast`
+| 4,693,387
+| 1.747
 |===
 
-NOTE: `decimal128` is currently absent due to results showing it is 2 orders of magnitude faster than the others.
-This should not be the case so will be investigated.
+=== `to_chars`
 
-=== `to_chars` general shortest representation
+==== `to_chars` general shortest representation
 
-==== M1 macOS Results
+===== M1 macOS Results
 
-Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 316,300
-| 1.040
-| `double`
-| 304,272
-| 1.000
-| `decimal32`
-| 406,053
-| 1.335
-| `decimal64`
-| 678,451
-| 2.230
-| `decimal128`
-| 6,309,346
-| 20.736
-|===
-
-=== `to_chars` general 6-digits of precision
-
-==== M1 macOS Results
-
-Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 323,867
-| 0.967
+| 2,917,920
+| 0.849
 | `double`
-| 334,989
+| 3,435,671
 | 1.000
 | `decimal32`
-| 409,608
-| 1.223
+| 4,636,747
+| 1.350
 | `decimal64`
-| 702,339
-| 2.097
-| `decimal128`
-| 6,305,521
-| 18.823
+| 5,680,800
+| 1.653
+| `decimal32_fast`
+| 4,675,951
+| 1.361
+| `decimal64_fast`
+| 5,900,272
+| 1.717
 |===
 
-=== `to_chars` scientific shortest representation
+==== `to_chars` general 6-digits of precision
 
-==== M1 macOS Results
+===== M1 macOS Results
 
-Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 286,330
-| 1.011
+| 6,320,719
+| 0.962
 | `double`
-| 283,287
+| 6,572,846
 | 1.000
 | `decimal32`
-| 290,117
-| 1.024
+| 4,133,466
+| 0.629
 | `decimal64`
-| 499,637
-| 1.764
-| `decimal128`
-| 3,096,910
-| 10.932
+| 6,106,989
+| 0.929
+| `decimal32_fast`
+| 3,458,534
+| 0.526
+| `decimal64_fast`
+| 5,997,442
+| 0.912
 |===
 
-=== `to_chars` scientific 6-digits of precision
+==== `to_chars` scientific shortest representation
 
-==== M1 macOS Results
+===== M1 macOS Results
 
-Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and homebrew Clang 18.1.4
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 258,710
-| 0.809
+| 2,814,527
+| 0.817
 | `double`
-| 319,676
+| 3,442,930
 | 1.000
 | `decimal32`
-| 292,250
-| 0.914
+| 3,048,663
+| 0.885
 | `decimal64`
-| 516,399
-| 1.615
-| `decimal128`
-| 3,108,380
-| 9.724
+| 3,786,216
+| 1.010
+| `decimal32_fast`
+| 2,813,360
+| 0.817
+| `decimal64_fast`
+| 4,082,146
+| 1.186
 |===
 
-////
+==== `to_chars` scientific 6-digits of precision
+
+===== M1 macOS Results
+
+Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 5,636,010
+| 0.952
+| `double`
+| 5,922,301
+| 1.000
+| `decimal32`
+| 3,048,058
+| 0.515
+| `decimal64`
+| 5,140,604
+| 0.868
+| `decimal32_fast`
+| 2,821,707
+| 0.476
+| `decimal64_fast`
+| 5,525,549
+| 0.933
+|===
