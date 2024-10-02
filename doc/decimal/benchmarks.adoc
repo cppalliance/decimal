@@ -356,6 +356,9 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | 12,573,178
 | 705.526
 |===
+As discussed in the design of the fast types the significand is stored in normalized form so that we do not have to worry about the effects of cohorts.
+Unfortunately this means that `decimal128_fast` multiplication is always carried out internally at 256-bit size whereas `decimal128` contains heuristics in `operator*` to avoid 256-bit multiplication when it is not needed (i.e. the resultant significand is less than or equal to 128-bits).
+This causes multiplication of `decimal128_fast` to be ~1.72x slower than `decimal128`, but all other operators leave us with a geometric average runtime under 1.00 for `decimal128_fast` / `decimal128` so we accept this tradeoff.
 
 ==== Division
 
