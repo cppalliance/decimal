@@ -408,6 +408,32 @@ These benchmarks are automatically disabled if your compiler does not provide fe
 
 ==== `from_chars` general
 
+===== x64 Linux Results
+
+Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 10,308,818
+| 0.551
+| `double`
+| 18,692,513
+| 1.000
+| `decimal32`
+| 3,301,003
+| 0.177
+| `decimal64`
+| 4,580,001
+| 0.245
+| `decimal32_fast`
+| 3,321,788
+| 0.178
+| `decimal64_fast`
+| 4,591,311
+| 0.246
+|===
+
 ===== M1 macOS Results
 
 Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
@@ -435,6 +461,32 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 |===
 
 ==== `from_chars` scientific
+
+===== x64 Linux Results
+
+Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 10,363,219
+| 0.554
+| `double`
+| 18,677,179
+| 1.000
+| `decimal32`
+| 3,296,877
+| 0.177
+| `decimal64`
+| 4,500,127
+| 0.241
+| `decimal32_fast`
+| 3,381,651
+| 0.181
+| `decimal64_fast`
+| 4,496,194
+| 0.241
+|===
 
 ===== M1 macOS Results
 
@@ -466,6 +518,32 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 
 ==== `to_chars` general shortest representation
 
+===== x64 Linux Results
+
+Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 2,839,146
+| 0.841
+| `double`
+| 3,374,946
+| 1.000
+| `decimal32`
+| 4,253,304
+| 1.260
+| `decimal64`
+| 6,885,679
+| 2.040
+| `decimal32_fast`
+| 4,453,957
+| 1.320
+| `decimal64_fast`
+| 7,827,910
+| 2.319
+|===
+
 ===== M1 macOS Results
 
 Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
@@ -493,6 +571,32 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 |===
 
 ==== `to_chars` general 6-digits of precision
+
+===== x64 Linux Results
+
+Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 5,226,353
+| 0.957
+| `double`
+| 5,458,987
+| 1.000
+| `decimal32`
+| 3,782,692
+| 0.693
+| `decimal64`
+| 5,368,162
+| 0.983
+| `decimal32_fast`
+| 3,611,498
+| 0.662
+| `decimal64_fast`
+| 6,025,340
+| 1.104
+|===
 
 ===== M1 macOS Results
 
@@ -522,6 +626,32 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 
 ==== `to_chars` scientific shortest representation
 
+===== x64 Linux Results
+
+Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 2,835,528
+| 0.849
+| `double`
+| 3,338,216
+| 1.000
+| `decimal32`
+| 2,887,451
+| 0.865
+| `decimal64`
+| 5,218,195
+| 1.563
+| `decimal32_fast`
+| 3,033,115
+| 0.909
+| `decimal64_fast`
+| 6,103,323
+| 1.828
+|===
+
 ===== M1 macOS Results
 
 Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
@@ -549,6 +679,32 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 |===
 
 ==== `to_chars` scientific 6-digits of precision
+
+===== x64 Linux Results
+
+Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 4,686,460
+| 0.938
+| `double`
+| 4,993,886
+| 1.000
+| `decimal32`
+| 2,919,727
+| 0.585
+| `decimal64`
+| 4,157,802
+| 0.833
+| `decimal32_fast`
+| 3,052,228
+| 0.611
+| `decimal64_fast`
+| 5,597,538
+| 1.121
+|===
 
 ===== M1 macOS Results
 
