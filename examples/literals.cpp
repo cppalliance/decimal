@@ -17,8 +17,8 @@ int main()
 {
     using namespace boost::decimal;
 
-    const auto pi_32 {"3.141592653589793238"_DF};
-    const auto pi_64 {"3.141592653589793238"_DD};
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED const auto pi_32 {"3.141592653589793238"_DF};
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED const auto pi_64 {"3.141592653589793238"_DD};
 
     assert(float_equal(pi_32, static_cast<decimal32>(pi_64))); // Explicit conversion between decimal types
     assert(float_equal(pi_32, boost::decimal::numbers::pi_v<decimal32>)); // Constants available in numbers namespace

@@ -15,6 +15,7 @@
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
+#include <boost/decimal/detail/emulated128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
@@ -23,6 +24,51 @@
 
 namespace boost {
 namespace decimal {
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool
+{
+    using comp_type = typename DecimalType::significand_type;
+
+    // Step 1: Check for NANs per IEEE 754
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+    #endif
+
+    // Step 3: Check signs
+    const auto lhs_neg {lhs.isneg()};
+    const auto rhs_neg {rhs.isneg()};
+
+    if (lhs_neg != rhs_neg)
+    {
+        return false;
+    }
+
+    // Step 4: Check the exponents
+    // If the difference is greater than we can represent in the significand than we can assume they are different
+    const auto lhs_exp {lhs.biased_exponent()};
+    const auto rhs_exp {rhs.biased_exponent()};
+
+    auto lhs_sig {lhs.full_significand()};
+    auto rhs_sig {rhs.full_significand()};
+
+    const auto delta_exp {lhs_exp - rhs_exp};
+
+    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType> ||
+        ((lhs_sig == static_cast<comp_type>(0)) ^ (rhs_sig == static_cast<comp_type>(0))))
+    {
+        return false;
+    }
+
+    // Step 5: Normalize the significand and compare
+    delta_exp >= 0 ? lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp)) :
+                     rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
+
+    return lhs_sig == rhs_sig;
+}
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
@@ -187,6 +233,82 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_type_less_parts_impl(T lhs_sig, U
     if (lhs_sign != rhs_sign)
     {
         return lhs_sign;
+    }
+
+    if (lhs_exp != rhs_exp)
+    {
+        return lhs_sign ? lhs_exp > rhs_exp : lhs_exp < rhs_exp;
+    }
+
+    return lhs_sign ? lhs_sig > rhs_sig : lhs_sig < rhs_sig;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool
+{
+    using comp_type = std::conditional_t<std::is_same<DecimalType, decimal32>::value, std::uint_fast64_t,
+    // GCC less than 10 in non-GNU mode, Clang < 10 and MinGW all have issues with the built-in u128,
+    // so use the emulated one
+    #if defined(BOOST_DECIMAL_HAS_INT128)
+    #if ( (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10) || (defined(__clang__) && __clang_major__ < 13) )
+        detail::uint128
+    #  else
+        detail::uint128_t
+    #  endif
+    #else
+    detail::uint128
+    #endif
+    >;
+
+    // Step 1: Handle our non-finite values in their own calling functions
+
+    // Step 2: Check if they are bitwise equal:
+    /*
+    if (lhs.bits_ == rhs.bits_)
+    {
+        return false;
+    }
+    */
+
+    // Step 3: Decode and compare signs first:
+    const auto lhs_sign {lhs.isneg()};
+    const auto rhs_sign {rhs.isneg()};
+
+    if (lhs_sign != rhs_sign)
+    {
+        return lhs_sign;
+    }
+
+    // Step 4: Decode the significand and do a trivial comp
+    auto lhs_sig {static_cast<comp_type>(lhs.full_significand())};
+    auto rhs_sig {static_cast<comp_type>(rhs.full_significand())};
+    if (lhs_sig == static_cast<comp_type>(0) || rhs_sig == static_cast<comp_type>(0))
+    {
+        return (lhs_sig == rhs_sig) ? false : (lhs_sig == static_cast<comp_type>(0) ? !rhs_sign : lhs_sign);
+    }
+
+    // Step 5: Decode the exponent and see if we can even compare the significands
+    auto lhs_exp {lhs.biased_exponent()};
+    auto rhs_exp {rhs.biased_exponent()};
+
+    const auto delta_exp {lhs_exp - rhs_exp};
+    constexpr auto max_delta_diff {std::numeric_limits<comp_type>::digits10 - detail::precision_v<DecimalType>};
+
+    if (delta_exp > max_delta_diff || delta_exp < -max_delta_diff)
+    {
+        return rhs_sign ? rhs_exp < lhs_exp : rhs_exp > lhs_exp;
+    }
+
+    // Step 6: Approximate normalization if we need to and then get the answer
+    if (delta_exp >= 0)
+    {
+        lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp));
+        lhs_exp -= delta_exp;
+    }
+    else
+    {
+        rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
+        rhs_exp += delta_exp;
     }
 
     if (lhs_exp != rhs_exp)

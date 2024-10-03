@@ -4,12 +4,13 @@
 # Distributed under the Boost Software License, Version 1.0.
 # https://www.boost.org/LICENSE_1_0.txt
 
+require-b2 5.0.1 ;
+import-search /boost/config/checks ;
+import config : requires ;
+import modules ;
 import testing ;
-import ../../config/checks/config : requires ;
 
 project : requirements
-
-  <library>/boost/charconv//boost_charconv
 
   <toolset>gcc:<cxxflags>-Wall
   <toolset>gcc:<cxxflags>-Wextra
@@ -98,6 +99,7 @@ run test_decimal64_fast_stream.cpp ;
 run test_decimal64_stream.cpp ;
 run test_decimal128_basis.cpp ;
 run test_decimal_quantum.cpp ;
+run test_dpd_conversions.cpp ;
 run test_edges_and_behave.cpp ;
 run test_edit_members.cpp ;
 run test_ellint_1.cpp ;
@@ -113,7 +115,7 @@ run test_fixed_width_trunc.cpp ;
 run test_float_conversion.cpp ;
 run-fail test_fprintf.cpp ;
 run test_frexp_ldexp.cpp ;
-run test_from_chars.cpp ;
+run test_from_chars.cpp /boost/charconv//boost_charconv ;
 run test_git_issue_266.cpp ;
 run test_git_issue_271.cpp ;
 run test_hash.cpp ;
@@ -142,3 +144,11 @@ run test_tgamma.cpp ;
 run test_to_chars.cpp ;
 run test_to_string.cpp ;
 run test_zeta.cpp ;
+
+# Run the examples too
+run ../examples/adl.cpp ;
+run ../examples/basic_construction.cpp ;
+run ../examples/bit_conversions.cpp ;
+run ../examples/charconv.cpp ;
+run ../examples/literals.cpp ;
+run ../examples/rounding_mode.cpp ;

@@ -172,10 +172,16 @@ typedef unsigned __int128 uint128_t;
 
 #define BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION
 
-#if defined(___GNUC__) || defined(__clang__)
-#    define BOOST_DECIMAL_ATTRIBUTE_UNUSED __attribute__((__unused__))
+#if __has_cpp_attribute(maybe_unused)
+#  define BOOST_DECIMAL_ATTRIBUTE_UNUSED [[maybe_unused]]
 #else
-#    define BOOST_DECIMAL_ATTRIBUTE_UNUSED
+#   if defined(___GNUC__) || defined(__clang__)
+#       define BOOST_DECIMAL_ATTRIBUTE_UNUSED __attribute__((__unused__))
+#   elif defined(_MSC_VER)
+#       define BOOST_DECIMAL_ATTRIBUTE_UNUSED __pragma(warning(suppress: 4189))
+#   else
+#       define BOOST_DECIMAL_ATTRIBUTE_UNUSED
+#   endif
 #endif
 
 #if !defined(__cpp_if_constexpr) || (__cpp_if_constexpr < 201606L)
@@ -264,7 +270,7 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_REDUCE_TEST_DEPTH
 #endif
 
-#ifdef __clang__
+#if defined(__clang__) && __clang_major__ < 19
 #  define BOOST_DECIMAL_CLANG_STATIC static
 #else
 #  define BOOST_DECIMAL_CLANG_STATIC
