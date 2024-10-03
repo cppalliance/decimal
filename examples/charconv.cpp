@@ -18,7 +18,7 @@ int main()
     *r_to.ptr = '\0';
 
     decimal64 return_value;
-    auto r_from = from_chars(buffer, buffer + std::strlen(buffer), return_value);
+    BOOST_DECIMAL_ATTRIBUTE_UNUSED auto r_from = from_chars(buffer, buffer + std::strlen(buffer), return_value);
     assert(r_from);
 
     assert(val == return_value);
