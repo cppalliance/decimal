@@ -1082,21 +1082,34 @@ constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) 
 
 constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return (rhs.bits_ & detail::d64_nan_mask) == detail::d64_nan_mask;
+    #else
+    return false;
+    #endif
 }
 
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return ((rhs.bits_ & detail::d64_nan_mask) == detail::d64_inf_mask);
+    #else
+    return false;
+    #endif
 }
 
 constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return (rhs.bits_ & detail::d64_snan_mask) == detail::d64_snan_mask;
+    #else
+    return false;
+    #endif
 }
 
 constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     // Check for de-normals
     const auto sig {rhs.full_significand()};
     const auto exp {rhs.unbiased_exponent()};
@@ -1107,16 +1120,27 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs)
     }
 
     return (sig != 0) && isfinite(rhs);
+    #else
+    return rhs.full_significand() != 0;
+    #endif
 }
 
 constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return ((rhs.bits_ & detail::d64_inf_mask) != detail::d64_inf_mask);
+    #else
+    return true;
+    #endif
 }
 
 constexpr auto not_finite(decimal64 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return ((rhs.bits_ & detail::d64_inf_mask) == detail::d64_inf_mask);
+    #else
+    return false;
+    #endif
 }
 
 constexpr auto operator+(decimal64 rhs) noexcept -> decimal64
