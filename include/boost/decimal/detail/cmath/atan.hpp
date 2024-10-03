@@ -35,8 +35,9 @@ constexpr auto atan_impl(T x) noexcept
 
     if (fpc == FP_ZERO
         #ifndef BOOST_DECIMAL_FAST_MATH
-        || fpc == FP_NAN)
+        || fpc == FP_NAN
         #endif
+        )
     {
         result = x;
     }
