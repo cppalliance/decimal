@@ -19,7 +19,7 @@ required_conan_version = ">=1.53.0"
 
 class CharconvConan(ConanFile):
     name = "boost_decimal"
-    version = "2.3.0"
+    version = "2.4.0"
     description = "Boost provides free peer-reviewed portable C++ source libraries"
     url = "https://github.com/cppalliance/decimal"
     homepage = "https://github.com/cppalliance/decimal"
@@ -43,7 +43,7 @@ class CharconvConan(ConanFile):
     def _min_compiler_version_default_cxx14(self):
         return {
             "apple-clang": 99,
-            "gcc": 6,
+            "gcc": 7,
             "clang": 6,
             "Visual Studio": 14,  # guess
             "msvc": 192,
