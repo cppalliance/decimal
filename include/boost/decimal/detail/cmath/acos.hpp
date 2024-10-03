@@ -30,10 +30,12 @@ template <typename T>
 constexpr auto acos_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(x))
     {
         return x;
     }
+    #endif
 
     constexpr auto half_pi {numbers::pi_v<T> / 2};
     const auto absx {fabs(static_cast<T>(x))};

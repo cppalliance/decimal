@@ -57,6 +57,7 @@ constexpr auto pow(T b, IntegralType p) noexcept
 
         result = ((p < static_cast<local_integral_type>(0)) ? std::numeric_limits<T>::infinity() : ((p_is_odd && signbit(b)) ? -zero : zero));
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc_x == FP_INFINITE)
     {
         if (signbit(b))
@@ -91,6 +92,7 @@ constexpr auto pow(T b, IntegralType p) noexcept
 
         result = std::numeric_limits<T>::quiet_NaN(); // LCOV_EXCL_LINE
     }
+    #endif
     else
     {
         using local_unsigned_integral_type = std::make_unsigned_t<IntegralType>;
@@ -173,6 +175,7 @@ constexpr auto pow(T x, T a) noexcept
         }
         else if (fpc_x == FP_ZERO)
         {
+            #ifndef BOOST_DECIMAL_FAST_MATH
             if ((fpc_a == FP_NORMAL) || (fpc_a == FP_INFINITE))
             {
                 // pow(+/-0, exp), where exp is negative and finite, returns +infinity.
@@ -187,7 +190,14 @@ constexpr auto pow(T x, T a) noexcept
             {
                 result = std::numeric_limits<T>::quiet_NaN();
             }
+            #else
+            if (fpc_a == FP_NORMAL)
+            {
+                result = T{0};
+            }
+            #endif
         }
+        #ifndef BOOST_DECIMAL_FAST_MATH
         else if (fpc_x == FP_INFINITE)
         {
             if ((fpc_a == FP_NORMAL) || (fpc_a == FP_INFINITE))
@@ -206,12 +216,14 @@ constexpr auto pow(T x, T a) noexcept
         {
             result = x;
         }
+        #endif
         else
         {
             if (fpc_a == FP_ZERO)
             {
                 result = one;
             }
+            #ifndef BOOST_DECIMAL_FAST_MATH
             else if (fpc_a == FP_INFINITE)
             {
                 result =
@@ -221,6 +233,7 @@ constexpr auto pow(T x, T a) noexcept
                         : one
                     );
             }
+            #endif
             else
             {
                 const T a_log_x { a * log(x) };

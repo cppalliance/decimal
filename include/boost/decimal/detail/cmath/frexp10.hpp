@@ -37,11 +37,13 @@ constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_t
         *expptr = 0;
         return 0;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (isinf(num) || isnan(num))
     {
         *expptr = 0;
         return (std::numeric_limits<ReturnType>::max)();
     }
+    #endif
 
     auto num_exp {num.biased_exponent()};
     auto num_sig {num.full_significand()};

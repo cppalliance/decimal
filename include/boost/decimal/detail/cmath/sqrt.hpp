@@ -30,6 +30,7 @@ constexpr auto sqrt_impl(T x) noexcept
 
     T result { };
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if ((fpc == FP_NAN) || (fpc == FP_ZERO))
     {
         result = x;
@@ -42,6 +43,12 @@ constexpr auto sqrt_impl(T x) noexcept
     {
         result = std::numeric_limits<T>::infinity();
     }
+    #else
+    if (signbit(x))
+    {
+        result = T{0};
+    }
+    #endif
     else
     {
         int exp10val { };

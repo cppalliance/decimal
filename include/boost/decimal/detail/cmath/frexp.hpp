@@ -38,6 +38,7 @@ constexpr auto frexp_impl(T v, int* expon) noexcept
     {
         if (expon != nullptr) { *expon = 0; }
 
+        #ifndef BOOST_DECIMAL_FAST_MATH
         if (v_fp == FP_NAN)
         {
             result_frexp = std::numeric_limits<T>::quiet_NaN();
@@ -46,6 +47,7 @@ constexpr auto frexp_impl(T v, int* expon) noexcept
         {
             result_frexp = std::numeric_limits<T>::infinity();
         }
+        #endif
     }
     else
     {

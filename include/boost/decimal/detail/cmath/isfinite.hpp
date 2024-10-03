@@ -22,7 +22,11 @@ BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return !isinf(rhs) && !isnan(rhs);
+    #else
+    return true;
+    #endif
 }
 
 } // namespace decimal

@@ -33,7 +33,10 @@ constexpr auto atan_impl(T x) noexcept
 
     constexpr T my_pi_half { numbers::pi_v<T> / 2 };
 
-    if (fpc == FP_ZERO || fpc == FP_NAN)
+    if (fpc == FP_ZERO
+        #ifndef BOOST_DECIMAL_FAST_MATH
+        || fpc == FP_NAN)
+        #endif
     {
         result = x;
     }
@@ -41,10 +44,12 @@ constexpr auto atan_impl(T x) noexcept
     {
         result = -atan_impl(-x);
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc == FP_INFINITE)
     {
         result = my_pi_half;
     }
+    #endif
     else
     {
         constexpr T one { 1 };

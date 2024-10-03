@@ -25,6 +25,7 @@ constexpr auto fdim(T x, T y) noexcept
 {
     constexpr T zero {0, 0};
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(x) || isinf(x))
     {
         return x;
@@ -33,6 +34,7 @@ constexpr auto fdim(T x, T y) noexcept
     {
         return y;
     }
+    #endif
 
     if (y >= x)
     {

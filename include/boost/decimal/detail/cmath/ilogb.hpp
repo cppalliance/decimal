@@ -30,6 +30,7 @@ constexpr auto ilogb(T d) noexcept
     {
         result = static_cast<int>(FP_ILOGB0);
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc == FP_INFINITE)
     {
         result = static_cast<int>(INT_MAX);
@@ -38,6 +39,7 @@ constexpr auto ilogb(T d) noexcept
     {
         result = static_cast<int>(FP_ILOGBNAN);
     }
+    #endif
     else
     {
         const auto offset = detail::num_digits(d.full_significand()) - 1;

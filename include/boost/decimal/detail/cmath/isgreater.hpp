@@ -22,10 +22,12 @@ BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto isgreater(T lhs, T rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return lhs > rhs;
 }
@@ -34,10 +36,12 @@ BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto isgreaterequal(T lhs, T rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
     {
         return false;
     }
+    #endif
 
     return lhs >= rhs;
 }

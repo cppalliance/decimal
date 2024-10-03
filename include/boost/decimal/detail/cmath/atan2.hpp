@@ -51,6 +51,7 @@ constexpr auto atan2_impl(T y, T x) noexcept
 
     T result { };
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (fpcx == FP_NAN)
     {
         result = x;
@@ -59,7 +60,9 @@ constexpr auto atan2_impl(T y, T x) noexcept
     {
         result = y;
     }
-    else if (fpcy == FP_ZERO && signx)
+    else
+    #endif
+    if (fpcy == FP_ZERO && signx)
     {
         result = signy ? -numbers::pi_v<T> : numbers::pi_v<T>;
     }
@@ -67,6 +70,7 @@ constexpr auto atan2_impl(T y, T x) noexcept
     {
         result = y;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpcy == FP_INFINITE && isfinitex)
     {
         result = atan2_detail::pi_constants<T>::pi_over_two;
@@ -85,12 +89,14 @@ constexpr auto atan2_impl(T y, T x) noexcept
 
         if (signy) { result = -result; }
     }
+    #endif
     else if (fpcx == FP_ZERO)
     {
         result = atan2_detail::pi_constants<T>::pi_over_two;
 
         if (signy) { result = -result; }
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpcx == FP_INFINITE && signx && isfinitey)
     {
         result = signy ? -numbers::pi_v<T> : numbers::pi_v<T>;
@@ -101,6 +107,7 @@ constexpr auto atan2_impl(T y, T x) noexcept
 
         result = signy ? -zero : zero;
     }
+    #endif
     else
     {
         if (x == T{1, 0})

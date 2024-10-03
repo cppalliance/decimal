@@ -30,6 +30,7 @@ constexpr auto remquo(T x, T y, int* quo) noexcept
     constexpr T zero {0, 0};
     constexpr T half {5, -1};
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if ((isinf(x) && !isinf(y)) ||
         (abs(y) == zero && !isnan(x)))
     {
@@ -43,6 +44,12 @@ constexpr auto remquo(T x, T y, int* quo) noexcept
     {
         return y;
     }
+    #else
+    if (abs(y) == zero)
+    {
+        return zero;
+    }
+    #endif
 
     // Compute quo
     auto div {x / y};

@@ -22,7 +22,11 @@ BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto isunordered(T lhs, T rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return isnan(lhs) || isnan(rhs);
+    #else
+    return false;
+    #endif
 }
 
 } // namespace decimal

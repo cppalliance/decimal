@@ -37,6 +37,7 @@ constexpr auto lgamma_impl(T x) noexcept
 
     const auto fpc = fpclassify(x);
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (fpc != FP_NORMAL)
     {
         if ((fpc == FP_ZERO) || (fpc == FP_INFINITE))
@@ -48,10 +49,20 @@ constexpr auto lgamma_impl(T x) noexcept
             result = x;
         }
     }
+    #else
+    if (fpc == FP_ZERO)
+    {
+        result = std::numeric_limits<T>::max();
+    }
+    #endif
     else if ((is_pure_int) && (nx < 0))
     {
         // Pure negative integer argument.
+        #ifndef BOOST_DECIMAL_FAST_MATH
         result = std::numeric_limits<T>::infinity();
+        #else
+        result = T{0};
+        #endif
     }
     else if ((is_pure_int) && ((nx == 1) || (nx == 2)))
     {
