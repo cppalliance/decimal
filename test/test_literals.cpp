@@ -26,6 +26,23 @@ void test_decimal32_literals()
     BOOST_TEST(isinf(5e300_df));
 }
 
+void test_decimal32_fast_literals()
+{
+    BOOST_TEST_EQ(decimal32_fast(0), 0_DFF);
+    BOOST_TEST_EQ(decimal32_fast(3), 3_DFF);
+    BOOST_TEST_EQ(decimal32_fast(3.1), 3.1_DFF);
+    BOOST_TEST_EQ(decimal32_fast(3, 1), 3e1_DFF);
+    BOOST_TEST(isinf(5e100_DFF));
+    BOOST_TEST(isinf(5e300_DFF));
+
+    BOOST_TEST_EQ(decimal32_fast(0), 0_dff);
+    BOOST_TEST_EQ(decimal32_fast(3), 3_dff);
+    BOOST_TEST_EQ(decimal32_fast(3.1), 3.1_dff);
+    BOOST_TEST_EQ(decimal32_fast(3, 1), 3e1_dff);
+    BOOST_TEST(isinf(5e100_dff));
+    BOOST_TEST(isinf(5e300_dff));
+}
+
 void test_decimal64_literals()
 {
     BOOST_TEST_EQ(decimal64(0), 0_DD);
@@ -47,6 +64,27 @@ void test_decimal64_literals()
     #endif
 }
 
+void test_decimal64_fast_literals()
+{
+    BOOST_TEST_EQ(decimal64_fast(0), 0_DDF);
+    BOOST_TEST_EQ(decimal64_fast(3), 3_DDF);
+    BOOST_TEST_EQ(decimal64_fast(3.1), 3.1_DDF);
+    BOOST_TEST_EQ(decimal64_fast(3, 1), 3e1_DDF);
+
+    BOOST_TEST_EQ(decimal64_fast(0), 0_ddf);
+    BOOST_TEST_EQ(decimal64_fast(3), 3_ddf);
+    BOOST_TEST_EQ(decimal64_fast(3.1), 3.1_ddf);
+    BOOST_TEST_EQ(decimal64_fast(3, 1), 3e1_ddf);
+
+    // 64-bit long double warn of overflow
+    #if !(LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024)
+    BOOST_TEST(isinf(5e1000_ddf));
+    BOOST_TEST(isinf(5e3000_ddf));
+    BOOST_TEST(isinf(5e1000_DDF));
+    BOOST_TEST(isinf(5e3000_DDF));
+    #endif
+}
+
 void test_decimal128_literals()
 {
     BOOST_TEST_EQ(decimal128(0), 0_DL);
@@ -60,11 +98,28 @@ void test_decimal128_literals()
     BOOST_TEST_EQ(decimal128(3, 1), 3e1_dl);
 }
 
+void test_decimal128_fast_literals()
+{
+    BOOST_TEST_EQ(decimal128_fast(0), 0_DLF);
+    BOOST_TEST_EQ(decimal128_fast(3), 3_DLF);
+    BOOST_TEST_EQ(decimal128_fast(3.1), 3.1_DLF);
+    BOOST_TEST_EQ(decimal128_fast(3, 1), 3e1_DLF);
+
+    BOOST_TEST_EQ(decimal128_fast(0), 0_dlf);
+    BOOST_TEST_EQ(decimal128_fast(3), 3_dlf);
+    BOOST_TEST_EQ(decimal128_fast(3.1), 3.1_dlf);
+    BOOST_TEST_EQ(decimal128_fast(3, 1), 3e1_dlf);
+}
+
 int main()
 {
     test_decimal32_literals();
     test_decimal64_literals();
     test_decimal128_literals();
+
+    test_decimal32_fast_literals();
+    test_decimal64_fast_literals();
+    test_decimal128_fast_literals();
 
     return boost::report_errors();
 }

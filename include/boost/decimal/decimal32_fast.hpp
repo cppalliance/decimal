@@ -385,7 +385,7 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
     auto biased_exp {static_cast<std::uint_fast32_t>(exp + detail::bias)};
 
     // Decimal32 exponent holds 8 bits
-    if (biased_exp > UINT32_C(0xFF))
+    if (biased_exp > detail::max_biased_exp_v<decimal32_fast>)
     {
         significand_ = detail::d32_fast_inf;
     }

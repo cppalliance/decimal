@@ -19,7 +19,7 @@ constexpr auto operator  "" _DF(const char* str) -> decimal32
 constexpr auto operator  "" _df(const char* str) -> decimal32
 
 constexpr auto operator  "" _DF(unsigned long long v) -> decimal32
-constexpr auto operator  "" _dF(unsigned long long v) -> decimal32
+constexpr auto operator  "" _df(unsigned long long v) -> decimal32
 
 constexpr auto operator  "" _DD(const char* str) -> decimal64
 constexpr auto operator  "" _dd(const char* str) -> decimal64
@@ -32,6 +32,26 @@ constexpr auto operator  "" _dl(const char* str) -> decimal128
 
 constexpr auto operator  "" _DL(unsigned long long v) -> decimal128
 constexpr auto operator  "" _dl(unsigned long long v) -> decimal128
+
+// ----- Fast Type Literals -----
+
+constexpr auto operator  "" _DFF(const char* str) -> decimal32_fast
+constexpr auto operator  "" _dff(const char* str) -> decimal32_fast
+
+constexpr auto operator  "" _DFF(unsigned long long v) -> decimal32_fast
+constexpr auto operator  "" _dff(unsigned long long v) -> decimal32_fast
+
+constexpr auto operator  "" _DDF(const char* str) -> decimal64_fast
+constexpr auto operator  "" _ddf(const char* str) -> decimal64_fast
+
+constexpr auto operator  "" _DDF(unsigned long long v) -> decimal64_fast
+constexpr auto operator  "" _ddf(unsigned long long v) -> decimal64_fast
+
+constexpr auto operator  "" _DLF(const char* str) -> decimal128_fast
+constexpr auto operator  "" _dlf(const char* str) -> decimal128_fast
+
+constexpr auto operator  "" _DLF(unsigned long long v) -> decimal128_fast
+constexpr auto operator  "" _dlf(unsigned long long v) -> decimal128_fast
 
 } //namespace decimal
 } //namespace boost
