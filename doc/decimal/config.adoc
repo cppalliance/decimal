@@ -42,3 +42,7 @@ This flag increases the performance of the basis operations (e.g. add, sub, mul,
   * __GNUC__ >= 9
   * Compiler has: __builtin_is_constant_evaluated()
   * C++20 support with: std::is_constant_evaluated()
+
+- `BOOST_DECIMAL_HAS_STD_CHARCONV`: This macro is defined if header `<charconv>` exists and the language standard used is >= C++17
+  * We only need the structs and enums out of the header so we are not concerned with being overly restrictive about the feature test macros.
+   Implementations of integer `std::from_chars` and `std::to_chars` existed far before the floating points were completed to allow the feature test macro to be properly set.
