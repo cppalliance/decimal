@@ -3021,11 +3021,30 @@ This behavior is the same as that of <a href="https://www.boost.org/doc/libs/mas
 <span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">DecimalType</span><span class="p">&gt;</span>
-<span class="k">constexpr</span> <span class="n">from_chars_result</span> <span class="n">from_chars</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">first</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">last</span><span class="p">,</span> <span class="n">DecimalType</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">,</span> <span class="n">chars_format</span> <span class="n">fmt</span> <span class="o">=</span> <span class="n">chars_format</span><span class="o">::</span><span class="n">general</span><span class="p">)</span>
+<span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">from_chars_result</span> <span class="n">from_chars</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">first</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">last</span><span class="p">,</span> <span class="n">DecimalType</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">,</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">chars_format</span> <span class="n">fmt</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">chars_format</span><span class="o">::</span><span class="n">general</span><span class="p">)</span> <span class="k">noexcept</span>
 
+<span class="cp">#ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
+</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">DecimalType</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">from_chars_result</span> <span class="n">from_chars</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">first</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">last</span><span class="p">,</span> <span class="n">DecimalType</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">chars_format</span> <span class="n">fmt</span><span class="p">)</span> <span class="k">noexcept</span>
+
+<span class="cp">#endif // BOOST_DECIMAL_HAS_STD_CHARCONV
+</span>
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+If <code>std::chars_format</code> is used the function will return a <code>std::from_chars_result</code> and if <code>boost::decimal::chars_format</code> is used <strong>OR</strong> no format is specified then a <code>boost::decimal::from_chars_result</code> will be returned.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -3044,6 +3063,16 @@ This behavior is the same as that of <a href="https://www.boost.org/doc/libs/mas
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">DecimalType</span><span class="p">&gt;</span>
 <span class="n">BOOST_DECIMAL_CONSTEXPR</span> <span class="n">to_chars_result</span> <span class="n">to_chars</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">first</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">last</span><span class="p">,</span> <span class="n">DecimalType</span> <span class="n">value</span><span class="p">,</span> <span class="n">chars_format</span> <span class="n">fmt</span><span class="p">,</span> <span class="kt">int</span> <span class="n">precision</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
 
+<span class="cp">#ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
+</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">DecimalType</span><span class="p">&gt;</span>
+<span class="n">BOOST_DECIMAL_CONSTEXPR</span> <span class="n">std</span><span class="o">::</span><span class="n">to_chars_result</span> <span class="n">to_chars</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">first</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">last</span><span class="p">,</span> <span class="n">DecimalType</span> <span class="n">value</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">chars_format</span> <span class="n">fmt</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">DecimalType</span><span class="p">&gt;</span>
+<span class="n">BOOST_DECIMAL_CONSTEXPR</span> <span class="n">std</span><span class="o">::</span><span class="n">to_chars_result</span> <span class="n">to_chars</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">first</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">last</span><span class="p">,</span> <span class="n">DecimalType</span> <span class="n">value</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">chars_format</span> <span class="n">fmt</span><span class="p">,</span> <span class="kt">int</span> <span class="n">precision</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="cp">#endif // BOOST_DECIMAL_HAS_STD_CHARCONV
+</span>
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
@@ -3075,6 +3104,18 @@ This behavior is the same as that of <a href="https://www.boost.org/doc/libs/mas
 <p>C++20 support with: <code>std::is_constant_evaluated()</code></p>
 </li>
 </ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Same as <code>from_chars</code>, <code>boost::decimal::to_chars</code> will return a <code>std::to_chars_result</code> if <code>std::chars_format</code> is used to specify the format; otherwise it returns a <code>boost::decimal::to_chars_result</code>.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>The library offers an additional feature for sizing buffers without specified precision and in general format</p>
@@ -3642,6 +3683,23 @@ This flag increases the performance of the basis operations (e.g. add, sub, mul,
 </li>
 <li>
 <p>C++20 support with: std::is_constant_evaluated()</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>BOOST_DECIMAL_HAS_STD_CHARCONV</code>: This macro is defined if header <code>&lt;charconv&gt;</code> exists and the language standard used is &gt;= C++17</p>
+<div class="ulist">
+<ul>
+<li>
+<p>We only need the structs and enums out of the header so we are not concerned with being overly restrictive about the feature test macros.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Known compilers that support this lighter  requirement are: GCC &gt;= 10, Clang &gt;= 13, and MSVC &gt;= 14.2</p>
+</li>
+</ul>
+</div>
 </li>
 </ul>
 </div>
@@ -5911,7 +5969,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-04 10:16:47 -0400
+Last updated 2024-10-04 11:42:48 -0400
 </div>
 </div>
 <style>
