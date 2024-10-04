@@ -202,6 +202,122 @@ void test_hex_values()
     BOOST_TEST_EQ(v3, res_3);
 }
 
+#ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
+
+template <typename T>
+void test_from_chars_scientific_std()
+{
+    std::uniform_real_distribution<float> dist(1e-10F, 1e10F);
+
+    constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
+
+    for (std::size_t i {}; i < max_iter; ++i)
+    {
+        char buffer[256] {};
+        const auto val {dist(rng)};
+        auto r = boost::charconv::to_chars(buffer, buffer + sizeof(buffer), val, boost::charconv::chars_format::scientific);
+
+        if (!r)
+        {
+            continue; // LCOV_EXCL_LINE
+        }
+
+        *r.ptr = '\0';
+
+        T return_value;
+        const std::from_chars_result r_dec = from_chars(buffer, buffer + std::strlen(buffer), return_value, std::chars_format::scientific);
+        const auto ret_value_float = static_cast<float>(return_value);
+        const auto float_distance = std::abs(boost::math::float_distance(ret_value_float, val));
+
+        if (!(BOOST_TEST(float_distance <= 10) && BOOST_TEST(r_dec.ec == std::errc())))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "     Value: " << val
+                      << "\n    Buffer: " << buffer
+                      << "\n   Ret Val: " << return_value
+                      << "\nFloat dist: " << float_distance << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+template <typename T>
+void test_from_chars_fixed_std()
+{
+    std::uniform_real_distribution<float> dist(1e-10F, 1e10F);
+
+    constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
+
+    for (std::size_t i {}; i < max_iter; ++i)
+    {
+        char buffer[256] {};
+        const auto val {dist(rng)};
+        auto r = boost::charconv::to_chars(buffer, buffer + sizeof(buffer), val, boost::charconv::chars_format::fixed);
+
+        if (!r)
+        {
+            continue; // LCOV_EXCL_LINE
+        }
+
+        *r.ptr = '\0';
+
+        T return_value;
+        const std::from_chars_result r_dec = from_chars(buffer, buffer + std::strlen(buffer), return_value, std::chars_format::fixed);
+
+        const auto ret_value_float = static_cast<float>(return_value);
+        const auto float_distance = std::abs(boost::math::float_distance(ret_value_float, val));
+
+        if (!(BOOST_TEST(float_distance <= 10) && BOOST_TEST(r_dec.ec == std::errc())))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "     Value: " << val
+                      << "\n    Buffer: " << buffer
+                      << "\n   Ret Val: " << return_value
+                      << "\nFloat dist: " << float_distance << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+template <typename T>
+void test_from_chars_general_std()
+{
+    std::uniform_real_distribution<float> dist(1e-10F, 1e10F);
+
+    constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
+
+    for (std::size_t i {}; i < max_iter; ++i)
+    {
+        char buffer[256] {};
+        const auto val {dist(rng)};
+        auto r = boost::charconv::to_chars(buffer, buffer + sizeof(buffer), val, boost::charconv::chars_format::general);
+
+        if (!r)
+        {
+            continue; // LCOV_EXCL_LINE
+        }
+
+        *r.ptr = '\0';
+
+        T return_value;
+        const std::from_chars_result r_dec = from_chars(buffer, buffer + std::strlen(buffer), return_value, std::chars_format::general);
+        const auto ret_value_float = static_cast<float>(return_value);
+        const auto float_distance = std::abs(boost::math::float_distance(ret_value_float, val));
+
+        if (!(BOOST_TEST(float_distance <= 10) && BOOST_TEST(r_dec.ec == std::errc())))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "     Value: " << val
+                      << "\n    Buffer: " << buffer
+                      << "\n   Ret Val: " << return_value
+                      << "\nFloat dist: " << float_distance << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+#endif
+
 int main()
 {
     test_from_chars_scientific<decimal32>();
@@ -218,6 +334,23 @@ int main()
     test_from_chars_general<decimal64>();
     test_from_chars_general<decimal32_fast>();
     test_from_chars_general<decimal64_fast>();
+
+    #ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
+    test_from_chars_scientific_std<decimal32>();
+    test_from_chars_scientific_std<decimal64>();
+    test_from_chars_scientific_std<decimal32_fast>();
+    test_from_chars_scientific_std<decimal64_fast>();
+
+    test_from_chars_fixed_std<decimal32>();
+    test_from_chars_fixed_std<decimal64>();
+    test_from_chars_fixed_std<decimal32_fast>();
+    test_from_chars_fixed_std<decimal64_fast>();
+
+    test_from_chars_general_std<decimal32>();
+    test_from_chars_general_std<decimal64>();
+    test_from_chars_general_std<decimal32_fast>();
+    test_from_chars_general_std<decimal64_fast>();
+    #endif
 
     test_non_finite_values<decimal32>();
     test_non_finite_values<decimal64>();
