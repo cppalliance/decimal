@@ -729,6 +729,20 @@ pre.rouge .gs {
 <li><a href="#overview_basic_usage">Basic Usage</a></li>
 </ul>
 </li>
+<li><a href="#api_reference">API Reference</a>
+<ul class="sectlevel2">
+<li><a href="#api_ref_types">Types</a>
+<ul class="sectlevel3">
+<li><a href="#api_ref_ieee_754_compliant_types">IEEE 754 Compliant Types</a></li>
+<li><a href="#api_ref_non_ieee_754_compliant_types">Non-IEEE 754 Compliant Types</a></li>
+</ul>
+</li>
+<li><a href="#api_ref_structures">Structures</a></li>
+<li><a href="#api_ref_enums">Enums</a></li>
+<li><a href="#api_ref_constants">Constants</a></li>
+<li><a href="#api_ref_macros">Macros</a></li>
+</ul>
+</li>
 <li><a href="#generic_decimal_">Decimal Types</a>
 <ul class="sectlevel2">
 <li><a href="#generic_decimal_3_2_8_note">3.2.8 Note</a></li>
@@ -814,6 +828,12 @@ pre.rouge .gs {
 <li><a href="#charconv">charconv support</a>
 <ul class="sectlevel2">
 <li><a href="#charconv_charconv">&lt;charconv&gt;</a></li>
+<li><a href="#chars_format">chars_format</a></li>
+<li><a href="#from_chars_result">from_chars_result</a></li>
+<li><a href="#to_chars_result">to_chars_result</a></li>
+<li><a href="#from_chars">from_chars</a></li>
+<li><a href="#to_chars">to_chars</a></li>
+<li><a href="#charconv_limits">limits</a></li>
 </ul>
 </li>
 <li><a href="#cfenv">cfenv support</a>
@@ -846,7 +866,12 @@ pre.rouge .gs {
 <li><a href="#limits_limits">&lt;limits&gt;</a></li>
 </ul>
 </li>
-<li><a href="#configuration">Configuration Macros</a></li>
+<li><a href="#configuration">Configuration Macros</a>
+<ul class="sectlevel2">
+<li><a href="#config_user_configurable_macros">User Configurable Macros</a></li>
+<li><a href="#config_automatic_configuration_macros">Automatic Configuration Macros</a></li>
+</ul>
+</li>
 <li><a href="#examples">Examples</a>
 <ul class="sectlevel2">
 <li><a href="#examples_construction_from_an_integer_and_exponent">Construction from an Integer and Exponent</a></li>
@@ -855,6 +880,7 @@ pre.rouge .gs {
 <li><a href="#examples_rounding_mode">Rounding Mode</a></li>
 <li><a href="#examples_generic_programming">Generic Programming</a></li>
 <li><a href="#examples_literals_and_constants">Literals and Constants</a></li>
+<li><a href="#examples_bit_conversions">Bit Conversions</a></li>
 </ul>
 </li>
 <li><a href="#Benchmarks">Benchmarks</a>
@@ -1013,6 +1039,88 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span></code></pre>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="api_reference">API Reference</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="api_ref_types">Types</h3>
+<div class="sect3">
+<h4 id="api_ref_ieee_754_compliant_types">IEEE 754 Compliant Types</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#decimal32"><code>decimal32</code></a></p>
+</li>
+<li>
+<p><a href="#decimal64"><code>decimal64</code></a></p>
+</li>
+<li>
+<p><a href="#decimal128"><code>decimal128</code></a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="api_ref_non_ieee_754_compliant_types">Non-IEEE 754 Compliant Types</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#decimal32_fast"><code>decimal32_fast</code></a></p>
+</li>
+<li>
+<p><a href="#decimal64_fast"><code>decimal64_fast</code></a></p>
+</li>
+<li>
+<p><a href="#decimal128_fast"><code>decimal128_fast</code></a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="api_ref_structures">Structures</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#to_chars_result"><code>to_chars_result</code></a></p>
+</li>
+<li>
+<p><a href="#from_chars_result"><code>from_chars_result</code></a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="api_ref_enums">Enums</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#chars_format"><code>chars_format</code></a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="api_ref_constants">Constants</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#charconv_limits"><code>limits</code></a></p>
+</li>
+<li>
+<p><a href="#numbers"><code>namespace boost::decimal::numbers</code></a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="api_ref_macros">Macros</h3>
+<div class="paragraph">
+<p>See: <a href="#configuration">Configuration Macros</a></p>
 </div>
 </div>
 </div>
@@ -2840,6 +2948,9 @@ This behavior is the same as that of <a href="https://www.boost.org/doc/libs/mas
 </tr>
 </table>
 </div>
+</div>
+<div class="sect2">
+<h3 id="chars_format">chars_format</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
@@ -2853,6 +2964,18 @@ This behavior is the same as that of <a href="https://www.boost.org/doc/libs/mas
     <span class="n">general</span> <span class="o">=</span> <span class="n">fixed</span> <span class="o">|</span> <span class="n">scientific</span>
 <span class="p">};</span>
 
+<span class="p">}</span> <span class="c1">//namespace decimal</span>
+<span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="from_chars_result">from_chars_result</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
 <span class="k">struct</span> <span class="nc">from_chars_result</span>
 <span class="p">{</span>
     <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">ptr</span><span class="p">;</span>
@@ -2862,6 +2985,18 @@ This behavior is the same as that of <a href="https://www.boost.org/doc/libs/mas
 
     <span class="k">constexpr</span> <span class="k">explicit</span> <span class="k">operator</span> <span class="kt">bool</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="p">{</span> <span class="k">return</span> <span class="n">ec</span> <span class="o">==</span> <span class="n">std</span><span class="o">::</span><span class="n">errc</span><span class="p">{};</span> <span class="p">}</span>
 <span class="p">}</span>
+
+<span class="p">}</span> <span class="c1">//namespace decimal</span>
+<span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="to_chars_result">to_chars_result</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
 
 <span class="k">struct</span> <span class="nc">to_chars_result</span>
 <span class="p">{</span>
@@ -2873,8 +3008,32 @@ This behavior is the same as that of <a href="https://www.boost.org/doc/libs/mas
     <span class="k">constexpr</span> <span class="k">explicit</span> <span class="k">operator</span> <span class="kt">bool</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="p">{</span> <span class="k">return</span> <span class="n">ec</span> <span class="o">==</span> <span class="n">std</span><span class="o">::</span><span class="n">errc</span><span class="p">{};</span> <span class="p">}</span>
 <span class="p">}</span>
 
+<span class="p">}</span> <span class="c1">//namespace decimal</span>
+<span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="from_chars">from_chars</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">DecimalType</span><span class="p">&gt;</span>
 <span class="k">constexpr</span> <span class="n">from_chars_result</span> <span class="n">from_chars</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">first</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">last</span><span class="p">,</span> <span class="n">DecimalType</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">,</span> <span class="n">chars_format</span> <span class="n">fmt</span> <span class="o">=</span> <span class="n">chars_format</span><span class="o">::</span><span class="n">general</span><span class="p">)</span>
+
+<span class="p">}</span> <span class="c1">//namespace decimal</span>
+<span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="to_chars">to_chars</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">DecimalType</span><span class="p">&gt;</span>
 <span class="n">BOOST_DECIMAL_CONSTEXPR</span> <span class="n">to_chars_result</span> <span class="n">to_chars</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">first</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">last</span><span class="p">,</span> <span class="n">DecimalType</span> <span class="n">value</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
@@ -2920,6 +3079,9 @@ This behavior is the same as that of <a href="https://www.boost.org/doc/libs/mas
 <div class="paragraph">
 <p>The library offers an additional feature for sizing buffers without specified precision and in general format</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="charconv_limits">limits</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
@@ -3261,45 +3423,45 @@ The uppercase format will return with all applicable values in uppercase (e.g. 3
 </span><span class="nl">public:</span>
 <span class="cp">#endif
 </span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_specialized</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_signed</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_integer</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_exact</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_infinity</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_quiet_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_signaling_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_specialized</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_signed</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_integer</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_exact</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_infinity</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_quiet_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_signaling_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
 
     <span class="c1">// These members were deprecated in C++23</span>
     <span class="cp">#if ((!defined(_MSC_VER) &amp;&amp; (__cplusplus &lt;= 202002L)) || (defined(_MSC_VER) &amp;&amp; (_MSVC_LANG &lt;= 202002L)))
-</span>    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_denorm_style</span> <span class="n">has_denorm</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">denorm_present</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_denorm_loss</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span>    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_denorm_style</span> <span class="n">has_denorm</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">denorm_present</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_denorm_loss</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
     <span class="cp">#endif
 </span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_round_style</span> <span class="n">round_style</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">round_indeterminate</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_iec559</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_bounded</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_modulo</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">digits</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">max_digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">radix</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">min_exponent</span> <span class="o">=</span> <span class="o">-</span><span class="mi">95</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">min_exponent10</span> <span class="o">=</span> <span class="n">min_exponent</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">max_exponent</span> <span class="o">=</span> <span class="mi">96</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">max_exponent10</span> <span class="o">=</span> <span class="n">max_exponent</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">traps</span> <span class="o">=</span> <span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="o">&gt;::</span><span class="n">traps</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">tinyness_before</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_round_style</span> <span class="n">round_style</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">round_indeterminate</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_iec559</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_bounded</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_modulo</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">digits</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">max_digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">radix</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">min_exponent</span> <span class="o">=</span> <span class="o">-</span><span class="mi">95</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">min_exponent10</span> <span class="o">=</span> <span class="n">min_exponent</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">max_exponent</span> <span class="o">=</span> <span class="mi">96</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span> <span class="n">max_exponent10</span> <span class="o">=</span> <span class="n">max_exponent</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">traps</span> <span class="o">=</span> <span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="o">&gt;::</span><span class="n">traps</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">tinyness_before</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
 
     <span class="c1">// Member functions</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">min</span><span class="p">()</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">max</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">lowest</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">epsilon</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">round_error</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">infinity</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">quiet_NaN</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">signaling_NaN</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">denorm_min</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">min</span><span class="p">()</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">max</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">lowest</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">epsilon</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">round_error</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">infinity</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">quiet_NaN</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">signaling_NaN</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">denorm_min</span><span class="p">();</span>
 <span class="p">};</span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="p">&gt;</span>
@@ -3314,45 +3476,45 @@ The uppercase format will return with all applicable values in uppercase (e.g. 3
 </span>    <span class="nl">public:</span>
 <span class="cp">#endif
 </span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_specialized</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_signed</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_integer</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_exact</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_infinity</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_quiet_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_signaling_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_specialized</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_signed</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_integer</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_exact</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_infinity</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_quiet_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_signaling_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
 
     <span class="c1">// These members were deprecated in C++23</span>
     <span class="cp">#if ((!defined(_MSC_VER) &amp;&amp; (__cplusplus &lt;= 202002L)) || (defined(_MSC_VER) &amp;&amp; (_MSVC_LANG &lt;= 202002L)))
-</span>    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_denorm_style</span> <span class="n">has_denorm</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">denorm_present</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_denorm_loss</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span>    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_denorm_style</span> <span class="n">has_denorm</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">denorm_present</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_denorm_loss</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
     <span class="cp">#endif
 </span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_round_style</span> <span class="n">round_style</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">round_indeterminate</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_iec559</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_bounded</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_modulo</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">digits</span> <span class="o">=</span> <span class="mi">16</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">radix</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">min_exponent</span> <span class="o">=</span> <span class="o">-</span><span class="mi">382</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">min_exponent10</span> <span class="o">=</span> <span class="n">min_exponent</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_exponent</span> <span class="o">=</span> <span class="mi">385</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_exponent10</span> <span class="o">=</span> <span class="n">max_exponent</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">traps</span> <span class="o">=</span> <span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span><span class="o">&gt;::</span><span class="n">traps</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">tinyness_before</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_round_style</span> <span class="n">round_style</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">round_indeterminate</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_iec559</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_bounded</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_modulo</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">digits</span> <span class="o">=</span> <span class="mi">16</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">radix</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">min_exponent</span> <span class="o">=</span> <span class="o">-</span><span class="mi">382</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">min_exponent10</span> <span class="o">=</span> <span class="n">min_exponent</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_exponent</span> <span class="o">=</span> <span class="mi">385</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_exponent10</span> <span class="o">=</span> <span class="n">max_exponent</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">traps</span> <span class="o">=</span> <span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span><span class="o">&gt;::</span><span class="n">traps</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">tinyness_before</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
 
     <span class="c1">// Member functions</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">min</span><span class="p">()</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">max</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">lowest</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">epsilon</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">round_error</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">infinity</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">quiet_NaN</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">signaling_NaN</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">denorm_min</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">min</span><span class="p">()</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">max</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">lowest</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">epsilon</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">round_error</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">infinity</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">quiet_NaN</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">signaling_NaN</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">denorm_min</span><span class="p">();</span>
 <span class="p">};</span>
 
 <span class="k">template</span><span class="o">&lt;</span><span class="p">&gt;</span>
@@ -3367,45 +3529,45 @@ The uppercase format will return with all applicable values in uppercase (e.g. 3
 </span>    <span class="nl">public:</span>
 <span class="cp">#endif
 </span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_specialized</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_signed</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_integer</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_exact</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_infinity</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_quiet_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_signaling_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_specialized</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_signed</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_integer</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_exact</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_infinity</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_quiet_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_signaling_NaN</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
 
     <span class="c1">// These members were deprecated in C++23</span>
     <span class="cp">#if ((!defined(_MSC_VER) &amp;&amp; (__cplusplus &lt;= 202002L)) || (defined(_MSC_VER) &amp;&amp; (_MSVC_LANG &lt;= 202002L)))
-</span>    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_denorm_style</span> <span class="n">has_denorm</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">denorm_present</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_denorm_loss</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span>    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_denorm_style</span> <span class="n">has_denorm</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">denorm_present</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">has_denorm_loss</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
     <span class="cp">#endif
 </span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_round_style</span> <span class="n">round_style</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">round_indeterminate</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_iec559</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_bounded</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_modulo</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">digits</span> <span class="o">=</span> <span class="mi">34</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">radix</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">min_exponent</span> <span class="o">=</span> <span class="o">-</span><span class="mi">6142</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">min_exponent10</span> <span class="o">=</span> <span class="n">min_exponent</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_exponent</span> <span class="o">=</span> <span class="mi">6145</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_exponent10</span> <span class="o">=</span> <span class="n">max_exponent</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">traps</span> <span class="o">=</span> <span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span><span class="o">&gt;::</span><span class="n">traps</span><span class="p">;</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">tinyness_before</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">float_round_style</span> <span class="n">round_style</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">round_indeterminate</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_iec559</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_bounded</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">is_modulo</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">digits</span> <span class="o">=</span> <span class="mi">34</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_digits10</span> <span class="o">=</span> <span class="n">digits</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">radix</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">min_exponent</span> <span class="o">=</span> <span class="o">-</span><span class="mi">6142</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">min_exponent10</span> <span class="o">=</span> <span class="n">min_exponent</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_exponent</span> <span class="o">=</span> <span class="mi">6145</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">int</span>  <span class="n">max_exponent10</span> <span class="o">=</span> <span class="n">max_exponent</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">traps</span> <span class="o">=</span> <span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span><span class="o">&gt;::</span><span class="n">traps</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="kt">bool</span> <span class="n">tinyness_before</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
 
     <span class="c1">// Member functions</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">min</span><span class="p">()</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">max</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">lowest</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">epsilon</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">round_error</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">infinity</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">quiet_NaN</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">signaling_NaN</span><span class="p">();</span>
-    <span class="n">BOOST_DECIMAL_ATTRIBUTE_UNUSED</span> <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">denorm_min</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">min</span><span class="p">()</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">max</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">lowest</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">epsilon</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">round_error</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">infinity</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">quiet_NaN</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">signaling_NaN</span><span class="p">();</span>
+    <span class="k">static</span> <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">denorm_min</span><span class="p">();</span>
 <span class="p">};</span>
 
 <span class="p">}</span> <span class="c1">// Namespace std</span></code></pre>
@@ -3417,6 +3579,8 @@ The uppercase format will return with all applicable values in uppercase (e.g. 3
 <div class="sect1">
 <h2 id="configuration">Configuration Macros</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="config_user_configurable_macros">User Configurable Macros</h3>
 <div class="paragraph">
 <p>The following configuration macros are available:</p>
 </div>
@@ -3450,7 +3614,40 @@ This option is not recommended, but can be useful if you want to use specific fu
 <p><code>BOOST_DECIMAL_FAST_MATH</code> performs optimizations similar to that of the <code>-ffast-math</code> compiler flag such as removing all checks for non-finite values.
 This flag increases the performance of the basis operations (e.g. add, sub, mul, div, and comparisons) by up to 20%.</p>
 </li>
+<li>
+<p><code>BOOST_DECIMAL_DEC_EVAL_METHOD</code>: See &lt;cfloat&gt; section for explanation</p>
+</li>
 </ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="config_automatic_configuration_macros">Automatic Configuration Macros</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>BOOST_DECIMAL_CXX20_CONSTEXPR</code>: This is defined to <code>constexpr</code> when compiling with C++20 or greater, otherwise it expands to nothing.</p>
+</li>
+<li>
+<p><code>BOOST_DECIMAL_CONSTEXPR</code>: This is defined to <code>constexpr</code> when any of the following are met:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>_MSC_FULL_VER &gt;= 192528326</p>
+</li>
+<li>
+<p><em>GNUC</em> &gt;= 9</p>
+</li>
+<li>
+<p>Compiler has: __builtin_is_constant_evaluated()</p>
+</li>
+<li>
+<p>C++20 support with: std::is_constant_evaluated()</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -3546,6 +3743,15 @@ The representation is exact with integers whereas you may get surprising or unwa
 <span class="p">}</span></code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"> <span class="n">Initial</span> <span class="n">Value</span><span class="o">:</span> <span class="mf">0.25</span>
+<span class="n">Returned</span> <span class="n">Value</span><span class="o">:</span> <span class="mf">0.25</span></code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="examples_rounding_mode">Rounding Mode</h3>
@@ -3637,6 +3843,43 @@ The representation is exact with integers whereas you may get surprising or unwa
 
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="examples_bit_conversions">Bit Conversions</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/decimal.hpp&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;iomanip&gt;</span><span class="cp">
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="n">decimal32_fast</span> <span class="n">fast_type</span> <span class="p">{</span><span class="mi">5</span><span class="p">};</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">BID_bits</span> <span class="p">{</span><span class="n">to_bid</span><span class="p">(</span><span class="n">fast_type</span><span class="p">)};</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span> <span class="n">DPD_bits</span> <span class="p">{</span><span class="n">to_dpd</span><span class="p">(</span><span class="n">fast_type</span><span class="p">)};</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">hex</span>
+              <span class="o">&lt;&lt;</span> <span class="s">"BID format: "</span> <span class="o">&lt;&lt;</span> <span class="n">BID_bits</span> <span class="o">&lt;&lt;</span> <span class="sc">'\n'</span>
+              <span class="o">&lt;&lt;</span> <span class="s">"DPD format: "</span> <span class="o">&lt;&lt;</span> <span class="n">DPD_bits</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">const</span> <span class="n">decimal32</span> <span class="n">bid_decimal</span> <span class="p">{</span><span class="n">from_bid</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">(</span><span class="n">BID_bits</span><span class="p">)};</span>
+    <span class="k">const</span> <span class="n">decimal32</span> <span class="n">dpd_decimal</span> <span class="p">{</span><span class="n">from_dpd</span><span class="o">&lt;</span><span class="n">decimal32</span><span class="o">&gt;</span><span class="p">(</span><span class="n">DPD_bits</span><span class="p">)};</span>
+
+    <span class="k">return</span> <span class="o">!</span><span class="p">(</span><span class="n">bid_decimal</span> <span class="o">==</span> <span class="n">dpd_decimal</span><span class="p">);</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">BID</span> <span class="n">format</span><span class="o">:</span> <span class="mi">31</span><span class="n">fc4b40</span>
+<span class="n">DPD</span> <span class="n">format</span><span class="o">:</span> <span class="mi">35</span><span class="n">f00000</span></code></pre>
 </div>
 </div>
 </div>
@@ -5668,7 +5911,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-30 17:12:31 -0400
+Last updated 2024-10-04 10:16:47 -0400
 </div>
 </div>
 <style>
