@@ -471,6 +471,7 @@ constexpr auto isinf(decimal128_fast val) noexcept -> bool
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high == detail::d128_fast_inf_high_bits;
     #else
+    static_cast<void>(val);
     return false;
     #endif
 }
@@ -480,6 +481,7 @@ constexpr auto isnan(decimal128_fast val) noexcept -> bool
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high >= detail::d128_fast_qnan_high_bits;
     #else
+    static_cast<void>(val);
     return false;
     #endif
 }
@@ -489,6 +491,7 @@ constexpr auto issignaling(decimal128_fast val) noexcept -> bool
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high == detail::d128_fast_snan_high_bits;
     #else
+    static_cast<void>(val);
     return false;
     #endif
 }
@@ -512,6 +515,7 @@ constexpr auto isfinite(decimal128_fast val) noexcept -> bool
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high < detail::d128_fast_inf_high_bits;
     #else
+    static_cast<void>(val);
     return true;
     #endif
 }
@@ -521,6 +525,7 @@ constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high >= detail::d128_fast_inf_high_bits;
     #else
+    static_cast<void>(val);
     return false;
     #endif
 }

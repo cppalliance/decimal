@@ -456,6 +456,7 @@ constexpr auto isinf(decimal32_fast val) noexcept -> bool
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d32_fast_inf;
     #else
+    static_cast<void>(val);
     return false;
     #endif
 }
@@ -465,6 +466,7 @@ constexpr auto isnan(decimal32_fast val) noexcept -> bool
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d32_fast_qnan || val.significand_ == detail::d32_fast_snan;
     #else
+    static_cast<void>(val);
     return false;
     #endif
 }
@@ -474,6 +476,7 @@ constexpr auto issignaling(decimal32_fast val) noexcept -> bool
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d32_fast_snan;
     #else
+    static_cast<void>(val);
     return false;
     #endif
 }

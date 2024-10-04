@@ -1085,6 +1085,7 @@ constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) no
     #ifndef BOOST_DECIMAL_FAST_MATH
     return (rhs.bits_ & detail::d64_nan_mask) == detail::d64_nan_mask;
     #else
+    static_cast<void>(rhs);
     return false;
     #endif
 }
@@ -1094,6 +1095,7 @@ constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) no
     #ifndef BOOST_DECIMAL_FAST_MATH
     return ((rhs.bits_ & detail::d64_nan_mask) == detail::d64_inf_mask);
     #else
+    static_cast<void>(rhs);
     return false;
     #endif
 }
@@ -1103,6 +1105,7 @@ constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 r
     #ifndef BOOST_DECIMAL_FAST_MATH
     return (rhs.bits_ & detail::d64_snan_mask) == detail::d64_snan_mask;
     #else
+    static_cast<void>(rhs);
     return false;
     #endif
 }
@@ -1130,6 +1133,7 @@ constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs)
     #ifndef BOOST_DECIMAL_FAST_MATH
     return ((rhs.bits_ & detail::d64_inf_mask) != detail::d64_inf_mask);
     #else
+    static_cast<void>(rhs);
     return true;
     #endif
 }
@@ -1139,6 +1143,7 @@ constexpr auto not_finite(decimal64 rhs) noexcept -> bool
     #ifndef BOOST_DECIMAL_FAST_MATH
     return ((rhs.bits_ & detail::d64_inf_mask) == detail::d64_inf_mask);
     #else
+    static_cast<void>(rhs);
     return false;
     #endif
 }
