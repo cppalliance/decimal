@@ -119,6 +119,36 @@ BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* la
     return detail::from_chars_general_impl(first, last, value, fmt);
 }
 
+#ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
+BOOST_DECIMAL_EXPORT template <typename DecimalType>
+constexpr auto from_chars(const char* first, const char* last, DecimalType& value, std::chars_format fmt) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::from_chars_result)
+{
+    from_chars_result boost_r {};
+    switch (fmt)
+    {
+        case std::chars_format::scientific:
+            boost_r = from_chars(first, last, value, chars_format::scientific);
+            break;
+        case std::chars_format::fixed:
+            boost_r = from_chars(first, last, value, chars_format::fixed);
+            break;
+        case std::chars_format::hex:
+            boost_r = from_chars(first, last, value, chars_format::hex);
+            break;
+        case std::chars_format::general:
+            boost_r = from_chars(first, last, value, chars_format::general);
+            break;
+        // LCOV_EXCL_START
+        default:
+            BOOST_DECIMAL_UNREACHABLE;
+        // LCOV_EXCL_STOP
+    }
+
+    return std::from_chars_result {boost_r.ptr, boost_r.ec};
+}
+#endif
+
 // ---------------------------------------------------------------------------------------------------------------------
 // to_chars and implementation
 // ---------------------------------------------------------------------------------------------------------------------
@@ -910,6 +940,71 @@ BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* la
 
     return detail::to_chars_impl(first, last, value, fmt, precision);
 }
+
+#ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
+
+BOOST_DECIMAL_EXPORT template <typename DecimalType>
+BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, DecimalType value, std::chars_format fmt)
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::to_chars_result)
+{
+    to_chars_result boost_r {};
+    switch (fmt)
+    {
+        case std::chars_format::scientific:
+            boost_r = detail::to_chars_impl(first, last, value, chars_format::scientific);
+            break;
+        case std::chars_format::fixed:
+            boost_r = detail::to_chars_impl(first, last, value, chars_format::fixed);
+            break;
+        case std::chars_format::hex:
+            boost_r = detail::to_chars_impl(first, last, value, chars_format::hex);
+            break;
+        case std::chars_format::general:
+            boost_r = detail::to_chars_impl(first, last, value, chars_format::general);
+            break;
+        // LCOV_EXCL_START
+        default:
+            BOOST_DECIMAL_UNREACHABLE;
+        // LCOV_EXCL_STOP
+    }
+
+    return std::to_chars_result {boost_r.ptr, boost_r.ec};
+}
+
+BOOST_DECIMAL_EXPORT template <typename DecimalType>
+BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, DecimalType value, std::chars_format fmt, int precision)
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::to_chars_result)
+{
+    if (precision < 0)
+    {
+        precision = 6;
+    }
+
+    to_chars_result boost_r {};
+    switch (fmt)
+    {
+        case std::chars_format::scientific:
+            boost_r = detail::to_chars_impl(first, last, value, chars_format::scientific, precision);
+            break;
+        case std::chars_format::fixed:
+            boost_r = detail::to_chars_impl(first, last, value, chars_format::fixed, precision);
+            break;
+        case std::chars_format::hex:
+            boost_r = detail::to_chars_impl(first, last, value, chars_format::hex, precision);
+            break;
+        case std::chars_format::general:
+            boost_r = detail::to_chars_impl(first, last, value, chars_format::general, precision);
+            break;
+        // LCOV_EXCL_START
+        default:
+            BOOST_DECIMAL_UNREACHABLE;
+        // LCOV_EXCL_STOP
+    }
+
+    return std::to_chars_result {boost_r.ptr, boost_r.ec};
+}
+
+#endif // BOOST_DECIMAL_HAS_STD_CHARCONV
 
 template <typename T>
 struct limits
