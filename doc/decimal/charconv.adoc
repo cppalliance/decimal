@@ -93,7 +93,7 @@ constexpr boost::decimal::from_chars_result from_chars(const char* first, const 
 template <typename DecimalType>
 constexpr std::from_chars_result from_chars(const char* first, const char* last, DecimalType& value, std::chars_format fmt) noexcept
 
-#endif
+#endif // BOOST_DECIMAL_HAS_STD_CHARCONV
 
 } //namespace decimal
 } //namespace boost
@@ -117,6 +117,16 @@ BOOST_DECIMAL_CONSTEXPR to_chars_result to_chars(char* first, char* last, Decima
 template <typename DecimalType>
 BOOST_DECIMAL_CONSTEXPR to_chars_result to_chars(char* first, char* last, DecimalType value, chars_format fmt, int precision) noexcept;
 
+#ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
+
+template <typename DecimalType>
+BOOST_DECIMAL_CONSTEXPR std::to_chars_result to_chars(char* first, char* last, DecimalType value, std::chars_format fmt) noexcept;
+
+template <typename DecimalType>
+BOOST_DECIMAL_CONSTEXPR std::to_chars_result to_chars(char* first, char* last, DecimalType value, std::chars_format fmt, int precision) noexcept;
+
+#endif // BOOST_DECIMAL_HAS_STD_CHARCONV
+
 } //namespace decimal
 } //namespace boost
 ----
@@ -127,6 +137,8 @@ NOTE: `BOOST_DECIMAL_CONSTEXPR` is defined if:
  - `\\__GNUC__` >= 9
  - Compiler has: `__builtin_is_constant_evaluated()`
  - C++20 support with: `std::is_constant_evaluated()`
+
+IMPORTANT: Same as `from_chars`, `boost::decimal::to_chars` will return a `std::to_chars_result` if `std::chars_format` is used to specify the format; otherwise it returns a `boost::decimal::to_chars_result`.
 
 The library offers an additional feature for sizing buffers without specified precision and in general format
 
