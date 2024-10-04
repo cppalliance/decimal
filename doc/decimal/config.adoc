@@ -8,6 +8,8 @@ https://www.boost.org/LICENSE_1_0.txt
 = Configuration Macros
 :idprefix: config_
 
+== User Configurable Macros
+
 The following configuration macros are available:
 
 - `BOOST_DECIMAL_DISABLE_CASSERT`: Disables the use of `<cassert>` and all run-time assertions.
@@ -28,3 +30,15 @@ const auto res = std::acos(test_val);
 
 - `BOOST_DECIMAL_FAST_MATH` performs optimizations similar to that of the `-ffast-math` compiler flag such as removing all checks for non-finite values.
 This flag increases the performance of the basis operations (e.g. add, sub, mul, div, and comparisons) by up to 20%.
+
+- `BOOST_DECIMAL_DEC_EVAL_METHOD`: See <cfloat> section for explanation
+
+== Automatic Configuration Macros
+
+- `BOOST_DECIMAL_CXX20_CONSTEXPR`: This is defined to `constexpr` when compiling with C++20 or greater, otherwise it expands to nothing.
+
+- `BOOST_DECIMAL_CONSTEXPR`: This is defined to `constexpr` when any of the following are met:
+  * _MSC_FULL_VER >= 192528326
+  * __GNUC__ >= 9
+  * Compiler has: __builtin_is_constant_evaluated()
+  * C++20 support with: std::is_constant_evaluated()
