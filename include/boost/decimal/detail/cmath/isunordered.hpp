@@ -25,6 +25,8 @@ constexpr auto isunordered(T lhs, T rhs) noexcept
     #ifndef BOOST_DECIMAL_FAST_MATH
     return isnan(lhs) || isnan(rhs);
     #else
+    static_cast<void>(lhs);
+    static_cast<void>(rhs);
     return false;
     #endif
 }

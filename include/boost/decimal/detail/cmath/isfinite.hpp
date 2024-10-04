@@ -25,6 +25,7 @@ constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexcep
     #ifndef BOOST_DECIMAL_FAST_MATH
     return !isinf(rhs) && !isnan(rhs);
     #else
+    static_cast<void>(rhs);
     return true;
     #endif
 }
