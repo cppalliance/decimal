@@ -28,8 +28,6 @@ namespace decimal {
 BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type
 {
-    using ReturnType = typename T::significand_type;
-
     constexpr T zero {0, 0};
 
     if (num == zero)
@@ -41,7 +39,7 @@ constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_t
     else if (isinf(num) || isnan(num))
     {
         *expptr = 0;
-        return (std::numeric_limits<ReturnType>::max)();
+        return (std::numeric_limits<typename T::significand_type>::max)();
     }
     #endif
 
