@@ -312,4 +312,13 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_FAST_MATH
 #endif
 
+#if __cplusplus >= 201703L
+#  if __has_include(<charconv>)
+#    ifndef BOOST_DECIMAL_BUILD_MODULE
+#      include <charconv>
+#    endif
+#    define BOOST_DECIMAL_HAS_STD_CHARCONV
+#  endif
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
