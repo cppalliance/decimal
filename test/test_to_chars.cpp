@@ -235,6 +235,178 @@ void test_hex_format()
     }
 }
 
+#ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
+
+template <typename T>
+void test_scientific_format_std()
+{
+    constexpr double max_value = 1e10;
+    std::uniform_real_distribution<double> dist(-max_value, max_value);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        char buffer[256] {};
+
+        const auto val {dist(rng)};
+        const T dec_val {val};
+
+        std::to_chars_result to_r = to_chars(buffer, buffer + sizeof(buffer), dec_val, std::chars_format::scientific);
+        BOOST_TEST(to_r.ec == std::errc());
+
+        T ret_val;
+        std::from_chars_result from_r = from_chars(buffer, buffer + std::strlen(buffer), ret_val, std::chars_format::scientific);
+        if (!BOOST_TEST(from_r.ec == std::errc()))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Value: " << dec_val
+                      << "\nBuffer: " << buffer
+                      << "\nError: " << static_cast<int>(from_r.ec) << std::endl;
+
+            continue;
+            // LCOV_EXCL_STOP
+        }
+
+        if (!BOOST_TEST_EQ(dec_val, ret_val))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "  Value: " << dec_val
+                      << "\n Buffer: " << buffer
+                      << "\nRet val: " << ret_val << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+template <typename T>
+void test_fixed_format_std()
+{
+    constexpr double max_value = 1e10;
+    std::uniform_real_distribution<double> dist(-max_value, max_value);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        char buffer[256] {};
+
+        const auto val {dist(rng)};
+        const T dec_val {val};
+
+        std::to_chars_result to_r = to_chars(buffer, buffer + sizeof(buffer), dec_val, std::chars_format::fixed);
+        BOOST_TEST(to_r.ec == std::errc());
+
+        T ret_val;
+        std::from_chars_result from_r = from_chars(buffer, buffer + std::strlen(buffer), ret_val, std::chars_format::fixed);
+        if (!BOOST_TEST(from_r.ec == std::errc()))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Value: " << dec_val
+                      << "\nBuffer: " << buffer
+                      << "\nError: " << static_cast<int>(from_r.ec) << std::endl;
+
+            continue;
+            // LCOV_EXCL_STOP
+        }
+
+        if (!BOOST_TEST_EQ(dec_val, ret_val))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "  Value: " << dec_val
+                      << "\n Buffer: " << buffer
+                      << "\nRet val: " << ret_val << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+template <typename T>
+void test_hex_format_std()
+{
+    constexpr double max_value = 1e10;
+    std::uniform_real_distribution<double> dist(-max_value, max_value);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        char buffer[256] {};
+
+        const auto val {dist(rng)};
+        const T dec_val {val};
+
+        std::to_chars_result to_r = to_chars(buffer, buffer + sizeof(buffer), dec_val, std::chars_format::hex);
+        BOOST_TEST(to_r.ec == std::errc());
+
+        T ret_val;
+        std::from_chars_result from_r = from_chars(buffer, buffer + std::strlen(buffer), ret_val, std::chars_format::hex);
+        if (!BOOST_TEST(from_r.ec == std::errc()))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Value: " << dec_val
+                      << "\nBuffer: " << buffer
+                      << "\nError: " << static_cast<int>(from_r.ec) << std::endl;
+
+            continue;
+            // LCOV_EXCL_STOP
+        }
+
+        if (!BOOST_TEST_EQ(dec_val, ret_val))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "  Value: " << dec_val
+                      << "\n Buffer: " << buffer
+                      << "\nRet val: " << ret_val << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+template <typename T>
+void test_general_format_std()
+{
+    constexpr double max_value = 1e10;
+    std::uniform_real_distribution<double> dist(-max_value, max_value);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        char buffer[256] {};
+
+        const auto val {dist(rng)};
+        const T dec_val {val};
+
+        std::to_chars_result to_r = to_chars(buffer, buffer + sizeof(buffer), dec_val, std::chars_format::general);
+        BOOST_TEST(to_r.ec == std::errc());
+
+        T ret_val;
+        std::from_chars_result from_r = from_chars(buffer, buffer + std::strlen(buffer), ret_val, std::chars_format::general);
+        if (!BOOST_TEST(from_r.ec == std::errc()))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "Value: " << dec_val
+                      << "\nBuffer: " << buffer
+                      << "\nError: " << static_cast<int>(from_r.ec) << std::endl;
+
+            continue;
+            // LCOV_EXCL_STOP
+        }
+
+        if (!BOOST_TEST_EQ(dec_val, ret_val))
+        {
+            // LCOV_EXCL_START
+            std::cerr << std::setprecision(std::numeric_limits<T>::digits10)
+                      << "  Value: " << dec_val
+                      << "\n Buffer: " << buffer
+                      << "\nRet val: " << ret_val << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+#endif
+
 template <typename T>
 void test_value(T val, chars_format fmt, int precision, const char* result)
 {
@@ -666,6 +838,20 @@ int main()
     {
         test_error_value<decimal64>("e1000a00000000000000000000p06", chars_format::hex, precision);
     }
+
+    #ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
+    test_scientific_format_std<decimal32>();
+    test_scientific_format_std<decimal64>();
+
+    test_fixed_format_std<decimal32>();
+    test_fixed_format_std<decimal64>();
+
+    test_hex_format_std<decimal32>();
+    test_hex_format_std<decimal64>();
+
+    test_general_format_std<decimal32>();
+    test_general_format_std<decimal64>();
+    #endif
 
     return boost::report_errors();
 }
