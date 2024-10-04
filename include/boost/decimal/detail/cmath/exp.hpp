@@ -39,6 +39,7 @@ constexpr auto exp_impl(T x) noexcept
     {
         result = one;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc != FP_NORMAL)
     {
         if (fpc == FP_INFINITE)
@@ -50,6 +51,7 @@ constexpr auto exp_impl(T x) noexcept
             result = x;
         }
     } // LCOV_EXCL_LINE
+    #endif
     else
     {
         if (signbit(x))

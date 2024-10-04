@@ -28,10 +28,17 @@ constexpr auto round(T num) noexcept
     constexpr T zero {0, 0};
     constexpr T half {5, -1};
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(num) || isinf(num) || abs(num) == zero)
     {
         return num;
     }
+    #else
+    if (abs(num) == zero)
+    {
+        return num;
+    }
+    #endif
 
     T iptr {};
     const auto x {modf(num, &iptr)};
@@ -66,6 +73,7 @@ constexpr auto int_round_impl(T num) noexcept -> Int
 
     const auto rounded_val {round(num)};
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(num) || isnan(num))
     {
         return std::numeric_limits<Int>::min();
@@ -74,6 +82,12 @@ constexpr auto int_round_impl(T num) noexcept -> Int
     {
         return 0;
     }
+    #else
+    if (abs(num) == zero)
+    {
+        return 0;
+    }
+    #endif
 
     if (rounded_val > lmax)
     {

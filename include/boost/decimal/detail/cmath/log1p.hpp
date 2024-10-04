@@ -37,6 +37,7 @@ constexpr auto log1p_impl(T x) noexcept
     {
         result = x;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc != FP_NORMAL)
     {
         result =
@@ -44,12 +45,17 @@ constexpr auto log1p_impl(T x) noexcept
             ((fpc == FP_INFINITE) && signbit(x)) ? std::numeric_limits<T>::quiet_NaN() : x
         );
     }
+    #endif
     else if (-x >= one)
     {
+        #ifndef BOOST_DECIMAL_FAST_MATH
         result =
         (
             (-x == one) ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::quiet_NaN()
         );
+        #else
+        result = T{0};
+        #endif
     }
     else
     {

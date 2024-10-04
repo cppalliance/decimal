@@ -43,6 +43,7 @@ constexpr auto tgamma_impl(T x) noexcept
         {
             result = (is_neg ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::infinity());
         }
+        #ifndef BOOST_DECIMAL_FAST_MATH
         else if(fpc == FP_INFINITE)
         {
             result = (is_neg ? std::numeric_limits<T>::quiet_NaN() : std::numeric_limits<T>::infinity());
@@ -51,11 +52,16 @@ constexpr auto tgamma_impl(T x) noexcept
         {
             result = x;
         }
+        #endif
     }
     else if (is_pure_int && is_neg)
     {
         // Pure negative integer argument.
+        #ifndef BOOST_DECIMAL_FAST_MATH
         result = std::numeric_limits<T>::quiet_NaN();
+        #else
+        result = T{0};
+        #endif
     }
     else
     {

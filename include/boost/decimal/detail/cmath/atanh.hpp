@@ -42,7 +42,11 @@ constexpr auto atanh_impl(T x) noexcept
 
         if (xx > one)
         {
+            #ifndef BOOST_DECIMAL_FAST_MATH
             result = std::numeric_limits<T>::quiet_NaN();
+            #else
+            result = zero;
+            #endif
         }
         else if (xx < one)
         {
@@ -86,7 +90,11 @@ constexpr auto atanh_impl(T x) noexcept
         }
         else
         {
+            #ifndef BOOST_DECIMAL_FAST_MATH
             result = ((!b_neg) ? std::numeric_limits<T>::infinity() : -std::numeric_limits<T>::infinity());
+            #else
+            result = zero;
+            #endif
         }
     }
 

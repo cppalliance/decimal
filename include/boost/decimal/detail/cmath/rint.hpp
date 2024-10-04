@@ -55,6 +55,7 @@ constexpr auto lrint_impl(T num) noexcept -> Int
     constexpr T lmax {(std::numeric_limits<Int>::max)()};
     constexpr T lmin {(std::numeric_limits<Int>::min)()};
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(num) || isnan(num))
     {
         // Implementation defined what to return here
@@ -64,6 +65,12 @@ constexpr auto lrint_impl(T num) noexcept -> Int
     {
         return 0;
     }
+    #else
+    if (abs(num) == zero)
+    {
+        return zero;
+    }
+    #endif
 
     int expptr {};
     auto sig {frexp10(num, &expptr)}; // Always returns detail::precision digits
@@ -112,10 +119,17 @@ constexpr auto rint(T num) noexcept
     constexpr T zero {0, 0};
     constexpr T max_round_value {1 / std::numeric_limits<T>::epsilon()};
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(num) || isnan(num) || abs(num) == zero || abs(num) > max_round_value)
     {
         return num;
     }
+    #else
+    if (abs(num) == zero || abs(num) > max_round_value)
+    {
+        return num;
+    }
+    #endif
 
     int expptr {};
     auto sig {frexp10(num, &expptr)}; // Always returns detail::precision digits

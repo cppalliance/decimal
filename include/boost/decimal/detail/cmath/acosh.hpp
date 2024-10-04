@@ -30,6 +30,7 @@ constexpr auto acosh_impl(T x) noexcept
 
     T result { };
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (fpc != FP_NORMAL)
     {
         if ((fpc == FP_INFINITE) && (!signbit(x)))
@@ -45,6 +46,12 @@ constexpr auto acosh_impl(T x) noexcept
             result = x;
         }
     }
+    #else
+    if (fpc == FP_ZERO)
+    {
+        result = T{0, 0};
+    }
+    #endif
     else
     {
         constexpr T one  { 1, 0 };

@@ -35,7 +35,11 @@ constexpr auto sin_impl(T x) noexcept
     const auto fpc = fpclassify(x);
 
     // First check non-finite values and small angles.
-    if (fabs(x) < std::numeric_limits<T>::epsilon() || (fpc == FP_INFINITE) || (fpc == FP_NAN))
+    if (fabs(x) < std::numeric_limits<T>::epsilon()
+        #ifndef BOOST_DECIMAL_FAST_MATH
+        || (fpc == FP_INFINITE) || (fpc == FP_NAN)
+        #endif
+        )
     {
         result = x;
     }

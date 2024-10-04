@@ -38,6 +38,7 @@ constexpr auto expm1_impl(T x) noexcept
     {
         result = x;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc != FP_NORMAL)
     {
         if (fpc == FP_INFINITE)
@@ -56,6 +57,7 @@ constexpr auto expm1_impl(T x) noexcept
             result = x;
         }
     }
+    #endif
     else
     {
         if (abs(x) > numbers::ln2_v<T>)

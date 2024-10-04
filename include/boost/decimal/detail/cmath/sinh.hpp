@@ -37,6 +37,7 @@ constexpr auto sinh_impl(T x) noexcept
     {
         result = x;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc != FP_NORMAL)
     {
         if (fpc == FP_INFINITE)
@@ -48,6 +49,7 @@ constexpr auto sinh_impl(T x) noexcept
             result = x;
         }
     }
+    #endif
     else
     {
         if (signbit(x))

@@ -31,7 +31,11 @@ constexpr auto cbrt_impl(T x) noexcept
 
     T result { };
 
-    if ((fpc == FP_NAN) || (fpc == FP_ZERO))
+    if ((fpc == FP_ZERO)
+        #ifndef BOOST_DECIMAL_FAST_MATH
+        || (fpc == FP_NAN)
+        #endif
+        )
     {
         result = x;
     }
@@ -39,10 +43,12 @@ constexpr auto cbrt_impl(T x) noexcept
     {
         result = -cbrt(-x);
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc == FP_INFINITE)
     {
         result = std::numeric_limits<T>::infinity();
     }
+    #endif
     else
     {
         int exp10val { };

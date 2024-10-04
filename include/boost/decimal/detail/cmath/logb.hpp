@@ -24,6 +24,7 @@ constexpr auto logb(T num) noexcept
 {
     const auto fpc {fpclassify(num)};
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (fpc == FP_ZERO)
     {
         return -std::numeric_limits<T>::infinity();
@@ -36,6 +37,12 @@ constexpr auto logb(T num) noexcept
     {
         return num;
     }
+    #else
+    if (fpc == FP_ZERO)
+    {
+        return T{0};
+    }
+    #endif
 
     const auto offset = detail::num_digits(num.full_significand()) - 1;
     const auto expval = static_cast<int>(static_cast<int>(num.unbiased_exponent()) + offset);

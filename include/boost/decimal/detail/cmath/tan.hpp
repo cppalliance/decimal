@@ -33,6 +33,7 @@ constexpr auto tan(T x) noexcept
     const auto fpc = fpclassify(x);
 
     // First check non-finite values and small angles.
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (fabs(x) < std::numeric_limits<T>::epsilon() || (fpc == FP_NAN))
     {
         result = x;
@@ -45,6 +46,12 @@ constexpr auto tan(T x) noexcept
     {
         result = -tan(-x);
     }
+    #else
+    if (fabs(x) < std::numeric_limits<T>::epsilon())
+    {
+        result = x;
+    }
+    #endif
     else
     {
         // Perform argument reduction.

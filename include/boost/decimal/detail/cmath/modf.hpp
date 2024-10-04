@@ -33,11 +33,13 @@ constexpr auto modf(T x, T* iptr) noexcept
         *iptr = x;
         return is_neg ? -zero : zero;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (isnan(x))
     {
         *iptr = x;
         return x;
     }
+    #endif
 
     *iptr = (x > zero) ? floor(x) : ceil(x);
     return (x - *iptr);

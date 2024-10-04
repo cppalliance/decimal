@@ -30,6 +30,7 @@ constexpr auto ldexp_impl(T v, int e2) noexcept
 
     if (v_fp != FP_NORMAL)
     {
+        #ifndef BOOST_DECIMAL_FAST_MATH
         if (v_fp == FP_NAN)
         {
             result = std::numeric_limits<T>::quiet_NaN();
@@ -39,6 +40,7 @@ constexpr auto ldexp_impl(T v, int e2) noexcept
             result = std::numeric_limits<T>::infinity();
         }
         else
+        #endif
         {
             result = T { 0, 0 };
         }

@@ -33,6 +33,7 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
 constexpr auto nextafter(T1 val, T2 direction) noexcept
     BOOST_DECIMAL_REQUIRES_TWO(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2)
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(val) || isinf(val))
     {
         return val;
@@ -41,6 +42,12 @@ constexpr auto nextafter(T1 val, T2 direction) noexcept
     {
         return direction;
     }
+    #else
+    if (val == direction)
+    {
+        return direction;
+    }
+    #endif
     else if (val < direction)
     {
         return val + std::numeric_limits<T1>::epsilon();

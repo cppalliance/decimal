@@ -458,28 +458,47 @@ constexpr auto signbit(decimal64_fast val) noexcept -> bool
 
 constexpr auto isinf(decimal64_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d64_fast_inf;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto isnan(decimal64_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d64_fast_qnan ||
            val.significand_ == detail::d64_fast_snan;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto issignaling(decimal64_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d64_fast_snan;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto isnormal(decimal64_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (val.exponent_ <= static_cast<decimal64_fast::exponent_type>(detail::precision_v<decimal64> - 1))
     {
         return false;
     }
 
     return (val.significand_ != 0) && isfinite(val);
+    #else
+    return val.significand_ != 0;
+    #endif
 }
 
 constexpr auto isfinite(decimal64_fast val) noexcept -> bool
