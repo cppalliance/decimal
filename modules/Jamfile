@@ -4,11 +4,13 @@
 # https://www.boost.org/LICENSE_1_0.txt
 
 # bring in the rules for testing
-import testing ;
+require-b2 5.0.1 ;
+import-search /boost/config/checks ;
+import config : requires ;
 import modules ;
+import testing ;
 import path ;
 import pch ;
-import ../../config/checks/config : requires ;
 
 project
     : requirements

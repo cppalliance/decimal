@@ -17,8 +17,13 @@
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+
 #include <limits>
 #include <cstdint>
+
+#endif
 
 namespace boost {
 namespace decimal {
@@ -41,7 +46,7 @@ struct decimal64_fast_components
 
 } // namespace detail
 
-class decimal64_fast final
+BOOST_DECIMAL_EXPORT class decimal64_fast final
 {
 public:
     using significand_type = std::uint_fast64_t;
@@ -1390,7 +1395,7 @@ constexpr auto copysignd64f(decimal64_fast mag, decimal64_fast sgn) noexcept -> 
 
 namespace std {
 
-template <>
+BOOST_DECIMAL_EXPORT template <>
 #ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal64_fast>
 #else
