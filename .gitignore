@@ -42,6 +42,7 @@ test/metal/bin/
 
 # Modules
 *.gcm
+gcm.cache/
 
 # Mac option
 *.DS_Store
