@@ -14,8 +14,13 @@
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+
 #include <limits>
 #include <cstdint>
+
+#endif
 
 #ifndef BOOST_DECIMAL_DECIMAL128_FAST_HPP
 #define BOOST_DECIMAL_DECIMAL128_FAST_HPP
@@ -45,7 +50,7 @@ struct decimal128_fast_components
 
 } // namespace detail
 
-class decimal128_fast final
+BOOST_DECIMAL_EXPORT class decimal128_fast final
 {
 public:
     using significand_type = detail::uint128;

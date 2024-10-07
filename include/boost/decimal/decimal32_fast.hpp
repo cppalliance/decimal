@@ -16,8 +16,11 @@
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -40,7 +43,7 @@ struct decimal32_fast_components
 
 }
 
-class decimal32_fast final
+BOOST_DECIMAL_EXPORT class decimal32_fast final
 {
 public:
     using significand_type = std::uint_fast32_t;
