@@ -64,6 +64,14 @@ constexpr auto rescale(T val, int precision = 0) noexcept
     return {sig, exp, isneg};
 }
 
+BOOST_DECIMAL_EXPORT template <typename T>
+[[deprecated("Renamed to rescale to match existing literature")]]
+constexpr auto trunc_to(T val, int precision = 0) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    return rescale(val, precision);
+}
+
 } // namespace decimal
 } // namespace boost
 
