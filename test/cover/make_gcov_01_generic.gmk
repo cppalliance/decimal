@@ -63,7 +63,7 @@ gcov: objects
 	@$(GNUECHO)
 	@$(GNUECHO) +++ running lcov
 	@$(LCOV) $(LCOV_BRANCH) -c --directory obj --output-file coverage_unfiltered.info
-	@$(LCOV) $(LCOV_BRANCH) --remove coverage_unfiltered.info $(LCOV_REMOVES) --output-file coverage.info
+	@$(LCOV) $(LCOV_BRANCH) --remove coverage_unfiltered.info $(LCOV_REMOVES) --ignore-errors unused --output-file coverage.info
 	@$(GNUECHO)
 	@$(GNUECHO) +++ running genhtml
 	@$(GENHTML) coverage.info $(LCOV_BRANCH) --demangle-cpp --output-directory $(PATH_BIN)/report

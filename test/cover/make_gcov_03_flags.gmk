@@ -33,7 +33,8 @@ CXXFLAGS     = -march=native                                                   \
                -Wall                                                           \
                -fno-inline-functions                                           \
                -fprofile-arcs                                                  \
-               -ftest-coverage
+               -ftest-coverage                                                 \
+               -std=$(STD)
 
 C_DEFINES    =
 
