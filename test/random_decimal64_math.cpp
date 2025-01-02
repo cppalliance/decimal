@@ -497,7 +497,7 @@ void random_mixed_and()
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
                       << "\nInt res: " << res_int << std::endl;
-            // LCOV_EXCL_START
+            // LCOV_EXCL_STOP
         }
     }
 }
