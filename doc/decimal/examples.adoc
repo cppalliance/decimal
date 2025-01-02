@@ -224,3 +224,7 @@ DPD format: 35f00000
 In the examples folder there is a file named `moving_average.cpp`.
 This example shows how to parse historical stock data from file and use it.
 This serves as a framework for other calculations for securities.
+
+=== Currency Conversion
+In the examples folder there is a file named `currency_conversion.cpp`.
+This example shows how to simply convert currencies based off a given exchange rate.
