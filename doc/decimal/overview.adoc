@@ -43,6 +43,9 @@ Coverage can be found on https://app.codecov.io/gh/cppalliance/decimal[Codecov].
 
 == Basic Usage
 
+The entire library should be accessed using the convince header `<boost/decimal.hpp>`.
+A short example of the basic usage:
+
 [source, c++]
 ----
 #include <boost/decimal.hpp>
