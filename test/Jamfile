@@ -150,3 +150,5 @@ run ../examples/bit_conversions.cpp ;
 run ../examples/charconv.cpp ;
 run ../examples/literals.cpp ;
 run ../examples/rounding_mode.cpp ;
+run ../examples/moving_average.cpp ;
+run ../examples/currency_conversion.cpp ;
