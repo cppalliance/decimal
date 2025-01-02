@@ -48,8 +48,6 @@ compile-fail concepts_test.cpp ;
 run github_issue_426.cpp ;
 run github_issue_448.cpp ;
 run-fail github_issue_519.cpp ;
-run ibm_abs.cpp ;
-run ibm_add.cpp ;
 run link_1.cpp link_2.cpp link_3.cpp ;
 run quick.cpp ;
 run random_decimal32_comp.cpp ;
