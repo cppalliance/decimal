@@ -29,6 +29,7 @@ module;
 #include <system_error>
 #include <complex>
 #include <compare>
+#include <charconv>
 
 // <stdfloat> is a C++23 feature that is not everywhere yet
 #if __has_include(<stdfloat>)
