@@ -9,85 +9,163 @@
 <style>
 /**
  * README:
- * This stylesheet contains styles for both AsciiDoctor and Antora templates.
- * The `boostlook` class is applied across both, but due to differences in their HTML structure,
- * specific CSS rules are necessary to target each appropriately.
+ * This stylesheet provides styles for both AsciiDoctor and Antora templates, using the
+ * `boostlook` class for a consistent appearance across both templates.
+ *
+ * Note: This is a work-in-progress and may continue to evolve as templates and requirements
+ * change.
  *
  * High-Level HTML Structure:
- * 
- * - Antora Template:
+ *
+ * - Common Structure:
  *   <div class="boostlook">
- *     <div class="card nav-container">...</div>
- *     <div class="doc">...</div>
+ *     <div class="header">...</div>
+ *     <div class="content">...</div>
+ *     <div class="footer">...</div>
  *   </div>
  *
- * - AsciiDoctor Template:
+ * - AsciiDoctor Example:
  *   <div class="boostlook">
- *     <div id="header">...</div>
- *     <div id="content">...</div>
- *     </div><div id="footer">...</div>
+ *     <div class="header">
+ *       <h1>...</h1>
+ *       <button id="toggle-toc">Show Table of Contents</button>
+ *       <div id="toc" class="toc2"></div>
+ *     </div>
+ *     <div id="content">
+ *       <div class="sect1">...</div>
+ *     </div>
+ *     <div id="footer">...</div>
  *   </div>
  *
- * - For Antora templates:
- *   The `.boostlook .doc` selector targets elements within the `.doc` class, and the 
- *   `.boostlook .nav-container` selector targets elements within the `.nav-container` class,
- *   both of which are specific to the Antora HTML structure.
+ * - Antora Example:
+ *   <div class="boostlook">
+ *     <div class="header">
+ *       <div class="nav-container toc2">...</div>
+ *     </div>
+ *     <div id="content">
+ *       <article class="doc max-width-reset">
+ *         <h1>Getting Started</h1>
+ *         <div class="sect1">...</div>
+ *       </article>
+ *     </div>
+ *     <div id="footer">...</div>
+ *   </div>
  *
- * - For AsciiDoctor templates:
- *   The `.boostlook:not(:has(.doc))` selector is used to target elements that do not have 
- *   a `.doc` child, applying styles specific to AsciiDoctor content.
-
- *   Since the `.doc` class is not present in the structure above, the styles defined for 
- *   `.boostlook:not(:has(.doc))` will apply.
+ * - Shared Styles:
+ *   Selectors like `.boostlook .header`, `.boostlook .content`, and `.boostlook .footer`
+ *   apply common styles across both templates.
+ *
+ * - Specific Styles:
+ *   Use `.boostlook:not(:has(.doc))` for AsciiDoctor-specific styles and
+ *   `.boostlook .doc` for Antora-specific styles to target unique elements accordingly.
+ *
+ * This CSS file aims to simplify maintenance by aligning the HTML structure and
+ * reducing the need for complex selectors.
  */
 
 /*----------------- Root Variables - Start -----------------*/
 
 :root {
+  /* General Variables */
   --bl-primary-color: rgb(255, 159, 0);
   --bl-header-height: 2.5rem;
 
   /* Light Theme Variables */
   --light-bl-background: rgb(255, 255, 255);
+  --light-bl-border-color: rgb(209, 209, 209);
+  --light-bl-breadcrumbs-svg-color: rgb(0, 0, 0);
   --light-bl-caret-svg: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24px'%20viewBox='0%20-960%20960%20960'%20width='24px'%20fill='%23000000'%3E%3Cpath%20d='M320-200v-560l440%20280-440%20280Z'/%3E%3C/svg%3E");
   --light-bl-card-background-color: rgb(255, 255, 255);
-  --light-bl-code-background: rgb(255, 255, 255);
+  --light-bl-code-background: rgb(248, 248, 248);
   --light-bl-code-border-color: rgb(220, 220, 220);
-  --light-bl-code-text-color: inherit;
-  --light-bl-link-color: rgb(0, 90, 156);
-  --light-bl-link-hover-color: rgba(0, 90, 156, 0.7);
+  --light-bl-code-text-color: rgb(0, 0, 0);
+  --light-bl-link-color: rgb(2, 132, 199);
+  --light-bl-link-hover-color: rgba(255, 159, 0);
+  --light-bl-header-color: rgb(49, 74, 87);
   --light-bl-hljs-attribute-color: rgb(70, 130, 180);
   --light-bl-hljs-doctag-color: rgb(221, 17, 68);
   --light-bl-hljs-keyword-color: rgb(51, 51, 51);
   --light-bl-hljs-number-color: rgb(0, 128, 128);
   --light-bl-hljs-section-color: rgb(153, 0, 0);
   --light-bl-nav-link-color: rgb(0, 0, 0);
-  --light-bl-pasteboard-color: rgb(209, 213, 219);
+  --light-bl-nav-link-hover-color: rgba(0, 0, 0, 0.6);
+  --light-bl-nav-fade-color: rgb(255, 255, 255, 1);
+  --light-bl-paragraph-color: rgb(0, 0, 0);
+  --light-bl-pasteboard-color: rgb(229, 231, 235);
   --light-bl-pre-background: rgb(248, 248, 248);
   --light-bl-primary-color: rgb(255, 159, 0);
   --light-bl-quote-background: rgb(255, 255, 255);
   --light-bl-table-border-color: rgb(232, 232, 232);
   --light-bl-table-head-background: rgb(248, 248, 248);
+  --light-bl-table-stripe-color: rgb(248, 248, 248);
+  --light-bl-tabpanel-background: rgb(255, 255, 255);
+  --light-bl-text-color: rgb(51, 65, 85);
+  --light-bl-scrollbar-track-color: rgb(234, 240, 243);
+  --light-bl-scrollbar-thumb-color: rgb(193, 193, 193);
+  --light-bl-scrollbar_hover-thumb-color: rgb(193, 193, 193);
 
   /* Dark Theme Variables */
-  --dark-bl-border-color: rgb(209, 228, 242);
+  --dark-bl-background: rgb(5, 26, 38);
+  --dark-bl-border-color: rgb(3, 25, 37);
+  --dark-bl-breadcrumbs-svg-color: rgb(255, 255, 255);
   --dark-bl-caret-svg: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24px'%20viewBox='0%20-960%20960%20960'%20width='24px'%20fill='%23ccc'%3E%3Cpath%20d='M320-200v-560l440%20280-440%20280Z'/%3E%3C/svg%3E");
-  --dark-bl-code-background: rgb(20, 20, 20);
+  --dark-bl-card-background-color: rgb(23, 42, 52);
+  --dark-bl-code-background: rgb(5, 26, 38);
   --dark-bl-code-border-color: transparent;
   --dark-bl-code-text-color: rgb(255, 255, 255);
   --dark-bl-link-color: rgb(125 211 252);
-  --dark-bl-link-hover-color: rgb(100, 160, 210);
+  --dark-bl-link-hover-color: rgb(255, 159, 0);
+  --dark-bl-header-color: rgb(255, 255, 255);
   --dark-bl-hljs-attribute-color: rgb(70, 130, 180);
   --dark-bl-hljs-doctag-color: rgb(255, 99, 132);
   --dark-bl-hljs-keyword-color: rgb(173, 216, 230);
   --dark-bl-hljs-number-color: rgb(72, 209, 204);
   --dark-bl-hljs-section-color: rgb(255, 69, 58);
-  --dark-bl-nav-link-color: rgb(0, 0, 0);
+  --dark-bl-nav-link-color: rgb(255, 255, 255);
+  --dark-bl-nav-link-hover-color: rgba(255, 255, 255, 0.6);
+  --dark-bl-nav-fade-color: rgb(23, 42, 52);
+  --dark-bl-paragraph-color: rgb(255, 255, 255);
+  --dark-bl-pasteboard-color: rgb(05, 26, 38);
   --dark-bl-pagination-color: rgb(200, 200, 200);
   --dark-bl-quote-background: rgb(11, 59, 82);
   --dark-bl-quote-word-color: rgb(209, 228, 242);
-  --dark-bl-tabpanel-background: rgb(28, 50, 59);
-  --dark-bl-text-color: rgb(209, 228, 242);
+  --dark-bl-table-border-color: rgb(3, 25, 37);
+  --dark-bl-table-head-background: rgb(5, 26, 38);
+  --dark-bl-tab-background: rgb(23, 42, 52);
+  --dark-bl-table-stripe-color: rgb(49,74,87);
+  --dark-bl-tabpanel-background: rgb(49 74 87);
+  --dark-bl-text-color: rgb(255, 255, 255);
+  --dark-bl-scrollbar-track-color: rgb(46, 58, 66);
+  --dark-bl-scrollbar-thumb-color: rgb(109, 124, 133);
+  --dark-bl-scrollbar_hover-thumb-color: rgb(147, 161, 170);
+
+  /* specific use colors */
+  --site-light-red: red;
+  --site-light-green: green;
+  --site-light-lime: #00FF00;
+  --site-light-blue: blue;
+  --site-light-navy: rgb(20, 20, 164);
+  --site-light-yellow: yellow;
+  --site-light-magenta: magenta;
+  --site-light-indigo: #4B0082;
+  --site-light-cyan: cyan;
+  --site-light-purple: purple;
+  --site-light-gold: #987301;
+  --site-light-silver: silver; /* lighter gray */
+  --site-light-gray: #808080; /* light gray */
+  --site-dark-red: #fa6f6f;
+  --site-dark-green: #45b945;
+  --site-dark-lime: #00FF00;
+  --site-dark-blue: #6666f8;
+  --site-dark-navy: #6060c4;
+  --site-dark-yellow: yellow;
+  --site-dark-magenta: magenta;
+  --site-dark-indigo: #a53def;
+  --site-dark-cyan: cyan;
+  --site-dark-purple: #ac43ac;
+  --site-dark-gold: gold;
+  --site-dark-silver: silver; /* lighter gray */
+  --site-dark-gray: #808080; /* light gray */
 }
 
 /*----------------- Root Variables - End -----------------*/
@@ -96,11 +174,14 @@
 
 html {
   --bl-background: var(--light-bl-background);
+  --bl-border-color: var(--light-bl-border-color);
+  --bl-breadcrumbs-svg-color: var(--light-bl-breadcrumbs-svg-color);
   --bl-caret-svg: var(--light-bl-caret-svg);
   --bl-card-background-color: var(--light-bl-card-background-color);
   --bl-code-background: var(--light-bl-code-background);
   --bl-code-border-color: var(--light-bl-code-border-color);
   --bl-code-text-color: var(--light-bl-code-text-color);
+  --bl-header-color: var(--light-bl-header-color);
   --bl-hljs-doctag-color: var(--light-bl-hljs-doctag-color);
   --bl-hljs-attribute-color: var(--light-bl-hljs-attribute-color);
   --bl-hljs-keyword-color: var(--light-bl-hljs-keyword-color);
@@ -109,20 +190,48 @@ html {
   --bl-link-color: var(--light-bl-link-color);
   --bl-link-hover-color: var(--light-bl-link-hover-color);
   --bl-nav-link-color: var(--light-bl-nav-link-color);
+  --bl-nav-link-hover-color: var(--light-bl-nav-link-hover-color);
+  --bl-nav-fade-color: var(--light-bl-nav-fade-color);
+  --bl-paragraph-color: var(--light-bl-paragraph-color);
   --bl-pasteboard-color: var(--light-bl-pasteboard-color);
   --bl-pre-background: var(--light-bl-pre-background);
   --bl-quote-background: var(--light-bl-quote-background);
+  --bl-tab-background: var(--light-bl-tab-background);
   --bl-table-border-color: var(--light-bl-table-border-color);
   --bl-table-head-background: var(--light-bl-table-head-background);
-  
+  --bl-table-stripe-color: var(--light-bl-table-stripe-color);
+  --bl-tabpanel-background: var(--light-bl-tabpanel-background);
+  --bl-text-color: var(--light-bl-text-color);
+  --bl-scrollbar-track-color: var(--light-bl-scrollbar-track-color);
+  --bl-scrollbar-thumb-color: var(--light-bl-scrollbar-thumb-color);
+  --bl-scrollbar_hover-thumb-color: var(--light-bl-scrollbar_hover-thumb-color);
+
+  /* specific use colors */
+  --color-red: var(--site-light-red);
+  --color-green: var(--site-light-green);
+  --color-lime: var(--site-light-lime);
+  --color-blue: var(--site-light-blue);
+  --color-navy: var(--site-light-navy);
+  --color-yellow: var(--site-light-yellow);
+  --color-magenta: var(--site-light-magenta);
+  --color-indigo: var(--site-light-indigo);
+  --color-cyan: var(--site-light-cyan);
+  --color-purple: var(--site-light-purple);
+  --color-gold: var(--site-light-gold);
+  --color-silver: var(--site-light-silver);/* lighter gray */
+  --color-gray: var(--site-light-gray); /* light gray */
 }
 
 html.dark {
+  --bl-background: var(--dark-bl-background);
   --bl-border-color: var(--dark-bl-border-color);
+  --bl-breadcrumbs-svg-color: var(--dark-bl-breadcrumbs-svg-color);
   --bl-caret-svg: var(--dark-bl-caret-svg);
+  --bl-card-background-color: var(--dark-bl-card-background-color);
   --bl-code-background: var(--dark-bl-code-background);
   --bl-code-border-color: var(--dark-bl-code-border-color);
   --bl-code-text-color: var(--dark-bl-code-text-color);
+  --bl-header-color: var(--dark-bl-header-color);
   --bl-hljs-attribute-color: var(--dark-bl-hljs-attribute-color);
   --bl-hljs-doctag-color: var(--dark-bl-hljs-doctag-color);
   --bl-hljs-keyword-color: var(--dark-bl-hljs-keyword-color);
@@ -131,12 +240,38 @@ html.dark {
   --bl-link-color: var(--dark-bl-link-color);
   --bl-link-hover-color: var(--dark-bl-link-hover-color);
   --bl-nav-link-color: var(--dark-bl-nav-link-color);
+  --bl-nav-link-hover-color: var(--dark-bl-nav-link-hover-color);
+  --bl-nav-fade-color: var(--dark-bl-nav-fade-color);
+  --bl-paragraph-color: var(--dark-bl-paragraph-color);
+  --bl-pasteboard-color: var(--dark-bl-pasteboard-color);
+  --bl-pre-background: var(--dark-bl-code-background);
   --bl-pagination-color: var(--dark-bl-pagination-color);
   --bl-quote-background: var(--dark-bl-quote-background);
   --bl-quote-word-color: var(--dark-bl-quote-word-color);
+  --bl-tab-background: var(--dark-bl-tab-background);
+  --bl-table-border-color: var(--dark-bl-table-border-color);
+  --bl-table-head-background: var(--dark-bl-table-head-background);
+  --bl-table-stripe-color: var(--dark-bl-table-stripe-color);
   --bl-tabpanel-background: var(--dark-bl-tabpanel-background);
   --bl-text-color: var(--dark-bl-text-color);
+  --bl-scrollbar-track-color: var(--dark-bl-scrollbar-track-color);
+  --bl-scrollbar-thumb-color: var(--dark-bl-scrollbar-thumb-color);
+  --bl-scrollbar_hover-thumb-color: var(--dark-bl-scrollbar_hover-thumb-color);
 
+  /* specific use colors */
+  --color-red: var(--site-dark-red);
+  --color-green: var(--site-dark-green);
+  --color-lime: var(--site-dark-lime);
+  --color-blue: var(--site-dark-blue);
+  --color-navy: var(--site-dark-navy);
+  --color-yellow: var(--site-dark-yellow);
+  --color-magenta: var(--site-dark-magenta);
+  --color-indigo: var(--site-dark-indigo);
+  --color-cyan: var(--site-dark-cyan);
+  --color-purple: var(--site-dark-purple);
+  --color-gold: var(--site-dark-gold);
+  --color-silver: var(--site-dark-silver);/* lighter gray */
+  --color-gray: var(--site-dark-gray); /* light gray */
 }
 
 /*----------------- HTML Variables - End -----------------*/
@@ -146,7 +281,8 @@ html.dark {
 @font-face {
   font-family: "Noto Sans Display";
   font-style: normal;
-  font-weight: normal;
+  font-weight: 100 900;
+  font-variation-settings: "wght" 400;
   font-stretch: semi-condensed;
   font-display: block;
   src: url('/_/fonts/NotoSansDisplay.ttf') format('truetype'),
@@ -155,9 +291,21 @@ html.dark {
 }
 
 @font-face {
-  font-family: "Noto Sans Italic";
+  font-family: "Noto Sans Display";
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: semi-condensed;
+  font-display: block;
+  src: url('/_/fonts/NotoSansDisplay.ttf') format('truetype'),
+       url('../../../../tools/boostlook/NotoSansDisplay.ttf') format('truetype'),
+       url("https://cppalliance.org/fonts/NotoSansDisplay.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: "Noto Sans Display";
   font-style: italic;
-  font-weight: normal;
+  font-weight: 100 900;
+  font-variation-settings: "wght" 400;
   font-stretch: semi-condensed;
   font-display: block;
   src: url("/font/NotoSansDisplay-Italic.ttf") format("truetype"),
@@ -168,8 +316,20 @@ html.dark {
 @font-face {
   font-family: "Noto Sans Mono";
   font-style: normal;
-  font-weight: normal;
+  font-weight: 100 900;
+  font-variation-settings: "wght" 400;
   font-stretch: semi-condensed;
+  font-display: block;
+  src: url("/_/boostlook/NotoSansMono.ttf") format("truetype"),
+       url("../../../../tools/boostlook/NotoSansMono.ttf") format("truetype"),
+       url("https://cppalliance.org/fonts/NotoSansMono.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: "Noto Sans Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: ultra-condensed;
   font-display: block;
   src: url("/_/boostlook/NotoSansMono.ttf") format("truetype"),
        url("../../../../tools/boostlook/NotoSansMono.ttf") format("truetype"),
@@ -210,7 +370,7 @@ p, h1, h2, h3, h4, h5, h6 {
 
 .boostlook {
   font-family: "Noto Sans Display" !important;
-  font-stretch: condensed;
+  font-stretch: 90%;
 }
 
 .boostlook h1,
@@ -226,36 +386,98 @@ p, h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
 }
 
-.boostlook h1 { font-size: 1.75em; }
-.boostlook h2 { font-size: 1.5em; }
-.boostlook h3 { font-size: 1.375em; }
-.boostlook h4 { font-size: 1.25em; }
-.boostlook h5 { font-size: 1.125em; }
-.boostlook h6 { font-size: 1em; }
-.boostlook p { 
-  font-size: 1rem;
-  margin: 1em 0em; 
+.boostlook h1 { font-size: 1.8rem; }
+.boostlook h2 { font-size: 1,65rem; }
+.boostlook h3 { font-size: 1.5rem; }
+.boostlook h4 { font-size: 1.35rem; }
+.boostlook h5 { font-size: 1.25rem; }
+.boostlook h6 { font-size: 1rem; }
+
+.boostlook h1,
+.boostlook h2,
+.boostlook h3,
+.boostlook h4,
+.boostlook h5,
+.boostlook h6 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
 }
 
-.boostlook a, 
+.boostlook .doc h2:not(.discrete) {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.boostlook .doc h1 .anchor {
+  margin: 3px 0 0 -1.3ex;
+}
+
+.boostlook .doc h2 .anchor,
+.boostlook .doc h3 .anchor {
+  margin: 2px 0 0 -1.3ex;
+}
+
+.boostlook .doc h4 .anchor,
+.boostlook .doc h5 .anchor,
+.boostlook .doc h6 .anchor {
+  margin: 1px 0 0 -1.3ex;
+}
+
+.boostlook p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.boostlook table p,
+.boostlook ul p {
+  margin: 0;
+}
+
+.boostlook a,
 .boostlook .doc a {
   color: var(--bl-link-color);
   text-decoration: none;
 }
 
 .boostlook a:hover,
-.boostlook .doc a:hover {
+.boostlook .doc a:hover,
+#libraryReadMe a:hover,
+#boost-legacy-docs-wrapper a:hover {
   color: var(--bl-link-hover-color);
   cursor: pointer;
-  text-decoration: none;
+  text-decoration: underline;
 }
 
-.boostlook code {
+.boostlook code,
+.boostlook pre code,
+.boostlook .doc .content pre code {
   font-family: "Noto Sans Mono", monospace;
+  margin-bottom: 1.25rem;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+}
+
+.boostlook code::-webkit-scrollbar,
+.boostlook pre code::-webkit-scrollbar,
+.boostlook .doc .content pre code::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.boostlook em,
+.boostlook code em {
+  font-family: "Noto Sans Display";
+  font-size: inherit;
 }
 
 .boostlook h6:has(+table) {
   margin-left: 1em;
+}
+
+.boostlook ul.itemizedlist,
+#boost-legacy-docs-wrapper .ulist ul {
+  padding: 0 0 0 15px;
+  margin: 0;
 }
 
 .boostlook p code,
@@ -264,26 +486,68 @@ p, h1, h2, h3, h4, h5, h6 {
 .boostlook p kbd,
 .boostlook p samp,
 .boostlook p pre {
-  background-color: transparent !important;
+  overflow-x: hidden;
 }
 
 .boostlook .content div:has(> table) {
   overflow-x: auto;
 }
 
+.boostlook code,
 .boostlook p code,
-.boostlook .colist > table code {
+.boostlook li code,
+.boostlook .doc p code,
+.boostlook .doc table code,
+.boostlook .doc .colist > table code {
+  background: none;
+  padding: 0;
+  font-weight: 400;
+  font-stretch: 90%;
   color: var(--bl-code-text-color) !important;
 }
 
-.boostlook .quoteblock, 
+.boostlook code a,
+.boostlook p code a,
+.boostlook li code a,
+.boostlook .doc p code a,
+.boostlook .doc table code a,
+.boostlook .doc .colist > table code a,
+.boostlook a code,
+.boostlook p a code,
+.boostlook li a code,
+.boostlook .doc p a code,
+.boostlook .doc table a code,
+.boostlook .doc .colist > table a code {
+  color: var(--bl-link-color) !important;
+}
+
+.boostlook code a:hover,
+.boostlook p code a:hover,
+.boostlook li code a:hover,
+.boostlook .doc p code a:hover,
+.boostlook .doc table code a:hover,
+.boostlook .doc .colist > table code a:hover,
+.boostlook a:hover code,
+.boostlook p a:hover code,
+.boostlook li a:hover code,
+.boostlook .doc p a:hover code,
+.boostlook .doc table a:hover code,
+.boostlook .doc .colist > table a:hover code {
+  color: var(--bl-link-hover-color) !important;
+}
+
+.boostlook td code {
+  margin-bottom: 10px;
+}
+
+.boostlook .quoteblock,
 .boostlook .verseblock {
   background: var(--bl-quote-background);
   border-left: 3px solid var(--bl-border-color);
   color: var(--bl-text-color);
 }
 
-.boostlook .quoteblock::before, 
+.boostlook .quoteblock::before,
 .boostlook .verseblock::before {
   color: var(--bl-quote-word-color);
 }
@@ -292,8 +556,8 @@ p, h1, h2, h3, h4, h5, h6 {
   background-color: var(--bl-tabpanel-background);
 }
 
-.boostlook .hljs-keyword, 
-.boostlook .hljs-selector-tag, 
+.boostlook .hljs-keyword,
+.boostlook .hljs-selector-tag,
 .boostlook .hljs-subst {
   color: var(--bl-hljs-keyword-color);
 }
@@ -302,13 +566,13 @@ p, h1, h2, h3, h4, h5, h6 {
   color: var(--bl-hljs-number-color);
 }
 
-.boostlook .hljs-doctag, 
+.boostlook .hljs-doctag,
 .boostlook .hljs-string {
   color: var(--bl-hljs-doctag-color);
 }
 
-.boostlook .hljs-section, 
-.boostlook .hljs-selector-id, 
+.boostlook .hljs-section,
+.boostlook .hljs-selector-id,
 .boostlook .hljs-title {
   color: var(--bl-hljs-section-color);
 }
@@ -319,14 +583,132 @@ p, h1, h2, h3, h4, h5, h6 {
   color: var(--bl-link-color);
 }
 
-.boostlook .hljs-attribute, 
-.boostlook .hljs-name, 
+.boostlook .hljs-attribute,
+.boostlook .hljs-name,
 .boostlook .hljs-tag {
   color: var(--bl-hljs-attribute-color);
 }
 
 .boostlook nav.pagination span::before {
   color: var(--bl-pagination-color);
+}
+
+.boostlook #toc a {
+  color: var(--bl-nav-link-color);
+}
+
+.boostlook #toc a:hover,
+.boostlook #toc a:focus {
+  color: var(--bl-nav-link-hover-color);
+}
+
+.boostlook #toc.toc2 {
+  padding-bottom: 1.5rem;
+}
+
+.boostlook b,
+.boostlook strong {
+  font-weight: bold;
+}
+
+.boostlook #header,
+.boostlook #content,
+.boostlook #footer {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.boostlook #header {
+  padding-top: 1.25rem;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.boostlook #content {
+  padding-top: 1.25rem;
+  padding-bottom: .50rem;
+}
+
+.boostlook #footer {
+  padding-bottom: 1.25rem;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
+
+.boostlook h2:first-of-type {
+  margin-top: 0;
+}
+/* Scrollbar styling */
+/* Antora template - Hide root scrollbars */
+html:has(.article > .boostlook) {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Hide scrollbars for iframe container but keep content scrollable */
+html:has(#docsiframe) {
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+/* Chrome/Edge scrollbar for iframe container */
+html:has(#docsiframe)::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Firefox scrollbar hiding for iframe */
+html:has(#docsiframe) {
+  scrollbar-width: none;
+}
+
+/* Navigation/Table Of Contents scrollbar */
+.boostlook .nav {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bl-scrollbar-thumb-color) var(--bl-scrollbar-track-color);
+}
+
+/* Chrome/Edge - Navigation scrollbar */
+.boostlook .nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.boostlook .nav::-webkit-scrollbar-thumb {
+  background-color: var(--bl-scrollbar-thumb-color);
+  border-radius: 10px;
+}
+
+.boostlook .nav::-webkit-scrollbar-track {
+  background-color: var(--bl-scrollbar-track-color);
+}
+
+/* Antora template - Scrollable content area with styled scrollbar */
+.boostlook #content:has(> .doc) {
+  overflow-y: auto;
+  height: 100vh;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bl-scrollbar-thumb-color) var(--bl-scrollbar-track-color);
+}
+
+/* Chrome/Edge - Content scrollbar */
+.boostlook #content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.boostlook #content::-webkit-scrollbar-thumb {
+  background-color: var(--bl-scrollbar-thumb-color);
+  border-radius: 10px;
+}
+
+.boostlook #content::-webkit-scrollbar-track {
+  background-color: var(--bl-scrollbar-track-color);
+}
+
+/* Asciidoc template - Content fits height and allows overflow */
+.boostlook:has(#content > .sect1) {
+  scrollbar-width: thin;
+  overflow-y: auto;
+  height: 100vh;
 }
 
 /*----------------- Global Styles for .boostlook end -----------------*/
@@ -345,14 +727,16 @@ p, h1, h2, h3, h4, h5, h6 {
 .boostlook:not(:has(.doc)) pre {
   font-family: "Noto Sans Mono", monospace;
   background-color: var(--bl-pre-background);
-  margin: 1em;
+  margin-bottom: 1.25rem;
   padding: 1rem;
   overflow-x: auto;
+  scrollbar-width: none;
+  border-color: var(--bl-code-border-color);
 }
 
 .boostlook:not(:has(.doc)) table {
   border-collapse: collapse;
-  margin: 1em;
+  margin: 1em 0;
   border: 1px solid var(--bl-table-border-color);
 }
 
@@ -360,7 +744,6 @@ p, h1, h2, h3, h4, h5, h6 {
   background-color: var(--bl-table-head-background);
   text-align: left;
   padding: 0.25em 0.55em;
-  font-weight: 550;
 }
 
 .boostlook:not(:has(.doc)) td {
@@ -378,9 +761,9 @@ p, h1, h2, h3, h4, h5, h6 {
 
 .boostlook #toc ul {
   margin: 0;
-  padding: 0 0 0 0.5rem;
+  padding: 0 0 0 0.8rem;
   line-height: 1.5;
-  font-size: 0.85rem;
+  font-size: 1rem;
   list-style: none;
 }
 
@@ -392,38 +775,97 @@ p, h1, h2, h3, h4, h5, h6 {
   font-size: 1.5rem;
 }
 
-.boostlook #toc ul li a {
-  font-size: 1rem;
-}
- 
-.boostlook:not(:has(.doc)),
-.boostlook #toc.toc2 {
+.boostlook #toc.toc2,
+.boostlook #header:not(:has(.nav-container)),
+.boostlook #content,
+.boostlook #footer {
   background-color: var(--bl-card-background-color);
-  padding: 1rem 1.5rem;
 }
 
-.boostlook #toc.toc2 {
-  padding-left: 0;
+.boostlook #toc.toc2,
+.boostlook #toc.toc2.nav-container {
+  overflow-y: auto;
 }
 
-.boostlook #content {
-  overflow-x: auto;
+.boostlook #toc.toc2,
+#boost-legacy-docs-wrapper:not(:has(article.doc)) #toc.toc2.is-active {
+  position: static;
+}
+#boost-legacy-docs-wrapper:not(:has(article.doc)) #toc.toc2 {
+  position: fixed;
+}
+
+.boostlook #toc.toc2 > ul {
+  padding-bottom: 2rem;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 0;
 }
 
 .boostlook #toggle-toc {
-  display: none;
+  visibility: hidden;
+  height: 0;
+  width: 0;
+}
+
+.boostlook #toc .nav-menu > .nav-list,
+.boostlook #toc .nav-menu > .nav-list > .nav-list {
+  padding-left: 0
+}
+
+.boostlook .nav-menu .title {
+  border-bottom: 1px solid var(--bl-table-border-color);
+  margin-bottom: 16px;
 }
 
 .boostlook #content .sect3:has(.tableblock) {
   overflow-x: auto;
 }
 
+#boost-legacy-docs-wrapper h2.title {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+#boost-legacy-docs-wrapper h3.title,
+#boost-legacy-docs-wrapper.boostlook h3,
+#libraryReadMe.boostlook h3 {
+  font-weight: 550;
+  margin-bottom: 0.5rem;
+  font-feature-settings: normal;
+}
+
+.boostlook h2 a code {
+  color: var(---bl-nav-link-color);
+  font-size: 1.65rem;
+}
+
+.boostlook h3 a code,
+.boostlook h3 a:hover code {
+  color: var(---bl-nav-link-color) !important;
+  font-size: 1.5rem;
+}
+
+.boostlook pre.rouge .o {
+  font-weight: normal;
+}
+
+.boostlook pre.rouge code span {
+  font-style: normal;
+}
+
 @media screen and (min-width: 768px) {
-  .article.toc2.toc-left {
-    padding: 1rem;
+  .boostlook #toggle-toc {
+    visibility: visible;
+    height: auto;
+    width: auto;
   }
 
-  .boostlook:not(:has(.doc)),
+  .article.toc2.toc-left {
+    padding: 1rem 1rem 0 1rem;
+  }
+
   .boostlook #toc.toc2 {
     border-radius: 0.5rem;
   }
@@ -431,73 +873,99 @@ p, h1, h2, h3, h4, h5, h6 {
   .boostlook #toc.toc2 {
     position: fixed;
     width: 17rem;
-    left: max(1rem, calc(50% - 39rem));
+    left: max(1rem, 50% - 39rem);
     top: 1rem;
-    overflow-y: auto;
-    overflow-x: hidden;
     z-index: 1000;
-    height: calc(100vh - 2rem);
+    height: calc(100vh - 1rem);
     padding: 1rem;
+    padding: 1rem 1rem 1.5rem;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
-  .boostlook:not(:has(.doc)) {
+  .boostlook {
     margin-left: 18rem;
   }
 
   .boostlook #toggle-toc {
-    display: block;
     position: fixed;
-    top: 2.375rem;
-    left: calc(max(1rem, calc(50% - 39rem)) + 14rem);
-    background-color: rgb(255, 255, 255); 
+    top: 2rem;
+    left: max(1rem, 50% - 39rem - 1rem);
+    background-color: rgb(255, 255, 255, 0.5);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     border: 0;
     padding: 0;
     cursor: pointer;
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="%235f6368"><path d="m680-280-56-56 103-104H520v-80h207L624-624l56-56 200 200-200 200Zm-400 0L80-480l200-200 56 56-103 104h207v80H233l103 104-56 56Z"/></svg>');
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%235f6368%22%3E%3Cpath%20d%3D%22M400-240l240-240-240-240-56%2056%20184%20184-184%20184%2056%2056Z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat;
     background-position: center;
-    border-radius: 0.3125rem;
+    border-radius: 1rem;
+    height: 2rem;
     width: 2rem;
     text-indent: -9999px;
-    z-index: 1001; 
+    z-index: 1001;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  html.toc-hidden .boostlook {
+    margin-left: 0;
   }
 
-  .boostlook #toggle-toc:hover {
-    background-color: #f0f0f0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-
-  .boostlook #toggle-toc:active {
-    background-color: #e0e0e0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
   html.toc-hidden .boostlook #toggle-toc {
-    left: calc(max(1rem, calc(50% - 39rem)) - 1rem);
+    left: max(0rem, 50% - 39rem - 1rem);
+  }
+
+  html.toc-visible .boostlook #toggle-toc {
+    left: max(0rem, 50% - 39rem - 1rem);
+    background-color: rgb(255, 255, 255, 1);
+  }
+
+  html.toc-visible .boostlook {
+    margin-left: 0;
+  }
+
+  html.toc-hidden .boostlook #toc.toc2 {
+    visibility: hidden;
+  }
+
+  html.toc-visible #toc.toc2 {
+    opacity: 1;
+    visibility: visible;
+    width: 250px;
+    padding-left: 1.5rem;
+  }
+
+  html.toc-visible:not(.toc-pinned) #toc.toc2 {
+    box-shadow: 4px 0 12px 0px rgba(0, 0, 0, 0.10);
+  }
+
+  html.toc-visible.toc-pinned #toggle-toc {
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%235f6368%22%3E%3Cpath%20d%3D%22M560-240%20320-480l240-240%2056%2056-184%20184%20184%20184-56%2056Z%22%2F%3E%3C%2Fsvg%3E");
+  }
+
+  html.toc-visible.toc-pinned .boostlook {
+    margin-left: 17rem;
   }
 }
-
-html:not(.toc-hidden) .boostlook #toc {
-  display: block;
-}
-
-html.toc-hidden .boostlook #toc {
-  display: none;
-}
-
-html.toc-hidden .boostlook:not(:has(.doc)) {
-  margin-left: 0;
-}
-
 
 /*----------------- Styles specific to AsciiDoctor content end -----------------*/
 
 /*----------------- Styles specific to Antora Templates start -----------------*/
 
+.boostlook #header:has(.nav-container) {
+  padding: 0;
+}
+
 /* Typography */
+.boostlook .doc {
+  line-height: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
 .boostlook .doc,
 .boostlook .doc i {
+  color: var(--bl-text-color);
   font-family: "Noto Sans Display";
 }
 
@@ -509,13 +977,19 @@ html.toc-hidden .boostlook:not(:has(.doc)) {
   font-size: 0.875rem !important;
 }
 
+.boostlook p {
+  color: var(--bl-text-color);
+  padding-top: initial !important;
+  padding-bottom: initial !important;
+}
+
 /* Navigation Menu */
 .boostlook .nav-panel-menu {
   overflow: visible;
 }
 
-.boostlook .nav-menu {
-  padding-left: 1rem;
+.boostlook .nav-close {
+  display: none;
 }
 
 .boostlook .nav-menu > .nav-list > .nav-list {
@@ -524,10 +998,6 @@ html.toc-hidden .boostlook:not(:has(.doc)) {
 
 .boostlook .nav-menu > .nav-list > .nav-list > li {
   font-weight: bolder;
-}
-
-.boostlook .nav-menu .nav-list li {
-  line-height: 1.5;
 }
 
 .boostlook .nav-link,
@@ -542,8 +1012,24 @@ html.toc-hidden .boostlook:not(:has(.doc)) {
   color: var(--bl-link-hover-color);
 }
 
-.boostlook .nav-text { 
+.boostlook .nav-text {
   color: #828282;
+}
+
+.boostlook #toc.toc2.nav-container {
+  position: fixed;
+}
+
+.boostlook #toc.toc2.nav-container.is-active {
+  position: static;
+}
+
+.boostlook #header .nav-container.is-active {
+  padding: 1rem;
+}
+
+.boostlook #content .nav-toggle {
+  background-position-x: 0;
 }
 
 /* Active Page Indicator */
@@ -554,7 +1040,7 @@ html.toc-hidden .boostlook:not(:has(.doc)) {
 .boostlook .is-current-page.is-active::before {
   content: "";
   position: absolute;
-  top: 38%;
+  top: 0.3125rem;
   width: 16px;
   height: 16px;
   margin-left: -1.25rem;
@@ -573,10 +1059,22 @@ html.toc-hidden .boostlook:not(:has(.doc)) {
   display: flex;
 }
 
+.boostlook .breadcrumbs svg {
+  fill: var(--bl-breadcrumbs-svg-color);
+}
+
 /* Code Block */
 .boostlook .doc .content pre code {
-  background-color: var(--bl-code-background);
+  background-color: var(--bl-pre-background);
   border-color: var(--bl-code-border-color);
+  color: var(--bl-code-text-color);
+  padding: 1.2em .8em;
+  border-radius: 0;
+}
+
+.boostlook .doc pre {
+  padding: initial;
+  overflow-x: hidden;
 }
 
 /* Layout */
@@ -584,13 +1082,554 @@ html.toc-hidden .boostlook:not(:has(.doc)) {
   gap: 1rem;
 }
 
+.boostlook #content:has(.toc.sidebar) {
+  display: flex;
+}
+
+.boostlook #footer:has(> script):not(:has(> div)) {
+  padding-top: 0;
+}
+
 /* Table of Contents */
+.boostlook .nav {
+  height: 100%;
+}
+
 .boostlook .toc .toc-menu a {
   border-left: 0;
   padding: .25rem 0 0 0;
 }
 
+/* Admonitions */
+.boostlook .admonitionblock p {
+  line-height: normal;
+}
+
+.boostlook .doc .admonitionblock {
+  background-color: var(--bl-tabpanel-background);
+  border-radius: 8px;
+}
+
+/* Tabs */
+.boostlook .tabs:not(.is-loading) .tablist li:not(.is-selected) {
+  background-color: var(--bl-tab-background);
+}
+
+.boostlook .tablist > ul li {
+  background-color: var(--bl-tabpanel-background);
+}
+
+/* Tables */
+.boostlook .doc table.tableblock {
+  display: block;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  margin-top: 1rem;
+}
+.boostlook .doc table.tableblock tr th {
+  background-color: var(--bl-table-head-background);
+  font-size: 1rem;
+}
+
+.dark .doc table.stripes-even>tbody>tr:nth-of-type(2n) {
+  background-color: var(--bl-table-stripe-color);
+}
+
+.boostlook .doc p.tableblock + p.tableblock {
+  margin-top: .25rem;
+}
+
+/* Toolbar */
+.boostlook .toolbar .breadcrumbs a,
+.boostlook .toolbar .breadcrumbs li {
+  color: var(--bl-text-color);
+}
+
+
+/* Responsive Styles */
+@media screen and (min-width: 768px) {
+  .boostlook #content:has(> article.doc) {
+    border-top-right-radius: 0.5rem;
+    border-top-left-radius: 0.5rem;
+  }
+}
+
 /*----------------- Styles specific to Antora Templates end -----------------*/
+
+/*----------------- Styles specific to website-v2 start -----------------*/
+
+/* Library/Releases Readmes */
+.boostlook#libraryReadMe li p {
+  display: inline;
+}
+
+.boostlook#libraryReadMe {
+  margin-left: 0;
+}
+
+.boostlook#libraryReadMe ul {
+  margin-bottom: 1.5rem;
+}
+
+.boostlook#libraryReadMe pre {
+  padding: 0;
+}
+
+.boostlook#libraryReadMe pre code {
+  background-color: var(--bl-code-background);
+  margin-bottom: 0;
+}
+
+.boostlook .doc .content pre code {
+  border-color: var(--bl-code-border-color);
+  color: var(--bl-code-text-color);
+  padding: 1.2em .8em;
+}
+
+/* Temporary fix for undetected code from highlight.js */
+.boostlook#libraryReadMe .language- span {
+  color: inherit;
+  font-weight: initial;
+}
+
+/*----------------- Styles specific to website-v2 end -----------------*/
+
+/*---------- Quickbook docs styling fixes -----------*/
+
+#boost-legacy-docs-wrapper.boostlook h1,
+#libraryReadMe.boostlook h1 {
+  font-size: 1.8rem;
+}
+
+#boost-legacy-docs-wrapper.boostlook h2,
+#libraryReadMe.boostlook h2 {
+  font-size: 1.65rem;
+  border-bottom: 1px solid #eaf0f3;
+  border-bottom: 1px solid var(--bl-table-border-color);
+  font-weight: 500;
+}
+
+#boost-legacy-docs-wrapper.boostlook h3,
+#libraryReadMe.boostlook h3 {
+  font-size: 1.5rem;
+}
+
+#boost-legacy-docs-wrapper.boostlook h4,
+#libraryReadMe.boostlook h4 {
+  font-size: 1.35rem;
+}
+
+#boost-legacy-docs-wrapper.boostlook p,
+.boostlook p {
+  margin-bottom: 0;
+  font-size: 16px;
+}
+
+#boost-legacy-docs-wrapper li {
+  font-size: 16px;
+}
+
+#boost-legacy-docs-wrapper.boostlook:not(:has(.doc)) th {
+  background-color: var(--bg-color);
+  border-color: var(--bl-border-color);
+}
+
+.boostlook div.note,
+.boostlook div.tip,
+.boostlook div.important,
+.boostlook div.caution,
+.boostlook div.warning,
+.boostlook div.blurb,
+.boostlook p.blurb {
+  border: 1px solid var(--bl-border-color);
+  border-radius: 8px;
+  background-color: var(--bl-tabpanel-background);
+  margin: 1pc 0 0 0;
+  padding: 8px;
+}
+
+.boostlook div.note table,
+.boostlook div.tip table,
+.boostlook div.important table,
+.boostlook div.caution table,
+.boostlook div.warning table,
+.boostlook div.blurb table,
+.boostlook p.blurb table {
+  border: none;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.boostlook div.note th,
+.boostlook div.tip th,
+.boostlook div.important th,
+.boostlook div.caution th,
+.boostlook div.warning th,
+.boostlook div.blurb th,
+.boostlook .blurb th {
+  background-color: transparent !important;
+  font-size: 16px;
+}
+
+.boostlook div.note td,
+.boostlook div.tip td,
+.boostlook div.important td,
+.boostlook div.caution td,
+.boostlook div.warning td,
+.boostlook div.blurb td,
+.boostlook p.blurb td {
+  border: none !important;
+  padding: 1px;
+}
+
+.boostlook:not(:has(.doc)) td pre {
+  padding: 5px;
+}
+
+.boostlook .programlisting {
+  margin: 1rem 0;
+}
+
+.boostlook table h1,
+.boostlook table h2,
+.boostlook table h3 {
+  line-height: 2rem;
+}
+.boostlook table h4,
+.boostlook table h5,
+.boostlook table h6 {
+  line-height: 1.75rem;
+}
+
+.boostlook:not(:has(.doc)) div.variablelist dl dt {
+    margin-bottom: 0.2em;
+    font-weight: bold;
+}
+
+.boostlook:not(:has(.doc)) div.variablelist dl dd {
+    margin: 0em 0em 0.5em 2em;
+    font-size: 10pt;
+}
+
+.boostlook:not(:has(.doc)) div.variablelist table tbody tr td p,
+.boostlook:not(:has(.doc)) div.variablelist dl dd p {
+    margin: 0em 0em 0.5em 0em;
+    line-height: 1;
+}
+
+.boostlook div.toc {
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+#boost-legacy-docs-wrapper.boostlook div.toc > p {
+  padding-top: 0 !important;
+}
+
+.boostlook dl.toc > dt {
+  font-variation-settings: "wght" 550;
+}
+
+.boostlook dl.toc dd {
+  padding-left: .6rem;
+}
+
+.boostlook dl.toc code {
+  font-size: 80%;
+  line-height: 1.15;
+}
+
+.boostlook .copyright-footer {
+  padding: 1rem;
+}
+
+body > .section,
+body > .chapter,
+#boost-legacy-docs-wrapper.boostlook > .section,
+#boost-legacy-docs-wrapper.boostlook > .chapter,
+#boost-legacy-docs-wrapper.boostlook > .document,
+#boost-legacy-docs-wrapper.boostlook > .refentry,
+#boost-legacy-docs-wrapper.boostlook > .book {
+  margin: 0rem 1rem;
+  padding: 1rem;
+  background-color: var(--card-color);
+  border-radius: 0.5rem;
+}
+
+/* qbk spirit nav hack */
+.boostlook:not(:has(.doc)) .spirit-nav a img {
+  display: none;
+}
+
+.boostlook:not(:has(.doc)) .spirit-nav a,
+#boost-legacy-docs-wrapper.boostlook:not(:has(.doc)) .spirit-nav a {
+  font-family: 'Material Symbols Outlined';
+  font-size: 18px;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  color: var(--bl-nav-link-color);
+}
+
+.boostlook:not(:has(.doc)) .spirit-nav a:hover,
+#boost-legacy-docs-wrapper.boostlook:not(:has(.doc)) .spirit-nav a:hover,
+.toolbar a:hover .material-symbols-outlined {
+  color: var(--bl-primary-color);
+  text-decoration: none;
+}
+
+.boostlook:not(:has(.doc)) .spirit-nav a[accesskey='p']::after {
+  content: "arrow_back";
+}
+.boostlook:not(:has(.doc)) .spirit-nav a[accesskey='u']::after {
+  content: "arrow_upward";
+}
+.boostlook:not(:has(.doc)) .spirit-nav a[accesskey='h']::after {
+  content: "home";
+}
+.boostlook:not(:has(.doc)) .spirit-nav a[accesskey='n']::after {
+  content: "arrow_forward";
+}
+
+@media screen and (max-width: 768px) {
+  .boostlook:not(:has(.doc)) .spirit-nav {
+    right: 2rem;
+    top: 0.2rem;
+  }
+}
+
+/* ---------------- Styling from boostbookV2.css ----------------*/
+
+body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
+  background-color: transparent;
+}
+
+.boostlook:not(:has(.doc)) {
+  border-radius: 0;
+}
+/* general elements */
+.boostlook:not(:has(.doc)) h1,
+.boostlook:not(:has(.doc)) h2,
+.boostlook:not(:has(.doc)) h2:first-of-type,
+.boostlook:not(:has(.doc)) h3,
+.boostlook:not(:has(.doc)) h4,
+.boostlook:not(:has(.doc)) h5,
+.boostlook:not(:has(.doc)) h6 {
+  margin: 1em 0em 0.5em;
+}
+
+.boostlook:not(:has(.doc)) h5 {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 110%;
+}
+
+.boostlook:not(:has(.doc)) h1 a,
+.boostlook:not(:has(.doc)) h2 a,
+.boostlook:not(:has(.doc)) h3 a,
+.boostlook:not(:has(.doc)) h4 a {
+  color: var(--bl-header-color)
+}
+
+.boostlook:not(:has(.doc)) p {
+  padding: 1em 0 !important;
+}
+.boostlook:not(:has(.doc)) li p {
+  padding: 0 !important;
+}
+
+.boostlook:not(:has(.doc)) > hr {
+  display: none;
+}
+
+.boostlook:not(:has(.doc)) ol {
+  padding-left: 1em;
+}
+
+.boostlook:not(:has(.doc)) ol li {
+  list-style-type: decimal;
+}
+
+.boostlook:not(:has(.doc)) pre {
+  background-color: var(--bl-pre-background);
+  border: 1px solid var(--bl-code-border-color);
+  padding: 1.2em .8em;
+  margin: 0;
+}
+
+.boostlook:not(:has(.doc)) pre code {
+  border: none;
+}
+
+.boostlook:not(:has(.doc)) :not(.highlight) pre {
+  color: var(--bl-code-text-color);
+}
+
+.boostlook:not(:has(.doc)) div.informaltable table tr th,
+.boostlook:not(:has(.doc)) div.table table tr th {
+  border: 1px solid var(--bl-border-color);
+}
+
+/* spirit nav */
+.boostlook:not(:has(.doc)) .spirit-nav {
+  position: absolute;
+  top: 0.2rem;
+  right: calc(((100% - 75rem) / 2));
+  text-align: right;
+  margin: 0.75rem;
+  max-width: 80rem;
+  display: flex;
+}
+.boostlook:not(:has(.doc)) .spirit-nav a {
+  color: var(--secondary-color);
+  padding-left: 0.5em;
+}
+.boostlook:not(:has(.doc)) .spirit-nav img {
+  border-width: 0px;
+}
+.dark .boostlook:not(:has(.doc)) .spirit-nav img {
+  -webkit-filter: invert(100%); /* Safari/Chrome */
+  filter: invert(100%);
+}
+/* TOC */
+.boostlook:not(:has(.doc)) div.toc {
+  font-size: 80%;
+  line-height: 1.15;
+  color: var(--text-color);
+  border: 1px solid var(--bl-border-color);
+  background-color: var(--bl-pre-background);
+}
+
+.boostlook:not(:has(.doc)) div.toc dl.toc {
+  background-color: transparent;
+}
+
+.boostlook:not(:has(.doc)) #toc ul {
+  list-style: none !important;
+  margin: 0.5rem 0 !important;
+}
+
+.boostlook:not(:has(.doc)) .boost-toc {
+  float: right;
+  padding: 0.5pc;
+}
+
+/* Code on toc */
+.boostlook:not(:has(.doc)) .toc .computeroutput {
+  font-size: 120%
+}
+
+.boostlook:not(:has(.doc)) .copyright-footer {
+  text-align: right;
+  font-size: 70%;
+}
+
+.boostlook:not(:has(.doc)) .copyright-footer p {
+  text-align: left;
+  font-size: 10pt;
+  line-height: 1.15;
+}
+
+/* Syntax Highlighting */
+.property,
+.highlight .k,
+.highlight .kc,
+.highlight .kd,
+.highlight .kn,
+.highlight .kp,
+.highlight .kr,
+.highlight .kt,
+.keyword {
+  color: var(--color-purple);
+}
+
+.highlight .n,
+.highlight .na,
+.highlight .nb,
+.highlight .bp,
+.highlight .nc,
+.highlight .no,
+.highlight .nd,
+.highlight .ni,
+.highlight .ne,
+.highlight .nf,
+.highlight .py,
+.highlight .nl,
+.highlight .nn,
+.highlight .nx,
+.highlight .nt,
+.highlight .nv,
+.highlight .vc,
+.highlight .vg,
+.highlight .vi,
+.identifier {
+  color: var(--color-navy);
+}
+
+.special {
+  color: var(--text-color);
+}
+
+.highlight .cp,
+.preprocessor {
+  color: var(--color-blue);
+}
+
+.highlight .sc
+.char {
+  color: var(--color-lime);
+}
+
+.highlight .c,
+.highlight .ch,
+.highlight .cm,
+.highlight .cp,
+.highlight .cpf,
+.highlight .c1,
+.highlight .cs,
+.highlight .sd,
+.highlight .sh,
+.comment {
+  color: var(--color-green);
+}
+
+.highlight .s,
+.highlight .sa,
+.highlight .sb,
+.highlight .dl,
+.highlight .s2,
+.highlight .se,
+.highlight .si,
+.highlight .sx,
+.highlight .sr,
+.highlight .s1,
+.highlight .ss,
+.string {
+  color: var(--color-gold);
+}
+
+.highlight .m,
+.highlight .mf,
+.highlight .mh,
+.highlight .mi,
+.highlight .mo,
+.number {
+  color: var(--color-red);
+}
+
+.highlight,
+.white_bkd {
+  background-color: var(--card-color);
+}
+
+.highlight .hll,
+.dk_grey_bkd {
+  background-color: var(--border-color);
+}
+
+/* ---------------- Styling from boostbookV2.css end ----------------*/
+
 </style>
 <style>
 pre.rouge table td { padding: 5px; }
@@ -706,20 +1745,13 @@ pre.rouge .gs {
   font-weight: bold;
 }
 </style>
-<script>
-(function() {
-  if (localStorage.getItem('tocVisible') === 'false') {
-    document.documentElement.classList.add('toc-hidden');
-  }
-})();
-</script>
 </head>
-<body class="article toc2 toc-left"><div class="boostlook">
+</div><body class="article toc2 toc-left"><div class="boostlook">
 <div id="header">
-<h1>Decimal: IEEE 754 Decimal Floating Point Numbers</h1>
-<button id="toggle-toc" title="Toggle Table of Contents" aria-expanded="true" aria-controls="toc">Toggle TOC</button><div id="toc" class="toc2">
+<div id="toc" class="toc2"><button id="toggle-toc" title="Show Table of Contents" aria-expanded="false" aria-controls="toc">☰</button>
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#decimal_ieee_754_decimal_floating_point_numbers">Decimal: IEEE 754 Decimal Floating Point Numbers</a></li>
 <li><a href="#overview">Overview</a>
 <ul class="sectlevel2">
 <li><a href="#overview_description">Description</a></li>
@@ -815,7 +1847,7 @@ pre.rouge .gs {
 <li><a href="#cmath_quantexp">quantexp</a></li>
 <li><a href="#cmath_quantized">quantized</a></li>
 <li><a href="#cmath_frexp10">frexp10</a></li>
-<li><a href="#cmath_trunc_to">trunc_to</a></li>
+<li><a href="#cmath_rescale">rescale</a></li>
 </ul>
 </li>
 </ul>
@@ -881,6 +1913,12 @@ pre.rouge .gs {
 <li><a href="#examples_generic_programming">Generic Programming</a></li>
 <li><a href="#examples_literals_and_constants">Literals and Constants</a></li>
 <li><a href="#examples_bit_conversions">Bit Conversions</a></li>
+<li><a href="#examples_financial_applications">Financial Applications</a>
+<ul class="sectlevel3">
+<li><a href="#examples_simple_moving_average">Simple Moving Average</a></li>
+<li><a href="#examples_currency_conversion">Currency Conversion</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#Benchmarks">Benchmarks</a>
@@ -959,6 +1997,14 @@ pre.rouge .gs {
 </div>
 <div id="content">
 <div class="sect1">
+<h2 id="decimal_ieee_754_decimal_floating_point_numbers">Decimal: IEEE 754 Decimal Floating Point Numbers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Matt Borland and Chris Kormanyos</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="overview">Overview</h2>
 <div class="sectionbody">
 <div class="sect2">
@@ -1016,6 +2062,10 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 </div>
 <div class="sect2">
 <h3 id="overview_basic_usage">Basic Usage</h3>
+<div class="paragraph">
+<p>The entire library should be accessed using the convince header <code>&lt;boost/decimal.hpp&gt;</code>.
+A short example of the basic usage:</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/decimal.hpp&gt;</span><span class="cp">
@@ -1316,6 +2366,9 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>The encoding of Decimal32 is in the <a href="#conversions">BID format</a>.</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/decimal/decimal32.hpp&gt;</span><span class="cp">
@@ -1417,6 +2470,9 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>The encoding of Decimal64 is in the <a href="#conversions">BID format</a>.</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/decimal/decimal64.hpp&gt;</span><span class="cp">
@@ -1517,6 +2573,9 @@ Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal"
 <p>Smallest subnormal - 1e-6176</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>The encoding of Decimal128 is in the <a href="#conversions">BID format</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2034,7 +3093,7 @@ Should the user want to capture the bit format in BID or convert to DPD we offer
 <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_df</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
 
 <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DF</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
-<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dF</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_df</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32</span>
 
 <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DD</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
 <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dd</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64</span>
@@ -2047,6 +3106,26 @@ Should the user want to capture the bit format in BID or convert to DPD we offer
 
 <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DL</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128</span>
 <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dl</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128</span>
+
+<span class="c1">// ----- Fast Type Literals -----</span>
+
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DFF</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32_fast</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dff</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32_fast</span>
+
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DFF</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32_fast</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dff</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal32_fast</span>
+
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DDF</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64_fast</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_ddf</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64_fast</span>
+
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DDF</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64_fast</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_ddf</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal64_fast</span>
+
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DLF</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128_fast</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dlf</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128_fast</span>
+
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_DLF</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128_fast</span>
+<span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span>  <span class="s">""</span> <span class="n">_dlf</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal128_fast</span>
 
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
@@ -2878,16 +3957,16 @@ The significand is normalized to the number of digits of precision the type has 
 </div>
 </div>
 <div class="sect3">
-<h4 id="cmath_trunc_to">trunc_to</h4>
+<h4 id="cmath_rescale">rescale</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Decimal</span><span class="p">&gt;</span>
-<span class="k">constexpr</span> <span class="n">Decimal</span> <span class="nf">trunc_to</span><span class="p">(</span><span class="n">Decimal</span> <span class="n">val</span><span class="p">,</span> <span class="kt">int</span> <span class="n">precision</span> <span class="o">=</span> <span class="mi">0</span><span class="p">);</span></code></pre>
+<span class="k">constexpr</span> <span class="n">Decimal</span> <span class="nf">rescale</span><span class="p">(</span><span class="n">Decimal</span> <span class="n">val</span><span class="p">,</span> <span class="kt">int</span> <span class="n">precision</span> <span class="o">=</span> <span class="mi">0</span><span class="p">);</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>The function returns the decimal type with number of fractional digits equal to the value of precision.
-<code>trunc_to</code> is similar to <a href="https://en.cppreference.com/w/cpp/numeric/math/trunc">trunc</a>, and with the default precision argument of 0 it is identical.</p>
+<code>rescale</code> is similar to <a href="https://en.cppreference.com/w/cpp/numeric/math/trunc">trunc</a>, and with the default precision argument of 0 it is identical.</p>
 </div>
 </div>
 </div>
@@ -3938,6 +5017,24 @@ The representation is exact with integers whereas you may get surprising or unwa
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">BID</span> <span class="n">format</span><span class="o">:</span> <span class="mi">31</span><span class="n">fc4b40</span>
 <span class="n">DPD</span> <span class="n">format</span><span class="o">:</span> <span class="mi">35</span><span class="n">f00000</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="examples_financial_applications">Financial Applications</h3>
+<div class="sect3">
+<h4 id="examples_simple_moving_average">Simple Moving Average</h4>
+<div class="paragraph">
+<p>In the examples folder there is a file named <code>moving_average.cpp</code>.
+This example shows how to parse historical stock data from file and use it.
+This serves as a framework for other calculations for securities.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples_currency_conversion">Currency Conversion</h4>
+<div class="paragraph">
+<p>In the examples folder there is a file named <code>currency_conversion.cpp</code>.
+This example shows how to simply convert currencies based off a given exchange rate.</p>
 </div>
 </div>
 </div>
@@ -5969,7 +7066,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-04 11:42:48 -0400
+Last updated 2025-01-02 14:24:56 -0500
 </div>
 </div>
 <style>
@@ -5979,30 +7076,55 @@ Last updated 2024-10-04 11:42:48 -0400
 
 </style>
 </div><script>
-  document.addEventListener('DOMContentLoaded', (event) => {
-  const tocButton = document.getElementById('toggle-toc');
-  const toc = document.getElementById('toc');
+(function() {
   const html = document.documentElement;
-  
-  if (tocButton && toc) {
-    const tocVisible = !html.classList.contains('toc-hidden');
-    updateTocVisibility(tocVisible);
-    
-    tocButton.addEventListener('click', () => {
-      const newState = html.classList.contains('toc-hidden');
-      updateTocVisibility(newState);
-      localStorage.setItem('tocVisible', newState);
+  const isPinned = localStorage.getItem('tocPinned') === 'true';
+
+  html.classList.add('toc-hidden');
+  if (isPinned) {
+    html.classList.add('toc-pinned');
+    html.classList.add('toc-visible');
+    html.classList.remove('toc-hidden');
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const tocButton = document.getElementById("toggle-toc");
+    const toc = document.getElementById("toc");
+
+    if (!tocButton || !toc) return;
+
+    let isPinned = localStorage.getItem('tocPinned') === 'true';
+
+    function updateTocVisibility(visible) {
+      html.classList.toggle("toc-visible", visible);
+      html.classList.toggle("toc-hidden", !visible);
+      tocButton.setAttribute("aria-expanded", visible);
+      tocButton.textContent = visible ? "×" : "☰";
+      tocButton.setAttribute("title", visible ? "Hide Table of Contents" : "Show Table of Contents");
+    }
+
+    tocButton.addEventListener("click", () => {
+      isPinned = !isPinned;
+      localStorage.setItem('tocPinned', isPinned);
+      html.classList.toggle('toc-pinned', isPinned);
+      updateTocVisibility(isPinned);
     });
-  }
-  
-  function updateTocVisibility(visible) {
-    html.classList.toggle('toc-hidden', !visible);
-    toc.style.display = visible ? 'block' : 'none';
-    tocButton.setAttribute('aria-expanded', visible);
-    tocButton.textContent = visible ? 'Hide TOC' : 'Show TOC';
-    tocButton.setAttribute('title', visible ? 'Hide Table of Contents' : 'Show Table of Contents');
-  }
-});
+
+    tocButton.addEventListener("mouseenter", () => {
+      if (!isPinned) {
+        updateTocVisibility(true);
+      }
+    });
+
+    toc.addEventListener("mouseleave", () => {
+      if (!isPinned) {
+        updateTocVisibility(false);
+      }
+    });
+
+    updateTocVisibility(isPinned);
+  });
+})();
 </script>
 </body>
 </html>
