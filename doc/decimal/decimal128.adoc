@@ -19,6 +19,8 @@ Decimal128 is the 128-bit version of the decimal interchange format, and has the
 - Smallest normalized value - 1.0000...e-6142
 - Smallest subnormal - 1e-6176
 
+The encoding of Decimal128 is in the <<conversions, BID format>>.
+
 [source, c++]
 ----
 #include <boost/decimal/decimal128.hpp>

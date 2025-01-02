@@ -19,6 +19,8 @@ Decimal64 is the 64-bit version of the decimal interchange format, and has the f
 - Smallest normalized value - 1.000000000000000e-382
 - Smallest subnormal - 1e-398
 
+The encoding of Decimal64 is in the <<conversions, BID format>>.
+
 [source, c++]
 ----
 #include <boost/decimal/decimal64.hpp>
