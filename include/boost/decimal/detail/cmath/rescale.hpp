@@ -1,9 +1,9 @@
-// Copyright 2024 Matt Borland
+// Copyright 2025 Matt Borland
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_DECIMAL_DETAIL_CMATH_TRUNC_TO_HPP
-#define BOOST_DECIMAL_DETAIL_CMATH_TRUNC_TO_HPP
+#ifndef BOOST_DECIMAL_DETAIL_CMATH_RESCALE_HPP
+#define BOOST_DECIMAL_DETAIL_CMATH_RESCALE_HPP
 
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
@@ -24,7 +24,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto trunc_to(T val, int precision = 0) noexcept
+constexpr auto rescale(T val, int precision = 0) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr auto biggest_val {1 / std::numeric_limits<T>::epsilon()};
@@ -64,8 +64,7 @@ constexpr auto trunc_to(T val, int precision = 0) noexcept
     return {sig, exp, isneg};
 }
 
-
 } // namespace decimal
 } // namespace boost
 
-#endif //BOOST_DECIMAL_DETAIL_CMATH_TRUNC_TO_HPP
+#endif //BOOST_DECIMAL_DETAIL_CMATH_RESCALE_HPP
