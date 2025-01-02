@@ -19,7 +19,7 @@ int main()
     const auto usd_to_eur_rate = strtod64("0.92", nullptr);
 
     const decimal64 eur_amount = convert_currency(usd_amount, usd_to_eur_rate);
-    const decimal64 exact_eur_amount = strtod64("920.46", nullptr);
+    constexpr decimal64 exact_eur_amount(92046, -2);
 
     std::cout << "USD: " << std::fixed << std::setprecision(2) << usd_amount << "\n";
     std::cout << "EUR: " << std::fixed << std::setprecision(2) << eur_amount << "\n";
