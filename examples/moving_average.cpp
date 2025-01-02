@@ -170,7 +170,7 @@ int main()
         decimal64 sum(0);
 
         // Calculate sum for the window
-        for (int j = 0; j < window_size; ++j) {
+        for (size_t j = 0; j < window_size; ++j) {
             sum += stock_data[i - j].close;
         }
 
