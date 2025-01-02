@@ -217,3 +217,10 @@ BID format: 31fc4b40
 DPD format: 35f00000
 ----
 
+== Financial Applications
+
+=== Simple Moving Average
+
+In the examples folder there is a file named `moving_average.cpp`.
+This example shows how to parse historical stock data from file and use it.
+This serves as a framework for other calculations for securities.
