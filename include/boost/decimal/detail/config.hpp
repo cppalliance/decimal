@@ -325,4 +325,9 @@ typedef unsigned __int128 uint128_t;
 #  endif
 #endif
 
+#ifdef BOOST_DECIMAL_BUILD_MODULE
+#  define UINT64_C(x) (x ## ULL)
+#  define UINT32_C(x) (x ## UL)
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
