@@ -47,14 +47,14 @@ constexpr auto d32_fma_impl(T x, T y, T z) noexcept -> T
     }
     #endif
 
-    exp_type exp_lhs {};
+    int exp_lhs {};
     auto sig_lhs = frexp10(x, &exp_lhs);
 
-    exp_type exp_rhs {};
+    int exp_rhs {};
     auto sig_rhs = frexp10(y, &exp_rhs);
 
-    auto first_res = detail::mul_impl<T_components_type>(sig_lhs, exp_lhs, x < 0,
-                                                         sig_rhs, exp_rhs, y < 0);
+    auto first_res = detail::mul_impl<T_components_type>(sig_lhs, static_cast<exp_type>(exp_lhs), x < 0,
+                                                         sig_rhs, static_cast<exp_type>(exp_rhs), y < 0);
 
     // Apply the mul on the carried components
     // We still create the result as a decimal type to check for non-finite values and comparisons,
@@ -73,12 +73,12 @@ constexpr auto d32_fma_impl(T x, T y, T z) noexcept -> T
 
     const bool abs_lhs_bigger {abs(complete_lhs) > abs(z)};
 
-    exp_type exp_z {};
+    int exp_z {};
     auto sig_z = frexp10(z, &exp_z);
     detail::normalize<T>(first_res.sig, first_res.exp);
 
     return detail::d32_add_impl<T>(first_res.sig, first_res.exp, first_res.sign,
-                                   sig_z, exp_z, z < 0,
+                                   sig_z, static_cast<exp_type>(exp_z), z < 0,
                                    abs_lhs_bigger);
 }
 
