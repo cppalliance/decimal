@@ -325,4 +325,15 @@ typedef unsigned __int128 uint128_t;
 #  endif
 #endif
 
+// Since we should not be able to pull these in from the STL in module mode define them ourselves
+// This is also low risk since they are not supposed to be exported
+#ifdef BOOST_DECIMAL_BUILD_MODULE
+#  ifndef UINT64_C
+#    define UINT64_C(x) (x ## ULL)
+#  endif
+#  ifndef UINT32_C
+#    define UINT32_C(x) (x ## UL)
+#  endif
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP

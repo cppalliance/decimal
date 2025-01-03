@@ -29,6 +29,7 @@ module;
 #include <system_error>
 #include <complex>
 #include <compare>
+#include <charconv>
 
 // <stdfloat> is a C++23 feature that is not everywhere yet
 #if __has_include(<stdfloat>)
@@ -123,7 +124,17 @@ struct numeric_limits<boost::decimal::decimal128_fast>;
 
 // MSVC wants <boost/decimal> to be imported but also does not support importing it...
 #ifdef _MSC_VER
+#  pragma warning( push )
 #  pragma warning( disable : 5244 )
+#elif defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Winclude-angled-in-module-purview"
 #endif
 
 #include <boost/decimal.hpp>
+
+#ifdef _MSC_VER
+#  pragma warning( pop )
+#elif defined(__clang__)
+#  pragma clang diagnostic pop
+#endif
