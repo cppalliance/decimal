@@ -162,6 +162,7 @@ void test_non_finite_values()
 
     const char* snan_str = "nan(snan)";
     auto r = from_chars(snan_str, snan_str + std::strlen(snan_str), val);
+    BOOST_TEST(r);
     BOOST_TEST(isnan(val));
 
     const char* qnan_str = "nan";
@@ -318,6 +319,17 @@ void test_from_chars_general_std()
 
 #endif
 
+template <typename T>
+void test_string_interface()
+{
+    constexpr T correct_val {42};
+    std::string str {"42"};
+    T val;
+    const auto r = from_chars(str, val);
+    BOOST_TEST(r);
+    BOOST_TEST_EQ(val, correct_val);
+}
+
 int main()
 {
     test_from_chars_scientific<decimal32>();
@@ -362,12 +374,25 @@ int main()
     test_hex_values<decimal32_fast>();
     test_hex_values<decimal64_fast>();
 
+    test_string_interface<decimal32>();
+    test_string_interface<decimal64>();
+    test_string_interface<decimal32_fast>();
+    test_string_interface<decimal64_fast>();
+
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
     test_from_chars_scientific<decimal128>();
     test_from_chars_fixed<decimal128>();
     test_from_chars_general<decimal128>();
     test_non_finite_values<decimal128>();
     test_hex_values<decimal128>();
+    test_string_interface<decimal128>();
+
+    test_from_chars_scientific<decimal128_fast>();
+    test_from_chars_fixed<decimal128_fast>();
+    test_from_chars_general<decimal128_fast>();
+    test_non_finite_values<decimal128_fast>();
+    test_hex_values<decimal128_fast>();
+    test_string_interface<decimal128_fast>();
     #endif
 
     return boost::report_errors();
