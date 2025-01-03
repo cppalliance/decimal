@@ -99,7 +99,7 @@ BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* la
 }
 
 #ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const std::string& str, decimal32& value, chars_format fmt = chars_format::general) noexcept
+BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal32& value, chars_format fmt = chars_format::general) noexcept
 {
     return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
 }
@@ -116,7 +116,7 @@ BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* la
 }
 
 #ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const std::string& str, decimal32_fast& value, chars_format fmt = chars_format::general) noexcept
+BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal32_fast& value, chars_format fmt = chars_format::general) noexcept
 {
     return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
 }
@@ -133,7 +133,7 @@ BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* la
 }
 
 #ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const std::string& str, decimal64& value, chars_format fmt = chars_format::general) noexcept
+BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal64& value, chars_format fmt = chars_format::general) noexcept
 {
     return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
 }
@@ -150,7 +150,7 @@ BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* la
 }
 
 #ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const std::string& str, decimal64_fast& value, chars_format fmt = chars_format::general) noexcept
+BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal64_fast& value, chars_format fmt = chars_format::general) noexcept
 {
     return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
 }
@@ -167,7 +167,7 @@ BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* la
 }
 
 #ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const std::string& str, decimal128& value, chars_format fmt = chars_format::general) noexcept
+BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal128& value, chars_format fmt = chars_format::general) noexcept
 {
     return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
 }
@@ -184,7 +184,7 @@ BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* la
 }
 
 #ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const std::string& str, decimal128_fast& value, chars_format fmt = chars_format::general) noexcept
+BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal128_fast& value, chars_format fmt = chars_format::general) noexcept
 {
     return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
 }
