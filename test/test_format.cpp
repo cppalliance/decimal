@@ -75,6 +75,14 @@ void test_general()
     BOOST_TEST_EQ(std::format("{:g}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
 }
 
+template <concepts::decimal_floating_point_type T>
+void test_fixed()
+{
+    BOOST_TEST_EQ(std::format("{:f}", T {21, 6, true}), "-21000000.000000");
+    BOOST_TEST_EQ(std::format("{:f}", T {211, 6, true}), "-211000000.000000");
+    BOOST_TEST_EQ(std::format("{:f}", T {2111, 6, true}), "-2111000000.000000");
+}
+
 int main()
 {
     test_general<decimal32>();
@@ -83,6 +91,13 @@ int main()
     test_general<decimal64_fast>();
     test_general<decimal128>();
     test_general<decimal128_fast>();
+
+    test_fixed<decimal32>();
+    test_fixed<decimal32_fast>();
+    test_fixed<decimal64>();
+    test_fixed<decimal64_fast>();
+    test_fixed<decimal128>();
+    test_fixed<decimal128_fast>();
 
     return boost::report_errors();
 }
