@@ -4,13 +4,29 @@
 
 #include "where_file.hpp"
 #include <boost/decimal.hpp>
-#include <boost/math/statistics/univariate_statistics.hpp>
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <sstream>
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+#  pragma clang diagnostic ignored "-Wsign-conversion"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+
+#include <boost/math/statistics/univariate_statistics.hpp>
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
 
 using namespace boost::decimal;
 
