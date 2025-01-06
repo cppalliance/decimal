@@ -11,6 +11,7 @@
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/emulated256.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
+#include <boost/decimal/detail/components.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -26,7 +27,7 @@ namespace detail {
 
 template <typename ReturnType, typename T, typename U>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<ReturnType, decimal32_fast>::value, ReturnType>
+                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<ReturnType, decimal32_fast>::value || std::is_same<ReturnType, decimal32_fast_components>::value, ReturnType>
 {
     using mul_type = std::uint_fast64_t;
 
@@ -38,7 +39,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
 
 template <typename ReturnType, typename T, typename U>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<ReturnType, decimal32>::value, ReturnType>
+                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<ReturnType, decimal32>::value || std::is_same<ReturnType, decimal32_components>::value, ReturnType>
 {
     using mul_type = std::uint_fast64_t;
 
@@ -52,47 +53,6 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
     auto res_exp {lhs_exp + rhs_exp + static_cast<U>(5)};
 
     return {static_cast<std::uint32_t>(res_sig), res_exp, lhs_sign != rhs_sign};
-}
-
-template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
-{
-    using mul_type = std::uint_fast64_t;
-
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "sig lhs: " << sig_lhs
-              << "\nexp lhs: " << exp_lhs
-              << "\nsig rhs: " << sig_rhs
-              << "\nexp rhs: " << exp_rhs;
-    #endif
-
-    bool sign {lhs_sign != rhs_sign};
-
-    // Once we have the normalized significands and exponents all we have to do is
-    // multiply the significands and add the exponents
-    //
-    // We use a 64 bit resultant significand because the two 23-bit unsigned significands will always fit
-
-    auto res_sig {static_cast<mul_type>(lhs_sig) * static_cast<mul_type>(rhs_sig)};
-    auto res_exp {lhs_exp + rhs_exp};
-
-    // We don't need to use the regular binary search tree detail::num_digits(res_sig)
-    // because we know that res_sig must be [1'000'000^2, 9'999'999^2] which only differ by one order
-    // of magnitude in their number of digits
-    const auto sig_dig {res_sig >= UINT64_C(10000000000000) ? 14 : 13};
-    constexpr auto max_dig {std::numeric_limits<typename ReturnType::significand_type>::digits10};
-    res_sig /= detail::pow10(static_cast<mul_type>(sig_dig - max_dig));
-    res_exp += sig_dig - max_dig;
-
-    const auto res_sig_32 {static_cast<typename ReturnType::significand_type>(res_sig)};
-
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "\nres sig: " << res_sig_32
-              << "\nres exp: " << res_exp << std::endl;
-    #endif
-
-    return {res_sig_32, res_exp, sign};
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
