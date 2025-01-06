@@ -4,6 +4,7 @@
 
 #include "where_file.hpp"
 #include <boost/decimal.hpp>
+#include <boost/math/statistics/univariate_statistics.hpp>
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -53,7 +54,6 @@ auto parse_csv_line(const std::string& line) -> daily_data
 int main()
 {
     std::vector<daily_data> stock_data;
-    const int window_size = 30;
 
     // Open and read the CSV file
     std::ifstream file(where_file("AAPL.csv"));
@@ -68,29 +68,30 @@ int main()
         stock_data.push_back(parse_csv_line(line));
     }
 
-    // Calculate and print 30-day moving averages
-    std::cout << "Date,30-Day Moving Average\n";
-
-    size_t loop_count = 0; // Trivial counter to ensure this ran in the CI
-    for (size_t i = window_size - 1; i < stock_data.size(); ++i)
+    // Get the closing prices for the entire year
+    std::vector<decimal64> closing_prices;
+    for (const auto& day : stock_data)
     {
-        decimal64 sum(0);
-
-        // Calculate sum for the window
-        for (size_t j = 0; j < window_size; ++j)
-        {
-            sum += stock_data[i - j].close;
-        }
-
-        // Calculate average
-        decimal64 moving_avg = sum / decimal64(window_size);
-
-        // Print result
-        std::cout << stock_data[i].date << ","
-                  << std::fixed << std::setprecision(2) << moving_avg << "\n";
-
-        ++loop_count;
+        closing_prices.emplace_back(day.close);
     }
 
-    return loop_count == 0U;
+    const auto mean_closing_price = boost::math::statistics::mean(closing_prices);
+    const auto median_closing_price = boost::math::statistics::median(closing_prices);
+    const auto variance_closing_price = boost::math::statistics::variance(closing_prices);
+    const auto std_dev_closing_price = sqrt(variance_closing_price);
+
+    // 2-Sigma Bollinger Bands
+    const auto upper_band = mean_closing_price + 2 * std_dev_closing_price;
+    const auto lower_band = mean_closing_price - 2 * std_dev_closing_price;
+
+    std::cout << std::fixed << std::setprecision(2)
+              << "  Mean Closing Price: " << mean_closing_price << '\n'
+              << "  Standard Deviation: " << std_dev_closing_price << '\n'
+              << "Upper Bollinger Band: " << upper_band << '\n'
+              << "Lower Bollinger Band: " << lower_band << std::endl;
+
+    //   Mean = 207.21
+    // Median = 214.27
+    return mean_closing_price > median_closing_price;
 }
+
