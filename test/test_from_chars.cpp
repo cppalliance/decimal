@@ -325,9 +325,20 @@ void test_string_interface()
     constexpr T correct_val {42};
     std::string str {"42"};
     T val;
-    const auto r = from_chars(str, val);
+    auto r = from_chars(str, val);
     BOOST_TEST(r);
     BOOST_TEST_EQ(val, correct_val);
+
+    // Empty string
+    std::string empty;
+    r = from_chars(empty, val);
+    BOOST_TEST(r.ec == std::errc::invalid_argument);
+
+    #ifdef BOOST_DECIMAL_HAS_STD_STRING_VIEW
+    std::string_view empty_view = std::string_view(empty);
+    r = from_chars(empty_view, val);
+    BOOST_TEST(r.ec == std::errc::invalid_argument);
+    #endif
 }
 
 int main()
