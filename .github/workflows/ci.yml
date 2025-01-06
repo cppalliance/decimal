@@ -743,7 +743,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [ intel ]
-        standard: [ c++20 ]
+        standard: [ 14, 17, 20, 23 ]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -791,7 +791,12 @@ jobs:
         run: |
           cd ../boost-root
           mkdir __build__ && cd __build__
-          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DBOOST_INCLUDE_LIBRARIES=$LIBRARY -DBUILD_TESTING=ON ..
+          cmake -DCMAKE_C_COMPILER=icx \
+              -DCMAKE_CXX_COMPILER=icpx \
+              -DCMAKE_CXX_STANDARD=${{ matrix.standard }} \
+              -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+              -DBOOST_INCLUDE_LIBRARIES=$LIBRARY \
+              -DBUILD_TESTING=ON ..
 
       - name: Build tests
         run: |
