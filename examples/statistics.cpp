@@ -51,19 +51,19 @@ auto parse_csv_line(const std::string& line) -> daily_data
     // Parse each column
     std::getline(ss, data.date, ',');
     std::getline(ss, token, ',');
-    from_chars(token.c_str(), token.c_str() + token.size(), data.open);
+    from_chars(token, data.open);
 
     std::getline(ss, token, ',');
-    from_chars(token.c_str(), token.c_str() + token.size(), data.high);
+    from_chars(token, data.high);
 
     std::getline(ss, token, ',');
-    from_chars(token.c_str(), token.c_str() + token.size(), data.low);
+    from_chars(token, data.low);
 
     std::getline(ss, token, ',');
-    from_chars(token.c_str(), token.c_str() + token.size(), data.close);
+    from_chars(token, data.close);
 
     std::getline(ss, token, ',');
-    from_chars(token.c_str(), token.c_str() + token.size(), data.volume);
+    from_chars(token, data.volume);
 
     return data;
 }
