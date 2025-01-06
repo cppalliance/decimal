@@ -49,6 +49,31 @@ constexpr int countl_impl(unsigned long long x) noexcept
     return x ? __builtin_clzll(x) : std::numeric_limits<unsigned long long>::digits;
 }
 
+constexpr int unchecked_countl_impl(unsigned char x) noexcept
+{
+    return __builtin_clz(x) - (std::numeric_limits<unsigned int>::digits - std::numeric_limits<unsigned char>::digits);
+}
+
+constexpr int unchecked_countl_impl(unsigned short x) noexcept
+{
+    return __builtin_clz(x) - (std::numeric_limits<unsigned int>::digits - std::numeric_limits<unsigned short>::digits);
+}
+
+constexpr int unchecked_countl_impl(unsigned int x) noexcept
+{
+    return __builtin_clz(x);
+}
+
+constexpr int unchecked_countl_impl(unsigned long x) noexcept
+{
+    return __builtin_clzl(x);
+}
+
+constexpr int unchecked_countl_impl(unsigned long long x) noexcept
+{
+    return __builtin_clzll(x);
+}
+
 #else
 
 BOOST_DECIMAL_CONSTEXPR_VARIABLE int index64[64] = {
@@ -85,6 +110,12 @@ constexpr int countl_impl(T x) noexcept
     return x ? bit_scan_reverse(static_cast<std::uint64_t>(x)) ^ 63 : std::numeric_limits<T>::digits;
 }
 
+template <typename T>
+constexpr int unchecked_countl_impl(T x) noexcept
+{
+    return bit_scan_reverse(static_cast<std::uint64_t>(x)) ^ 63;
+}
+
 #endif
 
 } //namespace impl
@@ -96,6 +127,15 @@ constexpr int countl_zero(T x) noexcept
                   "Can only count with unsigned integers");
 
     return impl::countl_impl(x);
+}
+
+template <typename T>
+constexpr int unchecked_countl_zero(T x) noexcept
+{
+    static_assert(std::numeric_limits<T>::is_integer && !std::numeric_limits<T>::is_signed,
+                  "Can only count with unsigned integers");
+
+    return impl::unchecked_countl_impl(x);
 }
 
 } //namespace detail
