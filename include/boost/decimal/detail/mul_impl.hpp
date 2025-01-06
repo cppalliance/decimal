@@ -25,21 +25,10 @@ namespace detail {
 // 1) Returns a decimal type and lets the constructor handle with shrinking the significand
 // 2) Returns a struct of the constituent components (used with FMAs)
 
-template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<ReturnType, decimal32_fast>::value || std::is_same<ReturnType, decimal32_fast_components>::value, ReturnType>
-{
-    using mul_type = std::uint_fast64_t;
-
-    const auto res_sig {static_cast<mul_type>(lhs_sig) * static_cast<mul_type>(rhs_sig)};
-    const auto res_exp {lhs_exp + rhs_exp};
-
-    return {res_sig, res_exp, lhs_sign != rhs_sign};
-}
 
 template <typename ReturnType, typename T, typename U>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<ReturnType, decimal32>::value || std::is_same<ReturnType, decimal32_components>::value, ReturnType>
+                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
     using mul_type = std::uint_fast64_t;
 
