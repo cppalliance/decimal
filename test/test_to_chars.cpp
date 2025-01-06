@@ -750,6 +750,18 @@ void test_434_hex()
     test_value(test_one_and_quarter, "7.d0000000000000000000000000000000000000000000000000p-01", chars_format::hex, 50);
 }
 
+template <typename T>
+void test_777()
+{
+    constexpr T value1 = T {21, 6, true};
+    constexpr T value2 = T {211, 6, true};
+    constexpr T value3 = T {2111, 6, true};
+
+    test_value(value1, "-21000000", chars_format::fixed, 0);
+    test_value(value2, "-211000000", chars_format::fixed, 0);
+    test_value(value3, "-2111000000", chars_format::fixed, 0);
+}
+
 int main()
 {
     test_non_finite_values<decimal32>();
@@ -852,6 +864,13 @@ int main()
     test_general_format_std<decimal32>();
     test_general_format_std<decimal64>();
     #endif
+
+    test_777<decimal32>();
+    test_777<decimal64>();
+    test_777<decimal128>();
+    test_777<decimal32_fast>();
+    test_777<decimal64_fast>();
+    test_777<decimal128_fast>();
 
     return boost::report_errors();
 }
