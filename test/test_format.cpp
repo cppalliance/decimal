@@ -81,6 +81,10 @@ void test_fixed()
     BOOST_TEST_EQ(std::format("{:f}", T {21, 6, true}), "-21000000.000000");
     BOOST_TEST_EQ(std::format("{:f}", T {211, 6, true}), "-211000000.000000");
     BOOST_TEST_EQ(std::format("{:f}", T {2111, 6, true}), "-2111000000.000000");
+
+    BOOST_TEST_EQ(std::format("{:.0f}", T {21, 6, true}), std::string{"-21000000"});
+    BOOST_TEST_EQ(std::format("{:.0f}", T {211, 6, true}), std::string{"-211000000"});
+    BOOST_TEST_EQ(std::format("{:.0f}", T {2111, 6, true}), std::string{"-2111000000"});
 }
 
 int main()
