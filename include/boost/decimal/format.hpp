@@ -124,7 +124,20 @@ constexpr auto parse_impl(ParseContext &ctx)
     bool is_upper = false;
     int padding_digits = 0;
 
-    if (*it != '}')
+    // If there is a . then we need to capture the precision argument
+    if (*it == '.')
+    {
+        ++it;
+        ctx_precision = 0;
+        while (it != ctx.end() && *it >= '0' && *it <= '9')
+        {
+            ctx_precision = ctx_precision * 10 + (*it - '0');
+            ++it;
+        }
+    }
+
+    // Lastly we capture the format to include if it's upper case
+    if (it != ctx.end() && *it != '}')
     {
         switch (*it)
         {
