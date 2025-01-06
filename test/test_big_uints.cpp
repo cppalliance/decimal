@@ -30,6 +30,11 @@ int main()
 #  pragma clang diagnostic ignored "-Wsign-conversion"
 #  pragma clang diagnostic ignored "-Wfloat-equal"
 #  pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
+#  if __clang_major__ >= 20
+#    pragma clang diagnostic ignored "-Wdeprecated-literal-operator"
+#  endif
+
 #elif defined(__GNUC__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wold-style-cast"
