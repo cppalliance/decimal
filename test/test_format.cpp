@@ -4,6 +4,7 @@
 
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
+#include <limits>
 
 using namespace boost::decimal;
 
@@ -19,9 +20,19 @@ void test_general()
     BOOST_TEST_EQ(std::format("{}", T{10000}), "10000");
     BOOST_TEST_EQ(std::format("{}", T{210000}), "210000");
     BOOST_TEST_EQ(std::format("{}", T{2100000}), "2100000");
-    BOOST_TEST_EQ(std::format("{}", T{21, 6, true}), "-2.1e+07");
-    BOOST_TEST_EQ(std::format("{}", T{211, 6, true}), "-2.11e+08");
-    BOOST_TEST_EQ(std::format("{}", T{2111, 6, true}), "-2.111e+09");
+
+    if constexpr (std::numeric_limits<T>::digits10 <= 7)
+    {
+        BOOST_TEST_EQ(std::format("{}", T {21, 6}), "2.1e+07");
+        BOOST_TEST_EQ(std::format("{}", T {211, 6}), "2.11e+08");
+        BOOST_TEST_EQ(std::format("{}", T {2111, 6}), "2.111e+09");
+    }
+    else
+    {
+        BOOST_TEST_EQ(std::format("{}", T {21, 6}), "21000000");
+        BOOST_TEST_EQ(std::format("{}", T {211, 6}), "211000000");
+        BOOST_TEST_EQ(std::format("{}", T {2111, 6}), "2111000000");
+    }
 
     BOOST_TEST_EQ(std::format("{}", std::numeric_limits<T>::infinity()), "inf");
     BOOST_TEST_EQ(std::format("{}", -std::numeric_limits<T>::infinity()), "-inf");
@@ -37,9 +48,19 @@ void test_general()
     BOOST_TEST_EQ(std::format("{:g}", T{10000}), "10000");
     BOOST_TEST_EQ(std::format("{:g}", T{210000}), "210000");
     BOOST_TEST_EQ(std::format("{:g}", T{2100000}), "2100000");
-    BOOST_TEST_EQ(std::format("{:g}", T{21, 6, true}), "-2.1e+07");
-    BOOST_TEST_EQ(std::format("{:g}", T{211, 6, true}), "-2.11e+08");
-    BOOST_TEST_EQ(std::format("{:g}", T{2111, 6, true}), "-2.111e+09");
+
+    if constexpr (std::numeric_limits<T>::digits10 <= 7)
+    {
+        BOOST_TEST_EQ(std::format("{:g}", T {21, 6, true}), "-2.1e+07");
+        BOOST_TEST_EQ(std::format("{:g}", T {211, 6, true}), "-2.11e+08");
+        BOOST_TEST_EQ(std::format("{:g}", T {2111, 6, true}), "-2.111e+09");
+    }
+    else
+    {
+        BOOST_TEST_EQ(std::format("{:g}", T {21, 6, true}), "-21000000");
+        BOOST_TEST_EQ(std::format("{:g}", T {211, 6, true}), "-211000000");
+        BOOST_TEST_EQ(std::format("{:g}", T {2111, 6, true}), "-2111000000");
+    }
 
     BOOST_TEST_EQ(std::format("{:g}", std::numeric_limits<T>::infinity()), "inf");
     BOOST_TEST_EQ(std::format("{:g}", -std::numeric_limits<T>::infinity()), "-inf");
@@ -52,6 +73,7 @@ void test_general()
 int main()
 {
     test_general<decimal32>();
+    test_general<decimal64>();
 
     return boost::report_errors();
 }
