@@ -31,16 +31,6 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = std::numeric_limits<std::ui
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = std::numeric_limits<std::uint_fast32_t>::max() - 1;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::uint_fast32_t>::max() - 2;
 
-struct decimal32_fast_components
-{
-    using significand_type = std::uint_fast32_t;
-    using biased_exponent_type = std::int_fast32_t;
-
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
-
 }
 
 BOOST_DECIMAL_EXPORT class decimal32_fast final

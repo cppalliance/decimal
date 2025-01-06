@@ -37,6 +37,7 @@
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
+#include <boost/decimal/detail/components.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -120,16 +121,6 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_big_combination_field_mask = 
 //BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_combination_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
 //BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_exp_mask = UINT32_C(0b0'00000'111111'0000000000'0000000000);
 //BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_significand_mask = d32_no_combination;
-
-struct decimal32_components
-{
-    using significand_type = std::uint32_t;
-    using biased_exponent_type = std::int32_t;
-
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
 
 } // namespace detail
 
