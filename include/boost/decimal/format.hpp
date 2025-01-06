@@ -29,6 +29,7 @@
 
 namespace boost::decimal::detail {
 
+/*
 template <typename ParseContext>
 constexpr auto parse_impl(ParseContext &ctx)
 {
@@ -109,6 +110,57 @@ constexpr auto parse_impl(ParseContext &ctx)
     {
         throw std::format_error("Invalid format");
     }
+
+    return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
+}
+*/
+
+template <typename ParseContext>
+constexpr auto parse_impl(ParseContext &ctx)
+{
+    auto it {ctx.begin()};
+    int ctx_precision = 6;
+    boost::decimal::chars_format fmt = boost::decimal::chars_format::general;
+    bool is_upper = false;
+    int padding_digits = 0;
+
+    if (*it != '}')
+    {
+        switch (*it)
+        {
+            case 'G':
+                is_upper = true;
+                [[fallthrough]];
+            case 'g':
+                fmt = chars_format::general;
+                break;
+
+            case 'F':
+                [[fallthrough]];
+            case 'f':
+                fmt = chars_format::fixed;
+                break;
+
+            case 'E':
+                is_upper = true;
+                [[fallthrough]];
+            case 'e':
+                fmt = chars_format::scientific;
+                break;
+
+            case 'A':
+                is_upper = true;
+                [[fallthrough]];
+            case 'a':
+                fmt = chars_format::hex;
+                break;
+
+            default:
+                throw std::format_error("Invalid format");
+        }
+    }
+
+    ++it;
 
     return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
 }
