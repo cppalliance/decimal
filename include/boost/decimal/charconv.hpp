@@ -535,7 +535,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             if (num_dig == precision + 1)
             {
                 --num_dig;
-                exponent += fenv_round(significand);
+                exponent += fenv_round<TargetDecimalType>(significand);
             }
         }
         else if (num_dig < precision && fmt != chars_format::general)
