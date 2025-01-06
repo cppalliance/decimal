@@ -171,6 +171,57 @@ struct formatter<boost::decimal::decimal32> {
     }
 };
 
+template <>
+struct formatter<boost::decimal::decimal64> {
+    constexpr formatter() : ctx_precision(6),
+                            fmt(boost::decimal::chars_format::general),
+                            is_upper(false),
+                            padding_digits(0)
+    {}
+
+    int ctx_precision;
+    boost::decimal::chars_format fmt;
+    bool is_upper;
+    int padding_digits;
+
+    constexpr auto parse(format_parse_context &ctx)
+    {
+        const auto res {boost::decimal::detail::parse_impl(ctx)};
+
+        ctx_precision = std::get<0>(res);
+        fmt = std::get<1>(res);
+        is_upper = std::get<2>(res);
+        padding_digits = std::get<3>(res);
+
+        return std::get<4>(res);
+    }
+
+    template <typename FormatContext>
+    auto format(const boost::decimal::decimal64& v, FormatContext &ctx) const
+    {
+        auto out = ctx.out();
+        std::array<char, 128> buffer {};
+        const auto r = to_chars(buffer.data(), buffer.data() + buffer.size(), v, fmt, ctx_precision);
+
+        std::string_view sv(buffer.data(), static_cast<std::size_t>(r.ptr - buffer.data()));
+        std::string s(sv);
+
+        if (is_upper)
+        {
+            std::transform(s.begin(), s.end(), s.begin(),
+                           [](unsigned char c)
+                           { return std::toupper(c); });
+        }
+
+        if (s.size() < static_cast<std::size_t>(padding_digits))
+        {
+            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), '0');
+        }
+
+        return std::copy(s.begin(), s.end(), out);
+    }
+};
+
 } // Namespace std
 
 #endif
