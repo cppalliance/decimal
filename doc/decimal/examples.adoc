@@ -228,3 +228,11 @@ This serves as a framework for other calculations for securities.
 === Currency Conversion
 In the examples folder there is a file named `currency_conversion.cpp`.
 This example shows how to simply convert currencies based off a given exchange rate.
+
+== Boost.Math Integration
+
+=== Bollinger Bands
+
+In the examples folder there is a file named `statistics.cpp`.
+This example demonstrates how to parse a file, and then leverage Boost.Math to compute statistics of that data set culminating with the values of the Bollinger Bands.
+This example could be extended with the simple moving average to create full bands based on the period of the moving average you would like.
