@@ -7,9 +7,7 @@
 
 using namespace boost::decimal;
 
-#if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && __has_include(<format>) && !defined(BOOST_DECIMAL_DISABLE_CLIB)
-
-#include <format>
+#ifdef BOOST_CRYPT_HAS_FORMAT_SUPPORT
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 void test_general()
@@ -54,9 +52,6 @@ void test_general()
 int main()
 {
     test_general<decimal32>();
-
-    //test<decimal64>();
-    //test<decimal128>();
 
     return boost::report_errors();
 }
