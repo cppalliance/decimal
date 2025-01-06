@@ -28,7 +28,7 @@ extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size
         }
 
         // Now with strings
-        const auto c_data_str = std::string(c_data);
+        const auto c_data_str = std::string(c_data, size);
         for (const auto format : formats)
         {
             boost::decimal::decimal32 f_val;
