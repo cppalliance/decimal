@@ -78,7 +78,11 @@ void test_general()
 int main()
 {
     test_general<decimal32>();
+    test_general<decimal32_fast>();
     test_general<decimal64>();
+    test_general<decimal64_fast>();
+    test_general<decimal128>();
+    test_general<decimal128_fast>();
 
     return boost::report_errors();
 }
