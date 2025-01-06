@@ -74,7 +74,7 @@ void test_add()
 
             std::cerr << strm.str() << std::endl;
             // LCOV_EXCL_STOP
-        }
+        } // LCOV_EXCL_LINE
     }
 
     std::uniform_real_distribution<double> small_vals(0.0, 1.0);
@@ -109,7 +109,7 @@ void test_add()
 
             std::cerr << strm.str() << std::endl;
             // LCOV_EXCL_STOP
-        }
+        } // LCOV_EXCL_LINE
     }
 }
 
@@ -147,7 +147,7 @@ void test_sub()
 
             std::cerr << strm.str() << std::endl;
             // LCOV_EXCL_STOP
-        }
+        } // LCOV_EXCL_LINE
     }
 
     std::uniform_real_distribution<double> small_vals(0.0, 1.0);
@@ -182,7 +182,7 @@ void test_sub()
 
             std::cerr << strm.str() << std::endl;
             // LCOV_EXCL_STOP
-        }
+        } // LCOV_EXCL_LINE
     }
 }
 
