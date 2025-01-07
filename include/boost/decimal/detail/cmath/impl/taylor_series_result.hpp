@@ -21,7 +21,7 @@ constexpr auto taylor_series_result(T x, const Array &coeffs) noexcept
 
     for (std::size_t i = N - 1; i-- > 0;)
     {
-        result = fma(result, x, coeffs[i]);
+        result = unchecked_fma(result, x, coeffs[i]);
     }
 
     return result;
