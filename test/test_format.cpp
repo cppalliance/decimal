@@ -91,6 +91,18 @@ void test_fixed()
     BOOST_TEST_EQ(std::format("{:.0f}", T {21, 6, true}), std::string{"-21000000"});
     BOOST_TEST_EQ(std::format("{:.0f}", T {211, 6, true}), std::string{"-211000000"});
     BOOST_TEST_EQ(std::format("{:.0f}", T {2111, 6, true}), std::string{"-2111000000"});
+
+    BOOST_TEST_EQ(std::format("{:.1f}", T {21, 6, true}), std::string{"-21000000.0"});
+    BOOST_TEST_EQ(std::format("{:.1f}", T {211, 6, true}), std::string{"-211000000.0"});
+    BOOST_TEST_EQ(std::format("{:.1f}", T {2111, 6, true}), std::string{"-2111000000.0"});
+
+    BOOST_TEST_EQ(std::format("{:.0f}", T {0}), "0");
+    BOOST_TEST_EQ(std::format("{:f}", std::numeric_limits<T>::infinity()), "inf");
+    BOOST_TEST_EQ(std::format("{:f}", -std::numeric_limits<T>::infinity()), "-inf");
+    BOOST_TEST_EQ(std::format("{:f}", std::numeric_limits<T>::quiet_NaN()), "nan");
+    BOOST_TEST_EQ(std::format("{:f}", -std::numeric_limits<T>::quiet_NaN()), "-nan(ind)");
+    BOOST_TEST_EQ(std::format("{:f}", std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
+    BOOST_TEST_EQ(std::format("{:f}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
 }
 
 int main()
