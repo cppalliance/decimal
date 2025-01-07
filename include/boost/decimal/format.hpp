@@ -29,92 +29,6 @@
 
 namespace boost::decimal::detail {
 
-/*
-template <typename ParseContext>
-constexpr auto parse_impl(ParseContext &ctx)
-{
-    auto it {ctx.begin()};
-    ++it;
-    int ctx_precision = 6;
-    boost::decimal::chars_format fmt = boost::decimal::chars_format::general;
-    bool is_upper = false;
-    int padding_digits = 0;
-
-    if (it == ctx.end())
-    {
-        return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
-    }
-
-    while (it != ctx.end() && *it >= '0' && *it <= '9')
-    {
-        padding_digits = padding_digits * 10 + (*it - '0');
-        ++it;
-    }
-
-    if (it != ctx.end() && *it == ':')
-    {
-        ++it;
-    }
-
-    if (it != ctx.end() && *it == '.')
-    {
-        ++it;
-        ctx_precision = 0;
-        while (it != ctx.end() && *it >= '0' && *it <= '9')
-        {
-            ctx_precision = ctx_precision * 10 + (*it - '0');
-            ++it;
-        }
-
-        if (it == ctx.end())
-        {
-            throw std::format_error("Unexpected end of format string");
-        }
-
-        switch (*it)
-        {
-            case 'G':
-                is_upper = true;
-                [[fallthrough]];
-            case 'g':
-                fmt = chars_format::general;
-                break;
-
-            case 'F':
-                [[fallthrough]];
-            case 'f':
-                fmt = chars_format::fixed;
-                break;
-
-            case 'E':
-                is_upper = true;
-                [[fallthrough]];
-            case 'e':
-                fmt = chars_format::scientific;
-                break;
-
-            case 'A':
-                is_upper = true;
-                [[fallthrough]];
-            case 'a':
-                fmt = chars_format::hex;
-                break;
-
-            default:
-                throw std::format_error("Invalid format");
-        }
-        ++it;
-    }
-
-    if (it == ctx.end() || *it != '}')
-    {
-        throw std::format_error("Invalid format");
-    }
-
-    return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
-}
-*/
-
 template <typename ParseContext>
 constexpr auto parse_impl(ParseContext &ctx)
 {
@@ -176,7 +90,7 @@ constexpr auto parse_impl(ParseContext &ctx)
                 break;
 
             default:
-                throw std::format_error("Invalid format");
+                throw std::format_error("Invalid format specifier");
         }
     }
 
