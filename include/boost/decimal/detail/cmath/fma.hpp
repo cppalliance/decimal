@@ -134,6 +134,12 @@ constexpr auto d64_fma_impl(T x, T y, T z) noexcept -> T
                                    abs_lhs_bigger);
 }
 
+template <bool, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto d128_fma_impl(T x, T y, T z) noexcept -> T
+{
+    return x * y + z;
+}
+
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -158,6 +164,16 @@ constexpr auto unchecked_fma(decimal64_fast x, decimal64_fast y, decimal64_fast 
     return detail::d64_fma_impl<false>(x, y, z);
 }
 
+constexpr auto unchecked_fma(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
+{
+    return detail::d128_fma_impl<false>(x, y, z);
+}
+
+constexpr auto unchecked_fma(decimal128_fast x, decimal128_fast y, decimal128_fast z) noexcept -> decimal128_fast
+{
+    return detail::d128_fma_impl<false>(x, y, z);
+}
+
 } // Namespace detail
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
@@ -172,7 +188,7 @@ BOOST_DECIMAL_EXPORT constexpr auto fma(decimal64 x, decimal64 y, decimal64 z) n
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
 {
-    return x * y + z;
+    return detail::d128_fma_impl<true>(x, y, z);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32_fast x, decimal32_fast y, decimal32_fast z) noexcept -> decimal32_fast
@@ -187,7 +203,7 @@ BOOST_DECIMAL_EXPORT constexpr auto fma(decimal64_fast x, decimal64_fast y, deci
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal128_fast x, decimal128_fast y, decimal128_fast z) noexcept -> decimal128_fast
 {
-    return x * y + z;
+    return detail::d128_fma_impl<true>(x, y, z);
 }
 
 } //namespace decimal
