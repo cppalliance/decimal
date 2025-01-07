@@ -11,7 +11,7 @@
 #include <boost/decimal.hpp>
 #include <iostream>
 
-#ifdef BOOST_CRYPT_HAS_FORMAT_SUPPORT
+#ifdef BOOST_DECIMAL_HAS_FORMAT_SUPPORT
 
 #include <format>
 

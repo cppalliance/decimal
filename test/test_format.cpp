@@ -14,7 +14,7 @@
 
 using namespace boost::decimal;
 
-#ifdef BOOST_CRYPT_HAS_FORMAT_SUPPORT
+#ifdef BOOST_DECIMAL_HAS_FORMAT_SUPPORT
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 void test_general()
