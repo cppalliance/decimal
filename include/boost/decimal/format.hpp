@@ -7,7 +7,7 @@
 
 // Many compilers seem to have <format> with completly broken support so narrow down our support range
 #if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && !defined(BOOST_DECIMAL_DISABLE_CLIB) && \
-    ((defined(__GNUC__) && __GNUC__ >= 13) || (defined(__clang__) && __clang_major__ > 17) || (defined(_MSC_VER) && _MSC_VER >= 1930))
+    ((defined(__GNUC__) && __GNUC__ >= 13) || (defined(__clang__) && __clang_major__ >= 18) || (defined(_MSC_VER) && _MSC_VER >= 1940))
 
 #define BOOST_CRYPT_HAS_FORMAT_SUPPORT
 

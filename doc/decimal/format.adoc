@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == <format>
 
-Format is supported when using C++20 and a compiler with appropriate support: GCC >= 13, Clang >= 18, MSVC >= 19.30
+Format is supported when using C++20 and a compiler with appropriate support: GCC >= 13, Clang >= 18, MSVC >= 19.40
 
 === Type Modifiers
 
