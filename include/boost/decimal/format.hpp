@@ -88,9 +88,10 @@ constexpr auto parse_impl(ParseContext &ctx)
             case 'a':
                 fmt = chars_format::hex;
                 break;
-
+            // LCOV_EXCL_START
             default:
                 throw std::format_error("Invalid format specifier");
+            // LCOV_EXCL_STOP
         }
     }
 

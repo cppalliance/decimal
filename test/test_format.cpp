@@ -65,6 +65,9 @@ void test_general()
         BOOST_TEST_EQ(std::format("{:g}", T {21, 6, true}), "-2.1e+07");
         BOOST_TEST_EQ(std::format("{:g}", T {211, 6, true}), "-2.11e+08");
         BOOST_TEST_EQ(std::format("{:g}", T {2111, 6, true}), "-2.111e+09");
+        BOOST_TEST_EQ(std::format("{:G}", T {21, 6, true}), "-2.1E+07");
+        BOOST_TEST_EQ(std::format("{:G}", T {211, 6, true}), "-2.11E+08");
+        BOOST_TEST_EQ(std::format("{:G}", T {2111, 6, true}), "-2.111E+09");
     }
     else
     {
