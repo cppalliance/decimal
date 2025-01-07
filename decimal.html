@@ -1673,6 +1673,10 @@ pre.rouge .gi {
   color: #116329;
   background-color: #dafbe1;
 }
+pre.rouge .ges {
+  font-weight: bold;
+  font-style: italic;
+}
 pre.rouge .kc {
   color: #0550ae;
 }
@@ -1868,6 +1872,18 @@ pre.rouge .gs {
 <li><a href="#charconv_limits">limits</a></li>
 </ul>
 </li>
+<li><a href="#format">format support</a>
+<ul class="sectlevel2">
+<li><a href="#format_format">&lt;format&gt;</a>
+<ul class="sectlevel3">
+<li><a href="#format_type_modifiers">Type Modifiers</a></li>
+<li><a href="#format_precision_modifiers">Precision Modifiers</a></li>
+<li><a href="#format_padding_modifiers">Padding Modifiers</a></li>
+<li><a href="#format_examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#cfenv">cfenv support</a>
 <ul class="sectlevel2">
 <li><a href="#cfenv_cfenv">&lt;cfenv&gt;</a></li>
@@ -1917,6 +1933,11 @@ pre.rouge .gs {
 <ul class="sectlevel3">
 <li><a href="#examples_simple_moving_average">Simple Moving Average</a></li>
 <li><a href="#examples_currency_conversion">Currency Conversion</a></li>
+</ul>
+</li>
+<li><a href="#examples_boost_math_integration">Boost.Math Integration</a>
+<ul class="sectlevel3">
+<li><a href="#examples_bollinger_bands">Bollinger Bands</a></li>
 </ul>
 </li>
 </ul>
@@ -4102,6 +4123,18 @@ This behavior is the same as that of <a href="https://www.boost.org/doc/libs/mas
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">DecimalType</span><span class="p">&gt;</span>
 <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">from_chars_result</span> <span class="n">from_chars</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">first</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">last</span><span class="p">,</span> <span class="n">DecimalType</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">,</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">chars_format</span> <span class="n">fmt</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">chars_format</span><span class="o">::</span><span class="n">general</span><span class="p">)</span> <span class="k">noexcept</span>
 
+<span class="cp">#ifdef BOOST_DECIMAL_HAS_STD_STRING_VIEW
+</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">DecimalType</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">from_chars_result</span> <span class="n">from_chars</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string_view</span> <span class="n">str</span><span class="p">,</span> <span class="n">DecimalType</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">,</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">chars_format</span> <span class="n">fmt</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">chars_format</span><span class="o">::</span><span class="n">general</span><span class="p">)</span> <span class="k">noexcept</span>
+
+<span class="cp">#else
+</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">DecimalType</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">from_chars_result</span> <span class="n">from_chars</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">str</span><span class="p">,</span> <span class="n">DecimalType</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">,</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">chars_format</span> <span class="n">fmt</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">chars_format</span><span class="o">::</span><span class="n">general</span><span class="p">)</span> <span class="k">noexcept</span>
+
+<span class="cp">#endif
+</span>
 <span class="cp">#ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
 </span>
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">DecimalType</span><span class="p">&gt;</span>
@@ -4240,6 +4273,105 @@ Same as <code>from_chars</code>, <code>boost::decimal::to_chars</code> will retu
 
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="format">format support</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="format_format">&lt;format&gt;</h3>
+<div class="paragraph">
+<p>Format is supported when using C++20 and a compiler with appropriate support: GCC &gt;= 13, Clang &gt;= 18, MSVC &gt;= 19.40</p>
+</div>
+<div class="sect3">
+<h4 id="format_type_modifiers">Type Modifiers</h4>
+<div class="paragraph">
+<p>The following type modifiers are the same as those used by built-in floating point values:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>"g" or "G" for general format</p>
+</li>
+<li>
+<p>"e" or "E" for scientific format</p>
+</li>
+<li>
+<p>"f" for fixed format</p>
+</li>
+<li>
+<p>"a" or "A" for hex format</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Example usage for scientific format would be: <code>{:e}</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The uppercase format will return with all applicable values in uppercase (e.g. 3.14E+02 vs 3.14e+02)
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="format_precision_modifiers">Precision Modifiers</h4>
+<div class="paragraph">
+<p>Precision can be specified in the same way as built-in floating point values.
+For example a scientific format with 3 digits or precision would be: <code>{:.3e}</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="format_padding_modifiers">Padding Modifiers</h4>
+<div class="paragraph">
+<p>If you want all values to be printed with a fixed width padding is allowed before the precision modifier.
+For example with <code>{:10.3e}</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>3.14 &#8594; " 3.140e+00"</p>
+</li>
+<li>
+<p>3.141 &#8594; " 3.141e+00"</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Note the space at the front of these string to keep with width at 10 characters</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="format_examples">Examples</h4>
+<div class="paragraph">
+<p>The example is padding modifiers can be done like so</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="cp">#include</span> <span class="cpf">&lt;boost/decimal.hpp&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;format&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">val1</span> <span class="p">{</span><span class="mi">314</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">};</span>
+    <span class="k">constexpr</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">val2</span> <span class="p">{</span><span class="mi">3141</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">};</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">format</span><span class="p">(</span><span class="s">"{:10.3e}"</span><span class="p">,</span> <span class="n">val1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="sc">'\n'</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">format</span><span class="p">(</span><span class="s">"{:10.3e}"</span><span class="p">,</span> <span class="n">val2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span></code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -4783,6 +4915,9 @@ This flag increases the performance of the basis operations (e.g. add, sub, mul,
 </ul>
 </div>
 </li>
+<li>
+<p><code>BOOST_DECIMAL_HAS_STD_STRING_VIEW</code>: This macro is defined if header <code>&lt;string_view&gt;</code> exists and the langauge standard used is &gt;= C++17</p>
+</li>
 </ul>
 </div>
 </div>
@@ -5035,6 +5170,17 @@ This serves as a framework for other calculations for securities.</p>
 <div class="paragraph">
 <p>In the examples folder there is a file named <code>currency_conversion.cpp</code>.
 This example shows how to simply convert currencies based off a given exchange rate.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="examples_boost_math_integration">Boost.Math Integration</h3>
+<div class="sect3">
+<h4 id="examples_bollinger_bands">Bollinger Bands</h4>
+<div class="paragraph">
+<p>In the examples folder there is a file named <code>statistics.cpp</code>.
+This example demonstrates how to parse a file, and then leverage Boost.Math to compute statistics of that data set culminating with the values of the Bollinger Bands.
+This example could be extended with the simple moving average to create full bands based on the period of the moving average you would like.</p>
 </div>
 </div>
 </div>
@@ -7066,7 +7212,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-02 14:24:56 -0500
+Last updated 2025-01-07 11:06:14 -0500
 </div>
 </div>
 <style>
