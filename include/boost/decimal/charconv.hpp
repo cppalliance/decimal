@@ -535,7 +535,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             if (num_dig == precision + 1)
             {
                 --num_dig;
-                exponent += fenv_round(significand);
+                exponent += fenv_round<TargetDecimalType>(significand);
             }
         }
         else if (num_dig < precision && fmt != chars_format::general)
@@ -602,7 +602,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     // Bounds check again
-    if (precision == 0)
+    if (precision == 0 && !append_trailing_zeros && !append_leading_zeros)
     {
         return {r.ptr, std::errc()};
     }
@@ -691,6 +691,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
         boost::decimal::detail::memset(r.ptr, '0', zeros_inserted);
         r.ptr += zeros_inserted;
+
+        if (*(r.ptr - 1) == '.')
+        {
+            --r.ptr;
+        }
     }
 
     return {r.ptr, std::errc()};
