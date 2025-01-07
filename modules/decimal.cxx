@@ -102,21 +102,21 @@ struct numeric_limits<boost::decimal::decimal128>;
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal32>;
+class numeric_limits<boost::decimal::decimal32_fast>;
 #else
 struct numeric_limits<boost::decimal::decimal32_fast>;
 #endif
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal64>;
+class numeric_limits<boost::decimal::decimal64_fast>;
 #else
 struct numeric_limits<boost::decimal::decimal64_fast>;
 #endif
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal128>;
+class numeric_limits<boost::decimal::decimal128_fast>;
 #else
 struct numeric_limits<boost::decimal::decimal128_fast>;
 #endif
