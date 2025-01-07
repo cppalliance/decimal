@@ -124,6 +124,13 @@ constexpr auto parse_impl(ParseContext &ctx)
     bool is_upper = false;
     int padding_digits = 0;
 
+    // Check for a padding character
+    while (it != ctx.end() && *it >= '0' && *it <= '9')
+    {
+        padding_digits = padding_digits * 10 + (*it - '0');
+        ++it;
+    }
+
     // If there is a . then we need to capture the precision argument
     if (*it == '.')
     {
@@ -227,7 +234,7 @@ struct formatter<T>
 
         if (s.size() < static_cast<std::size_t>(padding_digits))
         {
-            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), '0');
+            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), ' ');
         }
 
         return std::copy(s.begin(), s.end(), out);
