@@ -154,3 +154,4 @@ run ../examples/rounding_mode.cpp ;
 run ../examples/moving_average.cpp ;
 run ../examples/currency_conversion.cpp ;
 run ../examples/statistics.cpp ;
+run ../examples/format.cpp ;
