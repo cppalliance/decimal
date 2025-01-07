@@ -226,18 +226,26 @@ jobs:
               - "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"
             source_keys:
               - "https://apt.llvm.org/llvm-snapshot.gpg.key"
-          - name: UBSAN
-            toolset: clang
-            compiler: clang++-14
+          - toolset: clang
+            compiler: clang++-18
             cxxstd: "03,11,14,17,20,2b"
-            cxxflags: -stdlib=libc++
-            linkflags: -stdlib=libc++
-            ubsan: 1
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             install:
-              - clang-14
-              - libc++-14-dev
-              - libc++abi-14-dev
+              - clang-18
+            sources:
+              - "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-18 main"
+            source_keys:
+              - "https://apt.llvm.org/llvm-snapshot.gpg.key"
+          - toolset: clang
+            compiler: clang++-19
+            cxxstd: "03,11,14,17,20,2b"
+            os: ubuntu-24.04
+            install:
+              - clang-19
+            sources:
+              - "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-19 main"
+            source_keys:
+              - "https://apt.llvm.org/llvm-snapshot.gpg.key"
 
           - toolset: clang
             cxxstd: "03,11,14,17,20,2b"

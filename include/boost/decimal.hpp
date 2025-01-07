@@ -38,6 +38,7 @@
 #include <boost/decimal/cfloat.hpp>
 #include <boost/decimal/charconv.hpp>
 #include <boost/decimal/detail/io.hpp>
+#include <boost/decimal/format.hpp>
 #include <boost/decimal/cstdio.hpp>
 #include <boost/decimal/bid_conversion.hpp>
 #include <boost/decimal/dpd_conversion.hpp>
