@@ -105,6 +105,30 @@ void test_fixed()
     BOOST_TEST_EQ(std::format("{:f}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
 }
 
+template <concepts::decimal_floating_point_type T>
+void test_scientific()
+{
+    BOOST_TEST_EQ(std::format("{:e}", T {21, 6, true}), "-2.100000e+07");
+    BOOST_TEST_EQ(std::format("{:e}", T {211, 6, true}), "-2.110000e+08");
+    BOOST_TEST_EQ(std::format("{:e}", T {2111, 6, true}), "-2.111000e+09");
+
+    BOOST_TEST_EQ(std::format("{:E}", T {21, 6, true}), "-2.100000E+07");
+    BOOST_TEST_EQ(std::format("{:E}", T {211, 6, true}), "-2.110000E+08");
+    BOOST_TEST_EQ(std::format("{:E}", T {2111, 6, true}), "-2.111000E+09");
+
+    BOOST_TEST_EQ(std::format("{:.0E}", T {0}), "0E+00");
+    BOOST_TEST_EQ(std::format("{:e}", std::numeric_limits<T>::infinity()), "inf");
+    BOOST_TEST_EQ(std::format("{:e}", -std::numeric_limits<T>::infinity()), "-inf");
+    BOOST_TEST_EQ(std::format("{:e}", std::numeric_limits<T>::quiet_NaN()), "nan");
+    BOOST_TEST_EQ(std::format("{:e}", -std::numeric_limits<T>::quiet_NaN()), "-nan(ind)");
+    BOOST_TEST_EQ(std::format("{:e}", std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
+    BOOST_TEST_EQ(std::format("{:e}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
+
+    // Padding to the front
+    BOOST_TEST_EQ(std::format("{:10.1E}", T {0}), "   0.0E+00");
+    BOOST_TEST_EQ(std::format("{:10.3E}", T {0}), " 0.000E+00");
+}
+
 int main()
 {
     test_general<decimal32>();
@@ -120,6 +144,13 @@ int main()
     test_fixed<decimal64_fast>();
     test_fixed<decimal128>();
     test_fixed<decimal128_fast>();
+
+    test_scientific<decimal32>();
+    test_scientific<decimal32_fast>();
+    test_scientific<decimal64>();
+    test_scientific<decimal64_fast>();
+    test_scientific<decimal128>();
+    test_scientific<decimal128_fast>();
 
     return boost::report_errors();
 }
