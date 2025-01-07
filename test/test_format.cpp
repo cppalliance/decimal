@@ -129,6 +129,19 @@ void test_scientific()
     BOOST_TEST_EQ(std::format("{:10.3E}", T {0}), " 0.000E+00");
 }
 
+template <concepts::decimal_floating_point_type T>
+void test_hex()
+{
+    BOOST_TEST_EQ(std::format("{:.0a}", T {0}), "0p+00");
+    BOOST_TEST_EQ(std::format("{:.3A}", T {0}), "0.000P+00");
+    BOOST_TEST_EQ(std::format("{:a}", std::numeric_limits<T>::infinity()), "inf");
+    BOOST_TEST_EQ(std::format("{:a}", -std::numeric_limits<T>::infinity()), "-inf");
+    BOOST_TEST_EQ(std::format("{:a}", std::numeric_limits<T>::quiet_NaN()), "nan");
+    BOOST_TEST_EQ(std::format("{:a}", -std::numeric_limits<T>::quiet_NaN()), "-nan(ind)");
+    BOOST_TEST_EQ(std::format("{:a}", std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
+    BOOST_TEST_EQ(std::format("{:a}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
+}
+
 int main()
 {
     test_general<decimal32>();
@@ -151,6 +164,13 @@ int main()
     test_scientific<decimal64_fast>();
     test_scientific<decimal128>();
     test_scientific<decimal128_fast>();
+
+    test_hex<decimal32>();
+    test_hex<decimal32_fast>();
+    test_hex<decimal64>();
+    test_hex<decimal64_fast>();
+    test_hex<decimal128>();
+    test_hex<decimal128_fast>();
 
     return boost::report_errors();
 }
