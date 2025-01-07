@@ -5,7 +5,7 @@
 // MSVC 14.3 has a conversion error in <algorithm> so we need to try and supress that everywhere
 #ifdef _MSC_VER
 #  pragma warning(push)
-#  pragma wanning(disable : 4244)
+#  pragma warning(disable : 4244)
 #endif
 
 #include <boost/decimal.hpp>
