@@ -406,9 +406,9 @@ If exactly one operand is infinity or exactly one operand is NaN, they do not ha
 template <typename Decimal>
 constexpr int quantexp(Decimal x) noexcept;
 
-constexpr bool quantexp32(decimal32 x) noexcept;
-constexpr bool quantexp64(decimal64 x) noexcept;
-constexpr bool quantexp128(decimal128 x) noexcept;
+constexpr int quantexp32(decimal32 x) noexcept;
+constexpr int quantexp64(decimal64 x) noexcept;
+constexpr int quantexp128(decimal128 x) noexcept;
 ----
 
 Effects: if x is finite, returns its quantum exponent.
