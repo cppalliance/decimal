@@ -2,12 +2,6 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-// MSVC 14.3 has a conversion error in <algorithm> so we need to try and supress that everywhere
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4244)
-#endif
-
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <limits>

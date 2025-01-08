@@ -143,9 +143,18 @@ struct formatter<T>
 
         if (is_upper)
         {
+            #ifdef _MSC_VER
+            #  pragma warning(push)
+            #  pragma warning(disable : 4244)
+            #endif
+
             std::transform(s.begin(), s.end(), s.begin(),
                            [](unsigned char c)
                            { return std::toupper(c); });
+
+            #ifdef _MSC_VER
+            #  pragma warning(pop)
+            #endif
         }
 
         if (s.size() < static_cast<std::size_t>(padding_digits))
