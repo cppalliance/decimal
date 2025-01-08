@@ -2,12 +2,6 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-// MSVC 14.3 has a conversion error in <algorithm> so we need to try and supress that everywhere
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4244)
-#endif
-
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <limits>
@@ -16,7 +10,7 @@ using namespace boost::decimal;
 
 #ifdef BOOST_DECIMAL_HAS_FORMAT_SUPPORT
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+template <concepts::decimal_floating_point_type T>
 void test_general()
 {
     // For unknown reasons Clang does not like this empty bracket and throws compiler errors
@@ -82,6 +76,13 @@ void test_general()
     BOOST_TEST_EQ(std::format("{:g}", -std::numeric_limits<T>::quiet_NaN()), "-nan(ind)");
     BOOST_TEST_EQ(std::format("{:g}", std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
     BOOST_TEST_EQ(std::format("{:g}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
+
+    BOOST_TEST_EQ(std::format("{:G}", std::numeric_limits<T>::infinity()), "INF");
+    BOOST_TEST_EQ(std::format("{:G}", -std::numeric_limits<T>::infinity()), "-INF");
+    BOOST_TEST_EQ(std::format("{:G}", std::numeric_limits<T>::quiet_NaN()), "NAN");
+    BOOST_TEST_EQ(std::format("{:G}", -std::numeric_limits<T>::quiet_NaN()), "-NAN(IND)");
+    BOOST_TEST_EQ(std::format("{:G}", std::numeric_limits<T>::signaling_NaN()), "NAN(SNAN)");
+    BOOST_TEST_EQ(std::format("{:G}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
 }
 
 template <concepts::decimal_floating_point_type T>
@@ -106,6 +107,13 @@ void test_fixed()
     BOOST_TEST_EQ(std::format("{:f}", -std::numeric_limits<T>::quiet_NaN()), "-nan(ind)");
     BOOST_TEST_EQ(std::format("{:f}", std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
     BOOST_TEST_EQ(std::format("{:f}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
+
+    BOOST_TEST_EQ(std::format("{:F}", std::numeric_limits<T>::infinity()), "INF");
+    BOOST_TEST_EQ(std::format("{:F}", -std::numeric_limits<T>::infinity()), "-INF");
+    BOOST_TEST_EQ(std::format("{:F}", std::numeric_limits<T>::quiet_NaN()), "NAN");
+    BOOST_TEST_EQ(std::format("{:F}", -std::numeric_limits<T>::quiet_NaN()), "-NAN(IND)");
+    BOOST_TEST_EQ(std::format("{:F}", std::numeric_limits<T>::signaling_NaN()), "NAN(SNAN)");
+    BOOST_TEST_EQ(std::format("{:F}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
 }
 
 template <concepts::decimal_floating_point_type T>
@@ -127,6 +135,13 @@ void test_scientific()
     BOOST_TEST_EQ(std::format("{:e}", std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
     BOOST_TEST_EQ(std::format("{:e}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
 
+    BOOST_TEST_EQ(std::format("{:E}", std::numeric_limits<T>::infinity()), "INF");
+    BOOST_TEST_EQ(std::format("{:E}", -std::numeric_limits<T>::infinity()), "-INF");
+    BOOST_TEST_EQ(std::format("{:E}", std::numeric_limits<T>::quiet_NaN()), "NAN");
+    BOOST_TEST_EQ(std::format("{:E}", -std::numeric_limits<T>::quiet_NaN()), "-NAN(IND)");
+    BOOST_TEST_EQ(std::format("{:E}", std::numeric_limits<T>::signaling_NaN()), "NAN(SNAN)");
+    BOOST_TEST_EQ(std::format("{:E}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
+
     // Padding to the front
     BOOST_TEST_EQ(std::format("{:10.1E}", T {0}), "   0.0E+00");
     BOOST_TEST_EQ(std::format("{:10.3E}", T {0}), " 0.000E+00");
@@ -143,6 +158,13 @@ void test_hex()
     BOOST_TEST_EQ(std::format("{:a}", -std::numeric_limits<T>::quiet_NaN()), "-nan(ind)");
     BOOST_TEST_EQ(std::format("{:a}", std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
     BOOST_TEST_EQ(std::format("{:a}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
+
+    BOOST_TEST_EQ(std::format("{:A}", std::numeric_limits<T>::infinity()), "INF");
+    BOOST_TEST_EQ(std::format("{:A}", -std::numeric_limits<T>::infinity()), "-INF");
+    BOOST_TEST_EQ(std::format("{:A}", std::numeric_limits<T>::quiet_NaN()), "NAN");
+    BOOST_TEST_EQ(std::format("{:A}", -std::numeric_limits<T>::quiet_NaN()), "-NAN(IND)");
+    BOOST_TEST_EQ(std::format("{:A}", std::numeric_limits<T>::signaling_NaN()), "NAN(SNAN)");
+    BOOST_TEST_EQ(std::format("{:A}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
 }
 
 int main()
