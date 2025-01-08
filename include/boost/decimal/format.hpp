@@ -70,6 +70,7 @@ constexpr auto parse_impl(ParseContext &ctx)
                 break;
 
             case 'F':
+                is_upper = true;
                 [[fallthrough]];
             case 'f':
                 fmt = chars_format::fixed;
