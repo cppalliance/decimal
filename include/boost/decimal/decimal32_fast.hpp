@@ -16,8 +16,11 @@
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
 #include <cstdint>
+#endif
 
 namespace boost {
 namespace decimal {
@@ -28,19 +31,9 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = std::numeric_limits<std::ui
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = std::numeric_limits<std::uint_fast32_t>::max() - 1;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::uint_fast32_t>::max() - 2;
 
-struct decimal32_fast_components
-{
-    using significand_type = std::uint_fast32_t;
-    using biased_exponent_type = std::int_fast32_t;
-
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
-
 }
 
-class decimal32_fast final
+BOOST_DECIMAL_EXPORT class decimal32_fast final
 {
 public:
     using significand_type = std::uint_fast32_t;
@@ -385,7 +378,7 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
     auto biased_exp {static_cast<std::uint_fast32_t>(exp + detail::bias)};
 
     // Decimal32 exponent holds 8 bits
-    if (biased_exp > UINT32_C(0xFF))
+    if (biased_exp > detail::max_biased_exp_v<decimal32_fast>)
     {
         significand_ = detail::d32_fast_inf;
     }
@@ -453,22 +446,41 @@ constexpr auto signbit(decimal32_fast val) noexcept -> bool
 
 constexpr auto isinf(decimal32_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d32_fast_inf;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto isnan(decimal32_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d32_fast_qnan || val.significand_ == detail::d32_fast_snan;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto issignaling(decimal32_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d32_fast_snan;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto isnormal(decimal32_fast val) noexcept -> bool
 {
-    return (val.significand_ != 0) && isfinite(val) && (val.exponent_ > static_cast<std::uint8_t>(detail::precision_v<decimal32> - 1));
+    return (val.significand_ != 0)
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    && isfinite(val) && (val.exponent_ > static_cast<std::uint8_t>(detail::precision_v<decimal32> - 1))
+    #endif
+    ;
 }
 
 constexpr auto isfinite(decimal32_fast val) noexcept -> bool

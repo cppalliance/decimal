@@ -32,7 +32,11 @@ constexpr auto asin_impl(T x) noexcept
     const auto fpc {fpclassify(x)};
     const auto isneg {signbit(x)};
 
-    if (fpc == FP_ZERO || fpc == FP_NAN)
+    if (fpc == FP_ZERO
+        #ifndef BOOST_DECIMAL_FAST_MATH
+        || fpc == FP_NAN
+        #endif
+        )
     {
         return x;
     }
@@ -55,7 +59,11 @@ constexpr auto asin_impl(T x) noexcept
     }
     else
     {
+        #ifndef BOOST_DECIMAL_FAST_MATH
         result = std::numeric_limits<T>::quiet_NaN();
+        #else
+        result = T{0};
+        #endif
     }
 
     // arcsin(-x) == -arcsin(x)

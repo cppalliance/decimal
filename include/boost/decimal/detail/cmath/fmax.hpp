@@ -25,6 +25,7 @@ constexpr auto fmax(T1 lhs, T2 rhs) noexcept
 {
     using promoted_type = detail::promote_args_t<T1, T2>;
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) && !isnan(rhs))
     {
         return static_cast<promoted_type>(rhs);
@@ -34,6 +35,7 @@ constexpr auto fmax(T1 lhs, T2 rhs) noexcept
     {
         return static_cast<promoted_type>(lhs);
     }
+    #endif
 
     return lhs > rhs ? static_cast<promoted_type>(lhs) : static_cast<promoted_type>(rhs);
 }

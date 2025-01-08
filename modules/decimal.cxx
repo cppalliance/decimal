@@ -29,6 +29,8 @@ module;
 #include <system_error>
 #include <complex>
 #include <compare>
+#include <charconv>
+#include <string_view>
 
 // <stdfloat> is a C++23 feature that is not everywhere yet
 #if __has_include(<stdfloat>)
@@ -69,6 +71,10 @@ class decimal32;
 class decimal64;
 class decimal128;
 
+class decimal32_fast;
+class decimal64_fast;
+class decimal128_fast;
+
 } // namespace boost::decimal
 
 export namespace std {
@@ -94,11 +100,42 @@ class numeric_limits<boost::decimal::decimal128>;
 struct numeric_limits<boost::decimal::decimal128>;
 #endif
 
+template <>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal32_fast>;
+#else
+struct numeric_limits<boost::decimal::decimal32_fast>;
+#endif
+
+template <>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal64_fast>;
+#else
+struct numeric_limits<boost::decimal::decimal64_fast>;
+#endif
+
+template <>
+#ifdef _MSC_VER
+class numeric_limits<boost::decimal::decimal128_fast>;
+#else
+struct numeric_limits<boost::decimal::decimal128_fast>;
+#endif
+
 } // Namespace std
 
 // MSVC wants <boost/decimal> to be imported but also does not support importing it...
 #ifdef _MSC_VER
+#  pragma warning( push )
 #  pragma warning( disable : 5244 )
+#elif defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Winclude-angled-in-module-purview"
 #endif
 
 #include <boost/decimal.hpp>
+
+#ifdef _MSC_VER
+#  pragma warning( pop )
+#elif defined(__clang__)
+#  pragma clang diagnostic pop
+#endif

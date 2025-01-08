@@ -127,7 +127,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const DecimalType& d)
 
     if (BOOST_DECIMAL_UNLIKELY(!r))
     {
-        errno = static_cast<int>(r.ec);
+        errno = static_cast<int>(r.ec); // LCOV_EXCL_LINE
     }
 
     *r.ptr = '\0';

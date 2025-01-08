@@ -312,4 +312,38 @@ typedef unsigned __int128 uint128_t;
 #  define BOOST_DECIMAL_FAST_MATH
 #endif
 
+#if __cplusplus >= 201703L
+#  if __has_include(<charconv>)
+     // We don't need all of charconv, just: std::to_chars_result, std::from_chars_result, and std::chars_format
+     // These compilers and versions give us what we need
+#    if (defined(__clang_major__) && __clang_major__ >= 13) || (defined(__GNUC__) && __GNUC__ >= 10) || defined(_MSC_VER)
+#      ifndef BOOST_DECIMAL_BUILD_MODULE
+#        include <charconv>
+#      endif
+#      define BOOST_DECIMAL_HAS_STD_CHARCONV
+#    endif
+#  endif
+
+#  if __has_include(<string_view>)
+#    ifndef BOOST_DECIMAL_BUILD_MODULE
+#      include <string_view>
+#    endif
+#    if __cpp_lib_string_view >= 201606L
+#      define BOOST_DECIMAL_HAS_STD_STRING_VIEW
+#    endif
+#  endif
+
+#endif
+
+// Since we should not be able to pull these in from the STL in module mode define them ourselves
+// This is also low risk since they are not supposed to be exported
+#ifdef BOOST_DECIMAL_BUILD_MODULE
+#  ifndef UINT64_C
+#    define UINT64_C(x) (x ## ULL)
+#  endif
+#  ifndef UINT32_C
+#    define UINT32_C(x) (x ## UL)
+#  endif
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP

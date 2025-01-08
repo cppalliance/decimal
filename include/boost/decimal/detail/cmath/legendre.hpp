@@ -39,12 +39,18 @@ constexpr auto legendre_impl(unsigned l, T x) noexcept
 {
     if (x < -1 || x > 1 || l > 128)
     {
+        #ifndef BOOST_DECIMAL_FAST_MATH
         return std::numeric_limits<T>::quiet_NaN();
+        #else
+        return T{0};
+        #endif
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (isnan(x))
     {
         return x;
     }
+    #endif
 
     T p0 {1};
     T p1 {x};

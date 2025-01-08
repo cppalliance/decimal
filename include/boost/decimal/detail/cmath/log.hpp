@@ -38,12 +38,18 @@ constexpr auto log_impl(T x) noexcept
     }
     else if (signbit(x) || (fpc == FP_NAN))
     {
+        #ifndef BOOST_DECIMAL_FAST_MATH
         result = std::numeric_limits<T>::quiet_NaN();
+        #else
+        result = T{0};
+        #endif
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc == FP_INFINITE)
     {
         result = std::numeric_limits<T>::infinity();
     }
+    #endif
     else if (x < one)
     {
         // Handle reflection.

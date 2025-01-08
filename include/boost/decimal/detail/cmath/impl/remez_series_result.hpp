@@ -20,7 +20,7 @@ constexpr auto remez_series_result(T x, const Array &coeffs) noexcept
     result = coeffs[0];
     for (std::size_t i {1}; i < coeffs.size(); ++i)
     {
-        result = fma(result, x, coeffs[i]);
+        result = unchecked_fma(result, x, coeffs[i]);
     }
 
     return result;

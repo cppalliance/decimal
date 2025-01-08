@@ -17,6 +17,8 @@ The standard for <charconv> does not distinguish between underflow and overflow 
 `boost::decimal::from_chars` modifies `value` in order to communicate this to the user in a divergence from the standard.
 This behavior is the same as that of https://www.boost.org/doc/libs/master/libs/charconv/doc/html/charconv.html#from_chars_usage_notes_for_from_chars_for_floating_point_types[`boost::charconv::from_chars_erange`].
 
+[#chars_format]
+== chars_format
 [source, c++]
 ----
 namespace boost {
@@ -30,6 +32,17 @@ enum class chars_format : unsigned
     general = fixed | scientific
 };
 
+} //namespace decimal
+} //namespace boost
+----
+
+[#from_chars_result]
+== from_chars_result
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
 struct from_chars_result
 {
     const char* ptr;
@@ -39,6 +52,17 @@ struct from_chars_result
 
     constexpr explicit operator bool() const noexcept { return ec == std::errc{}; }
 }
+
+} //namespace decimal
+} //namespace boost
+----
+
+[#to_chars_result]
+== to_chars_result
+[source, c++]
+----
+namespace boost {
+namespace decimal {
 
 struct to_chars_result
 {
@@ -50,8 +74,51 @@ struct to_chars_result
     constexpr explicit operator bool() const noexcept { return ec == std::errc{}; }
 }
 
+} //namespace decimal
+} //namespace boost
+----
+
+[#from_chars]
+== from_chars
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
 template <typename DecimalType>
-constexpr from_chars_result from_chars(const char* first, const char* last, DecimalType& value, chars_format fmt = chars_format::general)
+constexpr boost::decimal::from_chars_result from_chars(const char* first, const char* last, DecimalType& value, boost::decimal::chars_format fmt = boost::decimal::chars_format::general) noexcept
+
+#ifdef BOOST_DECIMAL_HAS_STD_STRING_VIEW
+
+template <typename DecimalType>
+constexpr boost::decimal::from_chars_result from_chars(std::string_view str, DecimalType& value, boost::decimal::chars_format fmt = boost::decimal::chars_format::general) noexcept
+
+#else
+
+template <typename DecimalType>
+constexpr boost::decimal::from_chars_result from_chars(const std::string& str, DecimalType& value, boost::decimal::chars_format fmt = boost::decimal::chars_format::general) noexcept
+
+#endif
+
+#ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
+
+template <typename DecimalType>
+constexpr std::from_chars_result from_chars(const char* first, const char* last, DecimalType& value, std::chars_format fmt) noexcept
+
+#endif // BOOST_DECIMAL_HAS_STD_CHARCONV
+
+} //namespace decimal
+} //namespace boost
+----
+
+IMPORTANT: If `std::chars_format` is used the function will return a `std::from_chars_result` and if `boost::decimal::chars_format` is used *OR* no format is specified then a `boost::decimal::from_chars_result` will be returned.
+
+[#to_chars]
+== to_chars
+[source, c++]
+----
+namespace boost {
+namespace decimal {
 
 template <typename DecimalType>
 BOOST_DECIMAL_CONSTEXPR to_chars_result to_chars(char* first, char* last, DecimalType value) noexcept;
@@ -61,6 +128,16 @@ BOOST_DECIMAL_CONSTEXPR to_chars_result to_chars(char* first, char* last, Decima
 
 template <typename DecimalType>
 BOOST_DECIMAL_CONSTEXPR to_chars_result to_chars(char* first, char* last, DecimalType value, chars_format fmt, int precision) noexcept;
+
+#ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
+
+template <typename DecimalType>
+BOOST_DECIMAL_CONSTEXPR std::to_chars_result to_chars(char* first, char* last, DecimalType value, std::chars_format fmt) noexcept;
+
+template <typename DecimalType>
+BOOST_DECIMAL_CONSTEXPR std::to_chars_result to_chars(char* first, char* last, DecimalType value, std::chars_format fmt, int precision) noexcept;
+
+#endif // BOOST_DECIMAL_HAS_STD_CHARCONV
 
 } //namespace decimal
 } //namespace boost
@@ -73,7 +150,12 @@ NOTE: `BOOST_DECIMAL_CONSTEXPR` is defined if:
  - Compiler has: `__builtin_is_constant_evaluated()`
  - C++20 support with: `std::is_constant_evaluated()`
 
+IMPORTANT: Same as `from_chars`, `boost::decimal::to_chars` will return a `std::to_chars_result` if `std::chars_format` is used to specify the format; otherwise it returns a `boost::decimal::to_chars_result`.
+
 The library offers an additional feature for sizing buffers without specified precision and in general format
+
+[#charconv_limits]
+== limits
 [source, c++]
 ----
 namespace boost {

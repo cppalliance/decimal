@@ -77,7 +77,7 @@ static_assert(sizeof(emulated_128_pow10) == sizeof(uint128) * 40, "Should have 1
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-static constexpr uint128_t builtin_128_pow10[] = {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE uint128_t builtin_128_pow10[] = {
     uint128_t(1),
     uint128_t(10),
     uint128_t(100),
@@ -124,7 +124,7 @@ static_assert(sizeof(builtin_128_pow10) == sizeof(boost::decimal::detail::uint12
 
 #endif
 
-static constexpr uint256_t emulated_256_pow10[] = {
+BOOST_DECIMAL_CONSTEXPR_VARIABLE uint256_t emulated_256_pow10[] = {
    uint256_t{uint128{UINT64_C(0), UINT64_C(0)}, uint128{UINT64_C(0), UINT64_C(1)}},
    uint256_t{uint128{UINT64_C(0), UINT64_C(0)}, uint128{UINT64_C(0), UINT64_C(10)}},
    uint256_t{uint128{UINT64_C(0), UINT64_C(0)}, uint128{UINT64_C(0), UINT64_C(100)}},

@@ -33,11 +33,19 @@ constexpr auto log10_impl(T x) noexcept
 
     if (fpc == FP_ZERO)
     {
+        #ifndef BOOST_DECIMAL_FAST_MATH
         result = -std::numeric_limits<T>::infinity();
+        #else
+        result = T{0};
+        #endif
     }
     else if (signbit(x))
     {
+        #ifndef BOOST_DECIMAL_FAST_MATH
         result = std::numeric_limits<T>::quiet_NaN();
+        #else
+        result = T{0};
+        #endif
     }
     else if (fpc != FP_NORMAL)
     {

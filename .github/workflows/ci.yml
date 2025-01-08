@@ -226,32 +226,44 @@ jobs:
               - "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"
             source_keys:
               - "https://apt.llvm.org/llvm-snapshot.gpg.key"
-          - name: UBSAN
-            toolset: clang
-            compiler: clang++-14
-            cxxstd: "03,11,14,17,20,2b"
-            cxxflags: -stdlib=libc++
-            linkflags: -stdlib=libc++
-            ubsan: 1
-            os: ubuntu-22.04
-            install:
-              - clang-14
-              - libc++-14-dev
-              - libc++abi-14-dev
-
           - toolset: clang
+            compiler: clang++-18
             cxxstd: "03,11,14,17,20,2b"
-            os: macos-12
+            os: ubuntu-24.04
+            install:
+              - clang-18
+            sources:
+              - "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-18 main"
+            source_keys:
+              - "https://apt.llvm.org/llvm-snapshot.gpg.key"
+          - toolset: clang
+            compiler: clang++-19
+            cxxstd: "03,11,14,17,20,2b"
+            os: ubuntu-24.04
+            install:
+              - clang-19
+            sources:
+              - "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-19 main"
+            source_keys:
+              - "https://apt.llvm.org/llvm-snapshot.gpg.key"
+
           - toolset: clang
             cxxstd: "03,11,14,17,20,2b"
             os: macos-13
           - toolset: clang
             cxxstd: "03,11,14,17,20,2b"
             os: macos-14
+          - toolset: clang
+            cxxstd: "03,11,14,17,20,2b"
+            os: macos-15
 
     timeout-minutes: 180
     runs-on: ${{matrix.os}}
-    container: ${{matrix.container}}
+    container:
+      image: ${{matrix.container}}
+      volumes:
+        - /node20217:/node20217:rw,rshared
+        - ${{ startsWith(matrix.container, 'ubuntu:1') && '/node20217:/__e/node20:ro,rshared' || ' ' }}
 
     steps:
       - name: Setup environment
@@ -275,9 +287,13 @@ jobs:
                     fi
                     apt-get -o Acquire::Retries=$NET_RETRY_COUNT install -y sudo software-properties-common tzdata wget curl apt-transport-https ca-certificates make build-essential g++ $PYTHON_PACKAGE python3 perl git cmake
                 fi
+                if [[ "${{matrix.container}}" == "ubuntu:1"* ]]; then
+                  # Node 20 doesn't work with Ubuntu 16/18  glibc: https://github.com/actions/checkout/issues/1590
+                  curl -sL https://archives.boost.io/misc/node/node-v20.9.0-linux-x64-glibc-217.tar.xz | tar -xJ --strip-components 1 -C /node20217
+                fi
             fi
             git config --global pack.threads 0
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install packages
         if: matrix.install
@@ -459,28 +475,26 @@ jobs:
             cxxstd: "14,17,20,latest"
             addrmd: "32"
             os: windows-2019
-          # B2 does not work with MSVC 17.10. Once it's updated we can re-enable these tests
-          # Still covered in drone
-          #- toolset: msvc-14.3
-          #  cxxstd: "14,17,20,latest"
-          #  addrmd: "32"
-          #  os: windows-2022
+          - toolset: msvc-14.3
+            cxxstd: "14,17,20,latest"
+            addrmd: "32"
+            os: windows-2022
           - toolset: msvc-14.2
             cxxstd: "14,17,20,latest"
             addrmd: "64"
             os: windows-2019
-          #- toolset: msvc-14.3
-          #  cxxstd: "14,17,20,latest"
-          #  addrmd: "64"
-          #  os: windows-2022
-          #- toolset: clang-win
-          #  cxxstd: "14,17,latest"
-          #  addrmd: "32"
-          #  os: windows-2022
-          #- toolset: clang-win
-          #  cxxstd: "14,17,latest"
-          #  addrmd: "64"
-          #  os: windows-2022
+          - toolset: msvc-14.3
+            cxxstd: "14,17,20,latest"
+            addrmd: "64"
+            os: windows-2022
+          - toolset: clang-win
+            cxxstd: "14,17,latest"
+            addrmd: "32"
+            os: windows-2022
+          - toolset: clang-win
+            cxxstd: "14,17,latest"
+            addrmd: "64"
+            os: windows-2022
           - toolset: gcc
             cxxstd: "03,11,14,17,2a"
             addrmd: "64"
@@ -489,7 +503,7 @@ jobs:
     runs-on: ${{matrix.os}}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Boost
         shell: cmd
@@ -526,18 +540,18 @@ jobs:
         include:
           - os: ubuntu-20.04
           - os: ubuntu-22.04
-          - os: macos-12
           - os: macos-13
           - os: macos-14
+          - os: macos-15
 
     runs-on: ${{matrix.os}}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install packages
         if: matrix.install
-        run: sudo apt install ${{matrix.install}}
+        run: sudo apt-get -y install ${{matrix.install}}
 
       - name: Setup Boost
         run: |
@@ -575,14 +589,14 @@ jobs:
         include:
           - os: ubuntu-20.04
           - os: ubuntu-22.04
-          - os: macos-12
           - os: macos-13
           - os: macos-14
+          - os: macos-15
 
     runs-on: ${{matrix.os}}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install packages
         if: matrix.install
@@ -634,14 +648,14 @@ jobs:
         include:
           - os: ubuntu-20.04
           - os: ubuntu-22.04
-          - os: macos-12
           - os: macos-13
           - os: macos-14
+          - os: macos-15
 
     runs-on: ${{matrix.os}}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install packages
         if: matrix.install
@@ -698,7 +712,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup MSYS2 environment
         uses: msys2/setup-msys2@v2
@@ -709,7 +723,7 @@ jobs:
           pacboy: gcc:p cmake:p ninja:p
 
       - name: Fetch Boost.CI
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: boostorg/boost-ci
           ref: master
@@ -737,7 +751,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [ intel ]
-        standard: [ c++20 ]
+        standard: [ 14, 17, 20, 23 ]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -785,7 +799,12 @@ jobs:
         run: |
           cd ../boost-root
           mkdir __build__ && cd __build__
-          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DBOOST_INCLUDE_LIBRARIES=$LIBRARY -DBUILD_TESTING=ON ..
+          cmake -DCMAKE_C_COMPILER=icx \
+              -DCMAKE_CXX_COMPILER=icpx \
+              -DCMAKE_CXX_STANDARD=${{ matrix.standard }} \
+              -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+              -DBOOST_INCLUDE_LIBRARIES=$LIBRARY \
+              -DBUILD_TESTING=ON ..
 
       - name: Build tests
         run: |

@@ -30,19 +30,29 @@ constexpr auto hypot_impl(T x, T y) noexcept
 {
     constexpr T zero {0, 0};
 
-    if (abs(x) == zero || isnan(y))
+    if (abs(x) == zero
+        #ifndef BOOST_DECIMAL_FAST_MATH
+        || isnan(y)
+        #endif
+        )
     {
         return y;
     }
-    else if (abs(y) == zero || isnan(x))
+    else if (abs(y) == zero
+             #ifndef BOOST_DECIMAL_FAST_MATH
+             || isnan(x)
+             #endif
+            )
     {
         return x;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (isinf(x) || isinf(y))
     {
         // Return +inf even if the other value is nan
         return std::numeric_limits<T>::infinity();
     }
+    #endif
 
     auto new_x {abs(x)};
     auto new_y {abs(y)};
@@ -64,6 +74,7 @@ constexpr auto hypot_impl(T x, T y) noexcept
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto hypot_impl(T x, T y, T z) noexcept
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(x) || isinf(y) || isinf(z))
     {
         return std::numeric_limits<T>::infinity();
@@ -80,6 +91,7 @@ constexpr auto hypot_impl(T x, T y, T z) noexcept
     {
         return z;
     }
+    #endif
 
     const auto a {fmax(fmax(x, y), z)};
     const auto x_over_a {x / a};

@@ -32,14 +32,18 @@ constexpr auto cos_impl(T x) noexcept
 {
     T result { };
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     const auto fpc = fpclassify(x);
 
     // First check non-finite values and small angles
+
     if ((fpc == FP_INFINITE) || (fpc == FP_NAN))
     {
         result = x;
     }
-    else if (signbit(x))
+    else
+    #endif
+    if (signbit(x))
     {
         result = cos(-x);
     }

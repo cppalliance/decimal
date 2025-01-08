@@ -766,10 +766,12 @@ constexpr auto erf_impl(T z) noexcept
     {
         return z;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fp == FP_INFINITE)
     {
         return z < T{0} ? T{-1} : T{1};
     }
+    #endif
 
     return detail::erf_calc_impl(z, false);
 }
@@ -785,10 +787,12 @@ constexpr auto erfc_impl(T z) noexcept
     {
         return z;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fp == FP_INFINITE)
     {
         return z < T{0} ? T{2} : T{0};
     }
+    #endif
 
     return detail::erf_calc_impl(z, true);
 }

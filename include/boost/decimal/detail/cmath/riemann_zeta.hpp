@@ -44,10 +44,12 @@ constexpr auto riemann_zeta_impl(T x) noexcept
 
         result = T { 5, -1, true };
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc != FP_NORMAL)
     {
         result = ((fpc == FP_INFINITE) ? (is_neg ? -std::numeric_limits<T>::infinity() : one) : x);
     }
+    #endif
     else
     {
         if (is_neg)
@@ -89,8 +91,11 @@ constexpr auto riemann_zeta_impl(T x) noexcept
                 else
                 {
                     // The argument is exaclty one. The result is complex-infinity.
-
+                    #ifndef BOOST_DECIMAL_FAST_MATH
                     result = std::numeric_limits<T>::quiet_NaN();
+                    #else
+                    result = T{0};
+                    #endif
                 }
             }
             else

@@ -19,6 +19,8 @@ Decimal32 is the 32-bit version of the decimal interchange format, and has the f
 - Smallest normalized value - 1.000000e-95
 - Smallest subnormal - 1e-101
 
+The encoding of Decimal32 is in the <<conversions, BID format>>.
+
 [source, c++]
 ----
 #include <boost/decimal/decimal32.hpp>

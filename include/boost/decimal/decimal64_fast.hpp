@@ -17,8 +17,13 @@
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+
 #include <limits>
 #include <cstdint>
+
+#endif
 
 namespace boost {
 namespace decimal {
@@ -41,7 +46,7 @@ struct decimal64_fast_components
 
 } // namespace detail
 
-class decimal64_fast final
+BOOST_DECIMAL_EXPORT class decimal64_fast final
 {
 public:
     using significand_type = std::uint_fast64_t;
@@ -458,28 +463,47 @@ constexpr auto signbit(decimal64_fast val) noexcept -> bool
 
 constexpr auto isinf(decimal64_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d64_fast_inf;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto isnan(decimal64_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d64_fast_qnan ||
            val.significand_ == detail::d64_fast_snan;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto issignaling(decimal64_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d64_fast_snan;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto isnormal(decimal64_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (val.exponent_ <= static_cast<decimal64_fast::exponent_type>(detail::precision_v<decimal64> - 1))
     {
         return false;
     }
 
     return (val.significand_ != 0) && isfinite(val);
+    #else
+    return val.significand_ != 0;
+    #endif
 }
 
 constexpr auto isfinite(decimal64_fast val) noexcept -> bool
@@ -866,8 +890,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::operator double() const noexcept
 
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::operator long double() const noexcept
 {
-    // TODO(mborland): Don't have an exact way of converting to various long doubles
-    return static_cast<long double>(to_float<decimal64_fast, double>(*this));
+    return to_float<decimal64_fast, long double>(*this);
 }
 
 #ifdef BOOST_DECIMAL_HAS_FLOAT16
@@ -1371,7 +1394,7 @@ constexpr auto copysignd64f(decimal64_fast mag, decimal64_fast sgn) noexcept -> 
 
 namespace std {
 
-template <>
+BOOST_DECIMAL_EXPORT template <>
 #ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal64_fast>
 #else

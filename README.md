@@ -61,7 +61,7 @@ as well as emulated PPC64LE and STM32 using QEMU with the following compilers:
 
 # Synopsis
 
-Decimal provides 3 types:
+Decimal provides 3 IEEE-754 compliant types:
 
 ```cpp
 namespace boost {
@@ -70,6 +70,20 @@ namespace decimal {
 class decimal32;
 class decimal64;
 class decimal128;
+
+} //namespace decimal
+} //namespace boost
+```
+
+and also 3 similar but non-compliant types with improved runtime performance:
+
+```cpp
+namespace boost {
+namespace decimal {
+
+class decimal32_fast;
+class decimal64_fast;
+class decimal128_fast;
 
 } //namespace decimal
 } //namespace boost

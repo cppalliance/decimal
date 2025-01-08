@@ -9,332 +9,201 @@
 #include <boost/decimal/decimal32_fast.hpp>
 #include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal128_fast.hpp>
 #include <boost/decimal/detail/config.hpp>
 
 namespace boost {
 namespace decimal {
 
-/*
-constexpr auto fmad32(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
+namespace detail {
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4127)
+#endif
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec>
+using components_type = std::conditional_t<std::is_same<Dec, decimal32>::value, decimal32_components,
+                        std::conditional_t<std::is_same<Dec, decimal32_fast>::value, decimal32_fast_components,
+                        std::conditional_t<std::is_same<Dec, decimal64>::value, decimal64_components,
+                        std::conditional_t<std::is_same<Dec, decimal64_fast>::value, decimal64_fast_components,
+                        std::conditional_t<std::is_same<Dec, decimal128>::value, decimal128_components, decimal128_fast_components
+                        >>>>>;
+
+template <bool checked, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto d32_fma_impl(T x, T y, T z) noexcept -> T
 {
-    // First calculate x * y without rounding
-    constexpr decimal32 zero {0, 0};
+    using T_components_type = components_type<T>;
+    using exp_type = typename T::biased_exponent_type;
 
-    const auto res {detail::check_non_finite(x, y)};
-    if (res != zero)
+    // Apply the add
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    BOOST_DECIMAL_IF_CONSTEXPR (checked)
     {
-        return res;
+        if (!isfinite(x) || !isfinite(y))
+        {
+            return detail::check_non_finite(x, y);
+        }
     }
+    #endif
 
-    auto sig_lhs {x.full_significand()};
-    auto exp_lhs {x.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
+    int exp_lhs {};
+    auto sig_lhs = frexp10(x, &exp_lhs);
 
-    auto sig_rhs {y.full_significand()};
-    auto exp_rhs {y.biased_exponent()};
-    detail::normalize(sig_rhs, exp_rhs);
+    int exp_rhs {};
+    auto sig_rhs = frexp10(y, &exp_rhs);
 
-    auto mul_result {detail::mul_impl<detail::decimal32_components>(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
-    const decimal32 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
+    auto first_res = detail::mul_impl<T_components_type>(sig_lhs, static_cast<exp_type>(exp_lhs), x < 0,
+                                                         sig_rhs, static_cast<exp_type>(exp_rhs), y < 0);
 
-    const auto res_add {detail::check_non_finite(dec_result, z)};
-    if (res_add != zero)
+    // Apply the mul on the carried components
+    // We still create the result as a decimal type to check for non-finite values and comparisons,
+    // but we do not use it for the resultant calculation
+    const T complete_lhs {first_res.sig, first_res.exp, first_res.sign};
+
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    BOOST_DECIMAL_IF_CONSTEXPR (checked)
     {
-        return res_add;
+        if (!isfinite(complete_lhs) || !isfinite(z))
+        {
+            return detail::check_non_finite(complete_lhs, z);
+        }
     }
+    #endif
 
-    bool lhs_bigger {dec_result > z};
-    if (dec_result.isneg() && z.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-    bool abs_lhs_bigger {abs(dec_result) > abs(z)};
+    const bool abs_lhs_bigger {abs(complete_lhs) > abs(z)};
 
-    // To avoid the rounding step we promote the constituent pieces to the next higher type
-    detail::decimal64_components promoted_mul_result {static_cast<std::uint64_t>(mul_result.sig),
-                                                      mul_result.exp, mul_result.sign};
+    int exp_z {};
+    auto sig_z = frexp10(z, &exp_z);
+    detail::normalize<T>(first_res.sig, first_res.exp);
 
-    detail::normalize<decimal64>(promoted_mul_result.sig, promoted_mul_result.exp);
-
-    auto sig_z {static_cast<std::uint64_t>(z.full_significand())};
-    auto exp_z {z.biased_exponent()};
-    detail::normalize<decimal64>(sig_z, exp_z);
-    detail::decimal64_components z_components {sig_z, exp_z, z.isneg()};
-
-    if (!lhs_bigger)
-    {
-        detail::swap(promoted_mul_result, z_components);
-        abs_lhs_bigger = !abs_lhs_bigger;
-    }
-
-    detail::decimal64_components result {};
-
-    if (!promoted_mul_result.sign && z_components.sign)
-    {
-        result = detail::d64_sub_impl<detail::decimal64_components>(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                              z_components.sig, z_components.exp, z_components.sign,
-                              abs_lhs_bigger);
-    }
-    else
-    {
-        result = detail::d64_add_impl<detail::decimal64_components>(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                              z_components.sig, z_components.exp, z_components.sign);
-    }
-
-    return {result.sig, result.exp, result.sign};
+    return detail::d32_add_impl<T>(first_res.sig, first_res.exp, first_res.sign,
+                                   sig_z, static_cast<exp_type>(exp_z), z < 0,
+                                   abs_lhs_bigger);
 }
 
-constexpr auto fmad64(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
+template <bool checked, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto d64_fma_impl(T x, T y, T z) noexcept -> T
 {
-    // First calculate x * y without rounding
-    constexpr decimal64 zero {0, 0};
+    using T_components_type = components_type<T>;
+    using exp_type = typename T::biased_exponent_type;
 
-    const auto res {detail::check_non_finite(x, y)};
-    if (res != zero)
+    // Apply the add
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    BOOST_DECIMAL_IF_CONSTEXPR (checked)
     {
-        return res;
+        if (!isfinite(x) || !isfinite(y))
+        {
+            return detail::check_non_finite(x, y);
+        }
     }
+    #endif
 
-    auto sig_lhs {x.full_significand()};
-    auto exp_lhs {x.biased_exponent()};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
+    int exp_lhs {};
+    auto sig_lhs = frexp10(x, &exp_lhs);
 
-    auto sig_rhs {y.full_significand()};
-    auto exp_rhs {y.biased_exponent()};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
+    int exp_rhs {};
+    auto sig_rhs = frexp10(y, &exp_rhs);
 
-    auto mul_result {detail::d64_mul_impl<detail::decimal64_components>(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
-    const decimal64 dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
+    auto first_res = detail::d64_mul_impl<T_components_type>(sig_lhs, static_cast<exp_type>(exp_lhs), x < 0,
+                                                             sig_rhs, static_cast<exp_type>(exp_rhs), y < 0);
 
-    const auto res_add {detail::check_non_finite(dec_result, z)};
-    if (res_add != zero)
+    // Apply the mul on the carried components
+    // We still create the result as a decimal type to check for non-finite values and comparisons,
+    // but we do not use it for the resultant calculation
+    const T complete_lhs {first_res.sig, first_res.exp, first_res.sign};
+
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    BOOST_DECIMAL_IF_CONSTEXPR (checked)
     {
-        return res_add;
+        if (!isfinite(complete_lhs) || !isfinite(z))
+        {
+            return detail::check_non_finite(complete_lhs, z);
+        }
     }
+    #endif
 
-    bool lhs_bigger {dec_result > z};
-    if (dec_result.isneg() && z.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-    bool abs_lhs_bigger {abs(dec_result) > abs(z)};
+    const bool abs_lhs_bigger {abs(complete_lhs) > abs(z)};
 
-    // To avoid the rounding step we promote the constituent pieces to the next higher type
-    detail::decimal128_components promoted_mul_result {static_cast<detail::uint128>(mul_result.sig),
-                                                       mul_result.exp, mul_result.sign};
+    int exp_z {};
+    auto sig_z = frexp10(z, &exp_z);
+    detail::normalize<T>(first_res.sig, first_res.exp);
 
-    detail::normalize<decimal128>(promoted_mul_result.sig, promoted_mul_result.exp);
-
-    auto sig_z {static_cast<detail::uint128>(z.full_significand())};
-    auto exp_z {z.biased_exponent()};
-    detail::normalize<decimal128>(sig_z, exp_z);
-    detail::decimal128_components z_components {sig_z, exp_z, z.isneg()};
-
-    if (!lhs_bigger)
-    {
-        detail::swap(promoted_mul_result, z_components);
-        abs_lhs_bigger = !abs_lhs_bigger;
-    }
-
-    detail::decimal128_components result {};
-
-    if (!promoted_mul_result.sign && z_components.sign)
-    {
-        result = detail::d128_sub_impl<detail::decimal128_components>(
-                        promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                        z_components.sig, z_components.exp, z_components.sign,
-                        abs_lhs_bigger);
-    }
-    else
-    {
-        result = detail::d128_add_impl<detail::decimal128_components>(
-                        promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                        z_components.sig, z_components.exp, z_components.sign);
-    }
-
-    return {result.sig, result.exp, result.sign};
+    return detail::d64_add_impl<T>(first_res.sig, first_res.exp, first_res.sign,
+                                   sig_z, static_cast<exp_type>(exp_z), z < 0,
+                                   abs_lhs_bigger);
 }
 
-constexpr auto fmad128(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
+template <bool, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+constexpr auto d128_fma_impl(T x, T y, T z) noexcept -> T
 {
     return x * y + z;
 }
 
-// TODO(mborland): promote to decimal64_fast instead of regular decimal64 once it is available
-constexpr auto fmad32f(decimal32_fast x, decimal32_fast y, decimal32_fast z) noexcept -> decimal32_fast
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+constexpr auto unchecked_fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
-    // First calculate x * y without rounding
-    constexpr decimal32_fast zero {0, 0};
-
-    const auto res {detail::check_non_finite(x, y)};
-    if (res != zero)
-    {
-        return res;
-    }
-
-    auto sig_lhs {x.full_significand()};
-    auto exp_lhs {x.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
-
-    auto sig_rhs {y.full_significand()};
-    auto exp_rhs {y.biased_exponent()};
-    detail::normalize(sig_rhs, exp_rhs);
-
-    auto mul_result {detail::mul_impl<detail::decimal32_fast_components>(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
-    const decimal32_fast dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
-
-    const auto res_add {detail::check_non_finite(dec_result, z)};
-    if (res_add != zero)
-    {
-        return res_add;
-    }
-
-    bool lhs_bigger {dec_result > z};
-    if (dec_result.isneg() && z.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-    bool abs_lhs_bigger {abs(dec_result) > abs(z)};
-
-    // To avoid the rounding step we promote the constituent pieces to the next higher type
-    detail::decimal64_components promoted_mul_result {static_cast<std::uint64_t>(mul_result.sig),
-                                                      mul_result.exp, mul_result.sign};
-
-    detail::normalize<decimal64>(promoted_mul_result.sig, promoted_mul_result.exp);
-
-    auto sig_z {static_cast<std::uint64_t>(z.full_significand())};
-    auto exp_z {z.biased_exponent()};
-    detail::normalize<decimal64>(sig_z, exp_z);
-    detail::decimal64_components z_components {sig_z, exp_z, z.isneg()};
-
-    if (!lhs_bigger)
-    {
-        detail::swap(promoted_mul_result, z_components);
-        abs_lhs_bigger = !abs_lhs_bigger;
-    }
-
-    detail::decimal64_components result {};
-
-    if (!promoted_mul_result.sign && z_components.sign)
-    {
-        result = detail::d64_sub_impl<detail::decimal64_components>(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                              z_components.sig, z_components.exp, z_components.sign,
-                              abs_lhs_bigger);
-    }
-    else
-    {
-        result = detail::d64_add_impl<detail::decimal64_components>(promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                              z_components.sig, z_components.exp, z_components.sign);
-    }
-
-    return {result.sig, result.exp, result.sign};
+    return detail::d32_fma_impl<false>(x, y, z);
 }
 
-constexpr auto fmad64f(decimal64_fast x, decimal64_fast y, decimal64_fast z) noexcept -> decimal64_fast
+constexpr auto unchecked_fma(decimal32_fast x, decimal32_fast y, decimal32_fast z) noexcept -> decimal32_fast
 {
-    // First calculate x * y without rounding
-    constexpr decimal64_fast zero {0, 0};
-
-    const auto res {detail::check_non_finite(x, y)};
-    if (res != zero)
-    {
-        return res;
-    }
-
-    auto sig_lhs {x.full_significand()};
-    auto exp_lhs {x.biased_exponent()};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
-
-    auto sig_rhs {y.full_significand()};
-    auto exp_rhs {y.biased_exponent()};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
-
-    auto mul_result {detail::d64_mul_impl<detail::decimal64_fast_components>(sig_lhs, exp_lhs, x.isneg(), sig_rhs, exp_rhs, y.isneg())};
-    const decimal64_fast dec_result {mul_result.sig, mul_result.exp, mul_result.sign};
-
-    const auto res_add {detail::check_non_finite(dec_result, z)};
-    if (res_add != zero)
-    {
-        return res_add;
-    }
-
-    bool lhs_bigger {dec_result > z};
-    if (dec_result.isneg() && z.isneg())
-    {
-        lhs_bigger = !lhs_bigger;
-    }
-    bool abs_lhs_bigger {abs(dec_result) > abs(z)};
-
-    // To avoid the rounding step we promote the constituent pieces to the next higher type
-    detail::decimal128_components promoted_mul_result {static_cast<detail::uint128>(mul_result.sig),
-                                                       mul_result.exp, mul_result.sign};
-
-    detail::normalize<decimal128>(promoted_mul_result.sig, promoted_mul_result.exp);
-
-    auto sig_z {static_cast<detail::uint128>(z.full_significand())};
-    auto exp_z {z.biased_exponent()};
-    detail::normalize<decimal128>(sig_z, exp_z);
-    detail::decimal128_components z_components {sig_z, exp_z, z.isneg()};
-
-    if (!lhs_bigger)
-    {
-        detail::swap(promoted_mul_result, z_components);
-        abs_lhs_bigger = !abs_lhs_bigger;
-    }
-
-    detail::decimal128_components result {};
-
-    if (!promoted_mul_result.sign && z_components.sign)
-    {
-        result = detail::d128_sub_impl<detail::decimal128_components>(
-                        promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                        z_components.sig, z_components.exp, z_components.sign,
-                        abs_lhs_bigger);
-    }
-    else
-    {
-        result = detail::d128_add_impl<detail::decimal128_components>(
-                        promoted_mul_result.sig, promoted_mul_result.exp, promoted_mul_result.sign,
-                        z_components.sig, z_components.exp, z_components.sign);
-    }
-
-    return {result.sig, result.exp, result.sign};
+    return detail::d32_fma_impl<false>(x, y, z);
 }
 
-constexpr auto fmad128f(decimal128_fast x, decimal128_fast y, decimal128_fast z) noexcept -> decimal128_fast
+constexpr auto unchecked_fma(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
 {
-    return x * y + z;
+    return detail::d64_fma_impl<false>(x, y, z);
 }
-*/
+
+constexpr auto unchecked_fma(decimal64_fast x, decimal64_fast y, decimal64_fast z) noexcept -> decimal64_fast
+{
+    return detail::d64_fma_impl<false>(x, y, z);
+}
+
+constexpr auto unchecked_fma(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
+{
+    return detail::d128_fma_impl<false>(x, y, z);
+}
+
+constexpr auto unchecked_fma(decimal128_fast x, decimal128_fast y, decimal128_fast z) noexcept -> decimal128_fast
+{
+    return detail::d128_fma_impl<false>(x, y, z);
+}
+
+} // Namespace detail
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32 x, decimal32 y, decimal32 z) noexcept -> decimal32
 {
-    return x * y + z;
+    return detail::d32_fma_impl<true>(x, y, z);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal64 x, decimal64 y, decimal64 z) noexcept -> decimal64
 {
-    return x * y + z;
+    return detail::d64_fma_impl<true>(x, y, z);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal128 x, decimal128 y, decimal128 z) noexcept -> decimal128
 {
-    return x * y + z;
+    return detail::d128_fma_impl<true>(x, y, z);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32_fast x, decimal32_fast y, decimal32_fast z) noexcept -> decimal32_fast
 {
-    return x * y + z;
+    return detail::d32_fma_impl<true>(x, y, z);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal64_fast x, decimal64_fast y, decimal64_fast z) noexcept -> decimal64_fast
 {
-    return x * y + z;
+    return detail::d64_fma_impl<true>(x, y, z);
 }
 
 BOOST_DECIMAL_EXPORT constexpr auto fma(decimal128_fast x, decimal128_fast y, decimal128_fast z) noexcept -> decimal128_fast
 {
-    return x * y + z;
+    return detail::d128_fma_impl<true>(x, y, z);
 }
 
 } //namespace decimal

@@ -26,6 +26,7 @@ constexpr auto remainder(T x, T y) noexcept
     constexpr T zero {0, 0};
     constexpr T half {5, -1};
 
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if ((isinf(x) && !isinf(y)) ||
         (abs(y) == zero && !isnan(x)))
     {
@@ -39,6 +40,12 @@ constexpr auto remainder(T x, T y) noexcept
     {
         return y;
     }
+    #else
+    if (abs(y) == zero)
+    {
+        return zero;
+    }
+    #endif
 
     T n {};
     const T frac {modf(x / y, &n)};

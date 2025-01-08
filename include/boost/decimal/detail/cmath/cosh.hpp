@@ -38,6 +38,7 @@ constexpr auto cosh_impl(T x) noexcept
     {
         result = one;
     }
+    #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc != FP_NORMAL)
     {
         if (fpc == FP_INFINITE)
@@ -49,6 +50,7 @@ constexpr auto cosh_impl(T x) noexcept
             result = abs(x);
         }
     }
+    #endif
     else
     {
         if (signbit(x))

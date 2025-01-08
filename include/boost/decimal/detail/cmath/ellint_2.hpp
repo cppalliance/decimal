@@ -53,7 +53,11 @@ constexpr auto ellint_2_impl(T m, T phi) noexcept
   }
   else if((fabs(m) > one) || (fpc_phi != FP_NORMAL) || (fpc_m != FP_NORMAL))
   {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     result = std::numeric_limits<T>::quiet_NaN();
+    #else
+    result = T{0};
+    #endif
   }
   else if(signbit(phi))
   {

@@ -37,6 +37,7 @@
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
+#include <boost/decimal/detail/components.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -120,16 +121,6 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_big_combination_field_mask = 
 //BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_combination_mask = UINT32_C(0b0'11111'000000'0000000000'0000000000);
 //BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_exp_mask = UINT32_C(0b0'00000'111111'0000000000'0000000000);
 //BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_significand_mask = d32_no_combination;
-
-struct decimal32_components
-{
-    using significand_type = std::uint32_t;
-    using biased_exponent_type = std::int32_t;
-
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
 
 } // namespace detail
 
@@ -805,26 +796,47 @@ constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) 
 
 constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return (rhs.bits_ & detail::d32_nan_mask) == detail::d32_nan_mask;
+    #else
+    static_cast<void>(rhs);
+    return false;
+    #endif
 }
 
 constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return (rhs.bits_ & detail::d32_snan_mask) == detail::d32_snan_mask;
+    #else
+    static_cast<void>(rhs);
+    return false;
+    #endif
 }
 
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return ((rhs.bits_ & detail::d32_nan_mask) == detail::d32_inf_mask);
+    #else
+    static_cast<void>(rhs);
+    return false;
+    #endif
 }
 
 constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return ((rhs.bits_ & detail::d32_inf_mask) != detail::d32_inf_mask);
+    #else
+    static_cast<void>(rhs);
+    return false;
+    #endif
 }
 
 constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     // Check for de-normals
     const auto sig {rhs.full_significand()};
     const auto exp {rhs.unbiased_exponent()};
@@ -835,6 +847,9 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32 rhs)
     }
 
     return (sig != 0) && isfinite(rhs);
+    #else
+    return rhs.full_significand() != 0;
+    #endif
 }
 
 constexpr auto operator+(decimal32 rhs) noexcept -> decimal32

@@ -14,8 +14,13 @@
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+
 #include <limits>
 #include <cstdint>
+
+#endif
 
 #ifndef BOOST_DECIMAL_DECIMAL128_FAST_HPP
 #define BOOST_DECIMAL_DECIMAL128_FAST_HPP
@@ -45,7 +50,7 @@ struct decimal128_fast_components
 
 } // namespace detail
 
-class decimal128_fast final
+BOOST_DECIMAL_EXPORT class decimal128_fast final
 {
 public:
     using significand_type = detail::uint128;
@@ -468,37 +473,66 @@ constexpr auto signbit(decimal128_fast val) noexcept -> bool
 
 constexpr auto isinf(decimal128_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high == detail::d128_fast_inf_high_bits;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto isnan(decimal128_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high >= detail::d128_fast_qnan_high_bits;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto issignaling(decimal128_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high == detail::d128_fast_snan_high_bits;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto isnormal(decimal128_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     if (val.exponent_ <= static_cast<decimal128_fast::exponent_type>(detail::precision_v<decimal128> - 1))
     {
         return false;
     }
 
     return (val.significand_ != 0) && isfinite(val);
+    #else
+    return val.significand_ != 0;
+    #endif
 }
 
 constexpr auto isfinite(decimal128_fast val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high < detail::d128_fast_inf_high_bits;
+    #else
+    static_cast<void>(val);
+    return true;
+    #endif
 }
 
 constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high >= detail::d128_fast_inf_high_bits;
+    #else
+    static_cast<void>(val);
+    return false;
+    #endif
 }
 
 constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
