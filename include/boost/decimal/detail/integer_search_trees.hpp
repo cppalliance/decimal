@@ -1,4 +1,5 @@
 // Copyright 2023 Matt Borland
+// Copyright 2021 Daniel Lemire
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -7,10 +8,12 @@
 
 // https://stackoverflow.com/questions/1489830/efficient-way-to-determine-number-of-digits-in-an-integer?page=1&tab=scoredesc#tab-top
 // https://graphics.stanford.edu/~seander/bithacks.html
+// https://lemire.me/blog/2021/06/03/computing-the-number-of-digits-of-an-integer-even-faster/
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/emulated256.hpp>
+#include <boost/decimal/detail/countl.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <array>
@@ -21,6 +24,16 @@
 namespace boost {
 namespace decimal {
 namespace detail {
+
+constexpr auto int_log2(std::uint32_t x) noexcept -> int
+{
+    return 31 - unchecked_countl_zero(x | 1);
+}
+
+constexpr auto int_log2(std::uint64_t x) noexcept -> int
+{
+    return 63 - unchecked_countl_zero(x | 1);
+}
 
 // Generic solution
 template <typename T>
@@ -37,130 +50,35 @@ constexpr auto num_digits(T x) noexcept -> int
     return digits;
 }
 
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t uint32_t_zeros_table[] = {
+        4294967296,  8589934582,  8589934582,  8589934582,  12884901788,
+        12884901788, 12884901788, 17179868184, 17179868184, 17179868184,
+        21474826480, 21474826480, 21474826480, 21474826480, 25769703776,
+        25769703776, 25769703776, 30063771072, 30063771072, 30063771072,
+        34349738368, 34349738368, 34349738368, 34349738368, 38554705664,
+        38554705664, 38554705664, 41949672960, 41949672960, 41949672960,
+        42949672960, 42949672960
+};
+
 template <>
 constexpr auto num_digits(std::uint32_t x) noexcept -> int
 {
-    if (x >= UINT32_C(10000))
-    {
-        if (x >= UINT32_C(10000000))
-        {
-            if (x >= UINT32_C(100000000))
-            {
-                if (x >= UINT32_C(1000000000))
-                {
-                    return 10;
-                }
-                return 9;
-            }
-            return 8;
-        }
-
-        else if (x >= UINT32_C(100000))
-        {
-            if (x >= UINT32_C(1000000))
-            {
-                return 7;
-            }
-            return 6;
-        }
-        return 5;
-    }
-    else if (x >= UINT32_C(100))
-    {
-        if (x >= UINT32_C(1000))
-        {
-            return 4;
-        }
-        return 3;
-    }
-    else if (x >= UINT32_C(10))
-    {
-        return 2;
-    }
-
-    return 1;
+    return static_cast<int>((x + uint32_t_zeros_table[int_log2(x)]) >> 32U);
 }
+
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t uint64_t_zeros_table[] = {
+            9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999,
+            9999999999, 99999999999, 999999999999, 9999999999999, 99999999999999,
+            999999999999999ULL, 9999999999999999ULL, 99999999999999999ULL,
+            999999999999999999ULL, 9999999999999999999ULL
+};
 
 template <>
 constexpr auto num_digits(std::uint64_t x) noexcept -> int
 {
-    if (x >= UINT64_C(10000000000))
-    {
-        if (x >= UINT64_C(100000000000000))
-        {
-            if (x >= UINT64_C(10000000000000000))
-            {
-                if (x >= UINT64_C(100000000000000000)) 
-                {
-                    if (x >= UINT64_C(1000000000000000000))
-                    {
-                        if (x >= UINT64_C(10000000000000000000))
-                        {
-                            return 20;
-                        }
-                        return 19;
-                    }
-                    return 18;
-                }
-                return 17;
-            }
-            else if (x >= UINT64_C(1000000000000000))
-            {
-                return 16;
-            }
-            return 15;
-        } 
-        if (x >= UINT64_C(1000000000000))
-        {
-            if (x >= UINT64_C(10000000000000))
-            {
-                return 14;
-            }
-            return 13;
-        }
-        if (x >= UINT64_C(100000000000))
-        {
-            return 12;
-        }
-        return 11;
-    }
-    else if (x >= UINT64_C(100000))
-    {
-        if (x >= UINT64_C(10000000))
-        {
-            if (x >= UINT64_C(100000000))
-            {
-                if (x >= UINT64_C(1000000000))
-                {
-                    return 10;
-                }
-                return 9;
-            }
-            return 8;
-        }
-        if (x >= UINT64_C(1000000))
-        {
-            return 7;
-        }
-        return 6;
-    }
-    if (x >= UINT64_C(100))
-    {
-        if (x >= UINT64_C(1000))
-        {
-            if (x >= UINT64_C(10000))
-            {
-                return 5;
-            }
-            return 4;
-        }
-        return 3;
-    }
-    if (x >= UINT64_C(10))
-    {
-        return 2;
-    }
-    return 1;
+    auto y = static_cast<int>(19 * int_log2(x) >> 6);
+    y += static_cast<int>(x > uint64_t_zeros_table[y]);
+    return y + 1;
 }
 
 #ifdef _MSC_VER
