@@ -1,0 +1,85 @@
+////
+Copyright 2025 Matt Borland
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+////
+
+[#basics]
+= Basic Usage
+:idprefix: basics_
+
+== Construction of Decimal Types
+
+Every decimal type can be constructed in a few ways:
+
+1) The parameters to the constructor are like so:
+
+[source, c++]
+----
+template <typename T, typename T2>
+constexpr decimal32(T coeff, T2 exp, bool sign = false) noexcept;
+----
+
+Where types `T` and `T2` are integral types (signed and unsigned are both allowed).
+Lastly the sign follows the convention of `signbit` where `false` is positive and `true` is negative.
+If both a negative coefficient and a sign are passed then the resulting decimal number will be negative.
+The final number constructed is in the form coeff x 10^exp.
+
+[souce, c++]
+----
+boost::decimal::decimal32 a {1, 0};         // constructs 1
+boost::decimal::decimal32 b {-2, 0};        // constructs -2
+boost::decimal::decimal32 c {2, 0, true};   // Also constructs -2
+boost::decimal::decimal32 d {-2, 0, true};  // Also constructs -2
+boost::decimal::decimal32 e {5, 5};         // constructs 5x10^5
+boost::decimal::decimal32 f {1234, -3}      // constructs 1.234 or 1234x10^-3
+----
+
+2) A decimal number can be explicitly or implicitly constructed from an integer.
+For example:
+
+[source, c++]
+----
+boost::decimal::decimal64 g = 1;
+boost::decimal::decimal32 h {-4};
+----
+
+3) A decimal number can only be explicitly constructed from a floating point type.
+For example:
+
+[source, c++]
+----
+boost::decimal::decimal128 pi {3.14};
+----
+
+NOTE: Due to the differences in decimal and binary floating point numbers there may be a difference in the resulting representation in decimal format, and thus it is not recommended to construct from binary floating point numbers
+
+== Using the Library
+
+The entire library should be accessed using the convince header `<boost/decimal.hpp>`.
+A short example of the basic usage:
+
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <iostream>
+#include <iomanip>
+
+int main()
+{
+    using namespace boost::decimal;
+
+    // Outputs 0.30000000000000004
+    std::cout << std::setprecision(17) << 0.1 + 0.2;
+
+    // Construct the two decimal values
+    constexpr decimal64 a {1, -1}; // 1e-1 or 0.1
+    constexpr decimal64 b {2, -1}; // 2e-1 or 0.2
+
+    // Outputs 0.30000000000000000
+    std::cout << a + b << std::endl;
+
+    return 0;
+}
+
+----

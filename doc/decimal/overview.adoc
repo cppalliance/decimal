@@ -40,34 +40,3 @@ as well as emulated PPC64LE and STM32 using QEMU with the following compilers:
 
 Tested on https://github.com/cppalliance/decimal/actions[Github Actions] and https://drone.cpp.al/cppalliance/decimal[Drone].
 Coverage can be found on https://app.codecov.io/gh/cppalliance/decimal[Codecov].
-
-== Basic Usage
-
-The entire library should be accessed using the convince header `<boost/decimal.hpp>`.
-A short example of the basic usage:
-
-[source, c++]
-----
-#include <boost/decimal.hpp>
-#include <iostream>
-#include <iomanip>
-
-int main()
-{
-    using namespace boost::decimal;
-
-    // Outputs 0.30000000000000004
-    std::cout << std::setprecision(17) << 0.1 + 0.2;
-
-    // Construct the two decimal values
-    constexpr decimal64 a {1, -1}; // 1e-1 or 0.1
-    constexpr decimal64 b {2, -1}; // 2e-1 or 0.2
-
-    // Outputs 0.30000000000000000
-    std::cout << a + b << std::endl;
-
-    return 0;
-}
-
-----
-
