@@ -23,7 +23,7 @@ constexpr decimal32(T coeff, T2 exp, bool sign = false) noexcept;
 Where types `T` and `T2` are integral types (signed and unsigned are both allowed).
 Lastly the sign follows the convention of `signbit` where `false` is positive and `true` is negative.
 If both a negative coefficient and a sign are passed then the resulting decimal number will be negative.
-The final number constructed is in the form coeff x 10^exp.
+The final number constructed is in the form (sign ? -1 : 1) x coeff x 10^exp.
 
 [souce, c++]
 ----
@@ -70,7 +70,7 @@ int main()
     using namespace boost::decimal;
 
     // Outputs 0.30000000000000004
-    std::cout << std::setprecision(17) << 0.1 + 0.2;
+    std::cout << std::setprecision(17) << 0.1 + 0.2 << std::endl;
 
     // Construct the two decimal values
     constexpr decimal64 a {1, -1}; // 1e-1 or 0.1
