@@ -8,138 +8,184 @@
 <title>Decimal: IEEE 754 Decimal Floating Point Numbers</title>
 <style>
 /**
- * README:
- * This stylesheet provides styles for both AsciiDoctor and Antora templates, using the
- * `boostlook` class for a consistent appearance across both templates.
+ * Boost Look CSS Framework
+ * Version: 1.0.0
+ * Description: A comprehensive CSS framework for styling Boost C++ Library documentation
+ * Author: Boost C++ Libraries
+ * License: BSL-1.0
+ */
+
+/**
+ * File Structure Overview:
+ * 1. Root Variables (Light/Dark themes)
+ * 2. HTML Variables
+ * 3. Font-Face Declarations
+ * 4. CSS Reset
+ * 5. Global Styles for .boostlook
+ * 6. AsciiDoctor-specific Styles
+ * 7. Antora Templates Styles
+ * 8. Website-v2 Styles
+ * 9. Quickbook Documentation Styles
+ */
+
+/**
+ * Template Structure:
+ * The framework supports two main documentation templates:
  *
- * Note: This is a work-in-progress and may continue to evolve as templates and requirements
- * change.
- *
- * High-Level HTML Structure:
- *
- * - Common Structure:
- *   <div class="boostlook">
- *     <div class="header">...</div>
- *     <div class="content">...</div>
- *     <div class="footer">...</div>
+ * 1. AsciiDoctor Template:
+ * <div class="boostlook">
+ *   <div class="header">
+ *     <h1>Title</h1>
+ *     <button id="toggle-toc">Show Table of Contents</button>
+ *     <div id="toc" class="toc2"></div>
  *   </div>
- *
- * - AsciiDoctor Example:
- *   <div class="boostlook">
- *     <div class="header">
- *       <h1>...</h1>
- *       <button id="toggle-toc">Show Table of Contents</button>
- *       <div id="toc" class="toc2"></div>
- *     </div>
- *     <div id="content">
- *       <div class="sect1">...</div>
- *     </div>
- *     <div id="footer">...</div>
+ *   <div id="content">
+ *     <div class="sect1">Content Sections</div>
  *   </div>
+ *   <div id="footer">Footer Content</div>
+ * </div>
  *
- * - Antora Example:
- *   <div class="boostlook">
- *     <div class="header">
- *       <div class="nav-container toc2">...</div>
- *     </div>
- *     <div id="content">
- *       <article class="doc max-width-reset">
- *         <h1>Getting Started</h1>
- *         <div class="sect1">...</div>
- *       </article>
- *     </div>
- *     <div id="footer">...</div>
+ * 2. Antora Template:
+ * <div class="boostlook">
+ *   <div class="header">
+ *     <div class="nav-container toc2">Navigation</div>
  *   </div>
- *
- * - Shared Styles:
- *   Selectors like `.boostlook .header`, `.boostlook .content`, and `.boostlook .footer`
- *   apply common styles across both templates.
- *
- * - Specific Styles:
- *   Use `.boostlook:not(:has(.doc))` for AsciiDoctor-specific styles and
- *   `.boostlook .doc` for Antora-specific styles to target unique elements accordingly.
- *
- * This CSS file aims to simplify maintenance by aligning the HTML structure and
- * reducing the need for complex selectors.
+ *   <div id="content">
+ *     <article class="doc max-width-reset">
+ *       <h1>Title</h1>
+ *       <div class="sect1">Content Sections</div>
+ *     </article>
+ *   </div>
+ *   <div id="footer">Footer Content</div>
+ * </div>
+ */
+
+/**
+ * Design Philosophy:
+ * - Consistent styling across different documentation templates
+ * - Responsive design with mobile-first approach
+ * - Dark/Light theme support
+ * - Accessible typography and color schemes
+ * - Modern scrolling and navigation experience
  */
 
 /*----------------- Root Variables - Start -----------------*/
 
-:root {
-  /* General Variables */
-  --bl-primary-color: rgb(255, 159, 0);
-  --bl-header-height: 2.5rem;
+/* Root CSS Variables
+ * Defines core design tokens used throughout the framework.
+ * Organized into:
+ * 1. General Variables (cross-theme)
+ * 2. Light Theme Variables
+ * 3. Dark Theme Variables
+ */
 
-  /* Light Theme Variables */
+:root {
+  /* General Variables - Core design tokens for all themes */
+  --bl-primary-color: rgb(255, 159, 0);  /* Boost's signature orange color */
+  --bl-header-height: 2.5rem;            /* Standard header height */
+
+  /* Light Theme Variables - Color scheme for light mode */
+  /* Background and Border Colors */
   --light-bl-background: rgb(255, 255, 255);
   --light-bl-border-color: rgb(209, 209, 209);
-  --light-bl-breadcrumbs-svg-color: rgb(0, 0, 0);
-  --light-bl-caret-svg: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24px'%20viewBox='0%20-960%20960%20960'%20width='24px'%20fill='%23000000'%3E%3Cpath%20d='M320-200v-560l440%20280-440%20280Z'/%3E%3C/svg%3E");
   --light-bl-card-background-color: rgb(255, 255, 255);
   --light-bl-code-background: rgb(248, 248, 248);
   --light-bl-code-border-color: rgb(220, 220, 220);
+  --light-bl-pre-background: rgb(248, 248, 248);
+  --light-bl-quote-background: rgb(255, 255, 255);
+  --light-bl-table-head-background: rgb(248, 248, 248);
+  --light-bl-table-stripe-color: rgb(248, 248, 248);
+  --light-bl-tabpanel-background: rgb(255, 255, 255);
+
+  /* Text Colors */
   --light-bl-code-text-color: rgb(0, 0, 0);
+  --light-bl-header-color: rgb(49, 74, 87);
+  --light-bl-nav-link-color: rgb(0, 0, 0);
+  --light-bl-paragraph-color: rgb(0, 0, 0);
+  --light-bl-text-color: rgb(51, 65, 85);
+
+  /* Interactive Elements */
   --light-bl-link-color: rgb(2, 132, 199);
   --light-bl-link-hover-color: rgba(255, 159, 0);
-  --light-bl-header-color: rgb(49, 74, 87);
+  --light-bl-nav-link-hover-color: rgba(0, 0, 0, 0.6);
+
+  /* Syntax Highlighting */
   --light-bl-hljs-attribute-color: rgb(70, 130, 180);
   --light-bl-hljs-doctag-color: rgb(221, 17, 68);
   --light-bl-hljs-keyword-color: rgb(51, 51, 51);
   --light-bl-hljs-number-color: rgb(0, 128, 128);
   --light-bl-hljs-section-color: rgb(153, 0, 0);
-  --light-bl-nav-link-color: rgb(0, 0, 0);
-  --light-bl-nav-link-hover-color: rgba(0, 0, 0, 0.6);
+
+  /* UI Elements */
+  --light-bl-breadcrumbs-svg-color: rgb(0, 0, 0);
+  --light-bl-caret-svg: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24px'%20viewBox='0%20-960%20960%20960'%20width='24px'%20fill='%23000000'%3E%3Cpath%20d='M320-200v-560l440%20280-440%20280Z'/%3E%3C/svg%3E");
   --light-bl-nav-fade-color: rgb(255, 255, 255, 1);
-  --light-bl-paragraph-color: rgb(0, 0, 0);
   --light-bl-pasteboard-color: rgb(229, 231, 235);
-  --light-bl-pre-background: rgb(248, 248, 248);
-  --light-bl-primary-color: rgb(255, 159, 0);
-  --light-bl-quote-background: rgb(255, 255, 255);
-  --light-bl-table-border-color: rgb(232, 232, 232);
-  --light-bl-table-head-background: rgb(248, 248, 248);
-  --light-bl-table-stripe-color: rgb(248, 248, 248);
-  --light-bl-tabpanel-background: rgb(255, 255, 255);
-  --light-bl-text-color: rgb(51, 65, 85);
+
+  /* Scrollbar Colors */
   --light-bl-scrollbar-track-color: rgb(234, 240, 243);
   --light-bl-scrollbar-thumb-color: rgb(193, 193, 193);
   --light-bl-scrollbar_hover-thumb-color: rgb(193, 193, 193);
 
-  /* Dark Theme Variables */
+  /* Additional Theme Variables */
+  --light-bl-table-border-color: rgb(209, 209, 209);
+  --light-bl-tab-background: rgb(240, 240, 240);
+
+  /**
+   * Dark Theme Variables
+   * Color palette and design tokens for dark mode
+   */
+  /* Background and Border Colors */
   --dark-bl-background: rgb(5, 26, 38);
   --dark-bl-border-color: rgb(3, 25, 37);
-  --dark-bl-breadcrumbs-svg-color: rgb(255, 255, 255);
-  --dark-bl-caret-svg: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24px'%20viewBox='0%20-960%20960%20960'%20width='24px'%20fill='%23ccc'%3E%3Cpath%20d='M320-200v-560l440%20280-440%20280Z'/%3E%3C/svg%3E");
   --dark-bl-card-background-color: rgb(23, 42, 52);
   --dark-bl-code-background: rgb(5, 26, 38);
   --dark-bl-code-border-color: transparent;
+  --dark-bl-pre-background: rgb(5, 26, 38);
+  --dark-bl-quote-background: rgb(11, 59, 82);
+  --dark-bl-table-head-background: rgb(5, 26, 38);
+  --dark-bl-table-stripe-color: rgb(49,74,87);
+  --dark-bl-table-border-color: rgb(49, 74, 87);
+  --dark-bl-tabpanel-background: rgb(49, 74, 87);
+  --dark-bl-tab-background: rgb(30, 50, 65);
+
+  /* Text Colors */
   --dark-bl-code-text-color: rgb(255, 255, 255);
+  --dark-bl-header-color: rgb(255, 255, 255);
+  --dark-bl-nav-link-color: rgb(255, 255, 255);
+  --dark-bl-paragraph-color: rgb(255, 255, 255);
+  --dark-bl-text-color: rgb(255, 255, 255);
+
+  /* Interactive Elements */
   --dark-bl-link-color: rgb(125 211 252);
   --dark-bl-link-hover-color: rgb(255, 159, 0);
-  --dark-bl-header-color: rgb(255, 255, 255);
+  --dark-bl-nav-link-hover-color: rgba(255, 255, 255, 0.6);
+
+  /* Syntax Highlighting */
   --dark-bl-hljs-attribute-color: rgb(70, 130, 180);
   --dark-bl-hljs-doctag-color: rgb(255, 99, 132);
   --dark-bl-hljs-keyword-color: rgb(173, 216, 230);
   --dark-bl-hljs-number-color: rgb(72, 209, 204);
   --dark-bl-hljs-section-color: rgb(255, 69, 58);
-  --dark-bl-nav-link-color: rgb(255, 255, 255);
-  --dark-bl-nav-link-hover-color: rgba(255, 255, 255, 0.6);
+
+  /* UI Elements */
+  --dark-bl-breadcrumbs-svg-color: rgb(255, 255, 255);
+  --dark-bl-caret-svg: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24px'%20viewBox='0%20-960%20960%20960'%20width='24px'%20fill='%23ccc'%3E%3Cpath%20d='M320-200v-560l440%20280-440%20280Z'/%3E%3C/svg%3E");
   --dark-bl-nav-fade-color: rgb(23, 42, 52);
-  --dark-bl-paragraph-color: rgb(255, 255, 255);
   --dark-bl-pasteboard-color: rgb(05, 26, 38);
   --dark-bl-pagination-color: rgb(200, 200, 200);
-  --dark-bl-quote-background: rgb(11, 59, 82);
   --dark-bl-quote-word-color: rgb(209, 228, 242);
-  --dark-bl-table-border-color: rgb(3, 25, 37);
-  --dark-bl-table-head-background: rgb(5, 26, 38);
-  --dark-bl-tab-background: rgb(23, 42, 52);
-  --dark-bl-table-stripe-color: rgb(49,74,87);
-  --dark-bl-tabpanel-background: rgb(49 74 87);
-  --dark-bl-text-color: rgb(255, 255, 255);
+
+  /* Scrollbar Colors */
   --dark-bl-scrollbar-track-color: rgb(46, 58, 66);
   --dark-bl-scrollbar-thumb-color: rgb(109, 124, 133);
   --dark-bl-scrollbar_hover-thumb-color: rgb(147, 161, 170);
 
-  /* specific use colors */
+  /**
+   * Specific Use Colors
+   * Special purpose colors for both light and dark themes
+   */
+  /* Light Theme Special Colors */
   --site-light-red: red;
   --site-light-green: green;
   --site-light-lime: #00FF00;
@@ -151,8 +197,10 @@
   --site-light-cyan: cyan;
   --site-light-purple: purple;
   --site-light-gold: #987301;
-  --site-light-silver: silver; /* lighter gray */
-  --site-light-gray: #808080; /* light gray */
+  --site-light-silver: silver;
+  --site-light-gray: #808080;
+
+  /* Dark Theme Special Colors */
   --site-dark-red: #fa6f6f;
   --site-dark-green: #45b945;
   --site-dark-lime: #00FF00;
@@ -164,49 +212,66 @@
   --site-dark-cyan: cyan;
   --site-dark-purple: #ac43ac;
   --site-dark-gold: gold;
-  --site-dark-silver: silver; /* lighter gray */
-  --site-dark-gray: #808080; /* light gray */
+  --site-dark-silver: silver;
+  --site-dark-gray: #808080;
 }
 
 /*----------------- Root Variables - End -----------------*/
 
 /*----------------- HTML Variables - Start -----------------*/
 
+/**
+ * HTML Theme Variables
+ * These variables are applied to the HTML element and control the active theme.
+ * The framework supports two themes:
+ * 1. Light Theme (default)
+ * 2. Dark Theme (activated by html.dark class)
+ */
+
+/* Light Theme (Default) Configuration */
 html {
+  /* Background and Borders */
   --bl-background: var(--light-bl-background);
   --bl-border-color: var(--light-bl-border-color);
-  --bl-breadcrumbs-svg-color: var(--light-bl-breadcrumbs-svg-color);
-  --bl-caret-svg: var(--light-bl-caret-svg);
   --bl-card-background-color: var(--light-bl-card-background-color);
   --bl-code-background: var(--light-bl-code-background);
   --bl-code-border-color: var(--light-bl-code-border-color);
+  --bl-pre-background: var(--light-bl-pre-background);
+  --bl-quote-background: var(--light-bl-quote-background);
+  --bl-table-border-color: var(--light-bl-table-border-color);
+  --bl-table-head-background: var(--light-bl-table-head-background);
+  --bl-table-stripe-color: var(--light-bl-table-stripe-color);
+  --bl-tabpanel-background: var(--light-bl-tabpanel-background);
+
+  /* Typography and Colors */
   --bl-code-text-color: var(--light-bl-code-text-color);
   --bl-header-color: var(--light-bl-header-color);
-  --bl-hljs-doctag-color: var(--light-bl-hljs-doctag-color);
-  --bl-hljs-attribute-color: var(--light-bl-hljs-attribute-color);
-  --bl-hljs-keyword-color: var(--light-bl-hljs-keyword-color);
-  --bl-hljs-number-color: var(--light-bl-hljs-number-color);
-  --bl-hljs-section-color: var(--light-bl-hljs-section-color);
   --bl-link-color: var(--light-bl-link-color);
   --bl-link-hover-color: var(--light-bl-link-hover-color);
   --bl-nav-link-color: var(--light-bl-nav-link-color);
   --bl-nav-link-hover-color: var(--light-bl-nav-link-hover-color);
   --bl-nav-fade-color: var(--light-bl-nav-fade-color);
   --bl-paragraph-color: var(--light-bl-paragraph-color);
-  --bl-pasteboard-color: var(--light-bl-pasteboard-color);
-  --bl-pre-background: var(--light-bl-pre-background);
-  --bl-quote-background: var(--light-bl-quote-background);
-  --bl-tab-background: var(--light-bl-tab-background);
-  --bl-table-border-color: var(--light-bl-table-border-color);
-  --bl-table-head-background: var(--light-bl-table-head-background);
-  --bl-table-stripe-color: var(--light-bl-table-stripe-color);
-  --bl-tabpanel-background: var(--light-bl-tabpanel-background);
   --bl-text-color: var(--light-bl-text-color);
+
+  /* UI Components */
+  --bl-breadcrumbs-svg-color: var(--light-bl-breadcrumbs-svg-color);
+  --bl-caret-svg: var(--light-bl-caret-svg);
+  --bl-pasteboard-color: var(--light-bl-pasteboard-color);
+
+  /* Syntax Highlighting */
+  --bl-hljs-doctag-color: var(--light-bl-hljs-doctag-color);
+  --bl-hljs-attribute-color: var(--light-bl-hljs-attribute-color);
+  --bl-hljs-keyword-color: var(--light-bl-hljs-keyword-color);
+  --bl-hljs-number-color: var(--light-bl-hljs-number-color);
+  --bl-hljs-section-color: var(--light-bl-hljs-section-color);
+
+  /* Scrollbar Styling */
   --bl-scrollbar-track-color: var(--light-bl-scrollbar-track-color);
   --bl-scrollbar-thumb-color: var(--light-bl-scrollbar-thumb-color);
   --bl-scrollbar_hover-thumb-color: var(--light-bl-scrollbar_hover-thumb-color);
 
-  /* specific use colors */
+  /* Special Purpose Colors */
   --color-red: var(--site-light-red);
   --color-green: var(--site-light-green);
   --color-lime: var(--site-light-lime);
@@ -218,47 +283,56 @@ html {
   --color-cyan: var(--site-light-cyan);
   --color-purple: var(--site-light-purple);
   --color-gold: var(--site-light-gold);
-  --color-silver: var(--site-light-silver);/* lighter gray */
-  --color-gray: var(--site-light-gray); /* light gray */
+  --color-silver: var(--site-light-silver);
+  --color-gray: var(--site-light-gray);
 }
 
+/* Dark Theme Configuration */
 html.dark {
+  /* Background and Borders */
   --bl-background: var(--dark-bl-background);
   --bl-border-color: var(--dark-bl-border-color);
-  --bl-breadcrumbs-svg-color: var(--dark-bl-breadcrumbs-svg-color);
-  --bl-caret-svg: var(--dark-bl-caret-svg);
   --bl-card-background-color: var(--dark-bl-card-background-color);
   --bl-code-background: var(--dark-bl-code-background);
   --bl-code-border-color: var(--dark-bl-code-border-color);
+  --bl-pre-background: var(--dark-bl-code-background);
+  --bl-quote-background: var(--dark-bl-quote-background);
+  --bl-quote-word-color: var(--dark-bl-quote-word-color);
+  --bl-table-border-color: var(--dark-bl-table-border-color);
+  --bl-table-head-background: var(--dark-bl-table-head-background);
+  --bl-table-stripe-color: var(--dark-bl-table-stripe-color);
+  --bl-tabpanel-background: var(--dark-bl-tabpanel-background);
+
+  /* Typography and Colors */
   --bl-code-text-color: var(--dark-bl-code-text-color);
   --bl-header-color: var(--dark-bl-header-color);
-  --bl-hljs-attribute-color: var(--dark-bl-hljs-attribute-color);
-  --bl-hljs-doctag-color: var(--dark-bl-hljs-doctag-color);
-  --bl-hljs-keyword-color: var(--dark-bl-hljs-keyword-color);
-  --bl-hljs-number-color: var(--dark-bl-hljs-number-color);
-  --bl-hljs-section-color: var(--dark-bl-hljs-section-color);
   --bl-link-color: var(--dark-bl-link-color);
   --bl-link-hover-color: var(--dark-bl-link-hover-color);
   --bl-nav-link-color: var(--dark-bl-nav-link-color);
   --bl-nav-link-hover-color: var(--dark-bl-nav-link-hover-color);
   --bl-nav-fade-color: var(--dark-bl-nav-fade-color);
   --bl-paragraph-color: var(--dark-bl-paragraph-color);
-  --bl-pasteboard-color: var(--dark-bl-pasteboard-color);
-  --bl-pre-background: var(--dark-bl-code-background);
-  --bl-pagination-color: var(--dark-bl-pagination-color);
-  --bl-quote-background: var(--dark-bl-quote-background);
-  --bl-quote-word-color: var(--dark-bl-quote-word-color);
-  --bl-tab-background: var(--dark-bl-tab-background);
-  --bl-table-border-color: var(--dark-bl-table-border-color);
-  --bl-table-head-background: var(--dark-bl-table-head-background);
-  --bl-table-stripe-color: var(--dark-bl-table-stripe-color);
-  --bl-tabpanel-background: var(--dark-bl-tabpanel-background);
   --bl-text-color: var(--dark-bl-text-color);
+
+  /* UI Components */
+  --bl-breadcrumbs-svg-color: var(--dark-bl-breadcrumbs-svg-color);
+  --bl-caret-svg: var(--dark-bl-caret-svg);
+  --bl-pasteboard-color: var(--dark-bl-pasteboard-color);
+  --bl-pagination-color: var(--dark-bl-pagination-color);
+
+  /* Syntax Highlighting */
+  --bl-hljs-attribute-color: var(--dark-bl-hljs-attribute-color);
+  --bl-hljs-doctag-color: var(--dark-bl-hljs-doctag-color);
+  --bl-hljs-keyword-color: var(--dark-bl-hljs-keyword-color);
+  --bl-hljs-number-color: var(--dark-bl-hljs-number-color);
+  --bl-hljs-section-color: var(--dark-bl-hljs-section-color);
+
+  /* Scrollbar Styling */
   --bl-scrollbar-track-color: var(--dark-bl-scrollbar-track-color);
   --bl-scrollbar-thumb-color: var(--dark-bl-scrollbar-thumb-color);
   --bl-scrollbar_hover-thumb-color: var(--dark-bl-scrollbar_hover-thumb-color);
 
-  /* specific use colors */
+  /* Special Purpose Colors */
   --color-red: var(--site-dark-red);
   --color-green: var(--site-dark-green);
   --color-lime: var(--site-dark-lime);
@@ -270,67 +344,72 @@ html.dark {
   --color-cyan: var(--site-dark-cyan);
   --color-purple: var(--site-dark-purple);
   --color-gold: var(--site-dark-gold);
-  --color-silver: var(--site-dark-silver);/* lighter gray */
-  --color-gray: var(--site-dark-gray); /* light gray */
+  --color-silver: var(--site-dark-silver);
+  --color-gray: var(--site-dark-gray);
 }
 
 /*----------------- HTML Variables - End -----------------*/
 
 /*----------------- Font-Face Declarations start -----------------*/
 
+/**
+ * Typography Configuration
+ * The framework uses Noto Sans family as its primary font system:
+ * 1. Noto Sans Display: Main text font with variable weight support
+ * 2. Noto Sans Mono: Monospace font for code blocks
+ *
+ * Font Loading Strategy:
+ * - Multiple source paths for resilient loading
+ * - Variable fonts for optimal performance
+ * - Font-display: block to prevent FOIT (Flash of Invisible Text)
+ */
+
+/* Noto Sans Display - Regular */
 @font-face {
   font-family: "Noto Sans Display";
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 100 900;            /* Variable font weight range */
   font-variation-settings: "wght" 400;
   font-stretch: semi-condensed;
-  font-display: block;
+  font-display: block;             /* Prevents FOIT */
   src: url('/_/fonts/NotoSansDisplay.ttf') format('truetype'),
        url('../../../../tools/boostlook/NotoSansDisplay.ttf') format('truetype'),
        url("https://cppalliance.org/fonts/NotoSansDisplay.ttf") format('truetype');
 }
 
-@font-face {
-  font-family: "Noto Sans Display";
-  font-style: normal;
-  font-weight: 100 900;
-  font-stretch: semi-condensed;
-  font-display: block;
-  src: url('/_/fonts/NotoSansDisplay.ttf') format('truetype'),
-       url('../../../../tools/boostlook/NotoSansDisplay.ttf') format('truetype'),
-       url("https://cppalliance.org/fonts/NotoSansDisplay.ttf") format('truetype');
-}
-
+/* Noto Sans Display - Italic */
 @font-face {
   font-family: "Noto Sans Display";
   font-style: italic;
-  font-weight: 100 900;
+  font-weight: 100 900;            /* Variable font weight range */
   font-variation-settings: "wght" 400;
   font-stretch: semi-condensed;
-  font-display: block;
+  font-display: block;             /* Prevents FOIT */
   src: url("/font/NotoSansDisplay-Italic.ttf") format("truetype"),
        url("../../../../tools/boostlook/NotoSansDisplay-Italic.ttf") format("truetype"),
        url("https://cppalliance.org/fonts/NotoSansDisplay-Italic.ttf") format('truetype');
 }
 
+/* Noto Sans Mono - Variable Weight */
 @font-face {
   font-family: "Noto Sans Mono";
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 100 900;            /* Variable font weight range */
   font-variation-settings: "wght" 400;
   font-stretch: semi-condensed;
-  font-display: block;
+  font-display: block;             /* Prevents FOIT */
   src: url("/_/boostlook/NotoSansMono.ttf") format("truetype"),
        url("../../../../tools/boostlook/NotoSansMono.ttf") format("truetype"),
        url("https://cppalliance.org/fonts/NotoSansMono.ttf") format('truetype');
 }
 
+/* Noto Sans Mono - Fixed Weight */
 @font-face {
   font-family: "Noto Sans Mono";
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400;                /* Fixed weight for specific use cases */
   font-stretch: ultra-condensed;
-  font-display: block;
+  font-display: block;             /* Prevents FOIT */
   src: url("/_/boostlook/NotoSansMono.ttf") format("truetype"),
        url("../../../../tools/boostlook/NotoSansMono.ttf") format("truetype"),
        url("https://cppalliance.org/fonts/NotoSansMono.ttf") format('truetype');
@@ -340,39 +419,80 @@ html.dark {
 
 /*----------------- CSS Reset start -----------------*/
 
+/**
+ * Modern CSS Reset
+ * A minimal CSS reset that:
+ * 1. Uses modern box-sizing model
+ * 2. Removes default margins
+ * 3. Improves text rendering
+ * 4. Handles media elements consistently
+ * 5. Normalizes form elements
+ * 6. Prevents text overflow issues
+ * 7. Provides proper stacking context
+ */
+
+/* Box sizing rules */
 *, *::before, *::after {
   box-sizing: border-box;
 }
+
+/* Remove default margin */
 * {
   margin: 0;
 }
+
+/* Body defaults */
 body {
   line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;  /* Improves text rendering on WebKit */
 }
+
+/* Media elements */
 img, picture, video, canvas, svg {
   display: block;
-  max-width: 100%;
+  max-width: 100%;                      /* Responsive media elements */
 }
+
+/* Form elements */
 input, button, textarea, select {
-  font: inherit;
+  font: inherit;                        /* Inherit typography */
 }
+
+/* Text elements */
 p, h1, h2, h3, h4, h5, h6 {
-  overflow-wrap: break-word;
+  overflow-wrap: break-word;            /* Prevent text overflow */
 }
+
+/* Stacking context */
 #root, #__next {
-  isolation: isolate;
+  isolation: isolate;                   /* Create new stacking context */
 }
 
 /*----------------- CSS Reset end -----------------*/
 
 /*----------------- Global Styles for .boostlook start -----------------*/
 
+/**
+ * Global Styles for .boostlook
+ * Core styles that apply to all .boostlook containers regardless of template.
+ * These styles establish:
+ * 1. Typography hierarchy and spacing
+ * 2. Link appearances and interactions
+ * 3. Code block formatting
+ * 4. List and table styles
+ * 5. Layout structure and spacing
+ */
+
+/* Base Container */
 .boostlook {
   font-family: "Noto Sans Display" !important;
   font-stretch: 90%;
 }
 
+/* Typography Hierarchy
+ * Establishes consistent heading sizes and spacing
+ * while maintaining proper visual hierarchy
+ */
 .boostlook h1,
 .boostlook h2,
 .boostlook h3,
@@ -386,13 +506,15 @@ p, h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
 }
 
-.boostlook h1 { font-size: 1.8rem; }
-.boostlook h2 { font-size: 1,65rem; }
-.boostlook h3 { font-size: 1.5rem; }
-.boostlook h4 { font-size: 1.35rem; }
-.boostlook h5 { font-size: 1.25rem; }
-.boostlook h6 { font-size: 1rem; }
+/* Heading Sizes */
+.boostlook h1 { font-size: 1.8rem; }    /* Primary headings */
+.boostlook h2 { font-size: 1.65rem; }   /* Section headings */
+.boostlook h3 { font-size: 1.5rem; }    /* Subsection headings */
+.boostlook h4 { font-size: 1.35rem; }   /* Topic headings */
+.boostlook h5 { font-size: 1.25rem; }   /* Subtopic headings */
+.boostlook h6 { font-size: 1rem; }      /* Minor headings */
 
+/* Heading Spacing */
 .boostlook h1,
 .boostlook h2,
 .boostlook h3,
@@ -403,11 +525,13 @@ p, h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1rem;
 }
 
+/* Document-specific heading adjustments */
 .boostlook .doc h2:not(.discrete) {
   margin-left: 0;
   padding-left: 0;
 }
 
+/* Anchor positioning within headings */
 .boostlook .doc h1 .anchor {
   margin: 3px 0 0 -1.3ex;
 }
@@ -423,22 +547,26 @@ p, h1, h2, h3, h4, h5, h6 {
   margin: 1px 0 0 -1.3ex;
 }
 
+/* Paragraph Styling */
 .boostlook p {
   font-size: 1rem;
   margin-bottom: 1.5rem;
 }
 
+/* Special paragraph cases */
 .boostlook table p,
 .boostlook ul p {
   margin: 0;
 }
 
+/* Link Styling */
 .boostlook a,
 .boostlook .doc a {
   color: var(--bl-link-color);
   text-decoration: none;
 }
 
+/* Link Hover States */
 .boostlook a:hover,
 .boostlook .doc a:hover,
 #libraryReadMe a:hover,
@@ -448,6 +576,7 @@ p, h1, h2, h3, h4, h5, h6 {
   text-decoration: underline;
 }
 
+/* Code Block Styling */
 .boostlook code,
 .boostlook pre code,
 .boostlook .doc .content pre code {
@@ -457,6 +586,7 @@ p, h1, h2, h3, h4, h5, h6 {
   scrollbar-width: none !important;
 }
 
+/* Hide scrollbars but keep functionality */
 .boostlook code::-webkit-scrollbar,
 .boostlook pre code::-webkit-scrollbar,
 .boostlook .doc .content pre code::-webkit-scrollbar {
@@ -464,22 +594,26 @@ p, h1, h2, h3, h4, h5, h6 {
   height: 0;
 }
 
+/* Emphasis within code */
 .boostlook em,
 .boostlook code em {
   font-family: "Noto Sans Display";
   font-size: inherit;
 }
 
+/* Table Headings */
 .boostlook h6:has(+table) {
   margin-left: 1em;
 }
 
+/* List Styling */
 .boostlook ul.itemizedlist,
 #boost-legacy-docs-wrapper .ulist ul {
   padding: 0 0 0 15px;
   margin: 0;
 }
 
+/* Inline Code Elements */
 .boostlook p code,
 .boostlook table code,
 .boostlook p tt,
@@ -489,10 +623,12 @@ p, h1, h2, h3, h4, h5, h6 {
   overflow-x: hidden;
 }
 
+/* Table Container */
 .boostlook .content div:has(> table) {
   overflow-x: auto;
 }
 
+/* Code Styling */
 .boostlook code,
 .boostlook p code,
 .boostlook li code,
@@ -506,6 +642,7 @@ p, h1, h2, h3, h4, h5, h6 {
   color: var(--bl-code-text-color) !important;
 }
 
+/* Code Links */
 .boostlook code a,
 .boostlook p code a,
 .boostlook li code a,
@@ -521,6 +658,7 @@ p, h1, h2, h3, h4, h5, h6 {
   color: var(--bl-link-color) !important;
 }
 
+/* Code Link Hover States */
 .boostlook code a:hover,
 .boostlook p code a:hover,
 .boostlook li code a:hover,
@@ -536,10 +674,12 @@ p, h1, h2, h3, h4, h5, h6 {
   color: var(--bl-link-hover-color) !important;
 }
 
+/* Table Cell Code */
 .boostlook td code {
   margin-bottom: 10px;
 }
 
+/* Quote Blocks */
 .boostlook .quoteblock,
 .boostlook .verseblock {
   background: var(--bl-quote-background);
@@ -552,10 +692,12 @@ p, h1, h2, h3, h4, h5, h6 {
   color: var(--bl-quote-word-color);
 }
 
+/* Tab Panels */
 .boostlook .tabpanel {
   background-color: var(--bl-tabpanel-background);
 }
 
+/* Syntax Highlighting */
 .boostlook .hljs-keyword,
 .boostlook .hljs-selector-tag,
 .boostlook .hljs-subst {
@@ -577,6 +719,7 @@ p, h1, h2, h3, h4, h5, h6 {
   color: var(--bl-hljs-section-color);
 }
 
+/* Link States */
 .boostlook p a:visited,
 .boostlook table a,
 .boostlook .pagination a {
@@ -589,10 +732,12 @@ p, h1, h2, h3, h4, h5, h6 {
   color: var(--bl-hljs-attribute-color);
 }
 
+/* Pagination */
 .boostlook nav.pagination span::before {
   color: var(--bl-pagination-color);
 }
 
+/* Table of Contents Links */
 .boostlook #toc a {
   color: var(--bl-nav-link-color);
 }
@@ -606,11 +751,13 @@ p, h1, h2, h3, h4, h5, h6 {
   padding-bottom: 1.5rem;
 }
 
+/* Text Emphasis */
 .boostlook b,
 .boostlook strong {
-  font-weight: bold;
+  font-variation-settings: "wght" 700;
 }
 
+/* Layout Structure */
 .boostlook #header,
 .boostlook #content,
 .boostlook #footer {
@@ -635,17 +782,29 @@ p, h1, h2, h3, h4, h5, h6 {
   border-bottom-right-radius: 0.5rem;
 }
 
+/* First Heading Adjustment */
 .boostlook h2:first-of-type {
   margin-top: 0;
 }
-/* Scrollbar styling */
-/* Antora template - Hide root scrollbars */
+
+/*----------------- Global Styles for .boostlook end -----------------*/
+
+/**
+ * Scrollbar Styling
+ * Comprehensive scrollbar customization for different contexts:
+ * 1. Root level scrollbars
+ * 2. Navigation/TOC scrollbars
+ * 3. Content area scrollbars
+ * 4. Template-specific adjustments
+ */
+
+/* Hide root scrollbars for Antora template */
 html:has(.article > .boostlook) {
   height: 100vh;
   overflow: hidden;
 }
 
-/* Hide scrollbars for iframe container but keep content scrollable */
+/* Iframe container scrollbar handling */
 html:has(#docsiframe) {
   overflow-y: hidden;
   scrollbar-width: thin;
@@ -682,7 +841,7 @@ html:has(#docsiframe) {
   background-color: var(--bl-scrollbar-track-color);
 }
 
-/* Antora template - Scrollable content area with styled scrollbar */
+/* Antora template - Scrollable content area */
 .boostlook #content:has(> .doc) {
   overflow-y: auto;
   height: 100vh;
@@ -704,17 +863,26 @@ html:has(#docsiframe) {
   background-color: var(--bl-scrollbar-track-color);
 }
 
-/* Asciidoc template - Content fits height and allows overflow */
+/* Asciidoc template - Content overflow handling */
 .boostlook:has(#content > .sect1) {
   scrollbar-width: thin;
   overflow-y: auto;
   height: 100vh;
 }
 
-/*----------------- Global Styles for .boostlook end -----------------*/
-
 /*----------------- Styles specific to AsciiDoctor content start -----------------*/
 
+/**
+ * AsciiDoctor-Specific Styles
+ * Styles that apply specifically to content generated by AsciiDoctor.
+ * These styles handle:
+ * 1. Article layout and structure
+ * 2. Table of contents (TOC) styling
+ * 3. Content formatting
+ * 4. Responsive design adjustments
+ */
+
+/* Article Layout */
 .article.toc2.toc-left {
   min-height: 100vh;
   max-width: 80rem;
@@ -724,6 +892,7 @@ html:has(#docsiframe) {
   position: relative;
 }
 
+/* Pre-formatted Text Blocks */
 .boostlook:not(:has(.doc)) pre {
   font-family: "Noto Sans Mono", monospace;
   background-color: var(--bl-pre-background);
@@ -734,6 +903,7 @@ html:has(#docsiframe) {
   border-color: var(--bl-code-border-color);
 }
 
+/* Table Styling */
 .boostlook:not(:has(.doc)) table {
   border-collapse: collapse;
   margin: 1em 0;
@@ -751,10 +921,12 @@ html:has(#docsiframe) {
   padding: 0.25em 0.55em;
 }
 
+/* Header Adjustments */
 .boostlook #header > h1 {
   margin-top: 0;
 }
 
+/* Table of Contents Styling */
 .boostlook #toc > ul.sectlevel1 {
   padding-left: 0;
 }
@@ -768,13 +940,14 @@ html:has(#docsiframe) {
 }
 
 .boostlook #toc .sectlevel1 > li > a {
-  font-weight: bolder;
+  font-variation-settings: "wght" 750;
 }
 
 .boostlook #toc #toctitle {
   font-size: 1.5rem;
 }
 
+/* Background Colors */
 .boostlook #toc.toc2,
 .boostlook #header:not(:has(.nav-container)),
 .boostlook #content,
@@ -782,19 +955,23 @@ html:has(#docsiframe) {
   background-color: var(--bl-card-background-color);
 }
 
+/* TOC Scrolling */
 .boostlook #toc.toc2,
 .boostlook #toc.toc2.nav-container {
   overflow-y: auto;
 }
 
+/* TOC Positioning */
 .boostlook #toc.toc2,
 #boost-legacy-docs-wrapper:not(:has(article.doc)) #toc.toc2.is-active {
   position: static;
 }
+
 #boost-legacy-docs-wrapper:not(:has(article.doc)) #toc.toc2 {
   position: fixed;
 }
 
+/* TOC List Padding */
 .boostlook #toc.toc2 > ul {
   padding-bottom: 2rem;
   box-sizing: border-box;
@@ -802,26 +979,31 @@ html:has(#docsiframe) {
   z-index: 0;
 }
 
+/* TOC Toggle Button */
 .boostlook #toggle-toc {
   visibility: hidden;
   height: 0;
   width: 0;
 }
 
+/* TOC Navigation Menu */
 .boostlook #toc .nav-menu > .nav-list,
 .boostlook #toc .nav-menu > .nav-list > .nav-list {
   padding-left: 0
 }
 
+/* Navigation Menu Title */
 .boostlook .nav-menu .title {
   border-bottom: 1px solid var(--bl-table-border-color);
   margin-bottom: 16px;
 }
 
+/* Table Container */
 .boostlook #content .sect3:has(.tableblock) {
   overflow-x: auto;
 }
 
+/* Legacy Documentation Titles */
 #boost-legacy-docs-wrapper h2.title {
   margin-top: 0;
   margin-bottom: 0.5rem;
@@ -836,17 +1018,19 @@ html:has(#docsiframe) {
   font-feature-settings: normal;
 }
 
+/* Code in Headings */
 .boostlook h2 a code {
-  color: var(---bl-nav-link-color);
+  color: var(--bl-nav-link-color);
   font-size: 1.65rem;
 }
 
 .boostlook h3 a code,
 .boostlook h3 a:hover code {
-  color: var(---bl-nav-link-color) !important;
+  color: var(--bl-nav-link-color) !important;
   font-size: 1.5rem;
 }
 
+/* Rouge Syntax Highlighting */
 .boostlook pre.rouge .o {
   font-weight: normal;
 }
@@ -855,6 +1039,7 @@ html:has(#docsiframe) {
   font-style: normal;
 }
 
+/* Responsive Design */
 @media screen and (min-width: 768px) {
   .boostlook #toggle-toc {
     visibility: visible;
@@ -887,6 +1072,7 @@ html:has(#docsiframe) {
     margin-left: 18rem;
   }
 
+  /* TOC Toggle Button */
   .boostlook #toggle-toc {
     position: fixed;
     top: 2rem;
@@ -907,7 +1093,9 @@ html:has(#docsiframe) {
   }
 }
 
+/* TOC States */
 @media screen and (min-width: 768px) {
+  /* Hidden TOC */
   html.toc-hidden .boostlook {
     margin-left: 0;
   }
@@ -916,6 +1104,7 @@ html:has(#docsiframe) {
     left: max(0rem, 50% - 39rem - 1rem);
   }
 
+  /* Visible TOC */
   html.toc-visible .boostlook #toggle-toc {
     left: max(0rem, 50% - 39rem - 1rem);
     background-color: rgb(255, 255, 255, 1);
@@ -936,10 +1125,12 @@ html:has(#docsiframe) {
     padding-left: 1.5rem;
   }
 
+  /* TOC Shadow States */
   html.toc-visible:not(.toc-pinned) #toc.toc2 {
     box-shadow: 4px 0 12px 0px rgba(0, 0, 0, 0.10);
   }
 
+  /* TOC Pin States */
   html.toc-visible.toc-pinned #toggle-toc {
     background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%235f6368%22%3E%3Cpath%20d%3D%22M560-240%20320-480l240-240%2056%2056-184%20184%20184%20184-56%2056Z%22%2F%3E%3C%2Fsvg%3E");
   }
@@ -953,6 +1144,18 @@ html:has(#docsiframe) {
 
 /*----------------- Styles specific to Antora Templates start -----------------*/
 
+/**
+ * Antora Template Styles
+ * Specific styles for Antora-generated documentation.
+ * These styles handle:
+ * 1. Header and navigation layout
+ * 2. Typography customization
+ * 3. Navigation menu structure
+ * 4. Content layout and formatting
+ * 5. Responsive design adaptations
+ */
+
+/* Header Layout */
 .boostlook #header:has(.nav-container) {
   padding: 0;
 }
@@ -997,9 +1200,10 @@ html:has(#docsiframe) {
 }
 
 .boostlook .nav-menu > .nav-list > .nav-list > li {
-  font-weight: bolder;
+  font-variation-settings: "wght" 750;
 }
 
+/* Navigation Links */
 .boostlook .nav-link,
 .boostlook .nav-menu a{
   cursor: pointer;
@@ -1016,6 +1220,7 @@ html:has(#docsiframe) {
   color: #828282;
 }
 
+/* TOC Container */
 .boostlook #toc.toc2.nav-container {
   position: fixed;
 }
@@ -1126,6 +1331,7 @@ html:has(#docsiframe) {
   margin-bottom: 1.5rem;
   margin-top: 1rem;
 }
+
 .boostlook .doc table.tableblock tr th {
   background-color: var(--bl-table-head-background);
   font-size: 1rem;
@@ -1145,8 +1351,7 @@ html:has(#docsiframe) {
   color: var(--bl-text-color);
 }
 
-
-/* Responsive Styles */
+/* Responsive Design */
 @media screen and (min-width: 768px) {
   .boostlook #content:has(> article.doc) {
     border-top-right-radius: 0.5rem;
@@ -1157,6 +1362,15 @@ html:has(#docsiframe) {
 /*----------------- Styles specific to Antora Templates end -----------------*/
 
 /*----------------- Styles specific to website-v2 start -----------------*/
+
+/**
+ * Website-v2 Specific Styles
+ * Styles for the Boost website version 2, focusing on:
+ * 1. Library and Release README formatting
+ * 2. Content spacing and margins
+ * 3. Code block presentation
+ * 4. Documentation-specific adjustments
+ */
 
 /* Library/Releases Readmes */
 .boostlook#libraryReadMe li p {
@@ -1171,6 +1385,7 @@ html:has(#docsiframe) {
   margin-bottom: 1.5rem;
 }
 
+/* Code Block Formatting */
 .boostlook#libraryReadMe pre {
   padding: 0;
 }
@@ -1186,7 +1401,7 @@ html:has(#docsiframe) {
   padding: 1.2em .8em;
 }
 
-/* Temporary fix for undetected code from highlight.js */
+/* Syntax Highlighting Fix */
 .boostlook#libraryReadMe .language- span {
   color: inherit;
   font-weight: initial;
@@ -1196,6 +1411,17 @@ html:has(#docsiframe) {
 
 /*---------- Quickbook docs styling fixes -----------*/
 
+/**
+ * Quickbook Documentation Styles
+ * Comprehensive styling for Quickbook-generated documentation, including:
+ * 1. Typography and heading hierarchy
+ * 2. Content blocks and spacing
+ * 3. Navigation and spirit-nav elements
+ * 4. Special elements (notes, tips, etc.)
+ * 5. Code and syntax highlighting
+ */
+
+/* Heading Styles */
 #boost-legacy-docs-wrapper.boostlook h1,
 #libraryReadMe.boostlook h1 {
   font-size: 1.8rem;
@@ -1219,6 +1445,7 @@ html:has(#docsiframe) {
   font-size: 1.35rem;
 }
 
+/* Paragraph Spacing */
 #boost-legacy-docs-wrapper.boostlook p,
 .boostlook p {
   margin-bottom: 0;
@@ -1229,11 +1456,13 @@ html:has(#docsiframe) {
   font-size: 16px;
 }
 
+/* Table Headers */
 #boost-legacy-docs-wrapper.boostlook:not(:has(.doc)) th {
   background-color: var(--bg-color);
   border-color: var(--bl-border-color);
 }
 
+/* Special Content Blocks */
 .boostlook div.note,
 .boostlook div.tip,
 .boostlook div.important,
@@ -1248,6 +1477,7 @@ html:has(#docsiframe) {
   padding: 8px;
 }
 
+/* Special Block Tables */
 .boostlook div.note table,
 .boostlook div.tip table,
 .boostlook div.important table,
@@ -1260,6 +1490,7 @@ html:has(#docsiframe) {
   margin: 0;
 }
 
+/* Special Block Headers */
 .boostlook div.note th,
 .boostlook div.tip th,
 .boostlook div.important th,
@@ -1271,6 +1502,7 @@ html:has(#docsiframe) {
   font-size: 16px;
 }
 
+/* Special Block Cells */
 .boostlook div.note td,
 .boostlook div.tip td,
 .boostlook div.important td,
@@ -1282,41 +1514,47 @@ html:has(#docsiframe) {
   padding: 1px;
 }
 
+/* Pre-formatted Text */
 .boostlook:not(:has(.doc)) td pre {
   padding: 5px;
 }
 
+/* Program Listings */
 .boostlook .programlisting {
   margin: 1rem 0;
 }
 
+/* Table Typography */
 .boostlook table h1,
 .boostlook table h2,
 .boostlook table h3 {
   line-height: 2rem;
 }
+
 .boostlook table h4,
 .boostlook table h5,
 .boostlook table h6 {
   line-height: 1.75rem;
 }
 
+/* Variable Lists */
 .boostlook:not(:has(.doc)) div.variablelist dl dt {
-    margin-bottom: 0.2em;
-    font-weight: bold;
+  margin-bottom: 0.2em;
+  font-variation-settings: "wght" 700;
 }
 
 .boostlook:not(:has(.doc)) div.variablelist dl dd {
-    margin: 0em 0em 0.5em 2em;
-    font-size: 10pt;
+  margin: 0em 0em 0.5em 2em;
+  font-size: 10pt;
 }
 
 .boostlook:not(:has(.doc)) div.variablelist table tbody tr td p,
 .boostlook:not(:has(.doc)) div.variablelist dl dd p {
-    margin: 0em 0em 0.5em 0em;
-    line-height: 1;
+  margin: 0em 0em 0.5em 0em;
+  line-height: 1;
 }
 
+/* Table of Contents */
 .boostlook div.toc {
   border-radius: 8px;
   padding: 1rem;
@@ -1340,10 +1578,12 @@ html:has(#docsiframe) {
   line-height: 1.15;
 }
 
+/* Copyright Footer */
 .boostlook .copyright-footer {
   padding: 1rem;
 }
 
+/* Section Layout */
 body > .section,
 body > .chapter,
 #boost-legacy-docs-wrapper.boostlook > .section,
@@ -1357,7 +1597,7 @@ body > .chapter,
   border-radius: 0.5rem;
 }
 
-/* qbk spirit nav hack */
+/* Spirit Navigation */
 .boostlook:not(:has(.doc)) .spirit-nav a img {
   display: none;
 }
@@ -1379,6 +1619,7 @@ body > .chapter,
   text-decoration: none;
 }
 
+/* Spirit Navigation Icons */
 .boostlook:not(:has(.doc)) .spirit-nav a[accesskey='p']::after {
   content: "arrow_back";
 }
@@ -1392,6 +1633,7 @@ body > .chapter,
   content: "arrow_forward";
 }
 
+/* Responsive Spirit Navigation */
 @media screen and (max-width: 768px) {
   .boostlook:not(:has(.doc)) .spirit-nav {
     right: 2rem;
@@ -1399,8 +1641,7 @@ body > .chapter,
   }
 }
 
-/* ---------------- Styling from boostbookV2.css ----------------*/
-
+/* Legacy Styling Overrides */
 body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
   background-color: transparent;
 }
@@ -1408,7 +1649,8 @@ body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
 .boostlook:not(:has(.doc)) {
   border-radius: 0;
 }
-/* general elements */
+
+/* General Elements */
 .boostlook:not(:has(.doc)) h1,
 .boostlook:not(:has(.doc)) h2,
 .boostlook:not(:has(.doc)) h2:first-of-type,
@@ -1435,6 +1677,7 @@ body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
 .boostlook:not(:has(.doc)) p {
   padding: 1em 0 !important;
 }
+
 .boostlook:not(:has(.doc)) li p {
   padding: 0 !important;
 }
@@ -1451,6 +1694,7 @@ body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
   list-style-type: decimal;
 }
 
+/* Pre-formatted Text and Code */
 .boostlook:not(:has(.doc)) pre {
   background-color: var(--bl-pre-background);
   border: 1px solid var(--bl-code-border-color);
@@ -1466,12 +1710,13 @@ body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
   color: var(--bl-code-text-color);
 }
 
+/* Table Headers */
 .boostlook:not(:has(.doc)) div.informaltable table tr th,
 .boostlook:not(:has(.doc)) div.table table tr th {
   border: 1px solid var(--bl-border-color);
 }
 
-/* spirit nav */
+/* Spirit Navigation */
 .boostlook:not(:has(.doc)) .spirit-nav {
   position: absolute;
   top: 0.2rem;
@@ -1481,18 +1726,22 @@ body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
   max-width: 80rem;
   display: flex;
 }
+
 .boostlook:not(:has(.doc)) .spirit-nav a {
   color: var(--secondary-color);
   padding-left: 0.5em;
 }
+
 .boostlook:not(:has(.doc)) .spirit-nav img {
   border-width: 0px;
 }
+
 .dark .boostlook:not(:has(.doc)) .spirit-nav img {
-  -webkit-filter: invert(100%); /* Safari/Chrome */
+  -webkit-filter: invert(100%);
   filter: invert(100%);
 }
-/* TOC */
+
+/* Table of Contents */
 .boostlook:not(:has(.doc)) div.toc {
   font-size: 80%;
   line-height: 1.15;
@@ -1515,11 +1764,12 @@ body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
   padding: 0.5pc;
 }
 
-/* Code on toc */
+/* Code in TOC */
 .boostlook:not(:has(.doc)) .toc .computeroutput {
   font-size: 120%
 }
 
+/* Copyright Footer */
 .boostlook:not(:has(.doc)) .copyright-footer {
   text-align: right;
   font-size: 70%;
@@ -1628,7 +1878,135 @@ body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
   background-color: var(--border-color);
 }
 
-/* ---------------- Styling from boostbookV2.css end ----------------*/
+/*----------------- Quickbook Documentation Styles end -----------------*/
+
+/*----------------- Library README Styles start -----------------*/
+
+/**
+ * Library README Styles
+ * Specific styles for the Boost library README pages.
+ * These styles handle:
+ * 1. Typography and heading hierarchy
+ * 2. Content spacing and margins
+ * 3. List styling and nesting
+ * 4. Link appearances
+ */
+
+/* Base Container */
+.boostlook#libraryReadMe {
+  margin-left: 0;
+}
+
+/* Headings */
+.boostlook#libraryReadMe h1 {
+  font-size: 1.875rem;
+  font-variation-settings: "wght" 600;
+  border-bottom: 1px solid var(--bl-border-color);
+}
+
+.boostlook#libraryReadMe h2 {
+  margin-top: 0.75rem;
+  font-size: 1.5rem;
+  font-variation-settings: "wght" 600;
+  border-bottom: 1px solid var(--bl-border-color);
+}
+
+.boostlook#libraryReadMe h3 {
+  margin-top: 0.75rem;
+  font-size: 1.25rem;
+  font-variation-settings: "wght" 600;
+  margin-bottom: 0.5rem;
+  font-feature-settings: normal;
+}
+
+.boostlook#libraryReadMe h4 {
+  font-size: 1.35rem;
+}
+
+/* Paragraphs */
+.boostlook#libraryReadMe p {
+  font-size: 1rem;
+  padding-bottom: 0.25rem;
+  font-variation-settings: "wght" 300;
+  margin-bottom: 0;
+}
+
+/* Lists */
+.boostlook#libraryReadMe ul {
+  list-style-type: disc;
+  list-style-position: inside;
+  padding-left: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.boostlook#libraryReadMe ul li {
+  font-size: 1rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-variation-settings: "wght" 300;
+}
+
+.boostlook#libraryReadMe li p {
+  display: inline;
+}
+
+/* Special list cases */
+.boostlook#libraryReadMe > h3 + ul {
+  list-style-type: none;
+}
+
+.boostlook#libraryReadMe > h3 + ul > li > a {
+  font-variation-settings: "wght" 600;
+}
+
+.boostlook#libraryReadMe ul > li > ul > li {
+  list-style-type: disc;
+}
+
+.boostlook#libraryReadMe ul > li > ul > li > a {
+  font-variation-settings: "wght" 400;
+}
+
+.boostlook#libraryReadMe h3 + p + ul {
+  list-style-type: none;
+}
+
+.boostlook#libraryReadMe h3 + p + ul > li {
+  font-variation-settings: "wght" 600;
+}
+
+/* Tables */
+.boostlook#libraryReadMe table {
+  table-layout: auto;
+  width: 100%;
+}
+
+/* Links */
+.boostlook#libraryReadMe a {
+  color: var(--bl-link-color);
+}
+
+.boostlook#libraryReadMe a img {
+  display: inline;
+}
+
+/* Code Blocks */
+.boostlook#libraryReadMe pre {
+  padding: 0;
+}
+
+.boostlook#libraryReadMe pre code {
+  background-color: var(--bl-code-background);
+  margin-bottom: 0;
+}
+
+/* Syntax Highlighting Fix */
+.boostlook#libraryReadMe .language- span {
+  color: inherit;
+  font-weight: initial;
+}
+
+/*----------------- Library README Styles end -----------------*/
 
 </style>
 <style>
@@ -1762,7 +2140,12 @@ pre.rouge .gs {
 <li><a href="#overview_motivation">Motivation</a></li>
 <li><a href="#overview_use_cases">Use Cases</a></li>
 <li><a href="#overview_supported_compilers">Supported Compilers</a></li>
-<li><a href="#overview_basic_usage">Basic Usage</a></li>
+</ul>
+</li>
+<li><a href="#basics">Basic Usage</a>
+<ul class="sectlevel2">
+<li><a href="#basics_construction_of_decimal_types">Construction of Decimal Types</a></li>
+<li><a href="#basics_using_the_library">Using the Library</a></li>
 </ul>
 </li>
 <li><a href="#api_reference">API Reference</a>
@@ -2081,8 +2464,75 @@ as well as emulated PPC64LE and STM32 using QEMU with the following compilers:</
 Coverage can be found on <a href="https://app.codecov.io/gh/cppalliance/decimal">Codecov</a>.</p>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="basics">Basic Usage</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="overview_basic_usage">Basic Usage</h3>
+<h3 id="basics_construction_of_decimal_types">Construction of Decimal Types</h3>
+<div class="paragraph">
+<p>Every decimal type can be constructed in a few ways:</p>
+</div>
+<div class="paragraph">
+<p>1) The parameters to the constructor are like so:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">T2</span><span class="p">&gt;</span>
+<span class="k">constexpr</span> <span class="n">decimal32</span><span class="p">(</span><span class="n">T</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">T2</span> <span class="n">exp</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">sign</span> <span class="o">=</span> <span class="nb">false</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Where types <code>T</code> and <code>T2</code> are integral types (signed and unsigned are both allowed).
+Lastly the sign follows the convention of <code>signbit</code> where <code>false</code> is positive and <code>true</code> is negative.
+If both a negative coefficient and a sign are passed then the resulting decimal number will be negative.
+The final number constructed is in the form (sign || coeff &lt; 0 ? -1 : 1) x abs(coeff) x 10^exp.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>boost::decimal::decimal32 a {1, 0};         // constructs 1
+boost::decimal::decimal32 b {-2, 0};        // constructs -2
+boost::decimal::decimal32 c {2, 0, true};   // Also constructs -2
+boost::decimal::decimal32 d {-2, 0, true};  // Also constructs -2
+boost::decimal::decimal32 e {5, 5};         // constructs 5x10^5
+boost::decimal::decimal32 f {1234, -3}      // constructs 1.234 or 1234x10^-3</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>2) A decimal number can be explicitly or implicitly constructed from an integer.
+For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal64</span> <span class="n">g</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal32</span> <span class="n">h</span> <span class="p">{</span><span class="o">-</span><span class="mi">4</span><span class="p">};</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>3) A decimal number can only be explicitly constructed from a floating point type.
+For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="o">::</span><span class="n">decimal128</span> <span class="n">pi</span> <span class="p">{</span><span class="mf">3.14</span><span class="p">};</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Due to the differences in decimal and binary floating point numbers there may be a difference in the resulting representation in decimal format, and thus it is not recommended to construct from binary floating point numbers
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="basics_using_the_library">Using the Library</h3>
 <div class="paragraph">
 <p>The entire library should be accessed using the convince header <code>&lt;boost/decimal.hpp&gt;</code>.
 A short example of the basic usage:</p>
@@ -2098,7 +2548,7 @@ A short example of the basic usage:</p>
     <span class="k">using</span> <span class="k">namespace</span> <span class="n">boost</span><span class="o">::</span><span class="n">decimal</span><span class="p">;</span>
 
     <span class="c1">// Outputs 0.30000000000000004</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setprecision</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span> <span class="o">+</span> <span class="mf">0.2</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setprecision</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mf">0.1</span> <span class="o">+</span> <span class="mf">0.2</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 
     <span class="c1">// Construct the two decimal values</span>
     <span class="k">constexpr</span> <span class="n">decimal64</span> <span class="n">a</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">};</span> <span class="c1">// 1e-1 or 0.1</span>
@@ -7212,7 +7662,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-07 15:15:37 -0500
+Last updated 2025-01-09 08:35:13 -0500
 </div>
 </div>
 <style>
