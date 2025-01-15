@@ -85,6 +85,9 @@
   --bl-header-height: 2.5rem;            /* Standard header height */
 
   /* Light Theme Variables - Color scheme for light mode */
+  /* General Variables */
+  --light-bl-secondary-color: rgb(2, 132, 199);
+
   /* Background and Border Colors */
   --light-bl-background: rgb(255, 255, 255);
   --light-bl-border-color: rgb(209, 209, 209);
@@ -135,6 +138,9 @@
    * Dark Theme Variables
    * Color palette and design tokens for dark mode
    */
+  /* General Variables */
+  --dark-bl-secondary-color: rgb(125, 211, 252);
+
   /* Background and Border Colors */
   --dark-bl-background: rgb(5, 26, 38);
   --dark-bl-border-color: rgb(3, 25, 37);
@@ -230,6 +236,9 @@
 
 /* Light Theme (Default) Configuration */
 html {
+  /* General Variables */
+  --bl-secondary-color: var(--light-bl-secondary-color);
+
   /* Background and Borders */
   --bl-background: var(--light-bl-background);
   --bl-border-color: var(--light-bl-border-color);
@@ -289,6 +298,9 @@ html {
 
 /* Dark Theme Configuration */
 html.dark {
+  /* General Variables */
+  --bl-secondary-color: var(--dark-bl-secondary-color);
+
   /* Background and Borders */
   --bl-background: var(--dark-bl-background);
   --bl-border-color: var(--dark-bl-border-color);
@@ -501,8 +513,8 @@ p, h1, h2, h3, h4, h5, h6 {
 .boostlook h6 {
   display: block;
   line-height: 1;
-  margin-top: 1em;
-  margin-bottom: 1em;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
   font-weight: 500;
 }
 
@@ -513,17 +525,6 @@ p, h1, h2, h3, h4, h5, h6 {
 .boostlook h4 { font-size: 1.35rem; }   /* Topic headings */
 .boostlook h5 { font-size: 1.25rem; }   /* Subtopic headings */
 .boostlook h6 { font-size: 1rem; }      /* Minor headings */
-
-/* Heading Spacing */
-.boostlook h1,
-.boostlook h2,
-.boostlook h3,
-.boostlook h4,
-.boostlook h5,
-.boostlook h6 {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-}
 
 /* Document-specific heading adjustments */
 .boostlook .doc h2:not(.discrete) {
@@ -551,6 +552,9 @@ p, h1, h2, h3, h4, h5, h6 {
 .boostlook p {
   font-size: 1rem;
   margin-bottom: 1.5rem;
+  color: var(--bl-text-color);
+  padding-top: initial !important;
+  padding-bottom: initial !important;
 }
 
 /* Special paragraph cases */
@@ -580,18 +584,13 @@ p, h1, h2, h3, h4, h5, h6 {
 .boostlook code,
 .boostlook pre code,
 .boostlook .doc .content pre code {
+  border-color: var(--bl-code-border-color);
+  color: var(--bl-code-text-color);
+  padding: 1.2em .8em;
   font-family: "Noto Sans Mono", monospace;
   margin-bottom: 1.25rem;
   overflow-x: auto !important;
   scrollbar-width: none !important;
-}
-
-/* Hide scrollbars but keep functionality */
-.boostlook code::-webkit-scrollbar,
-.boostlook pre code::-webkit-scrollbar,
-.boostlook .doc .content pre code::-webkit-scrollbar {
-  width: 0;
-  height: 0;
 }
 
 /* Emphasis within code */
@@ -629,6 +628,17 @@ p, h1, h2, h3, h4, h5, h6 {
 }
 
 /* Code Styling */
+.boostlook h2 a code {
+  color: var(--bl-nav-link-color);
+  font-size: 1.65rem;
+}
+
+.boostlook h3 a code,
+.boostlook h3 a:hover code {
+  color: var(--bl-nav-link-color) !important;
+  font-size: 1.5rem;
+}
+
 .boostlook code,
 .boostlook p code,
 .boostlook li code,
@@ -719,17 +729,17 @@ p, h1, h2, h3, h4, h5, h6 {
   color: var(--bl-hljs-section-color);
 }
 
+.boostlook .hljs-attribute,
+.boostlook .hljs-name,
+.boostlook .hljs-tag {
+  color: var(--bl-hljs-attribute-color);
+}
+
 /* Link States */
 .boostlook p a:visited,
 .boostlook table a,
 .boostlook .pagination a {
   color: var(--bl-link-color);
-}
-
-.boostlook .hljs-attribute,
-.boostlook .hljs-name,
-.boostlook .hljs-tag {
-  color: var(--bl-hljs-attribute-color);
 }
 
 /* Pagination */
@@ -796,6 +806,7 @@ p, h1, h2, h3, h4, h5, h6 {
  * 2. Navigation/TOC scrollbars
  * 3. Content area scrollbars
  * 4. Template-specific adjustments
+ * 5. Code block scrollbars
  */
 
 /* Hide root scrollbars for Antora template */
@@ -868,6 +879,14 @@ html:has(#docsiframe) {
   scrollbar-width: thin;
   overflow-y: auto;
   height: 100vh;
+}
+
+/* Hide scrollbars but keep functionality */
+.boostlook code::-webkit-scrollbar,
+.boostlook pre code::-webkit-scrollbar,
+.boostlook .doc .content pre code::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 /*----------------- Styles specific to AsciiDoctor content start -----------------*/
@@ -1011,28 +1030,15 @@ html:has(#docsiframe) {
 }
 
 #boost-legacy-docs-wrapper h3.title,
-#boost-legacy-docs-wrapper.boostlook h3,
-#libraryReadMe.boostlook h3 {
+#boost-legacy-docs-wrapper.boostlook h3 {
   font-weight: 550;
   margin-bottom: 0.5rem;
   font-feature-settings: normal;
 }
 
-/* Code in Headings */
-.boostlook h2 a code {
-  color: var(--bl-nav-link-color);
-  font-size: 1.65rem;
-}
-
-.boostlook h3 a code,
-.boostlook h3 a:hover code {
-  color: var(--bl-nav-link-color) !important;
-  font-size: 1.5rem;
-}
-
 /* Rouge Syntax Highlighting */
 .boostlook pre.rouge .o {
-  font-weight: normal;
+  font-weight: 400;
 }
 
 .boostlook pre.rouge code span {
@@ -1178,12 +1184,6 @@ html:has(#docsiframe) {
 
 .boostlook .breadcrumbs ul li {
   font-size: 0.875rem !important;
-}
-
-.boostlook p {
-  color: var(--bl-text-color);
-  padding-top: initial !important;
-  padding-bottom: initial !important;
 }
 
 /* Navigation Menu */
@@ -1351,6 +1351,15 @@ html:has(#docsiframe) {
   color: var(--bl-text-color);
 }
 
+@media screen and (max-width: 768px) {
+  .boostlook .toolbar {
+    width: calc(100% - 2.5rem);
+    position: fixed;
+    top: 0;
+    padding-top: 10px;
+  }
+}
+
 /* Responsive Design */
 @media screen and (min-width: 768px) {
   .boostlook #content:has(> article.doc) {
@@ -1360,54 +1369,6 @@ html:has(#docsiframe) {
 }
 
 /*----------------- Styles specific to Antora Templates end -----------------*/
-
-/*----------------- Styles specific to website-v2 start -----------------*/
-
-/**
- * Website-v2 Specific Styles
- * Styles for the Boost website version 2, focusing on:
- * 1. Library and Release README formatting
- * 2. Content spacing and margins
- * 3. Code block presentation
- * 4. Documentation-specific adjustments
- */
-
-/* Library/Releases Readmes */
-.boostlook#libraryReadMe li p {
-  display: inline;
-}
-
-.boostlook#libraryReadMe {
-  margin-left: 0;
-}
-
-.boostlook#libraryReadMe ul {
-  margin-bottom: 1.5rem;
-}
-
-/* Code Block Formatting */
-.boostlook#libraryReadMe pre {
-  padding: 0;
-}
-
-.boostlook#libraryReadMe pre code {
-  background-color: var(--bl-code-background);
-  margin-bottom: 0;
-}
-
-.boostlook .doc .content pre code {
-  border-color: var(--bl-code-border-color);
-  color: var(--bl-code-text-color);
-  padding: 1.2em .8em;
-}
-
-/* Syntax Highlighting Fix */
-.boostlook#libraryReadMe .language- span {
-  color: inherit;
-  font-weight: initial;
-}
-
-/*----------------- Styles specific to website-v2 end -----------------*/
 
 /*---------- Quickbook docs styling fixes -----------*/
 
@@ -1422,26 +1383,22 @@ html:has(#docsiframe) {
  */
 
 /* Heading Styles */
-#boost-legacy-docs-wrapper.boostlook h1,
-#libraryReadMe.boostlook h1 {
+#boost-legacy-docs-wrapper.boostlook h1 {
   font-size: 1.8rem;
 }
 
-#boost-legacy-docs-wrapper.boostlook h2,
-#libraryReadMe.boostlook h2 {
+#boost-legacy-docs-wrapper.boostlook h2 {
   font-size: 1.65rem;
   border-bottom: 1px solid #eaf0f3;
   border-bottom: 1px solid var(--bl-table-border-color);
   font-weight: 500;
 }
 
-#boost-legacy-docs-wrapper.boostlook h3,
-#libraryReadMe.boostlook h3 {
+#boost-legacy-docs-wrapper.boostlook h3 {
   font-size: 1.5rem;
 }
 
-#boost-legacy-docs-wrapper.boostlook h4,
-#libraryReadMe.boostlook h4 {
+#boost-legacy-docs-wrapper.boostlook h4 {
   font-size: 1.35rem;
 }
 
@@ -1598,8 +1555,16 @@ body > .chapter,
 }
 
 /* Spirit Navigation */
-.boostlook:not(:has(.doc)) .spirit-nav a img {
-  display: none;
+.boostlook:not(:has(.doc)) .spirit-nav {
+  position: relative;
+  float: right;
+  top: 0.2rem;
+  right: 28px;
+  text-align: right;
+  margin: 0.75rem;
+  padding-left: 10px;
+  max-width: 80rem;
+  display: flex;
 }
 
 .boostlook:not(:has(.doc)) .spirit-nav a,
@@ -1607,6 +1572,7 @@ body > .chapter,
   font-family: 'Material Symbols Outlined';
   font-size: 18px;
   display: inline-block;
+  padding-left: 0.5em;
   width: 24px;
   height: 24px;
   color: var(--bl-nav-link-color);
@@ -1617,6 +1583,21 @@ body > .chapter,
 .toolbar a:hover .material-symbols-outlined {
   color: var(--bl-primary-color);
   text-decoration: none;
+}
+
+.boostlook:not(:has(.doc)) .spirit-nav a img {
+  display: none;
+  border-width: 0px;
+}
+
+.dark .boostlook:not(:has(.doc)) .spirit-nav img {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+/* hide footer spirit nav since it wasn't visible before */
+.boostlook:not(:has(.doc)) div:nth-of-type(4).spirit-nav {
+  display: none !important;
 }
 
 /* Spirit Navigation Icons */
@@ -1663,7 +1644,7 @@ body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
 
 .boostlook:not(:has(.doc)) h5 {
   font-style: italic;
-  font-weight: normal;
+  font-weight: 400;
   font-size: 110%;
 }
 
@@ -1714,31 +1695,6 @@ body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
 .boostlook:not(:has(.doc)) div.informaltable table tr th,
 .boostlook:not(:has(.doc)) div.table table tr th {
   border: 1px solid var(--bl-border-color);
-}
-
-/* Spirit Navigation */
-.boostlook:not(:has(.doc)) .spirit-nav {
-  position: absolute;
-  top: 0.2rem;
-  right: calc(((100% - 75rem) / 2));
-  text-align: right;
-  margin: 0.75rem;
-  max-width: 80rem;
-  display: flex;
-}
-
-.boostlook:not(:has(.doc)) .spirit-nav a {
-  color: var(--secondary-color);
-  padding-left: 0.5em;
-}
-
-.boostlook:not(:has(.doc)) .spirit-nav img {
-  border-width: 0px;
-}
-
-.dark .boostlook:not(:has(.doc)) .spirit-nav img {
-  -webkit-filter: invert(100%);
-  filter: invert(100%);
 }
 
 /* Table of Contents */
@@ -1901,6 +1857,7 @@ body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
 .boostlook#libraryReadMe h1 {
   font-size: 1.875rem;
   font-variation-settings: "wght" 600;
+  line-height: 1em;
   border-bottom: 1px solid var(--bl-border-color);
 }
 
@@ -1908,6 +1865,7 @@ body[bgcolor="white"]:has(.boostlook):not(:has(.doc)) {
   margin-top: 0.75rem;
   font-size: 1.5rem;
   font-variation-settings: "wght" 600;
+  line-height: 1em;
   border-bottom: 1px solid var(--bl-border-color);
 }
 
@@ -2534,7 +2492,7 @@ Due to the differences in decimal and binary floating point numbers there may be
 <div class="sect2">
 <h3 id="basics_using_the_library">Using the Library</h3>
 <div class="paragraph">
-<p>The entire library should be accessed using the convince header <code>&lt;boost/decimal.hpp&gt;</code>.
+<p>The entire library should be accessed using the convenience header <code>&lt;boost/decimal.hpp&gt;</code>.
 A short example of the basic usage:</p>
 </div>
 <div class="listingblock">
@@ -7665,7 +7623,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-10 08:21:24 -0500
+Last updated 2025-01-15 09:53:43 -0500
 </div>
 </div>
 <style>
