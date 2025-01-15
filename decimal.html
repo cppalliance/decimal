@@ -4370,7 +4370,7 @@ They are also all constexpr with C++14 unlike the built-in floating point types 
 <p>Effects: if x is finite, returns its quantum exponent.</p>
 </div>
 <div class="paragraph">
-<p>Otherwise, a domain error occurs and <code>INT_MIN</code> is returned.</p>
+<p>Otherwise, <code>INT_MIN</code> is returned.</p>
 </div>
 </div>
 <div class="sect3">
@@ -4638,6 +4638,9 @@ If <code>std::chars_format</code> is used the function will return a <code>std::
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>All <code>to_chars</code> functions ignore the effects of cohorts, and instead output normalized values.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -7662,7 +7665,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-09 08:35:13 -0500
+Last updated 2025-01-10 08:21:24 -0500
 </div>
 </div>
 <style>
