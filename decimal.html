@@ -2805,6 +2805,8 @@ A short example of the basic usage:</p>
 <span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
 <span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
 
+<span class="k">class</span> <span class="nc">decimal32</span> <span class="p">{</span>
+
 <span class="c1">// Paragraph numbers are from ISO/IEC DTR 24733</span>
 
 <span class="c1">// 3.2.2.1 construct/copy/destroy</span>
@@ -2862,6 +2864,8 @@ A short example of the basic usage:</p>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal64</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal128</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 
+<span class="p">};</span> <span class="c1">// class decimal32</span>
+
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
@@ -2908,6 +2912,8 @@ A short example of the basic usage:</p>
 </span>
 <span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
 <span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="k">class</span> <span class="nc">decimal64</span> <span class="p">{</span>
 
 <span class="c1">// Paragraph numbers are from ISO/IEC DTR 24733</span>
 
@@ -2966,6 +2972,8 @@ A short example of the basic usage:</p>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal32</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal128</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 
+<span class="p">};</span> <span class="c1">// class decimal64</span>
+
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
@@ -3012,6 +3020,8 @@ A short example of the basic usage:</p>
 </span>
 <span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
 <span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="k">class</span> <span class="nc">decimal128</span> <span class="p">{</span>
 
 <span class="c1">// Paragraph numbers are from ISO/IEC DTR 24733</span>
 
@@ -3070,6 +3080,8 @@ A short example of the basic usage:</p>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal32</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal64</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 
+<span class="p">};</span> <span class="c1">// class decimal128</span>
+
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
@@ -3125,6 +3137,8 @@ As is often the case this trades space for time by having greater storage width 
 </span>
 <span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
 <span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="k">class</span> <span class="nc">decimal32_fast</span> <span class="p">{</span>
 
 <span class="c1">// Paragraph numbers are from ISO/IEC DTR 24733</span>
 
@@ -3183,6 +3197,8 @@ As is often the case this trades space for time by having greater storage width 
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal64</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal128</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 
+<span class="p">};</span> <span class="c1">// class decimal32_fast</span>
+
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
@@ -3228,6 +3244,8 @@ As is often the case this trades space for time by having greater storage width 
 </span>
 <span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
 <span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="k">class</span> <span class="nc">decimal64_fast</span> <span class="p">{</span>
 
 <span class="c1">// Paragraph numbers are from ISO/IEC DTR 24733</span>
 
@@ -3286,6 +3304,8 @@ As is often the case this trades space for time by having greater storage width 
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal32</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal128</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 
+<span class="p">};</span> <span class="c1">// class decimal64_fast</span>
+
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
 </div>
@@ -3331,6 +3351,8 @@ As is often the case this trades space for time by having greater storage width 
 </span>
 <span class="k">namespace</span> <span class="n">boost</span> <span class="p">{</span>
 <span class="k">namespace</span> <span class="n">decimal</span> <span class="p">{</span>
+
+<span class="k">class</span> <span class="nc">decimal128_fast</span> <span class="p">{</span>
 
 <span class="c1">// Paragraph numbers are from ISO/IEC DTR 24733</span>
 
@@ -3388,6 +3410,8 @@ As is often the case this trades space for time by having greater storage width 
 
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal32</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
 <span class="k">explicit</span> <span class="k">constexpr</span> <span class="k">operator</span> <span class="n">decimal64</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+
+<span class="p">};</span> <span class="c1">// class decimal128_fast</span>
 
 <span class="p">}</span> <span class="c1">//namespace decimal</span>
 <span class="p">}</span> <span class="c1">//namespace boost</span></code></pre>
@@ -7623,7 +7647,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-15 09:53:43 -0500
+Last updated 2025-01-15 14:17:52 -0500
 </div>
 </div>
 <style>
