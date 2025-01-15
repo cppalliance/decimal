@@ -56,7 +56,7 @@ NOTE: Due to the differences in decimal and binary floating point numbers there 
 
 == Using the Library
 
-The entire library should be accessed using the convince header `<boost/decimal.hpp>`.
+The entire library should be accessed using the convenience header `<boost/decimal.hpp>`.
 A short example of the basic usage:
 
 [source, c++]
