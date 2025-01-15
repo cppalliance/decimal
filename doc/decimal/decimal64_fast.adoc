@@ -28,6 +28,8 @@ As is often the case this trades space for time by having greater storage width 
 namespace boost {
 namespace decimal {
 
+class decimal64_fast {
+
 // Paragraph numbers are from ISO/IEC DTR 24733
 
 // 3.2.3.1 construct/copy/destroy
@@ -84,6 +86,8 @@ explicit constexpr operator std::bfloat16_t() const noexcept;
 
 explicit constexpr operator decimal32() const noexcept;
 explicit constexpr operator decimal128() const noexcept;
+
+}; // class decimal64_fast
 
 } //namespace decimal
 } //namespace boost
