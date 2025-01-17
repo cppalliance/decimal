@@ -569,7 +569,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             *first++ = '0';
             return {first, std::errc()};
         }
-        else if (num_leading_zeros > precision)
+        else if (precision != -1 && num_leading_zeros > precision)
         {
             *first++ = '0';
             *first++ = '.';
