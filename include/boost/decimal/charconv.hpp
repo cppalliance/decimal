@@ -542,16 +542,16 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         {
             append_trailing_zeros = true;
         }
+    }
 
-        // In general formatting we remove trailing 0s
-        if (fmt == chars_format::general)
-        {
-
-            const auto zeros_removal {remove_trailing_zeros(significand)};
-            significand = zeros_removal.trimmed_number;
-            exponent += static_cast<int>(zeros_removal.number_of_removed_zeros);
-            num_dig -= static_cast<int>(zeros_removal.number_of_removed_zeros);
-        }
+    // In general formatting we remove trailing 0s
+    // Same with unspecified precision fixed formatting
+    if ((precision == -1 && fmt == chars_format::fixed) || fmt == chars_format::general)
+    {
+        const auto zeros_removal {remove_trailing_zeros(significand)};
+        significand = zeros_removal.trimmed_number;
+        exponent += static_cast<int>(zeros_removal.number_of_removed_zeros);
+        num_dig -= static_cast<int>(zeros_removal.number_of_removed_zeros);
     }
 
     // Make sure the result will fit in the buffer
