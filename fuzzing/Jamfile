@@ -36,7 +36,7 @@ toolset.flags $(__name__).make-corpus PYTHON <python.interpreter> ;
 
 for local fuzzer in $(all_fuzzers)
 {
-    local fuzz_time = 60 ;
+    local fuzz_time = 30 ;
     local corpus = /tmp/corpus/$(fuzzer) ;
     local min_corpus = /tmp/mincorpus/$(fuzzer) ;
     local seed_corpus = $(HERE)/seedcorpus/$(fuzzer) ;

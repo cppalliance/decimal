@@ -542,16 +542,16 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         {
             append_trailing_zeros = true;
         }
+    }
 
-        // In general formatting we remove trailing 0s
-        if (fmt == chars_format::general)
-        {
-
-            const auto zeros_removal {remove_trailing_zeros(significand)};
-            significand = zeros_removal.trimmed_number;
-            exponent += static_cast<int>(zeros_removal.number_of_removed_zeros);
-            num_dig -= static_cast<int>(zeros_removal.number_of_removed_zeros);
-        }
+    // In general formatting we remove trailing 0s
+    // Same with unspecified precision fixed formatting
+    if ((precision == -1 && fmt == chars_format::fixed) || fmt == chars_format::general)
+    {
+        const auto zeros_removal {remove_trailing_zeros(significand)};
+        significand = zeros_removal.trimmed_number;
+        exponent += static_cast<int>(zeros_removal.number_of_removed_zeros);
+        num_dig -= static_cast<int>(zeros_removal.number_of_removed_zeros);
     }
 
     // Make sure the result will fit in the buffer
@@ -569,25 +569,32 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             *first++ = '0';
             return {first, std::errc()};
         }
-        else if (num_leading_zeros > precision)
+        else if (precision != -1 && num_leading_zeros > precision)
         {
             *first++ = '0';
             *first++ = '.';
-            std::memset(first, '0', static_cast<std::size_t>(precision));
+            boost::decimal::detail::memset(first, '0', static_cast<std::size_t>(precision));
             return {first + precision, std::errc()};
         }
         else
         {
             *first++ = '0';
             *first++ = '.';
-            std::memset(first, '0', static_cast<std::size_t>(num_leading_zeros));
+            boost::decimal::detail::memset(first, '0', static_cast<std::size_t>(num_leading_zeros));
             first += num_leading_zeros;
 
             // We can skip the rest if there's nothing more to do for the required precision
             if (significand == 0)
             {
-                std::memset(first, '0', static_cast<std::size_t>(precision - num_leading_zeros));
-                return {first + precision, std::errc()};
+                if (precision - num_leading_zeros > 0)
+                {
+                    boost::decimal::detail::memset(first, '0', static_cast<std::size_t>(precision - num_leading_zeros));
+                    return {first + precision, std::errc()};
+                }
+                else
+                {
+                    return {first, std::errc()};
+                }
             }
         }
     }

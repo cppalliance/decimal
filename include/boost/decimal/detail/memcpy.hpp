@@ -23,6 +23,7 @@
 #if defined(__GNUC__) && __GNUC__ >= 10
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wstringop-overflow"
+#  pragma GCC diagnostic ignored "-Warray-bounds"
 #  define BOOST_DECIMAL_STRINGOP_OVERFLOW_DISABLED
 #endif
 
