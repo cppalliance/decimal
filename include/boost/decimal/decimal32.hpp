@@ -2248,9 +2248,9 @@ public:
 
     // Member functions
     static constexpr auto (min)        () -> boost::decimal::decimal32 { return {1, min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal32 { return {9'999'999, max_exponent}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal32 { return {-9'999'999, max_exponent}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal32 { return {1, -7}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal32 { return {9'999'999, max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal32 { return {9'999'999, max_exponent - digits + 1, true}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal32 { return {1, -digits + 1}; }
     static constexpr auto round_error  () -> boost::decimal::decimal32 { return epsilon(); }
     static constexpr auto infinity     () -> boost::decimal::decimal32 { return boost::decimal::from_bits(boost::decimal::detail::d32_inf_mask); }
     static constexpr auto quiet_NaN    () -> boost::decimal::decimal32 { return boost::decimal::from_bits(boost::decimal::detail::d32_nan_mask); }

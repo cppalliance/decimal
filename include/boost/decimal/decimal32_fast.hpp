@@ -1481,16 +1481,16 @@ struct numeric_limits<boost::decimal::decimal32_fast>
 
     // Member functions
     static constexpr auto (min)        () -> boost::decimal::decimal32_fast { return {1, min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal32_fast { return {9'999'999, max_exponent}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal32_fast { return {-9'999'999, max_exponent}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal32_fast { return {1, -7}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal32_fast { return {9'999'999, max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal32_fast { return {9'999'999, max_exponent - digits + 1, true}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal32_fast { return {1, -digits + 1}; }
     static constexpr auto round_error  () -> boost::decimal::decimal32_fast { return epsilon(); }
     static constexpr auto infinity     () -> boost::decimal::decimal32_fast { return boost::decimal::direct_init(boost::decimal::detail::d32_fast_inf, UINT8_C((0))); }
     static constexpr auto quiet_NaN    () -> boost::decimal::decimal32_fast { return boost::decimal::direct_init(boost::decimal::detail::d32_fast_qnan, UINT8_C((0))); }
     static constexpr auto signaling_NaN() -> boost::decimal::decimal32_fast { return boost::decimal::direct_init(boost::decimal::detail::d32_fast_snan, UINT8_C((0))); }
 
     // With denorm absent returns the same value as min
-    static constexpr auto denorm_min   () -> boost::decimal::decimal32_fast { return {1, min_exponent}; }
+    static constexpr auto denorm_min   () -> boost::decimal::decimal32_fast { return min(); }
 };
 
 } // Namespace std
