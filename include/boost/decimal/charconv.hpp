@@ -573,21 +573,28 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         {
             *first++ = '0';
             *first++ = '.';
-            std::memset(first, '0', static_cast<std::size_t>(precision));
+            boost::decimal::detail::memset(first, '0', static_cast<std::size_t>(precision));
             return {first + precision, std::errc()};
         }
         else
         {
             *first++ = '0';
             *first++ = '.';
-            std::memset(first, '0', static_cast<std::size_t>(num_leading_zeros));
+            boost::decimal::detail::memset(first, '0', static_cast<std::size_t>(num_leading_zeros));
             first += num_leading_zeros;
 
             // We can skip the rest if there's nothing more to do for the required precision
             if (significand == 0)
             {
-                std::memset(first, '0', static_cast<std::size_t>(precision - num_leading_zeros));
-                return {first + precision, std::errc()};
+                if (precision - num_leading_zeros > 0)
+                {
+                    boost::decimal::detail::memset(first, '0', static_cast<std::size_t>(precision - num_leading_zeros));
+                    return {first + precision, std::errc()};
+                }
+                else
+                {
+                    return {first, std::errc()};
+                }
             }
         }
     }
