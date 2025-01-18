@@ -7,26 +7,18 @@
 
 #if defined(__cpp_consteval) && __cpp_consteval >= 201811L && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
 
+#include <string_view>
+
 using namespace boost::decimal;
 
 template <typename T>
-consteval bool test_value(T value, const char* res)
+consteval bool test_value(T value, std::string_view res)
 {
     char buffer[256];
     const auto r = to_chars(buffer, buffer + sizeof(buffer), value, chars_format::scientific, 40);
     *r.ptr = '\0';
-    
-    auto res_ptr {res};
-    auto buffer_ptr {buffer};
-    while (*buffer_ptr != '\0')
-    {
-        if (*buffer_ptr++ != *res_ptr++)
-        {
-            return false;
-        }
-    }
-    
-    return true;
+    std::string_view buffer_view {buffer};
+    return res == buffer_view;
 }
 
 int main()
@@ -52,8 +44,8 @@ int main()
     static_assert(test_value(std::numeric_limits<decimal32_fast>::min(), "1.0000000000000000000000000000000000000000e-95"));
     static_assert(test_value(std::numeric_limits<decimal64>::min(), "1.0000000000000000000000000000000000000000e-383"));
     static_assert(test_value(std::numeric_limits<decimal64_fast>::min(), "1.0000000000000000000000000000000000000000e-383"));
-    static_assert(test_value(std::numeric_limits<decimal128>::epsilon(), "1.0000000000000000000000000000000000000000e-33"));
-    static_assert(test_value(std::numeric_limits<decimal128_fast>::epsilon(), "1.0000000000000000000000000000000000000000e-33"));
+    static_assert(test_value(std::numeric_limits<decimal128>::min(), "1.0000000000000000000000000000000000000000e-6143"));
+    static_assert(test_value(std::numeric_limits<decimal128_fast>::min(), "1.0000000000000000000000000000000000000000e-6143"));
 
     // Min subnormal
     // Fast types don't support sub-normals so they should return min
@@ -104,8 +96,8 @@ int main()
     test_value(std::numeric_limits<decimal32_fast>::min(), "1.0000000000000000000000000000000000000000e-95");
     test_value(std::numeric_limits<decimal64>::min(), "1.0000000000000000000000000000000000000000e-383");
     test_value(std::numeric_limits<decimal64_fast>::min(), "1.0000000000000000000000000000000000000000e-383");
-    test_value(std::numeric_limits<decimal128>::epsilon(), "1.0000000000000000000000000000000000000000e-33");
-    test_value(std::numeric_limits<decimal128_fast>::epsilon(), "1.0000000000000000000000000000000000000000e-33");
+    test_value(std::numeric_limits<decimal128>::min(), "1.0000000000000000000000000000000000000000e-6143");
+    test_value(std::numeric_limits<decimal128_fast>::min(), "1.0000000000000000000000000000000000000000e-6143");
 
     // Min subnormal
     // Fast types don't support sub-normals so they should return min
