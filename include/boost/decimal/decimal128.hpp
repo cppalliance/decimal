@@ -2238,18 +2238,18 @@ struct numeric_limits<boost::decimal::decimal128>
     static constexpr int  digits10 = digits;
     static constexpr int  max_digits10 = digits;
     static constexpr int  radix = 10;
-    static constexpr int  min_exponent = -6142;
+    static constexpr int  min_exponent = -6143;
     static constexpr int  min_exponent10 = min_exponent;
-    static constexpr int  max_exponent = 6145;
+    static constexpr int  max_exponent = 6144;
     static constexpr int  max_exponent10 = max_exponent;
     static constexpr bool traps = numeric_limits<std::uint64_t>::traps;
     static constexpr bool tinyness_before = true;
 
     // Member functions
     static constexpr auto (min)        () -> boost::decimal::decimal128 { return {1, min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal128 { return {boost::decimal::detail::uint128{UINT64_C(999'999'999'999'999), UINT64_C(9'999'999'999'999'999'999)}, max_exponent}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal128 { return {boost::decimal::detail::uint128{UINT64_C(999'999'999'999'999), UINT64_C(9'999'999'999'999'999'999)}, max_exponent, true}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal128 { return {1, -34}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal128 { return {boost::decimal::detail::uint128{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal128 { return {boost::decimal::detail::uint128{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1, true}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal128 { return {1, -digits + 1}; }
     static constexpr auto round_error  () -> boost::decimal::decimal128 { return epsilon(); }
     static constexpr auto infinity     () -> boost::decimal::decimal128 { return boost::decimal::from_bits(boost::decimal::detail::d128_inf_mask); }
     static constexpr auto quiet_NaN    () -> boost::decimal::decimal128 { return boost::decimal::from_bits(boost::decimal::detail::d128_nan_mask); }
