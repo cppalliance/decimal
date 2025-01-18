@@ -742,7 +742,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     Unsigned_Integer significand = frexp10(value, &exp);
     BOOST_DECIMAL_ASSERT(significand != 0);
     // Strip zeros of the significand since frexp10 normalizes it
-    while (significand % 10U == 0)
+    while (significand % 10U == 0 && significand > 0)
     {
         significand /= 10U;
         ++exp;
