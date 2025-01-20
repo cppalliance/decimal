@@ -56,6 +56,7 @@ int main()
     static_assert(test_value(std::numeric_limits<decimal128>::denorm_min(), "1.0000000000000000000000000000000000000000e-6176"));
     static_assert(test_value(std::numeric_limits<decimal128_fast>::denorm_min(), "1.0000000000000000000000000000000000000000e-6143"));
 
+    // Lowest + max should be 0
     static_assert(test_value(std::numeric_limits<decimal32>::max() + std::numeric_limits<decimal32>::lowest(), "0.0000000000000000000000000000000000000000e+00"));
     static_assert(test_value(std::numeric_limits<decimal32_fast>::max() + std::numeric_limits<decimal32_fast>::lowest(), "0.0000000000000000000000000000000000000000e+00"));
     static_assert(test_value(std::numeric_limits<decimal64>::max() + std::numeric_limits<decimal64>::lowest(), "0.0000000000000000000000000000000000000000e+00"));
