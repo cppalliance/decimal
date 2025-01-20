@@ -68,8 +68,25 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     }
 
     // Step 5: Normalize the significand and compare
-    delta_exp >= 0 ? lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp)) :
-                     rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
+    // Instead of multiplying the larger number, divide the smaller one
+    if (delta_exp >= 0)
+    {
+        // Check if we can divide rhs_sig safely
+        if (delta_exp > 0 && rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0)
+        {
+            return false;
+        }
+        rhs_sig /= detail::pow10(static_cast<comp_type>(delta_exp));
+    }
+    else
+    {
+        // Check if we can divide lhs_sig safely
+        if (lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0)
+        {
+            return false;
+        }
+        lhs_sig /= detail::pow10(static_cast<comp_type>(-delta_exp));
+    }
 
     return lhs_sig == rhs_sig;
 }
