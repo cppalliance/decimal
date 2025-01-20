@@ -57,15 +57,36 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
 
     const auto delta_exp {lhs_exp - rhs_exp};
 
-    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType> ||
-        ((lhs_sig == static_cast<comp_type>(0)) ^ (rhs_sig == static_cast<comp_type>(0))))
+    if (lhs_sig == 0 && rhs_sig == 0)
+    {
+        // The difference in exponent is irrelevant here
+        return true;
+    }
+    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType>)
     {
         return false;
     }
 
     // Step 5: Normalize the significand and compare
-    delta_exp >= 0 ? lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp)) :
-                     rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
+    // Instead of multiplying the larger number, divide the smaller one
+    if (delta_exp >= 0)
+    {
+        // Check if we can divide rhs_sig safely
+        if (delta_exp > 0 && rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0)
+        {
+            return false;
+        }
+        rhs_sig /= detail::pow10(static_cast<comp_type>(delta_exp));
+    }
+    else
+    {
+        // Check if we can divide lhs_sig safely
+        if (lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0)
+        {
+            return false;
+        }
+        lhs_sig /= detail::pow10(static_cast<comp_type>(-delta_exp));
+    }
 
     return lhs_sig == rhs_sig;
 }
@@ -93,19 +114,34 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
     // Check the value of delta exp to avoid to large a value for pow10
     // Also if only one of the significands is 0 then we know the values have to be mismatched
-    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType> ||
-        ((new_lhs_sig == static_cast<comp_type>(0)) ^ (new_rhs_sig == static_cast<comp_type>(0))))
+    if (new_lhs_sig == static_cast<comp_type>(0) && new_rhs_sig == static_cast<comp_type>(0))
+    {
+        return true;
+    }
+    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType>)
     {
         return false;
     }
 
+    // Step 5: Normalize the significand and compare
+    // Instead of multiplying the larger number, divide the smaller one
     if (delta_exp >= 0)
     {
-        new_lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp));
+        // Check if we can divide rhs_sig safely
+        if (delta_exp > 0 && new_rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0)
+        {
+            return false;
+        }
+        new_rhs_sig /= detail::pow10(static_cast<comp_type>(delta_exp));
     }
     else
     {
-        new_rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
+        // Check if we can divide lhs_sig safely
+        if (new_lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0)
+        {
+            return false;
+        }
+        new_lhs_sig /= detail::pow10(static_cast<comp_type>(-delta_exp));
     }
 
     #ifdef BOOST_DECIMAL_DEBUG_EQUAL

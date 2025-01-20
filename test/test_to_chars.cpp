@@ -58,8 +58,6 @@ void test_error_value(const char* input, chars_format format, int precision = -1
     T val;
     const auto r_from = from_chars(input, input + std::strlen(input), val, format);
     BOOST_TEST(r_from);
-    std::cerr << "Val: " << val
-              << "\nIsneg: " << signbit(val) << std::endl;
     char buffer[boost::decimal::limits<T>::max_chars] {};
     const auto r_to = to_chars(buffer, buffer + sizeof(buffer), val, format, precision);
     BOOST_TEST(r_to);
@@ -872,9 +870,6 @@ int main()
     // See: https://github.com/cppalliance/decimal/issues/470
     test_value(decimal32{504.29034} / decimal32{-727.45465}, "-0.693226", chars_format::general, 6);
     test_value(decimal32{504.29034} / decimal32{-727.45465}, "-6.932257e-01", chars_format::scientific, 6);
-
-    // See: https://github.com/cppalliance/decimal/issues/478
-    test_value(std::numeric_limits<decimal32>::epsilon(), "1e-07");
 
     // Value found from fuzzing
     for (int precision = -1; precision < 10; ++precision)

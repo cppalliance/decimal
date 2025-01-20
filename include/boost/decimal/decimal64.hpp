@@ -2149,18 +2149,18 @@ struct numeric_limits<boost::decimal::decimal64>
     static constexpr int  digits10 = digits;
     static constexpr int  max_digits10 = digits;
     static constexpr int  radix = 10;
-    static constexpr int  min_exponent = -382;
+    static constexpr int  min_exponent = -383;
     static constexpr int  min_exponent10 = min_exponent;
-    static constexpr int  max_exponent = 385;
+    static constexpr int  max_exponent = 384;
     static constexpr int  max_exponent10 = max_exponent;
     static constexpr bool traps = numeric_limits<std::uint64_t>::traps;
     static constexpr bool tinyness_before = true;
 
     // Member functions
     static constexpr auto (min)        () -> boost::decimal::decimal64 { return {1, min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal64 { return {9'999'999'999'999'999, max_exponent}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal64 { return {-9'999'999'999'999'999, max_exponent}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal64 { return {1, -16}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal64 { return {9'999'999'999'999'999, max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal64 { return {9'999'999'999'999'999, max_exponent - digits + 1, true}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal64 { return {1, -digits + 1}; }
     static constexpr auto round_error  () -> boost::decimal::decimal64 { return epsilon(); }
     static constexpr auto infinity     () -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask); }
     static constexpr auto quiet_NaN    () -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_nan_mask); }

@@ -353,7 +353,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     }
 
     const auto fp = fpclassify(value);
-    if (fp != FP_NORMAL)
+    if (!(fp == FP_NORMAL || fp == FP_SUBNORMAL))
     {
         return to_chars_nonfinite(first, last, value, fp, fmt, precision);
     }
@@ -494,7 +494,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     const auto fp = fpclassify(value);
-    if (fp != FP_NORMAL)
+    if (!(fp == FP_NORMAL || fp == FP_SUBNORMAL))
     {
         return to_chars_nonfinite(first, last, value, fp, fmt, precision);
     }
@@ -720,7 +720,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     }
 
     const auto fp = fpclassify(value);
-    if (fp != FP_NORMAL)
+    if (!(fp == FP_NORMAL || fp == FP_SUBNORMAL))
     {
         return to_chars_nonfinite(first, last, value, fp, chars_format::hex, precision);
     }
@@ -742,7 +742,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     Unsigned_Integer significand = frexp10(value, &exp);
     BOOST_DECIMAL_ASSERT(significand != 0);
     // Strip zeros of the significand since frexp10 normalizes it
-    while (significand % 10U == 0)
+    while (significand % 10U == 0 && significand > 0)
     {
         significand /= 10U;
         ++exp;
