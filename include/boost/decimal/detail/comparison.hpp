@@ -57,8 +57,12 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
 
     const auto delta_exp {lhs_exp - rhs_exp};
 
-    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType> ||
-        ((lhs_sig == static_cast<comp_type>(0)) ^ (rhs_sig == static_cast<comp_type>(0))))
+    if (lhs_sig == 0 && rhs_sig == 0)
+    {
+        // The difference in exponent is irrelevant here
+        return true;
+    }
+    if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType>)
     {
         return false;
     }
