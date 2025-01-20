@@ -143,6 +143,8 @@ BOOST_DECIMAL_CONSTEXPR std::to_chars_result to_chars(char* first, char* last, D
 } //namespace boost
 ----
 
+All `to_chars` functions ignore the effects of cohorts, and instead output normalized values.
+
 NOTE: `BOOST_DECIMAL_CONSTEXPR` is defined if:
 
  - `_MSC_FULL_VER` >= 192528326

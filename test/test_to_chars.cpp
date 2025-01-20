@@ -23,10 +23,20 @@ static constexpr auto N = static_cast<std::size_t>(1024U >> 4U); // Number of tr
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB) && !(defined(__GNUC__) && __GNUC__ >= 13 && !defined(__aarch64__))
 
 template <typename T>
-void test_value(T val, const char* result, chars_format fmt, int precision = -1)
+void test_value(T val, const char* result, chars_format fmt, int precision)
 {
     char buffer[256] {};
     auto r = to_chars(buffer, buffer + sizeof(buffer), val, fmt, precision);
+    *r.ptr = '\0';
+    BOOST_TEST(r);
+    BOOST_TEST_CSTR_EQ(result, buffer);
+}
+
+template <typename T>
+void test_value(T val, const char* result, chars_format fmt)
+{
+    char buffer[256] {};
+    auto r = to_chars(buffer, buffer + sizeof(buffer), val, fmt);
     *r.ptr = '\0';
     BOOST_TEST(r);
     BOOST_TEST_CSTR_EQ(result, buffer);
@@ -764,6 +774,25 @@ void test_777()
     test_value(value3, "-2111000000", chars_format::fixed, 0);
 }
 
+template <typename T>
+void test_more_powers_10()
+{
+    test_value(T{1, -6}, "0.000001", chars_format::fixed);
+    test_value(T{1, -5}, "0.00001", chars_format::fixed);
+    test_value(T{1, -4}, "0.0001", chars_format::fixed);
+    test_value(T{1, -3}, "0.001", chars_format::fixed);
+    test_value(T{1, -2}, "0.01", chars_format::fixed);
+    test_value(T{1, -1}, "0.1", chars_format::fixed);
+    test_value(T{1, 0}, "1", chars_format::fixed);
+    test_value(T{1, 1}, "10", chars_format::fixed);
+    test_value(T{1, 2}, "100", chars_format::fixed);
+    test_value(T{1, 3}, "1000", chars_format::fixed);
+    test_value(T{1, 4}, "10000", chars_format::fixed);
+    test_value(T{1, 5}, "100000", chars_format::fixed);
+    test_value(T{1, 6}, "1000000", chars_format::fixed);
+    test_value(T{1, 7}, "10000000", chars_format::fixed);
+}
+
 int main()
 {
     test_non_finite_values<decimal32>();
@@ -873,6 +902,10 @@ int main()
     test_777<decimal32_fast>();
     test_777<decimal64_fast>();
     test_777<decimal128_fast>();
+
+    test_more_powers_10<decimal32>();
+    test_more_powers_10<decimal64>();
+    test_more_powers_10<decimal128>();
 
     return boost::report_errors();
 }

@@ -28,6 +28,8 @@ The encoding of Decimal128 is in the <<conversions, BID format>>.
 namespace boost {
 namespace decimal {
 
+class decimal128 {
+
 // Paragraph numbers are from ISO/IEC DTR 24733
 
 // 3.2.4.1 construct/copy/destroy
@@ -84,6 +86,8 @@ explicit constexpr operator std::bfloat16_t() const noexcept;
 
 explicit constexpr operator decimal32() const noexcept;
 explicit constexpr operator decimal64() const noexcept;
+
+}; // class decimal128
 
 } //namespace decimal
 } //namespace boost

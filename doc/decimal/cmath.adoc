@@ -413,7 +413,7 @@ constexpr int quantexp128(decimal128 x) noexcept;
 
 Effects: if x is finite, returns its quantum exponent.
 
-Otherwise, a domain error occurs and `INT_MIN` is returned.
+Otherwise, `INT_MIN` is returned.
 
 === quantized
 

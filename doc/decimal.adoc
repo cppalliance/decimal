@@ -18,6 +18,7 @@ https://www.boost.org/LICENSE_1_0.txt
 Matt Borland and Chris Kormanyos
 
 include::decimal/overview.adoc[]
+include::decimal/basics.adoc[]
 include::decimal/api_reference.adoc[]
 include::decimal/generic_decimal.adoc[]
 include::decimal/decimal32.adoc[]
