@@ -170,9 +170,8 @@ void test_bootstrap()
     }
 }
 
-void test_fuzzer_crash()
+void test_fuzzer_crash(const char* c_data)
 {
-    auto c_data = reinterpret_cast<const char*>("");
     auto size = std::strlen(c_data);
 
     const auto formats = std::array<boost::decimal::chars_format, 4>{boost::decimal::chars_format::general,
@@ -213,7 +212,8 @@ int main()
     test_locales();
     #endif
 
-    test_fuzzer_crash();
+    test_fuzzer_crash("");
+    test_fuzzer_crash("Dd00000000001000000000000000000000000000000000001000000000ccccccccc�Cccc0ccccccccc8888000010000)001.2");
 
     return boost::report_errors();
 }
