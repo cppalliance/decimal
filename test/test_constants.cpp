@@ -8,6 +8,7 @@
 
 using namespace boost::decimal;
 using namespace boost::decimal::numbers;
+using namespace boost::decimal::literals;
 
 template <typename Dec>
 void test_constants()
