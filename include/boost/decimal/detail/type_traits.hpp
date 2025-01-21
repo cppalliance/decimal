@@ -156,6 +156,19 @@ constexpr bool is_decimal_floating_point<T>::value;
 template <typename T>
 constexpr bool is_decimal_floating_point_v = is_decimal_floating_point<T>::value;
 
+template <typename...>
+struct conjunction : std::true_type {};
+
+template <typename B1>
+struct conjunction<B1> : B1 {};
+
+template <typename B1, typename... Bn>
+struct conjunction<B1, Bn...>
+        : std::conditional_t<bool(B1::value), conjunction<Bn...>, B1> {};
+
+template <typename... B>
+BOOST_DECIMAL_CONSTEXPR_VARIABLE bool conjunction_v = conjunction<B...>::value;
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
