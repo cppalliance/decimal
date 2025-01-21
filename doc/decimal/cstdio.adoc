@@ -21,9 +21,6 @@ template <typename... Dec>
 int snprintf(char* buffer, std::size_t buf_size, const char* format, Dec... value) noexcept;
 
 template <typename... Dec>
-int sprintf(char* buffer, const char* format, Dec... value) noexcept;
-
-template <typename... Dec>
 int fprintf(std::FILE* buffer, const char* format, Dec... values) noexcept;
 
 template <typename... Dec>
@@ -32,8 +29,6 @@ int printf(const char* format, Dec... values) noexcept;
 } //namespace decimal
 } //namespace boost
 ----
-
-WARNING: In the interest of safety `sprintf` simply calls `snprintf` with buf_size equal to sizeof(buffer).
 
 === Type Modifiers
 
