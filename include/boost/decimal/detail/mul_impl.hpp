@@ -125,7 +125,7 @@ constexpr auto d128_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     const auto rhs_dig {detail::num_digits(rhs_sig)};
 
     // If we can avoid it don't do 256 bit multiplication because it is slow
-    if (lhs_dig * rhs_dig <= std::numeric_limits<uint128>::digits10)
+    if (lhs_dig + rhs_dig <= std::numeric_limits<uint128>::digits10)
     {
         auto res_sig {lhs_sig * rhs_sig};
         auto res_exp {lhs_exp + rhs_exp};
