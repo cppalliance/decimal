@@ -157,9 +157,9 @@ inline void make_uppercase(char* first, const char* last) noexcept
 template <typename... T>
 inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format, T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
+    -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else
-    -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
+    -> int requires detail::conjunction_v<detail::is_decimal_floating_point<T>...>
     #endif
 {
     if (buffer == nullptr || format == nullptr)
@@ -246,9 +246,9 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
 template <typename... T>
 inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
+    -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else
-    -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
+    -> int requires detail::conjunction_v<detail::is_decimal_floating_point<T>...>
     #endif
 {
     return detail::snprintf_impl(buffer, buf_size, format, values...);
@@ -257,9 +257,9 @@ inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T..
 template <typename... T>
 inline auto sprintf(char* buffer, const char* format, T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
+    -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else
-    -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
+    -> int requires detail::conjunction_v<detail::is_decimal_floating_point<T>...>
     #endif
 {
     return detail::snprintf_impl(buffer, sizeof(buffer), format, values...);
@@ -267,10 +267,10 @@ inline auto sprintf(char* buffer, const char* format, T... values) noexcept
 
 template <typename... T>
 inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
-#ifndef BOOST_DECIMAL_HAS_CONCEPTS
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
+    #ifndef BOOST_DECIMAL_HAS_CONCEPTS
+    -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else
-    -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
+    -> int requires detail::conjunction_v<detail::is_decimal_floating_point<T>...>
     #endif
 {
     if (format == nullptr)
@@ -319,9 +319,9 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
 template <typename... T>
 inline auto printf(const char* format, T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
-    -> std::enable_if_t<detail::is_decimal_floating_point_v<std::common_type_t<T...>>, int>
+    -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else
-    -> int requires detail::is_decimal_floating_point_v<std::common_type_t<T...>>
+    -> int requires detail::conjunction_v<detail::is_decimal_floating_point<T>...>
     #endif
 {
     return fprintf(stdout, format, values...);
