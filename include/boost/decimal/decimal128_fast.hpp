@@ -537,16 +537,28 @@ constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool
 
 constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
 {
+    if (lhs.exponent_ != rhs.exponent_)
+    {
+        return false;
+    }
+    if (lhs.significand_ != rhs.significand_)
+    {
+        return false;
+    }
+
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs) || isnan(rhs))
+    if (isnan(lhs))
     {
         return false;
     }
     #endif
 
-    return lhs.sign_ == rhs.sign_ &&
-           lhs.exponent_ == rhs.exponent_ &&
-           lhs.significand_ == rhs.significand_;
+    if (lhs.significand_ == 0)
+    {
+        return true; // -0 == +0
+    }
+
+    return lhs.sign_ == rhs.sign_;
 }
 
 template <typename Integer>
