@@ -8,6 +8,7 @@
 #include <boost/core/lightweight_test.hpp>
 
 using namespace boost::decimal;
+using namespace boost::decimal::literals;
 
 void test_decimal32_literals()
 {

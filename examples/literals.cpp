@@ -5,6 +5,8 @@
 #include <boost/decimal.hpp>
 #include <cassert>
 
+using namespace boost::decimal::literals;
+
 template <typename T>
 bool float_equal(T lhs, T rhs)
 {
