@@ -574,5 +574,9 @@ int main()
     random_mixed_SPACESHIP(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
     #endif
 
+    constexpr auto pos_zero = boost::decimal::decimal128{0, 0, false};
+    constexpr auto neg_zero = boost::decimal::decimal128{0, 0, true};
+    BOOST_TEST(pos_zero == neg_zero);
+
     return boost::report_errors();
 }

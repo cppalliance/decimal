@@ -38,7 +38,21 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     }
     #endif
 
-    // Step 3: Check signs
+    // Step 2: Fast path
+    if (lhs.bits_ == rhs.bits_)
+    {
+        return true;
+    }
+
+    // Step 3: Check -0 == +0
+    auto lhs_sig {lhs.full_significand()};
+    auto rhs_sig {rhs.full_significand()};
+    if (lhs_sig == 0 && rhs_sig == 0)
+    {
+        return true;
+    }
+
+    // Step 4: Check signs
     const auto lhs_neg {lhs.isneg()};
     const auto rhs_neg {rhs.isneg()};
 
@@ -47,27 +61,19 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
         return false;
     }
 
-    // Step 4: Check the exponents
+    // Step 5: Check the exponents
     // If the difference is greater than we can represent in the significand than we can assume they are different
     const auto lhs_exp {lhs.biased_exponent()};
     const auto rhs_exp {rhs.biased_exponent()};
 
-    auto lhs_sig {lhs.full_significand()};
-    auto rhs_sig {rhs.full_significand()};
-
     const auto delta_exp {lhs_exp - rhs_exp};
 
-    if (lhs_sig == 0 && rhs_sig == 0)
-    {
-        // The difference in exponent is irrelevant here
-        return true;
-    }
     if (delta_exp > detail::precision_v<DecimalType> || delta_exp < -detail::precision_v<DecimalType>)
     {
         return false;
     }
 
-    // Step 5: Normalize the significand and compare
+    // Step 6: Normalize the significand and compare
     // Instead of multiplying the larger number, divide the smaller one
     if (delta_exp >= 0)
     {
