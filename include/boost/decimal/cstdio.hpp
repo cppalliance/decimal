@@ -255,17 +255,6 @@ inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T..
 }
 
 template <typename... T>
-inline auto sprintf(char* buffer, const char* format, T... values) noexcept
-    #ifndef BOOST_DECIMAL_HAS_CONCEPTS
-    -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
-    #else
-    -> int requires detail::conjunction_v<detail::is_decimal_floating_point<T>...>
-    #endif
-{
-    return detail::snprintf_impl(buffer, sizeof(buffer), format, values...);
-}
-
-template <typename... T>
 inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
     -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
