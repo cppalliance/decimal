@@ -294,7 +294,11 @@ public:
     #endif
 
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    // Conversion to other decimal type
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> > detail::impl::decimal_val_v<decimal64>), bool> = true>
+    constexpr operator Decimal() const noexcept;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> <= detail::impl::decimal_val_v<decimal64>), bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
     // 3.2.6 Conversion to floating-point type
@@ -951,8 +955,13 @@ constexpr decimal64::operator detail::uint128_t() const noexcept
 
 #endif
 
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> > detail::impl::decimal_val_v<decimal64>), bool>>
+constexpr decimal64::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
+}
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> <= detail::impl::decimal_val_v<decimal64>), bool>>
 constexpr decimal64::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);
