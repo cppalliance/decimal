@@ -337,7 +337,10 @@ public:
     explicit constexpr operator std::bfloat16_t() const noexcept;
     #endif
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> > detail::impl::decimal_val_v<decimal128>), bool> = true>
+    constexpr operator Decimal() const noexcept;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> <= detail::impl::decimal_val_v<decimal128>), bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
     // cmath functions that are easier as friends
@@ -1112,7 +1115,13 @@ constexpr decimal128::operator std::bfloat16_t() const noexcept
 }
 #endif
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> > detail::impl::decimal_val_v<decimal128>), bool>>
+constexpr decimal128::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> <= detail::impl::decimal_val_v<decimal128>), bool>>
 constexpr decimal128::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);

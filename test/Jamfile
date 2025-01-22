@@ -126,6 +126,7 @@ compile-fail test_illegal_decimal32_fast_implicit_conversions.cpp ;
 compile-fail test_illegal_decimal32_implicit_conversions.cpp ;
 compile-fail test_illegal_decimal64_fast_implicit_conversions.cpp ;
 compile-fail test_illegal_decimal64_implicit_conversions.cpp ;
+compile-fail test_illegal_decimal128_implicit_conversions.cpp ;
 run test_implicit_integral_conversion.cpp ;
 run test_laguerre.cpp ;
 run test_legal_implicit_conversions.cpp ;
