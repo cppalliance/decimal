@@ -11,7 +11,6 @@
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
-#include <boost/decimal/detail/to_string.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/locale_conversion.hpp>
 #include <boost/decimal/charconv.hpp>

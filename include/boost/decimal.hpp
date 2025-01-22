@@ -42,6 +42,7 @@
 #include <boost/decimal/cstdio.hpp>
 #include <boost/decimal/bid_conversion.hpp>
 #include <boost/decimal/dpd_conversion.hpp>
+#include <boost/decimal/string.hpp>
 
 #if defined(__clang__) && !defined(__GNUC__)
 #  pragma clang diagnostic pop
