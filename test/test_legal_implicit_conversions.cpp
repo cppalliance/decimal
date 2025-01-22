@@ -39,6 +39,13 @@ int main()
     test_explicit<boost::decimal::decimal128, boost::decimal::decimal32_fast>();
     test_explicit<boost::decimal::decimal128_fast, boost::decimal::decimal32_fast>();
 
+    test_explicit<boost::decimal::decimal32, boost::decimal::decimal64_fast>();
+    test_explicit<boost::decimal::decimal32_fast, boost::decimal::decimal64_fast>();
+    test_explicit<boost::decimal::decimal64, boost::decimal::decimal64_fast>();
+    test_explicit<boost::decimal::decimal64_fast, boost::decimal::decimal64_fast>();
+    test_explicit<boost::decimal::decimal128, boost::decimal::decimal64_fast>();
+    test_explicit<boost::decimal::decimal128_fast, boost::decimal::decimal64_fast>();
+
     test_implicit<boost::decimal::decimal32, boost::decimal::decimal32>();
     test_implicit<boost::decimal::decimal32, boost::decimal::decimal32_fast>();
     test_implicit<boost::decimal::decimal32, boost::decimal::decimal64>();
@@ -56,6 +63,10 @@ int main()
     test_implicit<boost::decimal::decimal64, boost::decimal::decimal64_fast>();
     test_implicit<boost::decimal::decimal64, boost::decimal::decimal128>();
     test_implicit<boost::decimal::decimal64, boost::decimal::decimal128_fast>();
+
+    test_implicit<boost::decimal::decimal64_fast, boost::decimal::decimal64_fast>();
+    test_implicit<boost::decimal::decimal64_fast, boost::decimal::decimal128>();
+    test_implicit<boost::decimal::decimal64_fast, boost::decimal::decimal128_fast>();
 
     return boost::report_errors();
 }

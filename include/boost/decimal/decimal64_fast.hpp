@@ -17,6 +17,7 @@
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+#include <boost/decimal/detail/promotion.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -267,7 +268,11 @@ public:
     explicit constexpr operator std::bfloat16_t() const noexcept;
     #endif
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    // Conversion to other decimal type
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> > detail::impl::decimal_val_v<decimal64_fast>), bool> = true>
+    constexpr operator Decimal() const noexcept;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> <= detail::impl::decimal_val_v<decimal64_fast>), bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
     // Unary Operators
@@ -930,7 +935,13 @@ constexpr decimal64_fast::operator std::bfloat16_t() const noexcept
 }
 #endif
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> > detail::impl::decimal_val_v<decimal64_fast>), bool>>
+constexpr decimal64_fast::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> <= detail::impl::decimal_val_v<decimal64_fast>), bool>>
 constexpr decimal64_fast::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);
