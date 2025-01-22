@@ -8,13 +8,19 @@
 
 FILES_PRJ     := $(basename $(wildcard $(PATH_SRC)/*.cpp))
 
-FILES_EXCLUDE := $(PATH_SRC)/concepts_test.cpp               \
-                 $(PATH_SRC)/link_1.cpp                      \
-                 $(PATH_SRC)/link_2.cpp                      \
-                 $(PATH_SRC)/link_3.cpp                      \
-                 $(PATH_SRC)/test_bad_evaluation_method.cpp  \
-                 $(PATH_SRC)/test_explicit_floats.cpp        \
-                 $(PATH_SRC)/test_from_chars.cpp
+FILES_EXCLUDE := $(PATH_SRC)/concepts_test.cpp                                      \
+                 $(PATH_SRC)/link_1.cpp                                             \
+                 $(PATH_SRC)/link_2.cpp                                             \
+                 $(PATH_SRC)/link_3.cpp                                             \
+                 $(PATH_SRC)/test_bad_evaluation_method.cpp                         \
+                 $(PATH_SRC)/test_explicit_floats.cpp                               \
+                 $(PATH_SRC)/test_from_chars.cpp                                    \
+                 $(PATH_SRC)/test_illegal_decimal32_fast_implicit_conversions.cpp   \
+                 $(PATH_SRC)/test_illegal_decimal32_implicit_conversions.cpp        \
+                 $(PATH_SRC)/test_illegal_decimal64_fast_implicit_conversions.cpp   \
+                 $(PATH_SRC)/test_illegal_decimal64_implicit_conversions.cpp        \
+                 $(PATH_SRC)/test_illegal_decimal128_implicit_conversions.cpp       \
+
 
 FILES_EXCLUDE := $(basename $(FILES_EXCLUDE))
 
