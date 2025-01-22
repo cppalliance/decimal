@@ -273,8 +273,9 @@ public:
     explicit constexpr operator detail::uint128_t() const noexcept;
     #endif
 
+    // We allow implict promotions to and decimal type with greater or equal precision (e.g. decimal32_fast)
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
-    explicit constexpr operator Decimal() const noexcept;
+    constexpr operator Decimal() const noexcept;
 
     // 3.2.5 initialization from coefficient and exponent:
     #ifdef BOOST_DECIMAL_HAS_CONCEPTS
