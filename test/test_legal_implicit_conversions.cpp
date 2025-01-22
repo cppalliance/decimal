@@ -78,5 +78,7 @@ int main()
     test_implicit<boost::decimal::decimal128, boost::decimal::decimal128>();
     test_implicit<boost::decimal::decimal128, boost::decimal::decimal128_fast>();
 
+    test_implicit<boost::decimal::decimal128_fast, boost::decimal::decimal128_fast>();
+
     return boost::report_errors();
 }
