@@ -50,6 +50,17 @@ private:
     // Since we have the overhead of memcpy in order to decode anything
     // get them all at once if we are going to need it
     BOOST_DECIMAL_NO_DISCARD inline auto to_components() const noexcept -> detail::decimal32_components;
+
+public:
+
+    gcc_decimal32() = default;
+
+    // 3.2.5  Initialization from coefficient and exponent.
+    gcc_decimal32(long long coeff, int exp);
+    gcc_decimal32(unsigned long long coeff, int exp);
+
+    // Non-conforming extension: Conversion to integral type.
+    inline operator long long() const noexcept;
 };
 
 namespace detail {
@@ -156,6 +167,21 @@ inline auto gcc_decimal32::to_components() const noexcept -> detail::decimal32_c
     components.sign = detail::decode_gccd32_sign(bits_);
 
     return components;
+}
+
+inline gcc_decimal32::gcc_decimal32(long long coeff, int exp)
+{
+    internal_decimal_ = std::decimal::make_decimal32(coeff, exp);
+}
+
+inline gcc_decimal32::gcc_decimal32(unsigned long long coeff, int exp)
+{
+    internal_decimal_ = std::decimal::make_decimal32(coeff, exp);
+}
+
+inline gcc_decimal32::operator long long() const noexcept
+{
+    return std::decimal::decimal32_to_long_long(internal_decimal_);
 }
 
 } // namespace decimal
