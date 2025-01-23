@@ -28,9 +28,9 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = std::numeric_limits<std::uint_fast32_t>::max();
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = std::numeric_limits<std::uint_fast32_t>::max() - 1;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::uint_fast32_t>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = std::numeric_limits<std::uint_fast32_t>::max() - 3;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = std::numeric_limits<std::uint_fast32_t>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::uint_fast32_t>::max() - 1;
 
 }
 
@@ -461,7 +461,7 @@ constexpr auto isinf(decimal32_fast val) noexcept -> bool
 constexpr auto isnan(decimal32_fast val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    return val.significand_ == detail::d32_fast_qnan || val.significand_ == detail::d32_fast_snan;
+    return val.significand_ >= detail::d32_fast_qnan;
     #else
     static_cast<void>(val);
     return false;
@@ -489,7 +489,7 @@ constexpr auto isnormal(decimal32_fast val) noexcept -> bool
 
 constexpr auto isfinite(decimal32_fast val) noexcept -> bool
 {
-    return val.significand_ < detail::d32_fast_snan;
+    return val.significand_ < detail::d32_fast_inf;
 }
 
 constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
