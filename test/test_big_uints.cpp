@@ -497,6 +497,7 @@ int main()
 
   test_digit_counting<boost::decimal::detail::uint128>();
   test_digit_counting<boost::decimal::detail::uint256_t>();
+  test_digit_counting<boost::decimal::uint128>();
 
   return boost::report_errors();
 }
