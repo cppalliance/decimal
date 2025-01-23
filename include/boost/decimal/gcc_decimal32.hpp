@@ -51,7 +51,11 @@ private:
     // get them all at once if we are going to need it
     BOOST_DECIMAL_NO_DISCARD inline auto to_components() const noexcept -> detail::decimal32_components;
 
+    BOOST_DECIMAL_NO_DISCARD inline auto underlying() const noexcept -> std::decimal::decimal32 { return internal_decimal_; }
+
 public:
+
+    using return_type = std::decimal::decimal32;
 
     gcc_decimal32() = default;
 
