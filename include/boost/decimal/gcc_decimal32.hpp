@@ -71,6 +71,10 @@ public:
     inline explicit operator double() const noexcept;
     inline explicit operator long double() const noexcept;
 
+    // 3.2.7  Unary arithmetic operators.
+    friend return_type operator+(const gcc_decimal32 rhs) { return rhs.underlying(); }
+    friend return_type operator-(const gcc_decimal32 rhs) { return -rhs.underlying(); }
+
 };
 
 namespace detail {
