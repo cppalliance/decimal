@@ -341,6 +341,16 @@ typedef unsigned __int128 uint128_t;
 #    endif
 #  endif
 
+#ifdef __has_cpp_attribute
+#  if __has_cpp_attribute(nodiscard)
+#     define BOOST_DECIMAL_NO_DISCARD [[nodiscard]]
+#  endif
+#endif
+
+#ifndef BOOST_DECIMAL_NO_DISCARD
+#  define BOOST_DECIMAL_NO_DISCARD
+#endif
+
 #endif
 
 // Since we should not be able to pull these in from the STL in module mode define them ourselves
