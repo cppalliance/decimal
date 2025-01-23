@@ -61,6 +61,12 @@ public:
 
     // Non-conforming extension: Conversion to integral type.
     inline operator long long() const noexcept;
+
+    // 3.2.6  Conversion to generic floating-point type.
+    inline explicit operator float() const noexcept;
+    inline explicit operator double() const noexcept;
+    inline explicit operator long double() const noexcept;
+
 };
 
 namespace detail {
@@ -182,6 +188,21 @@ inline gcc_decimal32::gcc_decimal32(unsigned long long coeff, int exp)
 inline gcc_decimal32::operator long long() const noexcept
 {
     return std::decimal::decimal32_to_long_long(internal_decimal_);
+}
+
+inline gcc_decimal32::operator float() const noexcept
+{
+    return std::decimal::decimal32_to_float(internal_decimal_);
+}
+
+inline gcc_decimal32::operator double() const noexcept
+{
+    return std::decimal::decimal32_to_double(internal_decimal_);
+}
+
+inline gcc_decimal32::operator long double() const noexcept
+{
+    return std::decimal::decimal32_to_long_double(internal_decimal_);
 }
 
 } // namespace decimal
