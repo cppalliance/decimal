@@ -130,14 +130,17 @@ BOOST_DECIMAL_NO_DISCARD inline auto decode_gccd32_unbiased_exponent(std::uint32
     {
         case detail::d32_comb_11_mask:
             // bits 2 and 3 are the exp part of the combination field
-                expval = (bits_ & detail::d32_comb_11_exp_bits) >> (detail::d32_significand_bits + 1);
-        break;
+            expval = (bits_ & detail::d32_comb_11_exp_bits) >> (detail::d32_significand_bits + 1);
+            break;
         case detail::d32_comb_10_mask:
             expval = UINT32_C(0b10000000);
-        break;
+            break;
         case detail::d32_comb_01_mask:
             expval = UINT32_C(0b01000000);
-        break;
+            break;
+        case 0U:
+            expval = UINT32_C(0b00000000);
+            break;
         // LCOV_EXCL_START
         default:
             BOOST_DECIMAL_UNREACHABLE;
