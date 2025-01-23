@@ -4,7 +4,9 @@
 
 #include "mini_to_chars.hpp"
 
-#include <boost/decimal.hpp>
+#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/iostream.hpp>
 #include <limits>
 #include <random>
 #include <sstream>

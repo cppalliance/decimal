@@ -5,7 +5,14 @@
 // Propogates up from boost.math
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
-#include <boost/decimal.hpp>
+#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/decimal64_fast.hpp>
+#include <boost/decimal/decimal128_fast.hpp>
+#include <boost/decimal/iostream.hpp>
+#include <boost/decimal/cmath.hpp>
 
 #if defined(__clang__)
 #  pragma clang diagnostic push

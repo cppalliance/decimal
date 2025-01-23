@@ -4,7 +4,15 @@
 
 #include "mini_to_chars.hpp"
 #include <cfloat>
-#include <boost/decimal.hpp>
+#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/decimal64_fast.hpp>
+#include <boost/decimal/decimal128_fast.hpp>
+#include <boost/decimal/string.hpp>
+#include <boost/decimal/iostream.hpp>
+#include <boost/decimal/literals.hpp>
 #include <boost/core/lightweight_test.hpp>
 
 using namespace boost::decimal;
