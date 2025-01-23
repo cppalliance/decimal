@@ -4,7 +4,14 @@
 //
 // This is a toy example to make sure that the hashing compiles correctly
 
-#include <boost/decimal.hpp>
+#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/decimal64_fast.hpp>
+#include <boost/decimal/decimal128_fast.hpp>
+#include <boost/decimal/hash.hpp>
+#include <boost/decimal/iostream.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <functional>
 
@@ -24,6 +31,9 @@ int main()
     test_hash<boost::decimal::decimal32>();
     test_hash<boost::decimal::decimal64>();
     test_hash<boost::decimal::decimal128>();
+    test_hash<boost::decimal::decimal32_fast>();
+    test_hash<boost::decimal::decimal64_fast>();
+    test_hash<boost::decimal::decimal128_fast>();
 
     return boost::report_errors();
 }

@@ -8,6 +8,9 @@
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/decimal64.hpp>
 #include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/decimal64_fast.hpp>
+#include <boost/decimal/decimal128_fast.hpp>
 #include <boost/decimal/detail/config.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE

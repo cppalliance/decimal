@@ -5,6 +5,14 @@
 #ifndef BOOST_DECIMAL_DETAIL_CONFIG_HPP
 #define BOOST_DECIMAL_DETAIL_CONFIG_HPP
 
+// 3.4.7 evaluation format:
+// This is defined at top level because it has ramifications for every successive header
+//
+// We add an extra definition here in case users want to pick and choose headers
+#ifndef BOOST_DECIMAL_DEC_EVAL_METHOD
+#  define BOOST_DECIMAL_DEC_EVAL_METHOD 0
+#endif
+
 // Determine endianness
 #if defined(_WIN32)
 

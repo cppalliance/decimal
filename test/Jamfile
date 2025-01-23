@@ -165,3 +165,26 @@ run ../examples/moving_average.cpp ;
 run ../examples/currency_conversion.cpp ;
 run ../examples/statistics.cpp ;
 run ../examples/format.cpp ;
+
+# Test compilation of separate headers
+compile compile_tests/bid_conversion.cpp ;
+compile compile_tests/dpd_conversion.cpp ;
+compile compile_tests/cfloat.cpp ;
+compile compile_tests/charconv_compile.cpp ;
+compile compile_tests/cmath_compile.cpp ;
+compile compile_tests/cstdio_compile.cpp ;
+compile compile_tests/cstdlib_compile.cpp ;
+compile compile_tests/decimal32_compile.cpp ;
+compile compile_tests/decimal32_fast_compile.cpp ;
+compile compile_tests/decimal64_compile.cpp ;
+compile compile_tests/decimal64_fast_compile.cpp ;
+compile compile_tests/decimal128_compile.cpp ;
+compile compile_tests/decimal128_fast_compile.cpp ;
+compile compile_tests/main_header.cpp ;
+compile compile_tests/fenv_compile.cpp ;
+compile compile_tests/format_compile.cpp ;
+compile compile_tests/fwd_compile.cpp ;
+compile compile_tests/iostream_compile.cpp ;
+compile compile_tests/literals_compile.cpp ;
+compile compile_tests/numbers_compile.cpp ;
+compile compile_tests/string_compile.cpp ;

@@ -5,6 +5,12 @@
 #ifndef BOOST_DECIMAL_CSTDIO_HPP
 #define BOOST_DECIMAL_CSTDIO_HPP
 
+#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/decimal64_fast.hpp>
+#include <boost/decimal/decimal128_fast.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/locale_conversion.hpp>
 #include <boost/decimal/detail/parser.hpp>

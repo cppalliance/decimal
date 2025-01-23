@@ -10,6 +10,7 @@
 #include <boost/decimal/decimal128.hpp>
 #include <boost/decimal/decimal32_fast.hpp>
 #include <boost/decimal/decimal64_fast.hpp>
+#include <boost/decimal/decimal128_fast.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 
 namespace boost {

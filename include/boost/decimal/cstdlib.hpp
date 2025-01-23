@@ -5,7 +5,12 @@
 #ifndef BOOST_DECIMAL_CSTDLIB_HPP
 #define BOOST_DECIMAL_CSTDLIB_HPP
 
-#include <boost/decimal/fwd.hpp>
+#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/decimal64_fast.hpp>
+#include <boost/decimal/decimal128_fast.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/utilities.hpp>
