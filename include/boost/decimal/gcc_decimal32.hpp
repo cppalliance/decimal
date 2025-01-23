@@ -34,6 +34,8 @@ public:
 
 private:
 
+    static_assert(sizeof(std::decimal::decimal32) == sizeof(std::uint32_t), "Incorrect size detected. std::decimal::decimal32 must be exactly 32 bits");
+
     std::decimal::decimal32 internal_decimal_ {};
 
     // Returns the un-biased (quantum) exponent
