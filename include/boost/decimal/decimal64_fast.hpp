@@ -31,9 +31,9 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_inf = std::numeric_limits<std::uint_fast64_t>::max();
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_qnan = std::numeric_limits<std::uint_fast64_t>::max() - 1;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_snan = std::numeric_limits<std::uint_fast64_t>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_inf = std::numeric_limits<std::uint_fast64_t>::max() - 3;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_qnan = std::numeric_limits<std::uint_fast64_t>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_snan = std::numeric_limits<std::uint_fast64_t>::max() - 1;
 
 struct decimal64_fast_components
 {
@@ -479,8 +479,7 @@ constexpr auto isinf(decimal64_fast val) noexcept -> bool
 constexpr auto isnan(decimal64_fast val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    return val.significand_ == detail::d64_fast_qnan ||
-           val.significand_ == detail::d64_fast_snan;
+    return val.significand_ >= detail::d64_fast_qnan;
     #else
     static_cast<void>(val);
     return false;
@@ -513,12 +512,12 @@ constexpr auto isnormal(decimal64_fast val) noexcept -> bool
 
 constexpr auto isfinite(decimal64_fast val) noexcept -> bool
 {
-    return val.significand_ < detail::d64_fast_snan;
+    return val.significand_ < detail::d64_fast_inf;
 }
 
 constexpr auto not_finite(decimal64_fast val) noexcept -> bool
 {
-    return val.significand_ >= detail::d64_fast_snan;
+    return val.significand_ >= detail::d64_fast_inf;
 }
 
 constexpr auto operator==(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
