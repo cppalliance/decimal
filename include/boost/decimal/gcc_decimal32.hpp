@@ -23,6 +23,33 @@
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
+// Masks to update the significand based on the combination field
+// GCC / IBM do not follow the IEEE 754 encoding standard for BID
+// Reverse engineering found the following patters:
+//
+//    Comb.  Exponent          Significand
+// s         eeeeeeee     ttttttttttttttttttttttt - sign + 2 steering bits concatenate to 6 bits of exponent + 23 bits of significand like float
+// s   11    eeeeeeee    [t]ttttttttttttttttttttt - sign + 2 steering bits + 8 bits of exponent + 21 bits of significand
+//
+// Only is the type different in steering 11 which yields significand 100 + 21 bits giving us our 24 total bits of precision
+
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_sign_mask =          UINT32_C(0b10000000000000000000000000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_steering_bits_mask = UINT32_C(0b01100000000000000000000000000000);
+
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_00_steering_bits = UINT32_C(0);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_01_steering_bits = UINT32_C(0b00100000000000000000000000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_10_steering_bits = UINT32_C(0b01000000000000000000000000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_11_steering_bits = gccd32_steering_bits_mask;
+
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_01_exp_mask = UINT32_C(0b01111111100000000000000000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_11_exp_mask = UINT32_C(0b00011111111000000000000000000000);
+
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_01_significand_mask = UINT32_C(0b00000000011111111111111111111111);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_11_significand_mask = UINT32_C(0b00000000000111111111111111111111);
+} // namespace detail
+
 // This type is a wrapper around gcc std::decimal::decimal32 to allow it to use
 // the standard library provided by Boost.Decimal
 BOOST_DECIMAL_EXPORT class gcc_decimal32 final
@@ -63,6 +90,8 @@ public:
     using return_type = std::decimal::decimal32;
 
     gcc_decimal32() = default;
+
+    explicit gcc_decimal32(std::decimal::decimal32 decimal) { internal_decimal_ = decimal; }
 
     // 3.2.5  Initialization from coefficient and exponent.
     gcc_decimal32(long long coeff, int exp);
@@ -218,30 +247,17 @@ namespace detail {
 inline auto decode_gccd32_unbiased_exponent(std::uint32_t bits_) noexcept -> gcc_decimal32::exponent_type
 {
     gcc_decimal32::exponent_type expval {};
-    const auto exp_comb_bits {(bits_ & detail::d32_comb_11_mask)};
+    const auto steering_bits {(bits_ & gccd32_steering_bits_mask)};
 
-    switch (exp_comb_bits)
+    // 3 of the 4 steering patterns leave this laid out like a binary float instead of an IEEE 754 decimal float
+    if (steering_bits == gccd32_11_steering_bits)
     {
-        case detail::d32_comb_11_mask:
-            // bits 2 and 3 are the exp part of the combination field
-            expval = (bits_ & detail::d32_comb_11_exp_bits) >> (detail::d32_significand_bits + 1);
-            break;
-        case detail::d32_comb_10_mask:
-            expval = UINT32_C(0b10000000);
-            break;
-        case detail::d32_comb_01_mask:
-            expval = UINT32_C(0b01000000);
-            break;
-        case 0U:
-            expval = UINT32_C(0b00000000);
-            break;
-        // LCOV_EXCL_START
-        default:
-            BOOST_DECIMAL_UNREACHABLE;
-        // LCOV_EXCL_STOP
+        expval |= (bits_ & gccd32_11_exp_mask) >> 21U;
     }
-
-    expval |= (bits_ & detail::d32_exponent_mask) >> detail::d32_significand_bits;
+    else
+    {
+        expval |= (bits_ & gccd32_01_exp_mask) >> 23U;
+    }
 
     return expval;
 }
@@ -255,28 +271,24 @@ inline auto decode_gccd32_significand(std::uint32_t bits_) -> gcc_decimal32::sig
 {
     gcc_decimal32::significand_type significand {};
 
-    if ((bits_ & detail::d32_comb_11_mask) == detail::d32_comb_11_mask)
+    const auto steering_bits {(bits_ & gccd32_steering_bits_mask)};
+
+    if (steering_bits == gccd32_11_steering_bits)
     {
-        // Only need the one bit of T because the other 3 are implied
-        significand = (bits_ & detail::d32_comb_11_significand_bits) == detail::d32_comb_11_significand_bits ?
-                      UINT32_C(0b1001'0000000000'0000000000) :
-                      UINT32_C(0b1000'0000000000'0000000000);
+        significand = UINT32_C(0b1000'0000000000'0000000000);
+        significand |= (bits_ & gccd32_11_significand_mask);
     }
     else
     {
-        // Last three bits in the combination field, so we need to shift past the exp field
-        // which is next
-        significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
+        significand |= (bits_ & gccd32_01_significand_mask);
     }
-
-    significand |= (bits_ & detail::d32_significand_mask);
 
     return significand;
 }
 
 inline auto decode_gccd32_sign(std::uint32_t bits_) -> bool
 {
-    return static_cast<bool>(bits_ & detail::d32_sign_mask);
+    return static_cast<bool>(bits_ & gccd32_sign_mask);
 }
 
 } // detail
@@ -317,42 +329,23 @@ inline auto gcc_decimal32::to_components() const noexcept -> detail::decimal32_c
 
     gcc_decimal32::exponent_type expval {};
     gcc_decimal32::significand_type significand {};
-    const auto exp_comb_bits {(bits_ & detail::d32_comb_11_mask)};
+    const auto steering_bits {(bits_ & detail::gccd32_steering_bits_mask)};
 
-    switch (exp_comb_bits)
+    if (steering_bits == detail::gccd32_11_steering_bits)
     {
-        case detail::d32_comb_11_mask:
-            // bits 2 and 3 are the exp part of the combination field
-            expval = (bits_ & detail::d32_comb_11_exp_bits) >> (detail::d32_significand_bits + 1);
-            significand = (bits_ & detail::d32_comb_11_significand_bits) == detail::d32_comb_11_significand_bits ?
-                      UINT32_C(0b1001'0000000000'0000000000) :
-                      UINT32_C(0b1000'0000000000'0000000000);
-            break;
-        case detail::d32_comb_10_mask:
-            expval = UINT32_C(0b10000000);
-            // Last three bits in the combination field, so we need to shift past the exp field
-            // which is next
-            significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
-            break;
-        case detail::d32_comb_01_mask:
-            expval = UINT32_C(0b01000000);
-            significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
-            break;
-        case 0U:
-            significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
-            break;
-        // LCOV_EXCL_START
-        default:
-            BOOST_DECIMAL_UNREACHABLE;
-        // LCOV_EXCL_STOP
+        significand = UINT32_C(0b1000'0000000000'0000000000);
+        significand |= (bits_ & detail::gccd32_11_significand_mask);
+        expval |= (bits_ & detail::gccd32_11_exp_mask) >> 21U;
     }
-
-    expval |= (bits_ & detail::d32_exponent_mask) >> detail::d32_significand_bits;
-    significand |= (bits_ & detail::d32_significand_mask);
+    else
+    {
+        significand |= (bits_ & detail::gccd32_01_significand_mask);
+        expval |= (bits_ & detail::gccd32_01_exp_mask) >> 23U;
+    }
 
     components.sig = significand;
     components.exp = expval;
-    components.sign = bits_ & detail::d32_sign_mask;
+    components.sign = bits_ & detail::gccd32_sign_mask;
 
     return components;
 }
