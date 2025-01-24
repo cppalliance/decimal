@@ -117,6 +117,67 @@ public:
     friend auto operator/(Integral lhs, gcc_decimal32 rhs)
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, return_type)
             { return lhs / rhs.underlying(); }
+
+    // 3.2.9  Comparison operators.
+    template <typename Integral>
+    friend auto operator==(gcc_decimal32 lhs, Integral rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs.underlying() + rhs; }
+
+    template <typename Integral>
+    friend auto operator==(Integral lhs, gcc_decimal32 rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs + rhs.underlying(); }
+
+    template <typename Integral>
+    friend auto operator!=(gcc_decimal32 lhs, Integral rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs.underlying() + rhs; }
+
+    template <typename Integral>
+    friend auto operator!=(Integral lhs, gcc_decimal32 rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs + rhs.underlying(); }
+
+    template <typename Integral>
+    friend auto operator<(gcc_decimal32 lhs, Integral rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs.underlying() + rhs; }
+
+    template <typename Integral>
+    friend auto operator<(Integral lhs, gcc_decimal32 rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs + rhs.underlying(); }
+
+    template <typename Integral>
+    friend auto operator<=(gcc_decimal32 lhs, Integral rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs.underlying() + rhs; }
+
+    template <typename Integral>
+    friend auto operator<=(Integral lhs, gcc_decimal32 rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs + rhs.underlying(); }
+
+    template <typename Integral>
+    friend auto operator>(gcc_decimal32 lhs, Integral rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs.underlying() + rhs; }
+
+    template <typename Integral>
+    friend auto operator>(Integral lhs, gcc_decimal32 rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs + rhs.underlying(); }
+
+    template <typename Integral>
+    friend auto operator>=(gcc_decimal32 lhs, Integral rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs.underlying() + rhs; }
+
+    template <typename Integral>
+    friend auto operator>=(Integral lhs, gcc_decimal32 rhs)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
+            { return lhs + rhs.underlying(); }
 };
 
 namespace detail {
