@@ -156,6 +156,9 @@ public:
     constexpr auto full_significand() const noexcept -> significand_type ;
     constexpr auto isneg() const noexcept -> bool;
 
+    // Returns a complete struct so we don't have to decode multiple times
+    constexpr auto to_components() const noexcept -> detail::decimal32_components;
+
 #ifdef BOOST_DECIMAL_DEBUG_ACCESSORS
 private:
 #endif
@@ -1450,16 +1453,57 @@ constexpr auto decimal32::full_significand() const noexcept -> significand_type
     return significand;
 }
 
+constexpr auto decimal32::isneg() const noexcept -> bool
+{
+    return static_cast<bool>(bits_ & detail::d32_sign_mask);
+}
+
+constexpr auto decimal32::to_components() const noexcept -> detail::decimal32_components
+{
+    detail::decimal32_components components {};
+
+    exponent_type expval {};
+    significand_type significand {};
+
+    const auto comb_bits {(bits_ & detail::d32_comb_11_mask)};
+
+    switch (comb_bits)
+    {
+        case detail::d32_comb_11_mask:
+            // bits 2 and 3 are the exp part of the combination field
+            expval = (bits_ & detail::d32_comb_11_exp_bits) >> (detail::d32_significand_bits + 1);
+            // Only need the one bit of T because the other 3 are implied
+            significand = (bits_ & detail::d32_comb_11_significand_bits) == detail::d32_comb_11_significand_bits ?
+                          UINT32_C(0b1001'0000000000'0000000000) :
+                          UINT32_C(0b1000'0000000000'0000000000);
+            break;
+        case detail::d32_comb_10_mask:
+            expval = UINT32_C(0b10000000);
+            // Last three bits in the combination field, so we need to shift past the exp field
+            // which is next
+            significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
+            break;
+        case detail::d32_comb_01_mask:
+            expval = UINT32_C(0b01000000);
+            significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
+            break;
+    }
+
+    significand |= (bits_ & detail::d32_significand_mask);
+    expval |= (bits_ & detail::d32_exponent_mask) >> detail::d32_significand_bits;
+
+    components.sig = significand;
+    components.exp = expval;
+    components.sign = bits_ & detail::d32_sign_mask;
+
+    return components;
+}
+
 template <typename T>
 constexpr auto decimal32::edit_significand(T sig) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, T, void)
 {
     *this = decimal32(sig, this->biased_exponent(), this->isneg());
-}
-
-constexpr auto decimal32::isneg() const noexcept -> bool
-{
-    return static_cast<bool>(bits_ & detail::d32_sign_mask);
 }
 
 // Allows changing the sign even on nans and infs
