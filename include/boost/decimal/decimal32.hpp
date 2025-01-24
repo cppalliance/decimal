@@ -1487,13 +1487,16 @@ constexpr auto decimal32::to_components() const noexcept -> detail::decimal32_co
             expval = UINT32_C(0b01000000);
             significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
             break;
+        case 0U:
+            significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
+            break;
     }
 
     significand |= (bits_ & detail::d32_significand_mask);
     expval |= (bits_ & detail::d32_exponent_mask) >> detail::d32_significand_bits;
 
     components.sig = significand;
-    components.exp = expval;
+    components.exp = expval - detail::bias_v<decimal32>;
     components.sign = bits_ & detail::d32_sign_mask;
 
     return components;
