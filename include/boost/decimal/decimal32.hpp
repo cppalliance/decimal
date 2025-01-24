@@ -143,6 +143,9 @@ private:
 
     std::uint32_t bits_ {};
 
+#ifdef BOOST_DECIMAL_DEBUG_ACCESSORS
+public:
+#endif
     // Returns the un-biased (quantum) exponent
     constexpr auto unbiased_exponent() const noexcept -> exponent_type ;
 
@@ -153,6 +156,9 @@ private:
     constexpr auto full_significand() const noexcept -> significand_type ;
     constexpr auto isneg() const noexcept -> bool;
 
+#ifdef BOOST_DECIMAL_DEBUG_ACCESSORS
+private:
+#endif
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
