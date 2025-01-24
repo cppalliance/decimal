@@ -189,3 +189,4 @@ compile compile_tests/iostream_compile.cpp ;
 compile compile_tests/literals_compile.cpp ;
 compile compile_tests/numbers_compile.cpp ;
 compile compile_tests/string_compile.cpp ;
+compile compile_tests/uint128.cpp ;
