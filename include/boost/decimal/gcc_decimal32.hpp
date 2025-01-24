@@ -39,21 +39,21 @@ private:
     std::decimal::decimal32 internal_decimal_ {};
 
     // Returns the un-biased (quantum) exponent
-    BOOST_DECIMAL_NO_DISCARD inline auto unbiased_exponent() const noexcept -> exponent_type;
+    inline auto unbiased_exponent() const noexcept -> exponent_type;
 
     // Returns the biased exponent
-    BOOST_DECIMAL_NO_DISCARD inline auto biased_exponent() const noexcept -> biased_exponent_type;
+    inline auto biased_exponent() const noexcept -> biased_exponent_type;
 
     // Returns the significand complete with the bits implied from the combination field
-    BOOST_DECIMAL_NO_DISCARD inline auto full_significand() const noexcept -> significand_type;
+    inline auto full_significand() const noexcept -> significand_type;
 
-    BOOST_DECIMAL_NO_DISCARD inline auto isneg() const noexcept -> bool;
+    inline auto isneg() const noexcept -> bool;
 
     // Since we have the overhead of memcpy in order to decode anything
     // get them all at once if we are going to need it
-    BOOST_DECIMAL_NO_DISCARD inline auto to_components() const noexcept -> detail::decimal32_components;
+    inline auto to_components() const noexcept -> detail::decimal32_components;
 
-    BOOST_DECIMAL_NO_DISCARD inline auto underlying() const noexcept -> std::decimal::decimal32 { return internal_decimal_; }
+    inline auto underlying() const noexcept -> std::decimal::decimal32 { return internal_decimal_; }
 
 public:
 
