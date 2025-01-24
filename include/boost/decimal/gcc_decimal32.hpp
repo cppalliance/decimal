@@ -78,6 +78,9 @@ public:
     friend return_type operator-(const gcc_decimal32 rhs) { return -rhs.underlying(); }
 
     // 3.2.8  Binary arithmetic operators.
+    friend auto operator+(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+        {return lhs.underlying() + rhs.underlying(); }
+
     template <typename Integral>
     friend auto operator+(gcc_decimal32 lhs, Integral rhs)
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, return_type)
@@ -87,6 +90,9 @@ public:
     friend auto operator+(Integral lhs, gcc_decimal32 rhs)
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, return_type)
             { return lhs + rhs.underlying(); }
+
+    friend auto operator-(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+        {return lhs.underlying() - rhs.underlying(); }
 
     template <typename Integral>
     friend auto operator-(gcc_decimal32 lhs, Integral rhs)
@@ -98,6 +104,9 @@ public:
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, return_type)
             { return lhs - rhs.underlying(); }
 
+    friend auto operator*(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+        {return lhs.underlying() * rhs.underlying(); }
+
     template <typename Integral>
     friend auto operator*(gcc_decimal32 lhs, Integral rhs)
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, return_type)
@@ -107,6 +116,9 @@ public:
     friend auto operator*(Integral lhs, gcc_decimal32 rhs)
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, return_type)
             { return lhs * rhs.underlying(); }
+
+    friend auto operator/(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+        {return lhs.underlying() / rhs.underlying(); }
 
     template <typename Integral>
     friend auto operator/(gcc_decimal32 lhs, Integral rhs)
@@ -119,6 +131,9 @@ public:
             { return lhs / rhs.underlying(); }
 
     // 3.2.9  Comparison operators.
+    friend auto operator==(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+        {return lhs.underlying() == rhs.underlying(); }
+
     template <typename Integral>
     friend auto operator==(gcc_decimal32 lhs, Integral rhs)
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
@@ -128,6 +143,9 @@ public:
     friend auto operator==(Integral lhs, gcc_decimal32 rhs)
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
             { return lhs + rhs.underlying(); }
+
+    friend auto operator!=(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+        { return lhs.underlying() != rhs.underlying(); }
 
     template <typename Integral>
     friend auto operator!=(gcc_decimal32 lhs, Integral rhs)
@@ -139,6 +157,9 @@ public:
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
             { return lhs + rhs.underlying(); }
 
+    friend auto operator<(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+        {return lhs.underlying() < rhs.underlying(); }
+
     template <typename Integral>
     friend auto operator<(gcc_decimal32 lhs, Integral rhs)
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
@@ -148,6 +169,9 @@ public:
     friend auto operator<(Integral lhs, gcc_decimal32 rhs)
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
             { return lhs + rhs.underlying(); }
+
+    friend auto operator<=(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+        { return lhs.underlying() <= rhs.underlying(); }
 
     template <typename Integral>
     friend auto operator<=(gcc_decimal32 lhs, Integral rhs)
@@ -159,6 +183,9 @@ public:
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
             { return lhs + rhs.underlying(); }
 
+    friend auto operator>(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+        { return lhs.underlying() > rhs.underlying(); }
+
     template <typename Integral>
     friend auto operator>(gcc_decimal32 lhs, Integral rhs)
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
@@ -168,6 +195,9 @@ public:
     friend auto operator>(Integral lhs, gcc_decimal32 rhs)
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
             { return lhs + rhs.underlying(); }
+
+    friend auto operator>=(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+        { return lhs.underlying() >= rhs.underlying(); }
 
     template <typename Integral>
     friend auto operator>=(gcc_decimal32 lhs, Integral rhs)
