@@ -38,6 +38,9 @@ private:
 
     std::decimal::decimal32 internal_decimal_ {};
 
+#ifdef BOOST_DECIMAL_DEBUG_ACCESSORS
+public:
+#endif
     // Returns the un-biased (quantum) exponent
     inline auto unbiased_exponent() const noexcept -> exponent_type;
 
