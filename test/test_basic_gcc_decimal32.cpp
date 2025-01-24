@@ -34,6 +34,18 @@ void compare_bits(long long coeff, int exp)
                   << "Boost: " << std::bitset<32>(boost_bits) << "\n"
                   << "  GCC: " << std::bitset<32>(gcc_bits) << "\n" << std::endl;
     }
+
+    // Separate test of the to_components
+    const auto dec_struct = dec32_val.to_components();
+    const auto gcc_struct = gcc_val.to_components();
+
+    BOOST_TEST_EQ(gcc_struct.sign, gcc_val.isneg());
+    BOOST_TEST_EQ(gcc_struct.sig, gcc_val.full_significand());
+    BOOST_TEST_EQ(gcc_struct.exp, gcc_val.biased_exponent());
+
+    BOOST_TEST_EQ(dec_struct.sign, gcc_struct.sign);
+    BOOST_TEST_EQ(dec_struct.sig, gcc_struct.sig);
+    BOOST_TEST_EQ(dec_struct.exp, gcc_struct.exp);
 }
 
 int main()
