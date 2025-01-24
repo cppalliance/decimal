@@ -1496,7 +1496,7 @@ constexpr auto decimal32::to_components() const noexcept -> detail::decimal32_co
     expval |= (bits_ & detail::d32_exponent_mask) >> detail::d32_significand_bits;
 
     components.sig = significand;
-    components.exp = expval - detail::bias_v<decimal32>;
+    components.exp = static_cast<decimal32::biased_exponent_type>(expval) - detail::bias_v<decimal32>;
     components.sign = bits_ & detail::d32_sign_mask;
 
     return components;
