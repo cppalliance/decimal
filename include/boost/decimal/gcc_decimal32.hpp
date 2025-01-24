@@ -250,13 +250,13 @@ inline auto decode_gccd32_unbiased_exponent(std::uint32_t bits_) noexcept -> gcc
     const auto steering_bits {(bits_ & gccd32_steering_bits_mask)};
 
     // 3 of the 4 steering patterns leave this laid out like a binary float instead of an IEEE 754 decimal float
-    if (steering_bits == gccd32_11_steering_bits)
+    if (steering_bits != gccd32_11_steering_bits)
     {
-        expval |= (bits_ & gccd32_11_exp_mask) >> 21U;
+        expval |= (bits_ & gccd32_01_exp_mask) >> 23U;
     }
     else
     {
-        expval |= (bits_ & gccd32_01_exp_mask) >> 23U;
+        expval |= (bits_ & gccd32_11_exp_mask) >> 21U;
     }
 
     return expval;
@@ -273,14 +273,14 @@ inline auto decode_gccd32_significand(std::uint32_t bits_) -> gcc_decimal32::sig
 
     const auto steering_bits {(bits_ & gccd32_steering_bits_mask)};
 
-    if (steering_bits == gccd32_11_steering_bits)
+    if (steering_bits != gccd32_11_steering_bits)
     {
-        significand = UINT32_C(0b1000'0000000000'0000000000);
-        significand |= (bits_ & gccd32_11_significand_mask);
+        significand |= (bits_ & gccd32_01_significand_mask);
     }
     else
     {
-        significand |= (bits_ & gccd32_01_significand_mask);
+        significand = UINT32_C(0b1000'0000000000'0000000000);
+        significand |= (bits_ & gccd32_11_significand_mask);
     }
 
     return significand;
@@ -331,16 +331,16 @@ inline auto gcc_decimal32::to_components() const noexcept -> detail::decimal32_c
     gcc_decimal32::significand_type significand {};
     const auto steering_bits {(bits_ & detail::gccd32_steering_bits_mask)};
 
-    if (steering_bits == detail::gccd32_11_steering_bits)
+    if (steering_bits != detail::gccd32_11_steering_bits)
+    {
+        significand |= (bits_ & detail::gccd32_01_significand_mask);
+        expval |= (bits_ & detail::gccd32_01_exp_mask) >> 23U;
+    }
+    else
     {
         significand = UINT32_C(0b1000'0000000000'0000000000);
         significand |= (bits_ & detail::gccd32_11_significand_mask);
         expval |= (bits_ & detail::gccd32_11_exp_mask) >> 21U;
-    }
-    else
-    {
-        significand |= (bits_ & detail::gccd32_01_significand_mask);
-        expval |= (bits_ & detail::gccd32_01_exp_mask) >> 23U;
     }
 
     components.sig = significand;
