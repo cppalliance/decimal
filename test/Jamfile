@@ -192,3 +192,6 @@ compile compile_tests/numbers_compile.cpp ;
 compile compile_tests/string_compile.cpp ;
 compile compile_tests/uint128.cpp ;
 compile compile_tests/gcc_decimal32.cpp ;
+
+# Wrapper types
+run test_basic_gcc_decimal32.cpp ;
