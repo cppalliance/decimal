@@ -94,8 +94,29 @@ public:
     explicit gcc_decimal32(std::decimal::decimal32 decimal) { internal_decimal_ = decimal; }
 
     // 3.2.5  Initialization from coefficient and exponent.
-    gcc_decimal32(long long coeff, int exp);
-    gcc_decimal32(unsigned long long coeff, int exp);
+    template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer> && detail::is_signed_v<Integer>, bool> = true>
+    gcc_decimal32(Integer coeff)
+    {
+        internal_decimal_ = std::decimal::make_decimal32(static_cast<long long>(coeff), 0);
+    }
+
+    template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer> && detail::is_unsigned_v<Integer>, bool> = true>
+    gcc_decimal32(Integer coeff)
+    {
+        internal_decimal_ = std::decimal::make_decimal32(static_cast<unsigned long long>(coeff), 0);
+    }
+
+    template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer> && detail::is_signed_v<Integer>, bool> = true>
+    gcc_decimal32(Integer coeff, int exp)
+    {
+        internal_decimal_ = std::decimal::make_decimal32(static_cast<long long>(coeff), exp);
+    }
+
+    template <BOOST_DECIMAL_INTEGRAL Integer, std::enable_if_t<detail::is_integral_v<Integer> && detail::is_unsigned_v<Integer>, bool> = true>
+    gcc_decimal32(Integer coeff, int exp)
+    {
+        internal_decimal_ = std::decimal::make_decimal32(static_cast<unsigned long long>(coeff), exp);
+    }
 
     // Non-conforming extension: Conversion to integral type.
     inline operator long long() const noexcept;
