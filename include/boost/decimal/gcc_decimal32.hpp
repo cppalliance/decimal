@@ -5,7 +5,7 @@
 #ifndef BOOST_DECIMAL_GCC_DECIMAL32_HPP
 #define BOOST_DECIMAL_GCC_DECIMAL32_HPP
 
-#if __has_include(<decimal/decimal>)
+#if __has_include(<decimal/decimal>) && defined(__GNUC__) && __GNUC__ >= 7
 
 #include <decimal/decimal>
 #include <boost/decimal/decimal32.hpp>
