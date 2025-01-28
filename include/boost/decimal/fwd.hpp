@@ -20,6 +20,10 @@ class decimal64_fast;
 class decimal128;
 class decimal128_fast;
 
+#ifdef BOOST_DECIMAL_HAS_LIBSTDCPP_DECIMAL
+class gcc_decimal32;
+#endif
+
 } // namespace decimal
 } // namespace boost
 
