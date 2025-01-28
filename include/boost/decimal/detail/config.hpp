@@ -360,4 +360,8 @@ typedef unsigned __int128 uint128_t;
 #  endif
 #endif
 
+#if __has_include(<decimal/decimal>) && defined(__GNUC__) && __GNUC__ >= 7
+#  define BOOST_DECIMAL_HAS_LIBSTDCPP_DECIMAL
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP

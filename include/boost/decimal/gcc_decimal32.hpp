@@ -5,11 +5,13 @@
 #ifndef BOOST_DECIMAL_GCC_DECIMAL32_HPP
 #define BOOST_DECIMAL_GCC_DECIMAL32_HPP
 
-#if __has_include(<decimal/decimal>) && defined(__GNUC__) && __GNUC__ >= 7
+#include <boost/decimal/detail/config.hpp>
+
+#ifdef BOOST_DECIMAL_HAS_LIBSTDCPP_DECIMAL
 
 #include <decimal/decimal>
 #include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/to_integral.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
