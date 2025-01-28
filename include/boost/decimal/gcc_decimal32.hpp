@@ -321,6 +321,39 @@ public:
     inline auto operator--() noexcept -> gcc_decimal32&;
     inline auto operator--(int) noexcept -> gcc_decimal32;
 
+    // 3.2.2.7  Compound assignment.
+    inline auto operator+=(gcc_decimal32 rhs) noexcept -> gcc_decimal32&
+        { internal_decimal_ += rhs.underlying(); return *this; }
+
+    template <typename Integer>
+    inline auto operator+=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
+            { internal_decimal_ += rhs; return *this; }
+
+    inline auto operator-=(gcc_decimal32 rhs) noexcept -> gcc_decimal32&
+        { internal_decimal_ -= rhs.underlying(); return *this; }
+
+    template <typename Integer>
+    inline auto operator-=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
+            { internal_decimal_ -= rhs; return *this; }
+
+    template <typename Integer>
+    inline auto operator*=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
+            { internal_decimal_ *= rhs; return *this; }
+
+    inline auto operator*=(gcc_decimal32 rhs) noexcept -> gcc_decimal32&
+        { internal_decimal_ *= rhs.underlying(); return *this; }
+
+    template <typename Integer>
+    inline auto operator/=(Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
+            { internal_decimal_ /= rhs; return *this; }
+
+    inline auto operator/=(gcc_decimal32 rhs) noexcept -> gcc_decimal32&
+        { internal_decimal_ /= rhs.underlying(); return *this; }
+
     // A basic output operator for now
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const gcc_decimal32& d) -> std::basic_ostream<charT, traits>&
