@@ -470,6 +470,31 @@ void random_mixed_division(T lower, T upper)
     */
 }
 
+void force_nonfinite()
+{
+    // INF
+    gcc_decimal32 val1 {1'000'000};
+
+    for (int i {}; i < 1000; ++i)
+    {
+        val1 *= val1;
+    }
+
+    std::uint32_t bits {};
+    std::memcpy(&bits, &val1, sizeof(std::uint32_t));
+
+    BOOST_TEST(isinf(val1));
+
+    // NAN
+    val1 = 10;
+    val1 /= gcc_decimal32{0};
+    bits = 0U;
+
+    std::memcpy(&bits, &val1, sizeof(std::uint32_t));
+
+    BOOST_TEST(!isfinite(val1));
+}
+
 int main()
 {
     // Values that won't exceed the range of the significand
@@ -589,6 +614,8 @@ int main()
 
     spot_random_mixed_addition(-653573LL, 1391401LL);
     spot_random_mixed_addition(894090LL, -1886315LL);
+
+    force_nonfinite();
 
     return boost::report_errors();
 }
