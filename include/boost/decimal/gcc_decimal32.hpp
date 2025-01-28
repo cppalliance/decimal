@@ -95,6 +95,13 @@ public:
     friend inline auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool;
     friend inline auto isfinite    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool;
 
+    // Attempts conversion to integral type:
+    // If this is nan sets errno to EINVAL and returns 0
+    // If this is not representable sets errno to ERANGE and returns 0
+    template <typename Decimal, typename TargetType>
+    friend constexpr auto to_integral(Decimal val) noexcept
+        BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
+
 public:
 
     using return_type = std::decimal::decimal32;
@@ -129,6 +136,7 @@ public:
     }
 
     // Non-conforming extension: Conversion to integral type.
+    inline operator unsigned long long() const noexcept;
     inline operator long long() const noexcept;
 
     // 3.2.6  Conversion to generic floating-point type.
@@ -194,7 +202,7 @@ public:
             { return lhs / rhs.underlying(); }
 
     // 3.2.9  Comparison operators.
-    friend auto operator==(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+    friend auto operator==(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> bool
         {return lhs.underlying() == rhs.underlying(); }
 
     template <typename Integral>
@@ -207,7 +215,7 @@ public:
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
             { return lhs == rhs.underlying(); }
 
-    friend auto operator!=(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+    friend auto operator!=(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> bool
         { return lhs.underlying() != rhs.underlying(); }
 
     template <typename Integral>
@@ -220,7 +228,7 @@ public:
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
             { return lhs != rhs.underlying(); }
 
-    friend auto operator<(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+    friend auto operator<(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> bool
         {return lhs.underlying() < rhs.underlying(); }
 
     template <typename Integral>
@@ -233,7 +241,7 @@ public:
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
             { return lhs < rhs.underlying(); }
 
-    friend auto operator<=(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+    friend auto operator<=(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> bool
         { return lhs.underlying() <= rhs.underlying(); }
 
     template <typename Integral>
@@ -246,7 +254,7 @@ public:
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
             { return lhs <= rhs.underlying(); }
 
-    friend auto operator>(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+    friend auto operator>(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> bool
         { return lhs.underlying() > rhs.underlying(); }
 
     template <typename Integral>
@@ -259,7 +267,7 @@ public:
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integral, bool)
             { return lhs > rhs.underlying(); }
 
-    friend auto operator>=(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> return_type
+    friend auto operator>=(gcc_decimal32 lhs, gcc_decimal32 rhs) noexcept -> bool
         { return lhs.underlying() >= rhs.underlying(); }
 
     template <typename Integral>
@@ -469,13 +477,6 @@ inline gcc_decimal32::operator long double() const noexcept
 {
     return std::decimal::decimal32_to_long_double(internal_decimal_);
 }
-
-namespace detail {
-
-template <>
-struct is_decimal_floating_point<gcc_decimal32> { static constexpr bool value = true; };
-
-}// namespace detial
 
 } // namespace decimal
 } // namespace boost
