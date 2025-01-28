@@ -360,7 +360,7 @@ typedef unsigned __int128 uint128_t;
 #  endif
 #endif
 
-#if __has_include(<decimal/decimal>) && defined(__GNUC__) && __GNUC__ >= 7
+#if __has_include(<decimal/decimal>) && defined(_GLIBCXX_USE_DECIMAL_FLOAT)
 #  define BOOST_DECIMAL_HAS_LIBSTDCPP_DECIMAL
 #endif
 
