@@ -35,8 +35,8 @@ constexpr auto to_integral(Decimal val) noexcept
 {
     using Conversion_Type = std::conditional_t<std::numeric_limits<TargetType>::is_signed, std::int64_t, std::uint64_t>;
 
-    constexpr Decimal max_target_type { (std::numeric_limits<TargetType>::max)() };
-    constexpr Decimal min_target_type { (std::numeric_limits<TargetType>::min)() };
+    const Decimal max_target_type { (std::numeric_limits<TargetType>::max)() };
+    const Decimal min_target_type { (std::numeric_limits<TargetType>::min)() };
 
     if (isnan(val))
     {
