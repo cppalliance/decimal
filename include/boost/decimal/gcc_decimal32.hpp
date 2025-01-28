@@ -138,6 +138,10 @@ public:
     // Non-conforming extension: Conversion to integral type.
     inline operator unsigned long long() const noexcept;
     inline operator long long() const noexcept;
+    inline operator unsigned long() const noexcept;
+    inline operator long() const noexcept;
+    inline operator unsigned() const noexcept;
+    inline operator int() const noexcept;
 
     // 3.2.6  Conversion to generic floating-point type.
     inline explicit operator float() const noexcept;
@@ -429,6 +433,12 @@ inline auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs)
     return rhs.isneg();
 }
 
+inline auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
+{
+    static_cast<void>(rhs);
+    return false;
+}
+
 inline auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
 {
     static_cast<void>(rhs);
@@ -461,6 +471,26 @@ inline gcc_decimal32::operator unsigned long long() const noexcept
 inline gcc_decimal32::operator long long() const noexcept
 {
     return std::decimal::decimal32_to_long_long(internal_decimal_);
+}
+
+inline gcc_decimal32::operator unsigned long() const noexcept
+{
+    return to_integral<gcc_decimal32, unsigned long>(*this);
+}
+
+inline gcc_decimal32::operator long() const noexcept
+{
+    return static_cast<long>(std::decimal::decimal32_to_long_long(internal_decimal_));
+}
+
+inline gcc_decimal32::operator unsigned() const noexcept
+{
+    return static_cast<unsigned>(std::decimal::decimal32_to_long_long(internal_decimal_));
+}
+
+inline gcc_decimal32::operator int() const noexcept
+{
+    return static_cast<int>(std::decimal::decimal32_to_long_long(internal_decimal_));
 }
 
 inline gcc_decimal32::operator float() const noexcept
