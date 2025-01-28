@@ -71,6 +71,11 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_11_significand_mask = UINT
 
 #endif
 
+// Non-finite values
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_inf = UINT32_C(0x78000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_qnan = UINT32_C(0x7C000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_snan = UINT32_C(0x7E000000);
+
 } // namespace detail
 
 // This type is a wrapper around gcc std::decimal::decimal32 to allow it to use
@@ -327,7 +332,7 @@ public:
 
     template <typename Integer>
     inline auto operator+=(Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, gcc_decimal32&)
             { internal_decimal_ += rhs; return *this; }
 
     inline auto operator-=(gcc_decimal32 rhs) noexcept -> gcc_decimal32&
@@ -335,12 +340,12 @@ public:
 
     template <typename Integer>
     inline auto operator-=(Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, gcc_decimal32&)
             { internal_decimal_ -= rhs; return *this; }
 
     template <typename Integer>
     inline auto operator*=(Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, gcc_decimal32&)
             { internal_decimal_ *= rhs; return *this; }
 
     inline auto operator*=(gcc_decimal32 rhs) noexcept -> gcc_decimal32&
@@ -348,7 +353,7 @@ public:
 
     template <typename Integer>
     inline auto operator/=(Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32&)
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, gcc_decimal32&)
             { internal_decimal_ /= rhs; return *this; }
 
     inline auto operator/=(gcc_decimal32 rhs) noexcept -> gcc_decimal32&
@@ -505,32 +510,48 @@ inline auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs)
 
 inline auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
 {
-    static_cast<void>(rhs);
-    return false;
+    std::uint32_t bits_ {};
+    std::memcpy(&bits_, &rhs.internal_decimal_, sizeof(std::uint32_t));
+
+    return bits_ == detail::gccd32_inf;
 }
 
 inline auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
 {
-    static_cast<void>(rhs);
-    return false;
+    std::uint32_t bits_ {};
+    std::memcpy(&bits_, &rhs.internal_decimal_, sizeof(std::uint32_t));
+
+    return bits_ >= detail::gccd32_qnan;
 }
 
 inline auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
 {
-    static_cast<void>(rhs);
-    return false;
+    std::uint32_t bits_ {};
+    std::memcpy(&bits_, &rhs.internal_decimal_, sizeof(std::uint32_t));
+
+    return bits_ == detail::gccd32_snan;
 }
 
 inline auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
 {
-    static_cast<void>(rhs);
-    return true;
+    std::uint32_t bits_ {};
+    std::memcpy(&bits_, &rhs.internal_decimal_, sizeof(std::uint32_t));
+
+    return bits_ < detail::gccd32_inf;
 }
 
 inline auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
 {
-    static_cast<void>(rhs);
-    return true;
+    // Check for de-normals
+    const auto sig {rhs.full_significand()};
+    const auto exp {rhs.unbiased_exponent()};
+
+    if (exp <= detail::precision_v<decimal32> - 1)
+    {
+        return false;
+    }
+
+    return (sig != 0) && isfinite(rhs);
 }
 
 inline gcc_decimal32::operator unsigned long long() const noexcept
