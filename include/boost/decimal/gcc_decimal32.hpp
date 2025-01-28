@@ -317,6 +317,12 @@ public:
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering);
     #endif
 
+    // 3.2.2.6  Increment and decrement operators
+    inline auto operator++() noexcept -> gcc_decimal32&;
+    inline auto operator++(int) noexcept -> gcc_decimal32;
+    inline auto operator--() noexcept -> gcc_decimal32&;
+    inline auto operator--(int) noexcept -> gcc_decimal32;
+
     // A basic output operator for now
     template <typename charT, typename traits>
     friend auto operator<<(std::basic_ostream<charT, traits>& os, const gcc_decimal32& d) -> std::basic_ostream<charT, traits>&
@@ -602,6 +608,30 @@ constexpr auto operator<=>(Integer lhs, gcc_decimal32 rhs) noexcept
 }
 
 #endif
+
+inline auto gcc_decimal32::operator++() noexcept -> gcc_decimal32&
+{
+    internal_decimal_++;
+    return *this;
+}
+
+inline auto gcc_decimal32::operator++(int) noexcept -> gcc_decimal32
+{
+    internal_decimal_++;
+    return *this;
+}
+
+inline auto gcc_decimal32::operator--() noexcept -> gcc_decimal32&
+{
+    internal_decimal_--;
+    return *this;
+}
+
+inline auto gcc_decimal32::operator--(int) noexcept -> gcc_decimal32
+{
+    internal_decimal_--;
+    return *this;
+}
 
 } // namespace decimal
 } // namespace boost
