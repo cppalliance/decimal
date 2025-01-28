@@ -4,6 +4,10 @@
 
 #define BOOST_DECIMAL_DEBUG_ACCESSORS
 
+#include <boost/decimal/detail/config.hpp>
+
+#ifdef BOOST_DECIMAL_HAS_LIBSTDCPP_DECIMAL
+
 #include <boost/decimal/decimal32.hpp>
 #include <boost/decimal/gcc_decimal32.hpp>
 #include <boost/decimal/dpd_conversion.hpp>
@@ -92,3 +96,12 @@ int main()
 
     return boost::report_errors();
 }
+
+#else
+
+int main()
+{
+    return 0;
+}
+
+#endif
