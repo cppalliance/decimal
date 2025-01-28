@@ -53,6 +53,10 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_11_exp_mask = UINT32_C(0b0
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_01_significand_mask = UINT32_C(0b00000000011111111111111111111111);
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_11_significand_mask = UINT32_C(0b00000000000111111111111111111111);
 
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_inf_mask = UINT32_C(0x78000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_qnan_mask = UINT32_C(0x7C000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_snan_mask = UINT32_C(0x7E000000);
+
 #else
 
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_sign_mask =          UINT32_C(0b00000000000000000000000000000001);
@@ -68,6 +72,10 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_11_exp_mask = UINT32_C(0b0
 
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_01_significand_mask = UINT32_C(0b11111111111111111111111000000000);
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_11_significand_mask = UINT32_C(0b11111111111111111111100000000000);
+
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_inf_mask  = UINT32_C(0b00000000000000000000000000011110);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_qnan_mask = UINT32_C(0b00000000000000000000000000111110);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t gccd32_snan_mask = UINT32_C(0b00000000000000000000000001111110);
 
 #endif
 
@@ -687,6 +695,71 @@ inline auto gcc_decimal32::operator--(int) noexcept -> gcc_decimal32
 
 } // namespace decimal
 } // namespace boost
+
+BOOST_DECIMAL_EXPORT template <>
+struct std::numeric_limits<boost::decimal::gcc_decimal32>
+{
+    static constexpr bool is_specialized = true;
+    static constexpr bool is_signed = true;
+    static constexpr bool is_integer = false;
+    static constexpr bool is_exact = false;
+    static constexpr bool has_infinity = true;
+    static constexpr bool has_quiet_NaN = true;
+    static constexpr bool has_signaling_NaN = true;
+
+    // These members were deprecated in C++23
+    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
+    static constexpr std::float_denorm_style has_denorm = std::denorm_present;
+    static constexpr bool has_denorm_loss = true;
+    #endif
+
+    static constexpr std::float_round_style round_style = std::round_indeterminate;
+    static constexpr bool is_iec559 = true;
+    static constexpr bool is_bounded = true;
+    static constexpr bool is_modulo = false;
+    static constexpr int digits = 7;
+    static constexpr int digits10 = digits;
+    static constexpr int max_digits10 = digits;
+    static constexpr int radix = 10;
+    static constexpr int min_exponent = -95;
+    static constexpr int min_exponent10 = min_exponent;
+    static constexpr int max_exponent = 96;
+    static constexpr int max_exponent10 = max_exponent;
+    static constexpr bool traps = numeric_limits<std::uint32_t>::traps;
+    static constexpr bool tinyness_before = true;
+
+    // Member functions
+    static inline auto (min)        () -> boost::decimal::gcc_decimal32 { return {1, min_exponent}; }
+    static inline auto (max)        () -> boost::decimal::gcc_decimal32 { return {9'999'999, max_exponent - digits + 1}; }
+    static inline auto lowest       () -> boost::decimal::gcc_decimal32 { return {-9'999'999, max_exponent - digits + 1}; }
+    static inline auto epsilon      () -> boost::decimal::gcc_decimal32 { return {1, -digits + 1}; }
+    static inline auto round_error  () -> boost::decimal::gcc_decimal32 { return epsilon(); }
+    static inline auto infinity     () -> boost::decimal::gcc_decimal32
+    {
+        constexpr std::uint32_t bits_ = boost::decimal::detail::gccd32_inf_mask;
+        std::decimal::decimal32 val {};
+        std::memcpy(&val, &bits_, sizeof(std::uint32_t));
+        return boost::decimal::gcc_decimal32{val};
+    }
+
+    static inline auto quiet_NaN    () -> boost::decimal::gcc_decimal32
+    {
+        constexpr std::uint32_t bits_ = boost::decimal::detail::gccd32_qnan_mask;
+        std::decimal::decimal32 val {};
+        std::memcpy(&val, &bits_, sizeof(std::uint32_t));
+        return boost::decimal::gcc_decimal32{val};
+    }
+
+    static inline auto signaling_NaN() -> boost::decimal::gcc_decimal32
+    {
+        constexpr std::uint32_t bits_ = boost::decimal::detail::gccd32_snan_mask;
+        std::decimal::decimal32 val {};
+        std::memcpy(&val, &bits_, sizeof(std::uint32_t));
+        return boost::decimal::gcc_decimal32{val};
+    }
+
+    static inline auto denorm_min   () -> boost::decimal::gcc_decimal32 { return {1, boost::decimal::detail::etiny}; }
+};
 
 #else
 
