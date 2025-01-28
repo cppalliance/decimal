@@ -85,6 +85,14 @@ public:
 
     inline auto underlying() const noexcept -> std::decimal::decimal32 { return internal_decimal_; }
 
+    // cmath functions that are easier as friends
+    friend inline auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool;
+    friend inline auto isinf       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool;
+    friend inline auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool;
+    friend inline auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool;
+    friend inline auto isnormal    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool;
+    friend inline auto isfinite    BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool;
+
 public:
 
     using return_type = std::decimal::decimal32;
@@ -404,6 +412,40 @@ inline auto gcc_decimal32::to_components() const noexcept -> detail::decimal32_c
     components.sign = bits_ & detail::gccd32_sign_mask;
 
     return components;
+}
+
+inline auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
+{
+    return rhs.isneg();
+}
+
+inline auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
+{
+    static_cast<void>(rhs);
+    return false;
+}
+
+inline auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
+{
+    static_cast<void>(rhs);
+    return false;
+}
+
+inline auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
+{
+    static_cast<void>(rhs);
+    return true;
+}
+
+inline auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (gcc_decimal32 rhs) noexcept -> bool
+{
+    static_cast<void>(rhs);
+    return true;
+}
+
+inline gcc_decimal32::operator unsigned long long() const noexcept
+{
+    return to_integral<gcc_decimal32, unsigned long long>(*this);
 }
 
 inline gcc_decimal32::operator long long() const noexcept
