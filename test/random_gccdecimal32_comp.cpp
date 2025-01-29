@@ -7,6 +7,7 @@
 #ifdef BOOST_DECIMAL_HAS_LIBSTDCPP_DECIMAL
 
 #include <boost/decimal/gcc_decimal32.hpp>
+#include <boost/decimal/iostream.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <random>
 #include <limits>
