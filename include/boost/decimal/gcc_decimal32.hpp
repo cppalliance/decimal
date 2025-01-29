@@ -136,6 +136,9 @@ public:
     friend constexpr auto to_integral(Decimal val) noexcept
         BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+    friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
+
 public:
 
     gcc_decimal32() = default;
