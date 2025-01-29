@@ -17,6 +17,8 @@
 #elif defined(__GNUC__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
+#  pragma GCC diagnostic ignored "-Wfloat-conversion"
+#  pragma GCC diagnostic ignored "-Wconversion"
 #endif
 
 #include <boost/core/lightweight_test.hpp>
@@ -376,7 +378,7 @@ void random_division(T lower, T upper)
         if (std::isinf(res) && std::isinf(res_int))
         {
         }
-        else if (!BOOST_TEST(abs(res - res_int) < 0.001f))
+        else if (!BOOST_TEST(std::fabs(res - res_int) < 0.001f))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -417,7 +419,7 @@ void random_mixed_division(T lower, T upper)
         if (std::isinf(res) && std::isinf(res_int))
         {
         }
-        else if (!BOOST_TEST(abs(res - res_int) < 0.001f))
+        else if (!BOOST_TEST(std::fabs(res - res_int) < 0.001f))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -444,7 +446,7 @@ void random_mixed_division(T lower, T upper)
         if (std::isinf(res) && std::isinf(res_int))
         {
         }
-        else if (!BOOST_TEST(abs(res - res_int) < 0.01))
+        else if (!BOOST_TEST(std::fabs(res - res_int) < 0.01))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
