@@ -29,8 +29,8 @@ constexpr auto ceil BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
 {
     using DivType = typename T::significand_type;
 
-    constexpr T zero {0, 0};
-    constexpr T one {1, 0};
+    const T zero {0, 0};
+    const T one {1, 0};
     const auto fp {fpclassify(val)};
 
     switch (fp)

@@ -27,8 +27,8 @@ constexpr auto pow(T b, IntegralType p) noexcept
 {
     using local_integral_type = IntegralType;
 
-    constexpr T zero { 0, 0 };
-    constexpr T one  { 1, 0 };
+    const T zero { 0, 0 };
+    const T one  { 1, 0 };
 
     T result { };
 
@@ -150,7 +150,7 @@ BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto pow(T x, T a) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    constexpr T zero { 0, 0 };
+    const T zero { 0, 0 };
 
     auto result = zero;
 
@@ -162,7 +162,7 @@ constexpr auto pow(T x, T a) noexcept
     }
     else
     {
-        constexpr T one  { 1, 0 };
+        const T one  { 1, 0 };
 
         const auto fpc_x = fpclassify(x);
         const auto fpc_a = fpclassify(a);

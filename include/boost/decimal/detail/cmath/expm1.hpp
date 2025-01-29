@@ -29,8 +29,8 @@ constexpr auto expm1_impl(T x) noexcept
 {
     const auto fpc = fpclassify(x);
 
-    constexpr T zero { 0, 0 };
-    constexpr T one  { 1, 0 };
+    const T zero { 0, 0 };
+    const T one  { 1, 0 };
 
     auto result = zero;
 

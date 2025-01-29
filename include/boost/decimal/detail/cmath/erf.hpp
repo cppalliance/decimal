@@ -102,7 +102,7 @@ constexpr auto erf_series_near_zero_sum(const T &x) noexcept -> T
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto erf_calc_impl(T z, bool invert) noexcept -> T
 {
-    constexpr T zero {0, 0};
+    const T zero {0, 0};
 
     if (z < zero)
     {
@@ -232,7 +232,7 @@ constexpr auto erf_calc_impl(T z, bool invert) noexcept -> T
                 T{UINT64_C(8978713707780316114), -22}
             };
 
-            constexpr T one_and_half {15, -1};
+            const T one_and_half {15, -1};
             result = Y + tools::evaluate_polynomial(P, T(z - one_and_half)) / tools::evaluate_polynomial(Q, T(z - one_and_half));
         }
         else if (z < T{45, -1})

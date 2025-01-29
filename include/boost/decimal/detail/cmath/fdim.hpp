@@ -23,7 +23,7 @@ BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto fdim(T x, T y) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    constexpr T zero {0, 0};
+    const T zero {0, 0};
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(x) || isinf(x))

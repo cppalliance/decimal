@@ -34,7 +34,7 @@ template <typename T>
 constexpr auto ellint_1_impl(T m, T phi) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-  constexpr T one { 1 };
+  const T one { 1 };
 
   T result { };
 
@@ -47,7 +47,7 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
   }
   else if((fpc_phi == FP_ZERO) && (fpc_m == FP_NORMAL))
   {
-    constexpr T zero { 0 };
+    const T zero { 0 };
 
     result = zero;
   }
@@ -132,7 +132,7 @@ template <typename T>
 constexpr auto comp_ellint_1_impl(T m) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-  constexpr T one  { 1 };
+  const T one  { 1 };
 
   T result { };
 
@@ -152,7 +152,7 @@ constexpr auto comp_ellint_1_impl(T m) noexcept
   }
   else
   {
-    constexpr T zero { 0 };
+    const T zero { 0 };
 
     T Fpm { };
 

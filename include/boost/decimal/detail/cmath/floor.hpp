@@ -29,7 +29,7 @@ constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
 {
     using DivType = typename T::significand_type;
 
-    constexpr T zero {0, 0};
+    const T zero {0, 0};
     constexpr T neg_one {1, 0, true};
     const auto fp {fpclassify(val)};
 

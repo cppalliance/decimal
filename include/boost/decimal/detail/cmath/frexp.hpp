@@ -28,7 +28,7 @@ constexpr auto frexp_impl(T v, int* expon) noexcept
 {
     // This implementation of frexp follows closely that of eval_frexp
     // in Boost.Multiprecision's cpp_dec_float template class.
-    constexpr T zero { 0, 0 };
+    const T zero { 0, 0 };
 
     auto result_frexp = zero;
 

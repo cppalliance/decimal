@@ -73,7 +73,7 @@ constexpr auto tgamma_impl(T x) noexcept
         }
         else
         {
-            constexpr T one { 1, 0 };
+            const T one { 1, 0 };
 
             if (is_pure_int)
             {

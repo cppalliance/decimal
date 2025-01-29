@@ -35,8 +35,8 @@ constexpr auto asinh_impl(T x) noexcept
     {
         // Use (parts of) the implementation of asinh from Boost.Math.
 
-        constexpr T zero { 0, 0 };
-        constexpr T one  { 1, 0 };
+        const T zero { 0, 0 };
+        const T one  { 1, 0 };
 
         if (x < zero)
         {

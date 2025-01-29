@@ -27,7 +27,7 @@ template <typename T>
 constexpr auto log1p_impl(T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    constexpr T one { 1, 0 };
+    const T one { 1, 0 };
 
     T result { };
 

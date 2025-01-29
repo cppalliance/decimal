@@ -103,7 +103,7 @@ constexpr auto atan2_impl(T y, T x) noexcept
     }
     else if (fpcx == FP_INFINITE && !signx && isfinitey)
     {
-        constexpr T zero { 0, 0 };
+        const T zero { 0, 0 };
 
         result = signy ? -zero : zero;
     }

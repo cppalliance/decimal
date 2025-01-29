@@ -25,7 +25,7 @@ BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto round(T num) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    constexpr T zero {0, 0};
+    const T zero {0, 0};
     constexpr T half {5, -1};
 
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -67,7 +67,7 @@ namespace detail {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T, BOOST_DECIMAL_INTEGRAL Int>
 constexpr auto int_round_impl(T num) noexcept -> Int
 {
-    constexpr T zero {0, 0};
+    const T zero {0, 0};
     constexpr T lmax {(std::numeric_limits<Int>::max)()};
     constexpr T lmin {(std::numeric_limits<Int>::min)()};
 

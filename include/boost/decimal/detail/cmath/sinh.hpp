@@ -29,7 +29,7 @@ constexpr auto sinh_impl(T x) noexcept
 {
     const auto fpc = fpclassify(x);
 
-    constexpr T zero { 0, 0 };
+    const T zero { 0, 0 };
 
     auto result = zero;
 
@@ -58,7 +58,7 @@ constexpr auto sinh_impl(T x) noexcept
         }
         else
         {
-            constexpr T one  { 1, 0 };
+            const T one  { 1, 0 };
 
             if (x < one)
             {
