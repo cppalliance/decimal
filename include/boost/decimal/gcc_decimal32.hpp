@@ -366,35 +366,6 @@ public:
 
     inline auto operator/=(gcc_decimal32 rhs) noexcept -> gcc_decimal32&
         { internal_decimal_ /= rhs.underlying(); return *this; }
-
-    // A basic output operator for now
-    template <typename charT, typename traits>
-    friend auto operator<<(std::basic_ostream<charT, traits>& os, const gcc_decimal32& d) -> std::basic_ostream<charT, traits>&
-    {
-        if (d.isneg())
-        {
-            os << "-";
-        }
-        else
-        {
-            os << "+";
-        }
-
-        os << d.full_significand();
-
-        const auto exp {d.biased_exponent()};
-
-        if (exp < 0)
-        {
-            os << "e-" << exp;
-        }
-        else
-        {
-            os << "e+" << exp;
-        }
-
-        return os;
-    }
 };
 
 template <typename charT, typename traits>
