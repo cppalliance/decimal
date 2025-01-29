@@ -27,6 +27,7 @@ void compare_bits(long long coeff, int exp)
         !BOOST_TEST_EQ(dec32_val.unbiased_exponent(), gcc_val.unbiased_exponent()) ||
         !BOOST_TEST_EQ(dec32_val.isneg(), gcc_val.isneg()))
     {
+        // LCOV_EXCL_START
         std::uint32_t boost_bits;
         std::memcpy(&boost_bits, &dec32_val, sizeof(std::uint32_t));
 
@@ -37,6 +38,7 @@ void compare_bits(long long coeff, int exp)
                   << "  Exp: " << exp << '\n'
                   << "Boost: " << std::bitset<32>(boost_bits) << "\n"
                   << "  GCC: " << std::bitset<32>(gcc_bits) << "\n" << std::endl;
+        // LCOV_EXCL_STOP
     }
 
     // Separate test of the to_components
