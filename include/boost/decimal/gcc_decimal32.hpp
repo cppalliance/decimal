@@ -734,8 +734,15 @@ struct std::numeric_limits<boost::decimal::gcc_decimal32>
     static inline auto lowest       () -> boost::decimal::gcc_decimal32 { return {-9'999'999, max_exponent - digits + 1}; }
     static inline auto epsilon      () -> boost::decimal::gcc_decimal32 { return {1, -digits + 1}; }
     static inline auto round_error  () -> boost::decimal::gcc_decimal32 { return epsilon(); }
+
+    #if defined(__GNUC__) && __GNUC__ >= 8
+    #  pragma GCC diagnostic push
+    #  pragma GCC diagnostic ignored "-Wclass-memaccess"
+    #endif
+
     static inline auto infinity     () -> boost::decimal::gcc_decimal32
     {
+        static_assert(sizeof(std::decimal::decimal32) == sizeof(std::uint32_t), "Decimal32 is an unexpected size.");
         constexpr std::uint32_t bits_ = boost::decimal::detail::gccd32_inf_mask;
         std::decimal::decimal32 val {};
         std::memcpy(&val, &bits_, sizeof(std::uint32_t));
@@ -744,6 +751,7 @@ struct std::numeric_limits<boost::decimal::gcc_decimal32>
 
     static inline auto quiet_NaN    () -> boost::decimal::gcc_decimal32
     {
+        static_assert(sizeof(std::decimal::decimal32) == sizeof(std::uint32_t), "Decimal32 is an unexpected size.");
         constexpr std::uint32_t bits_ = boost::decimal::detail::gccd32_qnan_mask;
         std::decimal::decimal32 val {};
         std::memcpy(&val, &bits_, sizeof(std::uint32_t));
@@ -752,11 +760,16 @@ struct std::numeric_limits<boost::decimal::gcc_decimal32>
 
     static inline auto signaling_NaN() -> boost::decimal::gcc_decimal32
     {
+        static_assert(sizeof(std::decimal::decimal32) == sizeof(std::uint32_t), "Decimal32 is an unexpected size.");
         constexpr std::uint32_t bits_ = boost::decimal::detail::gccd32_snan_mask;
         std::decimal::decimal32 val {};
         std::memcpy(&val, &bits_, sizeof(std::uint32_t));
         return boost::decimal::gcc_decimal32{val};
     }
+
+    #if defined(__GNUC__) && __GNUC__ >= 8
+    #  pragma GCC diagnostic pop
+    #endif
 
     static inline auto denorm_min   () -> boost::decimal::gcc_decimal32 { return {1, boost::decimal::detail::etiny}; }
 };
