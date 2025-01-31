@@ -41,7 +41,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan_high_bits = UINT64_MAX;
 struct decimal128_fast_components
 {
     using significand_type = uint128;
-    using biased_exponent_type = std::int_fast32_t;
+    using biased_exponent_type = std::int32_t;
 
     significand_type sig;
     biased_exponent_type exp;
@@ -54,8 +54,8 @@ BOOST_DECIMAL_EXPORT class decimal128_fast final
 {
 public:
     using significand_type = detail::uint128;
-    using exponent_type = std::uint_fast32_t;
-    using biased_exponent_type = std::int_fast32_t;
+    using exponent_type = std::uint32_t;
+    using biased_exponent_type = std::int32_t;
 
 private:
     // Instead of having to encode and decode at every operation
