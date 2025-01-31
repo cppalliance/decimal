@@ -285,13 +285,6 @@ public:
     #endif
     constexpr decimal32(T coeff, T2 exp, bool sign = false) noexcept;
 
-    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-    template <BOOST_DECIMAL_INTEGRAL T>
-    #else
-    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
-    #endif
-    constexpr decimal32(bool coeff, T exp, bool sign = false) noexcept;
-
     constexpr decimal32(const decimal32& val) noexcept = default;
     constexpr decimal32(decimal32&& val) noexcept = default;
     constexpr auto operator=(const decimal32& val) noexcept -> decimal32& = default;
@@ -1555,16 +1548,6 @@ constexpr auto decimal32::operator=(const Integer& val) noexcept
     using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
     *this = decimal32{static_cast<ConversionType>(val), 0};
     return *this;
-}
-
-#ifdef BOOST_DECIMAL_HAS_CONCEPTS
-template <BOOST_DECIMAL_INTEGRAL T>
-#else
-template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
-#endif
-constexpr decimal32::decimal32(bool coeff, T exp, bool sign) noexcept
-{
-    *this = decimal32(static_cast<std::int32_t>(coeff), exp, sign);
 }
 
 constexpr decimal32::operator bool() const noexcept
