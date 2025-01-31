@@ -14,7 +14,7 @@ https://www.boost.org/LICENSE_1_0.txt
 The performance changes by being non-IEEE 754 compliant so that the value does not have to be decoded from bits, but is instead directly represented internal to the type.
 As is often the case this trades space for time by having greater storage width requirements.
 
-- Storage width - At least 88 bits (`std::uint_fast64_t` + `std::uint_fast_16_t` + `bool`)
+- Storage width - 88 bits (`std::uint64_t` + `std::uint16_t` + `bool`)
 - Precision - 16 decimal digits (not bits like binary)
 - Max exponent - 385
 - Max Value - 9.999999999999999e385
@@ -29,6 +29,11 @@ namespace boost {
 namespace decimal {
 
 class decimal64_fast {
+
+public:
+    using significand_type = std::uint64_t;
+    using exponent_type = std::uint16_t;
+    using biased_exponent_type = std::int32_t;
 
 // Paragraph numbers are from ISO/IEC DTR 24733
 
