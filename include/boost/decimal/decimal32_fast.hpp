@@ -28,9 +28,9 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = std::numeric_limits<std::uint_fast32_t>::max() - 3;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = std::numeric_limits<std::uint_fast32_t>::max() - 2;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::uint_fast32_t>::max() - 1;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_fast_inf = std::numeric_limits<std::uint32_t>::max() - 3;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_fast_qnan = std::numeric_limits<std::uint32_t>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_fast_snan = std::numeric_limits<std::uint32_t>::max() - 1;
 
 }
 

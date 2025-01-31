@@ -31,9 +31,9 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_inf = std::numeric_limits<std::uint_fast64_t>::max() - 3;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_qnan = std::numeric_limits<std::uint_fast64_t>::max() - 2;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_snan = std::numeric_limits<std::uint_fast64_t>::max() - 1;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_fast_inf = std::numeric_limits<std::uint64_t>::max() - 3;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_fast_qnan = std::numeric_limits<std::uint64_t>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_fast_snan = std::numeric_limits<std::uint64_t>::max() - 1;
 
 struct decimal64_fast_components
 {
