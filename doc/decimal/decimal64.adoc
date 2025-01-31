@@ -50,6 +50,8 @@ template <typename Integral>
 constexpr decimal64& operator=(const Integeral& RHS) noexcept;
 
 // 3.2.3.4 Conversion to integral type
+// If the value exceeds the range of the integral,
+// or is non-finite std::numeric_limits::max() is returned
 explicit constexpr operator int() const noexcept;
 explicit constexpr operator unsigned() const noexcept;
 explicit constexpr operator long() const noexcept;
