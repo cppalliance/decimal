@@ -12,20 +12,65 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/cmath/modf.hpp>
 #include <boost/decimal/detail/cmath/abs.hpp>
 #include <boost/decimal/detail/cmath/round.hpp>
 #include <boost/decimal/detail/cmath/ilogb.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
+#include <boost/decimal/detail/cmath/frexp10.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
-#include <type_traits>
 #include <limits>
-#include <cstdint>
 #endif
 
 namespace boost {
 namespace decimal {
+
+namespace detail {
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1>
+constexpr auto nextafter_impl(T1 val, bool direction) noexcept -> T1
+{
+    constexpr T1 zero {0};
+
+    // Val < direction = +
+    // Val > direction = -
+    const auto abs_val {abs(val)};
+
+    if (val == zero)
+    {
+        const auto min_val {direction ? std::numeric_limits<T1>::denorm_min() :
+                                        -std::numeric_limits<T1>::denorm_min()};
+        return min_val;
+    }
+    if (abs_val > zero && abs_val < std::numeric_limits<T1>::epsilon())
+    {
+        const auto min_val {direction ? val + std::numeric_limits<T1>::min() :
+                                        val - std::numeric_limits<T1>::min()};
+        return min_val;
+    }
+
+    const auto val_eps {direction ? val + std::numeric_limits<T1>::epsilon() :
+                                    val - std::numeric_limits<T1>::epsilon()};
+
+    // If adding epsilon does nothing then we need to manipulate the representation
+    if (val == val_eps)
+    {
+        int exp {} ;
+        auto significand {frexp10(val, &exp)};
+
+        direction ? significand++ : significand--;
+
+        return T1{significand, exp};
+    }
+    else
+    {
+        return val_eps;
+    }
+}
+
+} // namespace detail
 
 BOOST_DECIMAL_EXPORT
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
@@ -48,12 +93,10 @@ constexpr auto nextafter(T1 val, T2 direction) noexcept
         return direction;
     }
     #endif
-    else if (val < direction)
+    else
     {
-        return val + std::numeric_limits<T1>::epsilon();
+        return detail::nextafter_impl(val, val < direction);
     }
-
-    return val - std::numeric_limits<T1>::epsilon();
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
