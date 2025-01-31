@@ -327,13 +327,6 @@ public:
     #endif
     constexpr decimal64(T1 coeff, T2 exp, bool sign = false) noexcept;
 
-    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-    template <BOOST_DECIMAL_INTEGRAL T>
-    #else
-    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
-    #endif
-    constexpr decimal64(bool coeff, T exp, bool sign = false) noexcept;
-
     // cmath functions that are easier as friends
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
     friend constexpr auto isnan       BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
@@ -860,10 +853,8 @@ template <BOOST_DECIMAL_INTEGRAL Integer>
 #else
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 #endif
-constexpr decimal64::decimal64(Integer val) noexcept // NOLINT : Incorrect parameter is never used
+constexpr decimal64::decimal64(Integer val) noexcept : decimal64{val, 0}
 {
-    using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
-    *this = decimal64{static_cast<ConversionType>(val), 0};
 }
 
 template <typename Integer>
@@ -873,16 +864,6 @@ constexpr auto decimal64::operator=(const Integer& val) noexcept
     using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
     *this = decimal64{static_cast<ConversionType>(val), 0};
     return *this;
-}
-
-#ifdef BOOST_DECIMAL_HAS_CONCEPTS
-template <BOOST_DECIMAL_INTEGRAL T>
-#else
-template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
-#endif
-constexpr decimal64::decimal64(bool coeff, T exp, bool sign) noexcept
-{
-    *this = decimal64(static_cast<std::int32_t>(coeff), exp, sign);
 }
 
 constexpr decimal64::operator bool() const noexcept

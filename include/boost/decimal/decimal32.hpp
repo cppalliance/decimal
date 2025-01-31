@@ -1535,10 +1535,8 @@ template <BOOST_DECIMAL_INTEGRAL Integer>
 #else
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 #endif
-constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect parameter is never used
+constexpr decimal32::decimal32(Integer val) noexcept : decimal32{val, 0}// NOLINT : Incorrect parameter is never used
 {
-    using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
-    *this = decimal32{static_cast<ConversionType>(val), 0};
 }
 
 template <typename Integer>

@@ -407,10 +407,8 @@ template <BOOST_DECIMAL_INTEGRAL Integer>
 #else
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 #endif
-constexpr decimal64_fast::decimal64_fast(Integer val) noexcept
+constexpr decimal64_fast::decimal64_fast(Integer val) noexcept : decimal64_fast{val, 0}
 {
-    using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
-    *this = decimal64_fast{static_cast<ConversionType>(val), 0, false};
 }
 
 #if defined(__clang__)
