@@ -49,6 +49,7 @@ run crash_report_1.cpp ;
 run github_issue_426.cpp ;
 run github_issue_448.cpp ;
 run-fail github_issue_519.cpp ;
+run github_issue_798.cpp ;
 run github_issue_799.cpp ;
 run github_issue_802.cpp ;
 run github_issue_805.cpp ;
