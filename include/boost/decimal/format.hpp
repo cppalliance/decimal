@@ -105,7 +105,7 @@ constexpr auto parse_impl(ParseContext &ctx)
 
 namespace std {
 
-template <boost::decimal::concepts::decimal_floating_point_type T>
+template <boost::decimal::detail::concepts::decimal_floating_point_type T>
 struct formatter<T>
 {
     constexpr formatter() : ctx_precision(6),
