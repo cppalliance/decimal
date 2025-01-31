@@ -50,6 +50,9 @@ template <typename T>
 struct make_unsigned { using type = std::make_unsigned_t<T>; };
 
 template <>
+struct make_unsigned<bool> { using type = std::uint8_t; };
+
+template <>
 struct make_unsigned<uint128> { using type = uint128; };
 
 template <>
