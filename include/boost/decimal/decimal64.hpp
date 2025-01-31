@@ -142,7 +142,7 @@ BOOST_DECIMAL_EXPORT class decimal64 final
 {
 public:
     using significand_type = std::uint64_t;
-    using exponent_type = std::uint64_t;
+    using exponent_type = std::uint32_t;
     using biased_exponent_type = std::int32_t;
 
 private:
