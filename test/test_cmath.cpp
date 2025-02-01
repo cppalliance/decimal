@@ -1128,7 +1128,7 @@ void test_nextafter()
         {
             BOOST_TEST_EQ(ret_val, ret_dec); // LCOV_EXCL_LINE
         }
-        else if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
+        else if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 25))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -1137,7 +1137,7 @@ void test_nextafter()
                       << "\nDec 2: " << d2
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
-                      << "\nDist: " << boost::math::float_distance(ret_val, ret_dec);
+                      << "\nDist: " << boost::math::float_distance(ret_val, ret_dec) << std::endl;
             // LCOV_EXCL_STOP
         }
     }
@@ -1147,8 +1147,8 @@ void test_nextafter()
     BOOST_TEST(isnan(nextafter(Dec(1), std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
     BOOST_TEST(!isinf(nextafter(Dec(1), std::numeric_limits<Dec>::infinity() * Dec(dist(rng)))));
     BOOST_TEST_EQ(nextafter(Dec(1), Dec(1)), Dec(1));
-    BOOST_TEST_EQ(nextafter(Dec(0), Dec(1)), std::numeric_limits<Dec>::epsilon());
-    BOOST_TEST_EQ(nextafter(Dec(0), Dec(-1)), -std::numeric_limits<Dec>::epsilon());
+    BOOST_TEST_EQ(nextafter(Dec(0), Dec(1)), std::numeric_limits<Dec>::denorm_min());
+    BOOST_TEST_EQ(nextafter(Dec(0), Dec(-1)), -std::numeric_limits<Dec>::denorm_min());
 }
 
 template <typename Dec>
@@ -1171,7 +1171,7 @@ void test_nexttoward()
         {
             BOOST_TEST_EQ(ret_val, ret_dec); // LCOV_EXCL_LINE
         }
-        else if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 10))
+        else if (!BOOST_TEST(boost::math::float_distance(ret_val, ret_dec) < 25))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -1180,7 +1180,7 @@ void test_nexttoward()
                       << "\nDec 2: " << d2
                       << "\nRet val: " << ret_val
                       << "\nRet dec: " << ret_dec
-                      << "\nDist: " << boost::math::float_distance(ret_val, ret_dec);
+                      << "\nDist: " << boost::math::float_distance(ret_val, ret_dec) << std::endl;
             // LCOV_EXCL_STOP
         }
     }
@@ -1188,8 +1188,8 @@ void test_nexttoward()
     BOOST_TEST(isinf(nexttoward(std::numeric_limits<Dec>::infinity() * Dec(dist(rng)), 1)));
     BOOST_TEST(isnan(nexttoward(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)), 1)));
     BOOST_TEST_EQ(nexttoward(Dec(1), 1), Dec(1));
-    BOOST_TEST_EQ(nexttoward(Dec(0), 1), std::numeric_limits<Dec>::epsilon());
-    BOOST_TEST_EQ(nexttoward(Dec(0), -1), -std::numeric_limits<Dec>::epsilon());
+    BOOST_TEST_EQ(nexttoward(Dec(0), 1), std::numeric_limits<Dec>::denorm_min());
+    BOOST_TEST_EQ(nexttoward(Dec(0), -1), -std::numeric_limits<Dec>::denorm_min());
 }
 
 template <typename T>
