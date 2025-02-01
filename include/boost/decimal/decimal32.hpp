@@ -590,6 +590,7 @@ private:
 #if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
+#  pragma GCC diagnostic ignored "-Wbool-compare"
 #endif
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -609,11 +610,21 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T>)
     {
+        // This branch will never be taken by bool but it throws a warning prior to C++17
+        #ifdef _MSC_VER
+        #  pragma warning(push)
+        #  pragma warning(disable : 4804)
+        #endif
+
         if (coeff < 0 || sign)
         {
             bits_ |= detail::d32_sign_mask;
             isneg = true;
         }
+
+        #ifdef _MSC_VER
+        #  pragma warning(pop)
+        #endif
     }
     else
     {
@@ -1535,10 +1546,8 @@ template <BOOST_DECIMAL_INTEGRAL Integer>
 #else
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 #endif
-constexpr decimal32::decimal32(Integer val) noexcept // NOLINT : Incorrect parameter is never used
+constexpr decimal32::decimal32(Integer val) noexcept : decimal32{val, 0}// NOLINT : Incorrect parameter is never used
 {
-    using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
-    *this = decimal32{static_cast<ConversionType>(val), 0};
 }
 
 template <typename Integer>

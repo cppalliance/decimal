@@ -393,10 +393,8 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
 }
 
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
-constexpr decimal32_fast::decimal32_fast(Integer val) noexcept
+constexpr decimal32_fast::decimal32_fast(Integer val) noexcept : decimal32_fast{val, 0}
 {
-    using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
-    *this = decimal32_fast{static_cast<ConversionType>(val), 0, false};
 }
 
 #if defined(__clang__)
