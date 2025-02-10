@@ -379,7 +379,7 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
         exp = 0;
     }
 
-    auto biased_exp {static_cast<exponent_type>(exp + detail::bias)};
+    auto biased_exp {static_cast<std::uint64_t>(exp + detail::bias)};
 
     // Decimal32 exponent holds 8 bits
     if (biased_exp > detail::max_biased_exp_v<decimal32_fast> || exp > detail::max_biased_exp_v<decimal32_fast>)
@@ -1028,7 +1028,7 @@ constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& 
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    using promoted_type = std::uint64_t;
+    using promoted_type = std::uint_fast64_t;
 
     // We promote to uint64 since the significands are currently 32-bits
     // By appending enough zeros to the LHS we end up finding what we need anyway
