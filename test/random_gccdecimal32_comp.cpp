@@ -4,7 +4,7 @@
 
 #include <boost/decimal/detail/config.hpp>
 
-#ifdef BOOST_DECIMAL_HAS_LIBSTDCPP_DECIMAL
+#if defined(BOOST_DECIMAL_HAS_LIBSTDCPP_DECIMAL) && defined(BOOST_DECIMAL_ENDIAN_LITTLE_BYTE)
 
 #include <boost/decimal/gcc_decimal32.hpp>
 #include <boost/decimal/iostream.hpp>
