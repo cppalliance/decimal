@@ -326,7 +326,7 @@ public:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> <= detail::impl::decimal_val_v<decimal32_fast>), bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
-    friend constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign) noexcept -> decimal32_fast;
+    friend constexpr auto direct_init(significand_type significand, exponent_type exponent, bool sign) noexcept -> decimal32_fast;
 
     // <cmath> or extensions that need to be friends
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
@@ -379,7 +379,7 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
         exp = 0;
     }
 
-    auto biased_exp {static_cast<std::uint_fast32_t>(exp + detail::bias)};
+    auto biased_exp {static_cast<exponent_type>(exp + detail::bias)};
 
     // Decimal32 exponent holds 8 bits
     if (biased_exp > detail::max_biased_exp_v<decimal32_fast>)
@@ -431,7 +431,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal32_fast::decimal32_fast(Float val) noexcept
 #  pragma GCC diagnostic pop
 #endif
 
-constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign = false) noexcept -> decimal32_fast
+constexpr auto direct_init(decimal32_fast::significand_type significand, decimal32_fast::exponent_type exponent, bool sign = false) noexcept -> decimal32_fast
 {
     decimal32_fast val;
     val.significand_ = significand;
@@ -1028,11 +1028,13 @@ constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& 
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
+    using promoted_type = std::uint64_t;
+
     // We promote to uint64 since the significands are currently 32-bits
     // By appending enough zeros to the LHS we end up finding what we need anyway
-    constexpr auto ten_pow_precision {detail::pow10(static_cast<std::uint_fast64_t>(detail::precision_v<decimal32>))};
-    const auto big_sig_lhs {static_cast<std::uint_fast64_t>(lhs.significand_) * ten_pow_precision};
-    const auto res_sig {big_sig_lhs / static_cast<std::uint_fast64_t>(rhs.significand_)};
+    constexpr auto ten_pow_precision {detail::pow10(static_cast<promoted_type>(detail::precision_v<decimal32>))};
+    const auto big_sig_lhs {static_cast<promoted_type>(lhs.significand_) * ten_pow_precision};
+    const auto res_sig {big_sig_lhs / static_cast<promoted_type>(rhs.significand_)};
     const auto res_exp {(lhs.biased_exponent() - detail::precision_v<decimal32>) - rhs.biased_exponent()};
 
     q = decimal32_fast(res_sig, res_exp, lhs.sign_ != rhs.sign_);
@@ -1500,7 +1502,7 @@ struct numeric_limits<boost::decimal::decimal32_fast>
     static constexpr int min_exponent10 = min_exponent;
     static constexpr int max_exponent = 96;
     static constexpr int max_exponent10 = max_exponent;
-    static constexpr bool traps = numeric_limits<std::uint_fast32_t>::traps;
+    static constexpr bool traps = numeric_limits<std::uint32_t>::traps;
     static constexpr bool tinyness_before = true;
 
     // Member functions
