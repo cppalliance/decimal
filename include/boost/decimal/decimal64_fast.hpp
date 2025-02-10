@@ -390,9 +390,9 @@ constexpr decimal64_fast::decimal64_fast(T1 coeff, T2 exp, bool sign) noexcept
         exp = 0;
     }
 
-    const auto biased_exp {static_cast<std::uint_fast32_t>(exp + detail::bias_v<decimal64>)};
+    const auto biased_exp {static_cast<exponent_type>(exp + detail::bias_v<decimal64>)};
 
-    if (biased_exp > detail::max_biased_exp_v<decimal64>)
+    if (biased_exp > detail::max_biased_exp_v<decimal64> || exp > detail::max_biased_exp_v<decimal64>)
     {
         significand_ = detail::d64_fast_inf;
     }
