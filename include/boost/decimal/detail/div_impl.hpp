@@ -23,7 +23,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T
 
     // If rhs is greater than we need to offset the significands to get the correct values
     // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    const auto big_sig_lhs {static_cast<std::uint64_t>(lhs.sig) * detail::pow10(detail::precision)};
+    constexpr auto ten_pow_precision {detail::pow10(detail::precision)};
+    const auto big_sig_lhs {static_cast<std::uint64_t>(lhs.sig) * ten_pow_precision};
 
     auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(rhs.sig)};
     auto res_exp {(lhs.exp - detail::precision) - rhs.exp};
@@ -75,7 +76,8 @@ constexpr auto d128_generic_div_impl(T lhs, T rhs, T& q) noexcept -> void
 {
     bool sign {lhs.sign != rhs.sign};
 
-    const auto big_sig_lhs {detail::uint256_t(lhs.sig) * detail::uint256_t(pow10(detail::uint128(detail::precision_v<decimal128>)))};
+    constexpr auto ten_pow_precision {detail::uint256_t(pow10(detail::uint128(detail::precision_v<decimal128>)))};
+    const auto big_sig_lhs {detail::uint256_t(lhs.sig) * ten_pow_precision};
     lhs.exp -= detail::precision_v<decimal128>;
 
     auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
