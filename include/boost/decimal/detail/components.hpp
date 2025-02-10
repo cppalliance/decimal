@@ -27,8 +27,8 @@ struct decimal32_components
 
 struct decimal32_fast_components
 {
-    using significand_type = std::uint_fast32_t;
-    using biased_exponent_type = std::int_fast32_t;
+    using significand_type = std::uint32_t;
+    using biased_exponent_type = std::int32_t;
 
     significand_type sig;
     biased_exponent_type exp;
