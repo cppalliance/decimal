@@ -1018,7 +1018,7 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> exponent_type
             break;
     }
 
-    expval |= (bits_ & detail::d64_exponent_mask) >> detail::d64_significand_bits;
+    expval |= static_cast<exponent_type>((bits_ & detail::d64_exponent_mask) >> detail::d64_significand_bits);
 
     return expval;
 }
