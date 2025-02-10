@@ -54,20 +54,20 @@ void test_conversion_to_integer()
     else
     {
         // Bad conversion so we use zero
-        BOOST_TEST_EQ(static_cast<T>(-one), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+        BOOST_TEST_EQ(static_cast<T>(-one), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, ERANGE);
     }
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::infinity()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::infinity()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal32>::infinity()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal32>::infinity()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::quiet_NaN()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, EINVAL);
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::quiet_NaN()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, EINVAL);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::signaling_NaN()), static_cast<T>(0)) && BOOST_TEST_EQ(errno, EINVAL);
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal32>::signaling_NaN()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, EINVAL);
 
     errno = 0;
     BOOST_TEST_EQ(static_cast<T>(half), static_cast<T>(0)) && BOOST_TEST_EQ(errno, 0);
@@ -82,13 +82,13 @@ void test_conversion_to_integer()
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<int> dist(-100, -20);
     errno = 0;
-    BOOST_TEST_EQ(static_cast<unsigned>(decimal32(dist(rng))), static_cast<unsigned>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<unsigned>(decimal32(dist(rng))), std::numeric_limits<unsigned>::max()) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<unsigned long>(decimal32(dist(rng))), static_cast<unsigned long>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<unsigned long>(decimal32(dist(rng))), std::numeric_limits<unsigned long>::max()) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<unsigned long long>(decimal32(dist(rng))), static_cast<unsigned long long>(0)) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<unsigned long long>(decimal32(dist(rng))), std::numeric_limits<unsigned long long>::max()) && BOOST_TEST_EQ(errno, ERANGE);
 }
 
 template <typename T>

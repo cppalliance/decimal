@@ -41,23 +41,19 @@ constexpr auto to_integral(Decimal val) noexcept
     if (isnan(val))
     {
         errno = EINVAL;
-        return static_cast<TargetType>(0);
+        return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
     if (isinf(val) || val > max_target_type || val < min_target_type)
     {
         errno = ERANGE;
-        return static_cast<TargetType>(0);
+        return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
 
     auto result {static_cast<Conversion_Type>(val.full_significand())};
     auto expval {val.biased_exponent()};
     const auto abs_exp_val {detail::make_positive_unsigned(expval)};
 
-    if (abs_exp_val >= 19)
-    {
-        result = 0;
-    }
-    else if (expval > 0)
+    if (expval > 0)
     {
         result *= detail::pow10<Conversion_Type>(static_cast<Conversion_Type>(expval));
     }
@@ -84,23 +80,19 @@ constexpr auto to_integral_128(Decimal val) noexcept
     if (isnan(val))
     {
         errno = EINVAL;
-        return static_cast<TargetType>(UINT64_C(0));
+        return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
     if (isinf(val) || val > max_target_type || val < min_target_type)
     {
         errno = ERANGE;
-        return static_cast<TargetType>(UINT64_C(0));
+        return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
 
     auto sig {val.full_significand()};
     auto expval {val.biased_exponent()};
     const auto abs_exp_val {detail::make_positive_unsigned(expval)};
 
-    if (abs_exp_val >= 38)
-    {
-        sig = 0;
-    }
-    else if (expval > 0)
+    if (expval > 0)
     {
         sig *= detail::pow10<detail::uint128>(expval);
     }
