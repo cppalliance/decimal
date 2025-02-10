@@ -837,9 +837,9 @@ constexpr auto operator+(decimal32_fast lhs, Integer rhs) noexcept
 
     exp_type exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
-    const auto final_sig_rhs {static_cast<detail::decimal32_fast_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
+    const auto final_sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(sig_rhs))};
 
-    return detail::d32_add_impl<decimal32_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+    return detail::d32_add_impl<decimal32_fast>(static_cast<promoted_significand_type>(lhs.significand_), lhs.biased_exponent(), lhs.sign_,
                                                 final_sig_rhs, exp_rhs, (rhs < 0),
                                                 abs_lhs_bigger);
 }
