@@ -613,7 +613,7 @@ int main()
   test_comp_ellint<decimal64, double>();
 
   test_ellint<decimal32, float>(128);
-  test_ellint<decimal64, double>(0x10'000);
+  test_ellint<decimal64, double>(0x12'000);
 
   {
     using decimal_type = boost::decimal::decimal32;
