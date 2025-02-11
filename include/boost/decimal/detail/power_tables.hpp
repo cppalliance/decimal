@@ -215,7 +215,7 @@ constexpr auto pow10(T n) noexcept -> T
     return static_cast<T>(impl::powers_of_10[static_cast<std::size_t>(n)]);
 }
 
-#if defined(__GNUC__) && __GNUC__ == 7
+#if defined(__GNUC__) && __GNUC__ >= 7
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
@@ -241,7 +241,7 @@ constexpr auto pow10(detail::uint128_t n) noexcept -> detail::uint128_t
 
 #endif
 
-#if defined(__GNUC__) && __GNUC__ == 7
+#if defined(__GNUC__) && __GNUC__ >= 7
 #  pragma GCC diagnostic pop
 #endif
 

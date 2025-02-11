@@ -38,7 +38,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
     // uint32_t instead. 14 - 5 = 9 or 13 - 5 = 8 which are both still greater than or equal to
     // digits10 + 1 for rounding which is 8 decimal digits
 
-    auto res_sig {(static_cast<mul_type>(lhs_sig) * static_cast<mul_type>(rhs_sig)) / pow10(static_cast<mul_type>(5))};
+    constexpr auto ten_pow_five {pow10(static_cast<mul_type>(5))};
+    auto res_sig {(static_cast<mul_type>(lhs_sig) * static_cast<mul_type>(rhs_sig)) / ten_pow_five};
     auto res_exp {lhs_exp + rhs_exp + static_cast<U>(5)};
 
     return {static_cast<std::uint32_t>(res_sig), res_exp, lhs_sign != rhs_sign};
@@ -65,7 +66,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
     // uint_fast64_t instead. 32 - 13 = 19 or 31 - 13 = 18 which are both still greater than
     // digits10 + 1 for rounding which is 17 decimal digits
 
-    auto res_sig {(static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)) / pow10(static_cast<unsigned_int128_type>(13))};
+    constexpr auto ten_pow_13 {pow10(static_cast<unsigned_int128_type>(13))};
+    auto res_sig {(static_cast<unsigned_int128_type>(lhs_sig) * static_cast<unsigned_int128_type>(rhs_sig)) / ten_pow_13};
     auto res_exp {lhs_exp + rhs_exp + static_cast<U>(13)};
 
     return {static_cast<std::uint64_t>(res_sig), res_exp, lhs_sign != rhs_sign};
@@ -164,7 +166,8 @@ constexpr auto d128_fast_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
-    res_sig /= detail::pow10(static_cast<uint256_t>(30));
+    constexpr auto ten_pow_30 {detail::pow10(static_cast<uint256_t>(30))};
+    res_sig /= ten_pow_30;
     res_exp += 30;
 
     BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0,0));

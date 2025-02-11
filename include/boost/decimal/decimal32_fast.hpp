@@ -1030,7 +1030,8 @@ constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& 
 
     // We promote to uint64 since the significands are currently 32-bits
     // By appending enough zeros to the LHS we end up finding what we need anyway
-    const auto big_sig_lhs {static_cast<std::uint_fast64_t>(lhs.significand_) * detail::pow10(static_cast<std::uint_fast64_t>(detail::precision_v<decimal32>))};
+    constexpr auto ten_pow_precision {detail::pow10(static_cast<std::uint_fast64_t>(detail::precision_v<decimal32>))};
+    const auto big_sig_lhs {static_cast<std::uint_fast64_t>(lhs.significand_) * ten_pow_precision};
     const auto res_sig {big_sig_lhs / static_cast<std::uint_fast64_t>(rhs.significand_)};
     const auto res_exp {(lhs.biased_exponent() - detail::precision_v<decimal32>) - rhs.biased_exponent()};
 
