@@ -19,7 +19,7 @@ namespace impl {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, BOOST_DECIMAL_INTEGRAL Integer>
 struct promote_significand
 {
-    using type = std::conditional_t<std::numeric_limits<Integer>::digits10 < std::numeric_limits<typename DecimalType::significand_type>::digits10,
+    using type = std::conditional_t<std::numeric_limits<make_unsigned_t<Integer>>::digits10 < std::numeric_limits<typename DecimalType::significand_type>::digits10,
                                     typename DecimalType::significand_type, detail::make_unsigned_t<Integer>>;
 };
 
