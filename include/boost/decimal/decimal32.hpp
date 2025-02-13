@@ -988,12 +988,16 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
+    const auto lhs_components {lhs.to_components()};
+
+    auto sig_lhs {lhs_components.sig};
+    auto exp_lhs {lhs_components.exp};
     detail::normalize(sig_lhs, exp_lhs);
 
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
+    const auto rhs_components {rhs.to_components()};
+
+    auto sig_rhs {rhs_components.sig};
+    auto exp_rhs {rhs_components.exp};
     detail::normalize(sig_rhs, exp_rhs);
 
     return detail::d32_sub_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
@@ -1705,12 +1709,16 @@ constexpr auto operator*(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     }
     #endif
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
+    const auto lhs_components {lhs.to_components()};
+
+    auto sig_lhs {lhs_components.sig};
+    auto exp_lhs {lhs_components.exp};
     detail::normalize(sig_lhs, exp_lhs);
 
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
+    const auto rhs_components {rhs.to_components()};
+
+    auto sig_rhs {rhs_components.sig};
+    auto exp_rhs {rhs_components.exp};
     detail::normalize(sig_rhs, exp_rhs);
 
     return detail::mul_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
@@ -1824,13 +1832,11 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
     static_cast<void>(r);
     #endif
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize(sig_lhs, exp_lhs);
+    auto lhs_components {lhs.to_components()};
+    detail::normalize(lhs_components.sig, lhs_components.exp);
 
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize(sig_rhs, exp_rhs);
+    auto rhs_components {rhs.to_components()};
+    detail::normalize(rhs_components.sig, rhs_components.exp);
 
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "sig lhs: " << sig_lhs
@@ -1838,9 +1844,6 @@ constexpr auto div_impl(decimal32 lhs, decimal32 rhs, decimal32& q, decimal32& r
               << "\nsig rhs: " << sig_rhs
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
-
-    detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
-    detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
 
     q = detail::generic_div_impl<decimal32>(lhs_components, rhs_components);
 }
