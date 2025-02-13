@@ -74,30 +74,25 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, boo
     auto sig_smaller {abs_lhs_bigger ? signed_sig_rhs : signed_sig_lhs};
     const auto sign_smaller {abs_lhs_bigger ? rhs_sign : lhs_sign};
 
-    if (delta_exp == 1)
+    if (delta_exp <= 2)
     {
-        sig_bigger *= 10;
-        --delta_exp;
-        --exp_bigger;
+        sig_bigger *= pow10(delta_exp);
+        exp_bigger -= delta_exp;
     }
     else
     {
-        if (delta_exp >= 2)
-        {
-            sig_bigger *= 100;
-            delta_exp -= 2;
-            exp_bigger -= 2;
-        }
+        sig_bigger *= 100;
+        delta_exp -= 2;
+        exp_bigger -= 2;
 
         if (delta_exp > 1)
         {
             sig_smaller /= pow10(delta_exp - 1);
-            delta_exp = 1;
+            fenv_round(sig_smaller, sign_smaller);
         }
-
-        if (delta_exp == 1)
+        else if (delta_exp == 1)
         {
-            detail::fenv_round(sig_smaller, sign_smaller);
+            fenv_round(sig_smaller, sign_smaller);
         }
     }
 
