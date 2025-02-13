@@ -885,16 +885,20 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
 
     const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
+    const auto lhs_components {lhs.to_components()};
+
+    auto sig_lhs {lhs_components.sig};
+    auto exp_lhs {lhs_components.exp};
     detail::normalize(sig_lhs, exp_lhs);
 
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
+    const auto rhs_components {rhs.to_components()};
+
+    auto sig_rhs {rhs_components.sig};
+    auto exp_rhs {rhs_components.exp};
     detail::normalize(sig_rhs, exp_rhs);
 
-    return detail::d32_add_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
-                                           sig_rhs, exp_rhs, rhs.isneg(),
+    return detail::d32_add_impl<decimal32>(sig_lhs, exp_lhs, lhs_components.sign,
+                                           sig_rhs, exp_rhs, rhs_components.sign,
                                            abs_lhs_bigger);
 }
 
