@@ -883,8 +883,6 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     }
     #endif
 
-    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
-
     const auto lhs_components {lhs.to_components()};
 
     auto sig_lhs {lhs_components.sig};
@@ -898,8 +896,7 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     detail::normalize(sig_rhs, exp_rhs);
 
     return detail::d32_add_impl<decimal32>(sig_lhs, exp_lhs, lhs_components.sign,
-                                           sig_rhs, exp_rhs, rhs_components.sign,
-                                           abs_lhs_bigger);
+                                           sig_rhs, exp_rhs, rhs_components.sign);
 }
 
 template <typename Integer>
@@ -918,7 +915,6 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
 
     // Make the significand type wide enough that it won't overflow during normalization
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
-    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
@@ -931,8 +927,7 @@ constexpr auto operator+(decimal32 lhs, Integer rhs) noexcept
     const auto final_sig_rhs {static_cast<typename detail::decimal32_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
 
     return detail::d32_add_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
-                                           final_sig_rhs, exp_rhs, (rhs < 0),
-                                           abs_lhs_bigger);
+                                           final_sig_rhs, exp_rhs, (rhs < 0));
 }
 
 template <typename Integer>
@@ -986,8 +981,6 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     }
     #endif
 
-    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
-
     const auto lhs_components {lhs.to_components()};
 
     auto sig_lhs {lhs_components.sig};
@@ -1001,8 +994,7 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     detail::normalize(sig_rhs, exp_rhs);
 
     return detail::d32_add_impl<decimal32>(sig_lhs, exp_lhs, lhs_components.sign,
-                                           sig_rhs, exp_rhs, !rhs_components.sign,
-                                           abs_lhs_bigger);
+                                           sig_rhs, exp_rhs, !rhs_components.sign);
 }
 
 template <typename Integer>
@@ -1020,7 +1012,6 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
     #endif
 
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
-    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
@@ -1031,8 +1022,7 @@ constexpr auto operator-(decimal32 lhs, Integer rhs) noexcept
     auto final_sig_rhs {static_cast<decimal32::significand_type>(sig_rhs)};
 
     return detail::d32_add_impl<decimal32>(sig_lhs, exp_lhs, lhs.isneg(),
-                                           final_sig_rhs, exp_rhs, !(rhs < 0),
-                                           abs_lhs_bigger);
+                                           final_sig_rhs, exp_rhs, !(rhs < 0));
 }
 
 template <typename Integer>
@@ -1050,7 +1040,6 @@ constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
     #endif
     
     auto sig_lhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(lhs))};
-    const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
 
     exp_type exp_lhs {0};
     detail::normalize(sig_lhs, exp_lhs);
@@ -1061,8 +1050,7 @@ constexpr auto operator-(Integer lhs, decimal32 rhs) noexcept
     detail::normalize(sig_rhs, exp_rhs);
 
     return detail::d32_add_impl<decimal32>(final_sig_lhs, exp_lhs, (lhs < 0),
-                                           sig_rhs, exp_rhs, !rhs.isneg(),
-                                           abs_lhs_bigger);
+                                           sig_rhs, exp_rhs, !rhs.isneg());
 }
 
 constexpr auto decimal32::operator--() noexcept -> decimal32&

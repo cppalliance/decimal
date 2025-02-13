@@ -814,8 +814,7 @@ constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     
     return detail::d32_add_impl<decimal32_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
-            (abs(lhs) > abs(rhs)));
+            rhs.significand_, rhs.biased_exponent(), rhs.sign_);
 }
 
 template <typename Integer>
@@ -833,15 +832,13 @@ constexpr auto operator+(decimal32_fast lhs, Integer rhs) noexcept
     #endif
 
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
-    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     exp_type exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
     const auto final_sig_rhs {static_cast<detail::decimal32_fast_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
 
     return detail::d32_add_impl<decimal32_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-                                                final_sig_rhs, exp_rhs, (rhs < 0),
-                                                abs_lhs_bigger);
+                                                final_sig_rhs, exp_rhs, (rhs < 0));
 }
 
 template <typename Integer>
@@ -862,8 +859,7 @@ constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
 
     return detail::d32_add_impl<decimal32_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), !rhs.sign_,
-            abs(lhs) > abs(rhs)
+            rhs.significand_, rhs.biased_exponent(), !rhs.sign_
     );
 }
 
@@ -883,16 +879,13 @@ constexpr auto operator-(decimal32_fast lhs, Integer rhs) noexcept
 
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
 
-    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
-
     exp_type exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
     auto final_sig_rhs {static_cast<decimal32_fast::significand_type>(detail::make_positive_unsigned(sig_rhs))};
 
     return detail::d32_add_impl<decimal32_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            final_sig_rhs, exp_rhs, !(rhs < 0),
-            abs_lhs_bigger);
+            final_sig_rhs, exp_rhs, !(rhs < 0));
 }
 
 template <typename Integer>
@@ -910,7 +903,6 @@ constexpr auto operator-(Integer lhs, decimal32_fast rhs) noexcept
     #endif
 
     auto sig_lhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(lhs))};
-    const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
 
     exp_type exp_lhs {0};
     detail::normalize(sig_lhs, exp_lhs);
@@ -918,8 +910,7 @@ constexpr auto operator-(Integer lhs, decimal32_fast rhs) noexcept
 
     return detail::d32_add_impl<decimal32_fast>(
             final_sig_lhs, exp_lhs, (lhs < 0),
-            rhs.significand_, rhs.biased_exponent(), !rhs.sign_,
-            abs_lhs_bigger
+            rhs.significand_, rhs.biased_exponent(), !rhs.sign_
     );
 }
 

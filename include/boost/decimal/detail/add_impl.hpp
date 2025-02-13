@@ -19,10 +19,21 @@ namespace detail {
 
 template <typename ReturnType, typename T, typename U>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                       T rhs_sig, U rhs_exp, bool rhs_sign,
-                                                       bool abs_lhs_bigger) noexcept -> ReturnType
+                                                       T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
     using add_type = std::int_fast32_t;
+
+    // The happy paths where we don't have to do anything
+    if (lhs_sig == 0)
+    {
+        return ReturnType{rhs_sig, rhs_exp, rhs_sign};
+    }
+    if (rhs_sig == 0)
+    {
+        return ReturnType{lhs_sig, lhs_exp, lhs_sign};
+    }
+
+    const bool abs_lhs_bigger {lhs_exp != rhs_exp ? lhs_exp > rhs_exp : lhs_sig > rhs_sig};
 
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
     auto signed_sig_lhs {static_cast<add_type>(detail::make_signed_value(lhs_sig, lhs_sign))};
@@ -57,10 +68,10 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, boo
     // If we can add to the lhs sig rather than dividing we can save some precision
     // 32-bit signed int can have 9 digits and our normalized significand has 7
 
-    auto& sig_bigger {abs_lhs_bigger ? signed_sig_lhs : signed_sig_rhs};
-    auto& exp_bigger {abs_lhs_bigger ? lhs_exp : rhs_exp};
-    auto& sig_smaller {abs_lhs_bigger ? signed_sig_rhs : signed_sig_lhs};
-    const auto& sign_smaller {abs_lhs_bigger ? rhs_sign : lhs_sign};
+    auto sig_bigger {abs_lhs_bigger ? signed_sig_lhs : signed_sig_rhs};
+    auto exp_bigger {abs_lhs_bigger ? lhs_exp : rhs_exp};
+    auto sig_smaller {abs_lhs_bigger ? signed_sig_rhs : signed_sig_lhs};
+    const auto sign_smaller {abs_lhs_bigger ? rhs_sign : lhs_sign};
 
     if (delta_exp == 1)
     {
