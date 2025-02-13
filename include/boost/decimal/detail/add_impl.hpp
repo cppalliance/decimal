@@ -33,9 +33,10 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, boo
         return ReturnType{lhs_sig, lhs_exp, lhs_sign};
     }
 
-    const bool abs_lhs_bigger {lhs_exp != rhs_exp ? lhs_exp > rhs_exp : lhs_sig > rhs_sig};
+    const bool lhs_exp_bigger {lhs_exp > rhs_exp};
+    const bool abs_lhs_bigger {lhs_exp != rhs_exp ? lhs_exp_bigger : lhs_sig > rhs_sig};
 
-    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
+    auto delta_exp {lhs_exp_bigger ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
     auto signed_sig_lhs {static_cast<add_type>(detail::make_signed_value(lhs_sig, lhs_sign))};
     auto signed_sig_rhs {static_cast<add_type>(detail::make_signed_value(rhs_sig, rhs_sign))};
 
