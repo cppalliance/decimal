@@ -153,6 +153,9 @@ private:
     constexpr auto full_significand() const noexcept -> significand_type ;
     constexpr auto isneg() const noexcept -> bool;
 
+    // Returns a complete struct so we don't have to decode the number multiple times if we need everything
+    constexpr auto to_components() const noexcept -> detail::decimal32_components;
+
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
     // If this is not representable sets errno to ERANGE and returns 0
@@ -1476,6 +1479,54 @@ constexpr auto decimal32::edit_sign(bool sign) noexcept -> void
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
+
+constexpr auto decimal32::to_components() const noexcept -> detail::decimal32_components
+{
+    detail::decimal32_components components {};
+
+    exponent_type expval {};
+    significand_type significand {};
+
+    const auto comb_bits {(bits_ & detail::d32_comb_11_mask)};
+
+    switch (comb_bits)
+    {
+        case detail::d32_comb_11_mask:
+            // bits 2 and 3 are the exp part of the combination field
+            expval = (bits_ & detail::d32_comb_11_exp_bits) >> (detail::d32_significand_bits + 1);
+            // Only need the one bit of T because the other 3 are implied
+            significand = (bits_ & detail::d32_comb_11_significand_bits) == detail::d32_comb_11_significand_bits ?
+                          UINT32_C(0b1001'0000000000'0000000000) :
+                          UINT32_C(0b1000'0000000000'0000000000);
+            break;
+
+        case detail::d32_comb_10_mask:
+            expval = UINT32_C(0b10000000);
+            // Last three bits in the combination field, so we need to shift past the exp field
+            // which is next
+            significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
+            break;
+
+        case detail::d32_comb_01_mask:
+            expval = UINT32_C(0b01000000);
+            significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
+            break;
+
+        default:
+            significand |= (bits_ & detail::d32_comb_00_01_10_significand_bits) >> detail::d32_exponent_bits;
+            break;
+    }
+
+    significand |= (bits_ & detail::d32_significand_mask);
+    expval |= (bits_ & detail::d32_exponent_mask) >> detail::d32_significand_bits;
+
+    components.sig = significand;
+    components.exp = static_cast<decimal32::biased_exponent_type>(expval) - detail::bias_v<decimal32>;
+    components.sign = bits_ & detail::d32_sign_mask;
+
+    return components;
+}
+
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_REAL Float>
