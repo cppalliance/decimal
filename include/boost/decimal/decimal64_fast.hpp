@@ -970,14 +970,22 @@ constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
             return lhs_sig != 0U && (lhs_exp > rhs_exp) ? lhs : rhs;
         }
 
+        // To ensure that we round correctly we try to lenghten one number by up to a factor of 100
+        // and then reduce the other number
+        const auto shift_diff {(std::min)(shift, 2U)};
+        const auto remaining_shift {shift - shift_diff};
+
         if (lhs_exp < rhs_exp)
         {
-            lhs_sig /= detail::pow10<decimal64_fast::significand_type>(shift);
-            lhs_exp = rhs_exp;
+            rhs_sig *= detail::pow10<decimal64_fast::significand_type>(shift_diff);
+            lhs_sig /= detail::pow10<decimal64_fast::significand_type>(remaining_shift);
+            lhs_exp = rhs_exp - static_cast<decimal64_fast::biased_exponent_type>(shift_diff);
         }
         else
         {
-            rhs_sig /= detail::pow10<decimal64_fast::significand_type>(shift);
+            lhs_sig *= detail::pow10<decimal64_fast::significand_type>(shift_diff);
+            rhs_sig /= detail::pow10<decimal64_fast::significand_type>(remaining_shift);
+            lhs_exp -= static_cast<decimal64_fast::biased_exponent_type>(shift_diff);
         }
     }
 
