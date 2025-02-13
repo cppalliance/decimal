@@ -35,7 +35,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, boo
               << "\nStarting exp rhs: " << rhs_exp << std::endl;
     #endif
 
-    if (delta_exp > detail::precision + 1)
+    if (delta_exp > detail::precision_v<ReturnType> + 1)
     {
         // If the difference in exponents is more than the digits of accuracy
         // we return the larger of the two
@@ -60,46 +60,45 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, boo
     auto& sig_bigger {abs_lhs_bigger ? signed_sig_lhs : signed_sig_rhs};
     auto& exp_bigger {abs_lhs_bigger ? lhs_exp : rhs_exp};
     auto& sig_smaller {abs_lhs_bigger ? signed_sig_rhs : signed_sig_lhs};
-    auto& sign_smaller {abs_lhs_bigger ? rhs_sign : lhs_sign};
-
-    if (delta_exp <= 2)
-    {
-        sig_bigger *= pow10(static_cast<std::remove_reference_t<decltype(sig_bigger)>>(delta_exp));
-        exp_bigger -= delta_exp;
-        delta_exp = 0;
-    }
-    else
-    {
-        sig_bigger *= 100;
-        delta_exp -= 2;
-        exp_bigger -=2;
-
-        if (delta_exp > 1)
-        {
-            sig_smaller /= pow10(static_cast<std::remove_reference_t<decltype(sig_smaller)>>(delta_exp - 1));
-            delta_exp = 1;
-        }
-    }
+    const auto& sign_smaller {abs_lhs_bigger ? rhs_sign : lhs_sign};
 
     if (delta_exp == 1)
     {
-        detail::fenv_round(sig_smaller, sign_smaller);
+        sig_bigger *= 10;
+        --delta_exp;
+        --exp_bigger;
+    }
+    else
+    {
+        if (delta_exp >= 2)
+        {
+            sig_bigger *= 100;
+            delta_exp -= 2;
+            exp_bigger -= 2;
+        }
+
+        if (delta_exp > 1)
+        {
+            sig_smaller /= pow10(delta_exp - 1);
+            delta_exp = 1;
+        }
+
+        if (delta_exp == 1)
+        {
+            detail::fenv_round(sig_smaller, sign_smaller);
+        }
     }
 
     // Cast the results to signed types so that we can apply a sign at the end if necessary
     // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
     const auto new_sig {sig_bigger + sig_smaller};
-    const auto new_exp {exp_bigger};
-    const auto new_sign {new_sig < 0};
-    const auto res_sig {detail::make_positive_unsigned(new_sig)};
-
     #ifdef BOOST_DECIMAL_DEBUG_ADD
     std::cerr << "Final sig lhs: " << lhs_sig
               << "\nFinal sig rhs: " << rhs_sig
               << "\nResult sig: " << new_sig << std::endl;
     #endif
 
-    return {res_sig, new_exp, new_sign};
+    return {new_sig, exp_bigger};
 }
 
 template <typename ReturnType, typename T, typename U>
