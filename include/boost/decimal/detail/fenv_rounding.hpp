@@ -23,9 +23,8 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
     using significand_type = std::conditional_t<std::is_same<TargetType, decimal128>::value || std::is_same<TargetType, decimal128_fast>::value, detail::uint128, int>;
 
     const auto trailing_num {val % 10};
-    int exp_delta {};
     val /= 10;
-    ++exp_delta;
+    int exp_delta {1};
 
     if (trailing_num >= 5)
     {
@@ -51,9 +50,8 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
     {
         const auto trailing_num {val % 10};
-        int exp_delta {};
         val /= 10;
-        ++exp_delta;
+        int exp_delta {1};
 
         if (trailing_num >= 5)
         {
@@ -74,11 +72,10 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
     else
     {
         const auto round {fegetround()};
-        int exp {};
+        int exp {1};
 
         const auto trailing_num {val % 10};
         val /= 10;
-        ++exp;
 
         // Default rounding mode
         switch (round)
