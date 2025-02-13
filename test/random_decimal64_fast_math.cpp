@@ -67,6 +67,10 @@ void random_addition(T lower, T upper)
         }
     }
 
+    constexpr T zero {0};
+    constexpr T one {1};
+    BOOST_TEST_EQ(zero + one, one);
+    BOOST_TEST_EQ(one + zero, one);
     BOOST_TEST(isinf(std::numeric_limits<decimal64_fast>::infinity() + decimal64_fast{0,0}));
     BOOST_TEST(isinf(decimal64_fast{0,0} + std::numeric_limits<decimal64_fast>::infinity()));
     BOOST_TEST(isnan(std::numeric_limits<decimal64_fast>::quiet_NaN() + decimal64_fast{0,0}));

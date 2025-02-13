@@ -953,10 +953,39 @@ constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::d64_add_impl<decimal64_fast>(
-            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
-            (abs(lhs) > abs(rhs)));
+    auto lhs_exp {lhs.biased_exponent()};
+    auto lhs_sig {lhs.significand_};
+
+    auto rhs_exp {rhs.biased_exponent()};
+    auto rhs_sig {rhs.significand_};
+
+    // Align to larger exponent
+    if (lhs_exp != rhs_exp)
+    {
+        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal64> + 1)};
+        const auto shift {detail::make_positive_unsigned(lhs_exp - rhs_exp)};
+
+        if (shift > max_shift)
+        {
+            return lhs_sig != 0U && (lhs_exp > rhs_exp) ? lhs : rhs;
+        }
+
+        if (lhs_exp < rhs_exp)
+        {
+            lhs_sig /= detail::pow10<decimal64_fast::significand_type>(shift);
+            lhs_exp = rhs_exp;
+        }
+        else
+        {
+            rhs_sig /= detail::pow10<decimal64_fast::significand_type>(shift);
+        }
+    }
+
+    // Perform signed addition with overflow protection
+    const auto new_sig = detail::make_signed_value(lhs_sig, lhs.sign_) +
+        detail::make_signed_value(rhs_sig, rhs.sign_);
+
+    return {new_sig, lhs_exp};
 }
 
 template <typename Integer>
