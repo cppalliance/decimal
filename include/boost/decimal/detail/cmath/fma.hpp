@@ -71,15 +71,12 @@ constexpr auto d32_fma_impl(T x, T y, T z) noexcept -> T
     }
     #endif
 
-    const bool abs_lhs_bigger {abs(complete_lhs) > abs(z)};
-
     int exp_z {};
     auto sig_z = frexp10(z, &exp_z);
     detail::normalize<T>(first_res.sig, first_res.exp);
 
-    return detail::d32_add_impl<T>(first_res.sig, first_res.exp, first_res.sign,
-                                   sig_z, static_cast<exp_type>(exp_z), z < 0,
-                                   abs_lhs_bigger);
+    return detail::add_impl<T>(first_res.sig, first_res.exp, first_res.sign,
+                                   sig_z, static_cast<exp_type>(exp_z), z < 0);
 }
 
 template <bool checked, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
@@ -127,8 +124,8 @@ constexpr auto d64_fma_impl(T x, T y, T z) noexcept -> T
     auto sig_z = frexp10(z, &exp_z);
     detail::normalize<T>(first_res.sig, first_res.exp);
 
-    return detail::d64_add_impl<T>(first_res.sig, first_res.exp, first_res.sign,
-                                   sig_z, static_cast<exp_type>(exp_z), z < 0);
+    return detail::add_impl<T>(first_res.sig, first_res.exp, first_res.sign,
+                               sig_z, static_cast<exp_type>(exp_z), z < 0);
 }
 
 template <bool, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>

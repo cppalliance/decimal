@@ -1257,7 +1257,7 @@ constexpr auto operator+(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
 
-    return detail::d64_add_impl<decimal64>(lhs_sig, lhs_exp, lhs.isneg(),
+    return detail::add_impl<decimal64>(lhs_sig, lhs_exp, lhs.isneg(),
                                            rhs_sig, rhs_exp, rhs.isneg());
 }
 
@@ -1285,7 +1285,7 @@ constexpr auto operator+(decimal64 lhs, Integer rhs) noexcept
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
     const auto final_sig_rhs {static_cast<decimal64::significand_type>(sig_rhs)};
 
-    return detail::d64_add_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
+    return detail::add_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
                                            final_sig_rhs, exp_rhs, (rhs < 0));
 }
 
