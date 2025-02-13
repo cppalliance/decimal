@@ -36,7 +36,7 @@ constexpr auto add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
         // To ensure that we round correctly we try to lenghten one number by up to a factor of 100
         // and then reduce the other number
-        const auto shift_diff {(std::min)(shift, 2U)};
+        const auto shift_diff {(std::min)(shift, static_cast<decltype(shift)>(2U))};
         const auto remaining_shift {shift - shift_diff};
 
         if (lhs_exp < rhs_exp)
