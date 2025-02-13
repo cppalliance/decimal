@@ -953,47 +953,8 @@ constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-    auto lhs_exp {lhs.biased_exponent()};
-    auto lhs_sig {lhs.significand_};
-
-    auto rhs_exp {rhs.biased_exponent()};
-    auto rhs_sig {rhs.significand_};
-
-    // Align to larger exponent
-    if (lhs_exp != rhs_exp)
-    {
-        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal64> + 1)};
-        const auto shift {detail::make_positive_unsigned(lhs_exp - rhs_exp)};
-
-        if (shift > max_shift)
-        {
-            return lhs_sig != 0U && (lhs_exp > rhs_exp) ? lhs : rhs;
-        }
-
-        // To ensure that we round correctly we try to lenghten one number by up to a factor of 100
-        // and then reduce the other number
-        const auto shift_diff {(std::min)(shift, 2U)};
-        const auto remaining_shift {shift - shift_diff};
-
-        if (lhs_exp < rhs_exp)
-        {
-            rhs_sig *= detail::pow10<decimal64_fast::significand_type>(shift_diff);
-            lhs_sig /= detail::pow10<decimal64_fast::significand_type>(remaining_shift);
-            lhs_exp = rhs_exp - static_cast<decimal64_fast::biased_exponent_type>(shift_diff);
-        }
-        else
-        {
-            lhs_sig *= detail::pow10<decimal64_fast::significand_type>(shift_diff);
-            rhs_sig /= detail::pow10<decimal64_fast::significand_type>(remaining_shift);
-            lhs_exp -= static_cast<decimal64_fast::biased_exponent_type>(shift_diff);
-        }
-    }
-
-    // Perform signed addition with overflow protection
-    const auto new_sig = detail::make_signed_value(lhs_sig, lhs.sign_) +
-        detail::make_signed_value(rhs_sig, rhs.sign_);
-
-    return {new_sig, lhs_exp};
+    return detail::d64_add_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                                rhs.significand_, rhs.biased_exponent(), rhs.sign_);
 }
 
 template <typename Integer>
@@ -1011,15 +972,13 @@ constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
     #endif
 
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
-    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     exp_type exp_rhs {0};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
     const auto final_sig_rhs {static_cast<decimal64_fast::significand_type>(sig_rhs)};
 
     return detail::d64_add_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-                                                final_sig_rhs, exp_rhs, (rhs < 0),
-                                                abs_lhs_bigger);
+                                                final_sig_rhs, exp_rhs, (rhs < 0));
 }
 
 template <typename Integer>
