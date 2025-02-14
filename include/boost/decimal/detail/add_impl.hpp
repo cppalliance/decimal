@@ -34,7 +34,7 @@ constexpr auto d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
     // Align to larger exponent
     if (lhs_exp != rhs.biased_exponent())
     {
-        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal64> + 1)};
+        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal32> + 1)};
         const auto shift {detail::make_positive_unsigned(lhs_exp - rhs.biased_exponent())};
 
         if (shift > max_shift)
@@ -56,9 +56,6 @@ constexpr auto d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
     }
 
     // Perform signed addition with overflow protection
-    BOOST_DECIMAL_ASSERT(big_lhs <= std::numeric_limits<add_type>::max());
-    BOOST_DECIMAL_ASSERT(big_rhs <= std::numeric_limits<add_type>::max());
-
     const auto signed_lhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_lhs), lhs.isneg())};
     const auto signed_rhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_rhs), rhs.isneg())};
 
@@ -83,7 +80,7 @@ constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
     // Align to larger exponent
     if (lhs_exp != rhs_exp)
     {
-        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal64> + 1)};
+        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal32> + 1)};
         const auto shift {detail::make_positive_unsigned(lhs_exp - rhs_exp)};
 
         if (shift > max_shift)
@@ -100,12 +97,12 @@ constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
             big_lhs *= detail::pow10<promoted_sig_type>(shift);
             lhs_exp -= static_cast<U>(shift);
         }
+
+        BOOST_DECIMAL_ASSERT(big_lhs <= std::numeric_limits<add_type>::max());
+        BOOST_DECIMAL_ASSERT(big_rhs <= std::numeric_limits<add_type>::max());
     }
 
     // Perform signed addition with overflow protection
-    BOOST_DECIMAL_ASSERT(big_lhs <= std::numeric_limits<add_type>::max());
-    BOOST_DECIMAL_ASSERT(big_rhs <= std::numeric_limits<add_type>::max());
-
     const auto signed_lhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_lhs), lhs_sign)};
     const auto signed_rhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_rhs), rhs_sign)};
 
