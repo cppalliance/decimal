@@ -97,9 +97,6 @@ constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
             big_lhs *= detail::pow10<promoted_sig_type>(shift);
             lhs_exp -= static_cast<U>(shift);
         }
-
-        BOOST_DECIMAL_ASSERT(big_lhs <= std::numeric_limits<add_type>::max());
-        BOOST_DECIMAL_ASSERT(big_rhs <= std::numeric_limits<add_type>::max());
     }
 
     // Perform signed addition with overflow protection
