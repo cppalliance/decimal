@@ -11,7 +11,6 @@
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/add_impl.hpp>
-#include <boost/decimal/detail/sub_impl.hpp>
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
@@ -111,6 +110,9 @@ private:
     template <typename DecimalType>
     friend constexpr auto to_dpd_d32(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint32_t);
+
+    template <typename ReturnType, typename T>
+    friend constexpr auto detail::d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType;
 
 public:
     constexpr decimal32_fast() noexcept = default;
@@ -811,10 +813,8 @@ constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
         return detail::check_non_finite(lhs, rhs);
     }
     #endif
-    
-    return detail::d32_add_impl<decimal32_fast>(
-            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_);
+
+    return detail::d32_add_impl<decimal32_fast>(lhs, rhs);
 }
 
 template <typename Integer>
@@ -857,10 +857,9 @@ constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::d32_add_impl<decimal32_fast>(
-            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), !rhs.sign_
-    );
+    rhs.sign_ = !rhs.sign_;
+
+    return detail::d32_add_impl<decimal32_fast>(lhs, rhs);
 }
 
 template <typename Integer>
