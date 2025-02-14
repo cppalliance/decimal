@@ -8,6 +8,7 @@
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
+#include <boost/decimal/detail/components.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -17,9 +18,56 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
+template <typename ReturnType>
+constexpr auto d32_add_impl(const decimal32_components& lhs, const decimal32_components& rhs)
+{
+    // Each of the significands is maximally 23 bits.
+    // Rather than doing division to get proper alignment we will promote to 64 bits
+    // And do a single mul followed by an add
+    using add_type = std::int_fast64_t;
+    using promoted_sig_type = std::uint_fast64_t;
+
+    promoted_sig_type big_lhs {lhs.sig};
+    promoted_sig_type big_rhs {rhs.sig};
+    auto lhs_exp {lhs.exp};
+
+    // Align to larger exponent
+    if (lhs_exp != rhs.exp)
+    {
+        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal64> + 1)};
+        const auto shift {detail::make_positive_unsigned(lhs_exp - rhs.exp)};
+
+        if (shift > max_shift)
+        {
+            return lhs.sig != 0U && (lhs_exp > rhs.exp) ? ReturnType{lhs.sig, lhs.exp, lhs.sign} : ReturnType{rhs.sig, rhs.exp, rhs.sign};
+        }
+        else if (lhs_exp < rhs.exp)
+        {
+            big_rhs *= detail::pow10<promoted_sig_type>(shift);
+            lhs_exp = rhs.exp - static_cast<decimal32_components::biased_exponent_type>(shift);
+        }
+        else
+        {
+            big_lhs *= detail::pow10<promoted_sig_type>(shift);
+            lhs_exp -= static_cast<decimal32_components::biased_exponent_type>(shift);
+        }
+    }
+
+    // Perform signed addition with overflow protection
+    BOOST_DECIMAL_ASSERT(big_lhs <= std::numeric_limits<add_type>::max());
+    BOOST_DECIMAL_ASSERT(big_rhs <= std::numeric_limits<add_type>::max());
+
+    const auto signed_lhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_lhs), lhs.sign)};
+    const auto signed_rhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_rhs), rhs.sign)};
+
+    const auto new_sig {signed_lhs + signed_rhs};
+
+    return ReturnType{new_sig, lhs_exp};
+}
+
 template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                       T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> ReturnType
+constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
+                            T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
     // Each of the significands is maximally 23 bits.
     // Rather than doing division to get proper alignment we will promote to 64 bits
