@@ -18,8 +18,8 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-template <typename ReturnType>
-constexpr auto d32_add_impl(const decimal32_components& lhs, const decimal32_components& rhs)
+template <typename ReturnType, typename T>
+constexpr auto d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
 {
     // Each of the significands is maximally 23 bits.
     // Rather than doing division to get proper alignment we will promote to 64 bits
@@ -27,24 +27,26 @@ constexpr auto d32_add_impl(const decimal32_components& lhs, const decimal32_com
     using add_type = std::int_fast64_t;
     using promoted_sig_type = std::uint_fast64_t;
 
-    promoted_sig_type big_lhs {lhs.sig};
-    promoted_sig_type big_rhs {rhs.sig};
-    auto lhs_exp {lhs.exp};
+    promoted_sig_type big_lhs {lhs.full_significand()};
+    promoted_sig_type big_rhs {rhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
 
     // Align to larger exponent
-    if (lhs_exp != rhs.exp)
+    if (lhs_exp != rhs.biased_exponent())
     {
         constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal64> + 1)};
-        const auto shift {detail::make_positive_unsigned(lhs_exp - rhs.exp)};
+        const auto shift {detail::make_positive_unsigned(lhs_exp - rhs.biased_exponent())};
 
         if (shift > max_shift)
         {
-            return lhs.sig != 0U && (lhs_exp > rhs.exp) ? ReturnType{lhs.sig, lhs.exp, lhs.sign} : ReturnType{rhs.sig, rhs.exp, rhs.sign};
+            return lhs.full_significand() != 0U && (lhs_exp > rhs.biased_exponent()) ?
+                ReturnType{lhs.full_significand(), lhs.biased_exponent(), lhs.isneg()} :
+                ReturnType{rhs.full_significand(), rhs.biased_exponent(), rhs.isneg()};
         }
-        else if (lhs_exp < rhs.exp)
+        else if (lhs_exp < rhs.biased_exponent())
         {
             big_rhs *= detail::pow10<promoted_sig_type>(shift);
-            lhs_exp = rhs.exp - static_cast<decimal32_components::biased_exponent_type>(shift);
+            lhs_exp = rhs.biased_exponent() - static_cast<decimal32_components::biased_exponent_type>(shift);
         }
         else
         {
@@ -57,8 +59,8 @@ constexpr auto d32_add_impl(const decimal32_components& lhs, const decimal32_com
     BOOST_DECIMAL_ASSERT(big_lhs <= std::numeric_limits<add_type>::max());
     BOOST_DECIMAL_ASSERT(big_rhs <= std::numeric_limits<add_type>::max());
 
-    const auto signed_lhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_lhs), lhs.sign)};
-    const auto signed_rhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_rhs), rhs.sign)};
+    const auto signed_lhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_lhs), lhs.isneg())};
+    const auto signed_rhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_rhs), rhs.isneg())};
 
     const auto new_sig {signed_lhs + signed_rhs};
 
