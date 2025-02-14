@@ -21,91 +21,47 @@ template <typename ReturnType, typename T, typename U>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
                                                        T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
-    using add_type = std::int_fast32_t;
+    // Each of the significands is maximally 23 bits.
+    // Rather than doing division to get proper alignment we will promote to 64 bits
+    // And do a single mul followed by an add
+    using add_type = std::int_fast64_t;
+    using promoted_sig_type = std::uint_fast64_t;
 
-    // The happy paths where we don't have to do anything
-    if (lhs_sig == 0)
+    promoted_sig_type big_lhs {lhs_sig};
+    promoted_sig_type big_rhs {rhs_sig};
+
+    // Align to larger exponent
+    if (lhs_exp != rhs_exp)
     {
-        return ReturnType{rhs_sig, rhs_exp, rhs_sign};
-    }
-    if (rhs_sig == 0)
-    {
-        return ReturnType{lhs_sig, lhs_exp, lhs_sign};
-    }
+        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal64> + 1)};
+        const auto shift {detail::make_positive_unsigned(lhs_exp - rhs_exp)};
 
-    const bool lhs_exp_bigger {lhs_exp > rhs_exp};
-    const bool abs_lhs_bigger {lhs_exp != rhs_exp ? lhs_exp_bigger : lhs_sig > rhs_sig};
-
-    auto delta_exp {lhs_exp_bigger ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-    auto signed_sig_lhs {static_cast<add_type>(detail::make_signed_value(lhs_sig, lhs_sign))};
-    auto signed_sig_rhs {static_cast<add_type>(detail::make_signed_value(rhs_sig, rhs_sign))};
-
-    #ifdef BOOST_DECIMAL_DEBUG_ADD
-    std::cerr << "Starting sig lhs: " << lhs_sig
-              << "\nStarting exp lhs: " << lhs_exp
-              << "\nStarting sig rhs: " << rhs_sig
-              << "\nStarting exp rhs: " << rhs_exp << std::endl;
-    #endif
-
-    if (delta_exp > detail::precision_v<ReturnType> + 1)
-    {
-        // If the difference in exponents is more than the digits of accuracy
-        // we return the larger of the two
-        //
-        // e.g. 1e20 + 1e-20 = 1e20
-
-        #ifdef BOOST_DECIMAL_DEBUG_ADD
-        std::cerr << "New sig: " << lhs_sig
-                  << "\nNew exp: " << lhs_exp
-                  << "\nNew neg: " << lhs_sign << std::endl;
-        #endif
-
-        return abs_lhs_bigger ? ReturnType{lhs_sig, lhs_exp, lhs_sign} :
-                                ReturnType{rhs_sig, rhs_exp, rhs_sign};
-    }
-
-    // The two numbers can be added together without special handling
-    //
-    // If we can add to the lhs sig rather than dividing we can save some precision
-    // 32-bit signed int can have 9 digits and our normalized significand has 7
-
-    auto sig_bigger {abs_lhs_bigger ? signed_sig_lhs : signed_sig_rhs};
-    auto exp_bigger {abs_lhs_bigger ? lhs_exp : rhs_exp};
-    auto sig_smaller {abs_lhs_bigger ? signed_sig_rhs : signed_sig_lhs};
-    const auto sign_smaller {abs_lhs_bigger ? rhs_sign : lhs_sign};
-
-    if (delta_exp <= 2)
-    {
-        sig_bigger *= pow10(delta_exp);
-        exp_bigger -= delta_exp;
-    }
-    else
-    {
-        sig_bigger *= 100;
-        delta_exp -= 2;
-        exp_bigger -= 2;
-
-        if (delta_exp > 1)
+        if (shift > max_shift)
         {
-            sig_smaller /= pow10(delta_exp - 1);
-            fenv_round(sig_smaller, sign_smaller);
+            return lhs_sig != 0U && (lhs_exp > rhs_exp) ? ReturnType{lhs_sig, lhs_exp, lhs_sign} : ReturnType{rhs_sig, rhs_exp, rhs_sign};
         }
-        else if (delta_exp == 1)
+        else if (lhs_exp < rhs_exp)
         {
-            fenv_round(sig_smaller, sign_smaller);
+            big_rhs *= detail::pow10<promoted_sig_type>(shift);
+            lhs_exp = rhs_exp - static_cast<U>(shift);
+        }
+        else
+        {
+            big_lhs *= detail::pow10<promoted_sig_type>(shift);
+            lhs_exp -= static_cast<U>(shift);
         }
     }
 
-    // Cast the results to signed types so that we can apply a sign at the end if necessary
-    // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
-    const auto new_sig {sig_bigger + sig_smaller};
-    #ifdef BOOST_DECIMAL_DEBUG_ADD
-    std::cerr << "Final sig lhs: " << lhs_sig
-              << "\nFinal sig rhs: " << rhs_sig
-              << "\nResult sig: " << new_sig << std::endl;
-    #endif
+    // Perform signed addition with overflow protection
+    BOOST_DECIMAL_ASSERT(big_lhs <= std::numeric_limits<add_type>::max());
+    BOOST_DECIMAL_ASSERT(big_rhs <= std::numeric_limits<add_type>::max());
 
-    return {new_sig, exp_bigger};
+    const auto signed_lhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_lhs), lhs_sign)};
+    const auto signed_rhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_rhs), rhs_sign)};
+
+    const auto new_sig {signed_lhs + signed_rhs};
+
+    return {new_sig, lhs_exp};
 }
 
 template <typename ReturnType, typename T, typename U>
