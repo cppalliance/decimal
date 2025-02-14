@@ -972,19 +972,11 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     #endif
 
     const auto lhs_components {lhs.to_components()};
+    auto rhs_components {rhs.to_components()};
 
-    auto sig_lhs {lhs_components.sig};
-    auto exp_lhs {lhs_components.exp};
-    detail::normalize(sig_lhs, exp_lhs);
-
-    const auto rhs_components {rhs.to_components()};
-
-    auto sig_rhs {rhs_components.sig};
-    auto exp_rhs {rhs_components.exp};
-    detail::normalize(sig_rhs, exp_rhs);
-
-    return detail::d32_add_impl<decimal32>(sig_lhs, exp_lhs, lhs_components.sign,
-                                           sig_rhs, exp_rhs, !rhs_components.sign);
+    // a - b = a + (-b)
+    rhs_components.sign = !rhs_components.sign;
+    return detail::d32_add_impl<decimal32>(lhs_components, rhs_components);
 }
 
 template <typename Integer>
