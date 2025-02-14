@@ -883,8 +883,10 @@ constexpr auto operator+(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     }
     #endif
 
-    const auto lhs_components {lhs.to_components()};
-    const auto rhs_components {rhs.to_components()};
+    auto lhs_components {lhs.to_components()};
+    detail::normalize(lhs_components.sig, lhs_components.exp);
+    auto rhs_components {rhs.to_components()};
+    detail::normalize(rhs_components.sig, rhs_components.exp);
 
     return detail::d32_add_impl<decimal32>(lhs_components, rhs_components);
 }
@@ -971,8 +973,10 @@ constexpr auto operator-(decimal32 lhs, decimal32 rhs) noexcept -> decimal32
     }
     #endif
 
-    const auto lhs_components {lhs.to_components()};
+    auto lhs_components {lhs.to_components()};
+    detail::normalize(lhs_components.sig, lhs_components.exp);
     auto rhs_components {rhs.to_components()};
+    detail::normalize(rhs_components.sig, rhs_components.exp);
 
     // a - b = a + (-b)
     rhs_components.sign = !rhs_components.sign;
