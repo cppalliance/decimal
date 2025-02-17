@@ -30,6 +30,11 @@ namespace decimal {
 
 class decimal128 {
 
+public:
+    using significand_type = detail::uint128;
+    using exponent_type = std::uint32_t;
+    using biased_exponent_type = std::int32_t;
+
 // Paragraph numbers are from ISO/IEC DTR 24733
 
 // 3.2.4.1 construct/copy/destroy
