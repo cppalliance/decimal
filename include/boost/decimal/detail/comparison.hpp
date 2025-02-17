@@ -16,6 +16,7 @@
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+#include <boost/decimal/detail/attributes.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
@@ -100,7 +101,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal64>::value || std::is_same<DecimalType, decimal128>::value, bool>
+                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<detail::is_ieee_type_v<DecimalType>, bool>
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
@@ -164,7 +165,7 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!(std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal64>::value || std::is_same<DecimalType, decimal128>::value), bool>
+                                T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<detail::is_fast_type_v<DecimalType>, bool>
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
@@ -364,7 +365,7 @@ constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
         BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign, bool normalized = false) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal32>::value, bool>
+                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign, bool normalized = false) noexcept -> std::enable_if_t<detail::decimal_val_v<DecimalType> == 32, bool>
 {
     using comp_type = std::uint_fast64_t;
 
@@ -425,9 +426,9 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
         BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<std::is_same<DecimalType, decimal64>::value || std::is_same<DecimalType, decimal128>::value, bool>
+                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<detail::decimal_val_v<DecimalType> == 64 || detail::decimal_val_v<DecimalType> == 128, bool>
 {
-    using comp_type = std::conditional_t<std::is_same<DecimalType, decimal128>::value, detail::uint128, std::uint_fast64_t>;
+    using comp_type = typename DecimalType::significand_type;
 
     BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
     BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
@@ -459,7 +460,7 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<!(std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal64>::value || std::is_same<DecimalType, decimal128>::value), bool>
+                               T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<detail::is_fast_type_v<DecimalType>, bool>
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
