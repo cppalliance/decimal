@@ -30,6 +30,11 @@ namespace decimal {
 
 class decimal32_fast {
 
+public:
+    using significand_type = std::uint_fast32_t;
+    using exponent_type = std::uint_fast8_t;
+    using biased_exponent_type = std::int32_t;
+
 // Paragraph numbers are from ISO/IEC DTR 24733
 
 // 3.2.2.1 construct/copy/destroy
