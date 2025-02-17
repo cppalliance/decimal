@@ -11,7 +11,6 @@
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/add_impl.hpp>
-#include <boost/decimal/detail/sub_impl.hpp>
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
@@ -111,6 +110,9 @@ private:
     template <typename DecimalType>
     friend constexpr auto to_dpd_d32(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint32_t);
+
+    template <typename ReturnType, typename T>
+    friend constexpr auto detail::d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType;
 
 public:
     constexpr decimal32_fast() noexcept = default;
@@ -811,11 +813,8 @@ constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
         return detail::check_non_finite(lhs, rhs);
     }
     #endif
-    
-    return detail::d32_add_impl<decimal32_fast>(
-            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
-            (abs(lhs) > abs(rhs)));
+
+    return detail::d32_add_impl<decimal32_fast>(lhs, rhs);
 }
 
 template <typename Integer>
@@ -833,15 +832,13 @@ constexpr auto operator+(decimal32_fast lhs, Integer rhs) noexcept
     #endif
 
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
-    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     exp_type exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
     const auto final_sig_rhs {static_cast<detail::decimal32_fast_components::significand_type>(detail::make_positive_unsigned(sig_rhs))};
 
     return detail::d32_add_impl<decimal32_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-                                                final_sig_rhs, exp_rhs, (rhs < 0),
-                                                abs_lhs_bigger);
+                                                final_sig_rhs, exp_rhs, (rhs < 0));
 }
 
 template <typename Integer>
@@ -860,11 +857,9 @@ constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::d32_sub_impl<decimal32_fast>(
-            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
-            abs(lhs) > abs(rhs)
-    );
+    rhs.sign_ = !rhs.sign_;
+
+    return detail::d32_add_impl<decimal32_fast>(lhs, rhs);
 }
 
 template <typename Integer>
@@ -883,16 +878,13 @@ constexpr auto operator-(decimal32_fast lhs, Integer rhs) noexcept
 
     auto sig_rhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
 
-    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
-
     exp_type exp_rhs {0};
     detail::normalize(sig_rhs, exp_rhs);
     auto final_sig_rhs {static_cast<decimal32_fast::significand_type>(detail::make_positive_unsigned(sig_rhs))};
 
-    return detail::d32_sub_impl<decimal32_fast>(
+    return detail::d32_add_impl<decimal32_fast>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            final_sig_rhs, exp_rhs, (rhs < 0),
-            abs_lhs_bigger);
+            final_sig_rhs, exp_rhs, !(rhs < 0));
 }
 
 template <typename Integer>
@@ -910,16 +902,14 @@ constexpr auto operator-(Integer lhs, decimal32_fast rhs) noexcept
     #endif
 
     auto sig_lhs {static_cast<promoted_significand_type>(detail::make_positive_unsigned(lhs))};
-    const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
 
     exp_type exp_lhs {0};
     detail::normalize(sig_lhs, exp_lhs);
     auto final_sig_lhs {static_cast<decimal32_fast::significand_type>(detail::make_positive_unsigned(sig_lhs))};
 
-    return detail::d32_sub_impl<decimal32_fast>(
+    return detail::d32_add_impl<decimal32_fast>(
             final_sig_lhs, exp_lhs, (lhs < 0),
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
-            abs_lhs_bigger
+            rhs.significand_, rhs.biased_exponent(), !rhs.sign_
     );
 }
 

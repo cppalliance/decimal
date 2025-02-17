@@ -23,6 +23,21 @@ struct decimal32_components
     significand_type sig;
     biased_exponent_type exp;
     bool sign;
+
+    constexpr auto full_significand() const -> significand_type
+    {
+        return sig;
+    }
+
+    constexpr auto biased_exponent() const -> biased_exponent_type
+    {
+        return exp;
+    }
+
+    constexpr auto isneg() const -> bool
+    {
+        return sign;
+    }
 };
 
 struct decimal32_fast_components
