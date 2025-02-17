@@ -99,6 +99,13 @@ constexpr auto max_string_length_v() noexcept -> int
            decimal_val_v<DecimalType> < 128 ? 25 : 41;
 }
 
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto is_fast_type_v() noexcept -> bool
+{
+    // The fast types all assign 1 additional bit over the regular types
+    return decimal_val_v<DecimalType> % 2 == 1;
+}
+
 } // namespace impl
 
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
@@ -134,6 +141,9 @@ BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto max_signifi
 // sign + decimal digits + '.' + 'e' + '+/-' + max digits of exponent + null term
 template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
 BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto max_string_length_v = impl::max_string_length_v<Dec>();
+
+template <typename Dec, std::enable_if_t<detail::is_decimal_floating_point_v<Dec>, bool> = true>
+BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto is_fast_type_v = impl::is_fast_type_v<Dec>();
 
 BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto storage_width {storage_width_v<decimal32>};
 BOOST_DECIMAL_ATTRIBUTE_UNUSED BOOST_DECIMAL_CONSTEXPR_VARIABLE auto precision {precision_v<decimal32>};
