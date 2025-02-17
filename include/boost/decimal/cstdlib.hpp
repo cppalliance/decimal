@@ -37,8 +37,9 @@ namespace detail {
 template <typename TargetDecimalType>
 inline auto strtod_calculation(const char* str, char** endptr, char* buffer, std::size_t str_length) noexcept -> TargetDecimalType
 {
-    using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value ||
-                                                std::is_same<TargetDecimalType, decimal128_fast>::value, detail::uint128, std::uint64_t>;
+    using significand_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                                 std::numeric_limits<std::uint64_t>::digits),
+                                                 detail::uint128, std::uint64_t>;
 
     std::memcpy(buffer, str, str_length);
     convert_string_to_c_locale(buffer);
