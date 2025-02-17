@@ -7,6 +7,7 @@
 
 // Extends the current type traits to include our types and __int128s
 
+#include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 
@@ -153,11 +154,32 @@ struct is_decimal_floating_point<decimal64_fast> { static constexpr bool value =
 template <>
 struct is_decimal_floating_point<decimal128_fast> { static constexpr bool value = true; };
 
+#ifdef BOOST_DECIMAL_HAS_LIBSTDCPP_DECIMAL
+template <>
+struct is_decimal_floating_point<gcc_decimal32> { static constexpr bool value = true; };
+#endif
+
 template <typename T>
 constexpr bool is_decimal_floating_point<T>::value;
 
 template <typename T>
 constexpr bool is_decimal_floating_point_v = is_decimal_floating_point<T>::value;
+
+#ifdef BOOST_DECIMAL_HAS_LIBSTDCPP_DECIMAL
+
+template <typename T>
+struct is_wrapper_type { static constexpr bool value = false; };
+
+template <>
+struct is_wrapper_type<gcc_decimal32> { static constexpr bool value = true; };
+
+template <typename T>
+constexpr bool is_wrapper_type<T>::value;
+
+template <typename T>
+constexpr bool is_wrapper_type_v = is_wrapper_type<T>::value;
+
+#endif
 
 template <typename...>
 struct conjunction : std::true_type {};

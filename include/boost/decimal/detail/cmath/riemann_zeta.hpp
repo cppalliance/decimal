@@ -32,7 +32,7 @@ constexpr auto riemann_zeta_impl(T x) noexcept
 {
     const auto fpc = fpclassify(x);
 
-    constexpr T one  { 1, 0 };
+    const T one  { 1, 0 };
 
     const bool is_neg { signbit(x) };
 

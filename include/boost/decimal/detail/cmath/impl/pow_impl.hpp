@@ -22,7 +22,7 @@ constexpr auto pow_n_impl(T b, UnsignedIntegralType p) noexcept -> std::enable_i
 {
     using local_unsigned_integral_type = UnsignedIntegralType;
 
-    constexpr T one { 1, 0 };
+    const T one { 1, 0 };
 
     T result { };
 
@@ -78,7 +78,7 @@ constexpr auto pow_n_impl(T b, UnsignedIntegralType p) noexcept -> std::enable_i
 template<typename T>
 constexpr auto pow_2_impl(int e2) noexcept -> std::enable_if_t<detail::is_decimal_floating_point_v<T>, T>
 {
-    constexpr T one { 1, 0 };
+    const T one { 1, 0 };
 
     T result { };
 

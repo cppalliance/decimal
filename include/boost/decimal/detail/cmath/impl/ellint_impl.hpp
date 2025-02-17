@@ -67,7 +67,7 @@ constexpr auto agm(T  phi,
 
   const bool phi_is_pi_half { phi == my_pi_half };
 
-  constexpr T one  { 1 };
+  const T one  { 1 };
 
   const bool has_e { ((pEm  != nullptr) || (pEpm != nullptr)) };
 
@@ -94,7 +94,7 @@ constexpr auto agm(T  phi,
   }
   else
   {
-    constexpr T zero { 0 };
+    const T zero { 0 };
     constexpr T half { 5 , -1 };
 
     T a0    { one };

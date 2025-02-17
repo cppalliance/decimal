@@ -27,7 +27,7 @@ constexpr auto remquo(T x, T y, int* quo) noexcept
     using unsigned_significand_type = std::conditional_t<std::is_same<T, decimal128>::value || std::is_same<T, decimal128_fast>::value,
                                                          detail::uint128, std::uint64_t>;
 
-    constexpr T zero {0, 0};
+    const T zero {0, 0};
     constexpr T half {5, -1};
 
     #ifndef BOOST_DECIMAL_FAST_MATH

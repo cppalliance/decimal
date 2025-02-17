@@ -76,7 +76,7 @@ constexpr auto tan(T x) noexcept
 
         constexpr T cbrt_epsilon { cbrt(std::numeric_limits<T>::epsilon()) };
 
-        constexpr T one { 1 };
+        const T one { 1 };
         constexpr T two { 2 };
 
         switch(n)

@@ -71,7 +71,7 @@ constexpr auto sin_impl(T x) noexcept
 
             T r { two_r / 2 };
 
-            constexpr T one { 1 };
+            const T one { 1 };
 
             bool do_scaling { two_r > one };
 

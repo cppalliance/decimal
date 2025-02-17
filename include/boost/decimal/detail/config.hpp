@@ -341,6 +341,12 @@ typedef unsigned __int128 uint128_t;
 #    endif
 #  endif
 
+#ifdef __has_cpp_attribute
+#  if __has_cpp_attribute(nodiscard)
+#     define BOOST_DECIMAL_NO_DISCARD [[nodiscard]]
+#  endif
+#endif
+
 #endif
 
 // Since we should not be able to pull these in from the STL in module mode define them ourselves
@@ -352,6 +358,10 @@ typedef unsigned __int128 uint128_t;
 #  ifndef UINT32_C
 #    define UINT32_C(x) (x ## UL)
 #  endif
+#endif
+
+#if __has_include(<decimal/decimal>) && defined(_GLIBCXX_USE_DECIMAL_FLOAT) && defined(__GNUC__) && __GNUC__ >= 7
+#  define BOOST_DECIMAL_HAS_LIBSTDCPP_DECIMAL
 #endif
 
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP

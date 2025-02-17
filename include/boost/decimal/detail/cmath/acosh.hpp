@@ -54,7 +54,7 @@ constexpr auto acosh_impl(T x) noexcept
     #endif
     else
     {
-        constexpr T one  { 1, 0 };
+        const T one  { 1, 0 };
 
         if (x < one)
         {

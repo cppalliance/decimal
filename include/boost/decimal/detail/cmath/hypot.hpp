@@ -28,7 +28,7 @@ namespace detail {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto hypot_impl(T x, T y) noexcept
 {
-    constexpr T zero {0, 0};
+    const T zero {0, 0};
 
     if (abs(x) == zero
         #ifndef BOOST_DECIMAL_FAST_MATH

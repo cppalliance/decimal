@@ -74,7 +74,7 @@ constexpr auto log10_impl(T x) noexcept
         }
         else
         {
-            constexpr T one  { 1 };
+            const T one  { 1 };
 
             if (x < one)
             {

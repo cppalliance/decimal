@@ -107,7 +107,7 @@ constexpr auto cos_impl(T x) noexcept
         }
         else
         {
-            constexpr T one { 1 };
+            const T one { 1 };
 
             result = one;
         }

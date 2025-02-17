@@ -66,13 +66,13 @@ constexpr auto lgamma_impl(T x) noexcept
     }
     else if ((is_pure_int) && ((nx == 1) || (nx == 2)))
     {
-        constexpr T zero { 0, 0 };
+        const T zero { 0, 0 };
 
         result = zero;
     }
     else
     {
-        constexpr T one { 1, 0 };
+        const T one { 1, 0 };
 
         if (signbit(x))
         {

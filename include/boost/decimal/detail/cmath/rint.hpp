@@ -51,7 +51,7 @@ constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T, BOOST_DECIMAL_INTEGRAL Int>
 constexpr auto lrint_impl(T num) noexcept -> Int
 {
-    constexpr T zero {0, 0};
+    const T zero {0, 0};
     constexpr T lmax {(std::numeric_limits<Int>::max)()};
     constexpr T lmin {(std::numeric_limits<Int>::min)()};
 
@@ -116,7 +116,7 @@ BOOST_DECIMAL_EXPORT template <typename T>
 constexpr auto rint(T num) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    constexpr T zero {0, 0};
+    const T zero {0, 0};
     constexpr T max_round_value {1 / std::numeric_limits<T>::epsilon()};
 
     #ifndef BOOST_DECIMAL_FAST_MATH

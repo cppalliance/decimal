@@ -53,7 +53,7 @@ constexpr auto atan_impl(T x) noexcept
     #endif
     else
     {
-        constexpr T one { 1 };
+        const T one { 1 };
 
         if (x <= T { 48 })
         {

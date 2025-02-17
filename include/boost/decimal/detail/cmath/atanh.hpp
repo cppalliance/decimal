@@ -33,12 +33,12 @@ constexpr auto atanh_impl(T x) noexcept
     }
     else
     {
-        constexpr T zero { 0, 0 };
+        const T zero { 0, 0 };
 
         const auto b_neg = x < zero;
         const auto xx = abs(x);
 
-        constexpr T one  { 1, 0 };
+        const T one  { 1, 0 };
 
         if (xx > one)
         {
