@@ -531,6 +531,8 @@ void zero_test()
     test_value(val * T{dist(rng)}, "0.000000000", chars_format::fixed, 9);
     test_value(val * T{dist(rng)}, "0.0000000000", chars_format::fixed, 10);
     test_value(val * T{dist(rng)}, "0.00000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
+    
+    test_value(val * T{dist(rng)}, "0", chars_format::fixed);
 }
 
 // See: https://github.com/cppalliance/decimal/issues/434
