@@ -25,6 +25,22 @@ namespace detail {
 // 1) Returns a decimal type and lets the constructor handle with shrinking the significand
 // 2) Returns a struct of the constituent components (used with FMAs)
 
+template <typename ReturnType, typename T>
+constexpr auto mul_impl(const T& rhs, const T& lhs) noexcept -> ReturnType
+{
+    using mul_type = std::uint_fast64_t;
+
+    // The constructor needs to calculate the number of digits in the significand which for uint128 is slow
+    // Since we know the value of res_sig is constrained to [1'000'000^2, 9'999'999^2] which equates to
+    // either 13 or 14 decimal digits we can use a single division to make binary search occur with
+    // uint32_t instead. 14 - 5 = 9 or 13 - 5 = 8 which are both still greater than or equal to
+    // digits10 + 1 for rounding which is 8 decimal digits
+
+    auto res_sig {(static_cast<mul_type>(lhs.full_significand()) * static_cast<mul_type>(rhs.full_significand()))};
+    auto res_exp {lhs.biased_exponent() + rhs.biased_exponent()};
+
+    return {res_sig, res_exp, lhs.isneg() != rhs.isneg()};
+}
 
 template <typename ReturnType, typename T, typename U>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
