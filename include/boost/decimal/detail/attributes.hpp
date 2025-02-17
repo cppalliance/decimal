@@ -88,8 +88,8 @@ constexpr auto max_significand_v() noexcept
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto max_significand_v() noexcept
 {
-    return std::is_same<DecimalType, decimal128>::value ? uint128{UINT64_C(0b1111111111'1111111111'1111111111'1111111111'111111), UINT64_MAX} :
-                                                          uint128{UINT64_C(542101086242752), UINT64_C(4003012203950112767)};
+    return decimal_val_v<DecimalType> == 128 ? uint128{UINT64_C(0b1111111111'1111111111'1111111111'1111111111'111111), UINT64_MAX} :
+                                               uint128{UINT64_C(542101086242752), UINT64_C(4003012203950112767)};
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
