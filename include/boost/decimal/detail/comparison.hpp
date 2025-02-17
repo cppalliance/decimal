@@ -288,7 +288,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_type_less_parts_impl(T lhs_sig, U
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
 constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool
 {
-    using comp_type = std::conditional_t<std::is_same<DecimalType, decimal32>::value, std::uint_fast64_t,
+    using comp_type = std::conditional_t<detail::decimal_val_v<DecimalType> < 64, std::uint_fast64_t,
     // GCC less than 10 in non-GNU mode, Clang < 10 and MinGW all have issues with the built-in u128,
     // so use the emulated one
     #if defined(BOOST_DECIMAL_HAS_INT128)
