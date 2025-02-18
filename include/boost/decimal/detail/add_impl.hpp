@@ -182,6 +182,58 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T lhs_sig, U lhs_exp, bool lh
     return {new_sig, new_exp, sign};
 }
 
+template <typename ReturnType, typename T>
+constexpr auto d64_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
+{
+    using add_type = std::int_fast64_t;
+    using significand_type = typename T::significand_type;
+
+    auto sig_lhs {lhs.full_significand()};
+    auto sig_rhs {rhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    const auto rhs_exp {rhs.biased_exponent()};
+
+    // Align to the larger exponent
+    if (lhs_exp != rhs_exp)
+    {
+        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal64> + 1)};
+        auto shift {detail::make_positive_unsigned(lhs_exp - rhs_exp)};
+
+        if (shift > max_shift)
+        {
+            return lhs.full_significand() != 0U && (lhs_exp > rhs.biased_exponent()) ?
+                ReturnType{lhs.full_significand(), lhs.biased_exponent(), lhs.isneg()} :
+                ReturnType{rhs.full_significand(), rhs.biased_exponent(), rhs.isneg()};
+        }
+
+        // Unlike 32 bit addition we will need to both expand one significand and shrink the other
+        // If we did not do this we would end up doing 128-bit maths which requires a 128 bit division on construction
+        const auto expand_shift {(std::min)(2U, shift)};
+        const auto shrink_shift {shift - expand_shift};
+
+        if (lhs_exp < rhs.biased_exponent())
+        {
+            sig_rhs *= detail::pow10<significand_type>(expand_shift);
+            sig_lhs /= detail::pow10<significand_type>(shrink_shift);
+            lhs_exp = rhs_exp - static_cast<typename T::biased_exponent_type>(expand_shift);
+        }
+        else
+        {
+            sig_lhs *= detail::pow10<significand_type>(expand_shift);
+            sig_rhs /= detail::pow10<significand_type>(shrink_shift);
+            lhs_exp -= static_cast<typename T::biased_exponent_type>(expand_shift);
+        }
+    }
+
+    // Perform signed addition with overflow protection
+    const auto signed_lhs {detail::make_signed_value<add_type>(static_cast<add_type>(sig_lhs), lhs.isneg())};
+    const auto signed_rhs {detail::make_signed_value<add_type>(static_cast<add_type>(sig_rhs), rhs.isneg())};
+
+    const auto new_sig {signed_lhs + signed_rhs};
+
+    return ReturnType{new_sig, lhs_exp};
+}
+
 template <typename ReturnType, typename T, typename U>
 constexpr auto d64_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
                             T rhs_sig, U rhs_exp, bool rhs_sign,
