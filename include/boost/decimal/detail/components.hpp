@@ -43,7 +43,7 @@ struct decimal_components
     }
 };
 
-}
+} // namespace impl
 
 using decimal32_components = impl::decimal_components<std::uint32_t, std::int32_t>;
 
