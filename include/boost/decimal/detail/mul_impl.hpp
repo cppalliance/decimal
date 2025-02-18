@@ -26,7 +26,7 @@ namespace detail {
 // 2) Returns a struct of the constituent components (used with FMAs)
 
 template <typename ReturnType, typename T>
-constexpr auto mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
+BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
 {
     using mul_type = std::uint_fast64_t;
 
@@ -62,7 +62,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
 }
 
 template <typename ReturnType, typename T>
-constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<std::is_same<ReturnType, decimal64>::value, ReturnType>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<std::is_same<ReturnType, decimal64>::value, ReturnType>
 {
     // Clang 6-12 yields incorrect results with builtin u128, so we force usage of our version
     #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || (__clang_major__) > 12)
@@ -79,7 +79,7 @@ constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_
 
 // In the fast case we are better served doing our 128-bit division here since we are at a know starting point
 template <typename ReturnType, typename T>
-constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<!std::is_same<ReturnType, decimal64>::value, ReturnType>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<!std::is_same<ReturnType, decimal64>::value, ReturnType>
 {
     // Clang 6-12 yields incorrect results with builtin u128, so we force usage of our version
     #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || (__clang_major__) > 12)

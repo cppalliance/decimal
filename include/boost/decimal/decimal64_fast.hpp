@@ -130,7 +130,7 @@ private:
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint64_t);
 
     template <typename ReturnType, typename T>
-    friend constexpr auto detail::d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<!std::is_same<ReturnType, decimal64>::value, ReturnType>;
+    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto detail::d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<!std::is_same<ReturnType, decimal64>::value, ReturnType>;
 
 public:
     constexpr decimal64_fast() noexcept = default;
