@@ -49,7 +49,9 @@ namespace detail {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 constexpr auto from_chars_general_impl(const char* first, const char* last, TargetDecimalType& value, chars_format fmt) noexcept -> from_chars_result
 {
-    using significand_type = std::conditional_t<std::is_same<typename TargetDecimalType::significand_type, uint128>::value, uint128, std::uint64_t>;
+    using significand_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                                 std::numeric_limits<std::uint64_t>::digits),
+                                                 detail::uint128, std::uint64_t>;
 
     if (first >= last)
     {
@@ -288,7 +290,10 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     int exp {};
     auto significand {frexp10(value, &exp)};
 
-    using uint_type = std::conditional_t<std::is_same<typename TargetDecimalType::significand_type, uint128>::value, uint128, std::uint64_t>;
+    using uint_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                          std::numeric_limits<std::uint64_t>::digits),
+                                          detail::uint128, std::uint64_t>;
+
     auto significand_digits = num_digits(significand);
     exp += significand_digits - 1;
     bool append_zeros = false;
@@ -526,7 +531,10 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         }
     }
 
-    using uint_type = std::conditional_t<std::is_same<typename TargetDecimalType::significand_type, uint128>::value, uint128, std::uint64_t>;
+    using uint_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                          std::numeric_limits<std::uint64_t>::digits),
+                                          detail::uint128, std::uint64_t>;
+
     auto r = to_chars_integer_impl<uint_type, uint_type>(first, last, significand, 10);
 
     if (BOOST_DECIMAL_UNLIKELY(!r))
@@ -637,7 +645,9 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value, int precision = -1) noexcept -> to_chars_result
 {
-    using Unsigned_Integer = std::conditional_t<std::is_same<typename TargetDecimalType::significand_type, uint128>::value, uint128, std::uint64_t>;
+    using Unsigned_Integer = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                                 std::numeric_limits<std::uint64_t>::digits),
+                                                 detail::uint128, std::uint64_t>;
 
     if (signbit(value))
     {
@@ -780,8 +790,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
     }
 
     auto abs_value = abs(value);
-    constexpr auto max_fractional_value = impl::decimal_val_v<TargetDecimalType> < 64 ?  TargetDecimalType{1, 7} :
-                                                          impl::decimal_val_v<TargetDecimalType> < 128 ? TargetDecimalType{1, 16} :
+    constexpr auto max_fractional_value = decimal_val_v<TargetDecimalType> < 64 ?  TargetDecimalType{1, 7} :
+                                                          decimal_val_v<TargetDecimalType> < 128 ? TargetDecimalType{1, 16} :
                                                                                                          TargetDecimalType{1, 34};
 
     constexpr auto min_fractional_value = TargetDecimalType{1, -4};

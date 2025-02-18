@@ -130,7 +130,7 @@ private:
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint64_t);
 
     template <typename ReturnType, typename T>
-    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto detail::d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<!std::is_same<ReturnType, decimal64>::value, ReturnType>;
+    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto detail::d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<detail::is_fast_type_v<ReturnType>, ReturnType>;
 
 public:
     constexpr decimal64_fast() noexcept = default;
@@ -272,10 +272,10 @@ public:
     #endif
 
     // Conversion to other decimal type
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> > detail::impl::decimal_val_v<decimal64_fast>), bool> = true>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> > detail::decimal_val_v<decimal64_fast>), bool> = true>
     constexpr operator Decimal() const noexcept;
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> <= detail::impl::decimal_val_v<decimal64_fast>), bool> = true>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> <= detail::decimal_val_v<decimal64_fast>), bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
     // Unary Operators
@@ -935,13 +935,13 @@ constexpr decimal64_fast::operator std::bfloat16_t() const noexcept
 }
 #endif
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> > detail::impl::decimal_val_v<decimal64_fast>), bool>>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> > detail::decimal_val_v<decimal64_fast>), bool>>
 constexpr decimal64_fast::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::impl::decimal_val_v<Decimal> <= detail::impl::decimal_val_v<decimal64_fast>), bool>>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> <= detail::decimal_val_v<decimal64_fast>), bool>>
 constexpr decimal64_fast::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);

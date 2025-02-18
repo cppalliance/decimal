@@ -6,7 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_TYPE_TRAITS
 
 // Extends the current type traits to include our types and __int128s
-
+#include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 
@@ -158,6 +158,33 @@ constexpr bool is_decimal_floating_point<T>::value;
 
 template <typename T>
 constexpr bool is_decimal_floating_point_v = is_decimal_floating_point<T>::value;
+
+template <typename T>
+struct is_ieee_type { static constexpr bool value = false; };
+
+template <>
+struct is_ieee_type<decimal32> { static constexpr bool value = true; };
+
+template <>
+struct is_ieee_type<decimal64> { static constexpr bool value = true; };
+
+template <>
+struct is_ieee_type<decimal128> { static constexpr bool value = true; };
+
+template <>
+struct is_ieee_type<decimal32_fast> { static constexpr bool value = false; };
+
+template <>
+struct is_ieee_type<decimal64_fast> { static constexpr bool value = false; };
+
+template <>
+struct is_ieee_type<decimal128_fast> { static constexpr bool value = false; };
+
+template <typename T>
+constexpr bool is_ieee_type_v = is_ieee_type<T>::value;
+
+template <typename T>
+constexpr bool is_fast_type_v = !is_ieee_type_v<T>;
 
 template <typename...>
 struct conjunction : std::true_type {};

@@ -20,7 +20,7 @@ namespace detail {
 template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
 constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 {
-    using significand_type = std::conditional_t<std::is_same<TargetType, decimal128>::value || std::is_same<TargetType, decimal128_fast>::value, detail::uint128, int>;
+    using significand_type = std::conditional_t<decimal_val_v<TargetType> >= 128, detail::uint128, std::int64_t>;
 
     const auto trailing_num {val % 10};
     val /= 10;
@@ -45,7 +45,7 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
 constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT(readability-function-cognitive-complexity)
 {
-    using significand_type = std::conditional_t<std::is_same<TargetType, decimal128>::value || std::is_same<TargetType, decimal128_fast>::value, detail::uint128, int>;
+    using significand_type = std::conditional_t<decimal_val_v<TargetType> >= 128, detail::uint128, std::int64_t>;
 
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
     {
