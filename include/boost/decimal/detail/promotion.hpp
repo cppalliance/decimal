@@ -18,7 +18,6 @@ namespace decimal {
 namespace detail {
 
 namespace impl {
-
 // Assign explicit decimal values because the decimal32_fast size could be greater than that
 // of decimal64 even though the precision is worse
 
@@ -66,8 +65,12 @@ struct decimal_val<decimal128_fast>
     static constexpr int value = 129;
 };
 
+} // namespace impl
+
 template <typename T>
-constexpr int decimal_val_v = decimal_val<T>::value;
+constexpr int decimal_val_v = impl::decimal_val<T>::value;
+
+namespace impl {
 
 // Promotes a single argument to double if it is an integer type
 template<typename T>

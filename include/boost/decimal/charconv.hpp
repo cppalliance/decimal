@@ -790,8 +790,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
     }
 
     auto abs_value = abs(value);
-    constexpr auto max_fractional_value = impl::decimal_val_v<TargetDecimalType> < 64 ?  TargetDecimalType{1, 7} :
-                                                          impl::decimal_val_v<TargetDecimalType> < 128 ? TargetDecimalType{1, 16} :
+    constexpr auto max_fractional_value = decimal_val_v<TargetDecimalType> < 64 ?  TargetDecimalType{1, 7} :
+                                                          decimal_val_v<TargetDecimalType> < 128 ? TargetDecimalType{1, 16} :
                                                                                                          TargetDecimalType{1, 34};
 
     constexpr auto min_fractional_value = TargetDecimalType{1, -4};
