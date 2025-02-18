@@ -39,6 +39,7 @@
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
+#include <boost/decimal/detail/components.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -120,16 +121,6 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_sign_mask = 0b1'000
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_combination_mask = 0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_exp_mask = 0b0'00000'11111111'0000000000'0000000000'0000000000'0000000000'0000000000;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_significand_mask = d64_no_combination;
-
-struct decimal64_components
-{
-    using significand_type = std::uint64_t;
-    using biased_exponent_type = std::int32_t;
-
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
 
 } //namespace detail
 
