@@ -15,10 +15,13 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-struct decimal32_components
+namespace impl {
+
+template <typename SigType, typename BiasedExpType>
+struct decimal_components
 {
-    using significand_type = std::uint32_t;
-    using biased_exponent_type = std::int32_t;
+    using significand_type = SigType;
+    using biased_exponent_type = BiasedExpType;
 
     significand_type sig;
     biased_exponent_type exp;
@@ -40,15 +43,13 @@ struct decimal32_components
     }
 };
 
-struct decimal32_fast_components
-{
-    using significand_type = std::uint_fast32_t;
-    using biased_exponent_type = std::int_fast32_t;
+} // namespace impl
 
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
+using decimal32_components = impl::decimal_components<std::uint32_t, std::int32_t>;
+
+using decimal32_fast_components = impl::decimal_components<std::uint_fast32_t, std::int_fast32_t>;
+
+using decimal64_components = impl::decimal_components<std::uint64_t, std::int32_t>;
 
 } // namespace detail
 } // namespace decimal

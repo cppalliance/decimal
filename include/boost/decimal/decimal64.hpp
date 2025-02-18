@@ -39,6 +39,7 @@
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
+#include <boost/decimal/detail/components.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -121,16 +122,6 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_combination_mask = 
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_exp_mask = 0b0'00000'11111111'0000000000'0000000000'0000000000'0000000000'0000000000;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_significand_mask = d64_no_combination;
 
-struct decimal64_components
-{
-    using significand_type = std::uint64_t;
-    using biased_exponent_type = std::int32_t;
-
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
-
 } //namespace detail
 
 #if defined(__GNUC__) && __GNUC__ >= 8
@@ -164,6 +155,8 @@ private:
     constexpr auto full_significand() const noexcept -> significand_type;
     constexpr auto isneg() const noexcept -> bool;
     constexpr auto edit_sign(bool sign) noexcept -> void;
+
+    constexpr auto to_components() const noexcept -> detail::decimal64_components;
 
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
@@ -1056,6 +1049,49 @@ constexpr auto decimal64::isneg() const noexcept -> bool
     return static_cast<bool>(bits_ & detail::d64_sign_mask);
 }
 
+constexpr auto decimal64::to_components() const noexcept -> detail::decimal64_components
+{
+    detail::decimal64_components components {};
+
+    exponent_type expval {};
+    significand_type significand {};
+
+    const auto comb_bits {(bits_ & detail::d64_comb_11_mask)};
+
+    switch (comb_bits)
+    {
+        case detail::d64_comb_11_mask:
+            expval = (bits_ & detail::d64_comb_11_exp_bits) >> (detail::d64_significand_bits + 1);
+
+            // Only need the one bit of T because the other 3 are implied
+            significand = (bits_ & detail::d64_comb_11_significand_bits) == detail::d64_comb_11_significand_bits ?
+                UINT64_C(0b1001'0000000000'0000000000'0000000000'0000000000'0000000000) :
+                UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000);
+            break;
+        case detail::d64_comb_10_mask:
+            expval = UINT64_C(0b1000000000);
+            significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
+            break;
+        case detail::d64_comb_01_mask:
+            expval = UINT64_C(0b0100000000);
+            significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
+            break;
+        default:
+            // Expval = 0
+            significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
+            break;
+    }
+
+    significand |= (bits_ & detail::d64_significand_mask);
+    expval |= (bits_ & detail::d64_exponent_mask) >> detail::d64_significand_bits;
+
+    components.sig = significand;
+    components.exp = static_cast<biased_exponent_type>(expval) - detail::bias_v<decimal64>;
+    components.sign = bits_ & detail::d64_sign_mask;
+
+    return components;
+}
+
 template <typename T>
 constexpr auto decimal64::edit_exponent(T expval) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, T, void)
@@ -1393,16 +1429,10 @@ constexpr auto operator*(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     }
     #endif
 
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+    const auto lhs_components {lhs.to_components()};
+    const auto rhs_components {rhs.to_components()};
 
-    auto rhs_sig {rhs.full_significand()};
-    auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize<decimal64>(rhs_sig, rhs_exp);
-
-    return detail::d64_mul_impl<decimal64>(lhs_sig, lhs_exp, lhs.isneg(),
-                                           rhs_sig, rhs_exp, rhs.isneg());
+    return detail::d64_mul_impl<decimal64>(lhs_components, rhs_components);
 }
 
 template <typename Integer>

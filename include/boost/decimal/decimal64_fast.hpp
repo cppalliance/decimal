@@ -129,6 +129,9 @@ private:
     friend constexpr auto to_dpd_d64(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint64_t);
 
+    template <typename ReturnType, typename T>
+    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto detail::d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<!std::is_same<ReturnType, decimal64>::value, ReturnType>;
+
 public:
     constexpr decimal64_fast() noexcept = default;
 
@@ -1069,8 +1072,7 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::d64_mul_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-                                                rhs.significand_, rhs.biased_exponent(), rhs.sign_);
+    return detail::d64_mul_impl<decimal64_fast>(lhs, rhs);
 }
 
 template <typename Integer>

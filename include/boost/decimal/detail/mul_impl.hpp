@@ -26,7 +26,7 @@ namespace detail {
 // 2) Returns a struct of the constituent components (used with FMAs)
 
 template <typename ReturnType, typename T>
-constexpr auto mul_impl(const T& rhs, const T& lhs) noexcept -> ReturnType
+BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
 {
     using mul_type = std::uint_fast64_t;
 
@@ -59,6 +59,49 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
     auto res_exp {lhs_exp + rhs_exp + static_cast<U>(5)};
 
     return {static_cast<std::uint32_t>(res_sig), res_exp, lhs_sign != rhs_sign};
+}
+
+template <typename ReturnType, typename T>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<std::is_same<ReturnType, decimal64>::value, ReturnType>
+{
+    // Clang 6-12 yields incorrect results with builtin u128, so we force usage of our version
+    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || (__clang_major__) > 12)
+    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    #else
+    using unsigned_int128_type = boost::decimal::detail::uint128;
+    #endif
+
+    const auto res_sig {(static_cast<unsigned_int128_type>(lhs.full_significand()) * static_cast<unsigned_int128_type>(rhs.full_significand()))};
+    const auto res_exp {lhs.biased_exponent() + rhs.biased_exponent()};
+
+    return {res_sig, res_exp, lhs.isneg() != rhs.isneg()};
+}
+
+// In the fast case we are better served doing our 128-bit division here since we are at a know starting point
+template <typename ReturnType, typename T>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<!std::is_same<ReturnType, decimal64>::value, ReturnType>
+{
+    // Clang 6-12 yields incorrect results with builtin u128, so we force usage of our version
+    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || (__clang_major__) > 12)
+    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    #else
+    using unsigned_int128_type = boost::decimal::detail::uint128;
+    #endif
+
+    // Once we have the normalized significands and exponents all we have to do is
+    // multiply the significands and add the exponents
+    //
+    // The constructor needs to calculate the number of digits in the significand which for uint128 is slow
+    // Since we know the value of res_sig is constrained to [(10^16)^2, (10^17 - 1)^2] which equates to
+    // either 31 or 32 decimal digits we can use a single division to make binary search occur with
+    // uint_fast64_t instead. 32 - 13 = 19 or 31 - 13 = 18 which are both still greater than
+    // digits10 + 1 for rounding which is 17 decimal digits
+
+    constexpr auto ten_pow_13 {pow10(static_cast<unsigned_int128_type>(13))};
+    const auto res_sig {static_cast<std::uint64_t>((static_cast<unsigned_int128_type>(lhs.full_significand()) * static_cast<unsigned_int128_type>(rhs.full_significand())) / ten_pow_13)};
+    const auto res_exp {lhs.biased_exponent() + rhs.biased_exponent() + 13};
+
+    return {res_sig, res_exp, lhs.isneg() != rhs.isneg()};
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
