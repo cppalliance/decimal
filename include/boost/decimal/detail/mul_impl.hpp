@@ -26,7 +26,7 @@ namespace detail {
 // 2) Returns a struct of the constituent components (used with FMAs)
 
 template <typename ReturnType, typename T>
-constexpr auto mul_impl(const T& rhs, const T& lhs) noexcept -> ReturnType
+constexpr auto mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
 {
     using mul_type = std::uint_fast64_t;
 
