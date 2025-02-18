@@ -77,7 +77,7 @@ constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_
     return {res_sig, res_exp, lhs.isneg() != rhs.isneg()};
 }
 
-// In the fast case we are better served doing our 128-bit divison here since we are at a know starting point
+// In the fast case we are better served doing our 128-bit division here since we are at a know starting point
 template <typename ReturnType, typename T>
 constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<!std::is_same<ReturnType, decimal64>::value, ReturnType>
 {
