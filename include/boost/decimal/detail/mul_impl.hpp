@@ -61,6 +61,22 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
     return {static_cast<std::uint32_t>(res_sig), res_exp, lhs_sign != rhs_sign};
 }
 
+template <typename ReturnType, typename T>
+constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
+{
+    // Clang 6-12 yields incorrect results with builtin u128, so we force usage of our version
+    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || (__clang_major__) > 12)
+    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    #else
+    using unsigned_int128_type = boost::decimal::detail::uint128;
+    #endif
+
+    const auto res_sig {(static_cast<unsigned_int128_type>(lhs.full_significand()) * static_cast<unsigned_int128_type>(rhs.full_significand()))};
+    const auto res_exp {lhs.biased_exponent() + rhs.biased_exponent()};
+
+    return {res_sig, res_exp, lhs.isneg() != rhs.isneg()};
+}
+
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
                                                        T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
