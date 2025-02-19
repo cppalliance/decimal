@@ -228,6 +228,9 @@ concept random_access_container = is_container<T> &&
 template <typename T>
 concept decimal_floating_point_type = boost::decimal::detail::is_decimal_floating_point_v<T>;
 
+template <typename T>
+concept fast_decimal_floating_point_type = boost::decimal::detail::is_fast_type_v<T>;
+
 } // boost::decimal::detail::concepts
 
 #define BOOST_DECIMAL_HAS_CONCEPTS 1
@@ -253,6 +256,7 @@ concept decimal_floating_point_type = boost::decimal::detail::is_decimal_floatin
 #define BOOST_DECIMAL_ARBITRARY_REAL_OR_COMPLEX boost::decimal::detail::concepts::arbitrary_real_or_complex_type
 #define BOOST_DECIMAL_ARBITRARY_NUMERICAL boost::decimal::detail::concepts::arbitrary_numerical_type
 #define BOOST_DECIMAL_DECIMAL_FLOATING_TYPE boost::decimal::detail::concepts::decimal_floating_point_type
+#define BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE boost::decimal::detail::concepts::fast_decimal_floating_point_type
 
 #define BOOST_DECIMAL_CONTAINER boost::decimal::detail::concepts::is_container
 #define BOOST_DECIMAL_RANDOM_ACCESS_CONTAINER boost::decimal::detail::concepts::random_access_container
@@ -386,6 +390,10 @@ concept execution_policy = std::is_execution_policy_v<std::remove_cvref_t<T>>;
 
 #ifndef BOOST_DECIMAL_DECIMAL_FLOATING_TYPE
 #  define BOOST_DECIMAL_DECIMAL_FLOATING_TYPE typename
+#endif
+
+#ifndef BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE
+#  define BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE typename
 #endif
 
 #ifndef BOOST_DECIMAL_OUTPUT_ITER
