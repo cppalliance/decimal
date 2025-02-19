@@ -114,6 +114,9 @@ private:
     template <typename ReturnType, typename T>
     friend constexpr auto detail::d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
+
 public:
     constexpr decimal32_fast() noexcept = default;
 
@@ -494,28 +497,7 @@ constexpr auto isfinite(decimal32_fast val) noexcept -> bool
 
 constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
 {
-    if (lhs.exponent_ != rhs.exponent_)
-    {
-        return false;
-    }
-    if (lhs.significand_ != rhs.significand_)
-    {
-        return false;
-    }
-
-    #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs))
-    {
-        return false;
-    }
-    #endif
-
-    if (lhs.significand_ == 0)
-    {
-        return true; // -0 == +0
-    }
-
-    return lhs.sign_ == rhs.sign_;
+    return fast_equality_impl(lhs, rhs);
 }
 
 constexpr auto operator!=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool

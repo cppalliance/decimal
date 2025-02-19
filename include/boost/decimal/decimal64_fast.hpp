@@ -132,6 +132,9 @@ private:
     template <typename ReturnType, typename T>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto detail::d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<detail::is_fast_type_v<ReturnType>, ReturnType>;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
+
 public:
     constexpr decimal64_fast() noexcept = default;
 
@@ -350,7 +353,7 @@ public:
     constexpr auto operator++(int) noexcept -> decimal64_fast&;
     constexpr auto operator--() noexcept -> decimal64_fast&;
     constexpr auto operator--(int) noexcept -> decimal64_fast&;
-    
+
     // Cmath friend functions
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
@@ -523,28 +526,7 @@ constexpr auto not_finite(decimal64_fast val) noexcept -> bool
 
 constexpr auto operator==(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
 {
-    if (lhs.exponent_ != rhs.exponent_)
-    {
-        return false;
-    }
-    if (lhs.significand_ != rhs.significand_)
-    {
-        return false;
-    }
-
-    #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs))
-    {
-        return false;
-    }
-    #endif
-
-    if (lhs.significand_ == 0)
-    {
-        return true; // -0 == +0
-    }
-
-    return lhs.sign_ == rhs.sign_;
+    return fast_equality_impl(lhs, rhs);
 }
 
 template <typename Integer>

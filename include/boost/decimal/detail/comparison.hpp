@@ -98,6 +98,33 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     return lhs_sig == rhs_sig;
 }
 
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool
+{
+    if (lhs.exponent_ != rhs.exponent_)
+    {
+        return false;
+    }
+    if (lhs.significand_ != rhs.significand_)
+    {
+        return false;
+    }
+
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(lhs))
+    {
+        return false;
+    }
+    #endif
+
+    if (lhs.significand_ == 0)
+    {
+        return true; // -0 == +0
+    }
+
+    return lhs.sign_ == rhs.sign_;
+}
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
