@@ -141,6 +141,9 @@ private:
     template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_less_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
 
+    template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
+    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_less_equal_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
+
 public:
     constexpr decimal64_fast() noexcept = default;
 

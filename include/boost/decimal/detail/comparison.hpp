@@ -295,8 +295,8 @@ constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
     return !(mixed_decimal_equality_impl(lhs, rhs));
 }
 
-template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE T>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_less_impl(const T& lhs, const T& rhs) noexcept -> bool
+template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_less_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs) || not_finite(rhs))
