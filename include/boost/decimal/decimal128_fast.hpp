@@ -132,6 +132,15 @@ private:
     friend constexpr auto to_dpd_d128(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, detail::uint128);
 
+    template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
+    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
+
+    template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
+    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_inequality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
+
+    template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
+    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_less_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
@@ -535,28 +544,7 @@ constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool
 
 constexpr auto operator==(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
 {
-    if (lhs.exponent_ != rhs.exponent_)
-    {
-        return false;
-    }
-    if (lhs.significand_ != rhs.significand_)
-    {
-        return false;
-    }
-
-    #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs))
-    {
-        return false;
-    }
-    #endif
-
-    if (lhs.significand_ == 0)
-    {
-        return true; // -0 == +0
-    }
-
-    return lhs.sign_ == rhs.sign_;
+    return fast_equality_impl(lhs, rhs);
 }
 
 template <typename Integer>
@@ -575,7 +563,7 @@ constexpr auto operator==(Integer lhs, decimal128_fast rhs) noexcept
 
 constexpr auto operator!=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
 {
-    return !(lhs == rhs);
+    return fast_inequality_impl(lhs, rhs);
 }
 
 template <typename Integer>
@@ -594,54 +582,7 @@ constexpr auto operator!=(Integer lhs, decimal128_fast rhs) noexcept
 
 constexpr auto operator<(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
 {
-    #ifndef BOOST_DECIMAL_FAST_MATH
-    if (not_finite(lhs) || not_finite(rhs))
-    {
-        if (isnan(lhs) || isnan(rhs) ||
-            (!lhs.isneg() && rhs.isneg()))
-        {
-            return false;
-        }
-        else if (lhs.isneg() && !rhs.isneg())
-        {
-            return true;
-        }
-        else if (isfinite(lhs) && isinf(rhs))
-        {
-            return !signbit(rhs);
-        }
-        else if (isinf(lhs) && isfinite(rhs))
-        {
-            return signbit(rhs);
-        }
-    }
-    #endif
-
-    // Needed to correctly compare signed and unsigned zeros
-    if (lhs.significand_ == 0 || rhs.significand_ == 0)
-    {
-        if (lhs.significand_ == 0 && rhs.significand_ == 0)
-        {
-            #ifndef BOOST_DECIMAL_FAST_MATH
-            return lhs.sign_ && !rhs.sign_;
-            #else
-            return false;
-            #endif
-        }
-        return lhs.significand_ == 0 ? !rhs.sign_ : lhs.sign_;
-    }
-
-    if (lhs.sign_ != rhs.sign_)
-    {
-        return lhs.sign_;
-    }
-
-    if (lhs.exponent_ != rhs.exponent_)
-    {
-        return lhs.sign_ ? lhs.exponent_ > rhs.exponent_ : lhs.exponent_ < rhs.exponent_;
-    }
-
-    return lhs.sign_ ? lhs.significand_ > rhs.significand_ : lhs.significand_ < rhs.significand_;
+    return fast_less_impl(lhs, rhs);
 }
 
 template <typename Integer>
