@@ -136,6 +136,9 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_inequality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
@@ -558,7 +561,7 @@ constexpr auto operator==(Integer lhs, decimal128_fast rhs) noexcept
 
 constexpr auto operator!=(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
 {
-    return !(lhs == rhs);
+    return fast_inequality_impl(lhs, rhs);
 }
 
 template <typename Integer>

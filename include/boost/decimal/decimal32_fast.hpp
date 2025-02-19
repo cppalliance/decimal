@@ -16,6 +16,7 @@
 #include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/comparison.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
@@ -116,6 +117,9 @@ private:
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_inequality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
 
 public:
     constexpr decimal32_fast() noexcept = default;
@@ -502,13 +506,7 @@ constexpr auto operator==(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bo
 
 constexpr auto operator!=(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
 {
-    return
-            #ifndef BOOST_DECIMAL_FAST_MATH
-            isnan(lhs) || isnan(rhs) ||
-            #endif
-            (lhs.sign_ != rhs.sign_) ||
-            (lhs.exponent_ != rhs.exponent_) ||
-            (lhs.significand_ != rhs.significand_);
+    return fast_inequality_impl(lhs, rhs);
 }
 
 constexpr auto operator<(decimal32_fast lhs, decimal32_fast rhs) noexcept -> bool
