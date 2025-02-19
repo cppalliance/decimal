@@ -98,7 +98,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     return lhs_sig == rhs_sig;
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool
 {
     if (lhs.exponent_ != rhs.exponent_)
@@ -125,7 +125,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_equality_impl(const DecimalType& 
     return lhs.sign_ == rhs.sign_;
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_inequality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool
 {
     return
@@ -293,6 +293,59 @@ constexpr auto operator!=(Decimal1 lhs, Decimal2 rhs) noexcept
                          detail::is_decimal_floating_point_v<Decimal2>), bool>
 {
     return !(mixed_decimal_equality_impl(lhs, rhs));
+}
+
+template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE T>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_less_impl(const T& lhs, const T& rhs) noexcept -> bool
+{
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (not_finite(lhs) || not_finite(rhs))
+    {
+        if (isnan(lhs) || isnan(rhs) ||
+            (!lhs.isneg() && rhs.isneg()))
+        {
+            return false;
+        }
+        else if (lhs.isneg() && !rhs.isneg())
+        {
+            return true;
+        }
+        else if (isfinite(lhs) && isinf(rhs))
+        {
+            return !signbit(rhs);
+        }
+        else if (isinf(lhs) && isfinite(rhs))
+        {
+            return signbit(rhs);
+        }
+    }
+    #endif
+
+    // Needed to correctly compare signed and unsigned zeros
+    if (lhs.significand_ == 0 || rhs.significand_ == 0)
+    {
+        if (lhs.significand_ == 0 && rhs.significand_ == 0)
+        {
+            #ifndef BOOST_DECIMAL_FAST_MATH
+            return lhs.sign_ && !rhs.sign_;
+            #else
+            return false;
+            #endif
+        }
+        return lhs.significand_ == 0 ? !rhs.sign_ : lhs.sign_;
+    }
+
+    if (lhs.sign_ != rhs.sign_)
+    {
+        return lhs.sign_;
+    }
+
+    if (lhs.exponent_ != rhs.exponent_)
+    {
+        return lhs.sign_ ? lhs.exponent_ > rhs.exponent_ : lhs.exponent_ < rhs.exponent_;
+    }
+
+    return lhs.sign_ ? lhs.significand_ > rhs.significand_ : lhs.significand_ < rhs.significand_;
 }
 
 template <BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
