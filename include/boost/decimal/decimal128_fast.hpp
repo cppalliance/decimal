@@ -133,10 +133,10 @@ private:
     friend constexpr auto to_dpd_d128(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, detail::uint128);
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_inequality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
 
 public:

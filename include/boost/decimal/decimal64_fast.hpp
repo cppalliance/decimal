@@ -132,10 +132,10 @@ private:
     template <typename ReturnType, typename T>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto detail::d64_mul_impl(const T& lhs, const T& rhs) noexcept -> std::enable_if_t<detail::is_fast_type_v<ReturnType>, ReturnType>;
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_inequality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
 
 public:
