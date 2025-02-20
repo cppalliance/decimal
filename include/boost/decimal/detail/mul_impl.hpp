@@ -85,7 +85,7 @@ constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
     const auto res_sig {static_cast<std::uint64_t>((static_cast<unsigned_int128_type>(lhs.full_significand()) * static_cast<unsigned_int128_type>(rhs.full_significand())) / ten_pow_13)};
     const auto res_exp {lhs.biased_exponent() + rhs.biased_exponent() + 13};
 
-    return {res_sig, res_exp, lhs.isneg() != rhs.isneg()};
+    return ReturnType{res_sig, res_exp, lhs.isneg() != rhs.isneg()};
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
