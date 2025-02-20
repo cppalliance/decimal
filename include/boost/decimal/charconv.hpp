@@ -456,20 +456,17 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
     if (precision != -1)
     {
-        if (num_dig >= precision + 1)
+        if (num_dig > precision + 1)
         {
-            while (num_dig > precision + 1)
-            {
-                significand /= 10;
-                ++exponent;
-                --num_dig;
-            }
-
-            if (num_dig == precision + 1)
-            {
-                --num_dig;
-                exponent += fenv_round<TargetDecimalType>(significand);
-            }
+            const auto digits_to_remove {num_dig - precision - 1};
+            significand /= pow10(static_cast<decltype(significand)>(digits_to_remove));
+            exponent += digits_to_remove + fenv_round<TargetDecimalType>(significand);
+            num_dig -= digits_to_remove - 1;
+        }
+        else if (num_dig == precision + 1)
+        {
+            --num_dig;
+            exponent += fenv_round<TargetDecimalType>(significand);
         }
         else if (num_dig < precision && fmt != chars_format::general)
         {
