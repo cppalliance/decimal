@@ -686,29 +686,25 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 
     if (precision != -1)
     {
-        if (significand_digits > precision)
+        if (significand_digits > precision + 2)
         {
-            // If the precision is specified we need to make sure the result is rounded correctly
-            // using the current fenv rounding mode
+            const auto shift_amount {significand_digits - (precision + 2)};
+            significand >>= (shift_amount * 4);
+            significand_digits -= shift_amount;
+        }
 
-            while (significand_digits > precision + 2)
+        if (significand_digits > precision + 1)
+        {
+            const auto trailing_digit = significand & 0xF;
+            significand >>= 4;
+            ++exp;
+            if (trailing_digit >= 8)
             {
-                significand /= 16;
-                --significand_digits;
-            }
-
-            if (significand_digits > precision + 1)
-            {
-                const auto trailing_digit = significand % 16;
-                significand /= 16;
-                ++exp;
-                if (trailing_digit >= 8)
-                {
-                    ++significand;
-                }
+                ++significand;
             }
         }
-        else if (significand_digits < precision)
+
+        if (significand_digits < precision)
         {
             append_zeros = true;
         }
