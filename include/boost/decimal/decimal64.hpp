@@ -1418,8 +1418,10 @@ constexpr auto operator*(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     }
     #endif
 
-    const auto lhs_components {lhs.to_components()};
-    const auto rhs_components {rhs.to_components()};
+    auto lhs_components {lhs.to_components()};
+    detail::normalize(lhs_components.sig, lhs_components.exp);
+    auto rhs_components {rhs.to_components()};
+    detail::normalize(rhs_components.sig, rhs_components.exp);
 
     return detail::d64_mul_impl<decimal64>(lhs_components, rhs_components);
 }
