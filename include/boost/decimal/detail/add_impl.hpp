@@ -31,23 +31,24 @@ constexpr auto d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
     promoted_sig_type big_lhs {lhs.full_significand()};
     promoted_sig_type big_rhs {rhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
+    const auto rhs_exp {rhs.biased_exponent()};
 
     // Align to larger exponent
-    if (lhs_exp != rhs.biased_exponent())
+    if (lhs_exp != rhs_exp)
     {
         constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal32> + 1)};
-        const auto shift {detail::make_positive_unsigned(lhs_exp - rhs.biased_exponent())};
+        const auto shift {detail::make_positive_unsigned(lhs_exp - rhs_exp)};
 
         if (shift > max_shift)
         {
-            return lhs.full_significand() != 0U && (lhs_exp > rhs.biased_exponent()) ?
+            return lhs.full_significand() != 0U && (lhs_exp > rhs_exp) ?
                 ReturnType{lhs.full_significand(), lhs.biased_exponent(), lhs.isneg()} :
                 ReturnType{rhs.full_significand(), rhs.biased_exponent(), rhs.isneg()};
         }
-        else if (lhs_exp < rhs.biased_exponent())
+        else if (lhs_exp < rhs_exp)
         {
             big_rhs *= detail::pow10<promoted_sig_type>(shift);
-            lhs_exp = rhs.biased_exponent() - static_cast<decimal32_components::biased_exponent_type>(shift);
+            lhs_exp = rhs_exp - static_cast<decimal32_components::biased_exponent_type>(shift);
         }
         else
         {
@@ -180,6 +181,53 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T lhs_sig, U lhs_exp, bool lh
     #endif
 
     return {new_sig, new_exp, sign};
+}
+
+template <typename ReturnType, typename T>
+constexpr auto d64_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
+{
+    // Each of the significands is maximally 23 bits.
+    // Rather than doing division to get proper alignment we will promote to 64 bits
+    // And do a single mul followed by an add
+    using add_type = detail::int128;
+    using promoted_sig_type = detail::uint128;
+
+    promoted_sig_type big_lhs {lhs.full_significand()};
+    promoted_sig_type big_rhs {rhs.full_significand()};
+    auto lhs_exp {lhs.biased_exponent()};
+    const auto rhs_exp {rhs.biased_exponent()};
+
+    // Align to larger exponent
+    if (lhs_exp != rhs_exp)
+    {
+        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal64> + 1)};
+        const auto shift {detail::make_positive_unsigned(lhs_exp - rhs_exp)};
+
+        if (shift > max_shift)
+        {
+            return lhs.full_significand() != 0U && (lhs_exp > rhs_exp) ?
+                ReturnType{lhs.full_significand(), lhs.biased_exponent(), lhs.isneg()} :
+                ReturnType{rhs.full_significand(), rhs.biased_exponent(), rhs.isneg()};
+        }
+        else if (lhs_exp < rhs_exp)
+        {
+            big_rhs *= detail::pow10<promoted_sig_type>(shift);
+            lhs_exp = rhs_exp - static_cast<decimal64_components::biased_exponent_type>(shift);
+        }
+        else
+        {
+            big_lhs *= detail::pow10<promoted_sig_type>(shift);
+            lhs_exp -= static_cast<decimal64_components::biased_exponent_type>(shift);
+        }
+    }
+
+    // Perform signed addition with overflow protection
+    const auto signed_lhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_lhs), lhs.isneg())};
+    const auto signed_rhs {detail::make_signed_value<add_type>(static_cast<add_type>(big_rhs), rhs.isneg())};
+
+    const auto new_sig {signed_lhs + signed_rhs};
+
+    return ReturnType{new_sig, lhs_exp};
 }
 
 template <typename ReturnType, typename T, typename U>
