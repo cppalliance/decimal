@@ -216,12 +216,16 @@ constexpr auto d64_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
             sig_rhs *= detail::pow10<significand_type>(expand_shift);
             sig_lhs /= detail::pow10<significand_type>(shrink_shift);
             lhs_exp = rhs_exp - static_cast<typename T::biased_exponent_type>(expand_shift);
+            BOOST_DECIMAL_ASSERT(sig_rhs >= rhs.full_significand() && sig_rhs <= static_cast<significand_type>(std::numeric_limits<add_type>::max()));
+            BOOST_DECIMAL_ASSERT(sig_lhs <= lhs.full_significand());
         }
         else
         {
             sig_lhs *= detail::pow10<significand_type>(expand_shift);
             sig_rhs /= detail::pow10<significand_type>(shrink_shift);
             lhs_exp -= static_cast<typename T::biased_exponent_type>(expand_shift);
+            BOOST_DECIMAL_ASSERT(sig_rhs <= rhs.full_significand());
+            BOOST_DECIMAL_ASSERT(sig_lhs >= lhs.full_significand() && sig_lhs <= static_cast<significand_type>(std::numeric_limits<add_type>::max()));
         }
     }
 
