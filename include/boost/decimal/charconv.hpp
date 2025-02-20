@@ -675,11 +675,9 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     Unsigned_Integer significand = frexp10(value, &exp);
     BOOST_DECIMAL_ASSERT(significand != 0);
     // Strip zeros of the significand since frexp10 normalizes it
-    while (significand % 10U == 0 && significand > 0)
-    {
-        significand /= 10U;
-        ++exp;
-    }
+    const auto zero_removal {detail::remove_trailing_zeros(significand)};
+    significand = zero_removal.trimmed_number;
+    exp += zero_removal.number_of_removed_zeros;
 
     // Calculate the number of bytes
     constexpr auto significand_bits = std::is_same<Unsigned_Integer, std::uint64_t>::value ? 64 : 128;
