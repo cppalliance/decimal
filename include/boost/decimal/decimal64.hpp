@@ -1340,19 +1340,13 @@ constexpr auto operator-(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     }
     #endif
 
-    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
+    auto lhs_components {lhs.to_components()};
+    detail::normalize<decimal64>(lhs_components.sig, lhs_components.exp);
+    auto rhs_components {rhs.to_components()};
+    detail::normalize<decimal64>(rhs_components.sig, rhs_components.exp);
+    rhs_components.sign = !rhs_components.sign;
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
-
-    return detail::d64_add_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
-                                           sig_rhs, exp_rhs, !rhs.isneg(),
-                                           abs_lhs_bigger);
+    return detail::d64_add_impl<decimal64>(lhs_components, rhs_components);
 }
 
 template <typename Integer>
