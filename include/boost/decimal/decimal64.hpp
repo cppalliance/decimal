@@ -1285,17 +1285,12 @@ constexpr auto operator+(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     }
     #endif
 
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+    auto lhs_components {lhs.to_components()};
+    detail::normalize<decimal64>(lhs_components.sig, lhs_components.exp);
+    auto rhs_components {rhs.to_components()};
+    detail::normalize<decimal64>(rhs_components.sig, rhs_components.exp);
 
-    auto rhs_sig {rhs.full_significand()};
-    auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize<decimal64>(rhs_sig, rhs_exp);
-
-    return detail::d64_add_impl<decimal64>(lhs_sig, lhs_exp, lhs.isneg(),
-                                           rhs_sig, rhs_exp, rhs.isneg(),
-                                           (abs(lhs) > abs(rhs)));
+    return detail::d64_add_impl<decimal64>(lhs_components, rhs_components);
 }
 
 template <typename Integer>
@@ -1345,19 +1340,13 @@ constexpr auto operator-(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     }
     #endif
 
-    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
+    auto lhs_components {lhs.to_components()};
+    detail::normalize<decimal64>(lhs_components.sig, lhs_components.exp);
+    auto rhs_components {rhs.to_components()};
+    detail::normalize<decimal64>(rhs_components.sig, rhs_components.exp);
+    rhs_components.sign = !rhs_components.sign;
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
-
-    return detail::d64_sub_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
-                                           sig_rhs, exp_rhs, rhs.isneg(),
-                                           abs_lhs_bigger);
+    return detail::d64_add_impl<decimal64>(lhs_components, rhs_components);
 }
 
 template <typename Integer>
@@ -1385,8 +1374,8 @@ constexpr auto operator-(decimal64 lhs, Integer rhs) noexcept
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
     const auto final_sig_rhs {static_cast<decimal64::significand_type>(sig_rhs)};
 
-    return detail::d64_sub_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
-                                           final_sig_rhs, exp_rhs, (rhs < 0),
+    return detail::d64_add_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
+                                           final_sig_rhs, exp_rhs, !(rhs < 0),
                                            abs_lhs_bigger);
 }
 
@@ -1415,8 +1404,8 @@ constexpr auto operator-(Integer lhs, decimal64 rhs) noexcept
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
 
-    return detail::d64_sub_impl<decimal64>(final_sig_lhs, exp_lhs, (lhs < 0),
-                                           sig_rhs, exp_rhs, rhs.isneg(),
+    return detail::d64_add_impl<decimal64>(final_sig_lhs, exp_lhs, (lhs < 0),
+                                           sig_rhs, exp_rhs, !rhs.isneg(),
                                            abs_lhs_bigger);
 }
 

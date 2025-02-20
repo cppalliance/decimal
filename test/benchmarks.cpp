@@ -20,9 +20,15 @@
 #if __has_include(<charconv>)
 #  include <charconv>
 #    if defined(__cpp_lib_to_chars) && __cpp_lib_to_chars >= 201611L
-#      define BOOST_DECIMAL_BENCHMARK_CHARCONV
+#      define BOOST_DECIMAL_ALLOW_BENCHMARK_CHARCONV
 #    endif
 #endif
+#endif
+
+#ifdef BOOST_DECIMAL_BENCHMARK_CHARCONV
+#  ifndef BOOST_DECIMAL_ALLOW_BENCHMARK_CHARCONV
+#    undef BOOST_DECIMAL_BENCHMARK_CHARCONV
+#  endif
 #endif
 
 using namespace boost::decimal;
