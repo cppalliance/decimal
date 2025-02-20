@@ -305,13 +305,14 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
             // If the precision is specified we need to make sure the result is rounded correctly
             // using the current fenv rounding mode
 
-            while (significand_digits > precision + 2)
+            if (significand_digits > precision + 2)
             {
-                significand /= 10;
-                --significand_digits;
+                const auto digits_to_remove {significand_digits - (precision + 2)};
+                significand /= pow10(static_cast<typename TargetDecimalType::significand_type>(digits_to_remove));
+                significand_digits -= digits_to_remove;
+                fenv_round(significand);
             }
-
-            if (significand_digits > precision + 1)
+            else if (significand_digits > precision + 1)
             {
                 fenv_round(significand);
             }
