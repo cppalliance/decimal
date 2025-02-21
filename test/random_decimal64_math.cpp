@@ -245,6 +245,27 @@ void spot_check_add(T lhs, T rhs)
 }
 
 template <typename T>
+void spot_check_mul(T lhs, T rhs)
+{
+    const decimal64 dec1 {lhs};
+    const decimal64 dec2 {rhs};
+    const decimal64 res {dec1 * dec2};
+    const auto res_int {static_cast<T>(res)};
+
+    if (!BOOST_TEST_EQ(res_int, lhs * rhs))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "Val 1: " << lhs
+                  << "\nDec 1: " << dec1
+                  << "\nVal 2: " << rhs
+                  << "\nDec 2: " << dec2
+                  << "\nDec res: " << res
+                  << "\nInt res: " << lhs - rhs << std::endl;
+        // LCOV_EXCL_STOP
+    }
+}
+
+template <typename T>
 void random_multiplication(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
@@ -975,6 +996,8 @@ int main()
 
     spot_check_add(256744693LL, -113311496787LL);
     spot_check_add(4636302739213LL, -904828263990LL);
+
+    spot_check_mul(27625, 2977);
 
     // Bitwise operators
     random_and();
