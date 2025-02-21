@@ -65,7 +65,7 @@ void test_error_value(const char* input, chars_format format, int precision = -1
     T val;
     const auto r_from = from_chars(input, input + std::strlen(input), val, format);
     BOOST_TEST(r_from);
-    char buffer[boost::decimal::limits<T>::max_chars] {};
+    char buffer[256] {};
     const auto r_to = to_chars(buffer, buffer + sizeof(buffer), val, format, precision);
     BOOST_TEST(r_to);
 }
@@ -881,10 +881,24 @@ int main()
     test_value(decimal32{504.29034} / decimal32{-727.45465}, "-6.932257e-01", chars_format::scientific, 6);
 
     // Value found from fuzzing
+    #ifdef __clang__
+    #  pragma clang diagnostic push
+    #  pragma clang diagnostic ignored "-Wnull-character"
+    #endif
+
     for (int precision = -1; precision < 10; ++precision)
     {
         test_error_value<decimal64>("e1000a00000000000000000000p06", chars_format::hex, precision);
+
+        // GCC just throws a hard error on the null characters in this string
+        #ifdef __clang__
+        test_error_value<decimal32>("000.000000000000000000000000000000000000000000200000ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ4444444444444444444ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ018446744073709551615  44 400000046$42 0 449600", chars_format::fixed, precision);
+        #endif
     }
+
+    #ifdef __clang__
+    #  pragma clang diagnostic pop
+    #endif
 
     #ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
     test_scientific_format_std<decimal32>();

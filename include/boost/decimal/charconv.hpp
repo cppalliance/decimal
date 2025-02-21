@@ -305,13 +305,14 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
             // If the precision is specified we need to make sure the result is rounded correctly
             // using the current fenv rounding mode
 
-            while (significand_digits > precision + 2)
+            if (significand_digits > precision + 2)
             {
-                significand /= 10;
-                --significand_digits;
+                const auto digits_to_remove {significand_digits - (precision + 2)};
+                significand /= pow10(static_cast<typename TargetDecimalType::significand_type>(digits_to_remove));
+                significand_digits -= digits_to_remove;
+                fenv_round(significand);
             }
-
-            if (significand_digits > precision + 1)
+            else if (significand_digits > precision + 1)
             {
                 fenv_round(significand);
             }
@@ -409,6 +410,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
 {
+    using target_decimal_significand_type = typename TargetDecimalType::significand_type;
+
     auto buffer_size = last - first;
     auto real_precision = get_real_precision<TargetDecimalType>(precision);
 
@@ -433,7 +436,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
     auto abs_value = abs(value);
     int exponent {};
-    auto significand = frexp10(abs_value, &exponent);
+    target_decimal_significand_type significand = frexp10(abs_value, &exponent);
 
     const char* output_start = first;
 
@@ -455,20 +458,26 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
     if (precision != -1)
     {
-        if (num_dig >= precision + 1)
+        if (num_dig > precision + 1)
         {
-            while (num_dig > precision + 1)
+            const auto digits_to_remove {num_dig - precision - 1};
+            if (digits_to_remove < std::numeric_limits<target_decimal_significand_type>::digits10 + 1)
             {
-                significand /= 10;
-                ++exponent;
-                --num_dig;
+                significand /= pow10(static_cast<target_decimal_significand_type>(digits_to_remove));
+                exponent += digits_to_remove + fenv_round<TargetDecimalType>(significand);
+                num_dig -= digits_to_remove - 1;
             }
-
-            if (num_dig == precision + 1)
+            else
             {
-                --num_dig;
-                exponent += fenv_round<TargetDecimalType>(significand);
+                significand = 0;
+                num_dig = 0;
+                exponent -= digits_to_remove + (precision + 1);
             }
+        }
+        else if (num_dig == precision + 1)
+        {
+            --num_dig;
+            exponent += fenv_round<TargetDecimalType>(significand);
         }
         else if (num_dig < precision && fmt != chars_format::general)
         {
@@ -677,11 +686,9 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     Unsigned_Integer significand = frexp10(value, &exp);
     BOOST_DECIMAL_ASSERT(significand != 0);
     // Strip zeros of the significand since frexp10 normalizes it
-    while (significand % 10U == 0 && significand > 0)
-    {
-        significand /= 10U;
-        ++exp;
-    }
+    const auto zero_removal {detail::remove_trailing_zeros(significand)};
+    significand = zero_removal.trimmed_number;
+    exp += static_cast<int>(zero_removal.number_of_removed_zeros);
 
     // Calculate the number of bytes
     constexpr auto significand_bits = std::is_same<Unsigned_Integer, std::uint64_t>::value ? 64 : 128;
@@ -690,29 +697,25 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 
     if (precision != -1)
     {
-        if (significand_digits > precision)
+        if (significand_digits > precision + 2)
         {
-            // If the precision is specified we need to make sure the result is rounded correctly
-            // using the current fenv rounding mode
+            const auto shift_amount {significand_digits - (precision + 2)};
+            significand >>= (shift_amount * 4);
+            significand_digits -= shift_amount;
+        }
 
-            while (significand_digits > precision + 2)
+        if (significand_digits > precision + 1)
+        {
+            const auto trailing_digit = significand & 0xF;
+            significand >>= 4;
+            ++exp;
+            if (trailing_digit >= 8)
             {
-                significand /= 16;
-                --significand_digits;
-            }
-
-            if (significand_digits > precision + 1)
-            {
-                const auto trailing_digit = significand % 16;
-                significand /= 16;
-                ++exp;
-                if (trailing_digit >= 8)
-                {
-                    ++significand;
-                }
+                ++significand;
             }
         }
-        else if (significand_digits < precision)
+
+        if (significand_digits < precision)
         {
             append_zeros = true;
         }
