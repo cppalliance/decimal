@@ -410,6 +410,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
 {
+    using target_decimal_significand_type = typename TargetDecimalType::significand_type;
+
     auto buffer_size = last - first;
     auto real_precision = get_real_precision<TargetDecimalType>(precision);
 
@@ -434,7 +436,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
     auto abs_value = abs(value);
     int exponent {};
-    auto significand = frexp10(abs_value, &exponent);
+    target_decimal_significand_type significand = frexp10(abs_value, &exponent);
 
     const char* output_start = first;
 
@@ -459,9 +461,18 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         if (num_dig > precision + 1)
         {
             const auto digits_to_remove {num_dig - precision - 1};
-            significand /= pow10(static_cast<decltype(significand)>(digits_to_remove));
-            exponent += digits_to_remove + fenv_round<TargetDecimalType>(significand);
-            num_dig -= digits_to_remove - 1;
+            if (digits_to_remove < std::numeric_limits<target_decimal_significand_type>::digits10 + 1)
+            {
+                significand /= pow10(static_cast<target_decimal_significand_type>(digits_to_remove));
+                exponent += digits_to_remove + fenv_round<TargetDecimalType>(significand);
+                num_dig -= digits_to_remove - 1;
+            }
+            else
+            {
+                significand = 0;
+                num_dig = 0;
+                exponent -= digits_to_remove + (precision + 1);
+            }
         }
         else if (num_dig == precision + 1)
         {
