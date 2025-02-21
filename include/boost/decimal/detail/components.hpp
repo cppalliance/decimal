@@ -23,9 +23,9 @@ struct decimal_components
     using significand_type = SigType;
     using biased_exponent_type = BiasedExpType;
 
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
+    significand_type sig {};
+    biased_exponent_type exp {};
+    bool sign {};
 
     constexpr decimal_components() = default;
     constexpr decimal_components(const decimal_components& rhs) = default;
