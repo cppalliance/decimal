@@ -38,16 +38,6 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_inf_high_bits = UINT64_MAX - 2;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_qnan_high_bits = UINT64_MAX - 1;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan_high_bits = UINT64_MAX;
 
-struct decimal128_fast_components
-{
-    using significand_type = uint128;
-    using biased_exponent_type = std::int_fast32_t;
-
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
-
 } // namespace detail
 
 BOOST_DECIMAL_EXPORT class decimal128_fast final
