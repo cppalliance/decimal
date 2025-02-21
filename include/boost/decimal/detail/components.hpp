@@ -58,6 +58,8 @@ using decimal64_components = impl::decimal_components<std::uint64_t, std::int32_
 
 using decimal128_components = impl::decimal_components<uint128, std::int32_t>;
 
+using decimal128_fast_components = impl::decimal_components<uint128, std::int_fast32_t>;
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
