@@ -27,6 +27,11 @@ struct decimal_components
     biased_exponent_type exp;
     bool sign;
 
+    constexpr decimal_components() = default;
+    constexpr decimal_components(const decimal_components& rhs) = default;
+    constexpr decimal_components& operator=(const decimal_components& rhs) = default;
+    constexpr decimal_components(SigType sig_, BiasedExpType exp_, bool sign_) : sig{sig_}, exp{exp_}, sign{sign_} {}
+
     constexpr auto full_significand() const -> significand_type
     {
         return sig;
@@ -50,6 +55,8 @@ using decimal32_components = impl::decimal_components<std::uint32_t, std::int32_
 using decimal32_fast_components = impl::decimal_components<std::uint_fast32_t, std::int_fast32_t>;
 
 using decimal64_components = impl::decimal_components<std::uint64_t, std::int32_t>;
+
+using decimal128_components = impl::decimal_components<uint128, std::int32_t>;
 
 } // namespace detail
 } // namespace decimal
