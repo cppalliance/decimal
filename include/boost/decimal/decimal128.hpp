@@ -158,6 +158,7 @@ private:
     constexpr auto biased_exponent() const noexcept -> std::int32_t;
     constexpr auto full_significand() const noexcept -> detail::uint128;
     constexpr auto isneg() const noexcept -> bool;
+    constexpr auto to_components() const noexcept -> detail::decimal128_components;
 
     // Allows direct editing of the exp
     template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
@@ -678,6 +679,45 @@ constexpr auto decimal128::isneg() const noexcept -> bool
 {
     return static_cast<bool>(bits_.high & detail::d128_sign_mask.high);
 }
+
+constexpr auto decimal128::to_components() const noexcept -> detail::decimal128_components
+{
+    detail::uint128 significand {};
+    std::uint64_t expval {};
+
+    constexpr std::uint64_t high_word_significand_bits {detail::d128_significand_bits - 64U};
+
+    const auto exp_comb_bits {(bits_.high & detail::d128_comb_11_mask.high)};
+
+    switch (exp_comb_bits)
+    {
+        case detail::d128_comb_11_mask.high:
+            expval = (bits_.high & detail::d128_comb_11_mask.high) >> (high_word_significand_bits + 1);
+            // Only need the one bit of T because the other 3 are implied 0s
+            significand = (bits_.high & detail::d128_comb_11_significand_bits.high) == detail::d128_comb_11_significand_bits.high ?
+                detail::uint128{0b10010000000000000000000000000000000000000000000000,0} :
+                detail::uint128{0b10000000000000000000000000000000000000000000000000,0};
+            break;
+        case detail::d128_comb_10_mask.high:
+            expval = UINT64_C(0b10000000000000);
+            significand.high |= (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
+            break;
+        case detail::d128_comb_01_mask.high:
+            expval = UINT64_C(0b01000000000000);
+            significand.high |= (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
+            break;
+        default:
+            significand.high |= (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
+            break;
+    }
+
+    expval |= (bits_.high & detail::d128_exponent_mask.high) >> high_word_significand_bits;
+    significand |= (bits_ & detail::d128_significand_mask);
+    const auto sign {static_cast<bool>(bits_.high & detail::d128_sign_mask.high)};
+
+    return {significand, static_cast<biased_exponent_type>(expval) - detail::bias_v<decimal128>, sign};
+}
+
 
 template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
 constexpr auto decimal128::edit_exponent(T expval) noexcept -> void
