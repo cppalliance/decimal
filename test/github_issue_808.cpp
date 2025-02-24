@@ -23,5 +23,9 @@ int main()
     tiny_div<decimal64>();
     tiny_div<decimal128>();
 
+    tiny_div<decimal32_fast>();
+    tiny_div<decimal64_fast>();
+    tiny_div<decimal128_fast>();
+
     return boost::report_errors();
 }
