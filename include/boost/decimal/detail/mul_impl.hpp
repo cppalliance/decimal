@@ -253,7 +253,7 @@ constexpr auto d128_fast_mul_impl(const T& lhs, const T& rhs) noexcept -> Return
     constexpr auto ten_pow_30 {detail::pow10(static_cast<uint256_t>(30))};
     res_sig /= ten_pow_30;
 
-    BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0,0));
+    BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0,0)); // LCOV_EXCL_LINE
     return {res_sig.low, res_exp, sign};
 }
 
@@ -273,7 +273,7 @@ constexpr auto d128_fast_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     res_sig /= ten_pow_30;
     res_exp += 30;
 
-    BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0,0));
+    BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0,0)); // LCOV_EXCL_LINE
     return {res_sig.low, res_exp, sign};
 }
 
