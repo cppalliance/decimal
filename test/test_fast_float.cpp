@@ -6,6 +6,7 @@
 #include <boost/decimal/detail/fast_float/compute_float80_128.hpp>
 #include <random>
 #include <limits>
+#include <cmath>
 
 inline bool test_close(long double lhs, long double rhs)
 {
@@ -40,7 +41,7 @@ int main()
     success = false;
     res = boost::decimal::detail::fast_float::compute_float80_128(q, w, false, success);
     BOOST_TEST(success);
-    BOOST_TEST(test_close(res, HUGE_VALL));
+    BOOST_TEST(test_close(res, HUGE_VALL) || std::isinf(res)); // Depending on the definition of HUGE_VALL
 
     return boost::report_errors();
 }
