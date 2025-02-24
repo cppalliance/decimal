@@ -910,7 +910,15 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
         }
         else
         {
-            bits_ = detail::d128_comb_inf_mask;
+            if (exp < 0)
+            {
+                constexpr auto zero_bits {detail::uint128{UINT64_C(0x2208000000000000), UINT64_C(0)}};
+                bits_ = zero_bits;
+            }
+            else
+            {
+                bits_ = detail::d128_comb_inf_mask;
+            }
         }
     }
 }

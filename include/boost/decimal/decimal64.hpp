@@ -773,7 +773,15 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
         }
         else
         {
-            bits_ = detail::d64_comb_inf_mask;
+            if (exp < 0)
+            {
+                constexpr auto zero_bits {UINT64_C(0x2238000000000000)};
+                bits_ = zero_bits;
+            }
+            else
+            {
+                bits_ = detail::d64_comb_inf_mask;
+            }
         }
     }
 }

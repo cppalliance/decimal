@@ -780,7 +780,16 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         }
         else
         {
-            bits_ = detail::d32_comb_inf_mask;
+            if (exp < 0)
+            {
+                // Normalized zero
+                constexpr auto zero_bits {UINT32_C(0x22500000)};
+                bits_ = zero_bits;
+            }
+            else
+            {
+                bits_ = detail::d32_comb_inf_mask;
+            }
         }
     }
 }
