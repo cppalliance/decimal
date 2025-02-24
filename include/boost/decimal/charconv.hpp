@@ -548,7 +548,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
     if (BOOST_DECIMAL_UNLIKELY(!r))
     {
-        return r;
+        return r; // LCOV_EXCL_LINE
     }
 
     // Bounds check again
