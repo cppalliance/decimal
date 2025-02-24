@@ -2,6 +2,9 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#ifndef BOOST_DECIMAL_DECIMAL128_FAST_HPP
+#define BOOST_DECIMAL_DECIMAL128_FAST_HPP
+
 #include <boost/decimal/decimal128.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
@@ -21,9 +24,6 @@
 #include <cstdint>
 
 #endif
-
-#ifndef BOOST_DECIMAL_DECIMAL128_FAST_HPP
-#define BOOST_DECIMAL_DECIMAL128_FAST_HPP
 
 namespace boost {
 namespace decimal {
