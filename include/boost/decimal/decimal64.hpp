@@ -738,6 +738,8 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     }
     else
     {
+        constexpr auto zero_bits {UINT64_C(0x2238000000000000)};
+
         // The value is probably infinity
 
         // If we can offset some extra power in the coefficient try to do so
@@ -763,7 +765,7 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
             {
                 if (exp < 0)
                 {
-                    *this = decimal64(0, 0, isneg);
+                    bits_ = zero_bits;
                 }
                 else
                 {
@@ -775,7 +777,6 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
         {
             if (exp < 0)
             {
-                constexpr auto zero_bits {UINT64_C(0x2238000000000000)};
                 bits_ = zero_bits;
             }
             else

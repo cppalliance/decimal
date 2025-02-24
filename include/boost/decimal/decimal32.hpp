@@ -745,6 +745,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
     else
     {
+        constexpr auto zero_bits {UINT32_C(0x22500000)};
         // The value is probably infinity
 
         // If we can offset some extra power in the coefficient try to do so
@@ -770,7 +771,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
             {
                 if (exp < 0)
                 {
-                    *this = decimal32(0, 0, isneg);
+                    bits_ = zero_bits;
                 }
                 else
                 {
@@ -783,7 +784,6 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
             if (exp < 0)
             {
                 // Normalized zero
-                constexpr auto zero_bits {UINT32_C(0x22500000)};
                 bits_ = zero_bits;
             }
             else

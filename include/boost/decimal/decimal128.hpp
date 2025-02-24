@@ -875,6 +875,8 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     }
     else
     {
+        constexpr auto zero_bits {detail::uint128{UINT64_C(0x2208000000000000), UINT64_C(0)}};
+
         // The value is probably infinity
 
         // If we can offset some extra power in the coefficient try to do so
@@ -900,7 +902,7 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
             {
                 if (exp < 0)
                 {
-                    *this = decimal128(0, 0, isneg);
+                    bits_ = zero_bits;
                 }
                 else
                 {
@@ -912,7 +914,6 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
         {
             if (exp < 0)
             {
-                constexpr auto zero_bits {detail::uint128{UINT64_C(0x2208000000000000), UINT64_C(0)}};
                 bits_ = zero_bits;
             }
             else
