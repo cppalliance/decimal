@@ -56,15 +56,9 @@ inline auto parse_format(const char* format) -> parameters
     // If the format is unspecified or incorrect we will use this as the default values
     parameters params {6, chars_format::general, decimal_type::decimal64, false};
 
-    auto iter {format};
+    auto iter {format + 1};
     const auto last {format + std::strlen(format)};
 
-    if (iter == last || *iter != '%')
-    {
-        return params;
-    }
-
-    ++iter;
     if (iter == last)
     {
         return params;

@@ -8,6 +8,8 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/bit_layouts.hpp>
+#include <boost/decimal/detail/apply_sign.hpp>
+#include <boost/decimal/detail/integer_search_trees.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <array>
@@ -150,8 +152,10 @@ constexpr auto compute_float80_128(std::int64_t q, const Unsigned_Integer &w,
 
     if (BOOST_DECIMAL_UNLIKELY(ld == std::numeric_limits<long double>::infinity()))
     {
+        // LCOV_EXCL_BEGIN
         success = false;
         ld = 0.0L;
+        // LCOV_EXCL_END
     }
 
     return ld;
