@@ -393,16 +393,23 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
         exp = 0;
     }
 
-    auto biased_exp {static_cast<std::uint_fast32_t>(exp + detail::bias)};
+    const auto biased_exp {exp + detail::bias};
 
     // Decimal32 exponent holds 8 bits
     if (biased_exp > detail::max_biased_exp_v<decimal32_fast>)
     {
         significand_ = detail::d32_fast_inf;
     }
-    else
+    else if (biased_exp >= 0)
     {
         exponent_ = static_cast<exponent_type>(biased_exp);
+    }
+    else
+    {
+        // Flush denorms to zero
+        significand_ = static_cast<significand_type>(0);
+        exponent_ = static_cast<exponent_type>(101);
+        sign_ = false;
     }
 }
 
