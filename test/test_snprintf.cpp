@@ -204,6 +204,22 @@ void test_fuzzer_crash(const char* c_data)
     }
 }
 
+template <typename DecimalType>
+void test_bad_input()
+{
+    DecimalType val {};
+    char buffer[256];
+
+    // Check for only % sign
+    boost::decimal::snprintf(buffer, sizeof(buffer), "%", val);
+
+    // Check for bad precision
+    boost::decimal::snprintf(buffer, sizeof(buffer), "%.", val);
+
+    // Precision without a format
+    boost::decimal::snprintf(buffer, sizeof(buffer), "%.3", val);
+}
+
 int main()
 {
     test_bootstrap<decimal32>();
@@ -217,6 +233,10 @@ int main()
 
     test_fuzzer_crash("");
     test_fuzzer_crash("Dd00000000001000000000000000000000000000000000001000000000ccccccccc�Cccc0ccccccccc8888000010000)001.2");
+
+    test_bad_input<decimal32>();
+    test_bad_input<decimal64>();
+    test_bad_input<decimal128>();
 
     return boost::report_errors();
 }
