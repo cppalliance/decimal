@@ -643,34 +643,37 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
 
     // If the coeff is not in range make it so
-    auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
-    const bool reduced {unsigned_coeff_digits > detail::precision};
-    if (unsigned_coeff_digits > detail::precision + 1)
+    // Only count the number of digits if we absolutely have to
+    int unsigned_coeff_digits {};
+    if (unsigned_coeff >= 10'000'000U)
     {
-        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision + 1)};
+        unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
+        if (unsigned_coeff_digits > detail::precision + 1)
+        {
+            const auto digits_to_remove {unsigned_coeff_digits - (detail::precision + 1)};
 
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic push
-        #  pragma GCC diagnostic ignored "-Wconversion"
-        #endif
+            #if defined(__GNUC__) && !defined(__clang__)
+            #  pragma GCC diagnostic push
+            #  pragma GCC diagnostic ignored "-Wconversion"
+            #endif
 
-        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+            unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
 
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic pop
-        #endif
+            #if defined(__GNUC__) && !defined(__clang__)
+            #  pragma GCC diagnostic pop
+            #endif
 
-        exp += digits_to_remove;
-        unsigned_coeff_digits -= digits_to_remove;
-        exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
-    }
-    else if (reduced)
-    {
-        exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
+            exp += digits_to_remove;
+            unsigned_coeff_digits -= digits_to_remove;
+            exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
+        }
+        else
+        {
+            exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
+        }
     }
 
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
-    const auto reduced_coeff_digits {unsigned_coeff_digits};
     bool big_combination {false};
 
     if (reduced_coeff == 0)
@@ -752,7 +755,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         // The value is probably infinity
 
         // If we can offset some extra power in the coefficient try to do so
-        auto coeff_dig {reduced_coeff_digits};
+        auto coeff_dig {unsigned_coeff_digits};
         if (coeff_dig < detail::precision)
         {
             for (; coeff_dig <= detail::precision; ++coeff_dig)
