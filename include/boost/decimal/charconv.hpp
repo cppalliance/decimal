@@ -268,7 +268,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
         default:
             // LCOV_EXCL_START
             BOOST_DECIMAL_UNREACHABLE;
-            return {first, std::errc::not_supported};
             // LCOV_EXCL_STOP
     }
 }
