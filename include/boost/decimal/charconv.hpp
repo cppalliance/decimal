@@ -267,7 +267,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
             return {last, std::errc::value_too_large};
         default:
             // LCOV_EXCL_START
-            BOOST_DECIMAL_ASSERT_MSG(fp != 0, "Unreachable return");
+            BOOST_DECIMAL_UNREACHABLE;
             return {first, std::errc::not_supported};
             // LCOV_EXCL_STOP
     }
