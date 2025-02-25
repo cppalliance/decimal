@@ -37,6 +37,7 @@
 #include <boost/decimal/detail/sub_impl.hpp>
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
+#include <boost/decimal/detail/cmath/next.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 

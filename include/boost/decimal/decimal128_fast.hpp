@@ -17,6 +17,7 @@
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
+#include <boost/decimal/detail/cmath/next.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
