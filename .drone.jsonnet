@@ -195,9 +195,16 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     ),
     
     linux_pipeline(
-        "Linux 24.04 GCC 13 32/64",
+        "Linux 24.04 GCC 13 32",
         "cppalliance/droneubuntu2404:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++-13', CXXSTD: '03,11,14,17,20,23', ADDRMD: '32,64', CXXFLAGS: "-fexcess-precision=fast" },
+        { TOOLSET: 'gcc', COMPILER: 'g++-13', CXXSTD: '03,11,14,17,20,23', ADDRMD: '32', CXXFLAGS: "-fexcess-precision=fast" },
+        "g++-13-multilib",
+    ),
+
+    linux_pipeline(
+        "Linux 24.04 GCC 13 64",
+        "cppalliance/droneubuntu2404:1",
+        { TOOLSET: 'gcc', COMPILER: 'g++-13', CXXSTD: '03,11,14,17,20,23', ADDRMD: '64', CXXFLAGS: "-fexcess-precision=fast" },
         "g++-13-multilib",
     ),
 
