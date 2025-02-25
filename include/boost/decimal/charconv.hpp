@@ -496,7 +496,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     // Make sure the result will fit in the buffer
-    const std::ptrdiff_t total_length = total_buffer_length(num_dig, exponent, is_neg) + num_leading_zeros;
+    const std::ptrdiff_t total_length = total_buffer_length<TargetDecimalType>(num_dig, exponent, is_neg) + num_leading_zeros;
     if (total_length > buffer_size)
     {
         return {last, std::errc::value_too_large};
