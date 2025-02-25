@@ -662,15 +662,15 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
 
         exp += digits_to_remove;
         unsigned_coeff_digits -= digits_to_remove;
+        exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
     }
-
-    // Round as required
-    if (reduced)
+    else if (reduced)
     {
         exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
     }
 
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
+    const auto reduced_coeff_digits {unsigned_coeff_digits};
     bool big_combination {false};
 
     if (reduced_coeff == 0)
@@ -753,10 +753,10 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         // The value is probably infinity
 
         // If we can offset some extra power in the coefficient try to do so
-        const auto coeff_dig {detail::num_digits(reduced_coeff)};
+        auto coeff_dig {reduced_coeff_digits};
         if (coeff_dig < detail::precision)
         {
-            for (auto i {coeff_dig}; i <= detail::precision; ++i)
+            for (; coeff_dig <= detail::precision; ++coeff_dig)
             {
                 reduced_coeff *= 10;
                 --biased_exp;
@@ -767,7 +767,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
                 }
             }
 
-            if (detail::num_digits(reduced_coeff) <= detail::precision)
+            if (coeff_dig <= detail::precision)
             {
                 *this = decimal32(reduced_coeff, exp, isneg);
             }
