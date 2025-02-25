@@ -20,6 +20,20 @@
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
+// Hopefully the compiler makes this NOOP for the fast case
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto frexp10_normalize(T1&, T2&) noexcept -> std::enable_if_t<is_fast_type_v<TargetType>, void> {}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto frexp10_normalize(T1& sig, T2& exp) noexcept -> std::enable_if_t<!is_fast_type_v<TargetType>, void>
+{
+    detail::normalize<TargetType>(sig, exp);
+}
+
+} // namespace detail
+
 // Returns the normalized significand and exponent to be cohort agnostic
 // Returns num in the range
 //   [1e06, 1e06 - 1] for decimal32
@@ -45,7 +59,7 @@ constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_t
 
     auto num_exp {num.biased_exponent()};
     auto num_sig {num.full_significand()};
-    detail::normalize<T>(num_sig, num_exp);
+    detail::frexp10_normalize<T>(num_sig, num_exp);
 
     *expptr = static_cast<int>(num_exp);
 
