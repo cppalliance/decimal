@@ -44,21 +44,13 @@ constexpr auto nextafter_impl(DecimalType val, bool direction) noexcept -> Decim
                                         -std::numeric_limits<DecimalType>::denorm_min()};
         return min_val;
     }
-    else if (abs_val < std::numeric_limits<DecimalType>::min())
-    {
-        // TODO(mborland): We need the non-normalized significand e.g. denorm_min next is {2, etiny} not some big thing
-        int exp {} ;
-        auto significand {frexp10(val, &exp)};
-
-        direction ? significand++ : significand--;
-
-        return DecimalType{significand, exp, abs_val != val};
-    }
     else if (abs_val > zero && abs_val < std::numeric_limits<DecimalType>::epsilon())
     {
-        const auto min_val {direction ? val + std::numeric_limits<DecimalType>::min() :
-                                        val - std::numeric_limits<DecimalType>::min()};
-        return min_val;
+        auto exp {val.biased_exponent()};
+        auto sig {val.full_significand()};
+        sig = direction ? sig + 1 : sig - 1;
+
+        return {sig, exp, val.isneg()};
     }
 
     const auto val_eps {direction ? val + std::numeric_limits<DecimalType>::epsilon() :

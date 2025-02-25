@@ -5,7 +5,6 @@
 
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
-#include <boost/decimal/detail/cmath/next.hpp>
 #include <iomanip>
 #include <limits>
 #include <random>
