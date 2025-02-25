@@ -123,6 +123,89 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_big_combination_field_mask = 
 //BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_exp_mask = UINT32_C(0b0'00000'111111'0000000000'0000000000);
 //BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_significand_mask = d32_no_combination;
 
+template <typename T>
+constexpr auto d32_constructor_num_digits(T x) noexcept -> int
+{
+    return detail::num_digits(x);
+}
+
+// Since we already have partial information we can greatly speed things up in this case
+template <>
+constexpr auto d32_constructor_num_digits<std::uint32_t>(std::uint32_t x) noexcept -> int
+{
+    if (x >= UINT32_C(100000000))
+    {
+        if (x >= UINT32_C(1000000000))
+        {
+            return 10;
+        }
+        return 9;
+    }
+    return 8;
+}
+
+// Uint64_t isn't as big of a difference
+template <>
+constexpr auto d32_constructor_num_digits<std::uint64_t>(std::uint64_t x) noexcept -> int
+{
+    // We already know that x >= 10000000 (7 digits)
+    if (x >= UINT64_C(10000000000))
+    {
+        if (x >= UINT64_C(100000000000000))
+        {
+            if (x >= UINT64_C(10000000000000000))
+            {
+                if (x >= UINT64_C(100000000000000000))
+                {
+                    if (x >= UINT64_C(1000000000000000000))
+                    {
+                        if (x >= UINT64_C(10000000000000000000))
+                        {
+                            return 20;
+                        }
+                        return 19;
+                    }
+                    return 18;
+                }
+                return 17;
+            }
+            else if (x >= UINT64_C(1000000000000000))
+            {
+                return 16;
+            }
+            return 15;
+        }
+        if (x >= UINT64_C(1000000000000))
+        {
+            if (x >= UINT64_C(10000000000000))
+            {
+                return 14;
+            }
+            return 13;
+        }
+        if (x >= UINT64_C(100000000000))
+        {
+            return 12;
+        }
+        return 11;
+    }
+    else // 10000000 <= x < 10000000000
+    {
+        if (x >= UINT64_C(100000000))
+        {
+            if (x >= UINT64_C(1000000000))
+            {
+                return 10;
+            }
+            return 9;
+        }
+        else // 10000000 <= x < 100000000
+        {
+            return 8;
+        }
+    }
+}
+
 } // namespace detail
 
 #if defined(__GNUC__) && __GNUC__ >= 8
@@ -647,7 +730,8 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     int unsigned_coeff_digits {};
     if (unsigned_coeff >= 10'000'000U)
     {
-        unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
+        // Since we know that the unsigned coeff is >= 10'000'000 we can use this information to traverse pruned trees
+        unsigned_coeff_digits = detail::d32_constructor_num_digits(unsigned_coeff);
         if (unsigned_coeff_digits > detail::precision + 1)
         {
             const auto digits_to_remove {unsigned_coeff_digits - (detail::precision + 1)};
