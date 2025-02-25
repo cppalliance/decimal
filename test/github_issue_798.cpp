@@ -5,7 +5,6 @@
 
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
-#include <boost/decimal/detail/cmath/next.hpp>
 #include <iomanip>
 #include <limits>
 #include <random>
@@ -65,6 +64,25 @@ void test_onek()
     BOOST_TEST_LT(next_after_onek, twok);
 }
 
+template <typename T>
+void test_min()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_int_distribution<int> dist(1, 1);
+
+    const T min_val {std::numeric_limits<T>::denorm_min()};
+    const T one {dist(rng)};
+
+    const auto next_after_min {boost::decimal::nextafter(min_val, one)};
+
+    BOOST_TEST_GT(next_after_min, min_val);
+    BOOST_TEST_LT(next_after_min, min_val + 3*std::numeric_limits<T>::min());
+
+    const auto two_next_after_zero {boost::decimal::nextafter(next_after_min, one)};
+    BOOST_TEST_GT(two_next_after_zero, next_after_min);
+    BOOST_TEST_LT(two_next_after_zero, min_val + 4*std::numeric_limits<T>::min());
+}
+
 int main()
 {
     using namespace boost::decimal;
@@ -96,6 +114,13 @@ int main()
     test_onek<decimal64_fast>();
     test_onek<decimal128>();
     test_onek<decimal128_fast>();
+
+    test_min<decimal32>();
+    test_min<decimal32_fast>();
+    test_min<decimal64>();
+    test_min<decimal64_fast>();
+    test_min<decimal128>();
+    test_min<decimal128_fast>();
 
     return boost::report_errors();
 }

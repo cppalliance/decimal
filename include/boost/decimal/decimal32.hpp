@@ -38,6 +38,7 @@
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/components.hpp>
+#include <boost/decimal/detail/cmath/next.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -219,6 +220,9 @@ private:
     template <typename DecimalType>
     friend constexpr auto to_dpd_d32(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint32_t);
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
 
 public:
     // 3.2.2.1 construct/copy/destroy:

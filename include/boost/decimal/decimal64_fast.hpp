@@ -18,6 +18,7 @@
 #include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/promotion.hpp>
+#include <boost/decimal/detail/cmath/next.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -143,6 +144,9 @@ private:
 
     template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_less_equal_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
 
 public:
     constexpr decimal64_fast() noexcept = default;

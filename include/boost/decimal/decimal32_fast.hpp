@@ -17,6 +17,7 @@
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/comparison.hpp>
+#include <boost/decimal/detail/cmath/next.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
@@ -125,6 +126,9 @@ private:
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_less_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
 
     friend constexpr auto not_finite(const decimal32_fast& val) noexcept -> bool;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
 
 public:
     constexpr decimal32_fast() noexcept = default;
