@@ -42,15 +42,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto frexp10_normalize(T1& sig, T2& exp) no
 BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type
 {
-    constexpr T zero {0, 0};
-
-    if (num == zero)
-    {
-        *expptr = 0;
-        return 0;
-    }
     #ifndef BOOST_DECIMAL_FAST_MATH
-    else if (isinf(num) || isnan(num))
+    if (isinf(num) || isnan(num))
     {
         *expptr = 0;
         return (std::numeric_limits<typename T::significand_type>::max)();
@@ -59,6 +52,14 @@ constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_t
 
     auto num_exp {num.biased_exponent()};
     auto num_sig {num.full_significand()};
+
+    // Normalize the handling of zeros
+    if (num_sig == 0)
+    {
+        *expptr = 0;
+        return 0;
+    }
+
     detail::frexp10_normalize<T>(num_sig, num_exp);
 
     *expptr = static_cast<int>(num_exp);
