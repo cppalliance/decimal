@@ -2,6 +2,9 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#ifndef BOOST_DECIMAL_DECIMAL128_FAST_HPP
+#define BOOST_DECIMAL_DECIMAL128_FAST_HPP
+
 #include <boost/decimal/decimal128.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
@@ -21,9 +24,6 @@
 #include <cstdint>
 
 #endif
-
-#ifndef BOOST_DECIMAL_DECIMAL128_FAST_HPP
-#define BOOST_DECIMAL_DECIMAL128_FAST_HPP
 
 namespace boost {
 namespace decimal {
@@ -394,15 +394,22 @@ constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
         exp = 0;
     }
 
-    const auto biased_exp {static_cast<exponent_type>(exp + detail::bias_v<decimal128>)};
+    const auto biased_exp {exp + detail::bias_v<decimal128>};
 
     if (biased_exp > detail::max_biased_exp_v<decimal128>)
     {
         significand_ = detail::d128_fast_inf;
     }
+    else if (biased_exp >= 0)
+    {
+        exponent_ = static_cast<exponent_type>(biased_exp);
+    }
     else
     {
-        exponent_ = biased_exp;
+        // Flush denorms to zero
+        significand_ = static_cast<significand_type>(0);
+        exponent_ = static_cast<exponent_type>(0 + detail::bias_v<decimal128>);
+        sign_ = false;
     }
 }
 

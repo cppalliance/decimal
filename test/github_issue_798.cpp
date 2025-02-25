@@ -8,17 +8,25 @@
 #include <boost/decimal/detail/cmath/next.hpp>
 #include <iomanip>
 #include <limits>
+#include <random>
 
 template <typename T>
 void test_zero()
 {
-    constexpr T zero {0};
-    constexpr T one {1};
+    std::mt19937_64 rng(42);
+    std::uniform_int_distribution<int> dist(1, 1);
+
+    const T zero {0};
+    const T one {dist(rng)};
 
     const auto next_after_zero {boost::decimal::nextafter(zero, one)};
 
     BOOST_TEST_GT(next_after_zero, zero);
     BOOST_TEST_LT(next_after_zero, zero + 2*std::numeric_limits<T>::min());
+
+    const auto two_next_after_zero {boost::decimal::nextafter(next_after_zero, one)};
+    BOOST_TEST_GT(two_next_after_zero, next_after_zero);
+    BOOST_TEST_LT(two_next_after_zero, zero + 3*std::numeric_limits<T>::min());
 }
 
 template <typename T>
