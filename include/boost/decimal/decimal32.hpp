@@ -691,8 +691,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         bits_ |= (reduced_coeff & detail::d32_significand_mask);
 
         // Now set the combination field (maximum of 3 bits)
-        std::uint32_t remaining_bits {reduced_coeff & detail::d32_small_combination_field_mask};
-        remaining_bits <<= detail::d32_exponent_bits;
+        const std::uint32_t remaining_bits {(reduced_coeff & detail::d32_small_combination_field_mask) << detail::d32_exponent_bits};
         bits_ |= remaining_bits;
     }
     else
