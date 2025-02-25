@@ -228,6 +228,9 @@ private:
     friend constexpr auto to_dpd_d128(DecimalType val) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, detail::uint128);
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
+
 public:
     // 3.2.4.1 construct/copy/destroy
     constexpr decimal128() noexcept = default;

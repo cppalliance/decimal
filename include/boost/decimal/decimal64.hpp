@@ -226,6 +226,9 @@ private:
     friend constexpr auto to_dpd_d64(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint64_t);
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;

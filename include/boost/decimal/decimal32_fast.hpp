@@ -126,6 +126,9 @@ private:
 
     friend constexpr auto not_finite(const decimal32_fast& val) noexcept -> bool;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
+
 public:
     constexpr decimal32_fast() noexcept = default;
 

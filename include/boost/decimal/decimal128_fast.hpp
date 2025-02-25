@@ -131,6 +131,9 @@ private:
     template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_less_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
+
 public:
     constexpr decimal128_fast() noexcept = default;
 
