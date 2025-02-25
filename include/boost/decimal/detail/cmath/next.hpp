@@ -29,10 +29,10 @@ namespace decimal {
 
 namespace detail {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1>
-constexpr auto nextafter_impl(T1 val, bool direction) noexcept -> T1
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+constexpr auto nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType
 {
-    constexpr T1 zero {0};
+    constexpr DecimalType zero {0};
 
     // Val < direction = +
     // Val > direction = -
@@ -40,19 +40,29 @@ constexpr auto nextafter_impl(T1 val, bool direction) noexcept -> T1
 
     if (val == zero)
     {
-        const auto min_val {direction ? std::numeric_limits<T1>::denorm_min() :
-                                        -std::numeric_limits<T1>::denorm_min()};
+        const auto min_val {direction ? std::numeric_limits<DecimalType>::denorm_min() :
+                                        -std::numeric_limits<DecimalType>::denorm_min()};
         return min_val;
     }
-    if (abs_val > zero && abs_val < std::numeric_limits<T1>::epsilon())
+    else if (abs_val < std::numeric_limits<DecimalType>::min())
     {
-        const auto min_val {direction ? val + std::numeric_limits<T1>::min() :
-                                        val - std::numeric_limits<T1>::min()};
+        // TODO(mborland): We need the non-normalized significand e.g. denorm_min next is {2, etiny} not some big thing
+        int exp {} ;
+        auto significand {frexp10(val, &exp)};
+
+        direction ? significand++ : significand--;
+
+        return DecimalType{significand, exp, abs_val != val};
+    }
+    else if (abs_val > zero && abs_val < std::numeric_limits<DecimalType>::epsilon())
+    {
+        const auto min_val {direction ? val + std::numeric_limits<DecimalType>::min() :
+                                        val - std::numeric_limits<DecimalType>::min()};
         return min_val;
     }
 
-    const auto val_eps {direction ? val + std::numeric_limits<T1>::epsilon() :
-                                    val - std::numeric_limits<T1>::epsilon()};
+    const auto val_eps {direction ? val + std::numeric_limits<DecimalType>::epsilon() :
+                                    val - std::numeric_limits<DecimalType>::epsilon()};
 
     // If adding epsilon does nothing then we need to manipulate the representation
     if (val == val_eps)
@@ -62,7 +72,7 @@ constexpr auto nextafter_impl(T1 val, bool direction) noexcept -> T1
 
         direction ? significand++ : significand--;
 
-        return T1{significand, exp};
+        return DecimalType{significand, exp};
     }
     else
     {
