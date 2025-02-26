@@ -268,6 +268,8 @@ template <typename T>
 constexpr auto d32_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 <= 10) &&
                                                                             (std::numeric_limits<T>::digits10 + 1 > 7), int>
 {
+    BOOST_DECIMAL_ASSERT(x >= 10000000);
+
     if (x >= 100000000)
     {
         if (x >= 1000000000)
@@ -284,6 +286,8 @@ constexpr auto d32_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std
                                                                             (std::numeric_limits<T>::digits10 + 1 <= 20), int>
 {
     // We already know that x >= 10000000 (7 digits)
+    BOOST_DECIMAL_ASSERT(x >= 10000000);
+
     if (x >= UINT64_C(10000000000))
     {
         if (x >= UINT64_C(100000000000000))
