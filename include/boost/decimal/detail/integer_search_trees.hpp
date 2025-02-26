@@ -352,6 +352,40 @@ constexpr auto d32_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std
     return num_digits(x);
 }
 
+template <typename T>
+constexpr auto d64_constructor_num_digits(T) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 <= 16), int>
+{
+    return 0;
+}
+
+template <typename T>
+constexpr auto d64_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 > 16) &&
+                                                                            (std::numeric_limits<T>::digits10 <= 20), int>
+{
+    // Pre-condition: x >= 10^16
+    BOOST_DECIMAL_ASSERT(x >= UINT64_C(10000000000000000));
+
+    if (x >= UINT64_C(100000000000000000))
+    {
+        if (x >= UINT64_C(1000000000000000000))
+        {
+            if (x >= UINT64_C(10000000000000000000))
+            {
+                return 20;
+            }
+            return 19;
+        }
+        return 18;
+    }
+    return 17;
+}
+
+template <typename T>
+constexpr auto d64_constructor_num_digits(T x) noexcept -> std::enable_if_t<std::numeric_limits<T>::digits10 >= 20, int>
+{
+    return num_digits(x);
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
