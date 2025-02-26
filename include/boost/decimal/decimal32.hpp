@@ -644,7 +644,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
 
     // If the coeff is not in range make it so
     // Only count the number of digits if we absolutely have to
-    int unsigned_coeff_digits {};
+    int unsigned_coeff_digits {-1};
     if (unsigned_coeff >= 10'000'000U)
     {
         // Since we know that the unsigned coeff is >= 10'000'000 we can use this information to traverse pruned trees
@@ -756,7 +756,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         // The value is probably infinity
 
         // If we can offset some extra power in the coefficient try to do so
-        auto coeff_dig {unsigned_coeff_digits};
+        auto coeff_dig {unsigned_coeff_digits == -1 ? detail::num_digits(unsigned_coeff) : unsigned_coeff_digits};
         if (coeff_dig < detail::precision)
         {
             for (; coeff_dig <= detail::precision; ++coeff_dig)
