@@ -2,10 +2,16 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+// GCC versions >= 10 don't adhere to pragma diagnostic ignored -Wstringop-overflow
+// So we exclude them this way
 #if defined(__GNUC__) && __GNUC__ >= 10
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wstringop-overflow"
-#endif
+
+int main()
+{
+    return 0;
+}
+
+#else
 
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
@@ -131,5 +137,7 @@ int main()
 
     return boost::report_errors();
 }
+
+#endif
 
 #endif
