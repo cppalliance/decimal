@@ -644,31 +644,33 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     }
 
     // If the coeff is not in range make it so
-    auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
-    const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal64>};
-    if (unsigned_coeff_digits > detail::precision_v<decimal64> + 1)
+    int unsigned_coeff_digits {-1};
+    if (unsigned_coeff >= UINT64_C(10000000000000000))
     {
-        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal64> + 1)};
+        unsigned_coeff_digits = detail::d64_constructor_num_digits(unsigned_coeff);
+        if (unsigned_coeff_digits > detail::precision_v<decimal64> + 1)
+        {
+            const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal64> + 1)};
 
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic push
-        #  pragma GCC diagnostic ignored "-Wconversion"
-        #endif
+            #if defined(__GNUC__) && !defined(__clang__)
+            #  pragma GCC diagnostic push
+            #  pragma GCC diagnostic ignored "-Wconversion"
+            #endif
 
-        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+            unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
 
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic pop
-        #endif
+            #if defined(__GNUC__) && !defined(__clang__)
+            #  pragma GCC diagnostic pop
+            #endif
 
-        exp += digits_to_remove;
-        unsigned_coeff_digits -= digits_to_remove;
-    }
-
-    // Round as required
-    if (reduced)
-    {
-        exp += detail::fenv_round<decimal64>(unsigned_coeff, isneg);
+            exp += digits_to_remove;
+            unsigned_coeff_digits -= digits_to_remove;
+            exp += detail::fenv_round<decimal64>(unsigned_coeff, isneg);
+        }
+        else
+        {
+            exp += detail::fenv_round<decimal64>(unsigned_coeff, isneg);
+        }
     }
 
     auto reduced_coeff {static_cast<std::uint64_t>(unsigned_coeff)};
@@ -747,10 +749,10 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
         // The value is probably infinity
 
         // If we can offset some extra power in the coefficient try to do so
-        const auto coeff_dig {detail::num_digits(reduced_coeff)};
+        auto coeff_dig {unsigned_coeff_digits == -1 ? detail::num_digits(unsigned_coeff) : unsigned_coeff_digits};
         if (coeff_dig < detail::precision_v<decimal64>)
         {
-            for (auto i {coeff_dig}; i <= detail::precision_v<decimal64>; ++i)
+            for (; coeff_dig <= detail::precision_v<decimal64>; ++coeff_dig)
             {
                 reduced_coeff *= 10;
                 --biased_exp;
@@ -761,7 +763,7 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
                 }
             }
 
-            if (detail::num_digits(reduced_coeff) <= detail::precision_v<decimal64>)
+            if (coeff_dig <= detail::precision_v<decimal64>)
             {
                 *this = decimal64(reduced_coeff, exp, isneg);
             }
