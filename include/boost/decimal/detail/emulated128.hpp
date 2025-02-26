@@ -343,6 +343,30 @@ struct uint128
     #undef INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO
     #undef UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO
 
+    // Now the other direction
+    #define          INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(expr) constexpr friend auto operator>=(expr lhs, uint128 rhs) noexcept  -> bool { return lhs >= 0 && static_cast<std::uint64_t>(lhs) >= rhs.low && rhs.high == 0U; } // NOLINT
+    #define UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(expr) constexpr friend auto operator>=(expr lhs, uint128 rhs) noexcept  -> bool { return lhs >= rhs.low && rhs.high == 0U; } // NOLINT
+
+    INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(char)                             // NOLINT
+    INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(signed char)                      // NOLINT
+    INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(short)                            // NOLINT
+    INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(int)                              // NOLINT
+    INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(long)                             // NOLINT
+    INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(long long)                        // NOLINT
+    UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(unsigned char)           // NOLINT
+    UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(unsigned short)          // NOLINT
+    UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(unsigned)                // NOLINT
+    UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(unsigned long)           // NOLINT
+    UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO(unsigned long long)      // NOLINT
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    constexpr friend auto operator>=(boost::decimal::detail::int128_t lhs, uint128  rhs) noexcept -> bool { return static_cast<uint128>(lhs) >= rhs; }
+    constexpr friend auto operator>=(boost::decimal::detail::uint128_t  lhs, uint128 rhs) noexcept -> bool { return static_cast<uint128>(lhs) >= rhs; }
+    #endif
+
+    #undef INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO
+    #undef UNSIGNED_INTEGER_OPERATOR_GREATER_THAN_OR_EQUAL_TO
+
     // Binary Operators
 
     // Not
