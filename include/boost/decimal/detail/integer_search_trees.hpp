@@ -386,6 +386,19 @@ constexpr auto d64_constructor_num_digits(T x) noexcept -> std::enable_if_t<std:
     return num_digits(x);
 }
 
+template <typename T>
+constexpr auto d128_constructor_num_digits(T) noexcept -> std::enable_if_t<std::numeric_limits<T>::digits10 + 1 <= 34, int>
+{
+    return 0;
+}
+
+template <typename T>
+constexpr auto d128_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 > 34), int>
+{
+    // TODO(mborland): Since we have the pow10 table we should be able to use that to provid the values in a generic way
+    return num_digits(x);
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
