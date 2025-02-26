@@ -123,19 +123,21 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_big_combination_field_mask = 
 //BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_exp_mask = UINT32_C(0b0'00000'111111'0000000000'0000000000);
 //BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_construct_significand_mask = d32_no_combination;
 
+// Since we already have partial information we can greatly speed things up in this case
 template <typename T>
-constexpr auto d32_constructor_num_digits(T x) noexcept -> int
+constexpr auto d32_constructor_num_digits(T) noexcept -> std::enable_if_t<std::numeric_limits<T>::digits10 + 1 < 7, int>
 {
-    return detail::num_digits(x);
+    // Does not matter since it is guaranteed to fit
+    return 0;
 }
 
-// Since we already have partial information we can greatly speed things up in this case
-template <>
-constexpr auto d32_constructor_num_digits<std::uint32_t>(std::uint32_t x) noexcept -> int
+template <typename T>
+constexpr auto d32_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 <= 10) &&
+                                                                            (std::numeric_limits<T>::digits10 + 1 > 7), int>
 {
-    if (x >= UINT32_C(100000000))
+    if (x >= 100000000)
     {
-        if (x >= UINT32_C(1000000000))
+        if (x >= 1000000000)
         {
             return 10;
         }
@@ -144,9 +146,9 @@ constexpr auto d32_constructor_num_digits<std::uint32_t>(std::uint32_t x) noexce
     return 8;
 }
 
-// Uint64_t isn't as big of a difference
-template <>
-constexpr auto d32_constructor_num_digits<std::uint64_t>(std::uint64_t x) noexcept -> int
+template <typename T>
+constexpr auto d32_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 > 10) &&
+                                                                            (std::numeric_limits<T>::digits10 + 1 <= 20), int>
 {
     // We already know that x >= 10000000 (7 digits)
     if (x >= UINT64_C(10000000000))
@@ -204,6 +206,13 @@ constexpr auto d32_constructor_num_digits<std::uint64_t>(std::uint64_t x) noexce
             return 8;
         }
     }
+}
+
+template <typename T>
+constexpr auto d32_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 > 20), int>
+{
+    // Anything bigger than uint64_t has no benefit so fall back to that
+    return num_digits(x);
 }
 
 } // namespace detail
