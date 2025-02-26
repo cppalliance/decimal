@@ -267,8 +267,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
             return {last, std::errc::value_too_large};
         default:
             // LCOV_EXCL_START
-            BOOST_DECIMAL_ASSERT_MSG(fp != 0, "Unreachable return");
-            return {first, std::errc::not_supported};
+            BOOST_DECIMAL_UNREACHABLE;
             // LCOV_EXCL_STOP
     }
 }
@@ -294,7 +293,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
                                           std::numeric_limits<std::uint64_t>::digits),
                                           detail::uint128, std::uint64_t>;
 
-    auto significand_digits = num_digits(significand);
+    // Since frexp10 normalizes the value we by default know the number of digits in the significand
+    auto significand_digits = std::numeric_limits<TargetDecimalType>::digits;
     exp += significand_digits - 1;
     bool append_zeros = false;
 
@@ -440,7 +440,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
     const char* output_start = first;
 
-    int num_dig = num_digits(significand);
+    int num_dig = std::numeric_limits<TargetDecimalType>::digits;
     bool append_trailing_zeros = false;
     bool append_leading_zeros = false;
     int num_leading_zeros = 0;
@@ -496,7 +496,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     // Make sure the result will fit in the buffer
-    const std::ptrdiff_t total_length = total_buffer_length(num_dig, exponent, is_neg) + num_leading_zeros;
+    const std::ptrdiff_t total_length = total_buffer_length<TargetDecimalType>(num_dig, exponent, is_neg) + num_leading_zeros;
     if (total_length > buffer_size)
     {
         return {last, std::errc::value_too_large};

@@ -84,8 +84,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
     // Work from LSB to MSB
     switch (base)
     {
-        // TODO(mborland): Don't need until hex support is added to charconv
-        // LCOV_EXCL_START
         case 16:
             while (unsigned_value != 0)
             {
@@ -93,7 +91,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
                 unsigned_value >>= 4U;
             }
             break;
-        // LCOV_EXCL_STOP
 
         default:
             while (unsigned_value != 0)

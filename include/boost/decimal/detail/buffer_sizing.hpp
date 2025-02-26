@@ -6,8 +6,8 @@
 #define BOOST_DECIMAL_DETAIL_BUFFER_SIZING_HPP
 
 #include <boost/decimal/detail/config.hpp>
-#include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/decimal/detail/apply_sign.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
@@ -30,11 +30,36 @@ constexpr int get_real_precision(int precision = -1) noexcept
     return precision == -1 ? std::numeric_limits<Dec>::max_digits10 : precision;
 }
 
-template <BOOST_DECIMAL_INTEGRAL Int>
-constexpr int total_buffer_length(int real_precision, Int exp, bool signed_value)
+// We don't need to use the full digit counting since the range of the exponents is well defined
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, BOOST_DECIMAL_INTEGRAL Int>
+constexpr auto buffer_length_exp(Int x) noexcept -> std::enable_if_t<std::numeric_limits<DecimalType>::max_exponent >= 1000, int>
+{
+    if (x < 10) return 1;
+    if (x < 100) return 2;
+    if (x < 1000) return 3;
+    return 4;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, BOOST_DECIMAL_INTEGRAL Int>
+constexpr auto buffer_length_exp(Int x) noexcept -> std::enable_if_t<std::numeric_limits<DecimalType>::max_exponent >= 100 && std::numeric_limits<DecimalType>::max_exponent < 1000, int>
+{
+    if (x < 10) return 1;
+    if (x < 100) return 2;
+    return 3;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, BOOST_DECIMAL_INTEGRAL Int>
+constexpr auto buffer_length_exp(Int x) noexcept -> std::enable_if_t<std::numeric_limits<DecimalType>::max_exponent >= 10 && std::numeric_limits<DecimalType>::max_exponent < 100, int>
+{
+    if (x < 10) return 1;
+    return 2;
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, BOOST_DECIMAL_INTEGRAL Int>
+constexpr int total_buffer_length(int real_precision, Int exp, bool signed_value) noexcept
 {
     // Sign + integer part + '.' + precision of fraction part + e+/e- or p+/p- + exponent digits
-    return static_cast<int>(signed_value) + 1 + real_precision + 2 + num_digits(exp);
+    return static_cast<int>(signed_value) + 1 + real_precision + 2 + buffer_length_exp<DecimalType>(make_positive_unsigned(exp));
 }
 
 #ifdef _MSC_VER
