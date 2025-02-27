@@ -1488,7 +1488,9 @@ template <typename Integer>
 constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64)
 {
+    using sig_type = decimal64::significand_type;
     using exp_type = decimal64::biased_exponent_type;
+    using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
@@ -1521,12 +1523,12 @@ constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
     detail::normalize<decimal64>(lhs_sig, lhs_exp);
-
     detail::decimal64_components lhs_components {lhs_sig, lhs_exp, lhs.isneg()};
 
-    auto rhs_sig {static_cast<std::uint64_t>(detail::make_positive_unsigned(rhs))};
+    auto rhs_sig {static_cast<integer_type>(detail::make_positive_unsigned(rhs))};
     exp_type rhs_exp {};
-    detail::decimal64_components rhs_components {detail::shrink_significand<std::uint64_t>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
+    detail::normalize<decimal64>(rhs_sig, rhs_exp);
+    detail::decimal64_components rhs_components {static_cast<sig_type>(rhs_sig), rhs_exp, rhs < 0};
 
     return detail::d64_generic_div_impl<decimal64>(lhs_components, rhs_components);
 }
@@ -1535,6 +1537,10 @@ template <typename Integer>
 constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64)
 {
+    using sig_type = decimal64::significand_type;
+    using exp_type = decimal64::biased_exponent_type;
+    using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64 zero {0, 0};
@@ -1565,7 +1571,10 @@ constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
 
-    detail::decimal64_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
+    exp_type lhs_exp {};
+    auto lhs_sig {static_cast<integer_type>(detail::make_positive_unsigned(lhs))};
+    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+    detail::decimal64_components lhs_components {static_cast<sig_type>(lhs_sig), lhs_exp, lhs < 0};
     detail::decimal64_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
 
     return detail::d64_generic_div_impl<decimal64>(lhs_components, rhs_components);
