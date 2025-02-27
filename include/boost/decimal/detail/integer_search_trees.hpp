@@ -206,92 +206,28 @@ constexpr int num_digits(const uint256_t& x) noexcept
     // Use the most significant bit position to approximate log10
     // log10(x) ≈ log2(x) / log2(10) ≈ log2(x) / 3.32
 
-    // Find the position of the most significant bit in high
-    int msb = 0;
+    int msb {};
     // Check high part of high (most significant 64 bits of 256-bit number)
     if (x.high.high != 0)
     {
-        msb = 192; // Base: 128 (for high) + 64 (for high.high)
-        auto temp = x.high.high;
-
-        // Find MSB in uint64_t using fast bit manipulation
-        if (temp & 0xFFFFFFFF00000000ULL)
-        {
-            msb += 32;
-            temp >>= 32;
-        }
-        if (temp & 0x00000000FFFF0000ULL)
-        {
-            msb += 16;
-            temp >>= 16;
-        }
-        if (temp & 0x000000000000FF00ULL)
-        {
-            msb += 8;
-            temp >>= 8;
-        }
-        if (temp & 0x00000000000000F0ULL)
-        {
-            msb += 4;
-            temp >>= 4;
-        }
-        if (temp & 0x000000000000000CULL)
-        {
-            msb += 2;
-            temp >>= 2;
-        }
-        if (temp & 0x0000000000000002ULL)
-        {
-            msb += 1;
-        }
+        msb = 192 + (64 - countl_zero(x.high.high));
     }
     // Check low part of high (bits 128-191 of 256-bit number)
     else if (x.high.low != 0)
     {
-        msb = 128; // Base: 128 (for high)
-        auto temp = x.high.low;
-
-        // Find MSB in uint64_t
-        if (temp & 0xFFFFFFFF00000000ULL)
-        {
-            msb += 32;
-            temp >>= 32;
-        }
-        if (temp & 0x00000000FFFF0000ULL)
-        {
-            msb += 16;
-            temp >>= 16;
-        }
-        if (temp & 0x000000000000FF00ULL)
-        {
-            msb += 8;
-            temp >>= 8;
-        }
-        if (temp & 0x00000000000000F0ULL)
-        {
-            msb += 4;
-            temp >>= 4;
-        }
-        if (temp & 0x000000000000000CULL)
-        {
-            msb += 2;
-            temp >>= 2;
-        }
-        if (temp & 0x0000000000000002ULL)
-        {
-            msb += 1;
-        }
+        msb = 128 + (64 - countl_zero(x.high.low));
     }
 
     // Approximate log10 using log2
-    auto estimated_digits = (msb * 1000) / 3322 + 1; // 1000/3322 approxeq 1/log2(10)
+    const auto estimated_digits {(msb * 1000) / 3322 + 1}; // 1000/3322 approxeq 1/log2(10)
 
     // Check if our estimate is correct or needs adjustment
     if (x >= impl::emulated_256_pow10[estimated_digits])
     {
-        return estimated_digits + 1;
+        // Check to make sure we don't exceed the maximum value
+        return estimated_digits != 78 ? estimated_digits + 1 : estimated_digits;
     }
-    else if (estimated_digits > 1 && x < impl::emulated_256_pow10[estimated_digits-1])
+    else if (estimated_digits > 1 && x < impl::emulated_256_pow10[estimated_digits - 1])
     {
         return estimated_digits - 1;
     }
