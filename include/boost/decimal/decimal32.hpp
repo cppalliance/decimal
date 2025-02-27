@@ -1851,6 +1851,8 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     using exp_type = decimal32::biased_exponent_type;
+    using sig_type = decimal32::significand_type;
+    using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
@@ -1883,10 +1885,12 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
     detail::normalize(sig_lhs, exp_lhs);
-
     detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+
     exp_type exp_rhs {};
-    detail::decimal32_components rhs_components {detail::shrink_significand(detail::make_positive_unsigned(rhs), exp_rhs), exp_rhs, rhs < 0};
+    auto unsigned_rhs {static_cast<integer_type>(detail::make_positive_unsigned(rhs))};
+    detail::normalize(unsigned_rhs, exp_rhs);
+    detail::decimal32_components rhs_components {static_cast<sig_type>(unsigned_rhs), exp_rhs, rhs < 0};
 
     return detail::generic_div_impl<decimal32>(lhs_components, rhs_components);
 }
@@ -1897,6 +1901,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
 {
     using exp_type = decimal32::biased_exponent_type;
     using sig_type = decimal32::significand_type;
+    using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
@@ -1929,7 +1934,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
     detail::normalize(sig_rhs, exp_rhs);
 
     exp_type lhs_exp {};
-    auto unsigned_lhs {detail::make_positive_unsigned(lhs)};
+    auto unsigned_lhs {static_cast<integer_type>(detail::make_positive_unsigned(lhs))};
     detail::normalize(unsigned_lhs, lhs_exp);
     detail::decimal32_components lhs_components {static_cast<sig_type>(unsigned_lhs), lhs_exp, lhs < 0};
     detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
