@@ -396,8 +396,7 @@ template <typename T>
 constexpr auto d128_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 > 34), int>
 {
     // Pre-condition: we know x has at least 34 digits
-    constexpr auto digits34 {detail::pow10(static_cast<T>(34))};
-    BOOST_DECIMAL_ASSERT(x >= digits34);
+    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<T>(34)));
 
     constexpr auto digits35 {detail::pow10(static_cast<T>(35))};
     constexpr auto digits36 {detail::pow10(static_cast<T>(36))};
