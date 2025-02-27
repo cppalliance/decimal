@@ -89,7 +89,7 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
         res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
         res_exp += digit_delta;
     }
-    else if (res_sig == UINT64_C(0))
+    else if (res_sig.low == UINT64_C(0))
     {
         sign = false;
     }
