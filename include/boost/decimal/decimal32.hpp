@@ -643,31 +643,35 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
 
     // If the coeff is not in range make it so
-    auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
-    const bool reduced {unsigned_coeff_digits > detail::precision};
-    if (unsigned_coeff_digits > detail::precision + 1)
+    // Only count the number of digits if we absolutely have to
+    int unsigned_coeff_digits {-1};
+    if (unsigned_coeff >= 10'000'000U)
     {
-        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision + 1)};
+        // Since we know that the unsigned coeff is >= 10'000'000 we can use this information to traverse pruned trees
+        unsigned_coeff_digits = detail::d32_constructor_num_digits(unsigned_coeff);
+        if (unsigned_coeff_digits > detail::precision + 1)
+        {
+            const auto digits_to_remove {unsigned_coeff_digits - (detail::precision + 1)};
 
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic push
-        #  pragma GCC diagnostic ignored "-Wconversion"
-        #endif
+            #if defined(__GNUC__) && !defined(__clang__)
+            #  pragma GCC diagnostic push
+            #  pragma GCC diagnostic ignored "-Wconversion"
+            #endif
 
-        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+            unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
 
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic pop
-        #endif
+            #if defined(__GNUC__) && !defined(__clang__)
+            #  pragma GCC diagnostic pop
+            #endif
 
-        exp += digits_to_remove;
-        unsigned_coeff_digits -= digits_to_remove;
-    }
-
-    // Round as required
-    if (reduced)
-    {
-        exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
+            exp += digits_to_remove;
+            unsigned_coeff_digits -= digits_to_remove;
+            exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
+        }
+        else
+        {
+            exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
+        }
     }
 
     auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
@@ -691,8 +695,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         bits_ |= (reduced_coeff & detail::d32_significand_mask);
 
         // Now set the combination field (maximum of 3 bits)
-        std::uint32_t remaining_bits {reduced_coeff & detail::d32_small_combination_field_mask};
-        remaining_bits <<= detail::d32_exponent_bits;
+        const std::uint32_t remaining_bits {(reduced_coeff & detail::d32_small_combination_field_mask) << detail::d32_exponent_bits};
         bits_ |= remaining_bits;
     }
     else
@@ -753,10 +756,10 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         // The value is probably infinity
 
         // If we can offset some extra power in the coefficient try to do so
-        const auto coeff_dig {detail::num_digits(reduced_coeff)};
+        auto coeff_dig {unsigned_coeff_digits == -1 ? detail::num_digits(unsigned_coeff) : unsigned_coeff_digits};
         if (coeff_dig < detail::precision)
         {
-            for (auto i {coeff_dig}; i <= detail::precision; ++i)
+            for (; coeff_dig <= detail::precision; ++coeff_dig)
             {
                 reduced_coeff *= 10;
                 --biased_exp;
@@ -767,7 +770,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
                 }
             }
 
-            if (detail::num_digits(reduced_coeff) <= detail::precision)
+            if (coeff_dig <= detail::precision)
             {
                 *this = decimal32(reduced_coeff, exp, isneg);
             }
@@ -1848,6 +1851,8 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     using exp_type = decimal32::biased_exponent_type;
+    using sig_type = decimal32::significand_type;
+    using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
@@ -1880,10 +1885,12 @@ constexpr auto operator/(decimal32 lhs, Integer rhs) noexcept
     auto sig_lhs {lhs.full_significand()};
     auto exp_lhs {lhs.biased_exponent()};
     detail::normalize(sig_lhs, exp_lhs);
-
     detail::decimal32_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
+
     exp_type exp_rhs {};
-    detail::decimal32_components rhs_components {detail::shrink_significand(detail::make_positive_unsigned(rhs), exp_rhs), exp_rhs, rhs < 0};
+    auto unsigned_rhs {static_cast<integer_type>(detail::make_positive_unsigned(rhs))};
+    detail::normalize(unsigned_rhs, exp_rhs);
+    detail::decimal32_components rhs_components {static_cast<sig_type>(unsigned_rhs), exp_rhs, rhs < 0};
 
     return detail::generic_div_impl<decimal32>(lhs_components, rhs_components);
 }
@@ -1893,6 +1900,8 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     using exp_type = decimal32::biased_exponent_type;
+    using sig_type = decimal32::significand_type;
+    using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
@@ -1925,8 +1934,9 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
     detail::normalize(sig_rhs, exp_rhs);
 
     exp_type lhs_exp {};
-    auto lhs_sig {detail::make_positive_unsigned(detail::shrink_significand(lhs, lhs_exp))};
-    detail::decimal32_components lhs_components {lhs_sig, lhs_exp, lhs < 0};
+    auto unsigned_lhs {static_cast<integer_type>(detail::make_positive_unsigned(lhs))};
+    detail::normalize(unsigned_lhs, lhs_exp);
+    detail::decimal32_components lhs_components {static_cast<sig_type>(unsigned_lhs), lhs_exp, lhs < 0};
     detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
 
     return detail::generic_div_impl<decimal32>(lhs_components, rhs_components);
