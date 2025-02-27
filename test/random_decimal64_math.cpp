@@ -387,6 +387,56 @@ void random_division(T lower, T upper)
 }
 
 template <typename T>
+void spot_mixed_division(T val1, T val2)
+{
+    {
+        const decimal64 dec1 {val1};
+        const T dec2 {static_cast<T>(decimal64(val2))};
+
+        const decimal64 res {dec1 / dec2};
+        const decimal64 res_int {static_cast<double>(val1) / static_cast<double>(val2)};
+
+        if (isinf(res) && isinf(res_int))
+        {
+        }
+        else if (!BOOST_TEST_EQ(static_cast<float>(res), static_cast<float>(res_int)))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+
+    {
+        const T dec1 {static_cast<T>(decimal64(val1))};
+        const decimal64 dec2 {val2};
+
+        const decimal64 res {dec1 / dec2};
+        const decimal64 res_int {static_cast<double>(val1) / static_cast<double>(val2)};
+
+        if (isinf(res) && isinf(res_int))
+        {
+        }
+        else if (!BOOST_TEST(abs(res - res_int) < decimal64(1, -1)))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
+template <typename T>
 void random_mixed_division(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
@@ -1010,6 +1060,8 @@ int main()
     random_mixed_left_shift();
     random_right_shift();
     random_mixed_right_shift();
+    
+    spot_mixed_division(4930, -24419);
 
     return boost::report_errors();
 }
