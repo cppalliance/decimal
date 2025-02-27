@@ -421,7 +421,7 @@ void random_mixed_division(T lower, T upper)
         const decimal32 dec2 {val2};
 
         const decimal32 res {dec1 / dec2};
-        const decimal32 res_int {static_cast<double>(val1) / static_cast<double>(val2)};
+        const decimal32 res_int {static_cast<float>(val1) / static_cast<float>(val2)};
 
         if (isinf(res) && isinf(res_int))
         {
@@ -920,7 +920,7 @@ void spot_mixed_division(T val1, T val2)
         const decimal32 dec2 {val2};
 
         const decimal32 res {dec1 / dec2};
-        const decimal32 res_int {static_cast<double>(val1) / static_cast<double>(val2)};
+        const decimal32 res_int {static_cast<float>(val1) / static_cast<float>(val2)};
 
         if (isinf(res) && isinf(res_int))
         {
@@ -941,7 +941,6 @@ void spot_mixed_division(T val1, T val2)
 
 int main()
 {
-    /*
     // Values that won't exceed the range of the significand
     // Only positive values
     random_addition(0, 5'000'000);

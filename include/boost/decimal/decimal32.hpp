@@ -1896,6 +1896,7 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal32)
 {
     using exp_type = decimal32::biased_exponent_type;
+    using sig_type = decimal32::significand_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
@@ -1928,8 +1929,9 @@ constexpr auto operator/(Integer lhs, decimal32 rhs) noexcept
     detail::normalize(sig_rhs, exp_rhs);
 
     exp_type lhs_exp {};
-    auto lhs_sig {detail::make_positive_unsigned(detail::shrink_significand(lhs, lhs_exp))};
-    detail::decimal32_components lhs_components {lhs_sig, lhs_exp, lhs < 0};
+    auto unsigned_lhs {detail::make_positive_unsigned(lhs)};
+    detail::normalize(unsigned_lhs, lhs_exp);
+    detail::decimal32_components lhs_components {static_cast<sig_type>(unsigned_lhs), lhs_exp, lhs < 0};
     detail::decimal32_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
 
     return detail::generic_div_impl<decimal32>(lhs_components, rhs_components);
