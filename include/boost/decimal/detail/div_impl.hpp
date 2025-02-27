@@ -82,18 +82,14 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
     auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
     auto res_exp {lhs.exp - rhs.exp - detail::precision_v<decimal128>};
 
-    if (res_sig.high != 0)
+    if (res_sig.high != UINT64_C(0))
     {
         const auto sig_dig {detail::num_digits(res_sig)};
-
-        if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
-        {
-            const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
-            res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
-            res_exp += digit_delta;
-        }
+        const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
+        res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
+        res_exp += digit_delta;
     }
-    else if (res_sig == 0)
+    else if (res_sig == UINT64_C(0))
     {
         sign = false;
     }
