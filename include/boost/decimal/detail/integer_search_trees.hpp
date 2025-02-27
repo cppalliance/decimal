@@ -427,6 +427,46 @@ constexpr auto d128_constructor_num_digits(T x) noexcept -> std::enable_if_t<(st
     return 34;  // Since we know x has at least 34 digits
 }
 
+template <>
+constexpr auto d128_constructor_num_digits<uint128>(uint128 x) noexcept -> std::enable_if_t<(std::numeric_limits<uint128>::digits10 + 1 > 34), int>
+{
+    // Pre-condition: we know x has at least 34 digits
+    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<uint128>(34)));
+
+    // Since we know that x has at least 34 digits we can get away with just comparing the high bits,
+    // which reduces these to uint64_t comps instead of synthesized 128-bit
+
+    constexpr auto digits35 {detail::pow10(static_cast<uint128>(35)).high};
+    constexpr auto digits36 {detail::pow10(static_cast<uint128>(36)).high};
+    constexpr auto digits37 {detail::pow10(static_cast<uint128>(37)).high};
+    constexpr auto digits38 {detail::pow10(static_cast<uint128>(38)).high};
+    constexpr auto digits39 {detail::pow10(static_cast<uint128>(39)).high};
+
+    const auto x_high {x.high};
+
+    if (x_high >= digits38)
+    {
+        if (x_high >= digits39)
+        {
+            return 39;
+        }
+        return 38;
+    }
+    if (x_high >= digits36)
+    {
+        if (x_high >= digits37)
+        {
+            return 37;
+        }
+        return 36;
+    }
+    if (x_high >= digits35)
+    {
+        return 35;
+    }
+    return 34;  // Since we know x has at least 34 digits
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
