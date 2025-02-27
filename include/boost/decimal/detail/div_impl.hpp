@@ -72,16 +72,15 @@ constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> Deci
 }
 
 template <typename T>
-constexpr auto d128_generic_div_impl(T lhs, T rhs, T& q) noexcept -> void
+constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept -> void
 {
     bool sign {lhs.sign != rhs.sign};
 
     constexpr auto ten_pow_precision {detail::uint256_t(pow10(detail::uint128(detail::precision_v<decimal128>)))};
     const auto big_sig_lhs {detail::uint256_t(lhs.sig) * ten_pow_precision};
-    lhs.exp -= detail::precision_v<decimal128>;
 
     auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
-    auto res_exp {lhs.exp - rhs.exp};
+    auto res_exp {lhs.exp - rhs.exp - detail::precision_v<decimal128>};
 
     const auto sig_dig {detail::num_digits(res_sig)};
 
