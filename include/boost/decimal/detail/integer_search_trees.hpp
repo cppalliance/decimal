@@ -352,6 +352,13 @@ constexpr auto d32_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std
     return num_digits(x);
 }
 
+#ifdef BOOST_DECIMAL_HAS_INT128
+constexpr auto d32_constructor_num_digits(uint128_t x) noexcept -> int
+{
+    return num_digits(x);
+}
+#endif
+
 template <typename T>
 constexpr auto d64_constructor_num_digits(T) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 <= 16), int>
 {
@@ -386,23 +393,30 @@ constexpr auto d64_constructor_num_digits(T x) noexcept -> std::enable_if_t<std:
     return num_digits(x);
 }
 
+#ifdef BOOST_DECIMAL_HAS_INT128
+constexpr auto d64_constructor_num_digits(uint128_t x) noexcept -> int
+{
+    return num_digits(x);
+}
+#endif
+
 template <typename T>
 constexpr auto d128_constructor_num_digits(T) noexcept -> std::enable_if_t<std::numeric_limits<T>::digits10 + 1 <= 34, int>
 {
     return 0;
 }
 
-template <typename T>
-constexpr auto d128_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 > 34), int>
+#ifdef BOOST_DECIMAL_HAS_INT128
+constexpr auto d128_constructor_num_digits(uint128_t x) noexcept -> int
 {
     // Pre-condition: we know x has at least 34 digits
-    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<T>(34)));
+    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<uint128_t>(34)));
 
-    constexpr auto digits35 {detail::pow10(static_cast<T>(35))};
-    constexpr auto digits36 {detail::pow10(static_cast<T>(36))};
-    constexpr auto digits37 {detail::pow10(static_cast<T>(37))};
-    constexpr auto digits38 {detail::pow10(static_cast<T>(38))};
-    constexpr auto digits39 {detail::pow10(static_cast<T>(39))};
+    constexpr auto digits35 {detail::pow10(static_cast<uint128_t>(35))};
+    constexpr auto digits36 {detail::pow10(static_cast<uint128_t>(36))};
+    constexpr auto digits37 {detail::pow10(static_cast<uint128_t>(37))};
+    constexpr auto digits38 {detail::pow10(static_cast<uint128_t>(38))};
+    constexpr auto digits39 {detail::pow10(static_cast<uint128_t>(39))};
 
     if (x >= digits38)
     {
@@ -426,9 +440,9 @@ constexpr auto d128_constructor_num_digits(T x) noexcept -> std::enable_if_t<(st
     }
     return 34;  // Since we know x has at least 34 digits
 }
+#endif
 
-template <>
-constexpr auto d128_constructor_num_digits<uint128>(uint128 x) noexcept -> std::enable_if_t<(std::numeric_limits<uint128>::digits10 + 1 > 34), int>
+constexpr auto d128_constructor_num_digits(uint128 x) noexcept -> int
 {
     // Pre-condition: we know x has at least 34 digits
     BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<uint128>(34)));
