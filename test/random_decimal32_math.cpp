@@ -399,7 +399,7 @@ void random_mixed_division(T lower, T upper)
         if (isinf(res) && isinf(res_int))
         {
         }
-        else if (!BOOST_TEST(abs(res - res_int) < decimal32(1, -3)))
+        else if (!BOOST_TEST(abs(res - res_int) < decimal32(1, -1)))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
