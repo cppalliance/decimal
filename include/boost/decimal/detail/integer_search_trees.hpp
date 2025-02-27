@@ -395,8 +395,37 @@ constexpr auto d128_constructor_num_digits(T) noexcept -> std::enable_if_t<std::
 template <typename T>
 constexpr auto d128_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 > 34), int>
 {
-    // TODO(mborland): Since we have the pow10 table we should be able to use that to provid the values in a generic way
-    return num_digits(x);
+    // Pre-condition: we know x has at least 34 digits
+    constexpr auto digits34 {detail::pow10(static_cast<T>(34))};
+    BOOST_DECIMAL_ASSERT(x >= digits34);
+
+    constexpr auto digits35 {detail::pow10(static_cast<T>(35))};
+    constexpr auto digits36 {detail::pow10(static_cast<T>(36))};
+    constexpr auto digits37 {detail::pow10(static_cast<T>(37))};
+    constexpr auto digits38 {detail::pow10(static_cast<T>(38))};
+    constexpr auto digits39 {detail::pow10(static_cast<T>(39))};
+
+    if (x >= digits38)
+    {
+        if (x >= digits39)
+        {
+            return 39;
+        }
+        return 38;
+    }
+    if (x >= digits36)
+    {
+        if (x >= digits37)
+        {
+            return 37;
+        }
+        return 36;
+    }
+    if (x >= digits35)
+    {
+        return 35;
+    }
+    return 34;  // Since we know x has at least 34 digits
 }
 
 } // namespace detail
