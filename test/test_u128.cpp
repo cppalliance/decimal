@@ -14,6 +14,35 @@
 #include <limits>
 #include <cmath>
 
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wold-style-cast"
+#  pragma clang diagnostic ignored "-Wundef"
+#  pragma clang diagnostic ignored "-Wconversion"
+#  pragma clang diagnostic ignored "-Wsign-conversion"
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+
+#  if (__clang_major__ >= 10 && !defined(__APPLE__)) || __clang_major__ >= 13
+#    pragma clang diagnostic ignored "-Wdeprecated-copy"
+#  endif
+
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wundef"
+#  pragma GCC diagnostic ignored "-Wconversion"
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
+#include <boost/random/uniform_int_distribution.hpp>
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
+
 // Used defined seed for repeatability
 static std::mt19937_64 rng(42);
 
@@ -22,13 +51,13 @@ constexpr std::size_t N = 1024;
 template <typename IntType>
 void test_arithmetic_constructor()
 {
-    std::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
                                                 std::numeric_limits<IntType>::max());
 
     for (std::size_t i {}; i < N; ++i)
     {
         const IntType value {dist(rng)};
-        unsigned __int128 builtin_value = value;
+        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
         boost::decimal::detail::u128 emulated_value {value};
 
         unsigned __int128 emulated_bits;
@@ -41,14 +70,14 @@ void test_arithmetic_constructor()
 template <typename IntType>
 void test_assignment_operators()
 {
-    std::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
                                                 std::numeric_limits<IntType>::max());
 
     for (std::size_t i {}; i < N; ++i)
     {
         const IntType value {dist(rng)};
         unsigned __int128 builtin_value;
-        builtin_value = value;
+        builtin_value = static_cast<unsigned __int128>(value);
         boost::decimal::detail::u128 emulated_value {};
         emulated_value = value;
 
@@ -62,14 +91,14 @@ void test_assignment_operators()
 template <typename IntType>
 void test_integer_conversion_operators()
 {
-    std::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
                                                 std::numeric_limits<IntType>::max());
 
     for (std::size_t i {}; i < N; ++i)
     {
         const IntType value {dist(rng)};
         unsigned __int128 builtin_value;
-        builtin_value = value;
+        builtin_value = static_cast<unsigned __int128>(value);
         boost::decimal::detail::u128 emulated_value {};
         emulated_value = value;
 
@@ -83,7 +112,7 @@ void test_integer_conversion_operators()
 template <typename FloatType>
 void test_float_conversion_operators()
 {
-    std::uniform_int_distribution<std::uint64_t> dist(std::numeric_limits<std::uint64_t>::min(),
+    boost::random::uniform_int_distribution<std::uint64_t> dist(std::numeric_limits<std::uint64_t>::min(),
                                                      std::numeric_limits<std::uint64_t>::max());
 
     for (std::size_t i {}; i < N; ++i)
@@ -107,31 +136,37 @@ int main()
     test_arithmetic_constructor<std::int16_t>();
     test_arithmetic_constructor<std::int32_t>();
     test_arithmetic_constructor<std::int64_t>();
+    test_arithmetic_constructor<__int128>();
 
     test_arithmetic_constructor<std::uint8_t>();
     test_arithmetic_constructor<std::uint16_t>();
     test_arithmetic_constructor<std::uint32_t>();
     test_arithmetic_constructor<std::uint64_t>();
+    test_arithmetic_constructor<unsigned __int128>();
 
     test_assignment_operators<std::int8_t>();
     test_assignment_operators<std::int16_t>();
     test_assignment_operators<std::int32_t>();
     test_assignment_operators<std::int64_t>();
+    test_arithmetic_constructor<__int128>();
 
     test_assignment_operators<std::uint8_t>();
     test_assignment_operators<std::uint16_t>();
     test_assignment_operators<std::uint32_t>();
     test_assignment_operators<std::uint64_t>();
+    test_arithmetic_constructor<unsigned __int128>();
 
     test_integer_conversion_operators<std::int8_t>();
     test_integer_conversion_operators<std::int16_t>();
     test_integer_conversion_operators<std::int32_t>();
     test_integer_conversion_operators<std::int64_t>();
+    test_arithmetic_constructor<__int128>();
 
     test_integer_conversion_operators<std::uint8_t>();
     test_integer_conversion_operators<std::uint16_t>();
     test_integer_conversion_operators<std::uint32_t>();
     test_integer_conversion_operators<std::uint64_t>();
+    test_arithmetic_constructor<unsigned __int128>();
 
     test_float_conversion_operators<float>();
     test_float_conversion_operators<double>();
