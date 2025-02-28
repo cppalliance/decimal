@@ -243,6 +243,24 @@ void test_operator_inequality()
     BOOST_TEST((true != bool_val) == (bool_val != true));
 }
 
+template <typename IntType>
+void test_operator_less()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+                                                          std::numeric_limits<IntType>::max());
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const IntType value {dist(rng)};
+        const IntType value2 {dist(rng)};
+        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
+        boost::decimal::detail::u128 emulated_value {value};
+
+        BOOST_TEST(((value2 < emulated_value) == (emulated_value < value2)) ==
+                   ((value2 < builtin_value) == (builtin_value < value2)));
+    }
+}
+
 int main()
 {
     test_arithmetic_constructor<std::int8_t>();
@@ -315,6 +333,18 @@ int main()
     test_operator_inequality<std::uint32_t>();
     test_operator_inequality<std::uint64_t>();
     test_operator_inequality<unsigned __int128>();
+
+    test_operator_less<std::int8_t>();
+    test_operator_less<std::int16_t>();
+    test_operator_less<std::int32_t>();
+    test_operator_less<std::int64_t>();
+    test_operator_less<__int128>();
+
+    test_operator_less<std::uint8_t>();
+    test_operator_less<std::uint16_t>();
+    test_operator_less<std::uint32_t>();
+    test_operator_less<std::uint64_t>();
+    test_operator_less<unsigned __int128>();
 
     return boost::report_errors();
 }
