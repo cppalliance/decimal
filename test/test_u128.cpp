@@ -37,6 +37,28 @@ void test_arithmetic_constructor()
     }
 }
 
+template <typename IntType>
+void test_assignment_operators()
+{
+    std::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+                                                std::numeric_limits<IntType>::max());
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const IntType value {dist(rng)};
+        unsigned __int128 builtin_value;
+        builtin_value = value;
+        boost::decimal::detail::u128 emulated_value {};
+        emulated_value = value;
+
+        unsigned __int128 emulated_bits;
+        std::memcpy(&emulated_bits, &emulated_value, sizeof(unsigned __int128));
+
+        BOOST_TEST(emulated_bits == builtin_value);
+    }
+}
+
+
 int main()
 {
     test_arithmetic_constructor<std::int8_t>();
@@ -48,6 +70,16 @@ int main()
     test_arithmetic_constructor<std::uint16_t>();
     test_arithmetic_constructor<std::uint32_t>();
     test_arithmetic_constructor<std::uint64_t>();
+
+    test_assignment_operators<std::int8_t>();
+    test_assignment_operators<std::int16_t>();
+    test_assignment_operators<std::int32_t>();
+    test_assignment_operators<std::int64_t>();
+
+    test_assignment_operators<std::uint8_t>();
+    test_assignment_operators<std::uint16_t>();
+    test_assignment_operators<std::uint32_t>();
+    test_assignment_operators<std::uint64_t>();
 
     return boost::report_errors();
 }
