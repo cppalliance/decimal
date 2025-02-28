@@ -65,6 +65,26 @@ public:
         low {static_cast<std::uint64_t>(value & low_word_mask)},
         high {static_cast<std::uint64_t>(value >> 64U)} {}
     #endif // BOOST_DECIMAL_HAS_INT128
+
+    // Signed assignment operators
+    constexpr u128& operator=(const std::int8_t value) noexcept { low = static_cast<std::uint64_t>(value); high = value < 0 ? UINT64_MAX : UINT64_C(0); return *this; }
+    constexpr u128& operator=(const std::int16_t value) noexcept { low = static_cast<std::uint64_t>(value); high = value < 0 ? UINT64_MAX : UINT64_C(0); return *this; }
+    constexpr u128& operator=(const std::int32_t value) noexcept { low = static_cast<std::uint64_t>(value); high = value < 0 ? UINT64_MAX : UINT64_C(0); return *this; }
+    constexpr u128& operator=(const std::int64_t value) noexcept { low = static_cast<std::uint64_t>(value); high = value < 0 ? UINT64_MAX : UINT64_C(0); return *this; }
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    constexpr u128& operator=(const __int128 value) noexcept { low = static_cast<std::uint64_t>(value & low_word_mask); high = static_cast<std::uint64_t>(static_cast<unsigned __int128>(value) >> 64U); return *this; }
+    #endif // BOOST_DECIMAL_HAS_INT128
+
+    // Unsigned assignment operators
+    constexpr u128& operator=(const std::uint8_t value) noexcept { low = static_cast<std::uint64_t>(value); high = UINT64_C(0); return *this; }
+    constexpr u128& operator=(const std::uint16_t value) noexcept { low = static_cast<std::uint64_t>(value); high = UINT64_C(0); return *this; }
+    constexpr u128& operator=(const std::uint32_t value) noexcept { low = static_cast<std::uint64_t>(value); high = UINT64_C(0); return *this; }
+    constexpr u128& operator=(const std::uint64_t value) noexcept { low = static_cast<std::uint64_t>(value); high = UINT64_C(0); return *this; }
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    constexpr u128& operator=(const unsigned __int128 value) noexcept { low = static_cast<std::uint64_t>(value & low_word_mask); high = static_cast<std::uint64_t>(value >> 64U); return *this; }
+    #endif
 };
 
 } // namespace detail
