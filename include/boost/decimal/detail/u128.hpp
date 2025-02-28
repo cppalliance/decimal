@@ -108,7 +108,46 @@ public:
     #ifdef BOOST_DECIMAL_HAS_INT128
     explicit constexpr operator unsigned __int128() const noexcept { return (static_cast<unsigned __int128>(high) << 64U) + low; }
     #endif // BOOST_DECIMAL_HAS_INT128
+
+    // Conversion to float
+    // This is basically the same as ldexp(static_cast<T>(high), 64) + static_cast<T>(low),
+    // but can be constexpr at C++11 instead of C++26
+    explicit constexpr operator float() const noexcept;
+    explicit constexpr operator double() const noexcept;
+    explicit constexpr operator long double() const noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_FLOAT128
+    explicit constexpr operator __float128() const noexcept;
+    #endif // BOOST_DECIMAL_HAS_FLOAT128
 };
+
+constexpr u128::operator float() const noexcept
+{
+    constexpr float offset {static_cast<float>(std::numeric_limits<std::uint64_t>::max())};
+    return static_cast<float>(high) * offset + static_cast<float>(low);
+}
+
+constexpr u128::operator double() const noexcept
+{
+    constexpr double offset {static_cast<double>(std::numeric_limits<std::uint64_t>::max())};
+    return static_cast<double>(high) * offset + static_cast<double>(low);
+}
+
+constexpr u128::operator long double() const noexcept
+{
+    constexpr long double offset {static_cast<long double>(std::numeric_limits<std::uint64_t>::max())};
+    return static_cast<long double>(high) * offset + static_cast<long double>(low);
+}
+
+#ifdef BOOST_DECIMAL_HAS_FLOAT128
+
+constexpr u128::operator __float128() const noexcept
+{
+    constexpr __float128 offset {static_cast<__float128>(std::numeric_limits<std::uint64_t>::max())};
+    return static_cast<__float128>(high) * offset + static_cast<__float128>(low);
+}
+
+#endif // BOOST_DECIMAL_HAS_FLOAT128
 
 } // namespace detail
 } // namespace decimal
