@@ -9,6 +9,21 @@
 
 #include <boost/decimal/detail/config.hpp>
 
+#ifndef BOOST_DECIMAL_BUILD_MODULE
+
+#include <cmath>
+#include <cstdint>
+#include <limits>
+#include <type_traits>
+
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
+#include <iomanip>
+#include <iosfwd>
+#include <ostream>
+#endif
+
+#endif // BOOST_DECIMAL_BUILD_MODULE
+
 namespace boost {
 namespace decimal {
 namespace detail {
