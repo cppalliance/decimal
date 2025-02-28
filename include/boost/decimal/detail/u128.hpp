@@ -165,6 +165,31 @@ public:
     friend constexpr bool operator==(std::uint16_t lhs, u128 rhs) noexcept;
     friend constexpr bool operator==(std::uint32_t lhs, u128 rhs) noexcept;
     friend constexpr bool operator==(std::uint64_t lhs, u128 rhs) noexcept;
+
+    // Inequality to signed integers
+    friend constexpr bool operator!=(u128 lhs, bool rhs) noexcept;
+    friend constexpr bool operator!=(u128 lhs, std::int8_t rhs) noexcept;
+    friend constexpr bool operator!=(u128 lhs, std::int16_t rhs) noexcept;
+    friend constexpr bool operator!=(u128 lhs, std::int32_t rhs) noexcept;
+    friend constexpr bool operator!=(u128 lhs, std::int64_t rhs) noexcept;
+
+    friend constexpr bool operator!=(bool lhs, u128 rhs) noexcept;
+    friend constexpr bool operator!=(std::int8_t lhs, u128 rhs) noexcept;
+    friend constexpr bool operator!=(std::int16_t lhs, u128 rhs) noexcept;
+    friend constexpr bool operator!=(std::int32_t lhs, u128 rhs) noexcept;
+    friend constexpr bool operator!=(std::int64_t lhs, u128 rhs) noexcept;
+
+    // Inequality to unsigned integers
+    friend constexpr bool operator!=(u128 lhs, std::uint8_t rhs) noexcept;
+    friend constexpr bool operator!=(u128 lhs, std::uint16_t rhs) noexcept;
+    friend constexpr bool operator!=(u128 lhs, std::uint32_t rhs) noexcept;
+    friend constexpr bool operator!=(u128 lhs, std::uint64_t rhs) noexcept;
+
+    friend constexpr bool operator!=(std::uint8_t lhs, u128 rhs) noexcept;
+    friend constexpr bool operator!=(std::uint16_t lhs, u128 rhs) noexcept;
+    friend constexpr bool operator!=(std::uint32_t lhs, u128 rhs) noexcept;
+    friend constexpr bool operator!=(std::uint64_t lhs, u128 rhs) noexcept;
+
 };
 
 // Signed assignment operators
@@ -341,6 +366,96 @@ constexpr bool operator==(const std::uint32_t lhs, const u128 rhs) noexcept
 constexpr bool operator==(const std::uint64_t lhs, const u128 rhs) noexcept
 {
     return rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
+}
+
+constexpr bool operator!=(const u128 lhs, const bool rhs) noexcept
+{
+    return lhs.high != UINT64_C(0) || lhs.low != static_cast<std::uint64_t>(rhs);
+}
+
+constexpr bool operator!=(const u128 lhs, const std::int8_t rhs) noexcept
+{
+    return rhs < 0 || lhs.high != UINT64_C(0) || lhs.low != static_cast<std::uint64_t>(rhs);
+}
+
+constexpr bool operator!=(const u128 lhs, const std::int16_t rhs) noexcept
+{
+    return rhs < 0 || lhs.high != UINT64_C(0) || lhs.low != static_cast<std::uint64_t>(rhs);
+}
+
+constexpr bool operator!=(const u128 lhs, const std::int32_t rhs) noexcept
+{
+    return rhs < 0 || lhs.high != UINT64_C(0) || lhs.low != static_cast<std::uint64_t>(rhs);
+}
+
+constexpr bool operator!=(const u128 lhs, const std::int64_t rhs) noexcept
+{
+    return rhs < 0 || lhs.high != UINT64_C(0) || lhs.low != static_cast<std::uint64_t>(rhs);
+}
+
+constexpr bool operator!=(const u128 lhs, const std::uint8_t rhs) noexcept
+{
+    return lhs.high != UINT64_C(0) || lhs.low != static_cast<std::uint64_t>(rhs);
+}
+
+constexpr bool operator!=(const u128 lhs, const std::uint16_t rhs) noexcept
+{
+    return lhs.high != UINT64_C(0) || lhs.low != static_cast<std::uint64_t>(rhs);
+}
+
+constexpr bool operator!=(const u128 lhs, const std::uint32_t rhs) noexcept
+{
+    return lhs.high != UINT64_C(0) || lhs.low != static_cast<std::uint64_t>(rhs);
+}
+
+constexpr bool operator!=(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    return lhs.high != UINT64_C(0) || lhs.low != static_cast<std::uint64_t>(rhs);
+}
+
+constexpr bool operator!=(const bool lhs, const u128 rhs) noexcept
+{
+    return rhs.high != UINT64_C(0) || rhs.low != static_cast<std::uint64_t>(lhs);
+}
+
+constexpr bool operator!=(const std::int8_t lhs, const u128 rhs) noexcept
+{
+    return lhs < 0 || rhs.high != UINT64_C(0) || rhs.low != static_cast<std::uint64_t>(lhs);
+}
+
+constexpr bool operator!=(const std::int16_t lhs, const u128 rhs) noexcept
+{
+    return lhs < 0 || rhs.high != UINT64_C(0) || rhs.low != static_cast<std::uint64_t>(lhs);
+}
+
+constexpr bool operator!=(const std::int32_t lhs, const u128 rhs) noexcept
+{
+    return lhs < 0 || rhs.high != UINT64_C(0) || rhs.low != static_cast<std::uint64_t>(lhs);
+}
+
+constexpr bool operator!=(const std::int64_t lhs, const u128 rhs) noexcept
+{
+    return lhs < 0 || rhs.high != UINT64_C(0) || rhs.low != static_cast<std::uint64_t>(lhs);
+}
+
+constexpr bool operator!=(const std::uint8_t lhs, const u128 rhs) noexcept
+{
+    return rhs.high != UINT64_C(0) || rhs.low != static_cast<std::uint64_t>(lhs);
+}
+
+constexpr bool operator!=(const std::uint16_t lhs, const u128 rhs) noexcept
+{
+    return rhs.high != UINT64_C(0) || rhs.low != static_cast<std::uint64_t>(lhs);
+}
+
+constexpr bool operator!=(const std::uint32_t lhs, const u128 rhs) noexcept
+{
+    return rhs.high != UINT64_C(0) || rhs.low != static_cast<std::uint64_t>(lhs);
+}
+
+constexpr bool operator!=(const std::uint64_t lhs, const u128 rhs) noexcept
+{
+    return rhs.high != UINT64_C(0) || rhs.low != static_cast<std::uint64_t>(lhs);
 }
 
 } // namespace detail
