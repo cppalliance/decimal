@@ -52,7 +52,7 @@ template <typename IntType>
 void test_arithmetic_constructor()
 {
     boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                std::numeric_limits<IntType>::max());
+                                                          std::numeric_limits<IntType>::max());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -71,7 +71,7 @@ template <typename IntType>
 void test_assignment_operators()
 {
     boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                std::numeric_limits<IntType>::max());
+                                                          std::numeric_limits<IntType>::max());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -92,7 +92,7 @@ template <typename IntType>
 void test_integer_conversion_operators()
 {
     boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                std::numeric_limits<IntType>::max());
+                                                          std::numeric_limits<IntType>::max());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -106,6 +106,12 @@ void test_integer_conversion_operators()
         const auto emulated_value_return = static_cast<IntType>(emulated_value);
 
         BOOST_TEST_EQ(builtin_value_return, emulated_value_return);
+
+        // Hits the implicit bool conversion
+        if (builtin_value)
+        {
+            BOOST_TEST(emulated_value);
+        }
     }
 }
 
@@ -113,7 +119,7 @@ template <typename FloatType>
 void test_float_conversion_operators()
 {
     boost::random::uniform_int_distribution<std::uint64_t> dist(std::numeric_limits<std::uint64_t>::min(),
-                                                     std::numeric_limits<std::uint64_t>::max());
+                                                                std::numeric_limits<std::uint64_t>::max());
 
     for (std::size_t i {}; i < N; ++i)
     {
