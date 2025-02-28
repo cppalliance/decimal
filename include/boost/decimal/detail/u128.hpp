@@ -138,10 +138,6 @@ public:
     explicit constexpr operator __float128() const noexcept;
     #endif // BOOST_DECIMAL_HAS_FLOAT128
 
-    // Unary operators
-    friend constexpr u128 operator+(u128 value) noexcept;
-    friend constexpr u128 operator-(u128 value) noexcept;
-
     // Equality to signed integers
     friend constexpr bool operator==(u128 lhs, bool rhs) noexcept;
     friend constexpr bool operator==(u128 lhs, std::int8_t rhs) noexcept;
