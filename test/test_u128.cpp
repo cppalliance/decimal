@@ -58,6 +58,26 @@ void test_assignment_operators()
     }
 }
 
+template <typename IntType>
+void test_integer_conversion_operators()
+{
+    std::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+                                                std::numeric_limits<IntType>::max());
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const IntType value {dist(rng)};
+        unsigned __int128 builtin_value;
+        builtin_value = value;
+        boost::decimal::detail::u128 emulated_value {};
+        emulated_value = value;
+
+        const auto builtin_value_return = static_cast<IntType>(builtin_value);
+        const auto emulated_value_return = static_cast<IntType>(emulated_value);
+
+        BOOST_TEST_EQ(builtin_value_return, emulated_value_return);
+    }
+}
 
 int main()
 {
@@ -80,6 +100,16 @@ int main()
     test_assignment_operators<std::uint16_t>();
     test_assignment_operators<std::uint32_t>();
     test_assignment_operators<std::uint64_t>();
+
+    test_integer_conversion_operators<std::int8_t>();
+    test_integer_conversion_operators<std::int16_t>();
+    test_integer_conversion_operators<std::int32_t>();
+    test_integer_conversion_operators<std::int64_t>();
+
+    test_integer_conversion_operators<std::uint8_t>();
+    test_integer_conversion_operators<std::uint16_t>();
+    test_integer_conversion_operators<std::uint32_t>();
+    test_integer_conversion_operators<std::uint64_t>();
 
     return boost::report_errors();
 }
