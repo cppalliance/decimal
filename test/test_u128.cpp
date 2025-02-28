@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <random>
 #include <limits>
+#include <cmath>
 
 // Used defined seed for repeatability
 static std::mt19937_64 rng(42);
@@ -79,6 +80,27 @@ void test_integer_conversion_operators()
     }
 }
 
+template <typename FloatType>
+void test_float_conversion_operators()
+{
+    std::uniform_int_distribution<std::uint64_t> dist(std::numeric_limits<std::uint64_t>::min(),
+                                                     std::numeric_limits<std::uint64_t>::max());
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const auto value {dist(rng)};
+        unsigned __int128 builtin_value;
+        builtin_value = value;
+        boost::decimal::detail::u128 emulated_value {};
+        emulated_value = value;
+
+        const auto builtin_value_return = static_cast<FloatType>(builtin_value);
+        const auto emulated_value_return = static_cast<FloatType>(emulated_value);
+
+        BOOST_TEST(std::abs(builtin_value_return - emulated_value_return) < std::numeric_limits<FloatType>::epsilon());
+    }
+}
+
 int main()
 {
     test_arithmetic_constructor<std::int8_t>();
@@ -110,6 +132,14 @@ int main()
     test_integer_conversion_operators<std::uint16_t>();
     test_integer_conversion_operators<std::uint32_t>();
     test_integer_conversion_operators<std::uint64_t>();
+
+    test_float_conversion_operators<float>();
+    test_float_conversion_operators<double>();
+    test_float_conversion_operators<long double>();
+
+    #ifdef BOOST_DECIMAL_HAS_FLOAT128
+    test_float_conversion_operators<__float128>();
+    #endif
 
     return boost::report_errors();
 }
