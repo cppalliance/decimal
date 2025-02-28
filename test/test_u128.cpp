@@ -251,6 +251,24 @@ void test_operator_less()
         unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
         boost::decimal::detail::u128 emulated_value {value};
 
+        // Some platforms get this wrong where for example -99 < 340282366920938463463374607431768211408 evaluates to false
+        #ifdef _MSC_VER
+        #pragma warning(push)
+        #pragma warning(disable:4127)
+        #endif
+
+        BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<IntType>::value)
+        {
+            if (value == value2 && value < 0)
+            {
+                continue;
+            }
+        }
+
+        #ifdef _MSC_VER
+        #pragma warning(pop)
+        #endif
+
         BOOST_TEST(((value2 < emulated_value) == (emulated_value < value2)) ==
                    ((value2 < builtin_value) == (builtin_value < value2)));
     }
