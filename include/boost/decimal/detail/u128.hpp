@@ -42,6 +42,9 @@ public:
     constexpr u128& operator=(const u128& other) noexcept = default;
     constexpr u128& operator=(u128&& other) noexcept = default;
 
+    // Direct construction of the number
+    constexpr u128(const std::uint64_t hi, const std::uint64_t lo) noexcept : low{lo}, high{hi} {}
+
     // Signed arithmetic constructors
     explicit constexpr u128(const std::int8_t value) noexcept : low {static_cast<std::uint64_t>(value)}, high {value < 0 ? UINT64_MAX : UINT64_C(0)} {}
     explicit constexpr u128(const std::int16_t value) noexcept : low {static_cast<std::uint64_t>(value)}, high {value < 0 ? UINT64_MAX : UINT64_C(0)} {}
@@ -119,6 +122,10 @@ public:
     #ifdef BOOST_DECIMAL_HAS_FLOAT128
     explicit constexpr operator __float128() const noexcept;
     #endif // BOOST_DECIMAL_HAS_FLOAT128
+
+    // Unary operators
+    friend constexpr u128 operator+(const u128 value) noexcept;
+    friend constexpr u128 operator-(const u128 value) noexcept;
 };
 
 // Signed assignment operators
@@ -196,6 +203,16 @@ constexpr u128::operator __float128() const noexcept
 }
 
 #endif // BOOST_DECIMAL_HAS_FLOAT128
+
+constexpr u128 operator+(const u128 value) noexcept
+{
+    return value;
+}
+
+constexpr u128 operator-(const u128 value) noexcept
+{
+    return u128{~value.high + static_cast<std::uint64_t>(value.low == UINT64_C(0)), ~value.low + UINT64_C(1)};
+}
 
 } // namespace detail
 } // namespace decimal
