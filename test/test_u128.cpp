@@ -296,21 +296,25 @@ int main()
     test_operator_equality<std::int16_t>();
     test_operator_equality<std::int32_t>();
     test_operator_equality<std::int64_t>();
+    test_operator_equality<__int128>();
 
     test_operator_equality<std::uint8_t>();
     test_operator_equality<std::uint16_t>();
     test_operator_equality<std::uint32_t>();
     test_operator_equality<std::uint64_t>();
+    test_operator_equality<unsigned __int128>();
 
     test_operator_inequality<std::int8_t>();
     test_operator_inequality<std::int16_t>();
     test_operator_inequality<std::int32_t>();
     test_operator_inequality<std::int64_t>();
+    test_operator_inequality<__int128>();
 
     test_operator_inequality<std::uint8_t>();
     test_operator_inequality<std::uint16_t>();
     test_operator_inequality<std::uint32_t>();
     test_operator_inequality<std::uint64_t>();
+    test_operator_inequality<unsigned __int128>();
 
     return boost::report_errors();
 }

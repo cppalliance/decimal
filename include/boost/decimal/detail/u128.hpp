@@ -166,6 +166,19 @@ public:
     friend constexpr bool operator==(std::uint32_t lhs, u128 rhs) noexcept;
     friend constexpr bool operator==(std::uint64_t lhs, u128 rhs) noexcept;
 
+    // 128-bit equality
+    friend constexpr bool operator==(u128 lhs, u128 rhs) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+
+    friend constexpr bool operator==(u128 lhs, __int128 rhs) noexcept;
+    friend constexpr bool operator==(__int128 lhs, u128 rhs) noexcept;
+
+    friend constexpr bool operator==(u128 lhs, unsigned __int128 rhs) noexcept;
+    friend constexpr bool operator==(unsigned __int128 lhs, u128 rhs) noexcept;
+
+    #endif // BOOST_DECIMAL_HAS_INT128
+
     // Inequality to signed integers
     friend constexpr bool operator!=(u128 lhs, bool rhs) noexcept;
     friend constexpr bool operator!=(u128 lhs, std::int8_t rhs) noexcept;
@@ -190,6 +203,18 @@ public:
     friend constexpr bool operator!=(std::uint32_t lhs, u128 rhs) noexcept;
     friend constexpr bool operator!=(std::uint64_t lhs, u128 rhs) noexcept;
 
+    // 128-bit inequality
+    friend constexpr bool operator!=(u128 lhs, u128 rhs) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+
+    friend constexpr bool operator!=(u128 lhs, __int128 rhs) noexcept;
+    friend constexpr bool operator!=(__int128 lhs, u128 rhs) noexcept;
+
+    friend constexpr bool operator!=(u128 lhs, unsigned __int128 rhs) noexcept;
+    friend constexpr bool operator!=(unsigned __int128 lhs, u128 rhs) noexcept;
+
+    #endif // BOOST_DECIMAL_HAS_INT128
 };
 
 // Signed assignment operators
@@ -368,6 +393,35 @@ constexpr bool operator==(const std::uint64_t lhs, const u128 rhs) noexcept
     return rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
 }
 
+constexpr bool operator==(const u128 lhs, const u128 rhs) noexcept
+{
+    return lhs.low == rhs.low && lhs.high == rhs.high;
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr bool operator==(const u128 lhs, const __int128 rhs) noexcept
+{
+    return lhs == static_cast<u128>(rhs);
+}
+
+constexpr bool operator==(const __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) == rhs;
+}
+
+constexpr bool operator==(const u128 lhs, const unsigned __int128 rhs) noexcept
+{
+    return lhs == static_cast<u128>(rhs);
+}
+
+constexpr bool operator==(const unsigned __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) == rhs;
+}
+
+#endif
+
 constexpr bool operator!=(const u128 lhs, const bool rhs) noexcept
 {
     return lhs.high != UINT64_C(0) || lhs.low != static_cast<std::uint64_t>(rhs);
@@ -457,6 +511,35 @@ constexpr bool operator!=(const std::uint64_t lhs, const u128 rhs) noexcept
 {
     return rhs.high != UINT64_C(0) || rhs.low != static_cast<std::uint64_t>(lhs);
 }
+
+constexpr bool operator!=(const u128 lhs, const u128 rhs) noexcept
+{
+    return lhs.low != rhs.low || lhs.high != rhs.high;
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr bool operator!=(const u128 lhs, const __int128 rhs) noexcept
+{
+    return lhs != static_cast<u128>(rhs);
+}
+
+constexpr bool operator!=(const __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) != rhs;
+}
+
+constexpr bool operator!=(const u128 lhs, const unsigned __int128 rhs) noexcept
+{
+    return lhs != static_cast<u128>(rhs);
+}
+
+constexpr bool operator!=(const unsigned __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) != rhs;
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
 
 } // namespace detail
 } // namespace decimal
