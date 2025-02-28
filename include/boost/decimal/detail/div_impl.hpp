@@ -88,6 +88,7 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
         const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
         res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
         res_exp += digit_delta;
+        BOOST_DECIMAL_ASSERT(res_sig.high == 0);
     }
     else if (res_sig.low == UINT64_C(0))
     {
