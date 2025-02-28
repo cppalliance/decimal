@@ -177,6 +177,39 @@ void test_unary_minus()
     }
 }
 
+template <typename IntType>
+void test_operator_equality()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+                                                          std::numeric_limits<IntType>::max());
+
+    // Always equal
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const IntType value {dist(rng)};
+        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
+        boost::decimal::detail::u128 emulated_value {value};
+
+        BOOST_TEST(((value == emulated_value) == (emulated_value == value)) ==
+                   ((value == builtin_value) == (builtin_value == value)));
+    }
+
+    // Potentially equal
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const IntType value {dist(rng)};
+        const IntType value2 {dist(rng)};
+        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
+        boost::decimal::detail::u128 emulated_value {value};
+
+        BOOST_TEST(((value2 == emulated_value) == (emulated_value == value2)) ==
+                   ((value2 == builtin_value) == (builtin_value == value2)));
+    }
+
+    boost::decimal::detail::u128 bool_val {dist(rng)};
+    BOOST_TEST((true == bool_val) == (bool_val == true));
+}
+
 int main()
 {
     test_arithmetic_constructor<std::int8_t>();
@@ -225,6 +258,16 @@ int main()
 
     test_unary_plus();
     test_unary_minus();
+
+    test_operator_equality<std::int8_t>();
+    test_operator_equality<std::int16_t>();
+    test_operator_equality<std::int32_t>();
+    test_operator_equality<std::int64_t>();
+
+    test_operator_equality<std::uint8_t>();
+    test_operator_equality<std::uint16_t>();
+    test_operator_equality<std::uint32_t>();
+    test_operator_equality<std::uint64_t>();
 
     return boost::report_errors();
 }
