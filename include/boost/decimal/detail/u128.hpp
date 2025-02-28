@@ -138,43 +138,6 @@ public:
     explicit constexpr operator __float128() const noexcept;
     #endif // BOOST_DECIMAL_HAS_FLOAT128
 
-    // Equality to signed integers
-    friend constexpr bool operator==(u128 lhs, bool rhs) noexcept;
-    friend constexpr bool operator==(u128 lhs, std::int8_t rhs) noexcept;
-    friend constexpr bool operator==(u128 lhs, std::int16_t rhs) noexcept;
-    friend constexpr bool operator==(u128 lhs, std::int32_t rhs) noexcept;
-    friend constexpr bool operator==(u128 lhs, std::int64_t rhs) noexcept;
-
-    friend constexpr bool operator==(bool lhs, u128 rhs) noexcept;
-    friend constexpr bool operator==(std::int8_t lhs, u128 rhs) noexcept;
-    friend constexpr bool operator==(std::int16_t lhs, u128 rhs) noexcept;
-    friend constexpr bool operator==(std::int32_t lhs, u128 rhs) noexcept;
-    friend constexpr bool operator==(std::int64_t lhs, u128 rhs) noexcept;
-
-    // Equality to unsigned integers
-    friend constexpr bool operator==(u128 lhs, std::uint8_t rhs) noexcept;
-    friend constexpr bool operator==(u128 lhs, std::uint16_t rhs) noexcept;
-    friend constexpr bool operator==(u128 lhs, std::uint32_t rhs) noexcept;
-    friend constexpr bool operator==(u128 lhs, std::uint64_t rhs) noexcept;
-
-    friend constexpr bool operator==(std::uint8_t lhs, u128 rhs) noexcept;
-    friend constexpr bool operator==(std::uint16_t lhs, u128 rhs) noexcept;
-    friend constexpr bool operator==(std::uint32_t lhs, u128 rhs) noexcept;
-    friend constexpr bool operator==(std::uint64_t lhs, u128 rhs) noexcept;
-
-    // 128-bit equality
-    friend constexpr bool operator==(u128 lhs, u128 rhs) noexcept;
-
-    #ifdef BOOST_DECIMAL_HAS_INT128
-
-    friend constexpr bool operator==(u128 lhs, __int128 rhs) noexcept;
-    friend constexpr bool operator==(__int128 lhs, u128 rhs) noexcept;
-
-    friend constexpr bool operator==(u128 lhs, unsigned __int128 rhs) noexcept;
-    friend constexpr bool operator==(unsigned __int128 lhs, u128 rhs) noexcept;
-
-    #endif // BOOST_DECIMAL_HAS_INT128
-
     // Inequality to signed integers
     friend constexpr bool operator!=(u128 lhs, bool rhs) noexcept;
     friend constexpr bool operator!=(u128 lhs, std::int8_t rhs) noexcept;
@@ -337,87 +300,31 @@ constexpr bool operator==(const u128 lhs, const bool rhs) noexcept
     return lhs.high == UINT64_C(0) && lhs.low == static_cast<std::uint64_t>(rhs);
 }
 
-constexpr bool operator==(const u128 lhs, const std::int8_t rhs) noexcept
-{
-    return rhs >= 0 && lhs.high == UINT64_C(0) && lhs.low == static_cast<std::uint64_t>(rhs);
-}
-
-constexpr bool operator==(const u128 lhs, const std::int16_t rhs) noexcept
-{
-    return rhs >= 0 && lhs.high == UINT64_C(0) && lhs.low == static_cast<std::uint64_t>(rhs);
-}
-
-constexpr bool operator==(const u128 lhs, const std::int32_t rhs) noexcept
-{
-    return rhs >= 0 && lhs.high == UINT64_C(0) && lhs.low == static_cast<std::uint64_t>(rhs);
-}
-
-constexpr bool operator==(const u128 lhs, const std::int64_t rhs) noexcept
-{
-    return rhs >= 0 && lhs.high == UINT64_C(0) && lhs.low == static_cast<std::uint64_t>(rhs);
-}
-
 constexpr bool operator==(const bool lhs, const u128 rhs) noexcept
 {
     return rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
 }
 
-constexpr bool operator==(const std::int8_t lhs, const u128 rhs) noexcept
+template <typename SignedInteger, std::enable_if_t<std::is_signed<SignedInteger>::value, bool> = true>
+constexpr bool operator==(const u128 lhs, const SignedInteger rhs) noexcept
+{
+    return rhs >= 0 && lhs.high == UINT64_C(0) && lhs.low == static_cast<std::uint64_t>(rhs);
+}
+
+template <typename SignedInteger, std::enable_if_t<std::is_integral<SignedInteger>::value && std::is_signed<SignedInteger>::value, bool> = true>
+constexpr bool operator==(const SignedInteger lhs, const u128 rhs) noexcept
 {
     return lhs >= 0 && rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
 }
 
-constexpr bool operator==(const std::int16_t lhs, const u128 rhs) noexcept
-{
-    return lhs >= 0 && rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
-}
-
-constexpr bool operator==(const std::int32_t lhs, const u128 rhs) noexcept
-{
-    return lhs >= 0 && rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
-}
-
-constexpr bool operator==(const std::int64_t lhs, const u128 rhs) noexcept
-{
-    return lhs >= 0 && rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
-}
-
-constexpr bool operator==(const u128 lhs, const std::uint8_t rhs) noexcept
+template <typename UnsignedInteger, std::enable_if_t<std::is_integral<UnsignedInteger>::value && std::is_unsigned<UnsignedInteger>::value, bool> = true>
+constexpr bool operator==(const u128 lhs, const UnsignedInteger rhs) noexcept
 {
     return lhs.high == UINT64_C(0) && lhs.low == static_cast<std::uint64_t>(rhs);
 }
 
-constexpr bool operator==(const u128 lhs, const std::uint16_t rhs) noexcept
-{
-    return lhs.high == UINT64_C(0) && lhs.low == static_cast<std::uint64_t>(rhs);
-}
-
-constexpr bool operator==(const u128 lhs, const std::uint32_t rhs) noexcept
-{
-    return lhs.high == UINT64_C(0) && lhs.low == static_cast<std::uint64_t>(rhs);
-}
-
-constexpr bool operator==(const u128 lhs, const std::uint64_t rhs) noexcept
-{
-    return lhs.high == UINT64_C(0) && lhs.low == static_cast<std::uint64_t>(rhs);
-}
-
-constexpr bool operator==(const std::uint8_t lhs, const u128 rhs) noexcept
-{
-    return rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
-}
-
-constexpr bool operator==(const std::uint16_t lhs, const u128 rhs) noexcept
-{
-    return rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
-}
-
-constexpr bool operator==(const std::uint32_t lhs, const u128 rhs) noexcept
-{
-    return rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
-}
-
-constexpr bool operator==(const std::uint64_t lhs, const u128 rhs) noexcept
+template <typename UnsignedInteger, std::enable_if_t<std::is_integral<UnsignedInteger>::value && std::is_unsigned<UnsignedInteger>::value, bool> = true>
+constexpr bool operator==(const UnsignedInteger lhs, const u128 rhs) noexcept
 {
     return rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
 }

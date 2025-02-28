@@ -32,16 +32,11 @@
 #  pragma GCC diagnostic ignored "-Wundef"
 #  pragma GCC diagnostic ignored "-Wconversion"
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
+#  pragma GCC diagnostic ignored "-Wsign-compare"
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
 
 #include <boost/random/uniform_int_distribution.hpp>
-
-#if defined(__clang__)
-#  pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#  pragma GCC diagnostic pop
-#endif
 
 // Used defined seed for repeatability
 static std::mt19937_64 rng(42);
