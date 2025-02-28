@@ -70,23 +70,23 @@ public:
     #endif // BOOST_DECIMAL_HAS_INT128
 
     // Signed assignment operators
-    constexpr u128& operator=(const std::int8_t value) noexcept;
-    constexpr u128& operator=(const std::int16_t value) noexcept;
-    constexpr u128& operator=(const std::int32_t value) noexcept;
-    constexpr u128& operator=(const std::int64_t value) noexcept;
+    constexpr u128& operator=(std::int8_t value) noexcept;
+    constexpr u128& operator=(std::int16_t value) noexcept;
+    constexpr u128& operator=(std::int32_t value) noexcept;
+    constexpr u128& operator=(std::int64_t value) noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr u128& operator=(const __int128 value) noexcept;
+    constexpr u128& operator=(__int128 value) noexcept;
     #endif // BOOST_DECIMAL_HAS_INT128
 
     // Unsigned assignment operators
-    constexpr u128& operator=(const std::uint8_t value) noexcept;
-    constexpr u128& operator=(const std::uint16_t value) noexcept;
-    constexpr u128& operator=(const std::uint32_t value) noexcept;
-    constexpr u128& operator=(const std::uint64_t value) noexcept;
+    constexpr u128& operator=(std::uint8_t value) noexcept;
+    constexpr u128& operator=(std::uint16_t value) noexcept;
+    constexpr u128& operator=(std::uint32_t value) noexcept;
+    constexpr u128& operator=(std::uint64_t value) noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    constexpr u128& operator=(const unsigned __int128 value) noexcept;
+    constexpr u128& operator=(unsigned __int128 value) noexcept;
     #endif
 
     // Bool conversion is not explicit so we can do stuff like if (num)
@@ -124,8 +124,8 @@ public:
     #endif // BOOST_DECIMAL_HAS_FLOAT128
 
     // Unary operators
-    friend constexpr u128 operator+(const u128 value) noexcept;
-    friend constexpr u128 operator-(const u128 value) noexcept;
+    friend constexpr u128 operator+(u128 value) noexcept;
+    friend constexpr u128 operator-(u128 value) noexcept;
 };
 
 // Signed assignment operators
