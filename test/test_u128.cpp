@@ -476,6 +476,29 @@ void test_operator_left_shift()
     }
 }
 
+template <typename IntType>
+void test_operator_right_shift()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+                                                          std::numeric_limits<IntType>::max());
+
+    boost::random::uniform_int_distribution<unsigned> shift_dist(0, sizeof(IntType) * CHAR_BIT - 1);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const IntType value {dist(rng)};
+        const unsigned shift_value {shift_dist(rng)};
+        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
+        boost::decimal::detail::u128 emulated_value {value};
+
+        BOOST_TEST((emulated_value >> shift_value) == (builtin_value >> shift_value));
+
+        emulated_value = shift_value;
+        builtin_value = shift_value;
+        BOOST_TEST((value >> emulated_value) == (value >> builtin_value));
+    }
+}
+
 int main()
 {
     test_arithmetic_constructor<std::int8_t>();
@@ -646,6 +669,18 @@ int main()
     test_operator_left_shift<std::uint32_t>();
     test_operator_left_shift<std::uint64_t>();
     test_operator_left_shift<unsigned __int128>();
+
+    test_operator_right_shift<std::int8_t>();
+    test_operator_right_shift<std::int16_t>();
+    test_operator_right_shift<std::int32_t>();
+    test_operator_right_shift<std::int64_t>();
+    test_operator_right_shift<__int128>();
+
+    test_operator_right_shift<std::uint8_t>();
+    test_operator_right_shift<std::uint16_t>();
+    test_operator_right_shift<std::uint32_t>();
+    test_operator_right_shift<std::uint64_t>();
+    test_operator_right_shift<unsigned __int128>();
 
     return boost::report_errors();
 }
