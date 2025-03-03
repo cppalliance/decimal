@@ -351,7 +351,17 @@ constexpr bool operator!=(const unsigned __int128 lhs, const u128 rhs) noexcept
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
-template <typename SignedInteger, std::enable_if_t<std::is_signed<SignedInteger>::value, bool> = true>
+constexpr bool operator<(const u128 lhs, const bool rhs) noexcept
+{
+    return lhs.high == UINT64_C(0) && lhs.low < static_cast<std::uint64_t>(rhs);
+}
+
+constexpr bool operator<(const bool lhs, const u128 rhs) noexcept
+{
+    return rhs.high == UINT64_C(0) && rhs.low < static_cast<std::uint64_t>(lhs);
+}
+
+template <typename SignedInteger, std::enable_if_t<std::is_integral<SignedInteger>::value && std::is_signed<SignedInteger>::value, bool> = true>
 constexpr bool operator<(const u128 lhs, const SignedInteger rhs) noexcept
 {
     return rhs > 0 && lhs.high == UINT64_C(0) && lhs.low < static_cast<std::uint64_t>(rhs);

@@ -272,7 +272,11 @@ void test_operator_less()
         BOOST_TEST(((value2 < emulated_value) == (emulated_value < value2)) ==
                    ((value2 < builtin_value) == (builtin_value < value2)));
     }
+
+    boost::decimal::detail::u128 bool_val {dist(rng)};
+    BOOST_TEST((true < bool_val) == (bool_val < true));
 }
+
 
 int main()
 {
