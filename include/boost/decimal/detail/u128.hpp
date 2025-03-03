@@ -1019,6 +1019,115 @@ constexpr unsigned __int128 operator>>(const unsigned __int128 lhs, const u128 r
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
+//=====================================
+// Addition Operator
+//=====================================
+
+namespace impl {
+
+template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_add(const u128 lhs, const T rhs) noexcept
+{
+    u128 temp {lhs.high, lhs.low + rhs};
+
+    if (temp.low < lhs.low)
+    {
+        ++temp.high;
+    }
+
+    return temp;
+}
+
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_add(const u128 lhs, const u128 rhs) noexcept
+{
+    u128 temp {lhs.high + rhs.high, lhs.low + rhs.low};
+
+    if (temp.low < lhs.low)
+    {
+        ++temp.high;
+    }
+
+    return temp;
+}
+
+} // namespace impl
+
+constexpr u128 operator+(const u128 lhs, const u128 rhs) noexcept
+{
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return impl::default_add(lhs, rhs);
+    }
+    else
+    {
+        #if (defined(__aarch64__) && __cplusplus >= 202002L) || (defined(_M_ARM64) && _MSVC_LANG >= 202002L)
+
+        std::uint64_t result_low {};
+        std::uint64_t result_high {};
+
+        // Use inline assembly to access the carry flag directly
+        // Roughly equivalent to the ADX instructions below for x64 platforms
+        __asm__ volatile(
+            "adds %0, %2, %3\n"  // adds sets carry flag if overflow occurs
+            "adc %1, %4, %5\n"   // adc adds with carry from previous operation
+            : "=r" (result_low), "=r" (result_high)
+            : "r" (lhs.low), "r" (rhs.low), "r" (lhs.high), "r" (rhs.high)
+            : "cc"               // clobbering condition codes (flags)
+        );
+
+        return {result_high, result_low};
+
+        #elif defined(BOOST_DECIMAL_ADD_CARRY)
+
+        // Intel ADX instructions are specifically for Multi-Precision Arithmetic
+        unsigned long long int res_low {};
+        unsigned long long int res_high {};
+
+        const unsigned char carry {BOOST_DECIMAL_ADD_CARRY(0, lhs.low, rhs.low, &res_low)};
+        BOOST_DECIMAL_ADD_CARRY(carry, lhs.high, rhs.high, &res_high);
+
+        return {res_high, res_low};
+
+        #else
+
+        return impl::default_add(lhs, rhs);
+
+        #endif
+    }
+
+    #else
+
+    return impl::default_add(lhs, rhs);
+
+    #endif
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128 operator+(const u128 lhs, const __int128 rhs) noexcept
+{
+    return lhs + static_cast<u128>(rhs);
+}
+
+constexpr u128 operator+(const __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) + rhs;
+}
+
+constexpr u128 operator+(const u128 lhs, const unsigned __int128 rhs) noexcept
+{
+    return lhs + static_cast<u128>(rhs);
+}
+
+constexpr u128 operator+(const unsigned __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) + rhs;
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
