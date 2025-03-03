@@ -408,7 +408,7 @@ void test_operator_not()
     }
 }
 
-template <typename IntType = unsigned __int128>
+template <typename IntType>
 void test_operator_or()
 {
     boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
@@ -433,6 +433,34 @@ void test_operator_or()
 
         BOOST_TEST((emulated_value | value2) == (builtin_value | value2));
         BOOST_TEST((value2 | emulated_value) == (value2 | builtin_value));
+    }
+}
+
+template <typename IntType>
+void test_operator_and()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+                                                          std::numeric_limits<IntType>::max());
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const IntType value {dist(rng)};
+        const IntType value2 {dist(rng)};
+        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
+        boost::decimal::detail::u128 emulated_value {value};
+
+        // Some platforms get this wrong where for example -99 < 340282366920938463463374607431768211408 evaluates to false
+        #ifdef _MSC_VER
+        #pragma warning(push)
+        #pragma warning(disable:4127)
+        #endif
+
+        #ifdef _MSC_VER
+        #pragma warning(pop)
+        #endif
+
+        BOOST_TEST((emulated_value & value2) == (builtin_value & value2));
+        BOOST_TEST((value2 & emulated_value) == (value2 & builtin_value));
     }
 }
 
@@ -570,6 +598,18 @@ int main()
     test_operator_or<std::uint32_t>();
     test_operator_or<std::uint64_t>();
     test_operator_or<unsigned __int128>();
+
+    test_operator_and<std::int8_t>();
+    test_operator_and<std::int16_t>();
+    test_operator_and<std::int32_t>();
+    test_operator_and<std::int64_t>();
+    test_operator_and<__int128>();
+
+    test_operator_and<std::uint8_t>();
+    test_operator_and<std::uint16_t>();
+    test_operator_and<std::uint32_t>();
+    test_operator_and<std::uint64_t>();
+    test_operator_and<unsigned __int128>();
 
     return boost::report_errors();
 }
