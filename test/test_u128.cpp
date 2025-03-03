@@ -269,8 +269,8 @@ void test_operator_less()
         #pragma warning(pop)
         #endif
 
-        BOOST_TEST(((value2 < emulated_value) == (emulated_value < value2)) ==
-                   ((value2 < builtin_value) == (builtin_value < value2)));
+        BOOST_TEST(((value2 < emulated_value) == (value2 < builtin_value)) ==
+                   ((emulated_value < value2) == (builtin_value < value2)));
     }
 }
 
@@ -305,8 +305,8 @@ void test_operator_le()
         #pragma warning(pop)
         #endif
 
-        BOOST_TEST(((value2 <= emulated_value) == (emulated_value <= value2)) ==
-                   ((value2 <= builtin_value) == (builtin_value <= value2)));
+        BOOST_TEST(((value2 <= emulated_value) == (value2 <= builtin_value)) ==
+                   ((emulated_value <= value2) == (builtin_value <= value2)));
     }
 }
 
@@ -341,8 +341,8 @@ void test_operator_greater()
         #pragma warning(pop)
         #endif
 
-        BOOST_TEST(((value2 > emulated_value) == (emulated_value > value2)) ==
-                   ((value2 > builtin_value) == (builtin_value > value2)));
+        BOOST_TEST(((value2 > emulated_value) == (value2 > builtin_value)) ==
+                   ((emulated_value > value2) == (builtin_value > value2)));
     }
 }
 
