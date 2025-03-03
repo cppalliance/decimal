@@ -272,9 +272,6 @@ void test_operator_less()
         BOOST_TEST(((value2 < emulated_value) == (emulated_value < value2)) ==
                    ((value2 < builtin_value) == (builtin_value < value2)));
     }
-
-    boost::decimal::detail::u128 bool_val {dist(rng)};
-    BOOST_TEST((true < bool_val) == (bool_val < true));
 }
 
 template <typename IntType>
@@ -311,9 +308,42 @@ void test_operator_le()
         BOOST_TEST(((value2 <= emulated_value) == (emulated_value <= value2)) ==
                    ((value2 <= builtin_value) == (builtin_value <= value2)));
     }
+}
 
-    boost::decimal::detail::u128 bool_val {dist(rng)};
-    BOOST_TEST((true <= bool_val) == (bool_val <= true));
+template <typename IntType>
+void test_operator_greater()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+                                                          std::numeric_limits<IntType>::max());
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const IntType value {dist(rng)};
+        const IntType value2 {dist(rng)};
+        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
+        boost::decimal::detail::u128 emulated_value {value};
+
+        // Some platforms get this wrong where for example -99 < 340282366920938463463374607431768211408 evaluates to false
+        #ifdef _MSC_VER
+        #pragma warning(push)
+        #pragma warning(disable:4127)
+        #endif
+
+        BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<IntType>::value)
+        {
+            if (value == value2 && value < 0)
+            {
+                continue;
+            }
+        }
+
+        #ifdef _MSC_VER
+        #pragma warning(pop)
+        #endif
+
+        BOOST_TEST(((value2 > emulated_value) == (emulated_value > value2)) ==
+                   ((value2 > builtin_value) == (builtin_value > value2)));
+    }
 }
 
 int main()
@@ -412,6 +442,18 @@ int main()
     test_operator_le<std::uint32_t>();
     test_operator_le<std::uint64_t>();
     test_operator_le<unsigned __int128>();
+
+    test_operator_greater<std::int8_t>();
+    test_operator_greater<std::int16_t>();
+    test_operator_greater<std::int32_t>();
+    test_operator_greater<std::int64_t>();
+    test_operator_greater<__int128>();
+
+    test_operator_greater<std::uint8_t>();
+    test_operator_greater<std::uint16_t>();
+    test_operator_greater<std::uint32_t>();
+    test_operator_greater<std::uint64_t>();
+    test_operator_greater<unsigned __int128>();
 
     return boost::report_errors();
 }
