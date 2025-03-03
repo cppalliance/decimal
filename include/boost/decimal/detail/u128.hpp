@@ -600,6 +600,63 @@ constexpr u128 operator~(const u128 rhs) noexcept
     return {~rhs.high, ~rhs.low};
 }
 
+//=====================================
+// Or Operator
+//=====================================
+
+template <typename SignedInteger, std::enable_if_t<std::is_integral<SignedInteger>::value && std::is_signed<SignedInteger>::value, bool> = true>
+constexpr u128 operator|(const u128 lhs, const SignedInteger rhs) noexcept
+{
+    return {lhs.high | (rhs < 0 ? ~UINT64_C(0) : UINT64_C(0)), lhs.low | static_cast<std::uint64_t>(rhs)};
+}
+
+template <typename SignedInteger, std::enable_if_t<std::is_integral<SignedInteger>::value && std::is_signed<SignedInteger>::value, bool> = true>
+constexpr u128 operator|(const SignedInteger lhs, const u128 rhs) noexcept
+{
+    return {rhs.high | (lhs < 0 ? ~UINT64_C(0) : UINT64_C(0)), rhs.low | static_cast<std::uint64_t>(lhs)};
+}
+
+template <typename UnsignedInteger, std::enable_if_t<std::is_integral<UnsignedInteger>::value && std::is_unsigned<UnsignedInteger>::value, bool> = true>
+constexpr u128 operator|(const u128 lhs, const UnsignedInteger rhs) noexcept
+{
+    return {lhs.high, lhs.low | static_cast<std::uint64_t>(rhs)};
+}
+
+template <typename UnsignedInteger, std::enable_if_t<std::is_integral<UnsignedInteger>::value && std::is_unsigned<UnsignedInteger>::value, bool> = true>
+constexpr u128 operator|(const UnsignedInteger lhs, const u128 rhs) noexcept
+{
+    return {rhs.high, rhs.low | static_cast<std::uint64_t>(lhs)};
+}
+
+constexpr u128 operator|(const u128 lhs, const u128 rhs) noexcept
+{
+    return {lhs.high | rhs.high, lhs.low | rhs.low};
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128 operator|(const u128 lhs, const __int128 rhs) noexcept
+{
+    return lhs | static_cast<u128>(rhs);
+}
+
+constexpr u128 operator|(const __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) | rhs;
+}
+
+constexpr u128 operator|(const u128 lhs, const unsigned __int128 rhs) noexcept
+{
+    return lhs | static_cast<u128>(rhs);
+}
+
+constexpr u128 operator|(const unsigned __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) | rhs;
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
