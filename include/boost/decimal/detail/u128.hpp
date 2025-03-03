@@ -771,6 +771,130 @@ constexpr u128 operator^(const unsigned __int128 lhs, const u128 rhs) noexcept
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
+//=====================================
+// Left Shift Operator
+//=====================================
+
+template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
+constexpr u128 operator<<(const u128 lhs, const Integer rhs) noexcept
+{
+    if (rhs < 0 || rhs >= 128)
+    {
+        return {0, 0};
+    }
+
+    if (rhs == 0)
+    {
+        return lhs;
+    }
+
+    if (rhs == 64)
+    {
+        return {lhs.low, 0};
+    }
+
+    if (rhs > 64)
+    {
+        return {lhs.low << (rhs - 64), 0};
+    }
+
+    return {
+        (lhs.high << rhs) | (lhs.low >> (64 - rhs)),
+        lhs.low << rhs
+    };
+}
+
+template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value && (sizeof(Integer) * 8 > 16), bool> = true>
+constexpr Integer operator<<(const Integer lhs, const u128 rhs) noexcept
+{
+    constexpr auto bit_width = sizeof(Integer) * 8;
+
+    if (rhs.high > UINT64_C(0) || rhs.low >= bit_width)
+    {
+        return 0;
+    }
+
+    return lhs << rhs.low;
+}
+
+template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value && (sizeof(Integer) * 8 <= 16) && std::is_signed<Integer>::value, bool> = true>
+constexpr int operator<<(const Integer lhs, const u128 rhs) noexcept
+{
+    constexpr auto bit_width = sizeof(Integer) * 8;
+
+    if (rhs.high > UINT64_C(0) || rhs.low >= bit_width)
+    {
+        return 0;
+    }
+
+    return static_cast<int>(lhs) << rhs.low;
+}
+
+template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value && (sizeof(Integer) * 8 <= 16) && std::is_unsigned<Integer>::value, bool> = true>
+constexpr unsigned operator<<(const Integer lhs, const u128 rhs) noexcept
+{
+    constexpr auto bit_width = sizeof(Integer) * 8;
+
+    if (rhs.high > UINT64_C(0) || rhs.low >= bit_width)
+    {
+        return 0;
+    }
+
+    return static_cast<unsigned>(lhs) << rhs.low;
+}
+
+constexpr u128 operator<<(const u128 lhs, const u128 rhs) noexcept
+{
+    if (rhs >= 128)
+    {
+        return {0, 0};
+    }
+
+    if (rhs.low == 0)
+    {
+        return lhs;
+    }
+
+    if (rhs.low == 64)
+    {
+        return {lhs.low, 0};
+    }
+
+    if (rhs.low > 64)
+    {
+        return {lhs.low << (rhs.low - 64), 0};
+    }
+
+    return {
+        (lhs.high << rhs.low) | (lhs.low >> (64 - rhs.low)),
+        lhs.low << rhs.low
+    };
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128 operator<<(const u128 lhs, const __int128 rhs) noexcept
+{
+    return lhs << static_cast<u128>(rhs);
+}
+
+constexpr __int128 operator<<(const __int128 lhs, const u128 rhs) noexcept
+{
+    return lhs << static_cast<__int128>(rhs);
+}
+
+constexpr u128 operator<<(const u128 lhs, const unsigned __int128 rhs) noexcept
+{
+    return lhs << static_cast<u128>(rhs);
+}
+
+constexpr unsigned __int128 operator<<(const unsigned __int128 lhs, const u128 rhs) noexcept
+{
+    return lhs << static_cast<unsigned __int128>(rhs);
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
