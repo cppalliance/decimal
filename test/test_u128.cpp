@@ -382,6 +382,32 @@ void test_operator_ge()
     }
 }
 
+template <typename IntType = unsigned __int128>
+void test_operator_not()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+                                                          std::numeric_limits<IntType>::max());
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const IntType value {dist(rng)};
+        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
+        boost::decimal::detail::u128 emulated_value {value};
+
+        // Some platforms get this wrong where for example -99 < 340282366920938463463374607431768211408 evaluates to false
+        #ifdef _MSC_VER
+        #pragma warning(push)
+        #pragma warning(disable:4127)
+        #endif
+
+        #ifdef _MSC_VER
+        #pragma warning(pop)
+        #endif
+
+        BOOST_TEST(~emulated_value == ~builtin_value);
+    }
+}
+
 int main()
 {
     test_arithmetic_constructor<std::int8_t>();
@@ -502,6 +528,8 @@ int main()
     test_operator_ge<std::uint32_t>();
     test_operator_ge<std::uint64_t>();
     test_operator_ge<unsigned __int128>();
+
+    test_operator_not();
 
     return boost::report_errors();
 }

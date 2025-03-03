@@ -215,6 +215,10 @@ constexpr u128::operator __float128() const noexcept
 
 #endif // BOOST_DECIMAL_HAS_FLOAT128
 
+//=====================================
+// Unary Operators
+//=====================================
+
 constexpr u128 operator+(const u128 value) noexcept
 {
     return value;
@@ -224,6 +228,10 @@ constexpr u128 operator-(const u128 value) noexcept
 {
     return u128{~value.high + static_cast<std::uint64_t>(value.low == UINT64_C(0)), ~value.low + UINT64_C(1)};
 }
+
+//=====================================
+// Equality Operators
+//=====================================
 
 constexpr bool operator==(const u128 lhs, const bool rhs) noexcept
 {
@@ -288,6 +296,10 @@ constexpr bool operator==(const unsigned __int128 lhs, const u128 rhs) noexcept
 
 #endif
 
+//=====================================
+// Inequality Operators
+//=====================================
+
 constexpr bool operator!=(const u128 lhs, const bool rhs) noexcept
 {
     return lhs.high != UINT64_C(0) || lhs.low != static_cast<std::uint64_t>(rhs);
@@ -351,6 +363,10 @@ constexpr bool operator!=(const unsigned __int128 lhs, const u128 rhs) noexcept
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
+//=====================================
+// Less than Operators
+//=====================================
+
 template <typename SignedInteger, std::enable_if_t<std::is_integral<SignedInteger>::value && std::is_signed<SignedInteger>::value, bool> = true>
 constexpr bool operator<(const u128 lhs, const SignedInteger rhs) noexcept
 {
@@ -403,6 +419,10 @@ constexpr bool operator<(const unsigned __int128 lhs, const u128 rhs) noexcept
 }
 
 #endif // BOOST_DECIMAL_HAS_INT128
+
+//=====================================
+// Less-equal Operators
+//=====================================
 
 template <typename SignedInteger, std::enable_if_t<std::is_integral<SignedInteger>::value && std::is_signed<SignedInteger>::value, bool> = true>
 constexpr bool operator<=(const u128 lhs, const SignedInteger rhs) noexcept
@@ -457,6 +477,10 @@ constexpr bool operator<=(const unsigned __int128 lhs, const u128 rhs) noexcept
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
+//=====================================
+// Greater Than Operators
+//=====================================
+
 template <typename SignedInteger, std::enable_if_t<std::is_integral<SignedInteger>::value && std::is_signed<SignedInteger>::value, bool> = true>
 constexpr bool operator>(const u128 lhs, const SignedInteger rhs) noexcept
 {
@@ -510,6 +534,10 @@ constexpr bool operator>(const unsigned __int128 lhs, const u128 rhs) noexcept
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
+//=====================================
+// Greater-equal Operators
+//=====================================
+
 template <typename SignedInteger, std::enable_if_t<std::is_integral<SignedInteger>::value && std::is_signed<SignedInteger>::value, bool> = true>
 constexpr bool operator>=(const u128 lhs, const SignedInteger rhs) noexcept
 {
@@ -562,6 +590,15 @@ constexpr bool operator>=(const unsigned __int128 lhs, const u128 rhs) noexcept
 }
 
 #endif // BOOST_DECIMAL_HAS_INT128
+
+//=====================================
+// Not Operator
+//=====================================
+
+constexpr u128 operator~(const u128 rhs) noexcept
+{
+    return {~rhs.high, ~rhs.low};
+}
 
 } // namespace detail
 } // namespace decimal
