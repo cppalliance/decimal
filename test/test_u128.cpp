@@ -700,10 +700,10 @@ int main()
     test_operator_right_shift<std::uint64_t>();
     test_operator_right_shift<unsigned __int128>();
 
-    //test_operator_add<std::int8_t>();
-    //test_operator_add<std::int16_t>();
-    //test_operator_add<std::int32_t>();
-    //test_operator_add<std::int64_t>();
+    test_operator_add<std::int8_t>();
+    test_operator_add<std::int16_t>();
+    test_operator_add<std::int32_t>();
+    test_operator_add<std::int64_t>();
     test_operator_add<__int128>();
 
     test_operator_add<std::uint8_t>();
