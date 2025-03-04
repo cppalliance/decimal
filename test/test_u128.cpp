@@ -535,6 +535,26 @@ void test_operator_sub()
     }
 }
 
+template <typename IntType>
+void test_operator_mul()
+{
+    const auto root_max {static_cast<IntType>(std::sqrt(std::numeric_limits<IntType>::max()))};
+    const auto root_min {std::is_unsigned<IntType>::value ? 0 : -root_max};
+
+    boost::random::uniform_int_distribution<IntType> dist(root_min, root_max);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        const IntType value {dist(rng)};
+        const IntType value2 {dist(rng)};
+        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
+        boost::decimal::detail::u128 emulated_value {value};
+
+        BOOST_TEST((emulated_value * value2) == (builtin_value * value2));
+        BOOST_TEST((value2 * emulated_value) == (value2 * builtin_value));
+    }
+}
+
 int main()
 {
     test_arithmetic_constructor<std::int8_t>();
@@ -741,6 +761,18 @@ int main()
     test_operator_sub<std::uint32_t>();
     test_operator_sub<std::uint64_t>();
     test_operator_sub<unsigned __int128>();
+
+    //test_operator_mul<std::int8_t>();
+    //test_operator_mul<std::int16_t>();
+    //test_operator_mul<std::int32_t>();
+    //test_operator_mul<std::int64_t>();
+    test_operator_mul<__int128>();
+
+    //test_operator_mul<std::uint8_t>();
+    //test_operator_mul<std::uint16_t>();
+    //test_operator_mul<std::uint32_t>();
+    //test_operator_mul<std::uint64_t>();
+    test_operator_mul<unsigned __int128>();
 
     return boost::report_errors();
 }
