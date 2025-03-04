@@ -1470,6 +1470,80 @@ constexpr u128 operator-(const UnsignedInteger lhs, const u128 rhs) noexcept
     return u128{UINT64_C(0), lhs} - rhs;
 }
 
+template <typename SignedInteger, std::enable_if_t<std::is_signed<SignedInteger>::value, bool> = true>
+constexpr u128 operator-(const u128 lhs, const SignedInteger rhs) noexcept
+{
+    if (rhs < 0)
+    {
+        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+        if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+        {
+            return impl::default_add(lhs, static_cast<std::uint64_t>(rhs));
+        }
+        else
+        {
+            #if defined(__aarch64__) || defined(_M_ARM64)
+
+            return impl::arm_asm_add(lhs, static_cast<std::uint64_t>(rhs));
+
+            #elif defined(BOOST_DECIMAL_ADD_CARRY)
+
+            return impl::adx_add(lhs, static_cast<std::uint64_t>(rhs));
+
+            #else
+
+            return impl::default_add(lhs, static_cast<std::uint64_t>(rhs));
+
+            #endif
+        }
+
+        #else
+
+        return impl::default_add(lhs, static_cast<std::uint64_t>(rhs));
+
+        #endif
+    }
+    else
+    {
+        const auto unsigned_rhs {detail::make_positive_unsigned(rhs)};
+        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+        if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+        {
+            return impl::default_sub(lhs, unsigned_rhs);
+        }
+        else
+        {
+            #if defined(__aarch64__) || defined(_M_ARM64)
+
+            return impl::arm_asm_sub(lhs, unsigned_rhs);
+
+            #elif defined(BOOST_DECIMAL_ADD_CARRY)
+
+            return impl::adx_sub(lhs, unsigned_rhs);
+
+            #else
+
+            return impl::default_sub(lhs, unsigned_rhs);
+
+            #endif
+        }
+
+        #else
+
+        return impl::default_sub(lhs, unsigned_rhs);
+
+        #endif
+    }
+}
+
+template <typename SignedInteger, std::enable_if_t<std::is_signed<SignedInteger>::value, bool> = true>
+constexpr u128 operator-(const SignedInteger lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) - rhs;
+}
+
 #ifdef BOOST_DECIMAL_HAS_INT128
 
 constexpr u128 operator-(const u128 lhs, const __int128 rhs) noexcept
