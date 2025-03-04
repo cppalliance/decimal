@@ -139,6 +139,10 @@ public:
     explicit constexpr operator __float128() const noexcept;
     #endif // BOOST_DECIMAL_HAS_FLOAT128
 
+    // Prefix and postfix increment
+    constexpr u128& operator++() noexcept;
+    constexpr u128& operator++(int) noexcept;
+
     // Compound Addition Operators
     constexpr u128& operator+=(std::uint8_t rhs) noexcept;
     constexpr u128& operator+=(std::uint16_t rhs) noexcept;
@@ -247,6 +251,25 @@ constexpr u128::operator __float128() const noexcept
 }
 
 #endif // BOOST_DECIMAL_HAS_FLOAT128
+
+//=====================================
+// Increment Operators
+//=====================================
+
+constexpr u128& u128::operator++() noexcept
+{
+    if (++low == UINT64_C(0))
+    {
+        ++high;
+    }
+
+    return *this;
+}
+
+constexpr u128& u128::operator++(int) noexcept
+{
+    return ++(*this);
+}
 
 //=====================================
 // Unary Operators
