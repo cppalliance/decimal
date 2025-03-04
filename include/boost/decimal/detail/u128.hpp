@@ -1050,6 +1050,30 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_add(const u128 lhs, const u128
     return temp;
 }
 
+#if defined(__aarch64__) || defined(_M_ARM64)
+
+// Inline ASM is not constexpr until C++20 so we offload into this function
+// in the non-constant evaluated case.
+BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_add(const u128 lhs, const u128 rhs) noexcept
+{
+    std::uint64_t result_low {};
+    std::uint64_t result_high {};
+
+    // Use inline assembly to access the carry flag directly
+    // Roughly equivalent to the ADX instructions below for x64 platforms
+    __asm__ volatile(
+        "adds %0, %2, %3\n"  // adds sets carry flag if overflow occurs
+        "adc %1, %4, %5\n"   // adc adds with carry from previous operation
+        : "=r" (result_low), "=r" (result_high)
+        : "r" (lhs.low), "r" (rhs.low), "r" (lhs.high), "r" (rhs.high)
+        : "cc"               // clobbering condition codes (flags)
+    );
+
+    return {result_high, result_low};
+}
+
+#endif
+
 } // namespace impl
 
 constexpr u128 operator+(const u128 lhs, const u128 rhs) noexcept
@@ -1062,22 +1086,9 @@ constexpr u128 operator+(const u128 lhs, const u128 rhs) noexcept
     }
     else
     {
-        #if (defined(__aarch64__) && __cplusplus >= 202002L) || (defined(_M_ARM64) && _MSVC_LANG >= 202002L)
+        #if defined(__aarch64__) || defined(_M_ARM64)
 
-        std::uint64_t result_low {};
-        std::uint64_t result_high {};
-
-        // Use inline assembly to access the carry flag directly
-        // Roughly equivalent to the ADX instructions below for x64 platforms
-        __asm__ volatile(
-            "adds %0, %2, %3\n"  // adds sets carry flag if overflow occurs
-            "adc %1, %4, %5\n"   // adc adds with carry from previous operation
-            : "=r" (result_low), "=r" (result_high)
-            : "r" (lhs.low), "r" (rhs.low), "r" (lhs.high), "r" (rhs.high)
-            : "cc"               // clobbering condition codes (flags)
-        );
-
-        return {result_high, result_low};
+        return impl::arm_asm_add(lhs, rhs);
 
         #elif defined(BOOST_DECIMAL_ADD_CARRY)
 
