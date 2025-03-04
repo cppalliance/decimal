@@ -98,6 +98,7 @@
 #  elif defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
 #    define BOOST_DECIMAL_ADD_CARRY _addcarry_u64
 #  endif
+#  define BOOST_DECIMAL_SUB_BORROW _subborrow_u64
 #elif defined(__x86_64__)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
 #    include <x86intrin.h>
@@ -108,6 +109,7 @@
 #  else
 #    define BOOST_DECIMAL_ADD_CARRY _addcarry_u64
 #  endif
+#  define BOOST_DECIMAL_SUB_BORROW _subborrow_u64
 #elif defined(__ARM_NEON__)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
 #    include <arm_neon.h>
