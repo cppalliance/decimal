@@ -1430,6 +1430,70 @@ constexpr u128 operator+(const unsigned __int128 lhs, const u128 rhs) noexcept
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
+template <typename UnsignedInteger, std::enable_if_t<std::is_unsigned<UnsignedInteger>::value || std::is_same<UnsignedInteger, u128>::value, bool> = true>
+constexpr u128 operator-(const u128 lhs, const UnsignedInteger rhs) noexcept
+{
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return impl::default_sub(lhs, rhs);
+    }
+    else
+    {
+        #if defined(__aarch64__) || defined(_M_ARM64)
+
+        return impl::arm_asm_sub(lhs, rhs);
+
+        #elif defined(BOOST_DECIMAL_ADD_CARRY)
+
+        return impl::adx_sub(lhs, rhs);
+
+        #else
+
+        return impl::default_sub(lhs, rhs);
+
+        #endif
+    }
+
+    #else
+
+    return impl::default_sub(lhs, rhs);
+
+    #endif
+}
+
+template <typename UnsignedInteger, std::enable_if_t<std::is_unsigned<UnsignedInteger>::value, bool> = true>
+constexpr u128 operator-(const UnsignedInteger lhs, const u128 rhs) noexcept
+{
+    // The only real viable way to do this is to promote lhs and perform 128-bit sub
+    return u128{UINT64_C(0), lhs} - rhs;
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128 operator-(const u128 lhs, const __int128 rhs) noexcept
+{
+    return lhs - static_cast<u128>(rhs);
+}
+
+constexpr u128 operator-(const __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) - rhs;
+}
+
+constexpr u128 operator-(const u128 lhs, const unsigned __int128 rhs) noexcept
+{
+    return lhs - static_cast<u128>(rhs);
+}
+
+constexpr u128 operator-(const unsigned __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) - rhs;
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
