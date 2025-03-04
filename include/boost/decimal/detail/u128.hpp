@@ -138,6 +138,22 @@ public:
     #ifdef BOOST_DECIMAL_HAS_FLOAT128
     explicit constexpr operator __float128() const noexcept;
     #endif // BOOST_DECIMAL_HAS_FLOAT128
+
+    // Compound operators
+    constexpr u128& operator+=(std::uint8_t rhs) noexcept;
+    constexpr u128& operator+=(std::uint16_t rhs) noexcept;
+    constexpr u128& operator+=(std::uint32_t rhs) noexcept;
+    constexpr u128& operator+=(std::uint64_t rhs) noexcept;
+
+    constexpr u128& operator+=(std::int8_t rhs) noexcept;
+    constexpr u128& operator+=(std::int16_t rhs) noexcept;
+    constexpr u128& operator+=(std::int32_t rhs) noexcept;
+    constexpr u128& operator+=(std::int64_t rhs) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    constexpr u128& operator+=(__int128 rhs) noexcept;
+    constexpr u128& operator+=(unsigned __int128 rhs) noexcept;
+    #endif // BOOST_DECIMAL_HAS_INT128
 };
 
 // Signed assignment operators
@@ -1429,6 +1445,78 @@ constexpr u128 operator+(const unsigned __int128 lhs, const u128 rhs) noexcept
 }
 
 #endif // BOOST_DECIMAL_HAS_INT128
+
+//=====================================
+// Compound Addition Operator
+//=====================================
+
+constexpr u128& u128::operator+=(const std::uint8_t rhs) noexcept
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator+=(const std::uint16_t rhs) noexcept
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator+=(const std::uint32_t rhs) noexcept
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator+=(const std::uint64_t rhs) noexcept
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator+=(const std::int8_t rhs) noexcept
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator+=(const std::int16_t rhs) noexcept
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator+=(const std::int32_t rhs) noexcept
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator+=(const std::int64_t rhs) noexcept
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128& u128::operator+=(const __int128 rhs) noexcept
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator+=(const unsigned __int128 rhs) noexcept
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+#endif
+
+//=====================================
+// Subtraction Operator
+//=====================================
 
 template <typename UnsignedInteger, std::enable_if_t<std::is_unsigned<UnsignedInteger>::value || std::is_same<UnsignedInteger, u128>::value, bool> = true>
 constexpr u128 operator-(const u128 lhs, const UnsignedInteger rhs) noexcept
