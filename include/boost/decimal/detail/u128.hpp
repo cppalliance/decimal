@@ -1783,6 +1783,21 @@ constexpr u128 default_mul(const u128 lhs, const u128 rhs) noexcept
     return result;
 }
 
+constexpr u128 default_mul(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    const auto c = static_cast<std::uint64_t>(rhs >> 32);
+    const auto d = static_cast<std::uint64_t>(rhs & UINT32_MAX);
+    const auto a = static_cast<std::uint64_t>(lhs.low >> 32);
+    const auto b = static_cast<std::uint64_t>(lhs.low & UINT32_MAX);
+
+    u128 result{lhs.high * rhs, b * d};
+    result += u128{0, a * d} << 32;
+    result += u128{0, b * c} << 32;
+
+    return result;
+}
+
+
 #if defined(__aarch64__) || defined(_M_ARM64)
 
 BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_mul(const u128 lhs, const u128 rhs) noexcept
@@ -1808,6 +1823,32 @@ BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_mul(const u128 lhs, const u128 rhs) noex
         // Input operands
         : [lhs_low] "r" (lhs.low), [lhs_high] "r" (lhs.high),
           [rhs_low] "r" (rhs.low), [rhs_high] "r" (rhs.high)
+        // Clobbered registers
+        : "x8", "cc"
+    );
+
+    return result;
+}
+
+BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_mul(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    u128 result;
+
+    // Does not compensate or track overflow of the high word
+    __asm__ volatile(
+        // Multiply lhs.low * rhs
+        "mul %[result_low], %[lhs_low], %[rhs]\n"       // result.low = lhs.low * rhs (low 64 bits)
+        "umulh %[result_high], %[lhs_low], %[rhs]\n"    // result.high = lhs.low * rhs (high 64 bits)
+
+        // Multiply lhs.high * rhs and add to result.high
+        "mul x8, %[lhs_high], %[rhs]\n"                 // x8 = lhs.high * rhs
+        "adds %[result_high], %[result_high], x8\n"     // result.high += x8 (with carry)
+
+        // Output operands
+        : [result_low] "=&r" (result.low), [result_high] "=&r" (result.high)
+        // Input operands
+        : [lhs_low] "r" (lhs.low), [lhs_high] "r" (lhs.high),
+          [rhs] "r" (rhs)
         // Clobbered registers
         : "x8", "cc"
     );
@@ -1849,6 +1890,32 @@ BOOST_DECIMAL_FORCE_INLINE u128 x64_mul(const u128 lhs, const u128 rhs) noexcept
     return result;
 }
 
+BOOST_DECIMAL_FORCE_INLINE u128 x64_mul(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    u128 result;
+
+    __asm__ volatile(
+        // Multiply lhs.low * rhs
+        "movq %[lhs_low], %%rax\n"
+        "mulq %[rhs]\n"              // rdx:rax = lhs.low * rhs
+        "movq %%rax, %[result_low]\n"
+        "movq %%rdx, %%r8\n"         // Save high part in r8
+
+        // Multiply lhs.high * rhs and add to r8
+        "movq %[lhs_high], %%rax\n"
+        "mulq %[rhs]\n"              // rdx:rax = lhs.high * rhs
+        "addq %%rax, %%r8\n"
+        "movq %%r8, %[result_high]\n"
+
+        : [result_low] "=m" (result.low), [result_high] "=m" (result.high)
+        : [lhs_low] "m" (lhs.low), [lhs_high] "m" (lhs.high),
+          [rhs] "m" (rhs)
+        : "rax", "rdx", "r8", "cc"
+    );
+
+    return result;
+}
+
 #elif defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
 
 BOOST_DECIMAL_FORCE_INLINE u128 x64_mul(const u128 lhs, const u128 rhs) noexcept
@@ -1867,11 +1934,25 @@ BOOST_DECIMAL_FORCE_INLINE u128 x64_mul(const u128 lhs, const u128 rhs) noexcept
     return result;
 }
 
+BOOST_DECIMAL_FORCE_INLINE u128 x64_mul(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    u128 result;
+
+    // Multiply lhs.low * rhs (full 128-bit result)
+    result.low = _umul128(lhs.low, rhs, &result.high);
+
+    // Add lhs.high * rhs to result.high
+    BOOST_DECIMAL_ADD_CARRY(0, result.high, lhs.high * rhs, &result.high);
+
+    return result;
+}
+
 #endif
 
 } // namespace impl
 
-constexpr u128 operator*(const u128 lhs, const u128 rhs) noexcept
+template <typename UnsignedInteger, std::enable_if_t<std::is_unsigned<UnsignedInteger>::value || std::is_same<UnsignedInteger, u128>::value, bool> = true>
+constexpr u128 operator*(const u128 lhs, const UnsignedInteger rhs) noexcept
 {
     #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
 
@@ -1899,6 +1980,39 @@ constexpr u128 operator*(const u128 lhs, const u128 rhs) noexcept
     #else
 
     return impl::default_mul(lhs, rhs);
+
+    #endif
+}
+
+template <typename UnsignedInteger, std::enable_if_t<std::is_unsigned<UnsignedInteger>::value, bool> = true>
+constexpr u128 operator*(const UnsignedInteger lhs, const u128 rhs) noexcept
+{
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return impl::default_mul(rhs, static_cast<std::uint64_t>(lhs));
+    }
+    else
+    {
+        #if defined(__aarch64__) || defined(_M_ARM64)
+
+        return impl::arm_asm_mul(rhs, static_cast<std::uint64_t>(lhs));
+
+        #elif defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
+
+        return impl::x64_mul(rhs, static_cast<std::uint64_t>(lhs));
+
+        #else
+
+        return impl::default_mul(rhs, static_cast<std::uint64_t>(lhs));
+
+        #endif
+    }
+
+    #else
+
+    return impl::default_mul(rhs, static_cast<std::uint64_t>(lhs));
 
     #endif
 }
