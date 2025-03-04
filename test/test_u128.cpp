@@ -706,10 +706,10 @@ int main()
     //test_operator_add<std::int64_t>();
     test_operator_add<__int128>();
 
-    //test_operator_add<std::uint8_t>();
-    //test_operator_add<std::uint16_t>();
-    //test_operator_add<std::uint32_t>();
-    //test_operator_add<std::uint64_t>();
+    test_operator_add<std::uint8_t>();
+    test_operator_add<std::uint16_t>();
+    test_operator_add<std::uint32_t>();
+    test_operator_add<std::uint64_t>();
     test_operator_add<unsigned __int128>();
 
     return boost::report_errors();

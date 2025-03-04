@@ -1025,8 +1025,7 @@ constexpr unsigned __int128 operator>>(const unsigned __int128 lhs, const u128 r
 
 namespace impl {
 
-template <typename T, std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
-BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_add(const u128 lhs, const T rhs) noexcept
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_add(const u128 lhs, const std::uint64_t rhs) noexcept
 {
     u128 temp {lhs.high, lhs.low + rhs};
 
@@ -1072,11 +1071,74 @@ BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_add(const u128 lhs, const u128 rhs) noex
     return {result_high, result_low};
 }
 
-#endif
+BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_add(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    std::uint64_t result_low {};
+    std::uint64_t result_high {};
+
+    // Use inline assembly to access the carry flag directly
+    // Roughly equivalent to the ADX instructions below for x64 platforms
+    __asm__ volatile(
+        "adds %0, %2, %3\n"  // adds sets carry flag if overflow occurs
+        "adc %1, %4, xzr\n"   // add carry to high
+        : "=r" (result_low), "=r" (result_high)
+        : "r" (lhs.low), "r" (rhs), "r" (lhs.high)
+        : "cc"               // clobbering condition codes (flags)
+    );
+
+    return {result_high, result_low};
+}
+
+BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_sub(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    std::uint64_t result_low {};
+    std::uint64_t result_high {};
+
+    // Use inline assembly to access the carry flag directly
+    // Roughly equivalent to the ADX instructions below for x64 platforms
+    __asm__ volatile(
+        "subs %0, %2, %3\n"  // subs sets carry flag if underflow occurs
+        "sbc %1, %4, xzr\n"   // subtract carry from high value
+        : "=r" (result_low), "=r" (result_high)
+        : "r" (lhs.low), "r" (rhs), "r" (lhs.high)
+        : "cc"               // clobbering condition codes (flags)
+    );
+
+    return {result_high, result_low};
+}
+
+#endif // defined(__aarch64__) || defined(_M_ARM64)
+
+#ifdef BOOST_DECIMAL_ADD_CARRY
+
+BOOST_DECIMAL_FORCE_INLINE u128 adx_add(const u128 lhs, const u128 rhs) noexcept
+{
+    // Intel ADX instructions are specifically for Multi-Precision Arithmetic
+    unsigned long long int res_low {};
+    unsigned long long int res_high {};
+
+    const unsigned char carry {BOOST_DECIMAL_ADD_CARRY(0, lhs.low, rhs.low, &res_low)};
+    BOOST_DECIMAL_ADD_CARRY(carry, lhs.high, rhs.high, &res_high);
+
+    return {res_high, res_low};
+}
+
+BOOST_DECIMAL_FORCE_INLINE u128 adx_add(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    // Intel ADX instructions are specifically for Multi-Precision Arithmetic
+    unsigned long long int res_low {};
+    const unsigned char carry {BOOST_DECIMAL_ADD_CARRY(0, lhs.low, rhs, &res_low)};
+
+    // Unconditionally add the carry to lhs.high since we don't have multiple additions here
+    return {lhs.high + static_cast<std::uint64_t>(carry), res_low};
+}
+
+#endif // BOOST_DECIMAL_ADD_CARRY
 
 } // namespace impl
 
-constexpr u128 operator+(const u128 lhs, const u128 rhs) noexcept
+template <typename UnsignedInteger, std::enable_if_t<std::is_unsigned<UnsignedInteger>::value || std::is_same<UnsignedInteger, u128>::value, bool> = true>
+constexpr u128 operator+(const u128 lhs, const UnsignedInteger rhs) noexcept
 {
     #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
 
@@ -1092,14 +1154,7 @@ constexpr u128 operator+(const u128 lhs, const u128 rhs) noexcept
 
         #elif defined(BOOST_DECIMAL_ADD_CARRY)
 
-        // Intel ADX instructions are specifically for Multi-Precision Arithmetic
-        unsigned long long int res_low {};
-        unsigned long long int res_high {};
-
-        const unsigned char carry {BOOST_DECIMAL_ADD_CARRY(0, lhs.low, rhs.low, &res_low)};
-        BOOST_DECIMAL_ADD_CARRY(carry, lhs.high, rhs.high, &res_high);
-
-        return {res_high, res_low};
+        return impl::adx_add(lhs, rhs);
 
         #else
 
@@ -1111,6 +1166,40 @@ constexpr u128 operator+(const u128 lhs, const u128 rhs) noexcept
     #else
 
     return impl::default_add(lhs, rhs);
+
+    #endif
+}
+
+// Since unsigned addition is trivially commutative we just reverse the order of the operands into the impl functions
+template <typename UnsignedInteger, std::enable_if_t<std::is_unsigned<UnsignedInteger>::value, bool> = true>
+constexpr u128 operator+(const UnsignedInteger lhs, const u128 rhs) noexcept
+{
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return impl::default_add(rhs, lhs);
+    }
+    else
+    {
+        #if defined(__aarch64__) || defined(_M_ARM64)
+
+        return impl::arm_asm_add(rhs, lhs);
+
+        #elif defined(BOOST_DECIMAL_ADD_CARRY)
+
+        return impl::adx_add(rhs, lhs);
+
+        #else
+
+        return impl::default_add(rhs, lhs);
+
+        #endif
+    }
+
+    #else
+
+    return impl::default_add(rhs, lhs);
 
     #endif
 }
