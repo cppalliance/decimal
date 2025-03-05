@@ -48,19 +48,19 @@ void test_traits()
 {
     using namespace boost::decimal::detail::impl;
 
-    static_assert(is_signed_integer_v<std::int8_t> && !is_unsigned_integer_v<std::int8_t>);
-    static_assert(is_signed_integer_v<std::int16_t> && !is_unsigned_integer_v<std::int16_t>);
-    static_assert(is_signed_integer_v<std::int32_t> && !is_unsigned_integer_v<std::int32_t>);
-    static_assert(is_signed_integer_v<std::int64_t> && !is_unsigned_integer_v<std::int64_t>);
+    static_assert(is_signed_integer_v<std::int8_t> && !is_unsigned_integer_v<std::int8_t>, "Wrong answer");
+    static_assert(is_signed_integer_v<std::int16_t> && !is_unsigned_integer_v<std::int16_t>, "Wrong answer");
+    static_assert(is_signed_integer_v<std::int32_t> && !is_unsigned_integer_v<std::int32_t>, "Wrong answer");
+    static_assert(is_signed_integer_v<std::int64_t> && !is_unsigned_integer_v<std::int64_t>, "Wrong answer");
 
-    static_assert(!is_signed_integer_v<std::uint8_t> && is_unsigned_integer_v<std::uint8_t>);
-    static_assert(!is_signed_integer_v<std::uint16_t> && is_unsigned_integer_v<std::uint16_t>);
-    static_assert(!is_signed_integer_v<std::uint32_t> && is_unsigned_integer_v<std::uint32_t>);
-    static_assert(!is_signed_integer_v<std::uint64_t> && is_unsigned_integer_v<std::uint64_t>);
+    static_assert(!is_signed_integer_v<std::uint8_t> && is_unsigned_integer_v<std::uint8_t>, "Wrong answer");
+    static_assert(!is_signed_integer_v<std::uint16_t> && is_unsigned_integer_v<std::uint16_t>, "Wrong answer");
+    static_assert(!is_signed_integer_v<std::uint32_t> && is_unsigned_integer_v<std::uint32_t>, "Wrong answer");
+    static_assert(!is_signed_integer_v<std::uint64_t> && is_unsigned_integer_v<std::uint64_t>, "Wrong answer");
 
-    static_assert(!is_signed_integer_v<float> && !is_unsigned_integer_v<float>);
-    static_assert(!is_signed_integer_v<double> && !is_unsigned_integer_v<double>);
-    static_assert(!is_signed_integer_v<long double> && !is_unsigned_integer_v<long double>);
+    static_assert(!is_signed_integer_v<float> && !is_unsigned_integer_v<float>, "Wrong answer");
+    static_assert(!is_signed_integer_v<double> && !is_unsigned_integer_v<double>, "Wrong answer");
+    static_assert(!is_signed_integer_v<long double> && !is_unsigned_integer_v<long double>, "Wrong answer");
 }
 
 template <typename IntType>
@@ -783,10 +783,10 @@ int main()
     test_operator_sub<std::uint64_t>();
     test_operator_sub<unsigned __int128>();
 
-    //test_operator_mul<std::int8_t>();
-    //test_operator_mul<std::int16_t>();
-    //test_operator_mul<std::int32_t>();
-    //test_operator_mul<std::int64_t>();
+    test_operator_mul<std::int8_t>();
+    test_operator_mul<std::int16_t>();
+    test_operator_mul<std::int32_t>();
+    test_operator_mul<std::int64_t>();
     test_operator_mul<__int128>();
 
     test_operator_mul<std::uint8_t>();
