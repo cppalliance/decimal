@@ -34,7 +34,7 @@ namespace impl {
 template <typename T>
 struct signed_integer
 {
-    constexpr bool value = std::is_signed<T>::value && std::is_integral<T>::value;
+    static constexpr bool value = std::is_signed<T>::value && std::is_integral<T>::value;
 };
 
 template <typename T>
@@ -43,7 +43,7 @@ static constexpr bool is_signed_integer_v = signed_integer<T>::value;
 template <typename T>
 struct unsigned_integer
 {
-    constexpr bool value = std::is_unsigned<T>::value && std::is_integral<T>::value;
+    static constexpr bool value = std::is_unsigned<T>::value && std::is_integral<T>::value;
 };
 
 template <typename T>
@@ -84,10 +84,8 @@ public:
     constexpr u128(const std::uint64_t hi, const std::uint64_t lo) noexcept : low{lo}, high{hi} {}
 
     // Signed arithmetic constructors
-    explicit constexpr u128(const std::int8_t value) noexcept : low {static_cast<std::uint64_t>(value)}, high {value < 0 ? UINT64_MAX : UINT64_C(0)} {}
-    explicit constexpr u128(const std::int16_t value) noexcept : low {static_cast<std::uint64_t>(value)}, high {value < 0 ? UINT64_MAX : UINT64_C(0)} {}
-    explicit constexpr u128(const std::int32_t value) noexcept : low {static_cast<std::uint64_t>(value)}, high {value < 0 ? UINT64_MAX : UINT64_C(0)} {}
-    explicit constexpr u128(const std::int64_t value) noexcept : low {static_cast<std::uint64_t>(value)}, high {value < 0 ? UINT64_MAX : UINT64_C(0)} {}
+    template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+    explicit constexpr u128(const SignedInteger value) noexcept : low {static_cast<std::uint64_t>(value)}, high {value < 0 ? UINT64_MAX : UINT64_C(0)} {}
 
     #ifdef BOOST_DECIMAL_HAS_INT128
     explicit constexpr u128(const __int128 value) noexcept :
@@ -96,10 +94,8 @@ public:
     #endif // BOOST_DECIMAL_HAS_INT128
 
     // Unsigned arithmetic constructors
-    explicit constexpr u128(const std::uint8_t value) noexcept : low {static_cast<std::uint64_t>(value)}, high {UINT64_C(0)} {}
-    explicit constexpr u128(const std::uint16_t value) noexcept : low {static_cast<std::uint64_t>(value)}, high {UINT64_C(0)} {}
-    explicit constexpr u128(const std::uint32_t value) noexcept : low {static_cast<std::uint64_t>(value)}, high {UINT64_C(0)} {}
-    explicit constexpr u128(const std::uint64_t value) noexcept : low {static_cast<std::uint64_t>(value)}, high {UINT64_C(0)} {}
+    template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+    explicit constexpr u128(const UnsignedInteger value) noexcept : low {static_cast<std::uint64_t>(value)}, high {UINT64_C(0)} {}
 
     #ifdef BOOST_DECIMAL_HAS_INT128
     explicit constexpr u128(const unsigned __int128 value) noexcept :
@@ -108,20 +104,16 @@ public:
     #endif // BOOST_DECIMAL_HAS_INT128
 
     // Signed assignment operators
-    constexpr u128& operator=(std::int8_t value) noexcept;
-    constexpr u128& operator=(std::int16_t value) noexcept;
-    constexpr u128& operator=(std::int32_t value) noexcept;
-    constexpr u128& operator=(std::int64_t value) noexcept;
+    template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+    constexpr u128& operator=(SignedInteger value) noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
     constexpr u128& operator=(__int128 value) noexcept;
     #endif // BOOST_DECIMAL_HAS_INT128
 
     // Unsigned assignment operators
-    constexpr u128& operator=(std::uint8_t value) noexcept;
-    constexpr u128& operator=(std::uint16_t value) noexcept;
-    constexpr u128& operator=(std::uint32_t value) noexcept;
-    constexpr u128& operator=(std::uint64_t value) noexcept;
+    template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+    constexpr u128& operator=(UnsignedInteger value) noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
     constexpr u128& operator=(unsigned __int128 value) noexcept;
@@ -131,20 +123,16 @@ public:
     constexpr operator bool() const noexcept { return low || high; }
 
     // Conversion to signed integer types
-    explicit constexpr operator std::int8_t() const noexcept { return static_cast<std::int8_t>(low); }
-    explicit constexpr operator std::int16_t() const noexcept { return static_cast<std::int16_t>(low); }
-    explicit constexpr operator std::int32_t() const noexcept { return static_cast<std::int32_t>(low); }
-    explicit constexpr operator std::int64_t() const noexcept { return static_cast<std::int64_t>(low); }
+    template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+    explicit constexpr operator SignedInteger() const noexcept { return static_cast<SignedInteger>(low); }
 
     #ifdef BOOST_DECIMAL_HAS_INT128
     explicit constexpr operator __int128() const noexcept { return (static_cast<__int128>(high) << 64) + low; }
     #endif // BOOST_DECIMAL_HAS_INT128
 
     // Conversion to unsigned integer types
-    explicit constexpr operator std::uint8_t() const noexcept { return static_cast<std::uint8_t>(low); }
-    explicit constexpr operator std::uint16_t() const noexcept { return static_cast<std::uint16_t>(low); }
-    explicit constexpr operator std::uint32_t() const noexcept { return static_cast<std::uint32_t>(low); }
-    explicit constexpr operator std::uint64_t() const noexcept { return low; }
+    template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+    explicit constexpr operator UnsignedInteger() const noexcept { return static_cast<UnsignedInteger>(low); }
 
     #ifdef BOOST_DECIMAL_HAS_INT128
     explicit constexpr operator unsigned __int128() const noexcept { return (static_cast<unsigned __int128>(high) << 64U) + low; }
@@ -166,15 +154,11 @@ public:
     constexpr u128& operator++(int) noexcept;
 
     // Compound Addition Operators
-    constexpr u128& operator+=(std::uint8_t rhs) noexcept;
-    constexpr u128& operator+=(std::uint16_t rhs) noexcept;
-    constexpr u128& operator+=(std::uint32_t rhs) noexcept;
-    constexpr u128& operator+=(std::uint64_t rhs) noexcept;
+    template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+    constexpr u128& operator+=(SignedInteger rhs) noexcept;
 
-    constexpr u128& operator+=(std::int8_t rhs) noexcept;
-    constexpr u128& operator+=(std::int16_t rhs) noexcept;
-    constexpr u128& operator+=(std::int32_t rhs) noexcept;
-    constexpr u128& operator+=(std::int64_t rhs) noexcept;
+    template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+    constexpr u128& operator+=(UnsignedInteger rhs) noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
     constexpr u128& operator+=(__int128 rhs) noexcept;
@@ -182,15 +166,11 @@ public:
     #endif // BOOST_DECIMAL_HAS_INT128
 
     // Compound Subtraction Operators
-    constexpr u128& operator-=(std::uint8_t rhs) noexcept;
-    constexpr u128& operator-=(std::uint16_t rhs) noexcept;
-    constexpr u128& operator-=(std::uint32_t rhs) noexcept;
-    constexpr u128& operator-=(std::uint64_t rhs) noexcept;
+    template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+    constexpr u128& operator-=(SignedInteger rhs) noexcept;
 
-    constexpr u128& operator-=(std::int8_t rhs) noexcept;
-    constexpr u128& operator-=(std::int16_t rhs) noexcept;
-    constexpr u128& operator-=(std::int32_t rhs) noexcept;
-    constexpr u128& operator-=(std::int64_t rhs) noexcept;
+    template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+    constexpr u128& operator-=(UnsignedInteger rhs) noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
     constexpr u128& operator-=(__int128 rhs) noexcept;
@@ -199,28 +179,8 @@ public:
 };
 
 // Signed assignment operators
-constexpr u128& u128::operator=(const std::int8_t value) noexcept
-{
-    low = static_cast<std::uint64_t>(value);
-    high = value < 0 ? UINT64_MAX : UINT64_C(0);
-    return *this;
-}
-
-constexpr u128& u128::operator=(const std::int16_t value) noexcept
-{
-    low = static_cast<std::uint64_t>(value);
-    high = value < 0 ? UINT64_MAX : UINT64_C(0);
-    return *this;
-}
-
-constexpr u128& u128::operator=(const std::int32_t value) noexcept
-{
-    low = static_cast<std::uint64_t>(value);
-    high = value < 0 ? UINT64_MAX : UINT64_C(0);
-    return *this;
-}
-
-constexpr u128& u128::operator=(const std::int64_t value) noexcept
+template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool>>
+constexpr u128& u128::operator=(const SignedInteger value) noexcept
 {
     low = static_cast<std::uint64_t>(value);
     high = value < 0 ? UINT64_MAX : UINT64_C(0);
@@ -237,10 +197,8 @@ constexpr u128& u128::operator=(const __int128 value) noexcept
 #endif // BOOST_DECIMAL_HAS_INT128
 
 // Unsigned assignment operators
-constexpr u128& u128::operator=(const std::uint8_t value) noexcept { low = static_cast<std::uint64_t>(value); high = UINT64_C(0); return *this; }
-constexpr u128& u128::operator=(const std::uint16_t value) noexcept { low = static_cast<std::uint64_t>(value); high = UINT64_C(0); return *this; }
-constexpr u128& u128::operator=(const std::uint32_t value) noexcept { low = static_cast<std::uint64_t>(value); high = UINT64_C(0); return *this; }
-constexpr u128& u128::operator=(const std::uint64_t value) noexcept { low = static_cast<std::uint64_t>(value); high = UINT64_C(0); return *this; }
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool>>
+constexpr u128& u128::operator=(const UnsignedInteger value) noexcept { low = static_cast<std::uint64_t>(value); high = UINT64_C(0); return *this; }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 constexpr u128& u128::operator=(const unsigned __int128 value) noexcept { low = static_cast<std::uint64_t>(value & low_word_mask); high = static_cast<std::uint64_t>(value >> 64U); return *this; }
@@ -1511,49 +1469,15 @@ constexpr u128 operator+(const unsigned __int128 lhs, const u128 rhs) noexcept
 // Compound Addition Operator
 //=====================================
 
-constexpr u128& u128::operator+=(const std::uint8_t rhs) noexcept
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool>>
+constexpr u128& u128::operator+=(const UnsignedInteger rhs) noexcept
 {
     *this = *this + rhs;
     return *this;
 }
 
-constexpr u128& u128::operator+=(const std::uint16_t rhs) noexcept
-{
-    *this = *this + rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator+=(const std::uint32_t rhs) noexcept
-{
-    *this = *this + rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator+=(const std::uint64_t rhs) noexcept
-{
-    *this = *this + rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator+=(const std::int8_t rhs) noexcept
-{
-    *this = *this + rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator+=(const std::int16_t rhs) noexcept
-{
-    *this = *this + rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator+=(const std::int32_t rhs) noexcept
-{
-    *this = *this + rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator+=(const std::int64_t rhs) noexcept
+template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool>>
+constexpr u128& u128::operator+=(const SignedInteger rhs) noexcept
 {
     *this = *this + rhs;
     return *this;
@@ -1721,49 +1645,15 @@ constexpr u128 operator-(const unsigned __int128 lhs, const u128 rhs) noexcept
 // Compound Subtraction Operator
 //=====================================
 
-constexpr u128& u128::operator-=(const std::uint8_t rhs) noexcept
+template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool>>
+constexpr u128& u128::operator-=(const SignedInteger rhs) noexcept
 {
     *this = *this - rhs;
     return *this;
 }
 
-constexpr u128& u128::operator-=(const std::uint16_t rhs) noexcept
-{
-    *this = *this - rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator-=(const std::uint32_t rhs) noexcept
-{
-    *this = *this - rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator-=(const std::uint64_t rhs) noexcept
-{
-    *this = *this - rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator-=(const std::int8_t rhs) noexcept
-{
-    *this = *this - rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator-=(const std::int16_t rhs) noexcept
-{
-    *this = *this - rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator-=(const std::int32_t rhs) noexcept
-{
-    *this = *this - rhs;
-    return *this;
-}
-
-constexpr u128& u128::operator-=(const std::int64_t rhs) noexcept
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool>>
+constexpr u128& u128::operator-=(const UnsignedInteger rhs) noexcept
 {
     *this = *this - rhs;
     return *this;
