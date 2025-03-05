@@ -129,6 +129,10 @@ int main()
 
     // Two word operations
     {
+        std::cout << "\n---------------------------\n";
+        std::cout << "Two Word Operations\n";
+        std::cout << "---------------------------\n\n";
+
         const auto old_vector = generate_random_vector<false, uint128>();
         const auto new_vector = generate_random_vector<false, u128>();
         const auto builtin_vector = generate_random_vector<false, unsigned __int128>();
@@ -157,27 +161,35 @@ int main()
     }
     // Single word operations
     {
+        std::cout << "\n---------------------------\n";
+        std::cout << "One Word Operations\n";
+        std::cout << "---------------------------\n\n";
+
         const auto old_vector = generate_random_vector<true, uint128>();
         const auto new_vector = generate_random_vector<true, u128>();
         const auto builtin_vector = generate_random_vector<true, unsigned __int128>();
 
-        std::cout << std::endl;
-
-        test_two_element_operation(builtin_vector, std::plus<>(), "One word add", "Builtin");
-        test_two_element_operation(old_vector, std::plus<>(), "One word add", "Old");
-        test_two_element_operation(new_vector, std::plus<>(), "One word add", "New");
+        test_comparisons(builtin_vector, "builtin");
+        test_comparisons(old_vector, "old");
+        test_comparisons(new_vector, "new");
 
         std::cout << std::endl;
 
-        test_two_element_operation(builtin_vector, std::minus<>(), "One word sub", "Builtin");
-        test_two_element_operation(old_vector, std::minus<>(), "One word sub", "Old");
-        test_two_element_operation(new_vector, std::minus<>(), "One word sub", "New");
+        test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
+        test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
+        test_two_element_operation(new_vector, std::plus<>(), "add", "New");
 
         std::cout << std::endl;
 
-        test_two_element_operation(builtin_vector, std::multiplies<>(), "One word mul", "Builtin");
-        test_two_element_operation(old_vector, std::multiplies<>(), "One word mul", "Old");
-        test_two_element_operation(new_vector, std::multiplies<>(), "One word mul", "New");
+        test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
+        test_two_element_operation(old_vector, std::minus<>(), "sub", "Old");
+        test_two_element_operation(new_vector, std::minus<>(), "sub", "New");
+
+        std::cout << std::endl;
+
+        test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
+        test_two_element_operation(old_vector, std::multiplies<>(), "mul", "Old");
+        test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
 
         std::cout << std::endl;
     }
