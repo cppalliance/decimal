@@ -309,7 +309,17 @@ constexpr bool operator==(const UnsignedInteger lhs, const u128 rhs) noexcept
 
 constexpr bool operator==(const u128 lhs, const u128 rhs) noexcept
 {
+    // Intel and ARM like the values in opposite directions
+
+    #if defined(__aarch64__) || defined(_M_ARM64)
+
     return lhs.low == rhs.low && lhs.high == rhs.high;
+
+    #else
+
+    return lhs.high == rhs.high && lhs.low == rhs.low;
+
+    #endif
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
@@ -376,7 +386,15 @@ constexpr bool operator!=(const UnsignedInteger lhs, const u128 rhs) noexcept
 
 constexpr bool operator!=(const u128 lhs, const u128 rhs) noexcept
 {
+    #if defined(__aarch64__) || defined(_M_ARM64)
+
     return lhs.low != rhs.low || lhs.high != rhs.high;
+
+    #else
+
+    return lhs.high != rhs.high || lhs.low != rhs.low;
+
+    #endif
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
@@ -547,7 +565,7 @@ constexpr bool operator>(const UnsignedInteger lhs, const u128 rhs) noexcept
 
 constexpr bool operator>(const u128 lhs, const u128 rhs) noexcept
 {
-    return lhs.high > rhs.high || (lhs.high == rhs.high && lhs.low > rhs.low);
+    return lhs.high == rhs.high ? rhs.low < lhs.low : rhs.high < lhs.high;
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
@@ -604,7 +622,7 @@ constexpr bool operator>=(const UnsignedInteger lhs, const u128 rhs) noexcept
 
 constexpr bool operator>=(const u128 lhs, const u128 rhs) noexcept
 {
-    return lhs.high > rhs.high || (lhs.high == rhs.high && lhs.low >= rhs.low);
+    return lhs.high == rhs.high ? rhs.low <= lhs.low : rhs.high <= lhs.high;
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
