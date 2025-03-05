@@ -29,6 +29,28 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
+namespace impl {
+
+template <typename T>
+struct signed_integer
+{
+    constexpr bool value = std::is_signed<T>::value && std::is_integral<T>::value;
+};
+
+template <typename T>
+static constexpr bool is_signed_integer_v = signed_integer<T>::value;
+
+template <typename T>
+struct unsigned_integer
+{
+    constexpr bool value = std::is_unsigned<T>::value && std::is_integral<T>::value;
+};
+
+template <typename T>
+static constexpr bool is_unsigned_integer_v = unsigned_integer<T>::value;
+
+}
+
 struct
     #ifdef BOOST_DECIMAL_HAS_INT128
     alignas(alignof(unsigned __int128))
