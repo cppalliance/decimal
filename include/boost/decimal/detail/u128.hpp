@@ -1091,6 +1091,12 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_add(const u128 lhs, const u128
 
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_sub(const u128 lhs, const u128 rhs) noexcept
 {
+    #ifdef __x86_64__
+
+    return static_cast<u128>(static_cast<unsigned __int128>(lhs) - static_cast<unsigned __int128>(rhs));
+
+    #else
+
     u128 temp {lhs.high - rhs.high, lhs.low - rhs.low};
 
     // Check for carry
@@ -1100,6 +1106,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_sub(const u128 lhs, const u128
     }
 
     return temp;
+
+    #endif
 }
 
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_sub(const u128 lhs, const std::uint64_t rhs) noexcept
