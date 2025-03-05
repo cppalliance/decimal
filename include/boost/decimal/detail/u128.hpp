@@ -1381,202 +1381,8 @@ constexpr u128 default_signed_mul(const u128 lhs, const std::int64_t rhs) noexce
     return res;
 }
 
-#if defined(__aarch64__) || defined(_M_ARM64)
-
-BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_mul(const u128 lhs, const u128 rhs) noexcept
-{
-    u128 result;
-
-    // Does not compensate or track overflow of the high word
-    __asm__ volatile(
-        // Multiply lhs.low * rhs.low
-        "mul %[result_low], %[lhs_low], %[rhs_low]\n"       // result.low = lhs.low * rhs.low (low 64 bits)
-        "umulh %[result_high], %[lhs_low], %[rhs_low]\n"    // result.high = lhs.low * rhs.low (high 64 bits)
-
-        // Multiply lhs.high * rhs.low and add to result.high
-        "mul x8, %[lhs_high], %[rhs_low]\n"                 // x8 = lhs.high * rhs.low
-        "adds %[result_high], %[result_high], x8\n"         // result.high += x8 (with carry)
-
-        // Multiply lhs.low * rhs.high and add to result.high
-        "mul x8, %[lhs_low], %[rhs_high]\n"                 // x8 = lhs.low * rhs.high
-        "adds %[result_high], %[result_high], x8\n"         // result.high += x8 (with carry)
-
-        // Output operands
-        : [result_low] "=&r" (result.low), [result_high] "=&r" (result.high)
-        // Input operands
-        : [lhs_low] "r" (lhs.low), [lhs_high] "r" (lhs.high),
-          [rhs_low] "r" (rhs.low), [rhs_high] "r" (rhs.high)
-        // Clobbered registers
-        : "x8", "cc"
-    );
-
-    return result;
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_mul(const u128 lhs, const std::uint64_t rhs) noexcept
-{
-    u128 result;
-
-    // Does not compensate or track overflow of the high word
-    __asm__ volatile(
-        // Multiply lhs.low * rhs
-        "mul %[result_low], %[lhs_low], %[rhs]\n"       // result.low = lhs.low * rhs (low 64 bits)
-        "umulh %[result_high], %[lhs_low], %[rhs]\n"    // result.high = lhs.low * rhs (high 64 bits)
-
-        // Multiply lhs.high * rhs and add to result.high
-        "mul x8, %[lhs_high], %[rhs]\n"                 // x8 = lhs.high * rhs
-        "adds %[result_high], %[result_high], x8\n"     // result.high += x8 (with carry)
-
-        // Output operands
-        : [result_low] "=&r" (result.low), [result_high] "=&r" (result.high)
-        // Input operands
-        : [lhs_low] "r" (lhs.low), [lhs_high] "r" (lhs.high),
-          [rhs] "r" (rhs)
-        // Clobbered registers
-        : "x8", "cc"
-    );
-
-    return result;
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_signed_mul(const u128 lhs, const std::int64_t rhs) noexcept
-{
-    u128 result;
-
-    __asm__ volatile(
-        // Compute abs(rhs) and save sign bit
-        "mov x9, %[rhs]\n"                     // x9 = rhs
-        "asr x10, x9, #63\n"                   // x10 = sign extension (0 if rhs >= 0, -1 if rhs < 0)
-        "eor x9, x9, x10\n"                    // Flip bits if negative
-        "sub x9, x9, x10\n"                    // Add 1 if negative (complete two's complement)
-
-        // Perform unsigned multiplication
-        "mul %[result_low], %[lhs_low], x9\n"       // result.low = lhs.low * abs(rhs)
-        "umulh %[result_high], %[lhs_low], x9\n"    // result.high = high part of lhs.low * abs(rhs)
-        "mul x8, %[lhs_high], x9\n"                 // x8 = lhs.high * abs(rhs)
-        "adds %[result_high], %[result_high], x8\n" // result.high += x8
-
-        // Conditionally negate the result based on sign bit
-        "eor %[result_low], %[result_low], x10\n"    // Flip bits if rhs < 0
-        "eor %[result_high], %[result_high], x10\n"  // Flip bits if rhs < 0
-
-        // Extract just 1 or 0 from the sign mask for addition
-        "and x8, x10, #1\n"                         // x8 = 1 if rhs < 0, 0 otherwise
-        "adds %[result_low], %[result_low], x8\n"   // Add 1 if rhs < 0
-        "adc %[result_high], %[result_high], xzr\n" // Add carry
-
-        : [result_low] "=&r" (result.low), [result_high] "=&r" (result.high)
-        : [lhs_low] "r" (lhs.low), [lhs_high] "r" (lhs.high),
-          [rhs] "r" (rhs)
-        : "x8", "x9", "x10", "cc"
-    );
-
-    return result;
-}
-
-#elif defined(BOOST_DECIMAL_HAS_X64_INTRINSICS)
-
-BOOST_DECIMAL_FORCE_INLINE u128 x64_mul(const u128 lhs, const u128 rhs) noexcept
-{
-    u128 result;
-
-    __asm__ volatile(
-        // Multiply lhs.low * rhs.low
-        "movq %[lhs_low], %%rax\n"
-        "mulq %[rhs_low]\n"          // rdx:rax = lhs.low * rhs.low
-        "movq %%rax, %[result_low]\n"
-        "movq %%rdx, %%r8\n"         // Save high part in r8
-
-        // Multiply lhs.high * rhs.low and add to r8
-        "movq %[lhs_high], %%rax\n"
-        "mulq %[rhs_low]\n"          // rdx:rax = lhs.high * rhs.low
-        "addq %%rax, %%r8\n"
-        "adcq $0, %%rdx\n"           // Add with carry
-
-        // Multiply lhs.low * rhs.high and add to r8:rdx
-        "movq %[lhs_low], %%rax\n"
-        "mulq %[rhs_high]\n"         // rdx:rax = lhs.low * rhs.high
-        "addq %%rax, %%r8\n"
-        "movq %%r8, %[result_high]\n"
-
-        : [result_low] "=m" (result.low), [result_high] "=m" (result.high)
-        : [lhs_low] "m" (lhs.low), [lhs_high] "m" (lhs.high),
-          [rhs_low] "m" (rhs.low), [rhs_high] "m" (rhs.high)
-        : "rax", "rdx", "r8", "cc"
-    );
-
-    return result;
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 x64_mul(const u128 lhs, const std::uint64_t rhs) noexcept
-{
-    u128 result;
-
-    __asm__ volatile(
-        // Multiply lhs.low * rhs
-        "movq %[lhs_low], %%rax\n"
-        "mulq %[rhs]\n"              // rdx:rax = lhs.low * rhs
-        "movq %%rax, %[result_low]\n"
-        "movq %%rdx, %%r8\n"         // Save high part in r8
-
-        // Multiply lhs.high * rhs and add to r8
-        "movq %[lhs_high], %%rax\n"
-        "mulq %[rhs]\n"              // rdx:rax = lhs.high * rhs
-        "addq %%rax, %%r8\n"
-        "movq %%r8, %[result_high]\n"
-
-        : [result_low] "=m" (result.low), [result_high] "=m" (result.high)
-        : [lhs_low] "m" (lhs.low), [lhs_high] "m" (lhs.high),
-          [rhs] "m" (rhs)
-        : "rax", "rdx", "r8", "cc"
-    );
-
-    return result;
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 x64_signed_mul(const u128 lhs, const std::int64_t rhs) noexcept
-{
-    u128 result;
-
-    __asm__ volatile(
-        // Prepare abs(rhs) and save sign
-        "movq %[rhs], %%r10\n"              // r10 = rhs
-        "movq %%r10, %%r11\n"               // r11 = rhs (save original)
-        "sarq $63, %%r11\n"                 // r11 = 0 if rhs >= 0, r11 = -1 if rhs < 0
-        "xorq %%r11, %%r10\n"               // Conditionally invert bits
-        "subq %%r11, %%r10\n"               // Add 1 if negative (two's complement)
-
-        // Multiply lhs.low * abs(rhs)
-        "movq %[lhs_low], %%rax\n"
-        "mulq %%r10\n"                      // rdx:rax = lhs.low * abs(rhs)
-        "movq %%rax, %%r8\n"                // r8 = low result
-        "movq %%rdx, %%r9\n"                // r9 = high part
-
-        // Multiply lhs.high * abs(rhs)
-        "movq %[lhs_high], %%rax\n"
-        "mulq %%r10\n"                      // rdx:rax = lhs.high * abs(rhs)
-        "addq %%rax, %%r9\n"                // r9 += rax
-
-        // Conditionally negate the result
-        "xorq %%r11, %%r8\n"                // Conditionally invert bits of low part
-        "xorq %%r11, %%r9\n"                // Conditionally invert bits of high part
-        "subq %%r11, %%r8\n"                // Add 1 if needed (low part)
-        "sbbq %%r11, %%r9\n"                // Subtract borrow (high part)
-
-        // Store the result
-        "movq %%r8, %[result_low]\n"
-        "movq %%r9, %[result_high]\n"
-
-        : [result_low] "=&r" (result.low), [result_high] "=&r" (result.high)
-        : [lhs_low] "rm" (lhs.low), [lhs_high] "rm" (lhs.high),
-          [rhs] "rm" (rhs)
-        : "rax", "rdx", "r8", "r9", "r10", "r11", "cc"
-    );
-
-    return result;
-}
-
-#elif defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
+// TODO(mborland): Run benchmarks on MSVC to see if these are worth it or not
+#if defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
 
 BOOST_DECIMAL_FORCE_INLINE u128 x64_mul(const u128 lhs, const u128 rhs) noexcept
 {
@@ -1638,6 +1444,12 @@ BOOST_DECIMAL_FORCE_INLINE u128 x64_signed_mul(const u128 lhs, const std::int64_
 template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger> || std::is_same<UnsignedInteger, u128>::value, bool> = true>
 constexpr u128 operator*(const u128 lhs, const UnsignedInteger rhs) noexcept
 {
+    #ifndef _MSVC_LANG
+
+    return impl::default_mul(lhs, rhs);
+
+    #else
+
     #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
 
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
@@ -1646,19 +1458,7 @@ constexpr u128 operator*(const u128 lhs, const UnsignedInteger rhs) noexcept
     }
     else
     {
-        #if defined(__aarch64__) || defined(_M_ARM64)
-
-        return impl::arm_asm_mul(lhs, rhs);
-
-        #elif defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
-
         return impl::x64_mul(lhs, rhs);
-
-        #else
-
-        return impl::default_mul(lhs, rhs);
-
-        #endif
     }
 
     #else
@@ -1666,105 +1466,26 @@ constexpr u128 operator*(const u128 lhs, const UnsignedInteger rhs) noexcept
     return impl::default_mul(lhs, rhs);
 
     #endif
+
+    #endif // _MSVC_LANG
 }
 
 template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
 constexpr u128 operator*(const UnsignedInteger lhs, const u128 rhs) noexcept
 {
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-    {
-        return impl::default_mul(rhs, static_cast<std::uint64_t>(lhs));
-    }
-    else
-    {
-        #if defined(__aarch64__) || defined(_M_ARM64)
-
-        return impl::arm_asm_mul(rhs, static_cast<std::uint64_t>(lhs));
-
-        #elif defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
-
-        return impl::x64_mul(rhs, static_cast<std::uint64_t>(lhs));
-
-        #else
-
-        return impl::default_mul(rhs, static_cast<std::uint64_t>(lhs));
-
-        #endif
-    }
-
-    #else
-
     return impl::default_mul(rhs, static_cast<std::uint64_t>(lhs));
-
-    #endif
 }
 
 template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
 constexpr u128 operator*(const u128 lhs, const SignedInteger rhs) noexcept
 {
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-    {
-        return impl::default_signed_mul(lhs, static_cast<std::int64_t>(rhs));
-    }
-    else
-    {
-        #if defined(__aarch64__) || defined(_M_ARM64)
-
-        return impl::arm_asm_signed_mul(lhs, static_cast<std::int64_t>(rhs));
-
-        #elif defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
-
-        return impl::x64_signed_mul(lhs, static_cast<std::int64_t>(rhs));
-
-        #else
-
-        return impl::default_signed_mul(lhs, static_cast<std::int64_t>(rhs));
-
-        #endif
-    }
-
-    #else
-
     return impl::default_signed_mul(lhs, static_cast<std::int64_t>(rhs));
-
-    #endif
 }
 
 template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
 constexpr u128 operator*(const SignedInteger lhs, const u128 rhs) noexcept
 {
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-    {
-        return impl::default_signed_mul(rhs, static_cast<std::int64_t>(lhs));
-    }
-    else
-    {
-        #if defined(__aarch64__) || defined(_M_ARM64)
-
-        return impl::arm_asm_signed_mul(rhs, static_cast<std::int64_t>(lhs));
-
-        #elif defined(BOOST_DECIMAL_HAS_X64_INTRINSICS) || defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
-
-        return impl::x64_signed_mul(rhs, static_cast<std::int64_t>(lhs));
-
-        #else
-
-        return impl::default_signed_mul(rhs, static_cast<std::int64_t>(lhs));
-
-        #endif
-    }
-
-    #else
-
     return impl::default_signed_mul(rhs, static_cast<std::int64_t>(lhs));
-
-    #endif
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
