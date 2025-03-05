@@ -1115,196 +1115,19 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_sub(const u128 lhs, const std:
     return temp;
 }
 
-#if defined(__aarch64__) || defined(_M_ARM64)
-
-// Inline ASM is not constexpr until C++20 so we offload into this function
-// in the non-constant evaluated case.
-BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_add(const u128 lhs, const u128 rhs) noexcept
-{
-    std::uint64_t result_low {};
-    std::uint64_t result_high {};
-
-    // Use inline assembly to access the carry flag directly
-    // Roughly equivalent to the ADX instructions below for x64 platforms
-    __asm__ volatile(
-        "adds %0, %2, %3\n"  // adds sets carry flag if overflow occurs
-        "adc %1, %4, %5\n"   // adc adds with carry from previous operation
-        : "=r" (result_low), "=r" (result_high)
-        : "r" (lhs.low), "r" (rhs.low), "r" (lhs.high), "r" (rhs.high)
-        : "cc"               // clobbering condition codes (flags)
-    );
-
-    return {result_high, result_low};
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_add(const u128 lhs, const std::uint64_t rhs) noexcept
-{
-    std::uint64_t result_low {};
-    std::uint64_t result_high {};
-
-    // Use inline assembly to access the carry flag directly
-    // Roughly equivalent to the ADX instructions below for x64 platforms
-    __asm__ volatile(
-        "adds %0, %2, %3\n"  // adds sets carry flag if overflow occurs
-        "adc %1, %4, xzr\n"   // add carry to high
-        : "=r" (result_low), "=r" (result_high)
-        : "r" (lhs.low), "r" (rhs), "r" (lhs.high)
-        : "cc"               // clobbering condition codes (flags)
-    );
-
-    return {result_high, result_low};
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_sub(const u128 lhs, const u128 rhs) noexcept
-{
-    std::uint64_t result_low {};
-    std::uint64_t result_high {};
-
-    // Use inline assembly to access the carry flag directly
-    // Roughly equivalent to the ADX instructions below for x64 platforms
-    __asm__ volatile(
-        "subs %0, %2, %3\n"  // adds sets carry flag if overflow occurs
-        "sbc %1, %4, %5\n"   // adc adds with carry from previous operation
-        : "=r" (result_low), "=r" (result_high)
-        : "r" (lhs.low), "r" (rhs.low), "r" (lhs.high), "r" (rhs.high)
-        : "cc"               // clobbering condition codes (flags)
-    );
-
-    return {result_high, result_low};
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_sub(const u128 lhs, const std::uint64_t rhs) noexcept
-{
-    std::uint64_t result_low {};
-    std::uint64_t result_high {};
-
-    // Use inline assembly to access the carry flag directly
-    // Roughly equivalent to the ADX instructions below for x64 platforms
-    __asm__ volatile(
-        "subs %0, %2, %3\n"  // subs sets carry flag if underflow occurs
-        "sbc %1, %4, xzr\n"   // subtract carry from high value
-        : "=r" (result_low), "=r" (result_high)
-        : "r" (lhs.low), "r" (rhs), "r" (lhs.high)
-        : "cc"               // clobbering condition codes (flags)
-    );
-
-    return {result_high, result_low};
-}
-
-#endif // defined(__aarch64__) || defined(_M_ARM64)
-
-#ifdef BOOST_DECIMAL_ADD_CARRY
-
-BOOST_DECIMAL_FORCE_INLINE u128 adx_add(const u128 lhs, const u128 rhs) noexcept
-{
-    // Intel ADX instructions are specifically for Multi-Precision Arithmetic
-    unsigned long long int res_low {};
-    unsigned long long int res_high {};
-
-    const unsigned char carry {BOOST_DECIMAL_ADD_CARRY(0, lhs.low, rhs.low, &res_low)};
-    BOOST_DECIMAL_ADD_CARRY(carry, lhs.high, rhs.high, &res_high);
-
-    return {res_high, res_low};
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 adx_add(const u128 lhs, const std::uint64_t rhs) noexcept
-{
-    // Intel ADX instructions are specifically for Multi-Precision Arithmetic
-    unsigned long long int res_low {};
-    const unsigned char carry {BOOST_DECIMAL_ADD_CARRY(0, lhs.low, rhs, &res_low)};
-
-    // Unconditionally add the carry to lhs.high since we don't have multiple additions here
-    return {lhs.high + static_cast<std::uint64_t>(carry), res_low};
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 adx_sub(const u128 lhs, const u128 rhs) noexcept
-{
-    unsigned long long int res_low {};
-    unsigned long long int res_high {};
-
-    const unsigned char carry {BOOST_DECIMAL_SUB_BORROW(0, lhs.low, rhs.low, &res_low)};
-    BOOST_DECIMAL_SUB_BORROW(carry, lhs.high, rhs.high, &res_high);
-
-    return {res_high, res_low};
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 adx_sub(const u128 lhs, const std::uint64_t rhs) noexcept
-{
-    unsigned long long int res_low {};
-    const unsigned char carry {BOOST_DECIMAL_SUB_BORROW(0, lhs.low, rhs, &res_low)};
-
-    return {lhs.high - static_cast<std::uint64_t>(carry), res_low};
-}
-
-#endif // BOOST_DECIMAL_ADD_CARRY
-
 } // namespace impl
 
 template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger> || std::is_same<UnsignedInteger, u128>::value, bool> = true>
 constexpr u128 operator+(const u128 lhs, const UnsignedInteger rhs) noexcept
 {
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-    {
-        return impl::default_add(lhs, rhs);
-    }
-    else
-    {
-        #if defined(__aarch64__) || defined(_M_ARM64)
-
-        return impl::arm_asm_add(lhs, rhs);
-
-        #elif defined(BOOST_DECIMAL_ADD_CARRY)
-
-        return impl::adx_add(lhs, rhs);
-
-        #else
-
-        return impl::default_add(lhs, rhs);
-
-        #endif
-    }
-
-    #else
-
     return impl::default_add(lhs, rhs);
-
-    #endif
 }
 
 // Since unsigned addition is trivially commutative we just reverse the order of the operands into the impl functions
 template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
 constexpr u128 operator+(const UnsignedInteger lhs, const u128 rhs) noexcept
 {
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-    {
-        return impl::default_add(rhs, lhs);
-    }
-    else
-    {
-        #if defined(__aarch64__) || defined(_M_ARM64)
-
-        return impl::arm_asm_add(rhs, lhs);
-
-        #elif defined(BOOST_DECIMAL_ADD_CARRY)
-
-        return impl::adx_add(rhs, lhs);
-
-        #else
-
-        return impl::default_add(rhs, lhs);
-
-        #endif
-    }
-
-    #else
-
     return impl::default_add(rhs, lhs);
-
-    #endif
 }
 
 template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
@@ -1312,66 +1135,12 @@ constexpr u128 operator+(const u128 lhs, const SignedInteger rhs) noexcept
 {
     if (rhs > 0)
     {
-        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-        if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-        {
-            return impl::default_add(lhs, static_cast<std::uint64_t>(rhs));
-        }
-        else
-        {
-            #if defined(__aarch64__) || defined(_M_ARM64)
-
-            return impl::arm_asm_add(lhs, static_cast<std::uint64_t>(rhs));
-
-            #elif defined(BOOST_DECIMAL_ADD_CARRY)
-
-            return impl::adx_add(lhs, static_cast<std::uint64_t>(rhs));
-
-            #else
-
-            return impl::default_add(lhs, static_cast<std::uint64_t>(rhs));
-
-            #endif
-        }
-
-        #else
-
         return impl::default_add(lhs, static_cast<std::uint64_t>(rhs));
-
-        #endif
     }
     else
     {
         const auto unsigned_rhs {detail::make_positive_unsigned(rhs)};
-        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-        if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-        {
-            return impl::default_sub(lhs, unsigned_rhs);
-        }
-        else
-        {
-            #if defined(__aarch64__) || defined(_M_ARM64)
-
-            return impl::arm_asm_sub(lhs, unsigned_rhs);
-
-            #elif defined(BOOST_DECIMAL_ADD_CARRY)
-
-            return impl::adx_sub(lhs, unsigned_rhs);
-
-            #else
-
-            return impl::default_sub(lhs, unsigned_rhs);
-
-            #endif
-        }
-
-        #else
-
         return impl::default_sub(lhs, unsigned_rhs);
-
-        #endif
     }
 }
 
@@ -1382,66 +1151,12 @@ constexpr u128 operator+(const SignedInteger lhs, const u128 rhs) noexcept
 {
     if (lhs > 0)
     {
-        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-        if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-        {
-            return impl::default_add(rhs, static_cast<std::uint64_t>(lhs));
-        }
-        else
-        {
-            #if defined(__aarch64__) || defined(_M_ARM64)
-
-            return impl::arm_asm_add(rhs, static_cast<std::uint64_t>(lhs));
-
-            #elif defined(BOOST_DECIMAL_ADD_CARRY)
-
-            return impl::adx_add(rhs, static_cast<std::uint64_t>(lhs));
-
-            #else
-
-            return impl::default_add(rhs, static_cast<std::uint64_t>(lhs));
-
-            #endif
-        }
-
-        #else
-
         return impl::default_add(rhs, static_cast<std::uint64_t>(lhs));
-
-        #endif
     }
     else
     {
         const auto unsigned_lhs {detail::make_positive_unsigned(lhs)};
-        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-        if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-        {
-            return impl::default_sub(rhs, unsigned_lhs);
-        }
-        else
-        {
-            #if defined(__aarch64__) || defined(_M_ARM64)
-
-            return impl::arm_asm_sub(rhs, unsigned_lhs);
-
-            #elif defined(BOOST_DECIMAL_ADD_CARRY)
-
-            return impl::adx_sub(rhs, unsigned_lhs);
-
-            #else
-
-            return impl::default_sub(rhs, unsigned_lhs);
-
-            #endif
-        }
-
-        #else
-
         return impl::default_sub(rhs, unsigned_lhs);
-
-        #endif
     }
 }
 
@@ -1516,34 +1231,7 @@ constexpr u128& u128::operator+=(const unsigned __int128 rhs) noexcept
 template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger> || std::is_same<UnsignedInteger, u128>::value, bool> = true>
 constexpr u128 operator-(const u128 lhs, const UnsignedInteger rhs) noexcept
 {
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-    {
-        return impl::default_sub(lhs, rhs);
-    }
-    else
-    {
-        #if defined(__aarch64__) || defined(_M_ARM64)
-
-        return impl::arm_asm_sub(lhs, rhs);
-
-        #elif defined(BOOST_DECIMAL_ADD_CARRY)
-
-        return impl::adx_sub(lhs, rhs);
-
-        #else
-
-        return impl::default_sub(lhs, rhs);
-
-        #endif
-    }
-
-    #else
-
     return impl::default_sub(lhs, rhs);
-
-    #endif
 }
 
 template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
@@ -1558,66 +1246,12 @@ constexpr u128 operator-(const u128 lhs, const SignedInteger rhs) noexcept
 {
     if (rhs < 0)
     {
-        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-        if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-        {
-            return impl::default_add(lhs, static_cast<std::uint64_t>(rhs));
-        }
-        else
-        {
-            #if defined(__aarch64__) || defined(_M_ARM64)
-
-            return impl::arm_asm_add(lhs, static_cast<std::uint64_t>(rhs));
-
-            #elif defined(BOOST_DECIMAL_ADD_CARRY)
-
-            return impl::adx_add(lhs, static_cast<std::uint64_t>(rhs));
-
-            #else
-
-            return impl::default_add(lhs, static_cast<std::uint64_t>(rhs));
-
-            #endif
-        }
-
-        #else
-
         return impl::default_add(lhs, static_cast<std::uint64_t>(rhs));
-
-        #endif
     }
     else
     {
         const auto unsigned_rhs {detail::make_positive_unsigned(rhs)};
-        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-        if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-        {
-            return impl::default_sub(lhs, unsigned_rhs);
-        }
-        else
-        {
-            #if defined(__aarch64__) || defined(_M_ARM64)
-
-            return impl::arm_asm_sub(lhs, unsigned_rhs);
-
-            #elif defined(BOOST_DECIMAL_ADD_CARRY)
-
-            return impl::adx_sub(lhs, unsigned_rhs);
-
-            #else
-
-            return impl::default_sub(lhs, unsigned_rhs);
-
-            #endif
-        }
-
-        #else
-
         return impl::default_sub(lhs, unsigned_rhs);
-
-        #endif
     }
 }
 
