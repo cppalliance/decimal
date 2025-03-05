@@ -42,6 +42,7 @@ project : requirements
   [ requires cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction cxx14_variable_templates cxx14_constexpr ]
   ;
 
+run-fail benchmark_uints.cpp ;
 run-fail benchmarks.cpp ;
 run compare_dec128_and_fast.cpp ;
 compile-fail concepts_test.cpp ;

@@ -1817,9 +1817,9 @@ BOOST_DECIMAL_FORCE_INLINE u128 arm_asm_signed_mul(const u128 lhs, const std::in
         "sub x9, x9, x10\n"                    // Add 1 if negative (complete two's complement)
 
         // Perform unsigned multiplication
-        "mul %[result_low], %[lhs_low], x9\n"     // result.low = lhs.low * abs(rhs)
-        "umulh %[result_high], %[lhs_low], x9\n"  // result.high = high part of lhs.low * abs(rhs)
-        "mul x8, %[lhs_high], x9\n"               // x8 = lhs.high * abs(rhs)
+        "mul %[result_low], %[lhs_low], x9\n"       // result.low = lhs.low * abs(rhs)
+        "umulh %[result_high], %[lhs_low], x9\n"    // result.high = high part of lhs.low * abs(rhs)
+        "mul x8, %[lhs_high], x9\n"                 // x8 = lhs.high * abs(rhs)
         "adds %[result_high], %[result_high], x8\n" // result.high += x8
 
         // Conditionally negate the result based on sign bit
