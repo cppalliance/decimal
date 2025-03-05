@@ -44,6 +44,25 @@ static std::mt19937_64 rng(42);
 
 constexpr std::size_t N = 1024;
 
+void test_traits()
+{
+    using namespace boost::decimal::detail::impl;
+
+    static_assert(is_signed_integer_v<std::int8_t> && !is_unsigned_integer_v<std::int8_t>);
+    static_assert(is_signed_integer_v<std::int16_t> && !is_unsigned_integer_v<std::int16_t>);
+    static_assert(is_signed_integer_v<std::int32_t> && !is_unsigned_integer_v<std::int32_t>);
+    static_assert(is_signed_integer_v<std::int64_t> && !is_unsigned_integer_v<std::int64_t>);
+
+    static_assert(!is_signed_integer_v<std::uint8_t> && is_unsigned_integer_v<std::uint8_t>);
+    static_assert(!is_signed_integer_v<std::uint16_t> && is_unsigned_integer_v<std::uint16_t>);
+    static_assert(!is_signed_integer_v<std::uint32_t> && is_unsigned_integer_v<std::uint32_t>);
+    static_assert(!is_signed_integer_v<std::uint64_t> && is_unsigned_integer_v<std::uint64_t>);
+
+    static_assert(!is_signed_integer_v<float> && !is_unsigned_integer_v<float>);
+    static_assert(!is_signed_integer_v<double> && !is_unsigned_integer_v<double>);
+    static_assert(!is_signed_integer_v<long double> && !is_unsigned_integer_v<long double>);
+}
+
 template <typename IntType>
 void test_arithmetic_constructor()
 {
@@ -557,6 +576,8 @@ void test_operator_mul()
 
 int main()
 {
+    test_traits();
+
     test_arithmetic_constructor<std::int8_t>();
     test_arithmetic_constructor<std::int16_t>();
     test_arithmetic_constructor<std::int32_t>();
@@ -768,10 +789,10 @@ int main()
     //test_operator_mul<std::int64_t>();
     test_operator_mul<__int128>();
 
-    //test_operator_mul<std::uint8_t>();
-    //test_operator_mul<std::uint16_t>();
-    //test_operator_mul<std::uint32_t>();
-    //test_operator_mul<std::uint64_t>();
+    test_operator_mul<std::uint8_t>();
+    test_operator_mul<std::uint16_t>();
+    test_operator_mul<std::uint32_t>();
+    test_operator_mul<std::uint64_t>();
     test_operator_mul<unsigned __int128>();
 
     return boost::report_errors();
