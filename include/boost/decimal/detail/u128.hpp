@@ -1357,18 +1357,31 @@ constexpr u128& u128::operator-=(const unsigned __int128 rhs) noexcept
 
 namespace impl {
 
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 shift_left_32(const std::uint64_t low) noexcept
+{
+    return {low >> 32, low << 32};
+}
+
 constexpr u128 default_mul(const u128 lhs, const u128 rhs) noexcept
 {
+    #if defined(__aarch64__)
+
+    // This did remarkably worse on x64 platforms
+    return static_cast<u128>(static_cast<unsigned __int128>(lhs) * static_cast<unsigned __int128>(rhs));
+
+    #else
+
     const auto a = static_cast<std::uint64_t>(lhs.low >> 32);
     const auto b = static_cast<std::uint64_t>(lhs.low & UINT32_MAX);
     const auto c = static_cast<std::uint64_t>(rhs.low >> 32);
     const auto d = static_cast<std::uint64_t>(rhs.low & UINT32_MAX);
 
     u128 result { lhs.high * rhs.low + lhs.low * rhs.high + a * c, b * d };
-    result += u128{0, a * d} << 32;
-    result += u128{0, b * c} << 32;
+    result += shift_left_32(a * d) + shift_left_32(b * c);
 
     return result;
+
+    #endif
 }
 
 constexpr u128 default_mul(const u128 lhs, const std::uint64_t rhs) noexcept
@@ -1379,8 +1392,7 @@ constexpr u128 default_mul(const u128 lhs, const std::uint64_t rhs) noexcept
     const auto b = static_cast<std::uint64_t>(lhs.low & UINT32_MAX);
 
     u128 result{lhs.high * rhs, b * d};
-    result += u128{0, a * d} << 32;
-    result += u128{0, b * c} << 32;
+    result += shift_left_32(a * d) + shift_left_32(b * c);
 
     return result;
 }
@@ -1470,7 +1482,7 @@ BOOST_DECIMAL_FORCE_INLINE u128 x64_signed_mul(const u128 lhs, const std::int64_
 template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger> || std::is_same<UnsignedInteger, u128>::value, bool> = true>
 constexpr u128 operator*(const u128 lhs, const UnsignedInteger rhs) noexcept
 {
-    #ifndef _MSVC_LANG
+    #ifndef BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS
 
     return impl::default_mul(lhs, rhs);
 
