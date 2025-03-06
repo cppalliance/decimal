@@ -1541,6 +1541,126 @@ constexpr u128 operator*(const unsigned __int128 lhs, const u128 rhs) noexcept
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
+namespace impl {
+
+using wide_integer_uint128 = ::boost::decimal::math::wide_integer::uint128_t;
+
+constexpr auto u128_to_wide_integer(const u128& src) -> wide_integer_uint128
+{
+    wide_integer_uint128 dst { };
+
+    using local_limb_type = typename wide_integer_uint128::limb_type;
+
+    static_assert(sizeof(local_limb_type) == static_cast<std::size_t>(UINT8_C(4)) && std::is_same<local_limb_type, std::uint32_t>::value, "Error: Configuration of external wide-integer limbs not OK");
+
+    auto rep = dst.representation();
+
+    rep[0] = static_cast<local_limb_type>(src.low);
+    rep[1] = static_cast<local_limb_type>(src.low >> 32U);
+    rep[2] = static_cast<local_limb_type>(src.high);
+    rep[3] = static_cast<local_limb_type>(src.high >> 32U);
+
+    return dst;
+}
+
+constexpr auto wide_integer_to_u128(const wide_integer_uint128& src) -> u128
+{
+    u128 dst {};
+
+    const auto rep = src.crepresentation();
+
+    dst.low = static_cast<std::uint64_t>(rep[0]) | (static_cast<std::uint64_t>(rep[1]) << 32);
+    dst.high = static_cast<std::uint64_t>(rep[2]) | (static_cast<std::uint64_t>(rep[3]) << 32U);
+
+    return dst;
+}
+
+BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u128& rhs, u128& quotient, u128& remainder) noexcept
+{
+    // Mash-Up: Use Knuth long-division from wide-integer (requires limb-conversions on input/output).
+
+    auto lhs_wide = u128_to_wide_integer(lhs);
+
+    wide_integer_uint128 rem_wide { };
+
+    lhs_wide.eval_divide_knuth(u128_to_wide_integer(rhs), rem_wide);
+
+    remainder = wide_integer_to_u128(rem_wide);
+    quotient  = wide_integer_to_u128(lhs_wide);
+}
+
+}
+
+constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
+{
+    // On ARM64 this is unconditionally better
+    // On x64 this is only better when both lhs and rhs are two word numbers
+    #ifdef __aarch64__
+
+    return static_cast<u128>(static_cast<unsigned __int128>(lhs) / static_cast<unsigned __int128>(rhs));
+
+    #else
+
+    BOOST_DECIMAL_ASSERT_MSG(rhs != 0, "Division by zero");
+
+    if (lhs.high != 0 && rhs.high != 0)
+    {
+        #ifdef BOOST_DECIMAL_HAS_INT128
+
+        return static_cast<u128>(static_cast<unsigned __int128>(lhs) / static_cast<unsigned __int128>(rhs));
+
+        #else
+
+        u128 quotient {};
+        u128 remainder {};
+        impl::div_mod_impl(lhs, rhs, quotient, remainder);
+        return quotient;
+
+        #endif
+    }
+    else if (lhs < rhs)
+    {
+        return {0, 0};
+    }
+    else if (lhs.high == 0 && rhs.high == 0)
+    {
+        return {0, lhs.high / rhs.high};
+    }
+    else
+    {
+        u128 quotient {};
+        u128 remainder {};
+        impl::div_mod_impl(lhs, rhs, quotient, remainder);
+        return quotient;
+    }
+
+    #endif
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128 operator/(const u128 lhs, const __int128 rhs) noexcept
+{
+    return lhs / static_cast<u128>(rhs);
+}
+
+constexpr u128 operator/(const __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) / rhs;
+}
+
+constexpr u128 operator/(const u128 lhs, const unsigned __int128 rhs) noexcept
+{
+    return lhs / static_cast<u128>(rhs);
+}
+
+constexpr u128 operator/(const unsigned __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) / rhs;
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
