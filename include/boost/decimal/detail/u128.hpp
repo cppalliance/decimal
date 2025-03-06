@@ -1362,15 +1362,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 shift_left_32(const std::uint64_t low)
     return {low >> 32, low << 32};
 }
 
-constexpr u128 default_mul(const u128 lhs, const u128 rhs) noexcept
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mul(const u128 lhs, const u128 rhs) noexcept
 {
-    #if defined(__aarch64__)
-
-    // This did remarkably worse on x64 platforms
-    return static_cast<u128>(static_cast<unsigned __int128>(lhs) * static_cast<unsigned __int128>(rhs));
-
-    #else
-
     const auto a = static_cast<std::uint64_t>(lhs.low >> 32);
     const auto b = static_cast<std::uint64_t>(lhs.low & UINT32_MAX);
     const auto c = static_cast<std::uint64_t>(rhs.low >> 32);
@@ -1380,11 +1373,9 @@ constexpr u128 default_mul(const u128 lhs, const u128 rhs) noexcept
     result += shift_left_32(a * d) + shift_left_32(b * c);
 
     return result;
-
-    #endif
 }
 
-constexpr u128 default_mul(const u128 lhs, const std::uint64_t rhs) noexcept
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mul(const u128 lhs, const std::uint64_t rhs) noexcept
 {
     const auto c = static_cast<std::uint64_t>(rhs >> 32);
     const auto d = static_cast<std::uint64_t>(rhs & UINT32_MAX);
