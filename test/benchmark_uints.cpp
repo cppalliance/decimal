@@ -43,6 +43,8 @@ using namespace std::chrono_literals;
 // 0 = 1 word
 // 1 = 2 words
 // 2 = 2 word / 1 word alternating
+// 3 = 1 word / 2 word alternating
+// 4 = Random width
 
 template <int words, typename T>
 std::vector<T> generate_random_vector(std::size_t size = N, unsigned seed = 42U)
@@ -55,6 +57,7 @@ std::vector<T> generate_random_vector(std::size_t size = N, unsigned seed = 42U)
 
     std::mt19937_64 gen(seed);
     std::uniform_int_distribution<std::uint64_t> dist(UINT64_C(0), UINT64_MAX);
+    std::uniform_int_distribution<int> size_dist(0, 1);
 
     std::vector<T> result(size);
     for (std::size_t i = 0; i < size; ++i)
@@ -89,7 +92,18 @@ std::vector<T> generate_random_vector(std::size_t size = N, unsigned seed = 42U)
                 {
                     result[i] = T{dist(gen)};
                 }
-            break;
+                break;
+
+            case 4:
+                if (size_dist(gen) == 1)
+                {
+                    result[i] = T{dist(gen), dist(gen)};
+                }
+                else
+                {
+                    result[i] = T{dist(gen)};
+                }
+                break;
 
             default:
                 BOOST_DECIMAL_UNREACHABLE;
@@ -110,6 +124,7 @@ std::vector<unsigned __int128> generate_random_builtin_vector(std::size_t size =
 
     std::mt19937_64 gen(seed);
     std::uniform_int_distribution<std::uint64_t> dist(UINT64_C(0), UINT64_MAX);
+    std::uniform_int_distribution<int> size_dist(0, 1);
 
     std::vector<unsigned __int128> result(size);
     for (std::size_t i = 0; i < size; ++i)
@@ -137,6 +152,17 @@ std::vector<unsigned __int128> generate_random_builtin_vector(std::size_t size =
 
             case 3:
                 if (i % 2 == 1)
+                {
+                    result[i] = static_cast<unsigned __int128>(boost::decimal::detail::u128{dist(gen), dist(gen)});
+                }
+                else
+                {
+                    result[i] = dist(gen);
+                }
+                break;
+
+            case 4:
+                if (size_dist(gen) == 1)
                 {
                     result[i] = static_cast<unsigned __int128>(boost::decimal::detail::u128{dist(gen), dist(gen)});
                 }
@@ -377,6 +403,60 @@ int main()
 
         #ifdef BOOST_DECIMAL_HAS_INT128
         const auto builtin_vector = generate_random_builtin_vector<3>();
+        test_comparisons(builtin_vector, "builtin");
+        #endif
+
+        test_comparisons(old_vector, "old");
+        test_comparisons(new_vector, "new");
+
+        std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
+        #endif
+
+        test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
+        test_two_element_operation(new_vector, std::plus<>(), "add", "New");
+
+        std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
+        #endif
+
+        test_two_element_operation(old_vector, std::minus<>(), "sub", "Old");
+        test_two_element_operation(new_vector, std::minus<>(), "sub", "New");
+
+        std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
+        #endif
+
+        test_two_element_operation(old_vector, std::multiplies<>(), "mul", "Old");
+        test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
+
+        std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
+        #endif
+
+        test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
+        test_two_element_operation(new_vector, std::divides<>(), "div", "New");
+    }
+    {
+        // Two word and one word operations Even = 1, odd = 2
+
+        std::cout << "\n---------------------------\n";
+        std::cout << "Random Width Operations\n";
+        std::cout << "---------------------------\n\n";
+
+        const auto old_vector = generate_random_vector<4, uint128>();
+        const auto new_vector = generate_random_vector<4, u128>();
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        const auto builtin_vector = generate_random_builtin_vector<4>();
         test_comparisons(builtin_vector, "builtin");
         #endif
 
