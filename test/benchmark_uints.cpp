@@ -61,16 +61,35 @@ std::vector<T> generate_random_vector(std::size_t size = N, unsigned seed = 42U)
         }
         else
         {
-            #ifdef BOOST_DECIMAL_HAS_INT128
-            BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, unsigned __int128>::value)
-            {
-                result[i] = T{boost::decimal::detail::u128{dist(gen), dist(gen)}};
-            }
-            else
-            #endif
-            {
-                result[i] = T{dist(gen), dist(gen)};
-            }
+            result[i] = T{dist(gen), dist(gen)};
+        }
+    }
+
+    return result;
+}
+
+template <bool one_word>
+std::vector<unsigned __int128> generate_random_builtin_vector(std::size_t size = N, unsigned seed = 42U)
+{
+    if (seed == 0)
+    {
+        std::random_device rd;
+        seed = rd();
+    }
+
+    std::mt19937_64 gen(seed);
+    std::uniform_int_distribution<std::uint64_t> dist(UINT64_C(0), UINT64_MAX);
+
+    std::vector<unsigned __int128> result(size);
+    for (std::size_t i = 0; i < size; ++i)
+    {
+        BOOST_DECIMAL_IF_CONSTEXPR (one_word)
+        {
+            result[i] = dist(gen);
+        }
+        else
+        {
+            result[i] = static_cast<unsigned __int128>(boost::decimal::detail::u128{dist(gen), dist(gen)});
         }
     }
 
@@ -139,7 +158,7 @@ int main()
         const auto new_vector = generate_random_vector<false, u128>();
 
         #ifdef BOOST_DECIMAL_HAS_INT128
-        const auto builtin_vector = generate_random_vector<false, unsigned __int128>();
+        const auto builtin_vector = generate_random_builtin_vector<false>();
         test_comparisons(builtin_vector, "builtin");
         #endif
 
@@ -183,7 +202,7 @@ int main()
         const auto new_vector = generate_random_vector<true, u128>();
 
         #ifdef BOOST_DECIMAL_HAS_INT128
-        const auto builtin_vector = generate_random_vector<true, unsigned __int128>();
+        const auto builtin_vector = generate_random_builtin_vector<true>();
         test_comparisons(builtin_vector, "builtin");
         #endif
 
