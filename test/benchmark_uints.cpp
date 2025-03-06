@@ -191,6 +191,15 @@ int main()
 
         test_two_element_operation(old_vector, std::multiplies<>(), "mul", "Old");
         test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
+
+        std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
+        #endif
+
+        test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
+        //test_two_element_operation(new_vector, std::divides<>(), "div", "New");
     }
     // Single word operations
     {
@@ -237,6 +246,13 @@ int main()
         test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
 
         std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
+        #endif
+
+        test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
+        //test_two_element_operation(new_vector, std::divides<>(), "div", "New");
     }
 
     return 1;
