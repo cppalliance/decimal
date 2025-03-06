@@ -180,6 +180,20 @@ public:
     constexpr u128& operator-=(__int128 rhs) noexcept;
     constexpr u128& operator-=(unsigned __int128 rhs) noexcept;
     #endif // BOOST_DECIMAL_HAS_INT128
+
+    // Compound Multiplication Operators
+    template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+    constexpr u128& operator*=(SignedInteger rhs) noexcept;
+
+    template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+    constexpr u128& operator*=(UnsignedInteger rhs) noexcept;
+
+    constexpr u128& operator*=(u128 rhs) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    constexpr u128& operator*=(__int128 rhs) noexcept;
+    constexpr u128& operator*=(unsigned __int128 rhs) noexcept;
+    #endif // BOOST_DECIMAL_HAS_INT128
 };
 
 // Signed assignment operators
@@ -1540,6 +1554,50 @@ constexpr u128 operator*(const unsigned __int128 lhs, const u128 rhs) noexcept
 }
 
 #endif // BOOST_DECIMAL_HAS_INT128
+
+//=====================================
+// Compound Multiplication Operator
+//=====================================
+
+template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool>>
+constexpr u128& u128::operator*=(const SignedInteger rhs) noexcept
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool>>
+constexpr u128& u128::operator*=(const UnsignedInteger rhs) noexcept
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator*=(const u128 rhs) noexcept
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128& u128::operator*=(const __int128 rhs) noexcept
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator*=(const unsigned __int128 rhs) noexcept
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
+//=====================================
+// Division Operator
+//=====================================
 
 namespace impl {
 
