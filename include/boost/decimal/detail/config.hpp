@@ -84,7 +84,7 @@
 #endif
 
 // Include intrinsics if available
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && defined(_M_X64)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
 #    include <intrin.h>
 #  endif

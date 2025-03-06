@@ -66,8 +66,8 @@ std::vector<T> generate_random_vector(std::size_t size = N, unsigned seed = 42U)
             {
                 result[i] = T{boost::decimal::detail::u128{dist(gen), dist(gen)}};
             }
-            #endif
             else
+            #endif
             {
                 result[i] = T{dist(gen), dist(gen)};
             }
