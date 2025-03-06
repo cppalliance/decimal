@@ -61,10 +61,12 @@ std::vector<T> generate_random_vector(std::size_t size = N, unsigned seed = 42U)
         }
         else
         {
+            #ifdef BOOST_DECIMAL_HAS_INT128
             BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, unsigned __int128>::value)
             {
                 result[i] = T{boost::decimal::detail::u128{dist(gen), dist(gen)}};
             }
+            #endif
             else
             {
                 result[i] = T{dist(gen), dist(gen)};
@@ -135,27 +137,39 @@ int main()
 
         const auto old_vector = generate_random_vector<false, uint128>();
         const auto new_vector = generate_random_vector<false, u128>();
-        const auto builtin_vector = generate_random_vector<false, unsigned __int128>();
 
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        const auto builtin_vector = generate_random_vector<false, unsigned __int128>();
         test_comparisons(builtin_vector, "builtin");
+        #endif
+
         test_comparisons(old_vector, "old");
         test_comparisons(new_vector, "new");
 
         std::cout << std::endl;
 
+        #ifdef BOOST_DECIMAL_HAS_INT128
         test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
+        #endif
+
         test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
         test_two_element_operation(new_vector, std::plus<>(), "add", "New");
 
         std::cout << std::endl;
 
+        #ifdef BOOST_DECIMAL_HAS_INT128
         test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
+        #endif
+
         test_two_element_operation(old_vector, std::minus<>(), "sub", "Old");
         test_two_element_operation(new_vector, std::minus<>(), "sub", "New");
 
         std::cout << std::endl;
 
+        #ifdef BOOST_DECIMAL_HAS_INT128
         test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
+        #endif
+
         test_two_element_operation(old_vector, std::multiplies<>(), "mul", "Old");
         test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
     }
@@ -167,27 +181,39 @@ int main()
 
         const auto old_vector = generate_random_vector<true, uint128>();
         const auto new_vector = generate_random_vector<true, u128>();
-        const auto builtin_vector = generate_random_vector<true, unsigned __int128>();
 
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        const auto builtin_vector = generate_random_vector<true, unsigned __int128>();
         test_comparisons(builtin_vector, "builtin");
+        #endif
+
         test_comparisons(old_vector, "old");
         test_comparisons(new_vector, "new");
 
         std::cout << std::endl;
 
+        #ifdef BOOST_DECIMAL_HAS_INT128
         test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
+        #endif
+
         test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
         test_two_element_operation(new_vector, std::plus<>(), "add", "New");
 
         std::cout << std::endl;
 
+        #ifdef BOOST_DECIMAL_HAS_INT128
         test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
+        #endif
+
         test_two_element_operation(old_vector, std::minus<>(), "sub", "Old");
         test_two_element_operation(new_vector, std::minus<>(), "sub", "New");
 
         std::cout << std::endl;
 
+        #ifdef BOOST_DECIMAL_HAS_INT128
         test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
+        #endif
+
         test_two_element_operation(old_vector, std::multiplies<>(), "mul", "Old");
         test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
 
