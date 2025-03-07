@@ -5,8 +5,6 @@
 #include <boost/decimal/uint128.hpp>
 #include <boost/decimal/detail/config.hpp>
 
-#ifdef BOOST_DECIMAL_HAS_INT128
-
 #include <boost/decimal/detail/u128.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <cstring>
@@ -35,6 +33,10 @@
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
 #  pragma GCC diagnostic ignored "-Wsign-compare"
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
+
+#elif defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable : 4389)
 #endif
 
 #include <boost/random/uniform_int_distribution.hpp>
@@ -62,6 +64,8 @@ void test_traits()
     static_assert(!is_signed_integer_v<double> && !is_unsigned_integer_v<double>, "Wrong answer");
     static_assert(!is_signed_integer_v<long double> && !is_unsigned_integer_v<long double>, "Wrong answer");
 }
+
+#ifdef BOOST_DECIMAL_HAS_INT128
 
 template <typename IntType>
 void test_arithmetic_constructor()
@@ -860,9 +864,411 @@ int main()
 
 #else
 
+using boost::decimal::detail::uint128;
+
+template <typename IntType>
+void test_arithmetic_constructor()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        uint128 builtin_value { value };
+        boost::decimal::detail::u128 emulated_value{ value };
+
+        BOOST_TEST(builtin_value.high == emulated_value.high && builtin_value.low == emulated_value.low);
+    }
+}
+
+template <typename IntType>
+void test_assignment_operators()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        uint128 builtin_value;
+        builtin_value = value;
+        boost::decimal::detail::u128 emulated_value{};
+        emulated_value = value;
+
+        BOOST_TEST(builtin_value.high == emulated_value.high && builtin_value.low == emulated_value.low);
+    }
+}
+
+template <typename IntType>
+void test_integer_conversion_operators()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        uint128 builtin_value;
+        builtin_value = value;
+        boost::decimal::detail::u128 emulated_value{};
+        emulated_value = value;
+
+        const auto builtin_value_return = static_cast<IntType>(builtin_value);
+        const auto emulated_value_return = static_cast<IntType>(emulated_value);
+
+        BOOST_TEST_EQ(builtin_value_return, emulated_value_return);
+
+        // Hits the implicit bool conversion
+        if (builtin_value)
+        {
+            BOOST_TEST(emulated_value);
+        }
+    }
+}
+
+template <typename FloatType>
+void test_float_conversion_operators()
+{
+    boost::random::uniform_int_distribution<std::uint64_t> dist(std::numeric_limits<std::uint64_t>::min(),
+        std::numeric_limits<std::uint64_t>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const auto value{ dist(rng) };
+        uint128 builtin_value;
+        builtin_value = value;
+        boost::decimal::detail::u128 emulated_value{};
+        emulated_value = value;
+
+        const auto builtin_value_return = static_cast<FloatType>(builtin_value);
+        const auto emulated_value_return = static_cast<FloatType>(emulated_value);
+
+        BOOST_TEST(std::abs(builtin_value_return - emulated_value_return) < std::numeric_limits<FloatType>::epsilon());
+    }
+}
+
+template <typename IntType = std::uint64_t>
+void test_unary_plus()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        uint128 builtin_value = value;
+        boost::decimal::detail::u128 emulated_value{ value };
+        emulated_value = +emulated_value;
+
+        BOOST_TEST(builtin_value.high == emulated_value.high && builtin_value.low == builtin_value.low);
+    }
+}
+
+template <typename IntType = std::uint64_t>
+void test_unary_minus()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        uint128 builtin_value = value;
+        builtin_value = -builtin_value;
+        boost::decimal::detail::u128 emulated_value{ value };
+        emulated_value = -emulated_value;
+
+        BOOST_TEST(builtin_value.high == emulated_value.high && builtin_value.low == builtin_value.low);
+    }
+}
+
+template <typename IntType>
+void test_operator_equality()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    // Always equal
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        boost::decimal::detail::u128 emulated_value{ value };
+
+        BOOST_TEST(((value == emulated_value) == (emulated_value == value)) == (value == value));
+    }
+
+    // Potentially equal
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        const IntType value2{ dist(rng) };
+        boost::decimal::detail::u128 emulated_value{ value };
+
+        BOOST_TEST(((value2 == emulated_value) == (value2 == value)) ==
+                   ((emulated_value == value2) == (value == value2)));
+    }
+
+    boost::decimal::detail::u128 bool_val{ dist(rng) };
+    BOOST_TEST((true == bool_val) == (bool_val == true));
+}
+
+template <typename IntType>
+void test_operator_inequality()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    // Always equal
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        boost::decimal::detail::u128 emulated_value{ value };
+
+        BOOST_TEST(((value != emulated_value) == (emulated_value != value)) == !(value != value));
+    }
+
+    // Potentially equal
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        const IntType value2{ dist(rng) };
+        boost::decimal::detail::u128 emulated_value{ value };
+
+        BOOST_TEST(((value2 != emulated_value) == (value2 != value)) ==
+                   ((emulated_value != value2) == (value != value2)));
+    }
+
+    boost::decimal::detail::u128 bool_val{ dist(rng) };
+    BOOST_TEST((true == bool_val) == (bool_val == true));
+}
+
+template <typename IntType>
+void test_operator_less()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        const IntType value2{ dist(rng) };
+        boost::decimal::detail::u128 emulated_value{ value };
+
+        BOOST_TEST(((value2 < emulated_value) == (value2 < value)) ==
+                   ((emulated_value < value2) == (value < value2)));
+    }
+}
+
+template <typename IntType>
+void test_operator_le()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        const IntType value2{ dist(rng) };
+        boost::decimal::detail::u128 emulated_value{ value };
+
+        BOOST_TEST(((value2 <= emulated_value) == (value2 <= value)) ==
+                   ((emulated_value <= value2) == (value <= value2)));
+    }
+}
+
+template <typename IntType>
+void test_operator_greater()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        const IntType value2{ dist(rng) };
+        boost::decimal::detail::u128 emulated_value{ value };
+
+        BOOST_TEST(((value2 > emulated_value) == (value2 > value)) ==
+                   ((emulated_value > value2) == (value > value2)));
+    }
+}
+
+template <typename IntType>
+void test_operator_ge()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        const IntType value2{ dist(rng) };
+        boost::decimal::detail::u128 emulated_value{ value };
+
+        BOOST_TEST(((value2 >= emulated_value) == (value2 >= value)) ==
+            ((emulated_value >= value2) == (value >= value2)));
+    }
+}
+
+template <typename IntType>
+void test_operator_not()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        uint128 builtin_value{ value };
+        builtin_value = ~builtin_value;
+        boost::decimal::detail::u128 emulated_value{ value };
+        emulated_value = ~emulated_value;
+
+        BOOST_TEST(builtin_value.high == emulated_value.high && builtin_value.low == emulated_value.low);
+    }
+}
+
+
+template <typename IntType>
+void test_operator_and()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        const IntType value2{ dist(rng) };
+        boost::decimal::detail::u128 emulated_value{ value };
+
+        BOOST_TEST((emulated_value.low & value2) == (value & value2));
+        BOOST_TEST((value2 & value) == (value2 & emulated_value.low));
+    }
+}
+
 int main()
 {
-    return 0;
+    test_traits();
+
+    test_arithmetic_constructor<std::int8_t>();
+    test_arithmetic_constructor<std::int16_t>();
+    test_arithmetic_constructor<std::int32_t>();
+    test_arithmetic_constructor<std::int64_t>();
+
+    test_arithmetic_constructor<std::uint8_t>();
+    test_arithmetic_constructor<std::uint16_t>();
+    test_arithmetic_constructor<std::uint32_t>();
+    test_arithmetic_constructor<std::uint64_t>();
+
+    test_assignment_operators<std::int8_t>();
+    test_assignment_operators<std::int16_t>();
+    test_assignment_operators<std::int32_t>();
+    test_assignment_operators<std::int64_t>();
+
+    test_assignment_operators<std::uint8_t>();
+    test_assignment_operators<std::uint16_t>();
+    test_assignment_operators<std::uint32_t>();
+    test_assignment_operators<std::uint64_t>();
+
+    test_integer_conversion_operators<std::int8_t>();
+    test_integer_conversion_operators<std::int16_t>();
+    test_integer_conversion_operators<std::int32_t>();
+    test_integer_conversion_operators<std::int64_t>();
+
+    test_integer_conversion_operators<std::uint8_t>();
+    test_integer_conversion_operators<std::uint16_t>();
+    test_integer_conversion_operators<std::uint32_t>();
+    test_integer_conversion_operators<std::uint64_t>();
+
+    test_float_conversion_operators<float>();
+    test_float_conversion_operators<double>();
+    test_float_conversion_operators<long double>();
+
+    test_unary_plus();
+    test_unary_minus();
+
+    test_operator_equality<std::int8_t>();
+    test_operator_equality<std::int16_t>();
+    test_operator_equality<std::int32_t>();
+    test_operator_equality<std::int64_t>();
+
+    test_operator_equality<std::uint8_t>();
+    test_operator_equality<std::uint16_t>();
+    test_operator_equality<std::uint32_t>();
+    test_operator_equality<std::uint64_t>();
+
+    test_operator_inequality<std::int8_t>();
+    test_operator_inequality<std::int16_t>();
+    test_operator_inequality<std::int32_t>();
+    test_operator_inequality<std::int64_t>();
+
+    test_operator_inequality<std::uint8_t>();
+    test_operator_inequality<std::uint16_t>();
+    test_operator_inequality<std::uint32_t>();
+    test_operator_inequality<std::uint64_t>();
+
+    test_operator_less<std::int8_t>();
+    test_operator_less<std::int16_t>();
+    test_operator_less<std::int32_t>();
+    test_operator_less<std::int64_t>();
+
+    test_operator_less<std::uint8_t>();
+    test_operator_less<std::uint16_t>();
+    test_operator_less<std::uint32_t>();
+    test_operator_less<std::uint64_t>();
+
+    test_operator_le<std::int8_t>();
+    test_operator_le<std::int16_t>();
+    test_operator_le<std::int32_t>();
+    test_operator_le<std::int64_t>();
+
+    test_operator_le<std::uint8_t>();
+    test_operator_le<std::uint16_t>();
+    test_operator_le<std::uint32_t>();
+    test_operator_le<std::uint64_t>();
+
+    test_operator_greater<std::int8_t>();
+    test_operator_greater<std::int16_t>();
+    test_operator_greater<std::int32_t>();
+    test_operator_greater<std::int64_t>();
+
+    test_operator_greater<std::uint8_t>();
+    test_operator_greater<std::uint16_t>();
+    test_operator_greater<std::uint32_t>(); 
+    test_operator_greater<std::uint64_t>();
+
+    test_operator_ge<std::int8_t>();
+    test_operator_ge<std::int16_t>();
+    test_operator_ge<std::int32_t>();
+    test_operator_ge<std::int64_t>();
+
+    test_operator_ge<std::uint8_t>();
+    test_operator_ge<std::uint16_t>();
+    test_operator_ge<std::uint32_t>();
+    test_operator_ge<std::uint64_t>();
+
+    test_operator_not<std::int8_t>();
+    test_operator_not<std::int16_t>();
+    test_operator_not<std::int32_t>();
+    test_operator_not<std::int64_t>();
+
+    test_operator_not<std::uint8_t>();
+    test_operator_not<std::uint16_t>();
+    test_operator_not<std::uint32_t>();
+    test_operator_not<std::uint64_t>();
+
+    test_operator_and<std::int8_t>();
+    test_operator_and<std::int16_t>();
+    test_operator_and<std::int32_t>();
+    test_operator_and<std::int64_t>();
+
+    test_operator_and<std::uint8_t>();
+    test_operator_and<std::uint16_t>();
+    test_operator_and<std::uint32_t>();
+    test_operator_and<std::uint64_t>();
+
+    return boost::report_errors();
 }
 
 #endif
