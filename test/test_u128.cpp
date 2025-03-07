@@ -1288,9 +1288,15 @@ void test_operator_div()
     for (std::size_t i{}; i < N; ++i)
     {
         const IntType value{ dist(rng) };
-        const IntType value2{ dist(rng) };
-        uint128 builtin_value{ value };
-        boost::decimal::detail::u128 emulated_value{ value };
+        IntType value2{ dist(rng) };
+
+        while (value2 == 0)
+        {
+            value2 = dist(rng);
+        }
+
+        uint128 builtin_value{ static_cast<std::uint64_t>(value), static_cast<std::uint64_t>(value) };
+        boost::decimal::detail::u128 emulated_value{ static_cast<std::uint64_t>(value), static_cast<std::uint64_t>(value) };
 
 
         const auto builtin_res_left = builtin_value / static_cast<uint128>(value2);
