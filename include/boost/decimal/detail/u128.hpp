@@ -1514,15 +1514,15 @@ constexpr u128 operator*(const u128 lhs, const UnsignedInteger rhs) noexcept
     }
     else
     {
-        unsigned __int128 new_lhs;
-        unsigned __int128 new_rhs;
+        unsigned __int128 new_lhs {};
+        unsigned __int128 new_rhs {};
 
         std::memcpy(&new_lhs, &lhs, sizeof(new_lhs));
         std::memcpy(&new_rhs, &rhs, sizeof(new_rhs));
 
         const auto res = new_lhs * new_rhs;
 
-        u128 new_result;
+        u128 new_result {};
         std::memcpy(&new_result, &res, sizeof(new_result));
 
         return new_result;
