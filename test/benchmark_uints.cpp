@@ -18,6 +18,7 @@
 #include <string>
 #include <cmath>
 #include <cstring>
+#include <functional>
 
 constexpr unsigned N = 20'000'000;
 constexpr unsigned K = 5;
@@ -113,6 +114,8 @@ std::vector<T> generate_random_vector(std::size_t size = N, unsigned seed = 42U)
     return result;
 }
 
+#ifdef BOOST_DECIMAL_HAS_INT128
+
 template <int words>
 std::vector<unsigned __int128> generate_random_builtin_vector(std::size_t size = N, unsigned seed = 42U)
 {
@@ -178,6 +181,8 @@ std::vector<unsigned __int128> generate_random_builtin_vector(std::size_t size =
     }
     return result;
 }
+
+#endif
 
 template <typename T>
 BOOST_DECIMAL_NO_INLINE void test_comparisons(const std::vector<T>& data_vec, const char* label)
