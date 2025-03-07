@@ -1424,93 +1424,12 @@ constexpr u128 default_signed_mul(const u128 lhs, const std::int64_t rhs) noexce
     return res;
 }
 
-// TODO(mborland): Run benchmarks on MSVC to see if these are worth it or not
-#if defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
-
-BOOST_DECIMAL_FORCE_INLINE u128 x64_mul(const u128 lhs, const u128 rhs) noexcept
-{
-    u128 result;
-
-    // Multiply lhs.low * rhs.low (full 128-bit result)
-    result.low = _umul128(lhs.low, rhs.low, &result.high);
-
-    // Add lhs.high * rhs.low to result.high
-    unsigned char carry = BOOST_DECIMAL_ADD_CARRY(0, result.high, lhs.high * rhs.low, &result.high);
-
-    // Add lhs.low * rhs.high to result.high
-    BOOST_DECIMAL_ADD_CARRY(carry, result.high, lhs.low * rhs.high, &result.high);
-
-    return result;
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 x64_mul(const u128 lhs, const std::uint64_t rhs) noexcept
-{
-    u128 result;
-
-    // Multiply lhs.low * rhs (full 128-bit result)
-    result.low = _umul128(lhs.low, rhs, &result.high);
-
-    // Add lhs.high * rhs to result.high
-    BOOST_DECIMAL_ADD_CARRY(0, result.high, lhs.high * rhs, &result.high);
-
-    return result;
-}
-
-BOOST_DECIMAL_FORCE_INLINE u128 x64_signed_mul(const u128 lhs, const std::int64_t rhs) noexcept
-{
-    const bool is_negative = rhs < 0;
-
-    const std::uint64_t abs_rhs = is_negative ? static_cast<std::uint64_t>(-rhs) : static_cast<std::uint64_t>(rhs);
-
-    u128 result;
-    result.low = _umul128(lhs.low, abs_rhs, &result.high);
-    BOOST_DECIMAL_ADD_CARRY(0, result.high, lhs.high * abs_rhs, &result.high);
-
-    if (is_negative)
-    {
-        // Two's complement negation
-        result.high = ~result.high;
-        result.low = ~result.low;
-
-        // Add 1 with carry handling
-        unsigned char carry = BOOST_DECIMAL_ADD_CARRY(0, result.low, 1ULL, &result.low);
-        BOOST_DECIMAL_ADD_CARRY(carry, result.high, 0ULL, &result.high);
-    }
-
-    return result;
-}
-
-#endif
-
 } // namespace impl
 
 template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger> || std::is_same<UnsignedInteger, u128>::value, bool> = true>
 constexpr u128 operator*(const u128 lhs, const UnsignedInteger rhs) noexcept
 {
-    #ifndef BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS
-
     return impl::default_mul(lhs, rhs);
-
-    #else
-
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
-    {
-        return impl::default_mul(lhs, rhs);
-    }
-    else
-    {
-        return impl::x64_mul(lhs, rhs);
-    }
-
-    #else
-
-    return impl::default_mul(lhs, rhs);
-
-    #endif
-
-    #endif // _MSVC_LANG
 }
 
 template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
