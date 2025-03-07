@@ -1487,11 +1487,7 @@ BOOST_DECIMAL_FORCE_INLINE u128 x64_signed_mul(const u128 lhs, const std::int64_
 template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger> || std::is_same<UnsignedInteger, u128>::value, bool> = true>
 constexpr u128 operator*(const u128 lhs, const UnsignedInteger rhs) noexcept
 {
-    #ifndef BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS
-
-    return impl::default_mul(lhs, rhs);
-
-    #else
+    #if BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS
 
     #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
 
@@ -1510,7 +1506,33 @@ constexpr u128 operator*(const u128 lhs, const UnsignedInteger rhs) noexcept
 
     #endif
 
-    #endif // _MSVC_LANG
+    #elif defined(__x86_64__) && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return impl::default_mul(lhs, rhs);
+    }
+    else
+    {
+        unsigned __int128 new_lhs;
+        unsigned __int128 new_rhs;
+
+        std::memcpy(&new_lhs, &lhs, sizeof(new_lhs));
+        std::memcpy(&new_rhs, &rhs, sizeof(new_rhs));
+
+        const auto res = new_lhs * new_rhs;
+
+        u128 new_result;
+        std::memcpy(&new_result, &res, sizeof(new_result));
+
+        return new_result;
+    }
+
+    #else
+
+    return impl::default_mul(lhs, rhs);
+
+    #endif
 }
 
 template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
