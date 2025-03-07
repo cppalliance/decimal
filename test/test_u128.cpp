@@ -1055,8 +1055,19 @@ void test_operator_less()
         const IntType value2{ dist(rng) };
         boost::decimal::detail::u128 emulated_value{ value };
 
-        BOOST_TEST(((value2 < emulated_value) == (value2 < value)) ==
-                   ((emulated_value < value2) == (value < value2)));
+        if (value2 >= 0)
+        {
+            BOOST_TEST(((value2 < emulated_value) == (value2 < value)) ==
+                       ((emulated_value < value2) == (value < value2)));
+        }
+        else if (value2 < value)
+        {
+            BOOST_TEST((value2 < emulated_value) == (value2 < value));
+        }
+        else
+        {
+            BOOST_TEST((value2 < emulated_value) != (value2 < value));
+        }
     }
 }
 
@@ -1072,8 +1083,19 @@ void test_operator_le()
         const IntType value2{ dist(rng) };
         boost::decimal::detail::u128 emulated_value{ value };
 
-        BOOST_TEST(((value2 <= emulated_value) == (value2 <= value)) ==
-                   ((emulated_value <= value2) == (value <= value2)));
+        if (value2 >= 0)
+        {
+            BOOST_TEST(((value2 <= emulated_value) == (value2 <= value)) ==
+                ((emulated_value <= value2) == (value <= value2)));
+        }
+        else if (value2 <= value)
+        {
+            BOOST_TEST((value2 <= emulated_value) == (value2 <= value));
+        }
+        else
+        {
+            BOOST_TEST((value2 <= emulated_value) != (value2 <= value));
+        }
     }
 }
 
@@ -1089,8 +1111,19 @@ void test_operator_greater()
         const IntType value2{ dist(rng) };
         boost::decimal::detail::u128 emulated_value{ value };
 
-        BOOST_TEST(((value2 > emulated_value) == (value2 > value)) ==
-                   ((emulated_value > value2) == (value > value2)));
+        if (value2 >= 0)
+        {
+            BOOST_TEST(((value2 > emulated_value) == (value2 > value)) ==
+                ((emulated_value > value2) == (value > value2)));
+        }
+        else if (value2 > value)
+        {
+            BOOST_TEST((value2 > emulated_value) != (value2 > value));
+        }
+        else
+        {
+            BOOST_TEST((value2 > emulated_value) == (value2 > value));
+        }
     }
 }
 
@@ -1106,8 +1139,19 @@ void test_operator_ge()
         const IntType value2{ dist(rng) };
         boost::decimal::detail::u128 emulated_value{ value };
 
-        BOOST_TEST(((value2 >= emulated_value) == (value2 >= value)) ==
-            ((emulated_value >= value2) == (value >= value2)));
+        if (value2 >= 0)
+        {
+            BOOST_TEST(((value2 >= emulated_value) == (value2 >= value)) ==
+                ((emulated_value >= value2) == (value >= value2)));
+        }
+        else if (value2 >= value)
+        {
+            BOOST_TEST((value2 >= emulated_value) != (value2 >= value));
+        }
+        else
+        {
+            BOOST_TEST((value2 >= emulated_value) == (value2 >= value));
+        }
     }
 }
 
