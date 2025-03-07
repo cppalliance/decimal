@@ -1601,7 +1601,21 @@ constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
     }
     else if (lhs.high == 0 && rhs.high == 0)
     {
-        return {0, lhs.high / rhs.high};
+        // Only Windows platforms trap on division by zero
+        #ifdef _WIN32
+        if (rhs.high != 0)
+        {
+            return { 0, lhs.high / rhs.high };
+        }
+        else
+        {
+            return { 0, 0 };
+        }
+        #else
+
+        return { 0, lhs.high / rhs.high };
+
+        #endif 
     }
     else
     {
