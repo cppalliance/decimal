@@ -33,6 +33,10 @@
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
 #  pragma GCC diagnostic ignored "-Wsign-compare"
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
+
+#elif defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable : 4389)
 #endif
 
 #include <boost/random/uniform_int_distribution.hpp>
@@ -1125,6 +1129,24 @@ void test_operator_not()
     }
 }
 
+
+template <typename IntType>
+void test_operator_and()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+        std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        const IntType value2{ dist(rng) };
+        boost::decimal::detail::u128 emulated_value{ value };
+
+        BOOST_TEST((emulated_value.low & value2) == (value & value2));
+        BOOST_TEST((value2 & value) == (value2 & emulated_value.low));
+    }
+}
+
 int main()
 {
     test_traits();
@@ -1235,6 +1257,16 @@ int main()
     test_operator_not<std::uint16_t>();
     test_operator_not<std::uint32_t>();
     test_operator_not<std::uint64_t>();
+
+    test_operator_and<std::int8_t>();
+    test_operator_and<std::int16_t>();
+    test_operator_and<std::int32_t>();
+    test_operator_and<std::int64_t>();
+
+    test_operator_and<std::uint8_t>();
+    test_operator_and<std::uint16_t>();
+    test_operator_and<std::uint32_t>();
+    test_operator_and<std::uint64_t>();
 
     return boost::report_errors();
 }
