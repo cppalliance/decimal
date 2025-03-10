@@ -853,10 +853,10 @@ int main()
     //test_operator_div<std::int64_t>();
     test_operator_div<__int128>();
 
-    //test_operator_div<std::uint8_t>();
-    //test_operator_div<std::uint16_t>();
-    //test_operator_div<std::uint32_t>();
-    //test_operator_div<std::uint64_t>();
+    test_operator_div<std::uint8_t>();
+    test_operator_div<std::uint16_t>();
+    test_operator_div<std::uint32_t>();
+    test_operator_div<std::uint64_t>();
     test_operator_div<unsigned __int128>();
 
     return boost::report_errors();

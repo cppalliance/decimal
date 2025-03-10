@@ -1566,6 +1566,30 @@ BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u1
     quotient  = wide_integer_to_u128(lhs_wide);
 }
 
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    return static_cast<u128>(static_cast<unsigned __int128>(lhs) / rhs);
+}
+
+}
+
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+constexpr u128 operator/(const u128 lhs, const UnsignedInteger rhs) noexcept
+{
+    return impl::default_div(lhs, static_cast<std::uint64_t>(rhs));
+}
+
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+constexpr u128 operator/(const UnsignedInteger lhs, const u128 rhs) noexcept
+{
+    if (rhs.high != 0)
+    {
+        return {0, 0};
+    }
+    else
+    {
+        return {0, lhs / rhs.low};
+    }
 }
 
 constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
