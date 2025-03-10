@@ -1719,34 +1719,15 @@ constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
 
         #endif
     }
-    else if (lhs < rhs)
+    else if (rhs.high == 0)
     {
-        return {0, 0};
-    }
-    else if (lhs.high == 0 && rhs.high == 0)
-    {
-        // Only Windows platforms trap on division by zero
-        #ifdef _WIN32
-        if (rhs.low != 0)
-        {
-            return { 0, lhs.low / rhs.low };
-        }
-        else
-        {
-            return { 0, 0 };
-        }
-        #else
-
-        return { 0, lhs.low / rhs.low };
-
-        #endif 
+        // Becomes u128 / std::uint64_t abbreviated division
+        return impl::default_div(lhs, rhs.low);
     }
     else
     {
-        u128 quotient {};
-        u128 remainder {};
-        impl::div_mod_impl(lhs, rhs, quotient, remainder);
-        return quotient;
+        // This would imply rhs.high != 0 and lhs.high == 0 which is always 0
+        return {0, 0};
     }
 
     #endif
