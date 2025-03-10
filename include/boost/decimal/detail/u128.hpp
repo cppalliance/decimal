@@ -1738,6 +1738,18 @@ constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
     #endif
 }
 
+template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+constexpr u128 operator/(const u128 lhs, const SignedInteger rhs) noexcept
+{
+    return rhs > 0 ? lhs / static_cast<std::uint64_t>(rhs) : lhs / static_cast<u128>(rhs);
+}
+
+template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+constexpr u128 operator/(const SignedInteger lhs, const u128 rhs) noexcept
+{
+    return lhs > 0 ? static_cast<std::uint64_t>(lhs) / rhs : static_cast<u128>(lhs) / rhs;
+}
+
 #ifdef BOOST_DECIMAL_HAS_INT128
 
 constexpr u128 operator/(const u128 lhs, const __int128 rhs) noexcept

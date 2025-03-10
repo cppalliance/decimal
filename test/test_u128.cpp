@@ -626,6 +626,16 @@ void test_operator_div()
     }
 }
 
+template <typename IntType>
+void test_spot_operator_div(IntType value, IntType value2)
+{
+    unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
+    boost::decimal::detail::u128 emulated_value {value};
+
+    BOOST_TEST((emulated_value / value2) == (builtin_value / value2));
+    BOOST_TEST((value2 / emulated_value) == (value2 / builtin_value));
+}
+
 int main()
 {
     test_traits();
@@ -847,10 +857,10 @@ int main()
     test_operator_mul<std::uint64_t>();
     test_operator_mul<unsigned __int128>();
 
-    //test_operator_div<std::int8_t>();
-    //test_operator_div<std::int16_t>();
-    //test_operator_div<std::int32_t>();
-    //test_operator_div<std::int64_t>();
+    test_operator_div<std::int8_t>();
+    test_operator_div<std::int16_t>();
+    test_operator_div<std::int32_t>();
+    test_operator_div<std::int64_t>();
     test_operator_div<__int128>();
 
     test_operator_div<std::uint8_t>();
@@ -858,6 +868,8 @@ int main()
     test_operator_div<std::uint32_t>();
     test_operator_div<std::uint64_t>();
     test_operator_div<unsigned __int128>();
+
+    test_spot_operator_div(1, -94);
 
     return boost::report_errors();
 }
