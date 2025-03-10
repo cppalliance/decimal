@@ -1376,6 +1376,41 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 shift_left_32(const std::uint64_t low)
     return {low >> 32, low << 32};
 }
 
+#ifdef __x86_64__
+
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mul(const u128 lhs, const u128 rhs) noexcept
+{
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return static_cast<u128>(static_cast<unsigned __int128>(lhs) * static_cast<unsigned __int128>(rhs));
+    }
+    else
+    {
+        unsigned __int128 new_lhs {};
+        unsigned __int128 new_rhs {};
+
+        std::memcpy(&new_lhs, &lhs, sizeof(new_lhs));
+        std::memcpy(&new_rhs, &rhs, sizeof(new_rhs));
+
+        const auto res {new_lhs * new_rhs};
+
+        u128 new_res {};
+        std::memcpy(&new_res, &res, sizeof(new_res));
+
+        return new_res;
+    }
+
+    #else
+
+    return static_cast<u128>(static_cast<unsigned __int128>(lhs) * static_cast<unsigned __int128>(rhs));
+
+    #endif
+}
+
+#else
+
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mul(const u128 lhs, const u128 rhs) noexcept
 {
     const auto a = static_cast<std::uint64_t>(lhs.low >> 32);
@@ -1388,6 +1423,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mul(const u128 lhs, const u128
 
     return result;
 }
+
+#endif // x64
 
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mul(const u128 lhs, const std::uint64_t rhs) noexcept
 {
