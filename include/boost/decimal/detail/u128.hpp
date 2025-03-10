@@ -1566,10 +1566,59 @@ BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u1
     quotient  = wide_integer_to_u128(lhs_wide);
 }
 
+#ifdef __aarch64__
+
+// This is unconditionally better on ARM64
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std::uint64_t rhs) noexcept
 {
     return static_cast<u128>(static_cast<unsigned __int128>(lhs) / rhs);
 }
+
+#else
+
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(rhs))
+    {
+        return static_cast<u128>(static_cast<unsigned __int128>(lhs) / rhs);
+    }
+    else if (lhs.high != 0)
+    {
+        // TODO(mborland): Can we abbreviate Knuth division for this case?
+        u128 quotient {};
+        u128 remainder {};
+        impl::div_mod_impl(lhs, u128{0, rhs}, quotient, remainder);
+        return quotient;
+    }
+    else
+    {
+        // Windows traps on division by 0
+        #ifdef _WIN32
+        if (rhs.low != 0)
+        {
+            return { 0, lhs.low / rhs };
+        }
+        else
+        {
+            return { 0, 0 };
+        }
+        #else
+
+        return {0, lhs.low / rhs};
+
+        #endif
+    }
+
+    #else
+
+    return static_cast<u128>(static_cast<unsigned __int128>(lhs) / rhs);
+
+    #endif
+}
+
+#endif
 
 }
 
