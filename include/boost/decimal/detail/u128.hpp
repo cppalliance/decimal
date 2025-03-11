@@ -1911,9 +1911,9 @@ BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u1
     }
 }
 
-#ifdef __aarch64__
+#if defined(__aarch64__) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) || defined(__s390x__)
 
-// This is unconditionally better on ARM64
+// This is unconditionally better on ARM64, PPC64LE, and S390X
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std::uint64_t rhs) noexcept
 {
     return static_cast<u128>(static_cast<unsigned __int128>(lhs) / rhs);
@@ -2015,9 +2015,9 @@ constexpr u128 operator/(const UnsignedInteger lhs, const u128 rhs) noexcept
 
 constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
 {
-    // On ARM64 this is unconditionally better
+    // On ARM64 and PPC64LE this is unconditionally better
     // On x64 this is only better when both lhs and rhs are two word numbers
-    #ifdef __aarch64__
+    #if defined(__aarch64__) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) || defined(__s390x__)
 
     return static_cast<u128>(static_cast<unsigned __int128>(lhs) / static_cast<unsigned __int128>(rhs));
 
