@@ -208,6 +208,76 @@ public:
     constexpr u128& operator/=(__int128 rhs) noexcept;
     constexpr u128& operator/=(unsigned __int128 rhs) noexcept;
     #endif // BOOST_DECIMAL_HAS_INT128
+
+    // Compound And
+    template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+    constexpr u128& operator&=(SignedInteger rhs) noexcept;
+
+    template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+    constexpr u128& operator&=(UnsignedInteger rhs) noexcept;
+
+    constexpr u128& operator&=(u128 rhs) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    constexpr u128& operator&=(__int128 rhs) noexcept;
+    constexpr u128& operator&=(unsigned __int128 rhs) noexcept;
+    #endif
+
+    // Compound Or
+    template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+    constexpr u128& operator|=(SignedInteger rhs) noexcept;
+
+    template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+    constexpr u128& operator|=(UnsignedInteger rhs) noexcept;
+
+    constexpr u128& operator|=(u128 rhs) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    constexpr u128& operator|=(__int128 rhs) noexcept;
+    constexpr u128& operator|=(unsigned __int128 rhs) noexcept;
+    #endif
+
+    // Compound XOR
+    template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+    constexpr u128& operator^=(SignedInteger rhs) noexcept;
+
+    template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+    constexpr u128& operator^=(UnsignedInteger rhs) noexcept;
+
+    constexpr u128& operator^=(u128 rhs) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    constexpr u128& operator^=(__int128 rhs) noexcept;
+    constexpr u128& operator^=(unsigned __int128 rhs) noexcept;
+    #endif
+
+    // Compound Left Shift
+    template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+    constexpr u128& operator<<=(SignedInteger rhs) noexcept;
+
+    template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+    constexpr u128& operator<<=(UnsignedInteger rhs) noexcept;
+
+    constexpr u128& operator<<=(u128 rhs) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    constexpr u128& operator<<=(__int128 rhs) noexcept;
+    constexpr u128& operator<<=(unsigned __int128 rhs) noexcept;
+    #endif
+
+    // Compound Right Shift
+    template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
+    constexpr u128& operator>>=(SignedInteger rhs) noexcept;
+
+    template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+    constexpr u128& operator>>=(UnsignedInteger rhs) noexcept;
+
+    constexpr u128& operator>>=(u128 rhs) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_INT128
+    constexpr u128& operator>>=(__int128 rhs) noexcept;
+    constexpr u128& operator>>=(unsigned __int128 rhs) noexcept;
+    #endif
 };
 
 // Signed assignment operators
@@ -744,6 +814,46 @@ constexpr u128 operator|(const unsigned __int128 lhs, const u128 rhs) noexcept
 #endif // BOOST_DECIMAL_HAS_INT128
 
 //=====================================
+// Compound OR Operator
+//=====================================
+
+template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool>>
+constexpr u128& u128::operator|=(const SignedInteger rhs) noexcept
+{
+    *this = *this | rhs;
+    return *this;
+}
+
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool>>
+constexpr u128& u128::operator|=(const UnsignedInteger rhs) noexcept
+{
+    *this = *this | rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator|=(const u128 rhs) noexcept
+{
+    *this = *this | rhs;
+    return *this;
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128& u128::operator|=(const __int128 rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator|=(const unsigned __int128 rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
+//=====================================
 // And Operator
 //=====================================
 
@@ -801,6 +911,46 @@ constexpr u128 operator&(const unsigned __int128 lhs, const u128 rhs) noexcept
 #endif // BOOST_DECIMAL_HAS_INT128
 
 //=====================================
+// Compound And Operator
+//=====================================
+
+template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool>>
+constexpr u128& u128::operator&=(const SignedInteger rhs) noexcept
+{
+    *this = *this & rhs;
+    return *this;
+}
+
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool>>
+constexpr u128& u128::operator&=(const UnsignedInteger rhs) noexcept
+{
+    *this = *this & rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator&=(const u128 rhs) noexcept
+{
+    *this = *this & rhs;
+    return *this;
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128& u128::operator&=(const __int128 rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator&=(const unsigned __int128 rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
+//=====================================
 // Xor Operator
 //=====================================
 
@@ -853,6 +1003,46 @@ constexpr u128 operator^(const u128 lhs, const unsigned __int128 rhs) noexcept
 constexpr u128 operator^(const unsigned __int128 lhs, const u128 rhs) noexcept
 {
     return static_cast<u128>(lhs) ^ rhs;
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
+//=====================================
+// Compound XOR Operator
+//=====================================
+
+template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool>>
+constexpr u128& u128::operator^=(const SignedInteger rhs) noexcept
+{
+    *this = *this ^ rhs;
+    return *this;
+}
+
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool>>
+constexpr u128& u128::operator^=(const UnsignedInteger rhs) noexcept
+{
+    *this = *this ^ rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator^=(const u128 rhs) noexcept
+{
+    *this = *this ^ rhs;
+    return *this;
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128& u128::operator^=(const __int128 rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator^=(const unsigned __int128 rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
 }
 
 #endif // BOOST_DECIMAL_HAS_INT128
@@ -982,6 +1172,46 @@ constexpr unsigned __int128 operator<<(const unsigned __int128 lhs, const u128 r
 #endif // BOOST_DECIMAL_HAS_INT128
 
 //=====================================
+// Compound Left Shift Operator
+//=====================================
+
+template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool>>
+constexpr u128& u128::operator<<=(const SignedInteger rhs) noexcept
+{
+    *this = *this << rhs;
+    return *this;
+}
+
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool>>
+constexpr u128& u128::operator<<=(const UnsignedInteger rhs) noexcept
+{
+    *this = *this << rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator<<=(const u128 rhs) noexcept
+{
+    *this = *this << rhs;
+    return *this;
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128& u128::operator<<=(const __int128 rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator<<=(const unsigned __int128 rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
+//=====================================
 // Right Shift Operator
 //=====================================
 
@@ -1101,6 +1331,46 @@ constexpr u128 operator>>(const u128 lhs, const unsigned __int128 rhs) noexcept
 constexpr unsigned __int128 operator>>(const unsigned __int128 lhs, const u128 rhs) noexcept
 {
     return lhs >> static_cast<unsigned __int128>(rhs);
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
+//=====================================
+// Compound Right Shift Operator
+//=====================================
+
+template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool>>
+constexpr u128& u128::operator>>=(const SignedInteger rhs) noexcept
+{
+    *this = *this >> rhs;
+    return *this;
+}
+
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool>>
+constexpr u128& u128::operator>>=(const UnsignedInteger rhs) noexcept
+{
+    *this = *this >> rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator>>=(const u128 rhs) noexcept
+{
+    *this = *this >> rhs;
+    return *this;
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128& u128::operator>>=(const __int128 rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+constexpr u128& u128::operator>>=(const unsigned __int128 rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
 }
 
 #endif // BOOST_DECIMAL_HAS_INT128
