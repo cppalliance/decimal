@@ -1919,7 +1919,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std:
     return static_cast<u128>(static_cast<unsigned __int128>(lhs) / rhs);
 }
 
-#else
+#elif defined(BOOST_DECIMAL_HAS_INT128)
 
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std::uint64_t rhs) noexcept
 {
@@ -1939,26 +1939,53 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std:
     }
     else
     {
-        // Windows traps on division by 0
-        #ifdef _WIN32
-        if (rhs.low != 0)
-        {
-            return { 0, lhs.low / rhs };
-        }
-        else
-        {
-            return { 0, 0 };
-        }
-        #else
-
         return {0, lhs.low / rhs};
-
-        #endif
     }
 
     #else
 
     return static_cast<u128>(static_cast<unsigned __int128>(lhs) / rhs);
+
+    #endif
+}
+
+#else 
+
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(rhs))
+    {
+        u128 quotient{};
+        u128 remainder{};
+        impl::div_mod_impl(lhs, u128{ 0, rhs }, quotient, remainder);
+        return quotient;
+    }
+    else if (lhs.high != 0)
+    {
+        // TODO(mborland): Can we abbreviate Knuth division for this case?
+        u128 quotient{};
+        u128 remainder{};
+        impl::div_mod_impl(lhs, u128{ 0, rhs }, quotient, remainder);
+        return quotient;
+    }
+    else
+    {
+        if (rhs == 0)
+        {
+            return { 0, 0 };
+        }
+
+        return { 0, lhs.low / rhs };
+    }
+
+    #else
+
+    u128 quotient{};
+    u128 remainder{};
+    impl::div_mod_impl(lhs, u128{ 0, rhs }, quotient, remainder);
+    return quotient;
 
     #endif
 }
@@ -2109,10 +2136,11 @@ constexpr u128& u128::operator/=(const unsigned __int128 rhs) noexcept
 } // namespace decimal
 } // namespace boost
 
+
 // Non-standard libraries may add specializations for library-provided types
 template <>
 #ifdef _MSC_VER
-class std::numeric_limitsboost::decimal::detail::u1282>
+class std::numeric_limits<boost::decimal::detail::u128>
 #else
 struct std::numeric_limits<boost::decimal::detail::u128>
 #endif
