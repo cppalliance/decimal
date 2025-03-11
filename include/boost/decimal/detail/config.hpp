@@ -356,4 +356,24 @@ typedef unsigned __int128 uint128_t;
 #  endif
 #endif
 
+#ifdef _MSC_VER
+#  define BOOST_DECIMAL_ASSUME(expr) __assume(expr)
+#elif defined(__clang__)
+#  define BOOST_DECIMAL_ASSUME(expr) __builtin_assume(expr)
+#elif defined(__GNUC__)
+#  if __GNUC__ >= 5 && __GNUC__ < 13
+#    define BOOST_DECIMAL_ASSUME(expr) if (expr) {} else { __builtin_unreachable(); }
+#  else
+#    define BOOST_DECIMAL_ASSUME(expr) __attribute__((assume(expr)))
+#  endif
+#elif defined(__has_cpp_attribute)
+#  if __has_cpp_attribute(assume)
+#    define BOOST_DECIMAL_ASSUME(expr) [[assume(expr)]]
+#  else
+#    define BOOST_DECIMAL_ASSUME(expr) BOOST_DECIMAL_ASSERT(expr)
+#  endif
+#else
+#  define BOOST_DECIMAL_ASSUME(expr) BOOST_DECIMAL_ASSERT(expr)
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
