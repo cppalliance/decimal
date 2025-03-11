@@ -65,6 +65,58 @@ void test_traits()
     static_assert(!is_signed_integer_v<long double> && !is_unsigned_integer_v<long double>, "Wrong answer");
 }
 
+void test_numeric_limits()
+{
+    using namespace boost::decimal::detail;
+
+    BOOST_TEST(std::numeric_limits<u128>::is_specialized);
+    BOOST_TEST(!std::numeric_limits<u128>::is_signed);
+    BOOST_TEST(std::numeric_limits<u128>::is_integer);
+    BOOST_TEST(std::numeric_limits<u128>::is_exact);
+    BOOST_TEST(!std::numeric_limits<u128>::has_infinity);
+    BOOST_TEST(!std::numeric_limits<u128>::has_quiet_NaN);
+    BOOST_TEST(!std::numeric_limits<u128>::has_signaling_NaN);
+
+    BOOST_TEST(std::numeric_limits<u128>::round_style == std::round_toward_zero);
+    BOOST_TEST(!std::numeric_limits<u128>::is_iec559);
+    BOOST_TEST(std::numeric_limits<u128>::is_bounded);
+    BOOST_TEST(std::numeric_limits<u128>::is_modulo);
+    BOOST_TEST_EQ(std::numeric_limits<u128>::digits, sizeof(u128) * 8U);
+    BOOST_TEST_EQ(std::numeric_limits<u128>::digits10, static_cast<int>(std::numeric_limits<u128>::digits * std::log10(2)));
+    BOOST_TEST_EQ(std::numeric_limits<u128>::max_digits10, std::numeric_limits<std::uint64_t>::max_digits10);
+    BOOST_TEST_EQ(std::numeric_limits<u128>::radix, std::numeric_limits<std::uint64_t>::radix);
+    BOOST_TEST_EQ(std::numeric_limits<u128>::min_exponent, std::numeric_limits<std::uint64_t>::min_exponent);
+    BOOST_TEST_EQ(std::numeric_limits<u128>::min_exponent10, std::numeric_limits<std::uint64_t>::min_exponent10);
+    BOOST_TEST_EQ(std::numeric_limits<u128>::max_exponent, std::numeric_limits<std::uint64_t>::max_exponent);
+    BOOST_TEST_EQ(std::numeric_limits<u128>::max_exponent10, std::numeric_limits<std::uint64_t>::max_exponent10);
+    BOOST_TEST_EQ(std::numeric_limits<u128>::traps, std::numeric_limits<std::uint64_t>::traps);
+    BOOST_TEST_EQ(std::numeric_limits<u128>::tinyness_before, std::numeric_limits<std::uint64_t>::tinyness_before);
+
+    BOOST_TEST(std::numeric_limits<u128>::min() == std::numeric_limits<std::uint64_t>::min());
+    BOOST_TEST(std::numeric_limits<u128>::lowest() == std::numeric_limits<std::uint64_t>::lowest());
+
+    #ifndef BOOST_DECIMAL_HAS_INT128
+
+    constexpr u128 two128 {std::numeric_limits<std::uint64_t>::max(), std::numeric_limits<std::uint64_t>::max()};
+    BOOST_TEST(std::numeric_limits<u128>::max() == two128);
+
+    #else
+
+    unsigned __int128 max_value {std::numeric_limits<std::uint64_t>::max()};
+    max_value <<= 64U;
+    max_value |= std::numeric_limits<std::uint64_t>::max();
+    BOOST_TEST(std::numeric_limits<u128>::max() == max_value);
+
+    #endif
+
+    BOOST_TEST(std::numeric_limits<u128>::epsilon() == std::numeric_limits<std::uint64_t>::epsilon());
+    BOOST_TEST(std::numeric_limits<u128>::round_error() == std::numeric_limits<std::uint64_t>::round_error());
+    BOOST_TEST(std::numeric_limits<u128>::infinity() == std::numeric_limits<std::uint64_t>::infinity());
+    BOOST_TEST(std::numeric_limits<u128>::quiet_NaN() == std::numeric_limits<std::uint64_t>::quiet_NaN());
+    BOOST_TEST(std::numeric_limits<u128>::signaling_NaN() == std::numeric_limits<std::uint64_t>::signaling_NaN());
+    BOOST_TEST(std::numeric_limits<u128>::denorm_min() == std::numeric_limits<std::uint64_t>::denorm_min());
+}
+
 #ifdef BOOST_DECIMAL_HAS_INT128
 
 template <typename IntType>
@@ -639,6 +691,8 @@ void test_spot_operator_div(IntType value, IntType value2)
 int main()
 {
     test_traits();
+
+    test_numeric_limits();
 
     test_arithmetic_constructor<std::int8_t>();
     test_arithmetic_constructor<std::int16_t>();
@@ -1322,6 +1376,8 @@ void test_operator_div()
 int main()
 {
     test_traits();
+
+    test_numeric_limits();
 
     test_arithmetic_constructor<std::int8_t>();
     test_arithmetic_constructor<std::int16_t>();
