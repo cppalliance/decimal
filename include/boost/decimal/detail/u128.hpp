@@ -1606,15 +1606,39 @@ constexpr auto wide_integer_to_u128(const wide_integer_uint128& src) -> u128
 BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u128& rhs, u128& quotient, u128& remainder) noexcept
 {
     // Mash-Up: Use Knuth long-division from wide-integer (requires limb-conversions on input/output).
+    if (rhs.high == UINT64_C(0) && rhs.low < UINT64_C(0x100000000))
+    {
+        const auto rhs32 = static_cast<std::uint32_t>(rhs.low);
 
-    auto lhs_wide = u128_to_wide_integer(lhs);
+        auto current = static_cast<std::uint64_t>(lhs.high >> 32U);
+        quotient.high = static_cast<std::uint64_t>(static_cast<std::uint64_t>(static_cast<std::uint32_t>(current / rhs32)) << 32U);
+        remainder.low = static_cast<std::uint64_t>(current % rhs32);
 
-    wide_integer_uint128 rem_wide { };
+        current = static_cast<std::uint64_t>(remainder.low << 32U) | static_cast<std::uint32_t>(lhs.high);
+        quotient.high |= static_cast<std::uint32_t>(current / rhs32);
+        remainder.low = static_cast<std::uint64_t>(current % rhs32);
 
-    lhs_wide.eval_divide_knuth(u128_to_wide_integer(rhs), rem_wide);
+        current = static_cast<std::uint64_t>(remainder.low << 32U) | static_cast<std::uint32_t>(lhs.low >> 32U);
+        quotient.low = static_cast<std::uint64_t>(static_cast<std::uint64_t>(static_cast<std::uint32_t>(current / rhs32)) << 32U);
+        remainder.low = static_cast<std::uint64_t>(current % rhs32);
 
-    remainder = wide_integer_to_u128(rem_wide);
-    quotient  = wide_integer_to_u128(lhs_wide);
+        current = remainder.low << 32U | static_cast<std::uint32_t>(lhs.low);
+        quotient.low |= static_cast<std::uint32_t>(current / rhs32);
+        remainder.low = static_cast<std::uint32_t>(current % rhs32);
+
+        remainder.high = UINT64_C(0);
+    }
+    else
+    {
+        auto lhs_wide = u128_to_wide_integer(lhs);
+
+        wide_integer_uint128 rem_wide { };
+
+        lhs_wide.eval_divide_knuth(u128_to_wide_integer(rhs), rem_wide);
+
+        remainder = wide_integer_to_u128(rem_wide);
+        quotient  = wide_integer_to_u128(lhs_wide);
+    }
 }
 
 #ifdef __aarch64__
