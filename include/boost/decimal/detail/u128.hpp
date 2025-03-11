@@ -1581,7 +1581,7 @@ constexpr auto u128_to_wide_integer(const u128& src) -> wide_integer_uint128
 
     static_assert(sizeof(local_limb_type) == static_cast<std::size_t>(UINT8_C(4)) && std::is_same<local_limb_type, std::uint32_t>::value, "Error: Configuration of external wide-integer limbs not OK");
 
-    auto rep = dst.representation();
+    auto& rep = dst.representation();
 
     rep[0] = static_cast<local_limb_type>(src.low);
     rep[1] = static_cast<local_limb_type>(src.low >> 32U);
@@ -1595,7 +1595,7 @@ constexpr auto wide_integer_to_u128(const wide_integer_uint128& src) -> u128
 {
     u128 dst {};
 
-    const auto rep = src.crepresentation();
+    const auto& rep = src.crepresentation();
 
     dst.low = static_cast<std::uint64_t>(rep[0]) | (static_cast<std::uint64_t>(rep[1]) << 32);
     dst.high = static_cast<std::uint64_t>(rep[2]) | (static_cast<std::uint64_t>(rep[3]) << 32U);
