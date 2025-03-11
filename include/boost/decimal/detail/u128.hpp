@@ -1743,15 +1743,17 @@ constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
 
         #endif
     }
-    else if (rhs.high == 0)
-    {
-        // Becomes u128 / std::uint64_t abbreviated division
-        return impl::default_div(lhs, rhs.low);
-    }
-    else
+    else if (rhs > lhs)
     {
         // This would imply rhs.high != 0 and lhs.high == 0 which is always 0
         return {0, 0};
+    }
+    else
+    {
+        u128 quotient {};
+        u128 remainder {};
+        impl::div_mod_impl(lhs, rhs, quotient, remainder);
+        return quotient;
     }
 
     #endif
