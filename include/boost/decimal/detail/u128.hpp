@@ -2110,12 +2110,18 @@ constexpr u128& u128::operator/=(const unsigned __int128 rhs) noexcept
 } // namespace boost
 
 // Non-standard libraries may add specializations for library-provided types
-namespace std {
-
 template <>
-class numeric_limits<boost::decimal::detail::u128>
+#ifdef _MSC_VER
+class std::numeric_limitsboost::decimal::detail::u1282>
+#else
+struct std::numeric_limits<boost::decimal::detail::u128>
+#endif
 {
+
+#ifdef _MSC_VER
 public:
+#endif
+
     // Member constants
     static constexpr bool is_specialized = true;
     static constexpr bool is_signed = false;
@@ -2158,6 +2164,36 @@ public:
     static constexpr auto denorm_min   () -> boost::decimal::detail::u128 { return {0, 0}; }
 };
 
-} // namespace std
+#if (!defined(__cpp_inline_variables) || __cpp_inline_variables < 201606L ) && (!defined(_MSC_VER) || _MSC_VER != 1900)
+
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::is_specialized;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::is_signed;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::is_integer;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::is_exact;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::has_infinity;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::has_quiet_NaN;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::has_signaling_NaN;
+constexpr std::float_round_style std::numeric_limits<boost::decimal::detail::u128>::round_style;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::is_iec559;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::is_bounded;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::is_modulo;
+constexpr int std::numeric_limits<boost::decimal::detail::u128>::digits;
+constexpr int std::numeric_limits<boost::decimal::detail::u128>::digits10;
+constexpr int std::numeric_limits<boost::decimal::detail::u128>::max_digits10;
+constexpr int std::numeric_limits<boost::decimal::detail::u128>::radix;
+constexpr int std::numeric_limits<boost::decimal::detail::u128>::min_exponent;
+constexpr int std::numeric_limits<boost::decimal::detail::u128>::min_exponent10;
+constexpr int std::numeric_limits<boost::decimal::detail::u128>::max_exponent;
+constexpr int std::numeric_limits<boost::decimal::detail::u128>::max_exponent10;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::traps;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::tinyness_before;
+
+// Also add the deprecated members if needed
+#if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
+constexpr std::float_denorm_style std::numeric_limits<boost::decimal::detail::u128>::has_denorm;
+constexpr bool std::numeric_limits<boost::decimal::detail::u128>::has_denorm_loss;
+#endif
+
+#endif
 
 #endif // BOOST_DECIMAL_DETAIL_U128_HPP
