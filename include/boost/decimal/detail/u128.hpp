@@ -2025,6 +2025,42 @@ constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
 
     BOOST_DECIMAL_ASSERT_MSG(rhs != 0, "Division by zero");
 
+    // The is best x64 path assuming the user has consteval detection
+    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(BOOST_DECIMAL_HAS_INT128)
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(rhs))
+    {
+        return static_cast<u128>(static_cast<unsigned __int128>(lhs) / static_cast<unsigned __int128>(rhs));
+    }
+    else if (lhs.high != 0 && rhs.high != 0)
+    {
+        unsigned __int128 new_lhs {};
+        unsigned __int128 new_rhs {};
+
+        std::memcpy(&new_lhs, &lhs, sizeof(new_lhs));
+        std::memcpy(&new_rhs, &rhs, sizeof(new_rhs));
+
+        const auto res {new_lhs / new_rhs};
+
+        u128 new_res {};
+        std::memcpy(&new_res, &res, sizeof(new_res));
+
+        return new_res;
+    }
+    else if (rhs > lhs)
+    {
+        return {0, 0};
+    }
+    else
+    {
+        u128 quotient {};
+        u128 remainder {};
+        impl::div_mod_impl(lhs, rhs, quotient, remainder);
+        return quotient;
+    }
+
+    #else
+
     if (lhs.high != 0 && rhs.high != 0)
     {
         #ifdef BOOST_DECIMAL_HAS_INT128
@@ -2052,6 +2088,8 @@ constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
         impl::div_mod_impl(lhs, rhs, quotient, remainder);
         return quotient;
     }
+    
+    #endif
 
     #endif
 }
