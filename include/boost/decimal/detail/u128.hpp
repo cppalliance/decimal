@@ -2113,8 +2113,9 @@ constexpr u128& u128::operator/=(const unsigned __int128 rhs) noexcept
 namespace std {
 
 template <>
-struct numeric_limits<boost::decimal::detail::u128>
+class numeric_limits<boost::decimal::detail::u128>
 {
+public:
     // Member constants
     static constexpr bool is_specialized = true;
     static constexpr bool is_signed = false;
