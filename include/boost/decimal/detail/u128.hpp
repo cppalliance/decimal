@@ -2185,6 +2185,91 @@ constexpr u128& u128::operator/=(const unsigned __int128 rhs) noexcept
 // Modulo Operator
 //=====================================
 
+namespace impl {
+
+#if defined(__aarch64__) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) || defined(__s390x__)
+
+// This is unconditionally better on ARM64, PPC64LE, and S390X
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mod(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    return static_cast<u128>(static_cast<unsigned __int128>(lhs) % rhs);
+}
+
+#elif defined(BOOST_DECIMAL_HAS_INT128)
+
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mod(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(rhs))
+    {
+        return static_cast<u128>(static_cast<unsigned __int128>(lhs) % rhs);
+    }
+    else if (lhs.high != 0)
+    {
+        // TODO(mborland): Can we abbreviate Knuth division for this case?
+        u128 quotient {};
+        u128 remainder {};
+        impl::div_mod_impl(lhs, u128{0, rhs}, quotient, remainder);
+        return remainder;
+    }
+    else
+    {
+        return {0, lhs.low % rhs};
+    }
+
+    #else
+
+    return static_cast<u128>(static_cast<unsigned __int128>(lhs) % rhs);
+
+    #endif
+}
+
+#else
+
+BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mod(const u128 lhs, const std::uint64_t rhs) noexcept
+{
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(rhs))
+    {
+        u128 quotient{};
+        u128 remainder{};
+        impl::div_mod_impl(lhs, u128{ 0, rhs }, quotient, remainder);
+        return remainder;
+    }
+    else if (lhs.high != 0)
+    {
+        // TODO(mborland): Can we abbreviate Knuth division for this case?
+        u128 quotient{};
+        u128 remainder{};
+        impl::div_mod_impl(lhs, u128{ 0, rhs }, quotient, remainder);
+        return remainder;
+    }
+    else
+    {
+        if (rhs == 0)
+        {
+            return { 0, 0 };
+        }
+
+        return { 0, lhs.low % rhs };
+    }
+
+    #else
+
+    u128 quotient{};
+    u128 remainder{};
+    impl::div_mod_impl(lhs, u128{ 0, rhs }, quotient, remainder);
+    return remainder;
+
+    #endif
+}
+
+#endif
+
+} // namespace impl
+
 constexpr u128 operator%(const u128 lhs, const u128 rhs) noexcept
 {
     // On ARM64 and PPC64LE this is unconditionally better
