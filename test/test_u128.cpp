@@ -757,22 +757,42 @@ void test_spot_operator_div(IntType value, IntType value2)
 
 void test_ostream_operator()
 {
-    std::stringstream out;
-    constexpr boost::decimal::detail::u128 small_num {0, 15};
+    {
+        std::stringstream out;
+        constexpr boost::decimal::detail::u128 small_num {0, 15};
+        out << small_num;
+        BOOST_TEST_CSTR_EQ(out.str().c_str(), "15");
 
-    out << small_num;
-    BOOST_TEST_CSTR_EQ(out.str().c_str(), "15");
+        std::stringstream out_hex_upper;
+        std::stringstream out_hex_lower;
+        out_hex_upper << std::hex << std::uppercase << small_num;
+        out_hex_lower << std::hex << small_num;
+        BOOST_TEST_CSTR_EQ(out_hex_upper.str().c_str(), "F");
+        BOOST_TEST_CSTR_EQ(out_hex_lower.str().c_str(), "f");
 
-    std::stringstream out_hex_upper;
-    std::stringstream out_hex_lower;
-    out_hex_upper << std::hex << std::uppercase << small_num;
-    out_hex_lower << std::hex << small_num;
-    BOOST_TEST_CSTR_EQ(out_hex_upper.str().c_str(), "F");
-    BOOST_TEST_CSTR_EQ(out_hex_lower.str().c_str(), "f");
+        std::stringstream out_oct;
+        out_oct << std::oct << small_num;
+        BOOST_TEST_CSTR_EQ(out_oct.str().c_str(), "17");
+    }
 
-    std::stringstream out_oct;
-    out_oct << std::oct << small_num;
-    BOOST_TEST_CSTR_EQ(out_oct.str().c_str(), "17");
+    {
+        std::stringstream out;
+        constexpr boost::decimal::detail::u128 big_num {0xF, 0};
+
+        out << big_num;
+        BOOST_TEST_CSTR_EQ(out.str().c_str(), "276701161105643274240");
+
+        std::stringstream out_hex_upper;
+        std::stringstream out_hex_lower;
+        out_hex_upper << std::hex << std::uppercase << big_num;
+        out_hex_lower << std::hex << big_num;
+        BOOST_TEST_CSTR_EQ(out_hex_upper.str().c_str(), "F0000000000000000");
+        BOOST_TEST_CSTR_EQ(out_hex_lower.str().c_str(), "f0000000000000000");
+
+        std::stringstream out_oct;
+        out_oct << std::oct << big_num;
+        BOOST_TEST_CSTR_EQ(out_oct.str().c_str(), "36000000000000000000000");
+    }
 }
 
 int main()
