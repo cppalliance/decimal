@@ -2350,6 +2350,30 @@ constexpr u128 operator%(const u128 lhs, const u128 rhs) noexcept
     #endif
 }
 
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+constexpr u128 operator%(const u128 lhs, const UnsignedInteger rhs) noexcept
+{
+    return impl::default_mod(lhs, static_cast<std::uint64_t>(rhs));
+}
+
+template <typename UnsignedInteger, std::enable_if_t<impl::is_unsigned_integer_v<UnsignedInteger>, bool> = true>
+constexpr u128 operator%(const UnsignedInteger lhs, const u128 rhs) noexcept
+{
+    if (rhs.high != 0)
+    {
+        return lhs;
+    }
+    else
+    {
+        if (rhs.low == 0)
+        {
+            return {0, 0};
+        }
+
+        return {0, lhs % rhs.low};
+    }
+}
+
 #ifdef BOOST_DECIMAL_HAS_INT128
 
 constexpr u128 operator%(const u128 lhs, const __int128 rhs) noexcept
