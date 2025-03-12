@@ -192,6 +192,12 @@ void test_float_conversion_operators()
     boost::random::uniform_int_distribution<std::uint64_t> dist(std::numeric_limits<std::uint64_t>::min(),
                                                                 std::numeric_limits<std::uint64_t>::max());
 
+    // Float128 won't have numerics limit defined all the time,
+    // Plus this affords some additional tolerance
+    constexpr FloatType error_tol {std::is_same<FloatType, float>::value ?
+        static_cast<FloatType>(std::numeric_limits<float>::epsilon()) :
+        static_cast<FloatType>(std::numeric_limits<double>::epsilon())};
+
     for (std::size_t i {}; i < N; ++i)
     {
         const auto value {dist(rng)};
@@ -202,8 +208,12 @@ void test_float_conversion_operators()
 
         const auto builtin_value_return = static_cast<FloatType>(builtin_value);
         const auto emulated_value_return = static_cast<FloatType>(emulated_value);
+        FloatType distance = builtin_value_return - emulated_value_return;
 
-        BOOST_TEST(std::abs(builtin_value_return - emulated_value_return) < std::numeric_limits<FloatType>::epsilon());
+        // We don't want to pull in quad math for a simple abs calculation...
+        distance = distance < 0 ? -distance : distance;
+
+        BOOST_TEST(distance < error_tol);
     }
 }
 
