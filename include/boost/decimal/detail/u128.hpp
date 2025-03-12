@@ -2486,6 +2486,105 @@ constexpr u128& u128::operator%=(const unsigned __int128 rhs) noexcept
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
+
+namespace impl {
+
+inline char* u128_to_dec(char (&buffer)[ 64 ], u128 v)
+{
+    char* p = buffer + 64;
+    *--p = '\0';
+
+    do
+    {
+        *--p = "0123456789"[ static_cast<std::size_t>(v.low % 10) ];
+        v /= 10;
+    } while ( v != 0 );
+
+    return p;
+}
+
+inline char* u128_to_hex(char (&buffer)[ 64 ], u128 v, bool upper_case)
+{
+    const auto alphabet = upper_case ? "0123456789ABCDEF" : "0123456789abcdef";
+
+    char* p = buffer + 64;
+    *--p = '\0';
+
+    do
+    {
+        const auto last_byte = v.low & 0xF;
+        *--p = alphabet[ static_cast<std::size_t>(last_byte)];
+        v >>= 4;
+    } while (v != 0);
+
+    return p;
+}
+
+inline char* u128_to_octal(char (&buffer)[ 64 ], u128 v)
+{
+    char* p = buffer + 64;
+    *--p = '\0';
+
+    do
+    {
+        const auto last_octet = v.low & 0x7;
+        *--p = "01234567"[ static_cast<std::size_t>(last_octet)];
+        v >>= 3;
+    } while (v != 0);
+
+    return p;
+}
+
+inline char* u128_to_binary(char (&buffer)[ 64 ], u128 v)
+{
+    char* p = buffer + 64;
+    *--p = '\0';
+
+    do
+    {
+        const auto last_bit = v.low & 0x1;
+        *--p = "01"[ static_cast<std::size_t>(last_bit)];
+        v >>= 1;
+    } while (v != 0);
+
+    return p;
+}
+
+} // namespace impl
+
+template <typename charT, typename traits>
+std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& os, u128 v)
+{
+    char buffer[64];
+
+    auto os_flags {os.flags()};
+
+    switch (os_flags & std::ios::basefield)
+    {
+        case std::ios::dec:
+            os << impl::u128_to_dec(buffer, v);
+            break;
+        case std::ios::hex:
+            os << impl::u128_to_hex(buffer, v, os_flags & std::ios::uppercase);
+            break;
+        case std::ios::oct:
+            os << impl::u128_to_octal(buffer, v);
+            break;
+        case std::ios::binary:
+            os << impl::u128_to_binary(buffer, v);
+            break;
+        // LCOV_EXCL_START
+        default:
+            BOOST_DECIMAL_UNREACHABLE;
+        // LCOV_EXCL_STOP
+    }
+
+    return os;
+}
+
+#endif // BOOST_DECIMAL_DISABLE_IOSTREAM
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
