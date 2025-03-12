@@ -306,30 +306,41 @@ constexpr u128& u128::operator=(const UnsignedInteger value) noexcept { low = st
 constexpr u128& u128::operator=(const unsigned __int128 value) noexcept { low = static_cast<std::uint64_t>(value & low_word_mask); high = static_cast<std::uint64_t>(value >> 64U); return *this; }
 #endif
 
+//=====================================
+// Float Conversion Operators
+//=====================================
+
+// The most correct way to do this would be std::ldexp(static_cast<T>(high), 64) + static_cast<T>(low);
+// Since std::ldexp is not constexpr until C++23 we can work around this by multiplying the high word
+// by 0xFFFFFFFF in order to generally replicate what ldexp is doing in the constexpr context.
+// We also avoid pulling in <quadmath.h> for the __float128 case where we would need ldexpq
+namespace impl {
+
+template <typename T>
+static constexpr T offset_value_v = static_cast<T>(std::numeric_limits<std::uint64_t>::max());
+
+}
+
 constexpr u128::operator float() const noexcept
 {
-    constexpr float offset {static_cast<float>(std::numeric_limits<std::uint64_t>::max())};
-    return static_cast<float>(high) * offset + static_cast<float>(low);
+    return static_cast<float>(high) * impl::offset_value_v<float> + static_cast<float>(low);
 }
 
 constexpr u128::operator double() const noexcept
 {
-    constexpr double offset {static_cast<double>(std::numeric_limits<std::uint64_t>::max())};
-    return static_cast<double>(high) * offset + static_cast<double>(low);
+    return static_cast<double>(high) * impl::offset_value_v<double> + static_cast<double>(low);
 }
 
 constexpr u128::operator long double() const noexcept
 {
-    constexpr long double offset {static_cast<long double>(std::numeric_limits<std::uint64_t>::max())};
-    return static_cast<long double>(high) * offset + static_cast<long double>(low);
+    return static_cast<long double>(high) * impl::offset_value_v<long double> + static_cast<long double>(low);
 }
 
 #ifdef BOOST_DECIMAL_HAS_FLOAT128
 
 constexpr u128::operator __float128() const noexcept
 {
-    constexpr __float128 offset {static_cast<__float128>(std::numeric_limits<std::uint64_t>::max())};
-    return static_cast<__float128>(high) * offset + static_cast<__float128>(low);
+    return static_cast<__float128>(high) * impl::offset_value_v<__float128> + static_cast<__float128>(low);
 }
 
 #endif // BOOST_DECIMAL_HAS_FLOAT128
