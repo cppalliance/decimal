@@ -2395,7 +2395,7 @@ constexpr u128 operator%(const u128 lhs, const unsigned __int128 rhs) noexcept
 
 constexpr u128 operator%(const unsigned __int128 lhs, const u128 rhs) noexcept
 {
-    return static_cast<u128>(lhs) / rhs;
+    return static_cast<u128>(lhs) % rhs;
 }
 
 #endif // BOOST_DECIMAL_HAS_INT128
