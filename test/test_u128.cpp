@@ -587,7 +587,9 @@ void test_operator_right_shift()
         unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
         boost::decimal::detail::u128 emulated_value {value};
 
-        BOOST_TEST((emulated_value >> shift_value) == (builtin_value >> shift_value));
+        auto check_1_value {emulated_value};
+        check_1_value >>= shift_value;
+        BOOST_TEST(check_1_value == (builtin_value >> shift_value));
 
         emulated_value = shift_value;
         builtin_value = shift_value;
