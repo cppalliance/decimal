@@ -653,7 +653,9 @@ void test_operator_mul()
         unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
         boost::decimal::detail::u128 emulated_value {value};
 
-        BOOST_TEST((emulated_value * value2) == (builtin_value * value2));
+        auto check_1_value {emulated_value};
+        check_1_value *= value2;
+        BOOST_TEST(check_1_value == (builtin_value * value2));
         BOOST_TEST((value2 * emulated_value) == (value2 * builtin_value));
     }
 }
@@ -673,7 +675,9 @@ void test_operator_mul()
         unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
         boost::decimal::detail::u128 emulated_value {value};
 
-        BOOST_TEST((emulated_value * value2) == (builtin_value * value2));
+        auto check_1_value {emulated_value};
+        check_1_value *= value2;
+        BOOST_TEST(check_1_value == (builtin_value * value2));
         BOOST_TEST((value2 * emulated_value) == (value2 * builtin_value));
     }
 }
@@ -701,7 +705,9 @@ void test_operator_div()
         unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
         boost::decimal::detail::u128 emulated_value {value};
 
-        BOOST_TEST((emulated_value / value2) == (builtin_value / value2));
+        auto check_1_value {emulated_value};
+        check_1_value /= value2;
+        BOOST_TEST(check_1_value == (builtin_value / value2));
         BOOST_TEST((value2 / emulated_value) == (value2 / builtin_value));
     }
 }
@@ -729,7 +735,9 @@ void test_operator_mod()
         unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
         boost::decimal::detail::u128 emulated_value {value};
 
-        BOOST_TEST((emulated_value % value2) == (builtin_value % value2));
+        auto check_1_value {emulated_value};
+        check_1_value %= value2;
+        BOOST_TEST(check_1_value == (builtin_value % value2));
         BOOST_TEST((value2 % emulated_value) == (value2 % builtin_value));
     }
 }
