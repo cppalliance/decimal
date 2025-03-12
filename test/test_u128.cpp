@@ -12,6 +12,9 @@
 #include <random>
 #include <limits>
 #include <cmath>
+#include <sstream>
+#include <iostream>
+#include <iomanip>
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -752,6 +755,26 @@ void test_spot_operator_div(IntType value, IntType value2)
     BOOST_TEST((value2 / emulated_value) == (value2 / builtin_value));
 }
 
+void test_ostream_operator()
+{
+    std::stringstream out;
+    constexpr boost::decimal::detail::u128 small_num {0, 15};
+
+    out << small_num;
+    BOOST_TEST_CSTR_EQ(out.str().c_str(), "15");
+
+    std::stringstream out_hex_upper;
+    std::stringstream out_hex_lower;
+    out_hex_upper << std::hex << std::uppercase << small_num;
+    out_hex_lower << std::hex << small_num;
+    BOOST_TEST_CSTR_EQ(out_hex_upper.str().c_str(), "F");
+    BOOST_TEST_CSTR_EQ(out_hex_lower.str().c_str(), "f");
+
+    std::stringstream out_oct;
+    out_oct << std::oct << small_num;
+    BOOST_TEST_CSTR_EQ(out_oct.str().c_str(), "17");
+}
+
 int main()
 {
     test_traits();
@@ -1000,6 +1023,8 @@ int main()
     test_operator_mod<std::uint32_t>();
     test_operator_mod<std::uint64_t>();
     test_operator_mod<unsigned __int128>();
+
+    test_ostream_operator();
 
     return boost::report_errors();
 }

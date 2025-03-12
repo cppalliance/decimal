@@ -2536,21 +2536,6 @@ inline char* u128_to_octal(char (&buffer)[ 64 ], u128 v)
     return p;
 }
 
-inline char* u128_to_binary(char (&buffer)[ 64 ], u128 v)
-{
-    char* p = buffer + 64;
-    *--p = '\0';
-
-    do
-    {
-        const auto last_bit = v.low & 0x1;
-        *--p = "01"[ static_cast<std::size_t>(last_bit)];
-        v >>= 1;
-    } while (v != 0);
-
-    return p;
-}
-
 } // namespace impl
 
 template <typename charT, typename traits>
@@ -2570,9 +2555,6 @@ std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>&
             break;
         case std::ios::oct:
             os << impl::u128_to_octal(buffer, v);
-            break;
-        case std::ios::binary:
-            os << impl::u128_to_binary(buffer, v);
             break;
         // LCOV_EXCL_START
         default:
