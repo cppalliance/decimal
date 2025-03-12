@@ -2361,7 +2361,7 @@ constexpr u128 operator%(const UnsignedInteger lhs, const u128 rhs) noexcept
 {
     if (rhs.high != 0)
     {
-        return lhs;
+        return {0, static_cast<std::uint64_t>(lhs)};
     }
     else
     {
@@ -2369,8 +2369,10 @@ constexpr u128 operator%(const UnsignedInteger lhs, const u128 rhs) noexcept
         {
             return {0, 0};
         }
-
-        return {0, lhs % rhs.low};
+        else
+        {
+            return {0, lhs % rhs.low};
+        }
     }
 }
 
