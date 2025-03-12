@@ -2497,8 +2497,8 @@ inline char* u128_to_dec(char (&buffer)[ 64 ], u128 v)
 
     do
     {
-        *--p = "0123456789"[ static_cast<std::size_t>(v.low % 10) ];
-        v /= 10;
+        *--p = "0123456789"[ static_cast<std::size_t>(v % UINT64_C(10)) ];
+        v /= UINT64_C(10);
     } while ( v != 0 );
 
     return p;
