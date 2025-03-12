@@ -503,6 +503,15 @@ int main()
 
         test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
+
+        std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_two_element_operation(builtin_vector, std::modulus<>(), "mod", "Builtin");
+        #endif
+
+        test_two_element_operation(old_vector, std::modulus<>(), "mod", "Old");
+        test_two_element_operation(new_vector, std::modulus<>(), "div", "New");
     }
 
     return 1;
