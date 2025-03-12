@@ -866,13 +866,13 @@ constexpr u128& u128::operator|=(const u128 rhs) noexcept
 
 constexpr u128& u128::operator|=(const __int128 rhs) noexcept
 {
-    *this = *this / rhs;
+    *this = *this | rhs;
     return *this;
 }
 
 constexpr u128& u128::operator|=(const unsigned __int128 rhs) noexcept
 {
-    *this = *this / rhs;
+    *this = *this | rhs;
     return *this;
 }
 
