@@ -2627,6 +2627,11 @@ constexpr std::ptrdiff_t generic_strlen(T* ptr)
     return dist;
 }
 
+#ifdef _MSC_VER
+#  pragma warning (push)
+#  pragma warning (disable: 4127) // conditional expression is constant
+#endif
+
 template <typename charT, typename traits>
 std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>& is, u128& v)
 {
@@ -2674,6 +2679,10 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
 
     return is;
 }
+
+#ifdef _MSC_VER
+#  pragma warning (pop)
+#endif
 
 #endif // BOOST_DECIMAL_DISABLE_IOSTREAM
 
