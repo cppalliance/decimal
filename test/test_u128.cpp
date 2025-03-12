@@ -689,6 +689,34 @@ void test_operator_div()
 }
 
 template <typename IntType>
+void test_operator_mod()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+                                                          std::numeric_limits<IntType>::max());
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        IntType value {0};
+        IntType value2 {0};
+
+        while (value == 0)
+        {
+            value = dist(rng);
+        }
+        while (value2 == 0)
+        {
+            value2 = dist(rng);
+        }
+
+        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
+        boost::decimal::detail::u128 emulated_value {value};
+
+        BOOST_TEST((emulated_value % value2) == (builtin_value % value2));
+        BOOST_TEST((value2 % emulated_value) == (value2 % builtin_value));
+    }
+}
+
+template <typename IntType>
 void test_spot_operator_div(IntType value, IntType value2)
 {
     unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
@@ -934,6 +962,18 @@ int main()
     test_operator_div<unsigned __int128>();
 
     test_spot_operator_div(1, -94);
+
+    test_operator_mod<std::int8_t>();
+    test_operator_mod<std::int16_t>();
+    test_operator_mod<std::int32_t>();
+    test_operator_mod<std::int64_t>();
+    test_operator_mod<__int128>();
+
+    test_operator_mod<std::uint8_t>();
+    test_operator_mod<std::uint16_t>();
+    test_operator_mod<std::uint32_t>();
+    test_operator_mod<std::uint64_t>();
+    test_operator_mod<unsigned __int128>();
 
     return boost::report_errors();
 }
