@@ -1595,12 +1595,11 @@ constexpr u128 operator-(const u128 lhs, const SignedInteger rhs) noexcept
 {
     if (rhs < 0)
     {
-        return impl::default_add(lhs, static_cast<std::uint64_t>(rhs));
+        return impl::default_add(lhs, static_cast<std::uint64_t>(-rhs));
     }
     else
     {
-        const auto unsigned_rhs {detail::make_positive_unsigned(rhs)};
-        return impl::default_sub(lhs, unsigned_rhs);
+        return impl::default_sub(lhs, static_cast<std::uint64_t>(rhs));
     }
 }
 
