@@ -2181,6 +2181,114 @@ constexpr u128& u128::operator/=(const unsigned __int128 rhs) noexcept
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
+//=====================================
+// Modulo Operator
+//=====================================
+
+constexpr u128 operator%(const u128 lhs, const u128 rhs) noexcept
+{
+    // On ARM64 and PPC64LE this is unconditionally better
+    // On x64 this is only better when both lhs and rhs are two word numbers
+    #if defined(__aarch64__) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) || defined(__s390x__)
+
+    return static_cast<u128>(static_cast<unsigned __int128>(lhs) % static_cast<unsigned __int128>(rhs));
+
+    #else
+
+    BOOST_DECIMAL_ASSERT_MSG(rhs != 0, "Division by zero");
+
+    // The is best x64 path assuming the user has consteval detection
+    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(BOOST_DECIMAL_HAS_INT128)
+
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(rhs))
+    {
+        return static_cast<u128>(static_cast<unsigned __int128>(lhs) % static_cast<unsigned __int128>(rhs));
+    }
+    else if (lhs.high != 0 && rhs.high != 0)
+    {
+        unsigned __int128 new_lhs {};
+        unsigned __int128 new_rhs {};
+
+        std::memcpy(&new_lhs, &lhs, sizeof(new_lhs));
+        std::memcpy(&new_rhs, &rhs, sizeof(new_rhs));
+
+        const auto res {new_lhs % new_rhs};
+
+        u128 new_res {};
+        std::memcpy(&new_res, &res, sizeof(new_res));
+
+        return new_res;
+    }
+    else if (rhs > lhs)
+    {
+        return lhs;
+    }
+    else
+    {
+        u128 quotient {};
+        u128 remainder {};
+        impl::div_mod_impl(lhs, rhs, quotient, remainder);
+        return remainder;
+    }
+
+    #else
+
+    if (lhs.high != 0 && rhs.high != 0)
+    {
+        #ifdef BOOST_DECIMAL_HAS_INT128
+
+        return static_cast<u128>(static_cast<unsigned __int128>(lhs) % static_cast<unsigned __int128>(rhs));
+
+        #else
+
+        u128 quotient {};
+        u128 remainder {};
+        impl::div_mod_impl(lhs, rhs, quotient, remainder);
+        return remainder;
+
+        #endif
+    }
+    else if (rhs > lhs)
+    {
+        return lhs;
+    }
+    else
+    {
+        u128 quotient {};
+        u128 remainder {};
+        impl::div_mod_impl(lhs, rhs, quotient, remainder);
+        return remainder;
+    }
+
+    #endif
+
+    #endif
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+
+constexpr u128 operator%(const u128 lhs, const __int128 rhs) noexcept
+{
+    return lhs % static_cast<u128>(rhs);
+}
+
+constexpr u128 operator%(const __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) % rhs;
+}
+
+constexpr u128 operator%(const u128 lhs, const unsigned __int128 rhs) noexcept
+{
+    return lhs % static_cast<u128>(rhs);
+}
+
+constexpr u128 operator%(const unsigned __int128 lhs, const u128 rhs) noexcept
+{
+    return static_cast<u128>(lhs) / rhs;
+}
+
+#endif // BOOST_DECIMAL_HAS_INT128
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
