@@ -9,6 +9,7 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
+#include <boost/decimal/detail/locale_conversion.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -2536,6 +2537,54 @@ inline char* u128_to_octal(char (&buffer)[ 64 ], u128 v)
     return p;
 }
 
+static constexpr unsigned char uchar_values[] =
+{
+  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    0,   1,   2,   3,   4,   5,   6,   7,   8,   9, 255, 255, 255, 255, 255, 255,
+  255,  10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24,
+   25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35, 255, 255, 255, 255, 255,
+  255,  10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24,
+   25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35, 255, 255, 255, 255, 255,
+  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+};
+
+static_assert(sizeof(uchar_values) == 256, "uchar_values should represent all 256 values of unsigned char");
+
+constexpr unsigned char digit_from_char(char val) noexcept
+{
+    return uchar_values[static_cast<unsigned char>(val)];
+}
+
+inline void base_to_u128(char (&buffer)[1024], u128& v, unsigned base)
+{
+    const char* end = buffer + 1024;
+    char* next = buffer;
+
+    const unsigned char first_digit = digit_from_char(*next);
+
+    if (static_cast<unsigned>(first_digit) >= base)
+    {
+        return;
+    }
+
+    unsigned char current_digit = first_digit;
+    while (next < end && current_digit != 255)
+    {
+        v = static_cast<u128>(v * base + current_digit);
+        ++next;
+        current_digit = digit_from_char(*next);
+    }
+}
+
 } // namespace impl
 
 template <typename charT, typename traits>
@@ -2563,6 +2612,67 @@ std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>&
     }
 
     return os;
+}
+
+template <typename T>
+constexpr std::ptrdiff_t generic_strlen(T* ptr)
+{
+    std::ptrdiff_t dist {};
+    while (*ptr != static_cast<T>(0))
+    {
+        ++dist;
+        ++ptr;
+    }
+
+    return dist;
+}
+
+template <typename charT, typename traits>
+std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>& is, u128& v)
+{
+    charT t_buffer[1024] {};
+    is >> t_buffer;
+
+    char buffer[1024] {};
+
+    BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<charT, char>::value)
+    {
+        auto first = buffer;
+        auto t_first = t_buffer;
+        auto t_buffer_end = t_buffer + generic_strlen(t_buffer);
+
+        while (t_first != t_buffer_end)
+        {
+            *first++ = static_cast<char>(*t_first++);
+        }
+    }
+    else
+    {
+        std::memcpy(buffer, t_buffer, sizeof(t_buffer));
+    }
+
+    convert_string_to_c_locale(buffer);
+
+    auto is_flags {is.flags()};
+
+    switch (is_flags & std::ios::basefield)
+    {
+        case std::ios::dec:
+            impl::base_to_u128(buffer, v, 10U);
+            break;
+        case std::ios::hex:
+            impl::base_to_u128(buffer, v, 16U);
+            break;
+        case std::ios::oct:
+            impl::base_to_u128(buffer, v, 8U);
+            break;
+        // LCOV_EXCL_START
+        default:
+            BOOST_DECIMAL_UNREACHABLE;
+        // LCOV_EXCL_STOP
+    }
+
+    return is;
 }
 
 #endif // BOOST_DECIMAL_DISABLE_IOSTREAM
