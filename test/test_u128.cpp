@@ -120,6 +120,123 @@ void test_numeric_limits()
     BOOST_TEST(std::numeric_limits<u128>::denorm_min() == std::numeric_limits<std::uint64_t>::denorm_min());
 }
 
+void test_ostream_operator()
+{
+    {
+        std::stringstream out;
+        constexpr boost::decimal::detail::u128 small_num {0, 15};
+        out << small_num;
+        BOOST_TEST_CSTR_EQ(out.str().c_str(), "15");
+
+        std::stringstream out_hex_upper;
+        std::stringstream out_hex_lower;
+        out_hex_upper << std::hex << std::uppercase << small_num;
+        out_hex_lower << std::hex << small_num;
+        BOOST_TEST_CSTR_EQ(out_hex_upper.str().c_str(), "F");
+        BOOST_TEST_CSTR_EQ(out_hex_lower.str().c_str(), "f");
+
+        std::stringstream out_oct;
+        out_oct << std::oct << small_num;
+        BOOST_TEST_CSTR_EQ(out_oct.str().c_str(), "17");
+    }
+
+    {
+        std::stringstream out;
+        constexpr boost::decimal::detail::u128 big_num {0xF, 0};
+
+        out << big_num;
+        BOOST_TEST_CSTR_EQ(out.str().c_str(), "276701161105643274240");
+
+        std::stringstream out_hex_upper;
+        std::stringstream out_hex_lower;
+        out_hex_upper << std::hex << std::uppercase << big_num;
+        out_hex_lower << std::hex << big_num;
+        BOOST_TEST_CSTR_EQ(out_hex_upper.str().c_str(), "F0000000000000000");
+        BOOST_TEST_CSTR_EQ(out_hex_lower.str().c_str(), "f0000000000000000");
+
+        std::stringstream out_oct;
+        out_oct << std::oct << big_num;
+        BOOST_TEST_CSTR_EQ(out_oct.str().c_str(), "36000000000000000000000");
+    }
+}
+
+void test_istream_operator()
+{
+    {
+        std::stringstream in;
+        in.str("15");
+        boost::decimal::detail::u128 num;
+        in >> num;
+        BOOST_TEST_EQ(num.low, UINT64_C(15));
+
+        num = 0;
+        std::stringstream hex_upper;
+        hex_upper.str("F");
+        hex_upper >> std::hex;
+        hex_upper >> num;
+        BOOST_TEST_EQ(num.low, UINT64_C(15));
+
+        num = 0;
+        std::stringstream hex_lower;
+        hex_lower.str("f");
+        hex_lower >> std::hex;
+        hex_lower >> num;
+        BOOST_TEST_EQ(num.low, UINT64_C(15));
+
+        num = 0;
+        std::stringstream octal_lower;
+        octal_lower.str("17");
+        octal_lower >> std::oct;
+        octal_lower >> num;
+        BOOST_TEST_EQ(num.low, UINT64_C(15));
+
+        num = 0;
+        auto wide_str = L"15";
+        std::wstringstream wide_dec;
+        wide_dec.str(wide_str);
+        wide_dec >> num;
+        BOOST_TEST_EQ(num.low, UINT64_C(15));
+    }
+
+    {
+        constexpr boost::decimal::detail::u128 res {0xF, 0};
+
+        std::stringstream in;
+        in.str("276701161105643274240");
+        boost::decimal::detail::u128 num;
+        in >> num;
+        BOOST_TEST_EQ(num, res);
+
+        num = 0;
+        std::stringstream hex_upper;
+        hex_upper.str("F0000000000000000");
+        hex_upper >> std::hex;
+        hex_upper >> num;
+        BOOST_TEST_EQ(num, res);
+
+        num = 0;
+        std::stringstream hex_lower;
+        hex_lower.str("f0000000000000000");
+        hex_lower >> std::hex;
+        hex_lower >> num;
+        BOOST_TEST_EQ(num, res);
+
+        num = 0;
+        std::stringstream octal_lower;
+        octal_lower.str("36000000000000000000000");
+        octal_lower >> std::oct;
+        octal_lower >> num;
+        BOOST_TEST_EQ(num, res);
+
+        num = 0;
+        auto wide_str = L"276701161105643274240";
+        std::wstringstream wide_dec;
+        wide_dec.str(wide_str);
+        wide_dec >> num;
+        BOOST_TEST_EQ(num, res);
+    }
+}
+
 #ifdef BOOST_DECIMAL_HAS_INT128
 
 template <typename IntType>
@@ -755,46 +872,6 @@ void test_spot_operator_div(IntType value, IntType value2)
     BOOST_TEST((value2 / emulated_value) == (value2 / builtin_value));
 }
 
-void test_ostream_operator()
-{
-    {
-        std::stringstream out;
-        constexpr boost::decimal::detail::u128 small_num {0, 15};
-        out << small_num;
-        BOOST_TEST_CSTR_EQ(out.str().c_str(), "15");
-
-        std::stringstream out_hex_upper;
-        std::stringstream out_hex_lower;
-        out_hex_upper << std::hex << std::uppercase << small_num;
-        out_hex_lower << std::hex << small_num;
-        BOOST_TEST_CSTR_EQ(out_hex_upper.str().c_str(), "F");
-        BOOST_TEST_CSTR_EQ(out_hex_lower.str().c_str(), "f");
-
-        std::stringstream out_oct;
-        out_oct << std::oct << small_num;
-        BOOST_TEST_CSTR_EQ(out_oct.str().c_str(), "17");
-    }
-
-    {
-        std::stringstream out;
-        constexpr boost::decimal::detail::u128 big_num {0xF, 0};
-
-        out << big_num;
-        BOOST_TEST_CSTR_EQ(out.str().c_str(), "276701161105643274240");
-
-        std::stringstream out_hex_upper;
-        std::stringstream out_hex_lower;
-        out_hex_upper << std::hex << std::uppercase << big_num;
-        out_hex_lower << std::hex << big_num;
-        BOOST_TEST_CSTR_EQ(out_hex_upper.str().c_str(), "F0000000000000000");
-        BOOST_TEST_CSTR_EQ(out_hex_lower.str().c_str(), "f0000000000000000");
-
-        std::stringstream out_oct;
-        out_oct << std::oct << big_num;
-        BOOST_TEST_CSTR_EQ(out_oct.str().c_str(), "36000000000000000000000");
-    }
-}
-
 int main()
 {
     test_traits();
@@ -1045,6 +1122,7 @@ int main()
     test_operator_mod<unsigned __int128>();
 
     test_ostream_operator();
+    test_istream_operator();
 
     return boost::report_errors();
 }
@@ -1666,6 +1744,9 @@ int main()
     test_operator_div<std::uint16_t>();
     test_operator_div<std::uint32_t>();
     test_operator_div<std::uint64_t>();
+
+    test_ostream_operator();
+    test_istream_operator();
 
     return boost::report_errors();
 }
