@@ -72,36 +72,36 @@ void test_numeric_limits()
 {
     using namespace boost::decimal::detail;
 
-    BOOST_TEST(std::numeric_limits<u128>::is_specialized);
-    BOOST_TEST(!std::numeric_limits<u128>::is_signed);
-    BOOST_TEST(std::numeric_limits<u128>::is_integer);
-    BOOST_TEST(std::numeric_limits<u128>::is_exact);
-    BOOST_TEST(!std::numeric_limits<u128>::has_infinity);
-    BOOST_TEST(!std::numeric_limits<u128>::has_quiet_NaN);
-    BOOST_TEST(!std::numeric_limits<u128>::has_signaling_NaN);
+    static_assert(std::numeric_limits<u128>::is_specialized, "incorrect");
+    static_assert(!std::numeric_limits<u128>::is_signed, "incorrect");
+    static_assert(std::numeric_limits<u128>::is_integer, "incorrect");
+    static_assert(std::numeric_limits<u128>::is_exact, "incorrect");
+    static_assert(!std::numeric_limits<u128>::has_infinity, "incorrect");
+    static_assert(!std::numeric_limits<u128>::has_quiet_NaN, "incorrect");
+    static_assert(!std::numeric_limits<u128>::has_signaling_NaN, "incorrect");
 
-    BOOST_TEST(std::numeric_limits<u128>::round_style == std::round_toward_zero);
-    BOOST_TEST(!std::numeric_limits<u128>::is_iec559);
-    BOOST_TEST(std::numeric_limits<u128>::is_bounded);
-    BOOST_TEST(std::numeric_limits<u128>::is_modulo);
-    BOOST_TEST_EQ(std::numeric_limits<u128>::digits, sizeof(u128) * 8U);
-    BOOST_TEST_EQ(std::numeric_limits<u128>::digits10, static_cast<int>(std::numeric_limits<u128>::digits * std::log10(2)));
-    BOOST_TEST_EQ(std::numeric_limits<u128>::max_digits10, std::numeric_limits<std::uint64_t>::max_digits10);
-    BOOST_TEST_EQ(std::numeric_limits<u128>::radix, std::numeric_limits<std::uint64_t>::radix);
-    BOOST_TEST_EQ(std::numeric_limits<u128>::min_exponent, std::numeric_limits<std::uint64_t>::min_exponent);
-    BOOST_TEST_EQ(std::numeric_limits<u128>::min_exponent10, std::numeric_limits<std::uint64_t>::min_exponent10);
-    BOOST_TEST_EQ(std::numeric_limits<u128>::max_exponent, std::numeric_limits<std::uint64_t>::max_exponent);
-    BOOST_TEST_EQ(std::numeric_limits<u128>::max_exponent10, std::numeric_limits<std::uint64_t>::max_exponent10);
-    BOOST_TEST_EQ(std::numeric_limits<u128>::traps, std::numeric_limits<std::uint64_t>::traps);
-    BOOST_TEST_EQ(std::numeric_limits<u128>::tinyness_before, std::numeric_limits<std::uint64_t>::tinyness_before);
+    static_assert(std::numeric_limits<u128>::round_style == std::round_toward_zero, "incorrect");
+    static_assert(!std::numeric_limits<u128>::is_iec559, "incorrect");
+    static_assert(std::numeric_limits<u128>::is_bounded, "incorrect");
+    static_assert(std::numeric_limits<u128>::is_modulo, "incorrect");
+    static_assert(std::numeric_limits<u128>::digits == sizeof(u128) * 8U, "incorrect");
+    static_assert(std::numeric_limits<u128>::digits10 == static_cast<int>(std::numeric_limits<u128>::digits * 0.30102999566398119521), "incorrect");
+    static_assert(std::numeric_limits<u128>::max_digits10 == std::numeric_limits<std::uint64_t>::max_digits10, "incorrect");
+    static_assert(std::numeric_limits<u128>::radix == std::numeric_limits<std::uint64_t>::radix, "incorrect");
+    static_assert(std::numeric_limits<u128>::min_exponent == std::numeric_limits<std::uint64_t>::min_exponent, "incorrect");
+    static_assert(std::numeric_limits<u128>::min_exponent10 == std::numeric_limits<std::uint64_t>::min_exponent10, "incorrect");
+    static_assert(std::numeric_limits<u128>::max_exponent == std::numeric_limits<std::uint64_t>::max_exponent, "incorrect");
+    static_assert(std::numeric_limits<u128>::max_exponent10 == std::numeric_limits<std::uint64_t>::max_exponent10, "incorrect");
+    static_assert(std::numeric_limits<u128>::traps == std::numeric_limits<std::uint64_t>::traps, "incorrect");
+    static_assert(std::numeric_limits<u128>::tinyness_before == std::numeric_limits<std::uint64_t>::tinyness_before, "incorrect");
 
-    BOOST_TEST(std::numeric_limits<u128>::min() == std::numeric_limits<std::uint64_t>::min());
-    BOOST_TEST(std::numeric_limits<u128>::lowest() == std::numeric_limits<std::uint64_t>::lowest());
+    static_assert(std::numeric_limits<u128>::min() == std::numeric_limits<std::uint64_t>::min(), "incorrect");
+    static_assert(std::numeric_limits<u128>::lowest() == std::numeric_limits<std::uint64_t>::lowest(), "incorrect");
 
     #ifndef BOOST_DECIMAL_HAS_INT128
 
     constexpr u128 two128 {std::numeric_limits<std::uint64_t>::max(), std::numeric_limits<std::uint64_t>::max()};
-    BOOST_TEST(std::numeric_limits<u128>::max() == two128);
+    BOOST_TEST(std::numeric_limits<u128>::max() == two128, "incorrect");
 
     #else
 
@@ -112,12 +112,12 @@ void test_numeric_limits()
 
     #endif
 
-    BOOST_TEST(std::numeric_limits<u128>::epsilon() == std::numeric_limits<std::uint64_t>::epsilon());
-    BOOST_TEST(std::numeric_limits<u128>::round_error() == std::numeric_limits<std::uint64_t>::round_error());
-    BOOST_TEST(std::numeric_limits<u128>::infinity() == std::numeric_limits<std::uint64_t>::infinity());
-    BOOST_TEST(std::numeric_limits<u128>::quiet_NaN() == std::numeric_limits<std::uint64_t>::quiet_NaN());
-    BOOST_TEST(std::numeric_limits<u128>::signaling_NaN() == std::numeric_limits<std::uint64_t>::signaling_NaN());
-    BOOST_TEST(std::numeric_limits<u128>::denorm_min() == std::numeric_limits<std::uint64_t>::denorm_min());
+    static_assert(std::numeric_limits<u128>::epsilon() == std::numeric_limits<std::uint64_t>::epsilon(), "incorrect");
+    static_assert(std::numeric_limits<u128>::round_error() == std::numeric_limits<std::uint64_t>::round_error(), "incorrect");
+    static_assert(std::numeric_limits<u128>::infinity() == std::numeric_limits<std::uint64_t>::infinity(), "incorrect");
+    static_assert(std::numeric_limits<u128>::quiet_NaN() == std::numeric_limits<std::uint64_t>::quiet_NaN(), "incorrect");
+    static_assert(std::numeric_limits<u128>::signaling_NaN() == std::numeric_limits<std::uint64_t>::signaling_NaN(), "incorrect");
+    static_assert(std::numeric_limits<u128>::denorm_min() == std::numeric_limits<std::uint64_t>::denorm_min(), "incorrect");
 }
 
 void test_ostream_operator()
