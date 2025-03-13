@@ -671,7 +671,7 @@ void test_operator_xor()
 template <typename IntType>
 void test_operator_left_shift()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+    boost::random::uniform_int_distribution<IntType> dist(static_cast<IntType>(0),
                                                           std::numeric_limits<IntType>::max());
 
     boost::random::uniform_int_distribution<unsigned> shift_dist(0, sizeof(IntType) * CHAR_BIT - 1);
@@ -696,7 +696,7 @@ void test_operator_left_shift()
 template <typename IntType>
 void test_operator_right_shift()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
+    boost::random::uniform_int_distribution<IntType> dist(static_cast<IntType>(0),
                                                           std::numeric_limits<IntType>::max());
 
     boost::random::uniform_int_distribution<unsigned> shift_dist(0, sizeof(IntType) * CHAR_BIT - 1);

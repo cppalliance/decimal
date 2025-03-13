@@ -571,7 +571,7 @@ int main()
         #endif
 
         test_two_element_operation(old_vector, std::modulus<>(), "mod", "Old");
-        test_two_element_operation(new_vector, std::modulus<>(), "div", "New");
+        test_two_element_operation(new_vector, std::modulus<>(), "mod", "New");
 
         std::cout << std::endl;
 
