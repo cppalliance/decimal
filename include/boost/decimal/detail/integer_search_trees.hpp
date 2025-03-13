@@ -258,7 +258,7 @@ constexpr auto num_digits(const uint128_t& x) noexcept -> int
 
 constexpr auto num_digits(const u128& x) noexcept -> int
 {
-    unsigned msb {};
+    int msb {};
     if (x.high != 0)
     {
         msb = 64 + (64 - countl_zero(x.high));
