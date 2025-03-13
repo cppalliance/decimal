@@ -2,7 +2,9 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#if defined(__aarch64__) && defined(NDEBUG)
 #define BOOST_DECIMAL_BENCHMARK_U128
+#endif 
 
 #include <iostream>
 
