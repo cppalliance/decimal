@@ -4,8 +4,8 @@
 
 #include <boost/decimal/uint128.hpp>
 #include <boost/decimal/detail/config.hpp>
-
 #include <boost/decimal/detail/u128.hpp>
+#include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <cstring>
 #include <cstdint>
@@ -872,6 +872,21 @@ void test_spot_operator_div(IntType value, IntType value2)
     BOOST_TEST((value2 / emulated_value) == (value2 / builtin_value));
 }
 
+void test_digit_counting()
+{
+    unsigned __int128 builtin_val = 1;
+    boost::decimal::detail::u128 emulated_val {1};
+
+    for (int i {}; i < 38; ++i)
+    {
+        BOOST_TEST_EQ(boost::decimal::detail::num_digits(builtin_val),
+                      boost::decimal::detail::num_digits(emulated_val));
+
+        builtin_val *= 10U;
+        emulated_val *= 10U;
+    }
+}
+
 int main()
 {
     test_traits();
@@ -1123,6 +1138,8 @@ int main()
 
     test_ostream_operator();
     test_istream_operator();
+
+    test_digit_counting();
 
     return boost::report_errors();
 }
