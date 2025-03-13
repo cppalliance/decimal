@@ -11,6 +11,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/emulated256.hpp>
+#include <boost/decimal/detail/u128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <array>
@@ -254,6 +255,34 @@ constexpr auto num_digits(const uint128_t& x) noexcept -> int
 }
 
 #endif // Has int128
+
+constexpr auto num_digits(const u128& x) noexcept -> int
+{
+    unsigned msb {};
+    if (x.high != 0)
+    {
+        msb = 64 + (64 - countl_zero(x.high));
+    }
+    else
+    {
+        msb = 64 - countl_zero(x.low);
+    }
+
+    const auto estimated_digits {(msb * 1000) / 3322 + 1};
+
+    if (x >= impl::emulated_u128_pow10[estimated_digits])
+    {
+        return estimated_digits != 39 ? estimated_digits + 1 : estimated_digits;
+    }
+    else if (estimated_digits > 1 && x < impl::emulated_u128_pow10[estimated_digits - 1])
+    {
+        return estimated_digits - 1;
+    }
+    else
+    {
+        return estimated_digits;
+    }
+}
 
 // Specializations with pruned branches for constructors
 // Since we already have partial information we can greatly speed things up in this case
