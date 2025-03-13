@@ -2686,6 +2686,17 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
 
 #endif // BOOST_DECIMAL_DISABLE_IOSTREAM
 
+template <>
+constexpr int countl_zero<u128>(u128 x) noexcept
+{
+    if (x.high == 0)
+    {
+        return 64 + countl_zero(x.low);
+    }
+
+    return countl_zero(x.high);
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
