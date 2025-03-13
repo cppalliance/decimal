@@ -101,7 +101,7 @@ void test_numeric_limits()
     #ifndef BOOST_DECIMAL_HAS_INT128
 
     constexpr u128 two128 {std::numeric_limits<std::uint64_t>::max(), std::numeric_limits<std::uint64_t>::max()};
-    BOOST_TEST(std::numeric_limits<u128>::max() == two128, "incorrect");
+    BOOST_TEST(std::numeric_limits<u128>::max() == two128);
 
     #else
 
