@@ -1687,7 +1687,7 @@ constexpr u128& u128::operator-=(const unsigned __int128 rhs) noexcept
 // Multiplication Operator
 //=====================================
 
-#if defined(__GNUC__) && __GNUC__ >= 5
+#if defined(__GNUC__) && __GNUC__ >= 8
 #  pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
 
