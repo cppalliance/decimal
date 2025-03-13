@@ -256,6 +256,9 @@ constexpr auto num_digits(const uint128_t& x) noexcept -> int
 
 #endif // Has int128
 
+// Check benchmark_uints.cpp for timing
+#if defined(__aarch64__) && defined(__APPLE__)
+
 constexpr auto num_digits(const u128& x) noexcept -> int
 {
     int msb {};
@@ -283,6 +286,25 @@ constexpr auto num_digits(const u128& x) noexcept -> int
         return estimated_digits;
     }
 }
+
+#else
+
+constexpr int num_digits(const u128& x) noexcept
+{
+    int guess {};
+    if (x.high != UINT64_C(0))
+    {
+        guess = num_digits(x.high) + 19;
+    }
+    else
+    {
+        return num_digits(x.low);
+    }
+
+    return x >= impl::emulated_u128_pow10[guess] && guess != 39 ? guess + 1 : guess;
+}
+
+#endif
 
 // Specializations with pruned branches for constructors
 // Since we already have partial information we can greatly speed things up in this case
