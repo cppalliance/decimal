@@ -40,8 +40,10 @@ using namespace std::chrono_literals;
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
 #  pragma GCC diagnostic ignored "-Wold-style-cast"
-#  pragma GCC diagnostic ignored "-Wstringop-overread"
 #  define BOOST_DECIMAL_NO_INLINE __attribute__ ((__noinline__))
+#  if __GNUC__ >= 11
+#    pragma GCC diagnostic ignored "-Wstringop-overread"
+#  endif
 #endif
 
 // 0 = 1 word
@@ -245,7 +247,7 @@ BOOST_DECIMAL_NO_INLINE void test_digit_counting(const std::vector<T>& data_vec,
         for (std::size_t i {}; i < data_vec.size(); ++i)
         {
             const auto val1 = data_vec[i];
-            s += boost::decimal::detail::num_digits(val1);
+            s += static_cast<std::size_t>(boost::decimal::detail::num_digits(val1));
         }
     }
 
