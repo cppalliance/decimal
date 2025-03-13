@@ -10,6 +10,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/locale_conversion.hpp>
+#include <boost/decimal/detail/strlen.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -2613,19 +2614,6 @@ std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>&
     }
 
     return os;
-}
-
-template <typename T>
-constexpr std::ptrdiff_t generic_strlen(T* ptr)
-{
-    std::ptrdiff_t dist {};
-    while (*ptr != static_cast<T>(0))
-    {
-        ++dist;
-        ++ptr;
-    }
-
-    return dist;
 }
 
 #ifdef _MSC_VER
