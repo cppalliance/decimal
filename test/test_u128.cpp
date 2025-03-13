@@ -23,6 +23,7 @@
 #  pragma clang diagnostic ignored "-Wconversion"
 #  pragma clang diagnostic ignored "-Wsign-conversion"
 #  pragma clang diagnostic ignored "-Wfloat-equal"
+#  pragma clang diagnostic ignored "-Wsign-compare"
 
 #  if (__clang_major__ >= 10 && !defined(__APPLE__)) || __clang_major__ >= 13
 #    pragma clang diagnostic ignored "-Wdeprecated-copy"

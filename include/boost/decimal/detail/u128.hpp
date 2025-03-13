@@ -408,6 +408,14 @@ constexpr bool operator==(const bool lhs, const u128 rhs) noexcept
     return rhs.high == UINT64_C(0) && rhs.low == static_cast<std::uint64_t>(lhs);
 }
 
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wsign-conversion"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+
 template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
 constexpr bool operator==(const u128 lhs, const SignedInteger rhs) noexcept
 {
@@ -1679,6 +1687,10 @@ constexpr u128& u128::operator-=(const unsigned __int128 rhs) noexcept
 // Multiplication Operator
 //=====================================
 
+#if defined(__GNUC__) && __GNUC__ >= 5
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 namespace impl {
 
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 shift_left_32(const std::uint64_t low) noexcept
@@ -2485,6 +2497,12 @@ constexpr u128& u128::operator%=(const unsigned __int128 rhs) noexcept
     *this = *this % rhs;
     return *this;
 }
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
