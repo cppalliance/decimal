@@ -12,6 +12,7 @@
 
 #include <boost/decimal/detail/u128.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+#include <boost/decimal/detail/integer_search_trees.hpp>
 #include <chrono>
 #include <random>
 #include <vector>
@@ -233,6 +234,25 @@ BOOST_DECIMAL_NO_INLINE void test_two_element_operation(const std::vector<T>& da
     std::cout << operation << " <" << std::left << std::setw(11) << type << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
+template <typename T>
+BOOST_DECIMAL_NO_INLINE void test_digit_counting(const std::vector<T>& data_vec, const char* label)
+{
+    const auto t1 = std::chrono::steady_clock::now();
+    std::size_t s = 0; // discard variable
+
+    for (std::size_t k {}; k < K; ++k)
+    {
+        for (std::size_t i {}; i < data_vec.size(); ++i)
+        {
+            const auto val1 = data_vec[i];
+            s += boost::decimal::detail::num_digits(val1);
+        }
+    }
+
+    const auto t2 = std::chrono::steady_clock::now();
+
+    std::cout << "digits<" << std::left << std::setw(11) << label << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+}
 
 int main()
 {
@@ -290,6 +310,15 @@ int main()
 
         test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
+
+        std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_digit_counting(builtin_vector, "builtin");
+        #endif
+
+        test_digit_counting(old_vector, "old");
+        test_digit_counting(new_vector, "new");
     }
     // Single word operations
     {
@@ -343,6 +372,15 @@ int main()
 
         test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
+
+        std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_digit_counting(builtin_vector, "builtin");
+        #endif
+
+        test_digit_counting(old_vector, "old");
+        test_digit_counting(new_vector, "new");
     }
     {
         // Two word and one word operations Even = 2, odd = 1
@@ -397,6 +435,15 @@ int main()
 
         test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
+
+        std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_digit_counting(builtin_vector, "builtin");
+        #endif
+
+        test_digit_counting(old_vector, "old");
+        test_digit_counting(new_vector, "new");
     }
     {
         // Two word and one word operations Even = 1, odd = 2
@@ -451,6 +498,15 @@ int main()
 
         test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
+
+        std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_digit_counting(builtin_vector, "builtin");
+        #endif
+
+        test_digit_counting(old_vector, "old");
+        test_digit_counting(new_vector, "new");
     }
     {
         // Two word and one word operations Even = 1, odd = 2
@@ -514,6 +570,15 @@ int main()
 
         test_two_element_operation(old_vector, std::modulus<>(), "mod", "Old");
         test_two_element_operation(new_vector, std::modulus<>(), "div", "New");
+
+        std::cout << std::endl;
+
+        #ifdef BOOST_DECIMAL_HAS_INT128
+        test_digit_counting(builtin_vector, "builtin");
+        #endif
+
+        test_digit_counting(old_vector, "old");
+        test_digit_counting(new_vector, "new");
     }
 
     return 1;
