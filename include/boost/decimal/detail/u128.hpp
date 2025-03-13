@@ -2564,9 +2564,10 @@ constexpr unsigned char digit_from_char(char val) noexcept
     return uchar_values[static_cast<unsigned char>(val)];
 }
 
-inline void base_to_u128(char (&buffer)[1024], u128& v, unsigned base)
+template <std::size_t N>
+void base_to_u128(char (&buffer)[N], u128& v, unsigned base)
 {
-    const char* end = buffer + 1024;
+    const char* end = buffer + N;
     char* next = buffer;
 
     const unsigned char first_digit = digit_from_char(*next);
@@ -2638,7 +2639,7 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
     charT t_buffer[1024] {};
     is >> t_buffer;
 
-    char buffer[1024] {};
+    char buffer[1024 * (sizeof(charT) / sizeof(char))] {};
 
     BOOST_DECIMAL_IF_CONSTEXPR (!std::is_same<charT, char>::value)
     {
@@ -2653,6 +2654,7 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
     }
     else
     {
+        static_assert(sizeof(buffer) == sizeof(t_buffer), "Need to be equivalent");
         std::memcpy(buffer, t_buffer, sizeof(t_buffer));
     }
 
