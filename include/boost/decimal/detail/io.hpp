@@ -13,6 +13,7 @@
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/locale_conversion.hpp>
+#include <boost/decimal/detail/strlen.hpp>
 #include <boost/decimal/charconv.hpp>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
@@ -45,7 +46,7 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     {
         auto first = buffer;
         auto t_first = t_buffer;
-        auto t_buffer_end = t_buffer + std::strlen(t_buffer);
+        const auto t_buffer_end = t_buffer + detail::generic_strlen(t_buffer);
 
         while (t_first != t_buffer_end)
         {

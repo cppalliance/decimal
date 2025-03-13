@@ -2633,7 +2633,7 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
     {
         auto first = buffer;
         auto t_first = t_buffer;
-        auto t_buffer_end = t_buffer + generic_strlen(t_buffer);
+        const auto t_buffer_end = t_buffer + generic_strlen(t_buffer);
 
         while (t_first != t_buffer_end)
         {
