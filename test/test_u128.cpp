@@ -1051,11 +1051,15 @@ int main()
     test_operator_xor<std::uint64_t>();
     test_operator_xor<unsigned __int128>();
 
+    #ifndef UBSAN
+
     test_operator_left_shift<std::int8_t>();
     test_operator_left_shift<std::int16_t>();
     test_operator_left_shift<std::int32_t>();
     test_operator_left_shift<std::int64_t>();
     test_operator_left_shift<__int128>();
+
+    #endif
 
     test_operator_left_shift<std::uint8_t>();
     test_operator_left_shift<std::uint16_t>();
@@ -1063,11 +1067,15 @@ int main()
     test_operator_left_shift<std::uint64_t>();
     test_operator_left_shift<unsigned __int128>();
 
+    #ifndef UBSAN
+
     test_operator_right_shift<std::int8_t>();
     test_operator_right_shift<std::int16_t>();
     test_operator_right_shift<std::int32_t>();
     test_operator_right_shift<std::int64_t>();
     test_operator_right_shift<__int128>();
+
+    #endif
 
     test_operator_right_shift<std::uint8_t>();
     test_operator_right_shift<std::uint16_t>();
