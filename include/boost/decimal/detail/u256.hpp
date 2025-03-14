@@ -82,7 +82,7 @@ constexpr bool memcmp_modified(const std::uint64_t* lhs, const std::uint64_t* rh
     else
     {
         // This will always be the comparison of 4x std::uint64_ts
-        return !static_cast<bool>(memcmp(lhs, rhs, 32));
+        return static_cast<bool>(memcmp(lhs, rhs, 32));
     }
 }
 
@@ -94,11 +94,11 @@ constexpr bool memcmp_modified(const std::uint64_t* lhs, const std::uint64_t* rh
     {
         if (lhs[i] != rhs[i])
         {
-            return false;
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 #endif
@@ -107,7 +107,10 @@ constexpr bool memcmp_modified(const std::uint64_t* lhs, const std::uint64_t* rh
 
 constexpr bool operator==(const u256& lhs, const u256& rhs) noexcept
 {
-    return impl::memcmp_modified(lhs.bytes, rhs.bytes);
+    // Start comp from low word since they will most likely be filled
+    return lhs.bytes[0] == rhs.bytes[0] && lhs.bytes[1] == rhs.bytes[1] && lhs.bytes[2] == rhs.bytes[2] && lhs.bytes[3] == rhs.bytes[3];
+}
+
 constexpr bool operator!=(const u256& lhs, const u256& rhs) noexcept
 {
     return lhs.bytes[0] != rhs.bytes[0] || lhs.bytes[1] != rhs.bytes[1] || lhs.bytes[2] != rhs.bytes[2] || lhs.bytes[3] != rhs.bytes[3];
