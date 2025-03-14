@@ -14,7 +14,8 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-struct u256
+struct alignas(alignof(std::uint64_t) * 4)
+u256
 {
     std::uint64_t bytes[4] {};
 
@@ -27,6 +28,9 @@ struct u256
 
     // Construction from uints
     constexpr u256(const u128& high_, const u128& low_) noexcept;
+
+    explicit constexpr operator u128() const noexcept;
+    explicit constexpr operator std::size_t() const noexcept;
 };
 
 constexpr u256::u256(const u128& high_, const u128& low_) noexcept
@@ -37,6 +41,15 @@ constexpr u256::u256(const u128& high_, const u128& low_) noexcept
     bytes[3] = high_.high;
 }
 
+constexpr u256::operator u128() const noexcept
+{
+    return u128{bytes[1], bytes[0]};
+}
+
+constexpr u256::operator std::size_t() const noexcept
+{
+    return static_cast<std::size_t>(bytes[3]);
+}
 
 } // namespace detail
 } // namespace decimal
