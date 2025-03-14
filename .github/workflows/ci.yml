@@ -42,7 +42,7 @@ jobs:
             install:
               - g++-7-multilib
           - toolset: gcc-7
-            cxxstd: 14,17"
+            cxxstd: "14,17"
             address_model: 32
             os: ubuntu-latest
             container: ubuntu:18.04
