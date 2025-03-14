@@ -108,6 +108,9 @@ constexpr bool memcmp_modified(const std::uint64_t* lhs, const std::uint64_t* rh
 constexpr bool operator==(const u256& lhs, const u256& rhs) noexcept
 {
     return impl::memcmp_modified(lhs.bytes, rhs.bytes);
+constexpr bool operator!=(const u256& lhs, const u256& rhs) noexcept
+{
+    return lhs.bytes[0] != rhs.bytes[0] || lhs.bytes[1] != rhs.bytes[1] || lhs.bytes[2] != rhs.bytes[2] || lhs.bytes[3] != rhs.bytes[3];
 }
 
 //=====================================
