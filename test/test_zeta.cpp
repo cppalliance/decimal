@@ -8,6 +8,10 @@
 
 #include <boost/decimal.hpp>
 
+// Github actions MSVC is broken with chrono
+// Drone and local run just fine
+#ifndef BOOST_DECIMAL_GHA_MSVC
+
 #if defined(__clang__)
 #  pragma clang diagnostic push
 #  pragma clang diagnostic ignored "-Wold-style-cast"
@@ -441,3 +445,12 @@ int main()
 template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_zero { 0 }; return val_zero; }
 template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_nan  { std::numeric_limits<decimal_type>::quiet_NaN() }; return val_nan; }
 template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_inf  { std::numeric_limits<decimal_type>::infinity() }; return val_inf; }
+
+#else
+
+int main()
+{
+  return 0;
+}
+
+#endif
