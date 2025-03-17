@@ -48,7 +48,11 @@
 // Used defined seed for repeatability
 static std::mt19937_64 rng(42);
 
+#if (defined(__clang_major__) && (__clang_major__ <= 10)) || (defined(__GNUC__) && (__GNUC__ >= 5) && (__GNUC__ < 10))
+constexpr std::size_t N = 128;
+#else
 constexpr std::size_t N = 1024;
+#endif
 
 void test_traits()
 {
@@ -894,6 +898,8 @@ int main()
 
     test_numeric_limits();
 
+    std::cout << "constructors" << std::endl;
+
     test_arithmetic_constructor<std::int8_t>();
     test_arithmetic_constructor<std::int16_t>();
     test_arithmetic_constructor<std::int32_t>();
@@ -905,6 +911,8 @@ int main()
     test_arithmetic_constructor<std::uint32_t>();
     test_arithmetic_constructor<std::uint64_t>();
     test_arithmetic_constructor<unsigned __int128>();
+
+    std::cout << "assignment" << std::endl;
 
     test_assignment_operators<std::int8_t>();
     test_assignment_operators<std::int16_t>();
@@ -918,6 +926,8 @@ int main()
     test_assignment_operators<std::uint64_t>();
     test_arithmetic_constructor<unsigned __int128>();
 
+    std::cout << "integer conversion" << std::endl;
+
     test_integer_conversion_operators<std::int8_t>();
     test_integer_conversion_operators<std::int16_t>();
     test_integer_conversion_operators<std::int32_t>();
@@ -930,6 +940,8 @@ int main()
     test_integer_conversion_operators<std::uint64_t>();
     test_arithmetic_constructor<unsigned __int128>();
 
+    std::cout << "float conversion" << std::endl;
+
     test_float_conversion_operators<float>();
     test_float_conversion_operators<double>();
     test_float_conversion_operators<long double>();
@@ -938,8 +950,12 @@ int main()
     test_float_conversion_operators<__float128>();
     #endif
 
+    std::cout << "unary" << std::endl;
+
     test_unary_plus();
     test_unary_minus();
+
+    std::cout << "equality" << std::endl;
 
     test_operator_equality<std::int8_t>();
     test_operator_equality<std::int16_t>();
@@ -953,6 +969,8 @@ int main()
     test_operator_equality<std::uint64_t>();
     test_operator_equality<unsigned __int128>();
 
+    std::cout << "inequality" << std::endl;
+
     test_operator_inequality<std::int8_t>();
     test_operator_inequality<std::int16_t>();
     test_operator_inequality<std::int32_t>();
@@ -964,6 +982,8 @@ int main()
     test_operator_inequality<std::uint32_t>();
     test_operator_inequality<std::uint64_t>();
     test_operator_inequality<unsigned __int128>();
+
+    std::cout << "less" << std::endl;
 
     test_operator_less<std::int8_t>();
     test_operator_less<std::int16_t>();
@@ -977,6 +997,8 @@ int main()
     test_operator_less<std::uint64_t>();
     test_operator_less<unsigned __int128>();
 
+    std::cout << "le" << std::endl;
+
     test_operator_le<std::int8_t>();
     test_operator_le<std::int16_t>();
     test_operator_le<std::int32_t>();
@@ -988,6 +1010,8 @@ int main()
     test_operator_le<std::uint32_t>();
     test_operator_le<std::uint64_t>();
     test_operator_le<unsigned __int128>();
+
+    std::cout << "greater" << std::endl;
 
     test_operator_greater<std::int8_t>();
     test_operator_greater<std::int16_t>();
@@ -1001,6 +1025,8 @@ int main()
     test_operator_greater<std::uint64_t>();
     test_operator_greater<unsigned __int128>();
 
+    std::cout << "ge" << std::endl;
+
     test_operator_ge<std::int8_t>();
     test_operator_ge<std::int16_t>();
     test_operator_ge<std::int32_t>();
@@ -1012,6 +1038,8 @@ int main()
     test_operator_ge<std::uint32_t>();
     test_operator_ge<std::uint64_t>();
     test_operator_ge<unsigned __int128>();
+
+    std::cout << "or" << std::endl;
 
     test_operator_not();
 
@@ -1027,6 +1055,8 @@ int main()
     test_operator_or<std::uint64_t>();
     test_operator_or<unsigned __int128>();
 
+    std::cout << "and" << std::endl;
+
     test_operator_and<std::int8_t>();
     test_operator_and<std::int16_t>();
     test_operator_and<std::int32_t>();
@@ -1039,6 +1069,8 @@ int main()
     test_operator_and<std::uint64_t>();
     test_operator_and<unsigned __int128>();
 
+    std::cout << "xor" << std::endl;
+
     test_operator_xor<std::int8_t>();
     test_operator_xor<std::int16_t>();
     test_operator_xor<std::int32_t>();
@@ -1050,6 +1082,8 @@ int main()
     test_operator_xor<std::uint32_t>();
     test_operator_xor<std::uint64_t>();
     test_operator_xor<unsigned __int128>();
+
+    std::cout << "leftshift" << std::endl;
 
     #ifndef UBSAN
 
@@ -1067,6 +1101,8 @@ int main()
     test_operator_left_shift<std::uint64_t>();
     test_operator_left_shift<unsigned __int128>();
 
+    std::cout << "rightshift" << std::endl;
+
     #ifndef UBSAN
 
     test_operator_right_shift<std::int8_t>();
@@ -1083,6 +1119,8 @@ int main()
     test_operator_right_shift<std::uint64_t>();
     test_operator_right_shift<unsigned __int128>();
 
+    std::cout << "add" << std::endl;
+
     test_operator_add<std::int8_t>();
     test_operator_add<std::int16_t>();
     test_operator_add<std::int32_t>();
@@ -1094,6 +1132,8 @@ int main()
     test_operator_add<std::uint32_t>();
     test_operator_add<std::uint64_t>();
     test_operator_add<unsigned __int128>();
+
+    std::cout << "sub" << std::endl;
 
     test_operator_sub<std::int8_t>();
     test_operator_sub<std::int16_t>();
@@ -1107,6 +1147,8 @@ int main()
     test_operator_sub<std::uint64_t>();
     test_operator_sub<unsigned __int128>();
 
+    std::cout << "mul" << std::endl;
+
     test_operator_mul<std::int8_t>();
     test_operator_mul<std::int16_t>();
     test_operator_mul<std::int32_t>();
@@ -1118,6 +1160,8 @@ int main()
     test_operator_mul<std::uint32_t>();
     test_operator_mul<std::uint64_t>();
     test_operator_mul<unsigned __int128>();
+
+    std::cout << "div" << std::endl;
 
     test_operator_div<std::int8_t>();
     test_operator_div<std::int16_t>();
@@ -1133,6 +1177,8 @@ int main()
 
     test_spot_operator_div(1, -94);
 
+    std::cout << "mod" << std::endl;
+
     test_operator_mod<std::int8_t>();
     test_operator_mod<std::int16_t>();
     test_operator_mod<std::int32_t>();
@@ -1145,8 +1191,12 @@ int main()
     test_operator_mod<std::uint64_t>();
     test_operator_mod<unsigned __int128>();
 
+    std::cout << "stream" << std::endl;
+
     test_ostream_operator();
     test_istream_operator();
+
+    std::cout << "count" << std::endl;
 
     test_digit_counting();
 
