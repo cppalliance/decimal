@@ -1698,7 +1698,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 shift_left_32(const std::uint64_t low)
     return {low >> 32, low << 32};
 }
 
-#if defined(__x86_64__) || (defined(__aarch64__) && !defined(__APPLE__)) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__))
+#if (defined(__x86_64__) || (defined(__aarch64__) && !defined(__APPLE__)) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__))) && defined(BOOST_DECIMAL_HAS_INT128)
 
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mul(const u128 lhs, const u128 rhs) noexcept
 {
