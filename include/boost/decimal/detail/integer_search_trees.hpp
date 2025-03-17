@@ -12,6 +12,7 @@
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/emulated256.hpp>
 #include <boost/decimal/detail/u128.hpp>
+#include <boost/decimal/detail/u256.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <array>
@@ -305,6 +306,40 @@ constexpr int num_digits(const u128& x) noexcept
 }
 
 #endif
+
+/*
+constexpr int num_digits(const u256& x) noexcept
+{
+    const auto digits = x.bytes;
+    if (digits[2] == digits[3] == 0)
+    {
+        return num_digits(u128{digits[1], digits[0]});
+    }
+
+    int msb {};
+    if (digits[3] != 0)
+    {
+        msb = 192 + (64 - countl_zero(digits[3]));
+    }
+    else if (digits[2] != 0)
+    {
+        msb = 128 + (64 - countl_zero(digits[2]));
+    }
+
+    const auto estimated_digits {(msb * 1000) / 3322 + 1};
+
+    if (x >= impl::emulated_u256_pow10[estimated_digits])
+    {
+        return estimated_digits != 78 ? estimated_digits + 1 : estimated_digits;
+    }
+    else if (estimated_digits > 1 && x < impl::emulated_u256_pow10[estimated_digits - 1])
+    {
+        return estimated_digits - 1;
+    }
+
+    return estimated_digits;
+}
+*/
 
 // Specializations with pruned branches for constructors
 // Since we already have partial information we can greatly speed things up in this case

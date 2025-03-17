@@ -157,7 +157,7 @@ BOOST_DECIMAL_NO_INLINE void test_two_element_operation(const std::vector<T>& da
 
     std::cout << operation << " <" << std::left << std::setw(11) << type << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
-
+*/
 template <typename T>
 BOOST_DECIMAL_NO_INLINE void test_digit_counting(const std::vector<T>& data_vec, const char* label)
 {
@@ -177,14 +177,14 @@ BOOST_DECIMAL_NO_INLINE void test_digit_counting(const std::vector<T>& data_vec,
 
     std::cout << "digits<" << std::left << std::setw(11) << label << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
-*/
+
 
 int main()
 {
     using namespace boost::decimal::detail;
 
     // Two word operations
-    //{
+    {
         std::cout << "\n---------------------------\n";
         std::cout << "Four Word Operations\n";
         std::cout << "---------------------------\n\n";
@@ -235,11 +235,12 @@ int main()
         #ifdef BOOST_DECIMAL_HAS_INT128
         test_digit_counting(builtin_vector, "builtin");
         #endif
-
+*/
         test_digit_counting(old_vector, "old");
         test_digit_counting(new_vector, "new");
     }
     // Single word operations
+    /*
     {
         std::cout << "\n---------------------------\n";
         std::cout << "One Word Operations\n";
