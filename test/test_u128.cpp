@@ -803,7 +803,7 @@ void test_operator_mul()
     }
 }
 
-template <typename IntType>
+template <typename IntType, std::enable_if_t<sizeof(IntType) <= sizeof(std::uint64_t), bool> = true>
 void test_operator_div()
 {
     boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
@@ -822,6 +822,38 @@ void test_operator_div()
         {
             value2 = dist(rng);
         }
+
+        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
+        boost::decimal::detail::u128 emulated_value {value};
+
+        auto check_1_value {emulated_value};
+        check_1_value /= value2;
+        BOOST_TEST(check_1_value == (builtin_value / value2));
+        BOOST_TEST((value2 / emulated_value) == (value2 / builtin_value));
+    }
+}
+
+template <typename IntType, std::enable_if_t<(sizeof(IntType) > sizeof(std::uint64_t)), bool> = true>
+void test_operator_div()
+{
+    boost::random::uniform_int_distribution<IntType> dist(0, UINT64_MAX);
+
+    for (std::size_t i {}; i < N; ++i)
+    {
+        IntType value {0};
+        IntType value2 {0};
+
+        while (value == 0)
+        {
+            value = dist(rng);
+        }
+        while (value2 == 0)
+        {
+            value2 = dist(rng);
+        }
+
+        value *= 1000000000;
+        value2 *= 1000000000;
 
         unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
         boost::decimal::detail::u128 emulated_value {value};
