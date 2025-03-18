@@ -2057,7 +2057,8 @@ constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
 {
     // On ARM64 and PPC64LE this is unconditionally better
     // On x64 this is only better when both lhs and rhs are two word numbers
-    #if defined(__aarch64__) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) || defined(__s390x__)
+    #if defined(__aarch64__) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) || defined(__s390x__) \
+        && (!defined(__clang_major__) || __clang_major__ >= 10)
 
     return static_cast<u128>(static_cast<unsigned __int128>(lhs) / static_cast<unsigned __int128>(rhs));
 
@@ -2216,7 +2217,8 @@ constexpr u128& u128::operator/=(const unsigned __int128 rhs) noexcept
 
 namespace impl {
 
-#if defined(__aarch64__) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) || defined(__s390x__)
+#if defined(__aarch64__) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) || defined(__s390x__) \
+    && (!defined(__clang_major__) || __clang_major__ >= 10)
 
 // This is unconditionally better on ARM64, PPC64LE, and S390X
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mod(const u128 lhs, const std::uint64_t rhs) noexcept
