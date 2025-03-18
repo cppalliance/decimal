@@ -1950,7 +1950,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u1
     }
 }
 
-#if defined(__aarch64__) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) || defined(__s390x__)
+#if (defined(__x86_64__) || (defined(__aarch64__) && !defined(__APPLE__)) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__))) && defined(BOOST_DECIMAL_HAS_INT128) \
+    && (!defined(__clang_major__) || __clang_major__ >= 10) 
 
 // This is unconditionally better on ARM64, PPC64LE, and S390X
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std::uint64_t rhs) noexcept
