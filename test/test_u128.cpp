@@ -75,7 +75,7 @@ constexpr unsigned __int128 get_min<unsigned __int128>()
 template <>
 constexpr __int128 get_max<__int128>()
 {
-    return ((static_cast<__int128>(1) << 127) - 1) / 32;
+    return static_cast<__int128>((static_cast<unsigned __int128>(1) << 127) - 1) / 32;
 }
 
 template <>
