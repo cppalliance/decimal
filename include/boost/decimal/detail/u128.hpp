@@ -1442,7 +1442,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_add(const u128 lhs, const u128
 
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_sub(const u128 lhs, const u128 rhs) noexcept
 {
-    #if defined(__x86_64__) && defined(BOOST_DECIMAL_HAS_INT128)
+    #if defined(__x86_64__) && defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ >= 10)
 
     return static_cast<u128>(static_cast<unsigned __int128>(lhs) - static_cast<unsigned __int128>(rhs));
 
