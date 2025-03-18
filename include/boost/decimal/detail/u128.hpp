@@ -73,6 +73,14 @@ private:
 
 public:
 
+    #ifdef BOOST_DECIMAL_ENDIAN_BIG_BYTE
+    #  if defined(__GNUC__)
+    #    pragma GCC diagnostic push
+    #    pragma GCC diagnostic ignored "-Wreorder"
+    #    define BOOST_DECIMAL_PUSHED_BIG_WARNING
+    #  endif
+    #endif // Big endian
+
     #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
     std::uint64_t low {};
     std::uint64_t high {};
@@ -87,14 +95,6 @@ public:
     constexpr u128(u128&& other) noexcept = default;
     constexpr u128& operator=(const u128& other) noexcept = default;
     constexpr u128& operator=(u128&& other) noexcept = default;
-
-    #ifdef BOOST_DECIMAL_ENDIAN_BIG_BYTE
-    #  if defined(__GNUC__)
-    #    pragma GCC diagnostic push
-    #    pragma GCC diagnostic ignored "-Wreorder"
-    #    define BOOST_DECIMAL_PUSHED_BIG_WARNING
-    #  endif
-    #endif // Big endian
 
     // Direct construction of the number
     constexpr u128(const std::uint64_t hi, const std::uint64_t lo) noexcept : low{lo}, high{hi} {}
