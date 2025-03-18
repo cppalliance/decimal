@@ -24,6 +24,7 @@
 #  pragma clang diagnostic ignored "-Wsign-conversion"
 #  pragma clang diagnostic ignored "-Wfloat-equal"
 #  pragma clang diagnostic ignored "-Wsign-compare"
+#  pragma clang diagnostic ignored "-Woverflow"
 
 #  if (__clang_major__ >= 10 && !defined(__APPLE__)) || __clang_major__ >= 13
 #    pragma clang diagnostic ignored "-Wdeprecated-copy"
@@ -37,6 +38,7 @@
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
 #  pragma GCC diagnostic ignored "-Wsign-compare"
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
+#  pragma GCC diagnostic ignored "-Woverflow"
 
 #elif defined(_MSC_VER)
 #  pragma warning(push)
@@ -56,10 +58,12 @@ constexpr IntType get_min()
     return std::numeric_limits<IntType>::min();
 }
 
+// We reduce the max end of the 128 bit types as they can cause a stack overflow in boost.random
+
 template <>
 constexpr unsigned __int128 get_max<unsigned __int128>()
 {
-    return static_cast<unsigned __int128>(UINT64_MAX) << 64 | UINT64_MAX;
+    return static_cast<unsigned __int128>(UINT64_MAX) << 64 | UINT64_MAX / 32;
 }
 
 template <>
@@ -71,7 +75,7 @@ constexpr unsigned __int128 get_min<unsigned __int128>()
 template <>
 constexpr __int128 get_max<__int128>()
 {
-    return (static_cast<__int128>(1) << 127) - 1;
+    return ((static_cast<__int128>(1) << 127) - 1) / 32;
 }
 
 template <>
@@ -840,7 +844,7 @@ void test_operator_mul()
     }
 }
 
-template <typename IntType, std::enable_if_t<sizeof(IntType) <= sizeof(std::uint64_t), bool> = true>
+template <typename IntType>
 void test_operator_div()
 {
     boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
