@@ -58,32 +58,6 @@ constexpr IntType get_min()
     return std::numeric_limits<IntType>::min();
 }
 
-// We reduce the max end of the 128 bit types as they can cause a stack overflow in boost.random
-
-template <>
-constexpr unsigned __int128 get_max<unsigned __int128>()
-{
-    return static_cast<unsigned __int128>(UINT64_MAX) << 64 | UINT64_MAX / 32;
-}
-
-template <>
-constexpr unsigned __int128 get_min<unsigned __int128>()
-{
-    return 0;
-}
-
-template <>
-constexpr __int128 get_max<__int128>()
-{
-    return static_cast<__int128>((static_cast<unsigned __int128>(1) << 127) - 1) / 32;
-}
-
-template <>
-constexpr __int128 get_min<__int128>()
-{
-    return -get_max<__int128>() - 1;
-}
-
 #include <boost/random/uniform_int_distribution.hpp>
 
 // Used defined seed for repeatability
@@ -280,6 +254,32 @@ void test_istream_operator()
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
+
+// We reduce the max end of the 128 bit types as they can cause a stack overflow in boost.random
+
+template <>
+constexpr unsigned __int128 get_max<unsigned __int128>()
+{
+    return static_cast<unsigned __int128>(UINT64_MAX) << 64 | UINT64_MAX / 32;
+}
+
+template <>
+constexpr unsigned __int128 get_min<unsigned __int128>()
+{
+    return 0;
+}
+
+template <>
+constexpr __int128 get_max<__int128>()
+{
+    return static_cast<__int128>((static_cast<unsigned __int128>(1) << 127) - 1) / 32;
+}
+
+template <>
+constexpr __int128 get_min<__int128>()
+{
+    return -get_max<__int128>() - 1;
+}
 
 template <typename IntType>
 void test_arithmetic_constructor()
