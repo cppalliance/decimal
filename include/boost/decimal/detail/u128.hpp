@@ -27,6 +27,12 @@
 
 #endif // BOOST_DECIMAL_BUILD_MODULE
 
+// This is used frequently enough that I'd rather not have this spaghetti everytime
+// These older clang and GCC versions return incorrect numerical results or sometimes hang
+#define BOOST_DECIMAL_OLD_NON_GNU_COMPILER ((defined(__clang__) && __clang_major__ < 11) || \
+                                            (defined(__GNUC__) && !defined(__clang__) && \
+                                            (__GNUC__ < 10 || (defined(__STRICT_ANSI__) && __GNUC__ >= 10))))
+
 namespace boost {
 namespace decimal {
 namespace detail {
@@ -1442,7 +1448,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_add(const u128 lhs, const u128
 
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_sub(const u128 lhs, const u128 rhs) noexcept
 {
-    #if defined(__x86_64__) && defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ >= 10)
+    #if defined(__x86_64__) && defined(BOOST_DECIMAL_HAS_INT128) && !defined(BOOST_DECIMAL_OLD_NON_GNU_COMPILER)
 
     return static_cast<u128>(static_cast<unsigned __int128>(lhs) - static_cast<unsigned __int128>(rhs));
 
@@ -1699,7 +1705,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 shift_left_32(const std::uint64_t low)
 }
 
 #if (defined(__x86_64__) || (defined(__aarch64__) && !defined(__APPLE__)) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__))) && defined(BOOST_DECIMAL_HAS_INT128) \
-    && (!defined(__clang_major__) || __clang_major__ >= 10)
+    && !defined(BOOST_DECIMAL_OLD_NON_GNU_COMPILER)
 
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mul(const u128 lhs, const u128 rhs) noexcept
 {
@@ -1951,7 +1957,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u1
 }
 
 #if (defined(__x86_64__) || (defined(__aarch64__) && !defined(__APPLE__)) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__))) && defined(BOOST_DECIMAL_HAS_INT128) \
-    && (!defined(__clang_major__) || __clang_major__ >= 10) 
+    && !defined(BOOST_DECIMAL_OLD_NON_GNU_COMPILER)
 
 // This is unconditionally better on ARM64, PPC64LE, and S390X
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std::uint64_t rhs) noexcept
@@ -2058,7 +2064,7 @@ constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
     // On ARM64 and PPC64LE this is unconditionally better
     // On x64 this is only better when both lhs and rhs are two word numbers
     #if defined(__aarch64__) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) || defined(__s390x__) \
-        && (!defined(__clang_major__) || __clang_major__ >= 10)
+        && !defined(BOOST_DECIMAL_OLD_NON_GNU_COMPILER)
 
     return static_cast<u128>(static_cast<unsigned __int128>(lhs) / static_cast<unsigned __int128>(rhs));
 
@@ -2067,7 +2073,7 @@ constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
     BOOST_DECIMAL_ASSERT_MSG(rhs != 0, "Division by zero");
 
     // The is best x64 path assuming the user has consteval detection
-    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(BOOST_DECIMAL_HAS_INT128)
+    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(BOOST_DECIMAL_HAS_INT128) && !defined(BOOST_DECIMAL_OLD_NON_GNU_COMPILER)
 
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(rhs))
     {
@@ -2104,7 +2110,7 @@ constexpr u128 operator/(const u128 lhs, const u128 rhs) noexcept
 
     if (lhs.high != 0 && rhs.high != 0)
     {
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) && !defined(BOOST_DECIMAL_OLD_NON_GNU_COMPILER)
 
         return static_cast<u128>(static_cast<unsigned __int128>(lhs) / static_cast<unsigned __int128>(rhs));
 
@@ -2218,7 +2224,7 @@ constexpr u128& u128::operator/=(const unsigned __int128 rhs) noexcept
 namespace impl {
 
 #if defined(__aarch64__) || (defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) || defined(__s390x__) \
-    && (!defined(__clang_major__) || __clang_major__ >= 10)
+    && !defined(BOOST_DECIMAL_OLD_NON_GNU_COMPILER)
 
 // This is unconditionally better on ARM64, PPC64LE, and S390X
 BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mod(const u128 lhs, const std::uint64_t rhs) noexcept
@@ -2768,5 +2774,7 @@ public:
     static constexpr auto signaling_NaN() -> boost::decimal::detail::u128 { return {0, 0}; }
     static constexpr auto denorm_min   () -> boost::decimal::detail::u128 { return {0, 0}; }
 };
+
+#undef BOOST_DECIMAL_OLD_NON_GNU_COMPILER
 
 #endif // BOOST_DECIMAL_DETAIL_U128_HPP
