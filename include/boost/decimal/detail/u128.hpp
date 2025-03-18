@@ -88,6 +88,14 @@ public:
     constexpr u128& operator=(const u128& other) noexcept = default;
     constexpr u128& operator=(u128&& other) noexcept = default;
 
+    #ifdef BOOST_DECIMAL_ENDIAN_BIG_BYTE
+    #  if defined(__GNUC__)
+    #    pragma GCC diagnostic push
+    #    pragma GCC diagnostic ignored "-Wreorder"
+    #    define BOOST_DECIMAL_PUSHED_BIG_WARNING
+    #  endif
+    #endif // Big endian
+
     // Direct construction of the number
     constexpr u128(const std::uint64_t hi, const std::uint64_t lo) noexcept : low{lo}, high{hi} {}
 
@@ -110,6 +118,11 @@ public:
         low {static_cast<std::uint64_t>(value & low_word_mask)},
         high {static_cast<std::uint64_t>(value >> 64U)} {}
     #endif // BOOST_DECIMAL_HAS_INT128
+
+    #ifdef BOOST_DECIMAL_PUSHED_BIG_WARNING
+    #  pragma GCC diagnostic pop
+    #  undef BOOST_DECIMAL_PUSHED_BIG_WARNING
+    #endif
 
     // Signed assignment operators
     template <typename SignedInteger, std::enable_if_t<impl::is_signed_integer_v<SignedInteger>, bool> = true>
