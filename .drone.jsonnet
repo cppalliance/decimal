@@ -365,7 +365,7 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     linux_pipeline(
         "Linux 22.04 Clang 14 UBSAN",
         "cppalliance/droneubuntu2204:1",
-        { TOOLSET: 'clang', COMPILER: 'clang++-14', CXXSTD: '03,11,14,17,20,2b' } + ubsan,
+        { TOOLSET: 'clang', COMPILER: 'clang++-14', CXXSTD: '03,11,14,17,20,2b', DEFINE: 'UBSAN' } + ubsan,
         "clang-14",
     ),
 
@@ -410,7 +410,7 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
 
     macos_pipeline(
         "MacOS 12.4 Xcode 13.4.1 UBSAN",
-        { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,20,2b' } + ubsan,
+        { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,20,2b', DEFINE: 'UBSAN' } + ubsan,
         xcode_version = "13.4.1", osx_version = "monterey", arch = "arm64",
     ),
 
