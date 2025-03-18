@@ -41,7 +41,44 @@
 #elif defined(_MSC_VER)
 #  pragma warning(push)
 #  pragma warning(disable : 4389)
+#  pragma warning(disable : 4127)
 #endif
+
+template <typename IntType>
+constexpr IntType get_max()
+{
+    return std::numeric_limits<IntType>::max();
+}
+
+template <typename IntType>
+constexpr IntType get_min()
+{
+    return std::numeric_limits<IntType>::min();
+}
+
+template <>
+constexpr unsigned __int128 get_max<unsigned __int128>()
+{
+    return static_cast<unsigned __int128>(UINT64_MAX) << 64 | UINT64_MAX;
+}
+
+template <>
+constexpr unsigned __int128 get_min<unsigned __int128>()
+{
+    return 0;
+}
+
+template <>
+constexpr __int128 get_max<__int128>()
+{
+    return (static_cast<__int128>(1) << 127) - 1;
+}
+
+template <>
+constexpr __int128 get_min<__int128>()
+{
+    return -get_max<__int128>() - 1;
+}
 
 #include <boost/random/uniform_int_distribution.hpp>
 
@@ -243,8 +280,8 @@ void test_istream_operator()
 template <typename IntType>
 void test_arithmetic_constructor()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -262,8 +299,8 @@ void test_arithmetic_constructor()
 template <typename IntType>
 void test_assignment_operators()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -283,8 +320,8 @@ void test_assignment_operators()
 template <typename IntType>
 void test_integer_conversion_operators()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -341,8 +378,8 @@ void test_float_conversion_operators()
 template <typename IntType = std::uint64_t>
 void test_unary_plus()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -361,8 +398,8 @@ void test_unary_plus()
 template <typename IntType = std::uint64_t>
 void test_unary_minus()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -382,8 +419,8 @@ void test_unary_minus()
 template <typename IntType>
 void test_operator_equality()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     // Always equal
     for (std::size_t i {}; i < N; ++i)
@@ -415,8 +452,8 @@ void test_operator_equality()
 template <typename IntType>
 void test_operator_inequality()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     // Always equal
     for (std::size_t i {}; i < N; ++i)
@@ -448,8 +485,8 @@ void test_operator_inequality()
 template <typename IntType>
 void test_operator_less()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -484,8 +521,8 @@ void test_operator_less()
 template <typename IntType>
 void test_operator_le()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -520,8 +557,8 @@ void test_operator_le()
 template <typename IntType>
 void test_operator_greater()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -556,8 +593,8 @@ void test_operator_greater()
 template <typename IntType>
 void test_operator_ge()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -592,8 +629,8 @@ void test_operator_ge()
 template <typename IntType = unsigned __int128>
 void test_operator_not()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -608,8 +645,8 @@ void test_operator_not()
 template <typename IntType>
 void test_operator_or()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -629,8 +666,8 @@ void test_operator_or()
 template <typename IntType>
 void test_operator_and()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -650,8 +687,8 @@ void test_operator_and()
 template <typename IntType>
 void test_operator_xor()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -672,7 +709,7 @@ template <typename IntType>
 void test_operator_left_shift()
 {
     boost::random::uniform_int_distribution<IntType> dist(static_cast<IntType>(0),
-                                                          std::numeric_limits<IntType>::max());
+                                                          get_max<IntType>());
 
     boost::random::uniform_int_distribution<unsigned> shift_dist(0, sizeof(IntType) * CHAR_BIT - 1);
 
@@ -697,7 +734,7 @@ template <typename IntType>
 void test_operator_right_shift()
 {
     boost::random::uniform_int_distribution<IntType> dist(static_cast<IntType>(0),
-                                                          std::numeric_limits<IntType>::max());
+                                                          get_max<IntType>());
 
     boost::random::uniform_int_distribution<unsigned> shift_dist(0, sizeof(IntType) * CHAR_BIT - 1);
 
@@ -721,8 +758,8 @@ void test_operator_right_shift()
 template <typename IntType>
 void test_operator_add()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -742,8 +779,8 @@ void test_operator_add()
 template <typename IntType>
 void test_operator_sub()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -762,7 +799,7 @@ void test_operator_sub()
 template <typename IntType, std::enable_if_t<(sizeof(IntType) <= sizeof(std::uint64_t)), bool> = true>
 void test_operator_mul()
 {
-    const auto root_max {static_cast<IntType>(std::sqrt(std::numeric_limits<IntType>::max()))};
+    const auto root_max {static_cast<IntType>(std::sqrt(get_max<IntType>()))};
     const auto root_min {std::is_unsigned<IntType>::value ? 0 : -root_max};
 
     boost::random::uniform_int_distribution<IntType> dist(root_min, root_max);
@@ -806,8 +843,8 @@ void test_operator_mul()
 template <typename IntType, std::enable_if_t<sizeof(IntType) <= sizeof(std::uint64_t), bool> = true>
 void test_operator_div()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
@@ -822,38 +859,6 @@ void test_operator_div()
         {
             value2 = dist(rng);
         }
-
-        unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
-        boost::decimal::detail::u128 emulated_value {value};
-
-        auto check_1_value {emulated_value};
-        check_1_value /= value2;
-        BOOST_TEST(check_1_value == (builtin_value / value2));
-        BOOST_TEST((value2 / emulated_value) == (value2 / builtin_value));
-    }
-}
-
-template <typename IntType, std::enable_if_t<(sizeof(IntType) > sizeof(std::uint64_t)), bool> = true>
-void test_operator_div()
-{
-    boost::random::uniform_int_distribution<IntType> dist(0, UINT64_MAX);
-
-    for (std::size_t i {}; i < N; ++i)
-    {
-        IntType value {0};
-        IntType value2 {0};
-
-        while (value == 0)
-        {
-            value = dist(rng);
-        }
-        while (value2 == 0)
-        {
-            value2 = dist(rng);
-        }
-
-        value *= 1000000000;
-        value2 *= 1000000000;
 
         unsigned __int128 builtin_value = static_cast<unsigned __int128>(value);
         boost::decimal::detail::u128 emulated_value {value};
@@ -868,8 +873,8 @@ void test_operator_div()
 template <typename IntType>
 void test_operator_mod()
 {
-    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(),
-                                                          std::numeric_limits<IntType>::max());
+    boost::random::uniform_int_distribution<IntType> dist(get_min<IntType>(),
+                                                          get_max<IntType>());
 
     for (std::size_t i {}; i < N; ++i)
     {
