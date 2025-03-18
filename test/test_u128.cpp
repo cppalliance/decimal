@@ -48,11 +48,7 @@
 // Used defined seed for repeatability
 static std::mt19937_64 rng(42);
 
-#if (defined(__clang_major__) && (__clang_major__ <= 10)) || (defined(__GNUC__) && (__GNUC__ >= 5) && (__GNUC__ < 10))
-constexpr std::size_t N = 5;
-#else
 constexpr std::size_t N = 1024;
-#endif
 
 void test_traits()
 {
