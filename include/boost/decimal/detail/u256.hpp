@@ -128,9 +128,57 @@ constexpr bool memcmp_modified(const std::uint64_t* lhs, const std::uint64_t* rh
 
 } // namespace impl
 
+#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(__AVX2__)
+
 constexpr bool operator==(const u256& lhs, const u256& rhs) noexcept
 {
     // Start comp from low word since they will most likely be filled
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2] && lhs[3] == rhs[3];
+    }
+    else
+    {
+        __m256i a = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(lhs.bytes));
+        __m256i b = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(rhs.bytes));
+
+        // Compare for equality (0xFFFFFFFF... where elements are equal)
+        __m256i cmp = _mm256_cmpeq_epi64(a, b);
+
+        // Get comparison mask (16 bits, one per byte)
+        int mask = _mm256_movemask_epi8(cmp);
+
+        // If mask isn't all 1s, at least one element differs
+        return mask == -1; // -1 is 0xFFFFFFFF in two's complement
+    }
+}
+
+constexpr bool operator!=(const u256& lhs, const u256& rhs) noexcept
+{
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return lhs[0] != rhs[0] || lhs[1] != rhs[1] || lhs[2] != rhs[2] || lhs[3] != rhs[3];
+    }
+    else
+    {
+        __m256i a = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(lhs.bytes));
+        __m256i b = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(rhs.bytes));
+
+        // Compare for equality (0xFFFFFFFF... where elements are equal)
+        __m256i cmp = _mm256_cmpeq_epi64(a, b);
+
+        // Get comparison mask (16 bits, one per byte)
+        int mask = _mm256_movemask_epi8(cmp);
+
+        // If mask isn't all 1s, at least one element differs
+        return mask != -1; // -1 is 0xFFFFFFFF in two's complement
+    }
+}
+
+#else
+
+constexpr bool operator==(const u256& lhs, const u256& rhs) noexcept
+{
     return lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2] && lhs[3] == rhs[3];
 }
 
@@ -138,6 +186,8 @@ constexpr bool operator!=(const u256& lhs, const u256& rhs) noexcept
 {
     return lhs[0] != rhs[0] || lhs[1] != rhs[1] || lhs[2] != rhs[2] || lhs[3] != rhs[3];
 }
+
+#endif
 
 //=====================================
 // Left Shift Operators
