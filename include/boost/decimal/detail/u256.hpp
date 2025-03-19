@@ -190,6 +190,25 @@ constexpr bool operator!=(const u256& lhs, const u256& rhs) noexcept
 #endif
 
 //=====================================
+// Less Than Operator
+//=====================================
+
+constexpr bool operator<(const u256& lhs, const u256& rhs) noexcept
+{
+    constexpr std::size_t indices[4] = {3, 2, 1, 0}; // MSB to LSB
+
+    for (std::size_t i = 0; i < 4; ++i)
+    {
+        if (lhs[indices[i]] != rhs[indices[i]])
+        {
+            return lhs[indices[i]] < rhs[indices[i]];
+        }
+    }
+
+    return false;
+}
+
+//=====================================
 // Left Shift Operators
 //=====================================
 
