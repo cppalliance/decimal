@@ -35,6 +35,19 @@ u256
 
     explicit constexpr operator u128() const noexcept;
     explicit constexpr operator std::size_t() const noexcept;
+
+    // Subscript Operators
+    constexpr std::uint64_t& operator[](const std::size_t index) noexcept
+    {
+        BOOST_DECIMAL_ASSERT(index < 4);
+        return bytes[index];
+    }
+
+    BOOST_DECIMAL_FORCE_INLINE constexpr std::uint64_t operator[](const std::size_t index) const noexcept
+    {
+        BOOST_DECIMAL_ASSERT(index < 4);
+        return bytes[index];
+    }
 };
 
 constexpr u256::u256(const u128& high_, const u128& low_) noexcept
@@ -118,12 +131,12 @@ constexpr bool memcmp_modified(const std::uint64_t* lhs, const std::uint64_t* rh
 constexpr bool operator==(const u256& lhs, const u256& rhs) noexcept
 {
     // Start comp from low word since they will most likely be filled
-    return lhs.bytes[0] == rhs.bytes[0] && lhs.bytes[1] == rhs.bytes[1] && lhs.bytes[2] == rhs.bytes[2] && lhs.bytes[3] == rhs.bytes[3];
+    return lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2] && lhs[3] == rhs[3];
 }
 
 constexpr bool operator!=(const u256& lhs, const u256& rhs) noexcept
 {
-    return lhs.bytes[0] != rhs.bytes[0] || lhs.bytes[1] != rhs.bytes[1] || lhs.bytes[2] != rhs.bytes[2] || lhs.bytes[3] != rhs.bytes[3];
+    return lhs[0] != rhs[0] || lhs[1] != rhs[1] || lhs[2] != rhs[2] || lhs[3] != rhs[3];
 }
 
 //=====================================
