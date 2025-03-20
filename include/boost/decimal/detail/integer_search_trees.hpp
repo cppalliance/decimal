@@ -307,11 +307,12 @@ constexpr int num_digits(const u128& x) noexcept
 
 #endif
 
-/*
-constexpr int num_digits(const u256& x) noexcept
+namespace impl {
+
+BOOST_DECIMAL_FORCE_INLINE constexpr num_digits_constexpr_impl(const u256& x) noexcept
 {
     const auto digits = x.bytes;
-    if (digits[2] == digits[3] == 0)
+    if (digits[2] == 0 && digits[3] == 0)
     {
         return num_digits(u128{digits[1], digits[0]});
     }
@@ -339,7 +340,70 @@ constexpr int num_digits(const u256& x) noexcept
 
     return estimated_digits;
 }
-*/
+
+}
+
+#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(__AVX2__)
+
+constexpr int num_digits(const u256& x) noexcept
+{
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x))
+    {
+        return impl::num_digits_constexpr_impl(x);
+    }
+    else
+    {
+        const auto digits = x.bytes;
+
+        // Use AVX2 to check if upper 128 bits are zero in one operation
+        __m128i upper_half = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&digits[2]));
+        if (_mm_testz_si128(upper_half, upper_half))
+        {
+            return num_digits(u128{digits[1], digits[0]});
+        }
+
+        // Find MSB using AVX2 to examine all parts in parallel
+        __m256i all_digits = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(digits));
+        __m256i zero_vec = _mm256_setzero_si256();
+        __m256i cmp_result = _mm256_cmpeq_epi64(all_digits, zero_vec);
+        int zero_mask = _mm256_movemask_pd(_mm256_castsi256_pd(cmp_result));
+        int nonzero_mask = ~zero_mask & 0xF;
+
+        int msb = 0;
+        if (nonzero_mask & 0x8)
+        {
+            // digits[3] != 0
+            msb = 192 + (64 - countl_zero(digits[3]));
+        }
+        else if (nonzero_mask & 0x4)
+        {
+            // digits[2] != 0
+            msb = 128 + (64 - countl_zero(digits[2]));
+        }
+
+        const auto estimated_digits = (msb * 1000) / 3322 + 1;
+
+        if (x >= impl::emulated_u256_pow10[estimated_digits])
+        {
+            return estimated_digits != 78 ? estimated_digits + 1 : estimated_digits;
+        }
+        else if (estimated_digits > 1 && x < impl::emulated_u256_pow10[estimated_digits - 1])
+        {
+            return estimated_digits - 1;
+        }
+
+        return estimated_digits;
+    }
+}
+
+#else
+
+constexpr int num_digits(const u256& x) noexcept
+{
+    return impl::num_digits_constexpr_impl(x);
+}
+
+#endif
 
 // Specializations with pruned branches for constructors
 // Since we already have partial information we can greatly speed things up in this case
