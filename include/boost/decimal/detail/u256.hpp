@@ -272,6 +272,45 @@ constexpr bool operator<=(const u256& lhs, const u256& rhs) noexcept
 // Greater Than Operator
 //=====================================
 
+#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(__AVX2__)
+
+constexpr bool operator>(const u256& lhs, const u256& rhs) noexcept
+{
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return rhs < lhs;
+    }
+    else
+    {
+        __m256i lhs_vec = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&lhs));
+        __m256i rhs_vec = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&rhs));
+
+        __m256i eq_mask = _mm256_cmpeq_epi64(lhs_vec, rhs_vec);
+        uint32_t eq_bits = _mm256_movemask_pd(_mm256_castsi256_pd(eq_mask));
+
+        if ((eq_bits & 0x8) == 0)
+        {
+            return (rhs[3] < lhs[3]);
+        }
+        else if ((eq_bits & 0x4) == 0)
+        {
+            return (rhs[2] < lhs[2]);
+        }
+        else if ((eq_bits & 0x2) == 0)
+        {
+            return (rhs[1] < lhs[1]);
+        }
+        else if ((eq_bits & 0x1) == 0)
+        {
+            return (rhs[0] < lhs[0]);
+        }
+
+        return false;
+    }
+}
+
+#else
+
 constexpr bool operator>(const u256& lhs, const u256& rhs) noexcept
 {
     for (int i = 3; i >= 0; --i)
@@ -284,6 +323,8 @@ constexpr bool operator>(const u256& lhs, const u256& rhs) noexcept
 
     return false;
 }
+
+#endif
 
 //=====================================
 // Left Shift Operators
