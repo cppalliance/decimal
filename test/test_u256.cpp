@@ -53,6 +53,7 @@ void test_equality()
         num = dist(rng);
         u256 new_val_2;
         new_val_2.bytes[0] = num;
+        new_val_2.bytes[1] = num;
         uint256_t old_val_2;
         old_val_2.low.low = num;
         old_val_2.low.high = num;
@@ -161,6 +162,7 @@ void test_inequality()
         num = dist(rng);
         u256 new_val_2;
         new_val_2.bytes[0] = num;
+        new_val_2.bytes[1] = num;
         uint256_t old_val_2;
         old_val_2.low.low = num;
         old_val_2.low.high = num;
@@ -269,6 +271,7 @@ void test_less()
         num = dist(rng);
         u256 new_val_2;
         new_val_2.bytes[0] = num;
+        new_val_2.bytes[1] = num;
         uint256_t old_val_2;
         old_val_2.low.low = num;
         old_val_2.low.high = num;
