@@ -48,6 +48,9 @@ u256
         BOOST_DECIMAL_ASSERT(index < 4);
         return bytes[index];
     }
+
+    // Compound left shift
+    constexpr u256& operator<<=(int amount) noexcept;
 };
 
 constexpr u256::u256(const u128& high_, const u128& low_) noexcept
@@ -449,7 +452,7 @@ constexpr u256 operator<<(const u256& lhs, int shift) noexcept
     {
         for (auto i = word_shift; i < 4; ++i)
         {
-            result.bytes[i] = lhs.bytes[i - word_shift];
+            result[i] = lhs[i - word_shift];
         }
 
         return result;
@@ -457,17 +460,24 @@ constexpr u256 operator<<(const u256& lhs, int shift) noexcept
 
     if (word_shift < 4)
     {
-        result.bytes[word_shift] = lhs.bytes[0] << bit_shift;
+        result[word_shift] = lhs[0] << bit_shift;
     }
 
     for (auto i = word_shift + 1; i < 4; ++i)
     {
-        result.bytes[i] = (lhs.bytes[i - word_shift] << bit_shift) |
-                          (lhs.bytes[i - word_shift - 1] >> (64 - bit_shift));
+        result[i] = (lhs[i - word_shift] << bit_shift) |
+                    (lhs[i - word_shift - 1] >> (64 - bit_shift));
     }
 
     return result;
 }
+
+constexpr u256& u256::operator<<=(int amount) noexcept
+{
+    *this = *this << amount;
+    return *this;
+}
+
 
 } // namespace detail
 } // namespace decimal
