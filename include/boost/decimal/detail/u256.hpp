@@ -269,6 +269,23 @@ constexpr bool operator<=(const u256& lhs, const u256& rhs) noexcept
 #endif
 
 //=====================================
+// Greater Than Operator
+//=====================================
+
+constexpr bool operator>(const u256& lhs, const u256& rhs) noexcept
+{
+    for (int i = 3; i >= 0; --i)
+    {
+        if (lhs[i] != rhs[i])
+        {
+            return rhs[i] < lhs[i];
+        }
+    }
+
+    return false;
+}
+
+//=====================================
 // Left Shift Operators
 //=====================================
 
