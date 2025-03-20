@@ -528,6 +528,22 @@ constexpr u256& u256::operator>>=(int amount) noexcept
     return *this;
 }
 
+//=====================================
+// Or Operators
+//=====================================
+
+constexpr u256 operator|(const u256& lhs, const u256& rhs) noexcept
+{
+    u256 result {};
+
+    result[3] = lhs[3] | rhs[3];
+    result[2] = lhs[2] | rhs[2];
+    result[1] = lhs[1] | rhs[1];
+    result[0] = lhs[0] | rhs[0];
+
+    return result;
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
