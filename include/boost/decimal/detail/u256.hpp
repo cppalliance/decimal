@@ -532,6 +532,41 @@ constexpr u256& u256::operator>>=(int amount) noexcept
 // Or Operators
 //=====================================
 
+#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(__AVX2__)
+
+constexpr u256 operator|(const u256& lhs, const u256& rhs) noexcept
+{
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        u256 result {};
+
+        result[3] = lhs[3] | rhs[3];
+        result[2] = lhs[2] | rhs[2];
+        result[1] = lhs[1] | rhs[1];
+        result[0] = lhs[0] | rhs[0];
+
+        return result;
+    }
+    else
+    {
+        u256 result;
+
+        // Load 256 bits from each operand into AVX2 registers
+        __m256i lhs_vec = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&lhs));
+        __m256i rhs_vec = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&rhs));
+
+        // Perform the bitwise OR operation
+        __m256i result_vec = _mm256_or_si256(lhs_vec, rhs_vec);
+
+        // Store the result back to memory
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(&result), result_vec);
+
+        return result;
+    }
+}
+
+#else
+
 constexpr u256 operator|(const u256& lhs, const u256& rhs) noexcept
 {
     u256 result {};
@@ -543,6 +578,8 @@ constexpr u256 operator|(const u256& lhs, const u256& rhs) noexcept
 
     return result;
 }
+
+#endif
 
 } // namespace detail
 } // namespace decimal
