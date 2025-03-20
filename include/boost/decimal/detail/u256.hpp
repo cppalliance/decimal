@@ -327,6 +327,15 @@ constexpr bool operator>(const u256& lhs, const u256& rhs) noexcept
 #endif
 
 //=====================================
+// Greater Equal Operator
+//=====================================
+
+constexpr bool operator>=(const u256& lhs, const u256& rhs) noexcept
+{
+    return !(lhs < rhs);
+}
+
+//=====================================
 // Left Shift Operators
 //=====================================
 
