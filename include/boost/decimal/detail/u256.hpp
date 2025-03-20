@@ -49,8 +49,9 @@ u256
         return bytes[index];
     }
 
-    // Compound left shift
+    // Compound Operators
     constexpr u256& operator<<=(int amount) noexcept;
+    constexpr u256& operator>>=(int amount) noexcept;
 };
 
 constexpr u256::u256(const u128& high_, const u128& low_) noexcept
@@ -478,6 +479,54 @@ constexpr u256& u256::operator<<=(int amount) noexcept
     return *this;
 }
 
+//=====================================
+// Right Shift Operators
+//=====================================
+
+constexpr u256 operator>>(const u256& lhs, int shift) noexcept
+{
+    u256 result {};
+
+    if (shift >= 256)
+    {
+        return result;
+    }
+
+    const auto word_shift {shift / 64};
+    const auto bit_shift {shift % 64};
+
+    // Only moving whole words
+    if (bit_shift == 0)
+    {
+        for (auto i = 0; i < 4 - word_shift; ++i)
+        {
+            result[i] = lhs[i + word_shift];
+        }
+
+        return result;
+    }
+
+    // Handle partial shifts across word boundaries
+    for (auto i = 0; i < 4 - word_shift - 1; ++i)
+    {
+        result[i] = (lhs[i + word_shift] >> bit_shift) |
+                    (lhs[i + word_shift + 1] << (64 - bit_shift));
+    }
+
+    // Handle the last word that has a partial shift
+    if (word_shift < 4)
+    {
+        result[3 - word_shift] = lhs[3] >> bit_shift;
+    }
+
+    return result;
+}
+
+constexpr u256& u256::operator>>=(int amount) noexcept
+{
+    *this = *this >> amount;
+    return *this;
+}
 
 } // namespace detail
 } // namespace decimal
