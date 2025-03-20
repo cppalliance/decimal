@@ -309,7 +309,7 @@ constexpr int num_digits(const u128& x) noexcept
 
 namespace impl {
 
-BOOST_DECIMAL_FORCE_INLINE constexpr num_digits_constexpr_impl(const u256& x) noexcept
+BOOST_DECIMAL_FORCE_INLINE constexpr int num_digits_constexpr_impl(const u256& x) noexcept
 {
     const auto digits = x.bytes;
     if (digits[2] == 0 && digits[3] == 0)
