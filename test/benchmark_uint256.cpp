@@ -136,7 +136,28 @@ BOOST_DECIMAL_NO_INLINE void test_comparisons(const std::vector<T>& data_vec, co
 
     std::cout << "comp<" << std::left << std::setw(11) << label << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
-/*
+
+template <typename T>
+BOOST_DECIMAL_NO_INLINE void test_bitwise_ops(const std::vector<T>& data_vec, const char* label)
+{
+    const auto t1 = std::chrono::steady_clock::now();
+    std::size_t s = 0; // discard variable
+
+    for (std::size_t k {}; k < K; ++k)
+    {
+        for (std::size_t i {}; i < data_vec.size() - 1U; ++i)
+        {
+            const auto val1 = data_vec[i];
+            const auto val2 = data_vec[i + 1];
+            s += static_cast<std::size_t>(val1 | val2);
+        }
+    }
+
+    const auto t2 = std::chrono::steady_clock::now();
+
+    std::cout << "bits<" << std::left << std::setw(11) << label << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+}
+
 template <typename T, typename Func>
 BOOST_DECIMAL_NO_INLINE void test_two_element_operation(const std::vector<T>& data_vec, Func op, const char* operation, const char* type)
 {
@@ -157,7 +178,7 @@ BOOST_DECIMAL_NO_INLINE void test_two_element_operation(const std::vector<T>& da
 
     std::cout << operation << " <" << std::left << std::setw(11) << type << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
-*/
+
 template <typename T>
 BOOST_DECIMAL_NO_INLINE void test_digit_counting(const std::vector<T>& data_vec, const char* label)
 {
@@ -193,6 +214,11 @@ int main()
         const auto new_vector = generate_random_vector_new<4>();
         test_comparisons(old_vector, "old");
         test_comparisons(new_vector, "new");
+
+        std::cout << std::endl;
+
+        test_bitwise_ops(old_vector, "old");
+        test_bitwise_ops(new_vector, "new");
 
         std::cout << std::endl;
 /*
