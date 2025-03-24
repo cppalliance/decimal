@@ -565,6 +565,43 @@ constexpr u256 operator|(const u256& lhs, const u256& rhs) noexcept
     }
 }
 
+#elif !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(BOOST_DECIMAL_HAS_ARM_INTRINSICS)
+
+constexpr u256 operator|(const u256& lhs, const u256& rhs) noexcept
+{
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        u256 result {};
+
+        result[3] = lhs[3] | rhs[3];
+        result[2] = lhs[2] | rhs[2];
+        result[1] = lhs[1] | rhs[1];
+        result[0] = lhs[0] | rhs[0];
+
+        return result;
+    }
+    else
+    {
+        u256 result;
+
+        uint64x2_t lhs_low = vld1q_u64(reinterpret_cast<const uint64_t*>(&lhs.bytes[0]));
+        uint64x2_t lhs_high = vld1q_u64(reinterpret_cast<const uint64_t*>(&lhs.bytes[2]));
+
+        uint64x2_t rhs_low = vld1q_u64(reinterpret_cast<const uint64_t*>(&rhs.bytes[0]));
+        uint64x2_t rhs_high = vld1q_u64(reinterpret_cast<const uint64_t*>(&rhs.bytes[2]));
+
+        // Perform bitwise OR in parallel
+        uint64x2_t result_low = vorrq_u64(lhs_low, rhs_low);
+        uint64x2_t result_high = vorrq_u64(lhs_high, rhs_high);
+
+        // Store results back
+        vst1q_u64(reinterpret_cast<uint64_t*>(&result[0]), result_low);
+        vst1q_u64(reinterpret_cast<uint64_t*>(&result[2]), result_high);
+
+        return result;
+    }
+}
+
 #else
 
 constexpr u256 operator|(const u256& lhs, const u256& rhs) noexcept
