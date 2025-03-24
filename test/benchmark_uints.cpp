@@ -389,11 +389,11 @@ int main()
         std::cout << std::endl;
 
         #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
-        test_digit_counting(builtin_vector, "builtin");
+        // test_digit_counting(builtin_vector, "builtin");
         #endif
 
-        test_digit_counting(old_vector, "old");
-        test_digit_counting(new_vector, "new");
+        // test_digit_counting(old_vector, "old");
+        // test_digit_counting(new_vector, "new");
     }
     // Single word operations
     {
@@ -451,11 +451,11 @@ int main()
         std::cout << std::endl;
 
         #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
-        test_digit_counting(builtin_vector, "builtin");
+        // test_digit_counting(builtin_vector, "builtin");
         #endif
 
-        test_digit_counting(old_vector, "old");
-        test_digit_counting(new_vector, "new");
+        // test_digit_counting(old_vector, "old");
+        // test_digit_counting(new_vector, "new");
     }
     {
         // Two word and one word operations Even = 2, odd = 1
@@ -514,11 +514,11 @@ int main()
         std::cout << std::endl;
 
         #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
-        test_digit_counting(builtin_vector, "builtin");
+        // test_digit_counting(builtin_vector, "builtin");
         #endif
 
-        test_digit_counting(old_vector, "old");
-        test_digit_counting(new_vector, "new");
+        // test_digit_counting(old_vector, "old");
+        // test_digit_counting(new_vector, "new");
     }
     {
         // Two word and one word operations Even = 1, odd = 2
@@ -577,11 +577,11 @@ int main()
         std::cout << std::endl;
 
         #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
-        test_digit_counting(builtin_vector, "builtin");
+        // test_digit_counting(builtin_vector, "builtin");
         #endif
 
-        test_digit_counting(old_vector, "old");
-        test_digit_counting(new_vector, "new");
+        // test_digit_counting(old_vector, "old");
+        // test_digit_counting(new_vector, "new");
     }
     {
         // Two word and one word operations Even = 1, odd = 2
@@ -649,11 +649,11 @@ int main()
         std::cout << std::endl;
 
         #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
-        test_digit_counting(builtin_vector, "builtin");
+        // test_digit_counting(builtin_vector, "builtin");
         #endif
 
-        test_digit_counting(old_vector, "old");
-        test_digit_counting(new_vector, "new");
+        // test_digit_counting(old_vector, "old");
+        // test_digit_counting(new_vector, "new");
     }
 
     return 1;

@@ -1956,6 +1956,13 @@ BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u1
 
         remainder.high = UINT64_C(0);
     }
+    #ifdef BOOST_DECIMAL_HAS_MSVC_X64_INTRINSICS
+    else if (rhs.high == UINT64_C(0))
+    {
+        // Since low is at least 2^32 the quotient will be less than 2^64
+        quotient.low = _udiv128(lhs.high, lhs.low, rhs.low, &remainder.low);
+    }
+    #endif
     else
     {
         auto lhs_wide = u128_to_wide_integer(lhs);
