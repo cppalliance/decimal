@@ -2,13 +2,16 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#if defined(__aarch64__) && defined(NDEBUG)
 #define BOOST_DECIMAL_BENCHMARK_U128
-#endif 
 
 #include <iostream>
 
 #ifdef BOOST_DECIMAL_BENCHMARK_U128
+
+#if __has_include(<__msvc_int128.hpp>)
+#include <__msvc_int128.hpp>
+#define BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128
+#endif
 
 #include <boost/decimal/detail/u128.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
@@ -189,6 +192,76 @@ std::vector<unsigned __int128> generate_random_builtin_vector(std::size_t size =
 
 #endif
 
+#ifdef BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128
+
+template <int words>
+std::vector<std::_Unsigned128> generate_random_builtin_vector(std::size_t size = N, unsigned seed = 42U)
+{
+    if (seed == 0)
+    {
+        std::random_device rd;
+        seed = rd();
+    }
+
+    std::mt19937_64 gen(seed);
+    std::uniform_int_distribution<std::uint64_t> dist(UINT64_C(0), UINT64_MAX);
+    std::uniform_int_distribution<int> size_dist(0, 1);
+
+    std::vector<std::_Unsigned128> result(size);
+    for (std::size_t i = 0; i < size; ++i)
+    {
+        switch (words)
+        {
+        case 0:
+            result[i] = dist(gen);
+            break;
+
+        case 1:
+            result[i] = static_cast<std::_Unsigned128>(dist(gen)) << 64U | dist(gen);
+            break;
+
+        case 2:
+            if (i % 2 == 0)
+            {
+                result[i] = static_cast<std::_Unsigned128>(dist(gen)) << 64U | dist(gen);
+            }
+            else
+            {
+                result[i] = dist(gen);
+            }
+            break;
+
+        case 3:
+            if (i % 2 == 1)
+            {
+                result[i] = static_cast<std::_Unsigned128>(dist(gen)) << 64U | dist(gen);
+            }
+            else
+            {
+                result[i] = dist(gen);
+            }
+            break;
+
+        case 4:
+            if (size_dist(gen) == 1)
+            {
+                result[i] = static_cast<std::_Unsigned128>(dist(gen)) << 64U | dist(gen);
+            }
+            else
+            {
+                result[i] = dist(gen);
+            }
+            break;
+
+        default:
+            BOOST_DECIMAL_UNREACHABLE;
+        }
+    }
+    return result;
+}
+
+#endif
+
 template <typename T>
 BOOST_DECIMAL_NO_INLINE void test_comparisons(const std::vector<T>& data_vec, const char* label)
 {
@@ -269,7 +342,7 @@ int main()
         const auto old_vector = generate_random_vector<0, uint128>();
         const auto new_vector = generate_random_vector<0, u128>();
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         const auto builtin_vector = generate_random_builtin_vector<0>();
         test_comparisons(builtin_vector, "builtin");
         #endif
@@ -279,7 +352,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
         #endif
 
@@ -288,7 +361,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
         #endif
 
@@ -297,7 +370,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
         #endif
 
@@ -306,7 +379,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
         #endif
 
@@ -315,7 +388,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_digit_counting(builtin_vector, "builtin");
         #endif
 
@@ -331,7 +404,7 @@ int main()
         const auto old_vector = generate_random_vector<1, uint128>();
         const auto new_vector = generate_random_vector<1, u128>();
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         const auto builtin_vector = generate_random_builtin_vector<1>();
         test_comparisons(builtin_vector, "builtin");
         #endif
@@ -341,7 +414,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
         #endif
 
@@ -350,7 +423,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
         #endif
 
@@ -359,7 +432,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
         #endif
 
@@ -368,7 +441,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
         #endif
 
@@ -377,7 +450,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_digit_counting(builtin_vector, "builtin");
         #endif
 
@@ -394,7 +467,7 @@ int main()
         const auto old_vector = generate_random_vector<2, uint128>();
         const auto new_vector = generate_random_vector<2, u128>();
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         const auto builtin_vector = generate_random_builtin_vector<2>();
         test_comparisons(builtin_vector, "builtin");
         #endif
@@ -404,7 +477,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
         #endif
 
@@ -413,7 +486,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
         #endif
 
@@ -422,7 +495,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
         #endif
 
@@ -431,7 +504,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
         #endif
 
@@ -440,7 +513,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_digit_counting(builtin_vector, "builtin");
         #endif
 
@@ -457,7 +530,7 @@ int main()
         const auto old_vector = generate_random_vector<3, uint128>();
         const auto new_vector = generate_random_vector<3, u128>();
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         const auto builtin_vector = generate_random_builtin_vector<3>();
         test_comparisons(builtin_vector, "builtin");
         #endif
@@ -467,7 +540,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
         #endif
 
@@ -476,7 +549,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
         #endif
 
@@ -485,7 +558,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
         #endif
 
@@ -494,7 +567,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)  
         test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
         #endif
 
@@ -503,7 +576,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_digit_counting(builtin_vector, "builtin");
         #endif
 
@@ -520,7 +593,7 @@ int main()
         const auto old_vector = generate_random_vector<4, uint128>();
         const auto new_vector = generate_random_vector<4, u128>();
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         const auto builtin_vector = generate_random_builtin_vector<4>();
         test_comparisons(builtin_vector, "builtin");
         #endif
@@ -530,7 +603,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
         #endif
 
@@ -539,7 +612,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
         #endif
 
@@ -548,7 +621,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
         #endif
 
@@ -557,7 +630,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
         #endif
 
@@ -566,7 +639,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_two_element_operation(builtin_vector, std::modulus<>(), "mod", "Builtin");
         #endif
 
@@ -575,7 +648,7 @@ int main()
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
+        #if defined(BOOST_DECIMAL_HAS_INT128) || defined(BOOST_DECIMAL_HAS_MSVC_INTERNAL_U128)
         test_digit_counting(builtin_vector, "builtin");
         #endif
 
