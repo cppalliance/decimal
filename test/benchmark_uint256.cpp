@@ -222,6 +222,11 @@ int main()
         test_bitwise_ops(new_vector, "new");
 
         std::cout << std::endl;
+
+        test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
+        test_two_element_operation(new_vector, std::plus<>(), "add", "New");
+
+        std::cout << std::endl;
 /*
         #ifdef BOOST_DECIMAL_HAS_INT128
         test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
