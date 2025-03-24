@@ -90,6 +90,10 @@
 #  endif
 #  if defined(_WIN64)
 #    define BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS
+#    ifndef _M_ARM64
+#      include <immintrin.h>
+#      define BOOST_DECIMAL_HAS_MSVC_X64_INTRINSICS
+#    endif
 #  else
 #    define BOOST_DECIMAL_HAS_MSVC_32BIT_INTRINSICS
 #  endif
