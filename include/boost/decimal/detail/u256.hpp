@@ -708,6 +708,70 @@ constexpr u256 operator&(const u256& lhs, const u256& rhs) noexcept
 
 #endif
 
+#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(BOOST_DECIMAL_ADD_CARRY)
+
+constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
+{
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        u256 result{};
+        uint64_t carry = 0;
+
+        uint64_t sum = lhs[0] + rhs[0];
+        result[0] = sum;
+        carry = (sum < lhs[0]) ? 1 : 0;
+
+        sum = lhs[1] + rhs[1] + carry;
+        result[1] = sum;
+        carry = (sum < lhs[1] || (sum == lhs[1] && carry)) ? 1 : 0;
+
+        sum = lhs[2] + rhs[2] + carry;
+        result[2] = sum;
+        carry = (sum < lhs[2] || (sum == lhs[2] && carry)) ? 1 : 0;
+
+        result[3] = lhs[3] + rhs[3] + carry;
+
+        return result;
+    }
+    else
+    {
+        unsigned long long result[4] {};
+        unsigned char carry {};
+        carry = BOOST_DECIMAL_ADD_CARRY(carry, lhs[0], rhs[0], &result[0]);
+        carry = BOOST_DECIMAL_ADD_CARRY(carry, lhs[1], rhs[1], &result[1]);
+        carry = BOOST_DECIMAL_ADD_CARRY(carry, lhs[2], rhs[2], &result[2]);
+        carry = BOOST_DECIMAL_ADD_CARRY(carry, lhs[3], rhs[3], &result[3]);
+
+        return {result[3], result[2], result[1], result[0]};
+    }
+}
+
+#else
+
+constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
+{
+    u256 result{};
+    uint64_t carry = 0;
+
+    uint64_t sum = lhs[0] + rhs[0];
+    result[0] = sum;
+    carry = (sum < lhs[0]) ? 1 : 0;
+
+    sum = lhs[1] + rhs[1] + carry;
+    result[1] = sum;
+    carry = (sum < lhs[1] || (sum == lhs[1] && carry)) ? 1 : 0;
+
+    sum = lhs[2] + rhs[2] + carry;
+    result[2] = sum;
+    carry = (sum < lhs[2] || (sum == lhs[2] && carry)) ? 1 : 0;
+
+    result[3] = lhs[3] + rhs[3] + carry;
+
+    return result;
+}
+
+#endif
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
