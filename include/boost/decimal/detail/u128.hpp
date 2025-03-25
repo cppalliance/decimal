@@ -1931,6 +1931,74 @@ constexpr auto wide_integer_to_u128(const wide_integer_uint128& src) -> u128
     return dst;
 }
 
+// Adapted from ckormanyos/wide-integer
+//
+// Use Knuth's long division algorithm.
+// The loop-ordering of indices in Knuth's original
+// algorithm has been reversed due to the data format
+// used here. Several optimizations and combinations
+// of logic have been carried out in the source code.
+//
+// See also:
+// D.E. Knuth, "The Art of Computer Programming, Volume 2:
+// Seminumerical Algorithms", Addison-Wesley (1998),
+// Section 4.3.1 Algorithm D and Exercise 16.
+
+template <std::size_t u_size, std::size_t v_size, std::size_t q_size>
+constexpr void divide_knuth_core(std::uint32_t (&u)[u_size], 
+                                 std::uint32_t (&v)[v_size], 
+                                 std::uint32_t (&q)[q_size]) noexcept
+{
+    const auto d { u_size - v_size - 1 };
+
+    for (std::size_t j = d; j >= 0; --j)
+    {
+        const auto next_digits{ static_cast<std::uint64_t>(u[j + v_size] << 32) | static_cast<std::uint64_t>(u[j + v_size - 1]) };
+        auto q_hat{ next_digits / v[v_size - 1] };
+        auto r_hat{ next_digits % v[v_size - 1] };
+
+        while ((q_hat >> 32) != 0 || ( q_hat * v[v_size - 2] > (r_hat << 32 | u[j + v_size - 2])))
+        {
+            --q_hat;
+            r_hat += v[v_size - 1];
+            if (r_hat >> 32 != 0)
+            {
+                break;
+            }
+        }
+
+        std::int64_t k{};
+        std::int64_t t{};
+
+        for (std::size_t i = 0; i < v_size; ++i)
+        {
+            const auto product{ static_cast<std::uint64_t>(q_hat) * static_cast<std::uint64_t>(v[i]) };
+            t = u[i + j] - k - product;
+            u[i + j] = static_cast<std::uint32_t>(t);
+            k = static_cast<std::int64_t>(product >> 32) - (t >> 32);
+        }
+
+        t = static_cast<std::int64_t>(u[j + v_size]) - k;
+        u[j + v_size] = static_cast<std::uint32_t>(t);
+        q[j] = static_cast<std::uint32_t>(q_hat);
+
+        if (t < 0)
+        {
+            --q[j];
+            k = 0;
+
+            for (std::size_t i = 0; i < v_size; ++i)
+            {
+                t = static_cast<std::int64_t>(u[i + j]) + k + static_cast<std::int64_t>(v[i]);
+                u[i + j] = static_cast<std::uint32_t>(t);
+                k = t >> 32;
+            }
+            
+            u[j + v_size] += static_cast<std::uint32_t>(k);
+        }
+    }
+}
+
 BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u128& rhs, u128& quotient, u128& remainder) noexcept
 {
     // Mash-Up: Use Knuth long-division from wide-integer (requires limb-conversions on input/output).
