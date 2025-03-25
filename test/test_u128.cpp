@@ -1685,6 +1685,33 @@ void test_operator_div()
     }
 }
 
+template <typename IntType>
+void test_operator_mod()
+{
+    boost::random::uniform_int_distribution<IntType> dist(std::numeric_limits<IntType>::min(), std::numeric_limits<IntType>::max());
+
+    for (std::size_t i{}; i < N; ++i)
+    {
+        const IntType value{ dist(rng) };
+        IntType value2{ dist(rng) };
+
+        while (value2 == 0)
+        {
+            value2 = dist(rng);
+        }
+
+        uint128 builtin_value{ static_cast<std::uint64_t>(value), static_cast<std::uint64_t>(value) };
+        boost::decimal::detail::u128 emulated_value{ static_cast<std::uint64_t>(value), static_cast<std::uint64_t>(value) };
+
+
+        const auto builtin_res_left = builtin_value % static_cast<uint128>(value2);
+        const auto emulated_res_left = emulated_value % static_cast<boost::decimal::detail::u128>(value2);
+
+        BOOST_TEST(emulated_res_left.high == builtin_res_left.high && emulated_res_left.low == builtin_res_left.low);
+
+    }
+}
+
 int main()
 {
     test_traits();
@@ -1857,6 +1884,16 @@ int main()
     test_operator_div<std::uint16_t>();
     test_operator_div<std::uint32_t>();
     test_operator_div<std::uint64_t>();
+
+    test_operator_mod<std::int8_t>();
+    test_operator_mod<std::int16_t>();
+    test_operator_mod<std::int32_t>();
+    test_operator_mod<std::int64_t>();
+
+    test_operator_mod<std::uint8_t>();
+    test_operator_mod<std::uint16_t>();
+    test_operator_mod<std::uint32_t>();
+    test_operator_mod<std::uint64_t>();
 
     test_ostream_operator();
     test_istream_operator();
