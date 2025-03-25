@@ -2004,11 +2004,20 @@ BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const st
     // If rhs is greater than 2^32 the result is trivial to find
     if (rhs >= UINT32_MAX)
     {
-        remainder.low = (lhs.high << 32U) | (lhs.low >> 32U);
-        auto res = remainder.low / rhs;
-        remainder.low = (remainder.low % rhs) << 32 | lhs.low;
-        res = (res << 32) | (remainder.low / rhs);
-        remainder.low %= rhs;
+        #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(BOOST_DECIMAL_HAS_MSVC_X64_INTRINSICS)
+        if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(rhs))
+        {
+            quotient.low = _udiv128(lhs.high, lhs.low, rhs, &remainder.low);
+        }
+        else
+        #endif
+        {
+            remainder.low = (lhs.high << 32U) | (lhs.low >> 32U);
+            auto res = remainder.low / rhs;
+            remainder.low = (remainder.low % rhs) << 32 | lhs.low;
+            res = (res << 32) | (remainder.low / rhs);
+            remainder.low %= rhs;
+        }
     }
 
     // Setup for Knuth Division
@@ -2043,7 +2052,9 @@ BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const st
 
     divide_knuth_core(u, v, q);
 
-
+    quotient.low = static_cast<std::uint64_t>(q[1] << 32) | q[0];
+    quotient.high = q[3];
+    remainder.low = static_cast<std::uint64_t>(u[1] << (32 - offset)) | static_cast<std::uint64_t>(u[0] >> offset);
 }
 
 BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u128& rhs, u128& quotient, u128& remainder) noexcept
