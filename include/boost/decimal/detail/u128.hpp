@@ -2025,7 +2025,8 @@ constexpr void div_mod_impl(const u128& lhs, const std::uint64_t rhs, u128& quot
     }
 
     // Setup for Knuth Division
-    const auto offset { countl_zero(rhs >> 32) };
+    // Includes the normalization step here instead of in main function for simplicity
+    const auto offset { countl_zero(static_cast<std::uint32_t>(rhs >> 32)) };
 
     std::uint32_t u[5]{};
 
@@ -2158,6 +2159,10 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std:
         impl::div_mod_impl(lhs, rhs, quotient, remainder);
         return quotient;
     }
+    if (rhs == 0)
+    {
+        return { 0,0 };
+    }
     else if (lhs.high != 0)
     {
         u128 quotient{};
@@ -2167,11 +2172,6 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std:
     }
     else
     {
-        if (rhs == 0)
-        {
-            return { 0, 0 };
-        }
-
         return { 0, lhs.low / rhs };
     }
 
