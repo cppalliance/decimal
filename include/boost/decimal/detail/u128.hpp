@@ -1951,11 +1951,13 @@ constexpr void divide_knuth_core(std::uint32_t (&u)[u_size],
 {
     const auto d { u_size - v_size - 1 };
 
-    for (std::size_t j = d; j >= 0; --j)
+    for (int j = d; j >= 0; --j)
     {
-        const auto next_digits{ static_cast<std::uint64_t>(u[j + v_size] << 32) | static_cast<std::uint64_t>(u[j + v_size - 1]) };
-        auto q_hat{ next_digits / v[v_size - 1] };
-        auto r_hat{ next_digits % v[v_size - 1] };
+        const auto next_digits{ (static_cast<std::uint64_t>(u[j + v_size]) << 32) | static_cast<std::uint64_t>(u[j + v_size - 1]) };
+        const auto div{ v[v_size - 1] };
+        BOOST_DECIMAL_ASSUME(div != 0);
+        auto q_hat{ next_digits / div };
+        auto r_hat{ next_digits % div };
 
         while ((q_hat >> 32) != 0 || ( q_hat * v[v_size - 2] > (r_hat << 32 | u[j + v_size - 2])))
         {
@@ -2052,9 +2054,9 @@ BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const st
 
     divide_knuth_core(u, v, q);
 
-    quotient.low = static_cast<std::uint64_t>(q[1] << 32) | q[0];
+    quotient.low = (static_cast<std::uint64_t>(q[1]) << 32) | q[0];
     quotient.high = q[3];
-    remainder.low = static_cast<std::uint64_t>(u[1] << (32 - offset)) | static_cast<std::uint64_t>(u[0] >> offset);
+    remainder.low = (static_cast<std::uint64_t>(u[1]) << (32 - offset)) | (static_cast<std::uint64_t>(u[0]) >> offset);
 }
 
 BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u128& rhs, u128& quotient, u128& remainder) noexcept
