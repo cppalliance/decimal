@@ -2421,24 +2421,22 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_mod(const u128 lhs, const std:
     {
         u128 quotient{};
         u128 remainder{};
-        impl::div_mod_impl(lhs, u128{ 0, rhs }, quotient, remainder);
+        impl::div_mod_impl(lhs, rhs, quotient, remainder);
         return remainder;
+    }
+    else if (rhs == 0)
+    {
+        return { 0, 0 };
     }
     else if (lhs.high != 0)
     {
-        // TODO(mborland): Can we abbreviate Knuth division for this case?
         u128 quotient{};
         u128 remainder{};
-        impl::div_mod_impl(lhs, u128{ 0, rhs }, quotient, remainder);
+        impl::div_mod_impl(lhs, rhs, quotient, remainder);
         return remainder;
     }
     else
     {
-        if (rhs == 0)
-        {
-            return { 0, 0 };
-        }
-
         return { 0, lhs.low % rhs };
     }
 
