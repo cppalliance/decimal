@@ -2001,8 +2001,10 @@ constexpr void divide_knuth_core(std::uint32_t (&u)[u_size],
     }
 }
 
-BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const std::uint64_t rhs, u128& quotient, u128& remainder) noexcept
+constexpr void div_mod_impl(const u128& lhs, const std::uint64_t rhs, u128& quotient, u128& remainder) noexcept
 {
+    BOOST_DECIMAL_ASSUME(rhs != 0);
+
     // If rhs is greater than 2^32 the result is trivial to find
     if (rhs >= UINT32_MAX)
     {
@@ -2055,7 +2057,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const st
     divide_knuth_core(u, v, q);
 
     quotient.low = (static_cast<std::uint64_t>(q[1]) << 32) | q[0];
-    quotient.high = q[3];
+    quotient.high = q[2];
     remainder.low = (static_cast<std::uint64_t>(u[1]) << (32 - offset)) | (static_cast<std::uint64_t>(u[0]) >> offset);
 }
 
