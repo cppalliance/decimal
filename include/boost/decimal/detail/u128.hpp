@@ -2151,15 +2151,14 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u128 default_div(const u128 lhs, const std:
     {
         u128 quotient{};
         u128 remainder{};
-        impl::div_mod_impl(lhs, u128{ 0, rhs }, quotient, remainder);
+        impl::div_mod_impl(lhs, rhs, quotient, remainder);
         return quotient;
     }
     else if (lhs.high != 0)
     {
-        // TODO(mborland): Can we abbreviate Knuth division for this case?
         u128 quotient{};
         u128 remainder{};
-        impl::div_mod_impl(lhs, u128{ 0, rhs }, quotient, remainder);
+        impl::div_mod_impl(lhs, rhs, quotient, remainder);
         return quotient;
     }
     else
