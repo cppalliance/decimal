@@ -1999,6 +1999,53 @@ constexpr void divide_knuth_core(std::uint32_t (&u)[u_size],
     }
 }
 
+BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const std::uint64_t rhs, u128& quotient, u128& remainder) noexcept
+{
+    // If rhs is greater than 2^32 the result is trivial to find
+    if (rhs >= UINT32_MAX)
+    {
+        remainder.low = (lhs.high << 32U) | (lhs.low >> 32U);
+        auto res = remainder.low / rhs;
+        remainder.low = (remainder.low % rhs) << 32 | lhs.low;
+        res = (res << 32) | (remainder.low / rhs);
+        remainder.low %= rhs;
+    }
+
+    // Setup for Knuth Division
+    const auto offset { countl_zero(rhs >> 32) };
+
+    std::uint32_t u[5]{};
+
+    if (offset != 0)
+    {
+        u[0] = static_cast<std::uint32_t>(lhs.low << offset);
+        u[1] = static_cast<std::uint32_t>(lhs.low >> (32 - offset));
+        u[2] = static_cast<std::uint32_t>(lhs.high << offset) |
+               static_cast<std::uint32_t>(lhs.low >> (64 - offset));
+        u[3] = static_cast<std::uint32_t>(lhs.high >> (32 - offset));
+        u[4] = static_cast<std::uint32_t>(lhs.high >> (64 - offset));
+    }
+    else
+    {
+        u[0] = static_cast<std::uint32_t>(lhs.low);
+        u[1] = static_cast<std::uint32_t>(lhs.low >> 32);
+        u[2] = static_cast<std::uint32_t>(lhs.high);
+        u[3] = static_cast<std::uint32_t>(lhs.high >> 32);
+    }
+
+    std::uint32_t v[2]
+    {
+        static_cast<std::uint32_t>(rhs << offset),
+        static_cast<std::uint32_t>(rhs >> (32 - offset))
+    };
+
+    std::uint32_t q[3]{};
+
+    divide_knuth_core(u, v, q);
+
+
+}
+
 BOOST_DECIMAL_FORCE_INLINE constexpr void div_mod_impl(const u128& lhs, const u128& rhs, u128& quotient, u128& remainder) noexcept
 {
     // Mash-Up: Use Knuth long-division from wide-integer (requires limb-conversions on input/output).
