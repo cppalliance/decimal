@@ -9,6 +9,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
@@ -26,6 +27,12 @@ struct is_signed<uint128> { static constexpr bool value = false; };
 
 template <>
 struct is_signed<int128> { static constexpr  bool value = true;};
+
+template <>
+struct is_signed<boost::int128::int128_t> { static constexpr bool value = true; };
+
+template <>
+struct is_signed<boost::int128::uint128_t> { static constexpr bool value = false; };
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
@@ -58,6 +65,12 @@ struct make_unsigned<uint128> { using type = uint128; };
 template <>
 struct make_unsigned<int128> { using type = uint128; };
 
+template <>
+struct make_unsigned<boost::int128::uint128_t> { using type = boost::int128::uint128_t; };
+
+template <>
+struct make_unsigned<boost::int128::int128_t> { using type = boost::int128::uint128_t; };
+
 #ifdef BOOST_DECIMAL_HAS_INT128
 
 template <>
@@ -80,6 +93,12 @@ struct make_signed<uint128> { using type = int128; };
 template <>
 struct make_signed<int128> { using type = int128; };
 
+template <>
+struct make_signed<boost::int128::int128_t> { using type = boost::int128::int128_t; };
+
+template <>
+struct make_signed<boost::int128::uint128_t> { using type = boost::int128::int128_t; };
+
 #ifdef BOOST_DECIMAL_HAS_INT128
 
 template <>
@@ -101,6 +120,12 @@ struct is_integral<uint128> { static constexpr bool value = true; };
 
 template <>
 struct is_integral<int128> { static constexpr bool value = true; };
+
+template <>
+struct is_integral<boost::int128::int128_t> { static constexpr bool value = true; };
+
+template <>
+struct is_integral<boost::int128::uint128_t> { static constexpr bool value = true; };
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
@@ -194,7 +219,7 @@ struct conjunction<B1> : B1 {};
 
 template <typename B1, typename... Bn>
 struct conjunction<B1, Bn...>
-        : std::conditional_t<bool(B1::value), conjunction<Bn...>, B1> {};
+        : std::conditional_t<static_cast<bool>(B1::value), conjunction<Bn...>, B1> {};
 
 template <typename... B>
 BOOST_DECIMAL_CONSTEXPR_VARIABLE bool conjunction_v = conjunction<B...>::value;
