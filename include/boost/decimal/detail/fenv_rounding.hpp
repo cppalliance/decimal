@@ -49,11 +49,11 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
 
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
     {
-        const auto trailing_num {val % 10};
-        val /= 10;
+        const auto trailing_num {val % 10U};
+        val /= 10U;
         int exp_delta {1};
 
-        if (trailing_num >= 5)
+        if (trailing_num >= 5U)
         {
             ++val;
         }
@@ -63,7 +63,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
 
         if (static_cast<significand_type>(val) > max_significand_v<TargetType>)
         {
-            val /= 10;
+            val /= 10U;
             ++exp_delta;
         }
 
@@ -74,35 +74,35 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         const auto round {fegetround()};
         int exp {1};
 
-        const auto trailing_num {val % 10};
-        val /= 10;
+        const auto trailing_num {val % 10U};
+        val /= 10U;
 
         // Default rounding mode
         switch (round)
         {
             case rounding_mode::fe_dec_to_nearest_from_zero:
-                if (trailing_num >= 5)
+                if (trailing_num >= 5U)
                 {
                     ++val;
                 }
                 break;
             case rounding_mode::fe_dec_downward:
-                if (trailing_num >= 5 && is_neg)
+                if (trailing_num >= 5U && is_neg)
                 {
                     ++val;
                 }
                 break;
             case rounding_mode::fe_dec_to_nearest:
                 // Round to even
-                if (trailing_num == 5)
+                if (trailing_num == 5U)
                 {
-                    if (val % 2 == 1)
+                    if (val % 2U == 1U)
                     {
                         ++val;
                     }
                 }
                 // ... or nearest
-                else if (trailing_num > 5)
+                else if (trailing_num > 5U)
                 {
                     ++val;
                 }
@@ -111,7 +111,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
                 // Do nothing
                 break;
             case rounding_mode::fe_dec_upward:
-                if (!is_neg && trailing_num != 0)
+                if (!is_neg && trailing_num != 0U)
                 {
                     ++val;
                 }
@@ -128,7 +128,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
 
         if (static_cast<significand_type>(val) > max_significand_v<TargetType>)
         {
-            val /= 10;
+            val /= 10U;
             ++exp;
         }
 

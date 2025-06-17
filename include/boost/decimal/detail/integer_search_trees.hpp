@@ -30,7 +30,7 @@ constexpr auto num_digits(T x) noexcept -> int
 
     while (x)
     {
-        x /= 10;
+        x /= 10U;
         ++digits;
     }
 
