@@ -1,4 +1,5 @@
 # Copyright 2022, 2023 Peter Dimov
+# Copyright 2024, 2025 Matt Borland
 # Distributed under the Boost Software License, Version 1.0.
 # https://www.boost.org/LICENSE_1_0.txt
 
@@ -411,16 +412,20 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
         ["deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main"],
     ),
 
-    macos_pipeline(
-        "MacOS 12.4 Xcode 13.4.1 UBSAN",
-        { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,20,2b' } + ubsan,
-        xcode_version = "13.4.1", osx_version = "monterey", arch = "arm64",
+    linux_pipeline(
+        "Linux 24.04 Clang 19",
+        "cppalliance/droneubuntu2404:1",
+        { TOOLSET: 'clang', COMPILER: 'clang++-19', CXXSTD: '03,11,14,17,20,2b' },
+        "clang-19",
+        ["deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-19 main"],
     ),
 
-    macos_pipeline(
-        "MacOS 12.4 Xcode 13.4.1 ASAN",
-        { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,20,2b' } + asan,
-        xcode_version = "13.4.1", osx_version = "monterey", arch = "arm64",
+    linux_pipeline(
+        "Linux 24.04 Clang 20",
+        "cppalliance/droneubuntu2404:1",
+        { TOOLSET: 'clang', COMPILER: 'clang++-20', CXXSTD: '03,11,14,17,20,2b' },
+        "clang-20",
+        ["deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-20 main"],
     ),
 
     windows_pipeline(
