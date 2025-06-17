@@ -12,6 +12,7 @@
 #include <boost/decimal/detail/emulated256.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/components.hpp>
+#include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -65,12 +66,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto mul_impl(T lhs_sig, U lhs_exp, bool lh
 template <typename ReturnType, typename T>
 constexpr auto d64_mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
 {
-    // Clang 6-12 yields incorrect results with builtin u128, so we force usage of our version
-    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || (__clang_major__) > 12)
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
-    #endif
+    using unsigned_int128_type = boost::int128::uint128_t;
 
     // Once we have the normalized significands and exponents all we have to do is
     // multiply the significands and add the exponents
@@ -93,12 +89,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
                                                        T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
                                                        -> std::enable_if_t<detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
 {
-    // Clang 6-12 yields incorrect results with builtin u128, so we force usage of our version
-    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || (__clang_major__) > 12)
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
-    #endif
+    using unsigned_int128_type = boost::int128::uint128_t;
 
     // Once we have the normalized significands and exponents all we have to do is
     // multiply the significands and add the exponents
@@ -121,13 +112,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
                                                        T rhs_sig, U rhs_exp, bool rhs_sign) noexcept
                                                        -> std::enable_if_t<!detail::is_decimal_floating_point_v<ReturnType>, ReturnType>
 {
-    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ > 13)
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    constexpr auto comp_value {impl::builtin_128_pow10[31]};
-    #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
-    constexpr auto comp_value {impl::emulated_128_pow10[31]};
-    #endif
+    using unsigned_int128_type = boost::int128::uint128_t;
+    constexpr auto comp_value {detail::pow10(static_cast<unsigned_int128_type>(31))};
 
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "sig lhs: " << sig_lhs
