@@ -9,6 +9,7 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/emulated256.hpp>
+#include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -71,6 +72,50 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE uint128 emulated_128_pow10[] =
     uint128 {UINT64_C(542101086242752217), UINT64_C(68739955140067328)},
     uint128 {UINT64_C(5421010862427522170), UINT64_C(687399551400673280)},
     uint128 {UINT64_C(17316620476856118468), UINT64_C(6873995514006732800)},
+};
+
+BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t boost_int128_pow10[] =
+{
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(1)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(10)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(100)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(1000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(10000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(100000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(1000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(10000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(100000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(1000000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(10000000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(100000000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(1000000000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(10000000000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(100000000000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(1000000000000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(10000000000000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(100000000000000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(1000000000000000000)},
+    boost::int128::uint128_t {UINT64_C(0), UINT64_C(10000000000000000000)},
+    boost::int128::uint128_t {UINT64_C(5), UINT64_C(7766279631452241920)},
+    boost::int128::uint128_t {UINT64_C(54), UINT64_C(3875820019684212736)},
+    boost::int128::uint128_t {UINT64_C(542), UINT64_C(1864712049423024128)},
+    boost::int128::uint128_t {UINT64_C(5421), UINT64_C(200376420520689664)},
+    boost::int128::uint128_t {UINT64_C(54210), UINT64_C(2003764205206896640)},
+    boost::int128::uint128_t {UINT64_C(542101), UINT64_C(1590897978359414784)},
+    boost::int128::uint128_t {UINT64_C(5421010), UINT64_C(15908979783594147840)},
+    boost::int128::uint128_t {UINT64_C(54210108), UINT64_C(11515845246265065472)},
+    boost::int128::uint128_t {UINT64_C(542101086), UINT64_C(4477988020393345024)},
+    boost::int128::uint128_t {UINT64_C(5421010862), UINT64_C(7886392056514347008)},
+    boost::int128::uint128_t {UINT64_C(54210108624), UINT64_C(5076944270305263616)},
+    boost::int128::uint128_t {UINT64_C(542101086242), UINT64_C(13875954555633532928)},
+    boost::int128::uint128_t {UINT64_C(5421010862427), UINT64_C(9632337040368467968)},
+    boost::int128::uint128_t {UINT64_C(54210108624275), UINT64_C(4089650035136921600)},
+    boost::int128::uint128_t {UINT64_C(542101086242752), UINT64_C(4003012203950112768)},
+    boost::int128::uint128_t {UINT64_C(5421010862427522), UINT64_C(3136633892082024448)},
+    boost::int128::uint128_t {UINT64_C(54210108624275221), UINT64_C(12919594847110692864)},
+    boost::int128::uint128_t {UINT64_C(542101086242752217), UINT64_C(68739955140067328)},
+    boost::int128::uint128_t {UINT64_C(5421010862427522170), UINT64_C(687399551400673280)},
+    boost::int128::uint128_t {UINT64_C(17316620476856118468), UINT64_C(6873995514006732800)},
 };
 
 static_assert(sizeof(emulated_128_pow10) == sizeof(uint128) * 40, "Should have 10^0 to 10^39");
@@ -224,6 +269,12 @@ template <>
 constexpr auto pow10(detail::uint128 n) noexcept -> detail::uint128
 {
     return impl::emulated_128_pow10[static_cast<std::size_t>(n.low)];
+}
+
+template <>
+constexpr auto pow10(const boost::int128::uint128_t n) noexcept -> boost::int128::uint128_t
+{
+    return impl::boost_int128_pow10[static_cast<std::size_t>(n.low)];
 }
 
 constexpr auto pow10(const uint256_t& n) noexcept -> uint256_t
