@@ -11,6 +11,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/emulated256.hpp>
+#include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <array>
@@ -184,6 +185,34 @@ constexpr int num_digits(const uint128& x) noexcept
         std::uint32_t mid = (left + right + 1U) / 2U;
 
         if (x >= impl::emulated_128_pow10[mid])
+        {
+            left = mid;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+
+    return static_cast<int>(left + 1);
+}
+
+constexpr int num_digits(const boost::int128::uint128_t& x) noexcept
+{
+    if (x.high == UINT64_C(0))
+    {
+        return num_digits(x.low);
+    }
+
+    // We start left at 19 because we already eliminated the high word being 0
+    std::uint32_t left = 19U;
+    std::uint32_t right = 38U;
+
+    while (left < right)
+    {
+        const auto mid = (left + right + 1U) / 2U;
+
+        if (x >= impl::boost_int128_pow10[mid])
         {
             left = mid;
         }
