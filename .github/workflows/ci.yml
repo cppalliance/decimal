@@ -72,13 +72,15 @@ jobs:
           - toolset: gcc-11
             cxxstd: "03,11,14,17,20,23"
             address_model: 32,64
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - g++-11-multilib
           - toolset: gcc-12
             cxxstd: "03,11,14,17,20,23"
             address_model: 32,64
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - g++-12-multilib
           # Disabled for now. 22.04 dropped support and 24.04 has internal errors
@@ -92,13 +94,15 @@ jobs:
           - toolset: gcc-12
             cxxstd: "03-gnu,11-gnu,14-gnu,17-gnu,20-gnu,23-gnu"
             address_model: "32"
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - g++-12-multilib
           - toolset: gcc-12
             cxxstd: "03-gnu,11-gnu,14-gnu,17-gnu,20-gnu,23-gnu"
             address_model: "64"
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - g++-12-multilib
           - name: 32-bit UBSAN
@@ -106,7 +110,8 @@ jobs:
             cxxstd: "03,11,14,17,20,23"
             address_model: "32"
             ubsan: 1
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - g++-12-multilib
           - name: 64-bit UBSAN
@@ -114,7 +119,8 @@ jobs:
             cxxstd: "03,11,14,17,20,23"
             address_model: "64"
             ubsan: 1
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - g++-12-multilib
 
@@ -160,37 +166,43 @@ jobs:
           - toolset: clang
             compiler: clang++-11
             cxxstd: "03,11,14,17"
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - clang-11
           - toolset: clang
             compiler: clang++-12
             cxxstd: "03,11,14,17"
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - clang-12
           - toolset: clang
             compiler: clang++-13
             cxxstd: "03,11,14,17"
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - clang-13
           - toolset: clang
             compiler: clang++-14
             cxxstd: "03,11,14,17"
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - clang-14
           - toolset: clang
             compiler: clang++-14
             cxxstd: "03-gnu,11-gnu,14-gnu,17-gnu"
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - clang-14
           - toolset: clang
             compiler: clang++-15
             cxxstd: "03,11,14,17,20"
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - clang-15
             sources:
@@ -200,7 +212,8 @@ jobs:
           - toolset: clang
             compiler: clang++-15
             cxxstd: "03,11,14,17,20,2b"
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - clang-15
               - libc++-15-dev
@@ -214,7 +227,8 @@ jobs:
           - toolset: clang
             compiler: clang++-16
             cxxstd: "03,11,14,17,20,2b"
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - clang-16
             sources:
@@ -224,7 +238,8 @@ jobs:
           - toolset: clang
             compiler: clang++-17
             cxxstd: "03,11,14,17,20,2b"
-            os: ubuntu-22.04
+            os: ubuntu-latest
+            container: ubuntu:20.04
             install:
               - clang-17
             sources:
@@ -476,18 +491,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - toolset: msvc-14.2
-            cxxstd: "14,17,20,latest"
-            addrmd: "32"
-            os: windows-2019
           - toolset: msvc-14.3
             cxxstd: "14,17,20,latest"
             addrmd: "32"
             os: windows-2022
-          - toolset: msvc-14.2
-            cxxstd: "14,17,20,latest"
-            addrmd: "64"
-            os: windows-2019
           - toolset: msvc-14.3
             cxxstd: "14,17,20,latest"
             addrmd: "64"
@@ -495,15 +502,15 @@ jobs:
           - toolset: clang-win
             cxxstd: "14,17,latest"
             addrmd: "32"
-            os: windows-2022
+            os: windows-latest
           - toolset: clang-win
             cxxstd: "14,17,latest"
             addrmd: "64"
-            os: windows-2022
+            os: windows-latest
           - toolset: gcc
             cxxstd: "03,11,14,17,2a"
             addrmd: "64"
-            os: windows-2019
+            os: windows-latest
 
     runs-on: ${{matrix.os}}
 
@@ -543,7 +550,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
           - os: ubuntu-24.04
           - os: macos-13
           - os: macos-14
@@ -592,7 +598,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
           - os: ubuntu-24.04
           - os: macos-13
           - os: macos-14
@@ -651,8 +656,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
           - os: macos-13
           - os: macos-14
           - os: macos-15
