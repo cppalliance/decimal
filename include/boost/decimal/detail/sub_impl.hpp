@@ -8,6 +8,7 @@
 #include <boost/decimal/detail/shrink_significand.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
+#include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -22,12 +23,7 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
                              T rhs_sig, U rhs_exp, bool rhs_sign,
                              bool abs_lhs_bigger) noexcept -> ReturnType
 {
-    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ > 13)
-    using sub_type = detail::int128_t;
-    #else
-    using sub_type = detail::int128;
-    #endif
-
+    using sub_type = boost::int128::int128_t;
     using unsigned_sub_type = detail::make_unsigned_t<sub_type>;
 
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
@@ -76,8 +72,9 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
         }
     }
 
-    const auto signed_sig_lhs {detail::make_signed_value(static_cast<unsigned_sub_type>(lhs_sig), lhs_sign)};
-    const auto signed_sig_rhs {detail::make_signed_value(static_cast<unsigned_sub_type>(rhs_sig), rhs_sign)};
+    static_assert(!std::is_same<T, unsigned_sub_type>::value, "TODO(mborland): update the following two lines!");
+    const auto signed_sig_lhs {detail::make_signed_value(unsigned_sub_type{lhs_sig.high, lhs_sig.low}, lhs_sign)};
+    const auto signed_sig_rhs {detail::make_signed_value(unsigned_sub_type{rhs_sig.high, rhs_sig.low}, rhs_sign)};
 
     const auto new_sig {signed_sig_lhs - signed_sig_rhs};
 
@@ -85,7 +82,7 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
     const auto new_sign {new_sig < 0};
     const auto res_sig {detail::make_positive_unsigned(new_sig)};
 
-    return {res_sig, new_exp, new_sign};
+    return {T{res_sig.high, res_sig.low}, new_exp, new_sign};
 }
 
 } // namespace detail
