@@ -508,7 +508,7 @@ jobs:
             addrmd: "64"
             os: windows-latest
           - toolset: gcc
-            cxxstd: "03,11,14,17,2a"
+            cxxstd: "03,11,14,17" # 20 has ICE
             addrmd: "64"
             os: windows-latest
 
