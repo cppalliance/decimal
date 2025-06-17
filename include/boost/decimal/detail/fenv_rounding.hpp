@@ -22,18 +22,18 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 {
     using significand_type = std::conditional_t<decimal_val_v<TargetType> >= 128, detail::uint128, std::int64_t>;
 
-    const auto trailing_num {val % 10};
-    val /= 10;
+    const auto trailing_num {val % 10U};
+    val /= 10U;
     int exp_delta {1};
 
-    if (trailing_num >= 5)
+    if (trailing_num >= 5U)
     {
         ++val;
     }
 
     if (static_cast<significand_type>(val) > max_significand_v<TargetType>)
     {
-        val /= 10;
+        val /= 10U;
         ++exp_delta;
     }
 
