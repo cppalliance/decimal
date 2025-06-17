@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_COMPONENTS_HPP
 
 #include <boost/decimal/detail/config.hpp>
+#include <boost/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -56,9 +57,9 @@ using decimal32_fast_components = impl::decimal_components<std::uint_fast32_t, s
 
 using decimal64_components = impl::decimal_components<std::uint64_t, std::int32_t>;
 
-using decimal128_components = impl::decimal_components<uint128, std::int32_t>;
+using decimal128_components = impl::decimal_components<boost::int128::uint128_t, std::int32_t>;
 
-using decimal128_fast_components = impl::decimal_components<uint128, std::int_fast32_t>;
+using decimal128_fast_components = impl::decimal_components<boost::int128::uint128_t, std::int_fast32_t>;
 
 } // namespace detail
 } // namespace decimal

@@ -166,7 +166,7 @@ constexpr bool operator==(const uint256_t& lhs, const uint256_t& rhs) noexcept
 
 constexpr bool operator==(uint256_t lhs, std::uint64_t rhs) noexcept
 {
-    return lhs.high == 0 && rhs != 0 && lhs.low == rhs;
+    return lhs.high == 0U && rhs != 0 && lhs.low == rhs;
 }
 
 constexpr bool operator!=(const uint256_t& lhs, const uint256_t& rhs) noexcept
@@ -226,12 +226,12 @@ constexpr uint256_t operator+(uint256_t lhs, boost::int128::uint128_t rhs) noexc
 
 constexpr uint256_t operator-(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
-    const uint256_t temp {lhs.high - rhs.high, lhs.low - rhs.low};
+    uint256_t temp {lhs.high - rhs.high, lhs.low - rhs.low};
 
     // Check for carry
     if (lhs.low < rhs.low)
     {
-        return {temp.high - 1, temp.low};
+        return {--temp.high, temp.low};
     }
 
     return temp;
@@ -562,11 +562,7 @@ constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept
 // Get the 256-bit result of multiplication of two 128-bit unsigned integers
 constexpr uint256_t umul256_impl(std::uint64_t a_high, std::uint64_t a_low, std::uint64_t b_high, std::uint64_t b_low) noexcept
 {
-    #ifdef BOOST_DECIMAL_HAS_INT128
-    using unsigned_int128_type = boost::decimal::detail::boost::int128::uint128_t_t;
-    #else
-    using unsigned_int128_type = boost::decimal::detail::boost::int128::uint128_t;
-    #endif
+    using unsigned_int128_type = boost::int128::uint128_t;
 
     const auto low_product {static_cast<unsigned_int128_type>(a_low) * b_low};
     const auto mid_product1 {static_cast<unsigned_int128_type>(a_low) * b_high};
@@ -592,7 +588,7 @@ constexpr uint256_t umul256(const T &x, const boost::int128::uint128_t &y) noexc
     static_assert(sizeof(T) == 16 && (!std::numeric_limits<T>::is_signed
             #ifdef BOOST_DECIMAL_HAS_INT128
             // May not have numeric_limits specialization without gnu mode
-                                      || std::is_same<T, boost::int128::uint128_t_t>::value
+                                      || std::is_same<T, boost::int128::uint128_t>::value
             #endif
     ), "This function is only for 128-bit unsigned types");
 

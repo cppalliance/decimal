@@ -139,7 +139,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE uint128 d128_big_combination_field_mask {UINT64
 BOOST_DECIMAL_EXPORT class decimal128 final
 {
 public:
-    using significand_type = detail::uint128;
+    using significand_type = boost::int128::uint128_t;
     using exponent_type = std::uint64_t;
     using biased_exponent_type = std::int32_t;
 
@@ -764,7 +764,8 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T1>)
     {
-        if (coeff < 0 || sign)
+        constexpr T1 zero {0};
+        if (coeff < zero || sign)
         {
             bits_.high = detail::d128_sign_mask.high;
             isneg = true;
