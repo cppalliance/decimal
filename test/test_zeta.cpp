@@ -24,8 +24,8 @@
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
 
-// Clang-win in Github actions has a broken chrono header
-#if defined(_WIN32) && defined(__clang__)
+// Windows in Github actions has a broken chrono header
+#if defined(_WIN32)
 
 int main()
 {

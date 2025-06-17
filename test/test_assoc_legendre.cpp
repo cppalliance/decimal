@@ -23,6 +23,16 @@
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
 
+// Windows in Github actions has a broken chrono header
+#if defined(_WIN32)
+
+int main()
+{
+    return 0;
+}
+
+#else
+
 #include <boost/math/special_functions/next.hpp>
 #include <boost/math/special_functions/legendre.hpp>
 #include <boost/core/lightweight_test.hpp>
@@ -233,3 +243,5 @@ int main()
 
     return boost::report_errors();
 }
+
+#endif
