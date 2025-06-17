@@ -6,8 +6,8 @@
 #define BOOST_DECIMAL_DETAIL_EMULATED256_HPP
 
 #include <boost/decimal/detail/config.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/wide-integer/uintwide_t.hpp>
+#include <boost/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -21,16 +21,16 @@ namespace detail {
 
 struct uint256_t
 {
-    uint128 high {};
-    uint128 low {};
+    boost::int128::uint128_t high {};
+    boost::int128::uint128_t low {};
 
     constexpr uint256_t() = default;
     constexpr uint256_t& operator=(const uint256_t& rhs) = default;
     constexpr uint256_t(const uint256_t& rhs) = default;
-    explicit constexpr uint256_t(const uint128& rhs) : high {}, low {rhs} {}
-    constexpr uint256_t(const uint128& high_, const uint128& low_) : high {high_}, low {low_} {}
+    explicit constexpr uint256_t(const boost::int128::uint128_t& rhs) : high {}, low {rhs} {}
+    constexpr uint256_t(const boost::int128::uint128_t& high_, const boost::int128::uint128_t& low_) : high {high_}, low {low_} {}
 
-    explicit operator uint128() const noexcept
+    explicit operator boost::int128::uint128_t() const noexcept
     { 
         return this->low; 
     }
@@ -67,7 +67,7 @@ struct uint256_t
 
     friend constexpr uint256_t operator&(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator&(uint256_t lhs, uint128 rhs) noexcept;
+    friend constexpr uint256_t operator&(uint256_t lhs, boost::int128::uint128_t rhs) noexcept;
 
     friend constexpr bool operator==(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
@@ -85,7 +85,7 @@ struct uint256_t
 
     friend constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
-    friend constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept;
+    friend constexpr uint256_t operator+(uint256_t lhs, boost::int128::uint128_t rhs) noexcept;
 
     friend constexpr uint256_t operator*(const uint256_t& lhs, const uint256_t& rhs) noexcept;
 
@@ -154,7 +154,7 @@ constexpr uint256_t operator&(const uint256_t& lhs, const uint256_t& rhs) noexce
     return {lhs.high & rhs.high, lhs.low & rhs.low};
 }
 
-constexpr uint256_t operator&(uint256_t lhs, uint128 rhs) noexcept
+constexpr uint256_t operator&(uint256_t lhs, boost::int128::uint128_t rhs) noexcept
 {
     return {lhs.high, lhs.low & rhs.low};
 }
@@ -212,7 +212,7 @@ constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexce
     return temp;
 }
 
-constexpr uint256_t operator+(uint256_t lhs, uint128 rhs) noexcept
+constexpr uint256_t operator+(uint256_t lhs, boost::int128::uint128_t rhs) noexcept
 {
     const uint256_t temp = {lhs.high, lhs.low + rhs};
 
@@ -241,6 +241,28 @@ constexpr uint256_t &uint256_t::operator-=(uint256_t v) noexcept
 {
     *this = *this - v;
     return *this;
+}
+
+constexpr auto high_bit(const boost::int128::uint128_t v) noexcept -> int
+{
+    if (v.high != 0)
+    {
+        #ifdef BOOST_DECIMAL_HAS_STDBIT
+        return 127 - std::countl_zero(v.high);
+        #else
+        return 127 - countl_zero(v.high);
+        #endif
+    }
+    else if (v.low != 0)
+    {
+        #ifdef BOOST_DECIMAL_HAS_STDBIT
+        return 63 - std::countl_zero(v.low);
+        #else
+        return 63 - countl_zero(v.low);
+        #endif
+    }
+
+    return 0;
 }
 
 constexpr int high_bit(uint256_t v) noexcept
@@ -291,7 +313,7 @@ constexpr uint256_t subtract(const uint256_t& a, const uint256_t& b)
 constexpr uint256_t left_shift(const uint256_t& a)
 {
     uint256_t result;
-    result.high = (a.high << 1) | (a.low >> (sizeof(uint128) * 8 - 1));
+    result.high = (a.high << 1) | (a.low >> (sizeof(boost::int128::uint128_t) * 8 - 1));
     result.low = a.low << 1;
     return result;
 }
@@ -301,11 +323,11 @@ constexpr void set_bit(uint256_t& a, int bit)
 {
     if (bit >= 0 && bit < 128)
     {
-        a.low |= (uint128(1) << bit);
+        a.low |= (boost::int128::uint128_t(1) << bit);
     }
     else if (bit >= 128 && bit < 256)
     {
-        a.high |= (uint128(1) << (bit - 128));
+        a.high |= (boost::int128::uint128_t(1) << (bit - 128));
     }
 }
 
@@ -461,19 +483,19 @@ constexpr std::tuple<uint256_t, uint256_t> divide_with_rem(const uint256_t& divi
 {
     uint256_t quotient { { 0U, 0U }, { 0U, 0U }};
 
-    uint128 current = dividend.high.high;
+    boost::int128::uint128_t current = dividend.high.high;
     quotient.high.high = static_cast<std::uint64_t>(current / divisor);
     auto remainder = static_cast<std::uint64_t>(current % divisor);
 
-    current = static_cast<uint128>(remainder) << 64U | dividend.high.low;
+    current = static_cast<boost::int128::uint128_t>(remainder) << 64U | dividend.high.low;
     quotient.high.low = static_cast<std::uint64_t>(current / divisor);
     remainder = static_cast<std::uint64_t>(current % divisor);
 
-    current = static_cast<uint128>(remainder) << 64U | dividend.low.high;
+    current = static_cast<boost::int128::uint128_t>(remainder) << 64U | dividend.low.high;
     quotient.low.high = static_cast<std::uint64_t>(current / divisor);
     remainder = static_cast<std::uint64_t>(current % divisor);
 
-    current = static_cast<uint128>(remainder) << 64U | dividend.low.low;
+    current = static_cast<boost::int128::uint128_t>(remainder) << 64U | dividend.low.low;
     quotient.low.low = static_cast<std::uint64_t>(current / divisor);
 
     return
@@ -495,19 +517,19 @@ constexpr uint256_t operator/(const uint256_t& lhs, std::uint64_t rhs) noexcept
 
     uint256_t quotient { { 0U, 0U }, { 0U, 0U }};
 
-    uint128 current = lhs.high.high;
+    boost::int128::uint128_t current = lhs.high.high;
     quotient.high.high = static_cast<std::uint64_t>(current / rhs);
     auto remainder = static_cast<std::uint64_t>(current % rhs);
 
-    current = static_cast<uint128>(remainder) << 64U | lhs.high.low;
+    current = static_cast<boost::int128::uint128_t>(remainder) << 64U | lhs.high.low;
     quotient.high.low = static_cast<std::uint64_t>(current / rhs);
     remainder = static_cast<std::uint64_t>(current % rhs);
 
-    current = static_cast<uint128>(remainder) << 64U | lhs.low.high;
+    current = static_cast<boost::int128::uint128_t>(remainder) << 64U | lhs.low.high;
     quotient.low.high = static_cast<std::uint64_t>(current / rhs);
     remainder = static_cast<std::uint64_t>(current % rhs);
 
-    current = static_cast<uint128>(remainder) << 64U | lhs.low.low;
+    current = static_cast<boost::int128::uint128_t>(remainder) << 64U | lhs.low.low;
     quotient.low.low = static_cast<std::uint64_t>(current / rhs);
 
     return quotient;
@@ -541,9 +563,9 @@ constexpr uint256_t operator%(uint256_t lhs, std::uint64_t rhs) noexcept
 constexpr uint256_t umul256_impl(std::uint64_t a_high, std::uint64_t a_low, std::uint64_t b_high, std::uint64_t b_low) noexcept
 {
     #ifdef BOOST_DECIMAL_HAS_INT128
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    using unsigned_int128_type = boost::decimal::detail::boost::int128::uint128_t_t;
     #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
+    using unsigned_int128_type = boost::decimal::detail::boost::int128::uint128_t;
     #endif
 
     const auto low_product {static_cast<unsigned_int128_type>(a_low) * b_low};
@@ -565,12 +587,12 @@ constexpr uint256_t umul256_impl(std::uint64_t a_high, std::uint64_t a_low, std:
 }
 
 template<typename T>
-constexpr uint256_t umul256(const T &x, const uint128 &y) noexcept
+constexpr uint256_t umul256(const T &x, const boost::int128::uint128_t &y) noexcept
 {
     static_assert(sizeof(T) == 16 && (!std::numeric_limits<T>::is_signed
             #ifdef BOOST_DECIMAL_HAS_INT128
             // May not have numeric_limits specialization without gnu mode
-                                      || std::is_same<T, uint128_t>::value
+                                      || std::is_same<T, boost::int128::uint128_t_t>::value
             #endif
     ), "This function is only for 128-bit unsigned types");
 
@@ -580,7 +602,7 @@ constexpr uint256_t umul256(const T &x, const uint128 &y) noexcept
     return umul256_impl(a, b, y.high, y.low);
 }
 
-constexpr uint256_t umul256(const uint128 &x, const uint128 &y) noexcept
+constexpr uint256_t umul256(const boost::int128::uint128_t &x, const boost::int128::uint128_t &y) noexcept
 {
     return umul256_impl(x.high, x.low, y.high, y.low);
 }
