@@ -618,13 +618,13 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T1>)
     {
-        // This branch will never be taken by bool but it throws a warning prior to C++17
+        // This branch will never be taken by bool, but it throws a warning prior to C++17
         #ifdef _MSC_VER
         #  pragma warning(push)
         #  pragma warning(disable : 4804)
         #endif
 
-        if (coeff < 0 || sign)
+        if (coeff < T1{0} || sign)
         {
             bits_ |= detail::d64_sign_mask;
             isneg = true;
