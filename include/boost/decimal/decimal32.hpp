@@ -623,7 +623,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         #  pragma warning(disable : 4804)
         #endif
 
-        if (coeff < 0U || sign)
+        if (coeff < T{0} || sign)
         {
             bits_ |= detail::d32_sign_mask;
             isneg = true;
@@ -2285,10 +2285,10 @@ public:
     static constexpr bool tinyness_before = true;
 
     // Member functions
-    static constexpr auto (min)        () -> boost::decimal::decimal32 { return {1, min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal32 { return {9'999'999, max_exponent - digits + 1}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal32 { return {9'999'999, max_exponent - digits + 1, true}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal32 { return {1, -digits + 1}; }
+    static constexpr auto (min)        () -> boost::decimal::decimal32 { return {UINT32_C(1), min_exponent}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal32 { return {UINT32_C(9'999'999), max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal32 { return {UINT32_C(9'999'999), max_exponent - digits + 1, true}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal32 { return {UINT32_C(1), -digits + 1}; }
     static constexpr auto round_error  () -> boost::decimal::decimal32 { return epsilon(); }
     static constexpr auto infinity     () -> boost::decimal::decimal32 { return boost::decimal::from_bits(boost::decimal::detail::d32_inf_mask); }
     static constexpr auto quiet_NaN    () -> boost::decimal::decimal32 { return boost::decimal::from_bits(boost::decimal::detail::d32_nan_mask); }
