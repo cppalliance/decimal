@@ -14,7 +14,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/utilities.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/from_chars_result.hpp>
 #include <boost/decimal/detail/chars_format.hpp>
 #include <boost/decimal/detail/concepts.hpp>
@@ -51,7 +51,7 @@ constexpr auto from_chars_general_impl(const char* first, const char* last, Targ
 {
     using significand_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
                                                  std::numeric_limits<std::uint64_t>::digits),
-                                                 detail::uint128, std::uint64_t>;
+                                                 int128::uint128_t, std::uint64_t>;
 
     if (first >= last)
     {
@@ -291,7 +291,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
 
     using uint_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
                                           std::numeric_limits<std::uint64_t>::digits),
-                                          detail::uint128, std::uint64_t>;
+                                          int128::uint128_t, std::uint64_t>;
 
     // Since frexp10 normalizes the value we by default know the number of digits in the significand
     auto significand_digits = std::numeric_limits<TargetDecimalType>::digits;
@@ -542,7 +542,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
     using uint_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
                                           std::numeric_limits<std::uint64_t>::digits),
-                                          detail::uint128, std::uint64_t>;
+                                          int128::uint128_t, std::uint64_t>;
 
     auto r = to_chars_integer_impl<uint_type, uint_type>(first, last, significand, 10);
 
@@ -656,7 +656,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 {
     using Unsigned_Integer = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
                                                  std::numeric_limits<std::uint64_t>::digits),
-                                                 detail::uint128, std::uint64_t>;
+                                                 int128::uint128_t, std::uint64_t>;
 
     if (signbit(value))
     {
@@ -706,7 +706,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 
         if (significand_digits > precision + 1)
         {
-            const auto trailing_digit = significand & 0xF;
+            const auto trailing_digit = significand & 0xFU;
             significand >>= 4;
             ++exp;
             if (trailing_digit >= 8)

@@ -10,7 +10,7 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 #include <boost/decimal/detail/config.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/parser.hpp>
@@ -276,8 +276,8 @@ public:
     explicit constexpr operator std::uint16_t() const noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    explicit constexpr operator detail::int128_t() const noexcept;
-    explicit constexpr operator detail::uint128_t() const noexcept;
+    explicit constexpr operator detail::builtin_int128_t() const noexcept;
+    explicit constexpr operator detail::builtin_uint128_t() const noexcept;
     #endif
 
     // We allow implict promotions to and decimal type with greater or equal precision (e.g. decimal32_fast)
@@ -1666,14 +1666,14 @@ constexpr decimal32::operator std::uint16_t() const noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-constexpr decimal32::operator detail::int128_t() const noexcept
+constexpr decimal32::operator detail::builtin_int128_t() const noexcept
 {
-    return to_integral<decimal32, detail::int128_t>(*this);
+    return to_integral<decimal32, detail::builtin_int128_t>(*this);
 }
 
-constexpr decimal32::operator detail::uint128_t() const noexcept
+constexpr decimal32::operator detail::builtin_uint128_t() const noexcept
 {
-    return to_integral<decimal32, detail::uint128_t>(*this);
+    return to_integral<decimal32, detail::builtin_uint128_t>(*this);
 }
 
 #endif

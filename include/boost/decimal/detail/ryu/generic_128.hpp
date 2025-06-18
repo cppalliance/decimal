@@ -8,7 +8,7 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -24,7 +24,7 @@ namespace detail {
 namespace ryu {
 
 #ifdef BOOST_DECIMAL_HAS_INT128
-using unsigned_128_type = uint128_t;
+using unsigned_128_type = builtin_uint128_t;
 #else
 using unsigned_128_type = uint128;
 #endif

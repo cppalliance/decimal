@@ -8,7 +8,7 @@
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/emulated256.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/components.hpp>
@@ -161,7 +161,7 @@ constexpr auto d128_mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
     const auto res_dig {lhs_dig + rhs_dig};
 
     // If we can avoid it don't do 256 bit multiplication because it is slow
-    if (res_dig <= std::numeric_limits<uint128>::digits10)
+    if (res_dig <= std::numeric_limits<boost::int128::uint128_t>::digits10)
     {
         auto res_sig {lhs_sig * rhs_sig};
         auto res_exp {lhs_exp + rhs_exp};
@@ -176,14 +176,14 @@ constexpr auto d128_mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
 
         const auto sig_dig {res_sig > pow10(static_cast<uint256_t>(static_cast<std::uint64_t>(res_dig))) ? res_dig : res_dig - 1};
 
-        if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
+        if (sig_dig > std::numeric_limits<boost::int128::uint128_t>::digits10)
         {
-            const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
-            res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
+            const auto digit_delta {sig_dig - std::numeric_limits<boost::int128::uint128_t>::digits10};
+            res_sig /= detail::uint256_t(pow10(boost::int128::uint128_t(digit_delta)));
             res_exp += digit_delta;
         }
 
-        BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0, 0));
+        BOOST_DECIMAL_ASSERT(res_sig.high == boost::int128::uint128_t(0, 0));
         return {res_sig.low, res_exp, sign};
     }
 }
@@ -199,7 +199,7 @@ constexpr auto d128_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     const auto rhs_dig {detail::num_digits(rhs_sig)};
 
     // If we can avoid it don't do 256 bit multiplication because it is slow
-    if (lhs_dig + rhs_dig <= std::numeric_limits<uint128>::digits10)
+    if (lhs_dig + rhs_dig <= std::numeric_limits<boost::int128::uint128_t>::digits10)
     {
         auto res_sig {lhs_sig * rhs_sig};
         auto res_exp {lhs_exp + rhs_exp};
@@ -214,14 +214,14 @@ constexpr auto d128_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
         const auto sig_dig {detail::num_digits(res_sig)};
 
-        if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
+        if (sig_dig > std::numeric_limits<boost::int128::uint128_t>::digits10)
         {
-            const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
-            res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
+            const auto digit_delta {sig_dig - std::numeric_limits<boost::int128::uint128_t>::digits10};
+            res_sig /= detail::uint256_t(pow10(boost::int128::uint128_t(digit_delta)));
             res_exp += digit_delta;
         }
 
-        BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0, 0));
+        BOOST_DECIMAL_ASSERT(res_sig.high == boost::int128::uint128_t(0, 0));
         return {res_sig.low, res_exp, sign};
     }
 }
@@ -259,7 +259,7 @@ constexpr auto d128_fast_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     res_sig /= ten_pow_30;
     res_exp += 30;
 
-    BOOST_DECIMAL_ASSERT(res_sig.high == uint128(0,0)); // LCOV_EXCL_LINE
+    BOOST_DECIMAL_ASSERT(res_sig.high == boost::int128::uint128_t(0,0)); // LCOV_EXCL_LINE
     return {res_sig.low, res_exp, sign};
 }
 

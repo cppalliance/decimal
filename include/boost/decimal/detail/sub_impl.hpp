@@ -72,9 +72,8 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
         }
     }
 
-    static_assert(!std::is_same<T, unsigned_sub_type>::value, "TODO(mborland): update the following two lines!");
-    const auto signed_sig_lhs {detail::make_signed_value(unsigned_sub_type{lhs_sig.high, lhs_sig.low}, lhs_sign)};
-    const auto signed_sig_rhs {detail::make_signed_value(unsigned_sub_type{rhs_sig.high, rhs_sig.low}, rhs_sign)};
+    const auto signed_sig_lhs {detail::make_signed_value(lhs_sig, lhs_sign)};
+    const auto signed_sig_rhs {detail::make_signed_value(rhs_sig, rhs_sign)};
 
     const auto new_sig {signed_sig_lhs - signed_sig_rhs};
 

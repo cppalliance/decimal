@@ -15,7 +15,7 @@
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -48,7 +48,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     // Step 3: Check -0 == +0
     auto lhs_sig {lhs.full_significand()};
     auto rhs_sig {rhs.full_significand()};
-    if (lhs_sig == 0 && rhs_sig == 0)
+    if (lhs_sig == 0U && rhs_sig == 0U)
     {
         return true;
     }
@@ -117,7 +117,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_equality_impl(const DecimalType& 
     }
     #endif
 
-    if (lhs.significand_ == 0)
+    if (lhs.significand_ == 0U)
     {
         return true; // -0 == +0
     }
@@ -144,8 +144,8 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
-    BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
-    BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
+    BOOST_DECIMAL_ASSERT(lhs_sig >= 0U);
+    BOOST_DECIMAL_ASSERT(rhs_sig >= 0U);
 
     // We con compare signs right away
     if (lhs_sign != rhs_sign)
@@ -246,7 +246,7 @@ constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
     bool rhs_isneg {false};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
     {
-        if (rhs < 0)
+        if (rhs < static_cast<Integer>(0))
         {
             rhs_isneg = true;
         }
@@ -386,12 +386,12 @@ constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -
     // so use the emulated one
     #if defined(BOOST_DECIMAL_HAS_INT128)
     #if ( (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10) || (defined(__clang__) && __clang_major__ < 13) )
-        detail::uint128
+        int128::uint128_t
     #  else
-        detail::uint128_t
+        detail::builtin_uint128_t
     #  endif
     #else
-    detail::uint128
+    int128::uint128_t
     #endif
     >;
 
@@ -609,7 +609,7 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
 
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
     {
-        if (rhs < 0)
+        if (rhs < 0U)
         {
             rhs_sign = true;
         }

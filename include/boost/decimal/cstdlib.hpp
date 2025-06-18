@@ -14,7 +14,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/utilities.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/locale_conversion.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -39,7 +39,7 @@ inline auto strtod_calculation(const char* str, char** endptr, char* buffer, std
 {
     using significand_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
                                                  std::numeric_limits<std::uint64_t>::digits),
-                                                 detail::uint128, std::uint64_t>;
+                                                 int128::uint128_t, std::uint64_t>;
 
     std::memcpy(buffer, str, str_length);
     convert_string_to_c_locale(buffer);

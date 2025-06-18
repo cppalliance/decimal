@@ -47,10 +47,10 @@ constexpr auto nextafter_impl(DecimalType val, bool direction) noexcept -> Decim
     else if (abs_val > zero && abs_val < std::numeric_limits<DecimalType>::epsilon())
     {
         auto exp {val.biased_exponent()};
-        auto sig {val.full_significand()};
-        sig = direction ? sig + 1 : sig - 1;
+        auto significand {val.full_significand()};
+        direction ? ++significand : --significand;
 
-        return {sig, exp, val.isneg()};
+        return {significand, exp, val.isneg()};
     }
 
     const auto val_eps {direction ? val + std::numeric_limits<DecimalType>::epsilon() :
@@ -62,7 +62,7 @@ constexpr auto nextafter_impl(DecimalType val, bool direction) noexcept -> Decim
         int exp {} ;
         auto significand {frexp10(val, &exp)};
 
-        direction ? significand++ : significand--;
+        direction ? ++significand : --significand;
 
         return DecimalType{significand, exp};
     }

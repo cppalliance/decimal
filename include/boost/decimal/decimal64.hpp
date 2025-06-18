@@ -10,7 +10,7 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 #include <boost/decimal/detail/config.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/fast_float/compute_float32.hpp>
 #include <boost/decimal/detail/fast_float/compute_float64.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
@@ -286,8 +286,8 @@ public:
     explicit constexpr operator std::uint16_t() const noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    explicit constexpr operator detail::int128_t() const noexcept;
-    explicit constexpr operator detail::uint128_t() const noexcept;
+    explicit constexpr operator detail::builtin_int128_t() const noexcept;
+    explicit constexpr operator detail::builtin_uint128_t() const noexcept;
     #endif
 
 
@@ -943,14 +943,14 @@ constexpr decimal64::operator std::uint16_t() const noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-constexpr decimal64::operator detail::int128_t() const noexcept
+constexpr decimal64::operator detail::builtin_int128_t() const noexcept
 {
-    return to_integral<decimal64, detail::int128_t>(*this);
+    return to_integral<decimal64, detail::builtin_int128_t>(*this);
 }
 
-constexpr decimal64::operator detail::uint128_t() const noexcept
+constexpr decimal64::operator detail::builtin_uint128_t() const noexcept
 {
-    return to_integral<decimal64, detail::uint128_t>(*this);
+    return to_integral<decimal64, detail::builtin_uint128_t>(*this);
 }
 
 #endif

@@ -374,7 +374,7 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
         if (delta_exp > 1)
         {
-            rhs_sig /= pow10(static_cast<uint128>(delta_exp - 1));
+            rhs_sig /= pow10(static_cast<boost::int128::uint128_t>(delta_exp - 1));
             delta_exp = 1;
         }
 
@@ -389,7 +389,7 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     const auto new_exp {lhs_exp};
 
     #ifdef BOOST_DECIMAL_DEBUG_ADD_128
-    std::cerr << "Res Sig: " << static_cast<detail::uint128_t>(new_sig)
+    std::cerr << "Res Sig: " << static_cast<detail::builtin_uint128_t>(new_sig)
               << "\nRes Exp: " << new_exp
               << "\nRes Neg: " << sign << std::endl;
     #endif
@@ -435,7 +435,7 @@ constexpr auto d128_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
     if (delta_exp <= 2)
     {
-        sig_bigger *= pow10(static_cast<uint128>(delta_exp));
+        sig_bigger *= pow10(static_cast<boost::int128::uint128_t>(delta_exp));
         exp_bigger -= delta_exp;
         delta_exp = 0;
     }
@@ -447,7 +447,7 @@ constexpr auto d128_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
         if (delta_exp > 1)
         {
-            sig_smaller /= pow10(static_cast<uint128>(delta_exp - 1));
+            sig_smaller /= pow10(static_cast<boost::int128::uint128_t>(delta_exp - 1));
             delta_exp = 1;
         }
 

@@ -266,8 +266,8 @@ public:
     explicit constexpr operator std::uint16_t() const noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    explicit constexpr operator detail::int128_t() const noexcept;
-    explicit constexpr operator detail::uint128_t() const noexcept;
+    explicit constexpr operator detail::builtin_int128_t() const noexcept;
+    explicit constexpr operator detail::builtin_uint128_t() const noexcept;
     #endif
 
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
@@ -387,7 +387,7 @@ constexpr decimal64_fast::decimal64_fast(T1 coeff, T2 exp, bool sign) noexcept
     // Older compilers have issues with conversions from __uint128, so we skip all that and use our uint128
     #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__GNUC__) || (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10)) && (!defined(__clang__) || (defined(__clang__) && __clang_major__ < 13))
     using Unsigned_Integer_1 = detail::make_unsigned_t<T1>;
-    using Unsigned_Integer = std::conditional_t<std::is_same<Unsigned_Integer_1, detail::uint128_t>::value, detail::uint128, Unsigned_Integer_1>;
+    using Unsigned_Integer = std::conditional_t<std::is_same<Unsigned_Integer_1, detail::builtin_uint128_t>::value, int128::uint128_t, Unsigned_Integer_1>;
     #else
     using Unsigned_Integer = detail::make_unsigned_t<T1>;
     #endif
@@ -838,14 +838,14 @@ constexpr decimal64_fast::operator std::uint16_t() const noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-constexpr decimal64_fast::operator detail::int128_t() const noexcept
+constexpr decimal64_fast::operator detail::builtin_int128_t() const noexcept
 {
-    return to_integral<decimal64_fast, detail::int128_t>(*this);
+    return to_integral<decimal64_fast, detail::builtin_int128_t>(*this);
 }
 
-constexpr decimal64_fast::operator detail::uint128_t() const noexcept
+constexpr decimal64_fast::operator detail::builtin_uint128_t() const noexcept
 {
-    return to_integral<decimal64_fast, detail::uint128_t>(*this);
+    return to_integral<decimal64_fast, detail::builtin_uint128_t>(*this);
 }
 
 #endif // BOOST_DECIMAL_HAS_INT128
@@ -1121,9 +1121,9 @@ constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal
     #endif
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
+    using unsigned_int128_type = boost::decimal::detail::builtin_uint128_t;
     #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
+    using unsigned_int128_type = boost::int128::uint128_t;
     #endif
 
     // If rhs is greater than we need to offset the significands to get the correct values

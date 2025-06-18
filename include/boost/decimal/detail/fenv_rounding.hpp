@@ -20,7 +20,7 @@ namespace detail {
 template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
 constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 {
-    using significand_type = std::conditional_t<decimal_val_v<TargetType> >= 128, detail::uint128, std::int64_t>;
+    using significand_type = std::conditional_t<decimal_val_v<TargetType> >= 128, int128::uint128_t, std::int64_t>;
 
     const auto trailing_num {val % 10U};
     val /= 10U;
@@ -45,7 +45,7 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
 constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT(readability-function-cognitive-complexity)
 {
-    using significand_type = std::conditional_t<decimal_val_v<TargetType> >= 128, detail::uint128, std::int64_t>;
+    using significand_type = std::conditional_t<decimal_val_v<TargetType> >= 128, int128::uint128_t, std::int64_t>;
 
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
     {
@@ -61,7 +61,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         // If the significand was e.g. 99'999'999 rounding up
         // would put it out of range again
 
-        if (static_cast<significand_type>(val) > max_significand_v<TargetType>)
+        if (static_cast<significand_type>(val) > static_cast<significand_type>(max_significand_v<TargetType>))
         {
             val /= 10U;
             ++exp_delta;

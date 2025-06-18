@@ -201,12 +201,12 @@ constexpr bool operator>=(const uint256_t& lhs, const uint256_t& rhs) noexcept
 
 constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexcept
 {
-    const uint256_t temp = {lhs.high + rhs.high, lhs.low + rhs.low};
+    uint256_t temp = {lhs.high + rhs.high, lhs.low + rhs.low};
 
     // Need to carry a bit into hrs
     if (temp.low < lhs.low)
     {
-        return {temp.high + 1, temp.low};
+        ++temp.high;
     }
 
     return temp;
@@ -214,11 +214,11 @@ constexpr uint256_t operator+(const uint256_t& lhs, const uint256_t& rhs) noexce
 
 constexpr uint256_t operator+(uint256_t lhs, boost::int128::uint128_t rhs) noexcept
 {
-    const uint256_t temp = {lhs.high, lhs.low + rhs};
+    uint256_t temp = {lhs.high, lhs.low + rhs};
 
     if (temp.low < lhs.low)
     {
-        return {temp.high + 1, temp.low};
+        ++temp.high;
     }
 
     return temp;
@@ -243,23 +243,15 @@ constexpr uint256_t &uint256_t::operator-=(uint256_t v) noexcept
     return *this;
 }
 
-constexpr auto high_bit(const boost::int128::uint128_t v) noexcept -> int
+constexpr auto high_bit(const int128::uint128_t v) noexcept -> int
 {
     if (v.high != 0)
     {
-        #ifdef BOOST_DECIMAL_HAS_STDBIT
-        return 127 - std::countl_zero(v.high);
-        #else
-        return 127 - countl_zero(v.high);
-        #endif
+        return 127 - int128::countl_zero(v.high);
     }
     else if (v.low != 0)
     {
-        #ifdef BOOST_DECIMAL_HAS_STDBIT
-        return 63 - std::countl_zero(v.low);
-        #else
-        return 63 - countl_zero(v.low);
-        #endif
+        return 63 - int128::countl_zero(v.low);
     }
 
     return 0;
@@ -303,7 +295,7 @@ constexpr uint256_t subtract(const uint256_t& a, const uint256_t& b)
     result.high = a.high - b.high;
     if (a.low < b.low)
     {
-        result.high--;
+        --result.high;
     }
 
     return result;

@@ -11,8 +11,8 @@
 #include <boost/decimal/decimal32_fast.hpp>
 #include <boost/decimal/decimal64_fast.hpp>
 #include <boost/decimal/decimal128_fast.hpp>
-#include <boost/decimal/uint128.hpp>
 #include <boost/decimal/detail/concepts.hpp>
+#include <boost/int128.hpp>
 
 namespace boost {
 namespace decimal {
@@ -68,30 +68,30 @@ BOOST_DECIMAL_EXPORT constexpr auto from_bid_d64f(std::uint64_t bits) noexcept -
     return val;
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_bid_d128(decimal128 val) noexcept -> uint128
+BOOST_DECIMAL_EXPORT constexpr auto to_bid_d128(decimal128 val) noexcept -> int128::uint128_t
 {
     return val.bits_;
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto from_bid_d128(uint128 bits) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT constexpr auto from_bid_d128(int128::uint128_t bits) noexcept -> decimal128
 {
     return from_bits(bits);
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
-BOOST_DECIMAL_EXPORT constexpr auto from_bid_d128(detail::uint128_t bits) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT constexpr auto from_bid_d128(detail::builtin_uint128_t bits) noexcept -> decimal128
 {
     return from_bits(bits);
 }
 #endif
 
-BOOST_DECIMAL_EXPORT constexpr auto to_bid_d128f(decimal128_fast val) noexcept -> uint128
+BOOST_DECIMAL_EXPORT constexpr auto to_bid_d128f(decimal128_fast val) noexcept -> int128::uint128_t
 {
     const decimal128 compliant_val {val};
     return to_bid_d128(compliant_val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto from_bid_d128f(uint128 bits) noexcept -> decimal128_fast
+BOOST_DECIMAL_EXPORT constexpr auto from_bid_d128f(int128::uint128_t bits) noexcept -> decimal128_fast
 {
     const auto compliant_val {from_bid_d128(bits)};
     const decimal128_fast val {compliant_val};
@@ -99,7 +99,7 @@ BOOST_DECIMAL_EXPORT constexpr auto from_bid_d128f(uint128 bits) noexcept -> dec
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
-BOOST_DECIMAL_EXPORT constexpr auto from_bid_d128f(detail::uint128_t bits) noexcept -> decimal128_fast
+BOOST_DECIMAL_EXPORT constexpr auto from_bid_d128f(detail::builtin_uint128_t bits) noexcept -> decimal128_fast
 {
     const auto compliant_val {from_bid_d128(bits)};
     const decimal128_fast val {compliant_val};
@@ -127,12 +127,12 @@ BOOST_DECIMAL_EXPORT constexpr auto to_bid(decimal64_fast val) noexcept -> std::
     return to_bid_d64f(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_bid(decimal128 val) noexcept -> uint128
+BOOST_DECIMAL_EXPORT constexpr auto to_bid(decimal128 val) noexcept -> int128::uint128_t
 {
     return to_bid_d128(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_bid(decimal128_fast val) noexcept -> uint128
+BOOST_DECIMAL_EXPORT constexpr auto to_bid(decimal128_fast val) noexcept -> int128::uint128_t
 {
     return to_bid_d128f(val);
 }
@@ -170,14 +170,14 @@ constexpr auto from_bid<decimal64>(std::uint64_t bits) noexcept -> decimal64
 }
 
 BOOST_DECIMAL_EXPORT template <typename T = decimal128_fast>
-constexpr auto from_bid(uint128 bits) noexcept
+constexpr auto from_bid(int128::uint128_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     return from_bid_d128f(bits);
 }
 
 BOOST_DECIMAL_EXPORT template <>
-constexpr auto from_bid<decimal128>(uint128 bits) noexcept -> decimal128
+constexpr auto from_bid<decimal128>(int128::uint128_t bits) noexcept -> decimal128
 {
     return from_bid_d128(bits);
 }
