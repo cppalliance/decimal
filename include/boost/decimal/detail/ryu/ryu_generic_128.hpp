@@ -66,11 +66,11 @@ inline constexpr auto generic_binary_to_decimal(
     #endif
 
     const std::uint32_t local_bias = (1u << (exponentBits - 1)) - 1;
-    const bool ieeeSign = ((bits >> (mantissaBits + exponentBits)) & 1) != 0;
-    const unsigned_128_type ieeeMantissa = bits & ((one << mantissaBits) - 1);
+    const bool ieeeSign = ((bits >> (mantissaBits + exponentBits)) & 1U) != 0U;
+    const unsigned_128_type ieeeMantissa = bits & ((one << mantissaBits) - 1U);
     const auto ieeeExponent = static_cast<std::uint32_t>((bits >> mantissaBits) & ((one << exponentBits) - 1u));
 
-    if (ieeeExponent == 0 && ieeeMantissa == 0)
+    if (ieeeExponent == 0 && ieeeMantissa == 0U)
     {
         struct floating_decimal_128 fd {0, 0, ieeeSign};
         return fd;
@@ -78,7 +78,7 @@ inline constexpr auto generic_binary_to_decimal(
     if (ieeeExponent == ((1u << exponentBits) - 1u))
     {
         struct floating_decimal_128 fd {};
-        fd.mantissa = explicitLeadingBit ? ieeeMantissa & ((one << (mantissaBits - 1)) - 1) : ieeeMantissa;
+        fd.mantissa = explicitLeadingBit ? ieeeMantissa & ((one << (mantissaBits - 1)) - 1U) : ieeeMantissa;
         fd.exponent = fd128_exceptional_exponent;
         fd.sign = ieeeSign;
         return fd;
@@ -112,7 +112,7 @@ inline constexpr auto generic_binary_to_decimal(
             m2 = (one << mantissaBits) | ieeeMantissa;
         }
     }
-    const bool even = (m2 & 1) == 0;
+    const bool even = (m2 & 1U) == 0U;
     const bool acceptBounds = even;
 
     #ifdef BOOST_DECIMAL_DEBUG_RYU
@@ -120,10 +120,10 @@ inline constexpr auto generic_binary_to_decimal(
     #endif
 
     // Step 2: Determine the interval of legal decimal representations.
-    const unsigned_128_type mv = 4 * m2;
+    const unsigned_128_type mv = 4U * m2;
     // Implicit bool -> int conversion. True is 1, false is 0.
     const std::uint32_t mmShift =
-            (ieeeMantissa != (explicitLeadingBit ? one << (mantissaBits - 1) : 0))
+            (ieeeMantissa != (explicitLeadingBit ? one << (mantissaBits - 1) : static_cast<unsigned_128_type>(0)))
             || (ieeeExponent == 0);
 
     // Step 3: Convert to a decimal power base using 128-bit arithmetic.
@@ -143,9 +143,9 @@ inline constexpr auto generic_binary_to_decimal(
         const std::int32_t i = -e2 + static_cast<std::int32_t>(q) + k;
         std::uint64_t pow5[4] {};
         generic_computeInvPow5(q, pow5);
-        vr = mulShift(4 * m2, pow5, static_cast<std::uint32_t>(i));
-        vp = mulShift(4 * m2 + 2, pow5, static_cast<std::uint32_t>(i));
-        vm = mulShift(4 * m2 - 1 - mmShift, pow5, static_cast<std::uint32_t>(i));
+        vr = mulShift(4U * m2, pow5, static_cast<std::uint32_t>(i));
+        vp = mulShift(4U * m2 + 2U, pow5, static_cast<std::uint32_t>(i));
+        vm = mulShift(4U * m2 - 1U - mmShift, pow5, static_cast<std::uint32_t>(i));
 
         #ifdef BOOST_DECIMAL_DEBUG_RYU
         printf("%s * 2^%d / 10^%d\n", s(mv), e2, q);
@@ -156,7 +156,7 @@ inline constexpr auto generic_binary_to_decimal(
         if (q <= 55)
         {
             // Only one of mp, mv, and mm can be a multiple of 5, if any.
-            if (mv % 5 == 0)
+            if (mv % 5U == 0U)
             {
                 vrIsTrailingZeros = multipleOfPowerOf5(mv, q - 1);
             }
@@ -165,12 +165,12 @@ inline constexpr auto generic_binary_to_decimal(
                 // Same as min(e2 + (~mm & 1), pow5Factor(mm)) >= q
                 // <=> e2 + (~mm & 1) >= q && pow5Factor(mm) >= q
                 // <=> true && pow5Factor(mm) >= q, since e2 >= q.
-                vmIsTrailingZeros = multipleOfPowerOf5(mv - 1 - mmShift, q);
+                vmIsTrailingZeros = multipleOfPowerOf5(mv - 1U - mmShift, q);
             }
             else
             {
                 // Same as min(e2 + 1, pow5Factor(mp)) >= q.
-                vp -= multipleOfPowerOf5(mv + 2, q);
+                vp -= multipleOfPowerOf5(mv + 2U, q);
             }
         }
     }
@@ -182,11 +182,11 @@ inline constexpr auto generic_binary_to_decimal(
         const int32_t i = -e2 - static_cast<int32_t>(q);
         const int32_t k = static_cast<int32_t>(pow5bits(static_cast<uint32_t>(i))) - BOOST_DECIMAL_POW5_BITCOUNT;
         const int32_t j = static_cast<int32_t>(q) - k;
-        uint64_t pow5[4] {};
+        uint64_t pow5[4U] {};
         generic_computePow5(static_cast<uint32_t>(i), pow5);
-        vr = mulShift(4 * m2, pow5, static_cast<std::uint32_t>(j));
-        vp = mulShift(4 * m2 + 2, pow5, static_cast<std::uint32_t>(j));
-        vm = mulShift(4 * m2 - 1 - mmShift, pow5, static_cast<std::uint32_t>(j));
+        vr = mulShift(4U * m2, pow5, static_cast<std::uint32_t>(j));
+        vp = mulShift(4U * m2 + 2U, pow5, static_cast<std::uint32_t>(j));
+        vm = mulShift(4U * m2 - 1U - mmShift, pow5, static_cast<std::uint32_t>(j));
 
         #ifdef BOOST_DECIMAL_DEBUG_RYU
         printf("%s * 5^%d / 10^%d\n", s(mv), -e2, q);
@@ -239,12 +239,12 @@ inline constexpr auto generic_binary_to_decimal(
 
     while (vp / UINT64_C(10) > vm / UINT64_C(10))
     {
-        vmIsTrailingZeros &= vm % 10 == 0;
+        vmIsTrailingZeros &= vm % 10U == 0U;
         vrIsTrailingZeros &= lastRemovedDigit == 0;
-        lastRemovedDigit = static_cast<uint8_t>(vr % 10);
-        vr /= 10;
-        vp /= 10;
-        vm /= 10;
+        lastRemovedDigit = static_cast<uint8_t>(vr % 10U);
+        vr /= 10U;
+        vp /= 10U;
+        vm /= 10U;
         ++removed;
     }
 
@@ -255,13 +255,13 @@ inline constexpr auto generic_binary_to_decimal(
 
     if (vmIsTrailingZeros)
     {
-        while (vm % 10 == 0)
+        while (vm % 10U == 0U)
         {
             vrIsTrailingZeros &= lastRemovedDigit == 0;
-            lastRemovedDigit = static_cast<uint8_t>(vr % 10);
-            vr /= 10;
-            vp /= 10;
-            vm /= 10;
+            lastRemovedDigit = static_cast<uint8_t>(vr % 10U);
+            vr /= 10U;
+            vp /= 10U;
+            vm /= 10U;
             ++removed;
         }
     }
@@ -271,7 +271,7 @@ inline constexpr auto generic_binary_to_decimal(
     printf("vr is trailing zeros=%s\n", vrIsTrailingZeros ? "true" : "false");
     #endif
 
-    if (vrIsTrailingZeros && (lastRemovedDigit == 5) && (vr % 2 == 0))
+    if (vrIsTrailingZeros && (lastRemovedDigit == 5) && (vr % 2U == 0U))
     {
         // Round even if the exact numbers is .....50..0.
         lastRemovedDigit = 4;
