@@ -23,9 +23,6 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
                              T rhs_sig, U rhs_exp, bool rhs_sign,
                              bool abs_lhs_bigger) noexcept -> ReturnType
 {
-    using sub_type = boost::int128::int128_t;
-    using unsigned_sub_type = detail::make_unsigned_t<sub_type>;
-
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
 
     if (delta_exp > detail::precision_v<decimal128> + 1)

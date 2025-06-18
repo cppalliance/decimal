@@ -623,7 +623,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         #  pragma warning(disable : 4804)
         #endif
 
-        if (coeff < 0 || sign)
+        if (coeff < 0U || sign)
         {
             bits_ |= detail::d32_sign_mask;
             isneg = true;
