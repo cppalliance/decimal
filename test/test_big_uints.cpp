@@ -310,7 +310,7 @@ auto test_various_spots() -> void
     BOOST_TEST_EQ(lowest_low, UINT64_C(0));
   }
 
-  std::uniform_int_distribution<int> n_dist(1, 4);
+  std::uniform_int_distribution<unsigned> n_dist(1, 4);
 
   for(auto trials = static_cast<int>(INT8_C(0)); trials < static_cast<int>(INT8_C(0x8)); ++trials)
   {
@@ -324,7 +324,7 @@ auto test_various_spots() -> void
 
       const local_uint128_type low_old { low };
 
-      const int n_add = n_dist(rng);
+      const auto n_add = n_dist(rng);
 
       low += static_cast<std::uint64_t>(n_add);
 
@@ -466,6 +466,7 @@ auto test_big_uints_shl() -> void
 template <typename T>
 void test_digit_counting()
 {
+    using boost::decimal::detail::num_digits;
     constexpr auto max_power {std::is_same<T, boost::decimal::detail::uint256_t>::value ? 77 : 38 };
 
     T current_power {1};
