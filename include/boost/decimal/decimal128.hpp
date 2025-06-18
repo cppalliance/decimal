@@ -144,7 +144,7 @@ public:
     using biased_exponent_type = std::int32_t;
 
 private:
-    detail::uint128 bits_ {};
+    int128::uint128_t bits_ {};
 
     #ifdef BOOST_DECIMAL_HAS_INT128
 
@@ -153,11 +153,11 @@ private:
 
     #endif
 
-    friend constexpr auto from_bits(detail::uint128 rhs) noexcept -> decimal128;
+    friend constexpr auto from_bits(int128::uint128_t rhs) noexcept -> decimal128;
 
     constexpr auto unbiased_exponent() const noexcept -> std::uint64_t;
     constexpr auto biased_exponent() const noexcept -> std::int32_t;
-    constexpr auto full_significand() const noexcept -> detail::uint128;
+    constexpr auto full_significand() const noexcept -> int128::uint128_t;
     constexpr auto isneg() const noexcept -> bool;
     constexpr auto to_components() const noexcept -> detail::decimal128_components;
 
@@ -217,9 +217,9 @@ private:
 
     friend constexpr auto not_finite(decimal128 rhs) noexcept -> bool;
 
-    friend constexpr auto to_bid_d128(decimal128 val) noexcept -> detail::uint128;
+    friend constexpr auto to_bid_d128(decimal128 val) noexcept -> int128::uint128_t;
 
-    friend constexpr auto from_bid_d128(detail::uint128 bits) noexcept -> decimal128;
+    friend constexpr auto from_bid_d128(int128::uint128_t bits) noexcept -> decimal128;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
     friend constexpr auto from_bid_d128(detail::uint128_t bits) noexcept -> decimal128;
@@ -227,7 +227,7 @@ private:
 
     template <typename DecimalType>
     friend constexpr auto to_dpd_d128(DecimalType val) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, detail::uint128);
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, int128::uint128_t);
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
@@ -300,8 +300,8 @@ public:
     explicit constexpr operator std::int16_t() const noexcept;
     explicit constexpr operator std::uint16_t() const noexcept;
 
-    explicit constexpr operator detail::int128() const noexcept;
-    explicit constexpr operator detail::uint128() const noexcept;
+    explicit constexpr operator boost::int128::int128_t() const noexcept;
+    explicit constexpr operator boost::int128::uint128_t() const noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
     explicit constexpr operator detail::int128_t() const noexcept;
@@ -618,7 +618,7 @@ constexpr auto to_bits(decimal128 rhs) noexcept -> detail::uint128_t
 
 #endif
 
-constexpr auto from_bits(detail::uint128 rhs) noexcept -> decimal128
+constexpr auto from_bits(int128::uint128_t rhs) noexcept -> decimal128
 {
     decimal128 result;
     result.bits_ = rhs;
@@ -656,16 +656,16 @@ constexpr auto decimal128::biased_exponent() const noexcept -> std::int32_t
     return static_cast<std::int32_t>(unbiased_exponent()) - detail::bias_v<decimal128>;
 }
 
-constexpr auto decimal128::full_significand() const noexcept -> detail::uint128
+constexpr auto decimal128::full_significand() const noexcept -> int128::uint128_t
 {
-    detail::uint128 significand {0, 0};
+    int128::uint128_t significand {0, 0};
 
     if ((bits_.high & detail::d128_comb_11_mask.high) == detail::d128_comb_11_mask.high)
     {
         // Only need the one bit of T because the other 3 are implied 0s
         significand = (bits_.high & detail::d128_comb_11_significand_bits.high) == detail::d128_comb_11_significand_bits.high ?
-            detail::uint128{0b10010000000000000000000000000000000000000000000000,0} :
-            detail::uint128{0b10000000000000000000000000000000000000000000000000,0};
+            int128::uint128_t{0b10010000000000000000000000000000000000000000000000,0} :
+            int128::uint128_t{0b10000000000000000000000000000000000000000000000000,0};
     }
     else
     {
@@ -686,7 +686,7 @@ constexpr auto decimal128::isneg() const noexcept -> bool
 
 constexpr auto decimal128::to_components() const noexcept -> detail::decimal128_components
 {
-    detail::uint128 significand {};
+    int128::uint128_t significand {};
     std::uint64_t expval {};
 
     constexpr std::uint64_t high_word_significand_bits {detail::d128_significand_bits - 64U};
@@ -699,8 +699,8 @@ constexpr auto decimal128::to_components() const noexcept -> detail::decimal128_
             expval = (bits_.high & detail::d128_comb_11_mask.high) >> (high_word_significand_bits + 1);
             // Only need the one bit of T because the other 3 are implied 0s
             significand = (bits_.high & detail::d128_comb_11_significand_bits.high) == detail::d128_comb_11_significand_bits.high ?
-                detail::uint128{0b10010000000000000000000000000000000000000000000000,0} :
-                detail::uint128{0b10000000000000000000000000000000000000000000000000,0};
+                int128::uint128_t{0b10010000000000000000000000000000000000000000000000,0} :
+                int128::uint128_t{0b10000000000000000000000000000000000000000000000000,0};
             break;
         case detail::d128_comb_10_mask.high:
             expval = UINT64_C(0b10000000000000);
@@ -719,7 +719,7 @@ constexpr auto decimal128::to_components() const noexcept -> detail::decimal128_
     significand |= (bits_ & detail::d128_significand_mask);
     const auto sign {static_cast<bool>(bits_.high & detail::d128_sign_mask.high)};
 
-    return {significand, static_cast<biased_exponent_type>(expval) - detail::bias_v<decimal128>, sign};
+    return detail::decimal128_components {significand, static_cast<biased_exponent_type>(expval) - detail::bias_v<decimal128>, sign};
 }
 
 
@@ -812,10 +812,10 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
         }
     }
 
-    auto reduced_coeff {static_cast<detail::uint128>(unsigned_coeff)};
+    auto reduced_coeff {static_cast<int128::uint128_t>(unsigned_coeff)};
     bool big_combination {false};
 
-    if (reduced_coeff == detail::uint128{0, 0})
+    if (reduced_coeff == int128::uint128_t{0, 0})
     {
         exp = 0;
     }
@@ -853,7 +853,7 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
 
     // If the exponent fits we do not need to use the combination field
     auto biased_exp {static_cast<std::uint64_t>(exp + detail::bias_v<decimal128>)};
-    const auto biased_exp_low_twelve_bits {detail::uint128(biased_exp & detail::d128_max_exp_no_combination) <<
+    const auto biased_exp_low_twelve_bits {int128::uint128_t(biased_exp & detail::d128_max_exp_no_combination) <<
                                            detail::d128_significand_bits};
 
     if (biased_exp <= detail::d128_max_exp_no_combination)
@@ -884,7 +884,7 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     }
     else
     {
-        constexpr auto zero_bits {detail::uint128{UINT64_C(0x2208000000000000), UINT64_C(0)}};
+        constexpr auto zero_bits {int128::uint128_t{UINT64_C(0x2208000000000000), UINT64_C(0)}};
 
         // The value is probably infinity
 
@@ -1091,14 +1091,14 @@ constexpr decimal128::operator std::uint16_t() const noexcept
     return to_integral_128<decimal128, std::uint16_t>(*this);
 }
 
-constexpr decimal128::operator detail::int128() const noexcept
+constexpr decimal128::operator boost::int128::int128_t() const noexcept
 {
-    return to_integral_128<decimal128, detail::int128>(*this);
+    return to_integral_128<decimal128, boost::int128::int128_t>(*this);
 }
 
-constexpr decimal128::operator detail::uint128() const noexcept
+constexpr decimal128::operator boost::int128::uint128_t() const noexcept
 {
-    return to_integral_128<decimal128, detail::uint128>(*this);
+    return to_integral_128<decimal128, boost::int128::uint128_t>(*this);
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
@@ -1651,7 +1651,7 @@ constexpr auto operator+(decimal128 lhs, Integer rhs) noexcept
     }
     #endif
 
-    auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    auto sig_rhs {static_cast<int128::uint128_t>(detail::make_positive_unsigned(rhs))};
     bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     auto sig_lhs {lhs.full_significand()};
@@ -1710,7 +1710,7 @@ constexpr auto operator-(decimal128 lhs, Integer rhs) noexcept
     }
     #endif
 
-    auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    auto sig_rhs {static_cast<int128::uint128_t>(detail::make_positive_unsigned(rhs))};
     const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     auto sig_lhs {lhs.full_significand()};
@@ -1739,7 +1739,7 @@ constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
     }
     #endif
 
-    auto sig_lhs {static_cast<detail::uint128>(detail::make_positive_unsigned(lhs))};
+    auto sig_lhs {static_cast<int128::uint128_t>(detail::make_positive_unsigned(lhs))};
     const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
 
     exp_type exp_lhs {0};
@@ -1794,7 +1794,7 @@ constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
     lhs_sig = lhs_zeros.trimmed_number;
     lhs_exp += static_cast<std::int32_t>(lhs_zeros.number_of_removed_zeros);
 
-    auto rhs_sig {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    auto rhs_sig {static_cast<int128::uint128_t>(detail::make_positive_unsigned(rhs))};
     const auto rhs_zeros {detail::remove_trailing_zeros(rhs_sig)};
     rhs_sig = rhs_zeros.trimmed_number;
     const auto rhs_exp = static_cast<exp_type>(rhs_zeros.number_of_removed_zeros);
@@ -2124,14 +2124,14 @@ template <typename Integer>
 constexpr auto operator&(decimal128 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128)
 {
-    return from_bits(lhs.bits_ & static_cast<detail::uint128>(rhs));
+    return from_bits(lhs.bits_ & static_cast<int128::uint128_t>(rhs));
 }
 
 template <typename Integer>
 constexpr auto operator&(Integer lhs, decimal128 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128)
 {
-    return from_bits(static_cast<detail::uint128>(lhs) & rhs.bits_);
+    return from_bits(static_cast<int128::uint128_t>(lhs) & rhs.bits_);
 }
 
 constexpr auto operator|(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
@@ -2143,14 +2143,14 @@ template <typename Integer>
 constexpr auto operator|(decimal128 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128)
 {
-    return from_bits(lhs.bits_ | static_cast<detail::uint128>(rhs));
+    return from_bits(lhs.bits_ | static_cast<int128::uint128_t>(rhs));
 }
 
 template <typename Integer>
 constexpr auto operator|(Integer lhs, decimal128 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128)
 {
-    return from_bits(static_cast<detail::uint128>(lhs) | rhs.bits_);
+    return from_bits(static_cast<int128::uint128_t>(lhs) | rhs.bits_);
 }
 
 constexpr auto operator^(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
@@ -2162,14 +2162,14 @@ template <typename Integer>
 constexpr auto operator^(decimal128 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128)
 {
-    return from_bits(lhs.bits_ ^ static_cast<detail::uint128>(rhs));
+    return from_bits(lhs.bits_ ^ static_cast<int128::uint128_t>(rhs));
 }
 
 template <typename Integer>
 constexpr auto operator^(Integer lhs, decimal128 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128)
 {
-    return from_bits(static_cast<detail::uint128>(lhs) ^ rhs.bits_);
+    return from_bits(static_cast<int128::uint128_t>(lhs) ^ rhs.bits_);
 }
 
 constexpr auto operator<<(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
@@ -2188,7 +2188,7 @@ template <typename Integer>
 constexpr auto operator<<(Integer lhs, decimal128 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128)
 {
-    return from_bits(static_cast<detail::uint128>(lhs) << static_cast<std::uint64_t>(rhs.bits_));
+    return from_bits(static_cast<int128::uint128_t>(lhs) << static_cast<std::uint64_t>(rhs.bits_));
 }
 
 constexpr auto operator>>(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
@@ -2207,7 +2207,7 @@ template <typename Integer>
 constexpr auto operator>>(Integer lhs, decimal128 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128)
 {
-    return from_bits(static_cast<detail::uint128>(lhs) >> static_cast<std::uint64_t>(rhs.bits_));
+    return from_bits(static_cast<int128::uint128_t>(lhs) >> static_cast<std::uint64_t>(rhs.bits_));
 }
 
 constexpr auto operator~(decimal128 lhs) noexcept -> decimal128
@@ -2290,8 +2290,8 @@ struct numeric_limits<boost::decimal::decimal128>
 
     // Member functions
     static constexpr auto (min)        () -> boost::decimal::decimal128 { return {1, min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal128 { return {boost::decimal::detail::uint128{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal128 { return {boost::decimal::detail::uint128{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1, true}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal128 { return {boost::decimal::int128::uint128_t{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal128 { return {boost::decimal::int128::uint128_t{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1, true}; }
     static constexpr auto epsilon      () -> boost::decimal::decimal128 { return {1, -digits + 1}; }
     static constexpr auto round_error  () -> boost::decimal::decimal128 { return epsilon(); }
     static constexpr auto infinity     () -> boost::decimal::decimal128 { return boost::decimal::from_bits(boost::decimal::detail::d128_inf_mask); }
