@@ -609,7 +609,7 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
 
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
     {
-        if (rhs < 0U)
+        if (rhs < static_cast<Integer>(0))
         {
             rhs_sign = true;
         }
