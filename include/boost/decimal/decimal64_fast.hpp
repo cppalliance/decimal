@@ -1412,10 +1412,10 @@ struct numeric_limits<boost::decimal::decimal64_fast>
     static constexpr bool tinyness_before = true;
 
     // Member functions
-    static constexpr auto (min)        () -> boost::decimal::decimal64_fast { return {1, min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal64_fast { return {9'999'999'999'999'999, max_exponent - digits + 1}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal64_fast { return {9'999'999'999'999'999, max_exponent - digits + 1, true}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal64_fast { return {1, -digits + 1}; }
+    static constexpr auto (min)        () -> boost::decimal::decimal64_fast { return {UINT32_C(1), min_exponent}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal64_fast { return {UINT64_C(9'999'999'999'999'999), max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal64_fast { return {UINT64_C(9'999'999'999'999'999), max_exponent - digits + 1, true}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal64_fast { return {UINT32_C(1), -digits + 1}; }
     static constexpr auto round_error  () -> boost::decimal::decimal64_fast { return epsilon(); }
     static constexpr auto infinity     () -> boost::decimal::decimal64_fast { return boost::decimal::direct_init_d64(
                 boost::decimal::detail::d64_fast_inf, 0, false); }

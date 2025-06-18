@@ -1437,10 +1437,10 @@ struct numeric_limits<boost::decimal::decimal128_fast>
     static constexpr bool tinyness_before = true;
 
     // Member functions
-    static constexpr auto (min)        () -> boost::decimal::decimal128_fast { return {1, min_exponent}; }
+    static constexpr auto (min)        () -> boost::decimal::decimal128_fast { return {UINT32_C(1), min_exponent}; }
     static constexpr auto (max)        () -> boost::decimal::decimal128_fast { return {boost::int128::uint128_t{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1}; }
     static constexpr auto lowest       () -> boost::decimal::decimal128_fast { return {boost::int128::uint128_t{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1, true}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal128_fast { return {1, -digits + 1}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal128_fast { return {UINT32_C(1), -digits + 1}; }
     static constexpr auto round_error  () -> boost::decimal::decimal128_fast { return epsilon(); }
     static constexpr auto infinity     () -> boost::decimal::decimal128_fast { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_inf, 0, false); }
     static constexpr auto quiet_NaN    () -> boost::decimal::decimal128_fast { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_qnan, 0, false); }
