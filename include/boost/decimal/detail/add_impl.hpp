@@ -368,7 +368,7 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     }
     else
     {
-        lhs_sig *= 1000;
+        lhs_sig *= 1000U;
         delta_exp -= 3;
         lhs_exp -= 3;
 
@@ -441,7 +441,7 @@ constexpr auto d128_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
     }
     else
     {
-        sig_bigger *= 100;
+        sig_bigger *= 100U;
         delta_exp -= 2;
         exp_bigger -= 2;
 

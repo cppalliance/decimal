@@ -525,7 +525,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             first += num_leading_zeros;
 
             // We can skip the rest if there's nothing more to do for the required precision
-            if (significand == 0)
+            if (significand == 0U)
             {
                 if (precision - num_leading_zeros > 0)
                 {
@@ -684,7 +684,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 
     int exp {};
     Unsigned_Integer significand = frexp10(value, &exp);
-    BOOST_DECIMAL_ASSERT(significand != 0);
+    BOOST_DECIMAL_ASSERT(significand != 0U);
     // Strip zeros of the significand since frexp10 normalizes it
     const auto zero_removal {detail::remove_trailing_zeros(significand)};
     significand = zero_removal.trimmed_number;
@@ -706,7 +706,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 
         if (significand_digits > precision + 1)
         {
-            const auto trailing_digit = significand & 0xFU;
+            const auto trailing_digit = static_cast<std::uint32_t>(significand & 0xFU);
             significand >>= 4;
             ++exp;
             if (trailing_digit >= 8)

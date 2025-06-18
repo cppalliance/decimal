@@ -744,7 +744,7 @@ constexpr auto to_dpd_d128(DecimalType val) noexcept
         temp_sig /= 10U;
     }
     BOOST_DECIMAL_ASSERT(d[0] >= 0 && d[0] <= 9);
-    BOOST_DECIMAL_ASSERT(temp_sig == 0);
+    BOOST_DECIMAL_ASSERT(temp_sig == 0U);
 
     constexpr std::uint64_t leading_two_exp_bits_mask {0b11000000000000};
     const auto leading_two_bits {(exp & leading_two_exp_bits_mask) >> 12U};
@@ -890,7 +890,7 @@ constexpr auto from_dpd_d128(int128::uint128_t dpd) noexcept
     digits[0] = static_cast<std::uint8_t>(d0);
     for (int i = num_digits - 1; i > 0; i -= 3)
     {
-        const auto declet_bits {static_cast<std::uint32_t>(significand_bits & 0b1111111111)};
+        const auto declet_bits {static_cast<std::uint32_t>(significand_bits & 0b1111111111U)};
         significand_bits >>= 10U;
         detail::decode_dpd(declet_bits, digits[i], digits[i - 1], digits[i - 2]);
     }

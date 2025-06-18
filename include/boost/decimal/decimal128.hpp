@@ -1215,9 +1215,9 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs
         return false;
     }
 
-    return (sig != 0) && isfinite(rhs);
+    return (sig != 0U) && isfinite(rhs);
     #else
-    return rhs.full_significand() != 0;
+    return rhs.full_significand() != 0U;
     #endif
 }
 

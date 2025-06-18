@@ -245,11 +245,11 @@ constexpr uint256_t &uint256_t::operator-=(uint256_t v) noexcept
 
 constexpr auto high_bit(const int128::uint128_t v) noexcept -> int
 {
-    if (v.high != 0)
+    if (v.high != 0U)
     {
         return 127 - int128::countl_zero(v.high);
     }
-    else if (v.low != 0)
+    else if (v.low != 0U)
     {
         return 63 - int128::countl_zero(v.low);
     }
@@ -259,11 +259,11 @@ constexpr auto high_bit(const int128::uint128_t v) noexcept -> int
 
 constexpr int high_bit(uint256_t v) noexcept
 {
-    if (v.high != 0)
+    if (v.high != 0U)
     {
         return 255 - high_bit(v.high);
     }
-    else if (v.low != 0)
+    else if (v.low != 0U)
     {
         return 127 - high_bit(v.low);
     }

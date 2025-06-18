@@ -47,7 +47,7 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
     if (delta_exp == 1)
     {
-        sig_bigger *= 10;
+        sig_bigger *= 10U;
         --delta_exp;
         --exp_bigger;
     }
@@ -55,7 +55,7 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
     {
         if (delta_exp >= 2)
         {
-            sig_bigger *= 100;
+            sig_bigger *= 100U;
             delta_exp -= 2;
             exp_bigger -= 2;
         }

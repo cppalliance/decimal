@@ -54,10 +54,10 @@ constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_t
     auto num_sig {num.full_significand()};
 
     // Normalize the handling of zeros
-    if (num_sig == 0)
+    if (num_sig == 0U)
     {
         *expptr = 0;
-        return 0;
+        return 0U;
     }
 
     detail::frexp10_normalize<T>(num_sig, num_exp);

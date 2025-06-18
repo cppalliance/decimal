@@ -79,7 +79,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     if (delta_exp >= 0)
     {
         // Check if we can divide rhs_sig safely
-        if (delta_exp > 0 && rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0)
+        if (delta_exp > 0 && rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0U)
         {
             return false;
         }
@@ -88,7 +88,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     else
     {
         // Check if we can divide lhs_sig safely
-        if (lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0)
+        if (lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0U)
         {
             return false;
         }
@@ -174,7 +174,7 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     if (delta_exp >= 0)
     {
         // Check if we can divide rhs_sig safely
-        if (delta_exp > 0 && new_rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0)
+        if (delta_exp > 0 && new_rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0U)
         {
             return false;
         }
@@ -183,7 +183,7 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     else
     {
         // Check if we can divide lhs_sig safely
-        if (new_lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0)
+        if (new_lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0U)
         {
             return false;
         }
@@ -208,8 +208,8 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
-    BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
-    BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
+    BOOST_DECIMAL_ASSERT(lhs_sig >= 0U);
+    BOOST_DECIMAL_ASSERT(rhs_sig >= 0U);
 
     auto new_lhs_sig {static_cast<comp_type>(lhs_sig)};
     auto new_rhs_sig {static_cast<comp_type>(rhs_sig)};
@@ -322,9 +322,9 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_less_impl(const DecimalType& lhs,
     #endif
 
     // Needed to correctly compare signed and unsigned zeros
-    if (lhs.significand_ == 0 || rhs.significand_ == 0)
+    if (lhs.significand_ == 0U || rhs.significand_ == 0U)
     {
-        if (lhs.significand_ == 0 && rhs.significand_ == 0)
+        if (lhs.significand_ == 0U && rhs.significand_ == 0U)
         {
             #ifndef BOOST_DECIMAL_FAST_MATH
             return lhs.sign_ && !rhs.sign_;
@@ -332,7 +332,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_less_impl(const DecimalType& lhs,
             return false;
             #endif
         }
-        return lhs.significand_ == 0 ? !rhs.sign_ : lhs.sign_;
+        return lhs.significand_ == 0U ? !rhs.sign_ : lhs.sign_;
     }
 
     if (lhs.sign_ != rhs.sign_)
@@ -352,9 +352,9 @@ template <BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_type_less_parts_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
                                                                     T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> bool
 {
-    if (lhs_sig == 0 || rhs_sig == 0)
+    if (lhs_sig == 0U || rhs_sig == 0U)
     {
-        if (lhs_sig == 0 && rhs_sig == 0)
+        if (lhs_sig == 0U && rhs_sig == 0U)
         {
             #ifndef BOOST_DECIMAL_FAST_MATH
             return lhs_sign && !rhs_sign;
@@ -362,7 +362,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_type_less_parts_impl(T lhs_sig, U
             return false;
             #endif
         }
-        return lhs_sig == 0 ? !rhs_sign : lhs_sign;
+        return lhs_sig == 0U ? !rhs_sign : lhs_sign;
     }
 
     if (lhs_sign != rhs_sign)
@@ -474,7 +474,7 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
     if (new_lhs_sig == UINT64_C(0) || new_rhs_sig == UINT64_C(0))
     {
-        return (new_lhs_sig == new_rhs_sig) ? false : (new_lhs_sig == 0 ? !rhs_sign : lhs_sign);
+        return (new_lhs_sig == new_rhs_sig) ? false : (new_lhs_sig == 0U ? !rhs_sign : lhs_sign);
     }
 
     const auto delta_exp {lhs_exp - rhs_exp};
@@ -522,8 +522,8 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 {
     using comp_type = typename DecimalType::significand_type;
 
-    BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
-    BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
+    BOOST_DECIMAL_ASSERT(lhs_sig >= 0U);
+    BOOST_DECIMAL_ASSERT(rhs_sig >= 0U);
 
     if (lhs_sign != rhs_sign)
     {
@@ -535,7 +535,7 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
     if (new_lhs_sig == UINT64_C(0) || new_rhs_sig == UINT64_C(0))
     {
-        return (new_lhs_sig == new_rhs_sig) ? false : (new_lhs_sig == 0 ? !rhs_sign : lhs_sign);
+        return (new_lhs_sig == new_rhs_sig) ? false : (new_lhs_sig == 0U ? !rhs_sign : lhs_sign);
     }
 
     detail::normalize<DecimalType>(new_lhs_sig, lhs_exp);
@@ -556,8 +556,8 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
-    BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
-    BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
+    BOOST_DECIMAL_ASSERT(lhs_sig >= 0U);
+    BOOST_DECIMAL_ASSERT(rhs_sig >= 0U);
 
     auto new_lhs_sig {static_cast<comp_type>(lhs_sig)};
     auto new_rhs_sig {static_cast<comp_type>(rhs_sig)};
@@ -565,13 +565,13 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     detail::normalize<DecimalType>(new_lhs_sig, lhs_exp);
     detail::normalize<DecimalType>(new_rhs_sig, rhs_exp);
 
-    if (new_lhs_sig == 0 || new_rhs_sig == 0)
+    if (new_lhs_sig == 0U || new_rhs_sig == 0U)
     {
-        if (new_lhs_sig == 0 && new_rhs_sig == 0)
+        if (new_lhs_sig == 0U && new_rhs_sig == 0U)
         {
             return false;
         }
-        return new_lhs_sig == 0 ? !rhs_sign : lhs_sign;
+        return new_lhs_sig == 0U ? !rhs_sign : lhs_sign;
     }
 
     if (lhs_sign != rhs_sign)

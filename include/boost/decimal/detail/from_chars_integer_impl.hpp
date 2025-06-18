@@ -147,7 +147,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
     {
         overflow_value /= unsigned_base;
         max_digit %= unsigned_base;
-        overflow_value *= 2; // Overflow value would cause INT128_MIN in non-base10 to fail
+        overflow_value <<= 1U; // Overflow value would cause INT128_MIN in non-base10 to fail
     }
     else
     #endif

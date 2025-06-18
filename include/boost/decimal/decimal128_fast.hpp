@@ -510,9 +510,9 @@ constexpr auto isnormal(decimal128_fast val) noexcept -> bool
         return false;
     }
 
-    return (val.significand_ != 0) && isfinite(val);
+    return (val.significand_ != 0U) && isfinite(val);
     #else
-    return val.significand_ != 0;
+    return val.significand_ != 0U;
     #endif
 }
 
