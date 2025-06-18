@@ -1120,11 +1120,7 @@ constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    #ifdef BOOST_DECIMAL_HAS_INT128
-    using unsigned_int128_type = boost::decimal::detail::builtin_uint128_t;
-    #else
     using unsigned_int128_type = boost::int128::uint128_t;
-    #endif
 
     // If rhs is greater than we need to offset the significands to get the correct values
     // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths

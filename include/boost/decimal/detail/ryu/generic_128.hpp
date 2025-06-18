@@ -23,11 +23,7 @@ namespace decimal {
 namespace detail {
 namespace ryu {
 
-#ifdef BOOST_DECIMAL_HAS_INT128
-using unsigned_128_type = builtin_uint128_t;
-#else
-using unsigned_128_type = uint128;
-#endif
+using unsigned_128_type = boost::int128::uint128_t;
     
 // These tables are ~4.5 kByte total, compared to ~160 kByte for the full tables.
 //
