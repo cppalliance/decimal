@@ -40,12 +40,23 @@ constexpr auto to_integral(Decimal val) noexcept
 
     if (isnan(val))
     {
-        errno = EINVAL;
+        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+        if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(val))
+        {
+            errno = EINVAL;
+        }
+        #endif
         return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
     if (isinf(val) || val > max_target_type || val < min_target_type)
     {
-        errno = ERANGE;
+        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+        if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(val))
+        {
+            errno = ERANGE;
+        }
+        #endif
+
         return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
 
@@ -79,12 +90,24 @@ constexpr auto to_integral_128(Decimal val) noexcept
 
     if (isnan(val))
     {
-        errno = EINVAL;
+        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+        if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(val))
+        {
+            errno = EINVAL;
+        }
+        #endif
+
         return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
     if (isinf(val) || val > max_target_type || val < min_target_type)
     {
-        errno = ERANGE;
+        #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+        if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(val))
+        {
+            errno = ERANGE;
+        }
+        #endif
+
         return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
 
