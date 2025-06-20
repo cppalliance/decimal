@@ -255,34 +255,6 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     ),
 
     linux_pipeline(
-        "Linux 18.04 GCC 7* 32 03",
-        "cppalliance/droneubuntu1804:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++', CXXSTD: '03', ADDRMD: '32' },
-        "nload",
-    ),
-
-    linux_pipeline(
-        "Linux 18.04 GCC 7* 32 11",
-        "cppalliance/droneubuntu1804:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++', CXXSTD: '11', ADDRMD: '32' },
-        "nload",
-    ),
-
-    linux_pipeline(
-        "Linux 18.04 GCC 7* 32 14",
-        "cppalliance/droneubuntu1804:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++', CXXSTD: '14', ADDRMD: '32' },
-        "nload",
-    ),
-
-    linux_pipeline(
-        "Linux 18.04 GCC 7* 32 17",
-        "cppalliance/droneubuntu1804:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++', CXXSTD: '17', ADDRMD: '32' },
-        "nload",
-    ),
-
-    linux_pipeline(
         "Linux 18.04 GCC 7* 64 03",
         "cppalliance/droneubuntu1804:1",
         { TOOLSET: 'gcc', COMPILER: 'g++', CXXSTD: '03', ADDRMD: '64' },
