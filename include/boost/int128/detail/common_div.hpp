@@ -338,7 +338,7 @@ constexpr T div_mod_msvc(T dividend, T divisor, T& remainder)
     {
         T product{};
         product.low = _umul128(quotient.low, divisor.low, reinterpret_cast<std::uint64_t*>(&product.high));
-        if (product <= T{static_cast<high_word_type>(dividend.low), remainder_estimate})
+        if (product <= T{remainder_estimate, dividend.low})
         {
             break;
         }
