@@ -491,52 +491,58 @@ BOOST_INT128_FORCE_INLINE constexpr T knuth_div(const T& dividend, const T& divi
 
     BOOST_INT128_IF_CONSTEXPR(!std::numeric_limits<T>::is_signed)
     {
-        T remainder{};
-        return impl::div_mod_msvc<false>(dividend, divisor, remainder);
+        if (!BOOST_INT128_IS_CONSTANT_EVALUATED(dividend))
+        {
+            T remainder{};
+            return impl::div_mod_msvc<false>(dividend, divisor, remainder);
+        }
     }
-    else
+
     #endif
-    {
-        std::uint32_t u[4]{};
-        std::uint32_t v[4]{};
-        std::uint32_t q[4]{};
 
-        const auto m{ impl::to_words(dividend, u) };
-        const auto n{ impl::to_words(divisor, v) };
+    std::uint32_t u[4]{};
+    std::uint32_t v[4]{};
+    std::uint32_t q[4]{};
 
-        impl::knuth_divide<false>(u, m, v, n, q);
+    const auto m{impl::to_words(dividend, u)};
+    const auto n{impl::to_words(divisor, v)};
 
-        return impl::from_words<T>(q);
-    }
+    impl::knuth_divide<false>(u, m, v, n, q);
+
+    return impl::from_words<T>(q);
+
 }
 
 template <typename T>
 BOOST_INT128_FORCE_INLINE constexpr T knuth_div(const T& dividend, const T& divisor, T& remainder) noexcept
 {
     BOOST_INT128_ASSUME(divisor != static_cast<T>(0));
-    
+
     #if defined(_M_AMD64) && !defined(__GNUC__) && !defined(__clang__) && _MSC_VER >= 1920
 
     BOOST_INT128_IF_CONSTEXPR(!std::numeric_limits<T>::is_signed)
     {
-        return impl::div_mod_msvc<true>(dividend, divisor, remainder);
+        if (!BOOST_INT128_IS_CONSTANT_EVALUATED(dividend))
+        {
+            return impl::div_mod_msvc<true>(dividend, divisor, remainder);
+        }
     }
-    else
+
+
     #endif
-    {
-        std::uint32_t u[4]{};
-        std::uint32_t v[4]{};
-        std::uint32_t q[4]{};
 
-        const auto m{ impl::to_words(dividend, u) };
-        const auto n{ impl::to_words(divisor, v) };
+    std::uint32_t u[4]{};
+    std::uint32_t v[4]{};
+    std::uint32_t q[4]{};
 
-        impl::knuth_divide<true>(u, m, v, n, q);
+    const auto m{impl::to_words(dividend, u)};
+    const auto n{impl::to_words(divisor, v)};
 
-        remainder = impl::from_words<T>(u);
+    impl::knuth_divide<true>(u, m, v, n, q);
 
-        return impl::from_words<T>(q);
-    }
+    remainder = impl::from_words<T>(u);
+
+    return impl::from_words<T>(q);
 }
 
 #ifdef _MSC_VER
