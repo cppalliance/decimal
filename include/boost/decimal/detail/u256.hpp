@@ -378,7 +378,7 @@ constexpr u256 operator>>(const u256& lhs, const int shift) noexcept
     // Only moving whole words
     if (bit_shift == 0)
     {
-        for (auto i {}; i < 4 - word_shift; ++i)
+        for (int i {}; i < 4 - word_shift; ++i)
         {
             result[i] = lhs[i + word_shift];
         }
@@ -387,7 +387,7 @@ constexpr u256 operator>>(const u256& lhs, const int shift) noexcept
     }
 
     // Handle partial shifts across word boundaries
-    for (auto i {}; i < 4 - word_shift - 1; ++i)
+    for (int i {}; i < 4 - word_shift - 1; ++i)
     {
         result[i] = (lhs[i + word_shift] >> bit_shift) |
                     (lhs[i + word_shift + 1] << (64 - bit_shift));
@@ -574,6 +574,102 @@ constexpr u256 operator&(const u256& lhs, const u256& rhs) noexcept
 constexpr u256 operator&(const u256& lhs, const u256& rhs) noexcept
 {
     return impl::basic_and_impl(lhs, rhs);
+}
+
+#endif
+
+//=====================================
+// Addition Operators
+//=====================================
+
+namespace impl {
+
+constexpr u256 basic_add_impl(const u256& lhs, const u256& rhs) noexcept
+{
+    u256 result;
+    std::uint64_t carry {};
+
+    auto sum {lhs[0] + rhs[0]};
+    result[0] = sum;
+    carry = (sum < lhs[0]) ? 1 : 0;
+
+    sum = lhs[1] + rhs[1] + carry;
+    result[1] = sum;
+    carry = (sum < lhs[1] || (sum == lhs[1] && carry)) ? 1 : 0;
+
+    sum = lhs[2] + rhs[2] + carry;
+    result[2] = sum;
+    carry = (sum < lhs[2] || (sum == lhs[2] && carry)) ? 1 : 0;
+
+    result[3] = lhs[3] + rhs[3] + carry;
+
+    return result;
+}
+
+} // namespace impl
+
+#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(BOOST_DECIMAL_ADD_CARRY)
+
+constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
+{
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return impl::basic_add_impl(lhs, rhs);
+    }
+    else
+    {
+        unsigned long long result[4] {};
+        unsigned char carry {};
+        carry = BOOST_DECIMAL_ADD_CARRY(carry, lhs[0], rhs[0], &result[0]);
+        carry = BOOST_DECIMAL_ADD_CARRY(carry, lhs[1], rhs[1], &result[1]);
+        carry = BOOST_DECIMAL_ADD_CARRY(carry, lhs[2], rhs[2], &result[2]);
+        carry = BOOST_DECIMAL_ADD_CARRY(carry, lhs[3], rhs[3], &result[3]);
+
+        return {result[3], result[2], result[1], result[0]};
+    }
+}
+
+#endif
+
+#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(__has_builtin) && __has_builtin(__builtin_uaddll_overflow)
+
+namespace impl {
+
+inline bool add_carry_u64(const bool carry_in, const std::uint64_t a, const std::uint64_t b, std::uint64_t* sum) noexcept
+{
+    unsigned long long res;
+    auto c = __builtin_uaddll_overflow(a, b, &res);
+    c |= __builtin_uaddll_overflow(res, static_cast<unsigned long long>(carry_in), &res);
+    *sum = res;
+    return c;
+}
+
+} // namespace impl
+
+constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
+{
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return impl::basic_add_impl(lhs, rhs);
+    }
+    else
+    {
+        unsigned long long result[4] {};
+        bool carry {};
+        carry = impl::add_carry_u64(carry, lhs[0], rhs[0], &result[0]);
+        carry = impl::add_carry_u64(carry, lhs[1], rhs[1], &result[1]);
+        carry = impl::add_carry_u64(carry, lhs[2], rhs[2], &result[2]);
+        carry = impl::add_carry_u64(carry, lhs[3], rhs[3], &result[3]);
+
+        return {result[3], result[2], result[1], result[0]};
+    }
+}
+
+#else
+
+constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
+{
+    return impl::basic_add_impl(lhs, rhs);
 }
 
 #endif
