@@ -37,7 +37,7 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>
 {
     charT t_buffer[1024] {}; // What should be an unreasonably high maximum
-    is >> t_buffer;
+    is >> std::setw(1023) >> t_buffer;
 
     char buffer[1024] {};
 
