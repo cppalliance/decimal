@@ -290,6 +290,15 @@ constexpr bool operator<=(const u256& lhs, const u256& rhs) noexcept
 
 #endif
 
+//=====================================
+// Greater Than Operator
+//=====================================
+
+constexpr bool operator>(const u256& lhs, const u256& rhs) noexcept
+{
+    return rhs < lhs;
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
