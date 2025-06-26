@@ -70,6 +70,89 @@ constexpr std::uint64_t& u256::operator[](const std::size_t i) noexcept
     return bytes[i];
 }
 
+//=====================================
+// Equality Operators
+//=====================================
+
+namespace impl {
+
+BOOST_DECIMAL_FORCE_INLINE constexpr bool basic_equality_impl(const u256& lhs, const u256& rhs) noexcept
+{
+    return lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2] && lhs[3] == rhs[3];
+}
+
+BOOST_DECIMAL_FORCE_INLINE constexpr bool basic_inequality_impl(const u256& lhs, const u256& rhs) noexcept
+{
+    return lhs[0] != rhs[0] || lhs[1] != rhs[1] || lhs[2] != rhs[2] || lhs[3] != rhs[3];
+}
+
+} // namespace impl
+
+#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(__AVX2__)
+
+constexpr bool operator==(const u256& lhs, const u256& rhs) noexcept
+{
+    // Start comp from low word since they will most likely be filled
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return impl::basic_equality_impl(lhs, rhs);
+    }
+    else
+    {
+        __m256i a = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(lhs.bytes));
+        __m256i b = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(rhs.bytes));
+
+        __m256i cmp = _mm256_cmpeq_epi64(a, b);
+
+        const int mask = _mm256_movemask_epi8(cmp);
+
+        return mask == -1;
+    }
+}
+
+#else
+
+constexpr bool operator==(const u256& lhs, const u256& rhs) noexcept
+{
+    return impl::basic_equality_impl(lhs, rhs);
+}
+
+#endif
+
+//=====================================
+// Inequality Operators
+//=====================================
+
+#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(__AVX2__)
+
+constexpr bool operator!=(const u256& lhs, const u256& rhs) noexcept
+{
+    if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return impl::basic_inequality_impl(lhs, rhs);
+    }
+    else
+    {
+        __m256i a = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(lhs.bytes));
+        __m256i b = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(rhs.bytes));
+
+        __m256i cmp = _mm256_cmpeq_epi64(a, b);
+
+        const int mask = _mm256_movemask_epi8(cmp);
+
+        return mask != -1;
+    }
+}
+
+#else
+
+constexpr bool operator!=(const u256& lhs, const u256& rhs) noexcept
+{
+    return impl::basic_inequality_impl(lhs, rhs);
+}
+
+#endif // !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(__AVX2__)
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
