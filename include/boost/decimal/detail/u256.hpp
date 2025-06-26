@@ -18,7 +18,7 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-struct alignas(alignof(std::uint64_t) * 4)
+struct alignas(sizeof(std::uint64_t) * 4)
 u256
 {
     std::uint64_t bytes[4] {};
@@ -31,7 +31,26 @@ u256
     constexpr u256& operator=(u256&& other) noexcept = default;
 
     constexpr u256(std::uint64_t byte3, std::uint64_t byte2, std::uint64_t byte1, std::uint64_t byte0) noexcept;
+
+    // Conversion to/from int128::uint128_t
+    constexpr u256(const int128::uint128_t& high_, const int128::uint128_t& low_) noexcept;
+
+    explicit constexpr operator int128::uint128_t() const noexcept;
 };
+
+constexpr u256::u256(const int128::uint128_t& high_, const int128::uint128_t& low_) noexcept
+{
+    bytes[0] = low_.low;
+    bytes[1] = low_.high;
+    bytes[2] = high_.low;
+    bytes[3] = high_.high;
+}
+
+constexpr u256::operator int128::uint128_t() const noexcept
+{
+    return int128::uint128_t {bytes[1], bytes[0]};
+}
+
 
 } // namespace detail
 } // namespace decimal
