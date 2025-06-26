@@ -42,6 +42,9 @@ u256
 
     constexpr std::uint64_t operator[](std::size_t i) const noexcept;
     constexpr std::uint64_t& operator[](std::size_t i) noexcept;
+
+    // Compound operators
+    constexpr u256& operator<<=(int amount) noexcept;
 };
 
 constexpr u256::u256(const std::uint64_t byte3, const std::uint64_t byte2, const std::uint64_t byte1, const std::uint64_t byte0) noexcept
@@ -307,6 +310,54 @@ constexpr bool operator>=(const u256& lhs, const u256& rhs) noexcept
 {
     return !(lhs < rhs);
 }
+
+//=====================================
+// Left Shift Operators
+//=====================================
+
+constexpr u256 operator<<(const u256& lhs, const int shift) noexcept
+{
+    u256 result {};
+
+    if (shift >= 256 || shift < 0)
+    {
+        return result;
+    }
+
+    const auto word_shift {shift / 64};
+    const auto bit_shift {shift % 64};
+
+    // Only moving whole words
+    if (bit_shift == 0)
+    {
+        for (auto i {word_shift}; i < 4; ++i)
+        {
+            result[i] = lhs[i - word_shift];
+        }
+
+        return result;
+    }
+
+    if (word_shift < 4)
+    {
+        result[word_shift] = lhs[0] << bit_shift;
+    }
+
+    for (auto i {word_shift + 1}; i < 4; ++i)
+    {
+        result[i] = (lhs[i - word_shift] << bit_shift) |
+                    (lhs[i - word_shift - 1] >> (64 - bit_shift));
+    }
+
+    return result;
+}
+
+constexpr u256& u256::operator<<=(const int amount) noexcept
+{
+    *this = *this << amount;
+    return *this;
+}
+
 
 } // namespace detail
 } // namespace decimal
