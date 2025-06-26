@@ -15,7 +15,7 @@
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -48,7 +48,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     // Step 3: Check -0 == +0
     auto lhs_sig {lhs.full_significand()};
     auto rhs_sig {rhs.full_significand()};
-    if (lhs_sig == 0 && rhs_sig == 0)
+    if (lhs_sig == 0U && rhs_sig == 0U)
     {
         return true;
     }
@@ -79,7 +79,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     if (delta_exp >= 0)
     {
         // Check if we can divide rhs_sig safely
-        if (delta_exp > 0 && rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0)
+        if (delta_exp > 0 && rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0U)
         {
             return false;
         }
@@ -88,7 +88,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     else
     {
         // Check if we can divide lhs_sig safely
-        if (lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0)
+        if (lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0U)
         {
             return false;
         }
@@ -117,7 +117,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_equality_impl(const DecimalType& 
     }
     #endif
 
-    if (lhs.significand_ == 0)
+    if (lhs.significand_ == 0U)
     {
         return true; // -0 == +0
     }
@@ -144,8 +144,8 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
-    BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
-    BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
+    BOOST_DECIMAL_ASSERT(lhs_sig >= 0U);
+    BOOST_DECIMAL_ASSERT(rhs_sig >= 0U);
 
     // We con compare signs right away
     if (lhs_sign != rhs_sign)
@@ -174,7 +174,7 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     if (delta_exp >= 0)
     {
         // Check if we can divide rhs_sig safely
-        if (delta_exp > 0 && new_rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0)
+        if (delta_exp > 0 && new_rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0U)
         {
             return false;
         }
@@ -183,7 +183,7 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     else
     {
         // Check if we can divide lhs_sig safely
-        if (new_lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0)
+        if (new_lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0U)
         {
             return false;
         }
@@ -208,8 +208,8 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
-    BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
-    BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
+    BOOST_DECIMAL_ASSERT(lhs_sig >= 0U);
+    BOOST_DECIMAL_ASSERT(rhs_sig >= 0U);
 
     auto new_lhs_sig {static_cast<comp_type>(lhs_sig)};
     auto new_rhs_sig {static_cast<comp_type>(rhs_sig)};
@@ -246,7 +246,7 @@ constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
     bool rhs_isneg {false};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
     {
-        if (rhs < 0)
+        if (rhs < static_cast<Integer>(0))
         {
             rhs_isneg = true;
         }
@@ -322,9 +322,9 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_less_impl(const DecimalType& lhs,
     #endif
 
     // Needed to correctly compare signed and unsigned zeros
-    if (lhs.significand_ == 0 || rhs.significand_ == 0)
+    if (lhs.significand_ == 0U || rhs.significand_ == 0U)
     {
-        if (lhs.significand_ == 0 && rhs.significand_ == 0)
+        if (lhs.significand_ == 0U && rhs.significand_ == 0U)
         {
             #ifndef BOOST_DECIMAL_FAST_MATH
             return lhs.sign_ && !rhs.sign_;
@@ -332,7 +332,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_less_impl(const DecimalType& lhs,
             return false;
             #endif
         }
-        return lhs.significand_ == 0 ? !rhs.sign_ : lhs.sign_;
+        return lhs.significand_ == 0U ? !rhs.sign_ : lhs.sign_;
     }
 
     if (lhs.sign_ != rhs.sign_)
@@ -352,9 +352,9 @@ template <BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL U>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_type_less_parts_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
                                                                     T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> bool
 {
-    if (lhs_sig == 0 || rhs_sig == 0)
+    if (lhs_sig == 0U || rhs_sig == 0U)
     {
-        if (lhs_sig == 0 && rhs_sig == 0)
+        if (lhs_sig == 0U && rhs_sig == 0U)
         {
             #ifndef BOOST_DECIMAL_FAST_MATH
             return lhs_sign && !rhs_sign;
@@ -362,7 +362,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_type_less_parts_impl(T lhs_sig, U
             return false;
             #endif
         }
-        return lhs_sig == 0 ? !rhs_sign : lhs_sign;
+        return lhs_sig == 0U ? !rhs_sign : lhs_sign;
     }
 
     if (lhs_sign != rhs_sign)
@@ -381,19 +381,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_type_less_parts_impl(T lhs_sig, U
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
 constexpr auto sequential_less_impl(DecimalType lhs, DecimalType rhs) noexcept -> bool
 {
-    using comp_type = std::conditional_t<detail::decimal_val_v<DecimalType> < 64, std::uint_fast64_t,
-    // GCC less than 10 in non-GNU mode, Clang < 10 and MinGW all have issues with the built-in u128,
-    // so use the emulated one
-    #if defined(BOOST_DECIMAL_HAS_INT128)
-    #if ( (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10) || (defined(__clang__) && __clang_major__ < 13) )
-        detail::uint128
-    #  else
-        detail::uint128_t
-    #  endif
-    #else
-    detail::uint128
-    #endif
-    >;
+    using comp_type = std::conditional_t<detail::decimal_val_v<DecimalType> < 64, std::uint_fast64_t, int128::uint128_t>;
 
     // Step 1: Handle our non-finite values in their own calling functions
 
@@ -474,7 +462,7 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
     if (new_lhs_sig == UINT64_C(0) || new_rhs_sig == UINT64_C(0))
     {
-        return (new_lhs_sig == new_rhs_sig) ? false : (new_lhs_sig == 0 ? !rhs_sign : lhs_sign);
+        return (new_lhs_sig == new_rhs_sig) ? false : (new_lhs_sig == 0U ? !rhs_sign : lhs_sign);
     }
 
     const auto delta_exp {lhs_exp - rhs_exp};
@@ -522,8 +510,8 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 {
     using comp_type = typename DecimalType::significand_type;
 
-    BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
-    BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
+    BOOST_DECIMAL_ASSERT(lhs_sig >= 0U);
+    BOOST_DECIMAL_ASSERT(rhs_sig >= 0U);
 
     if (lhs_sign != rhs_sign)
     {
@@ -535,7 +523,7 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
     if (new_lhs_sig == UINT64_C(0) || new_rhs_sig == UINT64_C(0))
     {
-        return (new_lhs_sig == new_rhs_sig) ? false : (new_lhs_sig == 0 ? !rhs_sign : lhs_sign);
+        return (new_lhs_sig == new_rhs_sig) ? false : (new_lhs_sig == 0U ? !rhs_sign : lhs_sign);
     }
 
     detail::normalize<DecimalType>(new_lhs_sig, lhs_exp);
@@ -556,8 +544,8 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 {
     using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
 
-    BOOST_DECIMAL_ASSERT(lhs_sig >= 0);
-    BOOST_DECIMAL_ASSERT(rhs_sig >= 0);
+    BOOST_DECIMAL_ASSERT(lhs_sig >= 0U);
+    BOOST_DECIMAL_ASSERT(rhs_sig >= 0U);
 
     auto new_lhs_sig {static_cast<comp_type>(lhs_sig)};
     auto new_rhs_sig {static_cast<comp_type>(rhs_sig)};
@@ -565,13 +553,13 @@ constexpr auto less_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     detail::normalize<DecimalType>(new_lhs_sig, lhs_exp);
     detail::normalize<DecimalType>(new_rhs_sig, rhs_exp);
 
-    if (new_lhs_sig == 0 || new_rhs_sig == 0)
+    if (new_lhs_sig == 0U || new_rhs_sig == 0U)
     {
-        if (new_lhs_sig == 0 && new_rhs_sig == 0)
+        if (new_lhs_sig == 0U && new_rhs_sig == 0U)
         {
             return false;
         }
-        return new_lhs_sig == 0 ? !rhs_sign : lhs_sign;
+        return new_lhs_sig == 0U ? !rhs_sign : lhs_sign;
     }
 
     if (lhs_sign != rhs_sign)
@@ -609,7 +597,7 @@ constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
 
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<Integer>)
     {
-        if (rhs < 0)
+        if (rhs < static_cast<Integer>(0))
         {
             rhs_sign = true;
         }

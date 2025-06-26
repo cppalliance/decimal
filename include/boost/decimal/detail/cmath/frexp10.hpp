@@ -8,7 +8,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/normalize.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
 
@@ -54,10 +54,10 @@ constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_t
     auto num_sig {num.full_significand()};
 
     // Normalize the handling of zeros
-    if (num_sig == 0)
+    if (num_sig == 0U)
     {
         *expptr = 0;
-        return 0;
+        return 0U;
     }
 
     detail::frexp10_normalize<T>(num_sig, num_exp);

@@ -10,7 +10,7 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 #include <boost/decimal/detail/config.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/parser.hpp>
@@ -276,8 +276,8 @@ public:
     explicit constexpr operator std::uint16_t() const noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    explicit constexpr operator detail::int128_t() const noexcept;
-    explicit constexpr operator detail::uint128_t() const noexcept;
+    explicit constexpr operator detail::builtin_int128_t() const noexcept;
+    explicit constexpr operator detail::builtin_uint128_t() const noexcept;
     #endif
 
     // We allow implict promotions to and decimal type with greater or equal precision (e.g. decimal32_fast)
@@ -623,7 +623,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         #  pragma warning(disable : 4804)
         #endif
 
-        if (coeff < 0 || sign)
+        if (coeff < T{0} || sign)
         {
             bits_ |= detail::d32_sign_mask;
             isneg = true;
@@ -1666,14 +1666,14 @@ constexpr decimal32::operator std::uint16_t() const noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-constexpr decimal32::operator detail::int128_t() const noexcept
+constexpr decimal32::operator detail::builtin_int128_t() const noexcept
 {
-    return to_integral<decimal32, detail::int128_t>(*this);
+    return to_integral<decimal32, detail::builtin_int128_t>(*this);
 }
 
-constexpr decimal32::operator detail::uint128_t() const noexcept
+constexpr decimal32::operator detail::builtin_uint128_t() const noexcept
 {
-    return to_integral<decimal32, detail::uint128_t>(*this);
+    return to_integral<decimal32, detail::builtin_uint128_t>(*this);
 }
 
 #endif
@@ -2285,10 +2285,10 @@ public:
     static constexpr bool tinyness_before = true;
 
     // Member functions
-    static constexpr auto (min)        () -> boost::decimal::decimal32 { return {1, min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal32 { return {9'999'999, max_exponent - digits + 1}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal32 { return {9'999'999, max_exponent - digits + 1, true}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal32 { return {1, -digits + 1}; }
+    static constexpr auto (min)        () -> boost::decimal::decimal32 { return {UINT32_C(1), min_exponent}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal32 { return {UINT32_C(9'999'999), max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal32 { return {UINT32_C(9'999'999), max_exponent - digits + 1, true}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal32 { return {UINT32_C(1), -digits + 1}; }
     static constexpr auto round_error  () -> boost::decimal::decimal32 { return epsilon(); }
     static constexpr auto infinity     () -> boost::decimal::decimal32 { return boost::decimal::from_bits(boost::decimal::detail::d32_inf_mask); }
     static constexpr auto quiet_NaN    () -> boost::decimal::decimal32 { return boost::decimal::from_bits(boost::decimal::detail::d32_nan_mask); }

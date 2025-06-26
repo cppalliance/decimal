@@ -8,7 +8,7 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -23,11 +23,7 @@ namespace decimal {
 namespace detail {
 namespace ryu {
 
-#ifdef BOOST_DECIMAL_HAS_INT128
-using unsigned_128_type = uint128_t;
-#else
-using unsigned_128_type = uint128;
-#endif
+using unsigned_128_type = boost::int128::uint128_t;
     
 // These tables are ~4.5 kByte total, compared to ~160 kByte for the full tables.
 //
@@ -482,13 +478,13 @@ inline constexpr auto generic_computeInvPow5(const std::uint32_t i, std::uint64_
 
 inline constexpr auto pow5Factor(unsigned_128_type value) noexcept -> std::uint32_t
 {
-    for (std::uint32_t count = 0; value > 0; ++count)
+    for (std::uint32_t count = 0; value > 0U; ++count)
     {
-        if (value % 5 != 0)
+        if (value % 5U != 0U)
         {
             return count;
         }
-        value /= 5;
+        value /= 5U;
     }
     return 0;
 }
@@ -503,7 +499,7 @@ inline constexpr auto multipleOfPowerOf5(const unsigned_128_type value, const st
 // Returns true if value is divisible by 2^p.
 inline constexpr auto multipleOfPowerOf2(const unsigned_128_type value, const std::uint32_t p) noexcept -> bool
 {
-    return (value & ((static_cast<unsigned_128_type>(1) << p) - 1)) == 0;
+    return (value & ((static_cast<unsigned_128_type>(1) << p) - 1U)) == 0U;
 }
 
 inline constexpr

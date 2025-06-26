@@ -40,12 +40,23 @@ constexpr auto to_integral(Decimal val) noexcept
 
     if (isnan(val))
     {
-        errno = EINVAL;
+        #if defined(__clang__) && __clang_major__ >= 20
+        if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(val))
+        #endif
+        {
+            errno = EINVAL;
+        }
         return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
     if (isinf(val) || val > max_target_type || val < min_target_type)
     {
-        errno = ERANGE;
+        #if defined(__clang__) && __clang_major__ >= 20
+        if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(val))
+        #endif
+        {
+            errno = ERANGE;
+        }
+
         return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
 
@@ -79,12 +90,24 @@ constexpr auto to_integral_128(Decimal val) noexcept
 
     if (isnan(val))
     {
-        errno = EINVAL;
+        #if defined(__clang__) && __clang_major__ >= 20
+        if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(val))
+        #endif
+        {
+            errno = EINVAL;
+        }
+
         return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
     if (isinf(val) || val > max_target_type || val < min_target_type)
     {
-        errno = ERANGE;
+        #if defined(__clang__) && __clang_major__ >= 20
+        if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(val))
+        #endif
+        {
+            errno = ERANGE;
+        }
+
         return static_cast<TargetType>(std::numeric_limits<TargetType>::max());
     }
 
@@ -94,11 +117,11 @@ constexpr auto to_integral_128(Decimal val) noexcept
 
     if (expval > 0)
     {
-        sig *= detail::pow10<detail::uint128>(expval);
+        sig *= detail::pow10<int128::uint128_t>(expval);
     }
     else if (expval < 0)
     {
-        sig /= detail::pow10<detail::uint128>(abs_exp_val);
+        sig /= detail::pow10<int128::uint128_t>(abs_exp_val);
     }
 
     auto result {static_cast<TargetType>(sig)};

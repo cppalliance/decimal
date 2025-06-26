@@ -866,6 +866,16 @@ void random_mixed_right_shift()
     }
 }
 
+template <typename T>
+void test_spot_sub(T lhs, T rhs)
+{
+    decimal128 dec_lhs{lhs};
+    decimal128 dec_rhs{rhs};
+    const auto dec_res{dec_lhs - dec_rhs};
+    const T dec_to_int_res{static_cast<T>(dec_res)};
+    BOOST_TEST_EQ(dec_to_int_res, (lhs - rhs));
+}
+
 int main()
 {
     // Values that won't exceed the range of the significand
@@ -972,6 +982,8 @@ int main()
     random_right_shift();
     random_mixed_right_shift();
     #endif
+
+    test_spot_sub(-813150, -905406);
 
     return boost::report_errors();
 }

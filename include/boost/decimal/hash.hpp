@@ -57,8 +57,8 @@ struct hash<boost::decimal::decimal128>
     // Take the xor of the two words and hash that
     auto operator()(const boost::decimal::decimal128& v) const noexcept -> std::size_t
     {
-        boost::decimal::detail::uint128 bits;
-        std::memcpy(&bits, &v, sizeof(boost::decimal::detail::uint128));
+        boost::int128::uint128_t bits;
+        std::memcpy(&bits, &v, sizeof(boost::int128::uint128_t));
 
         return std::hash<std::uint64_t>{}(bits.high ^ bits.low);
     }
@@ -109,8 +109,8 @@ struct hash<boost::decimal::decimal128_fast>
     auto operator()(const boost::decimal::decimal128_fast& v) const noexcept -> std::size_t
     {
         boost::decimal::decimal128 v_128 {v};
-        boost::decimal::detail::uint128 bits;
-        std::memcpy(&bits, &v_128, sizeof(boost::decimal::detail::uint128));
+        boost::int128::uint128_t bits;
+        std::memcpy(&bits, &v_128, sizeof(boost::int128::uint128_t));
 
         return std::hash<std::uint64_t>{}(bits.high ^ bits.low);
     }

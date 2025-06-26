@@ -16,7 +16,7 @@ int main()
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 
-#if defined(__cpp_consteval) && __cpp_consteval >= 201811L && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
+#if defined(__cpp_consteval) && __cpp_consteval >= 201811L && !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !defined(_MSC_VER)
 
 #include <string_view>
 

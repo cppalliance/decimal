@@ -53,14 +53,14 @@ constexpr auto from_chars_dispatch(const char* first, const char* last, std::uin
     return boost::decimal::detail::from_chars(first, last, value, base);
 }
 
-constexpr auto from_chars_dispatch(const char* first, const char* last, uint128& value, int base) noexcept -> from_chars_result
+constexpr auto from_chars_dispatch(const char* first, const char* last, int128::uint128_t& value, int base) noexcept -> from_chars_result
 {
     return boost::decimal::detail::from_chars128(first, last, value, base);
 }
 #endif
 
 #ifdef BOOST_DECIMAL_HAS_INT128
-constexpr auto from_chars_dispatch(const char* first, const char* last, uint128_t& value, int base) noexcept -> from_chars_result
+constexpr auto from_chars_dispatch(const char* first, const char* last, builtin_uint128_t& value, int base) noexcept -> from_chars_result
 {
     return boost::decimal::detail::from_chars128(first, last, value, base);
 }
@@ -157,7 +157,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     const char exp_char {fmt != chars_format::hex ? 'e' : 'p'};
     const char capital_exp_char {fmt != chars_format::hex ? 'E' : 'P'};
 
-    if (next == last || *next == exp_char || *next == -capital_exp_char)
+    if (next == last || *next == exp_char || *next == capital_exp_char)
     {
         significand = 0;
         exponent = 0;
@@ -333,7 +333,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
 
             if (round)
             {
-                significand += 1;
+                ++significand;
             }
         }
     }

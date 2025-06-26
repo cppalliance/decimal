@@ -15,7 +15,6 @@
 #include <boost/decimal/detail/sub_impl.hpp>
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/cmath/next.hpp>
 
@@ -31,9 +30,9 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_inf = uint128{UINT64_MAX - 2, UINT64_MAX};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_qnan = uint128{UINT64_MAX - 1, UINT64_MAX};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan = uint128{UINT64_MAX, UINT64_MAX};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_inf = boost::int128::uint128_t {UINT64_MAX - 2, UINT64_MAX};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_qnan = boost::int128::uint128_t {UINT64_MAX - 1, UINT64_MAX};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan = boost::int128::uint128_t {UINT64_MAX, UINT64_MAX};
 
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_inf_high_bits = UINT64_MAX - 2;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_qnan_high_bits = UINT64_MAX - 1;
@@ -44,7 +43,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan_high_bits = UINT64_MAX;
 BOOST_DECIMAL_EXPORT class decimal128_fast final
 {
 public:
-    using significand_type = detail::uint128;
+    using significand_type = int128::uint128_t;
     using exponent_type = std::uint_fast32_t;
     using biased_exponent_type = std::int_fast32_t;
 
@@ -121,7 +120,7 @@ private:
 
     template <typename DecimalType>
     friend constexpr auto to_dpd_d128(DecimalType val) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, detail::uint128);
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, int128::uint128_t);
 
     template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
@@ -321,8 +320,8 @@ public:
     explicit constexpr operator std::uint16_t() const noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    explicit constexpr operator detail::int128_t() const noexcept;
-    explicit constexpr operator detail::uint128_t() const noexcept;
+    explicit constexpr operator int128::int128_t() const noexcept;
+    explicit constexpr operator int128::uint128_t() const noexcept;
     #endif
 
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
@@ -372,13 +371,7 @@ template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> &
 #endif
 constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
 {
-    // Older compilers have issues with conversions from __uint128, so we skip all that and use our uint128
-    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__GNUC__) || (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10)) && (!defined(__clang__) || (defined(__clang__) && __clang_major__ < 13))
-    using Unsigned_Integer_1 = detail::make_unsigned_t<T1>;
-    using Unsigned_Integer = std::conditional_t<std::is_same<Unsigned_Integer_1, detail::uint128_t>::value, detail::uint128, Unsigned_Integer_1>;
-    #else
-    using Unsigned_Integer = detail::make_unsigned_t<T1>;
-    #endif
+    using Unsigned_Integer = int128::uint128_t;
 
     using Basis_Unsigned_Integer = std::conditional_t<std::numeric_limits<Unsigned_Integer>::digits10 < std::numeric_limits<significand_type>::digits10, significand_type, Unsigned_Integer>;
 
@@ -393,7 +386,7 @@ constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
     significand_ = unsigned_coeff;
 
     // Normalize the handling of 0
-    if (significand_ == detail::uint128{UINT64_C(0), UINT64_C(0)})
+    if (significand_ == int128::uint128_t{UINT64_C(0), UINT64_C(0)})
     {
         exp = 0;
     }
@@ -517,9 +510,9 @@ constexpr auto isnormal(decimal128_fast val) noexcept -> bool
         return false;
     }
 
-    return (val.significand_ != 0) && isfinite(val);
+    return (val.significand_ != 0U) && isfinite(val);
     #else
-    return val.significand_ != 0;
+    return val.significand_ != 0U;
     #endif
 }
 
@@ -807,7 +800,7 @@ constexpr auto operator+(decimal128_fast lhs, Integer rhs) noexcept
     }
     #endif
 
-    auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    auto sig_rhs {static_cast<int128::uint128_t>(detail::make_positive_unsigned(rhs))};
     bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     exp_type exp_rhs {0};
@@ -853,7 +846,7 @@ constexpr auto operator-(decimal128_fast lhs, Integer rhs) noexcept
     }
     #endif
 
-    auto sig_rhs {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    auto sig_rhs {static_cast<int128::uint128_t>(detail::make_positive_unsigned(rhs))};
     const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     exp_type exp_rhs {0};
@@ -878,7 +871,7 @@ constexpr auto operator-(Integer lhs, decimal128_fast rhs) noexcept
     }
     #endif
 
-    auto sig_lhs {static_cast<detail::uint128>(detail::make_positive_unsigned(lhs))};
+    auto sig_lhs {static_cast<int128::uint128_t>(detail::make_positive_unsigned(lhs))};
     const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
 
     exp_type exp_lhs {0};
@@ -929,7 +922,7 @@ constexpr auto operator*(decimal128_fast lhs, Integer rhs) noexcept
     }
     #endif
 
-    auto rhs_sig {static_cast<detail::uint128>(detail::make_positive_unsigned(rhs))};
+    auto rhs_sig {static_cast<int128::uint128_t>(detail::make_positive_unsigned(rhs))};
     exp_type rhs_exp {0};
     detail::normalize<decimal128_fast>(rhs_sig, rhs_exp);
 
@@ -1235,14 +1228,14 @@ constexpr decimal128_fast::operator std::uint16_t() const noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-constexpr decimal128_fast::operator detail::int128_t() const noexcept
+constexpr decimal128_fast::operator boost::int128::int128_t() const noexcept
 {
-    return to_integral_128<decimal128_fast, detail::int128_t>(*this);
+    return to_integral_128<decimal128_fast, int128::int128_t>(*this);
 }
 
-constexpr decimal128_fast::operator detail::uint128_t() const noexcept
+constexpr decimal128_fast::operator boost::int128::uint128_t() const noexcept
 {
-    return to_integral_128<decimal128_fast, detail::uint128_t>(*this);
+    return to_integral_128<decimal128_fast, int128::uint128_t>(*this);
 }
 
 #endif // BOOST_DECIMAL_HAS_INT128
@@ -1444,10 +1437,10 @@ struct numeric_limits<boost::decimal::decimal128_fast>
     static constexpr bool tinyness_before = true;
 
     // Member functions
-    static constexpr auto (min)        () -> boost::decimal::decimal128_fast { return {1, min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal128_fast { return {boost::decimal::detail::uint128{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal128_fast { return {boost::decimal::detail::uint128{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1, true}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal128_fast { return {1, -digits + 1}; }
+    static constexpr auto (min)        () -> boost::decimal::decimal128_fast { return {UINT32_C(1), min_exponent}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal128_fast { return {boost::int128::uint128_t{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal128_fast { return {boost::int128::uint128_t{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1, true}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal128_fast { return {UINT32_C(1), -digits + 1}; }
     static constexpr auto round_error  () -> boost::decimal::decimal128_fast { return epsilon(); }
     static constexpr auto infinity     () -> boost::decimal::decimal128_fast { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_inf, 0, false); }
     static constexpr auto quiet_NaN    () -> boost::decimal::decimal128_fast { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_qnan, 0, false); }

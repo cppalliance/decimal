@@ -14,7 +14,7 @@
 #include <boost/decimal/bid_conversion.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/concepts.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -711,7 +711,7 @@ constexpr auto from_dpd_d64(std::uint64_t dpd) noexcept
 
 BOOST_DECIMAL_EXPORT template <typename DecimalType>
 constexpr auto to_dpd_d128(DecimalType val) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, detail::uint128)
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, boost::int128::uint128_t)
 {
     static_assert(std::is_same<DecimalType, decimal128>::value ||
                   std::is_same<DecimalType, decimal128_fast>::value, "The input must be a 128-bit decimal type");
@@ -727,7 +727,7 @@ constexpr auto to_dpd_d128(DecimalType val) noexcept
     const auto exp {val.unbiased_exponent()};
     const auto significand {val.full_significand()};
 
-    detail::uint128 dpd {};
+    int128::uint128_t dpd {};
 
     // Set the sign bit as applicable
     if (sign)
@@ -744,7 +744,7 @@ constexpr auto to_dpd_d128(DecimalType val) noexcept
         temp_sig /= 10U;
     }
     BOOST_DECIMAL_ASSERT(d[0] >= 0 && d[0] <= 9);
-    BOOST_DECIMAL_ASSERT(temp_sig == 0);
+    BOOST_DECIMAL_ASSERT(temp_sig == 0U);
 
     constexpr std::uint64_t leading_two_exp_bits_mask {0b11000000000000};
     const auto leading_two_bits {(exp & leading_two_exp_bits_mask) >> 12U};
@@ -812,8 +812,8 @@ constexpr auto to_dpd_d128(DecimalType val) noexcept
     int offset {10};
     for (std::size_t i {1}; i < num_digits - 1; i += 3U)
     {
-        const auto declet {static_cast<detail::uint128>(detail::encode_dpd(d[i], d[i + 1], d[i + 2]))};
-        dpd |= detail::uint128(declet << (10 * offset));
+        const auto declet {static_cast<int128::uint128_t>(detail::encode_dpd(d[i], d[i + 1], d[i + 2]))};
+        dpd |= int128::uint128_t(declet << (10 * offset));
         --offset;
     }
 
@@ -821,7 +821,7 @@ constexpr auto to_dpd_d128(DecimalType val) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_fast>
-constexpr auto from_dpd_d128(detail::uint128 dpd) noexcept
+constexpr auto from_dpd_d128(int128::uint128_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     static_assert(std::is_same<DecimalType, decimal128>::value || std::is_same<DecimalType, decimal128_fast>::value,
@@ -890,15 +890,15 @@ constexpr auto from_dpd_d128(detail::uint128 dpd) noexcept
     digits[0] = static_cast<std::uint8_t>(d0);
     for (int i = num_digits - 1; i > 0; i -= 3)
     {
-        const auto declet_bits {static_cast<std::uint32_t>(significand_bits & 0b1111111111)};
+        const auto declet_bits {static_cast<std::uint32_t>(significand_bits & 0b1111111111U)};
         significand_bits >>= 10U;
         detail::decode_dpd(declet_bits, digits[i], digits[i - 1], digits[i - 2]);
     }
 
-    detail::uint128 significand {};
+    int128::uint128_t significand {};
     for (int i {}; i < num_digits; ++i)
     {
-        significand += static_cast<detail::uint128>(digits[i]) * detail::pow10(static_cast<detail::uint128>((num_digits - 1) - i));
+        significand += static_cast<int128::uint128_t>(digits[i]) * detail::pow10(static_cast<int128::uint128_t>((num_digits - 1) - i));
     }
 
     return DecimalType{significand, exp, sign};
@@ -924,12 +924,12 @@ BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal64_fast val) noexcept -> std::
     return to_dpd_d64(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal128 val) noexcept -> detail::uint128
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal128 val) noexcept -> int128::uint128_t
 {
     return to_dpd_d128(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal128_fast val) noexcept -> detail::uint128
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal128_fast val) noexcept -> int128::uint128_t
 {
     return to_dpd_d128(val);
 }
@@ -956,7 +956,7 @@ constexpr auto from_dpd(std::uint64_t bits) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_fast>
-constexpr auto from_dpd(detail::uint128 bits) noexcept
+constexpr auto from_dpd(int128::uint128_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     return from_dpd_d128<DecimalType>(bits);
@@ -965,10 +965,10 @@ constexpr auto from_dpd(detail::uint128 bits) noexcept
 #ifdef BOOST_DECIMAL_HAS_INT128
 
 BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_fast>
-constexpr auto from_dpd(detail::uint128_t bits) noexcept
+constexpr auto from_dpd(detail::builtin_uint128_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
-    const detail::uint128 converted_bits {bits};
+    const int128::uint128_t converted_bits {bits};
     return from_dpd_d128<DecimalType>(converted_bits);
 }
 

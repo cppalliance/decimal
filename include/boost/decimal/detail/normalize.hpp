@@ -33,7 +33,7 @@ constexpr auto normalize(T1& significand, T2& exp, bool sign = false) noexcept -
         const auto excess_digits {digits - (target_precision + 1)};
         significand /= pow10(static_cast<T1>(excess_digits));
         // Perform final rounding according to the fenv rounding mode
-        exp += detail::fenv_round<TargetDecimalType>(significand, sign || significand < 0) + excess_digits;
+        exp += detail::fenv_round<TargetDecimalType>(significand, sign || significand < 0U) + excess_digits;
     }
 }
 

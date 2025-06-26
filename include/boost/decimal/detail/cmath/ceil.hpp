@@ -61,7 +61,7 @@ constexpr auto ceil BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
     }
     else
     {
-        decimal_digits--;
+        --decimal_digits;
     }
 
     new_sig /= detail::pow10<DivType>(decimal_digits);
@@ -69,7 +69,7 @@ constexpr auto ceil BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
     {
         ++new_sig;
     }
-    new_sig *= 10;
+    new_sig *= 10U;
 
     return T{new_sig, exp_ptr + static_cast<int>(decimal_digits) - 1, is_neg};
 }

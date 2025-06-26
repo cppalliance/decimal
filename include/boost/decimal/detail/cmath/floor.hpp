@@ -12,7 +12,7 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE

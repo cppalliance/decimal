@@ -75,7 +75,7 @@ constexpr auto compute_float80_128(std::int64_t q, const Unsigned_Integer &w,
                                    const bool negative, bool &success) noexcept -> long double
 {
     // GLIBC uses 2^-16444 but MPFR uses 2^-16445 as the smallest subnormal value for 80 bit
-    // 39 is the max number of digits in an uint128_t
+    // 39 is the max number of digits in an builtin_uint128_t
     constexpr auto smallest_power {-4951 - 39};
     constexpr auto largest_power {4932};
 

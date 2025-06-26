@@ -18,7 +18,7 @@
 
 #include <ostream>
 
-static char* mini_to_chars( char (&buffer)[ 64 ], boost::decimal::detail::uint128_t v )
+static char* mini_to_chars( char (&buffer)[ 64 ], boost::decimal::detail::builtin_uint128_t v )
 {
     char* p = buffer + 64;
     *--p = '\0';
@@ -33,7 +33,7 @@ static char* mini_to_chars( char (&buffer)[ 64 ], boost::decimal::detail::uint12
     return p;
 }
 
-std::ostream& operator<<( std::ostream& os, boost::decimal::detail::uint128_t v )
+std::ostream& operator<<( std::ostream& os, boost::decimal::detail::builtin_uint128_t v )
 {
     char buffer[ 64 ];
 
@@ -41,18 +41,18 @@ std::ostream& operator<<( std::ostream& os, boost::decimal::detail::uint128_t v 
     return os;
 }
 
-std::ostream& operator<<( std::ostream& os, boost::decimal::detail::int128_t v )
+std::ostream& operator<<( std::ostream& os, boost::decimal::detail::builtin_int128_t v )
 {
     char buffer[ 64 ];
     char* p;
 
     if( v >= 0 )
     {
-        p = mini_to_chars( buffer, static_cast<boost::decimal::detail::uint128_t>(v) );
+        p = mini_to_chars( buffer, static_cast<boost::decimal::detail::builtin_uint128_t>(v) );
     }
     else
     {
-        p = mini_to_chars( buffer, static_cast<boost::decimal::detail::uint128_t>(-v) );
+        p = mini_to_chars( buffer, -static_cast<boost::decimal::detail::builtin_uint128_t>(v) );
         *--p = '-';
     }
 

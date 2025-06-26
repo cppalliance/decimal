@@ -108,7 +108,6 @@ run test_edges_and_behave.cpp ;
 run test_edit_members.cpp ;
 run test_ellint_1.cpp ;
 run test_ellint_2.cpp ;
-run test_emulated128.cpp ;
 run test_erf.cpp ;
 run test_exp.cpp ;
 compile-fail test_explicit_floats.cpp ;

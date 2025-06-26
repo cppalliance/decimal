@@ -8,7 +8,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/config.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -25,7 +25,7 @@ constexpr auto remquo(T x, T y, int* quo) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     using unsigned_significand_type = std::conditional_t<std::is_same<T, decimal128>::value || std::is_same<T, decimal128_fast>::value,
-                                                         detail::uint128, std::uint64_t>;
+                                                         int128::uint128_t, std::uint64_t>;
 
     constexpr T zero {0, 0};
     constexpr T half {5, -1};

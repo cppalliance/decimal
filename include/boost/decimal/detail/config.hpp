@@ -123,11 +123,11 @@
 namespace boost { namespace decimal { namespace detail {
 
 #  ifdef __GNUC__
-__extension__ typedef __int128 int128_t;
-__extension__ typedef unsigned __int128 uint128_t;
+__extension__ typedef __int128 builtin_int128_t;
+__extension__ typedef unsigned __int128 builtin_uint128_t;
 #  else
-typedef __int128 int128_t;
-typedef unsigned __int128 uint128_t;
+typedef __int128 builtin_int128_t;
+typedef unsigned __int128 builtin_uint128_t;
 #  endif
 
 } // namespace detail
@@ -135,9 +135,9 @@ typedef unsigned __int128 uint128_t;
 } // namespace boost
 
 #  define BOOST_DECIMAL_HAS_INT128
-#  define BOOST_DECIMAL_INT128_MAX  static_cast<boost::decimal::detail::int128_t>((static_cast<boost::decimal::detail::uint128_t>(1) << 127) - 1)
+#  define BOOST_DECIMAL_INT128_MAX  static_cast<boost::decimal::detail::builtin_int128_t>((static_cast<boost::decimal::detail::builtin_uint128_t>(1) << 127) - 1)
 #  define BOOST_DECIMAL_INT128_MIN  (-BOOST_DECIMAL_INT128_MAX - 1)
-#  define BOOST_DECIMAL_UINT128_MAX ((2 * static_cast<boost::decimal::detail::uint128_t>(BOOST_DECIMAL_INT128_MAX)) + 1)
+#  define BOOST_DECIMAL_UINT128_MAX ((2 * static_cast<boost::decimal::detail::builtin_uint128_t>(BOOST_DECIMAL_INT128_MAX)) + 1)
 #endif
 
 // 128-bit floats

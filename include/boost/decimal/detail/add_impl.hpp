@@ -10,6 +10,7 @@
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/components.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
+#include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -189,8 +190,8 @@ constexpr auto d64_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
     // Each of the significands is maximally 23 bits.
     // Rather than doing division to get proper alignment we will promote to 64 bits
     // And do a single mul followed by an add
-    using add_type = detail::int128;
-    using promoted_sig_type = detail::uint128;
+    using add_type = boost::int128::int128_t;
+    using promoted_sig_type = boost::int128::uint128_t;
 
     promoted_sig_type big_lhs {lhs.full_significand()};
     promoted_sig_type big_rhs {rhs.full_significand()};
@@ -341,7 +342,8 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
         BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T2>::digits10 > std::numeric_limits<std::uint64_t>::digits10)
         {
-            if (rhs_sig >= detail::uint128 {UINT64_C(0xF684DF56C3E0), UINT64_C(0x1BC6C73200000000)})
+            constexpr boost::int128::uint128_t max_value {UINT64_C(0xF684DF56C3E0), UINT64_C(0x1BC6C73200000000)};
+            if (rhs_sig >= max_value)
             {
                 ++lhs_sig;
             }
@@ -361,18 +363,18 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
     if (delta_exp <= 3)
     {
-        lhs_sig *= detail::pow10(static_cast<detail::uint128>(delta_exp));
+        lhs_sig *= detail::pow10(static_cast<boost::int128::uint128_t>(delta_exp));
         lhs_exp -= delta_exp;
     }
     else
     {
-        lhs_sig *= 1000;
+        lhs_sig *= 1000U;
         delta_exp -= 3;
         lhs_exp -= 3;
 
         if (delta_exp > 1)
         {
-            rhs_sig /= pow10(static_cast<uint128>(delta_exp - 1));
+            rhs_sig /= pow10(static_cast<boost::int128::uint128_t>(delta_exp - 1));
             delta_exp = 1;
         }
 
@@ -387,7 +389,7 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     const auto new_exp {lhs_exp};
 
     #ifdef BOOST_DECIMAL_DEBUG_ADD_128
-    std::cerr << "Res Sig: " << static_cast<detail::uint128_t>(new_sig)
+    std::cerr << "Res Sig: " << static_cast<detail::builtin_uint128_t>(new_sig)
               << "\nRes Exp: " << new_exp
               << "\nRes Neg: " << sign << std::endl;
     #endif
@@ -433,19 +435,19 @@ constexpr auto d128_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
     if (delta_exp <= 2)
     {
-        sig_bigger *= pow10(static_cast<uint128>(delta_exp));
+        sig_bigger *= pow10(static_cast<boost::int128::uint128_t>(delta_exp));
         exp_bigger -= delta_exp;
         delta_exp = 0;
     }
     else
     {
-        sig_bigger *= 100;
+        sig_bigger *= 100U;
         delta_exp -= 2;
         exp_bigger -= 2;
 
         if (delta_exp > 1)
         {
-            sig_smaller /= pow10(static_cast<uint128>(delta_exp - 1));
+            sig_smaller /= pow10(static_cast<boost::int128::uint128_t>(delta_exp - 1));
             delta_exp = 1;
         }
 
