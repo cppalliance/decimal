@@ -674,6 +674,105 @@ constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
 
 #endif
 
+//=====================================
+// Multiplication Operators
+//=====================================
+
+namespace impl {
+
+template <std::size_t u_size, std::size_t v_size>
+constexpr u256 knuth_mulitply(const std::uint32_t (&u)[u_size],
+                              const std::uint32_t (&v)[v_size]) noexcept
+{
+    std::uint32_t w[u_size + v_size] {};
+
+    // M.1
+    for (std::size_t j {}; j < v_size; ++j)
+    {
+        // M.2
+        if (v[j] == 0)
+        {
+            w[j + u_size] = 0;
+            continue;
+        }
+
+        // M.3
+        std::uint64_t t {};
+        for (std::size_t i {}; i < u_size; ++i)
+        {
+            // M.4
+            t += static_cast<std::uint64_t>(u[i]) * v[j] + w[i + j];
+            w[i + j] = static_cast<std::uint32_t>(t);
+            t >>= 32u;
+        }
+
+        // M.5
+        w[j + u_size] = static_cast<std::uint32_t>(t);
+    }
+
+    u256 result;
+    result[0] = static_cast<std::uint64_t>(w[0]) | (static_cast<std::uint64_t>(w[1]) << 32);
+    result[1] = static_cast<std::uint64_t>(w[2]) | (static_cast<std::uint64_t>(w[3]) << 32);
+    result[2] = static_cast<std::uint64_t>(w[4]) | (static_cast<std::uint64_t>(w[5]) << 32);
+    result[3] = static_cast<std::uint64_t>(w[6]) | (static_cast<std::uint64_t>(w[7]) << 32);
+
+    return result;
+}
+
+constexpr void to_words(const u256& x, std::uint32_t (&words)[8]) noexcept
+{
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+    if (!BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    {
+        std::memcpy(&words, &x, sizeof(x));
+        return;
+    }
+
+    #endif
+
+    words[0] = static_cast<std::uint32_t>(x[0] & UINT32_MAX);
+    words[1] = static_cast<std::uint32_t>(x[0] >> 32U);
+    words[2] = static_cast<std::uint32_t>(x[1] & UINT32_MAX);
+    words[3] = static_cast<std::uint32_t>(x[1] >> 32U);
+    words[4] = static_cast<std::uint32_t>(x[2] & UINT32_MAX);
+    words[5] = static_cast<std::uint32_t>(x[2] >> 32U);
+    words[6] = static_cast<std::uint32_t>(x[3] & UINT32_MAX);
+    words[7] = static_cast<std::uint32_t>(x[3] >> 32U);
+}
+
+template <typename UnsignedInteger>
+BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_mul(const u256& lhs, const UnsignedInteger& rhs) noexcept
+{
+    using boost::decimal::detail::impl::to_words;
+    using boost::int128::detail::to_words;
+
+    static_assert(!std::numeric_limits<UnsignedInteger>::is_signed);
+    constexpr std::size_t rhs_words_needed {sizeof(UnsignedInteger) / sizeof(std::uint32_t)};
+
+    std::uint32_t lhs_words[8];
+    std::uint32_t rhs_words[rhs_words_needed];
+
+    to_words(lhs, lhs_words);
+    to_words(rhs, rhs_words);
+
+    return knuth_mulitply(lhs_words, rhs_words);
+}
+
+} // namespace impl
+
+template <typename UnsignedInteger>
+constexpr u256 operator*(const u256& lhs, const UnsignedInteger& rhs) noexcept
+{
+    return impl::default_mul(lhs, rhs);
+}
+
+template <typename UnsignedInteger>
+constexpr u256 operator*(const UnsignedInteger& lhs, const u256& rhs) noexcept
+{
+    return impl::default_mul(rhs, lhs);
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
