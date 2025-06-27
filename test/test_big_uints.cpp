@@ -21,6 +21,7 @@ int main()
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
 #include <boost/decimal.hpp>
+#include <boost/decimal/detail/u256.hpp>
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -141,9 +142,9 @@ auto test_big_uints_mul() -> void
       auto digits_rhs = static_cast<int>(static_cast<float>((1.0F - split) * digits2));
 
       boost_ctrl_uint_type boost_ctrl_uint_lhs(1);
-      dec_intern_uint_type dec_intern_uint_lhs(1);
+      dec_intern_uint_type dec_intern_uint_lhs(1U);
       boost_ctrl_uint_type boost_ctrl_uint_rhs(1);
-      dec_intern_uint_type dec_intern_uint_rhs(1);
+      dec_intern_uint_type dec_intern_uint_rhs(1U);
 
       if(lhs_is_fixed_and_near_max)
       {
@@ -483,6 +484,7 @@ int main()
 {
   test_big_uints_mul<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
   test_big_uints_mul<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
+  test_big_uints_mul<boost::multiprecision::uint256_t, boost::decimal::detail::u256>();
 
   test_big_uints_div<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
   test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
