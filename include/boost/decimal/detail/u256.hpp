@@ -861,7 +861,7 @@ constexpr std::size_t div_to_words(const u256& x, std::uint32_t (&words)[8]) noe
     std::size_t word_count {8};
     while (words[word_count - 1U] == 0U)
     {
-        word_count--;
+        --word_count;
     }
 
     return word_count;

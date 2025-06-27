@@ -137,7 +137,7 @@ constexpr void knuth_divide(std::uint32_t (&u)[u_size], const std::size_t m,
     const bool needs_shift {s > 0};
 
     // Create normalized versions of u and v
-    constexpr std::size_t un_size {u_size == 8 ? 10 : 5};
+    constexpr std::size_t un_size {u_size == 8 ? 9 : 5};
     constexpr std::size_t vn_size {v_size == 8 ? 8 : 4};
     std::uint32_t un[un_size] {};
     std::uint32_t vn[vn_size] {};
