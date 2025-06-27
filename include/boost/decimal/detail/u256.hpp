@@ -54,6 +54,7 @@ u256
     constexpr u256& operator/=(std::uint64_t rhs) noexcept;
 
     constexpr u256& operator%=(const u256& rhs) noexcept;
+    constexpr u256& operator%=(std::uint64_t rhs) noexcept;
 };
 
 } // namespace detail
@@ -961,7 +962,7 @@ constexpr u256& u256::operator/=(const u256& rhs) noexcept
 
 constexpr u256& u256::operator/=(const std::uint64_t rhs) noexcept
 {
-    *this = *this / rhs;
+    *this = impl::default_div(*this, rhs);
     return *this;
 }
 
@@ -999,7 +1000,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_mod(const u256& lhs, const Uns
 {
     if (rhs <= UINT64_MAX)
     {
-        return default_div(lhs, static_cast<std::uint64_t>(rhs));
+        return default_mod(lhs, static_cast<std::uint64_t>(rhs));
     }
 
     std::uint32_t u[8] {};
@@ -1024,12 +1025,18 @@ constexpr u256 operator%(const u256& lhs, const u256& rhs) noexcept
 template <typename UnsignedInteger>
 constexpr u256 operator%(const u256& lhs, const UnsignedInteger rhs) noexcept
 {
-    return impl::default_div(lhs, rhs);
+    return impl::default_mod(lhs, rhs);
 }
 
 constexpr u256& u256::operator%=(const u256& rhs) noexcept
 {
     *this = *this % rhs;
+    return *this;
+}
+
+constexpr u256& u256::operator%=(const std::uint64_t rhs) noexcept
+{
+    *this = impl::default_mod(*this, rhs);
     return *this;
 }
 
@@ -1044,7 +1051,9 @@ inline auto u256_to_buffer(char (&buffer)[128], u256 v) noexcept
 
     do
     {
-        *--p = "0123456789"[ static_cast<std::size_t>(v % UINT64_C(10)) ];
+        const auto index {static_cast<std::size_t>(v % UINT64_C(10))};
+        BOOST_DECIMAL_ASSERT(index <= 10);
+        *--p = "0123456789"[index];
         v /= UINT64_C(10);
     }
     while ( v != zero );
