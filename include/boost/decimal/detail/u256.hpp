@@ -903,7 +903,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_div(const u256& lhs, const std
 {
     u256 quotient;
 
-    int128::uint128_t current {lhs[3], lhs[2]};
+    int128::uint128_t current {lhs[3]};
     quotient[3] = static_cast<std::uint64_t>(current / rhs);
     auto remainder = static_cast<std::uint64_t>(current % rhs);
 
@@ -976,7 +976,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_mod(const u256& lhs, const std
 {
     u256 quotient;
 
-    int128::uint128_t current {lhs[3], lhs[2]};
+    int128::uint128_t current {lhs[3]};
     quotient[3] = static_cast<std::uint64_t>(current / rhs);
     auto remainder = static_cast<std::uint64_t>(current % rhs);
 
