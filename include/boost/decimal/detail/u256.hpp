@@ -692,7 +692,7 @@ constexpr u256 knuth_mulitply(const std::uint32_t (&u)[u_size],
         // M.2
         if (v[j] == 0)
         {
-            w[j + u_size] = 0;
+            w[j + u_size] = 0u;
             continue;
         }
 
@@ -773,8 +773,63 @@ constexpr u256 operator*(const UnsignedInteger& lhs, const u256& rhs) noexcept
     return impl::default_mul(rhs, lhs);
 }
 
+//=====================================
+// Division Operators
+//=====================================
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
+
+namespace std {
+
+template <>
+class numeric_limits<boost::decimal::detail::u256>
+{
+public:
+
+    // Member constants
+    static constexpr bool is_specialized = true;
+    static constexpr bool is_signed = false;
+    static constexpr bool is_integer = true;
+    static constexpr bool is_exact = true;
+    static constexpr bool has_infinity = false;
+    static constexpr bool has_quiet_NaN = false;
+    static constexpr bool has_signaling_NaN = false;
+
+    // These members were deprecated in C++23
+    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
+    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+    static constexpr bool has_denorm_loss = false;
+    #endif
+
+    static constexpr std::float_round_style round_style = std::round_toward_zero;
+    static constexpr bool is_iec559 = false;
+    static constexpr bool is_bounded = true;
+    static constexpr bool is_modulo = true;
+    static constexpr int digits = 256;
+    static constexpr int digits10 = 76;
+    static constexpr int max_digits10 = 0;
+    static constexpr int radix = 2;
+    static constexpr int min_exponent = 0;
+    static constexpr int min_exponent10 = 0;
+    static constexpr int max_exponent = 0;
+    static constexpr int max_exponent10 = 0;
+    static constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
+    static constexpr bool tinyness_before = false;
+
+    // Member functions
+    static constexpr boost::decimal::detail::u256 (min)() { return {0, 0}; }
+    static constexpr boost::decimal::detail::u256 lowest() { return {0, 0}; }
+    static constexpr boost::decimal::detail::u256 (max)() { return {UINT64_MAX, UINT64_MAX, UINT64_MAX, UINT64_MAX}; }
+    static constexpr boost::decimal::detail::u256 epsilon() { return {0, 0}; }
+    static constexpr boost::decimal::detail::u256 round_error() { return {0, 0}; }
+    static constexpr boost::decimal::detail::u256 infinity() { return {0, 0}; }
+    static constexpr boost::decimal::detail::u256 quiet_NaN() { return {0, 0}; }
+    static constexpr boost::decimal::detail::u256 signaling_NaN() { return {0, 0}; }
+    static constexpr boost::decimal::detail::u256 denorm_min() { return {0, 0}; }
+};
+
+}
 
 #endif // BOOST_DECIMAL_DETAIL_U256_HPP
