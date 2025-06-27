@@ -700,8 +700,11 @@ constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
 
 namespace impl {
 
-BOOST_DECIMAL_FORCE_INLINE constexpr u256 from_words(const std::uint32_t (&words)[8]) noexcept
+template <std::size_t word_size>
+BOOST_DECIMAL_FORCE_INLINE constexpr u256 from_words(const std::uint32_t (&words)[word_size]) noexcept
 {
+    static_assert(word_size >= 8, "Not enough words to convert to u256");
+
     u256 result;
     result[0] = static_cast<std::uint64_t>(words[0]) | (static_cast<std::uint64_t>(words[1]) << 32);
     result[1] = static_cast<std::uint64_t>(words[2]) | (static_cast<std::uint64_t>(words[3]) << 32);
@@ -772,7 +775,6 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_mul(const u256& lhs, const Uns
     using boost::decimal::detail::impl::to_words;
     using boost::int128::detail::to_words;
 
-    static_assert(!std::numeric_limits<UnsignedInteger>::is_signed, "Only multiplication by unsigned types is allowed");
     constexpr std::size_t rhs_words_needed {sizeof(UnsignedInteger) / sizeof(std::uint32_t)};
 
     std::uint32_t lhs_words[8] {};
@@ -915,8 +917,6 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_div(const u256& lhs, const std
 template <typename UnsignedInteger>
 BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_div(const u256& lhs, const UnsignedInteger& rhs) noexcept
 {
-    static_assert(!std::numeric_limits<UnsignedInteger>::is_signed, "Only division by unsigned types is allowed");
-
     if (rhs <= UINT64_MAX)
     {
         return default_div(lhs, static_cast<std::uint64_t>(rhs));
