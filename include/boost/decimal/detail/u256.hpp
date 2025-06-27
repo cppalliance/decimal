@@ -49,6 +49,7 @@ u256
     constexpr u256& operator<<=(int amount) noexcept;
     constexpr u256& operator>>=(int amount) noexcept;
     constexpr u256& operator|=(const u256& rhs) noexcept;
+    constexpr u256& operator%=(const u256& rhs) noexcept;
 };
 
 } // namespace detail
@@ -946,6 +947,74 @@ template <typename UnsignedInteger>
 constexpr u256 operator/(const u256& lhs, const UnsignedInteger rhs) noexcept
 {
     return impl::default_div(lhs, rhs);
+}
+
+//=====================================
+// Modulo Operators
+//=====================================
+
+namespace impl {
+
+BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_mod(const u256& lhs, const std::uint64_t rhs) noexcept
+{
+    u256 quotient;
+
+    int128::uint128_t current {lhs[3], lhs[2]};
+    quotient[3] = static_cast<std::uint64_t>(current / rhs);
+    auto remainder = static_cast<std::uint64_t>(current % rhs);
+
+    current = static_cast<int128::uint128_t>(remainder) << 64U | lhs[2];
+    quotient[2] = static_cast<std::uint64_t>(current / rhs);
+    remainder = static_cast<std::uint64_t>(current % rhs);
+
+    current = static_cast<int128::uint128_t>(remainder) << 64U | lhs[1];
+    quotient[1] = static_cast<std::uint64_t>(current / rhs);
+    remainder = static_cast<std::uint64_t>(current % rhs);
+
+    current = static_cast<int128::uint128_t>(remainder) << 64U | lhs[0];
+    quotient[0] = static_cast<std::uint64_t>(current / rhs);
+    remainder = static_cast<std::uint64_t>(current % rhs);
+
+    return remainder;
+}
+
+template <typename UnsignedInteger>
+BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_mod(const u256& lhs, const UnsignedInteger& rhs) noexcept
+{
+    if (rhs <= UINT64_MAX)
+    {
+        return default_div(lhs, static_cast<std::uint64_t>(rhs));
+    }
+
+    std::uint32_t u[8] {};
+    std::uint32_t v[8] {};
+    std::uint32_t q[8] {};
+
+    const auto m {div_to_words(lhs, u)};
+    const auto n {div_to_words(rhs, v)};
+
+    int128::detail::impl::knuth_divide<true>(u, m, v, n, q);
+
+    return from_words(u);
+}
+
+} // namespace impl
+
+constexpr u256 operator%(const u256& lhs, const u256& rhs) noexcept
+{
+    return impl::default_mod(lhs, rhs);
+}
+
+template <typename UnsignedInteger>
+constexpr u256 operator%(const u256& lhs, const UnsignedInteger rhs) noexcept
+{
+    return impl::default_div(lhs, rhs);
+}
+
+constexpr u256& u256::operator%=(const u256& rhs) noexcept
+{
+    *this = *this % rhs;
+    return *this;
 }
 
 } // namespace detail
