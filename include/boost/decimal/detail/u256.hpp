@@ -252,6 +252,16 @@ constexpr bool operator<(const u256& lhs, const u256& rhs) noexcept
 
 #endif
 
+constexpr bool operator<(const u256& lhs, const std::uint64_t rhs) noexcept
+{
+    return lhs[3] == 0 && lhs[2] == 0 && lhs[1] == 0 && lhs[0] < rhs;
+}
+
+constexpr bool operator<(const std::uint64_t lhs, const u256& rhs) noexcept
+{
+    return rhs[3] == 0 && rhs[2] == 0 && rhs[1] == 0 && lhs < rhs[0];
+}
+
 //=====================================
 // Less Equal Operator
 //=====================================
@@ -314,6 +324,16 @@ constexpr bool operator<=(const u256& lhs, const u256& rhs) noexcept
 }
 
 #endif
+
+constexpr bool operator<=(const u256& lhs, const std::uint64_t rhs) noexcept
+{
+    return lhs[3] == 0 && lhs[2] == 0 && lhs[1] == 0 && lhs[0] <= rhs;
+}
+
+constexpr bool operator<=(const std::uint64_t lhs, const u256& rhs) noexcept
+{
+    return rhs[3] == 0 && rhs[2] == 0 && rhs[1] == 0 && lhs <= rhs[0];
+}
 
 //=====================================
 // Greater Than Operator
