@@ -502,7 +502,7 @@ int main()
 
   test_digit_counting<boost::int128::uint128_t>();
   test_digit_counting<boost::decimal::detail::uint256_t>();
-  test_digit_counting<boost::int128::uint128_t>();
+  test_digit_counting<boost::decimal::detail::u256>();
 
   return boost::report_errors();
 }
