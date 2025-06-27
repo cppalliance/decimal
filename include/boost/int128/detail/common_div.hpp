@@ -114,7 +114,8 @@ template <std::size_t un_size, std::size_t u_size>
 BOOST_INT128_FORCE_INLINE constexpr void unpack_u(std::uint32_t (&un)[un_size], const std::uint32_t (&u)[u_size],
     const bool needs_shift, const int s, const int complement_s, const std::integral_constant<std::size_t, 8>&) noexcept
 {
-    un[7] = needs_shift ? (u[7] >> complement_s) : 0;
+    un[8] = needs_shift ? (u[7] >> complement_s) : 0;
+    un[7] = needs_shift ? ((u[7] << s) | (u[6] >> complement_s)) : u[7];
     un[6] = needs_shift ? ((u[6] << s) | (u[5] >> complement_s)) : u[6];
     un[5] = needs_shift ? ((u[5] << s) | (u[4] >> complement_s)) : u[5];
     un[4] = needs_shift ? ((u[4] << s) | (u[3] >> complement_s)) : u[4];
