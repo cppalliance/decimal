@@ -764,11 +764,11 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_mul(const u256& lhs, const Uns
     using boost::decimal::detail::impl::to_words;
     using boost::int128::detail::to_words;
 
-    static_assert(!std::numeric_limits<UnsignedInteger>::is_signed);
+    static_assert(!std::numeric_limits<UnsignedInteger>::is_signed, "Only multiplication by unsigned types is allowed");
     constexpr std::size_t rhs_words_needed {sizeof(UnsignedInteger) / sizeof(std::uint32_t)};
 
-    std::uint32_t lhs_words[8];
-    std::uint32_t rhs_words[rhs_words_needed];
+    std::uint32_t lhs_words[8] {};
+    std::uint32_t rhs_words[rhs_words_needed] {};
 
     to_words(lhs, lhs_words);
     to_words(rhs, rhs_words);
@@ -902,16 +902,16 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_div(const u256& lhs, const std
 template <typename UnsignedInteger>
 BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_div(const u256& lhs, const UnsignedInteger& rhs) noexcept
 {
-    static_assert(!std::numeric_limits<UnsignedInteger>::is_signed);
+    static_assert(!std::numeric_limits<UnsignedInteger>::is_signed, "Only division by unsigned types is allowed");
 
     if (rhs <= UINT64_MAX)
     {
         return default_div(lhs, static_cast<std::uint64_t>(rhs));
     }
 
-    std::uint32_t u[8];
-    std::uint32_t v[8];
-    std::uint32_t q[8];
+    std::uint32_t u[8] {};
+    std::uint32_t v[8] {};
+    std::uint32_t q[8] {};
 
     const auto m {div_to_words(lhs, u)};
     const auto n {div_to_words(rhs, v)};
@@ -922,6 +922,12 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_div(const u256& lhs, const Uns
 }
 
 } // namespace impl
+
+template <typename UnsignedInteger>
+constexpr u256 operator/(const u256& lhs, const UnsignedInteger& rhs) noexcept
+{
+    return impl::default_div(lhs, rhs);
+}
 
 } // namespace detail
 } // namespace decimal
