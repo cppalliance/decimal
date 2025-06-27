@@ -48,6 +48,18 @@ u256
     constexpr u256& operator>>=(int amount) noexcept;
 };
 
+} // namespace detail
+} // namespace decimal
+} // namespace boost
+
+// Forward declare numeric limits so that we can use it with mul and div templates
+template <>
+class std::numeric_limits<boost::decimal::detail::u256>;
+
+namespace boost {
+namespace decimal {
+namespace detail {
+
 constexpr u256::u256(const std::uint64_t byte3, const std::uint64_t byte2, const std::uint64_t byte1, const std::uint64_t byte0) noexcept
 {
     bytes[0] = byte0;
@@ -819,15 +831,15 @@ public:
     static constexpr bool tinyness_before = false;
 
     // Member functions
-    static constexpr boost::decimal::detail::u256 (min)() { return {0, 0}; }
-    static constexpr boost::decimal::detail::u256 lowest() { return {0, 0}; }
+    static constexpr boost::decimal::detail::u256 (min)() { return {0, 0, 0, 0}; }
+    static constexpr boost::decimal::detail::u256 lowest() { return {0, 0, 0, 0}; }
     static constexpr boost::decimal::detail::u256 (max)() { return {UINT64_MAX, UINT64_MAX, UINT64_MAX, UINT64_MAX}; }
-    static constexpr boost::decimal::detail::u256 epsilon() { return {0, 0}; }
-    static constexpr boost::decimal::detail::u256 round_error() { return {0, 0}; }
-    static constexpr boost::decimal::detail::u256 infinity() { return {0, 0}; }
-    static constexpr boost::decimal::detail::u256 quiet_NaN() { return {0, 0}; }
-    static constexpr boost::decimal::detail::u256 signaling_NaN() { return {0, 0}; }
-    static constexpr boost::decimal::detail::u256 denorm_min() { return {0, 0}; }
+    static constexpr boost::decimal::detail::u256 epsilon() { return {0, 0, 0, 0}; }
+    static constexpr boost::decimal::detail::u256 round_error() { return {0, 0, 0, 0}; }
+    static constexpr boost::decimal::detail::u256 infinity() { return {0, 0, 0, 0}; }
+    static constexpr boost::decimal::detail::u256 quiet_NaN() { return {0, 0, 0, 0}; }
+    static constexpr boost::decimal::detail::u256 signaling_NaN() { return {0, 0, 0, 0}; }
+    static constexpr boost::decimal::detail::u256 denorm_min() { return {0, 0, 0, 0}; }
 };
 
 }
