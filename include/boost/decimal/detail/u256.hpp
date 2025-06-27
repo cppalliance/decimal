@@ -33,6 +33,7 @@ u256
     constexpr u256& operator=(u256&& other) noexcept = default;
 
     constexpr u256(std::uint64_t byte3, std::uint64_t byte2, std::uint64_t byte1, std::uint64_t byte0) noexcept;
+    constexpr u256(std::uint64_t x) { bytes[0] = x; }
 
     // Conversion to/from int128::uint128_t
     constexpr u256(const int128::uint128_t& high_, const int128::uint128_t& low_) noexcept;
@@ -46,6 +47,7 @@ u256
     // Compound operators
     constexpr u256& operator<<=(int amount) noexcept;
     constexpr u256& operator>>=(int amount) noexcept;
+    constexpr u256& operator|=(const u256& rhs) noexcept;
 };
 
 } // namespace detail
@@ -504,6 +506,12 @@ constexpr u256 operator|(const u256& lhs, const u256& rhs) noexcept
 }
 
 #endif
+
+constexpr u256& u256::operator|=(const u256& rhs) noexcept
+{
+    *this = *this | rhs;
+    return *this;
+}
 
 //=====================================
 // And Operators
