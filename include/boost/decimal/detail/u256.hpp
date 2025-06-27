@@ -786,14 +786,19 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_mul(const u256& lhs, const Uns
 
 } // namespace impl
 
-template <typename UnsignedInteger>
-constexpr u256 operator*(const u256& lhs, const UnsignedInteger& rhs) noexcept
+constexpr u256 operator*(const u256& lhs, const u256& rhs) noexcept
 {
     return impl::default_mul(lhs, rhs);
 }
 
 template <typename UnsignedInteger>
-constexpr u256 operator*(const UnsignedInteger& lhs, const u256& rhs) noexcept
+constexpr u256 operator*(const u256& lhs, const UnsignedInteger rhs) noexcept
+{
+    return impl::default_mul(lhs, rhs);
+}
+
+template <typename UnsignedInteger>
+constexpr u256 operator*(const UnsignedInteger lhs, const u256& rhs) noexcept
 {
     return impl::default_mul(rhs, lhs);
 }
@@ -931,8 +936,13 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_div(const u256& lhs, const Uns
 
 } // namespace impl
 
+constexpr u256 operator/(const u256& lhs, const u256& rhs) noexcept
+{
+    return impl::default_div(lhs, rhs);
+}
+
 template <typename UnsignedInteger>
-constexpr u256 operator/(const u256& lhs, const UnsignedInteger& rhs) noexcept
+constexpr u256 operator/(const u256& lhs, const UnsignedInteger rhs) noexcept
 {
     return impl::default_div(lhs, rhs);
 }
