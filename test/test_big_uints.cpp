@@ -334,10 +334,11 @@ auto test_various_spots() -> void
   }
 }
 
+template <typename T>
 auto test_spot_div_uint256_t() -> void
 {
   using boost_ctrl_uint_type = boost::multiprecision::uint256_t;
-  using dec_intern_uint_type = boost::decimal::detail::uint256_t;
+  using dec_intern_uint_type = T;
 
   {
     // Specially test several exactly-curated division operations that are know
@@ -400,9 +401,10 @@ auto test_spot_div_uint256_t() -> void
   }
 }
 
+template <typename T>
 auto test_p10_mul_uint256_t() -> void
 {
-  using local_uint256_t = boost::decimal::detail::uint256_t;
+  using local_uint256_t = T;
 
   auto powers_of_10 = local::generate_p10_array<local_uint256_t, static_cast<std::size_t>(UINT8_C(78))>();
 
@@ -492,9 +494,11 @@ int main()
 
   test_various_spots();
 
-  test_spot_div_uint256_t();
+  test_spot_div_uint256_t<boost::decimal::detail::uint256_t>();
+  test_spot_div_uint256_t<boost::decimal::detail::u256>();
 
-  test_p10_mul_uint256_t();
+  test_p10_mul_uint256_t<boost::decimal::detail::uint256_t>();
+  test_p10_mul_uint256_t<boost::decimal::detail::u256>();
 
   test_big_uints_shl<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
   test_big_uints_shl<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
