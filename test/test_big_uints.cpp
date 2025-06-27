@@ -488,6 +488,7 @@ int main()
 
   test_big_uints_div<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
   test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
+  test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::u256>();
 
   test_various_spots();
 
@@ -497,6 +498,7 @@ int main()
 
   test_big_uints_shl<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
   test_big_uints_shl<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
+  test_big_uints_shl<boost::multiprecision::uint256_t, boost::decimal::detail::u256>();
 
   test_digit_counting<boost::int128::uint128_t>();
   test_digit_counting<boost::decimal::detail::uint256_t>();
