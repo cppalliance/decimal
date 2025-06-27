@@ -49,6 +49,10 @@ u256
     constexpr u256& operator<<=(int amount) noexcept;
     constexpr u256& operator>>=(int amount) noexcept;
     constexpr u256& operator|=(const u256& rhs) noexcept;
+
+    constexpr u256& operator/=(const u256& rhs) noexcept;
+    constexpr u256& operator/=(std::uint64_t rhs) noexcept;
+
     constexpr u256& operator%=(const u256& rhs) noexcept;
 };
 
@@ -949,6 +953,18 @@ constexpr u256 operator/(const u256& lhs, const UnsignedInteger rhs) noexcept
     return impl::default_div(lhs, rhs);
 }
 
+constexpr u256& u256::operator/=(const u256& rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+constexpr u256& u256::operator/=(const std::uint64_t rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
 //=====================================
 // Modulo Operators
 //=====================================
@@ -1016,6 +1032,39 @@ constexpr u256& u256::operator%=(const u256& rhs) noexcept
     *this = *this % rhs;
     return *this;
 }
+
+namespace impl {
+
+inline auto u256_to_buffer(char (&buffer)[128], u256 v) noexcept
+{
+    constexpr u256 zero {0, 0, 0, 0};
+
+    char* p = buffer + 128;
+    *--p = '\0';
+
+    do
+    {
+        *--p = "0123456789"[ static_cast<std::size_t>(v % UINT64_C(10)) ];
+        v /= UINT64_C(10);
+    }
+    while ( v != zero );
+
+    return p;
+}
+
+} // namespace impl
+
+#if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
+template <typename charT, typename traits>
+auto operator<<(std::basic_ostream<charT, traits>& os, const u256& val) -> std::basic_ostream<charT, traits>&
+{
+    char buffer[128];
+
+    os << impl::u256_to_buffer(buffer, val);
+
+    return os;
+}
+#endif
 
 } // namespace detail
 } // namespace decimal
