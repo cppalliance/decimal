@@ -2,8 +2,6 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#define BOOST_DECIMAL_BENCHMARK_U256
-
 #include <iostream>
 
 #ifdef BOOST_DECIMAL_BENCHMARK_U256
@@ -82,7 +80,7 @@ std::vector<detail::uint256_t> generate_random_vector_old(std::size_t size = N, 
                 break;
             case 1:
                 result[i].low.low = dist(gen);
-                breakl;
+                break;
             default:
                 BOOST_DECIMAL_UNREACHABLE;
         }
@@ -237,61 +235,27 @@ int main()
 
         const auto old_vector = generate_random_vector_old<4>();
         const auto new_vector = generate_random_vector_new<4>();
+
         test_comparisons(old_vector, "old");
         test_comparisons(new_vector, "new");
 
         std::cout << std::endl;
 
-        test_bitwise_ops(old_vector, "old");
-        test_bitwise_ops(new_vector, "new");
-
-        std::cout << std::endl;
-
         test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
         test_two_element_operation(new_vector, std::plus<>(), "add", "New");
 
         std::cout << std::endl;
-/*
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
-        test_two_element_operation(new_vector, std::plus<>(), "add", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::minus<>(), "sub", "Old");
-        test_two_element_operation(new_vector, std::minus<>(), "sub", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
-        #endif
 
         test_two_element_operation(old_vector, std::multiplies<>(), "mul", "Old");
         test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
-        #endif
-
         test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_digit_counting(builtin_vector, "builtin");
-        #endif
-*/
         test_digit_counting(old_vector, "old");
         test_digit_counting(new_vector, "new");
     }
