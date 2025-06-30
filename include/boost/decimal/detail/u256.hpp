@@ -366,13 +366,13 @@ constexpr u256 operator<<(const u256& lhs, const int shift) noexcept
         return result;
     }
 
-    const auto word_shift {shift / 64};
-    const auto bit_shift {shift % 64};
+    const auto word_shift {static_cast<std::size_t>(shift / 64)};
+    const auto bit_shift {static_cast<std::size_t>(shift % 64)};
 
     // Only moving whole words
     if (bit_shift == 0)
     {
-        for (auto i {word_shift}; i < 4; ++i)
+        for (std::size_t i {word_shift}; i < 4; ++i)
         {
             result[i] = lhs[i - word_shift];
         }
@@ -380,12 +380,12 @@ constexpr u256 operator<<(const u256& lhs, const int shift) noexcept
         return result;
     }
 
-    if (word_shift < 4)
+    if (word_shift < 4U)
     {
-        result[word_shift] = lhs[0] << bit_shift;
+        result[word_shift] = lhs[0U] << bit_shift;
     }
 
-    for (auto i {word_shift + 1}; i < 4; ++i)
+    for (std::size_t i {word_shift + 1U}; i < 4U; ++i)
     {
         result[i] = (lhs[i - word_shift] << bit_shift) |
                     (lhs[i - word_shift - 1] >> (64 - bit_shift));
