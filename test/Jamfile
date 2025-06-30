@@ -43,7 +43,8 @@ project : requirements
   ;
 
 run-fail benchmarks.cpp ;
-run benchmark_uint256.cpp ;
+run-fail benchmark_uint256.cpp ;
+
 run compare_dec128_and_fast.cpp ;
 compile-fail concepts_test.cpp ;
 run crash_report_1.cpp ;
