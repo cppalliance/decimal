@@ -682,7 +682,7 @@ constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
 
 namespace impl {
 
-inline bool add_carry_u64(const bool carry_in, const std::uint64_t a, const std::uint64_t b, std::uint64_t* sum) noexcept
+inline bool add_carry_u64(const bool carry_in, const std::uint64_t a, const std::uint64_t b, unsigned long long* sum) noexcept
 {
     unsigned long long res;
     auto c = __builtin_uaddll_overflow(a, b, &res);
