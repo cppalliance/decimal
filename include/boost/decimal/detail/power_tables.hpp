@@ -208,16 +208,16 @@ static_assert(sizeof(emulated_256_pow10) == sizeof(boost::decimal::detail::uint2
 
 } // namespace impl
 
+#if defined(__GNUC__) && __GNUC__ >= 7
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 template <typename T>
 constexpr auto pow10(T n) noexcept -> T
 {
     return static_cast<T>(impl::powers_of_10[static_cast<std::size_t>(n)]);
 }
-
-#if defined(__GNUC__) && __GNUC__ >= 7
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
 
 template <>
 constexpr auto pow10(const boost::int128::uint128_t n) noexcept -> boost::int128::uint128_t
