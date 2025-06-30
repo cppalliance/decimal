@@ -678,7 +678,7 @@ constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
 
 #endif
 
-#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(__has_builtin) && __has_builtin(__builtin_uaddll_overflow) && !defined(BOOST_DECIMAL_ADD_CARRY)
+#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && ((defined(__GNUC__) && __GNUC__ >= 7) || (defined(__has_builtin) && __has_builtin(__builtin_uaddll_overflow))) && !defined(BOOST_DECIMAL_ADD_CARRY)
 
 namespace impl {
 
