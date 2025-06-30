@@ -840,10 +840,15 @@ constexpr u256 umul256_new(const int128::uint128_t& a, const int128::uint128_t& 
 {
     u256 result{};
 
-    const auto p0 = int128::uint128_t{a.low} * b.low;
-    const auto p1 = int128::uint128_t{a.low} * b.high;
-    const auto p2 = int128::uint128_t{a.high} * b.low;
-    const auto p3 = int128::uint128_t{a.high} * b.high;
+    const int128::uint128_t a_low {a.low};
+    const int128::uint128_t a_high {a.high};
+    const auto b_low {b.low};
+    const auto b_high {b.high};
+
+    const auto p0 = a_low * b_low;
+    const auto p1 = a_low * b_high;
+    const auto p2 = a_high * b_low;
+    const auto p3 = a_high * b_high;
 
     // Combine results
     const auto middle = p1 + p2 + p0.high;
