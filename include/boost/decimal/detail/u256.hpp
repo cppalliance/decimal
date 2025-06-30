@@ -419,13 +419,13 @@ constexpr u256 operator>>(const u256& lhs, const int shift) noexcept
         return result;
     }
 
-    const auto word_shift {shift / 64};
-    const auto bit_shift {shift % 64};
+    const auto word_shift {static_cast<std::size_t>(shift / 64)};
+    const auto bit_shift {static_cast<std::size_t>(shift % 64)};
 
     // Only moving whole words
     if (bit_shift == 0)
     {
-        for (int i {}; i < 4 - word_shift; ++i)
+        for (std::size_t i {}; i < 4 - word_shift; ++i)
         {
             result[i] = lhs[i + word_shift];
         }
@@ -434,7 +434,7 @@ constexpr u256 operator>>(const u256& lhs, const int shift) noexcept
     }
 
     // Handle partial shifts across word boundaries
-    for (int i {}; i < 4 - word_shift - 1; ++i)
+    for (std::size_t i {}; i < 4 - word_shift - 1; ++i)
     {
         result[i] = (lhs[i + word_shift] >> bit_shift) |
                     (lhs[i + word_shift + 1] << (64 - bit_shift));
