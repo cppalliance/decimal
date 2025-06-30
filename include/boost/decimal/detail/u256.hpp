@@ -836,6 +836,28 @@ constexpr u256 operator*(const UnsignedInteger lhs, const u256& rhs) noexcept
     return impl::default_mul(rhs, lhs);
 }
 
+constexpr u256 umul256_new(const int128::uint128_t& a, const int128::uint128_t& b) noexcept
+{
+    u256 result{};
+
+    const auto p0 = int128::uint128_t{a.low} * b.low;
+    const auto p1 = int128::uint128_t{a.low} * b.high;
+    const auto p2 = int128::uint128_t{a.high} * b.low;
+    const auto p3 = int128::uint128_t{a.high} * b.high;
+
+    // Combine results
+    const auto middle = p1 + p2 + p0.high;
+
+    result.bytes[0] = p0.low;
+    result.bytes[1] = middle.low;
+
+    const auto high_sum = middle.high + p3;
+    result.bytes[2] = high_sum.low;
+    result.bytes[3] = high_sum.high;
+
+    return result;
+}
+
 //=====================================
 // Division Operators
 //=====================================
