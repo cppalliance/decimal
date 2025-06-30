@@ -1106,7 +1106,11 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const u256& val) -> std::
 namespace std {
 
 template <>
+#if defined(__clang__) && __clang_major__ < 7
+struct numeric_limits<boost::decimal::detail::u256>
+#else
 class numeric_limits<boost::decimal::detail::u256>
+#endif
 {
 public:
 
