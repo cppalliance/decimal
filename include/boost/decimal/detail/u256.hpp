@@ -40,8 +40,6 @@ u256
     constexpr u256(const int128::uint128_t& high_, const int128::uint128_t& low_) noexcept;
     explicit constexpr operator int128::uint128_t() const noexcept;
 
-    explicit constexpr operator std::size_t() const noexcept { return static_cast<std::size_t>(bytes[0]); }
-
     constexpr std::uint64_t operator[](std::size_t i) const noexcept;
     constexpr std::uint64_t& operator[](std::size_t i) noexcept;
 
@@ -676,9 +674,7 @@ constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
     }
 }
 
-#endif
-
-#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && ((defined(__GNUC__) && __GNUC__ >= 7) || (defined(__has_builtin) && __has_builtin(__builtin_uaddll_overflow))) && !defined(BOOST_DECIMAL_ADD_CARRY)
+#elif !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && defined(__GNUC__) && !defined(BOOST_DECIMAL_ADD_CARRY)
 
 namespace impl {
 
