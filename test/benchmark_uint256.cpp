@@ -19,7 +19,7 @@
 #include <cstring>
 #include <functional>
 
-constexpr unsigned N = 200'000'000;
+constexpr unsigned N = 20'000'000;
 constexpr unsigned K = 5;
 
 using namespace boost::decimal;
@@ -222,12 +222,53 @@ BOOST_DECIMAL_NO_INLINE void test_digit_counting(const std::vector<T>& data_vec,
     std::cout << "digits<" << std::left << std::setw(11) << label << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
+template <typename T>
+BOOST_DECIMAL_NO_INLINE void test_umul256(const std::vector<T>& data_vec, const char* label)
+{
+    const auto t1 = std::chrono::steady_clock::now();
+    std::size_t s = 0; // discard variable
+
+    for (std::size_t k {}; k < K; ++k)
+    {
+        for (std::size_t i {}; i < data_vec.size() - 1U; ++i)
+        {
+            const auto val1 = static_cast<boost::int128::uint128_t>(data_vec[i]);
+            const auto val2 = static_cast<boost::int128::uint128_t>(data_vec[i + 1]);
+            s += static_cast<std::size_t>(boost::decimal::detail::umul256(val1, val2));
+        }
+    }
+
+    const auto t2 = std::chrono::steady_clock::now();
+
+    std::cout << "umul<" << std::left << std::setw(11) << label << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+}
+
+template <typename T>
+BOOST_DECIMAL_NO_INLINE void test_umul256_new(const std::vector<T>& data_vec, const char* label)
+{
+    const auto t1 = std::chrono::steady_clock::now();
+    std::size_t s = 0; // discard variable
+
+    for (std::size_t k {}; k < K; ++k)
+    {
+        for (std::size_t i {}; i < data_vec.size() - 1U; ++i)
+        {
+            const auto val1 = static_cast<boost::int128::uint128_t>(data_vec[i]);
+            const auto val2 = static_cast<boost::int128::uint128_t>(data_vec[i + 1]);
+            s += static_cast<std::size_t>(boost::decimal::detail::umul256_new(val1, val2));
+        }
+    }
+
+    const auto t2 = std::chrono::steady_clock::now();
+
+    std::cout << "umul<" << std::left << std::setw(11) << label << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+}
 
 int main()
 {
     using namespace boost::decimal::detail;
 
-    // Two word operations
+    // Four word operations
     {
         std::cout << "\n---------------------------\n";
         std::cout << "Four Word Operations\n";
@@ -246,11 +287,6 @@ int main()
 
         std::cout << std::endl;
 
-        test_two_element_operation(old_vector, std::multiplies<>(), "mul", "Old");
-        test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
-
-        std::cout << std::endl;
-
         test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
 
@@ -259,268 +295,39 @@ int main()
         test_digit_counting(old_vector, "old");
         test_digit_counting(new_vector, "new");
     }
-    // Single word operations
-    /*
+    // Two word operations
     {
         std::cout << "\n---------------------------\n";
-        std::cout << "One Word Operations\n";
+        std::cout << "Two Word Operations\n";
         std::cout << "---------------------------\n\n";
 
-        const auto old_vector = generate_random_vector<1, uint128>();
-        const auto new_vector = generate_random_vector<1, u128>();
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        const auto builtin_vector = generate_random_builtin_vector<1>();
-        test_comparisons(builtin_vector, "builtin");
-        #endif
+        const auto old_vector = generate_random_vector_old<2>();
+        const auto new_vector = generate_random_vector_new<2>();
 
         test_comparisons(old_vector, "old");
         test_comparisons(new_vector, "new");
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
-        #endif
-
         test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
         test_two_element_operation(new_vector, std::plus<>(), "add", "New");
 
         std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::minus<>(), "sub", "Old");
-        test_two_element_operation(new_vector, std::minus<>(), "sub", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::multiplies<>(), "mul", "Old");
-        test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
-        #endif
 
         test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
 
         std::cout << std::endl;
 
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_digit_counting(builtin_vector, "builtin");
-        #endif
-
         test_digit_counting(old_vector, "old");
         test_digit_counting(new_vector, "new");
+
+        std::cout << std::endl;
+
+        test_umul256(old_vector, "old");
+        test_umul256_new(new_vector, "new");
     }
-    {
-        // Two word and one word operations Even = 2, odd = 1
 
-        std::cout << "\n---------------------------\n";
-        std::cout << "Two-One Word Operations\n";
-        std::cout << "---------------------------\n\n";
-
-        const auto old_vector = generate_random_vector<2, uint128>();
-        const auto new_vector = generate_random_vector<2, u128>();
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        const auto builtin_vector = generate_random_builtin_vector<2>();
-        test_comparisons(builtin_vector, "builtin");
-        #endif
-
-        test_comparisons(old_vector, "old");
-        test_comparisons(new_vector, "new");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
-        test_two_element_operation(new_vector, std::plus<>(), "add", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::minus<>(), "sub", "Old");
-        test_two_element_operation(new_vector, std::minus<>(), "sub", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::multiplies<>(), "mul", "Old");
-        test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
-        test_two_element_operation(new_vector, std::divides<>(), "div", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_digit_counting(builtin_vector, "builtin");
-        #endif
-
-        test_digit_counting(old_vector, "old");
-        test_digit_counting(new_vector, "new");
-    }
-    {
-        // Two word and one word operations Even = 1, odd = 2
-
-        std::cout << "\n---------------------------\n";
-        std::cout << "One-Two Word Operations\n";
-        std::cout << "---------------------------\n\n";
-
-        const auto old_vector = generate_random_vector<3, uint128>();
-        const auto new_vector = generate_random_vector<3, u128>();
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        const auto builtin_vector = generate_random_builtin_vector<3>();
-        test_comparisons(builtin_vector, "builtin");
-        #endif
-
-        test_comparisons(old_vector, "old");
-        test_comparisons(new_vector, "new");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
-        test_two_element_operation(new_vector, std::plus<>(), "add", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::minus<>(), "sub", "Old");
-        test_two_element_operation(new_vector, std::minus<>(), "sub", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::multiplies<>(), "mul", "Old");
-        test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
-        test_two_element_operation(new_vector, std::divides<>(), "div", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_digit_counting(builtin_vector, "builtin");
-        #endif
-
-        test_digit_counting(old_vector, "old");
-        test_digit_counting(new_vector, "new");
-    }
-    {
-        // Two word and one word operations Even = 1, odd = 2
-
-        std::cout << "\n---------------------------\n";
-        std::cout << "Random Width Operations\n";
-        std::cout << "---------------------------\n\n";
-
-        const auto old_vector = generate_random_vector<4, uint128>();
-        const auto new_vector = generate_random_vector<4, u128>();
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        const auto builtin_vector = generate_random_builtin_vector<4>();
-        test_comparisons(builtin_vector, "builtin");
-        #endif
-
-        test_comparisons(old_vector, "old");
-        test_comparisons(new_vector, "new");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::plus<>(), "add", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
-        test_two_element_operation(new_vector, std::plus<>(), "add", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::minus<>(), "sub", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::minus<>(), "sub", "Old");
-        test_two_element_operation(new_vector, std::minus<>(), "sub", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::multiplies<>(), "mul", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::multiplies<>(), "mul", "Old");
-        test_two_element_operation(new_vector, std::multiplies<>(), "mul", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::divides<>(), "div", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
-        test_two_element_operation(new_vector, std::divides<>(), "div", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_two_element_operation(builtin_vector, std::modulus<>(), "mod", "Builtin");
-        #endif
-
-        test_two_element_operation(old_vector, std::modulus<>(), "mod", "Old");
-        test_two_element_operation(new_vector, std::modulus<>(), "mod", "New");
-
-        std::cout << std::endl;
-
-        #ifdef BOOST_DECIMAL_HAS_INT128
-        test_digit_counting(builtin_vector, "builtin");
-        #endif
-
-        test_digit_counting(old_vector, "old");
-        test_digit_counting(new_vector, "new");
-    }
-        */
     return 1;
 }
 
