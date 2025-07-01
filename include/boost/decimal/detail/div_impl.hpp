@@ -73,9 +73,10 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
 {
     bool sign {lhs.sign != rhs.sign};
 
-    constexpr auto ten_pow_precision {detail::uint256_t(pow10(int128::uint128_t(detail::precision_v<decimal128>)))};
-    const auto big_sig_lhs {detail::uint256_t(lhs.sig) * ten_pow_precision};
+    constexpr auto ten_pow_precision {pow10(int128::uint128_t(detail::precision_v<decimal128>))};
+    const auto big_sig_lhs {detail::umul256(lhs.sig * ten_pow_precision)};
 
+    // TODO(mborland): Make this u256 / u128 rather than 256/256
     auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
     auto res_exp {lhs.exp - rhs.exp - detail::precision_v<decimal128>};
 
@@ -86,7 +87,7 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
         res_sig /= detail::uint256_t(pow10(int128::uint128_t(digit_delta)));
         res_exp += digit_delta;
     }
-    else if (res_sig == UINT64_C(0))
+    else if (res_sig.low == UINT64_C(0))
     {
         sign = false;
     }
