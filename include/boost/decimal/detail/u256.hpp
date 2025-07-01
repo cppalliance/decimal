@@ -785,7 +785,7 @@ constexpr void to_words(const u256& x, std::uint32_t (&words)[8]) noexcept
 
     if (!BOOST_INT128_IS_CONSTANT_EVALUATED(x))
     {
-        std::memcpy(&words, &x, sizeof(x));
+        std::memcpy(words, &x, sizeof(x));
         return;
     }
 
@@ -875,7 +875,7 @@ constexpr std::size_t div_to_words(const u256& x, std::uint32_t (&words)[8]) noe
     #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
     if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x))
     {
-        std::memcpy(&words, &x, sizeof(x));
+        std::memcpy(words, &x, sizeof(x));
     }
     else
     #endif
@@ -904,7 +904,7 @@ constexpr std::size_t div_to_words(const boost::int128::uint128_t& x, std::uint3
     #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
     if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x))
     {
-        std::memcpy(&words, &x, sizeof(boost::int128::uint128_t));
+        std::memcpy(words, &x, sizeof(boost::int128::uint128_t));
     }
     else
     #endif
@@ -931,7 +931,7 @@ constexpr std::size_t div_to_words(const std::uint64_t x, std::uint32_t (&words)
     #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
     if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x))
     {
-        std::memcpy(&words, &x, sizeof(std::uint64_t));
+        std::memcpy(words, &x, sizeof(std::uint64_t));
     }
     else
     #endif
