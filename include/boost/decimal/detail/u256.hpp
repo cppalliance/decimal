@@ -67,10 +67,6 @@ u256
 } // namespace decimal
 } // namespace boost
 
-// Forward declare numeric limits so that we can use it with mul and div templates
-template <>
-class std::numeric_limits<boost::decimal::detail::u256>;
-
 namespace boost {
 namespace decimal {
 namespace detail {
