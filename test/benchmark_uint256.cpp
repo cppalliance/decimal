@@ -43,7 +43,7 @@ using namespace std::chrono_literals;
 #endif
 
 // 4 = 4 words
-// 5 = Random width
+// 5 = 4 / 2
 
 template <int words>
 std::vector<detail::uint256_t> generate_random_vector_old(std::size_t size = N, unsigned seed = 42U)
@@ -61,7 +61,14 @@ std::vector<detail::uint256_t> generate_random_vector_old(std::size_t size = N, 
     std::vector<detail::uint256_t> result(size);
     for (std::size_t i = 0; i < size; ++i)
     {
-        switch (words)
+        auto current_words = words;
+        BOOST_INT128_IF_CONSTEXPR (words == 5)
+        {
+            // Alternating 4/2
+            current_words = i % 2 == 0 ? 4 : 2;
+        }
+
+        switch (current_words)
         {
             case 4:
                 result[i].low.low = dist(gen);
@@ -105,7 +112,14 @@ std::vector<detail::u256> generate_random_vector_new(std::size_t size = N, unsig
     std::vector<detail::u256> result(size);
     for (std::size_t i = 0; i < size; ++i)
     {
-        switch (words)
+        auto current_words = words;
+        BOOST_INT128_IF_CONSTEXPR (words == 5)
+        {
+            // Alternating 4/2
+            current_words = i % 2 == 0 ? 4 : 2;
+        }
+
+        switch (current_words)
         {
             case 4:
                 result[i].bytes[0] = dist(gen);
@@ -326,6 +340,36 @@ int main()
 
         test_umul256(old_vector, "old");
         test_umul256_new(new_vector, "new");
+    }
+
+    // 4 x 2 word operations
+    {
+        std::cout << "\n---------------------------\n";
+        std::cout << "Four Word x Two Word Operations\n";
+        std::cout << "---------------------------\n\n";
+
+        const auto old_vector = generate_random_vector_old<5>();
+        const auto new_vector = generate_random_vector_new<5>();
+
+        test_comparisons(old_vector, "old");
+        test_comparisons(new_vector, "new");
+
+        std::cout << std::endl;
+
+        test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
+        test_two_element_operation(new_vector, std::plus<>(), "add", "New");
+
+        std::cout << std::endl;
+
+        test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
+        test_two_element_operation(new_vector, std::divides<>(), "div", "New");
+
+        std::cout << std::endl;
+
+        test_digit_counting(old_vector, "old");
+        test_digit_counting(new_vector, "new");
+
+        std::cout << std::endl;
     }
 
     return 1;
