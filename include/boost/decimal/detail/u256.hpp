@@ -744,11 +744,12 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 from_words(const std::uint32_t (&words
 
     u256 result {};
 
-    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
+    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
     if (BOOST_INT128_IS_CONSTANT_EVALUATED(words))
     {
         std::memcpy(&result, words, sizeof(result));
     }
+    else
     #endif
     {
         result[0] = static_cast<std::uint64_t>(words[0]) | (static_cast<std::uint64_t>(words[1]) << 32);
@@ -799,24 +800,25 @@ constexpr u256 knuth_mulitply(const std::uint32_t (&u)[u_size],
 
 constexpr void to_words(const u256& x, std::uint32_t (&words)[8]) noexcept
 {
-    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
+    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
 
     if (!BOOST_INT128_IS_CONSTANT_EVALUATED(x))
     {
         std::memcpy(words, &x, sizeof(x));
-        return;
     }
-
+    else
     #endif
+    {
 
-    words[0] = static_cast<std::uint32_t>(x[0] & UINT32_MAX);
-    words[1] = static_cast<std::uint32_t>(x[0] >> 32U);
-    words[2] = static_cast<std::uint32_t>(x[1] & UINT32_MAX);
-    words[3] = static_cast<std::uint32_t>(x[1] >> 32U);
-    words[4] = static_cast<std::uint32_t>(x[2] & UINT32_MAX);
-    words[5] = static_cast<std::uint32_t>(x[2] >> 32U);
-    words[6] = static_cast<std::uint32_t>(x[3] & UINT32_MAX);
-    words[7] = static_cast<std::uint32_t>(x[3] >> 32U);
+        words[0] = static_cast<std::uint32_t>(x[0] & UINT32_MAX);
+        words[1] = static_cast<std::uint32_t>(x[0] >> 32U);
+        words[2] = static_cast<std::uint32_t>(x[1] & UINT32_MAX);
+        words[3] = static_cast<std::uint32_t>(x[1] >> 32U);
+        words[4] = static_cast<std::uint32_t>(x[2] & UINT32_MAX);
+        words[5] = static_cast<std::uint32_t>(x[2] >> 32U);
+        words[6] = static_cast<std::uint32_t>(x[3] & UINT32_MAX);
+        words[7] = static_cast<std::uint32_t>(x[3] >> 32U);
+    }
 }
 
 template <typename UnsignedInteger>
