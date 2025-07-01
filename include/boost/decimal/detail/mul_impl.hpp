@@ -255,6 +255,7 @@ constexpr auto d128_fast_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
     auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
+    // TODO(10^30) fits in a u128, no need to make this 256 bit div
     constexpr auto ten_pow_30 {detail::pow10(static_cast<uint256_t>(30))};
     res_sig /= ten_pow_30;
     res_exp += 30;
