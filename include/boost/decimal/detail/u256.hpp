@@ -781,7 +781,7 @@ constexpr u256 knuth_mulitply(const std::uint32_t (&u)[u_size],
 
 constexpr void to_words(const u256& x, std::uint32_t (&words)[8]) noexcept
 {
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
 
     if (!BOOST_INT128_IS_CONSTANT_EVALUATED(x))
     {
