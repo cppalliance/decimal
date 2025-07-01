@@ -732,19 +732,37 @@ constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
 
 namespace impl {
 
+#if defined(__GNUC__) && __GNUC__ >= 7
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 template <std::size_t word_size>
 BOOST_DECIMAL_FORCE_INLINE constexpr u256 from_words(const std::uint32_t (&words)[word_size]) noexcept
 {
     static_assert(word_size >= 8, "Not enough words to convert to u256");
 
-    u256 result;
-    result[0] = static_cast<std::uint64_t>(words[0]) | (static_cast<std::uint64_t>(words[1]) << 32);
-    result[1] = static_cast<std::uint64_t>(words[2]) | (static_cast<std::uint64_t>(words[3]) << 32);
-    result[2] = static_cast<std::uint64_t>(words[4]) | (static_cast<std::uint64_t>(words[5]) << 32);
-    result[3] = static_cast<std::uint64_t>(words[6]) | (static_cast<std::uint64_t>(words[7]) << 32);
+    u256 result {};
+
+    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
+    if (BOOST_INT128_IS_CONSTANT_EVALUATED(words))
+    {
+        std::memcpy(&result, words, sizeof(result));
+    }
+    #endif
+    {
+        result[0] = static_cast<std::uint64_t>(words[0]) | (static_cast<std::uint64_t>(words[1]) << 32);
+        result[1] = static_cast<std::uint64_t>(words[2]) | (static_cast<std::uint64_t>(words[3]) << 32);
+        result[2] = static_cast<std::uint64_t>(words[4]) | (static_cast<std::uint64_t>(words[5]) << 32);
+        result[3] = static_cast<std::uint64_t>(words[6]) | (static_cast<std::uint64_t>(words[7]) << 32);
+    }
 
     return result;
 }
+
+#if defined(__GNUC__) && __GNUC__ >= 7
+#pragma GCC diagnostic pop
+#endif
 
 template <std::size_t u_size, std::size_t v_size>
 constexpr u256 knuth_mulitply(const std::uint32_t (&u)[u_size],
