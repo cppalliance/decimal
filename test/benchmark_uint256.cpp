@@ -365,11 +365,6 @@ int main()
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
 
         std::cout << std::endl;
-
-        test_digit_counting(old_vector, "old");
-        test_digit_counting(new_vector, "new");
-
-        std::cout << std::endl;
     }
 
     return 1;
