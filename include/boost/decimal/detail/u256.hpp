@@ -992,7 +992,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_div(const u256& lhs, const Uns
     const auto m {div_to_words(lhs, u)};
     const auto n {div_to_words(rhs, v)};
 
-    BOOST_INT128_ASSERT(m > n);
+    BOOST_INT128_ASSERT(m >= n);
 
     int128::detail::impl::knuth_divide<false>(u, m, v, n, q);
 
