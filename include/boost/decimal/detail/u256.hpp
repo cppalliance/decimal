@@ -195,15 +195,20 @@ namespace impl {
 
 BOOST_DECIMAL_FORCE_INLINE constexpr bool basic_lt_impl(const u256& lhs, const u256& rhs) noexcept
 {
-    for (std::size_t i {}; i < 4U; ++i)
+    if (lhs[3] != rhs[3])
     {
-        if (lhs[i] != rhs[i])
-        {
-            return lhs[i] < rhs[i];
-        }
+        return lhs[3] < rhs[3];
+    }
+    if (lhs[2] != rhs[2])
+    {
+        return lhs[2] < rhs[2];
+    }
+    if (lhs[1] != rhs[1])
+    {
+        return lhs[1] < rhs[1];
     }
 
-    return false;
+    return lhs[0] < rhs[0];
 }
 
 } // namespace impl
@@ -975,6 +980,10 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_div(const u256& lhs, const Uns
     {
         return default_div(lhs, static_cast<std::uint64_t>(rhs));
     }
+    else if (lhs < rhs)
+    {
+        return u256{};
+    }
 
     std::uint32_t u[8] {};
     std::uint32_t v[8] {};
@@ -982,6 +991,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_div(const u256& lhs, const Uns
 
     const auto m {div_to_words(lhs, u)};
     const auto n {div_to_words(rhs, v)};
+
+    BOOST_INT128_ASSERT(m > n);
 
     int128::detail::impl::knuth_divide<false>(u, m, v, n, q);
 
