@@ -74,7 +74,7 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
     bool sign {lhs.sign != rhs.sign};
 
     constexpr auto ten_pow_precision {pow10(int128::uint128_t(detail::precision_v<decimal128>))};
-    const auto big_sig_lhs {detail::umul256(lhs.sig * ten_pow_precision)};
+    const auto big_sig_lhs {detail::umul256(lhs.sig, ten_pow_precision)};
 
     // TODO(mborland): Make this u256 / u128 rather than 256/256
     auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
