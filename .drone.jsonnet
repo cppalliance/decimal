@@ -1,4 +1,5 @@
 # Copyright 2022, 2023 Peter Dimov
+# Copyright 2024, 2025 Matt Borland
 # Distributed under the Boost Software License, Version 1.0.
 # https://www.boost.org/LICENSE_1_0.txt
 
@@ -22,6 +23,9 @@ local linux_pipeline(name, image, environment, packages = "", sources = [], arch
     {
         os: "linux",
         arch: arch
+    },
+    "clone": {
+       "retries": 5
     },
     steps:
     [
@@ -195,9 +199,16 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     ),
     
     linux_pipeline(
-        "Linux 24.04 GCC 13 32/64",
+        "Linux 24.04 GCC 13 32",
         "cppalliance/droneubuntu2404:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++-13', CXXSTD: '03,11,14,17,20,23', ADDRMD: '32,64', CXXFLAGS: "-fexcess-precision=fast" },
+        { TOOLSET: 'gcc', COMPILER: 'g++-13', CXXSTD: '03,11,14,17,20,23', ADDRMD: '32', CXXFLAGS: "-fexcess-precision=fast" },
+        "g++-13-multilib",
+    ),
+
+    linux_pipeline(
+        "Linux 24.04 GCC 13 64",
+        "cppalliance/droneubuntu2404:1",
+        { TOOLSET: 'gcc', COMPILER: 'g++-13', CXXSTD: '03,11,14,17,20,23', ADDRMD: '64', CXXFLAGS: "-fexcess-precision=fast" },
         "g++-13-multilib",
     ),
 
@@ -241,34 +252,6 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
         "cppalliance/droneubuntu2404:1",
         { TOOLSET: 'gcc', COMPILER: 'g++-14', CXXSTD: '03,11,14,17,20,23', ADDRMD: '64', CXXFLAGS: "-fexcess-precision=fast", CXXSTDDIALECT: "gnu" },
         "g++-14-multilib",
-    ),
-
-    linux_pipeline(
-        "Linux 18.04 GCC 7* 32 03",
-        "cppalliance/droneubuntu1804:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++', CXXSTD: '03', ADDRMD: '32' },
-        "nload",
-    ),
-
-    linux_pipeline(
-        "Linux 18.04 GCC 7* 32 11",
-        "cppalliance/droneubuntu1804:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++', CXXSTD: '11', ADDRMD: '32' },
-        "nload",
-    ),
-
-    linux_pipeline(
-        "Linux 18.04 GCC 7* 32 14",
-        "cppalliance/droneubuntu1804:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++', CXXSTD: '14', ADDRMD: '32' },
-        "nload",
-    ),
-
-    linux_pipeline(
-        "Linux 18.04 GCC 7* 32 17",
-        "cppalliance/droneubuntu1804:1",
-        { TOOLSET: 'gcc', COMPILER: 'g++', CXXSTD: '17', ADDRMD: '32' },
-        "nload",
     ),
 
     linux_pipeline(
@@ -401,16 +384,20 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
         ["deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main"],
     ),
 
-    macos_pipeline(
-        "MacOS 12.4 Xcode 13.4.1 UBSAN",
-        { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,20,2b' } + ubsan,
-        xcode_version = "13.4.1", osx_version = "monterey", arch = "arm64",
+    linux_pipeline(
+        "Linux 24.04 Clang 19",
+        "cppalliance/droneubuntu2404:1",
+        { TOOLSET: 'clang', COMPILER: 'clang++-19', CXXSTD: '03,11,14,17,20,2b' },
+        "clang-19",
+        ["deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-19 main"],
     ),
 
-    macos_pipeline(
-        "MacOS 12.4 Xcode 13.4.1 ASAN",
-        { TOOLSET: 'clang', COMPILER: 'clang++', CXXSTD: '03,11,14,17,20,2b' } + asan,
-        xcode_version = "13.4.1", osx_version = "monterey", arch = "arm64",
+    linux_pipeline(
+        "Linux 24.04 Clang 20",
+        "cppalliance/droneubuntu2404:1",
+        { TOOLSET: 'clang', COMPILER: 'clang++-20', CXXSTD: '03,11,14,17,20,2b' },
+        "clang-20",
+        ["deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-20 main"],
     ),
 
     windows_pipeline(

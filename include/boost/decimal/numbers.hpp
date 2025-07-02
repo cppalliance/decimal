@@ -9,7 +9,7 @@
 #include <boost/decimal/literals.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/promotion.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -22,232 +22,232 @@ namespace numbers {
 
 namespace detail {
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto e_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(2718281828459045235), -18};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto e_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(147358353192158), UINT64_C(5661142159003925334)}, -33};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(147358353192158), UINT64_C(5661142159003925334)}, -33};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto log2e_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(1442695040888963407), -18};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto log2e_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(78208654878293), UINT64_C(16395798456599530402)}, -33};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(78208654878293), UINT64_C(16395798456599530402)}, -33};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto log10e_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(4342944819032518277), -19};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto log10e_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(235431510388986), UINT64_C(2047877485384264674)}, -34};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(235431510388986), UINT64_C(2047877485384264674)}, -34};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto log10_2_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(3010299956639811952), -19};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto log10_2_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(163188687641095), UINT64_C(3612628795761985410)}, -34};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(163188687641095), UINT64_C(3612628795761985410)}, -34};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto pi_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(3141592653589793238), -18};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto pi_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(170306079004327), UINT64_C(13456286628489437068)}, -33};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(170306079004327), UINT64_C(13456286628489437068)}, -33};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto pi_over_four_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(7853981633974483096), -19};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto pi_over_four_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(42576519751081932), UINT64_C(6764235707220873609)}, -38};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(42576519751081932), UINT64_C(6764235707220873609)}, -38};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto inv_pi_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(3183098861837906715), -19};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto inv_pi_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(172556135062039), UINT64_C(13820348844234745256)}, -34};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(172556135062039), UINT64_C(13820348844234745256)}, -34};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto inv_sqrtpi_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(5641895835477562869), -19};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto inv_sqrtpi_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(305847786088084), UINT64_C(12695685840195063976)}, -34};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(305847786088084), UINT64_C(12695685840195063976)}, -34};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto ln2_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(6931471805599453094), -19};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto ln2_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(375755839507647), UINT64_C(8395602002641374208)}, -34};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(375755839507647), UINT64_C(8395602002641374208)}, -34};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto ln10_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(2302585092994045684), -18};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto ln10_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(124823388007844), UINT64_C(1462833818723808456)}, -33};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(124823388007844), UINT64_C(1462833818723808456)}, -33};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto sqrt2_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(1414213562373095049), -18};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto sqrt2_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(76664670834168), UINT64_C(12987834932751794202)}, -33};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(76664670834168), UINT64_C(12987834932751794202)}, -33};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto sqrt3_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(1732050807568877294), -18};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto sqrt3_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(93894662421072), UINT64_C(8437766544231453518)}, -33};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(93894662421072), UINT64_C(8437766544231453518)}, -33};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto sqrt10_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(3162277660168379332), -18};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto sqrt10_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(171427415457846), UINT64_C(13450487317535253574)}, -33};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(171427415457846), UINT64_C(13450487317535253574)}, -33};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto cbrt2_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(1259921049894873165), -18};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto cbrt2_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(68300456972811), UINT64_C(17628749411094165652)}, -33};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(68300456972811), UINT64_C(17628749411094165652)}, -33};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto cbrt10_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(2154434690031883722), -18};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto cbrt10_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(116792138570535), UINT64_C(2467411419527284790)}, -33};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(116792138570535), UINT64_C(2467411419527284790)}, -33};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto inv_sqrt2_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(7071067811865475244), -19};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto inv_sqrt2_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(383323354170843), UINT64_C(9598942442630316202)}, -34};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(383323354170843), UINT64_C(9598942442630316202)}, -34};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto inv_sqrt3_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(5773502691896257645), -19};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto inv_sqrt3_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(312982208070241), UINT64_C(9679144407061960114)}, -34};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(312982208070241), UINT64_C(9679144407061960114)}, -34};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto egamma_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(5772156649015328606), -19};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto egamma_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(312909238939453), UINT64_C(7916302232898517972)}, -34};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(312909238939453), UINT64_C(7916302232898517972)}, -34};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> < 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> < 128, bool> = true>
 constexpr auto phi_v() noexcept -> DecimalType
 {
     return DecimalType{UINT64_C(1618033988749894848), -18};
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::impl::decimal_val_v<DecimalType> >= 128, bool> = true>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType, std::enable_if_t<boost::decimal::detail::decimal_val_v<DecimalType> >= 128, bool> = true>
 constexpr auto phi_v() noexcept -> DecimalType
 {
-    return DecimalType{boost::decimal::detail::uint128{UINT64_C(87713798287901), UINT64_C(2061523135646567614)}, -33};
+    return DecimalType{boost::int128::uint128_t{UINT64_C(87713798287901), UINT64_C(2061523135646567614)}, -33};
 }
 
 } // Namespace detail

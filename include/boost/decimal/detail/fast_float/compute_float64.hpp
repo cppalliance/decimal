@@ -8,9 +8,9 @@
 
 #include <boost/decimal/detail/fast_float/significand_tables.hpp>
 #include <boost/decimal/detail/config.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 #include <boost/decimal/detail/countl.hpp>
+#include <boost/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -28,6 +28,11 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE double double_powers_of_ten[] = {
     1e0,  1e1,  1e2,  1e3,  1e4,  1e5,  1e6,  1e7,  1e8,  1e9,  1e10, 1e11,
     1e12, 1e13, 1e14, 1e15, 1e16, 1e17, 1e18, 1e19, 1e20, 1e21, 1e22
 };
+
+constexpr auto umul128(const std::uint64_t x, const std::uint64_t y) noexcept
+{
+    return static_cast<int128::uint128_t>(x) * y;
+}
 
 // Attempts to compute i * 10^(power) exactly; and if "negative" is true, negate the result.
 // 
@@ -116,7 +121,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto compute_float64(std::int64_t power, std::uint
 
     i <<= static_cast<std::uint64_t>(leading_zeros);
 
-    uint128 product = umul128(i, factor_significand);
+    auto product = umul128(i, factor_significand);
     std::uint64_t low = product.low;
     std::uint64_t high = product.high;
 
@@ -194,7 +199,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto compute_float64(std::int64_t power, std::uint
     significand |= real_exponent << 52;
     significand |= ((static_cast<std::uint64_t>(negative) << 63));
 
-    auto d = bit_cast<double>(significand);
+    const auto d = bit_cast<double>(significand);
 
     success = true;
     return d;

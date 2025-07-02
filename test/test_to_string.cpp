@@ -2,7 +2,11 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal.hpp>
+#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/string.hpp>
+#include <boost/decimal/iostream.hpp>
 #include <boost/core/lightweight_test.hpp>
 
 using namespace boost::decimal;

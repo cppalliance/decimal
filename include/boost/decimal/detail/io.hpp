@@ -11,7 +11,6 @@
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
-#include <boost/decimal/detail/to_string.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/locale_conversion.hpp>
 #include <boost/decimal/charconv.hpp>
@@ -38,7 +37,7 @@ auto operator>>(std::basic_istream<charT, traits>& is, DecimalType& d)
     -> std::enable_if_t<detail::is_decimal_floating_point_v<DecimalType>, std::basic_istream<charT, traits>&>
 {
     charT t_buffer[1024] {}; // What should be an unreasonably high maximum
-    is >> t_buffer;
+    is >> std::setw(1023) >> t_buffer;
 
     char buffer[1024] {};
 

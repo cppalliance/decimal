@@ -52,9 +52,7 @@
 #include <complex>
 #endif
 
-namespace boost::decimal::concepts {
-
-namespace detail {
+namespace boost::decimal::detail::concepts {
 
 template <typename X, typename Y, typename Op>
 struct op_valid_impl
@@ -115,8 +113,6 @@ BOOST_DECIMAL_HAS_MEMBER_FUNCTION(end)
 BOOST_DECIMAL_HAS_MEMBER_FUNCTION(real)
 BOOST_DECIMAL_HAS_MEMBER_FUNCTION(imag)
 
-} // Namespace detail
-
 template <typename T>
 concept integral = boost::decimal::detail::is_integral_v<T>;
 
@@ -154,21 +150,21 @@ concept unsigned_arithmetic = arithmetic<T> && std::is_unsigned_v<T>;
 
 template <typename T>
 concept arbitrary_unsigned_arithmetic_type = unsigned_arithmetic<T> ||
-                                             (detail::op_valid_v<T, T, std::equal_to<>> &&
-                                              detail::op_valid_v<T, T, std::not_equal_to<>> &&
-                                              detail::op_valid_v<T, T, std::greater<>> &&
-                                              detail::op_valid_v<T, T, std::less<>> &&
-                                              detail::op_valid_v<T, T, std::greater_equal<>> &&
-                                              detail::op_valid_v<T, T, std::less_equal<>> &&
-                                              detail::op_valid_v<T, T, std::plus<>> &&
-                                              detail::op_valid_v<T, T, std::minus<>> &&
-                                              detail::op_valid_v<T, T, std::multiplies<>> &&
-                                              detail::op_valid_v<T, T, std::divides<>>);
+                                             (op_valid_v<T, T, std::equal_to<>> &&
+                                              op_valid_v<T, T, std::not_equal_to<>> &&
+                                              op_valid_v<T, T, std::greater<>> &&
+                                              op_valid_v<T, T, std::less<>> &&
+                                              op_valid_v<T, T, std::greater_equal<>> &&
+                                              op_valid_v<T, T, std::less_equal<>> &&
+                                              op_valid_v<T, T, std::plus<>> &&
+                                              op_valid_v<T, T, std::minus<>> &&
+                                              op_valid_v<T, T, std::multiplies<>> &&
+                                              op_valid_v<T, T, std::divides<>>);
 
 template <typename T>
 concept arbitrary_signed_arithmetic_type = signed_arithmetic<T> ||
                                            (arbitrary_unsigned_arithmetic_type<T> &&
-                                            (detail::op_valid_v<T, T, std::negate<>> ||
+                                            (op_valid_v<T, T, std::negate<>> ||
                                              std::numeric_limits<T>::is_signed));
 
 template <typename T>
@@ -193,8 +189,8 @@ concept arbitrary_real_type = arbitrary_arithmetic_type<T> &&
 
 template <typename T>
 concept arbitrary_complex_type = complex<T> ||
-                                 (detail::has_real_v<T> &&
-                                  detail::has_imag_v<T>);
+                                 (has_real_v<T> &&
+                                  has_imag_v<T>);
 
 template <typename T>
 concept arbitrary_real_or_complex_type = arbitrary_real_type<T> ||
@@ -222,49 +218,53 @@ concept output_iterator = derived_from<typename std::iterator_traits<I>::iterato
                           derived_from<typename std::iterator_traits<T>::iterator_category, std::output_iterator_tag>;
 
 template <typename T>
-concept is_container = detail::has_begin_v<T> &&
-                       detail::has_end_v<T>;
+concept is_container = has_begin_v<T> &&
+                       has_end_v<T>;
 
 template <typename T>
 concept random_access_container = is_container<T> &&
-                                  boost::decimal::concepts::random_access_iterator<typename T::iterator>;
+                                  boost::decimal::detail::concepts::random_access_iterator<typename T::iterator>;
 
 template <typename T>
 concept decimal_floating_point_type = boost::decimal::detail::is_decimal_floating_point_v<T>;
 
-} // boost::decimal::concepts
+template <typename T>
+concept fast_decimal_floating_point_type = boost::decimal::detail::is_fast_type_v<T>;
+
+} // boost::decimal::detail::concepts
 
 #define BOOST_DECIMAL_HAS_CONCEPTS 1
 
-#define BOOST_DECIMAL_INTEGRAL boost::decimal::concepts::integral
-#define BOOST_DECIMAL_SIGNED_INTEGRAL boost::decimal::concepts::signed_integral
-#define BOOST_DECIMAL_UNSIGNED_INTEGRAL boost::decimal::concepts::unsigned_integral
-#define BOOST_DECIMAL_REAL boost::decimal::concepts::real
-#define BOOST_DECIMAL_COMPLEX boost::decimal::concepts::complex
-#define BOOST_DECIMAL_REAL_OR_COMPLEX boost::decimal::concepts::real_or_complex
-#define BOOST_DECIMAL_ARITHMETIC boost::decimal::concepts::arithmetic
-#define BOOST_DECIMAL_NUMERICAL boost::decimal::concepts::numerical
-#define BOOST_DECIMAL_SIGNED_ARITHMETIC boost::decimal::concepts::signed_arithmetic
-#define BOOST_DECIMAL_UNSIGNED_ARITHMETIC boost::decimal::concepts::unsigned_arithmetic
-#define BOOST_DECIMAL_ARBITRARY_UNSIGNED_ARITHMETIC boost::decimal::concepts::arbitrary_unsigned_arithmetic_type
-#define BOOST_DECIMAL_ARBITRARY_SIGNED_ARITHMETIC boost::decimal::concepts::arbitrary_signed_arithmetic_type
-#define BOOST_DECIMAL_ARBITRARY_ARITHMETIC boost::decimal::concepts::arbitrary_arithmetic_type
-#define BOOST_DECIMAL_ARBITRARY_UNSIGNED_INTEGER boost::decimal::concepts::arbitrary_unsigned_integer_type
-#define BOOST_DECIMAL_ARBITRARY_SIGNED_INTEGER boost::decimal::concepts::arbitrary_signed_integer_type
-#define BOOST_DECIMAL_ARBITRARY_INTEGER boost::decimal::concepts::arbitrary_integer_type
-#define BOOST_DECIMAL_ARBITRARY_REAL boost::decimal::concepts::arbitrary_real_type
-#define BOOST_DECIMAL_ARBITRARY_COMPLEX boost::decimal::concepts::arbitrary_complex_type
-#define BOOST_DECIMAL_ARBITRARY_REAL_OR_COMPLEX boost::decimal::concepts::arbitrary_real_or_complex_type
-#define BOOST_DECIMAL_ARBITRARY_NUMERICAL boost::decimal::concepts::arbitrary_numerical_type
-#define BOOST_DECIMAL_DECIMAL_FLOATING_TYPE boost::decimal::concepts::decimal_floating_point_type
+#define BOOST_DECIMAL_INTEGRAL boost::decimal::detail::concepts::integral
+#define BOOST_DECIMAL_SIGNED_INTEGRAL boost::decimal::detail::concepts::signed_integral
+#define BOOST_DECIMAL_UNSIGNED_INTEGRAL boost::decimal::detail::concepts::unsigned_integral
+#define BOOST_DECIMAL_REAL boost::decimal::detail::concepts::real
+#define BOOST_DECIMAL_COMPLEX boost::decimal::detail::concepts::complex
+#define BOOST_DECIMAL_REAL_OR_COMPLEX boost::decimal::detail::concepts::real_or_complex
+#define BOOST_DECIMAL_ARITHMETIC boost::decimal::detail::concepts::arithmetic
+#define BOOST_DECIMAL_NUMERICAL boost::decimal::detail::concepts::numerical
+#define BOOST_DECIMAL_SIGNED_ARITHMETIC boost::decimal::detail::concepts::signed_arithmetic
+#define BOOST_DECIMAL_UNSIGNED_ARITHMETIC boost::decimal::detail::concepts::unsigned_arithmetic
+#define BOOST_DECIMAL_ARBITRARY_UNSIGNED_ARITHMETIC boost::decimal::detail::concepts::arbitrary_unsigned_arithmetic_type
+#define BOOST_DECIMAL_ARBITRARY_SIGNED_ARITHMETIC boost::decimal::detail::concepts::arbitrary_signed_arithmetic_type
+#define BOOST_DECIMAL_ARBITRARY_ARITHMETIC boost::decimal::detail::concepts::arbitrary_arithmetic_type
+#define BOOST_DECIMAL_ARBITRARY_UNSIGNED_INTEGER boost::decimal::detail::concepts::arbitrary_unsigned_integer_type
+#define BOOST_DECIMAL_ARBITRARY_SIGNED_INTEGER boost::decimal::detail::concepts::arbitrary_signed_integer_type
+#define BOOST_DECIMAL_ARBITRARY_INTEGER boost::decimal::detail::concepts::arbitrary_integer_type
+#define BOOST_DECIMAL_ARBITRARY_REAL boost::decimal::detail::concepts::arbitrary_real_type
+#define BOOST_DECIMAL_ARBITRARY_COMPLEX boost::decimal::detail::concepts::arbitrary_complex_type
+#define BOOST_DECIMAL_ARBITRARY_REAL_OR_COMPLEX boost::decimal::detail::concepts::arbitrary_real_or_complex_type
+#define BOOST_DECIMAL_ARBITRARY_NUMERICAL boost::decimal::detail::concepts::arbitrary_numerical_type
+#define BOOST_DECIMAL_DECIMAL_FLOATING_TYPE boost::decimal::detail::concepts::decimal_floating_point_type
+#define BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE boost::decimal::detail::concepts::fast_decimal_floating_point_type
 
-#define BOOST_DECIMAL_CONTAINER boost::decimal::concepts::is_container
-#define BOOST_DECIMAL_RANDOM_ACCESS_CONTAINER boost::decimal::concepts::random_access_container
+#define BOOST_DECIMAL_CONTAINER boost::decimal::detail::concepts::is_container
+#define BOOST_DECIMAL_RANDOM_ACCESS_CONTAINER boost::decimal::detail::concepts::random_access_container
 
-#define BOOST_DECIMAL_FORWARD_ITER boost::decimal::concepts::forward_iterator
-#define BOOST_DECIMAL_BIDIRECTIONAL_ITER boost::decimal::concepts::bidirectional_iterator
-#define BOOST_DECIMAL_RANDOM_ACCESS_ITER boost::decimal::concepts::random_access_iterator
-#define BOOST_DECIMAL_OUTPUT_ITER(I, T) boost::decimal::concepts::output_iterator<I, T>
+#define BOOST_DECIMAL_FORWARD_ITER boost::decimal::detail::concepts::forward_iterator
+#define BOOST_DECIMAL_BIDIRECTIONAL_ITER boost::decimal::detail::concepts::bidirectional_iterator
+#define BOOST_DECIMAL_RANDOM_ACCESS_ITER boost::decimal::detail::concepts::random_access_iterator
+#define BOOST_DECIMAL_OUTPUT_ITER(I, T) boost::decimal::detail::concepts::output_iterator<I, T>
 #define BOOST_DECIMAL_REQUIRES_ITER(X) requires X
 
 #define BOOST_DECIMAL_REQUIRES(X, T) -> T requires X<T>
@@ -276,14 +276,14 @@ concept decimal_floating_point_type = boost::decimal::detail::is_decimal_floatin
 #ifdef BOOST_DECIMAL_EXEC_COMPATIBLE
 #include <execution>
 
-namespace boost::decimal::concepts {
+namespace boost::decimal::detail::concepts {
 
 template <typename T>
 concept execution_policy = std::is_execution_policy_v<std::remove_cvref_t<T>>;
 
-} // Namespace boost::decimal::concepts
+} // Namespace boost::decimal::detail::concepts
 
-#define BOOST_DECIMAL_EXECUTION_POLICY boost::decimal::concepts::execution_policy
+#define BOOST_DECIMAL_EXECUTION_POLICY boost::decimal::detail::concepts::execution_policy
 
 #endif // Has <execution>
 
@@ -390,6 +390,10 @@ concept execution_policy = std::is_execution_policy_v<std::remove_cvref_t<T>>;
 
 #ifndef BOOST_DECIMAL_DECIMAL_FLOATING_TYPE
 #  define BOOST_DECIMAL_DECIMAL_FLOATING_TYPE typename
+#endif
+
+#ifndef BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE
+#  define BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE typename
 #endif
 
 #ifndef BOOST_DECIMAL_OUTPUT_ITER

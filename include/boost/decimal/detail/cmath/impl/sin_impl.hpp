@@ -153,20 +153,20 @@ constexpr auto sin_series_expansion<decimal128>(decimal128 x) noexcept
     // HornerForm[Numerator[Out[2]]]
     // HornerForm[Denominator[Out[2]]]
 
-    constexpr decimal128 c0 { boost::decimal::detail::uint128 { UINT64_C(72470724512963),  UINT64_C(12010094287581601792) },  -1 };
-    constexpr decimal128 c1 { boost::decimal::detail::uint128 { UINT64_C(111100426260665), UINT64_C(12001293056709775360) },  -2, true };
-    constexpr decimal128 c2 { boost::decimal::detail::uint128 { UINT64_C(448976101608303), UINT64_C(8651619847551332352)  },  -4 };
-    constexpr decimal128 c3 { boost::decimal::detail::uint128 { UINT64_C(73569920121966),  UINT64_C(7922026052315602944)  },  -5, true };
-    constexpr decimal128 c4 { boost::decimal::detail::uint128 { UINT64_C(56791565109495),  UINT64_C(18025512837605806080) },  -7 };
-    constexpr decimal128 c5 { boost::decimal::detail::uint128 { UINT64_C(208944907042123), UINT64_C(1905626912845279232)  }, -10, true };
-    constexpr decimal128 c6 { boost::decimal::detail::uint128 { UINT64_C(301324799882787), UINT64_C(8861120840873566208)  }, -13 };
+    constexpr decimal128 c0 { boost::int128::uint128_t { UINT64_C(72470724512963),  UINT64_C(12010094287581601792) },  -1 };
+    constexpr decimal128 c1 { boost::int128::uint128_t { UINT64_C(111100426260665), UINT64_C(12001293056709775360) },  -2, true };
+    constexpr decimal128 c2 { boost::int128::uint128_t { UINT64_C(448976101608303), UINT64_C(8651619847551332352)  },  -4 };
+    constexpr decimal128 c3 { boost::int128::uint128_t { UINT64_C(73569920121966),  UINT64_C(7922026052315602944)  },  -5, true };
+    constexpr decimal128 c4 { boost::int128::uint128_t { UINT64_C(56791565109495),  UINT64_C(18025512837605806080) },  -7 };
+    constexpr decimal128 c5 { boost::int128::uint128_t { UINT64_C(208944907042123), UINT64_C(1905626912845279232)  }, -10, true };
+    constexpr decimal128 c6 { boost::int128::uint128_t { UINT64_C(301324799882787), UINT64_C(8861120840873566208)  }, -13 };
 
-    constexpr decimal128 d1 { boost::decimal::detail::uint128 { UINT64_C(96841145942737),  UINT64_C(12517245955660587008) },  -3 };
-    constexpr decimal128 d2 { boost::decimal::detail::uint128 { UINT64_C(64553072381691),  UINT64_C(13718792646062137344) },  -5 };
-    constexpr decimal128 d3 { boost::decimal::detail::uint128 { UINT64_C(279090388104865), UINT64_C(5072548100861788160)  },  -8 };
-    constexpr decimal128 d4 { boost::decimal::detail::uint128 { UINT64_C(84086452204639),  UINT64_C(9046779044634853376)  }, -10 };
-    constexpr decimal128 d5 { boost::decimal::detail::uint128 { UINT64_C(171178955723736), UINT64_C(18053324302671642624) }, -13 };
-    constexpr decimal128 d6 { boost::decimal::detail::uint128 { UINT64_C(189091057352841), UINT64_C(2258222749986258944)  }, -16 };
+    constexpr decimal128 d1 { boost::int128::uint128_t { UINT64_C(96841145942737),  UINT64_C(12517245955660587008) },  -3 };
+    constexpr decimal128 d2 { boost::int128::uint128_t { UINT64_C(64553072381691),  UINT64_C(13718792646062137344) },  -5 };
+    constexpr decimal128 d3 { boost::int128::uint128_t { UINT64_C(279090388104865), UINT64_C(5072548100861788160)  },  -8 };
+    constexpr decimal128 d4 { boost::int128::uint128_t { UINT64_C(84086452204639),  UINT64_C(9046779044634853376)  }, -10 };
+    constexpr decimal128 d5 { boost::int128::uint128_t { UINT64_C(171178955723736), UINT64_C(18053324302671642624) }, -13 };
+    constexpr decimal128 d6 { boost::int128::uint128_t { UINT64_C(189091057352841), UINT64_C(2258222749986258944)  }, -16 };
 
     const decimal128 x2 { x * x };
 
@@ -190,20 +190,20 @@ constexpr auto sin_series_expansion<decimal128_fast>(decimal128_fast x) noexcept
     // HornerForm[Numerator[Out[2]]]
     // HornerForm[Denominator[Out[2]]]
 
-    constexpr decimal128_fast c0 { boost::decimal::detail::uint128 { UINT64_C(72470724512963),  UINT64_C(12010094287581601792) },  -1 };
-    constexpr decimal128_fast c1 { boost::decimal::detail::uint128 { UINT64_C(111100426260665), UINT64_C(12001293056709775360) },  -2, true };
-    constexpr decimal128_fast c2 { boost::decimal::detail::uint128 { UINT64_C(448976101608303), UINT64_C(8651619847551332352)  },  -4 };
-    constexpr decimal128_fast c3 { boost::decimal::detail::uint128 { UINT64_C(73569920121966),  UINT64_C(7922026052315602944)  },  -5, true };
-    constexpr decimal128_fast c4 { boost::decimal::detail::uint128 { UINT64_C(56791565109495),  UINT64_C(18025512837605806080) },  -7 };
-    constexpr decimal128_fast c5 { boost::decimal::detail::uint128 { UINT64_C(208944907042123), UINT64_C(1905626912845279232)  }, -10, true };
-    constexpr decimal128_fast c6 { boost::decimal::detail::uint128 { UINT64_C(301324799882787), UINT64_C(8861120840873566208)  }, -13 };
+    constexpr decimal128_fast c0 { boost::int128::uint128_t { UINT64_C(72470724512963),  UINT64_C(12010094287581601792) },  -1 };
+    constexpr decimal128_fast c1 { boost::int128::uint128_t { UINT64_C(111100426260665), UINT64_C(12001293056709775360) },  -2, true };
+    constexpr decimal128_fast c2 { boost::int128::uint128_t { UINT64_C(448976101608303), UINT64_C(8651619847551332352)  },  -4 };
+    constexpr decimal128_fast c3 { boost::int128::uint128_t { UINT64_C(73569920121966),  UINT64_C(7922026052315602944)  },  -5, true };
+    constexpr decimal128_fast c4 { boost::int128::uint128_t { UINT64_C(56791565109495),  UINT64_C(18025512837605806080) },  -7 };
+    constexpr decimal128_fast c5 { boost::int128::uint128_t { UINT64_C(208944907042123), UINT64_C(1905626912845279232)  }, -10, true };
+    constexpr decimal128_fast c6 { boost::int128::uint128_t { UINT64_C(301324799882787), UINT64_C(8861120840873566208)  }, -13 };
 
-    constexpr decimal128_fast d1 { boost::decimal::detail::uint128 { UINT64_C(96841145942737),  UINT64_C(12517245955660587008) },  -3 };
-    constexpr decimal128_fast d2 { boost::decimal::detail::uint128 { UINT64_C(64553072381691),  UINT64_C(13718792646062137344) },  -5 };
-    constexpr decimal128_fast d3 { boost::decimal::detail::uint128 { UINT64_C(279090388104865), UINT64_C(5072548100861788160)  },  -8 };
-    constexpr decimal128_fast d4 { boost::decimal::detail::uint128 { UINT64_C(84086452204639),  UINT64_C(9046779044634853376)  }, -10 };
-    constexpr decimal128_fast d5 { boost::decimal::detail::uint128 { UINT64_C(171178955723736), UINT64_C(18053324302671642624) }, -13 };
-    constexpr decimal128_fast d6 { boost::decimal::detail::uint128 { UINT64_C(189091057352841), UINT64_C(2258222749986258944)  }, -16 };
+    constexpr decimal128_fast d1 { boost::int128::uint128_t { UINT64_C(96841145942737),  UINT64_C(12517245955660587008) },  -3 };
+    constexpr decimal128_fast d2 { boost::int128::uint128_t { UINT64_C(64553072381691),  UINT64_C(13718792646062137344) },  -5 };
+    constexpr decimal128_fast d3 { boost::int128::uint128_t { UINT64_C(279090388104865), UINT64_C(5072548100861788160)  },  -8 };
+    constexpr decimal128_fast d4 { boost::int128::uint128_t { UINT64_C(84086452204639),  UINT64_C(9046779044634853376)  }, -10 };
+    constexpr decimal128_fast d5 { boost::int128::uint128_t { UINT64_C(171178955723736), UINT64_C(18053324302671642624) }, -13 };
+    constexpr decimal128_fast d6 { boost::int128::uint128_t { UINT64_C(189091057352841), UINT64_C(2258222749986258944)  }, -16 };
 
     const decimal128_fast x2 { x * x };
 

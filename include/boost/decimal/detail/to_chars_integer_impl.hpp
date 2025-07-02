@@ -8,7 +8,7 @@
 #define BOOST_TO_CHARS_INTEGER_IMPL_HPP
 
 #include <boost/decimal/detail/apply_sign.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/to_chars_result.hpp>
 #include <boost/decimal/detail/memcpy.hpp>
 
@@ -50,7 +50,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
         return {last, std::errc::invalid_argument};
     }
 
-    if (value == 0)
+    if (value == 0U)
     {
         *first++ = '0';
         return {first, std::errc()};
@@ -61,7 +61,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<Integer>::value)
     {
-        if (value < 0)
+        if (value < static_cast<Integer>(0))
         {
             *first++ = '-';
             unsigned_value = static_cast<Unsigned_Integer>(detail::apply_sign(value));
@@ -84,19 +84,16 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
     // Work from LSB to MSB
     switch (base)
     {
-        // TODO(mborland): Don't need until hex support is added to charconv
-        // LCOV_EXCL_START
         case 16:
-            while (unsigned_value != 0)
+            while (unsigned_value != 0U)
             {
                 *end-- = digit_table[static_cast<std::size_t>(unsigned_value & 15U)]; // 1<<4 - 1
                 unsigned_value >>= 4U;
             }
             break;
-        // LCOV_EXCL_STOP
 
         default:
-            while (unsigned_value != 0)
+            while (unsigned_value != 0U)
             {
                 *end-- = digit_table[static_cast<std::size_t>(unsigned_value % unsigned_base)];
                 unsigned_value /= unsigned_base;

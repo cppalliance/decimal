@@ -24,7 +24,15 @@
 #  pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
 
-#include <boost/decimal.hpp>
+// Windows in Github actions has a broken chrono header
+#if defined(_WIN32)
+
+int main()
+{
+  return 0;
+}
+
+#else
 
 #include <boost/core/lightweight_test.hpp>
 #include <boost/math/special_functions/zeta.hpp>
@@ -441,3 +449,5 @@ int main()
 template<typename DecimalType> auto my_zero() -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_zero { 0 }; return val_zero; }
 template<typename DecimalType> auto my_nan () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_nan  { std::numeric_limits<decimal_type>::quiet_NaN() }; return val_nan; }
 template<typename DecimalType> auto my_inf () -> DecimalType& { using decimal_type = DecimalType; static decimal_type val_inf  { std::numeric_limits<decimal_type>::infinity() }; return val_inf; }
+
+#endif

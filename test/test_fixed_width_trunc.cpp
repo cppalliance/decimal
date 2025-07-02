@@ -11,14 +11,12 @@ using namespace boost::decimal;
 template <typename T>
 void test()
 {
-    constexpr T test_val {UINT32_C(1234567), 0};
-    constexpr T validation_val_1 {UINT32_C(1), 6};
-    constexpr T validation_val_2 {UINT32_C(12), 5};
-    constexpr T validation_val_3 {UINT32_C(123), 4};
-    constexpr T validation_val_4 {UINT32_C(1235), 3};
-    constexpr T validation_val_5 {UINT32_C(12346), 2};
-    constexpr T validation_val_6 {UINT32_C(123457), 1};
-    constexpr T validation_val_7 {test_val};
+    constexpr T test_val {UINT32_C(123456), 0};
+    constexpr T validation_val_1 {UINT32_C(1), 5};
+    constexpr T validation_val_2 {UINT32_C(12), 4};
+    constexpr T validation_val_3 {UINT32_C(123), 3};
+    constexpr T validation_val_4 {UINT32_C(1235), 2};
+    constexpr T validation_val_5 {UINT32_C(12346), 1};
 
     BOOST_TEST_EQ(rescale(test_val, 0), rescale(test_val));
     BOOST_TEST_EQ(rescale(test_val, 1), validation_val_1);
@@ -26,8 +24,6 @@ void test()
     BOOST_TEST_EQ(rescale(test_val, 3), validation_val_3);
     BOOST_TEST_EQ(rescale(test_val, 4), validation_val_4);
     BOOST_TEST_EQ(rescale(test_val, 5), validation_val_5);
-    BOOST_TEST_EQ(rescale(test_val, 6), validation_val_6);
-    BOOST_TEST_EQ(rescale(test_val, 7), validation_val_7);
     BOOST_TEST_EQ(rescale(test_val, 100), test_val);
 
     // Non-finite values

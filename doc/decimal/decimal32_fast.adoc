@@ -30,6 +30,11 @@ namespace decimal {
 
 class decimal32_fast {
 
+public:
+    using significand_type = std::uint_fast32_t;
+    using exponent_type = std::uint_fast8_t;
+    using biased_exponent_type = std::int32_t;
+
 // Paragraph numbers are from ISO/IEC DTR 24733
 
 // 3.2.2.1 construct/copy/destroy
@@ -50,6 +55,8 @@ template <typename Integral>
 constexpr decimal32_fast& operator=(const Integeral& RHS) noexcept;
 
 // 3.2.2.4 Conversion to integral type
+// If the value exceeds the range of the integral,
+// or is non-finite std::numeric_limits::max() is returned
 explicit constexpr operator int() const noexcept;
 explicit constexpr operator unsigned() const noexcept;
 explicit constexpr operator long() const noexcept;

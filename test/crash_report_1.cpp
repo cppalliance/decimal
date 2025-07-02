@@ -7,6 +7,7 @@
 #include <iostream>
 
 using namespace boost::decimal;
+using namespace boost::decimal::literals;
 
 int main()
 {

@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_COMPONENTS_HPP
 
 #include <boost/decimal/detail/config.hpp>
+#include <boost/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -15,25 +16,50 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-struct decimal32_components
-{
-    using significand_type = std::uint32_t;
-    using biased_exponent_type = std::int32_t;
+namespace impl {
 
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
+template <typename SigType, typename BiasedExpType>
+struct decimal_components
+{
+    using significand_type = SigType;
+    using biased_exponent_type = BiasedExpType;
+
+    significand_type sig {};
+    biased_exponent_type exp {};
+    bool sign {};
+
+    constexpr decimal_components() = default;
+    constexpr decimal_components(const decimal_components& rhs) = default;
+    constexpr decimal_components& operator=(const decimal_components& rhs) = default;
+    constexpr decimal_components(SigType sig_, BiasedExpType exp_, bool sign_) : sig{sig_}, exp{exp_}, sign{sign_} {}
+
+    constexpr auto full_significand() const -> significand_type
+    {
+        return sig;
+    }
+
+    constexpr auto biased_exponent() const -> biased_exponent_type
+    {
+        return exp;
+    }
+
+    constexpr auto isneg() const -> bool
+    {
+        return sign;
+    }
 };
 
-struct decimal32_fast_components
-{
-    using significand_type = std::uint_fast32_t;
-    using biased_exponent_type = std::int_fast32_t;
+} // namespace impl
 
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
+using decimal32_components = impl::decimal_components<std::uint32_t, std::int32_t>;
+
+using decimal32_fast_components = impl::decimal_components<std::uint_fast32_t, std::int_fast32_t>;
+
+using decimal64_components = impl::decimal_components<std::uint64_t, std::int32_t>;
+
+using decimal128_components = impl::decimal_components<boost::int128::uint128_t, std::int32_t>;
+
+using decimal128_fast_components = impl::decimal_components<boost::int128::uint128_t, std::int_fast32_t>;
 
 } // namespace detail
 } // namespace decimal

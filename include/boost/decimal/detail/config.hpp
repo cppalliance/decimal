@@ -5,6 +5,14 @@
 #ifndef BOOST_DECIMAL_DETAIL_CONFIG_HPP
 #define BOOST_DECIMAL_DETAIL_CONFIG_HPP
 
+// 3.4.7 evaluation format:
+// This is defined at top level because it has ramifications for every successive header
+//
+// We add an extra definition here in case users want to pick and choose headers
+#ifndef BOOST_DECIMAL_DEC_EVAL_METHOD
+#  define BOOST_DECIMAL_DEC_EVAL_METHOD 0
+#endif
+
 // Determine endianness
 #if defined(_WIN32)
 
@@ -115,11 +123,11 @@
 namespace boost { namespace decimal { namespace detail {
 
 #  ifdef __GNUC__
-__extension__ typedef __int128 int128_t;
-__extension__ typedef unsigned __int128 uint128_t;
+__extension__ typedef __int128 builtin_int128_t;
+__extension__ typedef unsigned __int128 builtin_uint128_t;
 #  else
-typedef __int128 int128_t;
-typedef unsigned __int128 uint128_t;
+typedef __int128 builtin_int128_t;
+typedef unsigned __int128 builtin_uint128_t;
 #  endif
 
 } // namespace detail
@@ -127,9 +135,9 @@ typedef unsigned __int128 uint128_t;
 } // namespace boost
 
 #  define BOOST_DECIMAL_HAS_INT128
-#  define BOOST_DECIMAL_INT128_MAX  static_cast<boost::decimal::detail::int128_t>((static_cast<boost::decimal::detail::uint128_t>(1) << 127) - 1)
+#  define BOOST_DECIMAL_INT128_MAX  static_cast<boost::decimal::detail::builtin_int128_t>((static_cast<boost::decimal::detail::builtin_uint128_t>(1) << 127) - 1)
 #  define BOOST_DECIMAL_INT128_MIN  (-BOOST_DECIMAL_INT128_MAX - 1)
-#  define BOOST_DECIMAL_UINT128_MAX ((2 * static_cast<boost::decimal::detail::uint128_t>(BOOST_DECIMAL_INT128_MAX)) + 1)
+#  define BOOST_DECIMAL_UINT128_MAX ((2 * static_cast<boost::decimal::detail::builtin_uint128_t>(BOOST_DECIMAL_INT128_MAX)) + 1)
 #endif
 
 // 128-bit floats
@@ -244,7 +252,7 @@ typedef unsigned __int128 uint128_t;
 #endif
 
 // https://github.com/llvm/llvm-project/issues/55638
-#if defined(__clang__) && __cplusplus > 202002L
+#if defined(__clang__) && __cplusplus > 202002L && __clang_major__ < 17
 #  undef BOOST_DECIMAL_IS_CONSTANT_EVALUATED
 #  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) false
 #  define BOOST_DECIMAL_NO_CONSTEVAL_DETECTION

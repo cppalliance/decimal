@@ -5,11 +5,16 @@
 #ifndef BOOST_DECIMAL_CSTDLIB_HPP
 #define BOOST_DECIMAL_CSTDLIB_HPP
 
-#include <boost/decimal/fwd.hpp>
+#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/decimal64_fast.hpp>
+#include <boost/decimal/decimal128_fast.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/utilities.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/locale_conversion.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -32,8 +37,9 @@ namespace detail {
 template <typename TargetDecimalType>
 inline auto strtod_calculation(const char* str, char** endptr, char* buffer, std::size_t str_length) noexcept -> TargetDecimalType
 {
-    using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value ||
-                                                std::is_same<TargetDecimalType, decimal128_fast>::value, detail::uint128, std::uint64_t>;
+    using significand_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                                 std::numeric_limits<std::uint64_t>::digits),
+                                                 int128::uint128_t, std::uint64_t>;
 
     std::memcpy(buffer, str, str_length);
     convert_string_to_c_locale(buffer);

@@ -2,7 +2,9 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal.hpp>
+#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/iostream.hpp>
+#include <boost/decimal/cmath.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <random>
 #include <limits>
@@ -44,7 +46,13 @@ void random_LT(T lower, T upper)
 
     // Edge cases
     BOOST_TEST(decimal32_fast(dist(rng)) < std::numeric_limits<decimal32_fast>::infinity());
+
+    // For some bizarre reason MSVC 14.2 with C++14 has an issue with this test when T = std::int64_t
+    // All is well under every other language standard
+    #if !defined(_MSC_VER) || (_MSC_VER >= 1930 || _MSVC_LANG > 201703L)
     BOOST_TEST(!(decimal32_fast(dist(rng)) < -std::numeric_limits<decimal32_fast>::infinity()));
+    #endif
+
     BOOST_TEST(!(decimal32_fast(dist(rng)) < std::numeric_limits<decimal32_fast>::quiet_NaN()));
     BOOST_TEST(!(std::numeric_limits<decimal32_fast>::quiet_NaN() < std::numeric_limits<decimal32_fast>::quiet_NaN()));
 }
@@ -128,7 +136,11 @@ void random_LE(T lower, T upper)
     }
 
     BOOST_TEST(decimal32_fast(dist(rng)) <= std::numeric_limits<decimal32_fast>::infinity());
+
+    #if !defined(_MSC_VER) || (_MSC_VER >= 1930 || _MSVC_LANG > 201703L)
     BOOST_TEST(!(decimal32_fast(dist(rng)) <= -std::numeric_limits<decimal32_fast>::infinity()));
+    #endif
+
     BOOST_TEST(!(decimal32_fast(dist(rng)) <= std::numeric_limits<decimal32_fast>::quiet_NaN()));
     BOOST_TEST(!(std::numeric_limits<decimal32_fast>::quiet_NaN() <= std::numeric_limits<decimal32_fast>::quiet_NaN()));
 }
@@ -592,6 +604,10 @@ int main()
     random_mixed_SPACESHIP(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_SPACESHIP(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
     #endif
+
+    constexpr auto pos_zero = boost::decimal::decimal32_fast{0, 0, false};
+    constexpr auto neg_zero = boost::decimal::decimal32_fast{0, 0, true};
+    BOOST_TEST_EQ(pos_zero, neg_zero);
 
     return boost::report_errors();
 }

@@ -180,7 +180,7 @@ auto test_big_uints_mul() -> void
         const auto dec_intern_rhs_64 =
           static_cast<std::uint64_t>
           (
-            static_cast<::boost::decimal::detail::uint128>(dec_intern_uint_rhs)
+            static_cast<boost::int128::uint128_t>(dec_intern_uint_rhs)
           );
 
         const auto boost_ctrl_rhs_64 = static_cast<std::uint64_t>(boost_ctrl_uint_rhs);
@@ -268,7 +268,7 @@ auto test_big_uints_div() -> void
 
 auto test_various_spots() -> void
 {
-  using local_uint128_type = boost::decimal::detail::uint128;
+  using local_uint128_type = boost::int128::uint128_t;
 
   std::uniform_int_distribution<std::uint64_t>
     lower_dist
@@ -310,7 +310,7 @@ auto test_various_spots() -> void
     BOOST_TEST_EQ(lowest_low, UINT64_C(0));
   }
 
-  std::uniform_int_distribution<int> n_dist(1, 4);
+  std::uniform_int_distribution<unsigned> n_dist(1, 4);
 
   for(auto trials = static_cast<int>(INT8_C(0)); trials < static_cast<int>(INT8_C(0x8)); ++trials)
   {
@@ -324,7 +324,7 @@ auto test_various_spots() -> void
 
       const local_uint128_type low_old { low };
 
-      const int n_add = n_dist(rng);
+      const auto n_add = n_dist(rng);
 
       low += static_cast<std::uint64_t>(n_add);
 
@@ -466,6 +466,7 @@ auto test_big_uints_shl() -> void
 template <typename T>
 void test_digit_counting()
 {
+    using boost::decimal::detail::num_digits;
     constexpr auto max_power {std::is_same<T, boost::decimal::detail::uint256_t>::value ? 77 : 38 };
 
     T current_power {1};
@@ -480,10 +481,10 @@ void test_digit_counting()
 
 int main()
 {
-  test_big_uints_mul<boost::multiprecision::uint128_t, boost::decimal::detail::uint128  >();
+  test_big_uints_mul<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
   test_big_uints_mul<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
 
-  test_big_uints_div<boost::multiprecision::uint128_t, boost::decimal::detail::uint128  >();
+  test_big_uints_div<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
   test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
 
   test_various_spots();
@@ -492,11 +493,12 @@ int main()
 
   test_p10_mul_uint256_t();
 
-  test_big_uints_shl<boost::multiprecision::uint128_t, boost::decimal::detail::uint128  >();
+  test_big_uints_shl<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
   test_big_uints_shl<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
 
-  test_digit_counting<boost::decimal::detail::uint128>();
+  test_digit_counting<boost::int128::uint128_t>();
   test_digit_counting<boost::decimal::detail::uint256_t>();
+  test_digit_counting<boost::int128::uint128_t>();
 
   return boost::report_errors();
 }

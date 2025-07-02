@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_DIV_IMPL_HPP
 
 #include <boost/decimal/detail/config.hpp>
+#include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <limits>
@@ -23,7 +24,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T
 
     // If rhs is greater than we need to offset the significands to get the correct values
     // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    const auto big_sig_lhs {static_cast<std::uint64_t>(lhs.sig) * detail::pow10(detail::precision)};
+    constexpr auto ten_pow_precision {detail::pow10(static_cast<std::uint64_t>(detail::precision))};
+    const auto big_sig_lhs {static_cast<std::uint64_t>(lhs.sig) * ten_pow_precision};
 
     auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(rhs.sig)};
     auto res_exp {(lhs.exp - detail::precision) - rhs.exp};
@@ -33,7 +35,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T
               << "\nres exp: " << res_exp << std::endl;
     #endif
 
-    if (res_sig == 0)
+    if (res_sig == 0U)
     {
         sign = false;
     }
@@ -45,11 +47,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T
 template <typename DecimalType, typename T>
 constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> DecimalType
 {
-    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__clang_major__) || __clang_major__ > 13)
-    using unsigned_int128_type = boost::decimal::detail::uint128_t;
-    #else
-    using unsigned_int128_type = boost::decimal::detail::uint128;
-    #endif
+    using unsigned_int128_type = boost::int128::uint128_t;
 
     bool sign {lhs.sign != rhs.sign};
 
@@ -61,7 +59,7 @@ constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> Deci
     auto res_sig {big_sig_lhs / static_cast<unsigned_int128_type>(rhs.sig)};
     auto res_exp {(lhs.exp - detail::precision_v<decimal64>) - rhs.exp};
 
-    if (res_sig == 0)
+    if (res_sig == 0U)
     {
         sign = false;
     }
@@ -71,26 +69,24 @@ constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> Deci
 }
 
 template <typename T>
-constexpr auto d128_generic_div_impl(T lhs, T rhs, T& q) noexcept -> void
+constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept -> void
 {
     bool sign {lhs.sign != rhs.sign};
 
-    const auto big_sig_lhs {detail::uint256_t(lhs.sig) * detail::uint256_t(pow10(detail::uint128(detail::precision_v<decimal128>)))};
-    lhs.exp -= detail::precision_v<decimal128>;
+    constexpr auto ten_pow_precision {detail::uint256_t(pow10(int128::uint128_t(detail::precision_v<decimal128>)))};
+    const auto big_sig_lhs {detail::uint256_t(lhs.sig) * ten_pow_precision};
 
     auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
-    auto res_exp {lhs.exp - rhs.exp};
+    auto res_exp {lhs.exp - rhs.exp - detail::precision_v<decimal128>};
 
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > std::numeric_limits<detail::uint128>::digits10)
+    if (res_sig.high != UINT64_C(0))
     {
-        const auto digit_delta {sig_dig - std::numeric_limits<detail::uint128>::digits10};
-        res_sig /= detail::uint256_t(pow10(detail::uint128(digit_delta)));
+        const auto sig_dig {detail::num_digits(res_sig)};
+        const auto digit_delta {sig_dig - std::numeric_limits<int128::uint128_t>::digits10};
+        res_sig /= detail::uint256_t(pow10(int128::uint128_t(digit_delta)));
         res_exp += digit_delta;
     }
-
-    if (res_sig == 0)
+    else if (res_sig == UINT64_C(0))
     {
         sign = false;
     }

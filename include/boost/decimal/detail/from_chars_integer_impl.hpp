@@ -8,7 +8,7 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/from_chars_result.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
@@ -88,7 +88,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
     auto next = first;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, int128_t>::value || std::is_signed<Integer>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, builtin_int128_t>::value || std::is_signed<Integer>::value)
     #else
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<Integer>::value)
     #endif
@@ -103,7 +103,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
         }
 
         #ifdef BOOST_DECIMAL_HAS_INT128
-        BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, int128_t>::value)
+        BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, builtin_int128_t>::value)
         {
             overflow_value = BOOST_DECIMAL_INT128_MAX;
             max_digit = BOOST_DECIMAL_INT128_MAX;
@@ -129,7 +129,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
         }
         
         #ifdef BOOST_DECIMAL_HAS_INT128
-        BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, uint128_t>::value)
+        BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, builtin_uint128_t>::value)
         {
             overflow_value = BOOST_DECIMAL_UINT128_MAX;
             max_digit = BOOST_DECIMAL_UINT128_MAX;
@@ -143,11 +143,11 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
     }
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, int128_t>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, builtin_int128_t>::value)
     {
         overflow_value /= unsigned_base;
         max_digit %= unsigned_base;
-        overflow_value *= 2; // Overflow value would cause INT128_MIN in non-base10 to fail
+        overflow_value <<= 1U; // Overflow value would cause INT128_MIN in non-base10 to fail
     }
     else
     #endif
@@ -217,7 +217,7 @@ constexpr auto from_chars_integer_impl(const char* first, const char* last, Inte
 
     value = static_cast<Integer>(result);
     #ifdef BOOST_DECIMAL_HAS_INT128
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, int128_t>::value || std::is_signed<Integer>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Integer, builtin_int128_t>::value || std::is_signed<Integer>::value)
     #else
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<Integer>::value)
     #endif
@@ -251,14 +251,14 @@ constexpr auto from_chars(const char* first, const char* last, Integer& value, i
 template <typename Integer>
 constexpr from_chars_result from_chars128(const char* first, const char* last, Integer& value, int base = 10) noexcept
 {
-    using Unsigned_Integer = uint128_t;
+    using Unsigned_Integer = builtin_uint128_t;
     return detail::from_chars_integer_impl<Integer, Unsigned_Integer>(first, last, value, base);
 }
 #endif
 
-constexpr auto from_chars128(const char* first, const char* last, uint128& value, int base = 10) noexcept -> from_chars_result
+constexpr auto from_chars128(const char* first, const char* last, boost::int128::uint128_t& value, int base = 10) noexcept -> from_chars_result
 {
-    return from_chars_integer_impl<uint128, uint128>(first, last, value, base);
+    return from_chars_integer_impl<boost::int128::uint128_t, boost::int128::uint128_t>(first, last, value, base);
 }
 
 } // namespace detail

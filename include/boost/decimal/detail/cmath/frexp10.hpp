@@ -8,7 +8,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/normalize.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
 
@@ -20,6 +20,20 @@
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
+// Hopefully the compiler makes this NOOP for the fast case
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto frexp10_normalize(T1&, T2&) noexcept -> std::enable_if_t<is_fast_type_v<TargetType>, void> {}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto frexp10_normalize(T1& sig, T2& exp) noexcept -> std::enable_if_t<!is_fast_type_v<TargetType>, void>
+{
+    detail::normalize<TargetType>(sig, exp);
+}
+
+} // namespace detail
+
 // Returns the normalized significand and exponent to be cohort agnostic
 // Returns num in the range
 //   [1e06, 1e06 - 1] for decimal32
@@ -28,15 +42,8 @@ namespace decimal {
 BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
 constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type
 {
-    constexpr T zero {0, 0};
-
-    if (num == zero)
-    {
-        *expptr = 0;
-        return 0;
-    }
     #ifndef BOOST_DECIMAL_FAST_MATH
-    else if (isinf(num) || isnan(num))
+    if (isinf(num) || isnan(num))
     {
         *expptr = 0;
         return (std::numeric_limits<typename T::significand_type>::max)();
@@ -45,7 +52,15 @@ constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_t
 
     auto num_exp {num.biased_exponent()};
     auto num_sig {num.full_significand()};
-    detail::normalize<T>(num_sig, num_exp);
+
+    // Normalize the handling of zeros
+    if (num_sig == 0U)
+    {
+        *expptr = 0;
+        return 0U;
+    }
+
+    detail::frexp10_normalize<T>(num_sig, num_exp);
 
     *expptr = static_cast<int>(num_exp);
 

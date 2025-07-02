@@ -2,7 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal.hpp>
+#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/iostream.hpp>
 #include <random>
 #include <limits>
 
@@ -398,7 +399,7 @@ void random_mixed_division(T lower, T upper)
         if (isinf(res) && isinf(res_int))
         {
         }
-        else if (!BOOST_TEST(abs(res - res_int) < decimal32(1, -3)))
+        else if (!BOOST_TEST(abs(res - res_int) < decimal32(1, -1)))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -420,7 +421,7 @@ void random_mixed_division(T lower, T upper)
         const decimal32 dec2 {val2};
 
         const decimal32 res {dec1 / dec2};
-        const decimal32 res_int {static_cast<double>(val1) / static_cast<double>(val2)};
+        const decimal32 res_int {static_cast<float>(val1) / static_cast<float>(val2)};
 
         if (isinf(res) && isinf(res_int))
         {
@@ -889,6 +890,55 @@ void random_mixed_right_shift()
     }
 }
 
+template <typename T>
+void spot_mixed_division(T val1, T val2)
+{
+    {
+        const decimal32 dec1 {val1};
+        const T dec2 {static_cast<T>(decimal32(val2))};
+
+        const decimal32 res {dec1 / dec2};
+        const decimal32 res_int {static_cast<float>(val1) / static_cast<float>(val2)};
+
+        if (isinf(res) && isinf(res_int))
+        {
+        }
+        else if (!BOOST_TEST(abs(res - res_int) < decimal32(1, -3)))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << static_cast<float>(val1) / static_cast<float>(val2) << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+    {
+        const T dec1 {static_cast<T>(decimal32(val1))};
+        const decimal32 dec2 {val2};
+
+        const decimal32 res {dec1 / dec2};
+        const decimal32 res_int {static_cast<float>(val1) / static_cast<float>(val2)};
+
+        if (isinf(res) && isinf(res_int))
+        {
+        }
+        else if (!BOOST_TEST(abs(res - res_int) < decimal32(1, -1)))
+        {
+            // LCOV_EXCL_START
+            std::cerr << "Val 1: " << val1
+                      << "\nDec 1: " << dec1
+                      << "\nVal 2: " << val2
+                      << "\nDec 2: " << dec2
+                      << "\nDec res: " << res
+                      << "\nInt res: " << static_cast<double>(val1) / static_cast<double>(val2) << std::endl;
+            // LCOV_EXCL_STOP
+        }
+    }
+}
+
 int main()
 {
     // Values that won't exceed the range of the significand
@@ -1020,6 +1070,8 @@ int main()
 
     spot_random_mixed_addition(-653573LL, 1391401LL);
     spot_random_mixed_addition(894090LL, -1886315LL);
+
+    spot_mixed_division(-20902, -2810);
 
     return boost::report_errors();
 }

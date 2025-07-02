@@ -1,11 +1,11 @@
-// Copyright 2023 Matt Borland
+// Copyright 2025 Matt Borland
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#ifndef BOOST_DECIMAL_STRING_HPP
+#define BOOST_DECIMAL_STRING_HPP
 
-#ifndef BOOST_DECIMAL_DETAIL_TO_STRING
-#define BOOST_DECIMAL_DETAIL_TO_STRING
-
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/charconv.hpp>
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
@@ -17,7 +17,7 @@ template <typename DecimalType>
 auto to_string(DecimalType value)
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::string)
 {
-    char buffer[44];
+    char buffer[64];
     auto r = to_chars(buffer, buffer + sizeof(buffer), value, chars_format::fixed, 6);
     *r.ptr = '\0';
     return std::string(buffer);
@@ -28,4 +28,4 @@ auto to_string(DecimalType value)
 
 #endif
 
-#endif //BOOST_DECIMAL_DETAIL_TO_STRING
+#endif // BOOST_DECIMAL_STRING_HPP

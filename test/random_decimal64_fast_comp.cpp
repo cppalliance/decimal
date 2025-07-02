@@ -2,7 +2,9 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal.hpp>
+#include <boost/decimal/decimal64_fast.hpp>
+#include <boost/decimal/iostream.hpp>
+#include <boost/decimal/cmath.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <random>
 #include <limits>
@@ -592,6 +594,10 @@ int main()
     random_mixed_SPACESHIP(std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
     random_mixed_SPACESHIP(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
     #endif
+
+    constexpr auto pos_zero = boost::decimal::decimal64_fast{0, 0, false};
+    constexpr auto neg_zero = boost::decimal::decimal64_fast{0, 0, true};
+    BOOST_TEST_EQ(pos_zero, neg_zero);
 
     return boost::report_errors();
 }

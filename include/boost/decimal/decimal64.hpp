@@ -10,7 +10,7 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 #include <boost/decimal/detail/config.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/fast_float/compute_float32.hpp>
 #include <boost/decimal/detail/fast_float/compute_float64.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
@@ -39,6 +39,8 @@
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/promote_significand.hpp>
+#include <boost/decimal/detail/components.hpp>
+#include <boost/decimal/detail/cmath/next.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -121,16 +123,6 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_combination_mask = 
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_exp_mask = 0b0'00000'11111111'0000000000'0000000000'0000000000'0000000000'0000000000;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_construct_significand_mask = d64_no_combination;
 
-struct decimal64_components
-{
-    using significand_type = std::uint64_t;
-    using biased_exponent_type = std::int32_t;
-
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
-
 } //namespace detail
 
 #if defined(__GNUC__) && __GNUC__ >= 8
@@ -164,6 +156,8 @@ private:
     constexpr auto full_significand() const noexcept -> significand_type;
     constexpr auto isneg() const noexcept -> bool;
     constexpr auto edit_sign(bool sign) noexcept -> void;
+
+    constexpr auto to_components() const noexcept -> detail::decimal64_components;
 
     // Attempts conversion to integral type:
     // If this is nan sets errno to EINVAL and returns 0
@@ -233,6 +227,9 @@ private:
     friend constexpr auto to_dpd_d64(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint64_t);
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
+    friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
+
 public:
     // 3.2.3.1 construct/copy/destroy
     constexpr decimal64() noexcept = default;
@@ -289,12 +286,16 @@ public:
     explicit constexpr operator std::uint16_t() const noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
-    explicit constexpr operator detail::int128_t() const noexcept;
-    explicit constexpr operator detail::uint128_t() const noexcept;
+    explicit constexpr operator detail::builtin_int128_t() const noexcept;
+    explicit constexpr operator detail::builtin_uint128_t() const noexcept;
     #endif
 
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool> = true>
+    // Conversion to other decimal type
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> > detail::decimal_val_v<decimal64>), bool> = true>
+    constexpr operator Decimal() const noexcept;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> <= detail::decimal_val_v<decimal64>), bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
     // 3.2.6 Conversion to floating-point type
@@ -322,13 +323,6 @@ public:
     template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
     #endif
     constexpr decimal64(T1 coeff, T2 exp, bool sign = false) noexcept;
-
-    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-    template <BOOST_DECIMAL_INTEGRAL T>
-    #else
-    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
-    #endif
-    constexpr decimal64(bool coeff, T exp, bool sign = false) noexcept;
 
     // cmath functions that are easier as friends
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
@@ -606,6 +600,7 @@ constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
 #if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
+#  pragma GCC diagnostic ignored "-Wbool-compare"
 #endif
 
 // 3.2.5 initialization from coefficient and exponent:
@@ -623,11 +618,21 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
     BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T1>)
     {
-        if (coeff < 0 || sign)
+        // This branch will never be taken by bool, but it throws a warning prior to C++17
+        #ifdef _MSC_VER
+        #  pragma warning(push)
+        #  pragma warning(disable : 4804)
+        #endif
+
+        if (coeff < T1{0} || sign)
         {
             bits_ |= detail::d64_sign_mask;
             isneg = true;
         }
+
+        #ifdef _MSC_VER
+        #  pragma warning(pop)
+        #endif
     }
     else
     {
@@ -639,31 +644,33 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     }
 
     // If the coeff is not in range make it so
-    auto unsigned_coeff_digits {detail::num_digits(unsigned_coeff)};
-    const bool reduced {unsigned_coeff_digits > detail::precision_v<decimal64>};
-    if (unsigned_coeff_digits > detail::precision_v<decimal64> + 1)
+    int unsigned_coeff_digits {-1};
+    if (unsigned_coeff >= UINT64_C(10000000000000000))
     {
-        const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal64> + 1)};
+        unsigned_coeff_digits = detail::d64_constructor_num_digits(unsigned_coeff);
+        if (unsigned_coeff_digits > detail::precision_v<decimal64> + 1)
+        {
+            const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal64> + 1)};
 
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic push
-        #  pragma GCC diagnostic ignored "-Wconversion"
-        #endif
+            #if defined(__GNUC__) && !defined(__clang__)
+            #  pragma GCC diagnostic push
+            #  pragma GCC diagnostic ignored "-Wconversion"
+            #endif
 
-        unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+            unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
 
-        #if defined(__GNUC__) && !defined(__clang__)
-        #  pragma GCC diagnostic pop
-        #endif
+            #if defined(__GNUC__) && !defined(__clang__)
+            #  pragma GCC diagnostic pop
+            #endif
 
-        exp += digits_to_remove;
-        unsigned_coeff_digits -= digits_to_remove;
-    }
-
-    // Round as required
-    if (reduced)
-    {
-        exp += detail::fenv_round<decimal64>(unsigned_coeff, isneg);
+            exp += digits_to_remove;
+            unsigned_coeff_digits -= digits_to_remove;
+            exp += detail::fenv_round<decimal64>(unsigned_coeff, isneg);
+        }
+        else
+        {
+            exp += detail::fenv_round<decimal64>(unsigned_coeff, isneg);
+        }
     }
 
     auto reduced_coeff {static_cast<std::uint64_t>(unsigned_coeff)};
@@ -737,13 +744,15 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     }
     else
     {
+        constexpr auto zero_bits {UINT64_C(0x2238000000000000)};
+
         // The value is probably infinity
 
         // If we can offset some extra power in the coefficient try to do so
-        const auto coeff_dig {detail::num_digits(reduced_coeff)};
+        auto coeff_dig {unsigned_coeff_digits == -1 ? detail::num_digits(unsigned_coeff) : unsigned_coeff_digits};
         if (coeff_dig < detail::precision_v<decimal64>)
         {
-            for (auto i {coeff_dig}; i <= detail::precision_v<decimal64>; ++i)
+            for (; coeff_dig <= detail::precision_v<decimal64>; ++coeff_dig)
             {
                 reduced_coeff *= 10;
                 --biased_exp;
@@ -754,7 +763,7 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
                 }
             }
 
-            if (detail::num_digits(reduced_coeff) <= detail::precision_v<decimal64>)
+            if (coeff_dig <= detail::precision_v<decimal64>)
             {
                 *this = decimal64(reduced_coeff, exp, isneg);
             }
@@ -762,7 +771,7 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
             {
                 if (exp < 0)
                 {
-                    *this = decimal64(0, 0, isneg);
+                    bits_ = zero_bits;
                 }
                 else
                 {
@@ -772,7 +781,14 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
         }
         else
         {
-            bits_ = detail::d64_comb_inf_mask;
+            if (exp < 0)
+            {
+                bits_ = zero_bits;
+            }
+            else
+            {
+                bits_ = detail::d64_comb_inf_mask;
+            }
         }
     }
 }
@@ -856,10 +872,8 @@ template <BOOST_DECIMAL_INTEGRAL Integer>
 #else
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 #endif
-constexpr decimal64::decimal64(Integer val) noexcept // NOLINT : Incorrect parameter is never used
+constexpr decimal64::decimal64(Integer val) noexcept : decimal64{val, 0}
 {
-    using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
-    *this = decimal64{static_cast<ConversionType>(val), 0};
 }
 
 template <typename Integer>
@@ -869,16 +883,6 @@ constexpr auto decimal64::operator=(const Integer& val) noexcept
     using ConversionType = std::conditional_t<std::is_same<Integer, bool>::value, std::int32_t, Integer>;
     *this = decimal64{static_cast<ConversionType>(val), 0};
     return *this;
-}
-
-#ifdef BOOST_DECIMAL_HAS_CONCEPTS
-template <BOOST_DECIMAL_INTEGRAL T>
-#else
-template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
-#endif
-constexpr decimal64::decimal64(bool coeff, T exp, bool sign) noexcept
-{
-    *this = decimal64(static_cast<std::int32_t>(coeff), exp, sign);
 }
 
 constexpr decimal64::operator bool() const noexcept
@@ -939,20 +943,25 @@ constexpr decimal64::operator std::uint16_t() const noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-constexpr decimal64::operator detail::int128_t() const noexcept
+constexpr decimal64::operator detail::builtin_int128_t() const noexcept
 {
-    return to_integral<decimal64, detail::int128_t>(*this);
+    return to_integral<decimal64, detail::builtin_int128_t>(*this);
 }
 
-constexpr decimal64::operator detail::uint128_t() const noexcept
+constexpr decimal64::operator detail::builtin_uint128_t() const noexcept
 {
-    return to_integral<decimal64, detail::uint128_t>(*this);
+    return to_integral<decimal64, detail::builtin_uint128_t>(*this);
 }
 
 #endif
 
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> > detail::decimal_val_v<decimal64>), bool>>
+constexpr decimal64::operator Decimal() const noexcept
+{
+    return to_decimal<Decimal>(*this);
+}
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal>, bool>>
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> <= detail::decimal_val_v<decimal64>), bool>>
 constexpr decimal64::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);
@@ -1053,6 +1062,49 @@ constexpr auto decimal64::full_significand() const noexcept -> significand_type
 constexpr auto decimal64::isneg() const noexcept -> bool
 {
     return static_cast<bool>(bits_ & detail::d64_sign_mask);
+}
+
+constexpr auto decimal64::to_components() const noexcept -> detail::decimal64_components
+{
+    detail::decimal64_components components {};
+
+    exponent_type expval {};
+    significand_type significand {};
+
+    const auto comb_bits {(bits_ & detail::d64_comb_11_mask)};
+
+    switch (comb_bits)
+    {
+        case detail::d64_comb_11_mask:
+            expval = (bits_ & detail::d64_comb_11_exp_bits) >> (detail::d64_significand_bits + 1);
+
+            // Only need the one bit of T because the other 3 are implied
+            significand = (bits_ & detail::d64_comb_11_significand_bits) == detail::d64_comb_11_significand_bits ?
+                UINT64_C(0b1001'0000000000'0000000000'0000000000'0000000000'0000000000) :
+                UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000);
+            break;
+        case detail::d64_comb_10_mask:
+            expval = UINT64_C(0b1000000000);
+            significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
+            break;
+        case detail::d64_comb_01_mask:
+            expval = UINT64_C(0b0100000000);
+            significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
+            break;
+        default:
+            // Expval = 0
+            significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
+            break;
+    }
+
+    significand |= (bits_ & detail::d64_significand_mask);
+    expval |= (bits_ & detail::d64_exponent_mask) >> detail::d64_significand_bits;
+
+    components.sig = significand;
+    components.exp = static_cast<biased_exponent_type>(expval) - detail::bias_v<decimal64>;
+    components.sign = bits_ & detail::d64_sign_mask;
+
+    return components;
 }
 
 template <typename T>
@@ -1248,17 +1300,12 @@ constexpr auto operator+(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     }
     #endif
 
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+    auto lhs_components {lhs.to_components()};
+    detail::normalize<decimal64>(lhs_components.sig, lhs_components.exp);
+    auto rhs_components {rhs.to_components()};
+    detail::normalize<decimal64>(rhs_components.sig, rhs_components.exp);
 
-    auto rhs_sig {rhs.full_significand()};
-    auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize<decimal64>(rhs_sig, rhs_exp);
-
-    return detail::d64_add_impl<decimal64>(lhs_sig, lhs_exp, lhs.isneg(),
-                                           rhs_sig, rhs_exp, rhs.isneg(),
-                                           (abs(lhs) > abs(rhs)));
+    return detail::d64_add_impl<decimal64>(lhs_components, rhs_components);
 }
 
 template <typename Integer>
@@ -1308,19 +1355,13 @@ constexpr auto operator-(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     }
     #endif
 
-    const bool abs_lhs_bigger {abs(lhs) > abs(rhs)};
+    auto lhs_components {lhs.to_components()};
+    detail::normalize<decimal64>(lhs_components.sig, lhs_components.exp);
+    auto rhs_components {rhs.to_components()};
+    detail::normalize<decimal64>(rhs_components.sig, rhs_components.exp);
+    rhs_components.sign = !rhs_components.sign;
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
-
-    return detail::d64_sub_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
-                                           sig_rhs, exp_rhs, rhs.isneg(),
-                                           abs_lhs_bigger);
+    return detail::d64_add_impl<decimal64>(lhs_components, rhs_components);
 }
 
 template <typename Integer>
@@ -1348,8 +1389,8 @@ constexpr auto operator-(decimal64 lhs, Integer rhs) noexcept
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
     const auto final_sig_rhs {static_cast<decimal64::significand_type>(sig_rhs)};
 
-    return detail::d64_sub_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
-                                           final_sig_rhs, exp_rhs, (rhs < 0),
+    return detail::d64_add_impl<decimal64>(sig_lhs, exp_lhs, lhs.isneg(),
+                                           final_sig_rhs, exp_rhs, !(rhs < 0),
                                            abs_lhs_bigger);
 }
 
@@ -1378,8 +1419,8 @@ constexpr auto operator-(Integer lhs, decimal64 rhs) noexcept
     auto exp_rhs {rhs.biased_exponent()};
     detail::normalize<decimal64>(sig_rhs, exp_rhs);
 
-    return detail::d64_sub_impl<decimal64>(final_sig_lhs, exp_lhs, (lhs < 0),
-                                           sig_rhs, exp_rhs, rhs.isneg(),
+    return detail::d64_add_impl<decimal64>(final_sig_lhs, exp_lhs, (lhs < 0),
+                                           sig_rhs, exp_rhs, !rhs.isneg(),
                                            abs_lhs_bigger);
 }
 
@@ -1392,16 +1433,12 @@ constexpr auto operator*(decimal64 lhs, decimal64 rhs) noexcept -> decimal64
     }
     #endif
 
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+    auto lhs_components {lhs.to_components()};
+    detail::normalize<decimal64>(lhs_components.sig, lhs_components.exp);
+    auto rhs_components {rhs.to_components()};
+    detail::normalize<decimal64>(rhs_components.sig, rhs_components.exp);
 
-    auto rhs_sig {rhs.full_significand()};
-    auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize<decimal64>(rhs_sig, rhs_exp);
-
-    return detail::d64_mul_impl<decimal64>(lhs_sig, lhs_exp, lhs.isneg(),
-                                           rhs_sig, rhs_exp, rhs.isneg());
+    return detail::d64_mul_impl<decimal64>(lhs_components, rhs_components);
 }
 
 template <typename Integer>
@@ -1451,7 +1488,9 @@ template <typename Integer>
 constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64)
 {
+    using sig_type = decimal64::significand_type;
     using exp_type = decimal64::biased_exponent_type;
+    using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
@@ -1484,12 +1523,12 @@ constexpr auto operator/(decimal64 lhs, Integer rhs) noexcept
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
     detail::normalize<decimal64>(lhs_sig, lhs_exp);
-
     detail::decimal64_components lhs_components {lhs_sig, lhs_exp, lhs.isneg()};
 
-    auto rhs_sig {static_cast<std::uint64_t>(detail::make_positive_unsigned(rhs))};
+    auto rhs_sig {static_cast<integer_type>(detail::make_positive_unsigned(rhs))};
     exp_type rhs_exp {};
-    detail::decimal64_components rhs_components {detail::shrink_significand<std::uint64_t>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
+    detail::normalize<decimal64>(rhs_sig, rhs_exp);
+    detail::decimal64_components rhs_components {static_cast<sig_type>(rhs_sig), rhs_exp, rhs < 0};
 
     return detail::d64_generic_div_impl<decimal64>(lhs_components, rhs_components);
 }
@@ -1498,6 +1537,10 @@ template <typename Integer>
 constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64)
 {
+    using sig_type = decimal64::significand_type;
+    using exp_type = decimal64::biased_exponent_type;
+    using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64 zero {0, 0};
@@ -1528,7 +1571,10 @@ constexpr auto operator/(Integer lhs, decimal64 rhs) noexcept
     auto rhs_exp {rhs.biased_exponent()};
     detail::normalize<decimal64>(rhs_sig, rhs_exp);
 
-    detail::decimal64_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
+    exp_type lhs_exp {};
+    auto lhs_sig {static_cast<integer_type>(detail::make_positive_unsigned(lhs))};
+    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+    detail::decimal64_components lhs_components {static_cast<sig_type>(lhs_sig), lhs_exp, lhs < 0};
     detail::decimal64_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
 
     return detail::d64_generic_div_impl<decimal64>(lhs_components, rhs_components);
@@ -2149,18 +2195,18 @@ struct numeric_limits<boost::decimal::decimal64>
     static constexpr int  digits10 = digits;
     static constexpr int  max_digits10 = digits;
     static constexpr int  radix = 10;
-    static constexpr int  min_exponent = -382;
+    static constexpr int  min_exponent = -383;
     static constexpr int  min_exponent10 = min_exponent;
-    static constexpr int  max_exponent = 385;
+    static constexpr int  max_exponent = 384;
     static constexpr int  max_exponent10 = max_exponent;
     static constexpr bool traps = numeric_limits<std::uint64_t>::traps;
     static constexpr bool tinyness_before = true;
 
     // Member functions
-    static constexpr auto (min)        () -> boost::decimal::decimal64 { return {1, min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal64 { return {9'999'999'999'999'999, max_exponent}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal64 { return {-9'999'999'999'999'999, max_exponent}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal64 { return {1, -16}; }
+    static constexpr auto (min)        () -> boost::decimal::decimal64 { return {UINT32_C(1), min_exponent}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal64 { return {UINT64_C(9'999'999'999'999'999), max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal64 { return {UINT64_C(9'999'999'999'999'999), max_exponent - digits + 1, true}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal64 { return {UINT32_C(1), -digits + 1}; }
     static constexpr auto round_error  () -> boost::decimal::decimal64 { return epsilon(); }
     static constexpr auto infinity     () -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask); }
     static constexpr auto quiet_NaN    () -> boost::decimal::decimal64 { return boost::decimal::from_bits(boost::decimal::detail::d64_nan_mask); }

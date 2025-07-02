@@ -10,7 +10,7 @@ using namespace boost::decimal;
 
 #ifdef BOOST_DECIMAL_HAS_FORMAT_SUPPORT
 
-template <concepts::decimal_floating_point_type T>
+template <typename T>
 void test_general()
 {
     // For unknown reasons Clang does not like this empty bracket and throws compiler errors
@@ -85,7 +85,7 @@ void test_general()
     BOOST_TEST_EQ(std::format("{:G}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
 }
 
-template <concepts::decimal_floating_point_type T>
+template <typename T>
 void test_fixed()
 {
     BOOST_TEST_EQ(std::format("{:f}", T {21, 6, true}), "-21000000.000000");
@@ -116,7 +116,7 @@ void test_fixed()
     BOOST_TEST_EQ(std::format("{:F}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
 }
 
-template <concepts::decimal_floating_point_type T>
+template <typename T>
 void test_scientific()
 {
     BOOST_TEST_EQ(std::format("{:e}", T {21, 6, true}), "-2.100000e+07");
@@ -147,7 +147,7 @@ void test_scientific()
     BOOST_TEST_EQ(std::format("{:10.3E}", T {0}), " 0.000E+00");
 }
 
-template <concepts::decimal_floating_point_type T>
+template <typename T>
 void test_hex()
 {
     BOOST_TEST_EQ(std::format("{:.0a}", T {0}), "0p+00");

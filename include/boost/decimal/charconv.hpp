@@ -5,11 +5,16 @@
 #ifndef BOOST_DECIMAL_CHARCONV_HPP
 #define BOOST_DECIMAL_CHARCONV_HPP
 
-#include <boost/decimal/fwd.hpp>
+#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/decimal64_fast.hpp>
+#include <boost/decimal/decimal128_fast.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/utilities.hpp>
-#include <boost/decimal/detail/emulated128.hpp>
+#include <boost/int128.hpp>
 #include <boost/decimal/detail/from_chars_result.hpp>
 #include <boost/decimal/detail/chars_format.hpp>
 #include <boost/decimal/detail/concepts.hpp>
@@ -20,6 +25,7 @@
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/countl.hpp>
 #include <boost/decimal/detail/remove_trailing_zeros.hpp>
+#include <boost/decimal/detail/promotion.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -43,8 +49,9 @@ namespace detail {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 constexpr auto from_chars_general_impl(const char* first, const char* last, TargetDecimalType& value, chars_format fmt) noexcept -> from_chars_result
 {
-    using significand_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value ||
-                                                std::is_same<TargetDecimalType, decimal128_fast>::value, detail::uint128, std::uint64_t>;
+    using significand_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                                 std::numeric_limits<std::uint64_t>::digits),
+                                                 int128::uint128_t, std::uint64_t>;
 
     if (first >= last)
     {
@@ -93,106 +100,28 @@ constexpr auto from_chars_general_impl(const char* first, const char* last, Targ
 
 } //namespace detail
 
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal32& value, chars_format fmt = chars_format::general) noexcept
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, TargetDecimalType& value, chars_format fmt = chars_format::general) noexcept -> from_chars_result
 {
     return detail::from_chars_general_impl(first, last, value, fmt);
 }
 
 #ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal32& value, chars_format fmt = chars_format::general) noexcept
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_EXPORT constexpr auto from_chars(const std::string& str, TargetDecimalType& value, chars_format fmt = chars_format::general) noexcept -> from_chars_result
 {
     return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
 }
+
 #else
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(std::string_view str, decimal32& value, chars_format fmt = chars_format::general) noexcept
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_EXPORT constexpr auto from_chars(std::string_view str, TargetDecimalType& value, chars_format fmt = chars_format::general) noexcept -> from_chars_result
 {
     return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
-}
-#endif
-
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal32_fast& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(first, last, value, fmt);
 }
 
-#ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal32_fast& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
-}
-#else
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(std::string_view str, decimal32_fast& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
-}
-#endif
-
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal64& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(first, last, value, fmt);
-}
-
-#ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal64& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
-}
-#else
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(std::string_view str, decimal64& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
-}
-#endif
-
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal64_fast& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(first, last, value, fmt);
-}
-
-#ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal64_fast& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
-}
-#else
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(std::string_view str, decimal64_fast& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
-}
-#endif
-
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal128& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(first, last, value, fmt);
-}
-
-#ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal128& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
-}
-#else
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(std::string_view str, decimal128& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
-}
-#endif
-
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(const char* first, const char* last, decimal128_fast& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(first, last, value, fmt);
-}
-
-#ifndef BOOST_DECIMAL_HAS_STD_STRING_VIEW
-BOOST_DECIMAL_EXPORT inline auto from_chars(const std::string& str, decimal128_fast& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
-}
-#else
-BOOST_DECIMAL_EXPORT constexpr auto from_chars(std::string_view str, decimal128_fast& value, chars_format fmt = chars_format::general) noexcept
-{
-    return detail::from_chars_general_impl(str.data(), str.data() + str.size(), value, fmt);
-}
 #endif
 
 #ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
@@ -338,8 +267,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
             return {last, std::errc::value_too_large};
         default:
             // LCOV_EXCL_START
-            BOOST_DECIMAL_ASSERT_MSG(fp != 0, "Unreachable return");
-            return {first, std::errc::not_supported};
+            BOOST_DECIMAL_UNREACHABLE;
             // LCOV_EXCL_STOP
     }
 }
@@ -353,7 +281,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     }
 
     const auto fp = fpclassify(value);
-    if (fp != FP_NORMAL)
+    if (!(fp == FP_NORMAL || fp == FP_SUBNORMAL))
     {
         return to_chars_nonfinite(first, last, value, fp, fmt, precision);
     }
@@ -361,8 +289,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     int exp {};
     auto significand {frexp10(value, &exp)};
 
-    using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value || std::is_same<TargetDecimalType, decimal128_fast>::value, uint128, std::uint64_t>;
-    auto significand_digits = num_digits(significand);
+    using uint_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                          std::numeric_limits<std::uint64_t>::digits),
+                                          int128::uint128_t, std::uint64_t>;
+
+    // Since frexp10 normalizes the value we by default know the number of digits in the significand
+    auto significand_digits = std::numeric_limits<TargetDecimalType>::digits;
     exp += significand_digits - 1;
     bool append_zeros = false;
 
@@ -373,13 +305,14 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
             // If the precision is specified we need to make sure the result is rounded correctly
             // using the current fenv rounding mode
 
-            while (significand_digits > precision + 2)
+            if (significand_digits > precision + 2)
             {
-                significand /= 10;
-                --significand_digits;
+                const auto digits_to_remove {significand_digits - (precision + 2)};
+                significand /= pow10(static_cast<typename TargetDecimalType::significand_type>(digits_to_remove));
+                significand_digits -= digits_to_remove;
+                fenv_round(significand);
             }
-
-            if (significand_digits > precision + 1)
+            else if (significand_digits > precision + 1)
             {
                 fenv_round(significand);
             }
@@ -477,6 +410,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt = chars_format::general, int precision = -1) noexcept -> to_chars_result
 {
+    using target_decimal_significand_type = typename TargetDecimalType::significand_type;
+
     auto buffer_size = last - first;
     auto real_precision = get_real_precision<TargetDecimalType>(precision);
 
@@ -494,18 +429,18 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     const auto fp = fpclassify(value);
-    if (fp != FP_NORMAL)
+    if (!(fp == FP_NORMAL || fp == FP_SUBNORMAL))
     {
         return to_chars_nonfinite(first, last, value, fp, fmt, precision);
     }
 
     auto abs_value = abs(value);
     int exponent {};
-    auto significand = frexp10(abs_value, &exponent);
+    target_decimal_significand_type significand = frexp10(abs_value, &exponent);
 
     const char* output_start = first;
 
-    int num_dig = num_digits(significand);
+    int num_dig = std::numeric_limits<TargetDecimalType>::digits;
     bool append_trailing_zeros = false;
     bool append_leading_zeros = false;
     int num_leading_zeros = 0;
@@ -523,20 +458,26 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
     if (precision != -1)
     {
-        if (num_dig >= precision + 1)
+        if (num_dig > precision + 1)
         {
-            while (num_dig > precision + 1)
+            const auto digits_to_remove {num_dig - precision - 1};
+            if (digits_to_remove < std::numeric_limits<target_decimal_significand_type>::digits10 + 1)
             {
-                significand /= 10;
-                ++exponent;
-                --num_dig;
+                significand /= pow10(static_cast<target_decimal_significand_type>(digits_to_remove));
+                exponent += digits_to_remove + fenv_round<TargetDecimalType>(significand);
+                num_dig -= digits_to_remove - 1;
             }
-
-            if (num_dig == precision + 1)
+            else
             {
-                --num_dig;
-                exponent += fenv_round<TargetDecimalType>(significand);
+                significand = 0;
+                num_dig = 0;
+                exponent -= digits_to_remove + (precision + 1);
             }
+        }
+        else if (num_dig == precision + 1)
+        {
+            --num_dig;
+            exponent += fenv_round<TargetDecimalType>(significand);
         }
         else if (num_dig < precision && fmt != chars_format::general)
         {
@@ -555,7 +496,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     }
 
     // Make sure the result will fit in the buffer
-    const std::ptrdiff_t total_length = total_buffer_length(num_dig, exponent, is_neg) + num_leading_zeros;
+    const std::ptrdiff_t total_length = total_buffer_length<TargetDecimalType>(num_dig, exponent, is_neg) + num_leading_zeros;
     if (total_length > buffer_size)
     {
         return {last, std::errc::value_too_large};
@@ -584,7 +525,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
             first += num_leading_zeros;
 
             // We can skip the rest if there's nothing more to do for the required precision
-            if (significand == 0)
+            if (significand == 0U)
             {
                 if (precision - num_leading_zeros > 0)
                 {
@@ -599,13 +540,15 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         }
     }
 
-    using uint_type = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value ||
-                                         std::is_same<TargetDecimalType, decimal128_fast>::value, uint128, std::uint64_t>;
+    using uint_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                          std::numeric_limits<std::uint64_t>::digits),
+                                          int128::uint128_t, std::uint64_t>;
+
     auto r = to_chars_integer_impl<uint_type, uint_type>(first, last, significand, 10);
 
     if (BOOST_DECIMAL_UNLIKELY(!r))
     {
-        return r;
+        return r; // LCOV_EXCL_LINE
     }
 
     // Bounds check again
@@ -711,8 +654,9 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value, int precision = -1) noexcept -> to_chars_result
 {
-    using Unsigned_Integer = std::conditional_t<std::is_same<TargetDecimalType, decimal128>::value ||
-                                                std::is_same<TargetDecimalType, decimal128_fast>::value, uint128, std::uint64_t>;
+    using Unsigned_Integer = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                                 std::numeric_limits<std::uint64_t>::digits),
+                                                 int128::uint128_t, std::uint64_t>;
 
     if (signbit(value))
     {
@@ -720,7 +664,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
     }
 
     const auto fp = fpclassify(value);
-    if (fp != FP_NORMAL)
+    if (!(fp == FP_NORMAL || fp == FP_SUBNORMAL))
     {
         return to_chars_nonfinite(first, last, value, fp, chars_format::hex, precision);
     }
@@ -740,13 +684,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 
     int exp {};
     Unsigned_Integer significand = frexp10(value, &exp);
-    BOOST_DECIMAL_ASSERT(significand != 0);
+    BOOST_DECIMAL_ASSERT(significand != 0U);
     // Strip zeros of the significand since frexp10 normalizes it
-    while (significand % 10U == 0)
-    {
-        significand /= 10U;
-        ++exp;
-    }
+    const auto zero_removal {detail::remove_trailing_zeros(significand)};
+    significand = zero_removal.trimmed_number;
+    exp += static_cast<int>(zero_removal.number_of_removed_zeros);
 
     // Calculate the number of bytes
     constexpr auto significand_bits = std::is_same<Unsigned_Integer, std::uint64_t>::value ? 64 : 128;
@@ -755,29 +697,25 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 
     if (precision != -1)
     {
-        if (significand_digits > precision)
+        if (significand_digits > precision + 2)
         {
-            // If the precision is specified we need to make sure the result is rounded correctly
-            // using the current fenv rounding mode
+            const auto shift_amount {significand_digits - (precision + 2)};
+            significand >>= (shift_amount * 4);
+            significand_digits -= shift_amount;
+        }
 
-            while (significand_digits > precision + 2)
+        if (significand_digits > precision + 1)
+        {
+            const auto trailing_digit = static_cast<std::uint32_t>(significand & 0xFU);
+            significand >>= 4;
+            ++exp;
+            if (trailing_digit >= 8)
             {
-                significand /= 16;
-                --significand_digits;
-            }
-
-            if (significand_digits > precision + 1)
-            {
-                const auto trailing_digit = significand % 16;
-                significand /= 16;
-                ++exp;
-                if (trailing_digit >= 8)
-                {
-                    ++significand;
-                }
+                ++significand;
             }
         }
-        else if (significand_digits < precision)
+
+        if (significand_digits < precision)
         {
             append_zeros = true;
         }
@@ -855,9 +793,9 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
     }
 
     auto abs_value = abs(value);
-    constexpr auto max_fractional_value = std::is_same<TargetDecimalType, decimal32>::value || std::is_same<TargetDecimalType, decimal32_fast>::value ? TargetDecimalType{1, 7} :
-                                          std::is_same<TargetDecimalType, decimal64>::value || std::is_same<TargetDecimalType, decimal64_fast>::value ? TargetDecimalType{1, 16} :
-                                                                                              TargetDecimalType{1, 34};
+    constexpr auto max_fractional_value = decimal_val_v<TargetDecimalType> < 64 ?  TargetDecimalType{1, 7} :
+                                                          decimal_val_v<TargetDecimalType> < 128 ? TargetDecimalType{1, 16} :
+                                                                                                         TargetDecimalType{1, 34};
 
     constexpr auto min_fractional_value = TargetDecimalType{1, -4};
 
@@ -916,117 +854,20 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, TargetDecima
 
 } //namespace detail
 
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32 value) noexcept -> to_chars_result
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, TargetDecimalType value) noexcept -> to_chars_result
 {
     return detail::to_chars_impl(first, last, value);
 }
 
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32 value, chars_format fmt) noexcept -> to_chars_result
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, TargetDecimalType value, chars_format fmt) noexcept -> to_chars_result
 {
     return detail::to_chars_impl(first, last, value, fmt);
 }
 
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32 value, chars_format fmt, int precision) noexcept -> to_chars_result
-{
-    if (precision < 0)
-    {
-        precision = 6;
-    }
-
-    return detail::to_chars_impl(first, last, value, fmt, precision);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32_fast value) noexcept -> to_chars_result
-{
-    return detail::to_chars_impl(first, last, value);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32_fast value, chars_format fmt) noexcept -> to_chars_result
-{
-    return detail::to_chars_impl(first, last, value, fmt);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal32_fast value, chars_format fmt, int precision) noexcept -> to_chars_result
-{
-    if (precision < 0)
-    {
-        precision = 6;
-    }
-
-    return detail::to_chars_impl(first, last, value, fmt, precision);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value) noexcept -> to_chars_result
-{
-    return detail::to_chars_impl(first, last, value);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value, chars_format fmt) noexcept -> to_chars_result
-{
-    return detail::to_chars_impl(first, last, value, fmt);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64 value, chars_format fmt, int precision) noexcept -> to_chars_result
-{
-    if (precision < 0)
-    {
-        precision = 6;
-    }
-
-    return detail::to_chars_impl(first, last, value, fmt, precision);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64_fast value) noexcept -> to_chars_result
-{
-    return detail::to_chars_impl(first, last, value);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64_fast value, chars_format fmt) noexcept -> to_chars_result
-{
-    return detail::to_chars_impl(first, last, value, fmt);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal64_fast value, chars_format fmt, int precision) noexcept -> to_chars_result
-{
-    if (precision < 0)
-    {
-        precision = 6;
-    }
-
-    return detail::to_chars_impl(first, last, value, fmt, precision);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128 value) noexcept -> to_chars_result
-{
-    return detail::to_chars_impl(first, last, value);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128 value, chars_format fmt) noexcept -> to_chars_result
-{
-    return detail::to_chars_impl(first, last, value, fmt);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128 value, chars_format fmt, int precision) noexcept -> to_chars_result
-{
-    if (precision < 0)
-    {
-        precision = 6;
-    }
-
-    return detail::to_chars_impl(first, last, value, fmt, precision);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128_fast value) noexcept -> to_chars_result
-{
-    return detail::to_chars_impl(first, last, value);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128_fast value, chars_format fmt) noexcept -> to_chars_result
-{
-    return detail::to_chars_impl(first, last, value, fmt);
-}
-
-BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, decimal128_fast value, chars_format fmt, int precision) noexcept -> to_chars_result
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_EXPORT BOOST_DECIMAL_CONSTEXPR auto to_chars(char* first, char* last, TargetDecimalType value, chars_format fmt, int precision) noexcept -> to_chars_result
 {
     if (precision < 0)
     {

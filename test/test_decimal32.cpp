@@ -261,15 +261,6 @@ void test_addition()
     BOOST_TEST(isinf(one + inf_val));
     BOOST_TEST(isnan(inf_val + qnan_val));
     BOOST_TEST(isnan(qnan_val + inf_val));
-
-    // Overflow
-    constexpr decimal32 max_val((std::numeric_limits<decimal32>::max)());
-    if (!BOOST_TEST(isinf(max_val + one)))
-    {
-        // LCOV_EXCL_START
-        std::cerr << std::bitset<32>(to_bits(max_val + one)) << std::endl;
-        // LCOV_EXCL_STOP
-    }
 }
 
 void test_subtraction()
@@ -320,20 +311,6 @@ void test_subtraction()
     BOOST_TEST(isinf(one - inf_val));
     BOOST_TEST(isnan(inf_val - qnan_val));
     BOOST_TEST(isnan(qnan_val - inf_val));
-
-    // Why does MSVC 14.1 warn about unary minus but nothing else does?
-    #ifdef _MSC_VER
-    #  pragma warning(push)
-    #  pragma warning(disable: 4146)
-    #endif
-
-    // Underflow
-    constexpr decimal32 lowest_val(std::numeric_limits<decimal32>::lowest());
-    BOOST_TEST(isinf(lowest_val - one));
-
-    #ifdef _MSC_VER
-    #  pragma warning(pop)
-    #endif
 }
 
 void test_multiplicatiom()

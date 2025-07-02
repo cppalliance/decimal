@@ -1452,7 +1452,7 @@ private:
 };
 
 // Define some convenient unsigned wide integer types.
-using uint128_t = uintwide_t<static_cast<size_t>(UINT32_C(128))>;
+using builtin_uint128_t = uintwide_t<static_cast<size_t>(UINT32_C(128))>;
 using uint256_t = uintwide_t<static_cast<size_t>(UINT32_C(256))>;
 
 } // namespace wide_integer

@@ -11,6 +11,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/emulated256.hpp>
+#include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <array>
@@ -30,7 +31,7 @@ constexpr auto num_digits(T x) noexcept -> int
 
     while (x)
     {
-        x /= 10;
+        x /= 10U;
         ++digits;
     }
 
@@ -168,7 +169,7 @@ constexpr auto num_digits(std::uint64_t x) noexcept -> int
 # pragma warning(disable: 4307) // MSVC 14.1 warns of intergral constant overflow
 #endif
 
-constexpr int num_digits(const uint128& x) noexcept
+constexpr int num_digits(const boost::int128::uint128_t& x) noexcept
 {
     if (x.high == UINT64_C(0))
     {
@@ -181,9 +182,9 @@ constexpr int num_digits(const uint128& x) noexcept
 
     while (left < right)
     {
-        std::uint32_t mid = (left + right + 1U) / 2U;
+        const auto mid = (left + right + 1U) / 2U;
 
-        if (x >= impl::emulated_128_pow10[mid])
+        if (x >= impl::boost_int128_pow10[mid])
         {
             left = mid;
         }
@@ -198,13 +199,13 @@ constexpr int num_digits(const uint128& x) noexcept
 
 constexpr int num_digits(const uint256_t& x) noexcept
 {
-    if (x.high == 0)
+    if (x.high == 0U)
     {
         return num_digits(x.low);
     }
 
     // 10^77
-    auto current_power_of_10 {uint256_t{uint128{UINT64_C(15930919111324522770), UINT64_C(5327493063679123134)}, uint128{UINT64_C(12292710897160462336), UINT64_C(0)}}};
+    auto current_power_of_10 {uint256_t{boost::int128::uint128_t{UINT64_C(15930919111324522770), UINT64_C(5327493063679123134)}, boost::int128::uint128_t{UINT64_C(12292710897160462336), UINT64_C(0)}}};
 
     for (int i = 78; i > 0; --i)
     {
@@ -225,7 +226,7 @@ constexpr int num_digits(const uint256_t& x) noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-constexpr auto num_digits(const uint128_t& x) noexcept -> int
+constexpr auto num_digits(const builtin_uint128_t& x) noexcept -> int
 {
     if (static_cast<std::uint64_t>(x >> 64) == UINT64_C(0))
     {
@@ -240,7 +241,7 @@ constexpr auto num_digits(const uint128_t& x) noexcept -> int
     {
         std::uint32_t mid = (left + right + 1U) / 2U;
 
-        if (x >= impl::emulated_128_pow10[mid])
+        if (x >= impl::builtin_128_pow10[mid])
         {
             left = mid;
         }
@@ -254,6 +255,232 @@ constexpr auto num_digits(const uint128_t& x) noexcept -> int
 }
 
 #endif // Has int128
+
+// Specializations with pruned branches for constructors
+// Since we already have partial information we can greatly speed things up in this case
+template <typename T>
+constexpr auto d32_constructor_num_digits(T) noexcept -> std::enable_if_t<std::numeric_limits<T>::digits10 + 1 < 7, int>
+{
+    // Does not matter since it is guaranteed to fit
+    return 0;
+}
+
+template <typename T>
+constexpr auto d32_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 <= 10) &&
+                                                                            (std::numeric_limits<T>::digits10 + 1 > 7), int>
+{
+    BOOST_DECIMAL_ASSERT(x >= 10000000);
+
+    if (x >= 100000000)
+    {
+        if (x >= 1000000000)
+        {
+            return 10;
+        }
+        return 9;
+    }
+    return 8;
+}
+
+template <typename T>
+constexpr auto d32_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 > 10) &&
+                                                                            (std::numeric_limits<T>::digits10 + 1 <= 20), int>
+{
+    // We already know that x >= 10000000 (7 digits)
+    BOOST_DECIMAL_ASSERT(x >= 10000000);
+
+    if (x >= UINT64_C(10000000000))
+    {
+        if (x >= UINT64_C(100000000000000))
+        {
+            if (x >= UINT64_C(10000000000000000))
+            {
+                if (x >= UINT64_C(100000000000000000))
+                {
+                    if (x >= UINT64_C(1000000000000000000))
+                    {
+                        if (x >= UINT64_C(10000000000000000000))
+                        {
+                            return 20;
+                        }
+                        return 19;
+                    }
+                    return 18;
+                }
+                return 17;
+            }
+            else if (x >= UINT64_C(1000000000000000))
+            {
+                return 16;
+            }
+            return 15;
+        }
+        if (x >= UINT64_C(1000000000000))
+        {
+            if (x >= UINT64_C(10000000000000))
+            {
+                return 14;
+            }
+            return 13;
+        }
+        if (x >= UINT64_C(100000000000))
+        {
+            return 12;
+        }
+        return 11;
+    }
+    else // 10000000 <= x < 10000000000
+    {
+        if (x >= UINT64_C(100000000))
+        {
+            if (x >= UINT64_C(1000000000))
+            {
+                return 10;
+            }
+            return 9;
+        }
+        else // 10000000 <= x < 100000000
+        {
+            return 8;
+        }
+    }
+}
+
+template <typename T>
+constexpr auto d32_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 > 20), int>
+{
+    // Anything bigger than uint64_t has no benefit so fall back to that
+    return num_digits(x);
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+constexpr auto d32_constructor_num_digits(builtin_uint128_t x) noexcept -> int
+{
+    return num_digits(x);
+}
+#endif
+
+template <typename T>
+constexpr auto d64_constructor_num_digits(T) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 <= 16), int>
+{
+    return 0;
+}
+
+template <typename T>
+constexpr auto d64_constructor_num_digits(T x) noexcept -> std::enable_if_t<(std::numeric_limits<T>::digits10 + 1 > 16) &&
+                                                                            (std::numeric_limits<T>::digits10 <= 20), int>
+{
+    // Pre-condition: x >= 10^16
+    BOOST_DECIMAL_ASSERT(x >= UINT64_C(10000000000000000));
+
+    if (x >= UINT64_C(100000000000000000))
+    {
+        if (x >= UINT64_C(1000000000000000000))
+        {
+            if (x >= UINT64_C(10000000000000000000))
+            {
+                return 20;
+            }
+            return 19;
+        }
+        return 18;
+    }
+    return 17;
+}
+
+template <typename T>
+constexpr auto d64_constructor_num_digits(T x) noexcept -> std::enable_if_t<std::numeric_limits<T>::digits10 >= 20, int>
+{
+    return num_digits(x);
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+constexpr auto d64_constructor_num_digits(builtin_uint128_t x) noexcept -> int
+{
+    return num_digits(x);
+}
+#endif
+
+template <typename T>
+constexpr auto d128_constructor_num_digits(T) noexcept -> std::enable_if_t<std::numeric_limits<T>::digits10 + 1 <= 34, int>
+{
+    return 0;
+}
+
+#ifdef BOOST_DECIMAL_HAS_INT128
+constexpr auto d128_constructor_num_digits(builtin_uint128_t x) noexcept -> int
+{
+    // Pre-condition: we know x has at least 34 digits
+    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<builtin_uint128_t>(34)));
+
+    constexpr auto digits35 {detail::pow10(static_cast<builtin_uint128_t>(35))};
+    constexpr auto digits36 {detail::pow10(static_cast<builtin_uint128_t>(36))};
+    constexpr auto digits37 {detail::pow10(static_cast<builtin_uint128_t>(37))};
+    constexpr auto digits38 {detail::pow10(static_cast<builtin_uint128_t>(38))};
+    constexpr auto digits39 {detail::pow10(static_cast<builtin_uint128_t>(39))};
+
+    if (x >= digits38)
+    {
+        if (x >= digits39)
+        {
+            return 39;
+        }
+        return 38;
+    }
+    if (x >= digits36)
+    {
+        if (x >= digits37)
+        {
+            return 37;
+        }
+        return 36;
+    }
+    if (x >= digits35)
+    {
+        return 35;
+    }
+    return 34;  // Since we know x has at least 34 digits
+}
+#endif
+
+constexpr auto d128_constructor_num_digits(const boost::int128::uint128_t x) noexcept -> int
+{
+    // Pre-condition: we know x has at least 34 digits
+    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<boost::int128::uint128_t>(34)));
+
+    // Since we know that x has at least 34 digits we can get away with just comparing the high bits,
+    // which reduces these to uint64_t comps instead of synthesized 128-bit
+
+    constexpr auto digits35 {detail::pow10(static_cast<boost::int128::uint128_t>(35)).high};
+    constexpr auto digits36 {detail::pow10(static_cast<boost::int128::uint128_t>(36)).high};
+    constexpr auto digits37 {detail::pow10(static_cast<boost::int128::uint128_t>(37)).high};
+    constexpr auto digits38 {detail::pow10(static_cast<boost::int128::uint128_t>(38)).high};
+    constexpr auto digits39 {detail::pow10(static_cast<boost::int128::uint128_t>(39)).high};
+
+    const auto x_high {x.high};
+
+    if (x_high >= digits38)
+    {
+        if (x_high >= digits39)
+        {
+            return 39;
+        }
+        return 38;
+    }
+    if (x_high >= digits36)
+    {
+        if (x_high >= digits37)
+        {
+            return 37;
+        }
+        return 36;
+    }
+    if (x_high >= digits35)
+    {
+        return 35;
+    }
+    return 34;  // Since we know x has at least 34 digits
+}
 
 } // namespace detail
 } // namespace decimal
