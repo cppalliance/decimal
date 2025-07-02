@@ -732,7 +732,7 @@ constexpr u256 operator+(const u256& lhs, const u256& rhs) noexcept
 
 namespace impl {
 
-#if defined(__GNUC__) && __GNUC__ >= 7
+#if defined(__GNUC__) && __GNUC__ >= 8
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
