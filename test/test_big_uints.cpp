@@ -486,28 +486,22 @@ int main()
 {
   #ifndef __s390x__
   test_big_uints_mul<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
-  test_big_uints_mul<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
   test_big_uints_mul<boost::multiprecision::uint256_t, boost::decimal::detail::u256>();
 
-  test_p10_mul_uint256_t<boost::decimal::detail::uint256_t>();
   test_p10_mul_uint256_t<boost::decimal::detail::u256>();
 
   test_digit_counting<boost::int128::uint128_t>();
-  test_digit_counting<boost::decimal::detail::uint256_t>();
   test_digit_counting<boost::decimal::detail::u256>();
   #endif
 
   test_big_uints_div<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
-  test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
   test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::u256>();
 
   test_various_spots();
 
-  test_spot_div_uint256_t<boost::decimal::detail::uint256_t>();
   test_spot_div_uint256_t<boost::decimal::detail::u256>();
 
   test_big_uints_shl<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
-  test_big_uints_shl<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
   test_big_uints_shl<boost::multiprecision::uint256_t, boost::decimal::detail::u256>();
 
   return boost::report_errors();
