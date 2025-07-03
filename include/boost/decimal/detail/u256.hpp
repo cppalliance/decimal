@@ -746,7 +746,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 from_words(const std::uint32_t (&words
     u256 result {};
 
     #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
-    if (BOOST_INT128_IS_CONSTANT_EVALUATED(words))
+    if (!BOOST_INT128_IS_CONSTANT_EVALUATED(words))
     {
         std::memcpy(&result, words, sizeof(result));
     }
