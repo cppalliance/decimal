@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_DIV_IMPL_HPP
 
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/u256.hpp>
 #include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -76,15 +77,14 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
     constexpr auto ten_pow_precision {pow10(int128::uint128_t(detail::precision_v<decimal128>))};
     const auto big_sig_lhs {detail::umul256(lhs.sig, ten_pow_precision)};
 
-    // TODO(mborland): Make this u256 / u128 rather than 256/256
-    auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
+    auto res_sig {big_sig_lhs / rhs.sig};
     auto res_exp {lhs.exp - rhs.exp - detail::precision_v<decimal128>};
 
     if (res_sig.high != UINT64_C(0))
     {
         const auto sig_dig {detail::num_digits(res_sig)};
         const auto digit_delta {sig_dig - std::numeric_limits<int128::uint128_t>::digits10};
-        res_sig /= detail::uint256_t(pow10(int128::uint128_t(digit_delta)));
+        res_sig /= detail::u256(pow10(int128::uint128_t(digit_delta)));
         res_exp += digit_delta;
     }
     else if (res_sig.low == UINT64_C(0))
