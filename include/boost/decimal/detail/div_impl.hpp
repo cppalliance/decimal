@@ -80,20 +80,20 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
     auto res_sig {big_sig_lhs / rhs.sig};
     auto res_exp {lhs.exp - rhs.exp - detail::precision_v<decimal128>};
 
-    if (res_sig.high != UINT64_C(0))
+    if (res_sig[3] != 0 || res_sig[2] != 0)
     {
         const auto sig_dig {detail::num_digits(res_sig)};
         const auto digit_delta {sig_dig - std::numeric_limits<int128::uint128_t>::digits10};
         res_sig /= detail::u256(pow10(int128::uint128_t(digit_delta)));
         res_exp += digit_delta;
     }
-    else if (res_sig.low == UINT64_C(0))
+    else if (res_sig[1] == 0 && res_sig[0] == 0)
     {
         sign = false;
     }
 
     // Let the constructor handle shrinking it back down and rounding correctly
-    q = T {res_sig.low, res_exp, sign};
+    q = T {int128::uint128_t{res_sig[1], res_sig[0]}, res_exp, sign};
 }
 
 } // namespace detail
