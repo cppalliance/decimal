@@ -234,28 +234,27 @@ constexpr int num_digits(const u256& x) noexcept
     int msb {};
     if (x[3] != 0U)
     {
-        msb = 192 + (64 - int128::countl_zero(x[3]));
+        msb = 192 + (63 - int128::countl_zero(x[3]));
     }
     else
     {
-        msb = 128 + (64 - int128::countl_zero(x[2]));
+        msb = 128 + (63 - int128::countl_zero(x[2]));
     }
 
     // Approximate log10
     const auto estimated_digits {(msb * 1000) / 3322 + 1}; // 1000/3322 ~= 1/log2(10)
-    if (x >= impl::u256_pow_10[estimated_digits])
+
+    if (estimated_digits < 78 && x >= impl::u256_pow_10[estimated_digits])
     {
-        // Check to make sure we don't exceed the maximum value
-        return estimated_digits != 78 ? estimated_digits + 1 : estimated_digits;
+        return estimated_digits + 1;
     }
-    else if (estimated_digits > 1 && x < impl::u256_pow_10[estimated_digits - 1])
+
+    if (estimated_digits > 1 && x < impl::u256_pow_10[estimated_digits - 1])
     {
         return estimated_digits - 1;
     }
-    else
-    {
-        return estimated_digits;
-    }
+
+    return estimated_digits;
 }
 
 #ifdef _MSC_VER
