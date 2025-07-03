@@ -57,7 +57,7 @@ constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> Deci
     constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64>))};
     const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.sig) * tens_needed};
 
-    auto res_sig {big_sig_lhs / static_cast<unsigned_int128_type>(rhs.sig)};
+    auto res_sig {big_sig_lhs / rhs.sig};
     auto res_exp {(lhs.exp - detail::precision_v<decimal64>) - rhs.exp};
 
     if (res_sig == 0U)
