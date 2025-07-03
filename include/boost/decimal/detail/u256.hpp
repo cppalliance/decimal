@@ -857,7 +857,7 @@ constexpr u256 operator*(const UnsignedInteger lhs, const u256& rhs) noexcept
     return impl::default_mul(rhs, lhs);
 }
 
-constexpr u256 umul256_new(const int128::uint128_t& a, const int128::uint128_t& b) noexcept
+constexpr u256 umul256(const int128::uint128_t& a, const int128::uint128_t& b) noexcept
 {
     u256 result{};
 
