@@ -210,11 +210,11 @@ constexpr int num_digits(const u256& x) noexcept
     int msb {};
     if (x[3] != 0U)
     {
-        msb = 192 + (63 - int128::countl_zero(x[3]));
+        msb = 192 + (63 - int128::detail::impl::countl_impl(x[3]));
     }
     else
     {
-        msb = 128 + (63 - int128::countl_zero(x[2]));
+        msb = 128 + (63 - int128::detail::impl::countl_impl(x[2]));
     }
 
     // Approximate log10
