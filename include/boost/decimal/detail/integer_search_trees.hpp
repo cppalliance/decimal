@@ -10,7 +10,6 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
-#include <boost/decimal/detail/emulated256.hpp>
 #include <boost/decimal/detail/u256.hpp>
 #include <boost/int128/int128.hpp>
 
@@ -196,29 +195,6 @@ constexpr int num_digits(const boost::int128::uint128_t& x) noexcept
     }
 
     return static_cast<int>(left + 1);
-}
-
-constexpr int num_digits(const uint256_t& x) noexcept
-{
-    if (x.high == 0U)
-    {
-        return num_digits(x.low);
-    }
-
-    // 10^77
-    auto current_power_of_10 {uint256_t{boost::int128::uint128_t{UINT64_C(15930919111324522770), UINT64_C(5327493063679123134)}, boost::int128::uint128_t{UINT64_C(12292710897160462336), UINT64_C(0)}}};
-
-    for (int i = 78; i > 0; --i)
-    {
-        if (x >= current_power_of_10)
-        {
-            return i;
-        }
-
-        current_power_of_10 /= UINT64_C(10);
-    }
-
-    return 1;
 }
 
 constexpr int num_digits(const u256& x) noexcept
