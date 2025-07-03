@@ -84,7 +84,7 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
     {
         const auto sig_dig {detail::num_digits(res_sig)};
         const auto digit_delta {sig_dig - std::numeric_limits<int128::uint128_t>::digits10};
-        res_sig /= detail::u256(pow10(int128::uint128_t(digit_delta)));
+        res_sig /= pow10(int128::uint128_t(digit_delta));
         res_exp += digit_delta;
     }
     else if (res_sig[1] == 0 && res_sig[0] == 0)
@@ -93,6 +93,7 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
     }
 
     // Let the constructor handle shrinking it back down and rounding correctly
+    BOOST_DECIMAL_ASSERT((res_sig[3] | res_sig[2]) == 0U);
     q = T {int128::uint128_t{res_sig[1], res_sig[0]}, res_exp, sign};
 }
 
