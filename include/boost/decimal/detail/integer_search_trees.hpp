@@ -223,7 +223,7 @@ constexpr int num_digits(const uint256_t& x) noexcept
 
 constexpr int num_digits(const u256& x) noexcept
 {
-    if ((x[3] & x[2]) == 0)
+    if ((x[3] | x[2]) == 0)
     {
         return num_digits(int128::uint128_t{x[1], x[0]});
     }
