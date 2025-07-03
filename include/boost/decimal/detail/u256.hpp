@@ -57,6 +57,7 @@ u256
     constexpr u256& operator|=(const u256& rhs) noexcept;
 
     constexpr u256& operator/=(const u256& rhs) noexcept;
+    constexpr u256& operator/=(const int128::uint128_t& rhs) noexcept;
     constexpr u256& operator/=(std::uint64_t rhs) noexcept;
 
     constexpr u256& operator%=(const u256& rhs) noexcept;
@@ -919,7 +920,7 @@ constexpr std::size_t div_to_words(const u256& x, std::uint32_t (&words)[8]) noe
     return word_count;
 }
 
-constexpr std::size_t div_to_words(const boost::int128::uint128_t& x, std::uint32_t (&words)[4]) noexcept
+constexpr std::size_t div_to_words(const boost::int128::uint128_t& x, std::uint32_t (&words)[8]) noexcept
 {
     #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
     if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x))
@@ -1033,6 +1034,12 @@ constexpr u256 operator/(const u256& lhs, const UnsignedInteger rhs) noexcept
 }
 
 constexpr u256& u256::operator/=(const u256& rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+constexpr u256& u256::operator/=(const int128::uint128_t& rhs) noexcept
 {
     *this = *this / rhs;
     return *this;
