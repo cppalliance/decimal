@@ -21,6 +21,7 @@ int main()
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
 #include <boost/decimal.hpp>
+#include <boost/decimal/detail/u256.hpp>
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -141,9 +142,9 @@ auto test_big_uints_mul() -> void
       auto digits_rhs = static_cast<int>(static_cast<float>((1.0F - split) * digits2));
 
       boost_ctrl_uint_type boost_ctrl_uint_lhs(1);
-      dec_intern_uint_type dec_intern_uint_lhs(1);
+      dec_intern_uint_type dec_intern_uint_lhs(1U);
       boost_ctrl_uint_type boost_ctrl_uint_rhs(1);
-      dec_intern_uint_type dec_intern_uint_rhs(1);
+      dec_intern_uint_type dec_intern_uint_rhs(1U);
 
       if(lhs_is_fixed_and_near_max)
       {
@@ -333,10 +334,11 @@ auto test_various_spots() -> void
   }
 }
 
+template <typename T>
 auto test_spot_div_uint256_t() -> void
 {
   using boost_ctrl_uint_type = boost::multiprecision::uint256_t;
-  using dec_intern_uint_type = boost::decimal::detail::uint256_t;
+  using dec_intern_uint_type = T;
 
   {
     // Specially test several exactly-curated division operations that are know
@@ -399,9 +401,10 @@ auto test_spot_div_uint256_t() -> void
   }
 }
 
+template <typename T>
 auto test_p10_mul_uint256_t() -> void
 {
-  using local_uint256_t = boost::decimal::detail::uint256_t;
+  using local_uint256_t = T;
 
   auto powers_of_10 = local::generate_p10_array<local_uint256_t, static_cast<std::size_t>(UINT8_C(78))>();
 
@@ -481,24 +484,31 @@ void test_digit_counting()
 
 int main()
 {
+  #ifndef __s390x__
   test_big_uints_mul<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
   test_big_uints_mul<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
+  test_big_uints_mul<boost::multiprecision::uint256_t, boost::decimal::detail::u256>();
 
-  test_big_uints_div<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
-  test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
-
-  test_various_spots();
-
-  test_spot_div_uint256_t();
-
-  test_p10_mul_uint256_t();
-
-  test_big_uints_shl<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
-  test_big_uints_shl<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
+  test_p10_mul_uint256_t<boost::decimal::detail::uint256_t>();
+  test_p10_mul_uint256_t<boost::decimal::detail::u256>();
 
   test_digit_counting<boost::int128::uint128_t>();
   test_digit_counting<boost::decimal::detail::uint256_t>();
-  test_digit_counting<boost::int128::uint128_t>();
+  test_digit_counting<boost::decimal::detail::u256>();
+  #endif
+
+  test_big_uints_div<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
+  test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
+  test_big_uints_div<boost::multiprecision::uint256_t, boost::decimal::detail::u256>();
+
+  test_various_spots();
+
+  test_spot_div_uint256_t<boost::decimal::detail::uint256_t>();
+  test_spot_div_uint256_t<boost::decimal::detail::u256>();
+
+  test_big_uints_shl<boost::multiprecision::uint128_t, boost::int128::uint128_t  >();
+  test_big_uints_shl<boost::multiprecision::uint256_t, boost::decimal::detail::uint256_t>();
+  test_big_uints_shl<boost::multiprecision::uint256_t, boost::decimal::detail::u256>();
 
   return boost::report_errors();
 }

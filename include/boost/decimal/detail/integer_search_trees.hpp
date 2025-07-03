@@ -11,6 +11,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/emulated256.hpp>
+#include <boost/decimal/detail/u256.hpp>
 #include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -218,6 +219,42 @@ constexpr int num_digits(const uint256_t& x) noexcept
     }
 
     return 1;
+}
+
+constexpr int num_digits(const u256& x) noexcept
+{
+    if ((x[3] | x[2]) == 0)
+    {
+        return num_digits(int128::uint128_t{x[1], x[0]});
+    }
+
+    // Use the most significant bit position to approximate log10
+    // log10(x) ~= log2(x) / log2(10) ~= log2(x) / 3.32
+
+    int msb {};
+    if (x[3] != 0U)
+    {
+        msb = 192 + (63 - int128::countl_zero(x[3]));
+    }
+    else
+    {
+        msb = 128 + (63 - int128::countl_zero(x[2]));
+    }
+
+    // Approximate log10
+    const auto estimated_digits {(msb * 1000) / 3322 + 1}; // 1000/3322 ~= 1/log2(10)
+
+    if (estimated_digits < 78 && x >= impl::u256_pow_10[estimated_digits])
+    {
+        return estimated_digits + 1;
+    }
+
+    if (estimated_digits > 1 && x < impl::u256_pow_10[estimated_digits - 1])
+    {
+        return estimated_digits - 1;
+    }
+
+    return estimated_digits;
 }
 
 #ifdef _MSC_VER
