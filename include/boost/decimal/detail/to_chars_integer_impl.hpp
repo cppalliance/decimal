@@ -38,6 +38,11 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE char digit_table[] = {
         'u', 'v', 'w', 'x', 'y', 'z'
 };
 
+#if defined(__GNUC__) && __GNUC__ == 7
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+
 // Use a simple lookup table to put together the Integer in character form
 template <typename Integer, typename Unsigned_Integer>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Integer value, int base) noexcept
@@ -112,6 +117,10 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
 
     return {first + num_chars, std::errc()};
 }
+
+#if defined(__GNUC__) && __GNUC__ == 7
+#pragma GCC diagnostic pop
+#endif
 
 }
 }
