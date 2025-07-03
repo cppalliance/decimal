@@ -159,10 +159,10 @@ BOOST_DECIMAL_NO_INLINE void test_comparisons(const std::vector<T>& data_vec, co
         {
             const auto val1 = data_vec[i];
             const auto val2 = data_vec[i + 1];
-            //s += static_cast<std::size_t>(val1 > val2);
-            //s += static_cast<std::size_t>(val1 >= val2);
-            //s += static_cast<std::size_t>(val1 < val2);
-            //s += static_cast<std::size_t>(val1 <= val2);
+            s += static_cast<std::size_t>(val1 > val2);
+            s += static_cast<std::size_t>(val1 >= val2);
+            s += static_cast<std::size_t>(val1 < val2);
+            s += static_cast<std::size_t>(val1 <= val2);
             s += static_cast<std::size_t>(val1 == val2);
             s += static_cast<std::size_t>(val1 != val2);
         }
