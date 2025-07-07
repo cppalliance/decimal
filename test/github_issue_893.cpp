@@ -8,7 +8,7 @@
 #include <boost/core/lightweight_test.hpp>
 #include <array>
 
-int main()
+void test_128()
 {
     const std::array<boost::int128::uint128_t, 6> comp_values = {
         BOOST_INT128_UINT128_C(1234567890123456789012345678901234),
@@ -22,6 +22,7 @@ int main()
     int res {34};
     for (const auto& value : comp_values)
     {
+        BOOST_TEST_EQ(boost::decimal::detail::num_digits(value), res);
         BOOST_TEST_EQ(boost::decimal::detail::d128_constructor_num_digits(value), res++);
     }
 
@@ -30,10 +31,16 @@ int main()
     res = 34;
     for (const auto& value : comp_values)
     {
+        BOOST_TEST_EQ(boost::decimal::detail::num_digits(static_cast<boost::decimal::detail::builtin_uint128_t>(value)), res);
         BOOST_TEST_EQ(boost::decimal::detail::d128_constructor_num_digits(static_cast<boost::decimal::detail::builtin_uint128_t>(value)), res++);
     }
 
     #endif
+}
+
+int main()
+{
+    test_128();
 
     return boost::report_errors();
 }
