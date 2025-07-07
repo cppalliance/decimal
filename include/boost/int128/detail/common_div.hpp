@@ -251,8 +251,6 @@ BOOST_INT128_FORCE_INLINE constexpr std::size_t to_words(const T& x, std::uint32
         words[3] = static_cast<std::uint32_t>(static_cast<std::uint64_t>(x.high) >> 32);        // LCOV_EXCL_LINE
     }
 
-    BOOST_INT128_ASSERT_MSG(x != static_cast<T>(0), "Division by 0");
-
     std::size_t word_count {4};
     while (words[word_count - 1U] == 0U)
     {

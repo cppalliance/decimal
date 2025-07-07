@@ -2638,6 +2638,11 @@ constexpr uint128_t operator/(const uint128_t lhs, const UnsignedInteger rhs) no
         return {0, 0};
     }
 
+    if (lhs < rhs)
+    {
+        return {0, 0};
+    }
+
     uint128_t quotient {};
 
     detail::one_word_div(lhs, static_cast<eval_type>(rhs), quotient);
@@ -2655,7 +2660,7 @@ constexpr uint128_t operator/(const UnsignedInteger lhs, const uint128_t rhs) no
         return {0, 0};
     }
 
-    if (rhs.high != 0U)
+    if (lhs < rhs)
     {
         return {0, 0};
     }
