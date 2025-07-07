@@ -8,6 +8,23 @@
 #include <boost/core/lightweight_test.hpp>
 #include <array>
 
+void test_32()
+{
+    const std::array<std::uint64_t, 3> comp_values = {
+        UINT64_C(12345678),
+        UINT64_C(123456789),
+        UINT64_C(1234567890),
+    };
+
+    int res {8};
+
+    for (const auto& value : comp_values)
+    {
+        BOOST_TEST_EQ(boost::decimal::detail::num_digits(value), res);
+        BOOST_TEST_EQ(boost::decimal::detail::d32_constructor_num_digits(value), res++);
+    }
+}
+
 void test_64()
 {
     const std::array<std::uint64_t, 4> comp_values = {
@@ -58,6 +75,7 @@ void test_128()
 
 int main()
 {
+    test_32();
     test_64();
     test_128();
 

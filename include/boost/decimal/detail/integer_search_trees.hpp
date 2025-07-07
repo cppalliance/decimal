@@ -41,45 +41,25 @@ constexpr auto num_digits(T x) noexcept -> int
 template <>
 constexpr auto num_digits(std::uint32_t x) noexcept -> int
 {
-    if (x >= UINT32_C(10000))
-    {
-        if (x >= UINT32_C(10000000))
-        {
-            if (x >= UINT32_C(100000000))
-            {
-                if (x >= UINT32_C(1000000000))
-                {
-                    return 10;
-                }
-                return 9;
-            }
-            return 8;
-        }
+    // Use the most significant bit position to approximate log10
+    // log10(x) ~= log2(x) / log2(10) ~= log2(x) / 3.32
 
-        else if (x >= UINT32_C(100000))
-        {
-            if (x >= UINT32_C(1000000))
-            {
-                return 7;
-            }
-            return 6;
-        }
-        return 5;
-    }
-    else if (x >= UINT32_C(100))
+    const auto msb {32 - int128::detail::impl::countl_impl(x)};
+
+    // Approximate log10
+    const auto estimated_digits {(msb * 1000) / 3322 + 1}; // 1000/3322 ~= 1/log2(10)
+
+    if (estimated_digits < 10 && x >= impl::powers_of_10_u32[estimated_digits])
     {
-        if (x >= UINT32_C(1000))
-        {
-            return 4;
-        }
-        return 3;
-    }
-    else if (x >= UINT32_C(10))
-    {
-        return 2;
+        return estimated_digits + 1;
     }
 
-    return 1;
+    if (estimated_digits > 1 && x < impl::powers_of_10_u32[estimated_digits - 1])
+    {
+        return estimated_digits - 1;
+    }
+
+    return estimated_digits;
 }
 
 template <>
@@ -88,7 +68,7 @@ constexpr auto num_digits(std::uint64_t x) noexcept -> int
     // Use the most significant bit position to approximate log10
     // log10(x) ~= log2(x) / log2(10) ~= log2(x) / 3.32
 
-    const auto msb {64 + (63 - int128::detail::impl::countl_impl(x))};
+    const auto msb {63 - int128::detail::impl::countl_impl(x)};
 
     // Approximate log10
     const auto estimated_digits {(msb * 1000) / 3322 + 1}; // 1000/3322 ~= 1/log2(10)
