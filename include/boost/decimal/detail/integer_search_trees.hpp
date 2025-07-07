@@ -424,13 +424,13 @@ constexpr auto d128_constructor_num_digits(T) noexcept -> std::enable_if_t<std::
 constexpr auto d128_constructor_num_digits(builtin_uint128_t x) noexcept -> int
 {
     // Pre-condition: we know x has at least 34 digits
-    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<builtin_uint128_t>(34)));
+    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<builtin_uint128_t>(33)));
 
-    constexpr auto digits35 {detail::pow10(static_cast<builtin_uint128_t>(35))};
-    constexpr auto digits36 {detail::pow10(static_cast<builtin_uint128_t>(36))};
-    constexpr auto digits37 {detail::pow10(static_cast<builtin_uint128_t>(37))};
-    constexpr auto digits38 {detail::pow10(static_cast<builtin_uint128_t>(38))};
-    constexpr auto digits39 {detail::pow10(static_cast<builtin_uint128_t>(39))};
+    constexpr auto digits35 {detail::pow10(static_cast<builtin_uint128_t>(34))};
+    constexpr auto digits36 {detail::pow10(static_cast<builtin_uint128_t>(35))};
+    constexpr auto digits37 {detail::pow10(static_cast<builtin_uint128_t>(36))};
+    constexpr auto digits38 {detail::pow10(static_cast<builtin_uint128_t>(37))};
+    constexpr auto digits39 {detail::pow10(static_cast<builtin_uint128_t>(38))};
 
     if (x >= digits38)
     {
@@ -452,6 +452,7 @@ constexpr auto d128_constructor_num_digits(builtin_uint128_t x) noexcept -> int
     {
         return 35;
     }
+
     return 34;  // Since we know x has at least 34 digits
 }
 #endif
@@ -459,16 +460,16 @@ constexpr auto d128_constructor_num_digits(builtin_uint128_t x) noexcept -> int
 constexpr auto d128_constructor_num_digits(const boost::int128::uint128_t x) noexcept -> int
 {
     // Pre-condition: we know x has at least 34 digits
-    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<boost::int128::uint128_t>(34)));
+    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<boost::int128::uint128_t>(33)));
 
     // Since we know that x has at least 34 digits we can get away with just comparing the high bits,
     // which reduces these to uint64_t comps instead of synthesized 128-bit
 
-    constexpr auto digits35 {detail::pow10(static_cast<boost::int128::uint128_t>(35)).high};
-    constexpr auto digits36 {detail::pow10(static_cast<boost::int128::uint128_t>(36)).high};
-    constexpr auto digits37 {detail::pow10(static_cast<boost::int128::uint128_t>(37)).high};
-    constexpr auto digits38 {detail::pow10(static_cast<boost::int128::uint128_t>(38)).high};
-    constexpr auto digits39 {detail::pow10(static_cast<boost::int128::uint128_t>(39)).high};
+    constexpr auto digits35 {detail::pow10(static_cast<boost::int128::uint128_t>(34)).high};
+    constexpr auto digits36 {detail::pow10(static_cast<boost::int128::uint128_t>(35)).high};
+    constexpr auto digits37 {detail::pow10(static_cast<boost::int128::uint128_t>(36)).high};
+    constexpr auto digits38 {detail::pow10(static_cast<boost::int128::uint128_t>(37)).high};
+    constexpr auto digits39 {detail::pow10(static_cast<boost::int128::uint128_t>(38)).high};
 
     const auto x_high {x.high};
 
@@ -492,6 +493,7 @@ constexpr auto d128_constructor_num_digits(const boost::int128::uint128_t x) noe
     {
         return 35;
     }
+
     return 34;  // Since we know x has at least 34 digits
 }
 
