@@ -57,6 +57,7 @@ u256
     constexpr u256& operator|=(const u256& rhs) noexcept;
 
     constexpr u256& operator/=(const u256& rhs) noexcept;
+    constexpr u256& operator/=(const int128::uint128_t& rhs) noexcept;
     constexpr u256& operator/=(std::uint64_t rhs) noexcept;
 
     constexpr u256& operator%=(const u256& rhs) noexcept;
@@ -744,8 +745,8 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 from_words(const std::uint32_t (&words
 
     u256 result {};
 
-    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
-    if (BOOST_INT128_IS_CONSTANT_EVALUATED(words))
+    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
+    if (!BOOST_INT128_IS_CONSTANT_EVALUATED(words))
     {
         std::memcpy(&result, words, sizeof(result));
     }
@@ -800,8 +801,7 @@ constexpr u256 knuth_mulitply(const std::uint32_t (&u)[u_size],
 
 constexpr void to_words(const u256& x, std::uint32_t (&words)[8]) noexcept
 {
-    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
-
+    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
     if (!BOOST_INT128_IS_CONSTANT_EVALUATED(x))
     {
         std::memcpy(words, &x, sizeof(x));
@@ -857,7 +857,7 @@ constexpr u256 operator*(const UnsignedInteger lhs, const u256& rhs) noexcept
     return impl::default_mul(rhs, lhs);
 }
 
-constexpr u256 umul256_new(const int128::uint128_t& a, const int128::uint128_t& b) noexcept
+constexpr u256 umul256(const int128::uint128_t& a, const int128::uint128_t& b) noexcept
 {
     u256 result{};
 
@@ -919,7 +919,7 @@ constexpr std::size_t div_to_words(const u256& x, std::uint32_t (&words)[8]) noe
     return word_count;
 }
 
-constexpr std::size_t div_to_words(const boost::int128::uint128_t& x, std::uint32_t (&words)[4]) noexcept
+constexpr std::size_t div_to_words(const boost::int128::uint128_t& x, std::uint32_t (&words)[8]) noexcept
 {
     #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
     if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x))
@@ -1033,6 +1033,12 @@ constexpr u256 operator/(const u256& lhs, const UnsignedInteger rhs) noexcept
 }
 
 constexpr u256& u256::operator/=(const u256& rhs) noexcept
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+constexpr u256& u256::operator/=(const int128::uint128_t& rhs) noexcept
 {
     *this = *this / rhs;
     return *this;

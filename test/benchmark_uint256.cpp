@@ -7,7 +7,6 @@
 #ifdef BOOST_DECIMAL_BENCHMARK_U256
 
 #include <boost/decimal/detail/u256.hpp>
-#include <boost/decimal/detail/emulated256.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <chrono>
 #include <random>
@@ -44,57 +43,6 @@ using namespace std::chrono_literals;
 
 // 4 = 4 words
 // 5 = 4 / 2
-
-template <int words>
-std::vector<detail::uint256_t> generate_random_vector_old(std::size_t size = N, unsigned seed = 42U)
-{
-    if (seed == 0)
-    {
-        std::random_device rd;
-        seed = rd();
-    }
-
-    std::mt19937_64 gen(seed);
-    std::uniform_int_distribution<std::uint64_t> dist(UINT64_C(0), UINT64_MAX);
-    std::uniform_int_distribution<int> size_dist(0, 1);
-
-    std::vector<detail::uint256_t> result(size);
-    for (std::size_t i = 0; i < size; ++i)
-    {
-        auto current_words = words;
-        BOOST_INT128_IF_CONSTEXPR (words == 5)
-        {
-            // Alternating 4/2
-            current_words = i % 2 == 0 ? 4 : 2;
-        }
-
-        switch (current_words)
-        {
-            case 4:
-                result[i].low.low = dist(gen);
-                result[i].low.high = dist(gen);
-                result[i].high.low = dist(gen);
-                result[i].high.high = dist(gen);
-                break;
-            case 3:
-                result[i].low.low = dist(gen);
-                result[i].low.high = dist(gen);
-                result[i].high.low = dist(gen);
-                break;
-            case 2:
-                result[i].low.low = dist(gen);
-                result[i].low.high = dist(gen);
-                break;
-            case 1:
-                result[i].low.low = dist(gen);
-                break;
-            default:
-                BOOST_DECIMAL_UNREACHABLE;
-        }
-    }
-
-    return result;
-}
 
 template <int words>
 std::vector<detail::u256> generate_random_vector_new(std::size_t size = N, unsigned seed = 42U)
@@ -288,25 +236,20 @@ int main()
         std::cout << "Four Word Operations\n";
         std::cout << "---------------------------\n\n";
 
-        const auto old_vector = generate_random_vector_old<4>();
         const auto new_vector = generate_random_vector_new<4>();
 
-        test_comparisons(old_vector, "old");
         test_comparisons(new_vector, "new");
 
         std::cout << std::endl;
 
-        test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
         test_two_element_operation(new_vector, std::plus<>(), "add", "New");
 
         std::cout << std::endl;
 
-        test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
 
         std::cout << std::endl;
 
-        test_digit_counting(old_vector, "old");
         test_digit_counting(new_vector, "new");
     }
     // Two word operations
@@ -315,30 +258,24 @@ int main()
         std::cout << "Two Word Operations\n";
         std::cout << "---------------------------\n\n";
 
-        const auto old_vector = generate_random_vector_old<2>();
         const auto new_vector = generate_random_vector_new<2>();
 
-        test_comparisons(old_vector, "old");
         test_comparisons(new_vector, "new");
 
         std::cout << std::endl;
 
-        test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
         test_two_element_operation(new_vector, std::plus<>(), "add", "New");
 
         std::cout << std::endl;
 
-        test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
 
         std::cout << std::endl;
 
-        test_digit_counting(old_vector, "old");
         test_digit_counting(new_vector, "new");
 
         std::cout << std::endl;
 
-        test_umul256(old_vector, "old");
         test_umul256_new(new_vector, "new");
     }
 
@@ -348,20 +285,16 @@ int main()
         std::cout << "Four Word x Two Word Operations\n";
         std::cout << "---------------------------\n\n";
 
-        const auto old_vector = generate_random_vector_old<5>();
         const auto new_vector = generate_random_vector_new<5>();
 
-        test_comparisons(old_vector, "old");
         test_comparisons(new_vector, "new");
 
         std::cout << std::endl;
 
-        test_two_element_operation(old_vector, std::plus<>(), "add", "Old");
         test_two_element_operation(new_vector, std::plus<>(), "add", "New");
 
         std::cout << std::endl;
 
-        test_two_element_operation(old_vector, std::divides<>(), "div", "Old");
         test_two_element_operation(new_vector, std::divides<>(), "div", "New");
 
         std::cout << std::endl;
