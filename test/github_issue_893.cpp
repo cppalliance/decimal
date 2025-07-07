@@ -25,5 +25,15 @@ int main()
         BOOST_TEST_EQ(boost::decimal::detail::d128_constructor_num_digits(value), res++);
     }
 
+    #ifdef BOOST_DECIMAL_HAS_INT128
+
+    res = 34;
+    for (const auto& value : comp_values)
+    {
+        BOOST_TEST_EQ(boost::decimal::detail::d128_constructor_num_digits(static_cast<boost::decimal::detail::builtin_uint128_t>(value)), res++);
+    }
+
+    #endif
+
     return boost::report_errors();
 }
