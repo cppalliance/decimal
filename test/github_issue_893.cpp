@@ -1,0 +1,29 @@
+// Copyright 2025 Matt Borland
+// Distributed under the Boost Software License, Version 1.0.
+// https://www.boost.org/LICENSE_1_0.txt
+//
+// See: https://github.com/cppalliance/decimal/issues/893
+
+#include <boost/decimal.hpp>
+#include <boost/core/lightweight_test.hpp>
+#include <array>
+
+int main()
+{
+    const std::array<boost::int128::uint128_t, 6> comp_values = {
+        BOOST_INT128_UINT128_C(1234567890123456789012345678901234),
+        BOOST_INT128_UINT128_C(12345678901234567890123456789012345),
+        BOOST_INT128_UINT128_C(123456789012345678901234567890123456),
+        BOOST_INT128_UINT128_C(1234567890123456789012345678901234567),
+        BOOST_INT128_UINT128_C(12345678901234567890123456789012345678),
+        BOOST_INT128_UINT128_C(123456789012345678901234567890123456789),
+    };
+
+    int res {34};
+    for (const auto& value : comp_values)
+    {
+        BOOST_TEST_EQ(boost::decimal::detail::d128_constructor_num_digits(value), res++);
+    }
+
+    return boost::report_errors();
+}
