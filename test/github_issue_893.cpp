@@ -10,7 +10,7 @@
 
 void test_64()
 {
-    const std::array<std::uint64_t, 6> comp_values = {
+    const std::array<std::uint64_t, 4> comp_values = {
         UINT64_C(12345678901234567),
         UINT64_C(123456789012345678),
         UINT64_C(1234567890123456789),
