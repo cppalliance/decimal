@@ -745,7 +745,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 from_words(const std::uint32_t (&words
 
     u256 result {};
 
-    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
+    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
     if (!BOOST_INT128_IS_CONSTANT_EVALUATED(words))
     {
         std::memcpy(&result, words, sizeof(result));
@@ -801,8 +801,7 @@ constexpr u256 knuth_mulitply(const std::uint32_t (&u)[u_size],
 
 constexpr void to_words(const u256& x, std::uint32_t (&words)[8]) noexcept
 {
-    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
-
+    #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
     if (!BOOST_INT128_IS_CONSTANT_EVALUATED(x))
     {
         std::memcpy(words, &x, sizeof(x));
