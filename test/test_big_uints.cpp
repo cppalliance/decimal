@@ -470,7 +470,7 @@ template <typename T>
 void test_digit_counting()
 {
     using boost::decimal::detail::num_digits;
-    constexpr auto max_power {std::is_same<T, boost::decimal::detail::uint256_t>::value ? 77 : 38 };
+    constexpr auto max_power {sizeof(T) == sizeof(std::uint64_t) * 4 ? 77 : 38 };
 
     T current_power {1};
     int current_digits {1};
