@@ -176,25 +176,25 @@ constexpr int num_digits(const boost::int128::uint128_t& x) noexcept
         return num_digits(x.low);
     }
 
-    // We start left at 19 because we already eliminated the high word being 0
-    std::uint32_t left = 19U;
-    std::uint32_t right = 38U;
+    // Use the most significant bit position to approximate log10
+    // log10(x) ~= log2(x) / log2(10) ~= log2(x) / 3.32
 
-    while (left < right)
+    const auto msb {64 + (63 - int128::detail::impl::countl_impl(x.high))};
+
+    // Approximate log10
+    const auto estimated_digits {(msb * 1000) / 3322 + 1}; // 1000/3322 ~= 1/log2(10)
+
+    if (estimated_digits < 39 && x >= impl::boost_int128_pow10[estimated_digits])
     {
-        const auto mid = (left + right + 1U) / 2U;
-
-        if (x >= impl::boost_int128_pow10[mid])
-        {
-            left = mid;
-        }
-        else
-        {
-            right = mid - 1;
-        }
+        return estimated_digits + 1;
     }
 
-    return static_cast<int>(left + 1);
+    if (estimated_digits > 1 && x < impl::boost_int128_pow10[estimated_digits - 1])
+    {
+        return estimated_digits - 1;
+    }
+
+    return estimated_digits;
 }
 
 constexpr int num_digits(const u256& x) noexcept
