@@ -122,6 +122,7 @@ run test_fenv.cpp ;
 run test_fixed_width_trunc.cpp ;
 run test_float_conversion.cpp ;
 run test_format.cpp ;
+run test_format_fmtlib.cpp ;
 run-fail test_fprintf.cpp ;
 run test_frexp_ldexp.cpp ;
 run test_from_chars.cpp /boost/charconv//boost_charconv ;
