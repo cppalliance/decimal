@@ -8,7 +8,7 @@
 
 using namespace boost::decimal;
 
-#ifdef BOOST_DECIMAL_TEST_FMT
+#if defined(BOOST_DECIMAL_TEST_FMT) && defined(BOOST_DECIMAL_HAS_FMTLIB_SUPPORT)
 
 #include <fmt/format.h>
 

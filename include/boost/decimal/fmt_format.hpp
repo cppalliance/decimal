@@ -5,7 +5,9 @@
 #ifndef BOOST_DECIMAL_FMT_FORMAT_HPP
 #define BOOST_DECIMAL_FMT_FORMAT_HPP
 
-#if __has_include(<fmt/format.h>)
+#if __has_include(<fmt/format.h>) && __has_include(<fmt/base.h>)
+
+#define BOOST_DECIMAL_HAS_FMTLIB_SUPPORT
 
 #include <fmt/format.h>
 #include <fmt/base.h>
