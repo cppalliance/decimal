@@ -193,38 +193,22 @@ template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL
 constexpr auto d128_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
                              T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> ReturnType
 {
-    bool sign {lhs_sign != rhs_sign};
+    const bool sign {lhs_sign != rhs_sign};
 
-    const auto lhs_dig {detail::num_digits(lhs_sig)};
-    const auto rhs_dig {detail::num_digits(rhs_sig)};
+    auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
+    auto res_exp {lhs_exp + rhs_exp};
 
-    // TODO(mborland): Benchmark this since counting digits is a horribly slow operation
-    // If we can avoid it don't do 256 bit multiplication because it is slow
-    if (lhs_dig + rhs_dig <= std::numeric_limits<boost::int128::uint128_t>::digits10)
+    const auto sig_dig {detail::num_digits(res_sig)};
+
+    if (sig_dig > std::numeric_limits<boost::int128::uint128_t>::digits10)
     {
-        auto res_sig {lhs_sig * rhs_sig};
-        auto res_exp {lhs_exp + rhs_exp};
-        return {res_sig, res_exp, sign};
+        const auto digit_delta {sig_dig - std::numeric_limits<boost::int128::uint128_t>::digits10};
+        res_sig /= pow10(int128::uint128_t(digit_delta));
+        res_exp += digit_delta;
     }
-    else
-    {
-        // Once we have the normalized significands and exponents all we have to do is
-        // multiply the significands and add the exponents
-        auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
-        auto res_exp {lhs_exp + rhs_exp};
 
-        const auto sig_dig {detail::num_digits(res_sig)};
-
-        if (sig_dig > std::numeric_limits<boost::int128::uint128_t>::digits10)
-        {
-            const auto digit_delta {sig_dig - std::numeric_limits<boost::int128::uint128_t>::digits10};
-            res_sig /= pow10(int128::uint128_t(digit_delta));
-            res_exp += digit_delta;
-        }
-
-        BOOST_DECIMAL_ASSERT((res_sig[3] | res_sig[2]) == 0U);
-        return {int128::uint128_t{res_sig[1], res_sig[0]}, res_exp, sign};
-    }
+    BOOST_DECIMAL_ASSERT((res_sig[3] | res_sig[2]) == 0U);
+    return {int128::uint128_t{res_sig[1], res_sig[0]}, res_exp, sign};
 }
 
 template <typename ReturnType, typename T>
