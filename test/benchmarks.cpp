@@ -443,7 +443,7 @@ int main()
     test_two_element_operation(dec128_vector, std::divides<>(), "Division", "decimal128");
     test_two_element_operation(dec32_fast_vector, std::divides<>(), "Division", "dec32_fast");
     test_two_element_operation(dec64_fast_vector, std::divides<>(), "Division", "dec64_fast");
-    test_two_element_operation(dec64_fast_vector, std::divides<>(), "Division", "dec128_fast");
+    test_two_element_operation(dec128_fast_vector, std::divides<>(), "Division", "dec128_fast");
 
 #if 0
     std::cout << "\n===== sqrt =====\n";
