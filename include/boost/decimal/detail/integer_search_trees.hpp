@@ -41,127 +41,49 @@ constexpr auto num_digits(T x) noexcept -> int
 template <>
 constexpr auto num_digits(std::uint32_t x) noexcept -> int
 {
-    if (x >= UINT32_C(10000))
-    {
-        if (x >= UINT32_C(10000000))
-        {
-            if (x >= UINT32_C(100000000))
-            {
-                if (x >= UINT32_C(1000000000))
-                {
-                    return 10;
-                }
-                return 9;
-            }
-            return 8;
-        }
+    // Use the most significant bit position to approximate log10
+    // log10(x) ~= log2(x) / log2(10) ~= log2(x) / 3.32
 
-        else if (x >= UINT32_C(100000))
-        {
-            if (x >= UINT32_C(1000000))
-            {
-                return 7;
-            }
-            return 6;
-        }
-        return 5;
-    }
-    else if (x >= UINT32_C(100))
+    const auto msb {32 - int128::detail::impl::countl_impl(x)};
+
+    // Approximate log10
+    const auto estimated_digits {(msb * 1000) / 3322 + 1}; // 1000/3322 ~= 1/log2(10)
+
+    if (estimated_digits < 10 && x >= impl::powers_of_10_u32[estimated_digits])
     {
-        if (x >= UINT32_C(1000))
-        {
-            return 4;
-        }
-        return 3;
-    }
-    else if (x >= UINT32_C(10))
-    {
-        return 2;
+        return estimated_digits + 1;
     }
 
-    return 1;
+    if (estimated_digits > 1 && x < impl::powers_of_10_u32[estimated_digits - 1])
+    {
+        return estimated_digits - 1;
+    }
+
+    return estimated_digits;
 }
 
 template <>
 constexpr auto num_digits(std::uint64_t x) noexcept -> int
 {
-    if (x >= UINT64_C(10000000000))
+    // Use the most significant bit position to approximate log10
+    // log10(x) ~= log2(x) / log2(10) ~= log2(x) / 3.32
+
+    const auto msb {63 - int128::detail::impl::countl_impl(x)};
+
+    // Approximate log10
+    const auto estimated_digits {(msb * 1000) / 3322 + 1}; // 1000/3322 ~= 1/log2(10)
+
+    if (estimated_digits < 20 && x >= impl::powers_of_10[estimated_digits])
     {
-        if (x >= UINT64_C(100000000000000))
-        {
-            if (x >= UINT64_C(10000000000000000))
-            {
-                if (x >= UINT64_C(100000000000000000)) 
-                {
-                    if (x >= UINT64_C(1000000000000000000))
-                    {
-                        if (x >= UINT64_C(10000000000000000000))
-                        {
-                            return 20;
-                        }
-                        return 19;
-                    }
-                    return 18;
-                }
-                return 17;
-            }
-            else if (x >= UINT64_C(1000000000000000))
-            {
-                return 16;
-            }
-            return 15;
-        } 
-        if (x >= UINT64_C(1000000000000))
-        {
-            if (x >= UINT64_C(10000000000000))
-            {
-                return 14;
-            }
-            return 13;
-        }
-        if (x >= UINT64_C(100000000000))
-        {
-            return 12;
-        }
-        return 11;
+        return estimated_digits + 1;
     }
-    else if (x >= UINT64_C(100000))
+
+    if (estimated_digits > 1 && x < impl::powers_of_10[estimated_digits - 1])
     {
-        if (x >= UINT64_C(10000000))
-        {
-            if (x >= UINT64_C(100000000))
-            {
-                if (x >= UINT64_C(1000000000))
-                {
-                    return 10;
-                }
-                return 9;
-            }
-            return 8;
-        }
-        if (x >= UINT64_C(1000000))
-        {
-            return 7;
-        }
-        return 6;
+        return estimated_digits - 1;
     }
-    if (x >= UINT64_C(100))
-    {
-        if (x >= UINT64_C(1000))
-        {
-            if (x >= UINT64_C(10000))
-            {
-                return 5;
-            }
-            return 4;
-        }
-        return 3;
-    }
-    if (x >= UINT64_C(10))
-    {
-        return 2;
-    }
-    return 1;
+
+    return estimated_digits;
 }
 
 #ifdef _MSC_VER
@@ -176,25 +98,25 @@ constexpr int num_digits(const boost::int128::uint128_t& x) noexcept
         return num_digits(x.low);
     }
 
-    // We start left at 19 because we already eliminated the high word being 0
-    std::uint32_t left = 19U;
-    std::uint32_t right = 38U;
+    // Use the most significant bit position to approximate log10
+    // log10(x) ~= log2(x) / log2(10) ~= log2(x) / 3.32
 
-    while (left < right)
+    const auto msb {64 + (63 - int128::detail::impl::countl_impl(x.high))};
+
+    // Approximate log10
+    const auto estimated_digits {(msb * 1000) / 3322 + 1}; // 1000/3322 ~= 1/log2(10)
+
+    if (estimated_digits < 39 && x >= impl::boost_int128_pow10[estimated_digits])
     {
-        const auto mid = (left + right + 1U) / 2U;
-
-        if (x >= impl::boost_int128_pow10[mid])
-        {
-            left = mid;
-        }
-        else
-        {
-            right = mid - 1;
-        }
+        return estimated_digits + 1;
     }
 
-    return static_cast<int>(left + 1);
+    if (estimated_digits > 1 && x < impl::boost_int128_pow10[estimated_digits - 1])
+    {
+        return estimated_digits - 1;
+    }
+
+    return estimated_digits;
 }
 
 constexpr int num_digits(const u256& x) noexcept
@@ -424,13 +346,13 @@ constexpr auto d128_constructor_num_digits(T) noexcept -> std::enable_if_t<std::
 constexpr auto d128_constructor_num_digits(builtin_uint128_t x) noexcept -> int
 {
     // Pre-condition: we know x has at least 34 digits
-    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<builtin_uint128_t>(34)));
+    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<builtin_uint128_t>(33)));
 
-    constexpr auto digits35 {detail::pow10(static_cast<builtin_uint128_t>(35))};
-    constexpr auto digits36 {detail::pow10(static_cast<builtin_uint128_t>(36))};
-    constexpr auto digits37 {detail::pow10(static_cast<builtin_uint128_t>(37))};
-    constexpr auto digits38 {detail::pow10(static_cast<builtin_uint128_t>(38))};
-    constexpr auto digits39 {detail::pow10(static_cast<builtin_uint128_t>(39))};
+    constexpr auto digits35 {detail::pow10(static_cast<builtin_uint128_t>(34))};
+    constexpr auto digits36 {detail::pow10(static_cast<builtin_uint128_t>(35))};
+    constexpr auto digits37 {detail::pow10(static_cast<builtin_uint128_t>(36))};
+    constexpr auto digits38 {detail::pow10(static_cast<builtin_uint128_t>(37))};
+    constexpr auto digits39 {detail::pow10(static_cast<builtin_uint128_t>(38))};
 
     if (x >= digits38)
     {
@@ -452,6 +374,7 @@ constexpr auto d128_constructor_num_digits(builtin_uint128_t x) noexcept -> int
     {
         return 35;
     }
+
     return 34;  // Since we know x has at least 34 digits
 }
 #endif
@@ -459,16 +382,16 @@ constexpr auto d128_constructor_num_digits(builtin_uint128_t x) noexcept -> int
 constexpr auto d128_constructor_num_digits(const boost::int128::uint128_t x) noexcept -> int
 {
     // Pre-condition: we know x has at least 34 digits
-    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<boost::int128::uint128_t>(34)));
+    BOOST_DECIMAL_ASSERT(x >= detail::pow10(static_cast<boost::int128::uint128_t>(33)));
 
     // Since we know that x has at least 34 digits we can get away with just comparing the high bits,
     // which reduces these to uint64_t comps instead of synthesized 128-bit
 
-    constexpr auto digits35 {detail::pow10(static_cast<boost::int128::uint128_t>(35)).high};
-    constexpr auto digits36 {detail::pow10(static_cast<boost::int128::uint128_t>(36)).high};
-    constexpr auto digits37 {detail::pow10(static_cast<boost::int128::uint128_t>(37)).high};
-    constexpr auto digits38 {detail::pow10(static_cast<boost::int128::uint128_t>(38)).high};
-    constexpr auto digits39 {detail::pow10(static_cast<boost::int128::uint128_t>(39)).high};
+    constexpr auto digits35 {detail::pow10(static_cast<boost::int128::uint128_t>(34)).high};
+    constexpr auto digits36 {detail::pow10(static_cast<boost::int128::uint128_t>(35)).high};
+    constexpr auto digits37 {detail::pow10(static_cast<boost::int128::uint128_t>(36)).high};
+    constexpr auto digits38 {detail::pow10(static_cast<boost::int128::uint128_t>(37)).high};
+    constexpr auto digits39 {detail::pow10(static_cast<boost::int128::uint128_t>(38)).high};
 
     const auto x_high {x.high};
 
@@ -492,6 +415,7 @@ constexpr auto d128_constructor_num_digits(const boost::int128::uint128_t x) noe
     {
         return 35;
     }
+
     return 34;  // Since we know x has at least 34 digits
 }
 
