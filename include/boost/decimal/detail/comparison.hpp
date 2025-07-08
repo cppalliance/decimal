@@ -101,6 +101,13 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
 template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool
 {
+    #ifndef BOOST_DECIMAL_FAST_MATH
+    if (isnan(lhs) || isnan(rhs))
+    {
+        return false;
+    }
+    #endif
+
     if (lhs.significand_ == 0U && rhs.significand_ == 0U)
     {
         // -0 == +0
@@ -115,13 +122,6 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_equality_impl(const DecimalType& 
     {
         return false;
     }
-
-    #ifndef BOOST_DECIMAL_FAST_MATH
-    if (isnan(lhs))
-    {
-        return false;
-    }
-    #endif
 
     return lhs.sign_ == rhs.sign_;
 }
