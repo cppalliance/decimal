@@ -12,6 +12,11 @@ using namespace boost::decimal;
 
 #include <fmt/format.h>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4127) // Conditional expression is constant
+#endif
+
 template <typename T>
 void test_general()
 {
@@ -164,6 +169,10 @@ void test_hex()
     BOOST_TEST_EQ(fmt::format("{:A}", std::numeric_limits<T>::signaling_NaN()), "NAN(SNAN)");
     BOOST_TEST_EQ(fmt::format("{:A}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 int main()
 {
