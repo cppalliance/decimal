@@ -76,16 +76,17 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
 
     // Step 6: Normalize the significand and compare
     // Instead of multiplying the larger number, divide the smaller one
-    if (delta_exp >= 0)
+    if (delta_exp > 0)
     {
         // Check if we can divide rhs_sig safely
-        if (delta_exp > 0 && rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0U)
+        // E.g. 9e0 != 90000000204928e-13 but if we just did division we would falsely get 9 ?= 9
+        if (rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0U)
         {
             return false;
         }
         rhs_sig /= detail::pow10(static_cast<comp_type>(delta_exp));
     }
-    else
+    else if (delta_exp < 0)
     {
         // Check if we can divide lhs_sig safely
         if (lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0U)
