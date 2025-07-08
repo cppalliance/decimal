@@ -75,28 +75,48 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     }
 
     // Step 6: Normalize the significand and compare
-    // Instead of multiplying the larger number, divide the smaller one
-    if (delta_exp > 0)
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::decimal_val_v<DecimalType> >= 128)
     {
-        // Check if we can divide rhs_sig safely
-        // E.g. 9e0 != 90000000204928e-13 but if we just did division we would falsely get 9 ?= 9
-        if (rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0U)
+        // Instead of multiplying the larger number, divide the smaller one
+        if (delta_exp > 0)
         {
-            return false;
+            // Check if we can divide rhs_sig safely
+            // E.g. 9e0 != 90000000204928e-13 but if we just did division we would falsely get 9 ?= 9
+            if (rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0U)
+            {
+                return false;
+            }
+            rhs_sig /= detail::pow10(static_cast<comp_type>(delta_exp));
         }
-        rhs_sig /= detail::pow10(static_cast<comp_type>(delta_exp));
-    }
-    else if (delta_exp < 0)
-    {
-        // Check if we can divide lhs_sig safely
-        if (lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0U)
+        else if (delta_exp < 0)
         {
-            return false;
+            // Check if we can divide lhs_sig safely
+            if (lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0U)
+            {
+                return false;
+            }
+            lhs_sig /= detail::pow10(static_cast<comp_type>(-delta_exp));
         }
-        lhs_sig /= detail::pow10(static_cast<comp_type>(-delta_exp));
-    }
 
-    return lhs_sig == rhs_sig;
+        return lhs_sig == rhs_sig;
+    }
+    else
+    {
+        using promoted_sig_type = std::conditional_t<std::is_same<typename DecimalType::significand_type, std::uint32_t>::value, std::uint64_t, int128::uint128_t>;
+        promoted_sig_type promotes_lhs {lhs_sig};
+        promoted_sig_type promotes_rhs {rhs_sig};
+
+        if (delta_exp > 0)
+        {
+            promotes_lhs *= detail::pow10<promoted_sig_type>(delta_exp);
+        }
+        else if (delta_exp < 0)
+        {
+            promotes_rhs *= detail::pow10<promoted_sig_type>(-delta_exp);
+        }
+
+        return promotes_lhs == promotes_rhs;
+    }
 }
 
 template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
