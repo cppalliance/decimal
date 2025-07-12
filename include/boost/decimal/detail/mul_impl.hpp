@@ -145,49 +145,6 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
     return {res_sig_64, res_exp, sign};
 }
 
-template <typename ReturnType, typename T>
-constexpr auto d128_mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
-{
-    bool sign {lhs.isneg() != rhs.isneg()};
-
-    const auto lhs_sig {lhs.full_significand()};
-    const auto lhs_exp {lhs.biased_exponent()};
-    const auto rhs_sig {rhs.full_significand()};
-    const auto rhs_exp {rhs.biased_exponent()};
-
-    const auto lhs_dig {detail::num_digits(lhs_sig)};
-    const auto rhs_dig {detail::num_digits(rhs_sig)};
-
-    const auto res_dig {lhs_dig + rhs_dig};
-
-    // If we can avoid it don't do 256 bit multiplication because it is slow
-    if (res_dig <= std::numeric_limits<boost::int128::uint128_t>::digits10)
-    {
-        auto res_sig {lhs_sig * rhs_sig};
-        auto res_exp {lhs_exp + rhs_exp};
-        return {res_sig, res_exp, sign};
-    }
-    else
-    {
-        // Once we have the normalized significands and exponents all we have to do is
-        // multiply the significands and add the exponents
-        auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
-        auto res_exp {lhs_exp + rhs_exp};
-
-        const auto sig_dig {res_sig > pow10(static_cast<u256>(static_cast<std::uint64_t>(res_dig))) ? res_dig : res_dig - 1};
-
-        if (sig_dig > std::numeric_limits<boost::int128::uint128_t>::digits10)
-        {
-            const auto digit_delta {sig_dig - std::numeric_limits<boost::int128::uint128_t>::digits10};
-            res_sig /= detail::u256(pow10(boost::int128::uint128_t(digit_delta)));
-            res_exp += digit_delta;
-        }
-
-        BOOST_DECIMAL_ASSERT(res_sig.high == boost::int128::uint128_t(0, 0));
-        return {int128::uint128_t{res_sig[1], res_sig[0]}, res_exp, sign};
-    }
-}
-
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
                                BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto d128_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
