@@ -83,7 +83,21 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
     BOOST_DECIMAL_IF_CONSTEXPR (detail::decimal_val_v<DecimalType> >= 128)
     {
         // Instead of multiplying the larger number, divide the smaller one
-        if (delta_exp > 0)
+        //
+        // We try for multiplication even though it's a small range
+        // Since it's an order of magnitude faster
+        if (delta_exp <= 4 && delta_exp >= 4)
+        {
+            if (delta_exp > 0)
+            {
+                lhs_sig *= detail::pow10<comp_type>(delta_exp);
+            }
+            else if (delta_exp < 0)
+            {
+                rhs_sig *= detail::pow10<comp_type>(-delta_exp);
+            }
+        }
+        else if (delta_exp > 0)
         {
             // Check if we can divide rhs_sig safely
             // E.g. 9e0 != 90000000204928e-13 but if we just did division we would falsely get 9 ?= 9
