@@ -86,7 +86,7 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
         friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
-    friend constexpr auto d128f_div_impl(decimal128_fast lhs, decimal128_fast rhs, decimal128_fast& q, decimal128_fast& r) noexcept -> void;
+    friend constexpr auto d128f_div_impl(const decimal128_fast& lhs, const decimal128_fast& rhs, decimal128_fast& q, decimal128_fast& r) noexcept -> void;
 
     // Equality template between any integer type and decimal128
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
@@ -242,11 +242,11 @@ public:
     friend constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast;
 
     // Binary arithmetic operators
-    friend constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
-    friend constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator+(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator-(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator*(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast;
-    friend constexpr auto operator/(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
-    friend constexpr auto operator%(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator/(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator%(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast;
 
     // Mixed type binary arithmetic operators
     template <typename Integer>
@@ -355,13 +355,13 @@ public:
 
     // Decimal functions
     // 3.6.4 Same Quantum
-    friend constexpr auto samequantumd128f(decimal128_fast lhs, decimal128_fast rhs) noexcept -> bool;
+    friend constexpr auto samequantumd128f(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool;
 
     // 3.6.5 Quantum exponent
     friend constexpr auto quantexpd128f(decimal128_fast x) noexcept -> int;
 
     // 3.6.6 Quantize
-    friend constexpr auto quantized128f(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto quantized128f(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast;
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
@@ -772,7 +772,7 @@ constexpr auto operator-(decimal128_fast rhs) noexcept -> decimal128_fast
     return rhs;
 }
 
-constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+constexpr auto operator+(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs) || not_finite(rhs))
@@ -818,7 +818,7 @@ constexpr auto operator+(Integer lhs, decimal128_fast rhs) noexcept
     return rhs + lhs;
 }
 
-constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+constexpr auto operator-(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs) || not_finite(rhs))
@@ -925,7 +925,7 @@ constexpr auto operator*(Integer lhs, decimal128_fast rhs) noexcept
     return rhs * lhs;
 }
 
-constexpr auto d128f_div_impl(decimal128_fast lhs, decimal128_fast rhs, decimal128_fast& q, decimal128_fast& r) noexcept -> void
+constexpr auto d128f_div_impl(const decimal128_fast& lhs, const decimal128_fast& rhs, decimal128_fast& q, decimal128_fast& r) noexcept -> void
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
@@ -992,7 +992,7 @@ constexpr auto d128f_div_impl(decimal128_fast lhs, decimal128_fast rhs, decimal1
     q = decimal128_fast(q_components.sig, q_components.exp, q_components.sign);
 }
 
-constexpr auto d128f_mod_impl(decimal128_fast lhs, decimal128_fast rhs, const decimal128_fast& q, decimal128_fast& r) -> void
+constexpr auto d128f_mod_impl(const decimal128_fast& lhs, const decimal128_fast& rhs, const decimal128_fast& q, decimal128_fast& r) -> void
 {
     constexpr decimal128_fast zero {0, 0};
 
@@ -1000,7 +1000,7 @@ constexpr auto d128f_mod_impl(decimal128_fast lhs, decimal128_fast rhs, const de
     r = lhs - (decimal128_fast(q_trunc) * rhs);
 };
 
-constexpr auto operator/(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+constexpr auto operator/(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast
 {
     decimal128_fast q {};
     decimal128_fast r {};
@@ -1091,7 +1091,7 @@ constexpr auto operator/(Integer lhs, decimal128_fast rhs) noexcept
     return {q_components.sig, q_components.exp, q_components.sign};
 }
 
-constexpr auto operator%(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+constexpr auto operator%(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast
 {
     decimal128_fast q {};
     decimal128_fast r {};
@@ -1305,7 +1305,7 @@ constexpr auto scalbnd128f(decimal128_fast num, int exp) noexcept -> decimal128_
 // If both x and y are NaN, or infinity, they have the same quantum exponents;
 // if exactly one operand is infinity or exactly one operand is NaN, they do not have the same quantum exponents.
 // The samequantum functions raise no exception.
-constexpr auto samequantumd128f(decimal128_fast lhs, decimal128_fast rhs) noexcept -> bool
+constexpr auto samequantumd128f(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     const auto lhs_fp {fpclassify(lhs)};
@@ -1350,7 +1350,7 @@ constexpr auto quantexpd128f(decimal128_fast x) noexcept -> int
 // Otherwise, if only one operand is infinity, the "invalid" floating-point exception is raised and the result is NaN.
 // If both operands are infinity, the result is DEC_INFINITY, with the same sign as x, converted to the type of x.
 // The quantize functions do not signal underflow.
-constexpr auto quantized128f(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+constexpr auto quantized128f(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Return the correct type of nan
