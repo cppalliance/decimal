@@ -244,7 +244,7 @@ public:
     // Binary arithmetic operators
     friend constexpr auto operator+(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator-(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
-    friend constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
+    friend constexpr auto operator*(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator/(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
     friend constexpr auto operator%(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast;
 
@@ -883,7 +883,7 @@ constexpr auto operator-(Integer lhs, decimal128_fast rhs) noexcept
             abs_lhs_bigger);
 }
 
-constexpr auto operator*(decimal128_fast lhs, decimal128_fast rhs) noexcept -> decimal128_fast
+constexpr auto operator*(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs) || not_finite(rhs))
