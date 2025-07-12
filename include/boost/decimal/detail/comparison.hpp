@@ -177,7 +177,7 @@ template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DEC
 constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
                                 T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> std::enable_if_t<detail::is_ieee_type_v<DecimalType>, bool>
 {
-    using comp_type = std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>;
+    using comp_type = detail::make_unsigned_t<std::conditional_t<(std::numeric_limits<T1>::digits10 > std::numeric_limits<T2>::digits10), T1, T2>>;
 
     BOOST_DECIMAL_ASSERT(lhs_sig >= 0U);
     BOOST_DECIMAL_ASSERT(rhs_sig >= 0U);
@@ -188,14 +188,11 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
         return false;
     }
 
-    auto new_lhs_sig {static_cast<comp_type>(lhs_sig)};
-    auto new_rhs_sig {static_cast<comp_type>(rhs_sig)};
-
     const auto delta_exp {lhs_exp - rhs_exp};
 
     // Check the value of delta exp to avoid to large a value for pow10
     // Also if only one of the significands is 0 then we know the values have to be mismatched
-    if (new_lhs_sig == static_cast<comp_type>(0) && new_rhs_sig == static_cast<comp_type>(0))
+    if (lhs_sig == 0U && rhs_sig == 0U)
     {
         return true;
     }
@@ -204,36 +201,67 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
         return false;
     }
 
+    auto new_lhs_sig {static_cast<comp_type>(lhs_sig)};
+    auto new_rhs_sig {static_cast<comp_type>(rhs_sig)};
+
     // Step 5: Normalize the significand and compare
     // Instead of multiplying the larger number, divide the smaller one
-    if (delta_exp >= 0)
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::decimal_val_v<DecimalType> >= 128)
     {
-        // Check if we can divide rhs_sig safely
-        if (delta_exp > 0 && new_rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0U)
+        // Instead of multiplying the larger number, divide the smaller one
+        //
+        // We try for multiplication even though it's a small range
+        // Since it's an order of magnitude faster
+        if (delta_exp <= 4 && delta_exp >= 4)
         {
-            return false;
+            if (delta_exp > 0)
+            {
+                new_lhs_sig *= detail::pow10<comp_type>(delta_exp);
+            }
+            else if (delta_exp < 0)
+            {
+                new_rhs_sig *= detail::pow10<comp_type>(-delta_exp);
+            }
         }
-        new_rhs_sig /= detail::pow10(static_cast<comp_type>(delta_exp));
+        else if (delta_exp > 0)
+        {
+            // Check if we can divide rhs_sig safely
+            // E.g. 9e0 != 90000000204928e-13 but if we just did division we would falsely get 9 ?= 9
+            if (new_rhs_sig % detail::pow10(static_cast<comp_type>(delta_exp)) != 0U)
+            {
+                return false;
+            }
+            new_rhs_sig /= detail::pow10(static_cast<comp_type>(delta_exp));
+        }
+        else if (delta_exp < 0)
+        {
+            // Check if we can divide lhs_sig safely
+            if (new_lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0U)
+            {
+                return false;
+            }
+            new_lhs_sig /= detail::pow10(static_cast<comp_type>(-delta_exp));
+        }
+
+        return new_lhs_sig == new_rhs_sig;
     }
     else
     {
-        // Check if we can divide lhs_sig safely
-        if (new_lhs_sig % detail::pow10(static_cast<comp_type>(-delta_exp)) != 0U)
+        using promoted_sig_type = std::conditional_t<std::is_same<comp_type, std::uint32_t>::value, std::uint64_t, int128::uint128_t>;
+        promoted_sig_type promotes_lhs {new_lhs_sig};
+        promoted_sig_type promotes_rhs {new_rhs_sig};
+
+        if (delta_exp > 0)
         {
-            return false;
+            promotes_lhs *= detail::pow10<promoted_sig_type>(delta_exp);
         }
-        new_lhs_sig /= detail::pow10(static_cast<comp_type>(-delta_exp));
+        else if (delta_exp < 0)
+        {
+            promotes_rhs *= detail::pow10<promoted_sig_type>(-delta_exp);
+        }
+
+        return promotes_lhs == promotes_rhs;
     }
-
-    #ifdef BOOST_DECIMAL_DEBUG_EQUAL
-    std::cerr << "Normalized Values"
-              << "\nlhs_sig: " << new_lhs_sig
-              << "\nlhs_exp: " << lhs_exp
-              << "\nrhs_sig: " << new_rhs_sig
-              << "\nrhs_exp: " << rhs_exp << std::endl;
-    #endif
-
-    return new_lhs_sig == new_rhs_sig;
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
