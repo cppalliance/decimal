@@ -671,7 +671,7 @@ constexpr auto decimal128::full_significand() const noexcept -> int128::uint128_
     {
         // Last three bits in the combination field, so we need to shift past the exp field
         // which is next. Only need to operate on the high bits
-        significand.high |= (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
+        significand.high = (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
     }
 
     significand |= (bits_ & detail::d128_significand_mask);
