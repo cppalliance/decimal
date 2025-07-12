@@ -147,21 +147,27 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
                                BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
-constexpr auto d128_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                             T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> ReturnType
+constexpr auto d128_mul_impl(const T1& lhs_sig, const U1 lhs_exp, const bool lhs_sign,
+                             const T2& rhs_sig, const U2 rhs_exp, const bool rhs_sign) noexcept -> ReturnType
 {
+    using sig_type = T1;
+    static_assert(std::is_same<sig_type, T2>::value, "Should have a common type by this point");
+
     const bool sign {lhs_sign != rhs_sign};
 
     auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
 
-    const auto sig_dig {detail::num_digits(res_sig)};
-
-    if (sig_dig > std::numeric_limits<boost::int128::uint128_t>::digits10)
+    if (res_sig[3] != 0U || res_sig[2] != 0U)
     {
-        const auto digit_delta {sig_dig - std::numeric_limits<boost::int128::uint128_t>::digits10};
-        res_sig /= pow10(int128::uint128_t(digit_delta));
-        res_exp += digit_delta;
+        const auto sig_dig {detail::num_digits(res_sig)};
+
+        if (sig_dig > std::numeric_limits<sig_type>::digits10)
+        {
+            const auto digit_delta {sig_dig - std::numeric_limits<sig_type>::digits10};
+            res_sig /= pow10<sig_type>(digit_delta);
+            res_exp += digit_delta;
+        }
     }
 
     BOOST_DECIMAL_ASSERT((res_sig[3] | res_sig[2]) == 0U);
