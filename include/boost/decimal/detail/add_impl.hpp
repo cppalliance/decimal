@@ -90,7 +90,8 @@ constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
         {
             return lhs_sig != 0U && (lhs_exp > rhs_exp) ? ReturnType{lhs_sig, lhs_exp, lhs_sign} : ReturnType{rhs_sig, rhs_exp, rhs_sign};
         }
-        else if (lhs_exp < rhs_exp)
+
+        if (lhs_exp < rhs_exp)
         {
             big_rhs *= detail::pow10<promoted_sig_type>(shift);
             lhs_exp = rhs_exp - static_cast<U>(shift);
@@ -137,7 +138,8 @@ constexpr auto d64_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
                 ReturnType{lhs.full_significand(), lhs.biased_exponent(), lhs.isneg()} :
                 ReturnType{rhs.full_significand(), rhs.biased_exponent(), rhs.isneg()};
         }
-        else if (lhs_exp < rhs_exp)
+
+        if (lhs_exp < rhs_exp)
         {
             big_rhs *= detail::pow10<promoted_sig_type>(shift);
             lhs_exp = rhs_exp - static_cast<decimal64_components::biased_exponent_type>(shift);
@@ -260,7 +262,8 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
         return {lhs_sig, lhs_exp, lhs_sign};
     }
-    else if (delta_exp == detail::precision_v<decimal128> + 1)
+
+    if (delta_exp == detail::precision_v<decimal128> + 1)
     {
         // Only need to see if we need to add one to the
         // significand of the bigger value
