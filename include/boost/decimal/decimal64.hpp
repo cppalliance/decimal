@@ -1051,7 +1051,7 @@ constexpr auto decimal64::full_significand() const noexcept -> significand_type
     {
         // Last three bits in the combination field, so we need to shift past the exp field
         // which is next
-        significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
+        significand = (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
     }
 
     significand |= (bits_ & detail::d64_significand_mask);
