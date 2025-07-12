@@ -892,21 +892,8 @@ constexpr auto operator*(const decimal128_fast& lhs, const decimal128_fast& rhs)
     }
     #endif
 
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    const auto lhs_zeros {detail::remove_trailing_zeros(lhs_sig)};
-    lhs_sig = lhs_zeros.trimmed_number;
-    lhs_exp += static_cast<std::int32_t>(lhs_zeros.number_of_removed_zeros);
-
-    auto rhs_sig {rhs.full_significand()};
-    auto rhs_exp {rhs.biased_exponent()};
-    const auto rhs_zeros {detail::remove_trailing_zeros(rhs_sig)};
-    rhs_sig = rhs_zeros.trimmed_number;
-    rhs_exp += static_cast<std::int32_t>(rhs_zeros.number_of_removed_zeros);
-
-    return detail::d128_mul_impl<decimal128_fast>(
-            lhs_sig, lhs_exp, lhs.sign_,
-            rhs_sig, rhs_exp, rhs.sign_);
+    return detail::d128_mul_impl<decimal128_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+                                                 rhs.significand_, rhs.biased_exponent(), rhs.sign_);
 }
 
 template <typename Integer>
