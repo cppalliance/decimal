@@ -172,27 +172,11 @@ constexpr auto d128_mul_impl(const T1& lhs_sig, const U1 lhs_exp, const bool lhs
     return {int128::uint128_t{res_sig[1], res_sig[0]}, res_exp, sign};
 }
 
-template <typename ReturnType, typename T>
-constexpr auto d128_fast_mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
-{
-    const bool sign {lhs.isneg() != rhs.isneg()};
-
-    // Once we have the normalized significands and exponents all we have to do is
-    // multiply the significands and add the exponents
-    auto res_sig {detail::umul256(lhs.full_significand(), rhs.full_significand())};
-    const auto res_exp {lhs.biased_exponent() + rhs.biased_exponent() + 30};
-
-    constexpr auto ten_pow_30 {detail::pow10(static_cast<int128::uint128_t>(30))};
-    res_sig /= ten_pow_30;
-
-    BOOST_DECIMAL_ASSERT((res_sig[3] | res_sig[2]) == 0U); // LCOV_EXCL_LINE
-    return {int128::uint128_t{res_sig[1], res_sig[0]}, res_exp, sign};
-}
-
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
                                BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
-constexpr auto d128_fast_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                                  T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> ReturnType
+BOOST_DECIMAL_FORCE_INLINE
+constexpr auto d128_fast_mul_impl(const T1& lhs_sig, const U1 lhs_exp, const bool lhs_sign,
+                                  const T2& rhs_sig, const U2 rhs_exp, const bool rhs_sign) noexcept -> ReturnType
 {
     const bool sign {lhs_sign != rhs_sign};
 
