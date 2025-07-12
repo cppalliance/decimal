@@ -157,17 +157,15 @@ constexpr auto d128_mul_impl(const T1& lhs_sig, const U1 lhs_exp, const bool lhs
 
     auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
     auto res_exp {lhs_exp + rhs_exp};
+    const auto sig_dig {detail::num_digits(res_sig)};
 
-    if (res_sig[3] != 0U || res_sig[2] != 0U)
+    // 34 is the number of digits in the d128 significand
+    // this way we can skip rounding in the constructor a second time
+    const auto digit_delta {sig_dig - 34};
+    if (BOOST_DECIMAL_LIKELY(digit_delta > 0))
     {
-        const auto sig_dig {detail::num_digits(res_sig)};
-
-        if (sig_dig > std::numeric_limits<sig_type>::digits10)
-        {
-            const auto digit_delta {sig_dig - std::numeric_limits<sig_type>::digits10};
-            res_sig /= pow10<sig_type>(digit_delta);
-            res_exp += digit_delta;
-        }
+        res_sig /= pow10<sig_type>(digit_delta);
+        res_exp += digit_delta;
     }
 
     BOOST_DECIMAL_ASSERT((res_sig[3] | res_sig[2]) == 0U);
