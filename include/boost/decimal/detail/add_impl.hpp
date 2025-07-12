@@ -42,7 +42,7 @@ constexpr auto d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
 
         if (shift > max_shift)
         {
-            return lhs.full_significand() != 0U && (lhs_exp > rhs_exp) ?
+            return big_lhs != 0U && (lhs_exp > rhs_exp) ?
                 ReturnType{lhs.full_significand(), lhs.biased_exponent(), lhs.isneg()} :
                 ReturnType{rhs.full_significand(), rhs.biased_exponent(), rhs.isneg()};
         }
