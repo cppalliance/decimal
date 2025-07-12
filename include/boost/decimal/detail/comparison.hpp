@@ -152,34 +152,24 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_equality_impl(const DecimalType& 
     }
     #endif
 
-    if (lhs.significand_ == 0U && rhs.significand_ == 0U)
+    const auto lhs_sig {lhs.significand_};
+    const auto rhs_sig {rhs.significand_};
+
+    if (lhs_sig == 0U && rhs_sig == 0U)
     {
         // -0 == +0
         return true;
     }
 
-    if (lhs.exponent_ != rhs.exponent_)
-    {
-        return false;
-    }
-    if (lhs.significand_ != rhs.significand_)
-    {
-        return false;
-    }
-
-    return lhs.sign_ == rhs.sign_;
+    return  lhs_sig == rhs_sig &&
+            lhs.exponent_ == rhs.exponent_ &&
+            lhs.sign_ == rhs.sign_;
 }
 
 template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_inequality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool
 {
-    return
-            #ifndef BOOST_DECIMAL_FAST_MATH
-            isnan(lhs) || isnan(rhs) ||
-            #endif
-            (lhs.sign_ != rhs.sign_) ||
-            (lhs.exponent_ != rhs.exponent_) ||
-            (lhs.significand_ != rhs.significand_);
+    return !fast_equality_impl(lhs, rhs);
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
