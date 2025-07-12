@@ -365,7 +365,7 @@ public:
     friend constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128);
 
-    friend constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
+    friend constexpr auto operator*(const decimal128& lhs, const decimal128& rhs) noexcept -> decimal128;
 
     template <typename Integer>
     friend constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
@@ -1755,7 +1755,7 @@ constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
             abs_lhs_bigger);
 }
 
-constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+constexpr auto operator*(const decimal128& lhs, const decimal128& rhs) noexcept -> decimal128
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs) || not_finite(rhs))
