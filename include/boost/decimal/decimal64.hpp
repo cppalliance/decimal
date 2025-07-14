@@ -65,9 +65,9 @@ namespace decimal {
 namespace detail {
 
 // See IEEE 754 section 3.5.2
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_inf_mask = UINT64_C(0x78000000000000000);
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_nan_mask = UINT64_C(0x7C000000000000000);
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_snan_mask = UINT64_C(0x7E000000000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_inf_mask  = UINT64_C(0x7800000000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_nan_mask  = UINT64_C(0x7C00000000000000);
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_snan_mask = UINT64_C(0x7E00000000000000);
 
 //    Comb.  Exponent          Significand
 // s        eeeeeeeeee    [ttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt][tttttttttt]
@@ -661,7 +661,7 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
     }
 
     // If the exponent fits we do not need to use the combination field
-    const auto biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
+    const auto biased_exp {static_cast<std::uint64_t>(exp + detail::bias_v<decimal64>)};
     if (biased_exp <= detail::d64_max_biased_exponent)
     {
         if (big_combination)
@@ -685,11 +685,11 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
 
         const auto exp_delta {biased_exp - detail::d64_max_biased_exponent};
         const auto digit_delta {unsigned_coeff_digits - static_cast<int>(exp_delta)};
-        if (digit_delta > 0 && unsigned_coeff_digits + digit_delta <= detail::precision)
+        if (digit_delta > 0 && unsigned_coeff_digits + digit_delta <= detail::precision_v<decimal64>)
         {
             exp -= digit_delta;
             unsigned_coeff *= detail::pow10(static_cast<Unsigned_Integer>(digit_delta));
-            *this = decimal32(unsigned_coeff, exp, isneg);
+            *this = decimal64(unsigned_coeff, exp, isneg);
         }
         else
         {
