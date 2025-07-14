@@ -22,7 +22,9 @@
 #  if (__clang_major__ >= 10 && !defined(__APPLE__)) || __clang_major__ >= 13
 #    pragma clang diagnostic ignored "-Wdeprecated-copy"
 #  endif
-
+#  if __clang_major__ >= 20
+#    pragma clang diagnostic ignored "-Wfortify-source"
+#  endif
 #elif defined(__GNUC__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wold-style-cast"

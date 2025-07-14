@@ -34,6 +34,7 @@ int main()
 
 #  if __clang_major__ >= 20
 #    pragma clang diagnostic ignored "-Wdeprecated-literal-operator"
+#    pragma clang diagnostic ignored "-Wfortify-source"
 #  endif
 
 #elif defined(__GNUC__)

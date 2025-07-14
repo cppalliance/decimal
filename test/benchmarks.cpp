@@ -3,6 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#define BOOST_INT128_ALLOW_SIGN_CONVERSION
+
 #include <boost/decimal.hpp>
 #include <chrono>
 #include <random>
@@ -13,6 +15,30 @@
 #include <string>
 #include <cmath>
 #include <cstring>
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wold-style-cast"
+#  pragma clang diagnostic ignored "-Wundef"
+#  pragma clang diagnostic ignored "-Wconversion"
+#  pragma clang diagnostic ignored "-Wsign-conversion"
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+
+#  if (__clang_major__ >= 10 && !defined(__APPLE__)) || __clang_major__ >= 13
+#    pragma clang diagnostic ignored "-Wdeprecated-copy"
+#  endif
+
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wundef"
+#  pragma GCC diagnostic ignored "-Wconversion"
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
+#include <boost/random/uniform_int_distribution.hpp>
+
 
 #ifdef BOOST_DECIMAL_RUN_BENCHMARKS
 
@@ -64,7 +90,7 @@ std::vector<T> generate_random_vector(std::size_t size = N, unsigned seed = 42U)
 
     std::mt19937_64 gen(seed);
 
-    std::uniform_real_distribution<T> dis(0, 1);
+    std::uniform_real_distribution<T> dis(0, std::numeric_limits<T>::max());
     for (std::size_t i = 0; i < v.size(); ++i)
     {
         v[i] = dis(gen);
@@ -84,12 +110,26 @@ std::vector<T> generate_random_vector(std::size_t size = N, unsigned seed = 42U)
 
     std::mt19937_64 gen(seed);
 
-    std::uniform_real_distribution<double> dis(0, 1);
+    boost::random::uniform_int_distribution<typename T::significand_type> sig_dis(0U, std::numeric_limits<typename T::significand_type>::max() / 1000U);
+    std::uniform_int_distribution<int> exp_dis(std::numeric_limits<T>::min_exponent, std::numeric_limits<T>::max_exponent);
+
     for (std::size_t i = 0; i < v.size(); ++i)
     {
-        v[i] = T{dis(gen)};
+        v[i] = T{sig_dis(gen), exp_dis(gen)};
     }
     return v;
+}
+
+template <typename ResultType, typename T>
+std::vector<ResultType> convert_copy_vector(const std::vector<T>& v)
+{
+    std::vector<ResultType> r(v.size());
+    for (std::size_t i {}; i < v.size(); ++i)
+    {
+        r[i] = static_cast<ResultType>(v[i]);
+    }
+
+    return r;
 }
 
 template <typename T>
@@ -368,9 +408,10 @@ int main()
     const auto dec64_vector = generate_random_vector<decimal64>();
     const auto dec128_vector = generate_random_vector<decimal128>();
 
-    const auto dec32_fast_vector = generate_random_vector<decimal32_fast>();
-    const auto dec64_fast_vector = generate_random_vector<decimal64_fast>();
-    const auto dec128_fast_vector = generate_random_vector<decimal128_fast>();
+    // We use identical values to ensure fair comparison of IEEE vs fast types
+    const auto dec32_fast_vector = convert_copy_vector<decimal32_fast>(dec32_vector);
+    const auto dec64_fast_vector = convert_copy_vector<decimal64_fast>(dec64_vector);
+    const auto dec128_fast_vector = convert_copy_vector<decimal128_fast>(dec128_vector);
 
     std::cout << "===== Comparisons =====\n";
 
@@ -425,7 +466,7 @@ int main()
     test_two_element_operation(dec128_vector, std::divides<>(), "Division", "decimal128");
     test_two_element_operation(dec32_fast_vector, std::divides<>(), "Division", "dec32_fast");
     test_two_element_operation(dec64_fast_vector, std::divides<>(), "Division", "dec64_fast");
-    test_two_element_operation(dec64_fast_vector, std::divides<>(), "Division", "dec128_fast");
+    test_two_element_operation(dec128_fast_vector, std::divides<>(), "Division", "dec128_fast");
 
 #if 0
     std::cout << "\n===== sqrt =====\n";

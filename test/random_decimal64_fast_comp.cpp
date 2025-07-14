@@ -313,6 +313,7 @@ void random_EQ(T lower, T upper)
     }
 
     BOOST_TEST(!(std::numeric_limits<decimal64_fast>::quiet_NaN() == std::numeric_limits<decimal64_fast>::quiet_NaN()));
+    BOOST_TEST(decimal64_fast{0} == -decimal64_fast{0});
 }
 
 template <typename T>
@@ -394,6 +395,7 @@ void random_NE(T lower, T upper)
     }
 
     BOOST_TEST((std::numeric_limits<decimal64_fast>::quiet_NaN() != std::numeric_limits<decimal64_fast>::quiet_NaN()));
+    BOOST_TEST(!(decimal64_fast{0} != -decimal64_fast{0}));
 }
 
 template <typename T>
