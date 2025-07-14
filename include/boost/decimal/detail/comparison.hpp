@@ -90,11 +90,11 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
         {
             if (delta_exp > 0)
             {
-                lhs_sig *= detail::pow10<comp_type>(delta_exp);
+                lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp));
             }
             else if (delta_exp < 0)
             {
-                rhs_sig *= detail::pow10<comp_type>(-delta_exp);
+                rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
             }
         }
         else if (delta_exp > 0)
@@ -221,11 +221,11 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
         {
             if (delta_exp > 0)
             {
-                new_lhs_sig *= detail::pow10<comp_type>(delta_exp);
+                new_lhs_sig *= detail::pow10(static_cast<comp_type>(delta_exp));
             }
             else if (delta_exp < 0)
             {
-                new_rhs_sig *= detail::pow10<comp_type>(-delta_exp);
+                new_rhs_sig *= detail::pow10(static_cast<comp_type>(-delta_exp));
             }
         }
         else if (delta_exp > 0)
@@ -258,11 +258,11 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
         if (delta_exp > 0)
         {
-            promotes_lhs *= detail::pow10<promoted_sig_type>(delta_exp);
+            promotes_lhs *= detail::pow10(static_cast<promoted_sig_type>(delta_exp));
         }
         else if (delta_exp < 0)
         {
-            promotes_rhs *= detail::pow10<promoted_sig_type>(-delta_exp);
+            promotes_rhs *= detail::pow10(static_cast<promoted_sig_type>(-delta_exp));
         }
 
         return promotes_lhs == promotes_rhs;
