@@ -612,10 +612,11 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
 
     // If the coeff is not in range make it so
     // Only count the number of digits if we absolutely have to
-    if (unsigned_coeff >= detail::d32_max_significand_value)
+    int unsigned_coeff_digits {-1};
+    if (unsigned_coeff > detail::d32_max_significand_value)
     {
         // Since we know that the unsigned coeff is >= 10'000'000 we can use this information to traverse pruned trees
-        auto unsigned_coeff_digits = detail::d32_constructor_num_digits(unsigned_coeff);
+        unsigned_coeff_digits = detail::d32_constructor_num_digits(unsigned_coeff);
         if (unsigned_coeff_digits > detail::precision + 1)
         {
             const auto digits_to_remove {unsigned_coeff_digits - (detail::precision + 1)};
@@ -631,6 +632,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
             #  pragma GCC diagnostic pop
             #endif
 
+            unsigned_coeff_digits -= digits_to_remove;
             exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg)) + digits_to_remove;
         }
         else
