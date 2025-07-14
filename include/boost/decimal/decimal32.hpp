@@ -677,7 +677,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
     else
     {
-        bits_ = detail::d32_inf_mask;
+        bits_ = exp < 0 ? UINT32_C(0) : detail::d32_inf_mask;
     }
 }
 
