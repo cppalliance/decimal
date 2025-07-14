@@ -647,9 +647,10 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     if (reduced_coeff == 0U)
     {
         // Normalize our handling of zeros
-        exp = 0;
+        return;
     }
-    else if (reduced_coeff <= detail::d32_biggest_no_combination_significand)
+
+    if (reduced_coeff <= detail::d32_biggest_no_combination_significand)
     {
         // If the coefficient fits directly we don't need to use the combination field
         // bits_.significand = reduced_coeff;
@@ -663,7 +664,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
 
     // If the exponent fits we do not need to use the combination field
-    auto biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
+    const auto biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
     if (biased_exp <= detail::d32_max_biased_exponent)
     {
         if (big_combination)
@@ -677,21 +678,20 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
     else
     {
-        // We can try for denorm but probably infinity
+        // If we can fit the extra exponent in the significand then we can construct the value
+        // If we can't the value is either 0 or infinity depending on the sign of exp
+
         if (unsigned_coeff_digits == -1)
         {
             unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
         }
 
-        for (; unsigned_coeff_digits <= detail::precision && biased_exp != detail::d32_max_biased_exponent; ++unsigned_coeff_digits)
+        const auto exp_delta {biased_exp - detail::d32_max_biased_exponent};
+        const auto digit_delta {unsigned_coeff_digits - static_cast<int>(exp_delta)};
+        if (digit_delta > 0 && unsigned_coeff_digits + digit_delta <= detail::precision)
         {
-            unsigned_coeff *= 10;
-            --biased_exp;
-            --exp;
-        }
-
-        if (unsigned_coeff_digits <= detail::precision)
-        {
+            exp -= digit_delta;
+            unsigned_coeff *= detail::pow10(static_cast<Unsigned_Integer>(digit_delta));
             *this = decimal32(unsigned_coeff, exp, isneg);
         }
         else
