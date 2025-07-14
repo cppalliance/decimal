@@ -172,6 +172,11 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto fast_inequality_impl(const DecimalType
     return !fast_equality_impl(lhs, rhs);
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4127) // BOOST_DECIMAL_IF_CONSTEXPR prior to C++17 is constant conditional expression
+#endif
+
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
 constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
@@ -263,6 +268,10 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
         return promotes_lhs == promotes_rhs;
     }
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType = decimal32, BOOST_DECIMAL_INTEGRAL T1,
           BOOST_DECIMAL_INTEGRAL U1, BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
