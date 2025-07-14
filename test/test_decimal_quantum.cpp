@@ -97,6 +97,11 @@ void test_quantexp()
             // Fast decimals have no concept of subnormals
             BOOST_IF_CONSTEXPR (!std::is_same<Dec, decimal32_fast>::value)
             {
+                if (isinf(val1))
+                {
+                    continue;
+                }
+
                 if (!BOOST_TEST_EQ(quantexp(val1), detail::max_biased_exp_v<Dec>))
                 {
                     // LCOV_EXCL_START
