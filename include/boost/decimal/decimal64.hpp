@@ -916,22 +916,14 @@ constexpr auto decimal64::unbiased_exponent() const noexcept -> exponent_type
 {
     exponent_type expval {};
 
-    const auto exp_comb_bits {(bits_ & detail::d64_comb_11_mask)};
-
-    switch (exp_comb_bits)
+    if ((bits_ & detail::d64_combination_field_mask) == detail::d64_combination_field_mask)
     {
-        case detail::d64_comb_11_mask:
-            expval = (bits_ & detail::d64_comb_11_exp_bits) >> (detail::d64_significand_bits + 1);
-            break;
-        case detail::d64_comb_10_mask:
-            expval = UINT64_C(0b1000000000);
-            break;
-        case detail::d64_comb_01_mask:
-            expval = UINT64_C(0b0100000000);
-            break;
+        expval = (bits_ & detail::d64_11_exp_mask) >> detail::d64_11_exp_shift;
     }
-
-    expval |= (bits_ & detail::d64_exponent_mask) >> detail::d64_significand_bits;
+    else
+    {
+        expval = (bits_ & detail::d64_not_11_exp_mask) >> detail::d64_not_11_exp_shift;
+    }
 
     return expval;
 }
@@ -945,21 +937,15 @@ constexpr auto decimal64::full_significand() const noexcept -> significand_type
 {
     significand_type significand {};
 
-    if ((bits_ & detail::d64_comb_11_mask) == detail::d64_comb_11_mask)
+    if ((bits_ & detail::d64_combination_field_mask) == detail::d64_combination_field_mask)
     {
-        // Only need the one bit of T because the other 3 are implied
-        significand = (bits_ & detail::d64_comb_11_significand_bits) == detail::d64_comb_11_significand_bits ?
-            UINT64_C(0b1001'0000000000'0000000000'0000000000'0000000000'0000000000) :
-            UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000);
+        constexpr std::uint64_t implied_bit {UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000)};
+        significand = implied_bit | (bits_ & detail::d64_11_significand_mask);
     }
     else
     {
-        // Last three bits in the combination field, so we need to shift past the exp field
-        // which is next
-        significand = (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
+        significand = bits_ & detail::d64_not_11_significand_mask;
     }
-
-    significand |= (bits_ & detail::d64_significand_mask);
 
     return significand;
 }
@@ -976,34 +962,17 @@ constexpr auto decimal64::to_components() const noexcept -> detail::decimal64_co
     exponent_type expval {};
     significand_type significand {};
 
-    const auto comb_bits {(bits_ & detail::d64_comb_11_mask)};
-
-    switch (comb_bits)
+    if ((bits_ & detail::d64_combination_field_mask) == detail::d64_combination_field_mask)
     {
-        case detail::d64_comb_11_mask:
-            expval = (bits_ & detail::d64_comb_11_exp_bits) >> (detail::d64_significand_bits + 1);
-
-            // Only need the one bit of T because the other 3 are implied
-            significand = (bits_ & detail::d64_comb_11_significand_bits) == detail::d64_comb_11_significand_bits ?
-                UINT64_C(0b1001'0000000000'0000000000'0000000000'0000000000'0000000000) :
-                UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000);
-            break;
-        case detail::d64_comb_10_mask:
-            expval = UINT64_C(0b1000000000);
-            significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
-            break;
-        case detail::d64_comb_01_mask:
-            expval = UINT64_C(0b0100000000);
-            significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
-            break;
-        default:
-            // Expval = 0
-            significand |= (bits_ & detail::d64_comb_00_01_10_significand_bits) >> detail::d64_exponent_bits;
-            break;
+        constexpr std::uint64_t implied_bit {UINT64_C(0b1000'0000000000'0000000000'0000000000'0000000000'0000000000)};
+        significand = implied_bit | (bits_ & detail::d64_11_significand_mask);
+        expval = (bits_ & detail::d64_11_exp_mask) >> detail::d64_11_exp_shift;
     }
-
-    significand |= (bits_ & detail::d64_significand_mask);
-    expval |= (bits_ & detail::d64_exponent_mask) >> detail::d64_significand_bits;
+    else
+    {
+        significand = bits_ & detail::d64_not_11_significand_mask;
+        expval = (bits_ & detail::d64_not_11_exp_mask) >> detail::d64_not_11_exp_shift;
+    }
 
     components.sig = significand;
     components.exp = static_cast<biased_exponent_type>(expval) - detail::bias_v<decimal64>;
