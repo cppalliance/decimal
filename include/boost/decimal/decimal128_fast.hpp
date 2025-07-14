@@ -526,7 +526,7 @@ constexpr auto isfinite(decimal128_fast val) noexcept -> bool
     #endif
 }
 
-constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool
+BOOST_DECIMAL_FORCE_INLINE constexpr auto not_finite(const decimal128_fast& val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high >= detail::d128_fast_inf_high_bits;

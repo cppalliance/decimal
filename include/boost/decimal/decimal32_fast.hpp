@@ -515,7 +515,7 @@ constexpr auto isfinite(decimal32_fast val) noexcept -> bool
     return val.significand_ < detail::d32_fast_inf;
 }
 
-constexpr auto not_finite(const decimal32_fast& val) noexcept -> bool
+BOOST_DECIMAL_FORCE_INLINE constexpr auto not_finite(const decimal32_fast& val) noexcept -> bool
 {
     return val.significand_ >= detail::d32_fast_inf;
 }

@@ -1230,7 +1230,7 @@ constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs
     #endif
 }
 
-constexpr auto not_finite(decimal128 rhs) noexcept -> bool
+BOOST_DECIMAL_FORCE_INLINE constexpr auto not_finite(decimal128 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return (rhs.bits_.high & detail::d128_inf_mask_high_bits) == detail::d128_inf_mask_high_bits;
