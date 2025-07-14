@@ -455,10 +455,11 @@ constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
 
     constexpr std::uint32_t dpd_d32_exponent_mask {UINT32_C(0b0'00000'111111'0000000000'0000000000)};
     constexpr std::uint32_t dpd_d32_significand_mask {UINT32_C(0b0'00000'000000'1111111111'1111111111)};
+    constexpr std::uint32_t dpd_d32_combination_mask {UINT32_C(0b0'11111'000000'0000000000'0000000000)};
 
     // The bit lengths are the same as used in the standard bid format
     const auto sign {(dpd & detail::d32_sign_mask) != 0};
-    const auto combination_field_bits {(dpd & detail::d32_combination_field_mask) >> 26U};
+    const auto combination_field_bits {(dpd & dpd_d32_combination_mask) >> 26U};
     const auto exponent_field_bits {(dpd & dpd_d32_exponent_mask) >> 20U};
     const auto significand_bits {(dpd & dpd_d32_significand_mask)};
 
