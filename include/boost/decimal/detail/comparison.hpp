@@ -127,11 +127,11 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
 
         if (delta_exp > 0)
         {
-            promotes_lhs *= detail::pow10<promoted_sig_type>(delta_exp);
+            promotes_lhs *= detail::pow10(static_cast<promoted_sig_type>(delta_exp));
         }
         else if (delta_exp < 0)
         {
-            promotes_rhs *= detail::pow10<promoted_sig_type>(-delta_exp);
+            promotes_rhs *= detail::pow10(static_cast<promoted_sig_type>(-delta_exp));
         }
 
         return promotes_lhs == promotes_rhs;
