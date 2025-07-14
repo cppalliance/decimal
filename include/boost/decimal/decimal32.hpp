@@ -641,7 +641,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         }
     }
 
-    const auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
+    auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
     bool big_combination {false};
 
     if (reduced_coeff == 0U)
@@ -663,7 +663,7 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
 
     // If the exponent fits we do not need to use the combination field
-    const auto biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
+    auto biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
     if (biased_exp <= detail::d32_max_biased_exponent)
     {
         if (big_combination)
@@ -677,7 +677,27 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
     else
     {
-        bits_ = exp < 0 ? UINT32_C(0) : detail::d32_inf_mask;
+        // We can try for denorm but probably infinity
+        if (unsigned_coeff_digits == -1)
+        {
+            unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
+        }
+
+        for (; unsigned_coeff_digits <= detail::precision && biased_exp != detail::d32_max_biased_exponent; ++unsigned_coeff_digits)
+        {
+            unsigned_coeff *= 10;
+            --biased_exp;
+            --exp;
+        }
+
+        if (unsigned_coeff_digits <= detail::precision)
+        {
+            *this = decimal32(unsigned_coeff, exp, isneg);
+        }
+        else
+        {
+            bits_ = exp < 0 ? UINT32_C(0) : detail::d32_inf_mask;
+        }
     }
 }
 
