@@ -6,7 +6,6 @@
 #define BOOST_INT128_ALLOW_SIGN_CONVERSION
 
 #include <boost/decimal.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
 #include <chrono>
 #include <random>
 #include <vector>
@@ -16,6 +15,30 @@
 #include <string>
 #include <cmath>
 #include <cstring>
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wold-style-cast"
+#  pragma clang diagnostic ignored "-Wundef"
+#  pragma clang diagnostic ignored "-Wconversion"
+#  pragma clang diagnostic ignored "-Wsign-conversion"
+#  pragma clang diagnostic ignored "-Wfloat-equal"
+
+#  if (__clang_major__ >= 10 && !defined(__APPLE__)) || __clang_major__ >= 13
+#    pragma clang diagnostic ignored "-Wdeprecated-copy"
+#  endif
+
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wundef"
+#  pragma GCC diagnostic ignored "-Wconversion"
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
+#include <boost/random/uniform_int_distribution.hpp>
+
 
 #ifdef BOOST_DECIMAL_RUN_BENCHMARKS
 
