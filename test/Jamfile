@@ -34,7 +34,6 @@ project : requirements
   <toolset>clang:<cxxflags>-Wundef
   <toolset>clang:<cxxflags>-Wold-style-cast
   <toolset>clang:<cxxflags>-Wfloat-equal
-  <toolset>clang-20:<cxxflags>-Wno-fortify-source
 
   <toolset>msvc:<warnings-as-errors>on
   <toolset>clang:<warnings-as-errors>on
