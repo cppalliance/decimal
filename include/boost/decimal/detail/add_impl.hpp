@@ -42,7 +42,7 @@ constexpr auto d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
 
         if (shift > max_shift)
         {
-            return lhs.full_significand() != 0U && (lhs_exp > rhs_exp) ?
+            return big_lhs != 0U && (lhs_exp > rhs_exp) ?
                 ReturnType{lhs.full_significand(), lhs.biased_exponent(), lhs.isneg()} :
                 ReturnType{rhs.full_significand(), rhs.biased_exponent(), rhs.isneg()};
         }
@@ -90,7 +90,8 @@ constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
         {
             return lhs_sig != 0U && (lhs_exp > rhs_exp) ? ReturnType{lhs_sig, lhs_exp, lhs_sign} : ReturnType{rhs_sig, rhs_exp, rhs_sign};
         }
-        else if (lhs_exp < rhs_exp)
+
+        if (lhs_exp < rhs_exp)
         {
             big_rhs *= detail::pow10<promoted_sig_type>(shift);
             lhs_exp = rhs_exp - static_cast<U>(shift);
@@ -109,79 +110,6 @@ constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
     const auto new_sig {signed_lhs + signed_rhs};
 
     return {new_sig, lhs_exp};
-}
-
-template <typename ReturnType, typename T, typename U>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
-                                                   T rhs_sig, U rhs_exp, bool rhs_sign) noexcept -> ReturnType
-{
-    const bool sign {lhs_sign};
-
-    auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
-
-    #ifdef BOOST_DECIMAL_DEBUG_ADD
-    std::cerr << "Starting sig lhs: " << lhs_sig
-              << "\nStarting exp lhs: " << lhs_exp
-              << "\nStarting sig rhs: " << rhs_sig
-              << "\nStarting exp rhs: " << rhs_exp << std::endl;
-    #endif
-
-    if (delta_exp > detail::precision + 1)
-    {
-        // If the difference in exponents is more than the digits of accuracy
-        // we return the larger of the two
-        //
-        // e.g. 1e20 + 1e-20 = 1e20
-
-        #ifdef BOOST_DECIMAL_DEBUG_ADD
-        std::cerr << "New sig: " << lhs_sig
-                  << "\nNew exp: " << lhs_exp
-                  << "\nNew neg: " << lhs_sign << std::endl;
-        #endif
-
-        return {static_cast<std::uint32_t>(lhs_sig), lhs_exp, lhs_sign};
-    }
-
-    // The two numbers can be added together without special handling
-    //
-    // If we can add to the lhs sig rather than dividing we can save some precision
-    // 32-bit signed int can have 9 digits and our normalized significand has 7
-    if (delta_exp <= 2)
-    {
-        lhs_sig *= pow10(static_cast<T>(delta_exp));
-        lhs_exp -= delta_exp;
-        delta_exp = 0;
-    }
-    else
-    {
-        lhs_sig *= 100;
-        delta_exp -= 2;
-        lhs_exp -=2;
-
-        if (delta_exp > 1)
-        {
-            rhs_sig /= pow10(static_cast<T>(delta_exp - 1));
-            delta_exp = 1;
-        }
-
-        if (delta_exp == 1)
-        {
-            detail::fenv_round(rhs_sig, rhs_sign);
-        }
-    }
-
-    // Cast the results to signed types so that we can apply a sign at the end if necessary
-    // Both of the significands are maximally 24 bits, so they fit into a 32-bit signed type just fine
-    const auto new_sig {static_cast<typename ReturnType::significand_type>(lhs_sig + rhs_sig)};
-    const auto new_exp {lhs_exp};
-
-    #ifdef BOOST_DECIMAL_DEBUG_ADD
-    std::cerr << "Final sig lhs: " << lhs_sig
-              << "\nFinal sig rhs: " << rhs_sig
-              << "\nResult sig: " << new_sig << std::endl;
-    #endif
-
-    return {new_sig, new_exp, sign};
 }
 
 template <typename ReturnType, typename T>
@@ -210,7 +138,8 @@ constexpr auto d64_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
                 ReturnType{lhs.full_significand(), lhs.biased_exponent(), lhs.isneg()} :
                 ReturnType{rhs.full_significand(), rhs.biased_exponent(), rhs.isneg()};
         }
-        else if (lhs_exp < rhs_exp)
+
+        if (lhs_exp < rhs_exp)
         {
             big_rhs *= detail::pow10<promoted_sig_type>(shift);
             lhs_exp = rhs_exp - static_cast<decimal64_components::biased_exponent_type>(shift);
@@ -333,7 +262,8 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
         return {lhs_sig, lhs_exp, lhs_sign};
     }
-    else if (delta_exp == detail::precision_v<decimal128> + 1)
+
+    if (delta_exp == detail::precision_v<decimal128> + 1)
     {
         // Only need to see if we need to add one to the
         // significand of the bigger value

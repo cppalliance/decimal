@@ -239,6 +239,11 @@ constexpr auto pow10(detail::builtin_uint128_t n) noexcept -> detail::builtin_ui
 
 #endif
 
+constexpr auto pow10(const u256& n) noexcept -> u256
+{
+    return impl::u256_pow_10[n[3]];
+}
+
 #if defined(__GNUC__) && __GNUC__ >= 7
 #  pragma GCC diagnostic pop
 #endif

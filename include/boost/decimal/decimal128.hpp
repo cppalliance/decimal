@@ -365,7 +365,7 @@ public:
     friend constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal128);
 
-    friend constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128;
+    friend constexpr auto operator*(const decimal128& lhs, const decimal128& rhs) noexcept -> decimal128;
 
     template <typename Integer>
     friend constexpr auto operator*(decimal128 lhs, Integer rhs) noexcept
@@ -671,7 +671,7 @@ constexpr auto decimal128::full_significand() const noexcept -> int128::uint128_
     {
         // Last three bits in the combination field, so we need to shift past the exp field
         // which is next. Only need to operate on the high bits
-        significand.high |= (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
+        significand.high = (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
     }
 
     significand |= (bits_ & detail::d128_significand_mask);
@@ -1230,7 +1230,7 @@ constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs
     #endif
 }
 
-constexpr auto not_finite(decimal128 rhs) noexcept -> bool
+BOOST_DECIMAL_FORCE_INLINE constexpr auto not_finite(decimal128 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return (rhs.bits_.high & detail::d128_inf_mask_high_bits) == detail::d128_inf_mask_high_bits;
@@ -1755,7 +1755,7 @@ constexpr auto operator-(Integer lhs, decimal128 rhs) noexcept
             abs_lhs_bigger);
 }
 
-constexpr auto operator*(decimal128 lhs, decimal128 rhs) noexcept -> decimal128
+constexpr auto operator*(const decimal128& lhs, const decimal128& rhs) noexcept -> decimal128
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs) || not_finite(rhs))
