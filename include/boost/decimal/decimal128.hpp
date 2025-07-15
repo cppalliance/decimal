@@ -732,10 +732,11 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
         }
     }
 
+    constexpr int128::uint128_t zero {0, 0};
     auto reduced_coeff {static_cast<int128::uint128_t>(unsigned_coeff)};
     bool big_combination {false};
 
-    if (reduced_coeff == int128::uint128_t{0, 0})
+    if (reduced_coeff == zero)
     {
         return;
     }
@@ -785,7 +786,7 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
         }
         else
         {
-            bits_ = exp < 0 ? UINT64_C(0) : detail::d128_inf_mask;
+            bits_ = exp < 0 ? zero : detail::d128_inf_mask;
         }
     }
 }
