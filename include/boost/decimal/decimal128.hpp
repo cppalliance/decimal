@@ -579,55 +579,40 @@ constexpr auto from_bits(int128::uint128_t rhs) noexcept -> decimal128
     return result;
 }
 
-constexpr auto decimal128::unbiased_exponent() const noexcept -> std::uint64_t
+constexpr auto decimal128::unbiased_exponent() const noexcept -> exponent_type
 {
-    std::uint64_t expval {};
-    constexpr std::uint64_t high_word_significand_bits {detail::d128_significand_bits - 64U};
+    exponent_type expval {};
 
-    const auto exp_comb_bits {(bits_.high & detail::d128_comb_11_mask.high)};
-
-    switch (exp_comb_bits)
+    if ((bits_.high & detail::d128_combination_field_mask.high) == detail::d128_combination_field_mask.high)
     {
-        case detail::d128_comb_11_mask.high:
-            expval = (bits_.high & detail::d128_comb_11_mask.high) >> (high_word_significand_bits + 1);
-            break;
-        case detail::d128_comb_10_mask.high:
-            expval = UINT64_C(0b10000000000000);
-            break;
-        case detail::d128_comb_01_mask.high:
-            expval = UINT64_C(0b01000000000000);
-            break;
+        expval = (bits_.high & detail::d128_11_exp_mask.high) >> detail::d128_11_exp_high_word_shift;
     }
-
-    expval |= (bits_.high & detail::d128_exponent_mask.high) >> high_word_significand_bits;
+    else
+    {
+        expval = (bits_.high & detail::d128_not_11_exp_mask.high) >> detail::d128_not_11_exp_high_word_shift;
+    }
 
     return expval;
 }
 
-constexpr auto decimal128::biased_exponent() const noexcept -> std::int32_t
+constexpr auto decimal128::biased_exponent() const noexcept -> biased_exponent_type
 {
-    return static_cast<std::int32_t>(unbiased_exponent()) - detail::bias_v<decimal128>;
+    return static_cast<biased_exponent_type>(unbiased_exponent()) - detail::bias_v<decimal128>;
 }
 
-constexpr auto decimal128::full_significand() const noexcept -> int128::uint128_t
+constexpr auto decimal128::full_significand() const noexcept -> significand_type
 {
-    int128::uint128_t significand {0, 0};
+    significand_type significand {};
 
-    if ((bits_.high & detail::d128_comb_11_mask.high) == detail::d128_comb_11_mask.high)
+    if ((bits_.high & detail::d128_combination_field_mask.high) == detail::d128_combination_field_mask.high)
     {
-        // Only need the one bit of T because the other 3 are implied 0s
-        significand = (bits_.high & detail::d128_comb_11_significand_bits.high) == detail::d128_comb_11_significand_bits.high ?
-            int128::uint128_t{0b10010000000000000000000000000000000000000000000000,0} :
-            int128::uint128_t{0b10000000000000000000000000000000000000000000000000,0};
+        constexpr int128::uint128_t implied_bit {0b10010000000000000000000000000000000000000000000000,0};
+        significand = implied_bit | (bits_ & detail::d128_11_significand_mask);
     }
     else
     {
-        // Last three bits in the combination field, so we need to shift past the exp field
-        // which is next. Only need to operate on the high bits
-        significand.high = (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
+        significand = bits_ & detail::d128_not_11_significand_mask;
     }
-
-    significand |= (bits_ & detail::d128_significand_mask);
 
     return significand;
 }
@@ -639,37 +624,21 @@ constexpr auto decimal128::isneg() const noexcept -> bool
 
 constexpr auto decimal128::to_components() const noexcept -> detail::decimal128_components
 {
-    int128::uint128_t significand {};
-    std::uint64_t expval {};
+    significand_type significand {};
+    exponent_type expval {};
 
-    constexpr std::uint64_t high_word_significand_bits {detail::d128_significand_bits - 64U};
-
-    const auto exp_comb_bits {(bits_.high & detail::d128_comb_11_mask.high)};
-
-    switch (exp_comb_bits)
+    if ((bits_.high & detail::d128_combination_field_mask.high) == detail::d128_combination_field_mask.high)
     {
-        case detail::d128_comb_11_mask.high:
-            expval = (bits_.high & detail::d128_comb_11_mask.high) >> (high_word_significand_bits + 1);
-            // Only need the one bit of T because the other 3 are implied 0s
-            significand = (bits_.high & detail::d128_comb_11_significand_bits.high) == detail::d128_comb_11_significand_bits.high ?
-                int128::uint128_t{0b10010000000000000000000000000000000000000000000000,0} :
-                int128::uint128_t{0b10000000000000000000000000000000000000000000000000,0};
-            break;
-        case detail::d128_comb_10_mask.high:
-            expval = UINT64_C(0b10000000000000);
-            significand.high |= (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
-            break;
-        case detail::d128_comb_01_mask.high:
-            expval = UINT64_C(0b01000000000000);
-            significand.high |= (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
-            break;
-        default:
-            significand.high |= (bits_.high & detail::d128_comb_00_01_10_significand_bits.high) >> detail::d128_exponent_bits;
-            break;
+        constexpr int128::uint128_t implied_bit {0b10010000000000000000000000000000000000000000000000,0};
+        significand = implied_bit | (bits_ & detail::d128_11_significand_mask);
+        expval = (bits_.high & detail::d128_11_exp_mask.high) >> detail::d128_11_exp_high_word_shift;
+    }
+    else
+    {
+        significand = bits_ & detail::d128_not_11_significand_mask;
+        expval = (bits_.high & detail::d128_not_11_exp_mask.high) >> detail::d128_not_11_exp_high_word_shift;
     }
 
-    expval |= (bits_.high & detail::d128_exponent_mask.high) >> high_word_significand_bits;
-    significand |= (bits_ & detail::d128_significand_mask);
     const auto sign {static_cast<bool>(bits_.high & detail::d128_sign_mask.high)};
 
     return detail::decimal128_components {significand, static_cast<biased_exponent_type>(expval) - detail::bias_v<decimal128>, sign};
