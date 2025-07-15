@@ -1033,7 +1033,7 @@ constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs)
 constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    return (rhs.bits_.high & detail::d128_nan_mask_high_bits) == detail::d128_nan_mask_high_bits;
+    return (rhs.bits_.high & detail::d128_nan_mask.high) == detail::d128_nan_mask.high;
     #else
     static_cast<void>(rhs);
     return false;
@@ -1043,7 +1043,7 @@ constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) n
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    return (rhs.bits_.high & detail::d128_nan_mask_high_bits) == detail::d128_inf_mask_high_bits;
+    return (rhs.bits_.high & detail::d128_nan_mask.high) == detail::d128_nan_mask.high;
     #else
     static_cast<void>(rhs);
     return false;
@@ -1053,7 +1053,7 @@ constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) n
 constexpr auto issignaling BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    return (rhs.bits_.high & detail::d128_snan_mask_high_bits) == detail::d128_snan_mask_high_bits;
+    return (rhs.bits_.high & detail::d128_snan_mask.high) == detail::d128_snan_mask.high;
     #else
     static_cast<void>(rhs);
     return false;
@@ -1081,7 +1081,7 @@ constexpr auto isnormal BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs
 constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    return (rhs.bits_.high & detail::d128_inf_mask_high_bits) != detail::d128_inf_mask_high_bits;
+    return (rhs.bits_.high & detail::d128_inf_mask.high) != detail::d128_inf_mask.high;
     #else
     static_cast<void>(rhs);
     return true;
@@ -1091,7 +1091,7 @@ constexpr auto isfinite BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs
 BOOST_DECIMAL_FORCE_INLINE constexpr auto not_finite(decimal128 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    return (rhs.bits_.high & detail::d128_inf_mask_high_bits) == detail::d128_inf_mask_high_bits;
+    return (rhs.bits_.high & detail::d128_inf_mask.high) == detail::d128_inf_mask.high;
     #else
     static_cast<void>(rhs);
     return false;
