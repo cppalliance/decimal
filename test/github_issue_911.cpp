@@ -28,7 +28,7 @@ void test_issue()
 void test_random_spots()
 {
     std::mt19937_64 rng(42);
-    std::uniform_int_distribution<int> integer_part_dist(INT_MIN, INT_MAX);
+    std::uniform_int_distribution<std::int64_t> integer_part_dist(INT64_MIN, INT64_MAX);
     std::uniform_int_distribution<std::uint64_t> fractional_part_dist(UINT64_C(0), UINT64_MAX);
 
     for (std::size_t i {}; i < 1024; ++i)
