@@ -66,10 +66,20 @@ constexpr auto to_integral(Decimal val) noexcept
 
     if (expval > 0)
     {
+        if (expval > std::numeric_limits<Conversion_Type>::digits)
+        {
+            return std::numeric_limits<TargetType>::max();
+        }
+
         result *= detail::pow10<Conversion_Type>(static_cast<Conversion_Type>(expval));
     }
     else if (expval < 0)
     {
+        if (abs_exp_val > std::numeric_limits<Conversion_Type>::digits)
+        {
+            return static_cast<TargetType>(0);
+        }
+
         result /= detail::pow10<Conversion_Type>(static_cast<Conversion_Type>(abs_exp_val));
     }
 

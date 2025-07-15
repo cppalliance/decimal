@@ -453,11 +453,15 @@ constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
         }
     }
 
+    constexpr std::uint32_t dpd_d32_exponent_mask {UINT32_C(0b0'00000'111111'0000000000'0000000000)};
+    constexpr std::uint32_t dpd_d32_significand_mask {UINT32_C(0b0'00000'000000'1111111111'1111111111)};
+    constexpr std::uint32_t dpd_d32_combination_mask {UINT32_C(0b0'11111'000000'0000000000'0000000000)};
+
     // The bit lengths are the same as used in the standard bid format
     const auto sign {(dpd & detail::d32_sign_mask) != 0};
-    const auto combination_field_bits {(dpd & detail::d32_combination_field_mask) >> 26U};
-    const auto exponent_field_bits {(dpd & detail::d32_exponent_mask) >> 20U};
-    const auto significand_bits {(dpd & detail::d32_significand_mask)};
+    const auto combination_field_bits {(dpd & dpd_d32_combination_mask) >> 26U};
+    const auto exponent_field_bits {(dpd & dpd_d32_exponent_mask) >> 20U};
+    const auto significand_bits {(dpd & dpd_d32_significand_mask)};
 
     // Case 1: 3.5.2.c.1.i
     // Combination field bits are 110XX or 11110X
@@ -650,10 +654,15 @@ constexpr auto from_dpd_d64(std::uint64_t dpd) noexcept
     }
 
     // The bit lengths are the same as used in the standard bid format
+
+    constexpr std::uint64_t dpd_d64_combination_field_mask {UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
+    constexpr std::uint64_t dpd_d64_exponent_field_mask {UINT64_C(0b0'00000'11111111'0000000000'0000000000'0000000000'0000000000'0000000000)};
+    constexpr std::uint64_t dpd_d64_significand_field_mask {UINT64_C(0b0'00000'00000000'1111111111'1111111111'1111111111'1111111111'1111111111)};
+
     const auto sign {(dpd & detail::d64_sign_mask) != 0};
-    const auto combination_field_bits {(dpd & detail::d64_combination_field_mask) >> 58U};
-    const auto exponent_field_bits {(dpd & detail::d64_exponent_mask) >> 50U};
-    auto significand_bits {(dpd & detail::d64_significand_mask)};
+    const auto combination_field_bits {(dpd & dpd_d64_combination_field_mask) >> 58U};
+    const auto exponent_field_bits {(dpd & dpd_d64_exponent_field_mask) >> 50U};
+    auto significand_bits {(dpd & dpd_d64_significand_field_mask)};
 
     // Case 1: 3.5.2.c.1.i
     // Combination field bits are 110XX or 11110X

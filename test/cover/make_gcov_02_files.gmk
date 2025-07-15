@@ -20,7 +20,8 @@ FILES_EXCLUDE := $(PATH_SRC)/concepts_test.cpp                                  
                  $(PATH_SRC)/test_illegal_decimal64_fast_implicit_conversions.cpp   \
                  $(PATH_SRC)/test_illegal_decimal64_implicit_conversions.cpp        \
                  $(PATH_SRC)/test_illegal_decimal128_implicit_conversions.cpp       \
-
+                 $(PATH_SRC)/test_decimal32.cpp                                     \
+                 $(PATH_SRC)/test_decimal64_basis.cpp                               \
 
 FILES_EXCLUDE := $(basename $(FILES_EXCLUDE))
 
