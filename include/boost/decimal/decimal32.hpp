@@ -566,6 +566,7 @@ private:
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #  pragma GCC diagnostic ignored "-Wbool-compare"
+#  pragma GCC diagnostic ignored "-Wconversion"
 #endif
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS

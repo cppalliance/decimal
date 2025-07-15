@@ -567,6 +567,7 @@ constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #  pragma GCC diagnostic ignored "-Wbool-compare"
+#  pragma GCC diagnostic ignored "-Wconversion"
 #endif
 
 // 3.2.5 initialization from coefficient and exponent:
