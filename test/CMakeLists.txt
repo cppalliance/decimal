@@ -7,6 +7,13 @@ include(BoostTestJamfile OPTIONAL RESULT_VARIABLE HAVE_BOOST_TEST)
 
 if(HAVE_BOOST_TEST)
 
-    boost_test_jamfile(FILE Jamfile LINK_LIBRARIES Boost::decimal Boost::core Boost::math Boost::multiprecision Boost::charconv)
+    find_package(fmt)
+    if(fmt_FOUND)
+        message(STATUS "Boost.Decimal: Test with fmtlib")
+        boost_test_jamfile(FILE Jamfile LINK_LIBRARIES Boost::decimal Boost::core Boost::math Boost::multiprecision Boost::charconv Boost::random fmt::fmt COMPILE_DEFINITIONS BOOST_DECIMAL_TEST_FMT)
+    else()
+        message(STATUS "Boost.Decimal: Test without fmtlib")
+        boost_test_jamfile(FILE Jamfile LINK_LIBRARIES Boost::decimal Boost::core Boost::math Boost::multiprecision Boost::charconv Boost::random)
+    endif()
 
 endif()

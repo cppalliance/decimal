@@ -6,6 +6,7 @@
 #define BOOST_DECIMAL_DETAIL_DIV_IMPL_HPP
 
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/u256.hpp>
 #include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -56,7 +57,7 @@ constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> Deci
     constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64>))};
     const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.sig) * tens_needed};
 
-    auto res_sig {big_sig_lhs / static_cast<unsigned_int128_type>(rhs.sig)};
+    auto res_sig {big_sig_lhs / rhs.sig};
     auto res_exp {(lhs.exp - detail::precision_v<decimal64>) - rhs.exp};
 
     if (res_sig == 0U)
@@ -73,26 +74,27 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
 {
     bool sign {lhs.sign != rhs.sign};
 
-    constexpr auto ten_pow_precision {detail::uint256_t(pow10(int128::uint128_t(detail::precision_v<decimal128>)))};
-    const auto big_sig_lhs {detail::uint256_t(lhs.sig) * ten_pow_precision};
+    constexpr auto ten_pow_precision {pow10(int128::uint128_t(detail::precision_v<decimal128>))};
+    const auto big_sig_lhs {detail::umul256(lhs.sig, ten_pow_precision)};
 
-    auto res_sig {big_sig_lhs / detail::uint256_t(rhs.sig)};
+    auto res_sig {big_sig_lhs / rhs.sig};
     auto res_exp {lhs.exp - rhs.exp - detail::precision_v<decimal128>};
 
-    if (res_sig.high != UINT64_C(0))
+    if (res_sig[3] != 0 || res_sig[2] != 0)
     {
         const auto sig_dig {detail::num_digits(res_sig)};
         const auto digit_delta {sig_dig - std::numeric_limits<int128::uint128_t>::digits10};
-        res_sig /= detail::uint256_t(pow10(int128::uint128_t(digit_delta)));
+        res_sig /= pow10(int128::uint128_t(digit_delta));
         res_exp += digit_delta;
     }
-    else if (res_sig == UINT64_C(0))
+    else if (res_sig[1] == 0 && res_sig[0] == 0)
     {
         sign = false;
     }
 
     // Let the constructor handle shrinking it back down and rounding correctly
-    q = T {res_sig.low, res_exp, sign};
+    BOOST_DECIMAL_ASSERT((res_sig[3] | res_sig[2]) == 0U);
+    q = T {int128::uint128_t{res_sig[1], res_sig[0]}, res_exp, sign};
 }
 
 } // namespace detail

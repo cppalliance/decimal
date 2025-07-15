@@ -9,7 +9,7 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/int128.hpp>
-#include <boost/decimal/detail/emulated256.hpp>
+#include <boost/decimal/detail/u256.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/components.hpp>
 #include <boost/int128/int128.hpp>
@@ -145,122 +145,51 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
     return {res_sig_64, res_exp, sign};
 }
 
-template <typename ReturnType, typename T>
-constexpr auto d128_mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
+template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
+                               BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
+constexpr auto d128_mul_impl(const T1& lhs_sig, const U1 lhs_exp, const bool lhs_sign,
+                             const T2& rhs_sig, const U2 rhs_exp, const bool rhs_sign) noexcept -> ReturnType
 {
-    bool sign {lhs.isneg() != rhs.isneg()};
+    using sig_type = T1;
+    static_assert(std::is_same<sig_type, T2>::value, "Should have a common type by this point");
 
-    const auto lhs_sig {lhs.full_significand()};
-    const auto lhs_exp {lhs.biased_exponent()};
-    const auto rhs_sig {rhs.full_significand()};
-    const auto rhs_exp {rhs.biased_exponent()};
+    const bool sign {lhs_sign != rhs_sign};
 
-    const auto lhs_dig {detail::num_digits(lhs_sig)};
-    const auto rhs_dig {detail::num_digits(rhs_sig)};
+    auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
+    auto res_exp {lhs_exp + rhs_exp};
+    const auto sig_dig {detail::num_digits(res_sig)};
 
-    const auto res_dig {lhs_dig + rhs_dig};
-
-    // If we can avoid it don't do 256 bit multiplication because it is slow
-    if (res_dig <= std::numeric_limits<boost::int128::uint128_t>::digits10)
+    // 34 is the number of digits in the d128 significand
+    // this way we can skip rounding in the constructor a second time
+    const auto digit_delta {sig_dig - 34};
+    if (BOOST_DECIMAL_LIKELY(digit_delta > 0))
     {
-        auto res_sig {lhs_sig * rhs_sig};
-        auto res_exp {lhs_exp + rhs_exp};
-        return {res_sig, res_exp, sign};
+        res_sig /= pow10<sig_type>(digit_delta);
+        res_exp += digit_delta;
     }
-    else
-    {
-        // Once we have the normalized significands and exponents all we have to do is
-        // multiply the significands and add the exponents
-        auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
-        auto res_exp {lhs_exp + rhs_exp};
 
-        const auto sig_dig {res_sig > pow10(static_cast<uint256_t>(static_cast<std::uint64_t>(res_dig))) ? res_dig : res_dig - 1};
-
-        if (sig_dig > std::numeric_limits<boost::int128::uint128_t>::digits10)
-        {
-            const auto digit_delta {sig_dig - std::numeric_limits<boost::int128::uint128_t>::digits10};
-            res_sig /= detail::uint256_t(pow10(boost::int128::uint128_t(digit_delta)));
-            res_exp += digit_delta;
-        }
-
-        BOOST_DECIMAL_ASSERT(res_sig.high == boost::int128::uint128_t(0, 0));
-        return {res_sig.low, res_exp, sign};
-    }
+    BOOST_DECIMAL_ASSERT((res_sig[3] | res_sig[2]) == 0U);
+    return {int128::uint128_t{res_sig[1], res_sig[0]}, res_exp, sign};
 }
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
                                BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
-constexpr auto d128_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                             T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> ReturnType
+BOOST_DECIMAL_FORCE_INLINE
+constexpr auto d128_fast_mul_impl(const T1& lhs_sig, const U1 lhs_exp, const bool lhs_sign,
+                                  const T2& rhs_sig, const U2 rhs_exp, const bool rhs_sign) noexcept -> ReturnType
 {
-    bool sign {lhs_sign != rhs_sign};
-
-    const auto lhs_dig {detail::num_digits(lhs_sig)};
-    const auto rhs_dig {detail::num_digits(rhs_sig)};
-
-    // If we can avoid it don't do 256 bit multiplication because it is slow
-    if (lhs_dig + rhs_dig <= std::numeric_limits<boost::int128::uint128_t>::digits10)
-    {
-        auto res_sig {lhs_sig * rhs_sig};
-        auto res_exp {lhs_exp + rhs_exp};
-        return {res_sig, res_exp, sign};
-    }
-    else
-    {
-        // Once we have the normalized significands and exponents all we have to do is
-        // multiply the significands and add the exponents
-        auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
-        auto res_exp {lhs_exp + rhs_exp};
-
-        const auto sig_dig {detail::num_digits(res_sig)};
-
-        if (sig_dig > std::numeric_limits<boost::int128::uint128_t>::digits10)
-        {
-            const auto digit_delta {sig_dig - std::numeric_limits<boost::int128::uint128_t>::digits10};
-            res_sig /= detail::uint256_t(pow10(boost::int128::uint128_t(digit_delta)));
-            res_exp += digit_delta;
-        }
-
-        BOOST_DECIMAL_ASSERT(res_sig.high == boost::int128::uint128_t(0, 0));
-        return {res_sig.low, res_exp, sign};
-    }
-}
-
-template <typename ReturnType, typename T>
-constexpr auto d128_fast_mul_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
-{
-    bool sign {lhs.isneg() != rhs.isneg()};
-
-    // Once we have the normalized significands and exponents all we have to do is
-    // multiply the significands and add the exponents
-    auto res_sig {detail::umul256(lhs.full_significand(), rhs.full_significand())};
-    auto res_exp {lhs.biased_exponent() + rhs.biased_exponent() + 30};
-
-    constexpr auto ten_pow_30 {detail::pow10(static_cast<uint256_t>(30))};
-    res_sig /= ten_pow_30;
-
-    BOOST_DECIMAL_ASSERT(res_sig.high == boost::int128::uint128_t(0,0)); // LCOV_EXCL_LINE
-    return {res_sig.low, res_exp, sign};
-}
-
-template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
-                               BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
-constexpr auto d128_fast_mul_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
-                                  T2 rhs_sig, U2 rhs_exp, bool rhs_sign) noexcept -> ReturnType
-{
-    bool sign {lhs_sign != rhs_sign};
+    const bool sign {lhs_sign != rhs_sign};
 
     // Once we have the normalized significands and exponents all we have to do is
     // multiply the significands and add the exponents
     auto res_sig {detail::umul256(lhs_sig, rhs_sig)};
-    auto res_exp {lhs_exp + rhs_exp};
+    const auto res_exp {lhs_exp + rhs_exp + 30};
 
-    constexpr auto ten_pow_30 {detail::pow10(static_cast<uint256_t>(30))};
+    constexpr auto ten_pow_30 {detail::pow10(static_cast<int128::uint128_t>(30))};
     res_sig /= ten_pow_30;
-    res_exp += 30;
 
-    BOOST_DECIMAL_ASSERT(res_sig.high == boost::int128::uint128_t(0,0)); // LCOV_EXCL_LINE
-    return {res_sig.low, res_exp, sign};
+    BOOST_DECIMAL_ASSERT((res_sig[3] | res_sig[2]) == 0U); // LCOV_EXCL_LINE
+    return {int128::uint128_t{res_sig[1], res_sig[0]}, res_exp, sign};
 }
 
 } // namespace detail

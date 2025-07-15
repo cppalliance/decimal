@@ -305,6 +305,7 @@ void random_EQ(T lower, T upper)
     }
 
     BOOST_TEST(!(std::numeric_limits<decimal128>::quiet_NaN() == std::numeric_limits<decimal128>::quiet_NaN()));
+    BOOST_TEST(decimal128{0} == -decimal128{0});
 }
 
 template <typename T>
@@ -386,6 +387,7 @@ void random_NE(T lower, T upper)
     }
 
     BOOST_TEST((std::numeric_limits<decimal128>::quiet_NaN() != std::numeric_limits<decimal128>::quiet_NaN()));
+    BOOST_TEST(!(decimal128{0} != -decimal128{0}));
 }
 
 template <typename T>

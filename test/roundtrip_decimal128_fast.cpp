@@ -13,6 +13,9 @@
 #  pragma clang diagnostic ignored "-Wconversion"
 #  pragma clang diagnostic ignored "-Wsign-conversion"
 #  pragma clang diagnostic ignored "-Wfloat-equal"
+#  if __clang_major__ >= 20
+#    pragma clang diagnostic ignored "-Wfortify-source"
+#  endif
 #elif defined(__GNUC__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wold-style-cast"
