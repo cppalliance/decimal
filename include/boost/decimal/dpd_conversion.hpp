@@ -852,11 +852,15 @@ constexpr auto from_dpd_d128(int128::uint128_t dpd) noexcept
         }
     }
 
+    constexpr std::uint64_t d128_dpd_combination_field_mask_high_bits {UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
+    constexpr std::uint64_t d128_dpd_exponent_mask_high_bits {UINT64_C(0b0'00000'111111111111'0000000000'0000000000'0000000000'0000000000'000000)};
+    constexpr int128::uint128_t d128_dpd_significand_mask {UINT64_C(0b1111111111'1111111111'1111111111'1111111111'111111), UINT64_MAX};
+
     // The bit lengths are the same as used in the standard bid format
     const auto sign {(dpd.high & detail::d128_sign_mask.high) != 0};
-    const auto combination_field_bits {(dpd.high & detail::d128_combination_field_mask.high) >> 58U};
-    const auto exponent_field_bits {(dpd.high & detail::d128_exponent_mask.high) >> 46U};
-    auto significand_bits {(dpd & detail::d128_significand_mask)};
+    const auto combination_field_bits {(dpd.high & d128_dpd_combination_field_mask_high_bits) >> 58U};
+    const auto exponent_field_bits {(dpd.high & d128_dpd_exponent_mask_high_bits) >> 46U};
+    auto significand_bits {(dpd & d128_dpd_significand_mask)};
 
     // Case 1: 3.5.2.c.1.i
     // Combination field bits are 110XX or 11110X
