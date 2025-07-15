@@ -63,77 +63,30 @@ namespace decimal {
 namespace detail {
 
 // See IEEE 754 section 3.5.2
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_inf_mask {UINT64_C(0b0'11110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_nan_mask {UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_snan_mask {UINT64_C(0b0'11111'10000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_comb_inf_mask {UINT64_C(0b0'11110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_comb_nan_mask {UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_exp_snan_mask {UINT64_C(0b0'00000'10000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_inf_mask {UINT64_C(0x7800000000000000), UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_nan_mask {UINT64_C(0x7C00000000000000), UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_snan_mask {UINT64_C(0x7E00000000000000), UINT64_C(0)};
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_inf_mask_high_bits {UINT64_C(0b0'11110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_nan_mask_high_bits {UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_snan_mask_high_bits {UINT64_C(0b0'11111'10000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
-
-// Masks to update the significand based on the combination field
-// In these first three 00, 01, or 10 are the leading 2 bits of the exp
-// and the trailing 3 bits are to be concatenated onto the significand
-//
 //    Comb.  Exponent          Significand
-// s 00 TTT (00)eeeeeeeeeeee (0TTT) 110-bits
-// s 01 TTT (01)eeeeeeeeeeee (0TTT) 110-bits
-// s 10 TTT (10)eeeeeeeeeeee (0TTT) 110-bits
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_significand_bits = UINT64_C(110);
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_exponent_bits = UINT64_C(12);
+// s        eeeeeeeeeeeeee   (0TTT) 110-bits
+// s   11   eeeeeeeeeeeeee   (100T) 110-bits
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_sign_mask {UINT64_C(0b1'00000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000),
-                                         UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_combination_field_mask {UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000),
-                                                      UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_exponent_mask {UINT64_C(0b0'00000'111111111111'0000000000'0000000000'0000000000'0000000000'000000),
-                                             UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_sign_mask {UINT64_C(0b1'00000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_combination_field_mask {UINT64_C(0b0'11'00000000'000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_significand_mask {UINT64_C(0b1111111111'1111111111'1111111111'1111111111'111111), UINT64_MAX};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_not_11_exp_mask {UINT64_C(0b0'11111111111111'000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t     d128_not_11_exp_high_word_shift {49U};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_11_exp_mask {UINT64_C(0b0'00'11111111111111'0000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t     d128_11_exp_high_word_shift {47U};
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_comb_01_mask {UINT64_C(0b0'01000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000),
-                                            UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_comb_10_mask {UINT64_C(0b0'10000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000),
-                                            UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_comb_00_01_10_significand_bits {UINT64_C(0b0'00111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000),
-                                                              UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_not_11_significand_mask {UINT64_C(0b0'00000000000000'111111111'1111111111'1111111111'1111111111'1111111111), UINT64_MAX};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_11_significand_mask {UINT64_C(0b0'00'00000000000000'1111111'1111111111'1111111111'1111111111'1111111111), UINT64_MAX};
 
-// This mask is used to determine if we use the masks above or below since 11 TTT is invalid
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_comb_11_mask {UINT64_C(0b0'11000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000),
-                                            UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_comb_11_exp_bits {UINT64_C(0b0'00110'00000000'0000000000'0000000000'0000000000'0000000000'0000000000),
-                                                UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_comb_11_significand_bits {UINT64_C(0b0'00001'00000000'0000000000'0000000000'0000000000'0000000000'0000000000),
-                                                        UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_biggest_no_combination_significand {d128_not_11_significand_mask};
 
-// For these masks the first two bits of the combination field imply 100 T as the
-// leading bits of the significand and then bits 3 and 4 are the exp
-//
-//    Comb.  Exponent          Significand
-// s 1100 T (00)eeeeeeeeeeee (100T) 110-bits
-// s 1101 T (01)eeeeeeeeeeee (100T) 110-bits
-// s 1110 T (10)eeeeeeeeeeee (100T) 110-bits
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_comb_1101_mask {UINT64_C(0b0'11010'00000000'0000000000'0000000000'0000000000'0000000000'0000000000),
-                                              UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_comb_1110_mask {UINT64_C(0b0'11100'00000000'0000000000'0000000000'0000000000'0000000000'0000000000),
-                                              UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_max_biased_exponent {UINT64_C(12287)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_max_significand_value {UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)};
 
-// Powers of 2 used to determine the size of the significand
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_no_combination {d128_significand_mask};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_big_combination {UINT64_C(0b111'1111111111'1111111111'1111111111'1111111111'111111),
-                                               UINT64_MAX};
-
-// Exponent Fields
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_max_exp_no_combination {0b111111111111};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_exp_one_combination {0b1'111111111111};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d128_max_biased_exp {0b10'111111111111};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_small_combination_field_mask {UINT64_C(0b111'0000000000'0000000000'0000000000'0000000000'000000),
-                                                            UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t d128_big_combination_field_mask {UINT64_C(0b1'0000000000'0000000000'0000000000'0000000000'000000),
-                                                          UINT64_C(0)};
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT class decimal128 final
@@ -782,8 +735,7 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
 
     // If the coeff is not in range make it so
     int unsigned_coeff_digits {-1};
-    constexpr auto digits_upper_bound {detail::pow10(static_cast<significand_type>(34))};
-    if (unsigned_coeff >= digits_upper_bound)
+    if (unsigned_coeff > detail::d128_max_significand_value)
     {
         unsigned_coeff_digits = detail::d128_constructor_num_digits(unsigned_coeff);
         if (unsigned_coeff_digits > detail::precision_v<decimal128> + 1)
@@ -801,9 +753,8 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
             #  pragma GCC diagnostic pop
             #endif
 
-            exp += digits_to_remove;
             unsigned_coeff_digits -= digits_to_remove;
-            exp += detail::fenv_round<decimal128>(unsigned_coeff, isneg);
+            exp += detail::fenv_round<decimal128>(unsigned_coeff, isneg) + digits_to_remove;
         }
         // Round as required
         else
@@ -817,118 +768,55 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
 
     if (reduced_coeff == int128::uint128_t{0, 0})
     {
-        exp = 0;
+        return;
     }
-    else if (reduced_coeff <= detail::d128_no_combination)
+
+    if (reduced_coeff <= detail::d128_biggest_no_combination_significand)
     {
         // If the coefficient fits directly we don't need to use the combination field
-        bits_ |= (reduced_coeff & detail::d128_significand_mask);
-    }
-    else if (reduced_coeff <= detail::d128_big_combination)
-    {
-        // Break the number into 3 bits for the combination field and 110 bits for the significand field
-
-        // Use the least significant 110 bits to set the significand
-        bits_ |= (reduced_coeff & detail::d128_significand_mask);
-
-        // Now set the combination field (maximum of 3 bits)
-        auto remaining_bits {reduced_coeff & detail::d128_small_combination_field_mask};
-        remaining_bits <<= detail::d128_exponent_bits;
-        bits_ |= remaining_bits;
+        bits_ |= (reduced_coeff & detail::d128_not_11_significand_mask);
     }
     else
     {
         // Have to use the full combination field
-        bits_ |= detail::d128_comb_11_mask;
+        bits_ |= (detail::d128_combination_field_mask | (reduced_coeff & detail::d128_11_significand_mask));
         big_combination = true;
-
-        bits_ |= (reduced_coeff & detail::d128_significand_mask);
-        const auto remaining_bit {reduced_coeff & detail::d128_big_combination_field_mask};
-
-        if (remaining_bit)
-        {
-            bits_ |= detail::d128_comb_11_significand_bits;
-        }
     }
 
     // If the exponent fits we do not need to use the combination field
-    auto biased_exp {static_cast<std::uint64_t>(exp + detail::bias_v<decimal128>)};
-    const auto biased_exp_low_twelve_bits {int128::uint128_t(biased_exp & detail::d128_max_exp_no_combination) <<
-                                           detail::d128_significand_bits};
-
-    if (biased_exp <= detail::d128_max_exp_no_combination)
-    {
-        bits_ |= biased_exp_low_twelve_bits;
-    }
-    else if (biased_exp <= detail::d128_exp_one_combination)
+    const auto biased_exp {static_cast<std::uint64_t>(exp + detail::bias_v<decimal128>)};
+    if (biased_exp <= detail::d128_max_biased_exponent)
     {
         if (big_combination)
         {
-            bits_ |= (detail::d128_comb_1101_mask | biased_exp_low_twelve_bits);
+            bits_.high |= (biased_exp << detail::d128_11_exp_high_word_shift) & detail::d128_11_exp_mask.high;
         }
         else
         {
-            bits_ |= (detail::d128_comb_01_mask | biased_exp_low_twelve_bits);
-        }
-    }
-    else if (biased_exp <= detail::d128_max_biased_exp)
-    {
-        if (big_combination)
-        {
-            bits_ |= (detail::d128_comb_1110_mask | biased_exp_low_twelve_bits);
-        }
-        else
-        {
-            bits_ |= (detail::d128_comb_10_mask | biased_exp_low_twelve_bits);
+            bits_.high |= (biased_exp << detail::d128_not_11_exp_high_word_shift) & detail::d128_not_11_exp_mask.high;
         }
     }
     else
     {
-        constexpr auto zero_bits {int128::uint128_t{UINT64_C(0x2208000000000000), UINT64_C(0)}};
+        // If we can fit the extra exponent in the significand then we can construct the value
+        // If we can't the value is either 0 or infinity depending on the sign of exp
 
-        // The value is probably infinity
-
-        // If we can offset some extra power in the coefficient try to do so
-        auto coeff_dig {unsigned_coeff_digits == -1 ? detail::num_digits(unsigned_coeff) : unsigned_coeff_digits};
-        if (coeff_dig < detail::precision_v<decimal128>)
+        if (unsigned_coeff_digits == -1)
         {
-            for (; coeff_dig <= detail::precision_v<decimal128>; ++coeff_dig)
-            {
-                reduced_coeff *= 10U;
-                --biased_exp;
-                --exp;
-                if (biased_exp == detail::d128_max_biased_exp)
-                {
-                    break;
-                }
-            }
+            unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
+        }
 
-            if (coeff_dig <= detail::precision_v<decimal128>)
-            {
-                *this = decimal128(reduced_coeff, exp, isneg);
-            }
-            else
-            {
-                if (exp < 0)
-                {
-                    bits_ = zero_bits;
-                }
-                else
-                {
-                    bits_ = detail::d128_comb_inf_mask;
-                }
-            }
+        const auto exp_delta {biased_exp - detail::d128_max_biased_exponent};
+        const auto digit_delta {unsigned_coeff_digits - static_cast<int>(exp_delta)};
+        if (digit_delta > 0 && unsigned_coeff_digits + digit_delta <= detail::precision_v<decimal128>)
+        {
+            exp -= digit_delta;
+            unsigned_coeff *= detail::pow10(static_cast<Unsigned_Integer>(digit_delta));
+            *this = decimal128(unsigned_coeff, exp, isneg);
         }
         else
         {
-            if (exp < 0)
-            {
-                bits_ = zero_bits;
-            }
-            else
-            {
-                bits_ = detail::d128_comb_inf_mask;
-            }
+            bits_ = exp < 0 ? UINT64_C(0) : detail::d128_inf_mask;
         }
     }
 }
