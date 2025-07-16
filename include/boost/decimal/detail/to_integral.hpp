@@ -127,10 +127,20 @@ constexpr auto to_integral_128(Decimal val) noexcept
 
     if (expval > 0)
     {
+        if (expval > std::numeric_limits<int128::uint128_t>::digits)
+        {
+            return std::numeric_limits<TargetType>::max();
+        }
+
         sig *= detail::pow10<int128::uint128_t>(expval);
     }
     else if (expval < 0)
     {
+        if (abs_exp_val > std::numeric_limits<int128::uint128_t>::digits)
+        {
+            return static_cast<TargetType>(0);
+        }
+
         sig /= detail::pow10<int128::uint128_t>(abs_exp_val);
     }
 
