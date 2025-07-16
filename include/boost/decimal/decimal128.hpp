@@ -71,12 +71,12 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_snan_mask {UINT64_C(0x7E
 // s        eeeeeeeeeeeeee   (0TTT) 110-bits
 // s   11   eeeeeeeeeeeeee   (100T) 110-bits
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_sign_mask {UINT64_C(0b1'00000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_combination_field_mask {UINT64_C(0b0'11'00000000'000'0000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t     d128_sign_mask {UINT64_C(0b1'00000'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t     d128_combination_field_mask = UINT64_C(0b0'11'00000000'000'0000000000'0000000000'0000000000'0000000000'0000000000);
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_not_11_exp_mask {UINT64_C(0b0'11111111111111'000000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t     d128_not_11_exp_mask = UINT64_C(0b0'11111111111111'000000000'0000000000'0000000000'0000000000'0000000000);
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t     d128_not_11_exp_high_word_shift {49U};
-BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_11_exp_mask {UINT64_C(0b0'00'11111111111111'0000000'0000000000'0000000000'0000000000'0000000000), UINT64_C(0)};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t     d128_11_exp_mask {UINT64_C(0b0'00'11111111111111'0000000'0000000000'0000000000'0000000000'0000000000)};
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t     d128_11_exp_high_word_shift {47U};
 
 BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_not_11_significand_mask {UINT64_C(0b0'00000000000000'111111111'1111111111'1111111111'1111111111'1111111111), UINT64_MAX};
@@ -583,13 +583,13 @@ constexpr auto decimal128::unbiased_exponent() const noexcept -> exponent_type
 {
     exponent_type expval {};
 
-    if ((bits_.high & detail::d128_combination_field_mask.high) == detail::d128_combination_field_mask.high)
+    if ((bits_.high & detail::d128_combination_field_mask) == detail::d128_combination_field_mask)
     {
-        expval = (bits_.high & detail::d128_11_exp_mask.high) >> detail::d128_11_exp_high_word_shift;
+        expval = (bits_.high & detail::d128_11_exp_mask) >> detail::d128_11_exp_high_word_shift;
     }
     else
     {
-        expval = (bits_.high & detail::d128_not_11_exp_mask.high) >> detail::d128_not_11_exp_high_word_shift;
+        expval = (bits_.high & detail::d128_not_11_exp_mask) >> detail::d128_not_11_exp_high_word_shift;
     }
 
     return expval;
@@ -604,7 +604,7 @@ constexpr auto decimal128::full_significand() const noexcept -> significand_type
 {
     significand_type significand {};
 
-    if ((bits_.high & detail::d128_combination_field_mask.high) == detail::d128_combination_field_mask.high)
+    if ((bits_.high & detail::d128_combination_field_mask) == detail::d128_combination_field_mask)
     {
         constexpr int128::uint128_t implied_bit {UINT64_C(0b10000000000000000000000000000000000000000000000000),0};
         significand = implied_bit | (bits_ & detail::d128_11_significand_mask);
@@ -619,7 +619,7 @@ constexpr auto decimal128::full_significand() const noexcept -> significand_type
 
 constexpr auto decimal128::isneg() const noexcept -> bool
 {
-    return static_cast<bool>(bits_.high & detail::d128_sign_mask.high);
+    return static_cast<bool>(bits_.high & detail::d128_sign_mask);
 }
 
 constexpr auto decimal128::to_components() const noexcept -> detail::decimal128_components
@@ -627,19 +627,19 @@ constexpr auto decimal128::to_components() const noexcept -> detail::decimal128_
     significand_type significand {};
     exponent_type expval {};
 
-    if ((bits_.high & detail::d128_combination_field_mask.high) == detail::d128_combination_field_mask.high)
+    if ((bits_.high & detail::d128_combination_field_mask) == detail::d128_combination_field_mask)
     {
         constexpr int128::uint128_t implied_bit {UINT64_C(0b10000000000000000000000000000000000000000000000000),0};
         significand = implied_bit | (bits_ & detail::d128_11_significand_mask);
-        expval = (bits_.high & detail::d128_11_exp_mask.high) >> detail::d128_11_exp_high_word_shift;
+        expval = (bits_.high & detail::d128_11_exp_mask) >> detail::d128_11_exp_high_word_shift;
     }
     else
     {
         significand = bits_ & detail::d128_not_11_significand_mask;
-        expval = (bits_.high & detail::d128_not_11_exp_mask.high) >> detail::d128_not_11_exp_high_word_shift;
+        expval = (bits_.high & detail::d128_not_11_exp_mask) >> detail::d128_not_11_exp_high_word_shift;
     }
 
-    const auto sign {static_cast<bool>(bits_.high & detail::d128_sign_mask.high)};
+    const auto sign {static_cast<bool>(bits_.high & detail::d128_sign_mask)};
 
     return detail::decimal128_components {significand, static_cast<biased_exponent_type>(expval) - detail::bias_v<decimal128>, sign};
 }
@@ -655,11 +655,12 @@ constexpr auto decimal128::edit_sign(bool sign) noexcept -> void
 {
     if (sign)
     {
-        bits_.high |= detail::d128_sign_mask.high;
+        bits_.high |= detail::d128_sign_mask;
     }
     else
     {
-        bits_.high &= ~detail::d128_sign_mask.high;
+        constexpr auto not_sign_mask {~detail::d128_sign_mask};
+        bits_.high &= not_sign_mask;
     }
 }
 
@@ -674,7 +675,7 @@ constexpr auto decimal128::edit_sign(bool sign) noexcept -> void
 #  pragma warning(disable : 4127)
 #endif
 
-// e.g. for sign bits_.high |= detail::d128_sign_mask.high
+// e.g. for sign bits_.high |= detail::d128_sign_mask
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 #else
@@ -692,7 +693,7 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
         constexpr T1 zero {0};
         if (coeff < zero || sign)
         {
-            bits_.high = detail::d128_sign_mask.high;
+            bits_.high = detail::d128_sign_mask;
             isneg = true;
         }
     }
@@ -700,7 +701,7 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     {
         if (sign)
         {
-            bits_.high = detail::d128_sign_mask.high;
+            bits_.high = detail::d128_sign_mask;
             isneg = true;
         }
     }
@@ -759,7 +760,8 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     else
     {
         // Have to use the full combination field
-        bits_ |= (detail::d128_combination_field_mask | (reduced_coeff & detail::d128_11_significand_mask));
+        constexpr int128::uint128_t d128_full_combination_field_mask {detail::d128_combination_field_mask, UINT64_C(0)};
+        bits_ |= (d128_full_combination_field_mask | (reduced_coeff & detail::d128_11_significand_mask));
         big_combination = true;
     }
 
@@ -769,11 +771,11 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     {
         if (big_combination)
         {
-            bits_.high |= (biased_exp << detail::d128_11_exp_high_word_shift) & detail::d128_11_exp_mask.high;
+            bits_.high |= (biased_exp << detail::d128_11_exp_high_word_shift) & detail::d128_11_exp_mask;
         }
         else
         {
-            bits_.high |= (biased_exp << detail::d128_not_11_exp_high_word_shift) & detail::d128_not_11_exp_mask.high;
+            bits_.high |= (biased_exp << detail::d128_not_11_exp_high_word_shift) & detail::d128_not_11_exp_mask;
         }
     }
     else
@@ -1041,7 +1043,7 @@ constexpr decimal128::operator Decimal() const noexcept
 
 constexpr auto signbit BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
-    return rhs.bits_.high & detail::d128_sign_mask.high;
+    return rhs.bits_.high & detail::d128_sign_mask;
 }
 
 constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
@@ -1119,7 +1121,7 @@ constexpr auto operator+(decimal128 rhs) noexcept -> decimal128
 
 constexpr auto operator-(decimal128 rhs) noexcept-> decimal128
 {
-    rhs.bits_.high ^= detail::d128_sign_mask.high;
+    rhs.bits_.high ^= detail::d128_sign_mask;
     return rhs;
 }
 
