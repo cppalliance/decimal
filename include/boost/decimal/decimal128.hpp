@@ -745,38 +745,23 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
 
     constexpr int128::uint128_t zero {0, 0};
     auto reduced_coeff {static_cast<int128::uint128_t>(unsigned_coeff)};
-    bool big_combination {false};
 
     if (reduced_coeff == zero)
     {
         return;
     }
 
-    if (reduced_coeff <= detail::d128_biggest_no_combination_significand)
-    {
-        // If the coefficient fits directly we don't need to use the combination field
-        bits_ |= (reduced_coeff & detail::d128_not_11_significand_mask);
-    }
-    else
-    {
-        // Have to use the full combination field
-        constexpr int128::uint128_t d128_full_combination_field_mask {detail::d128_combination_field_mask, UINT64_C(0)};
-        bits_ |= (d128_full_combination_field_mask | (reduced_coeff & detail::d128_11_significand_mask));
-        big_combination = true;
-    }
+    // The decimal128 case is more straightforward than the others
+    // The precision of the type is 34, and 34x 9s fits into 113 bits,
+    // therefore we never need to use the combination field for additional space
+
+    bits_ |= (reduced_coeff & detail::d128_not_11_significand_mask);
 
     // If the exponent fits we do not need to use the combination field
     const auto biased_exp {static_cast<std::uint64_t>(exp + detail::bias_v<decimal128>)};
     if (biased_exp <= detail::d128_max_biased_exponent)
     {
-        if (big_combination)
-        {
-            bits_.high |= (biased_exp << detail::d128_11_exp_high_word_shift) & detail::d128_11_exp_mask;
-        }
-        else
-        {
-            bits_.high |= (biased_exp << detail::d128_not_11_exp_high_word_shift) & detail::d128_not_11_exp_mask;
-        }
+        bits_.high |= (biased_exp << detail::d128_not_11_exp_high_word_shift) & detail::d128_not_11_exp_mask;
     }
     else
     {
