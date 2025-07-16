@@ -448,6 +448,31 @@ void random_mixed_division(T lower, T upper)
     BOOST_TEST(isinf(val1 / zero));
 }
 
+template <typename T>
+void random_spot_division(T val1, T val2)
+{
+    const decimal32_fast dec1 {val1};
+    const decimal32_fast dec2 {val2};
+
+    const decimal32_fast res {dec1 / dec2};
+    const decimal32_fast res_int {static_cast<float>(val1) / static_cast<float>(val2)};
+
+    if (isinf(res) && isinf(res_int))
+    {
+    }
+    else if (!BOOST_TEST(abs(res - res_int) < decimal32_fast(1, -2)))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "Val 1: " << val1
+                  << "\nDec 1: " << dec1
+                  << "\nVal 2: " << val2
+                  << "\nDec 2: " << dec2
+                  << "\nDec res: " << res
+                  << "\nInt res: " << static_cast<float>(val1) / static_cast<float>(val2) << std::endl;
+        // LCOV_EXCL_STOP
+    }
+}
+
 int main()
 {
     // Values that won't exceed the range of the significand
@@ -540,6 +565,8 @@ int main()
     random_mixed_multiplication(-5'000L, 5'000L);
     random_mixed_multiplication(-5'000LL, 5'000LL);
     random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
+
+    random_spot_division(-23984, 2561);
 
     random_division(0, 5'000);
     random_division(0L, 5'000L);
