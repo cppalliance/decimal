@@ -668,9 +668,12 @@ constexpr auto decimal128::edit_sign(bool sign) noexcept -> void
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
 
-// TODO(mborland): Rather than doing bitwise operations on the whole uint128 we should
-// be able to only operate on the affected word
-//
+
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4127)
+#endif
+
 // e.g. for sign bits_.high |= detail::d128_sign_mask.high
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
@@ -703,32 +706,38 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     }
 
     // If the coeff is not in range make it so
+    // The coefficient needs at least 110 bits so there's a good chance we don't need to
+    // We use sizeof instead of std::numeric_limits since __int128 on GCC prior to 14 without GNU mode does not overload
+    // numeric_limits
     int unsigned_coeff_digits {-1};
-    if (unsigned_coeff > detail::d128_max_significand_value)
+    BOOST_DECIMAL_IF_CONSTEXPR (sizeof(Unsigned_Integer) >= sizeof(significand_type))
     {
-        unsigned_coeff_digits = detail::d128_constructor_num_digits(unsigned_coeff);
-        if (unsigned_coeff_digits > detail::precision_v<decimal128> + 1)
+        if (unsigned_coeff > detail::d128_max_significand_value)
         {
-            const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal128> + 1)};
+            unsigned_coeff_digits = detail::d128_constructor_num_digits(unsigned_coeff);
+            if (unsigned_coeff_digits > detail::precision_v<decimal128> + 1)
+            {
+                const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal128> + 1)};
 
-            #if defined(__GNUC__) && !defined(__clang__)
-            #  pragma GCC diagnostic push
-            #  pragma GCC diagnostic ignored "-Wconversion"
-            #endif
+                #if defined(__GNUC__) && !defined(__clang__)
+                #  pragma GCC diagnostic push
+                #  pragma GCC diagnostic ignored "-Wconversion"
+                #endif
 
-            unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+                unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
 
-            #if defined(__GNUC__) && !defined(__clang__)
-            #  pragma GCC diagnostic pop
-            #endif
+                #if defined(__GNUC__) && !defined(__clang__)
+                #  pragma GCC diagnostic pop
+                #endif
 
-            unsigned_coeff_digits -= digits_to_remove;
-            exp += detail::fenv_round<decimal128>(unsigned_coeff, isneg) + digits_to_remove;
-        }
-        // Round as required
-        else
-        {
-            exp += detail::fenv_round<decimal128>(unsigned_coeff, isneg);
+                unsigned_coeff_digits -= digits_to_remove;
+                exp += detail::fenv_round<decimal128>(unsigned_coeff, isneg) + digits_to_remove;
+            }
+            // Round as required
+            else
+            {
+                exp += detail::fenv_round<decimal128>(unsigned_coeff, isneg);
+            }
         }
     }
 
@@ -790,6 +799,10 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
         }
     }
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 #if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic pop
