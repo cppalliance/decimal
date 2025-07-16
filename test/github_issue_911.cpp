@@ -60,10 +60,54 @@ void test_random_spots()
     }
 }
 
+void test_rounded_spots()
+{
+    std::mt19937_64 rng(42);
+    std::uniform_int_distribution<std::int64_t> integer_part_dist(0, 100);
+    std::uniform_int_distribution<std::uint64_t> fractional_part_dist(UINT64_C(0), UINT64_MAX);
+
+    for (std::size_t i {}; i < 1024; ++i)
+    {
+        const auto integer_part {integer_part_dist(rng)};
+        const auto fractional_part {fractional_part_dist(rng)};
+
+        const auto integer_string {std::to_string(integer_part)};
+        const auto fractional_string {std::to_string(fractional_part)};
+
+        // We are going to force the value to always have 34 significant digits and end in a bunch of 9s
+        // This should force the usage of the combination field if we're going to use it
+        auto full_string {integer_string + "." + fractional_string + "9999999999"};
+        auto current_length {static_cast<int>(full_string.length())};
+        while (current_length < std::numeric_limits<boost::decimal::decimal128>::digits10 + 1)
+        {
+            full_string.append("9");
+            ++current_length;
+        }
+
+        bson_decimal128_t bson_res;
+        bson_decimal128_from_string(full_string.c_str(), &bson_res);
+
+        boost::decimal::decimal128 boost_res;
+        const auto r = boost::decimal::from_chars(full_string, boost_res);
+
+        BOOST_TEST(r);
+
+        boost::int128::uint128_t bson_bits;
+        std::memcpy(&bson_bits, &bson_res, sizeof(bson_bits));
+
+        boost::int128::uint128_t boost_bits;
+        std::memcpy(&boost_bits, &boost_res, sizeof(boost_bits));
+
+        BOOST_TEST_EQ(bson_bits.low, boost_bits.low);
+        BOOST_TEST_EQ(bson_bits.high, boost_bits.high);
+    }
+}
+
 int main()
 {
     test_issue();
     test_random_spots();
+    test_rounded_spots();
 
     return boost::report_errors();
 }
