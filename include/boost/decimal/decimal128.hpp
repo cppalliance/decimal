@@ -1059,7 +1059,7 @@ constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) n
 constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128 rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    return (rhs.bits_.high & detail::d128_nan_mask.high) == detail::d128_nan_mask.high;
+    return (rhs.bits_.high & detail::d128_nan_mask.high) == detail::d128_inf_mask.high;
     #else
     static_cast<void>(rhs);
     return false;
