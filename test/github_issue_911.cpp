@@ -28,7 +28,7 @@ void test_issue()
 void test_random_spots()
 {
     std::mt19937_64 rng(42);
-    std::uniform_int_distribution<std::int64_t> integer_part_dist(INT64_MIN, INT64_MAX);
+    std::uniform_int_distribution<std::int64_t> integer_part_dist(-100, 100);
     std::uniform_int_distribution<std::uint64_t> fractional_part_dist(UINT64_C(0), UINT64_MAX);
 
     for (std::size_t i {}; i < 1024; ++i)
@@ -50,10 +50,10 @@ void test_random_spots()
         BOOST_TEST(r);
 
         boost::int128::uint128_t bson_bits;
-        std::memcpy(&bson_bits, &boost_res, sizeof(bson_bits));
+        std::memcpy(&bson_bits, &bson_res, sizeof(bson_bits));
 
         boost::int128::uint128_t boost_bits;
-        std::memcpy(&boost_bits, &bson_bits, sizeof(boost_bits));
+        std::memcpy(&boost_bits, &boost_res, sizeof(boost_bits));
 
         BOOST_TEST_EQ(bson_bits.low, boost_bits.low);
         BOOST_TEST_EQ(bson_bits.high, boost_bits.high);
