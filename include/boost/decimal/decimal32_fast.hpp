@@ -856,10 +856,26 @@ constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::mul_impl<decimal32_fast>(
-            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_
-            );
+    using mul_type = std::uint_fast64_t;
+
+    const auto isneg {lhs.sign_ != rhs.sign_};
+    constexpr auto ten_pow_seven {detail::pow10(static_cast<mul_type>(6))};
+    constexpr auto ten_pow_seven_exp_offset {95U};
+    constexpr auto ten_pow_six {detail::pow10(static_cast<mul_type>(5))};
+    constexpr auto ten_pow_six_exp_offset {96U};
+
+    auto res_sig {(static_cast<mul_type>(lhs.significand_) * static_cast<mul_type>(rhs.significand_))};
+    const bool res_sig_14_dig {res_sig > UINT64_C(10000000000000)};
+    res_sig /= res_sig_14_dig ? ten_pow_seven : ten_pow_six;
+    auto res_exp {lhs.exponent_ + rhs.exponent_};
+    res_exp -= res_sig_14_dig ? ten_pow_seven_exp_offset : ten_pow_six_exp_offset;
+
+    res_exp += detail::fenv_round(res_sig, isneg);
+
+    BOOST_DECIMAL_ASSERT(res_sig >= 1'000'000 || res_sig == 0U);
+    BOOST_DECIMAL_ASSERT(res_exp <= 9'999'999 || res_sig == 0U);
+
+    return direct_init(static_cast<decimal32_fast::significand_type>(res_sig), static_cast<decimal32_fast::exponent_type>(res_exp) , isneg);
 }
 
 template <typename Integer>
