@@ -667,6 +667,7 @@ constexpr auto decimal128::edit_sign(bool sign) noexcept -> void
 #if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
+#  pragma GCC diagnostic ignored "-Wconversion"
 #endif
 
 
