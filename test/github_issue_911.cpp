@@ -8,6 +8,11 @@
 #include <boost/core/lightweight_test.hpp>
 #include <cstring>
 
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 void test_issue()
 {
     // -7.50
