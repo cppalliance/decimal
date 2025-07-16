@@ -714,10 +714,11 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
     {
         if (unsigned_coeff > detail::d128_max_significand_value)
         {
+            constexpr auto precision_plus_one {detail::precision_v<decimal128> + 1};
             unsigned_coeff_digits = detail::d128_constructor_num_digits(unsigned_coeff);
-            if (unsigned_coeff_digits > detail::precision_v<decimal128> + 1)
+            if (unsigned_coeff_digits > precision_plus_one)
             {
-                const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal128> + 1)};
+                const auto digits_to_remove {unsigned_coeff_digits - precision_plus_one};
 
                 #if defined(__GNUC__) && !defined(__clang__)
                 #  pragma GCC diagnostic push
