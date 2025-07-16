@@ -19,7 +19,7 @@ void test_issue()
     BOOST_TEST_EQ(bits.high, UINT64_C(12699025049277956096));
 }
 
-#if __has_include(<bson-2.0.2/bson/bson.h>)
+#ifdef BOOST_DECIMAL_TEST_BSON
 
 #include <bson-2.0.2/bson/bson.h>
 #include <random>
