@@ -277,6 +277,28 @@ void random_multiplication(T lower, T upper)
 }
 
 template <typename T>
+void random_spot_multiplication(T val1, T val2)
+{
+    const decimal32_fast dec1 {val1};
+    const decimal32_fast dec2 {val2};
+
+    const decimal32_fast res {dec1 * dec2};
+    const decimal32_fast res_int {val1 * val2};
+
+    if (!BOOST_TEST_EQ(res, res_int))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "Val 1: " << val1
+                  << "\nDec 1: " << dec1
+                  << "\nVal 2: " << val2
+                  << "\nDec 2: " << dec2
+                  << "\nDec res: " << res
+                  << "\nInt res: " << val1 * val2 << std::endl;
+        // LCOV_EXCL_STOP
+    }
+}
+
+template <typename T>
 void random_mixed_multiplication(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
@@ -484,6 +506,11 @@ int main()
 
     // Positive values
     const auto sqrt_int_max = static_cast<int>(std::sqrt(static_cast<double>((std::numeric_limits<int>::max)())));
+
+    random_spot_multiplication(4477, 4139);
+    random_spot_multiplication(28270, 45750);
+    random_spot_multiplication(2137, 3272);
+    random_spot_multiplication(-26554, 22692);
 
     random_multiplication(0, 5'000);
     random_multiplication(0L, 5'000L);
