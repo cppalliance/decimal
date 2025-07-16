@@ -972,10 +972,20 @@ constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& 
     // By appending enough zeros to the LHS we end up finding what we need anyway
     constexpr auto ten_pow_precision {detail::pow10(static_cast<std::uint_fast64_t>(detail::precision_v<decimal32>))};
     const auto big_sig_lhs {static_cast<std::uint_fast64_t>(lhs.significand_) * ten_pow_precision};
-    const auto res_sig {big_sig_lhs / static_cast<std::uint_fast64_t>(rhs.significand_)};
-    const auto res_exp {(lhs.biased_exponent() - detail::precision_v<decimal32>) - rhs.biased_exponent()};
+    auto res_sig {big_sig_lhs / static_cast<std::uint_fast64_t>(rhs.significand_)};
+    auto res_exp {lhs.exponent_ - rhs.exponent_ + 94};
+    const auto isneg {lhs.sign_ != rhs.sign_};
 
-    q = decimal32_fast(res_sig, res_exp, lhs.sign_ != rhs.sign_);
+    // If we have 8 figures round it down to 7
+    if (res_sig >= UINT64_C(10'000'000))
+    {
+        res_exp += detail::fenv_round(res_sig, isneg);
+    }
+
+    BOOST_DECIMAL_ASSERT(res_sig >= 1'000'000 || res_sig == 0U);
+    BOOST_DECIMAL_ASSERT(res_exp <= 9'999'999 || res_sig == 0U);
+
+    q = direct_init(static_cast<typename decimal32_fast::significand_type>(res_sig), static_cast<typename decimal32_fast::exponent_type>(res_exp), isneg);
 }
 
 constexpr auto mod_impl(decimal32_fast lhs, decimal32_fast rhs, const decimal32_fast& q, decimal32_fast& r) noexcept -> void
