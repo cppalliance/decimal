@@ -227,18 +227,20 @@ public:
 
     // 3.2.5 initialization from coefficient and exponent:
     #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-    template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+    template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
     #else
-    template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
+    template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
     #endif
     constexpr decimal128(T1 coeff, T2 exp, bool sign = false) noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-    template <BOOST_DECIMAL_INTEGRAL T>
+    template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
     #else
-    template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool> = true>
+    template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
     #endif
-    constexpr decimal128(bool coeff, T exp, bool sign = false) noexcept;
+    constexpr decimal128(T1 coeff, T2 exp) noexcept;
+
+    constexpr decimal128(bool value) noexcept;
 
     // 3.2.4.4 Conversion to integral type
     explicit constexpr operator bool() const noexcept;
@@ -674,74 +676,53 @@ constexpr auto decimal128::edit_sign(bool sign) noexcept -> void
 
 // e.g. for sign bits_.high |= detail::d128_sign_mask
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 #else
-template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
+template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
 #endif
 constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
 {
-    using Unsigned_Integer = detail::make_unsigned_t<T1>;
-
-    bits_ = {UINT64_C(0), UINT64_C(0)};
-    bool isneg {false};
-    Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
-    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T1>)
-    {
-        constexpr T1 zero {0};
-        if (coeff < zero || sign)
-        {
-            bits_.high = detail::d128_sign_mask;
-            isneg = true;
-        }
-    }
-    else
-    {
-        if (sign)
-        {
-            bits_.high = detail::d128_sign_mask;
-            isneg = true;
-        }
-    }
+    bits_.high = sign ? detail::d128_sign_mask : UINT64_C(0);
 
     // If the coeff is not in range make it so
     // The coefficient needs at least 110 bits so there's a good chance we don't need to
     // We use sizeof instead of std::numeric_limits since __int128 on GCC prior to 14 without GNU mode does not overload
     // numeric_limits
-    int unsigned_coeff_digits {-1};
-    BOOST_DECIMAL_IF_CONSTEXPR (sizeof(Unsigned_Integer) >= sizeof(significand_type))
+    int coeff_digits {-1};
+    BOOST_DECIMAL_IF_CONSTEXPR (sizeof(T1) >= sizeof(significand_type))
     {
-        if (unsigned_coeff > detail::d128_max_significand_value)
+        if (coeff > detail::d128_max_significand_value)
         {
             constexpr auto precision_plus_one {detail::precision_v<decimal128> + 1};
-            unsigned_coeff_digits = detail::d128_constructor_num_digits(unsigned_coeff);
-            if (unsigned_coeff_digits > precision_plus_one)
+            coeff_digits = detail::d128_constructor_num_digits(coeff);
+            if (coeff_digits > precision_plus_one)
             {
-                const auto digits_to_remove {unsigned_coeff_digits - precision_plus_one};
+                const auto digits_to_remove {coeff_digits - precision_plus_one};
 
                 #if defined(__GNUC__) && !defined(__clang__)
                 #  pragma GCC diagnostic push
                 #  pragma GCC diagnostic ignored "-Wconversion"
                 #endif
 
-                unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+                coeff /= detail::pow10(static_cast<T1>(digits_to_remove));
 
                 #if defined(__GNUC__) && !defined(__clang__)
                 #  pragma GCC diagnostic pop
                 #endif
 
-                unsigned_coeff_digits -= digits_to_remove;
-                exp += detail::fenv_round<decimal128>(unsigned_coeff, isneg) + digits_to_remove;
+                coeff_digits -= digits_to_remove;
+                exp += detail::fenv_round<decimal128>(coeff, sign) + digits_to_remove;
             }
             // Round as required
             else
             {
-                exp += detail::fenv_round<decimal128>(unsigned_coeff, isneg);
+                exp += detail::fenv_round<decimal128>(coeff, sign);
             }
         }
     }
 
     constexpr int128::uint128_t zero {0, 0};
-    auto reduced_coeff {static_cast<int128::uint128_t>(unsigned_coeff)};
+    auto reduced_coeff {static_cast<significand_type>(coeff)};
 
     if (reduced_coeff == zero)
     {
@@ -765,18 +746,18 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
         // If we can fit the extra exponent in the significand then we can construct the value
         // If we can't the value is either 0 or infinity depending on the sign of exp
 
-        if (unsigned_coeff_digits == -1)
+        if (coeff_digits == -1)
         {
-            unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
+            coeff_digits = detail::num_digits(reduced_coeff);
         }
 
         const auto exp_delta {biased_exp - detail::d128_max_biased_exponent};
-        const auto digit_delta {unsigned_coeff_digits - static_cast<int>(exp_delta)};
-        if (digit_delta > 0 && unsigned_coeff_digits + digit_delta <= detail::precision_v<decimal128>)
+        const auto digit_delta {coeff_digits - static_cast<int>(exp_delta)};
+        if (digit_delta > 0 && coeff_digits + digit_delta <= detail::precision_v<decimal128>)
         {
             exp -= digit_delta;
-            unsigned_coeff *= detail::pow10(static_cast<Unsigned_Integer>(digit_delta));
-            *this = decimal128(unsigned_coeff, exp, isneg);
+            reduced_coeff *= detail::pow10(static_cast<significand_type>(digit_delta));
+            *this = decimal128(reduced_coeff, exp, sign);
         }
         else
         {
@@ -784,6 +765,16 @@ constexpr decimal128::decimal128(T1 coeff, T2 exp, bool sign) noexcept
         }
     }
 }
+
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+#else
+template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
+#endif
+constexpr decimal128::decimal128(T1 coeff, T2 exp) noexcept : decimal128(detail::make_positive_unsigned(coeff), exp, coeff < 0) {}
+
+constexpr decimal128::decimal128(bool value) noexcept : decimal128(static_cast<std::uint64_t>(value), 0, false) {}
+
 
 #ifdef _MSC_VER
 #  pragma warning(pop)
@@ -879,16 +870,6 @@ template <typename Decimal, std::enable_if_t<detail::is_decimal_floating_point_v
 constexpr decimal128::decimal128(Decimal val) noexcept
 {
     *this = to_decimal<decimal128>(val);
-}
-
-#ifdef BOOST_DECIMAL_HAS_CONCEPTS
-template <BOOST_DECIMAL_INTEGRAL T>
-#else
-template <typename T, std::enable_if_t<detail::is_integral_v<T>, bool>>
-#endif
-constexpr decimal128::decimal128(bool coeff, T exp, bool sign) noexcept
-{
-    *this = decimal128(static_cast<std::int32_t>(coeff), exp, sign);
 }
 
 constexpr decimal128::operator bool() const noexcept
