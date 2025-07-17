@@ -8,6 +8,9 @@ https://www.boost.org/LICENSE_1_0.txt
 = API Reference
 :idprefix: api_ref_
 
+This section is a complete cross-reference to all the types, structures,
+enums, constants and macros that are provided in this library.
+
 == Types
 
 === IEEE 754 Compliant Types
