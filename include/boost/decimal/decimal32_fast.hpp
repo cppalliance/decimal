@@ -133,8 +133,13 @@ private:
 public:
     constexpr decimal32_fast() noexcept = default;
 
-    template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
+    template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
     constexpr decimal32_fast(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
+    constexpr decimal32_fast(T1 coeff, T2 exp) noexcept;
+
+    explicit constexpr decimal32_fast(bool value) noexcept;
 
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     constexpr decimal32_fast(Integer coeff) noexcept;
@@ -365,35 +370,17 @@ public:
     friend constexpr auto quantized32f(decimal32_fast lhs, decimal32_fast rhs) noexcept -> decimal32_fast;
 };
 
-template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
+template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
 constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
 {
-    // Older compilers have issues with conversions from __uint128, so we skip all that and use our uint128
-    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__GNUC__) || (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10)) && (!defined(__clang__) || (defined(__clang__) && __clang_major__ < 13))
-    using Unsigned_Integer_1 = detail::make_unsigned_t<T1>;
-    using Unsigned_Integer = std::conditional_t<std::is_same<Unsigned_Integer_1, detail::builtin_uint128_t>::value, int128::uint128_t, Unsigned_Integer_1>;
-    #else
-    using Unsigned_Integer = detail::make_unsigned_t<T1>;
-    #endif
-
-    using Basis_Unsigned_Integer = std::conditional_t<std::numeric_limits<Unsigned_Integer>::digits10 < std::numeric_limits<significand_type>::digits10, significand_type, Unsigned_Integer>;
-
-    const bool isneg {coeff < static_cast<T1>(0) || sign};
-    sign_ = isneg;
-    auto unsigned_coeff {static_cast<Basis_Unsigned_Integer>(detail::make_positive_unsigned(coeff))};
+    sign_ = sign;
 
     // Normalize in the constructor, so we never have to worry about it again
-    detail::normalize<decimal32>(unsigned_coeff, exp, sign);
+    detail::normalize<decimal32>(coeff, exp, sign);
 
-    significand_ = static_cast<significand_type>(unsigned_coeff);
+    significand_ = static_cast<significand_type>(coeff);
 
-    // Normalize the handling of zeros
-    if (significand_ == UINT32_C(0))
-    {
-        exp = 0;
-    }
-
-    const auto biased_exp {exp + detail::bias};
+    const auto biased_exp {significand_ == 0U ? 0 : exp + detail::bias};
 
     // Decimal32 exponent holds 8 bits
     if (biased_exp > detail::max_biased_exp_v<decimal32_fast>)
@@ -408,15 +395,18 @@ constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
     {
         // Flush denorms to zero
         significand_ = static_cast<significand_type>(0);
-        exponent_ = static_cast<exponent_type>(101);
+        exponent_ = static_cast<exponent_type>(detail::bias);
         sign_ = false;
     }
 }
 
+template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
+constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp) noexcept : decimal32_fast(detail::make_positive_unsigned(coeff), exp, coeff < 0) {}
+
+constexpr decimal32_fast::decimal32_fast(bool value) noexcept : decimal32_fast(static_cast<significand_type>(value), 0, false) {}
+
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
-constexpr decimal32_fast::decimal32_fast(Integer val) noexcept : decimal32_fast{val, 0}
-{
-}
+constexpr decimal32_fast::decimal32_fast(Integer val) noexcept : decimal32_fast{val, 0} {}
 
 #if defined(__clang__)
 #  pragma clang diagnostic push

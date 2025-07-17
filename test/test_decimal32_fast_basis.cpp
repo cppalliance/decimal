@@ -381,7 +381,7 @@ void test_construct_from_float()
     decimal32_fast float_frac(T(1.2345));
     BOOST_TEST_EQ(fraction, float_frac);
 
-    constexpr decimal32_fast neg_frac(98123, -4, true);
+    constexpr decimal32_fast neg_frac(-98123, -4);
     decimal32_fast neg_float_frac(T(-9.8123));
     BOOST_TEST_EQ(neg_frac, neg_float_frac);
 }
