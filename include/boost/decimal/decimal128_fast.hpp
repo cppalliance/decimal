@@ -138,11 +138,20 @@ public:
     constexpr decimal128_fast() noexcept = default;
 
     #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-    template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+    template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
     #else
-    template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
+    template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
     #endif
     constexpr decimal128_fast(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+    #else
+    template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
+    #endif
+    constexpr decimal128_fast(T1 coeff, T2 exp) noexcept;
+
+    explicit constexpr decimal128_fast(bool value) noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_CONCEPTS
     template <BOOST_DECIMAL_INTEGRAL Integer>
@@ -361,33 +370,25 @@ public:
 };
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 #else
-template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
+template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
 #endif
 constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
 {
-    using Unsigned_Integer = int128::uint128_t;
+    using minimum_coefficient_size = std::conditional_t<(sizeof(T1) > sizeof(significand_type)), T1, significand_type>;
 
-    using Basis_Unsigned_Integer = std::conditional_t<std::numeric_limits<Unsigned_Integer>::digits10 < std::numeric_limits<significand_type>::digits10, significand_type, Unsigned_Integer>;
+    minimum_coefficient_size min_coeff {coeff};
 
-    const bool isneg {coeff < static_cast<T1>(0) || sign};
-    sign_ = isneg;
-    auto unsigned_coeff {static_cast<Basis_Unsigned_Integer>(detail::make_positive_unsigned(coeff))};
+    sign_ = sign;
 
     // Normalize the significand in the constructor, so we don't have
-    // to calculate the number of digits for operationss
-    detail::normalize<decimal128_fast>(unsigned_coeff, exp, sign);
+    // to calculate the number of digits for operations
+    detail::normalize<decimal128_fast>(min_coeff, exp, sign);
 
-    significand_ = unsigned_coeff;
+    significand_ = static_cast<significand_type>(min_coeff);
 
-    // Normalize the handling of 0
-    if (significand_ == int128::uint128_t{UINT64_C(0), UINT64_C(0)})
-    {
-        exp = 0;
-    }
-
-    const auto biased_exp {exp + detail::bias_v<decimal128>};
+    const auto biased_exp {significand_ == 0U ? 0 : exp + detail::bias_v<decimal128>};
 
     if (biased_exp > detail::max_biased_exp_v<decimal128>)
     {
@@ -401,10 +402,19 @@ constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp, bool sign) noexcept
     {
         // Flush denorms to zero
         significand_ = static_cast<significand_type>(0);
-        exponent_ = static_cast<exponent_type>(0 + detail::bias_v<decimal128>);
+        exponent_ = static_cast<exponent_type>(detail::bias_v<decimal128>);
         sign_ = false;
     }
 }
+
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+#else
+template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
+#endif
+constexpr decimal128_fast::decimal128_fast(T1 coeff, T2 exp) noexcept : decimal128_fast(detail::make_positive_unsigned(coeff), exp, coeff < 0) {}
+
+constexpr decimal128_fast::decimal128_fast(bool value) noexcept : decimal128_fast(static_cast<significand_type>(value), 0, false) {}
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_INTEGRAL Integer>
