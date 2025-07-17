@@ -110,7 +110,7 @@ constexpr auto erf_calc_impl(T z, bool invert) noexcept -> T
         {
             return -erf_calc_impl(-z, invert);
         }
-        else if (z < T{5, -1, true})
+        else if (z < T{-5, -1})
         {
             return 2 - erf_calc_impl(-z, invert);
         }

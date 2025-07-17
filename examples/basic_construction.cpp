@@ -11,8 +11,8 @@ int main()
     using namespace boost::decimal;
 
     constexpr decimal32 val_1 {100};         // Construction from an integer
-    constexpr decimal32 val_2 {10, 1};       // Construction from an integer and exponent
-    constexpr decimal32 val_3 {1, 2, false}; // Construction from an integer, exponent, and sign
+    constexpr decimal32 val_2 {10, 1};       // Construction from a signed integer and exponent
+    constexpr decimal32 val_3 {1U, 2, false}; // Construction from an unsigned integer, exponent, and sign
 
     std::cout << "Val_1: " << val_1 << '\n'
               << "Val_2: " << val_2 << '\n'

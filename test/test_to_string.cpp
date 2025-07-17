@@ -23,9 +23,9 @@ void test()
     BOOST_TEST_EQ(to_string(T{10000}), "10000.000000");
     BOOST_TEST_EQ(to_string(T{210000}), "210000.000000");
     BOOST_TEST_EQ(to_string(T{2100000}), "2100000.000000");
-    BOOST_TEST_EQ(to_string(T{21, 6, true}), "-21000000.000000");
-    BOOST_TEST_EQ(to_string(T{211, 6, true}), "-211000000.000000");
-    BOOST_TEST_EQ(to_string(T{2111, 6, true}), "-2111000000.000000");
+    BOOST_TEST_EQ(to_string(T{21U, 6, true}), "-21000000.000000");
+    BOOST_TEST_EQ(to_string(T{211U, 6, true}), "-211000000.000000");
+    BOOST_TEST_EQ(to_string(T{2111U, 6, true}), "-2111000000.000000");
 
     BOOST_TEST_EQ(to_string(std::numeric_limits<T>::infinity()), "inf");
     BOOST_TEST_EQ(to_string(-std::numeric_limits<T>::infinity()), "-inf");

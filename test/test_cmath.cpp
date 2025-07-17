@@ -396,8 +396,8 @@ void test_fma()
         // LCOV_EXCL_STOP
     }
 
-    BOOST_TEST_EQ(Dec(1, 0) + Dec(1, 0, true), Dec(0, 0));
-    BOOST_TEST_EQ(fma(Dec(1, -1), Dec(1, 1), Dec(1, 0, true)), Dec(0, 0));
+    BOOST_TEST_EQ(Dec(1, 0) + Dec(-1, 0), Dec(0, 0));
+    BOOST_TEST_EQ(fma(Dec(1, -1), Dec(1, 1), Dec(-1, 0)), Dec(0, 0));
 
     std::uniform_real_distribution<double> dist(-1e3, 1e3);
 
@@ -790,7 +790,7 @@ void test_rint()
     BOOST_TEST(isnan(rint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
     BOOST_TEST_EQ(abs(rint(Dec(0) * Dec(dist(rng)))), Dec(0));
     BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
-    BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, true));
+    BOOST_TEST_EQ(rint(Dec(0) * Dec(dist(rng)) + Dec(1U, -20, true)), Dec(0, 0, true));
 }
 
 template <typename Dec>
@@ -873,7 +873,7 @@ void test_lrint()
     BOOST_TEST_EQ(lrint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng))), LONG_MIN);
     BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng))), 0);
     BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
-    BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+    BOOST_TEST_EQ(lrint(Dec(0) * Dec(dist(rng)) + Dec(1U, -20, true)), 0);
 }
 
 template <typename Dec>
@@ -916,7 +916,7 @@ void test_llrint()
     BOOST_TEST_EQ(llrint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng))), LLONG_MIN);
     BOOST_TEST_EQ(llrint(Dec(0) * Dec(dist(rng))), 0);
     BOOST_TEST_EQ(llrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
-    BOOST_TEST_EQ(llrint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+    BOOST_TEST_EQ(llrint(Dec(0) * Dec(dist(rng)) + Dec(1U, -20, true)), 0);
 }
 
 template <typename Dec>
@@ -980,7 +980,7 @@ void test_nearbyint()
     BOOST_TEST(isnan(nearbyint(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
     BOOST_TEST_EQ(abs(nearbyint(Dec(0) * Dec(dist(rng)))), Dec(0));
     BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
-    BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, true));
+    BOOST_TEST_EQ(nearbyint(Dec(0) * Dec(dist(rng)) + Dec(1U, -20, true)), Dec(0, 0, true));
 }
 
 template <typename Dec>
@@ -1022,7 +1022,7 @@ void test_round()
     BOOST_TEST(isnan(round(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng)))));
     BOOST_TEST_EQ(abs(round(Dec(0) * Dec(dist(rng)))), Dec(0));
     BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), Dec(0));
-    BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), Dec(0, 0, false));
+    BOOST_TEST_EQ(round(Dec(0) * Dec(dist(rng)) + Dec(1U, -20, true)), Dec(0, 0, false));
 }
 
 template <typename Dec>
@@ -1065,7 +1065,7 @@ void test_lround()
     BOOST_TEST_EQ(lround(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng))), LONG_MIN);
     BOOST_TEST_EQ(lround(Dec(0) * Dec(dist(rng))), 0);
     BOOST_TEST_EQ(lround(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
-    BOOST_TEST_EQ(lround(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+    BOOST_TEST_EQ(lround(Dec(0) * Dec(dist(rng)) + Dec(1U, -20, true)), 0);
 }
 
 template <typename Dec>
@@ -1108,7 +1108,7 @@ void test_llround()
     BOOST_TEST_EQ(llround(std::numeric_limits<Dec>::quiet_NaN() * Dec(dist(rng))), LLONG_MIN);
     BOOST_TEST_EQ(llround(Dec(0) * Dec(dist(rng))), 0);
     BOOST_TEST_EQ(llround(Dec(0) * Dec(dist(rng)) + Dec(1, -20)), 0);
-    BOOST_TEST_EQ(llround(Dec(0) * Dec(dist(rng)) + Dec(1, -20, true)), 0);
+    BOOST_TEST_EQ(llround(Dec(0) * Dec(dist(rng)) + Dec(1U, -20, true)), 0);
 }
 
 template <typename Dec>

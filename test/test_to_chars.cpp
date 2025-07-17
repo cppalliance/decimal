@@ -826,9 +826,9 @@ void test_434_hex()
 template <typename T>
 void test_777()
 {
-    constexpr T value1 = T {21, 6, true};
-    constexpr T value2 = T {211, 6, true};
-    constexpr T value3 = T {2111, 6, true};
+    constexpr T value1 = T {21U, 6, true};
+    constexpr T value2 = T {211U, 6, true};
+    constexpr T value3 = T {2111U, 6, true};
 
     test_value(value1, "-21000000", chars_format::fixed, 0);
     test_value(value2, "-211000000", chars_format::fixed, 0);

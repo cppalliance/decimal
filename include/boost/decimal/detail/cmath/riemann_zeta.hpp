@@ -42,7 +42,7 @@ constexpr auto riemann_zeta_impl(T x) noexcept
     {
         // The value of riemann_zeta(0) is 1/2.
 
-        result = T { 5, -1, true };
+        result = T { 5U, -1, true };
     }
     #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc != FP_NORMAL)
