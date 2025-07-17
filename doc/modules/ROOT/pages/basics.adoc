@@ -12,30 +12,32 @@ https://www.boost.org/LICENSE_1_0.txt
 
 Every decimal type can be constructed in a few ways:
 
-1) The parameters to the constructor are like so:
+=== Construction from Coefficient and Exponent
 
 [source, c++]
 ----
-template <typename T, typename T2>
-constexpr decimal32(T coeff, T2 exp, bool sign = false) noexcept;
+template <typename UnsignedInteger, typename Integer>
+constexpr decimal32(UnsignedInteger coefficient, Integer exponent, bool sign = false) noexcept;
+
+template <typename SignedInteger, typename Integer>
+constexpr decimal32(SignedInteger coefficient, Integer exponent) noexcept;
 ----
 
-Where types `T` and `T2` are integral types (signed and unsigned are both allowed).
-Lastly the sign follows the convention of `signbit` where `false` is positive and `true` is negative.
-If both a negative coefficient and a sign are passed then the resulting decimal number will be negative.
-The final number constructed is in the form (sign || coeff < 0 ? -1 : 1) x abs(coeff) x 10^exp.
+As you can see you are either allowed to pass a signed integer, or specify the signedness of the resulting number, but not both.
+This is designed to reduce confusion (e.g. what would be the resulting sign of `{-3, 0, true}`?)
 
 [souce, c++]
 ----
-boost::decimal::decimal32 a {1, 0};         // constructs 1
-boost::decimal::decimal32 b {-2, 0};        // constructs -2
-boost::decimal::decimal32 c {2, 0, true};   // Also constructs -2
-boost::decimal::decimal32 d {-2, 0, true};  // Also constructs -2
-boost::decimal::decimal32 e {5, 5};         // constructs 5x10^5
-boost::decimal::decimal32 f {1234, -3}      // constructs 1.234 or 1234x10^-3
+boost::decimal::decimal32 a {1, 1};          // constructs 1e1 = 10
+boost::decimal::decimal32 b {-2, -1};        // constructs -2e-2 or -0.2
+boost::decimal::decimal32 c {2, -1, true};   // also constructs -2e-1 or -0.2
+boost::decimal::decimal32 e {5, 5};          // constructs 5x10^5
+boost::decimal::decimal32 f {1234, -3}       // constructs 1.234 or 1234x10^-3
 ----
 
-2) A decimal number can be explicitly or implicitly constructed from an integer.
+=== Construction from Integer
+
+A decimal number can be explicitly or implicitly constructed from an integer.
 For example:
 
 [source, c++]
@@ -44,7 +46,9 @@ boost::decimal::decimal64 g = 1;
 boost::decimal::decimal32 h {-4};
 ----
 
-3) A decimal number can only be explicitly constructed from a floating point type.
+=== Construction from Binary Floating Point
+
+A decimal number can only be *explicitly* constructed from a floating point type.
 For example:
 
 [source, c++]
@@ -56,7 +60,7 @@ NOTE: Due to the differences in decimal and binary floating point numbers there 
 
 == Using the Library
 
-The entire library should be accessed using the convenience header `<boost/decimal.hpp>`.
+The entire library can be accessed using the convenience header `<boost/decimal.hpp>`.
 A short example of the basic usage:
 
 [source, c++]
