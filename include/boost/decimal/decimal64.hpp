@@ -280,11 +280,20 @@ public:
 
     // 3.2.5 initialization from coefficient and exponent:
     #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-    template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+    template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
     #else
-    template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
+    template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
     #endif
     constexpr decimal64(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+    #else
+    template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
+    #endif
+    constexpr decimal64(T1 coeff, T2 exp) noexcept;
+
+    constexpr decimal64(bool value) noexcept;
 
     // cmath functions that are easier as friends
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;
@@ -568,74 +577,44 @@ constexpr auto to_bits(decimal64 rhs) noexcept -> std::uint64_t
 
 // 3.2.5 initialization from coefficient and exponent:
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 #else
-template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
+template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
 #endif
 constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
 {
-    using Unsigned_Integer = detail::make_unsigned_t<T1>;
-
-    bits_ = UINT64_C(0);
-    bool isneg {false};
-    Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
-    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T1>)
-    {
-        // This branch will never be taken by bool, but it throws a warning prior to C++17
-        #ifdef _MSC_VER
-        #  pragma warning(push)
-        #  pragma warning(disable : 4804)
-        #endif
-
-        if (coeff < T1{0} || sign)
-        {
-            bits_ = detail::d64_sign_mask;
-            isneg = true;
-        }
-
-        #ifdef _MSC_VER
-        #  pragma warning(pop)
-        #endif
-    }
-    else
-    {
-        if (sign)
-        {
-            bits_ = detail::d64_sign_mask;
-            isneg = true;
-        }
-    }
+    bits_ = sign ? detail::d64_sign_mask : UINT64_C(0);
 
     // If the coeff is not in range make it so
-    int unsigned_coeff_digits {-1};
-    if (unsigned_coeff > detail::d64_max_significand_value)
+    int coeff_digits {-1};
+    if (coeff > detail::d64_max_significand_value)
     {
-        unsigned_coeff_digits = detail::d64_constructor_num_digits(unsigned_coeff);
-        if (unsigned_coeff_digits > detail::precision_v<decimal64> + 1)
+        coeff_digits = detail::d64_constructor_num_digits(coeff);
+        if (coeff_digits > detail::precision_v<decimal64> + 1)
         {
-            const auto digits_to_remove {unsigned_coeff_digits - (detail::precision_v<decimal64> + 1)};
+            const auto digits_to_remove {coeff_digits - (detail::precision_v<decimal64> + 1)};
 
             #if defined(__GNUC__) && !defined(__clang__)
             #  pragma GCC diagnostic push
             #  pragma GCC diagnostic ignored "-Wconversion"
             #endif
 
-            unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+            coeff /= detail::pow10(static_cast<T1>(digits_to_remove));
 
             #if defined(__GNUC__) && !defined(__clang__)
             #  pragma GCC diagnostic pop
             #endif
 
-            unsigned_coeff_digits -= digits_to_remove;
-            exp += detail::fenv_round<decimal64>(unsigned_coeff, isneg) + digits_to_remove;
+            coeff_digits -= digits_to_remove;
+            exp += detail::fenv_round<decimal64>(coeff, sign) + digits_to_remove;
         }
         else
         {
-            exp += detail::fenv_round<decimal64>(unsigned_coeff, isneg);
+            exp += detail::fenv_round<decimal64>(coeff, sign);
         }
     }
 
-    auto reduced_coeff {static_cast<std::uint64_t>(unsigned_coeff)};
+    auto reduced_coeff {static_cast<significand_type>(coeff)};
     bool big_combination {false};
 
     if (reduced_coeff == 0U)
@@ -675,18 +654,18 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
         // If we can fit the extra exponent in the significand then we can construct the value
         // If we can't the value is either 0 or infinity depending on the sign of exp
 
-        if (unsigned_coeff_digits == -1)
+        if (coeff_digits == -1)
         {
-            unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
+            coeff_digits = detail::num_digits(reduced_coeff);
         }
 
         const auto exp_delta {biased_exp - detail::d64_max_biased_exponent};
-        const auto digit_delta {unsigned_coeff_digits - static_cast<int>(exp_delta)};
-        if (digit_delta > 0 && unsigned_coeff_digits + digit_delta <= detail::precision_v<decimal64>)
+        const auto digit_delta {coeff_digits - static_cast<int>(exp_delta)};
+        if (digit_delta > 0 && coeff_digits + digit_delta <= detail::precision_v<decimal64>)
         {
             exp -= digit_delta;
-            unsigned_coeff *= detail::pow10(static_cast<Unsigned_Integer>(digit_delta));
-            *this = decimal64(unsigned_coeff, exp, isneg);
+            reduced_coeff *= detail::pow10(static_cast<significand_type>(digit_delta));
+            *this = decimal64(reduced_coeff, exp, sign);
         }
         else
         {
@@ -694,6 +673,16 @@ constexpr decimal64::decimal64(T1 coeff, T2 exp, bool sign) noexcept
         }
     }
 }
+
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+#else
+template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
+#endif
+constexpr decimal64::decimal64(T1 coeff, T2 exp) noexcept : decimal64(detail::make_positive_unsigned(coeff), exp, coeff < 0) {}
+
+constexpr decimal64::decimal64(bool value) noexcept : decimal64(static_cast<significand_type>(value), 0, false) {}
+
 
 #if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic pop
