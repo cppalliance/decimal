@@ -23,5 +23,9 @@ int main()
     test<decimal64>();
     test<decimal128>();
 
+    test<decimal32_fast>();
+    test<decimal64_fast>();
+    test<decimal128_fast>();
+
     return boost::report_errors();
 }
