@@ -30,7 +30,7 @@ constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
     using DivType = typename T::significand_type;
 
     constexpr T zero {0, 0};
-    constexpr T neg_one {1, 0, true};
+    constexpr T neg_one {1U, 0, true};
     const auto fp {fpclassify(val)};
 
     switch (fp)
@@ -66,7 +66,7 @@ constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
     }
     else
     {
-        decimal_digits--;
+        --decimal_digits;
     }
 
     new_sig /= detail::pow10<DivType>(decimal_digits);

@@ -250,11 +250,20 @@ public:
 
     // 3.2.5 initialization from coefficient and exponent:
     #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-    template <BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL T2>
+    template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
     #else
-    template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T> && detail::is_integral_v<T2>, bool> = true>
+    template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
     #endif
-    constexpr decimal32(T coeff, T2 exp, bool sign = false) noexcept;
+    constexpr decimal32(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+    #else
+    template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
+    #endif
+    constexpr decimal32(T1 coeff, T2 exp) noexcept;
+
+    explicit constexpr decimal32(bool value) noexcept;
 
     constexpr decimal32(const decimal32& val) noexcept = default;
     constexpr decimal32(decimal32&& val) noexcept = default;
@@ -566,79 +575,49 @@ private:
 #endif
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-template <BOOST_DECIMAL_INTEGRAL T, BOOST_DECIMAL_INTEGRAL T2>
+template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 #else
-template <typename T, typename T2, std::enable_if_t<detail::is_integral_v<T> && detail::is_integral_v<T2>, bool>>
+template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
 #endif
-constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)
+constexpr decimal32::decimal32(T1 coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)
 {
-    using Unsigned_Integer = detail::make_unsigned_t<T>;
-
-    static_assert(detail::is_integral_v<T>, "Coefficient must be an integer");
+    static_assert(detail::is_integral_v<T1>, "Coefficient must be an integer");
     static_assert(detail::is_integral_v<T2>, "Exponent must be an integer");
 
-    bits_ = UINT32_C(0);
-    bool isneg {false};
-    Unsigned_Integer unsigned_coeff {detail::make_positive_unsigned(coeff)};
-    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T>)
-    {
-        // This branch will never be taken by bool but it throws a warning prior to C++17
-        #ifdef _MSC_VER
-        #  pragma warning(push)
-        #  pragma warning(disable : 4804)
-        #endif
-
-        if (coeff < T{0} || sign)
-        {
-            bits_ = detail::d32_sign_mask;
-            isneg = true;
-        }
-
-        #ifdef _MSC_VER
-        #  pragma warning(pop)
-        #endif
-    }
-    else
-    {
-        if (sign)
-        {
-            bits_ = detail::d32_sign_mask;
-            isneg = true;
-        }
-    }
+    bits_ = sign ? detail::d32_sign_mask : UINT32_C(0);
 
     // If the coeff is not in range make it so
     // Only count the number of digits if we absolutely have to
-    int unsigned_coeff_digits {-1};
-    if (unsigned_coeff > detail::d32_max_significand_value)
+    int coeff_digits {-1};
+    if (coeff > detail::d32_max_significand_value)
     {
         // Since we know that the unsigned coeff is >= 10'000'000 we can use this information to traverse pruned trees
-        unsigned_coeff_digits = detail::d32_constructor_num_digits(unsigned_coeff);
-        if (unsigned_coeff_digits > detail::precision + 1)
+        coeff_digits = detail::d32_constructor_num_digits(coeff);
+        if (coeff_digits > detail::precision + 1)
         {
-            const auto digits_to_remove {unsigned_coeff_digits - (detail::precision + 1)};
+            const auto digits_to_remove {coeff_digits - (detail::precision + 1)};
 
             #if defined(__GNUC__) && !defined(__clang__)
             #  pragma GCC diagnostic push
             #  pragma GCC diagnostic ignored "-Wconversion"
             #endif
 
-            unsigned_coeff /= detail::pow10(static_cast<Unsigned_Integer>(digits_to_remove));
+            coeff /= detail::pow10(static_cast<T1>(digits_to_remove));
 
             #if defined(__GNUC__) && !defined(__clang__)
             #  pragma GCC diagnostic pop
             #endif
 
-            unsigned_coeff_digits -= digits_to_remove;
-            exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg)) + digits_to_remove;
+            coeff_digits -= digits_to_remove;
+            exp += static_cast<T2>(detail::fenv_round(coeff, sign)) + digits_to_remove;
         }
         else
         {
-            exp += static_cast<T2>(detail::fenv_round(unsigned_coeff, isneg));
+            exp += static_cast<T2>(detail::fenv_round(coeff, sign));
         }
     }
 
-    auto reduced_coeff {static_cast<std::uint32_t>(unsigned_coeff)};
+    auto reduced_coeff {static_cast<significand_type>(coeff)};
     bool big_combination {false};
 
     if (reduced_coeff == 0U)
@@ -678,18 +657,18 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
         // If we can fit the extra exponent in the significand then we can construct the value
         // If we can't the value is either 0 or infinity depending on the sign of exp
 
-        if (unsigned_coeff_digits == -1)
+        if (coeff_digits == -1)
         {
-            unsigned_coeff_digits = detail::num_digits(unsigned_coeff);
+            coeff_digits = detail::num_digits(reduced_coeff);
         }
 
         const auto exp_delta {biased_exp - detail::d32_max_biased_exponent};
-        const auto digit_delta {unsigned_coeff_digits - static_cast<int>(exp_delta)};
-        if (digit_delta > 0 && unsigned_coeff_digits + digit_delta <= detail::precision)
+        const auto digit_delta {coeff_digits - static_cast<int>(exp_delta)};
+        if (digit_delta > 0 && coeff_digits + digit_delta <= detail::precision)
         {
             exp -= digit_delta;
-            unsigned_coeff *= detail::pow10(static_cast<Unsigned_Integer>(digit_delta));
-            *this = decimal32(unsigned_coeff, exp, isneg);
+            reduced_coeff *= detail::pow10(static_cast<significand_type>(digit_delta));
+            *this = decimal32(reduced_coeff, exp, sign);
         }
         else
         {
@@ -698,9 +677,18 @@ constexpr decimal32::decimal32(T coeff, T2 exp, bool sign) noexcept // NOLINT(re
     }
 }
 
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+#else
+template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
+#endif
+constexpr decimal32::decimal32(T1 coeff, T2 exp) noexcept : decimal32(detail::make_positive_unsigned(coeff), exp, coeff < 0) {}
+
 #if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic pop
 #endif
+
+constexpr decimal32::decimal32(bool value) noexcept : decimal32(static_cast<significand_type>(value), 0, false) {}
 
 constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32
 {
@@ -1327,12 +1315,29 @@ constexpr auto decimal32::full_significand() const noexcept -> significand_type
     return significand;
 }
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4127)
+#endif
+
 template <typename T>
 constexpr auto decimal32::edit_significand(T sig) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, T, void)
 {
-    *this = decimal32(sig, this->biased_exponent(), this->isneg());
+    const auto unsigned_sig {detail::make_positive_unsigned(sig)};
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T>)
+    {
+        *this = decimal32(unsigned_sig, this->biased_exponent(), this->isneg() || sig < 0);
+    }
+    else
+    {
+        *this = decimal32(unsigned_sig, this->biased_exponent(), this->isneg());
+    }
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 constexpr auto decimal32::isneg() const noexcept -> bool
 {

@@ -117,10 +117,10 @@ template <typename T>
 concept integral = boost::decimal::detail::is_integral_v<T>;
 
 template <typename T>
-concept signed_integral = integral<T> && std::is_signed_v<T>;
+concept signed_integral = integral<T> && boost::decimal::detail::is_signed_v<T>;
 
 template <typename T>
-concept unsigned_integral = integral<T> && std::is_unsigned_v<T>;
+concept unsigned_integral = integral<T> && boost::decimal::detail::is_unsigned_v<T>;
 
 template <typename T>
 concept real = boost::decimal::detail::is_floating_point_v<T>;

@@ -46,7 +46,7 @@ constexpr auto acos_impl(T x) noexcept
     {
         result = std::numeric_limits<T>::quiet_NaN();
     }
-    else if (x < T{5, -1, true})
+    else if (x < T{-5, -1})
     {
         result = numbers::pi_v<T> - 2 * detail::asin_series(sqrt((1 - absx) / 2));
     }
