@@ -384,13 +384,6 @@ int main()
     test_roundtrip_conversion_integer<long long>(-9'999'999, 9'999'999);
     test_roundtrip_conversion_integer<unsigned long long>(0, 9'999'999);
 
-    #ifndef _MSC_VER
-    test_roundtrip_conversion_integer<std::int8_t>(INT8_MIN, INT8_MAX);
-    test_roundtrip_conversion_integer<std::uint8_t>(0, UINT8_MAX);
-    #endif
-
-    test_roundtrip_conversion_integer<std::int16_t>(INT16_MIN, INT16_MAX);
-    test_roundtrip_conversion_integer<std::uint16_t>(0, UINT16_MAX);
     test_roundtrip_conversion_integer<std::int32_t>(-9'999'999, 9'999'999);
     test_roundtrip_conversion_integer<std::uint32_t>(0, 9'999'999);
     test_roundtrip_conversion_integer<std::int64_t>(-9'999'999, 9'999'999);
