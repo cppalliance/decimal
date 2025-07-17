@@ -373,12 +373,16 @@ public:
 template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
 constexpr decimal32_fast::decimal32_fast(T1 coeff, T2 exp, bool sign) noexcept
 {
+    using minimum_coefficient_size = std::conditional_t<(sizeof(T1) > sizeof(significand_type)), T1, significand_type>;
+
+    minimum_coefficient_size min_coeff {coeff};
+
     sign_ = sign;
 
     // Normalize in the constructor, so we never have to worry about it again
-    detail::normalize<decimal32>(coeff, exp, sign);
+    detail::normalize<decimal32>(min_coeff, exp, sign);
 
-    significand_ = static_cast<significand_type>(coeff);
+    significand_ = static_cast<significand_type>(min_coeff);
 
     const auto biased_exp {significand_ == 0U ? 0 : exp + detail::bias};
 
