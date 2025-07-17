@@ -1311,12 +1311,29 @@ constexpr auto decimal32::full_significand() const noexcept -> significand_type
     return significand;
 }
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4127)
+#endif
+
 template <typename T>
 constexpr auto decimal32::edit_significand(T sig) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, T, void)
 {
-    *this = decimal32(sig, this->biased_exponent(), this->isneg());
+    const auto unsigned_sig {detail::make_positive_unsigned(sig)};
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T>)
+    {
+        *this = decimal32(unsigned_sig, this->biased_exponent(), this->isneg() || sig < 0);
+    }
+    else
+    {
+        *this = decimal32(unsigned_sig, this->biased_exponent(), this->isneg());
+    }
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 constexpr auto decimal32::isneg() const noexcept -> bool
 {
