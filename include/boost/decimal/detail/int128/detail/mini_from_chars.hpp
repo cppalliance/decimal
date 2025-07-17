@@ -38,7 +38,7 @@ static constexpr unsigned char uchar_values[] =
 static_assert(sizeof(uchar_values) == 256, "uchar_values should represent all 256 values of unsigned char");
 
 // Convert characters for 0-9, A-Z, a-z to 0-35. Anything else is 255
-BOOST_INT128_FORCE_INLINE constexpr auto digit_from_char(char val) noexcept -> unsigned char
+BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr auto digit_from_char(char val) noexcept -> unsigned char
 {
     return uchar_values[static_cast<unsigned char>(val)];
 }
@@ -63,7 +63,7 @@ constexpr int from_chars_integer_impl(const char* first, const char* last, Integ
     static_cast<void>(is_negative);
     auto next = first;
 
-    BOOST_INT128_IF_CONSTEXPR (std::numeric_limits<Integer>::is_signed)
+    BOOST_DECIMAL_DETAIL_INT128_IF_CONSTEXPR (std::numeric_limits<Integer>::is_signed)
     {
         if (*next == '-')
         {
@@ -157,7 +157,7 @@ constexpr int from_chars_integer_impl(const char* first, const char* last, Integ
 
     value = static_cast<Integer>(result);
 
-    BOOST_INT128_IF_CONSTEXPR (std::numeric_limits<Integer>::is_signed)
+    BOOST_DECIMAL_DETAIL_INT128_IF_CONSTEXPR (std::numeric_limits<Integer>::is_signed)
     {
         if (is_negative)
         {

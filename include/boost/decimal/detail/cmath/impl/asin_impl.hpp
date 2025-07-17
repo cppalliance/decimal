@@ -7,7 +7,7 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/concepts.hpp>
-#include <boost/int128.hpp>
+#include "../../int128.hpp"
 #include <boost/decimal/detail/cmath/impl/remez_series_result.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE

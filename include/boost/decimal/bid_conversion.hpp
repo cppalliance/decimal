@@ -12,7 +12,7 @@
 #include <boost/decimal/decimal64_fast.hpp>
 #include <boost/decimal/decimal128_fast.hpp>
 #include <boost/decimal/detail/concepts.hpp>
-#include <boost/int128.hpp>
+#include "detail/int128.hpp"
 
 namespace boost {
 namespace decimal {

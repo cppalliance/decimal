@@ -3,8 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_INT128_DETAIL_MINI_TO_CHARS_HPP
-#define BOOST_INT128_DETAIL_MINI_TO_CHARS_HPP
+#ifndef BOOST_DECIMAL_DETAIL_INT128_DETAIL_MINI_TO_CHARS_HPP
+#define BOOST_DECIMAL_DETAIL_INT128_DETAIL_MINI_TO_CHARS_HPP
 
 #include "uint128_imp.hpp"
 #include "int128_imp.hpp"
@@ -68,7 +68,7 @@ constexpr char* mini_to_chars(char (&buffer)[64], uint128_t v, const int base, c
             break;
 
         default:                        // LCOV_EXCL_LINE
-            BOOST_INT128_UNREACHABLE;   // LCOV_EXCL_LINE
+            BOOST_DECIMAL_DETAIL_INT128_UNREACHABLE;   // LCOV_EXCL_LINE
     }
 
     return last;
@@ -105,4 +105,4 @@ constexpr char* mini_to_chars(char (&buffer)[64], const int128_t v, const int ba
 } // namespace int128
 } // namespace boost
 
-#endif // BOOST_INT128_DETAIL_MINI_TO_CHARS_HPP
+#endif // BOOST_DECIMAL_DETAIL_INT128_DETAIL_MINI_TO_CHARS_HPP

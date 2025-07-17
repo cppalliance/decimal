@@ -3,8 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_INT128_LITERALS_HPP
-#define BOOST_INT128_LITERALS_HPP
+#ifndef BOOST_DECIMAL_DETAIL_INT128_LITERALS_HPP
+#define BOOST_DECIMAL_DETAIL_INT128_LITERALS_HPP
 
 #include "int128.hpp"
 #include "detail/mini_from_chars.hpp"
@@ -94,8 +94,8 @@ constexpr int128_t operator ""_I128(const char* str, std::size_t len) noexcept
 } // namespace int128
 } // namespace boost
 
-#define BOOST_INT128_STRINGIFY(x) #x
-#define BOOST_INT128_UINT128_C(x) boost::int128::literals::operator""_u128(BOOST_INT128_STRINGIFY(x))
-#define BOOST_INT128_INT128_C(x) boost::int128::literals::operator""_i128(BOOST_INT128_STRINGIFY(x))
+#define BOOST_DECIMAL_DETAIL_INT128_STRINGIFY(x) #x
+#define BOOST_DECIMAL_DETAIL_INT128_UINT128_C(x) boost::int128::literals::operator""_u128(BOOST_DECIMAL_DETAIL_INT128_STRINGIFY(x))
+#define BOOST_DECIMAL_DETAIL_INT128_INT128_C(x) boost::int128::literals::operator""_i128(BOOST_DECIMAL_DETAIL_INT128_STRINGIFY(x))
 
-#endif // BOOST_INT128_LITERALS_HPP
+#endif // BOOST_DECIMAL_DETAIL_INT128_LITERALS_HPP

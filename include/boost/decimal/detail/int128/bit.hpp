@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_INT128_BIT_HPP
-#define BOOST_INT128_BIT_HPP
+#ifndef BOOST_DECIMAL_DETAIL_INT128_BIT_HPP
+#define BOOST_DECIMAL_DETAIL_INT128_BIT_HPP
 
 #include "int128.hpp"
 #include "detail/config.hpp"
@@ -65,7 +65,7 @@ constexpr uint128_t rotr(const uint128_t x, const int s) noexcept
     return x >> (static_cast<unsigned>(s) & mask) | x << (static_cast<unsigned>(-s) & mask);
 }
 
-#if BOOST_INT128_HAS_BUILTIN(__builtin_popcountll)
+#if BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_popcountll)
 
 constexpr int popcount(const uint128_t x) noexcept
 {
@@ -87,11 +87,11 @@ constexpr int popcount_impl(std::uint64_t x) noexcept
 
 } // namespace impl
 
-#if defined(_M_AMD64) && !defined(BOOST_INT128_NO_CONSTEVAL_DETECTION) && !BOOST_INT128_HAS_BUILTIN(__builtin_popcountll)
+#if defined(_M_AMD64) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_popcountll)
 
 constexpr int popcount(const uint128_t x) noexcept
 {
-    if (BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    if (BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(x))
     {
         return impl::popcount_impl(x.high) + impl::popcount_impl(x.low); // LCOV_EXCL_LINE
     }
@@ -109,11 +109,11 @@ constexpr int popcount(const uint128_t x) noexcept
     }
 }
 
-#elif defined(_M_IX86) && !defined(BOOST_INT128_NO_CONSTEVAL_DETECTION) && !BOOST_INT128_HAS_BUILTIN(__builtin_popcountll)
+#elif defined(_M_IX86) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_popcountll)
 
 constexpr int popcount(const uint128_t x) noexcept
 {
-    if (BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    if (BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(x))
     {
         return impl::popcount_impl(x.high) + impl::popcount_impl(x.low); // LCOV_EXCL_LINE
     }
@@ -139,7 +139,7 @@ constexpr int popcount(const uint128_t x) noexcept
     }
 }
 
-#elif !BOOST_INT128_HAS_BUILTIN(__builtin_popcountll)
+#elif !BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_popcountll)
 
 constexpr int popcount(const uint128_t x) noexcept
 {
@@ -148,7 +148,7 @@ constexpr int popcount(const uint128_t x) noexcept
 
 #endif
 
-#if BOOST_INT128_HAS_BUILTIN(__builtin_bswap64)
+#if BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_bswap64)
 
 constexpr uint128_t byteswap(const uint128_t x) noexcept
 {
@@ -173,11 +173,11 @@ constexpr uint128_t byteswap_impl(const uint128_t x) noexcept
 
 } // namespace impl
 
-#if defined(_MSC_VER) && !defined(BOOST_INT128_NO_CONSTEVAL_DETECTION) && !BOOST_INT128_HAS_BUILTIN(__builtin_bswap64)
+#if defined(_MSC_VER) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_bswap64)
 
 constexpr uint128_t byteswap(const uint128_t x) noexcept
 {
-    if (BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    if (BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(x))
     {
         return impl::byteswap_impl(x); // LCOV_EXCL_LINE
     }
@@ -187,7 +187,7 @@ constexpr uint128_t byteswap(const uint128_t x) noexcept
     }
 }
 
-#elif !BOOST_INT128_HAS_BUILTIN(__builtin_bswap64)
+#elif !BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_bswap64)
 
 constexpr uint128_t byteswap(const uint128_t x) noexcept
 {
@@ -199,4 +199,4 @@ constexpr uint128_t byteswap(const uint128_t x) noexcept
 } // namespace int128
 } // namespace boost
 
-#endif // BOOST_INT128_BIT_HPP
+#endif // BOOST_DECIMAL_DETAIL_INT128_BIT_HPP

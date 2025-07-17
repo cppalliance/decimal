@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_INT128_DETAIL_CLZ_HPP
-#define BOOST_INT128_DETAIL_CLZ_HPP
+#ifndef BOOST_DECIMAL_DETAIL_INT128_DETAIL_CLZ_HPP
+#define BOOST_DECIMAL_DETAIL_INT128_DETAIL_CLZ_HPP
 
 #include "config.hpp"
 #include <limits>
@@ -31,7 +31,7 @@ constexpr int bit_scan_reverse(std::uint64_t bb) noexcept
 {
     constexpr auto debruijn64 {UINT64_C(0x03f79d71b4cb0a89)};
 
-    BOOST_INT128_ASSUME(bb != 0); // LCOV_EXCL_LINE
+    BOOST_DECIMAL_DETAIL_INT128_ASSUME(bb != 0); // LCOV_EXCL_LINE
 
     bb |= bb >> 1;
     bb |= bb >> 2;
@@ -62,7 +62,7 @@ constexpr int backup_countl_impl(std::uint32_t x) noexcept
     return countl_mod37[x % 37];
 }
 
-#if BOOST_INT128_HAS_BUILTIN(__builtin_clz)
+#if BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_clz)
 
 constexpr int countl_impl(unsigned int x) noexcept
 {
@@ -79,11 +79,11 @@ constexpr int countl_impl(unsigned long long x) noexcept
     return x ? __builtin_clzll(x) : std::numeric_limits<unsigned long long>::digits;
 }
 
-#elif (defined(_M_AMD64) || defined(_M_ARM64)) && !defined(BOOST_INT128_NO_CONSTEVAL_DETECTION)
+#elif (defined(_M_AMD64) || defined(_M_ARM64)) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION)
 
 constexpr int countl_impl(std::uint32_t x) noexcept
 {
-    if (BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    if (BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(x))
     {
         return backup_countl_impl(x); // LCOV_EXCL_LINE
     }
@@ -104,7 +104,7 @@ constexpr int countl_impl(std::uint32_t x) noexcept
 
 constexpr int countl_impl(std::uint64_t x) noexcept
 {
-    if (BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    if (BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(x))
     {
         return x ? bit_scan_reverse(static_cast<std::uint64_t>(x)) ^ 63 : std::numeric_limits<std::uint64_t>::digits; // LCOV_EXCL_LINE
     }
@@ -123,11 +123,11 @@ constexpr int countl_impl(std::uint64_t x) noexcept
     }
 }
 
-#elif defined(_M_IX86) && !defined(BOOST_INT128_NO_CONSTEVAL_DETECTION)
+#elif defined(_M_IX86) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION)
 
 constexpr int countl_impl(std::uint32_t x) noexcept
 {
-    if (BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    if (BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(x))
     {
         return backup_countl_impl(x); // LCOV_EXCL_LINE
     }
@@ -182,4 +182,4 @@ constexpr int countl_zero(T x) noexcept
 } // namespace int128
 } // namespace boost
 
-#endif // BOOST_INT128_DETAIL_CLZ_HPP
+#endif // BOOST_DECIMAL_DETAIL_INT128_DETAIL_CLZ_HPP

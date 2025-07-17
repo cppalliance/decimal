@@ -7,9 +7,8 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
-#include <boost/int128.hpp>
+#include "int128.hpp"
 #include <boost/decimal/detail/u256.hpp>
-#include <boost/int128/int128.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -36,7 +35,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t powers_of_10[20] =
     UINT64_C(10000000000000000000)
 };
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t boost_int128_pow10[] =
+BOOST_DECIMAL_CONSTEXPR_VARIABLE boost::int128::uint128_t BOOST_DECIMAL_DETAIL_INT128_pow10[] =
 {
     boost::int128::uint128_t {UINT64_C(0), UINT64_C(1)},
     boost::int128::uint128_t {UINT64_C(0), UINT64_C(10)},
@@ -226,7 +225,7 @@ constexpr auto pow10(T n) noexcept -> T
 template <>
 constexpr auto pow10(const boost::int128::uint128_t n) noexcept -> boost::int128::uint128_t
 {
-    return impl::boost_int128_pow10[static_cast<std::size_t>(n.low)];
+    return impl::BOOST_DECIMAL_DETAIL_INT128_pow10[static_cast<std::size_t>(n.low)];
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
