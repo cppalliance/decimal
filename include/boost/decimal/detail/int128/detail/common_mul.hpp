@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_INT128_DETAIL_COMMON_MUL_HPP
-#define BOOST_INT128_DETAIL_COMMON_MUL_HPP
+#ifndef BOOST_DECIMAL_DETAIL_INT128_DETAIL_COMMON_MUL_HPP
+#define BOOST_DECIMAL_DETAIL_INT128_DETAIL_COMMON_MUL_HPP
 
 #include "config.hpp"
 #include <cstdint>
@@ -16,7 +16,7 @@ namespace detail {
 // See: The Art of Computer Programming Volume 2 (Semi-numerical algorithms) section 4.3.1
 // Algorithm M: Multiplication of Non-negative integers
 template <typename ReturnType, std::size_t u_size, std::size_t v_size>
-BOOST_INT128_FORCE_INLINE constexpr ReturnType knuth_multiply(const std::uint32_t (&u)[u_size],
+BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr ReturnType knuth_multiply(const std::uint32_t (&u)[u_size],
                                                               const std::uint32_t (&v)[v_size]) noexcept
 {
     using high_word_type = decltype(ReturnType{}.high);
@@ -54,11 +54,11 @@ BOOST_INT128_FORCE_INLINE constexpr ReturnType knuth_multiply(const std::uint32_
 }
 
 template <typename T>
-BOOST_INT128_FORCE_INLINE constexpr void to_words(const T& x, std::uint32_t (&words)[4]) noexcept
+BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr void to_words(const T& x, std::uint32_t (&words)[4]) noexcept
 {
-    #ifndef BOOST_INT128_NO_CONSTEVAL_DETECTION
+    #ifndef BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION
 
-    if (!BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    if (!BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(x))
     {
         std::memcpy(words, &x, sizeof(T));
         return;
@@ -73,11 +73,11 @@ BOOST_INT128_FORCE_INLINE constexpr void to_words(const T& x, std::uint32_t (&wo
 }
 
 
-BOOST_INT128_FORCE_INLINE constexpr void to_words(const std::uint64_t x, std::uint32_t (&words)[2]) noexcept
+BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr void to_words(const std::uint64_t x, std::uint32_t (&words)[2]) noexcept
 {
-    #ifndef BOOST_INT128_NO_CONSTEVAL_DETECTION
+    #ifndef BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION
 
-    if (!BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    if (!BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(x))
     {
         std::memcpy(words, &x, sizeof(std::uint64_t));
         return;
@@ -89,7 +89,7 @@ BOOST_INT128_FORCE_INLINE constexpr void to_words(const std::uint64_t x, std::ui
     words[1] = static_cast<std::uint32_t>(x >> 32);         // LCOV_EXCL_LINE
 }
 
-BOOST_INT128_FORCE_INLINE constexpr void to_words(const std::uint32_t x, std::uint32_t (&words)[1]) noexcept
+BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr void to_words(const std::uint32_t x, std::uint32_t (&words)[1]) noexcept
 {
     words[0] = x;
 }
@@ -98,4 +98,4 @@ BOOST_INT128_FORCE_INLINE constexpr void to_words(const std::uint32_t x, std::ui
 } // namespace int128
 } // namespace boost
 
-#endif // BOOST_INT128_DETAIL_COMMON_MUL_HPP
+#endif // BOOST_DECIMAL_DETAIL_INT128_DETAIL_COMMON_MUL_HPP

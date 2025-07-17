@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_INT128_DETAIL_CTZ_HPP
-#define BOOST_INT128_DETAIL_CTZ_HPP
+#ifndef BOOST_DECIMAL_DETAIL_INT128_DETAIL_CTZ_HPP
+#define BOOST_DECIMAL_DETAIL_INT128_DETAIL_CTZ_HPP
 
 #include "config.hpp"
 #include <limits>
@@ -15,7 +15,7 @@ namespace detail {
 
 namespace impl {
 
-#if BOOST_INT128_HAS_BUILTIN(__builtin_ctz)
+#if BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_ctz)
 
 constexpr int countr_impl(unsigned int x) noexcept
 {
@@ -42,14 +42,14 @@ static constexpr int countr_mod37[37] = {
     5, 20, 8, 19, 18
 };
 
-#if defined(_MSC_VER) && !defined(BOOST_INT128_NO_CONSTEVAL_DETECTION) && !BOOST_INT128_HAS_BUILTIN(__builtin_ctz)
+#if defined(_MSC_VER) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_ctz)
 
 #pragma warning(push)
 #pragma warning(disable : 4146) // unary minus operator applied to unsigned type, result still unsigned
 
 constexpr int countr_impl(std::uint32_t x) noexcept
 {
-    if (BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    if (BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(x))
     {
         return countr_mod37[(-x & x) % 37]; // LCOV_EXCL_LINE
     }
@@ -70,7 +70,7 @@ constexpr int countr_impl(std::uint32_t x) noexcept
 
 #pragma warning(pop)
 
-#elif !BOOST_INT128_HAS_BUILTIN(__builtin_ctz)
+#elif !BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_ctz)
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -88,11 +88,11 @@ constexpr int countr_impl(std::uint32_t x) noexcept
 
 #endif
 
-#if (defined(_M_AMD64) || defined(_M_ARM64)) && !defined(BOOST_INT128_NO_CONSTEVAL_DETECTION) && !BOOST_INT128_HAS_BUILTIN(__builtin_ctz)
+#if (defined(_M_AMD64) || defined(_M_ARM64)) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_ctz)
 
 constexpr int countr_impl(std::uint64_t x) noexcept
 {
-    if (BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    if (BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(x))
     {
         return static_cast<std::uint32_t>(x) != 0 ? countr_impl(static_cast<std::uint32_t>(x)) : countr_impl(static_cast<std::uint32_t>(x >> 32)) + 32; // LCOV_EXCL_LINE
     }
@@ -111,7 +111,7 @@ constexpr int countr_impl(std::uint64_t x) noexcept
     }
 }
 
-#elif !BOOST_INT128_HAS_BUILTIN(__builtin_ctz)
+#elif !BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN(__builtin_ctz)
 
 constexpr int countr_impl(std::uint64_t x) noexcept
 {
@@ -136,4 +136,4 @@ constexpr int countr_zero(T x) noexcept
 } // namespace int128
 } // namespace boost
 
-#endif // BOOST_INT128_DETAIL_CTZ_HPP
+#endif // BOOST_DECIMAL_DETAIL_INT128_DETAIL_CTZ_HPP

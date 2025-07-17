@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_INT128_IOSTREAM_HPP
-#define BOOST_INT128_IOSTREAM_HPP
+#ifndef BOOST_DECIMAL_DETAIL_INT128_IOSTREAM_HPP
+#define BOOST_DECIMAL_DETAIL_INT128_IOSTREAM_HPP
 
 #include "int128.hpp"
 #include "detail/mini_from_chars.hpp"
@@ -40,7 +40,7 @@ auto operator>>(std::basic_istream<charT, traits>& is, LibIntegerType& v)
     char buffer[64] {};
     auto buffer_start {buffer};
 
-    BOOST_INT128_IF_CONSTEXPR (!std::is_same<charT, char>::value)
+    BOOST_DECIMAL_DETAIL_INT128_IF_CONSTEXPR (!std::is_same<charT, char>::value)
     {
         auto first {buffer};
         auto t_first {t_buffer};
@@ -115,7 +115,7 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const LibIntegerType& v)
         *--first = '0';
     }
 
-    BOOST_INT128_IF_CONSTEXPR (!std::is_same<charT, char>::value)
+    BOOST_DECIMAL_DETAIL_INT128_IF_CONSTEXPR (!std::is_same<charT, char>::value)
     {
         charT t_buffer[64U] {};
 
@@ -138,4 +138,4 @@ auto operator<<(std::basic_ostream<charT, traits>& os, const LibIntegerType& v)
 } // namespace int128
 } // namespace boost
 
-#endif // BOOST_INT128_IOSTREAM_HPP
+#endif // BOOST_DECIMAL_DETAIL_INT128_IOSTREAM_HPP

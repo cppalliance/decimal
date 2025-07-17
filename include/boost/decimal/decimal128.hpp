@@ -10,7 +10,7 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/bit_cast.hpp>
 #include <boost/decimal/detail/config.hpp>
-#include <boost/int128.hpp>
+#include "detail/int128.hpp"
 #include <boost/decimal/detail/fenv_rounding.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
 #include <boost/decimal/detail/parser.hpp>
@@ -37,7 +37,7 @@
 #include <boost/decimal/detail/mul_impl.hpp>
 #include <boost/decimal/detail/div_impl.hpp>
 #include <boost/decimal/detail/cmath/next.hpp>
-#include <boost/int128.hpp>
+#include "detail/int128.hpp"
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 

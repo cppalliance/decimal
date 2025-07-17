@@ -9,7 +9,7 @@
 #include <boost/decimal/literals.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/concepts.hpp>
-#include <boost/int128.hpp>
+#include "detail/int128.hpp"
 #include <boost/decimal/detail/promotion.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE

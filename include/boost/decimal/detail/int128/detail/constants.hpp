@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_INT128_DETAIL_CONSTANTS_HPP
-#define BOOST_INT128_DETAIL_CONSTANTS_HPP
+#ifndef BOOST_DECIMAL_DETAIL_INT128_DETAIL_CONSTANTS_HPP
+#define BOOST_DECIMAL_DETAIL_INT128_DETAIL_CONSTANTS_HPP
 
 #include <cstdint>
 #include <limits>
@@ -21,4 +21,4 @@ static constexpr T offset_value_v = static_cast<T>((std::numeric_limits<std::uin
 } // namespace int128
 } // namespace boost
 
-#endif // BOOST_INT128_DETAIL_CONSTANTS_HPP
+#endif // BOOST_DECIMAL_DETAIL_INT128_DETAIL_CONSTANTS_HPP

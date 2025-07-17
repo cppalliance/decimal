@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_INT128_NUMERIC_HPP
-#define BOOST_INT128_NUMERIC_HPP
+#ifndef BOOST_DECIMAL_DETAIL_INT128_NUMERIC_HPP
+#define BOOST_DECIMAL_DETAIL_INT128_NUMERIC_HPP
 
 #include "bit.hpp"
 #include "detail/traits.hpp"
@@ -32,7 +32,7 @@ struct reduced_integers
                                  std::is_same<IntegerType, uint128_t>::value};
 };
 
-#if defined(BOOST_INT128_HAS_INT128) || defined(BOOST_INT128_HAS_MSVC_INT128)
+#if defined(BOOST_DECIMAL_DETAIL_INT128_HAS_INT128) || defined(BOOST_DECIMAL_DETAIL_INT128_HAS_MSVC_INT128)
 
 template <typename IntegerType>
 static constexpr bool is_reduced_integer_v {reduced_integers<IntegerType>::value ||
@@ -178,7 +178,7 @@ constexpr uint128_t div_sat(const uint128_t x, const uint128_t y) noexcept
 
 constexpr int128_t div_sat(const int128_t x, const int128_t y) noexcept
 {
-    if (BOOST_INT128_UNLIKELY(x == (std::numeric_limits<int128_t>::min)() && y == -1))
+    if (BOOST_DECIMAL_DETAIL_INT128_UNLIKELY(x == (std::numeric_limits<int128_t>::min)() && y == -1))
     {
         // This is the only possible case of overflow
         return (std::numeric_limits<int128_t>::max)();
@@ -190,7 +190,7 @@ constexpr int128_t div_sat(const int128_t x, const int128_t y) noexcept
 template <typename TargetType, std::enable_if_t<detail::is_reduced_integer_v<TargetType>, bool> = true>
 constexpr TargetType saturate_cast(const uint128_t value) noexcept
 {
-    BOOST_INT128_IF_CONSTEXPR (std::is_same<uint128_t, TargetType>::value)
+    BOOST_DECIMAL_DETAIL_INT128_IF_CONSTEXPR (std::is_same<uint128_t, TargetType>::value)
     {
         return value;
     }
@@ -208,14 +208,14 @@ constexpr TargetType saturate_cast(const uint128_t value) noexcept
 template <typename TargetType, std::enable_if_t<detail::is_reduced_integer_v<TargetType>, bool> = true>
 constexpr TargetType saturate_cast(const int128_t value) noexcept
 {
-    BOOST_INT128_IF_CONSTEXPR (std::is_same<int128_t, TargetType>::value)
+    BOOST_DECIMAL_DETAIL_INT128_IF_CONSTEXPR (std::is_same<int128_t, TargetType>::value)
     {
         return value;
     }
-    #if defined(BOOST_INT128_HAS_INT128) || defined(BOOST_INT128_HAS_MSVC_INT128)
-    else BOOST_INT128_IF_CONSTEXPR (std::is_same<uint128_t, TargetType>::value || std::is_same<detail::builtin_u128, TargetType>::value)
+    #if defined(BOOST_DECIMAL_DETAIL_INT128_HAS_INT128) || defined(BOOST_DECIMAL_DETAIL_INT128_HAS_MSVC_INT128)
+    else BOOST_DECIMAL_DETAIL_INT128_IF_CONSTEXPR (std::is_same<uint128_t, TargetType>::value || std::is_same<detail::builtin_u128, TargetType>::value)
     #else
-    else BOOST_INT128_IF_CONSTEXPR (std::is_same<uint128_t, TargetType>::value)
+    else BOOST_DECIMAL_DETAIL_INT128_IF_CONSTEXPR (std::is_same<uint128_t, TargetType>::value)
     #endif
     {
         // We can't possibly have overflow in this case
@@ -239,4 +239,4 @@ constexpr TargetType saturate_cast(const int128_t value) noexcept
 } // namespace int128
 } // namespace boost
 
-#endif // BOOST_INT128_NUMERIC_HPP
+#endif // BOOST_DECIMAL_DETAIL_INT128_NUMERIC_HPP

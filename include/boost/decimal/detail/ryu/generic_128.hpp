@@ -8,7 +8,7 @@
 
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
-#include <boost/int128.hpp>
+#include "../int128.hpp"
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>

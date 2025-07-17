@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_INT128_CONVERSIONS_HPP
-#define BOOST_INT128_CONVERSIONS_HPP
+#ifndef BOOST_DECIMAL_DETAIL_INT128_CONVERSIONS_HPP
+#define BOOST_DECIMAL_DETAIL_INT128_CONVERSIONS_HPP
 
 #include "int128_imp.hpp"
 #include "uint128_imp.hpp"
@@ -24,7 +24,7 @@ static constexpr bool is_valid_overload_v = valid_overload<T>::value;
 
 } // namespace detail
 
-#if BOOST_INT128_ENDIAN_LITTLE_BYTE
+#if BOOST_DECIMAL_DETAIL_INT128_ENDIAN_LITTLE_BYTE
 
 constexpr int128_t::int128_t(const uint128_t& v) noexcept : low {v.low}, high {static_cast<std::int64_t>(v.high)} {}
 
@@ -36,7 +36,7 @@ constexpr int128_t::int128_t(const uint128_t& v) noexcept : high {static_cast<st
 
 constexpr uint128_t::uint128_t(const int128_t& v) noexcept : high {static_cast<std::uint64_t>(v.high)}, low {v.low} {}
 
-#endif // BOOST_INT128_ENDIAN_LITTLE_BYTE
+#endif // BOOST_DECIMAL_DETAIL_INT128_ENDIAN_LITTLE_BYTE
 
 //=====================================
 // Comparison Operators
@@ -126,4 +126,4 @@ constexpr T operator%(T lhs, U) noexcept
 } // namespace int128
 } // namespace boost
 
-#endif // BOOST_INT128_CONVERSIONS_HPP
+#endif // BOOST_DECIMAL_DETAIL_INT128_CONVERSIONS_HPP
