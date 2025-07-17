@@ -263,6 +263,8 @@ public:
     #endif
     constexpr decimal32(T1 coeff, T2 exp) noexcept;
 
+    constexpr decimal32(bool value) noexcept;
+
     constexpr decimal32(const decimal32& val) noexcept = default;
     constexpr decimal32(decimal32&& val) noexcept = default;
     constexpr auto operator=(const decimal32& val) noexcept -> decimal32& = default;
@@ -685,6 +687,8 @@ constexpr decimal32::decimal32(T1 coeff, T2 exp) noexcept : decimal32(detail::ma
 #if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic pop
 #endif
+
+constexpr decimal32::decimal32(bool value) noexcept : decimal32(static_cast<significand_type>(value), 0, false) {}
 
 constexpr auto from_bits(std::uint32_t bits) noexcept -> decimal32
 {
