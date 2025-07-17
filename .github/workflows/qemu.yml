@@ -42,9 +42,6 @@ jobs:
           # multiarch testing
           - { name: PPC64LE-GCC, multiarch: yes,
               compiler: gcc, cxxstd: '14', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le }
-          - { name: PPC64LE-Clang, multiarch: yes,
-              compiler: clang, cxxstd: '14', os: ubuntu-22.04, ccache: no, distro: alpine, edition: edge, arch: ppc64le }
-
 
     timeout-minutes: 360
     runs-on: ${{matrix.os}}

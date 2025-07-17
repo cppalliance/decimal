@@ -31,8 +31,8 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
         // we return the larger of the two
         //
         // e.g. 1e20 - 1e-20 = 1e20
-        return abs_lhs_bigger ? ReturnType{lhs_sig, lhs_exp, false} :
-                                ReturnType{rhs_sig, rhs_exp, true};
+        return abs_lhs_bigger ? ReturnType{lhs_sig, lhs_exp, lhs_sign} :
+                                ReturnType{rhs_sig, rhs_exp, !rhs_sign};
     }
 
     // The two numbers can be subtracted together without special handling
