@@ -293,7 +293,7 @@ public:
     #endif
     constexpr decimal64(T1 coeff, T2 exp) noexcept;
 
-    constexpr decimal64(bool value) noexcept;
+    explicit constexpr decimal64(bool value) noexcept;
 
     // cmath functions that are easier as friends
     friend constexpr auto signbit     BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64 rhs) noexcept -> bool;

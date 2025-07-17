@@ -240,7 +240,7 @@ public:
     #endif
     constexpr decimal128(T1 coeff, T2 exp) noexcept;
 
-    constexpr decimal128(bool value) noexcept;
+    explicit constexpr decimal128(bool value) noexcept;
 
     // 3.2.4.4 Conversion to integral type
     explicit constexpr operator bool() const noexcept;

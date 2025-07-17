@@ -263,7 +263,7 @@ public:
     #endif
     constexpr decimal32(T1 coeff, T2 exp) noexcept;
 
-    constexpr decimal32(bool value) noexcept;
+    explicit constexpr decimal32(bool value) noexcept;
 
     constexpr decimal32(const decimal32& val) noexcept = default;
     constexpr decimal32(decimal32&& val) noexcept = default;
