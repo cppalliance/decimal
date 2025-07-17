@@ -5,8 +5,10 @@ https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#overview]
-= Overview
-:idprefix: overview_
+
+= Decimal: IEEE 754 Decimal Floating Point Numbers
+
+Matt Borland and Chris Kormanyos
 
 == Description
 
