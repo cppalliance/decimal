@@ -617,7 +617,7 @@ constexpr decimal32::decimal32(T1 coeff, T2 exp, bool sign) noexcept // NOLINT(r
         }
     }
 
-    auto reduced_coeff {static_cast<std::uint32_t>(coeff)};
+    auto reduced_coeff {static_cast<significand_type>(coeff)};
     bool big_combination {false};
 
     if (reduced_coeff == 0U)
@@ -667,7 +667,7 @@ constexpr decimal32::decimal32(T1 coeff, T2 exp, bool sign) noexcept // NOLINT(r
         if (digit_delta > 0 && coeff_digits + digit_delta <= detail::precision)
         {
             exp -= digit_delta;
-            reduced_coeff *= detail::pow10(static_cast<T1>(digit_delta));
+            reduced_coeff *= detail::pow10(static_cast<significand_type>(digit_delta));
             *this = decimal32(reduced_coeff, exp, sign);
         }
         else
