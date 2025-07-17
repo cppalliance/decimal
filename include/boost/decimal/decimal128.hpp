@@ -248,10 +248,6 @@ public:
     explicit constexpr operator unsigned long() const noexcept;
     explicit constexpr operator long long() const noexcept;
     explicit constexpr operator unsigned long long() const noexcept;
-    explicit constexpr operator std::int8_t() const noexcept;
-    explicit constexpr operator std::uint8_t() const noexcept;
-    explicit constexpr operator std::int16_t() const noexcept;
-    explicit constexpr operator std::uint16_t() const noexcept;
 
     explicit constexpr operator boost::int128::int128_t() const noexcept;
     explicit constexpr operator boost::int128::uint128_t() const noexcept;
@@ -929,26 +925,6 @@ constexpr decimal128::operator long long() const noexcept
 constexpr decimal128::operator unsigned long long() const noexcept
 {
     return to_integral_128<decimal128, unsigned long long>(*this);
-}
-
-constexpr decimal128::operator std::int8_t() const noexcept
-{
-    return to_integral_128<decimal128, std::int8_t>(*this);
-}
-
-constexpr decimal128::operator std::uint8_t() const noexcept
-{
-    return to_integral_128<decimal128, std::uint8_t>(*this);
-}
-
-constexpr decimal128::operator std::int16_t() const noexcept
-{
-    return to_integral_128<decimal128, std::int16_t>(*this);
-}
-
-constexpr decimal128::operator std::uint16_t() const noexcept
-{
-    return to_integral_128<decimal128, std::uint16_t>(*this);
 }
 
 constexpr decimal128::operator boost::int128::int128_t() const noexcept
