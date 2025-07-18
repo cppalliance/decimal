@@ -12,14 +12,17 @@ https://www.boost.org/LICENSE_1_0.txt
 
 Decimal32 is the 32-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6
 
-- Storage width - 32 bits
-- Precision - 7 decimal digits (not bits like binary)
-- Max exponent - 96
-- Max Value - 9.999999e96
-- Smallest normalized value - 1.000000e-95
-- Smallest subnormal - 1e-101
+|===
+| Attribute | values
+| Storage Width | 32 bits
+| Precision | 7 decimal digits
+| Max exponent | 96
+| Max Value | 9.999999e+96
+| Smallest Normalized Value | 1.000000e-95
+| Smallest Subnormal Value | 1e-101
+|===
 
-The encoding of Decimal32 is in the <<conversions, BID format>>.
+The encoding of Decimal32 is in the `xref:conversions.adoc[BID format]`.
 
 [source, c++]
 ----

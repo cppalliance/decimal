@@ -14,12 +14,17 @@ https://www.boost.org/LICENSE_1_0.txt
 The performance changes by being non-IEEE 754 compliant so that the value does not have to be decoded from bits, but is instead directly represented internal to the type.
 As is often the case this trades space for time by having greater storage width requirements.
 
-- Storage width - at least 168 bits (`uint128` + `std::uint_fast32_t` + `bool`)
-- Precision - 34 decimal digits (not bits like binary)
-- Max exponent - 6145
-- Max Value - 9.99999...e6145
-- Smallest normalized value - 1.0000...e-6142
-- Smallest subnormal - 1e-6176
+|===
+| Attribute | values
+| Storage Width | 168 bits
+| Precision | 34 decimal digits
+| Max exponent | 6145
+| Max Value | 9.99999...e+6145
+| Smallest Normalized Value | 1.0000...e-6142
+| Smallest Subnormal Value | Flushed to 0
+|===
+
+*IMPORTANT* `decimal32_fast` does not support subnormal values
 
 [source, c++]
 ----

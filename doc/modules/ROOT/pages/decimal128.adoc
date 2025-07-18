@@ -12,14 +12,17 @@ https://www.boost.org/LICENSE_1_0.txt
 
 Decimal128 is the 128-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6
 
-- Storage width - 128 bits
-- Precision - 34 decimal digits (not bits like binary)
-- Max exponent - 6145
-- Max Value - 9.99999...e6145
-- Smallest normalized value - 1.0000...e-6142
-- Smallest subnormal - 1e-6176
+|===
+| Attribute | values
+| Storage Width | 128 bits
+| Precision | 34 decimal digits
+| Max exponent | 6145
+| Max Value | 9.99999...e+6145
+| Smallest Normalized Value | 1.0000...e-6142
+| Smallest Subnormal Value | 1e-6176
+|===
 
-The encoding of Decimal128 is in the <<conversions, BID format>>.
+The encoding of Decimal128 is in the `xref:conversions.adoc[BID format]`.
 
 [source, c++]
 ----
