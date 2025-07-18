@@ -30,117 +30,8 @@ Additionally, all functions are marked `noexcept`.
 | https://en.cppreference.com/w/cpp/numeric/math/nan[nan] | Generates NANs
 |===
 
-=== Exponential Functions
-
-|===
-| Function | Description
-| https://en.cppreference.com/w/cpp/numeric/math/exp[exp] | Returns `e` to the given power
-| https://en.cppreference.com/w/cpp/numeric/math/exp2[exp2] | Returns `2` to the given power
-| https://en.cppreference.com/w/cpp/numeric/math/expm1[expm1] | Returns (`e^x` - 1)
-| https://en.cppreference.com/w/cpp/numeric/math/log[log] | Returns the natural logarithm of the value (base `e`)
-| https://en.cppreference.com/w/cpp/numeric/math/log10[log10] | Returns the log base 10 of the value
-| https://en.cppreference.com/w/cpp/numeric/math/log2[log2] | Returns the log base 2 of the value
-| https://en.cppreference.com/w/cpp/numeric/math/log1p[log1p] | Returns ln(1 + x)
-|===
-
-=== Power Functions
-
-|===
-| Function | Description
-| https://en.cppreference.com/w/cpp/numeric/math/pow[pow] | Returns x^y
-| https://en.cppreference.com/w/cpp/numeric/math/sqrt[sqrt] | Returns the square root of the value
-| https://en.cppreference.com/w/cpp/numeric/math/cbrt[cbrt] | Returns the cube root of the value
-| https://en.cppreference.com/w/cpp/numeric/math/hypot[hypot] | Returns sqrt(x^2 + y^2) or sqrt(x^2 + y^2 + z^2) depending on number of arguments
-|===
-
-=== Trigonometric Functions
-
-|===
-| Function | Description
-| https://en.cppreference.com/w/cpp/numeric/math/sin[sin] | Computes sin(x)
-| https://en.cppreference.com/w/cpp/numeric/math/cos[cos] | Computes cos(x)
-| https://en.cppreference.com/w/cpp/numeric/math/tan[tan] | Computes tan(x)
-| https://en.cppreference.com/w/cpp/numeric/math/asin[asin] | Computes arcsin(x)
-| https://en.cppreference.com/w/cpp/numeric/math/acos[acos] | Computes arccos(x)
-| https://en.cppreference.com/w/cpp/numeric/math/atan[atan] | Computes arctan(x)
-| https://en.cppreference.com/w/cpp/numeric/math/atan2[atan2] | Computes arctan(x) using signs as quadrants
-|===
-
-=== Hyperbolic Functions
-
-|===
-| Function | Description
-| https://en.cppreference.com/w/cpp/numeric/math/sinh[sinh] | Computes hyperbolic sin sinh(x)
-| https://en.cppreference.com/w/cpp/numeric/math/cosh[cosh] | Computes hyperbolic cos cosh(x)
-| https://en.cppreference.com/w/cpp/numeric/math/tanh[tanh] | Computes hyperbolic tan tanh(x)
-| https://en.cppreference.com/w/cpp/numeric/math/asinh[asinh] | Computes hyperbolic arcsin asinh(x)
-| https://en.cppreference.com/w/cpp/numeric/math/acosh[acosh] | Computes hyperbolic arccos acosh(x)
-| https://en.cppreference.com/w/cpp/numeric/math/atanh[atanh] | Computes hyperbolic arctan atanh(x)
-|===
-
-=== Error and Gamma Functions
-
-|===
-| Function | Description
-| https://en.cppreference.com/w/cpp/numeric/math/erf[erf] | Computes the error function erf(x)
-| https://en.cppreference.com/w/cpp/numeric/math/erfc[erfc] | Computes the complementary error function erfc(x)
-| https://en.cppreference.com/w/cpp/numeric/math/tgamma[tgamma] | Computes the gamma function gamma(x)
-| https://en.cppreference.com/w/cpp/numeric/math/lgamma[lgamma] | Computes the natural log of the gamma function ln(gamma(x))
-|===
-
-=== Nearest integer floating point operations
-
-|===
-| Function | Description
-| https://en.cppreference.com/w/cpp/numeric/math/ceil[ceil] | Computes the nearest integer not less than the given value
-| https://en.cppreference.com/w/cpp/numeric/math/floor[floor] | Computes the nearest integer not greater than the given value
-| https://en.cppreference.com/w/cpp/numeric/math/trunc[trunc] | Computes the nearest integer not greater in magnitude than the given value
-| https://en.cppreference.com/w/cpp/numeric/math/round[round] | Computes the nearest integer represented in same decimal format rounding away from zero
-| https://en.cppreference.com/w/cpp/numeric/math/round[lround] | Computes the nearest `long` rounding away from zero
-| https://en.cppreference.com/w/cpp/numeric/math/round[llround] | Computes the nearest `long long` rounding away from zero
-| https://en.cppreference.com/w/cpp/numeric/math/nearbyint[nearbyint] | Computest the nearest integer represented in same decimal format subject to xref:cfenv.adoc[current fenv rounding mode]
-| https://en.cppreference.com/w/cpp/numeric/math/lrint[lrint] | Computest the nearest `long` subject to xref:cfenv.adoc[current fenv rounding mode]
-| https://en.cppreference.com/w/cpp/numeric/math/llrint[llrint] | Computest the nearest `long long` subject to xref:cfenv.adoc[current fenv rounding mode]
-|===
-
-=== Floating point manipulation functions
-
-|===
-| Function | Description
-| https://en.cppreference.com/w/cpp/numeric/math/frexp[frexp] | Returns significand and base 2 exponent
-| https://en.cppreference.com/w/cpp/numeric/math/ldexp[ldexp] | Multiplies a number by 2^x
-| https://en.cppreference.com/w/cpp/numeric/math/modf[modf] | Decomposes a number into integer and fractional parts
-| https://en.cppreference.com/w/cpp/numeric/math/scalbn[scalbn] | Multiplies a decimal number by `FLT_RADIX` (10) raised to an `int` power
-| https://en.cppreference.com/w/cpp/numeric/math/scalbn[scalbln] | Multiplies a decimal number by `FLT_RADIX` (10) raised to an `long` power
-| https://en.cppreference.com/w/cpp/numeric/math/ilogb[ilogb] | Extracts `int` exponent of a number
-| https://en.cppreference.com/w/cpp/numeric/math/logb[logb] | Extracts Decimal Type exponent of a number
-| https://en.cppreference.com/w/cpp/numeric/math/nextafter[nextafter] | Next representable decimal type value
-| https://en.cppreference.com/w/cpp/numeric/math/nextafter[nexttowards] | Next representable decimal type value towards a `long double`
-| https://en.cppreference.com/w/cpp/numeric/math/copysign[copysign] | Copies the sign of a decimal value
-|===
-
-=== Classification and comparison
-
-|===
-| Function | Description
-| https://en.cppreference.com/w/cpp/numeric/math/fpclassify[fpclassify] | Categorizes a value
-| https://en.cppreference.com/w/cpp/numeric/math/isfinite[isfinite] | Checks if a given value is finite
-| https://en.cppreference.com/w/cpp/numeric/math/isinf[isinf] | Checks if a given value is infinite
-| https://en.cppreference.com/w/cpp/numeric/math/isnan[isnan] | Checks if a given value is a NAN
-| https://en.cppreference.com/w/cpp/numeric/math/isnormal[isnormal] | Checks if a given value is normal
-| https://en.cppreference.com/w/cpp/numeric/math/signbit[signbit] | Checks the sign of a value
-| https://en.cppreference.com/w/cpp/numeric/math/isgreater[isgreater] | Checks if the LHS (Left-hand side or first parameter) is greater than the RHS (Right-hand side or second parameter)
-| https://en.cppreference.com/w/cpp/numeric/math/isgreaterequal[isgreaterequal] | Checks if the LHS is greater than or equal to the RHS
-| https://en.cppreference.com/w/cpp/numeric/math/isless[isless] | Checks if the LHS is less than the RHS
-| https://en.cppreference.com/w/cpp/numeric/math/islesequal[islessequal] | Checks if the LHS is less than or equal to the RHS
-| https://en.cppreference.com/w/cpp/numeric/math/isunordered[isunordered] | Checks if the LHS and RHS are unordered (i.e. if one or both are NAN)
-|===
-
-=== Function Signatures
-
 [source, c++]
 ----
-
 namespace boost {
 namespace decimal {
 
@@ -178,6 +69,28 @@ constexpr decimal32 nand32(const char* arg) noexcept;
 constexpr decimal64 nand64(const char* arg) noexcept;
 constexpr decimal128 nand128(const char* arg) noexcept;
 
+} // namespace decimal
+} // namespace boost
+----
+
+=== Exponential Functions
+
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/exp[exp] | Returns `e` to the given power
+| https://en.cppreference.com/w/cpp/numeric/math/exp2[exp2] | Returns `2` to the given power
+| https://en.cppreference.com/w/cpp/numeric/math/expm1[expm1] | Returns (`e^x` - 1)
+| https://en.cppreference.com/w/cpp/numeric/math/log[log] | Returns the natural logarithm of the value (base `e`)
+| https://en.cppreference.com/w/cpp/numeric/math/log10[log10] | Returns the log base 10 of the value
+| https://en.cppreference.com/w/cpp/numeric/math/log2[log2] | Returns the log base 2 of the value
+| https://en.cppreference.com/w/cpp/numeric/math/log1p[log1p] | Returns ln(1 + x)
+|===
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
 template <typename DecimalType>
 constexpr DecimalType exp(DecimalType x) noexcept;
 
@@ -199,6 +112,25 @@ constexpr DecimalType log2(DecimalType x) noexcept;
 template <typename DecimalType>
 constexpr DecimalType log1p(DecimalType x) noexcept;
 
+} // namespace decimal
+} // namespace boost
+----
+
+=== Power Functions
+
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/pow[pow] | Returns x^y
+| https://en.cppreference.com/w/cpp/numeric/math/sqrt[sqrt] | Returns the square root of the value
+| https://en.cppreference.com/w/cpp/numeric/math/cbrt[cbrt] | Returns the cube root of the value
+| https://en.cppreference.com/w/cpp/numeric/math/hypot[hypot] | Returns sqrt(x^2 + y^2) or sqrt(x^2 + y^2 + z^2) depending on number of arguments
+|===
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
 template <typename DecimalType>
 constexpr DecimalType pow(DecimalType x, DecimalType y) noexcept;
 
@@ -213,6 +145,28 @@ constexpr DecimalType hypot(DecimalType x, DecimalType y) noexcept;
 
 template <typename DecimalType>
 constexpr DecimalType hypot(DecimalType x, DecimalType y, DecimalType z) noexcept;
+
+} // namespace decimal
+} // namespace boost
+----
+
+=== Trigonometric Functions
+
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/sin[sin] | Computes sin(x)
+| https://en.cppreference.com/w/cpp/numeric/math/cos[cos] | Computes cos(x)
+| https://en.cppreference.com/w/cpp/numeric/math/tan[tan] | Computes tan(x)
+| https://en.cppreference.com/w/cpp/numeric/math/asin[asin] | Computes arcsin(x)
+| https://en.cppreference.com/w/cpp/numeric/math/acos[acos] | Computes arccos(x)
+| https://en.cppreference.com/w/cpp/numeric/math/atan[atan] | Computes arctan(x)
+| https://en.cppreference.com/w/cpp/numeric/math/atan2[atan2] | Computes arctan(x) using signs as quadrants
+|===
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
 
 template <typename DecimalType>
 constexpr DecimalType sin(DecimalType x) noexcept;
@@ -235,6 +189,28 @@ constexpr DecimalType atan(DecimalType x) noexcept;
 template <typename DecimalType>
 constexpr DecimalType atan2(DecimalType x, DecimalType y) noexcept;
 
+} // namespace decimal
+} // namespace boost
+----
+
+
+=== Hyperbolic Functions
+
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/sinh[sinh] | Computes hyperbolic sin sinh(x)
+| https://en.cppreference.com/w/cpp/numeric/math/cosh[cosh] | Computes hyperbolic cos cosh(x)
+| https://en.cppreference.com/w/cpp/numeric/math/tanh[tanh] | Computes hyperbolic tan tanh(x)
+| https://en.cppreference.com/w/cpp/numeric/math/asinh[asinh] | Computes hyperbolic arcsin asinh(x)
+| https://en.cppreference.com/w/cpp/numeric/math/acosh[acosh] | Computes hyperbolic arccos acosh(x)
+| https://en.cppreference.com/w/cpp/numeric/math/atanh[atanh] | Computes hyperbolic arctan atanh(x)
+|===
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
 template <typename DecimalType>
 constexpr DecimalType sinh(DecimalType x) noexcept;
 
@@ -253,6 +229,25 @@ constexpr DecimalType acosh(DecimalType x) noexcept;
 template <typename DecimalType>
 constexpr DecimalType atanh(DecimalType x) noexcept;
 
+} // namespace decimal
+} // namespace boost
+----
+
+=== Error and Gamma Functions
+
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/erf[erf] | Computes the error function erf(x)
+| https://en.cppreference.com/w/cpp/numeric/math/erfc[erfc] | Computes the complementary error function erfc(x)
+| https://en.cppreference.com/w/cpp/numeric/math/tgamma[tgamma] | Computes the gamma function gamma(x)
+| https://en.cppreference.com/w/cpp/numeric/math/lgamma[lgamma] | Computes the natural log of the gamma function ln(gamma(x))
+|===
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
 template <typename DecimalType>
 constexpr DecimalType erf(DecimalType x) noexcept;
 
@@ -264,6 +259,30 @@ constexpr DecimalType tgamma(DecimalType x) noexcept;
 
 template <typename DecimalType>
 constexpr DecimalType lgamma(DecimalType x) noexcept;
+
+} // namespace decimal
+} // namespace boost
+----
+
+=== Nearest integer floating point operations
+
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/ceil[ceil] | Computes the nearest integer not less than the given value
+| https://en.cppreference.com/w/cpp/numeric/math/floor[floor] | Computes the nearest integer not greater than the given value
+| https://en.cppreference.com/w/cpp/numeric/math/trunc[trunc] | Computes the nearest integer not greater in magnitude than the given value
+| https://en.cppreference.com/w/cpp/numeric/math/round[round] | Computes the nearest integer represented in same decimal format rounding away from zero
+| https://en.cppreference.com/w/cpp/numeric/math/round[lround] | Computes the nearest `long` rounding away from zero
+| https://en.cppreference.com/w/cpp/numeric/math/round[llround] | Computes the nearest `long long` rounding away from zero
+| https://en.cppreference.com/w/cpp/numeric/math/nearbyint[nearbyint] | Computest the nearest integer represented in same decimal format subject to xref:cfenv.adoc[current fenv rounding mode]
+| https://en.cppreference.com/w/cpp/numeric/math/lrint[lrint] | Computest the nearest `long` subject to xref:cfenv.adoc[current fenv rounding mode]
+| https://en.cppreference.com/w/cpp/numeric/math/llrint[llrint] | Computest the nearest `long long` subject to xref:cfenv.adoc[current fenv rounding mode]
+|===
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
 
 template <typename DecimalType>
 constexpr DecimalType ceil(DecimalType x) noexcept;
@@ -295,6 +314,31 @@ constexpr long lrint(DecimalType x) noexcept;
 template <typename DecimalType>
 constexpr long long llrint(DecimalType x) noexcept;
 
+} // namespace decimal
+} // namespace boost
+----
+
+=== Floating point manipulation functions
+
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/frexp[frexp] | Returns significand and base 2 exponent
+| https://en.cppreference.com/w/cpp/numeric/math/ldexp[ldexp] | Multiplies a number by 2^x
+| https://en.cppreference.com/w/cpp/numeric/math/modf[modf] | Decomposes a number into integer and fractional parts
+| https://en.cppreference.com/w/cpp/numeric/math/scalbn[scalbn] | Multiplies a decimal number by `FLT_RADIX` (10) raised to an `int` power
+| https://en.cppreference.com/w/cpp/numeric/math/scalbn[scalbln] | Multiplies a decimal number by `FLT_RADIX` (10) raised to an `long` power
+| https://en.cppreference.com/w/cpp/numeric/math/ilogb[ilogb] | Extracts `int` exponent of a number
+| https://en.cppreference.com/w/cpp/numeric/math/logb[logb] | Extracts Decimal Type exponent of a number
+| https://en.cppreference.com/w/cpp/numeric/math/nextafter[nextafter] | Next representable decimal type value
+| https://en.cppreference.com/w/cpp/numeric/math/nextafter[nexttowards] | Next representable decimal type value towards a `long double`
+| https://en.cppreference.com/w/cpp/numeric/math/copysign[copysign] | Copies the sign of a decimal value
+|===
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
+
 template <typename DecimalType>
 constexpr DecimalType frexp(DecimalType x, int* exp) noexcept;
 
@@ -324,6 +368,32 @@ constexpr DecimalType nexttoward(DecimalType from, long double to) noexcept;
 
 template <typename DecimalType>
 constexpr DecimalType copysign(DecimalType mag, DecimalType sgn) noexcept;
+
+} // namespace decimal
+} // namespace boost
+----
+
+=== Classification and comparison
+
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/fpclassify[fpclassify] | Categorizes a value
+| https://en.cppreference.com/w/cpp/numeric/math/isfinite[isfinite] | Checks if a given value is finite
+| https://en.cppreference.com/w/cpp/numeric/math/isinf[isinf] | Checks if a given value is infinite
+| https://en.cppreference.com/w/cpp/numeric/math/isnan[isnan] | Checks if a given value is a NAN
+| https://en.cppreference.com/w/cpp/numeric/math/isnormal[isnormal] | Checks if a given value is normal
+| https://en.cppreference.com/w/cpp/numeric/math/signbit[signbit] | Checks the sign of a value
+| https://en.cppreference.com/w/cpp/numeric/math/isgreater[isgreater] | Checks if the LHS (Left-hand side or first parameter) is greater than the RHS (Right-hand side or second parameter)
+| https://en.cppreference.com/w/cpp/numeric/math/isgreaterequal[isgreaterequal] | Checks if the LHS is greater than or equal to the RHS
+| https://en.cppreference.com/w/cpp/numeric/math/isless[isless] | Checks if the LHS is less than the RHS
+| https://en.cppreference.com/w/cpp/numeric/math/islesequal[islessequal] | Checks if the LHS is less than or equal to the RHS
+| https://en.cppreference.com/w/cpp/numeric/math/isunordered[isunordered] | Checks if the LHS and RHS are unordered (i.e. if one or both are NAN)
+|===
+
+[source, c++]
+----
+namespace boost {
+namespace decimal {
 
 template <typename DecimalType>
 constexpr int fpclassify(DecimalType x) noexcept;
@@ -358,8 +428,8 @@ constexpr bool islessgreater(DecimalType x, DecimalType y) noexcept;
 template <typename DecimalType>
 constexpr bool isunordered(DecimalType x, DecimalType y) noexcept;
 
-} //namespace decimal
-} //namespace boost
+} // namespace decimal
+} // namespace boost
 ----
 
 == C++17 Mathematical Special Functions
