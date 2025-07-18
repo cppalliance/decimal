@@ -87,23 +87,10 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
     char* end = buffer + buffer_size - 1;
 
     // Work from LSB to MSB
-    switch (base)
+    while (unsigned_value != 0U)
     {
-        case 16:
-            while (unsigned_value != 0U)
-            {
-                *end-- = digit_table[static_cast<std::size_t>(unsigned_value & 15U)]; // 1<<4 - 1
-                unsigned_value >>= 4U;
-            }
-            break;
-
-        default:
-            while (unsigned_value != 0U)
-            {
-                *end-- = digit_table[static_cast<std::size_t>(unsigned_value % unsigned_base)];
-                unsigned_value /= unsigned_base;
-            }
-            break;
+        *end-- = digit_table[static_cast<std::size_t>(unsigned_value & 15U)]; // 1<<4 - 1
+        unsigned_value >>= 4U;
     }
 
     const std::ptrdiff_t num_chars = buffer_end - end - 1;
