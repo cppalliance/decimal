@@ -80,23 +80,28 @@ Additionally, all functions are marked `noexcept`.
 
 === Error and Gamma Functions
 
-- https://en.cppreference.com/w/cpp/numeric/math/erf[erf]
-- https://en.cppreference.com/w/cpp/numeric/math/erfc[erfc]
-- https://en.cppreference.com/w/cpp/numeric/math/tgamma[tgamma]
-- https://en.cppreference.com/w/cpp/numeric/math/lgamma[lgamma]
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/erf[erf] | Computes the error function erf(x)
+| https://en.cppreference.com/w/cpp/numeric/math/erfc[erfc] | Computes the complementary error function erfc(x)
+| https://en.cppreference.com/w/cpp/numeric/math/tgamma[tgamma] | Computes the gamma function gamma(x)
+| https://en.cppreference.com/w/cpp/numeric/math/lgamma[lgamma] | Computes the natural log of the gamma function ln(gamma(x))
+|===
 
 === Nearest integer floating point operations
 
-- https://en.cppreference.com/w/cpp/numeric/math/ceil[ceil]
-- https://en.cppreference.com/w/cpp/numeric/math/floor[floor]
-- https://en.cppreference.com/w/cpp/numeric/math/trunc[trunc]
-- https://en.cppreference.com/w/cpp/numeric/math/round[round]
-- https://en.cppreference.com/w/cpp/numeric/math/round[lround]
-- https://en.cppreference.com/w/cpp/numeric/math/round[llround]
-- https://en.cppreference.com/w/cpp/numeric/math/nearbyint[nearbyint]
-- https://en.cppreference.com/w/cpp/numeric/math/rint[rint]
-- https://en.cppreference.com/w/cpp/numeric/math/lrint[lrint]
-- https://en.cppreference.com/w/cpp/numeric/math/llrint[llrint]
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/ceil[ceil] | Computes the nearest integer not less than the given value
+| https://en.cppreference.com/w/cpp/numeric/math/floor[floor] | Computes the nearest integer not greater than the given value
+| https://en.cppreference.com/w/cpp/numeric/math/trunc[trunc] | Computes the nearest integer not greater in magnitude than the given value
+| https://en.cppreference.com/w/cpp/numeric/math/round[round] | Computes the nearest integer represented in same decimal format rounding away from zero
+| https://en.cppreference.com/w/cpp/numeric/math/round[lround] | Computes the nearest `long` rounding away from zero
+| https://en.cppreference.com/w/cpp/numeric/math/round[llround] | Computes the nearest `long long` rounding away from zero
+| https://en.cppreference.com/w/cpp/numeric/math/nearbyint[nearbyint] | Computest the nearest integer represented in same decimal format subject to xref:cfenv.adoc[current fenv rounding mode]
+| https://en.cppreference.com/w/cpp/numeric/math/lrint[lrint] | Computest the nearest `long` subject to xref:cfenv.adoc[current fenv rounding mode]
+| https://en.cppreference.com/w/cpp/numeric/math/llrint[llrint] | Computest the nearest `long long` subject to xref:cfenv.adoc[current fenv rounding mode]
+|===
 
 === Floating point manipulation functions
 
