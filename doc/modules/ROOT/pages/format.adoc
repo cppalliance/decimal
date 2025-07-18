@@ -16,10 +16,13 @@ Format is supported when using C++20 and a compiler with appropriate support: GC
 
 The following type modifiers are the same as those used by built-in floating point values:
 
-- "g" or "G" for general format
-- "e" or "E" for scientific format
-- "f" for fixed format
-- "a" or "A" for hex format
+|===
+| Modifier | Format
+| "g" or "G" | General
+| "e" or "E" | Scientific
+| "f" | Fixed
+| "a" or "A" | Hex
+|===
 
 Example usage for scientific format would be: `{:e}`
 
