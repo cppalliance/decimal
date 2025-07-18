@@ -434,11 +434,24 @@ constexpr bool isunordered(DecimalType x, DecimalType y) noexcept;
 
 == C++17 Mathematical Special Functions
 
+NOTE: This section does not currently contain all functions specified by C++17, but it does contain the ones that are more commonly useful like the Beta Function.
+
 The following functions have been implemented for decimal types:
 
-- https://en.cppreference.com/w/cpp/numeric/special_functions/assoc_laguerre[assoc_laguerre]
-- https://en.cppreference.com/w/cpp/numeric/special_functions/hermite[hermite]
-- https://en.cppreference.com/w/cpp/numeric/special_functions/laguerre[laguerre]
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/special_functions/assoc_laguerre[assoc_laguerre] | Associated Laguerre Polynomials
+| https://en.cppreference.com/w/cpp/numeric/special_functions/assoc_legendre[assoc_legendre] | Associated Legendre Polynomials
+| https://en.cppreference.com/w/cpp/numeric/special_functions/beta[beta] | Calculates the beta function
+| https://en.cppreference.com/w/cpp/numeric/special_functions/comp_ellint_1[comp_ellint_1] | Calculates the complete elliptic integrals of the first kind
+| https://en.cppreference.com/w/cpp/numeric/special_functions/comp_ellint_2[comp_ellint_2] | Calculates the complete elliptic integrals of the second kind
+| https://en.cppreference.com/w/cpp/numeric/special_functions/comp_ellint_1[ellint_1] | Calculates the incomplete elliptic integrals of the first kind
+| https://en.cppreference.com/w/cpp/numeric/special_functions/comp_ellint_2[ellint_2] | Calculates the incomplete elliptic integrals of the second kind
+| https://en.cppreference.com/w/cpp/numeric/special_functions/hermite[hermite] | Hermite Polynomials
+| https://en.cppreference.com/w/cpp/numeric/special_functions/laguerre[laguerre] | Laguerre Polynomials
+| https://en.cppreference.com/w/cpp/numeric/special_functions/legendre[legendre] | Legendre Polynomials
+| https://en.cppreference.com/w/cpp/numeric/special_functions/riemann_zeta[riemann_zeta] | Computes the Riemann Zeta function
+|===
 
 === Function Signatures
 
