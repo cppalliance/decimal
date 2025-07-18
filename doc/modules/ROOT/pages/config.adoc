@@ -16,7 +16,7 @@ The following configuration macros are available:
 
 - `BOOST_DECIMAL_DISABLE_IOSTREAM`: Disables the use of I/O streaming and removes all associated headers (e.g. `<iostream>`, `<iosfwd>`, `<cwchar>`, etc.)
 
-- `BOOST_DECIMAL_DISABLE_CLIB`: Defines both of the above macros. In testing this reduces ROM usage by ~50%.
+- `BOOST_DECIMAL_DISABLE_CLIB`: Defines both of the above macros. In testing this reduces ROM usage by ~50% and can be useful if running on embedded platforms.
 
 - `BOOST_DECIMAL_ALLOW_IMPLICIT_CONVERSIONS`: Allows a binary floating-point type (e.g. `double`) to be implicitly converted to a decimal floating point type.
 This option is not recommended, but can be useful if you want to use specific functionality from the standard library with internal conversions such as:
