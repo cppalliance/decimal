@@ -68,12 +68,15 @@ Additionally, all functions are marked `noexcept`.
 
 === Hyperbolic Functions
 
-- https://en.cppreference.com/w/cpp/numeric/math/sinh[sinh]
-- https://en.cppreference.com/w/cpp/numeric/math/cosh[cosh]
-- https://en.cppreference.com/w/cpp/numeric/math/tanh[tanh]
-- https://en.cppreference.com/w/cpp/numeric/math/asinh[asinh]
-- https://en.cppreference.com/w/cpp/numeric/math/acosh[acosh]
-- https://en.cppreference.com/w/cpp/numeric/math/atanh[atanh]
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/sinh[sinh] | Computes hyperbolic sin sinh(x)
+| https://en.cppreference.com/w/cpp/numeric/math/cosh[cosh] | Computes hyperbolic cos cosh(x)
+| https://en.cppreference.com/w/cpp/numeric/math/tanh[tanh] | Computes hyperbolic tan tanh(x)
+| https://en.cppreference.com/w/cpp/numeric/math/asinh[asinh] | Computes hyperbolic arcsin asinh(x)
+| https://en.cppreference.com/w/cpp/numeric/math/acosh[acosh] | Computes hyperbolic arccos acosh(x)
+| https://en.cppreference.com/w/cpp/numeric/math/atanh[atanh] | Computes hyperbolic arctan atanh(x)
+|===
 
 === Error and Gamma Functions
 
