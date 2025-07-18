@@ -453,8 +453,6 @@ The following functions have been implemented for decimal types:
 | https://en.cppreference.com/w/cpp/numeric/special_functions/riemann_zeta[riemann_zeta] | Computes the Riemann Zeta function
 |===
 
-=== Function Signatures
-
 [source, c++]
 ----
 
@@ -465,10 +463,34 @@ template <typename DecimalType>
 constexpr DecimalType assoc_laguerre(unsigned int n, unsigned int m, DecimalType x) noexcept;
 
 template <typename DecimalType>
+constexpr DecimalType assoc_legendre(unsigned int n, unsigned int m, DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType beta(DecimalType x, DecimalType y) noexcept;
+
+template <typename DecimalType>
+constexpr auto comp_ellint_1(DecimalType k) noexcept;
+
+template <typename DecimalType>
+constexpr auto comp_ellint_2(DecimalType k) noexcept;
+
+template <typename DecimalType>
+constexpr auto ellint_1(DecimalType k, DecimalType phi) noexcept;
+
+template <typename DecimalType>
+constexpr auto ellint_2(DecimalType k, DecimalType phi) noexcept;
+
+template <typename DecimalType>
 constexpr DecimalType hermite(unsigned int n, DecimalType x) noexcept;
 
 template <typename DecimalType>
 constexpr DecimalType laguerre(unsigned int n, DecimalType x) noexcept;
+
+template <typename DecimalType>
+constexpr DecimalType legendre(unsigned int n, DecimalType x) noexcept;
+
+template <typename DecimalType, typename IntegralType>
+constexpr DecimalType riemann_zeta(IntegralType n) noexcept;
 
 } //namespace decimal
 } //namespace boost
