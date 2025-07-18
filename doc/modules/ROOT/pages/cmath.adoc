@@ -12,6 +12,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 Decimal contains overloads for all functions from `<cmath>`, and they have the same handling as built-in floating point types.
 They are also all constexpr with C\\++14 unlike the built-in floating point types which require either C++23 or 26.
+Additionally, all functions are marked `noexcept`.
 
 === Basic Operations
 
@@ -31,13 +32,16 @@ They are also all constexpr with C\\++14 unlike the built-in floating point type
 
 === Exponential Functions
 
-- https://en.cppreference.com/w/cpp/numeric/math/exp[exp]
-- https://en.cppreference.com/w/cpp/numeric/math/exp2[exp2]
-- https://en.cppreference.com/w/cpp/numeric/math/expm1[expm1]
-- https://en.cppreference.com/w/cpp/numeric/math/log[log]
-- https://en.cppreference.com/w/cpp/numeric/math/log10[log10]
-- https://en.cppreference.com/w/cpp/numeric/math/log2[log2]
-- https://en.cppreference.com/w/cpp/numeric/math/log1p[log1p]
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/exp[exp] | Returns `e` to the given power
+| https://en.cppreference.com/w/cpp/numeric/math/exp2[exp2] | Returns `2` to the given power
+| https://en.cppreference.com/w/cpp/numeric/math/expm1[expm1] | Returns (`e^x` - 1)
+| https://en.cppreference.com/w/cpp/numeric/math/log[log] | Returns the natural logarithm of the value (base `e`)
+| https://en.cppreference.com/w/cpp/numeric/math/log10[log10] | Returns the log base 10 of the value
+| https://en.cppreference.com/w/cpp/numeric/math/log2[log2] | Returns the log base 2 of the value
+| https://en.cppreference.com/w/cpp/numeric/math/log1p[log1p] | Returns ln(1 + x)
+|===
 
 === Power Functions
 
