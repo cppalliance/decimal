@@ -45,10 +45,13 @@ Additionally, all functions are marked `noexcept`.
 
 === Power Functions
 
-- https://en.cppreference.com/w/cpp/numeric/math/pow[pow]
-- https://en.cppreference.com/w/cpp/numeric/math/sqrt[sqrt]
-- https://en.cppreference.com/w/cpp/numeric/math/cbrt[cbrt]
-- https://en.cppreference.com/w/cpp/numeric/math/hypot[hypot] - Both 2 and 3 arg are supported
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/pow[pow] | Returns x^y
+| https://en.cppreference.com/w/cpp/numeric/math/sqrt[sqrt] | Returns the square root of the value
+| https://en.cppreference.com/w/cpp/numeric/math/cbrt[cbrt] | Returns the cube root of the value
+| https://en.cppreference.com/w/cpp/numeric/math/hypot[hypot] | Returns sqrt(x^2 + y^2) or sqrt(x^2 + y^2 + z^2) depending on number of arguments
+|===
 
 === Trigonometric Functions
 
