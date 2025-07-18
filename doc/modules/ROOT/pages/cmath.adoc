@@ -55,13 +55,16 @@ Additionally, all functions are marked `noexcept`.
 
 === Trigonometric Functions
 
-- https://en.cppreference.com/w/cpp/numeric/math/sin[sin]
-- https://en.cppreference.com/w/cpp/numeric/math/cos[cos]
-- https://en.cppreference.com/w/cpp/numeric/math/tan[tan]
-- https://en.cppreference.com/w/cpp/numeric/math/asin[asin]
-- https://en.cppreference.com/w/cpp/numeric/math/acos[acos]
-- https://en.cppreference.com/w/cpp/numeric/math/atan[atan]
-- https://en.cppreference.com/w/cpp/numeric/math/atan2[atan2]
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/sin[sin] | Computes sin(x)
+| https://en.cppreference.com/w/cpp/numeric/math/cos[cos] | Computes cos(x)
+| https://en.cppreference.com/w/cpp/numeric/math/tan[tan] | Computes tan(x)
+| https://en.cppreference.com/w/cpp/numeric/math/asin[asin] | Computes arcsin(x)
+| https://en.cppreference.com/w/cpp/numeric/math/acos[acos] | Computes arccos(x)
+| https://en.cppreference.com/w/cpp/numeric/math/atan[atan] | Computes arctan(x)
+| https://en.cppreference.com/w/cpp/numeric/math/atan2[atan2] | Computes arctan(x) using signs as quadrants
+|===
 
 === Hyperbolic Functions
 
@@ -120,7 +123,7 @@ Additionally, all functions are marked `noexcept`.
 - https://en.cppreference.com/w/cpp/numeric/math/islessgreater[islessgreater]
 - https://en.cppreference.com/w/cpp/numeric/math/isunordered[isunordered]
 
-=== Summary
+=== Function Signatures
 
 [source, c++]
 ----
@@ -354,7 +357,7 @@ The following functions have been implemented for decimal types:
 - https://en.cppreference.com/w/cpp/numeric/special_functions/hermite[hermite]
 - https://en.cppreference.com/w/cpp/numeric/special_functions/laguerre[laguerre]
 
-=== Summary
+=== Function Signatures
 
 [source, c++]
 ----
