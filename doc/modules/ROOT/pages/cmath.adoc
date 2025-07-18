@@ -105,31 +105,36 @@ Additionally, all functions are marked `noexcept`.
 
 === Floating point manipulation functions
 
-- https://en.cppreference.com/w/cpp/numeric/math/frexp[frexp]
-- https://en.cppreference.com/w/cpp/numeric/math/ldexp[ldexp]
-- https://en.cppreference.com/w/cpp/numeric/math/modf[modf]
-- https://en.cppreference.com/w/cpp/numeric/math/scalbn[scalbn]
-- https://en.cppreference.com/w/cpp/numeric/math/scalbn[scalbln]
-- https://en.cppreference.com/w/cpp/numeric/math/ilogb[ilogb]
-- https://en.cppreference.com/w/cpp/numeric/math/logb[logb]
-- https://en.cppreference.com/w/cpp/numeric/math/nextafter[nextafter]
-- https://en.cppreference.com/w/cpp/numeric/math/nextafter[nexttowards]
-- https://en.cppreference.com/w/cpp/numeric/math/copysign[copysign]
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/frexp[frexp] | Returns significand and base 2 exponent
+| https://en.cppreference.com/w/cpp/numeric/math/ldexp[ldexp] | Multiplies a number by 2^x
+| https://en.cppreference.com/w/cpp/numeric/math/modf[modf] | Decomposes a number into integer and fractional parts
+| https://en.cppreference.com/w/cpp/numeric/math/scalbn[scalbn] | Multiplies a decimal number by `FLT_RADIX` (10) raised to an `int` power
+| https://en.cppreference.com/w/cpp/numeric/math/scalbn[scalbln] | Multiplies a decimal number by `FLT_RADIX` (10) raised to an `long` power
+| https://en.cppreference.com/w/cpp/numeric/math/ilogb[ilogb] | Extracts `int` exponent of a number
+| https://en.cppreference.com/w/cpp/numeric/math/logb[logb] | Extracts Decimal Type exponent of a number
+| https://en.cppreference.com/w/cpp/numeric/math/nextafter[nextafter] | Next representable decimal type value
+| https://en.cppreference.com/w/cpp/numeric/math/nextafter[nexttowards] | Next representable decimal type value towards a `long double`
+| https://en.cppreference.com/w/cpp/numeric/math/copysign[copysign] | Copies the sign of a decimal value
+|===
 
 === Classification and comparison
 
-- https://en.cppreference.com/w/cpp/numeric/math/fpclassify[fpclassify]
-- https://en.cppreference.com/w/cpp/numeric/math/isfinite[isfinite]
-- https://en.cppreference.com/w/cpp/numeric/math/isinf[isinf]
-- https://en.cppreference.com/w/cpp/numeric/math/isnan[isnan]
-- https://en.cppreference.com/w/cpp/numeric/math/isnormal[isnormal]
-- https://en.cppreference.com/w/cpp/numeric/math/signbit[signbit]
-- https://en.cppreference.com/w/cpp/numeric/math/isgreater[isgreater]
-- https://en.cppreference.com/w/cpp/numeric/math/isgreaterequal[isgreaterequal]
-- https://en.cppreference.com/w/cpp/numeric/math/isless[isless]
-- https://en.cppreference.com/w/cpp/numeric/math/islesequal[islessequal]
-- https://en.cppreference.com/w/cpp/numeric/math/islessgreater[islessgreater]
-- https://en.cppreference.com/w/cpp/numeric/math/isunordered[isunordered]
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/fpclassify[fpclassify] | Categorizes a value
+| https://en.cppreference.com/w/cpp/numeric/math/isfinite[isfinite] | Checks if a given value is finite
+| https://en.cppreference.com/w/cpp/numeric/math/isinf[isinf] | Checks if a given value is infinite
+| https://en.cppreference.com/w/cpp/numeric/math/isnan[isnan] | Checks if a given value is a NAN
+| https://en.cppreference.com/w/cpp/numeric/math/isnormal[isnormal] | Checks if a given value is normal
+| https://en.cppreference.com/w/cpp/numeric/math/signbit[signbit] | Checks the sign of a value
+| https://en.cppreference.com/w/cpp/numeric/math/isgreater[isgreater] | Checks if the LHS (Left-hand side or first parameter) is greater than the RHS (Right-hand side or second parameter)
+| https://en.cppreference.com/w/cpp/numeric/math/isgreaterequal[isgreaterequal] | Checks if the LHS is greater than or equal to the RHS
+| https://en.cppreference.com/w/cpp/numeric/math/isless[isless] | Checks if the LHS is less than the RHS
+| https://en.cppreference.com/w/cpp/numeric/math/islesequal[islessequal] | Checks if the LHS is less than or equal to the RHS
+| https://en.cppreference.com/w/cpp/numeric/math/isunordered[isunordered] | Checks if the LHS and RHS are unordered (i.e. if one or both are NAN)
+|===
 
 === Function Signatures
 
