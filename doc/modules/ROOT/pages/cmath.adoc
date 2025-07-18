@@ -15,16 +15,19 @@ They are also all constexpr with C\\++14 unlike the built-in floating point type
 
 === Basic Operations
 
-- https://en.cppreference.com/w/cpp/numeric/math/fabs[abs]
-- https://en.cppreference.com/w/cpp/numeric/math/fabs[fabs]
-- https://en.cppreference.com/w/cpp/numeric/math/fmod[fmod]
-- https://en.cppreference.com/w/cpp/numeric/math/remainder[remainder]
-- https://en.cppreference.com/w/cpp/numeric/math/remquo[remquo]
-- https://en.cppreference.com/w/cpp/numeric/math/fma[fma]
-- https://en.cppreference.com/w/cpp/numeric/math/fmax[fmax]
-- https://en.cppreference.com/w/cpp/numeric/math/fmin[fmin]
-- https://en.cppreference.com/w/cpp/numeric/math/fdim[fdim]
-- https://en.cppreference.com/w/cpp/numeric/math/nan[nan]
+|===
+| Function | Description
+| https://en.cppreference.com/w/cpp/numeric/math/fabs[abs] | Absolute Value
+| https://en.cppreference.com/w/cpp/numeric/math/fabs[fabs] | Floating Point Absolute Value (Identical to `abs`)
+| https://en.cppreference.com/w/cpp/numeric/math/fmod[fmod] | Floating Point Modulo Operation
+| https://en.cppreference.com/w/cpp/numeric/math/remainder[remainder] | Signed Floating Point Modulo
+| https://en.cppreference.com/w/cpp/numeric/math/remquo[remquo] | Signed remainder and at least three bits of division result (quotient)
+| https://en.cppreference.com/w/cpp/numeric/math/fma[fma] | Fused Multiply - Add
+| https://en.cppreference.com/w/cpp/numeric/math/fmax[fmax] | Returns maximum value
+| https://en.cppreference.com/w/cpp/numeric/math/fmin[fmin] | Returns minimum value
+| https://en.cppreference.com/w/cpp/numeric/math/fdim[fdim] | Returns unsigned difference of two values
+| https://en.cppreference.com/w/cpp/numeric/math/nan[nan] | Generates NANs
+|===
 
 === Exponential Functions
 
