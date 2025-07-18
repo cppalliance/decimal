@@ -484,8 +484,10 @@ int main()
     test_to_chars<double>("double");
     test_to_chars<decimal32>("decimal32");
     test_to_chars<decimal64>("decimal64");
+    test_to_chars<decimal128>("decimal128");
     test_to_chars<decimal32_fast>("dec32_fast");
     test_to_chars<decimal64_fast>("dec64_fast");
+    test_to_chars<decimal128_fast>("dec128_fast");
 
     std::cerr << "\n===== <charconv> from_chars =====\n";
     test_from_chars<float>(false, "float");
@@ -496,10 +498,14 @@ int main()
     test_from_chars<decimal32>(true, "decimal32");
     test_from_chars<decimal64>(false, "decimal64");
     test_from_chars<decimal64>(true, "decimal64");
-    test_from_chars<decimal32>(false, "dec32_fast");
-    test_from_chars<decimal32>(true, "dec32_fast");
-    test_from_chars<decimal64>(false, "dec64_fast");
-    test_from_chars<decimal64>(true, "dec64_fast");
+    test_from_chars<decimal128>(false, "decimal128");
+    test_from_chars<decimal128>(true, "decimal128");
+    test_from_chars<decimal32_fast>(false, "dec32_fast");
+    test_from_chars<decimal32_fast>(true, "dec32_fast");
+    test_from_chars<decimal64_fast>(false, "dec64_fast");
+    test_from_chars<decimal64_fast>(true, "dec64_fast");
+    test_from_chars<decimal128_fast>(false, "dec128_fast");
+    test_from_chars<decimal128_fast>(true, "dec128_fast");
 #endif
     std::cerr << std::endl;
 
