@@ -12,14 +12,17 @@ https://www.boost.org/LICENSE_1_0.txt
 
 Decimal128 is the 128-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6
 
-- Storage width - 128 bits
-- Precision - 34 decimal digits (not bits like binary)
-- Max exponent - 6145
-- Max Value - 9.99999...e6145
-- Smallest normalized value - 1.0000...e-6142
-- Smallest subnormal - 1e-6176
+|===
+| Attribute | values
+| Storage Width | 128 bits
+| Precision | 34 decimal digits
+| Max exponent | 6145
+| Max Value | 9.99999...e+6145
+| Smallest Normalized Value | 1.0000...e-6142
+| Smallest Subnormal Value | 1e-6176
+|===
 
-The encoding of Decimal128 is in the <<conversions, BID format>>.
+The encoding of Decimal128 is in the `xref:conversions.adoc[BID format]`.
 
 [source, c++]
 ----
@@ -48,8 +51,11 @@ explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal128(Float val) noexcept;
 template <typename Integer>
 explicit constexpr decimal128(Integer val) noexcept;
 
-template <typename Integral1, typename Integral2>
-constexpr decimal128(Integral1 coeff, Integral2 exp, bool sign = false) noexcept;
+template <typename UnsignedIntegral, typename Integral>
+constexpr decimal128(UnsignedIntegral coeff, Integral exp, bool sign = false) noexcept;
+
+template <typename SignedIntegral, typename Integral>
+constexpr decimal128(SignedIntegral coeff, Integral exp, bool sign = false) noexcept;
 
 template <typename Integral>
 constexpr decimal128& operator=(const Integeral& RHS) noexcept;
@@ -63,10 +69,6 @@ explicit constexpr operator long() const noexcept;
 explicit constexpr operator unsigned long() const noexcept;
 explicit constexpr operator long long() const noexcept;
 explicit constexpr operator unsigned long long() const noexcept;
-explicit constexpr operator std::int8_t() const noexcept;
-explicit constexpr operator std::uint8_t() const noexcept;
-explicit constexpr operator std::int16_t() const noexcept;
-explicit constexpr operator std::uint16_t() const noexcept;
 
 // 3.2.4.5 increment and decrement operators:
 constexpr decimal128& operator++();

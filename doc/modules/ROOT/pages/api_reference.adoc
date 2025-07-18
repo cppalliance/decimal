@@ -8,34 +8,37 @@ https://www.boost.org/LICENSE_1_0.txt
 = API Reference
 :idprefix: api_ref_
 
+This section is a complete cross-reference to all the types, structures,
+enums, constants and macros that are provided in this library.
+
 == Types
 
 === IEEE 754 Compliant Types
 
-- <<decimal32, `decimal32`>>
-- <<decimal64, `decimal64`>>
-- <<decimal128, `decimal128`>>
+- xref:decimal32.adoc[decimal32]
+- xref:decimal64.adoc[decimal64]
+- xref:decimal128.adoc[decima128]
 
 === Non-IEEE 754 Compliant Types
 
-- <<decimal32_fast, `decimal32_fast`>>
-- <<decimal64_fast, `decimal64_fast`>>
-- <<decimal128_fast, `decimal128_fast`>>
+- xref:decimal32_fast.adoc[decimal32_fast]
+- xref:decimal64_fast.adoc[decimal64_fast]
+- xref:decimal128_fast.adoc[decimal128_fast]
 
 == Structures
 
-- <<to_chars_result, `to_chars_result`>>
-- <<from_chars_result, `from_chars_result`>>
+- xref:charconv.adoc#to_chars_result[to_chars_result]
+- xref:charconv.adoc#from_chars_result[from_chars_result]
 
 == Enums
 
-- <<chars_format, `chars_format`>>
+- xref:charconv.adoc#chars_format[chars_format]
 
 == Constants
 
-- <<charconv_limits, `limits`>>
-- <<numbers, `namespace boost::decimal::numbers`>>
+- xref:charconv.adoc#charconv_limits[limits]
+- xref:numbers.adoc[numbers]
 
 == Macros
 
-See: <<configuration>>
+See: xref:config.adoc[configuration]
