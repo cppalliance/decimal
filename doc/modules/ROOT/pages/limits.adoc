@@ -17,17 +17,8 @@ The following from <limits> are overloaded for each type with associated values 
 namespace std {
 
 template <>
-#ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal32>
-#else
 struct numeric_limits<boost::decimal::decimal32>
-#endif
 {
-
-#ifdef _MSC_VER
-public:
-#endif
-
     static constexpr bool is_specialized = true;
     static constexpr bool is_signed = true;
     static constexpr bool is_integer = false;
@@ -37,10 +28,8 @@ public:
     static constexpr bool has_signaling_NaN = true;
 
     // These members were deprecated in C++23
-    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
     static constexpr std::float_denorm_style has_denorm = std::denorm_present;
     static constexpr bool has_denorm_loss = true;
-    #endif
 
     static constexpr std::float_round_style round_style = std::round_indeterminate;
     static constexpr bool is_iec559 = true;
@@ -70,17 +59,8 @@ public:
 };
 
 template <>
-#ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal64>
-#else
 struct numeric_limits<boost::decimal::decimal64>
-#endif
 {
-
-#ifdef _MSC_VER
-    public:
-#endif
-
     static constexpr bool is_specialized = true;
     static constexpr bool is_signed = true;
     static constexpr bool is_integer = false;
@@ -90,10 +70,8 @@ struct numeric_limits<boost::decimal::decimal64>
     static constexpr bool has_signaling_NaN = true;
 
     // These members were deprecated in C++23
-    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
     static constexpr std::float_denorm_style has_denorm = std::denorm_present;
     static constexpr bool has_denorm_loss = true;
-    #endif
 
     static constexpr std::float_round_style round_style = std::round_indeterminate;
     static constexpr bool is_iec559 = true;
@@ -123,17 +101,8 @@ struct numeric_limits<boost::decimal::decimal64>
 };
 
 template<>
-#ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal128>
-#else
 struct numeric_limits<boost::decimal::decimal128>
-#endif
 {
-
-#ifdef _MSC_VER
-    public:
-#endif
-
     static constexpr bool is_specialized = true;
     static constexpr bool is_signed = true;
     static constexpr bool is_integer = false;
@@ -143,10 +112,8 @@ struct numeric_limits<boost::decimal::decimal128>
     static constexpr bool has_signaling_NaN = true;
 
     // These members were deprecated in C++23
-    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
     static constexpr std::float_denorm_style has_denorm = std::denorm_present;
     static constexpr bool has_denorm_loss = true;
-    #endif
 
     static constexpr std::float_round_style round_style = std::round_indeterminate;
     static constexpr bool is_iec559 = true;
@@ -178,3 +145,5 @@ struct numeric_limits<boost::decimal::decimal128>
 } // Namespace std
 
 ----
+
+The fast types each have the same member values as their corresponding non-fast type above.
