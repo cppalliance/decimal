@@ -4,6 +4,7 @@
 // https://www.boost.org/LICENSE_1_0.txt
 
 #define BOOST_DECIMAL_DETAIL_INT128_ALLOW_SIGN_CONVERSION
+#define BOOST_DECIMAL_DETAIL_INT128_ALLOW_SIGN_COMPARE
 
 #include <boost/decimal.hpp>
 #include <chrono>
