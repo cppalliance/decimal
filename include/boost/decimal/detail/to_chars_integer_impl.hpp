@@ -62,7 +62,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_integer_impl(char* first, char* last, Inte
     }
 
     Unsigned_Integer unsigned_value {};
-    const auto unsigned_base = static_cast<Unsigned_Integer>(base);
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<Integer>::value)
     {
@@ -155,7 +154,7 @@ constexpr char* decompose32(std::uint32_t value, char* buffer) noexcept
 template <typename Integer>
 constexpr to_chars_result to_chars_integer_impl(char* first, char* last, Integer value) noexcept
 {
-    using Unsigned_Integer = typename std::make_unsigned<Integer>::type;
+    using Unsigned_Integer = make_unsigned_t<Integer>;
     Unsigned_Integer unsigned_value {};
 
     char buffer[10] {};
@@ -168,9 +167,9 @@ constexpr to_chars_result to_chars_integer_impl(char* first, char* last, Integer
     }
 
     // Strip the sign from the value and apply at the end after parsing if the type is signed
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_signed<Integer>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (is_signed_v<Integer>)
     {
-        if (value < 0)
+        if (value < static_cast<Integer>(0))
         {
             is_negative = true;
             unsigned_value = apply_sign(value);
