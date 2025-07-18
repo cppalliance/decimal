@@ -324,7 +324,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     }
 
     // Offset the value of first by 1 so that we can copy the leading digit and insert a decimal point
-    auto r = to_chars_integer_impl<uint_type, uint_type>(first + 1, last, significand, 10);
+    auto r = to_chars_integer_impl<uint_type>(first + 1, last, significand);
 
     // Only real reason we will hit this is a buffer overflow
     if (BOOST_DECIMAL_UNLIKELY(!r))
@@ -398,7 +398,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
         *first++ = '0';
     }
 
-    r = to_chars_integer_impl<int, unsigned>(first, last, abs_exp, 10);
+    r = to_chars_integer_impl<int>(first, last, abs_exp);
     if (BOOST_DECIMAL_UNLIKELY(!r))
     {
         return r; // LCOV_EXCL_LINE
@@ -544,7 +544,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
                                           std::numeric_limits<std::uint64_t>::digits),
                                           int128::uint128_t, std::uint64_t>;
 
-    auto r = to_chars_integer_impl<uint_type, uint_type>(first, last, significand, 10);
+    auto r = to_chars_integer_impl<uint_type>(first, last, significand);
 
     if (BOOST_DECIMAL_UNLIKELY(!r))
     {
@@ -775,7 +775,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
         *first++ = '0';
     }
 
-    return to_chars_integer_impl<std::uint32_t, std::uint32_t>(first, last, static_cast<std::uint32_t>(abs_exp), 10);
+    return to_chars_integer_impl<std::uint32_t>(first, last, static_cast<std::uint32_t>(abs_exp));
 }
 
 #ifdef _MSC_VER
