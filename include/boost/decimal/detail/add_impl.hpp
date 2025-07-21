@@ -126,8 +126,8 @@ constexpr auto d32_fast_add_only_impl(const T& lhs, const T& rhs) noexcept -> Re
         lhs_exp += detail::fenv_round(res_sig, false);
     }
 
-    BOOST_DECIMAL_ASSERT(res_sig >= 1'000'000);
-    BOOST_DECIMAL_ASSERT(res_sig <= max_non_normalized_value);
+    BOOST_DECIMAL_ASSERT(res_sig >= 1'000'000U || res_sig == 0U);
+    BOOST_DECIMAL_ASSERT(res_sig <= max_non_normalized_value || res_sig == 0U);
 
     return ReturnType{static_cast<typename ReturnType::significand_type>(res_sig), lhs_exp, false};
 }
