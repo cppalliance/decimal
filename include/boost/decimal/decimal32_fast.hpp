@@ -346,6 +346,7 @@ public:
     explicit constexpr operator Decimal() const noexcept;
 
     friend constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign) noexcept -> decimal32_fast;
+    friend constexpr auto direct_init(const detail::decimal32_fast_components& x) noexcept -> decimal32_fast;
 
     // <cmath> or extensions that need to be friends
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
@@ -452,6 +453,16 @@ constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exp
     val.significand_ = significand;
     val.exponent_ = exponent;
     val.sign_ = sign;
+
+    return val;
+}
+
+constexpr auto direct_init(const detail::decimal32_fast_components& x) noexcept -> decimal32_fast
+{
+    decimal32_fast val;
+    val.significand_ = x.sig;
+    val.exponent_ = static_cast<std::uint_fast8_t>(static_cast<int>(x.exp) + detail::bias_v<decimal32_fast>);
+    val.sign_ = x.sign;
 
     return val;
 }
