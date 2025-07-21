@@ -1007,7 +1007,15 @@ constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& 
     BOOST_DECIMAL_ASSERT(res_sig >= 1'000'000 || res_sig == 0U);
     BOOST_DECIMAL_ASSERT(res_exp <= 9'999'999 || res_sig == 0U);
 
-    q = direct_init(static_cast<typename decimal32_fast::significand_type>(res_sig), static_cast<typename decimal32_fast::exponent_type>(res_exp), isneg);
+    if (BOOST_DECIMAL_LIKELY(res_exp >= 0))
+    {
+        q = direct_init(static_cast<typename decimal32_fast::significand_type>(res_sig), static_cast<typename decimal32_fast::exponent_type>(res_exp), isneg);
+    }
+    else
+    {
+        // Flush to zero
+        q = zero;
+    }
 }
 
 constexpr auto mod_impl(decimal32_fast lhs, decimal32_fast rhs, const decimal32_fast& q, decimal32_fast& r) noexcept -> void
