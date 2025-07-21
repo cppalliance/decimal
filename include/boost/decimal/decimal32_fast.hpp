@@ -935,10 +935,10 @@ constexpr auto operator*(Integer lhs, decimal32_fast rhs) noexcept
 
 constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& q, decimal32_fast& r) noexcept -> void
 {
+    constexpr decimal32_fast zero {0, 0};
+    
     #ifndef BOOST_DECIMAL_FAST_MATH
     const bool sign {lhs.isneg() != rhs.isneg()};
-
-    constexpr decimal32_fast zero {0, 0};
     constexpr decimal32_fast nan {direct_init(detail::d32_fast_qnan, UINT8_C(0), false)};
     constexpr decimal32_fast inf {direct_init(detail::d32_fast_inf, UINT8_C(0), false)};
 
