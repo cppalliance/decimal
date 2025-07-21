@@ -815,7 +815,15 @@ constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
 
     rhs.sign_ = !rhs.sign_;
 
-    return detail::d32_add_impl<decimal32_fast>(lhs, rhs);
+    if (lhs.sign_ || rhs.sign_)
+    {
+        return detail::d32_add_impl<decimal32_fast>(lhs, rhs);
+    }
+    else
+    {
+        const auto res {detail::d32_fast_add_only_impl<detail::decimal32_fast_components>(lhs, rhs)};
+        return direct_init(res);
+    }
 }
 
 template <typename Integer>
