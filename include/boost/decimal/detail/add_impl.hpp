@@ -118,7 +118,7 @@ constexpr auto d32_fast_add_only_impl(const T& lhs, const T& rhs) noexcept -> Re
         if (res_sig > max_non_compensated_value)
         {
             const auto offset_power {max_result_digits_overage == 1 ? 1 : max_result_digits_overage - 1};
-            const auto offset {detail::pow10<promoted_sig_type>(offset_power)};
+            const auto offset {detail::pow10(static_cast<promoted_sig_type>(offset_power))};
             res_sig /= offset;
             lhs_exp += offset_power;
         }
