@@ -116,6 +116,9 @@ private:
     template <typename ReturnType, typename T>
     friend constexpr auto detail::d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType;
 
+    template <typename ReturnType, typename T>
+    friend constexpr auto detail::d32_fast_add_only_impl(const T& lhs, const T& rhs) noexcept -> ReturnType;
+
     template <BOOST_DECIMAL_FAST_DECIMAL_FLOATING_TYPE DecimalType>
     BOOST_DECIMAL_FORCE_INLINE friend constexpr auto fast_equality_impl(const DecimalType& lhs, const DecimalType& rhs) noexcept -> bool;
 
@@ -346,6 +349,7 @@ public:
     explicit constexpr operator Decimal() const noexcept;
 
     friend constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign) noexcept -> decimal32_fast;
+    friend constexpr auto direct_init(const detail::decimal32_fast_components& x) noexcept -> decimal32_fast;
 
     // <cmath> or extensions that need to be friends
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
@@ -452,6 +456,16 @@ constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exp
     val.significand_ = significand;
     val.exponent_ = exponent;
     val.sign_ = sign;
+
+    return val;
+}
+
+constexpr auto direct_init(const detail::decimal32_fast_components& x) noexcept -> decimal32_fast
+{
+    decimal32_fast val;
+    val.significand_ = x.sig;
+    val.exponent_ = static_cast<std::uint_fast8_t>(static_cast<int>(x.exp) + detail::bias_v<decimal32_fast>);
+    val.sign_ = x.sign;
 
     return val;
 }
@@ -748,7 +762,15 @@ constexpr auto operator+(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::d32_add_impl<decimal32_fast>(lhs, rhs);
+    if (lhs.isneg() || rhs.isneg())
+    {
+        return detail::d32_add_impl<decimal32_fast>(lhs, rhs);
+    }
+    else
+    {
+        const auto res {detail::d32_fast_add_only_impl<detail::decimal32_fast_components>(lhs, rhs)};
+        return direct_init(res);
+    }
 }
 
 template <typename Integer>
@@ -793,7 +815,15 @@ constexpr auto operator-(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
 
     rhs.sign_ = !rhs.sign_;
 
-    return detail::d32_add_impl<decimal32_fast>(lhs, rhs);
+    if (lhs.sign_ || rhs.sign_)
+    {
+        return detail::d32_add_impl<decimal32_fast>(lhs, rhs);
+    }
+    else
+    {
+        const auto res {detail::d32_fast_add_only_impl<detail::decimal32_fast_components>(lhs, rhs)};
+        return direct_init(res);
+    }
 }
 
 template <typename Integer>
@@ -856,10 +886,26 @@ constexpr auto operator*(decimal32_fast lhs, decimal32_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::mul_impl<decimal32_fast>(
-            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_
-            );
+    using mul_type = std::uint_fast64_t;
+
+    const auto isneg {lhs.sign_ != rhs.sign_};
+    constexpr auto ten_pow_seven {detail::pow10(static_cast<mul_type>(6))};
+    constexpr auto ten_pow_seven_exp_offset {95};
+    constexpr auto ten_pow_six {detail::pow10(static_cast<mul_type>(5))};
+    constexpr auto ten_pow_six_exp_offset {96};
+
+    auto res_sig {(static_cast<mul_type>(lhs.significand_) * static_cast<mul_type>(rhs.significand_))};
+    const bool res_sig_14_dig {res_sig > UINT64_C(10000000000000)};
+    res_sig /= res_sig_14_dig ? ten_pow_seven : ten_pow_six;
+    auto res_exp {lhs.exponent_ + rhs.exponent_};
+    res_exp -= res_sig_14_dig ? ten_pow_seven_exp_offset : ten_pow_six_exp_offset;
+
+    res_exp += detail::fenv_round(res_sig, isneg);
+
+    BOOST_DECIMAL_ASSERT(res_sig >= 1'000'000 || res_sig == 0U);
+    BOOST_DECIMAL_ASSERT(res_exp <= 9'999'999 || res_sig == 0U);
+
+    return direct_init(static_cast<decimal32_fast::significand_type>(res_sig), static_cast<decimal32_fast::exponent_type>(res_exp) , isneg);
 }
 
 template <typename Integer>
@@ -897,10 +943,10 @@ constexpr auto operator*(Integer lhs, decimal32_fast rhs) noexcept
 
 constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& q, decimal32_fast& r) noexcept -> void
 {
+    constexpr decimal32_fast zero {0, 0};
+    
     #ifndef BOOST_DECIMAL_FAST_MATH
     const bool sign {lhs.isneg() != rhs.isneg()};
-
-    constexpr decimal32_fast zero {0, 0};
     constexpr decimal32_fast nan {direct_init(detail::d32_fast_qnan, UINT8_C(0), false)};
     constexpr decimal32_fast inf {direct_init(detail::d32_fast_inf, UINT8_C(0), false)};
 
@@ -956,10 +1002,28 @@ constexpr auto div_impl(decimal32_fast lhs, decimal32_fast rhs, decimal32_fast& 
     // By appending enough zeros to the LHS we end up finding what we need anyway
     constexpr auto ten_pow_precision {detail::pow10(static_cast<std::uint_fast64_t>(detail::precision_v<decimal32>))};
     const auto big_sig_lhs {static_cast<std::uint_fast64_t>(lhs.significand_) * ten_pow_precision};
-    const auto res_sig {big_sig_lhs / static_cast<std::uint_fast64_t>(rhs.significand_)};
-    const auto res_exp {(lhs.biased_exponent() - detail::precision_v<decimal32>) - rhs.biased_exponent()};
+    auto res_sig {big_sig_lhs / static_cast<std::uint_fast64_t>(rhs.significand_)};
+    auto res_exp {lhs.exponent_ - rhs.exponent_ + 94};
+    const auto isneg {lhs.sign_ != rhs.sign_};
 
-    q = decimal32_fast(res_sig, res_exp, lhs.sign_ != rhs.sign_);
+    // If we have 8 figures round it down to 7
+    if (res_sig >= UINT64_C(10'000'000))
+    {
+        res_exp += detail::fenv_round(res_sig, isneg);
+    }
+
+    BOOST_DECIMAL_ASSERT(res_sig >= 1'000'000 || res_sig == 0U);
+    BOOST_DECIMAL_ASSERT(res_exp <= 9'999'999 || res_sig == 0U);
+
+    if (BOOST_DECIMAL_LIKELY(res_exp >= 0))
+    {
+        q = direct_init(static_cast<typename decimal32_fast::significand_type>(res_sig), static_cast<typename decimal32_fast::exponent_type>(res_exp), isneg);
+    }
+    else
+    {
+        // Flush to zero
+        q = zero;
+    }
 }
 
 constexpr auto mod_impl(decimal32_fast lhs, decimal32_fast rhs, const decimal32_fast& q, decimal32_fast& r) noexcept -> void
