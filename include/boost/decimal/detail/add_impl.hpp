@@ -106,7 +106,7 @@ constexpr auto d32_fast_add_only_impl(const T& lhs, const T& rhs) noexcept -> Re
             lhs_exp -= static_cast<decimal32_components::biased_exponent_type>(shift);
         }
 
-        max_result_digits_overage = shift;
+        max_result_digits_overage = static_cast<int>(shift);
     }
 
     auto res_sig {big_lhs + big_rhs};
