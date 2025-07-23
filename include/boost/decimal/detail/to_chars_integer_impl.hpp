@@ -151,7 +151,7 @@ constexpr char* decompose32(std::uint32_t value, char* buffer) noexcept
 # pragma warning(disable: 4127 4146)
 #endif
 
-template <typename Integer>
+template <typename Integer, std::enable_if_t<sizeof(Integer) != 16, bool> = true>
 constexpr to_chars_result to_chars_integer_impl(char* first, char* last, Integer value) noexcept
 {
     using Unsigned_Integer = make_unsigned_t<Integer>;
@@ -279,9 +279,11 @@ constexpr to_chars_result to_chars_integer_impl(char* first, char* last, Integer
     return {first + converted_value_digits, std::errc()};
 }
 
-template <typename Integer, typename Unsigned_Integer = boost::int128::uint128_t>
-constexpr to_chars_result to_chars_128integer_impl(char* first, char* last, Integer value) noexcept
+template <typename Integer, std::enable_if_t<sizeof(Integer) == 16, bool> = true>
+constexpr to_chars_result to_chars_integer_impl(char* first, char* last, Integer value) noexcept
 {
+    using Unsigned_Integer = boost::int128::uint128_t;
+
     Unsigned_Integer unsigned_value {};
 
     const std::ptrdiff_t user_buffer_size = last - first;
@@ -295,11 +297,11 @@ constexpr to_chars_result to_chars_128integer_impl(char* first, char* last, Inte
     // Strip the sign from the value and apply at the end after parsing if the type is signed
     BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<Integer>::is_signed
                         #ifdef BOOST_DECIMAL_HAS_INT128
-                        || std::is_same<boost::decimal::detail::builtin_uint128_t, Integer>::value
+                        || std::is_same<boost::decimal::detail::builtin_int128_t, Integer>::value
                         #endif
                         )
     {
-        if (value < 0)
+        if (value < 0U)
         {
             is_negative = true;
             unsigned_value = -(static_cast<Unsigned_Integer>(value));
@@ -339,7 +341,7 @@ constexpr to_chars_result to_chars_128integer_impl(char* first, char* last, Inte
     int num_chars[5] {};
     int i = 0;
 
-    while (converted_value != 0)
+    while (converted_value != 0U)
     {
         auto digits = static_cast<std::uint32_t>(converted_value % ten_9);
         num_chars[i] = num_digits(digits);
