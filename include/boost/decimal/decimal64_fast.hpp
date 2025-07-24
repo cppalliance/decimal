@@ -48,6 +48,7 @@ struct decimal64_fast_components
 
 } // namespace detail
 
+[[deprecated("Use re-named type decimal_fast64_t instead of decimal64_fast")]]
 BOOST_DECIMAL_EXPORT class decimal64_fast final
 {
 public:
@@ -381,6 +382,8 @@ public:
     friend constexpr auto scalbnd64f(decimal64_fast num, int exp) noexcept -> decimal64_fast;
     friend constexpr auto scalblnd64f(decimal64_fast num, long exp) noexcept -> decimal64_fast;
 };
+
+using decimal_fast64_t = decimal64_fast;
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>

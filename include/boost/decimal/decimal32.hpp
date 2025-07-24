@@ -101,6 +101,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_max_significand_value = UINT3
 
 // ISO/IEC DTR 24733
 // 3.2.2 class decimal32
+[[deprecated("Use re-named type decimal32_t instead of decimal32")]]
 BOOST_DECIMAL_EXPORT class decimal32 final // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
 {
 public:
@@ -562,6 +563,8 @@ private:
     // Replaces the current sign with the one provided
     constexpr auto edit_sign(bool sign) noexcept -> void;
 };
+
+BOOST_DECIMAL_EXPORT using decimal32_t = decimal32;
 
 #if defined(__GNUC__) && __GNUC__ >= 8
 #  pragma GCC diagnostic pop

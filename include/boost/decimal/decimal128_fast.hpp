@@ -40,6 +40,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d128_fast_snan_high_bits = UINT64_MAX;
 
 } // namespace detail
 
+[[deprecated("Use re-named type decimal_fast128_t instead of decimal128_fast")]]
 BOOST_DECIMAL_EXPORT class decimal128_fast final
 {
 public:
@@ -368,6 +369,8 @@ public:
     // 3.6.6 Quantize
     friend constexpr auto quantized128f(const decimal128_fast& lhs, const decimal128_fast& rhs) noexcept -> decimal128_fast;
 };
+
+using decimal_fast128_t = decimal128_fast;
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
