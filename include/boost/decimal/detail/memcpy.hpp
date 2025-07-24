@@ -85,12 +85,7 @@ BOOST_DECIMAL_CONSTEXPR char* memcpy(char* dest, const char* src, std::size_t co
 {
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(count))
     {
-        for (std::size_t i = 0; i < count; ++i)
-        {
-            *(dest + i) = *(src + i);
-        }
-
-        return dest;
+        return static_cast<char*>(impl::memcpy_impl(dest, src, count));
     }
     else
     {
@@ -114,12 +109,7 @@ BOOST_DECIMAL_CONSTEXPR char* memset(char* dest, int ch, std::size_t count)
 {
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(count))
     {
-        for (std::size_t i = 0; i < count; ++i)
-        {
-            *(dest + i) = static_cast<char>(ch);
-        }
-
-        return dest;
+        return static_cast<char*>(impl::memset_impl(dest, ch, count));
     }
     else
     {
@@ -131,12 +121,7 @@ BOOST_DECIMAL_CONSTEXPR char* memmove(char* dest, const char* src, std::size_t c
 {
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(count))
     {
-        for (std::size_t i = 0; i < count; ++i)
-        {
-            *(dest + i) = *(src + i);
-        }
-
-        return dest;
+        return static_cast<char*>(impl::memmove_impl(dest, src, count));
     }
     else
     {
@@ -146,21 +131,19 @@ BOOST_DECIMAL_CONSTEXPR char* memmove(char* dest, const char* src, std::size_t c
 
 #else // No consteval detection
 
-#define BOOST_DECIMAL_CONSTEXPR inline
-
-BOOST_DECIMAL_CONSTEXPR void* memcpy(void* dest, const void* src, std::size_t count)
+BOOST_DECIMAL_CONSTEXPR char* memcpy(char* dest, const char* src, std::size_t count)
 {
-    return std::memcpy(dest, src, count);
+    return impl::memcpy_impl(dest, src, count);
 }
 
-BOOST_DECIMAL_CONSTEXPR void* memset(void* dest, int ch, std::size_t count)
+BOOST_DECIMAL_CONSTEXPR char* memset(char* dest, int ch, std::size_t count)
 {
-    return std::memset(dest, ch, count);
+    return impl::memset_impl(dest, ch, count);
 }
 
-BOOST_DECIMAL_CONSTEXPR void* memmove(void* dest, const void* src, std::size_t count)
+BOOST_DECIMAL_CONSTEXPR char* memmove(char* dest, const char* src, std::size_t count)
 {
-    return std::memmove(dest, src, count);
+    return impl::memmove_impl(dest, src, count);
 }
 
 #endif
