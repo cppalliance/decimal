@@ -3,7 +3,7 @@
 // https://www.boost.org/LICENSE_1_0.txt
 //
 // This is not a fully featured implementation of a 256-bit integer like int128::uint128_t is
-// u256 only contains the minimum amount that we need to perform operations like decimal128 mul
+// u256 only contains the minimum amount that we need to perform operations like decimal128_t mul
 
 #ifndef BOOST_DECIMAL_DETAIL_U256_HPP
 #define BOOST_DECIMAL_DETAIL_U256_HPP

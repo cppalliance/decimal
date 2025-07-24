@@ -5,12 +5,12 @@
 #ifndef BOOST_DECIMAL_CSTDLIB_HPP
 #define BOOST_DECIMAL_CSTDLIB_HPP
 
-#include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/decimal64.hpp>
-#include <boost/decimal/decimal128.hpp>
-#include <boost/decimal/decimal32_fast.hpp>
-#include <boost/decimal/decimal64_fast.hpp>
-#include <boost/decimal/decimal128_fast.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
+#include <boost/decimal/decimal_fast32_t.hpp>
+#include <boost/decimal/decimal_fast64_t.hpp>
+#include <boost/decimal/decimal_fast128_t.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/parser.hpp>
 #include <boost/decimal/detail/utilities.hpp>
@@ -184,76 +184,76 @@ inline auto wcstod_impl(const wchar_t* str, wchar_t** endptr) noexcept -> Target
 
 } //namespace detail
 
-BOOST_DECIMAL_EXPORT template <typename TargetDecimalType = decimal64>
+BOOST_DECIMAL_EXPORT template <typename TargetDecimalType = decimal64_t>
 inline auto strtod(const char* str, char** endptr) noexcept -> TargetDecimalType
 {
     return detail::strtod_impl<TargetDecimalType>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT template <typename TargetDecimalType = decimal64>
+BOOST_DECIMAL_EXPORT template <typename TargetDecimalType = decimal64_t>
 inline auto wcstod(const wchar_t* str, wchar_t** endptr) noexcept -> TargetDecimalType
 {
     return detail::wcstod_impl<TargetDecimalType>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto strtod32(const char* str, char** endptr) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT inline auto strtod32(const char* str, char** endptr) noexcept -> decimal32_t
 {
-    return detail::strtod_impl<decimal32>(str, endptr);
+    return detail::strtod_impl<decimal32_t>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT inline auto wcstod32(const wchar_t* str, wchar_t** endptr) noexcept -> decimal32_t
 {
-    return detail::wcstod_impl<decimal32>(str, endptr);
+    return detail::wcstod_impl<decimal32_t>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto strtod32f(const char* str, char** endptr) noexcept -> decimal32_fast
+BOOST_DECIMAL_EXPORT inline auto strtod32f(const char* str, char** endptr) noexcept -> decimal_fast32_t
 {
-    return detail::strtod_impl<decimal32_fast>(str, endptr);
+    return detail::strtod_impl<decimal_fast32_t>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto wcstod32f(const wchar_t* str, wchar_t** endptr) noexcept -> decimal32_fast
+BOOST_DECIMAL_EXPORT inline auto wcstod32f(const wchar_t* str, wchar_t** endptr) noexcept -> decimal_fast32_t
 {
-    return detail::wcstod_impl<decimal32_fast>(str, endptr);
+    return detail::wcstod_impl<decimal_fast32_t>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto strtod64(const char* str, char** endptr) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT inline auto strtod64(const char* str, char** endptr) noexcept -> decimal64_t
 {
-    return detail::strtod_impl<decimal64>(str, endptr);
+    return detail::strtod_impl<decimal64_t>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto wcstod64(const wchar_t* str, wchar_t** endptr) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT inline auto wcstod64(const wchar_t* str, wchar_t** endptr) noexcept -> decimal64_t
 {
-    return detail::wcstod_impl<decimal64>(str, endptr);
+    return detail::wcstod_impl<decimal64_t>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto strtod64f(const char* str, char** endptr) noexcept -> decimal64_fast
+BOOST_DECIMAL_EXPORT inline auto strtod64f(const char* str, char** endptr) noexcept -> decimal_fast64_t
 {
-    return detail::strtod_impl<decimal64_fast>(str, endptr);
+    return detail::strtod_impl<decimal_fast64_t>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto wcstod64f(const wchar_t* str, wchar_t** endptr) noexcept -> decimal64_fast
+BOOST_DECIMAL_EXPORT inline auto wcstod64f(const wchar_t* str, wchar_t** endptr) noexcept -> decimal_fast64_t
 {
-    return detail::wcstod_impl<decimal64_fast>(str, endptr);
+    return detail::wcstod_impl<decimal_fast64_t>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto strtod128(const char* str, char** endptr) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT inline auto strtod128(const char* str, char** endptr) noexcept -> decimal128_t
 {
-    return detail::strtod_impl<decimal128>(str, endptr);
+    return detail::strtod_impl<decimal128_t>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto wcstod128(const wchar_t* str, wchar_t** endptr) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT inline auto wcstod128(const wchar_t* str, wchar_t** endptr) noexcept -> decimal128_t
 {
-    return detail::wcstod_impl<decimal128>(str, endptr);
+    return detail::wcstod_impl<decimal128_t>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto strtod128f(const char* str, char** endptr) noexcept -> decimal128_fast
+BOOST_DECIMAL_EXPORT inline auto strtod128f(const char* str, char** endptr) noexcept -> decimal_fast128_t
 {
-    return detail::strtod_impl<decimal128_fast>(str, endptr);
+    return detail::strtod_impl<decimal_fast128_t>(str, endptr);
 }
 
-BOOST_DECIMAL_EXPORT inline auto wcstod128f(const wchar_t* str, wchar_t** endptr) noexcept -> decimal128_fast
+BOOST_DECIMAL_EXPORT inline auto wcstod128f(const wchar_t* str, wchar_t** endptr) noexcept -> decimal_fast128_t
 {
-    return detail::wcstod_impl<decimal128_fast>(str, endptr);
+    return detail::wcstod_impl<decimal_fast128_t>(str, endptr);
 }
 
 } // namespace decimal

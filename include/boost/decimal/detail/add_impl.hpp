@@ -37,7 +37,7 @@ constexpr auto d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
     // Align to larger exponent
     if (lhs_exp != rhs_exp)
     {
-        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal32> + 1)};
+        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal32_t> + 1)};
         const auto shift {detail::make_positive_unsigned(lhs_exp - rhs_exp)};
 
         if (shift > max_shift)
@@ -49,12 +49,12 @@ constexpr auto d32_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
         else if (lhs_exp < rhs_exp)
         {
             big_rhs *= detail::pow10<promoted_sig_type>(shift);
-            lhs_exp = rhs_exp - static_cast<decimal32_components::biased_exponent_type>(shift);
+            lhs_exp = rhs_exp - static_cast<decimal32_t_components::biased_exponent_type>(shift);
         }
         else
         {
             big_lhs *= detail::pow10<promoted_sig_type>(shift);
-            lhs_exp -= static_cast<decimal32_components::biased_exponent_type>(shift);
+            lhs_exp -= static_cast<decimal32_t_components::biased_exponent_type>(shift);
         }
     }
 
@@ -85,7 +85,7 @@ constexpr auto d32_fast_add_only_impl(const T& lhs, const T& rhs) noexcept -> Re
     // Align to larger exponent
     if (lhs_exp != rhs_exp)
     {
-        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal32> + 1)};
+        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal32_t> + 1)};
         const auto shift {detail::make_positive_unsigned(lhs_exp - rhs_exp)};
 
         if (shift > max_shift)
@@ -98,12 +98,12 @@ constexpr auto d32_fast_add_only_impl(const T& lhs, const T& rhs) noexcept -> Re
         if (lhs_exp < rhs_exp)
         {
             big_rhs *= detail::pow10<promoted_sig_type>(shift);
-            lhs_exp = rhs_exp - static_cast<decimal32_components::biased_exponent_type>(shift);
+            lhs_exp = rhs_exp - static_cast<decimal32_t_components::biased_exponent_type>(shift);
         }
         else
         {
             big_lhs *= detail::pow10<promoted_sig_type>(shift);
-            lhs_exp -= static_cast<decimal32_components::biased_exponent_type>(shift);
+            lhs_exp -= static_cast<decimal32_t_components::biased_exponent_type>(shift);
         }
 
         max_result_digits_overage = static_cast<int>(shift);
@@ -148,7 +148,7 @@ constexpr auto d32_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
     // Align to larger exponent
     if (lhs_exp != rhs_exp)
     {
-        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal32> + 1)};
+        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal32_t> + 1)};
         const auto shift {detail::make_positive_unsigned(lhs_exp - rhs_exp)};
 
         if (shift > max_shift)
@@ -194,7 +194,7 @@ constexpr auto d64_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
     // Align to larger exponent
     if (lhs_exp != rhs_exp)
     {
-        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal64> + 1)};
+        constexpr auto max_shift {detail::make_positive_unsigned(detail::precision_v<decimal64_t> + 1)};
         const auto shift {detail::make_positive_unsigned(lhs_exp - rhs_exp)};
 
         if (shift > max_shift)
@@ -207,12 +207,12 @@ constexpr auto d64_add_impl(const T& lhs, const T& rhs) noexcept -> ReturnType
         if (lhs_exp < rhs_exp)
         {
             big_rhs *= detail::pow10<promoted_sig_type>(shift);
-            lhs_exp = rhs_exp - static_cast<decimal64_components::biased_exponent_type>(shift);
+            lhs_exp = rhs_exp - static_cast<decimal64_t_components::biased_exponent_type>(shift);
         }
         else
         {
             big_lhs *= detail::pow10<promoted_sig_type>(shift);
-            lhs_exp -= static_cast<decimal64_components::biased_exponent_type>(shift);
+            lhs_exp -= static_cast<decimal64_t_components::biased_exponent_type>(shift);
         }
     }
 
@@ -243,7 +243,7 @@ constexpr auto d64_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
               << "\nStarting exp rhs: " << rhs_exp << std::endl;
     #endif
 
-    if (delta_exp > detail::precision_v<decimal64> + 1)
+    if (delta_exp > detail::precision_v<decimal64_t> + 1)
     {
         // If the difference in exponents is more than the digits of accuracy
         // we return the larger of the two
@@ -284,7 +284,7 @@ constexpr auto d64_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
         if (delta_exp == 1)
         {
-            detail::fenv_round<decimal64>(sig_smaller, sign_smaller);
+            detail::fenv_round<decimal64_t>(sig_smaller, sign_smaller);
         }
     }
 
@@ -318,7 +318,7 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
 
-    if (delta_exp > detail::precision_v<decimal128> + 1)
+    if (delta_exp > detail::precision_v<decimal128_t> + 1)
     {
         // If the difference in exponents is more than the digits of accuracy
         // we return the larger of the two
@@ -328,7 +328,7 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
         return {lhs_sig, lhs_exp, lhs_sign};
     }
 
-    if (delta_exp == detail::precision_v<decimal128> + 1)
+    if (delta_exp == detail::precision_v<decimal128_t> + 1)
     {
         // Only need to see if we need to add one to the
         // significand of the bigger value
@@ -375,7 +375,7 @@ constexpr auto d128_add_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
 
         if (delta_exp == 1)
         {
-            detail::fenv_round<decimal128>(rhs_sig, rhs_sign);
+            detail::fenv_round<decimal128_t>(rhs_sig, rhs_sign);
         }
     }
 
@@ -406,7 +406,7 @@ constexpr auto d128_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
               << "\nStarting exp rhs: " << rhs_exp << std::endl;
     #endif
 
-    if (delta_exp > detail::precision_v<decimal128> + 1)
+    if (delta_exp > detail::precision_v<decimal128_t> + 1)
     {
         // If the difference in exponents is more than the digits of accuracy
         // we return the larger of the two
@@ -448,7 +448,7 @@ constexpr auto d128_add_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
         if (delta_exp == 1)
         {
-            detail::fenv_round<decimal128>(sig_smaller, sign_smaller);
+            detail::fenv_round<decimal128_t>(sig_smaller, sign_smaller);
         }
     }
 

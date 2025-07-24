@@ -21,9 +21,9 @@ void test()
 
 int main()
 {
-    test<decimal32>();
-    test<decimal64>();
-    test<decimal128>();
+    test<decimal32_t>();
+    test<decimal64_t>();
+    test<decimal128_t>();
 
     return 0;
 }

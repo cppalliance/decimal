@@ -13,7 +13,7 @@ void simple_test()
 {
     // a_flt  : -9.000000020492800e+00
 
-    using decimal_type = boost::decimal::decimal64;
+    using decimal_type = boost::decimal::decimal64_t;
     using float_type   = double;
 
     const auto a_flt0 = static_cast<float_type>(9.000000020492800e+00L);
@@ -48,7 +48,7 @@ void simple_test()
 
 void random_test()
 {
-    using decimal_type = boost::decimal::decimal64;
+    using decimal_type = boost::decimal::decimal64_t;
     using float_type   = double;
     
     std::mt19937_64 gen(42);

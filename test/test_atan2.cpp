@@ -46,7 +46,7 @@ using namespace boost::decimal;
 template <typename Dec>
 void test()
 {
-    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value ? N / 4 : N};
 
     for (std::size_t n {}; n < max_iter; ++n)
     {
@@ -100,7 +100,7 @@ void test()
     BOOST_TEST_EQ(atan2(Dec(2), Dec(1)), atan(Dec(2)));
 }
 
-template <typename Dec = decimal32>
+template <typename Dec = decimal32_t>
 void spot_test(float val1, float val2)
 {
     const auto ret_val {std::atan2(val1, val2)};
@@ -126,9 +126,9 @@ void spot_test(float val1, float val2)
 
 int main()
 {
-    test<decimal32>();
-    test<decimal64>();
-    test<decimal32_fast>();
+    test<decimal32_t>();
+    test<decimal64_t>();
+    test<decimal_fast32_t>();
 
     spot_test(2.36174F, 0.427896F);
 

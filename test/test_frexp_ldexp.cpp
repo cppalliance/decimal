@@ -76,7 +76,7 @@ namespace local
 
   auto test_frexp_ldexp_impl(const test_frexp_ldexp_ctrl& ctrl, const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = boost::decimal::decimal32_t;
 
     std::random_device rd;
     std::mt19937_64 gen(rd());
@@ -177,7 +177,7 @@ namespace local
   template<typename FloatingPointType>
   auto test_frexp_ldexp_exact_impl(long double f_in, long double fr_ctrl, int nr_ctrl) -> bool
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = boost::decimal::decimal32_t;
 
     using local_float_type = FloatingPointType;
 
@@ -219,7 +219,7 @@ namespace local
 
   auto test_frexp_edge() -> bool
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = boost::decimal::decimal32_t;
 
     constexpr decimal_type zero {0};
 
@@ -257,7 +257,7 @@ namespace local
 
   auto test_ldexp_edge() -> bool
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = boost::decimal::decimal32_t;
 
     auto result_is_ok = true;
 

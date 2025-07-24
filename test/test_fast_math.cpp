@@ -164,36 +164,36 @@ void test_comparisions()
 
 int main()
 {
-    random_addition<decimal32>();
-    random_subtraction<decimal32>();
-    random_multiplication<decimal32>();
-    random_division<decimal32>();
-    test_comparisions<decimal32>();
+    random_addition<decimal32_t>();
+    random_subtraction<decimal32_t>();
+    random_multiplication<decimal32_t>();
+    random_division<decimal32_t>();
+    test_comparisions<decimal32_t>();
 
-    random_addition<decimal32_fast>();
-    random_subtraction<decimal32_fast>();
-    random_multiplication<decimal32_fast>();
-    random_division<decimal32_fast>();
-    test_comparisions<decimal32_fast>();
+    random_addition<decimal_fast32_t>();
+    random_subtraction<decimal_fast32_t>();
+    random_multiplication<decimal_fast32_t>();
+    random_division<decimal_fast32_t>();
+    test_comparisions<decimal_fast32_t>();
 
-    random_addition<decimal64>();
-    random_subtraction<decimal64>();
-    random_multiplication<decimal64>();
-    random_division<decimal64>();
-    test_comparisions<decimal64>();
+    random_addition<decimal64_t>();
+    random_subtraction<decimal64_t>();
+    random_multiplication<decimal64_t>();
+    random_division<decimal64_t>();
+    test_comparisions<decimal64_t>();
 
-    random_addition<decimal64_fast>();
-    random_subtraction<decimal64_fast>();
-    random_multiplication<decimal64_fast>();
-    random_division<decimal64_fast>();
-    test_comparisions<decimal64_fast>();
+    random_addition<decimal_fast64_t>();
+    random_subtraction<decimal_fast64_t>();
+    random_multiplication<decimal_fast64_t>();
+    random_division<decimal_fast64_t>();
+    test_comparisions<decimal_fast64_t>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    random_addition<decimal128>();
-    random_subtraction<decimal128>();
-    random_multiplication<decimal128>();
-    random_division<decimal128>();
-    test_comparisions<decimal128>();
+    random_addition<decimal128_t>();
+    random_subtraction<decimal128_t>();
+    random_multiplication<decimal128_t>();
+    random_division<decimal128_t>();
+    test_comparisions<decimal128_t>();
     #endif
 
     return boost::report_errors();

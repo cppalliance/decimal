@@ -48,7 +48,7 @@ void test_remainder()
 {
     std::uniform_real_distribution<float> dist(-1e3F, 1e3F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -84,7 +84,7 @@ void test_remquo()
 {
     std::uniform_real_distribution<float> dist(-1e3F, 1e3F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -134,13 +134,13 @@ void test_remquo()
 
 int main()
 {
-    test_remquo<decimal32>();
-    test_remquo<decimal64>();
-    test_remquo<decimal128>();
+    test_remquo<decimal32_t>();
+    test_remquo<decimal64_t>();
+    test_remquo<decimal128_t>();
 
-    test_remainder<decimal32>();
-    test_remainder<decimal64>();
-    test_remainder<decimal128>();
+    test_remainder<decimal32_t>();
+    test_remainder<decimal64_t>();
+    test_remainder<decimal128_t>();
 
     return boost::report_errors();
 }

@@ -32,7 +32,7 @@ Contains all constants provided by C+\+20's `<numbers>` specialized for the deci
 | phi_v | https://en.wikipedia.org/wiki/Golden_ratio[The Golden Ratio]
 |===
 
-There are also non-template variables that provide the constant as a decimal64 type.
+There are also non-template variables that provide the constant as a decimal64_t type.
 
 == Reference
 
@@ -95,23 +95,23 @@ static constexpr Decimal egamma_v;
 template <typename Decimal>
 static constexpr Decimal phi_v;
 
-static constexpr decimal64 e {e_v<decimal64>};
-static constexpr decimal64 log2e {log2e_v<decimal64>};
-static constexpr decimal64 log10e {log10e_v<decimal64>};
-static constexpr decimal64 pi {pi_v<decimal64>};
-static constexpr decimal64 inv_pi {inv_pi_v<decimal64>};
-static constexpr decimal64 inv_sqrtpi {inv_sqrtpi_v<decimal64>};
-static constexpr decimal64 ln2 {ln2_v<decimal64>};
-static constexpr decimal64 ln10 {ln10_v<decimal64>};
-static constexpr decimal64 sqrt2 {sqrt2_v<decimal64>};
-static constexpr decimal64 sqrt3 {sqrt3_v<decimal64>};
-static constexpr decimal64 sqrt10 {sqrt10_v<decimal64>};
-static constexpr decimal64 inv_sqrt2 {inv_sqrt2_v<decimal64>};
-static constexpr decimal64 inv_sqrt3 {inv_sqrt3_v<decimal64>};
-static constexpr decimal64 cbrt2 {cbrt2_v<decimal64>};
-static constexpr decimal64 cbrt10 {cbrt10_v<decimal64>};
-static constexpr decimal64 egamma {egamma_v<decimal64>};
-static constexpr decimal64 phi {phi_v<decimal64>};
+static constexpr decimal64_t e {e_v<decimal64_t>};
+static constexpr decimal64_t log2e {log2e_v<decimal64_t>};
+static constexpr decimal64_t log10e {log10e_v<decimal64_t>};
+static constexpr decimal64_t pi {pi_v<decimal64_t>};
+static constexpr decimal64_t inv_pi {inv_pi_v<decimal64_t>};
+static constexpr decimal64_t inv_sqrtpi {inv_sqrtpi_v<decimal64_t>};
+static constexpr decimal64_t ln2 {ln2_v<decimal64_t>};
+static constexpr decimal64_t ln10 {ln10_v<decimal64_t>};
+static constexpr decimal64_t sqrt2 {sqrt2_v<decimal64_t>};
+static constexpr decimal64_t sqrt3 {sqrt3_v<decimal64_t>};
+static constexpr decimal64_t sqrt10 {sqrt10_v<decimal64_t>};
+static constexpr decimal64_t inv_sqrt2 {inv_sqrt2_v<decimal64_t>};
+static constexpr decimal64_t inv_sqrt3 {inv_sqrt3_v<decimal64_t>};
+static constexpr decimal64_t cbrt2 {cbrt2_v<decimal64_t>};
+static constexpr decimal64_t cbrt10 {cbrt10_v<decimal64_t>};
+static constexpr decimal64_t egamma {egamma_v<decimal64_t>};
+static constexpr decimal64_t phi {phi_v<decimal64_t>};
 
 } //namespace decimal
 } //namespace boost

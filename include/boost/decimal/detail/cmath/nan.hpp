@@ -32,9 +32,9 @@ constexpr auto nan_impl(const char* arg) noexcept -> TargetDecimalType
 
 } //namespace detail
 
-BOOST_DECIMAL_EXPORT constexpr auto nand32(const char* arg) noexcept -> decimal32
+BOOST_DECIMAL_EXPORT constexpr auto nand32(const char* arg) noexcept -> decimal32_t
 {
-    return detail::nan_impl<decimal32>(arg);
+    return detail::nan_impl<decimal32_t>(arg);
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
@@ -44,14 +44,14 @@ constexpr auto nan(const char* arg) noexcept
     return detail::nan_impl<T>(arg);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto nand64(const char* arg) noexcept -> decimal64
+BOOST_DECIMAL_EXPORT constexpr auto nand64(const char* arg) noexcept -> decimal64_t
 {
-    return detail::nan_impl<decimal64>(arg);
+    return detail::nan_impl<decimal64_t>(arg);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto nand128(const char* arg) noexcept -> decimal128
+BOOST_DECIMAL_EXPORT constexpr auto nand128(const char* arg) noexcept -> decimal128_t
 {
-    return detail::nan_impl<decimal128>(arg);
+    return detail::nan_impl<decimal128_t>(arg);
 }
 
 } //namespace decimal

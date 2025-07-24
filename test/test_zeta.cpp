@@ -236,7 +236,7 @@ auto test_riemann_zeta_edge() -> bool
 
 auto test_riemann_zeta_128_lo(const int tol_factor) -> bool
 {
-  using decimal_type = boost::decimal::decimal128;
+  using decimal_type = boost::decimal::decimal128_t;
 
   using str_ctrl_array_type = std::array<const char*, 3U>;
 
@@ -285,7 +285,7 @@ auto test_riemann_zeta_128_lo(const int tol_factor) -> bool
 
 auto test_riemann_zeta_128_hi(const int tol_factor) -> bool
 {
-  using decimal_type = boost::decimal::decimal128;
+  using decimal_type = boost::decimal::decimal128_t;
 
   using str_ctrl_array_type = std::array<const char*, 9U>;
 
@@ -345,7 +345,7 @@ int main()
   bool result_is_ok { true };
 
   {
-      using decimal_type = ::boost::decimal::decimal32;
+      using decimal_type = ::boost::decimal::decimal32_t;
 
       const bool result_edge_is_ok = local::test_riemann_zeta_edge<decimal_type, float>();
 
@@ -355,7 +355,7 @@ int main()
   }
 
   {
-      using decimal_type = ::boost::decimal::decimal32;
+      using decimal_type = ::boost::decimal::decimal32_t;
 
       const bool result_rz32_is_ok = local::test_riemann_zeta<decimal_type, float>(128, 1.1L, 5.6L);
 
@@ -365,7 +365,7 @@ int main()
   }
 
   {
-      using decimal_type = ::boost::decimal::decimal32;
+      using decimal_type = ::boost::decimal::decimal32_t;
 
       const bool result_rz32_is_ok = local::test_riemann_zeta<decimal_type, float>(1024, 1.01L, 1.1L);
 
@@ -375,7 +375,7 @@ int main()
   }
 
   {
-      using decimal_type = ::boost::decimal::decimal32_fast;
+      using decimal_type = ::boost::decimal::decimal_fast32_t;
 
       const bool result_rz32_is_ok = local::test_riemann_zeta<decimal_type, float>(1024, 1.01L, 1.1L);
 
@@ -385,7 +385,7 @@ int main()
   }
 
   {
-      using decimal_type = ::boost::decimal::decimal32;
+      using decimal_type = ::boost::decimal::decimal32_t;
 
       const bool result_rz32_is_ok = local::test_riemann_zeta<decimal_type, float>(512, -3.6L, -2.3L);
 
@@ -395,7 +395,7 @@ int main()
   }
 
   {
-      using decimal_type = ::boost::decimal::decimal64;
+      using decimal_type = ::boost::decimal::decimal64_t;
 
       const bool result_rz64_is_ok = local::test_riemann_zeta<decimal_type, double>(256, 1.1L, 12.3L);
 
@@ -405,7 +405,7 @@ int main()
   }
 
   {
-      using decimal_type = ::boost::decimal::decimal64;
+      using decimal_type = ::boost::decimal::decimal64_t;
 
       const bool result_rz64_is_ok = local::test_riemann_zeta<decimal_type, double>(1024, 1.01L, 1.1L);
 
@@ -415,7 +415,7 @@ int main()
   }
 
   {
-    using decimal_type = ::boost::decimal::decimal64_fast;
+    using decimal_type = ::boost::decimal::decimal_fast64_t;
 
     const bool result_rz64_is_ok = local::test_riemann_zeta<decimal_type, double>(256, 1.1L, 12.3L);
 
@@ -425,7 +425,7 @@ int main()
   }
 
   {
-    using decimal_type = ::boost::decimal::decimal64_fast;
+    using decimal_type = ::boost::decimal::decimal_fast64_t;
 
     const bool result_rz64_is_ok = local::test_riemann_zeta<decimal_type, double>(1024, 1.01L, 1.1L);
 

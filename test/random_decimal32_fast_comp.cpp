@@ -2,7 +2,7 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/decimal_fast32_t.hpp>
 #include <boost/decimal/iostream.hpp>
 #include <boost/decimal/cmath.hpp>
 #include <boost/core/lightweight_test.hpp>
@@ -30,8 +30,8 @@ void random_LT(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
         {
@@ -45,16 +45,16 @@ void random_LT(T lower, T upper)
     }
 
     // Edge cases
-    BOOST_TEST(decimal32_fast(dist(rng)) < std::numeric_limits<decimal32_fast>::infinity());
+    BOOST_TEST(decimal_fast32_t(dist(rng)) < std::numeric_limits<decimal_fast32_t>::infinity());
 
     // For some bizarre reason MSVC 14.2 with C++14 has an issue with this test when T = std::int64_t
     // All is well under every other language standard
     #if !defined(_MSC_VER) || (_MSC_VER >= 1930 || _MSVC_LANG > 201703L)
-    BOOST_TEST(!(decimal32_fast(dist(rng)) < -std::numeric_limits<decimal32_fast>::infinity()));
+    BOOST_TEST(!(decimal_fast32_t(dist(rng)) < -std::numeric_limits<decimal_fast32_t>::infinity()));
     #endif
 
-    BOOST_TEST(!(decimal32_fast(dist(rng)) < std::numeric_limits<decimal32_fast>::quiet_NaN()));
-    BOOST_TEST(!(std::numeric_limits<decimal32_fast>::quiet_NaN() < std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(!(decimal_fast32_t(dist(rng)) < std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
+    BOOST_TEST(!(std::numeric_limits<decimal_fast32_t>::quiet_NaN() < std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -67,8 +67,8 @@ void random_mixed_LT(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const T dec2 {static_cast<T>(decimal32_fast(val2))};
+        const decimal_fast32_t dec1 {val1};
+        const T dec2 {static_cast<T>(decimal_fast32_t(val2))};
 
         if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
         {
@@ -87,8 +87,8 @@ void random_mixed_LT(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const T dec1 {static_cast<T>(decimal32_fast(val1))};
-        const decimal32_fast dec2 {val2};
+        const T dec1 {static_cast<T>(decimal_fast32_t(val1))};
+        const decimal_fast32_t dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 < dec2, val1 < val2))
         {
@@ -102,10 +102,10 @@ void random_mixed_LT(T lower, T upper)
     }
 
     // Edge Cases
-    BOOST_TEST_EQ(decimal32_fast(1) < T(1), false);
-    BOOST_TEST_EQ(decimal32_fast(10) < T(10), false);
-    BOOST_TEST_EQ(T(1) < decimal32_fast(1), false);
-    BOOST_TEST_EQ(T(10) < decimal32_fast(10), false);
+    BOOST_TEST_EQ(decimal_fast32_t(1) < T(1), false);
+    BOOST_TEST_EQ(decimal_fast32_t(10) < T(10), false);
+    BOOST_TEST_EQ(T(1) < decimal_fast32_t(1), false);
+    BOOST_TEST_EQ(T(10) < decimal_fast32_t(10), false);
     BOOST_TEST_EQ(BOOST_DECIMAL_DEC_INFINITY < T(1), false);
     BOOST_TEST_EQ(-BOOST_DECIMAL_DEC_INFINITY < T(1), true);
     BOOST_TEST_EQ(BOOST_DECIMAL_DEC_NAN < T(1), false);
@@ -121,8 +121,8 @@ void random_LE(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 <= dec2, val1 <= val2))
         {
@@ -135,14 +135,14 @@ void random_LE(T lower, T upper)
         }
     }
 
-    BOOST_TEST(decimal32_fast(dist(rng)) <= std::numeric_limits<decimal32_fast>::infinity());
+    BOOST_TEST(decimal_fast32_t(dist(rng)) <= std::numeric_limits<decimal_fast32_t>::infinity());
 
     #if !defined(_MSC_VER) || (_MSC_VER >= 1930 || _MSVC_LANG > 201703L)
-    BOOST_TEST(!(decimal32_fast(dist(rng)) <= -std::numeric_limits<decimal32_fast>::infinity()));
+    BOOST_TEST(!(decimal_fast32_t(dist(rng)) <= -std::numeric_limits<decimal_fast32_t>::infinity()));
     #endif
 
-    BOOST_TEST(!(decimal32_fast(dist(rng)) <= std::numeric_limits<decimal32_fast>::quiet_NaN()));
-    BOOST_TEST(!(std::numeric_limits<decimal32_fast>::quiet_NaN() <= std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(!(decimal_fast32_t(dist(rng)) <= std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
+    BOOST_TEST(!(std::numeric_limits<decimal_fast32_t>::quiet_NaN() <= std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -155,8 +155,8 @@ void random_mixed_LE(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const T dec2 {static_cast<T>(decimal32_fast(val2))};
+        const decimal_fast32_t dec1 {val1};
+        const T dec2 {static_cast<T>(decimal_fast32_t(val2))};
 
         if (!BOOST_TEST_EQ(dec1 <= dec2, val1 <= val2))
         {
@@ -169,9 +169,9 @@ void random_mixed_LE(T lower, T upper)
         }
     }
 
-    BOOST_TEST(dist(rng) <= std::numeric_limits<decimal32_fast>::infinity());
-    BOOST_TEST(!(dist(rng) <= -std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST(!(dist(rng) <= std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(dist(rng) <= std::numeric_limits<decimal_fast32_t>::infinity());
+    BOOST_TEST(!(dist(rng) <= -std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST(!(dist(rng) <= std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -184,8 +184,8 @@ void random_GT(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 > dec2, val1 > val2))
         {
@@ -198,11 +198,11 @@ void random_GT(T lower, T upper)
         }
     }
 
-    const auto inf = std::numeric_limits<decimal32_fast>::infinity();
-    BOOST_TEST(!(decimal32_fast(dist(rng)) > inf));
-    BOOST_TEST((decimal32_fast(dist(rng)) > -inf));
-    BOOST_TEST(!(decimal32_fast(dist(rng)) > std::numeric_limits<decimal32_fast>::quiet_NaN()));
-    BOOST_TEST(!(std::numeric_limits<decimal32_fast>::quiet_NaN() > std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    const auto inf = std::numeric_limits<decimal_fast32_t>::infinity();
+    BOOST_TEST(!(decimal_fast32_t(dist(rng)) > inf));
+    BOOST_TEST((decimal_fast32_t(dist(rng)) > -inf));
+    BOOST_TEST(!(decimal_fast32_t(dist(rng)) > std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
+    BOOST_TEST(!(std::numeric_limits<decimal_fast32_t>::quiet_NaN() > std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -215,8 +215,8 @@ void random_mixed_GT(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const T dec2 {static_cast<T>(decimal32_fast(val2))};
+        const decimal_fast32_t dec1 {val1};
+        const T dec2 {static_cast<T>(decimal_fast32_t(val2))};
 
         if (!BOOST_TEST_EQ(dec1 > dec2, val1 > val2))
         {
@@ -229,9 +229,9 @@ void random_mixed_GT(T lower, T upper)
         }
     }
 
-    BOOST_TEST(!(dist(rng) > std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST((dist(rng) > -std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST(!(dist(rng) > std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(!(dist(rng) > std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST((dist(rng) > -std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST(!(dist(rng) > std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -244,8 +244,8 @@ void random_GE(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 >= dec2, val1 >= val2))
         {
@@ -258,15 +258,15 @@ void random_GE(T lower, T upper)
         }
     }
 
-    BOOST_TEST(!(decimal32_fast(dist(rng)) >= std::numeric_limits<decimal32_fast>::infinity()));
+    BOOST_TEST(!(decimal_fast32_t(dist(rng)) >= std::numeric_limits<decimal_fast32_t>::infinity()));
 
     // MSVC 14.2
     #if !defined(_MSC_VER)
-    BOOST_TEST((decimal32_fast(dist(rng)) >= -std::numeric_limits<decimal32_fast>::infinity()));
+    BOOST_TEST((decimal_fast32_t(dist(rng)) >= -std::numeric_limits<decimal_fast32_t>::infinity()));
     #endif
 
-    BOOST_TEST(!(decimal32_fast(dist(rng)) >= std::numeric_limits<decimal32_fast>::quiet_NaN()));
-    BOOST_TEST(!(std::numeric_limits<decimal32_fast>::quiet_NaN() >= std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(!(decimal_fast32_t(dist(rng)) >= std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
+    BOOST_TEST(!(std::numeric_limits<decimal_fast32_t>::quiet_NaN() >= std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -279,8 +279,8 @@ void random_mixed_GE(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const T dec2 {static_cast<T>(decimal32_fast(val2))};
+        const decimal_fast32_t dec1 {val1};
+        const T dec2 {static_cast<T>(decimal_fast32_t(val2))};
 
         if (!BOOST_TEST_EQ(dec1 >= dec2, val1 >= val2))
         {
@@ -293,9 +293,9 @@ void random_mixed_GE(T lower, T upper)
         }
     }
 
-    BOOST_TEST(!(dist(rng) >= std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST((dist(rng) >= -std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST(!(dist(rng) >= std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(!(dist(rng) >= std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST((dist(rng) >= -std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST(!(dist(rng) >= std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -308,8 +308,8 @@ void random_EQ(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
@@ -322,8 +322,8 @@ void random_EQ(T lower, T upper)
         }
     }
 
-    BOOST_TEST(!(std::numeric_limits<decimal32_fast>::quiet_NaN() == std::numeric_limits<decimal32_fast>::quiet_NaN()));
-    BOOST_TEST(decimal32_fast{0} == -decimal32_fast{0});
+    BOOST_TEST(!(std::numeric_limits<decimal_fast32_t>::quiet_NaN() == std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
+    BOOST_TEST(decimal_fast32_t{0} == -decimal_fast32_t{0});
 }
 
 template <typename T>
@@ -336,8 +336,8 @@ void random_mixed_EQ(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const T dec2 {static_cast<T>(decimal32_fast(val2))};
+        const decimal_fast32_t dec1 {val1};
+        const T dec2 {static_cast<T>(decimal_fast32_t(val2))};
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
@@ -355,8 +355,8 @@ void random_mixed_EQ(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const T dec1 {static_cast<T>(decimal32_fast(val1))};
-        const decimal32_fast dec2 {val2};
+        const T dec1 {static_cast<T>(decimal_fast32_t(val1))};
+        const decimal_fast32_t dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 == dec2, val1 == val2))
         {
@@ -370,12 +370,12 @@ void random_mixed_EQ(T lower, T upper)
     }
 
     // Edge Cases
-    BOOST_TEST_EQ(decimal32_fast(1), T(1));
-    BOOST_TEST_EQ(decimal32_fast(10), T(10));
-    BOOST_TEST_EQ(decimal32_fast(100), T(100));
-    BOOST_TEST_EQ(decimal32_fast(1000), T(1000));
-    BOOST_TEST_EQ(decimal32_fast(10000), T(10000));
-    BOOST_TEST_EQ(decimal32_fast(100000), T(100000));
+    BOOST_TEST_EQ(decimal_fast32_t(1), T(1));
+    BOOST_TEST_EQ(decimal_fast32_t(10), T(10));
+    BOOST_TEST_EQ(decimal_fast32_t(100), T(100));
+    BOOST_TEST_EQ(decimal_fast32_t(1000), T(1000));
+    BOOST_TEST_EQ(decimal_fast32_t(10000), T(10000));
+    BOOST_TEST_EQ(decimal_fast32_t(100000), T(100000));
     BOOST_TEST_EQ(BOOST_DECIMAL_DEC_NAN == T(1), false);
     BOOST_TEST_EQ(BOOST_DECIMAL_DEC_INFINITY == T(1), false);
 }
@@ -390,8 +390,8 @@ void random_NE(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
         if (!BOOST_TEST_EQ(dec1 != dec2, val1 != val2))
         {
@@ -404,8 +404,8 @@ void random_NE(T lower, T upper)
         }
     }
 
-    BOOST_TEST((std::numeric_limits<decimal32_fast>::quiet_NaN() != std::numeric_limits<decimal32_fast>::quiet_NaN()));
-    BOOST_TEST(!(decimal32_fast{0} != -decimal32_fast{0}));
+    BOOST_TEST((std::numeric_limits<decimal_fast32_t>::quiet_NaN() != std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
+    BOOST_TEST(!(decimal_fast32_t{0} != -decimal_fast32_t{0}));
 }
 
 template <typename T>
@@ -418,8 +418,8 @@ void random_mixed_NE(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const T dec2 {static_cast<T>(decimal32_fast(val2))};
+        const decimal_fast32_t dec1 {val1};
+        const T dec2 {static_cast<T>(decimal_fast32_t(val2))};
 
         if (!BOOST_TEST_EQ(dec1 != dec2, val1 != val2))
         {
@@ -444,8 +444,8 @@ void random_SPACESHIP(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
         if (!BOOST_TEST((dec1 <=> dec2) == (val1 <=> val2)))
         {
@@ -458,8 +458,8 @@ void random_SPACESHIP(T lower, T upper)
         }
     }
 
-    BOOST_TEST((decimal32_fast(dist(rng)) <=> std::numeric_limits<decimal32_fast>::quiet_NaN()) == std::partial_ordering::unordered);
-    BOOST_TEST((std::numeric_limits<decimal32_fast>::quiet_NaN() <=> std::numeric_limits<decimal32_fast>::quiet_NaN()) == std::partial_ordering::unordered);
+    BOOST_TEST((decimal_fast32_t(dist(rng)) <=> std::numeric_limits<decimal_fast32_t>::quiet_NaN()) == std::partial_ordering::unordered);
+    BOOST_TEST((std::numeric_limits<decimal_fast32_t>::quiet_NaN() <=> std::numeric_limits<decimal_fast32_t>::quiet_NaN()) == std::partial_ordering::unordered);
 }
 
 template <typename T>
@@ -472,8 +472,8 @@ void random_mixed_SPACESHIP(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const T dec2 {static_cast<T>(decimal32_fast(val2))};
+        const decimal_fast32_t dec1 {val1};
+        const T dec2 {static_cast<T>(decimal_fast32_t(val2))};
 
         if (!BOOST_TEST((dec1 <=> dec2) == (val1 <=> val2)))
         {
@@ -486,10 +486,10 @@ void random_mixed_SPACESHIP(T lower, T upper)
         }
     }
 
-    if (!BOOST_TEST((dist(rng) <=> std::numeric_limits<decimal32_fast>::quiet_NaN()) == std::partial_ordering::unordered))
+    if (!BOOST_TEST((dist(rng) <=> std::numeric_limits<decimal_fast32_t>::quiet_NaN()) == std::partial_ordering::unordered))
     {
         // LCOV_EXCL_START
-        const auto eval {dist(rng) <=> std::numeric_limits<decimal32_fast>::quiet_NaN()};
+        const auto eval {dist(rng) <=> std::numeric_limits<decimal_fast32_t>::quiet_NaN()};
         if (eval == std::partial_ordering::less)
             std::cerr << "Less" << std::endl;
         else if (eval == std::partial_ordering::greater)
@@ -501,7 +501,7 @@ void random_mixed_SPACESHIP(T lower, T upper)
         // LCOV_EXCL_STOP
     }
 
-    BOOST_TEST((std::numeric_limits<decimal32_fast>::quiet_NaN() <=> std::numeric_limits<decimal32_fast>::quiet_NaN()) == std::partial_ordering::unordered);
+    BOOST_TEST((std::numeric_limits<decimal_fast32_t>::quiet_NaN() <=> std::numeric_limits<decimal_fast32_t>::quiet_NaN()) == std::partial_ordering::unordered);
 }
 #endif
 
@@ -607,8 +607,8 @@ int main()
     random_mixed_SPACESHIP(std::numeric_limits<unsigned long long>::min(), std::numeric_limits<unsigned long long>::max());
     #endif
 
-    constexpr auto pos_zero = boost::decimal::decimal32_fast{0U, 0, false};
-    constexpr auto neg_zero = boost::decimal::decimal32_fast{0U, 0, true};
+    constexpr auto pos_zero = boost::decimal::decimal_fast32_t{0U, 0, false};
+    constexpr auto neg_zero = boost::decimal::decimal_fast32_t{0U, 0, true};
     BOOST_TEST_EQ(pos_zero, neg_zero);
 
     return boost::report_errors();

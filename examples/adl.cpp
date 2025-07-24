@@ -31,9 +31,9 @@ int main()
     test(-0.5);
     test(-0.5L);
 
-    test(boost::decimal::decimal32{-5, -1});
-    test(boost::decimal::decimal64{-5, -1});
-    test(boost::decimal::decimal128{-5, -1});
+    test(boost::decimal::decimal32_t{-5, -1});
+    test(boost::decimal::decimal64_t{-5, -1});
+    test(boost::decimal::decimal128_t{-5, -1});
 
     return error_counter;
 }

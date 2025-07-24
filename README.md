@@ -67,9 +67,9 @@ Decimal provides 3 IEEE-754 compliant types:
 namespace boost {
 namespace decimal {
 
-class decimal32;
-class decimal64;
-class decimal128;
+class decimal32_t;
+class decimal64_t;
+class decimal128_t;
 
 } //namespace decimal
 } //namespace boost
@@ -81,9 +81,9 @@ and also 3 similar but non-compliant types with improved runtime performance:
 namespace boost {
 namespace decimal {
 
-class decimal32_fast;
-class decimal64_fast;
-class decimal128_fast;
+class decimal_fast32_t;
+class decimal_fast64_t;
+class decimal_fast128_t;
 
 } //namespace decimal
 } //namespace boost
@@ -103,10 +103,10 @@ Using the decimal types is simple.
 
 int main()
 {
-    using boost::decimal::decimal32;
+    using boost::decimal::decimal32_t;
 
-    constexpr decimal32 a {2, -1}; // Constructs the number 0.2
-    constexpr decimal32 b {1, -1}; // Constructs the number 0.1
+    constexpr decimal32_t a {2, -1}; // Constructs the number 0.2
+    constexpr decimal32_t b {1, -1}; // Constructs the number 0.1
     auto sum {a + b};
 
     std::cout << sum << std::endl; // prints 0.3
@@ -133,7 +133,7 @@ int main()
 {
     using namespace boost::decimal;
 
-    decimal64 val {-0.25}; // Construction from a double
+    decimal64_t val {-0.25}; // Construction from a double
     val = abs(val); // DO NOT call std::abs
 
     char buffer[256];
@@ -141,7 +141,7 @@ int main()
     assert(r_to); // checks std::errc()
     *r_to.ptr = '\0';
 
-    decimal64 return_value;
+    decimal64_t return_value;
     auto r_from = from_chars(buffer, buffer + std::strlen(buffer), return_value);
 
     assert(val == return_value);

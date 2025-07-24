@@ -25,46 +25,46 @@ void test_constructor_rounding()
     boost::decimal::fesetround(rounding_mode::fe_dec_to_nearest_from_zero);
     BOOST_TEST(boost::decimal::fegetround() == rounding_mode::fe_dec_to_nearest_from_zero);
 
-    BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
-    BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'568, 1));
-    BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'568, 1));
+    BOOST_TEST_EQ(decimal32_t(1, 0), decimal32_t(1, 0));
+    BOOST_TEST_EQ(decimal32_t(12'345'675, 0), decimal32_t(1'234'568, 1));
+    BOOST_TEST_EQ(decimal32_t(-12'345'675, 0), decimal32_t(-1'234'568, 1));
 
     // Downward
     boost::decimal::fesetround(rounding_mode::fe_dec_downward);
     BOOST_TEST(boost::decimal::fegetround() == rounding_mode::fe_dec_downward);
 
-    BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
-    BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'567, 1));
-    BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'568, 1));
+    BOOST_TEST_EQ(decimal32_t(1, 0), decimal32_t(1, 0));
+    BOOST_TEST_EQ(decimal32_t(12'345'675, 0), decimal32_t(1'234'567, 1));
+    BOOST_TEST_EQ(decimal32_t(-12'345'675, 0), decimal32_t(-1'234'568, 1));
 
     // To nearest (ties go to even)
     boost::decimal::fesetround(rounding_mode::fe_dec_to_nearest);
     BOOST_TEST(boost::decimal::fegetround() == rounding_mode::fe_dec_to_nearest);
 
-    BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
-    BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'568, 1));
-    BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'568, 1));
-    BOOST_TEST_EQ(decimal32(55'555'555, 0), decimal32(5'555'556, 1));
-    BOOST_TEST_EQ(decimal32(55'555'556, 0), decimal32(5'555'556, 1));
+    BOOST_TEST_EQ(decimal32_t(1, 0), decimal32_t(1, 0));
+    BOOST_TEST_EQ(decimal32_t(12'345'675, 0), decimal32_t(1'234'568, 1));
+    BOOST_TEST_EQ(decimal32_t(-12'345'675, 0), decimal32_t(-1'234'568, 1));
+    BOOST_TEST_EQ(decimal32_t(55'555'555, 0), decimal32_t(5'555'556, 1));
+    BOOST_TEST_EQ(decimal32_t(55'555'556, 0), decimal32_t(5'555'556, 1));
 
     // Toward zero
     boost::decimal::fesetround(rounding_mode::fe_dec_toward_zero);
     BOOST_TEST(boost::decimal::fegetround() == rounding_mode::fe_dec_toward_zero);
 
-    BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
-    BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'567, 1));
-    BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'567, 1));
+    BOOST_TEST_EQ(decimal32_t(1, 0), decimal32_t(1, 0));
+    BOOST_TEST_EQ(decimal32_t(12'345'675, 0), decimal32_t(1'234'567, 1));
+    BOOST_TEST_EQ(decimal32_t(-12'345'675, 0), decimal32_t(-1'234'567, 1));
 
     // Upward
     boost::decimal::fesetround(rounding_mode::fe_dec_upward);
     BOOST_TEST(boost::decimal::fegetround() == rounding_mode::fe_dec_upward);
 
-    BOOST_TEST_EQ(decimal32(1, 0), decimal32(1, 0));
-    BOOST_TEST_EQ(decimal32(12'345'675, 0), decimal32(1'234'568, 1));
-    BOOST_TEST_EQ(decimal32(-12'345'675, 0), decimal32(-1'234'567, 1));
+    BOOST_TEST_EQ(decimal32_t(1, 0), decimal32_t(1, 0));
+    BOOST_TEST_EQ(decimal32_t(12'345'675, 0), decimal32_t(1'234'568, 1));
+    BOOST_TEST_EQ(decimal32_t(-12'345'675, 0), decimal32_t(-1'234'567, 1));
 
     // Edge case
-    BOOST_TEST_EQ(decimal32(99'999'999), decimal32(1, 8));
+    BOOST_TEST_EQ(decimal32_t(99'999'999), decimal32_t(1, 8));
 }
 
 int main()

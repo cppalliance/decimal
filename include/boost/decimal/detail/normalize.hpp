@@ -16,7 +16,7 @@ namespace decimal {
 namespace detail {
 
 // Converts the significand to full precision to remove the effects of cohorts
-template <typename TargetDecimalType = decimal32, typename T1, typename T2>
+template <typename TargetDecimalType = decimal32_t, typename T1, typename T2>
 constexpr auto normalize(T1& significand, T2& exp, bool sign = false) noexcept -> void
 {
     constexpr auto target_precision {detail::precision_v<TargetDecimalType>};

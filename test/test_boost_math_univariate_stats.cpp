@@ -620,38 +620,38 @@ void test_mode()
 
 int main()
 {
-    test_mean<decimal32>();
-    test_mean<decimal64>();
+    test_mean<decimal32_t>();
+    test_mean<decimal64_t>();
 
-    test_variance<decimal32>();
-    test_variance<decimal64>();
+    test_variance<decimal32_t>();
+    test_variance<decimal64_t>();
 
-    test_skewness<decimal32>();
-    test_skewness<decimal64>();
+    test_skewness<decimal32_t>();
+    test_skewness<decimal64_t>();
 
-    test_kurtosis<decimal32>();
-    test_kurtosis<decimal64>();
+    test_kurtosis<decimal32_t>();
+    test_kurtosis<decimal64_t>();
 
-    test_first_four_moments<decimal32>();
-    test_first_four_moments<decimal64>();
+    test_first_four_moments<decimal32_t>();
+    test_first_four_moments<decimal64_t>();
 
-    test_median<decimal32>();
-    test_median<decimal64>();
+    test_median<decimal32_t>();
+    test_median<decimal64_t>();
 
-    test_median_absolute_deviation<decimal32>();
-    test_median_absolute_deviation<decimal64>();
+    test_median_absolute_deviation<decimal32_t>();
+    test_median_absolute_deviation<decimal64_t>();
 
-    test_sample_gini_coefficient<decimal32>();
-    test_sample_gini_coefficient<decimal64>();
+    test_sample_gini_coefficient<decimal32_t>();
+    test_sample_gini_coefficient<decimal64_t>();
 
-    test_gini_coefficient<decimal32>();
-    test_gini_coefficient<decimal64>();
+    test_gini_coefficient<decimal32_t>();
+    test_gini_coefficient<decimal64_t>();
 
-    test_interquartile_range<decimal32>();
-    test_interquartile_range<decimal64>();
+    test_interquartile_range<decimal32_t>();
+    test_interquartile_range<decimal64_t>();
 
-    test_mode<decimal32>();
-    test_mode<decimal64>();
+    test_mode<decimal32_t>();
+    test_mode<decimal64_t>();
 
     return boost::report_errors();
 }

@@ -17,7 +17,7 @@ The following from <limits> are overloaded for each type with associated values 
 namespace std {
 
 template <>
-struct numeric_limits<boost::decimal::decimal32>
+struct numeric_limits<boost::decimal::decimal32_t>
 {
     static constexpr bool is_specialized = true;
     static constexpr bool is_signed = true;
@@ -47,19 +47,19 @@ struct numeric_limits<boost::decimal::decimal32>
     static constexpr bool tinyness_before = true;
 
     // Member functions
-    static constexpr boost::decimal::decimal32 min()
-    static constexpr boost::decimal::decimal32 max();
-    static constexpr boost::decimal::decimal32 lowest();
-    static constexpr boost::decimal::decimal32 epsilon();
-    static constexpr boost::decimal::decimal32 round_error();
-    static constexpr boost::decimal::decimal32 infinity();
-    static constexpr boost::decimal::decimal32 quiet_NaN();
-    static constexpr boost::decimal::decimal32 signaling_NaN();
-    static constexpr boost::decimal::decimal32 denorm_min();
+    static constexpr boost::decimal::decimal32_t min()
+    static constexpr boost::decimal::decimal32_t max();
+    static constexpr boost::decimal::decimal32_t lowest();
+    static constexpr boost::decimal::decimal32_t epsilon();
+    static constexpr boost::decimal::decimal32_t round_error();
+    static constexpr boost::decimal::decimal32_t infinity();
+    static constexpr boost::decimal::decimal32_t quiet_NaN();
+    static constexpr boost::decimal::decimal32_t signaling_NaN();
+    static constexpr boost::decimal::decimal32_t denorm_min();
 };
 
 template <>
-struct numeric_limits<boost::decimal::decimal64>
+struct numeric_limits<boost::decimal::decimal64_t>
 {
     static constexpr bool is_specialized = true;
     static constexpr bool is_signed = true;
@@ -89,19 +89,19 @@ struct numeric_limits<boost::decimal::decimal64>
     static constexpr bool tinyness_before = true;
 
     // Member functions
-    static constexpr boost::decimal::decimal64 min()
-    static constexpr boost::decimal::decimal64 max();
-    static constexpr boost::decimal::decimal64 lowest();
-    static constexpr boost::decimal::decimal64 epsilon();
-    static constexpr boost::decimal::decimal64 round_error();
-    static constexpr boost::decimal::decimal64 infinity();
-    static constexpr boost::decimal::decimal64 quiet_NaN();
-    static constexpr boost::decimal::decimal64 signaling_NaN();
-    static constexpr boost::decimal::decimal64 denorm_min();
+    static constexpr boost::decimal::decimal64_t min()
+    static constexpr boost::decimal::decimal64_t max();
+    static constexpr boost::decimal::decimal64_t lowest();
+    static constexpr boost::decimal::decimal64_t epsilon();
+    static constexpr boost::decimal::decimal64_t round_error();
+    static constexpr boost::decimal::decimal64_t infinity();
+    static constexpr boost::decimal::decimal64_t quiet_NaN();
+    static constexpr boost::decimal::decimal64_t signaling_NaN();
+    static constexpr boost::decimal::decimal64_t denorm_min();
 };
 
 template<>
-struct numeric_limits<boost::decimal::decimal128>
+struct numeric_limits<boost::decimal::decimal128_t>
 {
     static constexpr bool is_specialized = true;
     static constexpr bool is_signed = true;
@@ -131,15 +131,15 @@ struct numeric_limits<boost::decimal::decimal128>
     static constexpr bool tinyness_before = true;
 
     // Member functions
-    static constexpr boost::decimal::decimal128 min()
-    static constexpr boost::decimal::decimal128 max();
-    static constexpr boost::decimal::decimal128 lowest();
-    static constexpr boost::decimal::decimal128 epsilon();
-    static constexpr boost::decimal::decimal128 round_error();
-    static constexpr boost::decimal::decimal128 infinity();
-    static constexpr boost::decimal::decimal128 quiet_NaN();
-    static constexpr boost::decimal::decimal128 signaling_NaN();
-    static constexpr boost::decimal::decimal128 denorm_min();
+    static constexpr boost::decimal::decimal128_t min()
+    static constexpr boost::decimal::decimal128_t max();
+    static constexpr boost::decimal::decimal128_t lowest();
+    static constexpr boost::decimal::decimal128_t epsilon();
+    static constexpr boost::decimal::decimal128_t round_error();
+    static constexpr boost::decimal::decimal128_t infinity();
+    static constexpr boost::decimal::decimal128_t quiet_NaN();
+    static constexpr boost::decimal::decimal128_t signaling_NaN();
+    static constexpr boost::decimal::decimal128_t denorm_min();
 };
 
 } // Namespace std

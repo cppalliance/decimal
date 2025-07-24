@@ -15,15 +15,15 @@ enums, constants and macros that are provided in this library.
 
 === IEEE 754 Compliant Types
 
-- xref:decimal32.adoc[decimal32]
-- xref:decimal64.adoc[decimal64]
-- xref:decimal128.adoc[decima128]
+- xref:decimal32_t.adoc[decimal32_t]
+- xref:decimal64_t.adoc[decimal64_t]
+- xref:decimal128_t.adoc[decima128]
 
 === Non-IEEE 754 Compliant Types
 
-- xref:decimal32_fast.adoc[decimal32_fast]
-- xref:decimal64_fast.adoc[decimal64_fast]
-- xref:decimal128_fast.adoc[decimal128_fast]
+- xref:decimal_fast32_t.adoc[decimal_fast32_t]
+- xref:decimal_fast64_t.adoc[decimal_fast64_t]
+- xref:decimal_fast128_t.adoc[decimal_fast128_t]
 
 == Structures
 

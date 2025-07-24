@@ -184,7 +184,7 @@ int main()
 {
     using namespace boost::decimal;
 
-    decimal32 val {5, -1};
+    decimal32_t val {5, -1};
 
     char buffer[limits<T>::max_chars];
 

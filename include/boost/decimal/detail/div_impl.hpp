@@ -54,11 +54,11 @@ constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> Deci
 
     // If rhs is greater than we need to offset the significands to get the correct values
     // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64>))};
+    constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64_t>))};
     const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.sig) * tens_needed};
 
     auto res_sig {big_sig_lhs / rhs.sig};
-    auto res_exp {(lhs.exp - detail::precision_v<decimal64>) - rhs.exp};
+    auto res_exp {(lhs.exp - detail::precision_v<decimal64_t>) - rhs.exp};
 
     if (res_sig == 0U)
     {
@@ -74,11 +74,11 @@ constexpr auto d128_generic_div_impl(const T& lhs, const T& rhs, T& q) noexcept 
 {
     bool sign {lhs.sign != rhs.sign};
 
-    constexpr auto ten_pow_precision {pow10(int128::uint128_t(detail::precision_v<decimal128>))};
+    constexpr auto ten_pow_precision {pow10(int128::uint128_t(detail::precision_v<decimal128_t>))};
     const auto big_sig_lhs {detail::umul256(lhs.sig, ten_pow_precision)};
 
     auto res_sig {big_sig_lhs / rhs.sig};
-    auto res_exp {lhs.exp - rhs.exp - detail::precision_v<decimal128>};
+    auto res_exp {lhs.exp - rhs.exp - detail::precision_v<decimal128_t>};
 
     if (res_sig[3] != 0 || res_sig[2] != 0)
     {

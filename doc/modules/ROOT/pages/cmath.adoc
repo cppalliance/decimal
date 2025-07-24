@@ -65,9 +65,9 @@ constexpr DecimalType fmin(DecimalType x, DecimalType y, int* quo) noexcept;
 template <typename DecimalType>
 constexpr DecimalType fdim(DecimalType x, DecimalType y, int* quo) noexcept;
 
-constexpr decimal32 nand32(const char* arg) noexcept;
-constexpr decimal64 nand64(const char* arg) noexcept;
-constexpr decimal128 nand128(const char* arg) noexcept;
+constexpr decimal32_t nand32(const char* arg) noexcept;
+constexpr decimal64_t nand64(const char* arg) noexcept;
+constexpr decimal128_t nand128(const char* arg) noexcept;
 
 } // namespace decimal
 } // namespace boost
@@ -518,9 +518,9 @@ Effects: If x is an sNaN returns true, otherwise returns false.
 template <typename Decimal>
 constexpr bool samequantum(Decimal x, Decimal y) noexcept;
 
-constexpr bool samequantumd32(decimal32 x, decimal32 y) noexcept;
-constexpr bool samequantumd64(decimal64 x, decimal64 y) noexcept;
-constexpr bool samequantumd128(decimal128 x, decimal128 y) noexcept;
+constexpr bool samequantumd32(decimal32_t x, decimal32_t y) noexcept;
+constexpr bool samequantumd64(decimal64_t x, decimal64_t y) noexcept;
+constexpr bool samequantumd128(decimal128_t x, decimal128_t y) noexcept;
 ----
 
 Effects: Determines if the quantum (unbiased) exponents of x and y are the same.
@@ -537,9 +537,9 @@ If exactly one operand is infinity or exactly one operand is NaN, they do not ha
 template <typename Decimal>
 constexpr int quantexp(Decimal x) noexcept;
 
-constexpr int quantexp32(decimal32 x) noexcept;
-constexpr int quantexp64(decimal64 x) noexcept;
-constexpr int quantexp128(decimal128 x) noexcept;
+constexpr int quantexp32(decimal32_t x) noexcept;
+constexpr int quantexp64(decimal64_t x) noexcept;
+constexpr int quantexp128(decimal128_t x) noexcept;
 ----
 
 Effects: if x is finite, returns its quantum exponent.
@@ -554,9 +554,9 @@ Otherwise, `INT_MIN` is returned.
 template <typename Decimal>
 constexpr Decimal quantized(Decimal x, Decimal y) noexcept;
 
-constexpr decimal32 quantized32(decimal32 x, decimal32 y) noexcept;
-constexpr decimal64 quantized64(decimal64 x, decimal64 y) noexcept;
-constexpr decimal128 quantized128(decimal128 x, decimal128 y) noexcept;
+constexpr decimal32_t quantized32(decimal32_t x, decimal32_t y) noexcept;
+constexpr decimal64_t quantized64(decimal64_t x, decimal64_t y) noexcept;
+constexpr decimal128_t quantized128(decimal128_t x, decimal128_t y) noexcept;
 ----
 
 Returns: a number that is equal in value (except for any rounding) and sign to x, and which has an exponent set to be equal to the exponent of y.
@@ -582,13 +582,13 @@ The quantize functions do not signal underflow.
 template <typename Decimal>
 constexpr auto frexp10(Decimal num, int* expptr) noexcept;
 
-constexpr std::uint32_t frexpd32(decimal32 num, int* expptr) noexcept;
-constexpr std::uint64_t frexpd64(decimal64 num, int* expptr) noexcept;
-constexpr boost::decimal::detail::uint128 frexpd128(decimal128 num, int* expptr) noexcept;
+constexpr std::uint32_t frexpd32(decimal32_t num, int* expptr) noexcept;
+constexpr std::uint64_t frexpd64(decimal64_t num, int* expptr) noexcept;
+constexpr boost::decimal::detail::uint128 frexpd128(decimal128_t num, int* expptr) noexcept;
 ----
 
 This function is very similar to https://en.cppreference.com/w/cpp/numeric/math/frexp[frexp], but returns the significand and an integral power of 10 since the `FLT_RADIX` of this type is 10.
-The significand is normalized to the number of digits of precision the type has (e.g. for decimal32 it is [1'000'000, 9'999'999]).
+The significand is normalized to the number of digits of precision the type has (e.g. for decimal32_t it is [1'000'000, 9'999'999]).
 
 === rescale
 

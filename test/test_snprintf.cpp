@@ -2,9 +2,9 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/decimal64.hpp>
-#include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
 #include <boost/decimal/cstdio.hpp>
 #include <iostream>
 #include <iomanip>
@@ -102,7 +102,7 @@ void test_locales()
     // LCOV_EXCL_STOP
 
     char printf_buffer[256];
-    snprintf(printf_buffer, sizeof(printf_buffer), "%.4De", decimal64{11897, -2});
+    snprintf(printf_buffer, sizeof(printf_buffer), "%.4De", decimal64_t{11897, -2});
     BOOST_TEST_CSTR_EQ(printf_buffer, buffer);
 }
 #endif
@@ -111,41 +111,41 @@ template <typename T>
 void test_bootstrap()
 {
     constexpr std::size_t N = 128;
-    const char* format = std::is_same<T, decimal32>::value ? "%H" :
-                         std::is_same<T, decimal64>::value ? "%D" : "%DD";
+    const char* format = std::is_same<T, decimal32_t>::value ? "%H" :
+                         std::is_same<T, decimal64_t>::value ? "%D" : "%DD";
 
-    const char* general_format = std::is_same<T, decimal32>::value ? "%Hg" :
-                                 std::is_same<T, decimal64>::value ? "%Dg" : "%DDg";
+    const char* general_format = std::is_same<T, decimal32_t>::value ? "%Hg" :
+                                 std::is_same<T, decimal64_t>::value ? "%Dg" : "%DDg";
 
-    const char* general_upper_format = std::is_same<T, decimal32>::value ? "%HG" :
-                                       std::is_same<T, decimal64>::value ? "%DG" : "%DDG";
+    const char* general_upper_format = std::is_same<T, decimal32_t>::value ? "%HG" :
+                                       std::is_same<T, decimal64_t>::value ? "%DG" : "%DDG";
 
-    const char* three_digit_format = std::is_same<T, decimal32>::value ? "%.3H" :
-                                     std::is_same<T, decimal64>::value ? "%.3D" : "%.3DD";
+    const char* three_digit_format = std::is_same<T, decimal32_t>::value ? "%.3H" :
+                                     std::is_same<T, decimal64_t>::value ? "%.3D" : "%.3DD";
 
-    const char* scientific_format = std::is_same<T, decimal32>::value ? "%He" :
-                                    std::is_same<T, decimal64>::value ? "%De" : "%DDe";
+    const char* scientific_format = std::is_same<T, decimal32_t>::value ? "%He" :
+                                    std::is_same<T, decimal64_t>::value ? "%De" : "%DDe";
 
-    const char* four_digit_scientific_format = std::is_same<T, decimal32>::value ? "%.4He" :
-                                               std::is_same<T, decimal64>::value ? "%.4De" : "%.4DDe";
+    const char* four_digit_scientific_format = std::is_same<T, decimal32_t>::value ? "%.4He" :
+                                               std::is_same<T, decimal64_t>::value ? "%.4De" : "%.4DDe";
 
-    const char* four_digit_upper_sci_format =  std::is_same<T, decimal32>::value ? "%.5HE" :
-                                               std::is_same<T, decimal64>::value ? "%.5DE" : "%.5DDE";
+    const char* four_digit_upper_sci_format =  std::is_same<T, decimal32_t>::value ? "%.5HE" :
+                                               std::is_same<T, decimal64_t>::value ? "%.5DE" : "%.5DDE";
 
-    const char* fixed_format = std::is_same<T, decimal32>::value ? "%Hf" :
-                               std::is_same<T, decimal64>::value ? "%Df" : "%DDf";
+    const char* fixed_format = std::is_same<T, decimal32_t>::value ? "%Hf" :
+                               std::is_same<T, decimal64_t>::value ? "%Df" : "%DDf";
 
-    const char* two_digit_fixed_format = std::is_same<T, decimal32>::value ? "%.2Hf" :
-                                         std::is_same<T, decimal64>::value ? "%.2Df" : "%.2DDf";
+    const char* two_digit_fixed_format = std::is_same<T, decimal32_t>::value ? "%.2Hf" :
+                                         std::is_same<T, decimal64_t>::value ? "%.2Df" : "%.2DDf";
 
-    const char* hex_format = std::is_same<T, decimal32>::value ? "%Ha" :
-                             std::is_same<T, decimal64>::value ? "%Da" : "%DDa";
+    const char* hex_format = std::is_same<T, decimal32_t>::value ? "%Ha" :
+                             std::is_same<T, decimal64_t>::value ? "%Da" : "%DDa";
 
-    const char* hex_upper_format = std::is_same<T, decimal32>::value ? "%HA" :
-                                   std::is_same<T, decimal64>::value ? "%DA" : "%DDA";
+    const char* hex_upper_format = std::is_same<T, decimal32_t>::value ? "%HA" :
+                                   std::is_same<T, decimal64_t>::value ? "%DA" : "%DDA";
 
-    const char* one_digit_hex_upper_format = std::is_same<T, decimal32>::value ? "%.1HA" :
-                                             std::is_same<T, decimal64>::value ? "%.1DA" : "%.1DDA";
+    const char* one_digit_hex_upper_format = std::is_same<T, decimal32_t>::value ? "%.1HA" :
+                                             std::is_same<T, decimal64_t>::value ? "%.1DA" : "%.1DDA";
 
     std::mt19937_64 rng(42);
 
@@ -190,15 +190,15 @@ void test_fuzzer_crash(const char* c_data)
     {
         char buffer[20]; // Small enough it should overflow sometimes
 
-        boost::decimal::decimal32 f_val {};
+        boost::decimal::decimal32_t f_val {};
         boost::decimal::from_chars(c_data, c_data + size, f_val, formats[i]);
         boost::decimal::snprintf(buffer, sizeof(buffer), dec32_printf_formats[i], f_val);
 
-        boost::decimal::decimal64 val {};
+        boost::decimal::decimal64_t val {};
         boost::decimal::from_chars(c_data, c_data + size, val, formats[i]);
         boost::decimal::snprintf(buffer, sizeof(buffer), dec64_printf_formats[i], val);
 
-        boost::decimal::decimal128 ld_val {};
+        boost::decimal::decimal128_t ld_val {};
         boost::decimal::from_chars(c_data, c_data + size, ld_val, formats[i]);
         boost::decimal::snprintf(buffer, sizeof(buffer), dec128_printf_formats[i], ld_val);
     }
@@ -222,9 +222,9 @@ void test_bad_input()
 
 int main()
 {
-    test_bootstrap<decimal32>();
-    test_bootstrap<decimal64>();
-    test_bootstrap<decimal128>();
+    test_bootstrap<decimal32_t>();
+    test_bootstrap<decimal64_t>();
+    test_bootstrap<decimal128_t>();
 
     // Homebrew gcc on mac does not support locales
     #if !(defined(__APPLE__) && defined(__GNUC__) && !defined(__clang__)) && !defined(BOOST_DECIMAL_QEMU_TEST)
@@ -234,9 +234,9 @@ int main()
     test_fuzzer_crash("");
     test_fuzzer_crash("Dd00000000001000000000000000000000000000000000001000000000ccccccccc�Cccc0ccccccccc8888000010000)001.2");
 
-    test_bad_input<decimal32>();
-    test_bad_input<decimal64>();
-    test_bad_input<decimal128>();
+    test_bad_input<decimal32_t>();
+    test_bad_input<decimal64_t>();
+    test_bad_input<decimal128_t>();
 
     return boost::report_errors();
 }

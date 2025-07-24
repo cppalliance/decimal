@@ -113,11 +113,11 @@ constexpr auto hypot(T1 x, T2 y) noexcept
 
     #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
 
-    using evaluation_type = detail::promote_args_t<T1, T2, decimal64>;
+    using evaluation_type = detail::promote_args_t<T1, T2, decimal64_t>;
 
     #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
 
-    using evaluation_type = detail::promote_args_t<T1, T2, decimal128>;
+    using evaluation_type = detail::promote_args_t<T1, T2, decimal128_t>;
 
     #endif
 
@@ -136,11 +136,11 @@ constexpr auto hypot(T1 x, T2 y, T3 z) noexcept
 
     #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
 
-    using evaluation_type = detail::promote_args_t<T1, T2, T3, decimal64>;
+    using evaluation_type = detail::promote_args_t<T1, T2, T3, decimal64_t>;
 
     #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
 
-    using evaluation_type = detail::promote_args_t<T1, T2, T3, decimal128>;
+    using evaluation_type = detail::promote_args_t<T1, T2, T3, decimal128_t>;
 
     #endif
 

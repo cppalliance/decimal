@@ -4,13 +4,13 @@ Distributed under the Boost Software License, Version 1.0.
 https://www.boost.org/LICENSE_1_0.txt
 ////
 
-[#decimal128]
-= Decimal128
-:idprefix: decimal128_
+[#decimal128_t]
+= decimal128_t
+:idprefix: decimal128_t_
 
 == Description
 
-Decimal128 is the 128-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6
+decimal128_t is the 128-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6
 
 |===
 | Attribute | values
@@ -22,16 +22,16 @@ Decimal128 is the 128-bit version of the decimal interchange format, and has the
 | Smallest Subnormal Value | 1e-6176
 |===
 
-The encoding of Decimal128 is in the `xref:conversions.adoc[BID format]`.
+The encoding of decimal128_t is in the `xref:conversions.adoc[BID format]`.
 
 [source, c++]
 ----
-#include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal128_t.hpp>
 
 namespace boost {
 namespace decimal {
 
-class decimal128 {
+class decimal128_t {
 
 public:
     using significand_type = detail::uint128;
@@ -41,24 +41,24 @@ public:
 // Paragraph numbers are from ISO/IEC DTR 24733
 
 // 3.2.4.1 construct/copy/destroy
-constexpr decimal128() noexcept = default;
+constexpr decimal128_t() noexcept = default;
 
 // 3.2.4.2 Conversion form floating-point type
 template <typename Float>
-explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal128(Float val) noexcept;
+explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal128_t(Float val) noexcept;
 
 // 3.2.4.3 Conversion from integral type
 template <typename Integer>
-explicit constexpr decimal128(Integer val) noexcept;
+explicit constexpr decimal128_t(Integer val) noexcept;
 
 template <typename UnsignedIntegral, typename Integral>
-constexpr decimal128(UnsignedIntegral coeff, Integral exp, bool sign = false) noexcept;
+constexpr decimal128_t(UnsignedIntegral coeff, Integral exp, bool sign = false) noexcept;
 
 template <typename SignedIntegral, typename Integral>
-constexpr decimal128(SignedIntegral coeff, Integral exp, bool sign = false) noexcept;
+constexpr decimal128_t(SignedIntegral coeff, Integral exp, bool sign = false) noexcept;
 
 template <typename Integral>
-constexpr decimal128& operator=(const Integeral& RHS) noexcept;
+constexpr decimal128_t& operator=(const Integeral& RHS) noexcept;
 
 // 3.2.4.4 Conversion to integral type
 // If the value exceeds the range of the integral,
@@ -71,16 +71,16 @@ explicit constexpr operator long long() const noexcept;
 explicit constexpr operator unsigned long long() const noexcept;
 
 // 3.2.4.5 increment and decrement operators:
-constexpr decimal128& operator++();
-constexpr decimal128  operator++(int);
-constexpr decimal128& operator--();
-constexpr decimal128  operator--(int);
+constexpr decimal128_t& operator++();
+constexpr decimal128_t  operator++(int);
+constexpr decimal128_t& operator--();
+constexpr decimal128_t  operator--(int);
 
 // 3.2.4.6 compound assignment:
-constexpr decimal128& operator+=(RHS rhs);
-constexpr decimal128& operator-=(RHS rhs);
-constexpr decimal128& operator*=(RHS rhs);
-constexpr decimal128& operator/=(RHS rhs);
+constexpr decimal128_t& operator+=(RHS rhs);
+constexpr decimal128_t& operator-=(RHS rhs);
+constexpr decimal128_t& operator*=(RHS rhs);
+constexpr decimal128_t& operator/=(RHS rhs);
 
 // 3.2.6 Conversion to floating-point type
 explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
@@ -93,10 +93,10 @@ explicit constexpr operator std::float32_t() const noexcept;
 explicit constexpr operator std::float64_t() const noexcept;
 explicit constexpr operator std::bfloat16_t() const noexcept;
 
-explicit constexpr operator decimal32() const noexcept;
-explicit constexpr operator decimal64() const noexcept;
+explicit constexpr operator decimal32_t() const noexcept;
+explicit constexpr operator decimal64_t() const noexcept;
 
-}; // class decimal128
+}; // class decimal128_t
 
 } //namespace decimal
 } //namespace boost

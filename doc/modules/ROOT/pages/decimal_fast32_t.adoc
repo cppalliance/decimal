@@ -4,61 +4,63 @@ Distributed under the Boost Software License, Version 1.0.
 https://www.boost.org/LICENSE_1_0.txt
 ////
 
-[#decimal32]
-= Decimal32
-:idprefix: decimal32_
+[#decimal_fast32_t]
+= decimal_fast32_t
+:idprefix: decimal_fast32_t_
 
 == Description
 
-Decimal32 is the 32-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6
+`decimal_fast32_t` has the same ranges of values and representations as `decimal32_t` but with greater performance.
+The performance changes by being non-IEEE 754 compliant so that the value does not have to be decoded from bits, but is instead directly represented internal to the type.
+As is often the case this trades space for time by having greater storage width requirements.
 
 |===
 | Attribute | values
-| Storage Width | 32 bits
+| Storage Width | 48 bits
 | Precision | 7 decimal digits
 | Max exponent | 96
 | Max Value | 9.999999e+96
 | Smallest Normalized Value | 1.000000e-95
-| Smallest Subnormal Value | 1e-101
+| Smallest Subnormal Value | Flushed to 0
 |===
 
-The encoding of Decimal32 is in the `xref:conversions.adoc[BID format]`.
+*IMPORTANT* `decimal_fast32_t` does not support subnormal values
 
 [source, c++]
 ----
-#include <boost/decimal/decimal32.hpp>
+#include <boost/decimal/decimal_fast32_t.hpp>
 
 namespace boost {
 namespace decimal {
 
-class decimal32 {
+class decimal_fast32_t {
 
 public:
-    using significand_type = std::uint32_t;
-    using exponent_type = std::uint32_t;
+    using significand_type = std::uint_fast32_t;
+    using exponent_type = std::uint_fast8_t;
     using biased_exponent_type = std::int32_t;
 
 // Paragraph numbers are from ISO/IEC DTR 24733
 
 // 3.2.2.1 construct/copy/destroy
-constexpr decimal32() noexcept = default;
+constexpr decimal_fast32_t() noexcept = default;
 
 // 3.2.2.2 Conversion form floating-point type
 template <typename Float>
-explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal32(Float val) noexcept;
+explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast32_t(Float val) noexcept;
 
 // 3.2.2.3 Conversion from integral type
 template <typename Integer>
-explicit constexpr decimal32(Integer val) noexcept;
+explicit constexpr decimal_fast32_t(Integer val) noexcept;
 
 template <typename UnsignedIntegral, typename Integral>
-constexpr decimal32(UnsignedIntegral coeff, Integral exp, bool sign = false) noexcept;
+constexpr decimal_fast32_t(UnsignedIntegral coeff, Integral exp, bool sign = false) noexcept;
 
 template <typename SignedIntegral, typename Integral>
-constexpr decimal32(SignedIntegral coeff, Integral exp) noexcept;
+constexpr decimal_fast32_t(SignedIntegral coeff, Integral exp) noexcept;
 
 template <typename Integral>
-constexpr decimal32& operator=(const Integeral& RHS) noexcept;
+constexpr decimal_fast32_t& operator=(const Integeral& RHS) noexcept;
 
 // 3.2.2.4 Conversion to integral type
 // If the value exceeds the range of the integral,
@@ -71,16 +73,16 @@ explicit constexpr operator long long() const noexcept;
 explicit constexpr operator unsigned long long() const noexcept;
 
 // 3.2.2.5 increment and decrement operators:
-constexpr decimal32& operator++();
-constexpr decimal32  operator++(int);
-constexpr decimal32& operator--();
-constexpr decimal32  operator--(int);
+constexpr decimal_fast32_t& operator++();
+constexpr decimal_fast32_t  operator++(int);
+constexpr decimal_fast32_t& operator--();
+constexpr decimal_fast32_t  operator--(int);
 
 // 3.2.2.6 compound assignment:
-constexpr decimal32& operator+=(RHS rhs);
-constexpr decimal32& operator-=(RHS rhs);
-constexpr decimal32& operator*=(RHS rhs);
-constexpr decimal32& operator/=(RHS rhs);
+constexpr decimal_fast32_t& operator+=(RHS rhs);
+constexpr decimal_fast32_t& operator-=(RHS rhs);
+constexpr decimal_fast32_t& operator*=(RHS rhs);
+constexpr decimal_fast32_t& operator/=(RHS rhs);
 
 // 3.2.6 Conversion to floating-point type
 explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
@@ -93,10 +95,10 @@ explicit constexpr operator std::float32_t() const noexcept;
 explicit constexpr operator std::float64_t() const noexcept;
 explicit constexpr operator std::bfloat16_t() const noexcept;
 
-explicit constexpr operator decimal64() const noexcept;
-explicit constexpr operator decimal128() const noexcept;
+explicit constexpr operator decimal64_t() const noexcept;
+explicit constexpr operator decimal128_t() const noexcept;
 
-}; // class decimal32
+}; // class decimal_fast32_t
 
 } //namespace decimal
 } //namespace boost

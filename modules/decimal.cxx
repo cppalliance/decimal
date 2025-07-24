@@ -67,13 +67,13 @@ export module boost2.decimal;
 
 export namespace boost::decimal {
 
-class decimal32;
-class decimal64;
-class decimal128;
+class decimal32_t;
+class decimal64_t;
+class decimal128_t;
 
-class decimal32_fast;
-class decimal64_fast;
-class decimal128_fast;
+class decimal_fast32_t;
+class decimal_fast64_t;
+class decimal_fast128_t;
 
 } // namespace boost::decimal
 
@@ -81,44 +81,44 @@ export namespace std {
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal32>;
+class numeric_limits<boost::decimal::decimal32_t>;
 #else
-struct numeric_limits<boost::decimal::decimal32>;
+struct numeric_limits<boost::decimal::decimal32_t>;
 #endif
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal64>;
+class numeric_limits<boost::decimal::decimal64_t>;
 #else
-struct numeric_limits<boost::decimal::decimal64>;
+struct numeric_limits<boost::decimal::decimal64_t>;
 #endif
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal128>;
+class numeric_limits<boost::decimal::decimal128_t>;
 #else
-struct numeric_limits<boost::decimal::decimal128>;
+struct numeric_limits<boost::decimal::decimal128_t>;
 #endif
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal32_fast>;
+class numeric_limits<boost::decimal::decimal_fast32_t>;
 #else
-struct numeric_limits<boost::decimal::decimal32_fast>;
+struct numeric_limits<boost::decimal::decimal_fast32_t>;
 #endif
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal64_fast>;
+class numeric_limits<boost::decimal::decimal_fast64_t>;
 #else
-struct numeric_limits<boost::decimal::decimal64_fast>;
+struct numeric_limits<boost::decimal::decimal_fast64_t>;
 #endif
 
 template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal128_fast>;
+class numeric_limits<boost::decimal::decimal_fast128_t>;
 #else
-struct numeric_limits<boost::decimal::decimal128_fast>;
+struct numeric_limits<boost::decimal::decimal_fast128_t>;
 #endif
 
 } // Namespace std
