@@ -31,9 +31,55 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
+namespace impl {
 
 #define BOOST_DECIMAL_CONSTEXPR constexpr
+
+constexpr char* memcpy_impl(char* dest, const char* src, std::size_t count)
+{
+    for (std::size_t i = 0; i < count; ++i)
+    {
+        dest[i] = src[i];
+    }
+
+    return dest;
+}
+
+constexpr char* memset_impl(char* dest, int ch, std::size_t count)
+{
+    for (std::size_t i = 0; i < count; ++i)
+    {
+        dest[i] = static_cast<char>(ch);
+    }
+
+    return dest;
+}
+
+constexpr char* memmove_impl(char* dest, const char* src, std::size_t count)
+{
+    if (dest < src || dest >= src + count)
+    {
+        // Non-overlapping or safe to copy forward
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            dest[i] = src[i];
+        }
+    }
+    else
+    {
+        // Overlapping, copy backward to avoid overwriting source
+        for (std::size_t i = count; i > 0; --i)
+        {
+            dest[i - 1] = src[i - 1];
+        }
+    }
+
+    return dest;
+}
+
+}
+
+#if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION)
 
 BOOST_DECIMAL_CONSTEXPR char* memcpy(char* dest, const char* src, std::size_t count)
 {
