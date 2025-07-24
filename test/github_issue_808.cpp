@@ -19,13 +19,13 @@ void tiny_div()
 
 int main()
 {
-    tiny_div<decimal32>();
-    tiny_div<decimal64>();
-    tiny_div<decimal128>();
+    tiny_div<decimal32_t>();
+    tiny_div<decimal64_t>();
+    tiny_div<decimal128_t>();
 
-    tiny_div<decimal32_fast>();
-    tiny_div<decimal64_fast>();
-    tiny_div<decimal128_fast>();
+    tiny_div<decimal_fast32_t>();
+    tiny_div<decimal_fast64_t>();
+    tiny_div<decimal_fast128_t>();
 
     return boost::report_errors();
 }

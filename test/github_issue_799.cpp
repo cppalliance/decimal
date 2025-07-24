@@ -20,12 +20,12 @@ int main()
 {
     using namespace boost::decimal;
 
-    mixed_compare<decimal32>();
-    mixed_compare<decimal32_fast>();
-    mixed_compare<decimal64>();
-    mixed_compare<decimal64_fast>();
-    mixed_compare<decimal128>();
-    mixed_compare<decimal128_fast>();
+    mixed_compare<decimal32_t>();
+    mixed_compare<decimal_fast32_t>();
+    mixed_compare<decimal64_t>();
+    mixed_compare<decimal_fast64_t>();
+    mixed_compare<decimal128_t>();
+    mixed_compare<decimal_fast128_t>();
 
     return boost::report_errors();
 }

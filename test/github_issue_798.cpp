@@ -87,40 +87,40 @@ int main()
 {
     using namespace boost::decimal;
 
-    test_zero<decimal32>();
-    test_zero<decimal32_fast>();
-    test_zero<decimal64>();
-    test_zero<decimal64_fast>();
-    test_zero<decimal128>();
-    test_zero<decimal128_fast>();
+    test_zero<decimal32_t>();
+    test_zero<decimal_fast32_t>();
+    test_zero<decimal64_t>();
+    test_zero<decimal_fast64_t>();
+    test_zero<decimal128_t>();
+    test_zero<decimal_fast128_t>();
 
-    test_eps<decimal32>();
-    test_eps<decimal32_fast>();
-    test_eps<decimal64>();
-    test_eps<decimal64_fast>();
-    test_eps<decimal128>();
-    test_eps<decimal128_fast>();
+    test_eps<decimal32_t>();
+    test_eps<decimal_fast32_t>();
+    test_eps<decimal64_t>();
+    test_eps<decimal_fast64_t>();
+    test_eps<decimal128_t>();
+    test_eps<decimal_fast128_t>();
 
-    test_one<decimal32>();
-    test_one<decimal32_fast>();
-    test_one<decimal64>();
-    test_one<decimal64_fast>();
-    test_one<decimal128>();
-    test_one<decimal128_fast>();
+    test_one<decimal32_t>();
+    test_one<decimal_fast32_t>();
+    test_one<decimal64_t>();
+    test_one<decimal_fast64_t>();
+    test_one<decimal128_t>();
+    test_one<decimal_fast128_t>();
 
-    test_onek<decimal32>();
-    test_onek<decimal32_fast>();
-    test_onek<decimal64>();
-    test_onek<decimal64_fast>();
-    test_onek<decimal128>();
-    test_onek<decimal128_fast>();
+    test_onek<decimal32_t>();
+    test_onek<decimal_fast32_t>();
+    test_onek<decimal64_t>();
+    test_onek<decimal_fast64_t>();
+    test_onek<decimal128_t>();
+    test_onek<decimal_fast128_t>();
 
-    test_min<decimal32>();
-    test_min<decimal32_fast>();
-    test_min<decimal64>();
-    test_min<decimal64_fast>();
-    test_min<decimal128>();
-    test_min<decimal128_fast>();
+    test_min<decimal32_t>();
+    test_min<decimal_fast32_t>();
+    test_min<decimal64_t>();
+    test_min<decimal_fast64_t>();
+    test_min<decimal128_t>();
+    test_min<decimal_fast128_t>();
 
     return boost::report_errors();
 }

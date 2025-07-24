@@ -355,7 +355,7 @@ namespace local
 
   auto test_ellint_2_small_phi_64(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal64;
+    using decimal_type = boost::decimal::decimal64_t;
 
     using val_ctrl_array_type = std::array<double, 8U>;
 
@@ -400,7 +400,7 @@ namespace local
 
   auto test_ellint_2_mediu_phi_64(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal64;
+    using decimal_type = boost::decimal::decimal64_t;
 
     using val_ctrl_array_type = std::array<double, 20U>;
 
@@ -444,7 +444,7 @@ namespace local
 
   auto test_ellint_2_large_phi_64(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal64;
+    using decimal_type = boost::decimal::decimal64_t;
 
     using val_ctrl_array_type = std::array<double, 9U>;
 
@@ -490,7 +490,7 @@ namespace local
 
   auto test_ellint_2_128_pos(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128;
+    using decimal_type = boost::decimal::decimal128_t;
 
     using str_ctrl_array_type = std::array<const char*, 9U>;
 
@@ -545,7 +545,7 @@ namespace local
 
   auto test_comp_ellint_2_128_pos(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128;
+    using decimal_type = boost::decimal::decimal128_t;
 
     using str_ctrl_array_type = std::array<const char*, 19U>;
 
@@ -612,14 +612,14 @@ namespace local
 
 int main()
 {
-  test_comp_ellint<decimal32, float>();
-  test_comp_ellint<decimal64, double>();
+  test_comp_ellint<decimal32_t, float>();
+  test_comp_ellint<decimal64_t, double>();
 
-  test_ellint<decimal32, float>(128);
-  //test_ellint<decimal64, double>(0x12'000);
+  test_ellint<decimal32_t, float>(128);
+  //test_ellint<decimal64_t, double>(0x12'000);
 
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = boost::decimal::decimal32_t;
     using float_type   = float;
 
     const auto test_ellint_2_edge_is_ok = local::test_ellint_2_edge<decimal_type, float_type>();

@@ -232,7 +232,7 @@ namespace local
 
   auto test_exp_128(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128;
+    using decimal_type = boost::decimal::decimal128_t;
 
     using str_ctrl_array_type = std::array<const char*, 39U>;
 
@@ -322,7 +322,7 @@ auto main() -> int
   auto result_is_ok = true;
 
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = boost::decimal::decimal32_t;
     using float_type   = float;
 
     const auto result_pos_is_ok = local::test_exp<decimal_type, float_type>(128, false, 0.03125L, 80.0L);
@@ -351,7 +351,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal64;
+    using decimal_type = boost::decimal::decimal64_t;
     using float_type   = double;
 
     const auto result_pos_lo_is_ok = local::test_exp<decimal_type, float_type>(512, false, 0.03125L, 80.0L);

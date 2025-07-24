@@ -48,10 +48,10 @@ void random_addition(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal128_fast dec1 {val1};
-        const decimal128_fast dec2 {val2};
+        const decimal_fast128_t dec1 {val1};
+        const decimal_fast128_t dec2 {val2};
 
-        const decimal128_fast res = dec1 + dec2;
+        const decimal_fast128_t res = dec1 + dec2;
         const auto res_int = static_cast<T>(res);
 
         if (!BOOST_TEST_EQ(res_int, val1 + val2))
@@ -67,10 +67,10 @@ void random_addition(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) + decimal128_fast{0,0}));
-    BOOST_TEST(isinf(decimal128_fast{0,0} + std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) + decimal128_fast{0,0}));
-    BOOST_TEST(isnan(decimal128_fast{0,0} + std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng)) + decimal_fast128_t{0,0}));
+    BOOST_TEST(isinf(decimal_fast128_t{0,0} + std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng)) + decimal_fast128_t{0,0}));
+    BOOST_TEST(isnan(decimal_fast128_t{0,0} + std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng))));
 }
 
 template <typename T>
@@ -83,10 +83,10 @@ void random_mixed_addition(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal128_fast dec1 {val1};
-        const T trunc_val_2 {static_cast<T>(decimal128_fast(val2))};
+        const decimal_fast128_t dec1 {val1};
+        const T trunc_val_2 {static_cast<T>(decimal_fast128_t(val2))};
 
-        const decimal128_fast res = dec1 + trunc_val_2;
+        const decimal_fast128_t res = dec1 + trunc_val_2;
         const auto res_int = static_cast<T>(res);
 
         if (!BOOST_TEST_EQ(res_int, val1 + val2))
@@ -102,10 +102,10 @@ void random_mixed_addition(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) + dist(rng)));
-    BOOST_TEST(isinf(dist(rng) + std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) + dist(rng)));
-    BOOST_TEST(isnan(dist(rng) + std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng)) + dist(rng)));
+    BOOST_TEST(isinf(dist(rng) + std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng)) + dist(rng)));
+    BOOST_TEST(isnan(dist(rng) + std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng))));
 }
 
 template <typename T>
@@ -118,10 +118,10 @@ void random_subtraction(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal128_fast dec1 {val1};
-        const decimal128_fast dec2 {val2};
+        const decimal_fast128_t dec1 {val1};
+        const decimal_fast128_t dec2 {val2};
 
-        const decimal128_fast res = dec1 - dec2;
+        const decimal_fast128_t res = dec1 - dec2;
         const auto res_int = static_cast<T>(res);
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
@@ -137,10 +137,10 @@ void random_subtraction(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) - decimal128_fast{0,0}));
-    BOOST_TEST(isinf(decimal128_fast{0,0} - std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) - decimal128_fast{0,0}));
-    BOOST_TEST(isnan(decimal128_fast{0,0} - std::numeric_limits<decimal128_fast>::quiet_NaN()* T(dist(rng))));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng)) - decimal_fast128_t{0,0}));
+    BOOST_TEST(isinf(decimal_fast128_t{0,0} - std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng)) - decimal_fast128_t{0,0}));
+    BOOST_TEST(isnan(decimal_fast128_t{0,0} - std::numeric_limits<decimal_fast128_t>::quiet_NaN()* T(dist(rng))));
 }
 
 template <typename T>
@@ -153,10 +153,10 @@ void random_mixed_subtraction(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal128_fast dec1 {val1};
-        const T trunc_val_2 {static_cast<T>(decimal128_fast(val2))};
+        const decimal_fast128_t dec1 {val1};
+        const T trunc_val_2 {static_cast<T>(decimal_fast128_t(val2))};
 
-        const decimal128_fast res = dec1 - trunc_val_2;
+        const decimal_fast128_t res = dec1 - trunc_val_2;
         const auto res_int = static_cast<T>(res);
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
@@ -177,10 +177,10 @@ void random_mixed_subtraction(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const T trunc_val_1 {static_cast<T>(decimal128_fast(val1))};
-        const decimal128_fast dec2 {val2};
+        const T trunc_val_1 {static_cast<T>(decimal_fast128_t(val1))};
+        const decimal_fast128_t dec2 {val2};
 
-        const decimal128_fast res = trunc_val_1 - dec2;
+        const decimal_fast128_t res = trunc_val_1 - dec2;
         const auto res_int = static_cast<T>(res);
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
@@ -196,18 +196,18 @@ void random_mixed_subtraction(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) - dist(rng)));
-    BOOST_TEST(isinf(dist(rng) - std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) - dist(rng)));
-    BOOST_TEST(isnan(dist(rng) - std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng)) - dist(rng)));
+    BOOST_TEST(isinf(dist(rng) - std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng)) - dist(rng)));
+    BOOST_TEST(isnan(dist(rng) - std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng))));
 }
 
 template <typename T>
 void spot_check_sub(T lhs, T rhs)
 {
-    const decimal128_fast dec1 {lhs};
-    const decimal128_fast dec2 {rhs};
-    const decimal128_fast res {dec1 - dec2};
+    const decimal_fast128_t dec1 {lhs};
+    const decimal_fast128_t dec2 {rhs};
+    const decimal_fast128_t res {dec1 - dec2};
     const auto res_int {static_cast<T>(res)};
 
     if (!BOOST_TEST_EQ(res_int, lhs - rhs))
@@ -233,11 +233,11 @@ void random_multiplication(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal128_fast dec1 {val1};
-        const decimal128_fast dec2 {val2};
+        const decimal_fast128_t dec1 {val1};
+        const decimal_fast128_t dec2 {val2};
 
-        const decimal128_fast res {dec1 * dec2};
-        const decimal128_fast res_int {val1 * val2};
+        const decimal_fast128_t res {dec1 * dec2};
+        const decimal_fast128_t res_int {val1 * val2};
 
         if (val1 * val2 == 0)
         {
@@ -252,15 +252,15 @@ void random_multiplication(T lower, T upper)
                       << "\nVal 2: " << val2
                       << "\nDec 2: " << dec2
                       << "\nDec res: " << res
-                      << "\nInt res: " << decimal128_fast{val1 * val2} << std::endl;
+                      << "\nInt res: " << decimal_fast128_t{val1 * val2} << std::endl;
             // LCOV_EXCL_STOP
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) * decimal128_fast(dist(rng))));
-    BOOST_TEST(isinf(decimal128_fast(dist(rng)) * std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) * decimal128_fast(dist(rng))));
-    BOOST_TEST(isnan(decimal128_fast(dist(rng)) * std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng)) * decimal_fast128_t(dist(rng))));
+    BOOST_TEST(isinf(decimal_fast128_t(dist(rng)) * std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng)) * decimal_fast128_t(dist(rng))));
+    BOOST_TEST(isnan(decimal_fast128_t(dist(rng)) * std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng))));
 }
 
 template <typename T>
@@ -273,11 +273,11 @@ void random_mixed_multiplication(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal128_fast dec1 {val1};
-        const T dec2 {static_cast<T>(decimal128_fast(val2))};
+        const decimal_fast128_t dec1 {val1};
+        const T dec2 {static_cast<T>(decimal_fast128_t(val2))};
 
-        const decimal128_fast res {dec1 * dec2};
-        const decimal128_fast res_int {val1 * val2};
+        const decimal_fast128_t res {dec1 * dec2};
+        const decimal_fast128_t res_int {val1 * val2};
 
         // Integers don't have a concept of negative 0
         if (val1 * val2 == 0)
@@ -298,20 +298,20 @@ void random_mixed_multiplication(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) * dist(rng)));
-    BOOST_TEST(isinf(dist(rng) * std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) * dist(rng)));
-    BOOST_TEST(isnan(dist(rng) * std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng)) * dist(rng)));
+    BOOST_TEST(isinf(dist(rng) * std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng)) * dist(rng)));
+    BOOST_TEST(isnan(dist(rng) * std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng))));
 }
 
 template <typename T>
 void spot_check_mul(T val1, T val2)
 {
-    const decimal128_fast dec1 {val1};
-    const decimal128_fast dec2 {val2};
+    const decimal_fast128_t dec1 {val1};
+    const decimal_fast128_t dec2 {val2};
 
-    const decimal128_fast res {dec1 * dec2};
-    const decimal128_fast res_int {val1 * val2};
+    const decimal_fast128_t res {dec1 * dec2};
+    const decimal_fast128_t res_int {val1 * val2};
 
     if (!BOOST_TEST_EQ(res, res_int))
     {
@@ -321,7 +321,7 @@ void spot_check_mul(T val1, T val2)
                   << "\nVal 2: " << val2
                   << "\nDec 2: " << dec2
                   << "\nDec res: " << res
-                  << "\nInt res: " << decimal128_fast{val1 * val2} << std::endl;
+                  << "\nInt res: " << decimal_fast128_t{val1 * val2} << std::endl;
         // LCOV_EXCL_STOP
     }
 };
@@ -336,11 +336,11 @@ void random_division(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal128_fast dec1 {val1};
-        const decimal128_fast dec2 {val2};
+        const decimal_fast128_t dec1 {val1};
+        const decimal_fast128_t dec2 {val2};
 
-        const decimal128_fast res {dec1 / dec2};
-        const decimal128_fast res_int {static_cast<double>(val1) / static_cast<double>(val2)};
+        const decimal_fast128_t res {dec1 / dec2};
+        const decimal_fast128_t res_int {static_cast<double>(val1) / static_cast<double>(val2)};
 
         if (isinf(res) && isinf(res_int))
         {
@@ -358,11 +358,11 @@ void random_division(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) / decimal128_fast(dist(rng))));
-    BOOST_TEST(!isinf(decimal128_fast(dist(rng)) / std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))));
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) / decimal128_fast(dist(rng))));
-    BOOST_TEST(isnan(decimal128_fast(dist(rng)) / std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
-    BOOST_TEST(isinf(decimal128_fast(dist(rng)) / decimal128_fast(0) * T(dist(rng))));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng)) / decimal_fast128_t(dist(rng))));
+    BOOST_TEST(!isinf(decimal_fast128_t(dist(rng)) / std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng))));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng)) / decimal_fast128_t(dist(rng))));
+    BOOST_TEST(isnan(decimal_fast128_t(dist(rng)) / std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng))));
+    BOOST_TEST(isinf(decimal_fast128_t(dist(rng)) / decimal_fast128_t(0) * T(dist(rng))));
 }
 
 template <typename T>
@@ -375,11 +375,11 @@ void random_mixed_division(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal128_fast dec1 {val1};
-        const T dec2 {static_cast<T>(decimal128_fast(val2))};
+        const decimal_fast128_t dec1 {val1};
+        const T dec2 {static_cast<T>(decimal_fast128_t(val2))};
 
-        const decimal128_fast res {dec1 / dec2};
-        const decimal128_fast res_int {static_cast<double>(val1) / static_cast<double>(val2)};
+        const decimal_fast128_t res {dec1 / dec2};
+        const decimal_fast128_t res_int {static_cast<double>(val1) / static_cast<double>(val2)};
 
         if (isinf(res) && isinf(res_int))
         {
@@ -402,16 +402,16 @@ void random_mixed_division(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const T dec1 {static_cast<T>(decimal128_fast(val1))};
-        const decimal128_fast dec2 {val2};
+        const T dec1 {static_cast<T>(decimal_fast128_t(val1))};
+        const decimal_fast128_t dec2 {val2};
 
-        const decimal128_fast res {dec1 / dec2};
-        const decimal128_fast res_int {static_cast<double>(val1) / static_cast<double>(val2)};
+        const decimal_fast128_t res {dec1 / dec2};
+        const decimal_fast128_t res_int {static_cast<double>(val1) / static_cast<double>(val2)};
 
         if (isinf(res) && isinf(res_int))
         {
         }
-        else if (!BOOST_TEST(abs(res - res_int) < decimal128_fast(1, -1)))
+        else if (!BOOST_TEST(abs(res - res_int) < decimal_fast128_t(1, -1)))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -426,13 +426,13 @@ void random_mixed_division(T lower, T upper)
     }
 
     // Edge cases
-    const decimal128_fast val1 {dist(rng)};
-    const decimal128_fast zero {0, 0};
-    BOOST_TEST(isnan(std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng)) / dist(rng)));
-    BOOST_TEST(isinf(std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng)) / dist(rng)));
-    BOOST_TEST(isnan(dist(rng) / std::numeric_limits<decimal128_fast>::quiet_NaN() * T(dist(rng))));
-    BOOST_TEST_EQ(abs(dist(rng) / std::numeric_limits<decimal128_fast>::infinity() * T(dist(rng))), zero);
-    BOOST_TEST(isinf(decimal128_fast(dist(rng)) / 0 * dist(rng)));
+    const decimal_fast128_t val1 {dist(rng)};
+    const decimal_fast128_t zero {0, 0};
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng)) / dist(rng)));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng)) / dist(rng)));
+    BOOST_TEST(isnan(dist(rng) / std::numeric_limits<decimal_fast128_t>::quiet_NaN() * T(dist(rng))));
+    BOOST_TEST_EQ(abs(dist(rng) / std::numeric_limits<decimal_fast128_t>::infinity() * T(dist(rng))), zero);
+    BOOST_TEST(isinf(decimal_fast128_t(dist(rng)) / 0 * dist(rng)));
     BOOST_TEST(isinf(val1 / zero));
 }
 

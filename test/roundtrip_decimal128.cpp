@@ -51,9 +51,9 @@ template <typename T>
 void test_conversion_to_integer()
 {
     errno = 0;
-    constexpr decimal128 one(1, 0);
-    constexpr decimal128 zero(0, 0);
-    constexpr decimal128 half(5, -1);
+    constexpr decimal128_t one(1, 0);
+    constexpr decimal128_t zero(0, 0);
+    constexpr decimal128_t half(5, -1);
     BOOST_TEST_EQ(static_cast<T>(one), static_cast<T>(1)) && BOOST_TEST_EQ(errno, 0);
     BOOST_TEST_EQ(static_cast<T>(zero), static_cast<T>(0)) && BOOST_TEST_EQ(errno, 0);
 
@@ -68,37 +68,37 @@ void test_conversion_to_integer()
     }
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal128>::infinity()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal128_t>::infinity()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal128>::infinity()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal128_t>::infinity()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal128>::quiet_NaN()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, EINVAL);
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal128_t>::quiet_NaN()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, EINVAL);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal128>::signaling_NaN()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, EINVAL);
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal128_t>::signaling_NaN()), std::numeric_limits<T>::max()) && BOOST_TEST_EQ(errno, EINVAL);
 
     errno = 0;
     BOOST_TEST_EQ(static_cast<T>(half), static_cast<T>(0)) && BOOST_TEST_EQ(errno, 0);
 
-    constexpr decimal128 one_e_8(1, 8);
+    constexpr decimal128_t one_e_8(1, 8);
     BOOST_TEST_EQ(static_cast<T>(one_e_8), static_cast<T>(100'000'000)) && BOOST_TEST_EQ(errno, 0);
 
-    constexpr decimal128 one_e_8_2(1'000'000, 2);
+    constexpr decimal128_t one_e_8_2(1'000'000, 2);
     BOOST_TEST_EQ(static_cast<T>(one_e_8_2), static_cast<T>(100'000'000)) && BOOST_TEST_EQ(errno, 0);
 
     // Edge case
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<int> dist(-100, -20);
     errno = 0;
-    BOOST_TEST_EQ(static_cast<unsigned>(decimal128(dist(rng))), std::numeric_limits<unsigned>::max()) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<unsigned>(decimal128_t(dist(rng))), std::numeric_limits<unsigned>::max()) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<unsigned long>(decimal128(dist(rng))), std::numeric_limits<unsigned long>::max()) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<unsigned long>(decimal128_t(dist(rng))), std::numeric_limits<unsigned long>::max()) && BOOST_TEST_EQ(errno, ERANGE);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<unsigned long long>(decimal128(dist(rng))), std::numeric_limits<unsigned long long>::max()) && BOOST_TEST_EQ(errno, ERANGE);
+    BOOST_TEST_EQ(static_cast<unsigned long long>(decimal128_t(dist(rng))), std::numeric_limits<unsigned long long>::max()) && BOOST_TEST_EQ(errno, ERANGE);
 }
 
 template <typename T>
@@ -110,9 +110,9 @@ void test_roundtrip_conversion_integer(T min = T(0), T max = T(detail::max_signi
     for (std::size_t i = 0; i < N; ++i)
     {
         const T val = dist(rng);
-        const decimal128 initial_decimal(val);
+        const decimal128_t initial_decimal(val);
         const T return_val (initial_decimal);
-        const decimal128 return_decimal(return_val);
+        const decimal128_t return_decimal(return_val);
 
         BOOST_TEST_EQ(val, return_val);
         BOOST_TEST_EQ(initial_decimal, return_decimal);
@@ -125,9 +125,9 @@ void test_roundtrip_conversion_integer(T min = T(0), T max = T(detail::max_signi
     for (std::size_t i = 0; i < N; ++i)
     {
         const T val = dist(rng);
-        const decimal128 initial_decimal(val);
+        const decimal128_t initial_decimal(val);
         const T return_val (initial_decimal);
-        const decimal128 return_decimal(return_val);
+        const decimal128_t return_decimal(return_val);
 
         BOOST_TEST_EQ(initial_decimal, return_decimal);
     }
@@ -139,14 +139,14 @@ void test_conversion_from_float()
     errno = 0;
 
     auto half {static_cast<T>(0.5)};
-    decimal128 dec_half {5, -1};
-    BOOST_TEST_EQ(decimal128(half), dec_half) && BOOST_TEST_EQ(errno, 0);
-    BOOST_TEST_EQ(decimal128(-half), -dec_half) && BOOST_TEST_EQ(errno, 0);
+    decimal128_t dec_half {5, -1};
+    BOOST_TEST_EQ(decimal128_t(half), dec_half) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST_EQ(decimal128_t(-half), -dec_half) && BOOST_TEST_EQ(errno, 0);
 
-    BOOST_TEST(isnan(decimal128(std::numeric_limits<T>::quiet_NaN())));
-    BOOST_TEST(isnan(decimal128(std::numeric_limits<T>::signaling_NaN())));
-    BOOST_TEST(isinf(decimal128(std::numeric_limits<T>::infinity())));
-    BOOST_TEST(isinf(decimal128(-std::numeric_limits<T>::infinity())));
+    BOOST_TEST(isnan(decimal128_t(std::numeric_limits<T>::quiet_NaN())));
+    BOOST_TEST(isnan(decimal128_t(std::numeric_limits<T>::signaling_NaN())));
+    BOOST_TEST(isinf(decimal128_t(std::numeric_limits<T>::infinity())));
+    BOOST_TEST(isinf(decimal128_t(-std::numeric_limits<T>::infinity())));
 }
 
 template <typename T>
@@ -154,20 +154,20 @@ void test_conversion_to_float()
 {
     errno = 0;
 
-    constexpr decimal128 half(5, -1);
+    constexpr decimal128_t half(5, -1);
     BOOST_TEST_EQ(static_cast<T>(half), T(0.5)) && BOOST_TEST_EQ(errno, 0);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal128>::infinity()), std::numeric_limits<T>::infinity()) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST_EQ(static_cast<T>(std::numeric_limits<decimal128_t>::infinity()), std::numeric_limits<T>::infinity()) && BOOST_TEST_EQ(errno, 0);
 
     errno = 0;
-    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal128>::infinity()), std::numeric_limits<T>::infinity()) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST_EQ(static_cast<T>(-std::numeric_limits<decimal128_t>::infinity()), std::numeric_limits<T>::infinity()) && BOOST_TEST_EQ(errno, 0);
 
     errno = 0;
-    BOOST_TEST(static_cast<T>(std::numeric_limits<decimal128>::quiet_NaN()) != std::numeric_limits<T>::quiet_NaN()) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST(static_cast<T>(std::numeric_limits<decimal128_t>::quiet_NaN()) != std::numeric_limits<T>::quiet_NaN()) && BOOST_TEST_EQ(errno, 0);
 
     errno = 0;
-    BOOST_TEST(static_cast<T>(std::numeric_limits<decimal128>::signaling_NaN()) != std::numeric_limits<T>::signaling_NaN()) && BOOST_TEST_EQ(errno, 0);
+    BOOST_TEST(static_cast<T>(std::numeric_limits<decimal128_t>::signaling_NaN()) != std::numeric_limits<T>::signaling_NaN()) && BOOST_TEST_EQ(errno, 0);
 }
 
 template <typename T>
@@ -179,9 +179,9 @@ void test_roundtrip_conversion_float()
     for (std::size_t i = 0; i < N; ++i)
     {
         const T val {dist(rng)};
-        const decimal128 initial_decimal(val);
+        const decimal128_t initial_decimal(val);
         const T return_val {static_cast<T>(initial_decimal)};
-        const decimal128 return_decimal {return_val};
+        const decimal128_t return_decimal {return_val};
 
         if (!BOOST_TEST_EQ(initial_decimal, return_decimal))
         {
@@ -207,9 +207,9 @@ void test_roundtrip_conversion_float<long double>()
     for (std::size_t i = 0; i < N; ++i)
     {
         const long double val {dist(rng)};
-        const decimal128 initial_decimal(val);
+        const decimal128_t initial_decimal(val);
         const auto return_val {static_cast<long double>(initial_decimal)};
-        const decimal128 return_decimal {return_val};
+        const decimal128_t return_decimal {return_val};
 
         if (!BOOST_TEST(boost::math::float_distance(val, return_val) < 50))
         {
@@ -229,9 +229,9 @@ void test_roundtrip_conversion_float<long double>()
     for (std::size_t i = 0; i < N; ++i)
     {
         const long double val {dist2(rng)};
-        const decimal128 initial_decimal(val);
+        const decimal128_t initial_decimal(val);
         const auto return_val {static_cast<long double>(initial_decimal)};
-        const decimal128 return_decimal {return_val};
+        const decimal128_t return_decimal {return_val};
 
         if (!BOOST_TEST(boost::math::float_distance(val, return_val) < 50))
         {
@@ -255,19 +255,19 @@ void test_roundtrip_integer_stream()
 
     for (std::size_t i {}; i < N; ++i)
     {
-        const decimal128 first_val {dist(rng)};
+        const decimal128_t first_val {dist(rng)};
         const T first_val_int {static_cast<T>(first_val)};
         std::stringstream ss;
-        ss << std::setprecision(std::numeric_limits<decimal128>::digits10);
+        ss << std::setprecision(std::numeric_limits<decimal128_t>::digits10);
         ss << first_val;
-        decimal128 return_val {};
+        decimal128_t return_val {};
         ss >> return_val;
         const T return_val_int {static_cast<T>(return_val)};
 
         if (!BOOST_TEST_EQ(first_val, return_val) || !BOOST_TEST_EQ(first_val_int, return_val_int))
         {
             // LCOV_EXCL_START
-            std::cerr << std::setprecision(std::numeric_limits<decimal128>::digits10)
+            std::cerr << std::setprecision(std::numeric_limits<decimal128_t>::digits10)
                       << "    Val: " << first_val
                       << "\nInt Val: " << first_val_int
                       << "\n SS Val: " << ss.str()
@@ -286,12 +286,12 @@ void test_roundtrip_float_stream()
 
     for (std::size_t i {}; i < N; ++i)
     {
-        const decimal128 first_val {dist(rng)};
+        const decimal128_t first_val {dist(rng)};
         const T first_val_flt {static_cast<T>(first_val)};
         std::stringstream ss;
-        ss << std::setprecision(std::numeric_limits<decimal128>::digits10);
+        ss << std::setprecision(std::numeric_limits<decimal128_t>::digits10);
         ss << first_val;
-        decimal128 return_val {};
+        decimal128_t return_val {};
         ss >> return_val;
         const T return_val_flt {static_cast<T>(return_val)};
 
@@ -317,12 +317,12 @@ void test_roundtrip_float_stream<long double>()
 
     for (std::size_t i {}; i < N; ++i)
     {
-        const decimal128 first_val {dist(rng)};
+        const decimal128_t first_val {dist(rng)};
         const long double first_val_flt {static_cast<long double>(first_val)};
         std::stringstream ss;
-        ss << std::setprecision(std::numeric_limits<decimal128>::digits10);
+        ss << std::setprecision(std::numeric_limits<decimal128_t>::digits10);
         ss << first_val;
-        decimal128 return_val {};
+        decimal128_t return_val {};
         ss >> return_val;
         const auto return_val_flt {static_cast<long double>(return_val)};
 
@@ -340,16 +340,16 @@ void test_roundtrip_float_stream<long double>()
     }
 }
 
-void test_roundtrip_conversion_decimal32()
+void test_roundtrip_conversion_decimal32_t()
 {
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
     for (std::size_t i = 0; i < N; ++i)
     {
-        const decimal128 val {dist(rng)};
-        const decimal32 short_dec(val);
-        const decimal128 return_decimal {short_dec};
+        const decimal128_t val {dist(rng)};
+        const decimal32_t short_dec(val);
+        const decimal128_t return_decimal {short_dec};
 
         if(!BOOST_TEST_EQ(val, return_decimal))
         {
@@ -434,7 +434,7 @@ int main()
     //test_roundtrip_float_stream<std::bfloat16_t>();
     #endif
 
-    test_roundtrip_conversion_decimal32();
+    test_roundtrip_conversion_decimal32_t();
 
     return boost::report_errors();
 }

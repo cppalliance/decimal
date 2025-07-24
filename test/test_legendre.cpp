@@ -48,7 +48,7 @@ void test()
 {
     std::uniform_real_distribution<float> dist(-1, 1);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter / 4; ++i)
     {
         for (unsigned n {}; n < 4; ++n)
@@ -80,11 +80,11 @@ void test()
 
 int main()
 {
-    test<decimal32>();
-    test<decimal64>();
+    test<decimal32_t>();
+    test<decimal64_t>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    test<decimal128>();
+    test<decimal128_t>();
     #endif
 
     return boost::report_errors();

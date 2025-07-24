@@ -15,8 +15,8 @@ void test()
 
 void f2()
 {
-    test<boost::decimal::decimal32>();
-    test<boost::decimal::decimal64>();
-    test<boost::decimal::decimal128>();
+    test<boost::decimal::decimal32_t>();
+    test<boost::decimal::decimal64_t>();
+    test<boost::decimal::decimal128_t>();
 }
 // LCOV_EXCL_STOP
