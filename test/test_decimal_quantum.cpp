@@ -51,7 +51,7 @@ void test_same_quantum()
     std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<Dec>::min_exponent10 + 19,
                                                     std::numeric_limits<Dec>::max_exponent10 - 19);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         auto exp1 {exp(rng)};
@@ -143,7 +143,7 @@ void test_quantize()
     std::uniform_int_distribution<std::int32_t> exp(std::numeric_limits<Dec>::min_exponent10 + std::numeric_limits<Dec>::digits10 + 1,
                                                     std::numeric_limits<Dec>::max_exponent10 - std::numeric_limits<Dec>::digits10 - 1);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         auto sig1 {static_cast<sig_type>(sig(rng))};
@@ -190,12 +190,12 @@ void test_nonfinite_quantize()
 
 int main()
 {
-    test_same_quantum<decimal32_t_t>();
-    test_nonfinite_samequantum<decimal32_t_t>();
-    test_quantexp<decimal32_t_t>();
-    test_nonfinite_quantexp<decimal32_t_t>();
-    test_quantize<decimal32_t_t>();
-    test_nonfinite_quantize<decimal32_t_t>();
+    test_same_quantum<decimal32_t>();
+    test_nonfinite_samequantum<decimal32_t>();
+    test_quantexp<decimal32_t>();
+    test_nonfinite_quantexp<decimal32_t>();
+    test_quantize<decimal32_t>();
+    test_nonfinite_quantize<decimal32_t>();
 
     test_same_quantum<decimal_fast32_t>();
     test_nonfinite_samequantum<decimal_fast32_t>();
@@ -206,19 +206,19 @@ int main()
     test_quantize<decimal_fast32_t>();
     test_nonfinite_quantize<decimal_fast32_t>();
 
-    test_same_quantum<decimal64_t_t>();
-    test_nonfinite_samequantum<decimal64_t_t>();
-    test_quantexp<decimal64_t_t>();
-    test_nonfinite_quantexp<decimal64_t_t>();
-    test_quantize<decimal64_t_t>();
-    test_nonfinite_quantize<decimal64_t_t>();
+    test_same_quantum<decimal64_t>();
+    test_nonfinite_samequantum<decimal64_t>();
+    test_quantexp<decimal64_t>();
+    test_nonfinite_quantexp<decimal64_t>();
+    test_quantize<decimal64_t>();
+    test_nonfinite_quantize<decimal64_t>();
 
-    test_same_quantum<decimal128_t_t>();
-    test_nonfinite_samequantum<decimal128_t_t>();
-    test_quantexp<decimal128_t_t>();
-    test_nonfinite_quantexp<decimal128_t_t>();
-    test_quantize<decimal128_t_t>();
-    test_nonfinite_quantize<decimal128_t_t>();
+    test_same_quantum<decimal128_t>();
+    test_nonfinite_samequantum<decimal128_t>();
+    test_quantexp<decimal128_t>();
+    test_nonfinite_quantexp<decimal128_t>();
+    test_quantize<decimal128_t>();
+    test_nonfinite_quantize<decimal128_t>();
 
     return boost::report_errors();
 }

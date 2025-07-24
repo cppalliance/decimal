@@ -5,9 +5,9 @@
 #include "mini_to_chars.hpp"
 #include <boost/decimal/cstdlib.hpp>
 #include <boost/decimal/iostream.hpp>
-#include <boost/decimal/decimal32_t_t.hpp>
-#include <boost/decimal/decimal64_t_t.hpp>
-#include <boost/decimal/decimal128_t_t.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -48,7 +48,7 @@ void roundtrip_strtod()
     std::uniform_int_distribution<std::int64_t> sig(1'000'000, 9'999'999);
     std::uniform_int_distribution<std::int64_t> exp(-15, 15);
 
-    constexpr auto max_iter {std::is_same<T, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<T, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val {sig(rng), exp(rng)};
@@ -87,7 +87,7 @@ void roundtrip_wcstrtod()
     std::uniform_int_distribution<std::int64_t> sig(1'000, 9'999);
     std::uniform_int_distribution<std::int64_t> exp(-15, 15);
 
-    constexpr auto max_iter {std::is_same<T, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<T, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val {sig(rng), exp(rng)};
@@ -258,30 +258,30 @@ void test_alloc()
 
 int main()
 {
-    roundtrip_strtod<decimal32_t_t>();
-    roundtrip_wcstrtod<decimal32_t_t>();
-    test_strtod_edges<decimal32_t_t>();
+    roundtrip_strtod<decimal32_t>();
+    roundtrip_wcstrtod<decimal32_t>();
+    test_strtod_edges<decimal32_t>();
 
-    roundtrip_strtod<decimal64_t_t>();
-    roundtrip_wcstrtod<decimal64_t_t>();
-    test_strtod_edges<decimal64_t_t>();
+    roundtrip_strtod<decimal64_t>();
+    roundtrip_wcstrtod<decimal64_t>();
+    test_strtod_edges<decimal64_t>();
 
-    roundtrip_strtod<decimal128_t_t>();
-    roundtrip_wcstrtod<decimal128_t_t>();
-    test_strtod_edges<decimal128_t_t>();
+    roundtrip_strtod<decimal128_t>();
+    roundtrip_wcstrtod<decimal128_t>();
+    test_strtod_edges<decimal128_t>();
 
-    test_spot("2.9379440e-03", decimal32_t_t{UINT32_C(29379440), -10});
-    test_spot("3.4255120e+06", decimal32_t_t{3.4255120e+06F});
-    test_spot("0.052306360", decimal32_t_t{ 5.2306360e-02});
+    test_spot("2.9379440e-03", decimal32_t{UINT32_C(29379440), -10});
+    test_spot("3.4255120e+06", decimal32_t{3.4255120e+06F});
+    test_spot("0.052306360", decimal32_t{ 5.2306360e-02});
 
-    test_alloc<decimal32_t_t>();
-    test_alloc<decimal64_t_t>();
+    test_alloc<decimal32_t>();
+    test_alloc<decimal64_t>();
 
     // Homebrew GCC does not support locales
     #if !(defined(__GNUC__) && __GNUC__ >= 5 && defined(__APPLE__)) && !defined(BOOST_DECIMAL_QEMU_TEST)
-    test_locales<decimal32_t_t>();
-    test_locales<decimal64_t_t>();
-    test_locales<decimal128_t_t>();
+    test_locales<decimal32_t>();
+    test_locales<decimal64_t>();
+    test_locales<decimal128_t>();
     #endif
 
     return boost::report_errors();

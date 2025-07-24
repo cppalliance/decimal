@@ -8,7 +8,7 @@
 /*
  * With concepts we get the following error for the call to hypot
  *
- * ../../../boost/decimal/detail/cmath/hypot.hpp:23:16: note: candidate template ignored: constraints not satisfied [with T1 = boost::decimal::decimal32_t_t, T2 = double]
+ * ../../../boost/decimal/detail/cmath/hypot.hpp:23:16: note: candidate template ignored: constraints not satisfied [with T1 = boost::decimal::decimal32_t, T2 = double]
    23 | constexpr auto hypot(T1 x, T2 y) noexcept
       |                ^
 ../../../boost/decimal/detail/cmath/hypot.hpp:22:51: note: because 'double' does not satisfy 'decimal_floating_point_type'
@@ -33,20 +33,20 @@ In file included from ../../../boost/decimal/cmath.hpp:30:
 ../../../boost/decimal/detail/cmath/hypot.hpp:29:27: error: no matching function for call to 'isnan'
    29 |     if (abs(x) == zero || isnan(y))
       |                           ^~~~~
-concepts_test.cpp:13:19: note: in instantiation of function template specialization 'boost::decimal::hypot<boost::decimal::decimal32_t_t, double>' requested here
+concepts_test.cpp:13:19: note: in instantiation of function template specialization 'boost::decimal::hypot<boost::decimal::decimal32_t, double>' requested here
    13 |     BOOST_TEST_EQ(hypot(T(1), 1.0), 1.0);
       |                   ^
-concepts_test.cpp:19:5: note: in instantiation of function template specialization 'test<boost::decimal::decimal32_t_t>' requested here
-   19 |     test<boost::decimal::decimal32_t_t>();
+concepts_test.cpp:19:5: note: in instantiation of function template specialization 'test<boost::decimal::decimal32_t>' requested here
+   19 |     test<boost::decimal::decimal32_t>();
       |     ^
-../../../boost/decimal/decimal32_t_t.hpp:740:16: note: candidate function not viable: no known conversion from 'double' to 'decimal32_t_t' for 1st argument
-  740 | constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32_t_t rhs) noexcept -> bool
+../../../boost/decimal/decimal32_t.hpp:740:16: note: candidate function not viable: no known conversion from 'double' to 'decimal32_t' for 1st argument
+  740 | constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32_t rhs) noexcept -> bool
       |                ^                                               ~~~~~~~~~~~~~
-../../../boost/decimal/decimal64_t_t.hpp:967:16: note: candidate function not viable: no known conversion from 'double' to 'decimal64_t_t' for 1st argument
-  967 | constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64_t_t rhs) noexcept -> bool
+../../../boost/decimal/decimal64_t.hpp:967:16: note: candidate function not viable: no known conversion from 'double' to 'decimal64_t' for 1st argument
+  967 | constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64_t rhs) noexcept -> bool
       |                ^                                               ~~~~~~~~~~~~~
-../../../boost/decimal/decimal128_t_t.hpp:996:16: note: candidate function not viable: no known conversion from 'double' to 'decimal128_t_t' for 1st argument
-  996 | constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128_t_t rhs) noexcept -> bool
+../../../boost/decimal/decimal128_t.hpp:996:16: note: candidate function not viable: no known conversion from 'double' to 'decimal128_t' for 1st argument
+  996 | constexpr auto isnan BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128_t rhs) noexcept -> bool
       |                ^                                               ~~~~~~~~~~~~~~
 In file included from concepts_test.cpp:5:
 In file included from ../../../boost/decimal.hpp:12:
@@ -63,14 +63,14 @@ In file included from ../../../boost/decimal/cmath.hpp:30:
 ../../../boost/decimal/detail/cmath/hypot.hpp:37:26: error: no matching function for call to 'isinf'
    37 |     else if (isinf(x) || isinf(y))
       |                          ^~~~~
-../../../boost/decimal/decimal32_t_t.hpp:750:16: note: candidate function not viable: no known conversion from 'double' to 'decimal32_t_t' for 1st argument
-  750 | constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32_t_t rhs) noexcept -> bool
+../../../boost/decimal/decimal32_t.hpp:750:16: note: candidate function not viable: no known conversion from 'double' to 'decimal32_t' for 1st argument
+  750 | constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal32_t rhs) noexcept -> bool
       |                ^                                               ~~~~~~~~~~~~~
-../../../boost/decimal/decimal64_t_t.hpp:972:16: note: candidate function not viable: no known conversion from 'double' to 'decimal64_t_t' for 1st argument
-  972 | constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64_t_t rhs) noexcept -> bool
+../../../boost/decimal/decimal64_t.hpp:972:16: note: candidate function not viable: no known conversion from 'double' to 'decimal64_t' for 1st argument
+  972 | constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal64_t rhs) noexcept -> bool
       |                ^                                               ~~~~~~~~~~~~~
-../../../boost/decimal/decimal128_t_t.hpp:1001:16: note: candidate function not viable: no known conversion from 'double' to 'decimal128_t_t' for 1st argument
- 1001 | constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128_t_t rhs) noexcept -> bool
+../../../boost/decimal/decimal128_t.hpp:1001:16: note: candidate function not viable: no known conversion from 'double' to 'decimal128_t' for 1st argument
+ 1001 | constexpr auto isinf BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (decimal128_t rhs) noexcept -> bool
       |                ^                                               ~~~~~~~~~~~~~~
 In file included from concepts_test.cpp:5:
 In file included from ../../../boost/decimal.hpp:12:
@@ -82,50 +82,50 @@ In file included from ../../../boost/decimal/cmath.hpp:30:
    19 | constexpr auto abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexcept
       |                ^
 In file included from concepts_test.cpp:6:
-../../../boost/core/lightweight_test.hpp:217:62: error: invalid operands to binary expression ('const boost::decimal::decimal32_t_t' and 'const double')
+../../../boost/core/lightweight_test.hpp:217:62: error: invalid operands to binary expression ('const boost::decimal::decimal32_t' and 'const double')
   217 |     bool operator()(const T& t, const U& u) const { return t == u; }
       |                                                            ~ ^  ~
-../../../boost/core/lightweight_test.hpp:294:9: note: in instantiation of function template specialization 'boost::detail::lw_test_eq::operator()<boost::decimal::decimal32_t_t, double>' requested here
+../../../boost/core/lightweight_test.hpp:294:9: note: in instantiation of function template specialization 'boost::detail::lw_test_eq::operator()<boost::decimal::decimal32_t, double>' requested here
   294 |     if( pred(t, u) )
       |         ^
-concepts_test.cpp:13:5: note: in instantiation of function template specialization 'boost::detail::test_with_impl<boost::detail::lw_test_eq, boost::decimal::decimal32_t_t, double>' requested here
+concepts_test.cpp:13:5: note: in instantiation of function template specialization 'boost::detail::test_with_impl<boost::detail::lw_test_eq, boost::decimal::decimal32_t, double>' requested here
    13 |     BOOST_TEST_EQ(hypot(T(1), 1.0), 1.0);
       |     ^
 ../../../boost/core/lightweight_test.hpp:539:55: note: expanded from macro 'BOOST_TEST_EQ'
   539 | #define BOOST_TEST_EQ(expr1,expr2) ( ::boost::detail::test_with_impl(::boost::detail::lw_test_eq(), #expr1, #expr2, __FILE__, __LINE__, BOOST_CURRENT_FUNCTION, expr1, expr2) )
       |                                                       ^
-concepts_test.cpp:19:5: note: in instantiation of function template specialization 'test<boost::decimal::decimal32_t_t>' requested here
-   19 |     test<boost::decimal::decimal32_t_t>();
+concepts_test.cpp:19:5: note: in instantiation of function template specialization 'test<boost::decimal::decimal32_t>' requested here
+   19 |     test<boost::decimal::decimal32_t>();
       |     ^
-../../../boost/decimal/decimal32_t_t.hpp:1214:16: note: candidate function not viable: no known conversion from 'const double' to 'decimal32_t_t' for 2nd argument
- 1214 | constexpr auto operator==(decimal32_t_t lhs, decimal32_t_t rhs) noexcept -> bool
+../../../boost/decimal/decimal32_t.hpp:1214:16: note: candidate function not viable: no known conversion from 'const double' to 'decimal32_t' for 2nd argument
+ 1214 | constexpr auto operator==(decimal32_t lhs, decimal32_t rhs) noexcept -> bool
       |                ^                         ~~~~~~~~~~~~~
-../../../boost/decimal/decimal32_t_t.hpp:1232:16: note: candidate function template not viable: no known conversion from 'const double' to 'decimal32_t_t' for 2nd argument
- 1232 | constexpr auto operator==(Integer lhs, decimal32_t_t rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+../../../boost/decimal/decimal32_t.hpp:1232:16: note: candidate function template not viable: no known conversion from 'const double' to 'decimal32_t' for 2nd argument
+ 1232 | constexpr auto operator==(Integer lhs, decimal32_t rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
       |                ^                       ~~~~~~~~~~~~~
-../../../boost/decimal/decimal64_t_t.hpp:1824:16: note: candidate function template not viable: no known conversion from 'const double' to 'decimal64_t_t' for 2nd argument
- 1824 | constexpr auto operator==(Integer lhs, decimal64_t_t rhs) noexcept
+../../../boost/decimal/decimal64_t.hpp:1824:16: note: candidate function template not viable: no known conversion from 'const double' to 'decimal64_t' for 2nd argument
+ 1824 | constexpr auto operator==(Integer lhs, decimal64_t rhs) noexcept
       |                ^                       ~~~~~~~~~~~~~
-../../../boost/decimal/decimal128_t_t.hpp:1057:16: note: candidate function template not viable: no known conversion from 'const double' to 'decimal128_t_t' for 2nd argument
- 1057 | constexpr auto operator==(Integer lhs, decimal128_t_t rhs) noexcept
+../../../boost/decimal/decimal128_t.hpp:1057:16: note: candidate function template not viable: no known conversion from 'const double' to 'decimal128_t' for 2nd argument
+ 1057 | constexpr auto operator==(Integer lhs, decimal128_t rhs) noexcept
       |                ^                       ~~~~~~~~~~~~~~
-../../../boost/decimal/decimal64_t_t.hpp:1804:16: note: candidate function not viable: no known conversion from 'const double' to 'decimal64_t_t' for 2nd argument
- 1804 | constexpr auto operator==(decimal64_t_t lhs, decimal64_t_t rhs) noexcept -> bool
+../../../boost/decimal/decimal64_t.hpp:1804:16: note: candidate function not viable: no known conversion from 'const double' to 'decimal64_t' for 2nd argument
+ 1804 | constexpr auto operator==(decimal64_t lhs, decimal64_t rhs) noexcept -> bool
       |                ^                         ~~~~~~~~~~~~~
-../../../boost/decimal/decimal128_t_t.hpp:1037:16: note: candidate function not viable: no known conversion from 'const double' to 'decimal128_t_t' for 2nd argument
- 1037 | constexpr auto operator==(decimal128_t_t lhs, decimal128_t_t rhs) noexcept -> bool
+../../../boost/decimal/decimal128_t.hpp:1037:16: note: candidate function not viable: no known conversion from 'const double' to 'decimal128_t' for 2nd argument
+ 1037 | constexpr auto operator==(decimal128_t lhs, decimal128_t rhs) noexcept -> bool
       |                ^                          ~~~~~~~~~~~~~~
-../../../boost/decimal/detail/comparison.hpp:92:16: note: candidate template ignored: requirement 'detail::is_decimal_floating_point_v<double>' was not satisfied [with Decimal1 = boost::decimal::decimal32_t_t, Decimal2 = double]
+../../../boost/decimal/detail/comparison.hpp:92:16: note: candidate template ignored: requirement 'detail::is_decimal_floating_point_v<double>' was not satisfied [with Decimal1 = boost::decimal::decimal32_t, Decimal2 = double]
    92 | constexpr auto operator==(Decimal1 lhs, Decimal2 rhs) noexcept
       |                ^
-../../../boost/decimal/decimal32_t_t.hpp:1226:16: note: candidate template ignored: requirement 'detail::is_integral_v<double>' was not satisfied [with Integer = double]
- 1226 | constexpr auto operator==(decimal32_t_t lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
+../../../boost/decimal/decimal32_t.hpp:1226:16: note: candidate template ignored: requirement 'detail::is_integral_v<double>' was not satisfied [with Integer = double]
+ 1226 | constexpr auto operator==(decimal32_t lhs, Integer rhs) noexcept -> std::enable_if_t<detail::is_integral_v<Integer>, bool>
       |                ^
-../../../boost/decimal/decimal64_t_t.hpp:1817:16: note: candidate template ignored: requirement 'detail::is_integral_v<double>' was not satisfied [with Integer = double]
- 1817 | constexpr auto operator==(decimal64_t_t lhs, Integer rhs) noexcept
+../../../boost/decimal/decimal64_t.hpp:1817:16: note: candidate template ignored: requirement 'detail::is_integral_v<double>' was not satisfied [with Integer = double]
+ 1817 | constexpr auto operator==(decimal64_t lhs, Integer rhs) noexcept
       |                ^
-../../../boost/decimal/decimal128_t_t.hpp:1050:16: note: candidate template ignored: requirement 'detail::is_integral_v<double>' was not satisfied [with Integer = double]
- 1050 | constexpr auto operator==(decimal128_t_t lhs, Integer rhs) noexcept
+../../../boost/decimal/decimal128_t.hpp:1050:16: note: candidate template ignored: requirement 'detail::is_integral_v<double>' was not satisfied [with Integer = double]
+ 1050 | constexpr auto operator==(decimal128_t lhs, Integer rhs) noexcept
  */
 
 template <typename T>
@@ -138,7 +138,7 @@ void test()
 
 int main()
 {
-    test<boost::decimal::decimal32_t_t>();
+    test<boost::decimal::decimal32_t>();
 
     return boost::report_errors();
 }

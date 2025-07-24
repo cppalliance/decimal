@@ -21,10 +21,10 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-auto my_zero() -> boost::decimal::decimal32_t_t&;
-auto my_one () -> boost::decimal::decimal32_t_t&;
+auto my_zero() -> boost::decimal::decimal32_t&;
+auto my_one () -> boost::decimal::decimal32_t&;
 
-auto my_make_nan(boost::decimal::decimal32_t_t factor) -> boost::decimal::decimal32_t_t;
+auto my_make_nan(boost::decimal::decimal32_t factor) -> boost::decimal::decimal32_t;
 
 namespace local
 {
@@ -86,7 +86,7 @@ namespace local
 
   auto test_log1p(const int tol_factor, const bool negate, const long double range_lo, const long double range_hi) -> bool
   {
-    using decimal_type = boost::decimal::decimal32_t_t;
+    using decimal_type = boost::decimal::decimal32_t;
 
     std::random_device rd;
     std::mt19937_64 gen(rd());
@@ -145,7 +145,7 @@ namespace local
 
   auto test_log1p_edge() -> bool
   {
-    using decimal_type = boost::decimal::decimal32_t_t;
+    using decimal_type = boost::decimal::decimal32_t;
 
     std::mt19937_64 gen;
 
@@ -251,7 +251,7 @@ namespace local
 
   auto test_log1p_64(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal64_t_t;
+    using decimal_type = boost::decimal::decimal64_t;
 
     using val_ctrl_array_type = std::array<double, 21U>;
 
@@ -295,7 +295,7 @@ namespace local
 
   auto test_log1p_128(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128_t_t;
+    using decimal_type = boost::decimal::decimal128_t;
 
     using str_ctrl_array_type = std::array<const char*, 21U>;
 
@@ -400,12 +400,12 @@ auto main() -> int
   return (result_is_ok ? 0 : -1);
 }
 
-auto my_zero() -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_zero { 0, 0 }; return val_zero; }
-auto my_one () -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_one  { 1, 0 }; return val_one; }
+auto my_zero() -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_zero { 0, 0 }; return val_zero; }
+auto my_one () -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_one  { 1, 0 }; return val_one; }
 
-auto my_make_nan(boost::decimal::decimal32_t_t factor) -> boost::decimal::decimal32_t_t
+auto my_make_nan(boost::decimal::decimal32_t factor) -> boost::decimal::decimal32_t
 {
-  boost::decimal::decimal32_t_t val_nan = std::numeric_limits<boost::decimal::decimal32_t_t>::quiet_NaN();
+  boost::decimal::decimal32_t val_nan = std::numeric_limits<boost::decimal::decimal32_t>::quiet_NaN();
 
   return val_nan * factor;
 }

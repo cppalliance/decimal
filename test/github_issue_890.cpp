@@ -11,7 +11,7 @@
 int main()
 {
     constexpr std::uint64_t reference_bits {0xB1800000000002EE};
-    constexpr boost::decimal::decimal64_t_t test_value {-750, -2};
+    constexpr boost::decimal::decimal64_t test_value {-750, -2};
 
     std::uint64_t test_value_bits;
     std::memcpy(&test_value_bits, &test_value, sizeof(test_value));

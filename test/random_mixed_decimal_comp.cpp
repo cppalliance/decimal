@@ -23,7 +23,7 @@ void random_mixed_EQ()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
@@ -83,7 +83,7 @@ void random_mixed_NE()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
@@ -134,7 +134,7 @@ void random_mixed_LT()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
@@ -189,7 +189,7 @@ void random_mixed_LE()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
@@ -240,7 +240,7 @@ void random_mixed_GT()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
@@ -291,7 +291,7 @@ void random_mixed_GE()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
@@ -353,7 +353,7 @@ void random_mixed_SPACESHIP()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
@@ -415,7 +415,7 @@ void random_conversion_EQ()
 {
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
 
-    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Decimal2, decimal128_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const int val1 {dist(rng)};
@@ -472,38 +472,38 @@ void random_conversion_EQ()
 
 int main()
 {
-    random_mixed_EQ<decimal32_t_t, decimal64_t_t>();
-    random_mixed_NE<decimal32_t_t, decimal64_t_t>();
-    random_mixed_LT<decimal32_t_t, decimal64_t_t>();
-    random_mixed_LE<decimal32_t_t, decimal64_t_t>();
-    random_mixed_GT<decimal32_t_t, decimal64_t_t>();
-    random_mixed_GE<decimal32_t_t, decimal64_t_t>();
+    random_mixed_EQ<decimal32_t, decimal64_t>();
+    random_mixed_NE<decimal32_t, decimal64_t>();
+    random_mixed_LT<decimal32_t, decimal64_t>();
+    random_mixed_LE<decimal32_t, decimal64_t>();
+    random_mixed_GT<decimal32_t, decimal64_t>();
+    random_mixed_GE<decimal32_t, decimal64_t>();
 
-    random_conversion_EQ<decimal32_t_t, decimal64_t_t>();
+    random_conversion_EQ<decimal32_t, decimal64_t>();
 
-    random_mixed_EQ<decimal32_t_t, decimal128_t_t>();
-    random_mixed_NE<decimal32_t_t, decimal128_t_t>();
-    random_mixed_LT<decimal32_t_t, decimal128_t_t>();
-    random_mixed_LE<decimal32_t_t, decimal128_t_t>();
-    random_mixed_GT<decimal32_t_t, decimal128_t_t>();
-    random_mixed_GE<decimal32_t_t, decimal128_t_t>();
+    random_mixed_EQ<decimal32_t, decimal128_t>();
+    random_mixed_NE<decimal32_t, decimal128_t>();
+    random_mixed_LT<decimal32_t, decimal128_t>();
+    random_mixed_LE<decimal32_t, decimal128_t>();
+    random_mixed_GT<decimal32_t, decimal128_t>();
+    random_mixed_GE<decimal32_t, decimal128_t>();
 
-    random_conversion_EQ<decimal32_t_t, decimal128_t_t>();
+    random_conversion_EQ<decimal32_t, decimal128_t>();
 
-    random_mixed_EQ<decimal64_t_t, decimal128_t_t>();
-    random_mixed_NE<decimal64_t_t, decimal128_t_t>();
-    random_mixed_LT<decimal64_t_t, decimal128_t_t>();
-    random_mixed_LE<decimal64_t_t, decimal128_t_t>();
-    random_mixed_GT<decimal64_t_t, decimal128_t_t>();
-    random_mixed_GE<decimal64_t_t, decimal128_t_t>();
+    random_mixed_EQ<decimal64_t, decimal128_t>();
+    random_mixed_NE<decimal64_t, decimal128_t>();
+    random_mixed_LT<decimal64_t, decimal128_t>();
+    random_mixed_LE<decimal64_t, decimal128_t>();
+    random_mixed_GT<decimal64_t, decimal128_t>();
+    random_mixed_GE<decimal64_t, decimal128_t>();
 
-    random_conversion_EQ<decimal64_t_t, decimal128_t_t>();
+    random_conversion_EQ<decimal64_t, decimal128_t>();
 
 
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
-    random_mixed_SPACESHIP<decimal32_t_t, decimal64_t_t>();
-    random_mixed_SPACESHIP<decimal32_t_t, decimal128_t_t>();
-    random_mixed_SPACESHIP<decimal64_t_t, decimal128_t_t>();
+    random_mixed_SPACESHIP<decimal32_t, decimal64_t>();
+    random_mixed_SPACESHIP<decimal32_t, decimal128_t>();
+    random_mixed_SPACESHIP<decimal64_t, decimal128_t>();
     #endif
 
     return boost::report_errors();

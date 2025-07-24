@@ -25,58 +25,58 @@ void test_explicit()
 
 int main()
 {
-    test_explicit<boost::decimal::decimal32_t_t, boost::decimal::decimal32_t_t>();
-    test_explicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal32_t_t>();
-    test_explicit<boost::decimal::decimal64_t_t, boost::decimal::decimal32_t_t>();
-    test_explicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal32_t_t>();
-    test_explicit<boost::decimal::decimal128_t_t, boost::decimal::decimal32_t_t>();
-    test_explicit<boost::decimal::decimal_fast128_t, boost::decimal::decimal32_t_t>();
+    test_explicit<boost::decimal::decimal32_t, boost::decimal::decimal32_t>();
+    test_explicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal32_t>();
+    test_explicit<boost::decimal::decimal64_t, boost::decimal::decimal32_t>();
+    test_explicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal32_t>();
+    test_explicit<boost::decimal::decimal128_t, boost::decimal::decimal32_t>();
+    test_explicit<boost::decimal::decimal_fast128_t, boost::decimal::decimal32_t>();
 
-    test_explicit<boost::decimal::decimal32_t_t, boost::decimal::decimal_fast32_t>();
+    test_explicit<boost::decimal::decimal32_t, boost::decimal::decimal_fast32_t>();
     test_explicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal_fast32_t>();
-    test_explicit<boost::decimal::decimal64_t_t, boost::decimal::decimal_fast32_t>();
+    test_explicit<boost::decimal::decimal64_t, boost::decimal::decimal_fast32_t>();
     test_explicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal_fast32_t>();
-    test_explicit<boost::decimal::decimal128_t_t, boost::decimal::decimal_fast32_t>();
+    test_explicit<boost::decimal::decimal128_t, boost::decimal::decimal_fast32_t>();
     test_explicit<boost::decimal::decimal_fast128_t, boost::decimal::decimal_fast32_t>();
 
-    test_explicit<boost::decimal::decimal32_t_t, boost::decimal::decimal_fast64_t>();
+    test_explicit<boost::decimal::decimal32_t, boost::decimal::decimal_fast64_t>();
     test_explicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal_fast64_t>();
-    test_explicit<boost::decimal::decimal64_t_t, boost::decimal::decimal_fast64_t>();
+    test_explicit<boost::decimal::decimal64_t, boost::decimal::decimal_fast64_t>();
     test_explicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal_fast64_t>();
-    test_explicit<boost::decimal::decimal128_t_t, boost::decimal::decimal_fast64_t>();
+    test_explicit<boost::decimal::decimal128_t, boost::decimal::decimal_fast64_t>();
     test_explicit<boost::decimal::decimal_fast128_t, boost::decimal::decimal_fast64_t>();
 
-    test_explicit<boost::decimal::decimal32_t_t, boost::decimal::decimal128_t_t>();
-    test_explicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal128_t_t>();
-    test_explicit<boost::decimal::decimal64_t_t, boost::decimal::decimal128_t_t>();
-    test_explicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal128_t_t>();
-    test_explicit<boost::decimal::decimal128_t_t, boost::decimal::decimal128_t_t>();
-    test_explicit<boost::decimal::decimal_fast128_t, boost::decimal::decimal128_t_t>();
+    test_explicit<boost::decimal::decimal32_t, boost::decimal::decimal128_t>();
+    test_explicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal128_t>();
+    test_explicit<boost::decimal::decimal64_t, boost::decimal::decimal128_t>();
+    test_explicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal128_t>();
+    test_explicit<boost::decimal::decimal128_t, boost::decimal::decimal128_t>();
+    test_explicit<boost::decimal::decimal_fast128_t, boost::decimal::decimal128_t>();
 
-    test_implicit<boost::decimal::decimal32_t_t, boost::decimal::decimal32_t_t>();
-    test_implicit<boost::decimal::decimal32_t_t, boost::decimal::decimal_fast32_t>();
-    test_implicit<boost::decimal::decimal32_t_t, boost::decimal::decimal64_t_t>();
-    test_implicit<boost::decimal::decimal32_t_t, boost::decimal::decimal_fast64_t>();
-    test_implicit<boost::decimal::decimal32_t_t, boost::decimal::decimal128_t_t>();
-    test_implicit<boost::decimal::decimal32_t_t, boost::decimal::decimal_fast128_t>();
+    test_implicit<boost::decimal::decimal32_t, boost::decimal::decimal32_t>();
+    test_implicit<boost::decimal::decimal32_t, boost::decimal::decimal_fast32_t>();
+    test_implicit<boost::decimal::decimal32_t, boost::decimal::decimal64_t>();
+    test_implicit<boost::decimal::decimal32_t, boost::decimal::decimal_fast64_t>();
+    test_implicit<boost::decimal::decimal32_t, boost::decimal::decimal128_t>();
+    test_implicit<boost::decimal::decimal32_t, boost::decimal::decimal_fast128_t>();
 
     test_implicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal_fast32_t>();
-    test_implicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal64_t_t>();
+    test_implicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal64_t>();
     test_implicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal_fast64_t>();
-    test_implicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal128_t_t>();
+    test_implicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal128_t>();
     test_implicit<boost::decimal::decimal_fast32_t, boost::decimal::decimal_fast128_t>();
 
-    test_implicit<boost::decimal::decimal64_t_t, boost::decimal::decimal64_t_t>();
-    test_implicit<boost::decimal::decimal64_t_t, boost::decimal::decimal_fast64_t>();
-    test_implicit<boost::decimal::decimal64_t_t, boost::decimal::decimal128_t_t>();
-    test_implicit<boost::decimal::decimal64_t_t, boost::decimal::decimal_fast128_t>();
+    test_implicit<boost::decimal::decimal64_t, boost::decimal::decimal64_t>();
+    test_implicit<boost::decimal::decimal64_t, boost::decimal::decimal_fast64_t>();
+    test_implicit<boost::decimal::decimal64_t, boost::decimal::decimal128_t>();
+    test_implicit<boost::decimal::decimal64_t, boost::decimal::decimal_fast128_t>();
 
     test_implicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal_fast64_t>();
-    test_implicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal128_t_t>();
+    test_implicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal128_t>();
     test_implicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal_fast128_t>();
 
-    test_implicit<boost::decimal::decimal128_t_t, boost::decimal::decimal128_t_t>();
-    test_implicit<boost::decimal::decimal128_t_t, boost::decimal::decimal_fast128_t>();
+    test_implicit<boost::decimal::decimal128_t, boost::decimal::decimal128_t>();
+    test_implicit<boost::decimal::decimal128_t, boost::decimal::decimal_fast128_t>();
 
     test_implicit<boost::decimal::decimal_fast128_t, boost::decimal::decimal_fast128_t>();
 

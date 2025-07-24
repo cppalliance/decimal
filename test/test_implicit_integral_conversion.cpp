@@ -23,9 +23,9 @@ void test()
 
 int main()
 {
-    test<boost::decimal::decimal32_t_t>();
-    test<boost::decimal::decimal64_t_t>();
-    test<boost::decimal::decimal128_t_t>();
+    test<boost::decimal::decimal32_t>();
+    test<boost::decimal::decimal64_t>();
+    test<boost::decimal::decimal128_t>();
 
     return boost::report_errors();
 }

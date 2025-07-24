@@ -405,9 +405,9 @@ int main()
 {
     const auto float_vector = generate_random_vector<float>();
     const auto double_vector = generate_random_vector<double>();
-    const auto dec32_vector = generate_random_vector<decimal32_t_t>();
-    const auto dec64_vector = generate_random_vector<decimal64_t_t>();
-    const auto dec128_vector = generate_random_vector<decimal128_t_t>();
+    const auto dec32_vector = generate_random_vector<decimal32_t>();
+    const auto dec64_vector = generate_random_vector<decimal64_t>();
+    const auto dec128_vector = generate_random_vector<decimal128_t>();
 
     // We use identical values to ensure fair comparison of IEEE vs fast types
     const auto dec32_fast_vector = convert_copy_vector<decimal_fast32_t>(dec32_vector);
@@ -418,9 +418,9 @@ int main()
 
     test_comparisons(float_vector, "float");
     test_comparisons(double_vector, "double");
-    test_comparisons(dec32_vector, "decimal32_t_t");
-    test_comparisons(dec64_vector, "decimal64_t_t");
-    test_comparisons(dec128_vector, "decimal128_t_t");
+    test_comparisons(dec32_vector, "decimal32_t");
+    test_comparisons(dec64_vector, "decimal64_t");
+    test_comparisons(dec128_vector, "decimal128_t");
     test_comparisons(dec32_fast_vector, "dec32_fast");
     test_comparisons(dec64_fast_vector, "dec64_fast");
     test_comparisons(dec128_fast_vector, "dec128_fast");
@@ -429,9 +429,9 @@ int main()
 
     test_two_element_operation(float_vector, std::plus<>(), "Addition", "float");
     test_two_element_operation(double_vector, std::plus<>(), "Addition", "double");
-    test_two_element_operation(dec32_vector, std::plus<>(), "Addition", "decimal32_t_t");
-    test_two_element_operation(dec64_vector, std::plus<>(), "Addition", "decimal64_t_t");
-    test_two_element_operation(dec128_vector, std::plus<>(), "Addition", "decimal128_t_t");
+    test_two_element_operation(dec32_vector, std::plus<>(), "Addition", "decimal32_t");
+    test_two_element_operation(dec64_vector, std::plus<>(), "Addition", "decimal64_t");
+    test_two_element_operation(dec128_vector, std::plus<>(), "Addition", "decimal128_t");
     test_two_element_operation(dec32_fast_vector, std::plus<>(), "Addition", "dec32_fast");
     test_two_element_operation(dec64_fast_vector, std::plus<>(), "Addition", "dec64_fast");
     test_two_element_operation(dec128_fast_vector, std::plus<>(), "Addition", "dec128_fast");
@@ -440,9 +440,9 @@ int main()
 
     test_two_element_operation(float_vector, std::minus<>(), "Subtraction", "float");
     test_two_element_operation(double_vector, std::minus<>(), "Subtraction", "double");
-    test_two_element_operation(dec32_vector, std::minus<>(), "Subtraction", "decimal32_t_t");
-    test_two_element_operation(dec64_vector, std::minus<>(), "Subtraction", "decimal64_t_t");
-    test_two_element_operation(dec128_vector, std::minus<>(), "Subtraction", "decimal128_t_t");
+    test_two_element_operation(dec32_vector, std::minus<>(), "Subtraction", "decimal32_t");
+    test_two_element_operation(dec64_vector, std::minus<>(), "Subtraction", "decimal64_t");
+    test_two_element_operation(dec128_vector, std::minus<>(), "Subtraction", "decimal128_t");
     test_two_element_operation(dec32_fast_vector, std::minus<>(), "Subtraction", "dec32_fast");
     test_two_element_operation(dec64_fast_vector, std::minus<>(), "Subtraction", "dec64_fast");
     test_two_element_operation(dec128_fast_vector, std::minus<>(), "Subtraction", "dec128_fast");
@@ -451,9 +451,9 @@ int main()
 
     test_two_element_operation(float_vector, std::multiplies<>(), "Multiplication", "float");
     test_two_element_operation(double_vector, std::multiplies<>(), "Multiplication", "double");
-    test_two_element_operation(dec32_vector, std::multiplies<>(), "Multiplication", "decimal32_t_t");
-    test_two_element_operation(dec64_vector, std::multiplies<>(), "Multiplication", "decimal64_t_t");
-    test_two_element_operation(dec128_vector, std::multiplies<>(), "Multiplication", "decimal128_t_t");
+    test_two_element_operation(dec32_vector, std::multiplies<>(), "Multiplication", "decimal32_t");
+    test_two_element_operation(dec64_vector, std::multiplies<>(), "Multiplication", "decimal64_t");
+    test_two_element_operation(dec128_vector, std::multiplies<>(), "Multiplication", "decimal128_t");
     test_two_element_operation(dec32_fast_vector, std::multiplies<>(), "Multiplication", "dec32_fast");
     test_two_element_operation(dec64_fast_vector, std::multiplies<>(), "Multiplication", "dec64_fast");
     test_two_element_operation(dec128_fast_vector, std::multiplies<>(), "Multiplication", "dec128_fast");
@@ -462,9 +462,9 @@ int main()
 
     test_two_element_operation(float_vector, std::divides<>(), "Division", "float");
     test_two_element_operation(double_vector, std::divides<>(), "Division", "double");
-    test_two_element_operation(dec32_vector, std::divides<>(), "Division", "decimal32_t_t");
-    test_two_element_operation(dec64_vector, std::divides<>(), "Division", "decimal64_t_t");
-    test_two_element_operation(dec128_vector, std::divides<>(), "Division", "decimal128_t_t");
+    test_two_element_operation(dec32_vector, std::divides<>(), "Division", "decimal32_t");
+    test_two_element_operation(dec64_vector, std::divides<>(), "Division", "decimal64_t");
+    test_two_element_operation(dec128_vector, std::divides<>(), "Division", "decimal128_t");
     test_two_element_operation(dec32_fast_vector, std::divides<>(), "Division", "dec32_fast");
     test_two_element_operation(dec64_fast_vector, std::divides<>(), "Division", "dec64_fast");
     test_two_element_operation(dec128_fast_vector, std::divides<>(), "Division", "dec128_fast");
@@ -474,9 +474,9 @@ int main()
 
     test_one_element_operation(float_vector, (float(*)(float))std::sqrt, "sqrt", "float");
     test_one_element_operation(double_vector, (double(*)(double))std::sqrt, "sqrt", "double");
-    test_one_element_operation(dec32_vector, (decimal32_t_t(*)(decimal32_t_t))sqrt, "sqrt", "decimal32_t_t");
-    test_one_element_operation(dec64_vector, (decimal64_t_t(*)(decimal64_t_t))sqrt, "sqrt", "decimal64_t_t");
-    test_one_element_operation(dec128_vector, (decimal128_t_t(*)(decimal128_t_t))sqrt, "sqrt", "decimal128_t_t");
+    test_one_element_operation(dec32_vector, (decimal32_t(*)(decimal32_t))sqrt, "sqrt", "decimal32_t");
+    test_one_element_operation(dec64_vector, (decimal64_t(*)(decimal64_t))sqrt, "sqrt", "decimal64_t");
+    test_one_element_operation(dec128_vector, (decimal128_t(*)(decimal128_t))sqrt, "sqrt", "decimal128_t");
 #endif
 #ifdef BOOST_DECIMAL_BENCHMARK_CHARCONV
     std::cerr << "\n===== <charconv> to_chars =====\n";

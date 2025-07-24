@@ -4,9 +4,9 @@
 //
 // This is a toy example to make sure that the hashing compiles correctly
 
-#include <boost/decimal/decimal32_t_t.hpp>
-#include <boost/decimal/decimal64_t_t.hpp>
-#include <boost/decimal/decimal128_t_t.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
 #include <boost/decimal/decimal_fast32_t.hpp>
 #include <boost/decimal/decimal_fast64_t.hpp>
 #include <boost/decimal/decimal_fast128_t.hpp>
@@ -28,9 +28,9 @@ void test_hash()
 
 int main()
 {
-    test_hash<boost::decimal::decimal32_t_t>();
-    test_hash<boost::decimal::decimal64_t_t>();
-    test_hash<boost::decimal::decimal128_t_t>();
+    test_hash<boost::decimal::decimal32_t>();
+    test_hash<boost::decimal::decimal64_t>();
+    test_hash<boost::decimal::decimal128_t>();
     test_hash<boost::decimal::decimal_fast32_t>();
     test_hash<boost::decimal::decimal_fast64_t>();
     test_hash<boost::decimal::decimal_fast128_t>();

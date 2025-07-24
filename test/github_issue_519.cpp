@@ -12,7 +12,7 @@
 
 auto main() -> int
 {
-    using local_decimal_type = boost::decimal::decimal128_t_t;
+    using local_decimal_type = boost::decimal::decimal128_t;
 
     // N[Gamma[456/100], 34]
     // 12.64819265438397922113369900828315

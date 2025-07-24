@@ -342,7 +342,7 @@ void test_roundtrip_float_stream<long double>()
     }
 }
 
-void test_roundtrip_conversion_decimal32_t_t()
+void test_roundtrip_conversion_decimal32_t()
 {
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
@@ -350,7 +350,7 @@ void test_roundtrip_conversion_decimal32_t_t()
     for (std::size_t i = 0; i < N; ++i)
     {
         const decimal_fast128_t val {dist(rng)};
-        const decimal32_t_t short_dec(val);
+        const decimal32_t short_dec(val);
         const decimal_fast128_t return_decimal {short_dec};
 
         if(!BOOST_TEST_EQ(val, return_decimal))
@@ -436,7 +436,7 @@ int main()
     //test_roundtrip_float_stream<std::bfloat16_t>();
     #endif
 
-    test_roundtrip_conversion_decimal32_t_t();
+    test_roundtrip_conversion_decimal32_t();
 
     return boost::report_errors();
 }

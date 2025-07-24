@@ -24,15 +24,15 @@ template <typename T>
 void test_edit_exp()
 {
     std::uniform_int_distribution<T> sig(1'000'000, 9'999'999);
-    std::uniform_int_distribution<T> exp(T(std::numeric_limits<decimal32_t_t>::min_exponent10 + 19),
-                                         T(std::numeric_limits<decimal32_t_t>::max_exponent10 - 19));
+    std::uniform_int_distribution<T> exp(T(std::numeric_limits<decimal32_t>::min_exponent10 + 19),
+                                         T(std::numeric_limits<decimal32_t>::max_exponent10 - 19));
 
     for (std::size_t i {}; i < N; ++i)
     {
         const auto orig_sig {sig(rng)};
-        decimal32_t_t val {orig_sig, exp(rng)};
+        decimal32_t val {orig_sig, exp(rng)};
         const auto new_exp {exp(rng)};
-        const decimal32_t_t new_val {orig_sig, new_exp};
+        const decimal32_t new_val {orig_sig, new_exp};
         val.edit_exponent(new_exp);
 
 
@@ -50,16 +50,16 @@ template <typename T>
 void test_edit_sig()
 {
     std::uniform_int_distribution<T> sig(1'000'000, 9'999'999);
-    std::uniform_int_distribution<T> exp(T(std::numeric_limits<decimal32_t_t>::min_exponent10 + 19),
-                                         T(std::numeric_limits<decimal32_t_t>::max_exponent10 - 19));
+    std::uniform_int_distribution<T> exp(T(std::numeric_limits<decimal32_t>::min_exponent10 + 19),
+                                         T(std::numeric_limits<decimal32_t>::max_exponent10 - 19));
 
     for (std::size_t i {}; i < N; ++i)
     {
         const auto orig_exp {exp(rng)};
         const auto orig_sig {sig(rng)};
-        decimal32_t_t val {orig_sig, orig_exp};
+        decimal32_t val {orig_sig, orig_exp};
         const auto new_sig {sig(rng)};
-        const decimal32_t_t new_val {new_sig, orig_exp};
+        const decimal32_t new_val {new_sig, orig_exp};
         val.edit_significand(new_sig);
 
 

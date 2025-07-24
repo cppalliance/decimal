@@ -200,7 +200,7 @@ namespace local
 
     auto result_is_ok = true;
 
-    using decimal_type = boost::decimal::decimal32_t_t;
+    using decimal_type = boost::decimal::decimal32_t;
     using float_type = float;
 
     for(auto   n = static_cast<std::size_t>(UINT8_C(0));
@@ -209,7 +209,7 @@ namespace local
     {
       const auto ld_arg = static_cast<long double>(-0.23L - static_cast<long double>(n + 1U));
 
-      const auto x_dec = static_cast<boost::decimal::decimal32_t_t>(ld_arg);
+      const auto x_dec = static_cast<boost::decimal::decimal32_t>(ld_arg);
       const auto x_flt = static_cast<float>(ld_arg);
 
       const auto val_flt = static_cast<float>(ctrl_values[n]);
@@ -360,7 +360,7 @@ namespace local
 
   auto test_lgamma_128(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128_t_t;
+    using decimal_type = boost::decimal::decimal128_t;
 
     using str_ctrl_array_type = std::array<const char*, 21U>;
 
@@ -434,7 +434,7 @@ auto main() -> int
   auto result_is_ok = true;
 
   {
-    using decimal_type = boost::decimal::decimal64_t_t;
+    using decimal_type = boost::decimal::decimal64_t;
     using float_type   = double;
 
     const auto result_special_issue385_is_ok = local::test_special_issue385<decimal_type, float_type>(4096);
@@ -445,7 +445,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal32_t_t;
+    using decimal_type = boost::decimal::decimal32_t;
     using float_type   = float;
 
     const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 0.01L, 0.9L);
@@ -456,7 +456,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal32_t_t;
+    using decimal_type = boost::decimal::decimal32_t;
     using float_type   = float;
 
     const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 1.1L, 1.9L);
@@ -467,7 +467,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal32_t_t;
+    using decimal_type = boost::decimal::decimal32_t;
     using float_type   = float;
 
     const auto result_lgamma_is_ok   = local::test_lgamma<decimal_type, float_type>(512, 2.1L, 123.4L);
@@ -478,7 +478,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal64_t_t;
+    using decimal_type = boost::decimal::decimal64_t;
     using float_type   = double;
 
     const auto result_lgamma_is_ok = local::test_lgamma<decimal_type, float_type>(4096, 0.01L, 0.9L);
@@ -489,7 +489,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal64_t_t;
+    using decimal_type = boost::decimal::decimal64_t;
     using float_type   = double;
 
     const auto result_lgamma_is_ok = local::test_lgamma<decimal_type, float_type>(4096, 1.1L, 1.9L);
@@ -500,7 +500,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal64_t_t;
+    using decimal_type = boost::decimal::decimal64_t;
     using float_type   = double;
 
     const auto result_lgamma_is_ok = local::test_lgamma<decimal_type, float_type>(4096, 2.1L, 123.4L);
@@ -519,7 +519,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal32_t_t;
+    using decimal_type = boost::decimal::decimal32_t;
     using float_type   = float;
 
     const auto result_edge_is_ok = local::test_lgamma_edge<decimal_type, float_type>();

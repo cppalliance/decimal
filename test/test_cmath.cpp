@@ -5,9 +5,9 @@
 // Propogates up from boost.math
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
-#include <boost/decimal/decimal32_t_t.hpp>
-#include <boost/decimal/decimal64_t_t.hpp>
-#include <boost/decimal/decimal128_t_t.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
 #include <boost/decimal/decimal_fast32_t.hpp>
 #include <boost/decimal/decimal_fast64_t.hpp>
 #include <boost/decimal/decimal_fast128_t.hpp>
@@ -66,8 +66,8 @@ void test_fmax()
     BOOST_TEST_EQ(fmax(Dec(-2), Dec(1)), Dec(1));
 
     // Mixed types
-    BOOST_TEST_EQ(fmax(decimal128_t_t(1), Dec(0)), decimal128_t_t(1));
-    BOOST_TEST_EQ(fmax(decimal128_t_t(-2), Dec(1)), decimal128_t_t(1));
+    BOOST_TEST_EQ(fmax(decimal128_t(1), Dec(0)), decimal128_t(1));
+    BOOST_TEST_EQ(fmax(decimal128_t(-2), Dec(1)), decimal128_t(1));
 }
 
 template <typename Dec>
@@ -108,8 +108,8 @@ void test_fmin()
     BOOST_TEST_EQ(fmin(Dec(-2), Dec(1)), Dec(-2));
 
     // Mixed types
-    BOOST_TEST_EQ(fmin(decimal128_t_t(1), Dec(0)), decimal128_t_t(0));
-    BOOST_TEST_EQ(fmin(decimal128_t_t(-2), Dec(1)), decimal128_t_t(-2));
+    BOOST_TEST_EQ(fmin(decimal128_t(1), Dec(0)), decimal128_t(0));
+    BOOST_TEST_EQ(fmin(decimal128_t(-2), Dec(1)), decimal128_t(-2));
 }
 
 template <typename Dec>
@@ -252,7 +252,7 @@ void test_frexp10()
     BOOST_TEST_EQ(frexp10(std::numeric_limits<Dec>::infinity(), &expval), -1);
     BOOST_TEST_EQ(expval, 0);
 
-    BOOST_IF_CONSTEXPR (std::is_same<Dec, decimal32_t_t>::value)
+    BOOST_IF_CONSTEXPR (std::is_same<Dec, decimal32_t>::value)
     {
         BOOST_TEST_EQ(frexp10(Dec(10, 0), &expval), 1'000'000);
         BOOST_TEST_EQ(expval, -5);
@@ -263,7 +263,7 @@ void test_frexp10()
         BOOST_TEST_EQ(frexp10(Dec(-1'000'000, 5), &expval), 1'000'000);
         BOOST_TEST_EQ(expval, 5);
     }
-    else BOOST_IF_CONSTEXPR (std::is_same<Dec, decimal64_t_t>::value)
+    else BOOST_IF_CONSTEXPR (std::is_same<Dec, decimal64_t>::value)
     {
         BOOST_TEST_EQ(frexp10(Dec(10, 0), &expval), 1000000000000000);
         BOOST_TEST_EQ(expval, -14);
@@ -321,7 +321,7 @@ void test_div_fmod()
 {
     std::uniform_real_distribution<float> dist(0.0F, 1e30F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -359,7 +359,7 @@ void test_copysign()
 {
     std::uniform_real_distribution<float> dist(0.0F, 1e30F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -401,7 +401,7 @@ void test_fma()
 
     std::uniform_real_distribution<double> dist(-1e3, 1e3);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -455,7 +455,7 @@ void test_fdim()
 {
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -498,12 +498,12 @@ void test_fdim()
 template <typename Dec>
 void test_ilogb()
 {
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32_t_t>::value || std::is_same<Dec, decimal_fast32_t>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32_t>::value || std::is_same<Dec, decimal_fast32_t>::value)
     {
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), 101);
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), 102);
     }
-    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal64_t_t>::value || std::is_same<Dec, decimal_fast64_t>::value)
+    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal64_t>::value || std::is_same<Dec, decimal_fast64_t>::value)
     {
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), 398);
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), 399);
@@ -522,12 +522,12 @@ void test_ilogb()
 template <typename Dec>
 void test_logb()
 {
-    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32_t_t>::value || std::is_same<Dec, decimal_fast32_t>::value)
+    BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal32_t>::value || std::is_same<Dec, decimal_fast32_t>::value)
     {
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), Dec(101));
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), Dec(102));
     }
-    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal64_t_t>::value || std::is_same<Dec, decimal_fast64_t>::value)
+    else BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<Dec, decimal64_t>::value || std::is_same<Dec, decimal_fast64_t>::value)
     {
         BOOST_TEST_EQ(ilogb(Dec(1, 0)), Dec(398));
         BOOST_TEST_EQ(ilogb(Dec(10, 0)), Dec(399));
@@ -550,10 +550,10 @@ void test_logb()
 template <typename Dec>
 void test_sqrt()
 {
-    using comp_type = std::conditional_t<std::is_same<Dec, decimal32_t_t>::value || std::is_same<Dec, decimal_fast32_t>::value, float, double>;
+    using comp_type = std::conditional_t<std::is_same<Dec, decimal32_t>::value || std::is_same<Dec, decimal_fast32_t>::value, float, double>;
     std::uniform_real_distribution<comp_type> dist(0, 1e5);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -591,7 +591,7 @@ void test_two_val_hypot()
 {
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -639,7 +639,7 @@ void test_mixed_two_val_hypot()
 {
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    constexpr auto max_iter {std::is_same<Dec2, decimal128_t_t>::value || std::is_same<Dec2, decimal_fast128_t>::value ? 4 : N};
+    constexpr auto max_iter {std::is_same<Dec2, decimal128_t>::value || std::is_same<Dec2, decimal_fast128_t>::value ? 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -677,7 +677,7 @@ void test_three_val_hypot()
     
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -732,7 +732,7 @@ void test_rint()
 {
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
 
     for (std::size_t n {}; n < max_iter; ++n)
     {
@@ -800,7 +800,7 @@ void test_lrint()
 
     std::uniform_real_distribution<float> dist(-1e5F, 1e5F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -881,7 +881,7 @@ void test_llrint()
 {
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
@@ -924,7 +924,7 @@ void test_nearbyint()
 {
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -988,7 +988,7 @@ void test_round()
 {
     std::uniform_real_distribution<float> dist(-1e5F, 1e5F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -1030,7 +1030,7 @@ void test_lround()
 {
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
@@ -1073,7 +1073,7 @@ void test_llround()
 {
     std::uniform_real_distribution<float> dist(-1e20F, 1e20F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
 
     std::uniform_real_distribution<float> dist2(-1e5F, 1e5F);
 
@@ -1116,7 +1116,7 @@ void test_nextafter()
 {
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -1159,7 +1159,7 @@ void test_nexttoward()
 {
     std::uniform_real_distribution<float> dist(1.0F, 1e5F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -1235,7 +1235,7 @@ void test_log2()
 {
     std::uniform_real_distribution<float> dist(-0.5F, 0.5F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -1268,7 +1268,7 @@ void test_log10()
 {
     std::uniform_real_distribution<float> dist(-0.5F, 0.5F);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value || std::is_same<Dec, decimal_fast128_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -1309,14 +1309,14 @@ void test_fpclassify()
 
 int main()
 {
-    test_fmax<decimal32_t_t>();
-    test_isgreater<decimal32_t_t>();
-    test_isgreaterequal<decimal32_t_t>();
-    test_fmin<decimal32_t_t>();
-    test_isless<decimal32_t_t>();
-    test_islessequal<decimal32_t_t>();
-    test_islessgreater<decimal32_t_t>();
-    test_isunordered<decimal32_t_t>();
+    test_fmax<decimal32_t>();
+    test_isgreater<decimal32_t>();
+    test_isgreaterequal<decimal32_t>();
+    test_fmin<decimal32_t>();
+    test_isless<decimal32_t>();
+    test_islessequal<decimal32_t>();
+    test_islessgreater<decimal32_t>();
+    test_isunordered<decimal32_t>();
 
     test_fmax<decimal_fast32_t>();
     test_isgreater<decimal_fast32_t>();
@@ -1327,14 +1327,14 @@ int main()
     test_islessgreater<decimal_fast32_t>();
     test_isunordered<decimal_fast32_t>();
 
-    test_fmax<decimal64_t_t>();
-    test_isgreater<decimal64_t_t>();
-    test_isgreaterequal<decimal64_t_t>();
-    test_fmin<decimal64_t_t>();
-    test_isless<decimal64_t_t>();
-    test_islessequal<decimal64_t_t>();
-    test_islessgreater<decimal64_t_t>();
-    test_isunordered<decimal64_t_t>();
+    test_fmax<decimal64_t>();
+    test_isgreater<decimal64_t>();
+    test_isgreaterequal<decimal64_t>();
+    test_fmin<decimal64_t>();
+    test_isless<decimal64_t>();
+    test_islessequal<decimal64_t>();
+    test_islessgreater<decimal64_t>();
+    test_isunordered<decimal64_t>();
 
     test_fmax<decimal_fast64_t>();
     test_isgreater<decimal_fast64_t>();
@@ -1345,14 +1345,14 @@ int main()
     test_islessgreater<decimal_fast64_t>();
     test_isunordered<decimal_fast64_t>();
 
-    test_fmax<decimal128_t_t>();
-    test_isgreater<decimal128_t_t>();
-    test_isgreaterequal<decimal128_t_t>();
-    test_fmin<decimal128_t_t>();
-    test_isless<decimal128_t_t>();
-    test_islessequal<decimal128_t_t>();
-    test_islessgreater<decimal128_t_t>();
-    test_isunordered<decimal128_t_t>();
+    test_fmax<decimal128_t>();
+    test_isgreater<decimal128_t>();
+    test_isgreaterequal<decimal128_t>();
+    test_fmin<decimal128_t>();
+    test_isless<decimal128_t>();
+    test_islessequal<decimal128_t>();
+    test_islessgreater<decimal128_t>();
+    test_isunordered<decimal128_t>();
 
     test_fmax<decimal_fast128_t>();
     test_isgreater<decimal_fast128_t>();
@@ -1363,196 +1363,196 @@ int main()
     test_islessgreater<decimal_fast128_t>();
     test_isunordered<decimal_fast128_t>();
 
-    test_floor<decimal32_t_t>();
-    test_ceil<decimal32_t_t>();
-    test_trunc<decimal32_t_t>();
+    test_floor<decimal32_t>();
+    test_ceil<decimal32_t>();
+    test_trunc<decimal32_t>();
 
     test_floor<decimal_fast32_t>();
     test_ceil<decimal_fast32_t>();
     test_trunc<decimal_fast32_t>();
 
-    test_floor<decimal64_t_t>();
-    test_ceil<decimal64_t_t>();
-    test_trunc<decimal64_t_t>();
+    test_floor<decimal64_t>();
+    test_ceil<decimal64_t>();
+    test_trunc<decimal64_t>();
 
     test_floor<decimal_fast64_t>();
     test_ceil<decimal_fast64_t>();
     test_trunc<decimal_fast64_t>();
 
-    test_floor<decimal128_t_t>();
-    test_ceil<decimal128_t_t>();
-    test_trunc<decimal128_t_t>();
+    test_floor<decimal128_t>();
+    test_ceil<decimal128_t>();
+    test_trunc<decimal128_t>();
 
     test_floor<decimal_fast128_t>();
     test_ceil<decimal_fast128_t>();
     test_trunc<decimal_fast128_t>();
 
-    test_frexp10<decimal32_t_t>();
-    test_scalbn<decimal32_t_t>();
-    test_scalbln<decimal32_t_t>();
+    test_frexp10<decimal32_t>();
+    test_scalbn<decimal32_t>();
+    test_scalbln<decimal32_t>();
 
     test_frexp10<decimal_fast32_t>();
     test_scalbn<decimal_fast32_t>();
     test_scalbln<decimal_fast32_t>();
 
-    test_frexp10<decimal64_t_t>();
-    test_scalbn<decimal64_t_t>();
-    test_scalbln<decimal64_t_t>();
+    test_frexp10<decimal64_t>();
+    test_scalbn<decimal64_t>();
+    test_scalbln<decimal64_t>();
 
     test_frexp10<decimal_fast64_t>();
     test_scalbn<decimal_fast64_t>();
     test_scalbln<decimal_fast64_t>();
 
-    test_div_fmod<decimal32_t_t>();
-    test_div_fmod<decimal64_t_t>();
+    test_div_fmod<decimal32_t>();
+    test_div_fmod<decimal64_t>();
 
-    test_copysign<decimal32_t_t>();
-    test_copysign<decimal64_t_t>();
+    test_copysign<decimal32_t>();
+    test_copysign<decimal64_t>();
 
-    test_fma<decimal32_t_t>();
+    test_fma<decimal32_t>();
     test_fma<decimal_fast32_t>();
-    test_fma<decimal64_t_t>();
+    test_fma<decimal64_t>();
     test_fma<decimal_fast64_t>();
-    test_fma<decimal128_t_t>();
+    test_fma<decimal128_t>();
     test_fma<decimal_fast128_t>();
 
-    test_modf<decimal32_t_t>();
+    test_modf<decimal32_t>();
     test_modf<decimal_fast32_t>();
-    test_modf<decimal64_t_t>();
+    test_modf<decimal64_t>();
     test_modf<decimal_fast64_t>();
 
-    test_fdim<decimal32_t_t>();
+    test_fdim<decimal32_t>();
     test_fdim<decimal_fast32_t>();
-    test_fdim<decimal64_t_t>();
+    test_fdim<decimal64_t>();
     test_fdim<decimal_fast64_t>();
 
-    test_ilogb<decimal32_t_t>();
+    test_ilogb<decimal32_t>();
     test_ilogb<decimal_fast32_t>();
-    test_ilogb<decimal64_t_t>();
+    test_ilogb<decimal64_t>();
     test_ilogb<decimal_fast64_t>();
-    test_ilogb<decimal128_t_t>();
+    test_ilogb<decimal128_t>();
     test_ilogb<decimal_fast128_t>();
 
-    test_logb<decimal32_t_t>();
+    test_logb<decimal32_t>();
     test_logb<decimal_fast32_t>();
-    test_logb<decimal64_t_t>();
+    test_logb<decimal64_t>();
     test_logb<decimal_fast64_t>();
-    test_logb<decimal128_t_t>();
+    test_logb<decimal128_t>();
     test_logb<decimal_fast128_t>();
 
-    test_sqrt<decimal32_t_t>();
+    test_sqrt<decimal32_t>();
     test_sqrt<decimal_fast32_t>();
-    test_sqrt<decimal64_t_t>();
+    test_sqrt<decimal64_t>();
     test_sqrt<decimal_fast64_t>();
 
-    test_two_val_hypot<decimal32_t_t>();
-    test_three_val_hypot<decimal32_t_t>();
+    test_two_val_hypot<decimal32_t>();
+    test_three_val_hypot<decimal32_t>();
     test_two_val_hypot<decimal_fast32_t>();
     test_three_val_hypot<decimal_fast32_t>();
-    test_two_val_hypot<decimal64_t_t>();
-    test_three_val_hypot<decimal64_t_t>();
+    test_two_val_hypot<decimal64_t>();
+    test_three_val_hypot<decimal64_t>();
     test_two_val_hypot<decimal_fast64_t>();
     test_three_val_hypot<decimal_fast64_t>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    test_sqrt<decimal128_t_t>();
+    test_sqrt<decimal128_t>();
     test_sqrt<decimal_fast128_t>();
 
-    test_two_val_hypot<decimal128_t_t>();
-    test_three_val_hypot<decimal128_t_t>();
-    test_mixed_two_val_hypot<decimal64_t_t, decimal128_t_t>();
+    test_two_val_hypot<decimal128_t>();
+    test_three_val_hypot<decimal128_t>();
+    test_mixed_two_val_hypot<decimal64_t, decimal128_t>();
 
     test_two_val_hypot<decimal_fast128_t>();
     test_three_val_hypot<decimal_fast128_t>();
-    test_mixed_two_val_hypot<decimal64_t_t, decimal_fast128_t>();
+    test_mixed_two_val_hypot<decimal64_t, decimal_fast128_t>();
     #endif
 
-    test_mixed_two_val_hypot<decimal32_t_t, decimal64_t_t>();
+    test_mixed_two_val_hypot<decimal32_t, decimal64_t>();
 
-    test_rint<decimal32_t_t>();
-    test_lrint<decimal32_t_t>();
-    test_llrint<decimal32_t_t>();
-    test_nearbyint<decimal32_t_t>();
+    test_rint<decimal32_t>();
+    test_lrint<decimal32_t>();
+    test_llrint<decimal32_t>();
+    test_nearbyint<decimal32_t>();
 
     test_rint<decimal_fast32_t>();
     test_lrint<decimal_fast32_t>();
     test_llrint<decimal_fast32_t>();
     test_nearbyint<decimal_fast32_t>();
 
-    test_rint<decimal64_t_t>();
-    test_lrint<decimal64_t_t>();
-    test_llrint<decimal64_t_t>();
-    test_nearbyint<decimal64_t_t>();
+    test_rint<decimal64_t>();
+    test_lrint<decimal64_t>();
+    test_llrint<decimal64_t>();
+    test_nearbyint<decimal64_t>();
 
     test_rint<decimal_fast64_t>();
     test_lrint<decimal_fast64_t>();
     test_llrint<decimal_fast64_t>();
     test_nearbyint<decimal_fast64_t>();
 
-    test_round<decimal32_t_t>();
-    test_lround<decimal32_t_t>();
-    test_llround<decimal32_t_t>();
+    test_round<decimal32_t>();
+    test_lround<decimal32_t>();
+    test_llround<decimal32_t>();
 
     test_round<decimal_fast32_t>();
     test_lround<decimal_fast32_t>();
     test_llround<decimal_fast32_t>();
 
-    test_round<decimal64_t_t>();
-    test_lround<decimal64_t_t>();
-    test_llround<decimal64_t_t>();
+    test_round<decimal64_t>();
+    test_lround<decimal64_t>();
+    test_llround<decimal64_t>();
 
     test_round<decimal_fast64_t>();
     test_lround<decimal_fast64_t>();
     test_llround<decimal_fast64_t>();
 
-    test_nextafter<decimal32_t_t>();
-    test_nexttoward<decimal32_t_t>();
+    test_nextafter<decimal32_t>();
+    test_nexttoward<decimal32_t>();
 
     test_nextafter<decimal_fast32_t>();
     test_nexttoward<decimal_fast32_t>();
 
-    test_nextafter<decimal64_t_t>();
-    test_nexttoward<decimal64_t_t>();
+    test_nextafter<decimal64_t>();
+    test_nexttoward<decimal64_t>();
 
     test_nextafter<decimal_fast64_t>();
     test_nexttoward<decimal_fast64_t>();
 
-    test_pow<decimal32_t_t>();
+    test_pow<decimal32_t>();
     test_pow<decimal_fast32_t>();
-    test_pow<decimal64_t_t>();
+    test_pow<decimal64_t>();
     test_pow<decimal_fast64_t>();
 
-    test_exp2<decimal32_t_t>();
+    test_exp2<decimal32_t>();
     test_exp2<decimal_fast32_t>();
-    test_exp2<decimal64_t_t>();
+    test_exp2<decimal64_t>();
 
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
-    test_nan<decimal32_t_t>();
-    test_nan<decimal64_t_t>();
-    test_nan<decimal128_t_t>();
+    test_nan<decimal32_t>();
+    test_nan<decimal64_t>();
+    test_nan<decimal128_t>();
     #endif
 
-    test_log2<decimal32_t_t>();
+    test_log2<decimal32_t>();
     test_log2<decimal_fast32_t>();
-    test_log2<decimal64_t_t>();
+    test_log2<decimal64_t>();
     test_log2<decimal_fast64_t>();
 
-    test_log10<decimal32_t_t>();
+    test_log10<decimal32_t>();
     test_log10<decimal_fast32_t>();
-    test_log10<decimal64_t_t>();
+    test_log10<decimal64_t>();
     test_log10<decimal_fast64_t>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    test_log2<decimal128_t_t>();
-    test_log10<decimal128_t_t>();
+    test_log2<decimal128_t>();
+    test_log10<decimal128_t>();
 
     test_log2<decimal_fast128_t>();
     test_log10<decimal_fast128_t>();
     #endif
 
-    test_fpclassify<decimal32_t_t>();
-    test_fpclassify<decimal64_t_t>();
-    test_fpclassify<decimal128_t_t>();
+    test_fpclassify<decimal32_t>();
+    test_fpclassify<decimal64_t>();
+    test_fpclassify<decimal128_t>();
 
     test_fpclassify<decimal_fast32_t>();
     test_fpclassify<decimal_fast64_t>();

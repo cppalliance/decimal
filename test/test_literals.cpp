@@ -4,9 +4,9 @@
 
 #include "mini_to_chars.hpp"
 #include <cfloat>
-#include <boost/decimal/decimal32_t_t.hpp>
-#include <boost/decimal/decimal64_t_t.hpp>
-#include <boost/decimal/decimal128_t_t.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
 #include <boost/decimal/decimal_fast32_t.hpp>
 #include <boost/decimal/decimal_fast64_t.hpp>
 #include <boost/decimal/decimal_fast128_t.hpp>
@@ -18,19 +18,19 @@
 using namespace boost::decimal;
 using namespace boost::decimal::literals;
 
-void test_decimal32_t_t_literals()
+void test_decimal32_t_literals()
 {
-    BOOST_TEST_EQ(decimal32_t_t(0), 0_DF);
-    BOOST_TEST_EQ(decimal32_t_t(3), 3_DF);
-    BOOST_TEST_EQ(decimal32_t_t(3.1), 3.1_DF);
-    BOOST_TEST_EQ(decimal32_t_t(3, 1), 3e1_DF);
+    BOOST_TEST_EQ(decimal32_t(0), 0_DF);
+    BOOST_TEST_EQ(decimal32_t(3), 3_DF);
+    BOOST_TEST_EQ(decimal32_t(3.1), 3.1_DF);
+    BOOST_TEST_EQ(decimal32_t(3, 1), 3e1_DF);
     BOOST_TEST(isinf(5e100_DF));
     BOOST_TEST(isinf(5e300_DF));
 
-    BOOST_TEST_EQ(decimal32_t_t(0), 0_df);
-    BOOST_TEST_EQ(decimal32_t_t(3), 3_df);
-    BOOST_TEST_EQ(decimal32_t_t(3.1), 3.1_df);
-    BOOST_TEST_EQ(decimal32_t_t(3, 1), 3e1_df);
+    BOOST_TEST_EQ(decimal32_t(0), 0_df);
+    BOOST_TEST_EQ(decimal32_t(3), 3_df);
+    BOOST_TEST_EQ(decimal32_t(3.1), 3.1_df);
+    BOOST_TEST_EQ(decimal32_t(3, 1), 3e1_df);
     BOOST_TEST(isinf(5e100_df));
     BOOST_TEST(isinf(5e300_df));
 }
@@ -52,17 +52,17 @@ void test_decimal_fast32_t_literals()
     BOOST_TEST(isinf(5e300_dff));
 }
 
-void test_decimal64_t_t_literals()
+void test_decimal64_t_literals()
 {
-    BOOST_TEST_EQ(decimal64_t_t(0), 0_DD);
-    BOOST_TEST_EQ(decimal64_t_t(3), 3_DD);
-    BOOST_TEST_EQ(decimal64_t_t(3.1), 3.1_DD);
-    BOOST_TEST_EQ(decimal64_t_t(3, 1), 3e1_DD);
+    BOOST_TEST_EQ(decimal64_t(0), 0_DD);
+    BOOST_TEST_EQ(decimal64_t(3), 3_DD);
+    BOOST_TEST_EQ(decimal64_t(3.1), 3.1_DD);
+    BOOST_TEST_EQ(decimal64_t(3, 1), 3e1_DD);
 
-    BOOST_TEST_EQ(decimal64_t_t(0), 0_dd);
-    BOOST_TEST_EQ(decimal64_t_t(3), 3_dd);
-    BOOST_TEST_EQ(decimal64_t_t(3.1), 3.1_dd);
-    BOOST_TEST_EQ(decimal64_t_t(3, 1), 3e1_dd);
+    BOOST_TEST_EQ(decimal64_t(0), 0_dd);
+    BOOST_TEST_EQ(decimal64_t(3), 3_dd);
+    BOOST_TEST_EQ(decimal64_t(3.1), 3.1_dd);
+    BOOST_TEST_EQ(decimal64_t(3, 1), 3e1_dd);
 
     // 64-bit long double warn of overflow
     #if !(LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024)
@@ -94,17 +94,17 @@ void test_decimal_fast64_t_literals()
     #endif
 }
 
-void test_decimal128_t_t_literals()
+void test_decimal128_t_literals()
 {
-    BOOST_TEST_EQ(decimal128_t_t(0), 0_DL);
-    BOOST_TEST_EQ(decimal128_t_t(3), 3_DL);
-    BOOST_TEST_EQ(decimal128_t_t(3.1), 3.1_DL);
-    BOOST_TEST_EQ(decimal128_t_t(3, 1), 3e1_DL);
+    BOOST_TEST_EQ(decimal128_t(0), 0_DL);
+    BOOST_TEST_EQ(decimal128_t(3), 3_DL);
+    BOOST_TEST_EQ(decimal128_t(3.1), 3.1_DL);
+    BOOST_TEST_EQ(decimal128_t(3, 1), 3e1_DL);
 
-    BOOST_TEST_EQ(decimal128_t_t(0), 0_dl);
-    BOOST_TEST_EQ(decimal128_t_t(3), 3_dl);
-    BOOST_TEST_EQ(decimal128_t_t(3.1), 3.1_dl);
-    BOOST_TEST_EQ(decimal128_t_t(3, 1), 3e1_dl);
+    BOOST_TEST_EQ(decimal128_t(0), 0_dl);
+    BOOST_TEST_EQ(decimal128_t(3), 3_dl);
+    BOOST_TEST_EQ(decimal128_t(3.1), 3.1_dl);
+    BOOST_TEST_EQ(decimal128_t(3, 1), 3e1_dl);
 }
 
 void test_decimal_fast128_t_literals()
@@ -122,9 +122,9 @@ void test_decimal_fast128_t_literals()
 
 int main()
 {
-    test_decimal32_t_t_literals();
-    test_decimal64_t_t_literals();
-    test_decimal128_t_t_literals();
+    test_decimal32_t_literals();
+    test_decimal64_t_literals();
+    test_decimal128_t_literals();
 
     test_decimal_fast32_t_literals();
     test_decimal_fast64_t_literals();

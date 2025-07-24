@@ -5,6 +5,6 @@
 #ifndef BOOST_DECIMAL_DECIMAL_FAST128_T_HPP
 #define BOOST_DECIMAL_DECIMAL_FAST128_T_HPP
 
-#include <boost/decimal/decimal64_fast.hpp>
+#include <boost/decimal/decimal128_fast.hpp>
 
 #endif // BOOST_DECIMAL_DECIMAL_FAST128_T_HPP

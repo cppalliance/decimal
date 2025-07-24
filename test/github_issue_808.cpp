@@ -19,9 +19,9 @@ void tiny_div()
 
 int main()
 {
-    tiny_div<decimal32_t_t>();
-    tiny_div<decimal64_t_t>();
-    tiny_div<decimal128_t_t>();
+    tiny_div<decimal32_t>();
+    tiny_div<decimal64_t>();
+    tiny_div<decimal128_t>();
 
     tiny_div<decimal_fast32_t>();
     tiny_div<decimal_fast64_t>();

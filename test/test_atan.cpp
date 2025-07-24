@@ -84,7 +84,7 @@ static std::mt19937_64 rng(42);
 
 using namespace boost::decimal;
 
-template <typename Dec = decimal32_t_t>
+template <typename Dec = decimal32_t>
 void spot_test(float val)
 {
     const auto ret_val {std::atan(val)};
@@ -106,7 +106,7 @@ void spot_test(float val)
 template <typename Dec>
 void test_atan()
 {
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value ? N / 4 : N};
 
     for (std::size_t n {}; n < max_iter; ++n)
     {
@@ -297,7 +297,7 @@ namespace local {
 
 auto test_atan_128(const int tol_factor) -> bool
 {
-    using decimal_type = boost::decimal::decimal128_t_t;
+    using decimal_type = boost::decimal::decimal128_t;
 
     using str_ctrl_array_type = std::array<const char*, 31U>;
 
@@ -376,8 +376,8 @@ auto test_atan_128(const int tol_factor) -> bool
 
 int main()
 {
-    test_atan<decimal32_t_t>();
-    test_atan<decimal64_t_t>();
+    test_atan<decimal32_t>();
+    test_atan<decimal64_t>();
     test_atan<decimal_fast32_t>();
 
     spot_test(0.344559F);

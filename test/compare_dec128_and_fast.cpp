@@ -49,9 +49,9 @@ void test_add()
         const auto val1 {big_vals(rng)};
         const auto val2 {big_vals(rng)};
 
-        const decimal128_t_t dec128_1 {val1};
-        const decimal128_t_t dec128_2 {val2};
-        const decimal128_t_t dec128_res {dec128_1 + dec128_2};
+        const decimal128_t dec128_1 {val1};
+        const decimal128_t dec128_2 {val2};
+        const decimal128_t dec128_res {dec128_1 + dec128_2};
 
         const decimal_fast128_t dec128_fast_1 {val1};
         const decimal_fast128_t dec128_fast_2 {val2};
@@ -84,9 +84,9 @@ void test_add()
         const auto val1 {small_vals(rng)};
         const auto val2 {small_vals(rng)};
 
-        const decimal128_t_t dec128_1 {val1};
-        const decimal128_t_t dec128_2 {val2};
-        const decimal128_t_t dec128_res {dec128_1 + dec128_2};
+        const decimal128_t dec128_1 {val1};
+        const decimal128_t dec128_2 {val2};
+        const decimal128_t dec128_res {dec128_1 + dec128_2};
 
         const decimal_fast128_t dec128_fast_1 {val1};
         const decimal_fast128_t dec128_fast_2 {val2};
@@ -122,9 +122,9 @@ void test_sub()
         const auto val1 {big_vals(rng)};
         const auto val2 {big_vals(rng)};
 
-        const decimal128_t_t dec128_1 {val1};
-        const decimal128_t_t dec128_2 {val2};
-        const decimal128_t_t dec128_res {dec128_1 - dec128_2};
+        const decimal128_t dec128_1 {val1};
+        const decimal128_t dec128_2 {val2};
+        const decimal128_t dec128_res {dec128_1 - dec128_2};
 
         const decimal_fast128_t dec128_fast_1 {val1};
         const decimal_fast128_t dec128_fast_2 {val2};
@@ -157,9 +157,9 @@ void test_sub()
         const auto val1 {small_vals(rng)};
         const auto val2 {small_vals(rng)};
 
-        const decimal128_t_t dec128_1 {val1};
-        const decimal128_t_t dec128_2 {val2};
-        const decimal128_t_t dec128_res {dec128_1 - dec128_2};
+        const decimal128_t dec128_1 {val1};
+        const decimal128_t dec128_2 {val2};
+        const decimal128_t dec128_res {dec128_1 - dec128_2};
 
         const decimal_fast128_t dec128_fast_1 {val1};
         const decimal_fast128_t dec128_fast_2 {val2};
@@ -195,9 +195,9 @@ void test_mul()
         const auto val1 {big_vals(rng)};
         const auto val2 {big_vals(rng)};
 
-        const decimal128_t_t dec128_1 {val1};
-        const decimal128_t_t dec128_2 {val2};
-        const decimal128_t_t dec128_res {dec128_1 * dec128_2};
+        const decimal128_t dec128_1 {val1};
+        const decimal128_t dec128_2 {val2};
+        const decimal128_t dec128_res {dec128_1 * dec128_2};
 
         const decimal_fast128_t dec128_fast_1 {val1};
         const decimal_fast128_t dec128_fast_2 {val2};
@@ -228,9 +228,9 @@ void test_mul()
         const auto val1 {small_vals(rng)};
         const auto val2 {small_vals(rng)};
 
-        const decimal128_t_t dec128_1 {val1};
-        const decimal128_t_t dec128_2 {val2};
-        const decimal128_t_t dec128_res {dec128_1 * dec128_2};
+        const decimal128_t dec128_1 {val1};
+        const decimal128_t dec128_2 {val2};
+        const decimal128_t dec128_res {dec128_1 * dec128_2};
 
         const decimal_fast128_t dec128_fast_1 {val1};
         const decimal_fast128_t dec128_fast_2 {val2};
@@ -264,9 +264,9 @@ void test_div()
         const auto val1 {big_vals(rng)};
         const auto val2 {big_vals(rng)};
 
-        const decimal128_t_t dec128_1 {val1};
-        const decimal128_t_t dec128_2 {val2};
-        const decimal128_t_t dec128_res {dec128_1 / dec128_2};
+        const decimal128_t dec128_1 {val1};
+        const decimal128_t dec128_2 {val2};
+        const decimal128_t dec128_res {dec128_1 / dec128_2};
 
         const decimal_fast128_t dec128_fast_1 {val1};
         const decimal_fast128_t dec128_fast_2 {val2};
@@ -297,9 +297,9 @@ void test_div()
         const auto val1 {small_vals(rng)};
         const auto val2 {small_vals(rng)};
 
-        const decimal128_t_t dec128_1 {val1};
-        const decimal128_t_t dec128_2 {val2};
-        const decimal128_t_t dec128_res {dec128_1 / dec128_2};
+        const decimal128_t dec128_1 {val1};
+        const decimal128_t dec128_2 {val2};
+        const decimal128_t dec128_res {dec128_1 / dec128_2};
 
         const decimal_fast128_t dec128_fast_1 {val1};
         const decimal_fast128_t dec128_fast_2 {val2};

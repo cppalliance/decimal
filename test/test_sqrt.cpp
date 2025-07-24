@@ -262,7 +262,7 @@ namespace local
 
   auto test_sqrt_128(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128_t_t;
+    using decimal_type = boost::decimal::decimal128_t;
 
     using str_ctrl_array_type = std::array<const char*, 41U>;
 
@@ -349,7 +349,7 @@ auto main() -> int
   auto result_is_ok = true;
 
   {
-    using decimal_type = boost::decimal::decimal32_t_t;
+    using decimal_type = boost::decimal::decimal32_t;
     using float_type   = float;
 
     const auto result_small_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E-26L, 1.0E-01L);
@@ -372,7 +372,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal64_t_t;
+    using decimal_type = boost::decimal::decimal64_t;
     using float_type   = double;
 
     const auto result_small_is_ok  = local::test_sqrt<decimal_type, float_type>(static_cast<std::int32_t>(INT32_C(16)), 1.0E-76L, 1.0E-01L);
