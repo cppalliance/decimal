@@ -89,7 +89,6 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE int128::uint128_t d128_max_significand_value {U
 
 } //namespace detail
 
-[[deprecated("Use re-named type decimal128_t_t instead of decimal128_t")]]
 BOOST_DECIMAL_EXPORT class decimal128_t final
 {
 public:
@@ -544,7 +543,7 @@ public:
     friend constexpr auto fmad128(decimal128_t x, decimal128_t y, decimal128_t z) noexcept -> decimal128_t;
 };
 
-using decimal128_t_t = decimal128_t;
+[[deprecated("Use re-named type decimal128_t instead of decimal128")]] BOOST_DECIMAL_EXPORT using decimal128 = decimal128_t;
 
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 inline std::string bit_string(decimal128_t rhs) noexcept

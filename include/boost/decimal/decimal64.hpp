@@ -96,7 +96,6 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_max_significand_value = UINT6
 #  pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
 
-[[deprecated("Use re-named type decimal64_t_t instead of decimal64_t")]]
 BOOST_DECIMAL_EXPORT class decimal64_t final
 {
 public:
@@ -552,7 +551,7 @@ public:
     friend constexpr auto scalblnd64(decimal64_t num, long exp) noexcept -> decimal64_t;
 };
 
-using decimal64_t_t = decimal64_t;
+[[deprecated("Use re-named type decimal64_t instead of decimal64")]] BOOST_DECIMAL_EXPORT using decimal64 = decimal64_t;
 
 #if defined(__GNUC__) && __GNUC__ >= 8
 #  pragma GCC diagnostic pop

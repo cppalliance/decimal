@@ -35,7 +35,6 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::u
 
 }
 
-[[deprecated("Use re-named type decimal_fast32_t instead of decimal_fast32_t")]]
 BOOST_DECIMAL_EXPORT class decimal_fast32_t final
 {
 public:
@@ -375,7 +374,7 @@ public:
     friend constexpr auto quantized32f(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> decimal_fast32_t;
 };
 
-BOOST_DECIMAL_EXPORT using decimal_fast32_t = decimal_fast32_t;
+[[deprecated("Use re-named type decimal_fast32_t instead of decimal_fast32_t")]] BOOST_DECIMAL_EXPORT using decimal32_fast = decimal_fast32_t;
 
 template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
 constexpr decimal_fast32_t::decimal_fast32_t(T1 coeff, T2 exp, bool sign) noexcept
