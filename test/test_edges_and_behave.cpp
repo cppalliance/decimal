@@ -18,13 +18,13 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-auto my_zero() -> boost::decimal::decimal32_t&;
-auto my_one () -> boost::decimal::decimal32_t&;
-auto my_inf () -> boost::decimal::decimal32_t&;
-auto my_nan () -> boost::decimal::decimal32_t&;
-auto my_pi  () -> boost::decimal::decimal32_t&;
-auto my_a   () -> boost::decimal::decimal32_t&;
-auto my_b   () -> boost::decimal::decimal32_t&;
+auto my_zero() -> boost::decimal::decimal32_t_t&;
+auto my_one () -> boost::decimal::decimal32_t_t&;
+auto my_inf () -> boost::decimal::decimal32_t_t&;
+auto my_nan () -> boost::decimal::decimal32_t_t&;
+auto my_pi  () -> boost::decimal::decimal32_t_t&;
+auto my_a   () -> boost::decimal::decimal32_t_t&;
+auto my_b   () -> boost::decimal::decimal32_t_t&;
 
 namespace local
 {
@@ -76,7 +76,7 @@ namespace local
 
   auto test_behave_over_under() -> bool
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
 
     auto result_is_ok = true;
 
@@ -291,7 +291,7 @@ namespace local
 
   auto test_edges() -> bool
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
 
     auto result_is_ok = true;
 
@@ -506,10 +506,10 @@ auto main() -> int
   return (result_is_ok ? 0 : -1);
 }
 
-auto my_zero() -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_zero { 0, 0 }; return val_zero; }
-auto my_one () -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_one  { 1, 0 }; return val_one; }
-auto my_inf () -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_inf = std::numeric_limits<boost::decimal::decimal32_t>::infinity(); return val_inf; }
-auto my_nan () -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_nan = std::numeric_limits<boost::decimal::decimal32_t>::quiet_NaN(); return val_nan; }
-auto my_pi  () -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_pi  = boost::decimal::numbers::pi_v<boost::decimal::decimal32_t>; return val_pi; }
-auto my_a   () -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_a { 1.234567e5L }; return val_a; }
-auto my_b   () -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_b { 9.876543e-2L }; return val_b; }
+auto my_zero() -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_zero { 0, 0 }; return val_zero; }
+auto my_one () -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_one  { 1, 0 }; return val_one; }
+auto my_inf () -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_inf = std::numeric_limits<boost::decimal::decimal32_t_t>::infinity(); return val_inf; }
+auto my_nan () -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_nan = std::numeric_limits<boost::decimal::decimal32_t_t>::quiet_NaN(); return val_nan; }
+auto my_pi  () -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_pi  = boost::decimal::numbers::pi_v<boost::decimal::decimal32_t_t>; return val_pi; }
+auto my_a   () -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_a { 1.234567e5L }; return val_a; }
+auto my_b   () -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_b { 9.876543e-2L }; return val_b; }

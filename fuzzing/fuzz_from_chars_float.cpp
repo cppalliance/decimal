@@ -17,13 +17,13 @@ extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size
 
         for (const auto format : formats)
         {
-            boost::decimal::decimal32 f_val;
+            boost::decimal::decimal32_t f_val;
             boost::decimal::from_chars(c_data, c_data + size, f_val, format);
 
-            boost::decimal::decimal64 val;
+            boost::decimal::decimal64_t val;
             boost::decimal::from_chars(c_data, c_data + size, val, format);
 
-            boost::decimal::decimal128 ld_val;
+            boost::decimal::decimal128_t ld_val;
             boost::decimal::from_chars(c_data, c_data + size, ld_val, format);
         }
 
@@ -31,13 +31,13 @@ extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size
         const auto c_data_str = std::string(c_data, size);
         for (const auto format : formats)
         {
-            boost::decimal::decimal32 f_val;
+            boost::decimal::decimal32_t f_val;
             boost::decimal::from_chars(c_data_str, f_val, format);
 
-            boost::decimal::decimal64 val;
+            boost::decimal::decimal64_t val;
             boost::decimal::from_chars(c_data_str, val, format);
 
-            boost::decimal::decimal128 ld_val;
+            boost::decimal::decimal128_t ld_val;
             boost::decimal::from_chars(c_data_str, ld_val, format);
         }
 
@@ -46,13 +46,13 @@ extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size
         const auto c_data_str_view = std::string_view(c_data_str);
         for (const auto format : formats)
         {
-            boost::decimal::decimal32 f_val;
+            boost::decimal::decimal32_t f_val;
             boost::decimal::from_chars(c_data_str_view, f_val, format);
 
-            boost::decimal::decimal64 val;
+            boost::decimal::decimal64_t val;
             boost::decimal::from_chars(c_data_str_view, val, format);
 
-            boost::decimal::decimal128 ld_val;
+            boost::decimal::decimal128_t ld_val;
             boost::decimal::from_chars(c_data_str_view, ld_val, format);
         }
         #endif

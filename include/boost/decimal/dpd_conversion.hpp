@@ -5,12 +5,12 @@
 #ifndef BOOST_DECIMAL_DPD_CONVERSION_HPP
 #define BOOST_DECIMAL_DPD_CONVERSION_HPP
 
-#include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/decimal64.hpp>
-#include <boost/decimal/decimal128.hpp>
-#include <boost/decimal/decimal32_fast.hpp>
-#include <boost/decimal/decimal64_fast.hpp>
-#include <boost/decimal/decimal128_fast.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
+#include <boost/decimal/decimal_fast32_t.hpp>
+#include <boost/decimal/decimal_fast64_t.hpp>
+#include <boost/decimal/decimal_fast128_t.hpp>
 #include <boost/decimal/bid_conversion.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/concepts.hpp>
@@ -322,8 +322,8 @@ BOOST_DECIMAL_EXPORT template <typename DecimalType>
 constexpr auto to_dpd_d32(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint32_t)
 {
-    static_assert(std::is_same<DecimalType, decimal32>::value ||
-                  std::is_same<DecimalType, decimal32_fast>::value, "The input must be a 32-bit decimal type");
+    static_assert(std::is_same<DecimalType, decimal32_t>::value ||
+                  std::is_same<DecimalType, decimal_fast32_t>::value, "The input must be a 32-bit decimal type");
 
     // In the non-finite cases the encodings are the same
     // 3.5.2.a and 3.5.2.b
@@ -428,11 +428,11 @@ constexpr auto to_dpd_d32(DecimalType val) noexcept
     return dpd;
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal32_fast>
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast32_t>
 constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
-    static_assert(std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal32_fast>::value,
+    static_assert(std::is_same<DecimalType, decimal32_t>::value || std::is_same<DecimalType, decimal_fast32_t>::value,
                   "Target decimal type must be 32-bits");
 
     // First we check for non-finite values
@@ -521,8 +521,8 @@ BOOST_DECIMAL_EXPORT template <typename DecimalType>
 constexpr auto to_dpd_d64(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint64_t)
 {
-    static_assert(std::is_same<DecimalType, decimal64>::value ||
-                  std::is_same<DecimalType, decimal64_fast>::value, "The input must be a 64-bit decimal type");
+    static_assert(std::is_same<DecimalType, decimal64_t>::value ||
+                  std::is_same<DecimalType, decimal_fast64_t>::value, "The input must be a 64-bit decimal type");
 
     // In the non-finite cases the encodings are the same
     // 3.5.2.a and 3.5.2.b
@@ -628,11 +628,11 @@ constexpr auto to_dpd_d64(DecimalType val) noexcept
     return dpd;
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal64_fast>
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast64_t>
 constexpr auto from_dpd_d64(std::uint64_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
-    static_assert(std::is_same<DecimalType, decimal64>::value || std::is_same<DecimalType, decimal64_fast>::value,
+    static_assert(std::is_same<DecimalType, decimal64_t>::value || std::is_same<DecimalType, decimal_fast64_t>::value,
                   "Target decimal type must be 64-bits");
 
     // First we check for non-finite values
@@ -722,8 +722,8 @@ BOOST_DECIMAL_EXPORT template <typename DecimalType>
 constexpr auto to_dpd_d128(DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, boost::int128::uint128_t)
 {
-    static_assert(std::is_same<DecimalType, decimal128>::value ||
-                  std::is_same<DecimalType, decimal128_fast>::value, "The input must be a 128-bit decimal type");
+    static_assert(std::is_same<DecimalType, decimal128_t>::value ||
+                  std::is_same<DecimalType, decimal_fast128_t>::value, "The input must be a 128-bit decimal type");
 
     // In the non-finite cases the encodings are the same
     // 3.5.2.a and 3.5.2.b
@@ -829,11 +829,11 @@ constexpr auto to_dpd_d128(DecimalType val) noexcept
     return dpd;
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_fast>
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast128_t>
 constexpr auto from_dpd_d128(int128::uint128_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
-    static_assert(std::is_same<DecimalType, decimal128>::value || std::is_same<DecimalType, decimal128_fast>::value,
+    static_assert(std::is_same<DecimalType, decimal128_t>::value || std::is_same<DecimalType, decimal_fast128_t>::value,
                   "Target decimal type must be 128-bits");
 
     if ((dpd & detail::d128_inf_mask) == detail::d128_inf_mask)
@@ -917,32 +917,32 @@ constexpr auto from_dpd_d128(int128::uint128_t dpd) noexcept
     return DecimalType{significand, exp, sign};
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal32 val) noexcept -> std::uint32_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal32_t val) noexcept -> std::uint32_t
 {
     return to_dpd_d32(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal32_fast val) noexcept -> std::uint32_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal_fast32_t val) noexcept -> std::uint32_t
 {
     return to_dpd_d32(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal64 val) noexcept -> std::uint64_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal64_t val) noexcept -> std::uint64_t
 {
     return to_dpd_d64(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal64_fast val) noexcept -> std::uint64_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal_fast64_t val) noexcept -> std::uint64_t
 {
     return to_dpd_d64(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal128 val) noexcept -> int128::uint128_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal128_t val) noexcept -> int128::uint128_t
 {
     return to_dpd_d128(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal128_fast val) noexcept -> int128::uint128_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal_fast128_t val) noexcept -> int128::uint128_t
 {
     return to_dpd_d128(val);
 }
@@ -954,21 +954,21 @@ constexpr auto to_dpd(DecimalType val) noexcept
     return to_dpd(val);
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal32_fast>
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast32_t>
 constexpr auto from_dpd(std::uint32_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     return from_dpd_d32<DecimalType>(bits);
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal64_fast>
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast64_t>
 constexpr auto from_dpd(std::uint64_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     return from_dpd_d64<DecimalType>(bits);
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_fast>
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast128_t>
 constexpr auto from_dpd(int128::uint128_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
@@ -977,7 +977,7 @@ constexpr auto from_dpd(int128::uint128_t bits) noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_fast>
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast128_t>
 constexpr auto from_dpd(detail::builtin_uint128_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {

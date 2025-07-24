@@ -21,8 +21,8 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-auto my_zero() -> boost::decimal::decimal32_t&;
-auto my_one () -> boost::decimal::decimal32_t&;
+auto my_zero() -> boost::decimal::decimal32_t_t&;
+auto my_one () -> boost::decimal::decimal32_t_t&;
 
 namespace local
 {
@@ -70,7 +70,7 @@ namespace local
 
   auto test_atanh(const std::int32_t tol_factor, const bool negate, const long double range_lo, const long double range_hi) -> bool
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
 
     std::random_device rd;
     std::mt19937_64 gen(rd());
@@ -129,7 +129,7 @@ namespace local
 
   auto test_atanh_edge() -> bool
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
 
     std::mt19937_64 gen;
 
@@ -224,7 +224,7 @@ auto main() -> int
 {
   auto result_is_ok = true;
 
-  constexpr boost::decimal::decimal32_t fourth_root_epsilon { 1, -((std::numeric_limits<boost::decimal::decimal32_t>::digits10 + 1) / 4) };
+  constexpr boost::decimal::decimal32_t_t fourth_root_epsilon { 1, -((std::numeric_limits<boost::decimal::decimal32_t_t>::digits10 + 1) / 4) };
 
   const auto result_eps_is_ok =
     local::test_atanh
@@ -271,5 +271,5 @@ auto main() -> int
   return (result_is_ok ? 0 : -1);
 }
 
-auto my_zero() -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_zero { 0, 0 }; return val_zero; }
-auto my_one () -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_one  { 1, 0 }; return val_one; }
+auto my_zero() -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_zero { 0, 0 }; return val_zero; }
+auto my_one () -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_one  { 1, 0 }; return val_one; }

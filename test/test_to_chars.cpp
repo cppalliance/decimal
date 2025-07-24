@@ -3,9 +3,9 @@
 // https://www.boost.org/LICENSE_1_0.txt
 
 #include "mini_to_chars.hpp"
-#include <boost/decimal/decimal32_t.hpp>
-#include <boost/decimal/decimal64_t.hpp>
-#include <boost/decimal/decimal128_t.hpp>
+#include <boost/decimal/decimal32_t_t.hpp>
+#include <boost/decimal/decimal64_t_t.hpp>
+#include <boost/decimal/decimal128_t_t.hpp>
 #include <boost/decimal/decimal_fast32_t.hpp>
 #include <boost/decimal/decimal_fast64_t.hpp>
 #include <boost/decimal/decimal_fast128_t.hpp>
@@ -135,7 +135,7 @@ void test_small_values()
 template <typename T>
 void test_large_values()
 {
-    constexpr double max_value = std::is_same<decimal32_t, T>::value || std::is_same<decimal_fast32_t, T>::value ? 1e80 : 1e200;
+    constexpr double max_value = std::is_same<decimal32_t_t, T>::value || std::is_same<decimal_fast32_t, T>::value ? 1e80 : 1e200;
     std::uniform_real_distribution<double> dist(-max_value, max_value);
 
     for (std::size_t i {}; i < N; ++i)
@@ -856,51 +856,51 @@ void test_more_powers_10()
 
 int main()
 {
-    test_non_finite_values<decimal32_t>();
-    test_non_finite_values<decimal64_t>();
+    test_non_finite_values<decimal32_t_t>();
+    test_non_finite_values<decimal64_t_t>();
 
-    test_small_values<decimal32_t>();
-    test_small_values<decimal64_t>();
+    test_small_values<decimal32_t_t>();
+    test_small_values<decimal64_t_t>();
 
-    test_large_values<decimal32_t>();
-    test_large_values<decimal64_t>();
+    test_large_values<decimal32_t_t>();
+    test_large_values<decimal64_t_t>();
 
-    test_fixed_format<decimal32_t>();
-    test_fixed_format<decimal64_t>();
+    test_fixed_format<decimal32_t_t>();
+    test_fixed_format<decimal64_t_t>();
 
-    test_precision<decimal32_t>();
-    test_precision<decimal64_t>();
+    test_precision<decimal32_t_t>();
+    test_precision<decimal64_t_t>();
 
-    test_buffer_overflow<decimal32_t>();
-    test_buffer_overflow<decimal64_t>();
+    test_buffer_overflow<decimal32_t_t>();
+    test_buffer_overflow<decimal64_t_t>();
 
-    zero_test<decimal32_t>();
-    zero_test<decimal64_t>();
+    zero_test<decimal32_t_t>();
+    zero_test<decimal64_t_t>();
 
-    test_434_fixed<decimal32_t>();
-    test_434_fixed<decimal64_t>();
+    test_434_fixed<decimal32_t_t>();
+    test_434_fixed<decimal64_t_t>();
 
-    test_434_scientific<decimal32_t>();
-    test_434_scientific<decimal64_t>();
+    test_434_scientific<decimal32_t_t>();
+    test_434_scientific<decimal64_t_t>();
 
-    test_hex_format<decimal32_t>();
-    test_hex_format<decimal64_t>();
+    test_hex_format<decimal32_t_t>();
+    test_hex_format<decimal64_t_t>();
 
-    test_434_hex<decimal32_t>();
-    test_434_hex<decimal64_t>();
+    test_434_hex<decimal32_t_t>();
+    test_434_hex<decimal64_t_t>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    test_non_finite_values<decimal128_t>();
-    test_small_values<decimal128_t>();
-    test_large_values<decimal128_t>();
-    test_fixed_format<decimal128_t>();
-    test_precision<decimal128_t>();
-    test_buffer_overflow<decimal128_t>();
-    zero_test<decimal128_t>();
-    test_434_fixed<decimal128_t>();
-    test_434_scientific<decimal128_t>();
-    test_hex_format<decimal128_t>();
-    test_434_hex<decimal128_t>();
+    test_non_finite_values<decimal128_t_t>();
+    test_small_values<decimal128_t_t>();
+    test_large_values<decimal128_t_t>();
+    test_fixed_format<decimal128_t_t>();
+    test_precision<decimal128_t_t>();
+    test_buffer_overflow<decimal128_t_t>();
+    zero_test<decimal128_t_t>();
+    test_434_fixed<decimal128_t_t>();
+    test_434_scientific<decimal128_t_t>();
+    test_hex_format<decimal128_t_t>();
+    test_434_hex<decimal128_t_t>();
     #endif
 
     test_non_finite_values<decimal_fast32_t>();
@@ -928,11 +928,11 @@ int main()
     test_434_hex<decimal_fast64_t>();
 
     // Bugfixes
-    test_value(decimal64_t{2657844750}, "2657844750", chars_format::general);
+    test_value(decimal64_t_t{2657844750}, "2657844750", chars_format::general);
 
     // See: https://github.com/cppalliance/decimal/issues/470
-    test_value(decimal32_t{504.29034} / decimal32_t{-727.45465}, "-0.693226", chars_format::general, 6);
-    test_value(decimal32_t{504.29034} / decimal32_t{-727.45465}, "-6.932257e-01", chars_format::scientific, 6);
+    test_value(decimal32_t_t{504.29034} / decimal32_t_t{-727.45465}, "-0.693226", chars_format::general, 6);
+    test_value(decimal32_t_t{504.29034} / decimal32_t_t{-727.45465}, "-6.932257e-01", chars_format::scientific, 6);
 
     // Value found from fuzzing
     #ifdef __clang__
@@ -942,13 +942,13 @@ int main()
 
     for (int precision = -1; precision < 10; ++precision)
     {
-        test_error_value<decimal64_t>("e1000a00000000000000000000p06", chars_format::hex, precision);
+        test_error_value<decimal64_t_t>("e1000a00000000000000000000p06", chars_format::hex, precision);
 
         // GCC just throws a hard error on the null characters in this string
         #ifdef __clang__
-        test_error_value<decimal32_t>("000.000000000000000000000000000000000000000000200000ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ4444444444444444444ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ018446744073709551615  44 400000046$42 0 449600", chars_format::fixed, precision);
+        test_error_value<decimal32_t_t>("000.000000000000000000000000000000000000000000200000ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ4444444444444444444ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ018446744073709551615  44 400000046$42 0 449600", chars_format::fixed, precision);
         #endif
-        test_error_value<decimal32_t>("000.000000000000000000000000000000000000000000200000ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ4444444444444444444ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ018446744073709551615", chars_format::fixed, precision);
+        test_error_value<decimal32_t_t>("000.000000000000000000000000000000000000000000200000ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ4444444444444444444ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ018446744073709551615", chars_format::fixed, precision);
     }
 
     #ifdef __clang__
@@ -956,33 +956,33 @@ int main()
     #endif
 
     #ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
-    test_scientific_format_std<decimal32_t>();
-    test_scientific_format_std<decimal64_t>();
+    test_scientific_format_std<decimal32_t_t>();
+    test_scientific_format_std<decimal64_t_t>();
 
-    test_fixed_format_std<decimal32_t>();
-    test_fixed_format_std<decimal64_t>();
+    test_fixed_format_std<decimal32_t_t>();
+    test_fixed_format_std<decimal64_t_t>();
 
-    test_hex_format_std<decimal32_t>();
-    test_hex_format_std<decimal64_t>();
+    test_hex_format_std<decimal32_t_t>();
+    test_hex_format_std<decimal64_t_t>();
 
-    test_general_format_std<decimal32_t>();
-    test_general_format_std<decimal64_t>();
+    test_general_format_std<decimal32_t_t>();
+    test_general_format_std<decimal64_t_t>();
     #endif
 
-    test_777<decimal32_t>();
-    test_777<decimal64_t>();
-    test_777<decimal128_t>();
+    test_777<decimal32_t_t>();
+    test_777<decimal64_t_t>();
+    test_777<decimal128_t_t>();
     test_777<decimal_fast32_t>();
     test_777<decimal_fast64_t>();
     test_777<decimal_fast128_t>();
 
-    test_more_powers_10<decimal32_t>();
-    test_more_powers_10<decimal64_t>();
-    test_more_powers_10<decimal128_t>();
+    test_more_powers_10<decimal32_t_t>();
+    test_more_powers_10<decimal64_t_t>();
+    test_more_powers_10<decimal128_t_t>();
 
-    test_non_finite_invalid_size(std::numeric_limits<decimal32_t>::infinity());
-    test_non_finite_invalid_size(std::numeric_limits<decimal32_t>::quiet_NaN());
-    test_non_finite_invalid_size(decimal32_t{0});
+    test_non_finite_invalid_size(std::numeric_limits<decimal32_t_t>::infinity());
+    test_non_finite_invalid_size(std::numeric_limits<decimal32_t_t>::quiet_NaN());
+    test_non_finite_invalid_size(decimal32_t_t{0});
 
     return boost::report_errors();
 }

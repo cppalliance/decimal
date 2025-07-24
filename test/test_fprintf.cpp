@@ -7,7 +7,7 @@
 
 int main()
 {
-    constexpr boost::decimal::decimal32_t d {1, 2};
+    constexpr boost::decimal::decimal32_t_t d {1, 2};
 
     boost::decimal::printf("%Hg", d);
     std::cout << std::endl;

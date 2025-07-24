@@ -2,9 +2,9 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal/decimal32_t.hpp>
-#include <boost/decimal/decimal64_t.hpp>
-#include <boost/decimal/decimal128_t.hpp>
+#include <boost/decimal/decimal32_t_t.hpp>
+#include <boost/decimal/decimal64_t_t.hpp>
+#include <boost/decimal/decimal128_t_t.hpp>
 #include <boost/decimal/decimal_fast32_t.hpp>
 #include <boost/decimal/decimal_fast64_t.hpp>
 #include <boost/decimal/decimal_fast128_t.hpp>
@@ -48,7 +48,7 @@ void test()
 template <typename T>
 void test_float_range()
 {
-    using float_type = std::conditional_t<std::is_same<T, decimal32_t>::value ||
+    using float_type = std::conditional_t<std::is_same<T, decimal32_t_t>::value ||
                                           std::is_same<T, decimal_fast32_t>::value, float, double>;
 
     std::mt19937_64 rng(42);
@@ -65,22 +65,22 @@ void test_float_range()
 
 int main()
 {
-    test<decimal32_t>();
+    test<decimal32_t_t>();
     test<decimal_fast32_t>();
 
-    test_float_range<decimal32_t>();
+    test_float_range<decimal32_t_t>();
     test_float_range<decimal_fast32_t>();
 
-    test<decimal64_t>();
+    test<decimal64_t_t>();
     test<decimal_fast64_t>();
 
-    test_float_range<decimal64_t>();
+    test_float_range<decimal64_t_t>();
     test_float_range<decimal_fast64_t>();
 
-    test<decimal128_t>();
+    test<decimal128_t_t>();
     test<decimal_fast128_t>();
 
-    test_float_range<decimal128_t>();
+    test_float_range<decimal128_t_t>();
     test_float_range<decimal_fast128_t>();
 
     return boost::report_errors();

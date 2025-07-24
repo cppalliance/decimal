@@ -24,9 +24,9 @@ void to_chars_helper()
 
 int main()
 {
-    to_chars_helper<decimal32_t>();
-    to_chars_helper<decimal64_t>();
-    to_chars_helper<decimal128_t>();
+    to_chars_helper<decimal32_t_t>();
+    to_chars_helper<decimal64_t_t>();
+    to_chars_helper<decimal128_t_t>();
 
     to_chars_helper<decimal_fast32_t>();
     to_chars_helper<decimal_fast64_t>();

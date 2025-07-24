@@ -15,7 +15,7 @@ int main()
 {
     using namespace boost::decimal;
 
-    decimal32 a {2, 0};
+    decimal32_t a {2, 0};
     a += 2;
     std::cout << a << std::endl;
 

@@ -37,7 +37,7 @@ void random_mixed_addition(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
 
-    constexpr auto max_iter {(std::is_same<Decimal2, decimal128_t>::value || std::is_same<Decimal1, decimal128_t>::value) ? N / 4 : N};
+    constexpr auto max_iter {(std::is_same<Decimal2, decimal128_t_t>::value || std::is_same<Decimal1, decimal128_t_t>::value) ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val1 {dist(rng)};
@@ -75,7 +75,7 @@ void random_mixed_subtraction(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
 
-    constexpr auto max_iter {(std::is_same<Decimal2, decimal128_t>::value || std::is_same<Decimal1, decimal128_t>::value) ? N / 4 : N};
+    constexpr auto max_iter {(std::is_same<Decimal2, decimal128_t_t>::value || std::is_same<Decimal1, decimal128_t_t>::value) ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val1 {dist(rng)};
@@ -113,7 +113,7 @@ void random_mixed_multiplication(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
 
-    constexpr auto max_iter {(std::is_same<Decimal2, decimal128_t>::value || std::is_same<Decimal1, decimal128_t>::value) ? N / 4 : N};
+    constexpr auto max_iter {(std::is_same<Decimal2, decimal128_t_t>::value || std::is_same<Decimal1, decimal128_t_t>::value) ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val1 {dist(rng)};
@@ -151,7 +151,7 @@ void random_mixed_division(T lower, T upper)
 {
     std::uniform_int_distribution<T> dist(lower, upper);
 
-    constexpr auto max_iter {(std::is_same<Decimal2, decimal128_t>::value || std::is_same<Decimal1, decimal128_t>::value) ? N / 4 : N};
+    constexpr auto max_iter {(std::is_same<Decimal2, decimal128_t_t>::value || std::is_same<Decimal1, decimal128_t_t>::value) ? N / 4 : N};
     for (std::size_t i {}; i < max_iter; ++i)
     {
         const T val1 {dist(rng)};
@@ -190,185 +190,185 @@ void random_mixed_division(T lower, T upper)
 
 int main()
 {
-    random_mixed_addition<decimal32_t, decimal64_t>(0, 5'000'000);
-    random_mixed_addition<decimal32_t, decimal64_t>(0LL, 5'000'000LL);
-    random_mixed_addition<decimal64_t, decimal32_t>(0, 5'000'000);
-    random_mixed_addition<decimal64_t, decimal32_t>(0LL, 5'000'000LL);
+    random_mixed_addition<decimal32_t_t, decimal64_t_t>(0, 5'000'000);
+    random_mixed_addition<decimal32_t_t, decimal64_t_t>(0LL, 5'000'000LL);
+    random_mixed_addition<decimal64_t_t, decimal32_t_t>(0, 5'000'000);
+    random_mixed_addition<decimal64_t_t, decimal32_t_t>(0LL, 5'000'000LL);
 
-    random_mixed_addition<decimal32_t, decimal64_t>(-5'000'000, 0);
-    random_mixed_addition<decimal32_t, decimal64_t>(-5'000'000LL, 0LL);
-    random_mixed_addition<decimal64_t, decimal32_t>(-5'000'000, 0);
-    random_mixed_addition<decimal64_t, decimal32_t>(-5'000'000LL, 0LL);
+    random_mixed_addition<decimal32_t_t, decimal64_t_t>(-5'000'000, 0);
+    random_mixed_addition<decimal32_t_t, decimal64_t_t>(-5'000'000LL, 0LL);
+    random_mixed_addition<decimal64_t_t, decimal32_t_t>(-5'000'000, 0);
+    random_mixed_addition<decimal64_t_t, decimal32_t_t>(-5'000'000LL, 0LL);
 
-    random_mixed_addition<decimal32_t, decimal64_t>(-5'000'000, 5'000'000);
-    random_mixed_addition<decimal32_t, decimal64_t>(-5'000'000LL, 5'000'000LL);
-    random_mixed_addition<decimal64_t, decimal32_t>(-5'000'000, 5'000'000);
-    random_mixed_addition<decimal64_t, decimal32_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_addition<decimal32_t_t, decimal64_t_t>(-5'000'000, 5'000'000);
+    random_mixed_addition<decimal32_t_t, decimal64_t_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_addition<decimal64_t_t, decimal32_t_t>(-5'000'000, 5'000'000);
+    random_mixed_addition<decimal64_t_t, decimal32_t_t>(-5'000'000LL, 5'000'000LL);
 
-    random_mixed_subtraction<decimal32_t, decimal64_t>(0, 5'000'000);
-    random_mixed_subtraction<decimal32_t, decimal64_t>(0LL, 5'000'000LL);
-    random_mixed_subtraction<decimal64_t, decimal32_t>(0, 5'000'000);
-    random_mixed_subtraction<decimal64_t, decimal32_t>(0LL, 5'000'000LL);
+    random_mixed_subtraction<decimal32_t_t, decimal64_t_t>(0, 5'000'000);
+    random_mixed_subtraction<decimal32_t_t, decimal64_t_t>(0LL, 5'000'000LL);
+    random_mixed_subtraction<decimal64_t_t, decimal32_t_t>(0, 5'000'000);
+    random_mixed_subtraction<decimal64_t_t, decimal32_t_t>(0LL, 5'000'000LL);
 
-    random_mixed_subtraction<decimal32_t, decimal64_t>(-5'000'000, 0);
-    random_mixed_subtraction<decimal32_t, decimal64_t>(-5'000'000LL, 0LL);
-    random_mixed_subtraction<decimal64_t, decimal32_t>(-5'000'000, 0);
-    random_mixed_subtraction<decimal64_t, decimal32_t>(-5'000'000LL, 0LL);
+    random_mixed_subtraction<decimal32_t_t, decimal64_t_t>(-5'000'000, 0);
+    random_mixed_subtraction<decimal32_t_t, decimal64_t_t>(-5'000'000LL, 0LL);
+    random_mixed_subtraction<decimal64_t_t, decimal32_t_t>(-5'000'000, 0);
+    random_mixed_subtraction<decimal64_t_t, decimal32_t_t>(-5'000'000LL, 0LL);
 
-    random_mixed_subtraction<decimal32_t, decimal64_t>(-5'000'000, 5'000'000);
-    random_mixed_subtraction<decimal32_t, decimal64_t>(-5'000'000LL, 5'000'000LL);
-    random_mixed_subtraction<decimal64_t, decimal32_t>(-5'000'000, 5'000'000);
-    random_mixed_subtraction<decimal64_t, decimal32_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_subtraction<decimal32_t_t, decimal64_t_t>(-5'000'000, 5'000'000);
+    random_mixed_subtraction<decimal32_t_t, decimal64_t_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_subtraction<decimal64_t_t, decimal32_t_t>(-5'000'000, 5'000'000);
+    random_mixed_subtraction<decimal64_t_t, decimal32_t_t>(-5'000'000LL, 5'000'000LL);
 
-    random_mixed_multiplication<decimal32_t, decimal64_t>(0, 5'000);
-    random_mixed_multiplication<decimal32_t, decimal64_t>(0LL, 5'000LL);
-    random_mixed_multiplication<decimal64_t, decimal32_t>(0, 5'000);
-    random_mixed_multiplication<decimal64_t, decimal32_t>(0LL, 5'000LL);
+    random_mixed_multiplication<decimal32_t_t, decimal64_t_t>(0, 5'000);
+    random_mixed_multiplication<decimal32_t_t, decimal64_t_t>(0LL, 5'000LL);
+    random_mixed_multiplication<decimal64_t_t, decimal32_t_t>(0, 5'000);
+    random_mixed_multiplication<decimal64_t_t, decimal32_t_t>(0LL, 5'000LL);
 
-    random_mixed_multiplication<decimal32_t, decimal64_t>(-5'000, 0);
-    random_mixed_multiplication<decimal32_t, decimal64_t>(-5'000LL, 0LL);
-    random_mixed_multiplication<decimal64_t, decimal32_t>(-5'000, 0);
-    random_mixed_multiplication<decimal64_t, decimal32_t>(-5'000LL, 0LL);
+    random_mixed_multiplication<decimal32_t_t, decimal64_t_t>(-5'000, 0);
+    random_mixed_multiplication<decimal32_t_t, decimal64_t_t>(-5'000LL, 0LL);
+    random_mixed_multiplication<decimal64_t_t, decimal32_t_t>(-5'000, 0);
+    random_mixed_multiplication<decimal64_t_t, decimal32_t_t>(-5'000LL, 0LL);
 
-    random_mixed_multiplication<decimal32_t, decimal64_t>(-5'000, 5'000);
-    random_mixed_multiplication<decimal32_t, decimal64_t>(-5'000LL, 5'000LL);
-    random_mixed_multiplication<decimal64_t, decimal32_t>(-5'000, 5'000);
-    random_mixed_multiplication<decimal64_t, decimal32_t>(-5'000LL, 5'000LL);
+    random_mixed_multiplication<decimal32_t_t, decimal64_t_t>(-5'000, 5'000);
+    random_mixed_multiplication<decimal32_t_t, decimal64_t_t>(-5'000LL, 5'000LL);
+    random_mixed_multiplication<decimal64_t_t, decimal32_t_t>(-5'000, 5'000);
+    random_mixed_multiplication<decimal64_t_t, decimal32_t_t>(-5'000LL, 5'000LL);
 
-    random_mixed_division<decimal32_t, decimal64_t>(0, 5'000);
-    random_mixed_division<decimal32_t, decimal64_t>(0LL, 5'000LL);
-    random_mixed_division<decimal64_t, decimal32_t>(0, 5'000);
-    random_mixed_division<decimal64_t, decimal32_t>(0LL, 5'000LL);
+    random_mixed_division<decimal32_t_t, decimal64_t_t>(0, 5'000);
+    random_mixed_division<decimal32_t_t, decimal64_t_t>(0LL, 5'000LL);
+    random_mixed_division<decimal64_t_t, decimal32_t_t>(0, 5'000);
+    random_mixed_division<decimal64_t_t, decimal32_t_t>(0LL, 5'000LL);
 
-    random_mixed_division<decimal32_t, decimal64_t>(-5'000, 0);
-    random_mixed_division<decimal32_t, decimal64_t>(-5'000LL, 0LL);
-    random_mixed_division<decimal64_t, decimal32_t>(-5'000, 0);
-    random_mixed_division<decimal64_t, decimal32_t>(-5'000LL, 0LL);
+    random_mixed_division<decimal32_t_t, decimal64_t_t>(-5'000, 0);
+    random_mixed_division<decimal32_t_t, decimal64_t_t>(-5'000LL, 0LL);
+    random_mixed_division<decimal64_t_t, decimal32_t_t>(-5'000, 0);
+    random_mixed_division<decimal64_t_t, decimal32_t_t>(-5'000LL, 0LL);
 
-    random_mixed_division<decimal32_t, decimal64_t>(-5'000, 5'000);
-    random_mixed_division<decimal32_t, decimal64_t>(-5'000LL, 5'000LL);
-    random_mixed_division<decimal64_t, decimal32_t>(-5'000, 5'000);
-    random_mixed_division<decimal64_t, decimal32_t>(-5'000LL, 5'000LL);
+    random_mixed_division<decimal32_t_t, decimal64_t_t>(-5'000, 5'000);
+    random_mixed_division<decimal32_t_t, decimal64_t_t>(-5'000LL, 5'000LL);
+    random_mixed_division<decimal64_t_t, decimal32_t_t>(-5'000, 5'000);
+    random_mixed_division<decimal64_t_t, decimal32_t_t>(-5'000LL, 5'000LL);
 
-    random_mixed_addition<decimal32_t, decimal128_t>(0, 5'000'000);
-    random_mixed_addition<decimal32_t, decimal128_t>(0LL, 5'000'000LL);
-    random_mixed_addition<decimal128_t, decimal32_t>(0, 5'000'000);
-    random_mixed_addition<decimal128_t, decimal32_t>(0LL, 5'000'000LL);
+    random_mixed_addition<decimal32_t_t, decimal128_t_t>(0, 5'000'000);
+    random_mixed_addition<decimal32_t_t, decimal128_t_t>(0LL, 5'000'000LL);
+    random_mixed_addition<decimal128_t_t, decimal32_t_t>(0, 5'000'000);
+    random_mixed_addition<decimal128_t_t, decimal32_t_t>(0LL, 5'000'000LL);
 
-    random_mixed_addition<decimal32_t, decimal128_t>(-5'000'000, 0);
-    random_mixed_addition<decimal32_t, decimal128_t>(-5'000'000LL, 0LL);
-    random_mixed_addition<decimal128_t, decimal32_t>(-5'000'000, 0);
-    random_mixed_addition<decimal128_t, decimal32_t>(-5'000'000LL, 0LL);
+    random_mixed_addition<decimal32_t_t, decimal128_t_t>(-5'000'000, 0);
+    random_mixed_addition<decimal32_t_t, decimal128_t_t>(-5'000'000LL, 0LL);
+    random_mixed_addition<decimal128_t_t, decimal32_t_t>(-5'000'000, 0);
+    random_mixed_addition<decimal128_t_t, decimal32_t_t>(-5'000'000LL, 0LL);
 
-    random_mixed_addition<decimal32_t, decimal128_t>(-5'000'000, 5'000'000);
-    random_mixed_addition<decimal32_t, decimal128_t>(-5'000'000LL, 5'000'000LL);
-    random_mixed_addition<decimal128_t, decimal32_t>(-5'000'000, 5'000'000);
-    random_mixed_addition<decimal128_t, decimal32_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_addition<decimal32_t_t, decimal128_t_t>(-5'000'000, 5'000'000);
+    random_mixed_addition<decimal32_t_t, decimal128_t_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_addition<decimal128_t_t, decimal32_t_t>(-5'000'000, 5'000'000);
+    random_mixed_addition<decimal128_t_t, decimal32_t_t>(-5'000'000LL, 5'000'000LL);
 
-    random_mixed_subtraction<decimal32_t, decimal128_t>(0, 5'000'000);
-    random_mixed_subtraction<decimal32_t, decimal128_t>(0LL, 5'000'000LL);
-    random_mixed_subtraction<decimal128_t, decimal32_t>(0, 5'000'000);
-    random_mixed_subtraction<decimal128_t, decimal32_t>(0LL, 5'000'000LL);
+    random_mixed_subtraction<decimal32_t_t, decimal128_t_t>(0, 5'000'000);
+    random_mixed_subtraction<decimal32_t_t, decimal128_t_t>(0LL, 5'000'000LL);
+    random_mixed_subtraction<decimal128_t_t, decimal32_t_t>(0, 5'000'000);
+    random_mixed_subtraction<decimal128_t_t, decimal32_t_t>(0LL, 5'000'000LL);
 
-    random_mixed_subtraction<decimal32_t, decimal128_t>(-5'000'000, 0);
-    random_mixed_subtraction<decimal32_t, decimal128_t>(-5'000'000LL, 0LL);
-    random_mixed_subtraction<decimal128_t, decimal32_t>(-5'000'000, 0);
-    random_mixed_subtraction<decimal128_t, decimal32_t>(-5'000'000LL, 0LL);
+    random_mixed_subtraction<decimal32_t_t, decimal128_t_t>(-5'000'000, 0);
+    random_mixed_subtraction<decimal32_t_t, decimal128_t_t>(-5'000'000LL, 0LL);
+    random_mixed_subtraction<decimal128_t_t, decimal32_t_t>(-5'000'000, 0);
+    random_mixed_subtraction<decimal128_t_t, decimal32_t_t>(-5'000'000LL, 0LL);
 
-    random_mixed_subtraction<decimal32_t, decimal128_t>(-5'000'000, 5'000'000);
-    random_mixed_subtraction<decimal32_t, decimal128_t>(-5'000'000LL, 5'000'000LL);
-    random_mixed_subtraction<decimal128_t, decimal32_t>(-5'000'000, 5'000'000);
-    random_mixed_subtraction<decimal128_t, decimal32_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_subtraction<decimal32_t_t, decimal128_t_t>(-5'000'000, 5'000'000);
+    random_mixed_subtraction<decimal32_t_t, decimal128_t_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_subtraction<decimal128_t_t, decimal32_t_t>(-5'000'000, 5'000'000);
+    random_mixed_subtraction<decimal128_t_t, decimal32_t_t>(-5'000'000LL, 5'000'000LL);
 
-    random_mixed_multiplication<decimal32_t, decimal128_t>(0, 5'000);
-    random_mixed_multiplication<decimal32_t, decimal128_t>(0LL, 5'000LL);
-    random_mixed_multiplication<decimal128_t, decimal32_t>(0, 5'000);
-    random_mixed_multiplication<decimal128_t, decimal32_t>(0LL, 5'000LL);
+    random_mixed_multiplication<decimal32_t_t, decimal128_t_t>(0, 5'000);
+    random_mixed_multiplication<decimal32_t_t, decimal128_t_t>(0LL, 5'000LL);
+    random_mixed_multiplication<decimal128_t_t, decimal32_t_t>(0, 5'000);
+    random_mixed_multiplication<decimal128_t_t, decimal32_t_t>(0LL, 5'000LL);
 
-    random_mixed_multiplication<decimal32_t, decimal128_t>(-5'000, 0);
-    random_mixed_multiplication<decimal32_t, decimal128_t>(-5'000LL, 0LL);
-    random_mixed_multiplication<decimal128_t, decimal32_t>(-5'000, 0);
-    random_mixed_multiplication<decimal128_t, decimal32_t>(-5'000LL, 0LL);
+    random_mixed_multiplication<decimal32_t_t, decimal128_t_t>(-5'000, 0);
+    random_mixed_multiplication<decimal32_t_t, decimal128_t_t>(-5'000LL, 0LL);
+    random_mixed_multiplication<decimal128_t_t, decimal32_t_t>(-5'000, 0);
+    random_mixed_multiplication<decimal128_t_t, decimal32_t_t>(-5'000LL, 0LL);
 
-    random_mixed_multiplication<decimal32_t, decimal128_t>(-5'000, 5'000);
-    random_mixed_multiplication<decimal32_t, decimal128_t>(-5'000LL, 5'000LL);
-    random_mixed_multiplication<decimal128_t, decimal32_t>(-5'000, 5'000);
-    random_mixed_multiplication<decimal128_t, decimal32_t>(-5'000LL, 5'000LL);
+    random_mixed_multiplication<decimal32_t_t, decimal128_t_t>(-5'000, 5'000);
+    random_mixed_multiplication<decimal32_t_t, decimal128_t_t>(-5'000LL, 5'000LL);
+    random_mixed_multiplication<decimal128_t_t, decimal32_t_t>(-5'000, 5'000);
+    random_mixed_multiplication<decimal128_t_t, decimal32_t_t>(-5'000LL, 5'000LL);
 
-    random_mixed_division<decimal32_t, decimal128_t>(0, 5'000);
-    random_mixed_division<decimal32_t, decimal128_t>(0LL, 5'000LL);
-    random_mixed_division<decimal128_t, decimal32_t>(0, 5'000);
-    random_mixed_division<decimal128_t, decimal32_t>(0LL, 5'000LL);
+    random_mixed_division<decimal32_t_t, decimal128_t_t>(0, 5'000);
+    random_mixed_division<decimal32_t_t, decimal128_t_t>(0LL, 5'000LL);
+    random_mixed_division<decimal128_t_t, decimal32_t_t>(0, 5'000);
+    random_mixed_division<decimal128_t_t, decimal32_t_t>(0LL, 5'000LL);
 
-    random_mixed_division<decimal32_t, decimal128_t>(-5'000, 0);
-    random_mixed_division<decimal32_t, decimal128_t>(-5'000LL, 0LL);
-    random_mixed_division<decimal128_t, decimal32_t>(-5'000, 0);
-    random_mixed_division<decimal128_t, decimal32_t>(-5'000LL, 0LL);
+    random_mixed_division<decimal32_t_t, decimal128_t_t>(-5'000, 0);
+    random_mixed_division<decimal32_t_t, decimal128_t_t>(-5'000LL, 0LL);
+    random_mixed_division<decimal128_t_t, decimal32_t_t>(-5'000, 0);
+    random_mixed_division<decimal128_t_t, decimal32_t_t>(-5'000LL, 0LL);
 
-    random_mixed_division<decimal32_t, decimal128_t>(-5'000, 5'000);
-    random_mixed_division<decimal32_t, decimal128_t>(-5'000LL, 5'000LL);
-    random_mixed_division<decimal128_t, decimal32_t>(-5'000, 5'000);
-    random_mixed_division<decimal128_t, decimal32_t>(-5'000LL, 5'000LL);
+    random_mixed_division<decimal32_t_t, decimal128_t_t>(-5'000, 5'000);
+    random_mixed_division<decimal32_t_t, decimal128_t_t>(-5'000LL, 5'000LL);
+    random_mixed_division<decimal128_t_t, decimal32_t_t>(-5'000, 5'000);
+    random_mixed_division<decimal128_t_t, decimal32_t_t>(-5'000LL, 5'000LL);
     
-    random_mixed_addition<decimal64_t, decimal128_t>(0, 5'000'000);
-    random_mixed_addition<decimal64_t, decimal128_t>(0LL, 5'000'000LL);
-    random_mixed_addition<decimal128_t, decimal64_t>(0, 5'000'000);
-    random_mixed_addition<decimal128_t, decimal64_t>(0LL, 5'000'000LL);
+    random_mixed_addition<decimal64_t_t, decimal128_t_t>(0, 5'000'000);
+    random_mixed_addition<decimal64_t_t, decimal128_t_t>(0LL, 5'000'000LL);
+    random_mixed_addition<decimal128_t_t, decimal64_t_t>(0, 5'000'000);
+    random_mixed_addition<decimal128_t_t, decimal64_t_t>(0LL, 5'000'000LL);
 
-    random_mixed_addition<decimal64_t, decimal128_t>(-5'000'000, 0);
-    random_mixed_addition<decimal64_t, decimal128_t>(-5'000'000LL, 0LL);
-    random_mixed_addition<decimal128_t, decimal64_t>(-5'000'000, 0);
-    random_mixed_addition<decimal128_t, decimal64_t>(-5'000'000LL, 0LL);
+    random_mixed_addition<decimal64_t_t, decimal128_t_t>(-5'000'000, 0);
+    random_mixed_addition<decimal64_t_t, decimal128_t_t>(-5'000'000LL, 0LL);
+    random_mixed_addition<decimal128_t_t, decimal64_t_t>(-5'000'000, 0);
+    random_mixed_addition<decimal128_t_t, decimal64_t_t>(-5'000'000LL, 0LL);
 
-    random_mixed_addition<decimal64_t, decimal128_t>(-5'000'000, 5'000'000);
-    random_mixed_addition<decimal64_t, decimal128_t>(-5'000'000LL, 5'000'000LL);
-    random_mixed_addition<decimal128_t, decimal64_t>(-5'000'000, 5'000'000);
-    random_mixed_addition<decimal128_t, decimal64_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_addition<decimal64_t_t, decimal128_t_t>(-5'000'000, 5'000'000);
+    random_mixed_addition<decimal64_t_t, decimal128_t_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_addition<decimal128_t_t, decimal64_t_t>(-5'000'000, 5'000'000);
+    random_mixed_addition<decimal128_t_t, decimal64_t_t>(-5'000'000LL, 5'000'000LL);
 
-    random_mixed_subtraction<decimal64_t, decimal128_t>(0, 5'000'000);
-    random_mixed_subtraction<decimal64_t, decimal128_t>(0LL, 5'000'000LL);
-    random_mixed_subtraction<decimal128_t, decimal64_t>(0, 5'000'000);
-    random_mixed_subtraction<decimal128_t, decimal64_t>(0LL, 5'000'000LL);
+    random_mixed_subtraction<decimal64_t_t, decimal128_t_t>(0, 5'000'000);
+    random_mixed_subtraction<decimal64_t_t, decimal128_t_t>(0LL, 5'000'000LL);
+    random_mixed_subtraction<decimal128_t_t, decimal64_t_t>(0, 5'000'000);
+    random_mixed_subtraction<decimal128_t_t, decimal64_t_t>(0LL, 5'000'000LL);
 
-    random_mixed_subtraction<decimal64_t, decimal128_t>(-5'000'000, 0);
-    random_mixed_subtraction<decimal64_t, decimal128_t>(-5'000'000LL, 0LL);
-    random_mixed_subtraction<decimal128_t, decimal64_t>(-5'000'000, 0);
-    random_mixed_subtraction<decimal128_t, decimal64_t>(-5'000'000LL, 0LL);
+    random_mixed_subtraction<decimal64_t_t, decimal128_t_t>(-5'000'000, 0);
+    random_mixed_subtraction<decimal64_t_t, decimal128_t_t>(-5'000'000LL, 0LL);
+    random_mixed_subtraction<decimal128_t_t, decimal64_t_t>(-5'000'000, 0);
+    random_mixed_subtraction<decimal128_t_t, decimal64_t_t>(-5'000'000LL, 0LL);
 
-    random_mixed_subtraction<decimal64_t, decimal128_t>(-5'000'000, 5'000'000);
-    random_mixed_subtraction<decimal64_t, decimal128_t>(-5'000'000LL, 5'000'000LL);
-    random_mixed_subtraction<decimal128_t, decimal64_t>(-5'000'000, 5'000'000);
-    random_mixed_subtraction<decimal128_t, decimal64_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_subtraction<decimal64_t_t, decimal128_t_t>(-5'000'000, 5'000'000);
+    random_mixed_subtraction<decimal64_t_t, decimal128_t_t>(-5'000'000LL, 5'000'000LL);
+    random_mixed_subtraction<decimal128_t_t, decimal64_t_t>(-5'000'000, 5'000'000);
+    random_mixed_subtraction<decimal128_t_t, decimal64_t_t>(-5'000'000LL, 5'000'000LL);
 
-    random_mixed_multiplication<decimal64_t, decimal128_t>(0, 5'000);
-    random_mixed_multiplication<decimal64_t, decimal128_t>(0LL, 5'000LL);
-    random_mixed_multiplication<decimal128_t, decimal64_t>(0, 5'000);
-    random_mixed_multiplication<decimal128_t, decimal64_t>(0LL, 5'000LL);
+    random_mixed_multiplication<decimal64_t_t, decimal128_t_t>(0, 5'000);
+    random_mixed_multiplication<decimal64_t_t, decimal128_t_t>(0LL, 5'000LL);
+    random_mixed_multiplication<decimal128_t_t, decimal64_t_t>(0, 5'000);
+    random_mixed_multiplication<decimal128_t_t, decimal64_t_t>(0LL, 5'000LL);
 
-    random_mixed_multiplication<decimal64_t, decimal128_t>(-5'000, 0);
-    random_mixed_multiplication<decimal64_t, decimal128_t>(-5'000LL, 0LL);
-    random_mixed_multiplication<decimal128_t, decimal64_t>(-5'000, 0);
-    random_mixed_multiplication<decimal128_t, decimal64_t>(-5'000LL, 0LL);
+    random_mixed_multiplication<decimal64_t_t, decimal128_t_t>(-5'000, 0);
+    random_mixed_multiplication<decimal64_t_t, decimal128_t_t>(-5'000LL, 0LL);
+    random_mixed_multiplication<decimal128_t_t, decimal64_t_t>(-5'000, 0);
+    random_mixed_multiplication<decimal128_t_t, decimal64_t_t>(-5'000LL, 0LL);
 
-    random_mixed_multiplication<decimal64_t, decimal128_t>(-5'000, 5'000);
-    random_mixed_multiplication<decimal64_t, decimal128_t>(-5'000LL, 5'000LL);
-    random_mixed_multiplication<decimal128_t, decimal64_t>(-5'000, 5'000);
-    random_mixed_multiplication<decimal128_t, decimal64_t>(-5'000LL, 5'000LL);
+    random_mixed_multiplication<decimal64_t_t, decimal128_t_t>(-5'000, 5'000);
+    random_mixed_multiplication<decimal64_t_t, decimal128_t_t>(-5'000LL, 5'000LL);
+    random_mixed_multiplication<decimal128_t_t, decimal64_t_t>(-5'000, 5'000);
+    random_mixed_multiplication<decimal128_t_t, decimal64_t_t>(-5'000LL, 5'000LL);
 
-    random_mixed_division<decimal64_t, decimal128_t>(0, 5'000);
-    random_mixed_division<decimal64_t, decimal128_t>(0LL, 5'000LL);
-    random_mixed_division<decimal128_t, decimal64_t>(0, 5'000);
-    random_mixed_division<decimal128_t, decimal64_t>(0LL, 5'000LL);
+    random_mixed_division<decimal64_t_t, decimal128_t_t>(0, 5'000);
+    random_mixed_division<decimal64_t_t, decimal128_t_t>(0LL, 5'000LL);
+    random_mixed_division<decimal128_t_t, decimal64_t_t>(0, 5'000);
+    random_mixed_division<decimal128_t_t, decimal64_t_t>(0LL, 5'000LL);
 
-    random_mixed_division<decimal64_t, decimal128_t>(-5'000, 0);
-    random_mixed_division<decimal64_t, decimal128_t>(-5'000LL, 0LL);
-    random_mixed_division<decimal128_t, decimal64_t>(-5'000, 0);
-    random_mixed_division<decimal128_t, decimal64_t>(-5'000LL, 0LL);
+    random_mixed_division<decimal64_t_t, decimal128_t_t>(-5'000, 0);
+    random_mixed_division<decimal64_t_t, decimal128_t_t>(-5'000LL, 0LL);
+    random_mixed_division<decimal128_t_t, decimal64_t_t>(-5'000, 0);
+    random_mixed_division<decimal128_t_t, decimal64_t_t>(-5'000LL, 0LL);
 
-    random_mixed_division<decimal64_t, decimal128_t>(-5'000, 5'000);
-    random_mixed_division<decimal64_t, decimal128_t>(-5'000LL, 5'000LL);
-    random_mixed_division<decimal128_t, decimal64_t>(-5'000, 5'000);
-    random_mixed_division<decimal128_t, decimal64_t>(-5'000LL, 5'000LL);
+    random_mixed_division<decimal64_t_t, decimal128_t_t>(-5'000, 5'000);
+    random_mixed_division<decimal64_t_t, decimal128_t_t>(-5'000LL, 5'000LL);
+    random_mixed_division<decimal128_t_t, decimal64_t_t>(-5'000, 5'000);
+    random_mixed_division<decimal128_t_t, decimal64_t_t>(-5'000LL, 5'000LL);
 
     return boost::report_errors();
 }

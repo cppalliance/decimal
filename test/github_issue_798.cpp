@@ -87,39 +87,39 @@ int main()
 {
     using namespace boost::decimal;
 
-    test_zero<decimal32_t>();
+    test_zero<decimal32_t_t>();
     test_zero<decimal_fast32_t>();
-    test_zero<decimal64_t>();
+    test_zero<decimal64_t_t>();
     test_zero<decimal_fast64_t>();
-    test_zero<decimal128_t>();
+    test_zero<decimal128_t_t>();
     test_zero<decimal_fast128_t>();
 
-    test_eps<decimal32_t>();
+    test_eps<decimal32_t_t>();
     test_eps<decimal_fast32_t>();
-    test_eps<decimal64_t>();
+    test_eps<decimal64_t_t>();
     test_eps<decimal_fast64_t>();
-    test_eps<decimal128_t>();
+    test_eps<decimal128_t_t>();
     test_eps<decimal_fast128_t>();
 
-    test_one<decimal32_t>();
+    test_one<decimal32_t_t>();
     test_one<decimal_fast32_t>();
-    test_one<decimal64_t>();
+    test_one<decimal64_t_t>();
     test_one<decimal_fast64_t>();
-    test_one<decimal128_t>();
+    test_one<decimal128_t_t>();
     test_one<decimal_fast128_t>();
 
-    test_onek<decimal32_t>();
+    test_onek<decimal32_t_t>();
     test_onek<decimal_fast32_t>();
-    test_onek<decimal64_t>();
+    test_onek<decimal64_t_t>();
     test_onek<decimal_fast64_t>();
-    test_onek<decimal128_t>();
+    test_onek<decimal128_t_t>();
     test_onek<decimal_fast128_t>();
 
-    test_min<decimal32_t>();
+    test_min<decimal32_t_t>();
     test_min<decimal_fast32_t>();
-    test_min<decimal64_t>();
+    test_min<decimal64_t_t>();
     test_min<decimal_fast64_t>();
-    test_min<decimal128_t>();
+    test_min<decimal128_t_t>();
     test_min<decimal_fast128_t>();
 
     return boost::report_errors();

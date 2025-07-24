@@ -161,7 +161,7 @@ namespace local
 
     auto result_is_ok = true;
 
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
     using float_type = float;
 
     for(auto   n = static_cast<std::size_t>(UINT8_C(0));
@@ -170,7 +170,7 @@ namespace local
     {
       const auto ld_arg = static_cast<long double>(-0.23L - static_cast<long double>(n + 1U));
 
-      const auto x_dec = static_cast<boost::decimal::decimal32_t>(ld_arg);
+      const auto x_dec = static_cast<boost::decimal::decimal32_t_t>(ld_arg);
       const auto x_flt = static_cast<float>(ld_arg);
 
       const auto val_flt = static_cast<float>(ctrl_values[n]);
@@ -220,7 +220,7 @@ namespace local
 
     for(auto& pr : values)
     {
-      const auto tg = tgamma( boost::decimal::decimal32_t { pr.first, 0 } );
+      const auto tg = tgamma( boost::decimal::decimal32_t_t { pr.first, 0 } );
 
       const auto result_tg_is_ok = ((static_cast<unsigned>(tg) == pr.second) && (static_cast<unsigned>(tg) == tg));
 
@@ -568,7 +568,7 @@ auto main() -> int
   auto result_is_ok = true;
 
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
     using float_type   = float;
 
     const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(768, 0.01L, 0.9L);
@@ -579,7 +579,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
     using float_type   = float;
 
     const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(768, 2.1L, 23.4L);
@@ -601,7 +601,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal64_t;
+    using decimal_type = boost::decimal::decimal64_t_t;
     using float_type   = double;
 
     const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(4096, 0.001L, 0.9L);
@@ -612,7 +612,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal64_t;
+    using decimal_type = boost::decimal::decimal64_t_t;
     using float_type   = double;
 
     const auto result_tgamma_is_ok   = local::test_tgamma<decimal_type, float_type>(4096, 2.1L, 78.9L);
@@ -639,7 +639,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
     using float_type   = float;
 
     const auto result_edge_is_ok = local::test_tgamma_edge<decimal_type, float_type>();
@@ -650,7 +650,7 @@ auto main() -> int
   }
 
   {
-    const auto result_tgamma64_is_ok   = local::test_tgamma_64<boost::decimal::decimal64_t>(4096);
+    const auto result_tgamma64_is_ok   = local::test_tgamma_64<boost::decimal::decimal64_t_t>(4096);
 
     BOOST_TEST(result_tgamma64_is_ok);
 
@@ -666,8 +666,8 @@ auto main() -> int
   }
 
   {
-    const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo<boost::decimal::decimal128_t>(4096);
-    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi<boost::decimal::decimal128_t>(0x30'000);
+    const auto result_tgamma128_lo_is_ok   = local::test_tgamma_128_lo<boost::decimal::decimal128_t_t>(4096);
+    const auto result_tgamma128_hi_is_ok   = local::test_tgamma_128_hi<boost::decimal::decimal128_t_t>(0x30'000);
 
     BOOST_TEST(result_tgamma128_lo_is_ok);
     BOOST_TEST(result_tgamma128_hi_is_ok);

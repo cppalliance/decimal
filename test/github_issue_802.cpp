@@ -9,7 +9,7 @@
 void fasting()
 {
     using namespace boost::decimal;
-    using Dec = decimal128_t;
+    using Dec = decimal128_t_t;
     const Dec a{100'000,1};  // 6 dec digits significant
     const Dec b{2'000'000,1}; // 7 dec digits significant
     constexpr Dec ab{2, 13};

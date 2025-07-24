@@ -55,7 +55,7 @@ auto run_non_std_decimal() -> bool;
 } // namespace app
 
 using builtin_float_type    = double;
-using decimal_float_type    = boost::decimal::decimal64_t;
+using decimal_float_type    = boost::decimal::decimal64_t_t;
 
 //using arithmetic_float_type = builtin_float_type;
 using arithmetic_float_type = decimal_float_type;
@@ -84,7 +84,7 @@ target-specific flags
 |--------------------------------|---------------|------------|-------------------|
 | double (built-in, no FPU)      |  22           |   1.0      |       5.6         |
 | ::math::softfloat::float64_t   |  27           |   1.2      |       8.5         |
-| boost::decimal::decimal64_t      |  2800         |   130      |       34          |
+| boost::decimal::decimal64_t_t      |  2800         |   130      |       34          |
 #endif
 
 namespace local

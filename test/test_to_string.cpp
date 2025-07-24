@@ -2,9 +2,9 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal/decimal32_t.hpp>
-#include <boost/decimal/decimal64_t.hpp>
-#include <boost/decimal/decimal128_t.hpp>
+#include <boost/decimal/decimal32_t_t.hpp>
+#include <boost/decimal/decimal64_t_t.hpp>
+#include <boost/decimal/decimal128_t_t.hpp>
 #include <boost/decimal/string.hpp>
 #include <boost/decimal/iostream.hpp>
 #include <boost/core/lightweight_test.hpp>
@@ -37,9 +37,9 @@ void test()
 
 int main()
 {
-    test<decimal32_t>();
-    test<decimal64_t>();
-    test<decimal128_t>();
+    test<decimal32_t_t>();
+    test<decimal64_t_t>();
+    test<decimal128_t_t>();
 
     return boost::report_errors();
 }

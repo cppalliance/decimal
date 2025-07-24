@@ -16,7 +16,7 @@
 void test_issue()
 {
     // -7.50
-    constexpr boost::decimal::decimal128_t test_val {-750, -2};
+    constexpr boost::decimal::decimal128_t_t test_val {-750, -2};
     boost::int128::uint128_t bits {};
     std::memcpy(&bits, &test_val, sizeof(bits));
 
@@ -46,10 +46,10 @@ void test_random_spots()
 
         const auto full_string {integer_string + "." + fractional_string};
 
-        bson_decimal128_t_t bson_res;
-        bson_decimal128_t_from_string(full_string.c_str(), &bson_res);
+        bson_decimal128_t_t_t bson_res;
+        bson_decimal128_t_t_from_string(full_string.c_str(), &bson_res);
 
-        boost::decimal::decimal128_t boost_res;
+        boost::decimal::decimal128_t_t boost_res;
         const auto r = boost::decimal::from_chars(full_string, boost_res);
 
         BOOST_TEST(r);
@@ -83,16 +83,16 @@ void test_rounded_spots()
         // This should force the usage of the combination field if we're going to use it
         auto full_string {integer_string + "." + fractional_string + "9999999999"};
         auto current_length {static_cast<int>(full_string.length())};
-        while (current_length < std::numeric_limits<boost::decimal::decimal128_t>::digits10 + 1)
+        while (current_length < std::numeric_limits<boost::decimal::decimal128_t_t>::digits10 + 1)
         {
             full_string.append("9");
             ++current_length;
         }
 
-        bson_decimal128_t_t bson_res;
-        bson_decimal128_t_from_string(full_string.c_str(), &bson_res);
+        bson_decimal128_t_t_t bson_res;
+        bson_decimal128_t_t_from_string(full_string.c_str(), &bson_res);
 
-        boost::decimal::decimal128_t boost_res;
+        boost::decimal::decimal128_t_t boost_res;
         const auto r = boost::decimal::from_chars(full_string, boost_res);
 
         BOOST_TEST(r);

@@ -17,26 +17,26 @@ The following functions analogous to those from `<cstdlib>` are provided:
 namespace boost {
 namespace decimal {
 
-inline decimal64 strtod(const char* str, char** endptr) noexcept;
-inline decimal64 wcstod(const wchar_t* str, wchar_t** endptr) noexcept;
+inline decimal64_t strtod(const char* str, char** endptr) noexcept;
+inline decimal64_t wcstod(const wchar_t* str, wchar_t** endptr) noexcept;
 
-inline decimal32 strtod32(const char* str, char** endptr) noexcept;
-inline decimal32 wcstod32(const wchar_t* str, wchar_t** endptr) noexcept;
+inline decimal32_t strtod32(const char* str, char** endptr) noexcept;
+inline decimal32_t wcstod32(const wchar_t* str, wchar_t** endptr) noexcept;
 
-inline decimal32_fast strtod32f(const char* str, char** endptr) noexcept;
-inline decimal32_fast wcstod32f(const wchar_t* str, wchar_t** endptr) noexcept;
+inline decimal_fast32_t strtod32f(const char* str, char** endptr) noexcept;
+inline decimal_fast32_t wcstod32f(const wchar_t* str, wchar_t** endptr) noexcept;
 
-inline decimal64 strtod64(const char* str, char** endptr) noexcept;
-inline decimal64 wcstod64(const wchar_t* str, wchar_t** endptr) noexcept;
+inline decimal64_t strtod64(const char* str, char** endptr) noexcept;
+inline decimal64_t wcstod64(const wchar_t* str, wchar_t** endptr) noexcept;
 
-inline decimal64_fast strtod64f(const char* str, char** endptr) noexcept;
-inline decimal64_fast wcstod64f(const wchar_t* str, wchar_t** endptr) noexcept;
+inline decimal_fast64_t strtod64f(const char* str, char** endptr) noexcept;
+inline decimal_fast64_t wcstod64f(const wchar_t* str, wchar_t** endptr) noexcept;
 
-inline decimal128 strtod128(const char* str, char** endptr) noexcept;
-inline decimal128 wcstod128(const wchar_t* str, wchar_t** endptr) noexcept;
+inline decimal128_t strtod128(const char* str, char** endptr) noexcept;
+inline decimal128_t wcstod128(const wchar_t* str, wchar_t** endptr) noexcept;
 
-inline decimal128_fast strtod128f(const char* str, char** endptr) noexcept;
-inline decimal128_fast wcstod128f(const wchar_t* str, wchar_t** endptr) noexcept;
+inline decimal_fast128_t strtod128f(const char* str, char** endptr) noexcept;
+inline decimal_fast128_t wcstod128f(const wchar_t* str, wchar_t** endptr) noexcept;
 
 } //namespace decimal
 } //namespace boost

@@ -37,11 +37,11 @@ using namespace boost::decimal;
 struct daily_data
 {
     std::string date;
-    decimal64 open;
-    decimal64 high;
-    decimal64 low;
-    decimal64 close;
-    decimal64 volume;
+    decimal64_t open;
+    decimal64_t high;
+    decimal64_t low;
+    decimal64_t close;
+    decimal64_t volume;
 };
 
 // Function to split a CSV line into daily_data
@@ -89,7 +89,7 @@ int main()
     }
 
     // Get the closing prices for the entire year
-    std::vector<decimal64> closing_prices;
+    std::vector<decimal64_t> closing_prices;
     for (const auto& day : stock_data)
     {
         closing_prices.emplace_back(day.close);

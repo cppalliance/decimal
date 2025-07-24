@@ -363,7 +363,7 @@ namespace local
 
   auto test_log_64(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal64_t;
+    using decimal_type = boost::decimal::decimal64_t_t;
 
     using val_ctrl_array_type = std::array<double, 28U>;
 
@@ -410,7 +410,7 @@ namespace local
 
   auto test_log_128(const int tol_factor) -> bool
   {
-    using decimal_type = boost::decimal::decimal128_t;
+    using decimal_type = boost::decimal::decimal128_t_t;
 
     using str_ctrl_array_type = std::array<const char*, 28U>;
 
@@ -483,7 +483,7 @@ auto main() -> int
   auto result_is_ok = true;
 
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
     using float_type   = float;
 
     const auto test_log_is_ok                 = local::test_log                <decimal_type, float_type>(32);
@@ -494,7 +494,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal64_t;
+    using decimal_type = boost::decimal::decimal64_t_t;
     using float_type   = double;
 
     const auto test_log_is_ok                 = local::test_log                <decimal_type, float_type>(64);

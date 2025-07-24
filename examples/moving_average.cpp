@@ -16,11 +16,11 @@ using namespace boost::decimal;
 struct daily_data
 {
     std::string date;
-    decimal64 open;
-    decimal64 high;
-    decimal64 low;
-    decimal64 close;
-    decimal64 volume;
+    decimal64_t open;
+    decimal64_t high;
+    decimal64_t low;
+    decimal64_t close;
+    decimal64_t volume;
 };
 
 // Function to split a CSV line into daily_data
@@ -74,7 +74,7 @@ int main()
     size_t loop_count = 0; // Trivial counter to ensure this ran in the CI
     for (size_t i = window_size - 1; i < stock_data.size(); ++i)
     {
-        decimal64 sum(0);
+        decimal64_t sum(0);
 
         // Calculate sum for the window
         for (size_t j = 0; j < window_size; ++j)
@@ -83,7 +83,7 @@ int main()
         }
 
         // Calculate average
-        decimal64 moving_avg = sum / decimal64(window_size);
+        decimal64_t moving_avg = sum / decimal64_t(window_size);
 
         // Print result
         std::cout << stock_data[i].date << ","

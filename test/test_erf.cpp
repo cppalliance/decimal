@@ -72,7 +72,7 @@ void test_erf()
     BOOST_TEST_EQ(erf(-std::numeric_limits<T>::infinity() * dist(rng)), T{-1});
 
     // Small values
-    using float_type = std::conditional_t<std::is_same<T, decimal32_t>::value, float, double>;
+    using float_type = std::conditional_t<std::is_same<T, decimal32_t_t>::value, float, double>;
 
     std::uniform_real_distribution<float_type> smallest_vals(static_cast<float_type>(1e-15), static_cast<float_type>(1e-10));
     for (std::size_t i {}; i < N / 6; ++i)
@@ -221,14 +221,14 @@ void test_erf()
 }
 
 template <>
-void test_erf<decimal128_t>()
+void test_erf<decimal128_t_t>()
 {
     std::uniform_int_distribution<int> dist(1, 1);
 
-    BOOST_TEST(isnan(erf(std::numeric_limits<decimal128_t>::quiet_NaN()) * dist(rng)));
-    BOOST_TEST_EQ(erf(decimal128_t(0 * dist(rng))), decimal128_t{0});
-    BOOST_TEST_EQ(erf(std::numeric_limits<decimal128_t>::infinity() * dist(rng)), decimal128_t{1});
-    BOOST_TEST_EQ(erf(-std::numeric_limits<decimal128_t>::infinity() * dist(rng)), decimal128_t{-1});
+    BOOST_TEST(isnan(erf(std::numeric_limits<decimal128_t_t>::quiet_NaN()) * dist(rng)));
+    BOOST_TEST_EQ(erf(decimal128_t_t(0 * dist(rng))), decimal128_t_t{0});
+    BOOST_TEST_EQ(erf(std::numeric_limits<decimal128_t_t>::infinity() * dist(rng)), decimal128_t_t{1});
+    BOOST_TEST_EQ(erf(-std::numeric_limits<decimal128_t_t>::infinity() * dist(rng)), decimal128_t_t{-1});
 
     // Small values
     using float_type = long double;
@@ -237,7 +237,7 @@ void test_erf<decimal128_t>()
     for (std::size_t i {}; i < 5; ++i)
     {
         const auto val {smallest_vals(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
@@ -257,7 +257,7 @@ void test_erf<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {second_smallest(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
@@ -277,7 +277,7 @@ void test_erf<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_smallest(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
@@ -297,7 +297,7 @@ void test_erf<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_two(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
@@ -317,7 +317,7 @@ void test_erf<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_three(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
@@ -337,7 +337,7 @@ void test_erf<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_four(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
@@ -357,7 +357,7 @@ void test_erf<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_five(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
@@ -377,7 +377,7 @@ void test_erf<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_six(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
@@ -397,7 +397,7 @@ void test_erf<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_seven(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
@@ -417,7 +417,7 @@ void test_erf<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_eight(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
@@ -437,7 +437,7 @@ void test_erf<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_large(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erf(val)};
         const auto dec_res {static_cast<float_type>(erf(dec_val))};
@@ -454,7 +454,7 @@ void test_erf<decimal128_t>()
     }
 
     // Underflow case
-    BOOST_TEST_EQ(erf(decimal128_t{120}), decimal128_t{1} * dist(rng));
+    BOOST_TEST_EQ(erf(decimal128_t_t{120}), decimal128_t_t{1} * dist(rng));
 }
 
 template <typename T>
@@ -467,7 +467,7 @@ void test_erfc()
     BOOST_TEST_EQ(erfc(-std::numeric_limits<T>::infinity() * dist(rng)), T{2});
 
     // Small values
-    using float_type = std::conditional_t<std::is_same<T, decimal32_t>::value, float, double>;
+    using float_type = std::conditional_t<std::is_same<T, decimal32_t_t>::value, float, double>;
 
     std::uniform_real_distribution<float_type> smallest_vals(static_cast<float_type>(1e-15), static_cast<float_type>(1e-10));
     for (std::size_t i {}; i < N / 6; ++i)
@@ -639,13 +639,13 @@ void test_erfc()
 }
 
 template <>
-void test_erfc<decimal128_t>()
+void test_erfc<decimal128_t_t>()
 {
     std::uniform_int_distribution<int> dist(1, 1);
 
-    BOOST_TEST(isnan(erfc(std::numeric_limits<decimal128_t>::quiet_NaN() * dist(rng))));
-    BOOST_TEST_EQ(erfc(std::numeric_limits<decimal128_t>::infinity() * dist(rng)), decimal128_t{0});
-    BOOST_TEST_EQ(erfc(-std::numeric_limits<decimal128_t>::infinity() * dist(rng)), decimal128_t{2});
+    BOOST_TEST(isnan(erfc(std::numeric_limits<decimal128_t_t>::quiet_NaN() * dist(rng))));
+    BOOST_TEST_EQ(erfc(std::numeric_limits<decimal128_t_t>::infinity() * dist(rng)), decimal128_t_t{0});
+    BOOST_TEST_EQ(erfc(-std::numeric_limits<decimal128_t_t>::infinity() * dist(rng)), decimal128_t_t{2});
 
     // Small values
     using float_type = long double;
@@ -654,7 +654,7 @@ void test_erfc<decimal128_t>()
     for (std::size_t i {}; i < 5; ++i)
     {
         const auto val {smallest_vals(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
@@ -674,7 +674,7 @@ void test_erfc<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {second_smallest(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
@@ -694,7 +694,7 @@ void test_erfc<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_smallest(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
@@ -714,7 +714,7 @@ void test_erfc<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_two(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
@@ -734,7 +734,7 @@ void test_erfc<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_three(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
@@ -754,7 +754,7 @@ void test_erfc<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_four(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
@@ -775,7 +775,7 @@ void test_erfc<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_five(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
@@ -795,7 +795,7 @@ void test_erfc<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_six(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
@@ -815,7 +815,7 @@ void test_erfc<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_seven(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
@@ -835,7 +835,7 @@ void test_erfc<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_eight(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
@@ -855,7 +855,7 @@ void test_erfc<decimal128_t>()
     for (std::size_t i {}; i < 2; ++i)
     {
         const auto val {erfc_large(rng)};
-        const decimal128_t dec_val {val};
+        const decimal128_t_t dec_val {val};
 
         const auto float_res {std::erfc(val)};
         const auto dec_res {static_cast<float_type>(erfc(dec_val))};
@@ -872,7 +872,7 @@ void test_erfc<decimal128_t>()
     }
 
     // Underflow case
-    BOOST_TEST_EQ(erfc(decimal128_t{120}), decimal128_t{0} * dist(rng));
+    BOOST_TEST_EQ(erfc(decimal128_t_t{120}), decimal128_t_t{0} * dist(rng));
 }
 
 int main()
@@ -1130,15 +1130,15 @@ int main()
     return 1;
     #endif
 
-    test_erf<decimal32_t>();
-    test_erf<decimal64_t>();
+    test_erf<decimal32_t_t>();
+    test_erf<decimal64_t_t>();
 
-    test_erfc<decimal32_t>();
-    test_erfc<decimal64_t>();
+    test_erfc<decimal32_t_t>();
+    test_erfc<decimal64_t_t>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH) && BOOST_DECIMAL_LDBL_BITS != 128 && !defined(__i386__) && !defined(_WIN32)
-    test_erf<decimal128_t>();
-    test_erfc<decimal128_t>();
+    test_erf<decimal128_t_t>();
+    test_erfc<decimal128_t_t>();
     #endif
 
     return boost::report_errors();

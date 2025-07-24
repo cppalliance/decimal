@@ -190,11 +190,11 @@ constexpr auto cbrt(T val) noexcept
 
     #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
 
-    using evaluation_type = detail::promote_args_t<T, decimal64>;
+    using evaluation_type = detail::promote_args_t<T, decimal64_t>;
 
     #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
 
-    using evaluation_type = detail::promote_args_t<T, decimal128>;
+    using evaluation_type = detail::promote_args_t<T, decimal128_t>;
 
     #endif
 

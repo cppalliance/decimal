@@ -33,11 +33,11 @@ using namespace boost::decimal;
 
 void test_comp()
 {
-    constexpr decimal32_t small(1, -50);
+    constexpr decimal32_t_t small(1, -50);
 
     BOOST_TEST(small == small);
 
-    constexpr decimal32_t sig(123456, -50);
+    constexpr decimal32_t_t sig(123456, -50);
     BOOST_TEST(sig != small);
 
     BOOST_TEST(small < sig);
@@ -46,9 +46,9 @@ void test_comp()
     BOOST_TEST(sig > small);
     BOOST_TEST(sig >= small);
 
-    decimal32_t zero {0, 0};
-    decimal32_t one {1, 0};
-    decimal32_t half {5, -1};
+    decimal32_t_t zero {0, 0};
+    decimal32_t_t one {1, 0};
+    decimal32_t_t half {5, -1};
     BOOST_TEST(zero < one);
     BOOST_TEST(zero < half);
     BOOST_TEST(one > zero);
@@ -59,48 +59,48 @@ void test_comp()
     BOOST_TEST(-one < half);
 
     // Test cohorts
-    BOOST_TEST(small == decimal32_t(10, -51));
-    BOOST_TEST(small == decimal32_t(100, -52));
-    BOOST_TEST(small == decimal32_t(1000, -53));
-    BOOST_TEST(small == decimal32_t(10000, -54));
-    BOOST_TEST(small == decimal32_t(100000, -55));
-    BOOST_TEST(small == decimal32_t(1000000, -56));
+    BOOST_TEST(small == decimal32_t_t(10, -51));
+    BOOST_TEST(small == decimal32_t_t(100, -52));
+    BOOST_TEST(small == decimal32_t_t(1000, -53));
+    BOOST_TEST(small == decimal32_t_t(10000, -54));
+    BOOST_TEST(small == decimal32_t_t(100000, -55));
+    BOOST_TEST(small == decimal32_t_t(1000000, -56));
 
     // Test non-finite comp
-    BOOST_TEST(small < std::numeric_limits<decimal32_t>::infinity());
-    BOOST_TEST(small > -std::numeric_limits<decimal32_t>::infinity());
-    BOOST_TEST(!(small == std::numeric_limits<decimal32_t>::infinity()));
-    BOOST_TEST(small != std::numeric_limits<decimal32_t>::infinity());
+    BOOST_TEST(small < std::numeric_limits<decimal32_t_t>::infinity());
+    BOOST_TEST(small > -std::numeric_limits<decimal32_t_t>::infinity());
+    BOOST_TEST(!(small == std::numeric_limits<decimal32_t_t>::infinity()));
+    BOOST_TEST(small != std::numeric_limits<decimal32_t_t>::infinity());
 
-    BOOST_TEST(!(small < std::numeric_limits<decimal32_t>::signaling_NaN()));
-    BOOST_TEST(!(small < std::numeric_limits<decimal32_t>::quiet_NaN()));
-    BOOST_TEST(small != std::numeric_limits<decimal32_t>::quiet_NaN());
-    BOOST_TEST(std::numeric_limits<decimal32_t>::quiet_NaN() != std::numeric_limits<decimal32_t>::quiet_NaN());
+    BOOST_TEST(!(small < std::numeric_limits<decimal32_t_t>::signaling_NaN()));
+    BOOST_TEST(!(small < std::numeric_limits<decimal32_t_t>::quiet_NaN()));
+    BOOST_TEST(small != std::numeric_limits<decimal32_t_t>::quiet_NaN());
+    BOOST_TEST(std::numeric_limits<decimal32_t_t>::quiet_NaN() != std::numeric_limits<decimal32_t_t>::quiet_NaN());
 
-    BOOST_TEST(small <= std::numeric_limits<decimal32_t>::infinity());
-    BOOST_TEST(small >= -std::numeric_limits<decimal32_t>::infinity());
-    BOOST_TEST(!(small <= std::numeric_limits<decimal32_t>::signaling_NaN()));
-    BOOST_TEST(!(small <= std::numeric_limits<decimal32_t>::quiet_NaN()));
+    BOOST_TEST(small <= std::numeric_limits<decimal32_t_t>::infinity());
+    BOOST_TEST(small >= -std::numeric_limits<decimal32_t_t>::infinity());
+    BOOST_TEST(!(small <= std::numeric_limits<decimal32_t_t>::signaling_NaN()));
+    BOOST_TEST(!(small <= std::numeric_limits<decimal32_t_t>::quiet_NaN()));
 }
 
 #if BOOST_DECIMAL_ENDIAN_LITTLE_BYTE
 void test_binary_constructor()
 {
-    decimal32_t one(0b1, -100);
+    decimal32_t_t one(0b1, -100);
     // 0 for sign
     // 00000 for combination field
     // 000001 for exp
     // 0000000000'0000000001 for significand
     BOOST_TEST_EQ(std::bitset<32>(to_bits(one)), std::bitset<32>(0b0'00000'000001'0000000000'0000000001));
 
-    decimal32_t neg_one(-0b1, -100);
+    decimal32_t_t neg_one(-0b1, -100);
     // 1 for sign
     // 00000 for combination field
     // 000001 for exp
     // 0000000000'0000000001 for significand
     BOOST_TEST_EQ(std::bitset<32>(to_bits(neg_one)), std::bitset<32>(0b1'00000'000001'0000000000'0000000001));
 
-    decimal32_t big_sig(0b1111111111'1111111111, -100);
+    decimal32_t_t big_sig(0b1111111111'1111111111, -100);
     // 0 for sign
     // 00000 for combination field
     // 000001 for exp
@@ -108,7 +108,7 @@ void test_binary_constructor()
     BOOST_TEST_EQ(std::bitset<32>(to_bits(big_sig)), std::bitset<32>(0b0'00000'000001'1111111111'1111111111));
 
     // Test the combination field
-    decimal32_t one_e_max(0b1, 90);
+    decimal32_t_t one_e_max(0b1, 90);
     // 0 for sign
     // 10000 for combination field
     // 111111 for exp
@@ -116,7 +116,7 @@ void test_binary_constructor()
     BOOST_TEST_EQ(std::bitset<32>(to_bits(one_e_max)), std::bitset<32>(0b0'10000'111111'0000000000'0000000001));
 
     // Construct denorm min
-    decimal32_t denorm_min(0b1, -101);
+    decimal32_t_t denorm_min(0b1, -101);
     // 0 for sign
     // 00000 for combination field
     // 000000 for exp
@@ -129,82 +129,82 @@ void test_decimal_constructor()
 {
     // The significand is more than 7 digits
     // Apply correct rounding when in the range of 7 digits
-    decimal32_t big(123456789, 0);
-    decimal32_t rounded_big(1234568, 2);
+    decimal32_t_t big(123456789, 0);
+    decimal32_t_t rounded_big(1234568, 2);
 
     BOOST_TEST_EQ(big, rounded_big);
 }
 
 void test_non_finite_values()
 {
-    constexpr decimal32_t one(0b1, 0);
+    constexpr decimal32_t_t one(0b1, 0);
 
-    BOOST_TEST(std::numeric_limits<decimal32_t>::has_infinity);
-    BOOST_TEST(isinf(std::numeric_limits<decimal32_t>::infinity()));
-    BOOST_TEST(isinf(-std::numeric_limits<decimal32_t>::infinity()));
+    BOOST_TEST(std::numeric_limits<decimal32_t_t>::has_infinity);
+    BOOST_TEST(isinf(std::numeric_limits<decimal32_t_t>::infinity()));
+    BOOST_TEST(isinf(-std::numeric_limits<decimal32_t_t>::infinity()));
     BOOST_TEST(!isinf(one));
-    BOOST_TEST(!isinf(std::numeric_limits<decimal32_t>::quiet_NaN()));
-    BOOST_TEST(!isinf(std::numeric_limits<decimal32_t>::signaling_NaN()));
-    BOOST_TEST(!isinf(std::numeric_limits<decimal32_t>::denorm_min()));
+    BOOST_TEST(!isinf(std::numeric_limits<decimal32_t_t>::quiet_NaN()));
+    BOOST_TEST(!isinf(std::numeric_limits<decimal32_t_t>::signaling_NaN()));
+    BOOST_TEST(!isinf(std::numeric_limits<decimal32_t_t>::denorm_min()));
 
-    BOOST_TEST(std::numeric_limits<decimal32_t>::has_quiet_NaN);
-    BOOST_TEST(std::numeric_limits<decimal32_t>::has_signaling_NaN);
-    BOOST_TEST(isnan(std::numeric_limits<decimal32_t>::quiet_NaN()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal32_t>::signaling_NaN()));
+    BOOST_TEST(std::numeric_limits<decimal32_t_t>::has_quiet_NaN);
+    BOOST_TEST(std::numeric_limits<decimal32_t_t>::has_signaling_NaN);
+    BOOST_TEST(isnan(std::numeric_limits<decimal32_t_t>::quiet_NaN()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal32_t_t>::signaling_NaN()));
     BOOST_TEST(!isnan(one));
-    BOOST_TEST(!isnan(std::numeric_limits<decimal32_t>::infinity()));
-    BOOST_TEST(!isnan(-std::numeric_limits<decimal32_t>::infinity()));
+    BOOST_TEST(!isnan(std::numeric_limits<decimal32_t_t>::infinity()));
+    BOOST_TEST(!isnan(-std::numeric_limits<decimal32_t_t>::infinity()));
 
-    BOOST_TEST(!issignaling(std::numeric_limits<decimal32_t>::quiet_NaN()));
-    BOOST_TEST(issignaling(std::numeric_limits<decimal32_t>::signaling_NaN()));
+    BOOST_TEST(!issignaling(std::numeric_limits<decimal32_t_t>::quiet_NaN()));
+    BOOST_TEST(issignaling(std::numeric_limits<decimal32_t_t>::signaling_NaN()));
     BOOST_TEST(!issignaling(one));
-    BOOST_TEST(!issignaling(std::numeric_limits<decimal32_t>::infinity()));
-    BOOST_TEST(!issignaling(-std::numeric_limits<decimal32_t>::infinity()));
+    BOOST_TEST(!issignaling(std::numeric_limits<decimal32_t_t>::infinity()));
+    BOOST_TEST(!issignaling(-std::numeric_limits<decimal32_t_t>::infinity()));
 
     #ifdef _MSC_VER
 
     BOOST_TEST(boost::decimal::isfinite(one));
-    BOOST_TEST(boost::decimal::isfinite(std::numeric_limits<decimal32_t>::denorm_min()));
-    BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal32_t>::infinity()));
-    BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal32_t>::quiet_NaN()));
-    BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal32_t>::signaling_NaN()));
+    BOOST_TEST(boost::decimal::isfinite(std::numeric_limits<decimal32_t_t>::denorm_min()));
+    BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal32_t_t>::infinity()));
+    BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal32_t_t>::quiet_NaN()));
+    BOOST_TEST(!boost::decimal::isfinite(std::numeric_limits<decimal32_t_t>::signaling_NaN()));
 
     #else
 
     BOOST_TEST(isfinite(one));
-    BOOST_TEST(isfinite(std::numeric_limits<decimal32_t>::denorm_min()));
-    BOOST_TEST(!isfinite(std::numeric_limits<decimal32_t>::infinity()));
-    BOOST_TEST(!isfinite(std::numeric_limits<decimal32_t>::quiet_NaN()));
-    BOOST_TEST(!isfinite(std::numeric_limits<decimal32_t>::signaling_NaN()));
+    BOOST_TEST(isfinite(std::numeric_limits<decimal32_t_t>::denorm_min()));
+    BOOST_TEST(!isfinite(std::numeric_limits<decimal32_t_t>::infinity()));
+    BOOST_TEST(!isfinite(std::numeric_limits<decimal32_t_t>::quiet_NaN()));
+    BOOST_TEST(!isfinite(std::numeric_limits<decimal32_t_t>::signaling_NaN()));
 
     #endif
 
     BOOST_TEST(isnormal(one));
-    BOOST_TEST(!isnormal(std::numeric_limits<decimal32_t>::infinity()));
-    BOOST_TEST(!isnormal(std::numeric_limits<decimal32_t>::quiet_NaN()));
-    BOOST_TEST(!isnormal(std::numeric_limits<decimal32_t>::signaling_NaN()));
-    BOOST_TEST(!isnormal(std::numeric_limits<decimal32_t>::denorm_min()));
+    BOOST_TEST(!isnormal(std::numeric_limits<decimal32_t_t>::infinity()));
+    BOOST_TEST(!isnormal(std::numeric_limits<decimal32_t_t>::quiet_NaN()));
+    BOOST_TEST(!isnormal(std::numeric_limits<decimal32_t_t>::signaling_NaN()));
+    BOOST_TEST(!isnormal(std::numeric_limits<decimal32_t_t>::denorm_min()));
 
     BOOST_TEST_EQ(fpclassify(one), FP_NORMAL);
     BOOST_TEST_EQ(fpclassify(-one), FP_NORMAL);
-    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32_t>::quiet_NaN()), FP_NAN);
-    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32_t>::signaling_NaN()), FP_NAN);
-    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32_t>::infinity()), FP_INFINITE);
-    BOOST_TEST_EQ(fpclassify(-std::numeric_limits<decimal32_t>::infinity()), FP_INFINITE);
-    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32_t>::denorm_min()), FP_SUBNORMAL);
+    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32_t_t>::quiet_NaN()), FP_NAN);
+    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32_t_t>::signaling_NaN()), FP_NAN);
+    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32_t_t>::infinity()), FP_INFINITE);
+    BOOST_TEST_EQ(fpclassify(-std::numeric_limits<decimal32_t_t>::infinity()), FP_INFINITE);
+    BOOST_TEST_EQ(fpclassify(std::numeric_limits<decimal32_t_t>::denorm_min()), FP_SUBNORMAL);
 
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<std::uint32_t> dist(1, 2);
 
-    BOOST_TEST(isnan(detail::check_non_finite(one, std::numeric_limits<decimal32_t>::quiet_NaN() * dist(rng))));
-    BOOST_TEST(isnan(detail::check_non_finite(std::numeric_limits<decimal32_t>::quiet_NaN() * dist(rng), one)));
-    BOOST_TEST(isinf(detail::check_non_finite(one, std::numeric_limits<decimal32_t>::infinity() * dist(rng))));
-    BOOST_TEST(isinf(detail::check_non_finite(std::numeric_limits<decimal32_t>::infinity() * dist(rng), one)));
+    BOOST_TEST(isnan(detail::check_non_finite(one, std::numeric_limits<decimal32_t_t>::quiet_NaN() * dist(rng))));
+    BOOST_TEST(isnan(detail::check_non_finite(std::numeric_limits<decimal32_t_t>::quiet_NaN() * dist(rng), one)));
+    BOOST_TEST(isinf(detail::check_non_finite(one, std::numeric_limits<decimal32_t_t>::infinity() * dist(rng))));
+    BOOST_TEST(isinf(detail::check_non_finite(std::numeric_limits<decimal32_t_t>::infinity() * dist(rng), one)));
 }
 
 void test_unary_arithmetic()
 {
-    constexpr decimal32_t one(0b1, -100);
+    constexpr decimal32_t_t one(0b1, -100);
     BOOST_TEST(+one == one);
     BOOST_TEST(-one != one);
 }
@@ -212,24 +212,24 @@ void test_unary_arithmetic()
 void test_addition()
 {
     // Case 1: The difference is more than the digits of accuracy
-    constexpr decimal32_t big_num(0b1, 20);
-    constexpr decimal32_t small_num(0b1, -20);
+    constexpr decimal32_t_t big_num(0b1, 20);
+    constexpr decimal32_t_t small_num(0b1, -20);
     BOOST_TEST_EQ(big_num + small_num, big_num);
     BOOST_TEST_EQ(small_num + big_num, big_num);
 
     // Case 2: Round the last digit of the significand
-    constexpr decimal32_t full_length_num {1000000, 0};
-    constexpr decimal32_t rounded_full_length_num {1000001, 0};
-    constexpr decimal32_t no_round(1, -1);
-    constexpr decimal32_t round(9, -1);
+    constexpr decimal32_t_t full_length_num {1000000, 0};
+    constexpr decimal32_t_t rounded_full_length_num {1000001, 0};
+    constexpr decimal32_t_t no_round(1, -1);
+    constexpr decimal32_t_t round(9, -1);
     BOOST_TEST_EQ(full_length_num + no_round, full_length_num);
     BOOST_TEST_EQ(full_length_num + round, rounded_full_length_num);
 
     // Case 3: Add away
-    constexpr decimal32_t one(1, 0);
-    constexpr decimal32_t two(2, 0);
-    constexpr decimal32_t three(3, 0);
-    decimal32_t mutable_one(1, 0);
+    constexpr decimal32_t_t one(1, 0);
+    constexpr decimal32_t_t two(2, 0);
+    constexpr decimal32_t_t three(3, 0);
+    decimal32_t_t mutable_one(1, 0);
 
     BOOST_TEST_EQ(one + one, two);
     BOOST_TEST_EQ(two + one, three);
@@ -241,18 +241,18 @@ void test_addition()
     BOOST_TEST_EQ(++mutable_one, three);
 
     // Different orders of magnitude
-    constexpr decimal32_t ten(10, 0);
-    constexpr decimal32_t eleven(11, 0);
+    constexpr decimal32_t_t ten(10, 0);
+    constexpr decimal32_t_t eleven(11, 0);
     BOOST_TEST_EQ(ten + one, eleven);
 
-    constexpr decimal32_t max_sig(9'999'999, 0);
-    constexpr decimal32_t max_plus_one(10'000'000, 0);
+    constexpr decimal32_t_t max_sig(9'999'999, 0);
+    constexpr decimal32_t_t max_plus_one(10'000'000, 0);
     BOOST_TEST_EQ(max_sig + one, max_plus_one);
 
     // Non-finite values
-    constexpr decimal32_t qnan_val(std::numeric_limits<decimal32_t>::quiet_NaN());
-    constexpr decimal32_t snan_val(std::numeric_limits<decimal32_t>::signaling_NaN());
-    constexpr decimal32_t inf_val(std::numeric_limits<decimal32_t>::infinity());
+    constexpr decimal32_t_t qnan_val(std::numeric_limits<decimal32_t_t>::quiet_NaN());
+    constexpr decimal32_t_t snan_val(std::numeric_limits<decimal32_t_t>::signaling_NaN());
+    constexpr decimal32_t_t inf_val(std::numeric_limits<decimal32_t_t>::infinity());
     BOOST_TEST(isnan(qnan_val + one));
     BOOST_TEST(isnan(snan_val + one));
     BOOST_TEST(isnan(one + qnan_val));
@@ -266,21 +266,21 @@ void test_addition()
 void test_subtraction()
 {
     // Case 1: The difference is more than the digits of accuracy
-    constexpr decimal32_t big_num(0b1, 20);
-    constexpr decimal32_t small_num(0b1, -20);
+    constexpr decimal32_t_t big_num(0b1, 20);
+    constexpr decimal32_t_t small_num(0b1, -20);
     BOOST_TEST_EQ(big_num - small_num, big_num);
     BOOST_TEST_EQ(small_num - big_num, -big_num);
 
     // Case 2: Round the last digit of the significand
-    constexpr decimal32_t no_round {1234567, 5};
-    constexpr decimal32_t round {9876543, -2};
-    BOOST_TEST_EQ(no_round - round, decimal32_t(1234566, 5));
+    constexpr decimal32_t_t no_round {1234567, 5};
+    constexpr decimal32_t_t round {9876543, -2};
+    BOOST_TEST_EQ(no_round - round, decimal32_t_t(1234566, 5));
 
     // Case 3: Add away
-    constexpr decimal32_t one(1, 0);
-    constexpr decimal32_t two(2, 0);
-    constexpr decimal32_t three(3, 0);
-    decimal32_t mutable_three(3, 0);
+    constexpr decimal32_t_t one(1, 0);
+    constexpr decimal32_t_t two(2, 0);
+    constexpr decimal32_t_t three(3, 0);
+    decimal32_t_t mutable_three(3, 0);
 
     BOOST_TEST_EQ(two - one, one);
     BOOST_TEST_EQ(three - one - one, one);
@@ -291,18 +291,18 @@ void test_subtraction()
     BOOST_TEST_EQ(--mutable_three, one);
 
     // Different orders of magnitude
-    constexpr decimal32_t ten(10, 0);
-    constexpr decimal32_t eleven(11, 0);
+    constexpr decimal32_t_t ten(10, 0);
+    constexpr decimal32_t_t eleven(11, 0);
     BOOST_TEST_EQ(eleven - one, ten);
 
-    constexpr decimal32_t max(9'999'999, 0);
-    constexpr decimal32_t max_plus_one(10'000'000, 0);
+    constexpr decimal32_t_t max(9'999'999, 0);
+    constexpr decimal32_t_t max_plus_one(10'000'000, 0);
     BOOST_TEST_EQ(max_plus_one - one, max);
 
     // Non-finite values
-    constexpr decimal32_t qnan_val(std::numeric_limits<decimal32_t>::quiet_NaN());
-    constexpr decimal32_t snan_val(std::numeric_limits<decimal32_t>::signaling_NaN());
-    constexpr decimal32_t inf_val(std::numeric_limits<decimal32_t>::infinity());
+    constexpr decimal32_t_t qnan_val(std::numeric_limits<decimal32_t_t>::quiet_NaN());
+    constexpr decimal32_t_t snan_val(std::numeric_limits<decimal32_t_t>::signaling_NaN());
+    constexpr decimal32_t_t inf_val(std::numeric_limits<decimal32_t_t>::infinity());
     BOOST_TEST(isnan(qnan_val - one));
     BOOST_TEST(isnan(snan_val - one));
     BOOST_TEST(isnan(one - qnan_val));
@@ -315,25 +315,25 @@ void test_subtraction()
 
 void test_multiplicatiom()
 {
-    constexpr decimal32_t zero {0, 0};
-    constexpr decimal32_t one {1, 0};
-    constexpr decimal32_t two {2, 0};
-    constexpr decimal32_t four {4, 0};
-    constexpr decimal32_t eight {8, 0};
+    constexpr decimal32_t_t zero {0, 0};
+    constexpr decimal32_t_t one {1, 0};
+    constexpr decimal32_t_t two {2, 0};
+    constexpr decimal32_t_t four {4, 0};
+    constexpr decimal32_t_t eight {8, 0};
 
     BOOST_TEST_EQ(zero * one, zero);
     BOOST_TEST_EQ(zero * -one, -zero);
     BOOST_TEST_EQ(one * two, two);
 
-    decimal32_t pow_two {1, 0};
+    decimal32_t_t pow_two {1, 0};
     BOOST_TEST_EQ(pow_two *= two, two);
     BOOST_TEST_EQ(pow_two *= two, four);
     BOOST_TEST_EQ(pow_two *= -two, -eight);
 
     // Non-finite values
-    constexpr decimal32_t qnan_val(std::numeric_limits<decimal32_t>::quiet_NaN());
-    constexpr decimal32_t snan_val(std::numeric_limits<decimal32_t>::signaling_NaN());
-    constexpr decimal32_t inf_val(std::numeric_limits<decimal32_t>::infinity());
+    constexpr decimal32_t_t qnan_val(std::numeric_limits<decimal32_t_t>::quiet_NaN());
+    constexpr decimal32_t_t snan_val(std::numeric_limits<decimal32_t_t>::signaling_NaN());
+    constexpr decimal32_t_t inf_val(std::numeric_limits<decimal32_t_t>::infinity());
     BOOST_TEST(isnan(qnan_val * one));
     BOOST_TEST(isnan(snan_val * one));
     BOOST_TEST(isnan(one * qnan_val));
@@ -346,15 +346,15 @@ void test_multiplicatiom()
 
 void test_div_mod()
 {
-    constexpr decimal32_t zero {0, 0};
-    constexpr decimal32_t one {1, 0};
-    constexpr decimal32_t two {2, 0};
-    constexpr decimal32_t three {3, 0};
-    constexpr decimal32_t four {4, 0};
-    constexpr decimal32_t eight {8, 0};
-    constexpr decimal32_t half {5, -1};
-    constexpr decimal32_t quarter {25, -2};
-    constexpr decimal32_t eighth {125, -3};
+    constexpr decimal32_t_t zero {0, 0};
+    constexpr decimal32_t_t one {1, 0};
+    constexpr decimal32_t_t two {2, 0};
+    constexpr decimal32_t_t three {3, 0};
+    constexpr decimal32_t_t four {4, 0};
+    constexpr decimal32_t_t eight {8, 0};
+    constexpr decimal32_t_t half {5, -1};
+    constexpr decimal32_t_t quarter {25, -2};
+    constexpr decimal32_t_t eighth {125, -3};
 
     BOOST_TEST_EQ(two / one, two);
     BOOST_TEST_EQ(two % one, zero);
@@ -365,12 +365,12 @@ void test_div_mod()
     BOOST_TEST_EQ(three / two, one + half);
 
     // From https://en.cppreference.com/w/cpp/numeric/math/fmod
-    BOOST_TEST_EQ(decimal32_t(51, -1) % decimal32_t(30, -1), decimal32_t(21, -1));
+    BOOST_TEST_EQ(decimal32_t_t(51, -1) % decimal32_t_t(30, -1), decimal32_t_t(21, -1));
 
     // Non-finite values
-    constexpr decimal32_t qnan_val(std::numeric_limits<decimal32_t>::quiet_NaN());
-    constexpr decimal32_t snan_val(std::numeric_limits<decimal32_t>::signaling_NaN());
-    constexpr decimal32_t inf_val(std::numeric_limits<decimal32_t>::infinity());
+    constexpr decimal32_t_t qnan_val(std::numeric_limits<decimal32_t_t>::quiet_NaN());
+    constexpr decimal32_t_t snan_val(std::numeric_limits<decimal32_t_t>::signaling_NaN());
+    constexpr decimal32_t_t inf_val(std::numeric_limits<decimal32_t_t>::infinity());
     BOOST_TEST(isnan(qnan_val / one));
     BOOST_TEST(isnan(snan_val / one));
     BOOST_TEST(isnan(one / qnan_val));
@@ -392,23 +392,23 @@ void test_div_mod()
 template <typename T>
 void test_construct_from_integer()
 {
-    constexpr decimal32_t one(1, 0);
-    BOOST_TEST_EQ(one, decimal32_t(T(1)));
+    constexpr decimal32_t_t one(1, 0);
+    BOOST_TEST_EQ(one, decimal32_t_t(T(1)));
 
-    constexpr decimal32_t one_pow_eight(1, 8);
-    BOOST_TEST_EQ(one_pow_eight, decimal32_t(T(100'000'000)));
+    constexpr decimal32_t_t one_pow_eight(1, 8);
+    BOOST_TEST_EQ(one_pow_eight, decimal32_t_t(T(100'000'000)));
 
-    constexpr decimal32_t rounded(1234568, 1);
-    BOOST_TEST_EQ(rounded, decimal32_t(T(12345678)));
+    constexpr decimal32_t_t rounded(1234568, 1);
+    BOOST_TEST_EQ(rounded, decimal32_t_t(T(12345678)));
 
     // Check the edge cases for use of the combination field
-    constexpr decimal32_t edge_20 (detail::d32_no_combination);
+    constexpr decimal32_t_t edge_20 (detail::d32_no_combination);
     BOOST_TEST_EQ(static_cast<T>(edge_20), detail::d32_no_combination);
 
-    constexpr decimal32_t edge_23 (detail::d32_big_combination);
+    constexpr decimal32_t_t edge_23 (detail::d32_big_combination);
     BOOST_TEST_EQ(static_cast<T>(edge_23), detail::d32_big_combination);
 
-    constexpr decimal32_t max_sig (detail::max_significand);
+    constexpr decimal32_t_t max_sig (detail::max_significand);
     if (!BOOST_TEST_EQ(static_cast<T>(max_sig), detail::max_significand))
     {
         // LCOV_EXCL_START
@@ -420,22 +420,22 @@ void test_construct_from_integer()
 template <typename T>
 void test_construct_from_float()
 {
-    constexpr decimal32_t one(1, 0);
-    decimal32_t float_one(T(1));
+    constexpr decimal32_t_t one(1, 0);
+    decimal32_t_t float_one(T(1));
     if(!BOOST_TEST_EQ(one, float_one))
     {
         debug_pattern(float_one); // LCOV_EXCL_LINE
     }
 
-    constexpr decimal32_t fraction(12345, -4);
-    decimal32_t float_frac(T(1.2345));
+    constexpr decimal32_t_t fraction(12345, -4);
+    decimal32_t_t float_frac(T(1.2345));
     if(!BOOST_TEST_EQ(fraction, float_frac))
     {
         debug_pattern(float_frac); // LCOV_EXCL_LINE
     }
 
-    constexpr decimal32_t neg_frac(98123, -4, true);
-    decimal32_t neg_float_frac(T(-9.8123));
+    constexpr decimal32_t_t neg_frac(98123, -4, true);
+    decimal32_t_t neg_float_frac(T(-9.8123));
     if(!BOOST_TEST_EQ(neg_frac, neg_float_frac))
     {
         debug_pattern(neg_float_frac); // LCOV_EXCL_LINE
@@ -445,25 +445,25 @@ void test_construct_from_float()
 template <typename T>
 void spot_check_addition(T a, T b, T res)
 {
-    decimal32_t dec_a {a};
-    decimal32_t dec_b {b};
-    decimal32_t dec_res {res};
+    decimal32_t_t dec_a {a};
+    decimal32_t_t dec_b {b};
+    decimal32_t_t dec_res {res};
 
     if (!BOOST_TEST_EQ(dec_a + dec_b, dec_res))
     {
         // LCOV_EXCL_START
         std::cerr << "A + B: " << a + b
-                  << "\nIn dec: " << decimal32_t(a + b) << std::endl;
+                  << "\nIn dec: " << decimal32_t_t(a + b) << std::endl;
         // LCOV_EXCL_STOP
     }
 }
 
 void test_hash()
 {
-    decimal32_t one {1, 0};
-    decimal32_t zero {0, 0};
+    decimal32_t_t one {1, 0};
+    decimal32_t_t zero {0, 0};
 
-    BOOST_TEST_NE(std::hash<decimal32_t>{}(one), std::hash<decimal32_t>{}(zero));
+    BOOST_TEST_NE(std::hash<decimal32_t_t>{}(one), std::hash<decimal32_t_t>{}(zero));
 }
 
 void test_shrink_significand()

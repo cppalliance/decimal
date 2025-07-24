@@ -16,13 +16,13 @@ FILES_EXCLUDE := $(PATH_SRC)/concepts_test.cpp                                  
                  $(PATH_SRC)/test_explicit_floats.cpp                               \
                  $(PATH_SRC)/test_from_chars.cpp                                    \
                  $(PATH_SRC)/test_illegal_decimal_fast32_t_implicit_conversions.cpp   \
-                 $(PATH_SRC)/test_illegal_decimal32_t_implicit_conversions.cpp        \
+                 $(PATH_SRC)/test_illegal_decimal32_t_t_implicit_conversions.cpp        \
                  $(PATH_SRC)/test_illegal_decimal_fast64_t_implicit_conversions.cpp   \
-                 $(PATH_SRC)/test_illegal_decimal64_t_implicit_conversions.cpp        \
-                 $(PATH_SRC)/test_illegal_decimal128_t_implicit_conversions.cpp       \
-                 $(PATH_SRC)/test_decimal32_t.cpp                                     \
-                 $(PATH_SRC)/test_decimal64_t_basis.cpp                               \
-                 $(PATH_SRC)/test_decimal128_t_basis.cpp                              \
+                 $(PATH_SRC)/test_illegal_decimal64_t_t_implicit_conversions.cpp        \
+                 $(PATH_SRC)/test_illegal_decimal128_t_t_implicit_conversions.cpp       \
+                 $(PATH_SRC)/test_decimal32_t_t.cpp                                     \
+                 $(PATH_SRC)/test_decimal64_t_t_basis.cpp                               \
+                 $(PATH_SRC)/test_decimal128_t_t_basis.cpp                              \
 
 FILES_EXCLUDE := $(basename $(FILES_EXCLUDE))
 

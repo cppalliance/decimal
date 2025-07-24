@@ -10,14 +10,14 @@ int main()
 {
     using namespace boost::decimal;
 
-    decimal64 val {0.25}; // Construction from a double (not recommended but explicit construction is allowed)
+    decimal64_t val {0.25}; // Construction from a double (not recommended but explicit construction is allowed)
 
     char buffer[256];
     auto r_to = to_chars(buffer, buffer + sizeof(buffer) - 1, val);
     assert(r_to); // checks std::errc()
     *r_to.ptr = '\0';
 
-    decimal64 return_value;
+    decimal64_t return_value;
     BOOST_DECIMAL_ATTRIBUTE_UNUSED auto r_from = from_chars(buffer, buffer + std::strlen(buffer), return_value);
     assert(r_from);
 

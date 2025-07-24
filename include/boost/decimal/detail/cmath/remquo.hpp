@@ -24,7 +24,7 @@ template <typename T>
 constexpr auto remquo(T x, T y, int* quo) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    using unsigned_significand_type = std::conditional_t<std::is_same<T, decimal128>::value || std::is_same<T, decimal128_fast>::value,
+    using unsigned_significand_type = std::conditional_t<std::is_same<T, decimal128_t>::value || std::is_same<T, decimal_fast128_t>::value,
                                                          int128::uint128_t, std::uint64_t>;
 
     constexpr T zero {0, 0};

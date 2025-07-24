@@ -48,7 +48,7 @@ void test_sin()
 {
     std::uniform_real_distribution<float> dist(-3.14F * 2, 3.14F * 2);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -80,14 +80,14 @@ void test_sin()
     {
         using std::sin;
 
-        BOOST_TEST_EQ((sin(boost::decimal::decimal32_t { x }) < 0), (sin(x) < 0));
+        BOOST_TEST_EQ((sin(boost::decimal::decimal32_t_t { x }) < 0), (sin(x) < 0));
     }
 
     for(auto x = 0.1F; x < 20.0F; x += 2.0F * atan(1.0F))
     {
         using std::sin;
 
-        BOOST_TEST_EQ((sin(boost::decimal::decimal32_t { -x }) < 0), (sin(-x) < 0));
+        BOOST_TEST_EQ((sin(boost::decimal::decimal32_t_t { -x }) < 0), (sin(-x) < 0));
     }
 }
 
@@ -96,7 +96,7 @@ void test_cos()
 {
     std::uniform_real_distribution<float> dist(-3.14F * 2, 3.14F * 2);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value ? N / 4 : N};
     for (std::size_t n {}; n < max_iter; ++n)
     {
         const auto val1 {dist(rng)};
@@ -128,14 +128,14 @@ void test_cos()
     {
         using std::cos;
 
-        BOOST_TEST_EQ((cos(boost::decimal::decimal32_t { x }) < 0), (cos(x) < 0));
+        BOOST_TEST_EQ((cos(boost::decimal::decimal32_t_t { x }) < 0), (cos(x) < 0));
     }
 
     for(auto x = 0.1F; x < 20.0F; x += 2.0F * atan(1.0F))
     {
         using std::cos;
 
-        BOOST_TEST_EQ((cos(boost::decimal::decimal32_t { -x }) < 0), (cos(-x) < 0));
+        BOOST_TEST_EQ((cos(boost::decimal::decimal32_t_t { -x }) < 0), (cos(-x) < 0));
     }
 }
 
@@ -422,18 +422,18 @@ int main()
     throw;
     #endif
 
-    test_sin<decimal32_t>();
-    test_cos<decimal32_t>();
+    test_sin<decimal32_t_t>();
+    test_cos<decimal32_t_t>();
     test_sin<decimal_fast32_t>();
     test_cos<decimal_fast32_t>();
-    test_sin<decimal64_t>();
-    test_cos<decimal64_t>();
+    test_sin<decimal64_t_t>();
+    test_cos<decimal64_t_t>();
     test_sin<decimal_fast64_t>();
     test_cos<decimal_fast64_t>();
 
     {
-        const auto result_sin128_is_ok = local::test_sin_128<decimal128_t>(0x800);
-        const auto result_cos128_is_ok = local::test_cos_128<decimal128_t>(0x800);
+        const auto result_sin128_is_ok = local::test_sin_128<decimal128_t_t>(0x800);
+        const auto result_cos128_is_ok = local::test_cos_128<decimal128_t_t>(0x800);
 
         BOOST_TEST(result_sin128_is_ok);
         BOOST_TEST(result_cos128_is_ok);

@@ -21,7 +21,7 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-auto my_zero() -> boost::decimal::decimal32_t&;
+auto my_zero() -> boost::decimal::decimal32_t_t&;
 
 namespace local
 {
@@ -69,7 +69,7 @@ namespace local
 
   auto test_tan(const int tol_factor, const bool negate, const long double range_lo, const long double range_hi) -> bool
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
 
     std::random_device rd;
     std::mt19937_64 gen(rd());
@@ -137,7 +137,7 @@ namespace local
     {
       using std::tan;
 
-      const auto result_signs_are_same_is_ok = ((tan(boost::decimal::decimal32_t { x }) < 0) == (tan(x) < 0));
+      const auto result_signs_are_same_is_ok = ((tan(boost::decimal::decimal32_t_t { x }) < 0) == (tan(x) < 0));
 
       BOOST_TEST(result_signs_are_same_is_ok);
 
@@ -148,7 +148,7 @@ namespace local
     {
       using std::tan;
 
-      const auto result_signs_are_same_is_ok = ((tan(boost::decimal::decimal32_t { -x }) < 0) == (tan(-x) < 0));
+      const auto result_signs_are_same_is_ok = ((tan(boost::decimal::decimal32_t_t { -x }) < 0) == (tan(-x) < 0));
 
       BOOST_TEST(result_signs_are_same_is_ok);
 
@@ -160,7 +160,7 @@ namespace local
 
   auto test_tan_edge() -> bool
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
 
     std::mt19937_64 gen;
 
@@ -266,4 +266,4 @@ auto main() -> int
   return (result_is_ok ? 0 : -1);
 }
 
-auto my_zero() -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_zero { 0, 0 }; return val_zero; }
+auto my_zero() -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_zero { 0, 0 }; return val_zero; }

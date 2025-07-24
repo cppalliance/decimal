@@ -37,31 +37,31 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `double`
 | 57,644
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,163,595
 | 37.534
-| `decimal64`
+| `decimal64_t`
 | 2,633,923
 | 45.693
-| `decimal128`
+| `decimal128_t`
 | 6,064,630
 | 105.208
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 613,626
 | 10.645
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 693,390
 | 12.029
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 628,596
 | 10.905
-| GCC `_Decimal32`
+| GCC `_decimal32_t`
 | 893,375
 | 15.498
-| GCC `_Decimal64`
+| GCC `_decimal64_t`
 | 496,127
 | 8.607
-| GCC `_Decimal128`
+| GCC `_decimal128_t`
 | 1,143,636
 | 19.840
 |===
@@ -78,22 +78,22 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | `double`
 | 193,737
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,097,942
 | 15.990
-| `decimal64`
+| `decimal64_t`
 | 4,697,948
 | 24.249
-| `decimal128`
+| `decimal128_t`
 | 17,267,609
 | 89.129
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 809,847
 | 4.180
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 1,043,657
 | 5.387
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 888,053
 | 4.584
 |===
@@ -110,22 +110,22 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 | `double`
 | 63,981
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,052,770
 | 32.084
-| `decimal64`
+| `decimal64_t`
 | 2,701,290
 | 42.220
-| `decimal128`
+| `decimal128_t`
 | 5,545,490
 | 86.674
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 728,146
 | 11.381
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 611,866
 | 9.563
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 714,586
 | 11.169
 |===
@@ -136,8 +136,8 @@ The benchmark for these operations generates a random vector containing 20,000,0
 This is repeated 5 times to generate stable results.
 
 As discussed in the design of the fast types the significand is stored in normalized form so that we do not have to worry about the effects of cohorts.
-Unfortunately this means that `decimal128_fast` multiplication is always carried out internally at 256-bit size whereas `decimal128` contains heuristics in `operator*` to avoid 256-bit multiplication when it is not needed (i.e. the resultant significand is less than or equal to 128-bits).
-This causes multiplication of `decimal128_fast` to be ~1.72x slower than `decimal128`, but all other operators leave us with a geometric average runtime under 1.00 for `decimal128_fast` / `decimal128` so we accept this tradeoff.
+Unfortunately this means that `decimal_fast128_t` multiplication is always carried out internally at 256-bit size whereas `decimal128_t` contains heuristics in `operator*` to avoid 256-bit multiplication when it is not needed (i.e. the resultant significand is less than or equal to 128-bits).
+This causes multiplication of `decimal_fast128_t` to be ~1.72x slower than `decimal128_t`, but all other operators leave us with a geometric average runtime under 1.00 for `decimal_fast128_t` / `decimal128_t` so we accept this tradeoff.
 
 === x64 Linux Results
 
@@ -153,31 +153,31 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `double`
 | 52,531
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,653,456
 | 50.512
-| `decimal64`
+| `decimal64_t`
 | 3,254,833
 | 61.960
-| `decimal128`
+| `decimal128_t`
 | 10,479,050
 | 199.483
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 1,371,022
 | 26.100
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 1,370,192
 | 26.083
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 7,197,718
 | 137.018
-| GCC `_Decimal32`
+| GCC `_decimal32_t`
 | 2,997,658
 | 57.065
-| GCC `_Decimal64`
+| GCC `_decimal64_t`
 | 2,129,898
 | 40.546
-| GCC `_Decimal128`
+| GCC `_decimal128_t`
 | 3,056,979
 | 58.194
 |===
@@ -192,31 +192,31 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `double`
 | 49,242
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,054,535
 | 41.723
-| `decimal64`
+| `decimal64_t`
 | 2,507,709
 | 50.926
-| `decimal128`
+| `decimal128_t`
 | 5,554,139
 | 112.793
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 1,050,225
 | 21.328
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 1,048,560
 | 21.294
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 2,073,580
 | 42.110
-| GCC `_Decimal32`
+| GCC `_decimal32_t`
 | 2,006,964
 | 40.757
-| GCC `_Decimal64`
+| GCC `_decimal64_t`
 | 1,324,796
 | 26.904
-| GCC `_Decimal128`
+| GCC `_decimal128_t`
 | 2,783,553
 | 56.528
 |===
@@ -231,31 +231,31 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `double`
 | 48,903
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 1,993,989
 | 40.774
-| `decimal64`
+| `decimal64_t`
 | 2,766,602
 | 56.573
-| `decimal128`
+| `decimal128_t`
 | 4,796,346
 | 98.079
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 1,117,727
 | 22.856
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 1,369,834
 | 28.011
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 8,139,518
 | 166.442
-| GCC `_Decimal32`
+| GCC `_decimal32_t`
 | 2,507,998
 | 51.285
-| GCC `_Decimal64`
+| GCC `_decimal64_t`
 | 2,414,864
 | 49.381
-| GCC `_Decimal128`
+| GCC `_decimal128_t`
 | 6,248,956
 | 127.783
 |===
@@ -270,31 +270,31 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `double`
 | 78,078
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,250,186
 | 28.820
-| `decimal64`
+| `decimal64_t`
 | 2,816,014
 | 36.067
-| `decimal128`
+| `decimal128_t`
 | 18,320,634
 | 234.645
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 1,123,428
 | 14.389
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 1,258,004
 | 16.112
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 1,243,024
 | 15.920
-| GCC `_Decimal32`
+| GCC `_decimal32_t`
 | 5,002,197
 | 64.067
-| GCC `_Decimal64`
+| GCC `_decimal64_t`
 | 2,961,731
 | 37.933
-| GCC `_Decimal128`
+| GCC `_decimal128_t`
 | 10,095,995
 | 129.307
 |===
@@ -313,22 +313,22 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | `double`
 | 68,820
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,994,405
 | 43.511
-| `decimal64`
+| `decimal64_t`
 | 4,531,755
 | 65.849
-| `decimal128`
+| `decimal128_t`
 | 25,209,554
 | 366.311
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 2,066,728
 | 30.031
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 3,667,169
 | 53.286
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 11,213,280
 | 162.936
 |===
@@ -343,22 +343,22 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | `double`
 | 62,409
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,132,613
 | 50.194
-| `decimal64`
+| `decimal64_t`
 | 3,864,498
 | 61.992
-| `decimal128`
+| `decimal128_t`
 | 17,210,173
 | 275.764
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 2,028,429
 | 32.502
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 3,017,419
 | 48.349
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 5,557,846
 | 89.055
 |===
@@ -373,22 +373,22 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | `double`
 | 62,658
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,029,689
 | 32.393
-| `decimal64`
+| `decimal64_t`
 | 8,805,524
 | 140.533
-| `decimal128`
+| `decimal128_t`
 | 15,519,053
 | 247.689
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 1,573,280
 | 25.109
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 7,650,156
 | 122.094
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 16,874,890
 | 269.317
 |===
@@ -403,22 +403,22 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | `double`
 | 80,559
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,832,016
 | 45.198
-| `decimal64`
+| `decimal64_t`
 | 11,640,789
 | 185.783
-| `decimal128`
+| `decimal128_t`
 | 32,470,044
 | 518.211
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 1,660,332
 | 26.498
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 11,266,972
 | 179.817
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 11,201,820
 | 178.777
 |===
@@ -437,22 +437,22 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | `double`
 | 33,238
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,146,032
 | 94.652
-| `decimal64`
+| `decimal64_t`
 | 2,963,788
 | 89.169
-| `decimal128`
+| `decimal128_t`
 | 10,125,221
 | 304.628
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 1,685,360
 | 50.706
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 1,886,022
 | 56.743
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 6,893,049
 | 207.385
 |===
@@ -467,22 +467,22 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | `double`
 | 33,204
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,385,896
 | 71.586
-| `decimal64`
+| `decimal64_t`
 | 2,759,536
 | 83.108
-| `decimal128`
+| `decimal128_t`
 | 5,560,295
 | 167.459
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 1,228,630
 | 37.002
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 1,312,815
 | 39.538
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 2,869,005
 | 86.405
 |===
@@ -497,22 +497,22 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | `double`
 | 32,970
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,826,351
 | 85.725
-| `decimal64`
+| `decimal64_t`
 | 3,268,243
 | 99.128
-| `decimal128`
+| `decimal128_t`
 | 4,654,643
 | 141.178
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 1,614,365
 | 48.965
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 2,417,646
 | 73.329
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 8,017,934
 | 243.189
 |===
@@ -527,22 +527,22 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 | `double`
 | 34,078
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,649,922
 | 77.760
-| `decimal64`
+| `decimal64_t`
 | 3,721,028
 | 109.192
-| `decimal128`
+| `decimal128_t`
 | 19,559,739
 | 573.970
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 1,436,099
 | 42.142
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 2,593,573
 | 76.107
-| `decimal128_fast`
+| `decimal_fast128_t`
 | 2,594,426
 | 76.132
 |===
@@ -550,7 +550,7 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 14.4.1 and home
 == `<charconv>`
 
 Parsing and serializing number exactly is one of the key features of decimal floating point types, so we must compare the performance of `<charconv>`. For all the following the results compare against STL provided `<charconv>` for 20,000,000 conversions.
-Since `<charconv>` is fully implemented in software for each type the performance gap between built-in `float` and `double` vs `decimal32` and `decimal64` is significantly smaller (or the decimal performance is better) than the hardware vs software performance gap seen above for basic operations.
+Since `<charconv>` is fully implemented in software for each type the performance gap between built-in `float` and `double` vs `decimal32_t` and `decimal64_t` is significantly smaller (or the decimal performance is better) than the hardware vs software performance gap seen above for basic operations.
 
 To run these benchmarks yourself you will need a compiler with complete implementation of `<charconv>` and to run the benchmarks under C++17 or higher.
 At the time of writing this is limited to:
@@ -576,16 +576,16 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `double`
 | 18,692,513
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,301,003
 | 0.177
-| `decimal64`
+| `decimal64_t`
 | 4,580,001
 | 0.245
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 3,321,788
 | 0.178
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 4,591,311
 | 0.246
 |===
@@ -602,16 +602,16 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | `double`
 | 20,903,459
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 4,602,771
 | 0.220
-| `decimal64`
+| `decimal64_t`
 | 5,332,730
 | 0.255
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 3,932,622
 | 0.188
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 5,614,476
 | 0.269
 |===
@@ -628,16 +628,16 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 | `double`
 | 2,648,485
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,201,545
 | 1.209
-| `decimal64`
+| `decimal64_t`
 | 4,775,487
 | 1.803
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 3,196,724
 | 1.207
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 4,762,636
 | 1.798
 |===
@@ -656,16 +656,16 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `double`
 | 18,677,179
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,296,877
 | 0.177
-| `decimal64`
+| `decimal64_t`
 | 4,500,127
 | 0.241
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 3,381,651
 | 0.181
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 4,496,194
 | 0.241
 |===
@@ -682,16 +682,16 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | `double`
 | 18,626,905
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,927,882
 | 0.211
-| `decimal64`
+| `decimal64_t`
 | 5,668,246
 | 0.304
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 3,904,457
 | 0.210
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 5,302,174
 | 0.285
 |===
@@ -708,16 +708,16 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 | `double`
 | 2,690,166
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,153,821
 | 1.172
-| `decimal64`
+| `decimal64_t`
 | 4,726,009
 | 1.926
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 4,726,009
 | 1.757
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 4,693,387
 | 1.747
 |===
@@ -738,16 +738,16 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `double`
 | 3,374,946
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 4,253,304
 | 1.260
-| `decimal64`
+| `decimal64_t`
 | 6,885,679
 | 2.040
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 4,453,957
 | 1.320
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 7,827,910
 | 2.319
 |===
@@ -764,16 +764,16 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | `double`
 | 3,774,811
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 6,127,529
 | 1.623
-| `decimal64`
+| `decimal64_t`
 | 8,582,256
 | 2.273
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 7,639,470
 | 2.024
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 11,564,222
 | 3.064
 |===
@@ -790,16 +790,16 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 | `double`
 | 3,435,671
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 4,636,747
 | 1.350
-| `decimal64`
+| `decimal64_t`
 | 5,680,800
 | 1.653
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 4,675,951
 | 1.361
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 5,900,272
 | 1.717
 |===
@@ -818,16 +818,16 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `double`
 | 5,458,987
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,782,692
 | 0.693
-| `decimal64`
+| `decimal64_t`
 | 5,368,162
 | 0.983
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 3,611,498
 | 0.662
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 6,025,340
 | 1.104
 |===
@@ -844,16 +844,16 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | `double`
 | 6,322,448
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 5,493,981
 | 0.869
-| `decimal64`
+| `decimal64_t`
 | 7,849,419
 | 1.215
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 6,516,633
 | 1.031
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 8,065,516
 | 1.276
 |===
@@ -870,16 +870,16 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 | `double`
 | 6,572,846
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 4,133,466
 | 0.629
-| `decimal64`
+| `decimal64_t`
 | 6,106,989
 | 0.929
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 3,458,534
 | 0.526
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 5,997,442
 | 0.912
 |===
@@ -898,16 +898,16 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `double`
 | 3,338,216
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,887,451
 | 0.865
-| `decimal64`
+| `decimal64_t`
 | 5,218,195
 | 1.563
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 3,033,115
 | 0.909
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 6,103,323
 | 1.828
 |===
@@ -924,16 +924,16 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | `double`
 | 3,742,344
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 4,103,661
 | 1.097
-| `decimal64`
+| `decimal64_t`
 | 6,721,570
 | 1.796
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 4,542,470
 | 1.214
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 8,694,813
 | 2.323
 |===
@@ -950,16 +950,16 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 | `double`
 | 3,442,930
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,048,663
 | 0.885
-| `decimal64`
+| `decimal64_t`
 | 3,786,216
 | 1.010
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 2,813,360
 | 0.817
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 4,082,146
 | 1.186
 |===
@@ -978,16 +978,16 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `double`
 | 4,993,886
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 2,919,727
 | 0.585
-| `decimal64`
+| `decimal64_t`
 | 4,157,802
 | 0.833
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 3,052,228
 | 0.611
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 5,597,538
 | 1.121
 |===
@@ -1004,16 +1004,16 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | `double`
 | 4,880,384
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,879,496
 | 0.795
-| `decimal64`
+| `decimal64_t`
 | 5,614,452
 | 1.150
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 4,445,619
 | 0.911
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 7,375,520
 | 1.511
 |===
@@ -1030,16 +1030,16 @@ Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebr
 | `double`
 | 5,922,301
 | 1.000
-| `decimal32`
+| `decimal32_t`
 | 3,048,058
 | 0.515
-| `decimal64`
+| `decimal64_t`
 | 5,140,604
 | 0.868
-| `decimal32_fast`
+| `decimal_fast32_t`
 | 2,821,707
 | 0.476
-| `decimal64_fast`
+| `decimal_fast64_t`
 | 5,525,549
 | 0.933
 |===

@@ -230,7 +230,7 @@ void test_roundtrip_float_stream()
 #  pragma GCC diagnostic ignored "-Wconversion"
 #endif
 
-void test_roundtrip_conversion_decimal64_t()
+void test_roundtrip_conversion_decimal64_t_t()
 {
     std::mt19937_64 rng(42);
     std::uniform_int_distribution<int> dist(-9'999'999, 9'999'999);
@@ -238,7 +238,7 @@ void test_roundtrip_conversion_decimal64_t()
     for (std::size_t i = 0; i < N; ++i)
     {
         const decimal_fast32_t val {dist(rng)};
-        const decimal64_t long_dec(val);
+        const decimal64_t_t long_dec(val);
         const decimal_fast32_t return_decimal {long_dec};
 
         if(!BOOST_TEST_EQ(val, return_decimal))
@@ -321,7 +321,7 @@ int main()
     // test_roundtrip_float_stream<std::bfloat16_t>();
     #endif
 
-    test_roundtrip_conversion_decimal64_t();
+    test_roundtrip_conversion_decimal64_t_t();
 
     return boost::report_errors();
 }

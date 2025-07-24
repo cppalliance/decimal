@@ -23,8 +23,8 @@ This option is not recommended, but can be useful if you want to use specific fu
 
 [source, c++]
 ----
-constexpr decimal64 half {5, -1};
-std::complex<decimal64> test_val {half, half};
+constexpr decimal64_t half {5, -1};
+std::complex<decimal64_t> test_val {half, half};
 const auto res = std::acos(test_val);
 ----
 

@@ -16,9 +16,9 @@ void test_implicit()
 
 int main()
 {
-    test_implicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal64_t>();
-    test_implicit<boost::decimal::decimal128_t, boost::decimal::decimal64_t>();
-    test_implicit<boost::decimal::decimal_fast128_t, boost::decimal::decimal64_t>();
+    test_implicit<boost::decimal::decimal_fast64_t, boost::decimal::decimal64_t_t>();
+    test_implicit<boost::decimal::decimal128_t_t, boost::decimal::decimal64_t_t>();
+    test_implicit<boost::decimal::decimal_fast128_t, boost::decimal::decimal64_t_t>();
 
     return boost::report_errors();
 }

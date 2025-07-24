@@ -18,8 +18,8 @@ namespace decimal {
 namespace detail {
 
 namespace impl {
-// Assign explicit decimal values because the decimal32_fast size could be greater than that
-// of decimal64 even though the precision is worse
+// Assign explicit decimal values because the decimal_fast32_t size could be greater than that
+// of decimal64_t even though the precision is worse
 
 template <typename T>
 struct decimal_val
@@ -28,7 +28,7 @@ struct decimal_val
 };
 
 template <>
-struct decimal_val<decimal32>
+struct decimal_val<decimal32_t>
 {
     static constexpr int value = 32;
 };
@@ -36,31 +36,31 @@ struct decimal_val<decimal32>
 // Assign a higher value to the fast type for consistency of promotion
 // Side effect is the same calculation will be faster with the same precision
 template <>
-struct decimal_val<decimal32_fast>
+struct decimal_val<decimal_fast32_t>
 {
     static constexpr int value = 33;
 };
 
 template <>
-struct decimal_val<decimal64>
+struct decimal_val<decimal64_t>
 {
     static constexpr int value = 64;
 };
 
 template <>
-struct decimal_val<decimal64_fast>
+struct decimal_val<decimal_fast64_t>
 {
     static constexpr int value = 65;
 };
 
 template <>
-struct decimal_val<decimal128>
+struct decimal_val<decimal128_t>
 {
     static constexpr int value = 128;
 };
 
 template <>
-struct decimal_val<decimal128_fast>
+struct decimal_val<decimal_fast128_t>
 {
     static constexpr int value = 129;
 };

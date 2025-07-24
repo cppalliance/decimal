@@ -24,12 +24,12 @@
 #endif
 
 #include <boost/decimal/fwd.hpp> // NOLINT(llvm-include-order)
-#include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/decimal32_fast.hpp>
-#include <boost/decimal/decimal64.hpp>
-#include <boost/decimal/decimal64_fast.hpp>
-#include <boost/decimal/decimal128.hpp>
-#include <boost/decimal/decimal128_fast.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal_fast32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal_fast64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
+#include <boost/decimal/decimal_fast128_t.hpp>
 #include <boost/decimal/cmath.hpp>
 #include <boost/decimal/cstdlib.hpp>
 #include <boost/decimal/fenv.hpp>

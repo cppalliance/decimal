@@ -164,11 +164,11 @@ void test_comparisions()
 
 int main()
 {
-    random_addition<decimal32_t>();
-    random_subtraction<decimal32_t>();
-    random_multiplication<decimal32_t>();
-    random_division<decimal32_t>();
-    test_comparisions<decimal32_t>();
+    random_addition<decimal32_t_t>();
+    random_subtraction<decimal32_t_t>();
+    random_multiplication<decimal32_t_t>();
+    random_division<decimal32_t_t>();
+    test_comparisions<decimal32_t_t>();
 
     random_addition<decimal_fast32_t>();
     random_subtraction<decimal_fast32_t>();
@@ -176,11 +176,11 @@ int main()
     random_division<decimal_fast32_t>();
     test_comparisions<decimal_fast32_t>();
 
-    random_addition<decimal64_t>();
-    random_subtraction<decimal64_t>();
-    random_multiplication<decimal64_t>();
-    random_division<decimal64_t>();
-    test_comparisions<decimal64_t>();
+    random_addition<decimal64_t_t>();
+    random_subtraction<decimal64_t_t>();
+    random_multiplication<decimal64_t_t>();
+    random_division<decimal64_t_t>();
+    test_comparisions<decimal64_t_t>();
 
     random_addition<decimal_fast64_t>();
     random_subtraction<decimal_fast64_t>();
@@ -189,11 +189,11 @@ int main()
     test_comparisions<decimal_fast64_t>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    random_addition<decimal128_t>();
-    random_subtraction<decimal128_t>();
-    random_multiplication<decimal128_t>();
-    random_division<decimal128_t>();
-    test_comparisions<decimal128_t>();
+    random_addition<decimal128_t_t>();
+    random_subtraction<decimal128_t_t>();
+    random_multiplication<decimal128_t_t>();
+    random_division<decimal128_t_t>();
+    test_comparisions<decimal128_t_t>();
     #endif
 
     return boost::report_errors();

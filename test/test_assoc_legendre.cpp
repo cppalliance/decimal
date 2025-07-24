@@ -58,7 +58,7 @@ void test()
 {
     std::uniform_real_distribution<float> dist(-1, 1);
 
-    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t_t>::value ? N / 4 : N};
     for (std::size_t i {}; i < max_iter / 4; ++i)
     {
         for (unsigned n {}; n < 4; ++n)
@@ -98,7 +98,7 @@ void test()
 template <typename T>
 void print_value(T value)
 {
-    const char* leading_type = std::is_same<T, decimal32_t>::value ? "decimal32_t{UINT32_C(" : "decimal64_t{UINT64_C(";
+    const char* leading_type = std::is_same<T, decimal32_t_t>::value ? "decimal32_t_t{UINT32_C(" : "decimal64_t_t{UINT64_C(";
 
     int ptr;
     const auto sig_val = frexp10(value, &ptr);
@@ -106,11 +106,11 @@ void print_value(T value)
 }
 
 template <>
-void print_value<decimal128_t>(decimal128_t value)
+void print_value<decimal128_t_t>(decimal128_t_t value)
 {
     int ptr;
     const auto sig_val = frexp10(value, &ptr);
-    std::cerr << "decimal128_t{detail::uint128{UINT64_C(" << sig_val.high << "),UINT64_C(" << sig_val.low << ")}," << ptr << "}," << std::endl;
+    std::cerr << "decimal128_t_t{detail::uint128{UINT64_C(" << sig_val.high << "),UINT64_C(" << sig_val.low << ")}," << ptr << "}," << std::endl;
 }
 
 template <typename T>
@@ -228,17 +228,17 @@ void print_table_constants()
 
 int main()
 {
-    test<decimal32_t>();
-    test<decimal64_t>();
+    test<decimal32_t_t>();
+    test<decimal64_t_t>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    test<decimal128_t>();
+    test<decimal128_t_t>();
     #endif
 
     #ifdef BOOST_DECIMAL_GENERATE_ASSOC_LEGENDRE_CONSTANTS
-    print_table_constants<decimal32_t>();
-    print_table_constants<decimal64_t>();
-    print_table_constants<decimal128_t>();
+    print_table_constants<decimal32_t_t>();
+    print_table_constants<decimal64_t_t>();
+    print_table_constants<decimal128_t_t>();
     throw;
     #endif
 

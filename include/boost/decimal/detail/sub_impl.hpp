@@ -25,7 +25,7 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 {
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
 
-    if (delta_exp > detail::precision_v<decimal128> + 1)
+    if (delta_exp > detail::precision_v<decimal128_t> + 1)
     {
         // If the difference in exponents is more than the digits of accuracy
         // we return the larger of the two
@@ -65,7 +65,7 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
         if (delta_exp == 1)
         {
-            detail::fenv_round<decimal128>(sig_smaller, smaller_sign);
+            detail::fenv_round<decimal128_t>(sig_smaller, smaller_sign);
         }
     }
 

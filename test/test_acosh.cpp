@@ -21,8 +21,8 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-auto my_zero() -> boost::decimal::decimal32_t&;
-auto my_one () -> boost::decimal::decimal32_t&;
+auto my_zero() -> boost::decimal::decimal32_t_t&;
+auto my_one () -> boost::decimal::decimal32_t_t&;
 
 namespace local
 {
@@ -70,7 +70,7 @@ namespace local
 
   auto test_acosh(const std::int32_t tol_factor, const long double range_lo, const long double range_hi) -> bool
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
 
     std::random_device rd;
     std::mt19937_64 gen(rd());
@@ -127,7 +127,7 @@ namespace local
 
   auto test_acosh_edge() -> bool
   {
-    using decimal_type = boost::decimal::decimal32_t;
+    using decimal_type = boost::decimal::decimal32_t_t;
 
     std::mt19937_64 gen;
 
@@ -226,8 +226,8 @@ auto main() -> int
     local::test_acosh
     (
       static_cast<std::int32_t>(INT32_C(16) * INT32_C(262144)),
-      1.0L + static_cast<long double>(std::numeric_limits<boost::decimal::decimal32_t>::epsilon()) * 10.0L,
-      1.0L + static_cast<long double>(std::numeric_limits<boost::decimal::decimal32_t>::epsilon()) * 100.0L
+      1.0L + static_cast<long double>(std::numeric_limits<boost::decimal::decimal32_t_t>::epsilon()) * 10.0L,
+      1.0L + static_cast<long double>(std::numeric_limits<boost::decimal::decimal32_t_t>::epsilon()) * 100.0L
     );
 
   const auto result_tiny_is_ok   = local::test_acosh(static_cast<std::int32_t>(INT32_C(4096)), 1.001L, 1.1L);
@@ -256,5 +256,5 @@ auto main() -> int
   return (result_is_ok ? 0 : -1);
 }
 
-auto my_zero() -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_zero { 0, 0 }; return val_zero; }
-auto my_one () -> boost::decimal::decimal32_t& { static boost::decimal::decimal32_t val_one  { 1, 0 }; return val_one; }
+auto my_zero() -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_zero { 0, 0 }; return val_zero; }
+auto my_one () -> boost::decimal::decimal32_t_t& { static boost::decimal::decimal32_t_t val_one  { 1, 0 }; return val_one; }
