@@ -616,30 +616,36 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | 0.269
 |===
 
-===== M1 macOS Results
+===== M4 macOS Results
 
-Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
+Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homebrew GCC 15.1.0
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 2,556,533
-| 0.965
+| 1,882,825
+| 0.990
 | `double`
-| 2,648,485
+| 1,901,380
 | 1.000
 | `decimal32_t`
-| 3,201,545
-| 1.209
-| `decimal64_t`
-| 4,775,487
+| 3,427,654
 | 1.803
+| `decimal64_t`
+| 5,364,564
+| 2.821
+| `decimal128_t`
+| 11,752,375
+| 6.181
 | `decimal_fast32_t`
-| 3,196,724
-| 1.207
+| 4,339,550
+| 2.282
 | `decimal_fast64_t`
-| 4,762,636
-| 1.798
+| 6,647,959
+| 3.496
+| `decimal_fast128_t`
+| 14,010,588
+| 7.369
 |===
 
 ==== `from_chars` scientific
@@ -696,30 +702,36 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 | 0.285
 |===
 
-===== M1 macOS Results
+===== M4 macOS Results
 
-Run using a Macbook pro with M1 pro chipset running macOS Sonoma 15.0 and homebrew GCC 14.2.0
+Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homebrew GCC 15.1.0
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 2,651,707
-| 0.986
+| 1,939,033
+| 1.010
 | `double`
-| 2,690,166
+| 1,919,671
 | 1.000
 | `decimal32_t`
-| 3,153,821
-| 1.172
+| 3,411,016
+| 1.777
 | `decimal64_t`
-| 4,726,009
-| 1.926
+| 5,278,214
+| 2.750
+| `decimal128_t`
+| 11,479,704
+| 5.980
 | `decimal_fast32_t`
-| 4,726,009
-| 1.757
+| 4,299,497
+| 2.240
 | `decimal_fast64_t`
-| 4,693,387
-| 1.747
+| 6,287,638
+| 3.275
+| `decimal_fast128_t`
+| 9,856,122
+| 5.134
 |===
 
 === `to_chars`
