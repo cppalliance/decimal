@@ -43,7 +43,7 @@
 
 #ifdef BOOST_DECIMAL_RUN_BENCHMARKS
 
-#if __cplusplus >= 201703L
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
 #if __has_include(<charconv>)
 #  include <charconv>
 #    if defined(__cpp_lib_to_chars) && __cpp_lib_to_chars >= 201611L
