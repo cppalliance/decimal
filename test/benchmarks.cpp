@@ -156,7 +156,7 @@ BOOST_DECIMAL_NO_INLINE void test_comparisons(const std::vector<T>& data_vec, co
 
     const auto t2 = std::chrono::steady_clock::now();
 
-    std::cerr << "comparisons<" << std::left << std::setw(11) << label << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << "comparisons<" << std::left << std::setw(13) << label << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T, typename Func>
@@ -177,7 +177,7 @@ BOOST_DECIMAL_NO_INLINE void test_two_element_operation(const std::vector<T>& da
 
     const auto t2 = std::chrono::steady_clock::now();
 
-    std::cerr << operation << "<" << std::left << std::setw(11) << type << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << operation << "<" << std::left << std::setw(13) << type << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T, typename Func>
@@ -196,7 +196,7 @@ BOOST_DECIMAL_NO_INLINE void test_one_element_operation(const std::vector<T>& da
 
     const auto t2 = std::chrono::steady_clock::now();
 
-    std::cerr << operation << "<" << std::left << std::setw(11) << type << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << operation << "<" << std::left << std::setw(13) << type << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T>
@@ -248,7 +248,7 @@ static BOOST_DECIMAL_NO_INLINE void test_boost_to_chars( std::vector<T> const& d
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cerr << "boost::decimal::to_chars<" << std::left << std::setw(11) << type << ">, " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << "boost::decimal::to_chars<" << std::left << std::setw(13) << type << ">, " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
@@ -364,7 +364,7 @@ BOOST_DECIMAL_NO_INLINE void test_boost_from_chars( std::vector<std::string> con
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cerr << "           std::from_chars<" << std::left << std::setw(11) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << "           std::from_chars<" << std::left << std::setw(13) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T, std::enable_if_t<!std::is_floating_point<T>::value, bool> = true>
@@ -386,7 +386,7 @@ BOOST_DECIMAL_NO_INLINE void test_boost_from_chars( std::vector<std::string> con
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cerr << "boost::decimal::from_chars<" << std::left << std::setw(11) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << "boost::decimal::from_chars<" << std::left << std::setw(13) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T>
