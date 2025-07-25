@@ -482,30 +482,30 @@ int main()
     std::cerr << "\n===== <charconv> to_chars =====\n";
     test_to_chars<float>("float");
     test_to_chars<double>("double");
-    test_to_chars<decimal32>("decimal32");
-    test_to_chars<decimal64>("decimal64");
-    test_to_chars<decimal128>("decimal128");
-    test_to_chars<decimal32_fast>("dec32_fast");
-    test_to_chars<decimal64_fast>("dec64_fast");
-    test_to_chars<decimal128_fast>("dec128_fast");
+    test_to_chars<decimal32_t>("decimal32_t");
+    test_to_chars<decimal64_t>("decimal64_t");
+    test_to_chars<decimal128_t>("decimal128_t");
+    test_to_chars<decimal_fast32_t>("dec32_fast");
+    test_to_chars<decimal_fast64_t>("dec64_fast");
+    test_to_chars<decimal_fast128_t>("dec128_fast");
 
     std::cerr << "\n===== <charconv> from_chars =====\n";
     test_from_chars<float>(false, "float");
     test_from_chars<float>(true, "float");
     test_from_chars<double>(false, "double");
     test_from_chars<double>(true, "double");
-    test_from_chars<decimal32>(false, "decimal32");
-    test_from_chars<decimal32>(true, "decimal32");
-    test_from_chars<decimal64>(false, "decimal64");
-    test_from_chars<decimal64>(true, "decimal64");
-    test_from_chars<decimal128>(false, "decimal128");
-    test_from_chars<decimal128>(true, "decimal128");
-    test_from_chars<decimal32_fast>(false, "dec32_fast");
-    test_from_chars<decimal32_fast>(true, "dec32_fast");
-    test_from_chars<decimal64_fast>(false, "dec64_fast");
-    test_from_chars<decimal64_fast>(true, "dec64_fast");
-    test_from_chars<decimal128_fast>(false, "dec128_fast");
-    test_from_chars<decimal128_fast>(true, "dec128_fast");
+    test_from_chars<decimal32_t>(false, "decimal32_t");
+    test_from_chars<decimal32_t>(true, "decimal32_t");
+    test_from_chars<decimal64_t>(false, "decimal64_t");
+    test_from_chars<decimal64_t>(true, "decimal64_t");
+    test_from_chars<decimal128_t>(false, "decimal128_t");
+    test_from_chars<decimal128_t>(true, "decimal128_t");
+    test_from_chars<decimal_fast32_t>(false, "dec32_fast");
+    test_from_chars<decimal_fast32_t>(true, "dec32_fast");
+    test_from_chars<decimal_fast64_t>(false, "dec64_fast");
+    test_from_chars<decimal_fast64_t>(true, "dec64_fast");
+    test_from_chars<decimal_fast128_t>(false, "dec128_fast");
+    test_from_chars<decimal_fast128_t>(true, "dec128_fast");
 #endif
     std::cerr << std::endl;
 
