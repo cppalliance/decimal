@@ -14,6 +14,7 @@
 * xref:literals.adoc[]
 * xref:numbers.adoc[]
 * xref:cmath.adoc[]
+** xref:cmath.adoc#non_standard_cmath[Non-Standard Functions]
 * xref:cstdlib.adoc[]
 * xref:charconv.adoc[]
 * xref:format.adoc[]

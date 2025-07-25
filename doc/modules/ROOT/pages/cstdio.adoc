@@ -5,12 +5,10 @@ https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#cstdio]
-= cstdio support
+= `<cstdio>` support
 :idprefix: cstdio_
 
-== <cstdio>
-
-The following functions analogous to those from <cstdio> are provided:
+The following functions analogous to those from `<cstdio>` are provided:
 
 [source, c++]
 ----

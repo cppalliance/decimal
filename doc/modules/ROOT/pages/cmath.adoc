@@ -5,16 +5,14 @@ https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#cmath]
-= cmath support
+= `<cmath>` support
 :idprefix: cmath_
-
-== <cmath>
 
 Decimal contains overloads for all functions from `<cmath>`, and they have the same handling as built-in floating point types.
 They are also all constexpr with C\\++14 unlike the built-in floating point types which require either C++23 or 26.
 Additionally, all functions are marked `noexcept`.
 
-=== Basic Operations
+== Basic Operations
 
 |===
 | Function | Description
@@ -73,7 +71,7 @@ constexpr decimal128_t nand128(const char* arg) noexcept;
 } // namespace boost
 ----
 
-=== Exponential Functions
+== Exponential Functions
 
 |===
 | Function | Description
@@ -150,7 +148,7 @@ constexpr DecimalType hypot(DecimalType x, DecimalType y, DecimalType z) noexcep
 } // namespace boost
 ----
 
-=== Trigonometric Functions
+== Trigonometric Functions
 
 |===
 | Function | Description
@@ -194,7 +192,7 @@ constexpr DecimalType atan2(DecimalType x, DecimalType y) noexcept;
 ----
 
 
-=== Hyperbolic Functions
+== Hyperbolic Functions
 
 |===
 | Function | Description
@@ -233,7 +231,7 @@ constexpr DecimalType atanh(DecimalType x) noexcept;
 } // namespace boost
 ----
 
-=== Error and Gamma Functions
+== Error and Gamma Functions
 
 |===
 | Function | Description
@@ -264,7 +262,7 @@ constexpr DecimalType lgamma(DecimalType x) noexcept;
 } // namespace boost
 ----
 
-=== Nearest integer floating point operations
+== Nearest integer floating point operations
 
 |===
 | Function | Description
@@ -318,7 +316,7 @@ constexpr long long llrint(DecimalType x) noexcept;
 } // namespace boost
 ----
 
-=== Floating point manipulation functions
+== Floating point manipulation functions
 
 |===
 | Function | Description
@@ -373,7 +371,7 @@ constexpr DecimalType copysign(DecimalType mag, DecimalType sgn) noexcept;
 } // namespace boost
 ----
 
-=== Classification and comparison
+== Classification and comparison
 
 |===
 | Function | Description
@@ -496,6 +494,7 @@ constexpr DecimalType riemann_zeta(IntegralType n) noexcept;
 } //namespace boost
 ----
 
+[#non_standard_cmath]
 == Non-standard Functions
 
 The following are convenience functions, or are prescribed in IEEE 754-2019 as required for decimal floating point types.
