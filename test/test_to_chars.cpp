@@ -969,6 +969,21 @@ int main()
     test_general_format_std<decimal64_t>();
     #endif
 
+    #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
+    test_non_finite_values<decimal_fast128_t>();
+    test_small_values<decimal_fast128_t>();
+    test_large_values<decimal_fast128_t>();
+    test_fixed_format<decimal_fast128_t>();
+    test_precision<decimal_fast128_t>();
+    test_buffer_overflow<decimal_fast128_t>();
+    zero_test<decimal_fast128_t>();
+    test_434_fixed<decimal_fast128_t>();
+    test_434_scientific<decimal_fast128_t>();
+    test_hex_format<decimal_fast128_t>();
+    test_434_hex<decimal_fast128_t>();
+    #endif
+
+
     test_777<decimal32_t>();
     test_777<decimal64_t>();
     test_777<decimal128_t>();
