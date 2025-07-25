@@ -17,7 +17,7 @@ enums, constants and macros that are provided in this library.
 
 - xref:decimal32_t.adoc[decimal32_t]
 - xref:decimal64_t.adoc[decimal64_t]
-- xref:decimal128_t.adoc[decima128]
+- xref:decimal128_t.adoc[decima128_t]
 
 === Non-IEEE 754 Compliant Types
 
