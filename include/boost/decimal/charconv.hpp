@@ -265,10 +265,10 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
             }
 
             return {last, std::errc::value_too_large};
+        // LCOV_EXCL_START
         default:
-            // LCOV_EXCL_START
             BOOST_DECIMAL_UNREACHABLE;
-            // LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
     }
 }
 
