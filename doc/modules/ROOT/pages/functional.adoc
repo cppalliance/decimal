@@ -5,12 +5,10 @@ https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#functional]
-= functional support
+= `<functional>` support
 :idprefix: functional_
 
-== <functional>
-
-The following functions from <functional> are overloaded:
+The following functions from `<functional>` are overloaded:
 
 [source, c++]
 ----
@@ -19,7 +17,7 @@ namespace std {
 template <>
 struct hash<boost::decimal::decimal32_t>;
 
-templte <>
+template <>
 struct hash<boost::decimal::decimal_fast32_t>;
 
 template <>

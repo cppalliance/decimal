@@ -8,7 +8,8 @@ https://www.boost.org/LICENSE_1_0.txt
 = formating support
 :idprefix: format_
 
-== <format>
+[#std_format]
+== `<format>`
 
 Format is supported when using C++20 and a compiler with appropriate support: GCC >= 13, Clang >= 18, MSVC >= 19.40
 
@@ -65,7 +66,8 @@ int main()
 }
 ----
 
-== <fmt/format.h>
+[#fmt_format]
+== `<fmt/format.h>`
 
 Support for fmtlib is available as long as `<fmt/format.h>` is present.
 All of the above information on modifiers is the same for fmtlib

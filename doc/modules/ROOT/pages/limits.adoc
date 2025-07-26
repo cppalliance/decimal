@@ -5,12 +5,10 @@ https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#limits]
-= limits support
+= `<limits>` support
 :idprefix: limits_
 
-== <limits>
-
-The following from <limits> are overloaded for each type with associated values for reference:
+The following from `<limits>` are overloaded for each type with associated values for reference:
 
 [source, c++]
 ----

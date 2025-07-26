@@ -5,12 +5,10 @@ https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#cfloat]
-= cfloat support
+= `<cfloat>` support
 :idprefix: cfloat_
 
-== <cfloat>
-
-The following macros analogous to those from <cfloat> for the decimal floating point types:
+The following macros analogous to those from `<cfloat>` for the decimal floating point types:
 
 [source, c++]
 ----
@@ -50,8 +48,11 @@ Additionally `BOOST_DECIMAL_DEC_EVAL_METHOD` is similar to `FLT_EVAL_METHOD`: ht
 
 The valid values are:
 
-- 0: all operations evaluated in the range and precision of the native type
-- 1: all `decimal32_t` operations are evaluated with the precision and range of `decimal64_t` internally, and returned as `decimal64_t`
-- 2: all `decimal32_t` and `decimal64_t` operations are evaluated with the precision and range of `decimal128_t` internally, and returned as the original type.
+|===
+| Value | Description
+| 0 | All operations evaluated in the range and precision of the native type
+| 1 | All `decimal32_t` (or `decimal_fast32_t`) operations are evaluated with the precision and range of `decimal64_t` internally, and returned as `decimal64_t`
+| 2 | All `decimal32_t` and `decimal64_t` (or fast equivalents) operations are evaluated with the precision and range of `decimal128_t` internally, and returned as the original type.
+|===
 
-To use the functionallity you must `#define BOOST_DECIMAL_DEC_EVAL_METHOD` to the value you want before you `#include <boost/decimal.hpp>`.
+To use the functionality you must `#define BOOST_DECIMAL_DEC_EVAL_METHOD` to the value you want before you `#include <boost/decimal.hpp>`.

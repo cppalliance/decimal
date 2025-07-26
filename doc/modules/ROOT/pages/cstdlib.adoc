@@ -5,10 +5,8 @@ https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#cstdlib]
-= cstdlib support
+= `<cstdlib>` support
 :idprefix: cstdlib_
-
-== <cstdlib>
 
 The following functions analogous to those from `<cstdlib>` are provided:
 

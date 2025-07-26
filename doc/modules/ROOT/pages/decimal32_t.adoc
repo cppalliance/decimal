@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == Description
 
-decimal32_t is the 32-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6
+`decimal32_t` is the 32-bit version of the decimal interchange format, and has the following properties as defined in IEEE 754-2019 table 3.6
 
 |===
 | Attribute | values
