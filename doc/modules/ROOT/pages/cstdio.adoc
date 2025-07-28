@@ -28,7 +28,7 @@ int printf(const char* format, Dec... values) noexcept;
 } //namespace boost
 ----
 
-=== Type Modifiers
+== Type Modifiers
 
 The type modifiers to be used are:
 
@@ -45,7 +45,7 @@ The remaining specifications of cstdio are the same as usual:
 
 NOTE: The uppercase format will return with all applicable values in uppercase (e.g. 3.14E+02 vs 3.14e+02)
 
-=== Examples
+== Examples
 
 Here are some example formats:
 
