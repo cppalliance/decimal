@@ -6,6 +6,7 @@
 | Github Actions   | [![CI](https://github.com/cppalliance/decimal/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/ci.yml) | [![CI](https://github.com/cppalliance/decimal/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/ci.yml)
 | Codecov          | [![codecov](https://codecov.io/gh/cppalliance/decimal/branch/master/graph/badge.svg?token=drvY8nnV5S)](https://codecov.io/gh/cppalliance/decimal)                 | [![codecov](https://codecov.io/gh/cppalliance/decimal/graph/badge.svg?token=drvY8nnV5S)](https://codecov.io/gh/cppalliance/decimal) |
 | Fuzzing          | [![Fuzzing](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml) | [![Fuzzing](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml) |
+| Metal            | [![Metal](https://github.com/cppalliance/decimal/actions/workflows/metal.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/metal.yml) | [![metal](https://github.com/cppalliance/decimal/actions/workflows/metal.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/metal.yml) |
 
 ---
 
@@ -51,12 +52,12 @@ conan create decimal/conan --build missing
 
 # Supported Platforms
 
-Boost.Decimal is tested natively on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon), and Windows (x32 and x64);
-as well as emulated PPC64LE and STM32 using QEMU with the following compilers:
+Boost.Decimal is tested natively on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon),
+and Windows (x32 and x64); as well as emulated PPC64LE and ARM Cortex-M using QEMU with the following compilers:
 
 * GCC 7 and later
 * Clang 6 and later
-* Visual Studio 2017 and later
+* Visual Studio 2019 and later
 * Intel OneAPI DPC++
 
 # Synopsis
@@ -122,7 +123,7 @@ int main()
 ```
 
 This intuitive straightforwardness is the same when using Standard-Library
-functions (such as STL functions, `<cmath>`-like functions and the like).
+functions (such as STL functions, `<cmath>` functions and the like).
 
 ```cpp
 #include <boost/decimal.hpp>
