@@ -20,6 +20,7 @@ IMPORTANT: On nearly all platforms there is hardware support for binary floating
 To run the benchmarks yourself, navigate to the test folder and define `BOOST_DECIMAL_RUN_BENCHMARKS` when running the tests.
 An example on Linux with b2: `../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_DECIMAL_RUN_BENCHMARKS benchmarks -a release` .
 
+[#comparisons]
 == Comparisons
 
 The benchmark for comparisons generates a random vector containing 20,000,000 elements and does operations `>`, `>=`, `<`, `\<=`, `==`, and `!=` between `vec[i] and vec[i + 1]`.
@@ -130,6 +131,7 @@ Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homeb
 | 11.563
 |===
 
+[#basic_operations]
 == Basic Operations
 
 The benchmark for these operations generates a random vector containing 20,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
@@ -547,6 +549,7 @@ Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homeb
 | 458.320
 |===
 
+[#benchmark_charconv]
 == `<charconv>`
 
 Parsing and serializing number exactly is one of the key features of decimal floating point types, so we must compare the performance of `<charconv>`. For all the following the results compare against STL provided `<charconv>` for 20,000,000 conversions.

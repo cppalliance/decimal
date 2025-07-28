@@ -14,19 +14,19 @@ The following macros analogous to those from `<cfloat>` for the decimal floating
 ----
 
 // Number of digits in the coefficient
-#define BOOST_DECIMAL_DEC32_MANT_DIG  7
-#define BOOST_DECIMAL_DEC64_MANT_DIG  16
-#define BOOST_DECIMAL_DEC128_MANT_DIG 34
+#define BOOST_DECIMAL_DEC32_MANT_DIG  std::numeric_limits<boost::decimal::decimal32_t>:digits10
+#define BOOST_DECIMAL_DEC64_MANT_DIG  std::numeric_limits<boost::decimal::decimal64_t>:digits10
+#define BOOST_DECIMAL_DEC128_MANT_DIG std::numeric_limits<boost::decimal::decimal128_t>:digits10
 
 // Minimum exponent
-#define BOOST_DECIMAL_DEC32_MIN_EXP  -94
-#define BOOST_DECIMAL_DEC64_MIN_EXP  -382
-#define BOOST_DECIMAL_DEC128_MIN_EXP -6142
+#define BOOST_DECIMAL_DEC32_MIN_EXP  std::numeric_limits<boost::decimal::decimal32_t>:min_exponent
+#define BOOST_DECIMAL_DEC64_MIN_EXP  std::numeric_limits<boost::decimal::decimal64_t>:min_exponent
+#define BOOST_DECIMAL_DEC128_MIN_EXP std::numeric_limits<boost::decimal::decimal128_t>:min_exponent
 
 // Maximum exponent
-#define BOOST_DECIMAL_DEC32_MAX_EXP  97
-#define BOOST_DECIMAL_DEC64_MAX_EXP  385
-#define BOOST_DECIMAL_DEC128_MAX_EXP 6145
+#define BOOST_DECIMAL_DEC32_MAX_EXP  std::numeric_limits<boost::decimal::decimal32_t>:max_exponent
+#define BOOST_DECIMAL_DEC64_MAX_EXP  std::numeric_limits<boost::decimal::decimal64_t>:max_exponent
+#define BOOST_DECIMAL_DEC128_MAX_EXP std::numeric_limits<boost::decimal::decimal128_t>:max_exponent
 
 // Maximum Finite Value
 #define BOOST_DECIMAL_DEC32_MAX  std::numeric_limits<boost::decimal::decimal32_t>::max()

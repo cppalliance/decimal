@@ -10,7 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 == <cfenv>
 
-As opposed to binary floating point types IEEE 754 defined 5 rounding modes instead of 4. They are:
+IEEE 754 defines 5 rounding modes for Decimal Floating Point Types.
 
 1. Downward
 2. To nearest
@@ -18,9 +18,9 @@ As opposed to binary floating point types IEEE 754 defined 5 rounding modes inst
 4. Toward zero
 5. Upward
 
-The default rounding mode is to nearest from zero.
+NOTE: The default rounding mode is to nearest from zero (#3).
 
-IMPORTANT: The rounding mode can only be changed at runtime. All constexpr calculations will use the default of to nearest from zero.
+IMPORTANT: The rounding mode can only be changed at runtime. All `constexpr` calculations will use the default of to nearest from zero.
 
 [source, c++]
 ----

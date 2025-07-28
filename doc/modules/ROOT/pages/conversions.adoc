@@ -19,10 +19,10 @@ namespace decimal {
 
 namespace detail {
 
-struct uint128
+struct uint128_t
 {
-    std::uint64_t hi;
-    std::uint64_t lo;
+    std::uint64_t high;
+    std::uint64_t low;
 };
 
 } // namespace detail
@@ -56,9 +56,9 @@ constexpr decimal128_t from_bid_d128(unsigned __int128 bits) noexcept;
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
-constexpr detail::uint128 to_bid_d128f(decimal_fast128_t val) noexcept;
+constexpr detail::uint128_t to_bid_d128f(decimal_fast128_t val) noexcept;
 
-constexpr decimal128_t from_bid_d128f(detail::uint128 bits) noexcept;
+constexpr decimal128_t from_bid_d128f(detail::uint128_t bits) noexcept;
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
