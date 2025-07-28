@@ -69,10 +69,10 @@ constexpr decimal128_t from_bid_d128f(unsigned __int128 bits) noexcept;
 template <typename T>
 constexpr auto to_bid(T val) noexcept;
 
-template <typename T = decimal_fast32_t>
+template <typename T = decimal32_t>
 constexpr T from_bid(std::uint32_t bits) noexcept;
 
-template <typename T = decimal_fast64_t>
+template <typename T = decimal64_t>
 constexpr T from_bid(std::uint64_t bits) noexcept;
 
 template <typename T = decimal128_t>
@@ -95,17 +95,17 @@ constexpr detail::uint128 to_dpd_d128f(decimal_fast128_t val) noexcept;
 template <typename T>
 constexpr auto to_dpd(T val) noexcept;
 
-template <typename T = decimal_fast32_t>
+template <typename T = decimal32_t>
 constexpr T from_dpd(std::uint32_t bits) noexcept;
 
-template <typename T = decimal_fast64_t>
+template <typename T = decimal64_t>
 constexpr T from_dpd(std::uint64_t bits) noexcept;
 
-template <typename T = decimal_fast128_t>
+template <typename T = decimal128_t>
 constexpr T from_dpd(detail::uint128 bits) noexcept;
 
 #ifdef BOOST_DECIMAL_HAS_INT128
-template <typename T = decimal_fast128_t>
+template <typename T = decimal128_t>
 constexpr T from_dpd(unsigned __int128 bits) noexcept;
 #endif
 
