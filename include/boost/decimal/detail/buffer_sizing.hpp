@@ -23,11 +23,11 @@ namespace detail {
 #endif
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Dec>
-constexpr int get_real_precision(int precision = -1) noexcept
+constexpr int get_real_precision(int my_precision = -1) noexcept
 {
     // If the user did not specify a precision than we use the maximum representable amount
     // and remove trailing zeros at the end
-    return precision == -1 ? std::numeric_limits<Dec>::max_digits10 : precision;
+    return my_precision == -1 ? std::numeric_limits<Dec>::max_digits10 : precision;
 }
 
 // We don't need to use the full digit counting since the range of the exponents is well defined

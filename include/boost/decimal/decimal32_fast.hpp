@@ -1000,12 +1000,16 @@ constexpr auto div_impl(decimal_fast32_t lhs, decimal_fast32_t rhs, decimal_fast
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
+    using local_signed_exponent_type = std::common_type_t<std::int_fast32_t, int>;
+
+    static_assert(sizeof(local_signed_exponent_type) >= 4, "Error in local exponent type definition");
+
     // We promote to uint64 since the significands are currently 32-bits
     // By appending enough zeros to the LHS we end up finding what we need anyway
     constexpr auto ten_pow_precision {detail::pow10(static_cast<std::uint_fast64_t>(detail::precision_v<decimal32_t>))};
     const auto big_sig_lhs {static_cast<std::uint_fast64_t>(lhs.significand_) * ten_pow_precision};
     auto res_sig {big_sig_lhs / static_cast<std::uint_fast64_t>(rhs.significand_)};
-    auto res_exp {lhs.exponent_ - rhs.exponent_ + 94};
+    local_signed_exponent_type res_exp {static_cast<local_signed_exponent_type>(lhs.exponent_) - static_cast<local_signed_exponent_type>(rhs.exponent_) + 94};
     const auto isneg {lhs.sign_ != rhs.sign_};
 
     // If we have 8 figures round it down to 7
