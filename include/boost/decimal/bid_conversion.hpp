@@ -143,43 +143,43 @@ constexpr auto to_bid(T val) noexcept
     return to_bid(val);
 }
 
-BOOST_DECIMAL_EXPORT template <typename T = decimal_fast32_t>
+BOOST_DECIMAL_EXPORT template <typename T = decimal32_t>
 constexpr auto from_bid(std::uint32_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
-{
-    return from_bid_d32f(bits);
-}
-
-BOOST_DECIMAL_EXPORT template <>
-constexpr auto from_bid<decimal32_t>(std::uint32_t bits) noexcept -> decimal32_t
 {
     return from_bid_d32(bits);
 }
 
-BOOST_DECIMAL_EXPORT template <typename T = decimal_fast64_t>
-constexpr auto from_bid(std::uint64_t bits) noexcept
-    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+BOOST_DECIMAL_EXPORT template <>
+constexpr auto from_bid<decimal_fast32_t>(std::uint32_t bits) noexcept -> decimal_fast32_t
 {
-    return from_bid_d64f(bits);
+    return from_bid_d32f(bits);
 }
 
-BOOST_DECIMAL_EXPORT template <>
-constexpr auto from_bid<decimal64_t>(std::uint64_t bits) noexcept -> decimal64_t
+BOOST_DECIMAL_EXPORT template <typename T = decimal64_t>
+constexpr auto from_bid(std::uint64_t bits) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     return from_bid_d64(bits);
 }
 
-BOOST_DECIMAL_EXPORT template <typename T = decimal_fast128_t>
+BOOST_DECIMAL_EXPORT template <>
+constexpr auto from_bid<decimal_fast64_t>(std::uint64_t bits) noexcept -> decimal_fast64_t
+{
+    return from_bid_d64f(bits);
+}
+
+BOOST_DECIMAL_EXPORT template <typename T = decimal128_t>
 constexpr auto from_bid(int128::uint128_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
-    return from_bid_d128f(bits);
+    return from_bid_d128(bits);
 }
 
 BOOST_DECIMAL_EXPORT template <>
-constexpr auto from_bid<decimal128_t>(int128::uint128_t bits) noexcept -> decimal128_t
+constexpr auto from_bid<decimal_fast128_t>(int128::uint128_t bits) noexcept -> decimal_fast128_t
 {
-    return from_bid_d128(bits);
+    return from_bid_d128f(bits);
 }
 
 #if defined(__GNUC__) && __GNUC__ == 7
