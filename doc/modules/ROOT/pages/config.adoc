@@ -23,6 +23,10 @@ This option is not recommended, but can be useful if you want to use specific fu
 
 [source, c++]
 ----
+#define BOOST_DECIMAL_ALLOW_IMPLICIT_CONVERSIONS
+#include <boost/decimal.hpp>
+#include <complex>
+
 constexpr decimal64_t half {5, -1};
 std::complex<decimal64_t> test_val {half, half};
 const auto res = std::acos(test_val);
@@ -30,6 +34,13 @@ const auto res = std::acos(test_val);
 
 - `BOOST_DECIMAL_FAST_MATH` performs optimizations similar to that of the `-ffast-math` compiler flag such as removing all checks for non-finite values.
 This flag increases the performance of the basis operations (e.g. add, sub, mul, div, and comparisons) by up to 20%.
+Again, it must be defined before inclusion of decimal headers like so:
+
+[source, c++]
+----
+#define BOOST_DECIMAL_FAST_MATH
+#include <boost/decimal.hpp>
+----
 
 - `BOOST_DECIMAL_DEC_EVAL_METHOD`: See <cfloat> section for explanation
 
