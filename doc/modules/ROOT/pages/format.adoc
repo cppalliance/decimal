@@ -5,7 +5,7 @@ https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#format]
-= formating support
+= Formating support
 :idprefix: format_
 
 [#std_format]
