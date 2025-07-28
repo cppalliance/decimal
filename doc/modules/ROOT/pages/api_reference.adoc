@@ -11,6 +11,7 @@ https://www.boost.org/LICENSE_1_0.txt
 This section is a complete cross-reference to all the types, structures,
 enums, constants and macros that are provided in this library.
 
+[#api_ref_types]
 == Types
 
 === IEEE 754 Compliant Types
@@ -25,20 +26,24 @@ enums, constants and macros that are provided in this library.
 - xref:decimal_fast64_t.adoc[decimal_fast64_t]
 - xref:decimal_fast128_t.adoc[decimal_fast128_t]
 
+[#api_ref_structs]
 == Structures
 
 - xref:charconv.adoc#to_chars_result[to_chars_result]
 - xref:charconv.adoc#from_chars_result[from_chars_result]
 
+[#api_ref_enums]
 == Enums
 
 - xref:charconv.adoc#chars_format[chars_format]
 
+[#api_ref_constants]
 == Constants
 
 - xref:charconv.adoc#charconv_limits[limits]
 - xref:numbers.adoc[numbers]
 
+[#api_ref_macros]
 == Macros
 
 See: xref:config.adoc[configuration]
