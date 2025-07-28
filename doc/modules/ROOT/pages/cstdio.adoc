@@ -50,5 +50,5 @@ NOTE: The uppercase format will return with all applicable values in uppercase (
 Here are some example formats:
 
 - "%Hg" will print a `decimal32_t` in general format
-- "%.3De" will print a `decimal64_t` in scientific format with 3 digits of precision
-- "%.5DDA" will print a `decimal128_t` in hex format with 5 digits of precision and all letters will be capitalized (e.g. 1.F2CP+2 vs 1.f2cp+2)
+- "%.3De" will print a `decimal64_t` in scientific format with 3 digits of precision (e.g. 1.234e+05)
+- "%.5DDA" will print a `decimal128_t` in hex format with 5 digits of precision and all letters will be capitalized (e.g. 1.F2C34P+02 vs 1.f2c34p+02)
