@@ -803,28 +803,34 @@ Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
 
 ===== x64 Windows Results
 
-Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4
+Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 8,577,201
-| 0.410
+| 7,892,780
+| 0.457
 | `double`
-| 20,903,459
+| 17,282,516
 | 1.000
 | `decimal32_t`
-| 4,602,771
-| 0.220
+| 3,544,166
+| 0.205
 | `decimal64_t`
-| 5,332,730
-| 0.255
+| 5,095,337
+| 0.295
+| `decimal128_t`
+| 18,972,286
+| 1.098
 | `decimal_fast32_t`
-| 3,932,622
-| 0.188
+| 5,182,044
+| 0.300
 | `decimal_fast64_t`
-| 5,614,476
-| 0.269
+| 6,344,823
+| 0.367
+| `decimal_fast128_t`
+| 34,476,545
+| 1.995
 |===
 
 ===== M4 macOS Results
@@ -895,28 +901,34 @@ Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
 
 ===== x64 Windows Results
 
-Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4
+Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 8,170,079
-| 0.439
+| 7,839,980
+| 0.454
 | `double`
-| 18,626,905
+| 17,282,516
 | 1.000
 | `decimal32_t`
-| 3,927,882
-| 0.211
+| 3,393,317
+| 0.196
 | `decimal64_t`
-| 5,668,246
-| 0.304
-| `decimal_fast32_t`
-| 3,904,457
-| 0.210
-| `decimal_fast64_t`
-| 5,302,174
+| 4,924,720
 | 0.285
+| `decimal128_t`
+| 29,240,187
+| 1.692
+| `decimal_fast32_t`
+| 5,092,334
+| 0.295
+| `decimal_fast64_t`
+| 6,341,230
+| 0.367
+| `decimal_fast128_t`
+| 34,519,610
+| 1.997
 |===
 
 ===== M4 macOS Results
