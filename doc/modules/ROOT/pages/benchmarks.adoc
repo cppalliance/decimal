@@ -424,41 +424,83 @@ And on the same platform with GCC 13.3.0
 
 ==== Division
 
+Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compiler 2025.2.0.
+
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 59,003
-| 0.756
+| 100,799
+| 0.971
 | `double`
-| 78,078
+| 103,796
 | 1.000
 | `decimal32_t`
-| 2,250,186
-| 28.820
+| 2,125,437
+| 20.477
 | `decimal64_t`
-| 2,816,014
-| 36.067
+| 5,973,337
+| 57.549
 | `decimal128_t`
-| 18,320,634
-| 234.645
+| 9,482,403
+| 91.356
 | `decimal_fast32_t`
-| 1,123,428
-| 14.389
+| 1,011,695
+| 9.747
 | `decimal_fast64_t`
-| 1,258,004
-| 16.112
+| 2,138,793
+| 20.606
 | `decimal_fast128_t`
-| 1,243,024
-| 15.920
+| 8,277,721
+| 79.750
+// For unknown reasons this function segfaults
+//| `Intel Decimal32`
+//| 931,655
+//| 12.798
+//| `Intel Decimal64`
+//| 963,464
+//| 13.235
+//| `Intel Decimal128`
+//| 2,162,490
+//| 29.545
+|===
+
+And on the same platform with GCC 13.3.0
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 60,277
+| 0.747
+| `double`
+| 80,676
+| 1.000
+| `decimal32_t`
+| 2,396,732
+| 29.708
+| `decimal64_t`
+| 4,824,865
+| 59.805
+| `decimal128_t`
+| 10,751,669
+| 133.270
+| `decimal_fast32_t`
+| 1,103,023
+| 13.672
+| `decimal_fast64_t`
+| 2,384,925
+| 29.562
+| `decimal_fast128_t`
+| 8,332,936
+| 103.289
 | GCC `_Decimal32`
-| 5,002,197
-| 64.067
+| 5,082,812
+| 63.002
 | GCC `_Decimal64`
-| 2,961,731
-| 37.933
+| 3,005,153
+| 37.250
 | GCC `_Decimal128`
-| 10,095,995
-| 129.307
+| 10,257,437
+| 130.490
 |===
 
 === x64 Windows Results
