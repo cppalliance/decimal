@@ -263,41 +263,84 @@ And on the same platform with GCC 13.3.0
 
 ==== Subtraction
 
+Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compiler 2025.2.0.
+
+==== Addition
+
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 53,362
-| 1.083
+| 78,250
+| 1.069
 | `double`
-| 49,242
+| 73,193
 | 1.000
 | `decimal32_t`
-| 2,054,535
-| 41.723
+| 1,480,678
+| 20.229
 | `decimal64_t`
-| 2,507,709
-| 50.926
+| 1,371,677
+| 18.741
 | `decimal128_t`
-| 5,554,139
-| 112.793
+| 2,768,955
+| 37.831
 | `decimal_fast32_t`
-| 1,050,225
-| 21.328
+| 1,040,587
+| 14.217
 | `decimal_fast64_t`
-| 1,048,560
-| 21.294
+| 1,055,980
+| 14.427
 | `decimal_fast128_t`
-| 2,073,580
-| 42.110
+| 1,212,405
+| 16.564
+| `Intel Decimal32`
+| 1,275,562
+| 17.427
+| `Intel Decimal64`
+| 1,019,947
+| 13.935
+| `Intel Decimal128`
+| 2,162,490
+| 29.545
+|===
+
+And on the same platform with GCC 13.3.0
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 275,230
+| 0.936
+| `double`
+| 293,907
+| 1.000
+| `decimal32_t`
+| 1,451,610
+| 4.939
+| `decimal64_t`
+| 1,456,587
+| 4.956
+| `decimal128_t`
+| 4,332,644
+| 14.742
+| `decimal_fast32_t`
+| 842,910
+| 2.868
+| `decimal_fast64_t`
+| 968,939
+| 3.297
+| `decimal_fast128_t`
+| 1,327,411
+| 4.516
 | GCC `_Decimal32`
-| 2,006,964
-| 40.757
+| 2,045,306
+| 6.959
 | GCC `_Decimal64`
-| 1,324,796
-| 26.904
+| 1,355,777
+| 4.613
 | GCC `_Decimal128`
-| 2,783,553
-| 56.528
+| 3,178,891
+| 10.816
 |===
 
 ==== Multiplication
