@@ -14,6 +14,9 @@ The values in the ratio column are how many times longer running a specific oper
 
 IMPORTANT: On nearly all platforms there is hardware support for binary floating point math, so we are comparing hardware to software runtimes; *Decimal will be slower*
 
+NOTE: Both the results from Intel and GCC types are from very close, but not identical benchmark routines since they are written in C instead of C\++.
+We assume they are close enough, and the differences between the C and C++ compilers are small enough, for fair comparison
+
 == How to run the Benchmarks
 [#run_benchmarks_]
 
