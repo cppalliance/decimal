@@ -173,10 +173,6 @@ Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homeb
 The benchmark for these operations generates a random vector containing 20,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
 This is repeated 5 times to generate stable results.
 
-As discussed in the design of the fast types the significand is stored in normalized form so that we do not have to worry about the effects of cohorts.
-Unfortunately this means that `decimal_fast128_t` multiplication is always carried out internally at 256-bit size whereas `decimal128_t` contains heuristics in `operator*` to avoid 256-bit multiplication when it is not needed (i.e. the resultant significand is less than or equal to 128-bits).
-This causes multiplication of `decimal_fast128_t` to be ~1.72x slower than `decimal128_t`, but all other operators leave us with a geometric average runtime under 1.00 for `decimal_fast128_t` / `decimal128_t` so we accept this tradeoff.
-
 === x64 Linux Results
 
 Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
