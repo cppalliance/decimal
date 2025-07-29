@@ -265,8 +265,6 @@ And on the same platform with GCC 13.3.0
 
 Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compiler 2025.2.0.
 
-==== Addition
-
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
@@ -345,41 +343,83 @@ And on the same platform with GCC 13.3.0
 
 ==== Multiplication
 
+Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compiler 2025.2.0.
+
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 53,469
-| 1.093
+| 78,445
+| 1.078
 | `double`
-| 48,903
+| 72,798
 | 1.000
 | `decimal32_t`
-| 1,993,989
-| 40.774
+| 1,735,239
+| 23.836
 | `decimal64_t`
-| 2,766,602
-| 56.573
+| 2,272,739
+| 31.220
 | `decimal128_t`
-| 4,796,346
-| 98.079
+| 6,396,750
+| 87.870
 | `decimal_fast32_t`
-| 1,117,727
-| 22.856
+| 993,256
+| 13.644
 | `decimal_fast64_t`
-| 1,369,834
-| 28.011
+| 1,670,141
+| 22.942
 | `decimal_fast128_t`
-| 8,139,518
-| 166.442
+| 5,959,977
+| 81.870
+| `Intel Decimal32`
+| 931,655
+| 12.798
+| `Intel Decimal64`
+| 963,464
+| 13.235
+// For unknown reasons this function segfaults
+//| `Intel Decimal128`
+//| 2,162,490
+//| 29.545
+|===
+
+And on the same platform with GCC 13.3.0
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 76,238
+| 1.161
+| `double`
+| 65,652
+| 1.000
+| `decimal32_t`
+| 1,703,365
+| 25.945
+| `decimal64_t`
+| 2,564,605
+| 39.063
+| `decimal128_t`
+| 7,115,514
+| 108.382
+| `decimal_fast32_t`
+| 1,225,047
+| 18.660
+| `decimal_fast64_t`
+| 1,904,509
+| 29.009
+| `decimal_fast128_t`
+| 6,056,348
+| 92.249
 | GCC `_Decimal32`
-| 2,507,998
-| 51.285
+| 2,635,531
+| 40.144
 | GCC `_Decimal64`
-| 2,414,864
-| 49.381
+| 2,545,441
+| 38.772
 | GCC `_Decimal128`
-| 6,248,956
-| 127.783
+| 7,050,299
+| 107.289
 |===
 
 ==== Division
