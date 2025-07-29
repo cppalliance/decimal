@@ -957,28 +957,34 @@ Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homeb
 
 ===== x64 Linux Results
 
-Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 2,839,146
-| 0.841
+| 2,920,036
+| 0.850
 | `double`
-| 3,374,946
+| 3,436,919
 | 1.000
 | `decimal32_t`
-| 4,253,304
-| 1.260
+| 4,136,631
+| 1.204
 | `decimal64_t`
-| 6,885,679
-| 2.040
+| 4,318,996
+| 1.257
+| `decimal128_t`
+| 14,624,180
+| 4.255
 | `decimal_fast32_t`
-| 4,453,957
-| 1.320
+| 4,752,219
+| 1.383
 | `decimal_fast64_t`
-| 7,827,910
-| 2.319
+| 4,382,014
+| 1.275
+| `decimal_fast128_t`
+| 17,350,588
+| 5.048
 |===
 
 ===== x64 Windows Results
@@ -1048,23 +1054,29 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 5,226,353
-| 0.957
+| 5,541,073
+| 0.969
 | `double`
-| 5,458,987
+| 5,716,626
 | 1.000
 | `decimal32_t`
-| 3,782,692
-| 0.693
+| 3,527,433
+| 0.617
 | `decimal64_t`
-| 5,368,162
-| 0.983
+| 4,125,772
+| 0.722
+| `decimal128_t`
+| 6,967,211
+| 1.219
 | `decimal_fast32_t`
-| 3,611,498
-| 0.662
+| 3,654,219
+| 0.639
 | `decimal_fast64_t`
-| 6,025,340
-| 1.104
+| 3,386,125
+| 0.592
+| `decimal_fast128_t`
+| 6,018,439
+| 1.053
 |===
 
 ===== x64 Windows Results
