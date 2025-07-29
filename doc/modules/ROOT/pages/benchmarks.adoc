@@ -771,28 +771,34 @@ These benchmarks are automatically disabled if your compiler does not provide fe
 
 ===== x64 Linux Results
 
-Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 10,308,818
-| 0.551
+| 2,437,788
+| 0.917
 | `double`
-| 18,692,513
+| 2,657,378
 | 1.000
 | `decimal32_t`
-| 3,301,003
-| 0.177
+| 3,131,251
+| 1.178
 | `decimal64_t`
-| 4,580,001
-| 0.245
+| 4,291,891
+| 1.615
+| `decimal128_t`
+| 9,911,474
+| 3.730
 | `decimal_fast32_t`
-| 3,321,788
-| 0.178
+| 4,737,095
+| 1.783
 | `decimal_fast64_t`
-| 4,591,311
-| 0.246
+| 4,404,334
+| 1.657
+| `decimal_fast128_t`
+| 10,414,943
+| 3.919
 |===
 
 ===== x64 Windows Results
@@ -857,28 +863,34 @@ Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homeb
 
 ===== x64 Linux Results
 
-Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 10,363,219
-| 0.554
+| 2,506,008
+| 0.954
 | `double`
-| 18,677,179
+| 2,625,702
 | 1.000
 | `decimal32_t`
-| 3,296,877
-| 0.177
+| 3,008,653
+| 1.146
 | `decimal64_t`
-| 4,500,127
-| 0.241
+| 4,180,192
+| 1.592
+| `decimal128_t`
+| 9,712,229
+| 3.699
 | `decimal_fast32_t`
-| 3,381,651
-| 0.181
+| 4,142,588
+| 1.578
 | `decimal_fast64_t`
-| 4,496,194
-| 0.241
+| 4,118,461
+| 1.569
+| `decimal_fast128_t`
+| 8,772,097
+| 3.341
 |===
 
 ===== x64 Windows Results
