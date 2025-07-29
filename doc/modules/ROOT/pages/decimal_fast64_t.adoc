@@ -5,7 +5,7 @@ https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#decimal_fast64_t]
-= decimal_fast64_t
+= `decimal_fast64_t`
 :idprefix: decimal_fast64_t_
 
 == Description
