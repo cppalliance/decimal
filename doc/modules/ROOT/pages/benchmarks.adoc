@@ -23,15 +23,39 @@ We assume they are close enough, and the differences between the C and C++ compi
 To run the benchmarks yourself, navigate to the test folder and define `BOOST_DECIMAL_RUN_BENCHMARKS` when running the tests.
 An example on Linux with b2: `../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_DECIMAL_RUN_BENCHMARKS benchmarks -a release` .
 
-[#comparisons]
-== Comparisons
+== Methodology
+
+=== Comparisons
 
 The benchmark for comparisons generates a random vector containing 20,000,000 elements and does operations `>`, `>=`, `<`, `\<=`, `==`, and `!=` between `vec[i] and vec[i + 1]`.
 This is repeated 5 times to generate stable results.
 
-=== x64 Linux Results
+=== Basic Mathematical Operations
 
-Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compiler 2025.2.0.
+The benchmark for these operations generates a random vector containing 20,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
+This is repeated 5 times to generate stable results.
+
+=== `<charconv>`
+
+Parsing and serializing number exactly is one of the key features of decimal floating point types, so we must compare the performance of `<charconv>`. For all the following the results compare against STL provided `<charconv>` for 20,000,000 conversions.
+Since `<charconv>` is fully implemented in software for each type the performance gap between built-in `float` and `double` vs `decimal32_t` and `decimal64_t` is significantly smaller (or the decimal performance is better) than the hardware vs software performance gap seen above for basic operations.
+
+To run these benchmarks yourself you will need a compiler with complete implementation of `<charconv>` and to run the benchmarks under C++17 or higher.
+At the time of writing this is limited to:
+
+- GCC 11 or newer
+- MSVC 19.24 or newer
+
+These benchmarks are automatically disabled if your compiler does not provide feature complete `<charconv>` or if the language standard is set to C++14.
+
+[#x64_linux_benchmarks]
+== x64 Linux
+
+Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compiler 2025.2.0 or GCC 13.3.0.
+
+=== Comparisons
+
+Intel Compiler:
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -59,18 +83,18 @@ Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compi
 | `decimal_fast128_t`
 | 698,945
 | 4.856
-| `Intel Decimal32`
+| Intel `Decimal32`
 | 2,023,493
 | 14.059
-| `Intel Decimal64`
+| Intel `Decimal64`
 | 2,386,409
 | 16.581
-| `Intel Decimal128`
+| Intel `Decimal128`
 | 3,203,050
 | 22.255
 |===
 
-And on the same platform with GCC 13.3.0
+GCC:
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -109,81 +133,9 @@ And on the same platform with GCC 13.3.0
 | 14.844
 |===
 
-=== x64 Windows Results
+=== Addition
 
-Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 191,653
-| 1.028
-| `double`
-| 186,424
-| 1.000
-| `decimal32_t`
-| 2,391,863
-| 12.830
-| `decimal64_t`
-| 2,491,239
-| 13.363
-| `decimal128_t`
-| 16,643,031
-| 89.275
-| `decimal_fast32_t`
-| 872,997
-| 4.682
-| `decimal_fast64_t`
-| 793,997
-| 4.259
-| `decimal_fast128_t`
-| 801,708
-| 4.300
-|===
-
-=== M4 macOS Results
-
-Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homebrew Clang 20.1.8
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 64,639
-| 1.606
-| `double`
-| 40,255
-| 1.000
-| `decimal32_t`
-| 957,179
-| 23.778
-| `decimal64_t`
-| 897,409
-| 22.293
-| `decimal128_t`
-| 2,131,391
-| 52.947
-| `decimal_fast32_t`
-| 380,892
-| 9.462
-| `decimal_fast64_t`
-| 481,455
-| 11.960
-| `decimal_fast128_t`
-| 465,461
-| 11.563
-|===
-
-[#basic_operations]
-== Basic Operations
-
-The benchmark for these operations generates a random vector containing 20,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
-This is repeated 5 times to generate stable results.
-
-=== x64 Linux Results
-
-Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compiler 2025.2.0.
-
-==== Addition
+Intel Compiler:
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -211,18 +163,18 @@ Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compi
 | `decimal_fast128_t`
 | 1,367,004
 | 15.092
-| `Intel Decimal32`
+| Intel `Decimal32`
 | 1,159,069
 | 12.796
-| `Intel Decimal64`
+| Intel `Decimal64`
 | 1,248,111
 | 13.779
-| `Intel Decimal128`
+| Intel `Decimal128`
 | 2,099,084
 | 23.174
 |===
 
-And on the same platform with GCC 13.3.0
+GCC:
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -261,9 +213,9 @@ And on the same platform with GCC 13.3.0
 | 46.138
 |===
 
-==== Subtraction
+=== Subtraction
 
-Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compiler 2025.2.0.
+Intel Compiler:
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -291,18 +243,18 @@ Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compi
 | `decimal_fast128_t`
 | 1,212,405
 | 16.564
-| `Intel Decimal32`
+| Intel `Decimal32`
 | 1,275,562
 | 17.427
-| `Intel Decimal64`
+| Intel `Decimal64`
 | 1,019,947
 | 13.935
-| `Intel Decimal128`
+| Intel `Decimal128`
 | 2,162,490
 | 29.545
 |===
 
-And on the same platform with GCC 13.3.0
+GCC:
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -341,9 +293,9 @@ And on the same platform with GCC 13.3.0
 | 10.816
 |===
 
-==== Multiplication
+=== Multiplication
 
-Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compiler 2025.2.0.
+Intel Compiler:
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -371,19 +323,19 @@ Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compi
 | `decimal_fast128_t`
 | 5,959,977
 | 81.870
-| `Intel Decimal32`
+| Intel `Decimal32`
 | 931,655
 | 12.798
-| `Intel Decimal64`
+| Intel `Decimal64`
 | 963,464
 | 13.235
 // For unknown reasons this function segfaults
-//| `Intel Decimal128`
+//| Intel `Decimal128`
 //| 2,162,490
 //| 29.545
 |===
 
-And on the same platform with GCC 13.3.0
+GCC:
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -422,9 +374,9 @@ And on the same platform with GCC 13.3.0
 | 107.289
 |===
 
-==== Division
+=== Division
 
-Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compiler 2025.2.0.
+Intel Compiler:
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -453,18 +405,18 @@ Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compi
 | 8,277,721
 | 79.750
 // For unknown reasons this function segfaults
-//| `Intel Decimal32`
+//| Intel `Decimal32`
 //| 931,655
 //| 12.798
-//| `Intel Decimal64`
+//| Intel `Decimal64`
 //| 963,464
 //| 13.235
-//| `Intel Decimal128`
+//| Intel `Decimal128`
 //| 2,162,490
 //| 29.545
 |===
 
-And on the same platform with GCC 13.3.0
+GCC:
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -503,275 +455,9 @@ And on the same platform with GCC 13.3.0
 | 130.490
 |===
 
-=== x64 Windows Results
-
-Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
-
-==== Addition
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 76,777
-| 0.961
-| `double`
-| 79,897
-| 1.000
-| `decimal32_t`
-| 2,902,356
-| 36.326
-| `decimal64_t`
-| 3,569,820
-| 44.680
-| `decimal128_t`
-| 12,075,529
-| 151.139
-| `decimal_fast32_t`
-| 1,940,333
-| 24.285
-| `decimal_fast64_t`
-| 3,064,073
-| 38.350
-| `decimal_fast128_t`
-| 3,109,101
-| 38.914
-|===
-
-==== Subtraction
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 336,960
-| 1.042
-| `double`
-| 323,282
-| 1.000
-| `decimal32_t`
-| 3,040,167
-| 9.404
-| `decimal64_t`
-| 3,617,843
-| 11.191
-| `decimal128_t`
-| 12,325,962
-| 38.128
-| `decimal_fast32_t`
-| 2,313,234
-| 7.155
-| `decimal_fast64_t`
-| 2,935,476
-| 9.080
-| `decimal_fast128_t`
-| 2,963,570
-| 9.167
-|===
-
-==== Multiplication
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 78,634
-| 1.000
-| `double`
-| 78,649
-| 1.000
-| `decimal32_t`
-| 2,636,784
-| 33.526
-| `decimal64_t`
-| 3,861,139
-| 49.093
-| `decimal128_t`
-| 11,349,378
-| 144.304
-| `decimal_fast32_t`
-| 2,688,661
-| 34.186
-| `decimal_fast64_t`
-| 3,504,172
-| 44.554
-| `decimal_fast128_t`
-| 9,236,110
-| 117.434
-|===
-
-==== Division
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 83,566
-| 0.936
-| `double`
-| 89,317
-| 1.000
-| `decimal32_t`
-| 3,402,467
-| 38.094
-| `decimal64_t`
-| 4,663,830
-| 52.217
-| `decimal128_t`
-| 18,167,111
-| 203.400
-| `decimal_fast32_t`
-| 2,363,121
-| 26.458
-| `decimal_fast64_t`
-| 6,578,828
-| 73.657
-| `decimal_fast128_t`
-| 12,341,026
-| 138.171
-|===
-
-=== M4 macOS Results
-
-Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homebrew Clang 20.1.8
-
-==== Addition
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 11,853
-| 0.964
-| `double`
-| 12,295
-| 1.000
-| `decimal32_t`
-| 1,338,796
-| 108.889
-| `decimal64_t`
-| 1,231,462
-| 100.160
-| `decimal128_t`
-| 2,262,808
-| 184.043
-| `decimal_fast32_t`
-| 608,660
-| 49.505
-| `decimal_fast64_t`
-| 847,512
-| 68.931
-| `decimal_fast128_t`
-| 1,030,662
-| 83.827
-|===
-
-==== Subtraction
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 11,939
-| 0.951
-| `double`
-| 12,551
-| 1.000
-| `decimal32_t`
-| 1,296,430
-| 103.293
-| `decimal64_t`
-| 1,180,456
-| 94.053
-| `decimal128_t`
-| 2,078,008
-| 165.565
-| `decimal_fast32_t`
-| 817,989
-| 65.173
-| `decimal_fast64_t`
-| 823,569
-| 65.618
-| `decimal_fast128_t`
-| 993,447
-| 79.153
-|===
-
-==== Multiplication
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 12,186
-| 0.944
-| `double`
-| 12,914
-| 1.000
-| `decimal32_t`
-| 1,441,141
-| 111.595
-| `decimal64_t`
-| 2,117,061
-| 163.935
-| `decimal128_t`
-| 5,376,470
-| 416.329
-| `decimal_fast32_t`
-| 923,346
-| 71.500
-| `decimal_fast64_t`
-| 1,766,419
-| 136.783
-| `decimal_fast128_t`
-| 5,463,675
-| 423.082
-|===
-
-==== Division
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 12,576
-| 0.722
-| `double`
-| 17,145
-| 1.000
-| `decimal32_t`
-| 1,705,827
-| 97.951
-| `decimal64_t`
-| 3,912,831
-| 224.682
-| `decimal128_t`
-| 8,727,582
-| 501.153
-| `decimal_fast32_t`
-| 1,054,418
-| 60.547
-| `decimal_fast64_t`
-| 2,404,072
-| 138.046
-| `decimal_fast128_t`
-| 7,981,650
-| 458.320
-|===
-
-[#benchmark_charconv]
-== `<charconv>`
-
-Parsing and serializing number exactly is one of the key features of decimal floating point types, so we must compare the performance of `<charconv>`. For all the following the results compare against STL provided `<charconv>` for 20,000,000 conversions.
-Since `<charconv>` is fully implemented in software for each type the performance gap between built-in `float` and `double` vs `decimal32_t` and `decimal64_t` is significantly smaller (or the decimal performance is better) than the hardware vs software performance gap seen above for basic operations.
-
-To run these benchmarks yourself you will need a compiler with complete implementation of `<charconv>` and to run the benchmarks under C++17 or higher.
-At the time of writing this is limited to:
-
-- GCC 11 or newer
-- MSVC 19.24 or newer
-
-These benchmarks are automatically disabled if your compiler does not provide feature complete `<charconv>` or if the language standard is set to C++14.
-
 === `from_chars`
 
-==== `from_chars` general
-
-===== x64 Linux Results
-
-Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
+==== General Format
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -801,75 +487,7 @@ Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
 | 3.919
 |===
 
-===== x64 Windows Results
-
-Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 7,892,780
-| 0.457
-| `double`
-| 17,282,516
-| 1.000
-| `decimal32_t`
-| 3,544,166
-| 0.205
-| `decimal64_t`
-| 5,095,337
-| 0.295
-| `decimal128_t`
-| 18,972,286
-| 1.098
-| `decimal_fast32_t`
-| 5,182,044
-| 0.300
-| `decimal_fast64_t`
-| 6,344,823
-| 0.367
-| `decimal_fast128_t`
-| 34,476,545
-| 1.995
-|===
-
-===== M4 macOS Results
-
-Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homebrew GCC 15.1.0
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 1,882,825
-| 0.990
-| `double`
-| 1,901,380
-| 1.000
-| `decimal32_t`
-| 3,427,654
-| 1.803
-| `decimal64_t`
-| 5,364,564
-| 2.821
-| `decimal128_t`
-| 11,752,375
-| 6.181
-| `decimal_fast32_t`
-| 4,339,550
-| 2.282
-| `decimal_fast64_t`
-| 6,647,959
-| 3.496
-| `decimal_fast128_t`
-| 14,010,588
-| 7.369
-|===
-
-==== `from_chars` scientific
-
-===== x64 Linux Results
-
-Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
+==== Scientific Format
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -899,9 +517,316 @@ Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
 | 3.341
 |===
 
-===== x64 Windows Results
+=== `to_chars`
+
+==== General Format Shortest Precision
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 2,920,036
+| 0.850
+| `double`
+| 3,436,919
+| 1.000
+| `decimal32_t`
+| 4,136,631
+| 1.204
+| `decimal64_t`
+| 4,318,996
+| 1.257
+| `decimal128_t`
+| 14,624,180
+| 4.255
+| `decimal_fast32_t`
+| 4,752,219
+| 1.383
+| `decimal_fast64_t`
+| 4,382,014
+| 1.275
+| `decimal_fast128_t`
+| 17,350,588
+| 5.048
+|===
+
+==== General Format 6 digits Precision
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 5,541,073
+| 0.969
+| `double`
+| 5,716,626
+| 1.000
+| `decimal32_t`
+| 3,527,433
+| 0.617
+| `decimal64_t`
+| 4,125,772
+| 0.722
+| `decimal128_t`
+| 6,967,211
+| 1.219
+| `decimal_fast32_t`
+| 3,654,219
+| 0.639
+| `decimal_fast64_t`
+| 3,386,125
+| 0.592
+| `decimal_fast128_t`
+| 6,018,439
+| 1.053
+|===
+
+==== Scientific Format Shortest Precision
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 2,841,569
+| 0.827
+| `double`
+| 3,437,387
+| 1.000
+| `decimal32_t`
+| 2,564,053
+| 0.750
+| `decimal64_t`
+| 2,856,944
+| 0.831
+| `decimal128_t`
+| 12,147,039
+| 3.534
+| `decimal_fast32_t`
+| 2,878,507
+| 0.837
+| `decimal_fast64_t`
+| 2,933,273
+| 0.853
+| `decimal_fast128_t`
+| 15,010,374
+| 4.367
+|===
+
+==== Scientific Format 6 digits Precision
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 4,896,523
+| 0.958
+| `double`
+| 5,112,924
+| 1.000
+| `decimal32_t`
+| 2,542,237
+| 0.497
+| `decimal64_t`
+| 3,119,552
+| 0.610
+| `decimal128_t`
+| 4,811,741
+| 0.941
+| `decimal_fast32_t`
+| 2,890,023
+| 0.565
+| `decimal_fast64_t`
+| 2,956,466
+| 0.578
+| `decimal_fast128_t`
+| 5,476,431
+| 1.071
+|===
+
+[#x64_windows_benchmarks]
+== x64 Windows
 
 Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
+
+=== Comparisons
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 191,653
+| 1.028
+| `double`
+| 186,424
+| 1.000
+| `decimal32_t`
+| 2,391,863
+| 12.830
+| `decimal64_t`
+| 2,491,239
+| 13.363
+| `decimal128_t`
+| 16,643,031
+| 89.275
+| `decimal_fast32_t`
+| 872,997
+| 4.682
+| `decimal_fast64_t`
+| 793,997
+| 4.259
+| `decimal_fast128_t`
+| 801,708
+| 4.300
+|===
+
+=== Addition
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 76,777
+| 0.961
+| `double`
+| 79,897
+| 1.000
+| `decimal32_t`
+| 2,902,356
+| 36.326
+| `decimal64_t`
+| 3,569,820
+| 44.680
+| `decimal128_t`
+| 12,075,529
+| 151.139
+| `decimal_fast32_t`
+| 1,940,333
+| 24.285
+| `decimal_fast64_t`
+| 3,064,073
+| 38.350
+| `decimal_fast128_t`
+| 3,109,101
+| 38.914
+|===
+
+=== Subtraction
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 336,960
+| 1.042
+| `double`
+| 323,282
+| 1.000
+| `decimal32_t`
+| 3,040,167
+| 9.404
+| `decimal64_t`
+| 3,617,843
+| 11.191
+| `decimal128_t`
+| 12,325,962
+| 38.128
+| `decimal_fast32_t`
+| 2,313,234
+| 7.155
+| `decimal_fast64_t`
+| 2,935,476
+| 9.080
+| `decimal_fast128_t`
+| 2,963,570
+| 9.167
+|===
+
+=== Multiplication
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 78,634
+| 1.000
+| `double`
+| 78,649
+| 1.000
+| `decimal32_t`
+| 2,636,784
+| 33.526
+| `decimal64_t`
+| 3,861,139
+| 49.093
+| `decimal128_t`
+| 11,349,378
+| 144.304
+| `decimal_fast32_t`
+| 2,688,661
+| 34.186
+| `decimal_fast64_t`
+| 3,504,172
+| 44.554
+| `decimal_fast128_t`
+| 9,236,110
+| 117.434
+|===
+
+=== Division
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 83,566
+| 0.936
+| `double`
+| 89,317
+| 1.000
+| `decimal32_t`
+| 3,402,467
+| 38.094
+| `decimal64_t`
+| 4,663,830
+| 52.217
+| `decimal128_t`
+| 18,167,111
+| 203.400
+| `decimal_fast32_t`
+| 2,363,121
+| 26.458
+| `decimal_fast64_t`
+| 6,578,828
+| 73.657
+| `decimal_fast128_t`
+| 12,341,026
+| 138.171
+|===
+
+=== `from_chars`
+
+==== General Format
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 7,892,780
+| 0.457
+| `double`
+| 17,282,516
+| 1.000
+| `decimal32_t`
+| 3,544,166
+| 0.205
+| `decimal64_t`
+| 5,095,337
+| 0.295
+| `decimal128_t`
+| 18,972,286
+| 1.098
+| `decimal_fast32_t`
+| 5,182,044
+| 0.300
+| `decimal_fast64_t`
+| 6,344,823
+| 0.367
+| `decimal_fast128_t`
+| 34,476,545
+| 1.995
+|===
+
+==== Scientific Format
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -931,9 +856,316 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.
 | 1.997
 |===
 
-===== M4 macOS Results
+=== `to_chars`
 
-Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homebrew GCC 15.1.0
+==== General Format Shortest Precision
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 3,181,029
+| 0.826
+| `double`
+| 3,852,857
+| 1.000
+| `decimal32_t`
+| 5,242,934
+| 1.361
+| `decimal64_t`
+| 5,586,541
+| 1.450
+| `decimal128_t`
+| 13,955,214
+| 3.622
+| `decimal_fast32_t`
+| 6,053,804
+| 1.571
+| `decimal_fast64_t`
+| 7,957,278
+| 2.065
+| `decimal_fast128_t`
+| 20,202,107
+| 5.243
+|===
+
+==== General Format 6 digits Precision
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 6,111,231
+| 0.949
+| `double`
+| 6,433,885
+| 1.000
+| `decimal32_t`
+| 4,605,311
+| 0.716
+| `decimal64_t`
+| 4,742,497
+| 0.737
+| `decimal128_t`
+| 12,372,901
+| 1.923
+| `decimal_fast32_t`
+| 4,716,827
+| 0.733
+| `decimal_fast64_t`
+| 4,861,975
+| 0.756
+| `decimal_fast128_t`
+| 10,779,778
+| 1.675
+|===
+
+==== Scientific Format Shortest Precision
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 3,107,509
+| 0.773
+| `double`
+| 4,020,767
+| 1.000
+| `decimal32_t`
+| 3,428,517
+| 0.853
+| `decimal64_t`
+| 4,095,802
+| 1.019
+| `decimal128_t`
+| 11,577,791
+| 2.879
+| `decimal_fast32_t`
+| 3,375,975
+| 0.840
+| `decimal_fast64_t`
+| 4,427,563
+| 1.101
+| `decimal_fast128_t`
+| 13,581,654
+| 3.378
+|===
+
+==== Scientific Format 6 digits Precision
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 4,938,623
+| 0.930
+| `double`
+| 5,309,818
+| 1.000
+| `decimal32_t`
+| 3,435,843
+| 0.647
+| `decimal64_t`
+| 3,682,980
+| 0.694
+| `decimal128_t`
+| 9,223,227
+| 1.737
+| `decimal_fast32_t`
+| 3,379,702
+| 0.637
+| `decimal_fast64_t`
+| 3,892,990
+| 0.733
+| `decimal_fast128_t`
+| 10,158,657
+| 1.913
+|===
+
+[#m4_mac_benchmarks]
+== ARM64 macOS
+
+Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homebrew Clang 20.1.8
+
+=== Comparisons
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 64,639
+| 1.606
+| `double`
+| 40,255
+| 1.000
+| `decimal32_t`
+| 957,179
+| 23.778
+| `decimal64_t`
+| 897,409
+| 22.293
+| `decimal128_t`
+| 2,131,391
+| 52.947
+| `decimal_fast32_t`
+| 380,892
+| 9.462
+| `decimal_fast64_t`
+| 481,455
+| 11.960
+| `decimal_fast128_t`
+| 465,461
+| 11.563
+|===
+
+=== Addition
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 11,853
+| 0.964
+| `double`
+| 12,295
+| 1.000
+| `decimal32_t`
+| 1,338,796
+| 108.889
+| `decimal64_t`
+| 1,231,462
+| 100.160
+| `decimal128_t`
+| 2,262,808
+| 184.043
+| `decimal_fast32_t`
+| 608,660
+| 49.505
+| `decimal_fast64_t`
+| 847,512
+| 68.931
+| `decimal_fast128_t`
+| 1,030,662
+| 83.827
+|===
+
+=== Subtraction
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 11,939
+| 0.951
+| `double`
+| 12,551
+| 1.000
+| `decimal32_t`
+| 1,296,430
+| 103.293
+| `decimal64_t`
+| 1,180,456
+| 94.053
+| `decimal128_t`
+| 2,078,008
+| 165.565
+| `decimal_fast32_t`
+| 817,989
+| 65.173
+| `decimal_fast64_t`
+| 823,569
+| 65.618
+| `decimal_fast128_t`
+| 993,447
+| 79.153
+|===
+
+=== Multiplication
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 12,186
+| 0.944
+| `double`
+| 12,914
+| 1.000
+| `decimal32_t`
+| 1,441,141
+| 111.595
+| `decimal64_t`
+| 2,117,061
+| 163.935
+| `decimal128_t`
+| 5,376,470
+| 416.329
+| `decimal_fast32_t`
+| 923,346
+| 71.500
+| `decimal_fast64_t`
+| 1,766,419
+| 136.783
+| `decimal_fast128_t`
+| 5,463,675
+| 423.082
+|===
+
+=== Division
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 12,576
+| 0.722
+| `double`
+| 17,145
+| 1.000
+| `decimal32_t`
+| 1,705,827
+| 97.951
+| `decimal64_t`
+| 3,912,831
+| 224.682
+| `decimal128_t`
+| 8,727,582
+| 501.153
+| `decimal_fast32_t`
+| 1,054,418
+| 60.547
+| `decimal_fast64_t`
+| 2,404,072
+| 138.046
+| `decimal_fast128_t`
+| 7,981,650
+| 458.320
+|===
+
+=== `from_chars`
+
+==== General Format
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 1,882,825
+| 0.990
+| `double`
+| 1,901,380
+| 1.000
+| `decimal32_t`
+| 3,427,654
+| 1.803
+| `decimal64_t`
+| 5,364,564
+| 2.821
+| `decimal128_t`
+| 11,752,375
+| 6.181
+| `decimal_fast32_t`
+| 4,339,550
+| 2.282
+| `decimal_fast64_t`
+| 6,647,959
+| 3.496
+| `decimal_fast128_t`
+| 14,010,588
+| 7.369
+|===
+
+==== Scientific Format
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -965,75 +1197,7 @@ Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homeb
 
 === `to_chars`
 
-==== `to_chars` general shortest representation
-
-===== x64 Linux Results
-
-Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 2,920,036
-| 0.850
-| `double`
-| 3,436,919
-| 1.000
-| `decimal32_t`
-| 4,136,631
-| 1.204
-| `decimal64_t`
-| 4,318,996
-| 1.257
-| `decimal128_t`
-| 14,624,180
-| 4.255
-| `decimal_fast32_t`
-| 4,752,219
-| 1.383
-| `decimal_fast64_t`
-| 4,382,014
-| 1.275
-| `decimal_fast128_t`
-| 17,350,588
-| 5.048
-|===
-
-===== x64 Windows Results
-
-Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 3,181,029
-| 0.826
-| `double`
-| 3,852,857
-| 1.000
-| `decimal32_t`
-| 5,242,934
-| 1.361
-| `decimal64_t`
-| 5,586,541
-| 1.450
-| `decimal128_t`
-| 13,955,214
-| 3.622
-| `decimal_fast32_t`
-| 6,053,804
-| 1.571
-| `decimal_fast64_t`
-| 7,957,278
-| 2.065
-| `decimal_fast128_t`
-| 20,202,107
-| 5.243
-|===
-
-===== M4 macOS Results
-
-Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homebrew GCC 15.1.0
+==== General Format Shortest Precision
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -1063,75 +1227,7 @@ Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homeb
 | 4.964
 |===
 
-==== `to_chars` general 6-digits of precision
-
-===== x64 Linux Results
-
-Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 5,541,073
-| 0.969
-| `double`
-| 5,716,626
-| 1.000
-| `decimal32_t`
-| 3,527,433
-| 0.617
-| `decimal64_t`
-| 4,125,772
-| 0.722
-| `decimal128_t`
-| 6,967,211
-| 1.219
-| `decimal_fast32_t`
-| 3,654,219
-| 0.639
-| `decimal_fast64_t`
-| 3,386,125
-| 0.592
-| `decimal_fast128_t`
-| 6,018,439
-| 1.053
-|===
-
-===== x64 Windows Results
-
-Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 6,111,231
-| 0.949
-| `double`
-| 6,433,885
-| 1.000
-| `decimal32_t`
-| 4,605,311
-| 0.716
-| `decimal64_t`
-| 4,742,497
-| 0.737
-| `decimal128_t`
-| 12,372,901
-| 1.923
-| `decimal_fast32_t`
-| 4,716,827
-| 0.733
-| `decimal_fast64_t`
-| 4,861,975
-| 0.756
-| `decimal_fast128_t`
-| 10,779,778
-| 1.675
-|===
-
-===== M4 macOS Results
-
-Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homebrew GCC 15.1.0
+==== General Format 6 digits Precision
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -1161,75 +1257,7 @@ Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homeb
 | 1.222
 |===
 
-==== `to_chars` scientific shortest representation
-
-===== x64 Linux Results
-
-Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 2,841,569
-| 0.827
-| `double`
-| 3,437,387
-| 1.000
-| `decimal32_t`
-| 2,564,053
-| 0.750
-| `decimal64_t`
-| 2,856,944
-| 0.831
-| `decimal128_t`
-| 12,147,039
-| 3.534
-| `decimal_fast32_t`
-| 2,878,507
-| 0.837
-| `decimal_fast64_t`
-| 2,933,273
-| 0.853
-| `decimal_fast128_t`
-| 15,010,374
-| 4.367
-|===
-
-===== x64 Windows Results
-
-Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 3,107,509
-| 0.773
-| `double`
-| 4,020,767
-| 1.000
-| `decimal32_t`
-| 3,428,517
-| 0.853
-| `decimal64_t`
-| 4,095,802
-| 1.019
-| `decimal128_t`
-| 11,577,791
-| 2.879
-| `decimal_fast32_t`
-| 3,375,975
-| 0.840
-| `decimal_fast64_t`
-| 4,427,563 
-| 1.101
-| `decimal_fast128_t`
-| 13,581,654
-| 3.378
-|===
-
-===== M4 macOS Results
-
-Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homebrew GCC 15.1.0
+==== Scientific Format Shortest Precision
 
 |===
 | Type | Runtime (us) | Ratio to `double`
@@ -1259,75 +1287,7 @@ Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homeb
 | 5.002
 |===
 
-==== `to_chars` scientific 6-digits of precision
-
-===== x64 Linux Results
-
-Run using an Intel i9-11900k chipset running Ubuntu 24.04 and GCC 13.3.0.
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 4,896,523
-| 0.958
-| `double`
-| 5,112,924
-| 1.000
-| `decimal32_t`
-| 2,542,237
-| 0.497
-| `decimal64_t`
-| 3,119,552
-| 0.610
-| `decimal128_t`
-| 4,811,741
-| 0.941
-| `decimal_fast32_t`
-| 2,890,023
-| 0.565
-| `decimal_fast64_t`
-| 2,956,466
-| 0.578
-| `decimal_fast128_t`
-| 5,476,431
-| 1.071
-|===
-
-===== x64 Windows Results
-
-Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
-
-|===
-| Type | Runtime (us) | Ratio to `double`
-| `float`
-| 4,938,623
-| 0.930
-| `double`
-| 5,309,818
-| 1.000
-| `decimal32_t`
-| 3,435,843
-| 0.647
-| `decimal64_t`
-| 3,682,980
-| 0.694
-| `decimal128_t`
-| 9,223,227
-| 1.737
-| `decimal_fast32_t`
-| 3,379,702
-| 0.637
-| `decimal_fast64_t`
-| 3,892,990
-| 0.733
-| `decimal_fast128_t`
-| 10,158,657
-| 1.913
-|===
-
-===== M4 macOS Results
-
-Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homebrew GCC 15.1.0
+==== Scientific Format 6 digits Precision
 
 |===
 | Type | Runtime (us) | Ratio to `double`
