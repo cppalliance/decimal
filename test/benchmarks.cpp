@@ -277,7 +277,7 @@ static BOOST_DECIMAL_NO_INLINE void test_boost_to_chars( std::vector<T> const& d
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cerr << "            std::to_chars<" << std::left << std::setw(10) << type << ">, " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << "           std::to_chars<" << std::left << std::setw(10) << type << "   >, " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 
