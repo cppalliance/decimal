@@ -954,21 +954,21 @@ constexpr auto to_dpd(DecimalType val) noexcept
     return to_dpd(val);
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast32_t>
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal32_t>
 constexpr auto from_dpd(std::uint32_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     return from_dpd_d32<DecimalType>(bits);
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast64_t>
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal64_t>
 constexpr auto from_dpd(std::uint64_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     return from_dpd_d64<DecimalType>(bits);
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast128_t>
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_t>
 constexpr auto from_dpd(int128::uint128_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
@@ -977,7 +977,7 @@ constexpr auto from_dpd(int128::uint128_t bits) noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast128_t>
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_t>
 constexpr auto from_dpd(detail::builtin_uint128_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
