@@ -21,7 +21,8 @@ We assume they are close enough, and the differences between the C and C++ compi
 [#run_benchmarks_]
 
 To run the benchmarks yourself, navigate to the test folder and define `BOOST_DECIMAL_RUN_BENCHMARKS` when running the tests.
-An example on Linux with b2: `../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_DECIMAL_RUN_BENCHMARKS benchmarks -a release` .
+An example on Linux with b2: `../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_DECIMAL_RUN_BENCHMARKS benchmarks -a release`, or
+`../../../b2 cxxstd=20 toolset=gcc-13 define=BOOST_DECIMAL_RUN_BENCHMARKS=1,BOOST_DECIMAL_BENCHMARK_CHARCONV=1 benchmarks -a release` to also run the `<charconv>` benchmarks
 
 == Methodology
 
