@@ -28,43 +28,79 @@ This is repeated 5 times to generate stable results.
 
 === x64 Linux Results
 
-Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
+Run using an Intel i9-11900k chipset running Ubuntu 24.04 and Intel oneAPI compiler 2025.2.0.
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 34,814
-| 0.604
+| 72,696
+| 0.505
 | `double`
-| 57,644
+| 143,924
 | 1.000
 | `decimal32_t`
-| 2,163,595
-| 37.534
+| 1,485,786
+| 10.323
 | `decimal64_t`
-| 2,633,923
-| 45.693
+| 1,653,991
+| 11.492
 | `decimal128_t`
-| 6,064,630
-| 105.208
+| 4,662,704
+| 32.397
 | `decimal_fast32_t`
-| 613,626
-| 10.645
+| 619,662
+| 4.305
 | `decimal_fast64_t`
-| 693,390
-| 12.029
+| 606,382
+| 4.213
 | `decimal_fast128_t`
-| 628,596
-| 10.905
-| GCC `_decimal32_t`
-| 893,375
-| 15.498
-| GCC `_decimal64_t`
-| 496,127
-| 8.607
-| GCC `_decimal128_t`
-| 1,143,636
-| 19.840
+| 698,945
+| 4.856
+| `Intel Decimal32`
+| 2,023,493
+| 14.059
+| `Intel Decimal64`
+| 2,386,409
+| 16.581
+|===
+
+And on the same platform with GCC 13.3.0
+
+|===
+| Type | Runtime (us) | Ratio to `double`
+| `float`
+| 56,457
+| 0.916
+| `double`
+| 61,615
+| 1.000
+| `decimal32_t`
+| 1,404,638
+| 22.797
+| `decimal64_t`
+| 1,408,074
+| 22.853
+| `decimal128_t`
+| 4,974,170
+| 80.730
+| `decimal_fast32_t`
+| 546,836
+| 8.875
+| `decimal_fast64_t`
+| 472,387
+| 7.667
+| `decimal_fast128_t`
+| 480,853
+| 7.804
+| GCC `_Decimal32`
+| 816,703
+| 13.255
+| GCC `_Decimal64`
+| 501,479
+| 8.139
+| GCC `_Decimal128`
+| 914,600
+| 14.844
 |===
 
 === x64 Windows Results
@@ -173,13 +209,13 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `decimal_fast128_t`
 | 7,197,718
 | 137.018
-| GCC `_decimal32_t`
+| GCC `_Decimal32`
 | 2,997,658
 | 57.065
-| GCC `_decimal64_t`
+| GCC `_Decimal64`
 | 2,129,898
 | 40.546
-| GCC `_decimal128_t`
+| GCC `_Decimal128`
 | 3,056,979
 | 58.194
 |===
@@ -212,13 +248,13 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `decimal_fast128_t`
 | 2,073,580
 | 42.110
-| GCC `_decimal32_t`
+| GCC `_Decimal32`
 | 2,006,964
 | 40.757
-| GCC `_decimal64_t`
+| GCC `_Decimal64`
 | 1,324,796
 | 26.904
-| GCC `_decimal128_t`
+| GCC `_Decimal128`
 | 2,783,553
 | 56.528
 |===
@@ -251,13 +287,13 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `decimal_fast128_t`
 | 8,139,518
 | 166.442
-| GCC `_decimal32_t`
+| GCC `_Decimal32`
 | 2,507,998
 | 51.285
-| GCC `_decimal64_t`
+| GCC `_Decimal64`
 | 2,414,864
 | 49.381
-| GCC `_decimal128_t`
+| GCC `_Decimal128`
 | 6,248,956
 | 127.783
 |===
@@ -290,13 +326,13 @@ Run using an Intel i9-11900k chipset running RHEL 9.4 and GCC 11.4.1-3
 | `decimal_fast128_t`
 | 1,243,024
 | 15.920
-| GCC `_decimal32_t`
+| GCC `_Decimal32`
 | 5,002,197
 | 64.067
-| GCC `_decimal64_t`
+| GCC `_Decimal64`
 | 2,961,731
 | 37.933
-| GCC `_decimal128_t`
+| GCC `_Decimal128`
 | 10,095,995
 | 129.307
 |===
