@@ -34,7 +34,7 @@ BOOST_DECIMAL_EXPORT inline auto fegetround() noexcept -> rounding_mode
 // If we can't support constexpr and non-constexpr code paths we won't honor the updated rounding-mode,
 // since it will not be used anyway.
 // Return the default rounding mode
-BOOST_DECIMAL_EXPORT inline auto fesetround(rounding_mode round) noexcept -> rounding_mode
+BOOST_DECIMAL_EXPORT inline auto fesetround(const rounding_mode round) noexcept -> rounding_mode
 {
     _boost_decimal_global_rounding_mode = round;
     return round;

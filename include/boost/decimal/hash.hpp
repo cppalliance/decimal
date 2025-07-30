@@ -23,7 +23,7 @@ namespace std {
 BOOST_DECIMAL_EXPORT template <>
 struct hash<boost::decimal::decimal32_t>
 {
-    // Since the underlying type is a std::uint32_t we will rely on its hash function from the STL
+    // Since the underlying type is a std::uint32_t, we will rely on its hash function from the STL
     auto operator()(const boost::decimal::decimal32_t& v) const noexcept -> std::size_t
     {
         std::uint32_t bits;
@@ -36,7 +36,7 @@ struct hash<boost::decimal::decimal32_t>
 BOOST_DECIMAL_EXPORT template <>
 struct hash<boost::decimal::decimal64_t>
 {
-    // Since the underlying type is a std::uint64_t we will rely on its hash function from the STL
+    // Since the underlying type is a std::uint64_t, we will rely on its hash function from the STL
     auto operator()(const boost::decimal::decimal64_t& v) const noexcept -> std::size_t
     {
         std::uint64_t bits;
@@ -85,8 +85,8 @@ struct hash<boost::decimal::decimal_fast32_t>
 BOOST_DECIMAL_EXPORT template <>
 struct hash<boost::decimal::decimal_fast64_t>
 {
-    // Since the underlying type is a std::uint64_t we will rely on its hash function from the STL
-    // First we convert to a decimal64_t so they will have the same hash value
+    // Since the underlying type is a std::uint64_t, we will rely on its hash function from the STL
+    // First we convert to a decimal64_t, so they will have the same hash value
     auto operator()(const boost::decimal::decimal_fast64_t& v) const noexcept -> std::size_t
     {
         boost::decimal::decimal64_t v_64 {v};
