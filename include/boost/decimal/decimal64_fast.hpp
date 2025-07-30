@@ -19,6 +19,7 @@
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/cmath/next.hpp>
+#include <boost/decimal/detail/components.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -32,28 +33,18 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_inf = std::numeric_limits<std::uint_fast64_t>::max() - 3;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_qnan = std::numeric_limits<std::uint_fast64_t>::max() - 2;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_snan = std::numeric_limits<std::uint_fast64_t>::max() - 1;
-
-struct decimal_fast64_t_components
-{
-    using significand_type = std::uint_fast64_t;
-    using biased_exponent_type = std::int_fast32_t;
-
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_inf = std::numeric_limits<std::uint64_t>::max() - 3;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_qnan = std::numeric_limits<std::uint64_t>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_snan = std::numeric_limits<std::uint64_t>::max() - 1;
 
 } // namespace detail
 
 BOOST_DECIMAL_EXPORT class decimal_fast64_t final
 {
 public:
-    using significand_type = std::uint_fast64_t;
-    using exponent_type = std::uint_fast16_t;
-    using biased_exponent_type = std::int_fast32_t;
+    using significand_type = std::uint64_t;
+    using exponent_type = std::uint16_t;
+    using biased_exponent_type = std::int32_t;
 
 private:
     // In regular decimal64_t we have to decode the significand end exponent
@@ -1384,7 +1375,7 @@ struct numeric_limits<boost::decimal::decimal_fast64_t>
     static constexpr int  min_exponent10 = min_exponent;
     static constexpr int  max_exponent = 384;
     static constexpr int  max_exponent10 = max_exponent;
-    static constexpr bool traps = numeric_limits<std::uint_fast64_t>::traps;
+    static constexpr bool traps = numeric_limits<std::uint64_t>::traps;
     static constexpr bool tinyness_before = true;
 
     // Member functions
