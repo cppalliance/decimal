@@ -111,34 +111,34 @@ And on the same platform with GCC 13.3.0
 
 === x64 Windows Results
 
-Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4
+Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 182,707
-| 0.943
+| 191,653
+| 1.028
 | `double`
-| 193,737
+| 186,424
 | 1.000
 | `decimal32_t`
-| 3,097,942
-| 15.990
+| 2,391,863
+| 12.830
 | `decimal64_t`
-| 4,697,948
-| 24.249
+| 2,491,239
+| 13.363
 | `decimal128_t`
-| 17,267,609
-| 89.129
+| 16,643,031
+| 89.275
 | `decimal_fast32_t`
-| 809,847
-| 4.180
+| 872,997
+| 4.682
 | `decimal_fast64_t`
-| 1,043,657
-| 5.387
+| 793,997
+| 4.259
 | `decimal_fast128_t`
-| 888,053
-| 4.584
+| 801,708
+| 4.300
 |===
 
 === M4 macOS Results
