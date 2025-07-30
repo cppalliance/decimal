@@ -19,7 +19,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto logb(T num) noexcept
+constexpr auto logb(const T num) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto fpc {fpclassify(num)};

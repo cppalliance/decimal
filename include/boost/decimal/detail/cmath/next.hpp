@@ -30,7 +30,7 @@ namespace decimal {
 namespace detail {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
-constexpr auto nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType
+constexpr auto nextafter_impl(const DecimalType val, const bool direction) noexcept -> DecimalType
 {
     constexpr DecimalType zero {0};
 
@@ -56,7 +56,7 @@ constexpr auto nextafter_impl(DecimalType val, bool direction) noexcept -> Decim
     const auto val_eps {direction ? val + std::numeric_limits<DecimalType>::epsilon() :
                                     val - std::numeric_limits<DecimalType>::epsilon()};
 
-    // If adding epsilon does nothing then we need to manipulate the representation
+    // If adding epsilon does nothing, then we need to manipulate the representation
     if (val == val_eps)
     {
         int exp {} ;
@@ -77,7 +77,7 @@ constexpr auto nextafter_impl(DecimalType val, bool direction) noexcept -> Decim
 BOOST_DECIMAL_EXPORT
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
           BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2>
-constexpr auto nextafter(T1 val, T2 direction) noexcept
+constexpr auto nextafter(const T1 val, const T2 direction) noexcept
     BOOST_DECIMAL_REQUIRES_TWO(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -102,7 +102,7 @@ constexpr auto nextafter(T1 val, T2 direction) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
-BOOST_DECIMAL_CXX20_CONSTEXPR auto nexttoward(T val, long double direction) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR auto nexttoward(const T val, const long double direction) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto dec_direction {static_cast<T>(direction)};

@@ -100,7 +100,7 @@ constexpr auto erf_series_near_zero_sum(const T &x) noexcept -> T
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto erf_calc_impl(T z, bool invert) noexcept -> T
+constexpr auto erf_calc_impl(const T z, bool invert) noexcept -> T
 {
     constexpr T zero {0, 0};
 
@@ -328,7 +328,7 @@ constexpr auto erf_calc_impl(T z, bool invert) noexcept -> T
 }
 
 template <>
-constexpr auto erf_calc_impl<decimal128_t>(decimal128_t z, bool invert) noexcept -> decimal128_t
+constexpr auto erf_calc_impl<decimal128_t>(const decimal128_t z, bool invert) noexcept -> decimal128_t
 {
     constexpr decimal128_t zero {0, 0};
     constexpr decimal128_t half {5, -1};
@@ -756,7 +756,7 @@ constexpr auto erf_calc_impl<decimal128_t>(decimal128_t z, bool invert) noexcept
 }
 
 template <typename T>
-constexpr auto erf_impl(T z) noexcept
+constexpr auto erf_impl(const T z) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // Edge cases
@@ -777,7 +777,7 @@ constexpr auto erf_impl(T z) noexcept
 }
 
 template <typename T>
-constexpr auto erfc_impl(T z) noexcept
+constexpr auto erfc_impl(const T z) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // Edge cases
@@ -800,7 +800,7 @@ constexpr auto erfc_impl(T z) noexcept
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto erf(T z) noexcept
+constexpr auto erf(const T z) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -821,7 +821,7 @@ constexpr auto erf(T z) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto erfc(T z) noexcept
+constexpr auto erfc(const T z) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

@@ -23,7 +23,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto log_impl(T x) noexcept
+constexpr auto log_impl(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T one { 1, 0 };
@@ -77,7 +77,7 @@ constexpr auto log_impl(T x) noexcept
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto log(T x) noexcept
+constexpr auto log(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

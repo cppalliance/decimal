@@ -24,7 +24,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto rescale(T val, int precision = 0) noexcept
+constexpr auto rescale(const T val, const int precision = 0) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr auto biggest_val {1 / std::numeric_limits<T>::epsilon()};
@@ -33,7 +33,7 @@ constexpr auto rescale(T val, int precision = 0) noexcept
     {
         return trunc(val);
     }
-    else if (isnan(val) || isinf(val) || abs(val) == 0 || val > biggest_val)
+    if (isnan(val) || isinf(val) || abs(val) == 0 || val > biggest_val)
     {
         return val;
     }

@@ -26,7 +26,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto lgamma_impl(T x) noexcept
+constexpr auto lgamma_impl(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     T result { };
@@ -123,7 +123,7 @@ constexpr auto lgamma_impl(T x) noexcept
 } // namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto lgamma(T x) noexcept
+constexpr auto lgamma(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

@@ -142,39 +142,39 @@ constexpr auto d128_fma_impl(T x, T y, T z) noexcept -> T
 #pragma warning(pop)
 #endif
 
-constexpr auto unchecked_fma(decimal32_t x, decimal32_t y, decimal32_t z) noexcept -> decimal32_t
+constexpr auto unchecked_fma(const decimal32_t x, const decimal32_t y, const decimal32_t z) noexcept -> decimal32_t
 {
     return detail::d32_fma_impl<false>(x, y, z);
 }
 
-constexpr auto unchecked_fma(decimal_fast32_t x, decimal_fast32_t y, decimal_fast32_t z) noexcept -> decimal_fast32_t
+constexpr auto unchecked_fma(const decimal_fast32_t x, const decimal_fast32_t y, const decimal_fast32_t z) noexcept -> decimal_fast32_t
 {
     return detail::d32_fma_impl<false>(x, y, z);
 }
 
-constexpr auto unchecked_fma(decimal64_t x, decimal64_t y, decimal64_t z) noexcept -> decimal64_t
+constexpr auto unchecked_fma(const decimal64_t x, const decimal64_t y, const decimal64_t z) noexcept -> decimal64_t
 {
     return detail::d64_fma_impl<false>(x, y, z);
 }
 
-constexpr auto unchecked_fma(decimal_fast64_t x, decimal_fast64_t y, decimal_fast64_t z) noexcept -> decimal_fast64_t
+constexpr auto unchecked_fma(const decimal_fast64_t x, const decimal_fast64_t y, const decimal_fast64_t z) noexcept -> decimal_fast64_t
 {
     return detail::d64_fma_impl<false>(x, y, z);
 }
 
-constexpr auto unchecked_fma(decimal128_t x, decimal128_t y, decimal128_t z) noexcept -> decimal128_t
+constexpr auto unchecked_fma(const decimal128_t x, const decimal128_t y, const decimal128_t z) noexcept -> decimal128_t
 {
     return detail::d128_fma_impl<false>(x, y, z);
 }
 
-constexpr auto unchecked_fma(decimal_fast128_t x, decimal_fast128_t y, decimal_fast128_t z) noexcept -> decimal_fast128_t
+constexpr auto unchecked_fma(const decimal_fast128_t x, const decimal_fast128_t y, const decimal_fast128_t z) noexcept -> decimal_fast128_t
 {
     return detail::d128_fma_impl<false>(x, y, z);
 }
 
 } // Namespace detail
 
-BOOST_DECIMAL_EXPORT constexpr auto fma(decimal32_t x, decimal32_t y, decimal32_t z) noexcept -> decimal32_t
+BOOST_DECIMAL_EXPORT constexpr auto fma(const decimal32_t x, const decimal32_t y, const decimal32_t z) noexcept -> decimal32_t
 {
     return detail::d32_fma_impl<true>(x, y, z);
 }
@@ -184,22 +184,22 @@ BOOST_DECIMAL_EXPORT constexpr auto fma(decimal64_t x, decimal64_t y, decimal64_
     return detail::d64_fma_impl<true>(x, y, z);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto fma(decimal128_t x, decimal128_t y, decimal128_t z) noexcept -> decimal128_t
+BOOST_DECIMAL_EXPORT constexpr auto fma(const decimal128_t x, const decimal128_t y, const decimal128_t z) noexcept -> decimal128_t
 {
     return detail::d128_fma_impl<true>(x, y, z);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto fma(decimal_fast32_t x, decimal_fast32_t y, decimal_fast32_t z) noexcept -> decimal_fast32_t
+BOOST_DECIMAL_EXPORT constexpr auto fma(const decimal_fast32_t x, const decimal_fast32_t y, const decimal_fast32_t z) noexcept -> decimal_fast32_t
 {
     return detail::d32_fma_impl<true>(x, y, z);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto fma(decimal_fast64_t x, decimal_fast64_t y, decimal_fast64_t z) noexcept -> decimal_fast64_t
+BOOST_DECIMAL_EXPORT constexpr auto fma(const decimal_fast64_t x, const decimal_fast64_t y, const decimal_fast64_t z) noexcept -> decimal_fast64_t
 {
     return detail::d64_fma_impl<true>(x, y, z);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto fma(decimal_fast128_t x, decimal_fast128_t y, decimal_fast128_t z) noexcept -> decimal_fast128_t
+BOOST_DECIMAL_EXPORT constexpr auto fma(const decimal_fast128_t x, const decimal_fast128_t y, const decimal_fast128_t z) noexcept -> decimal_fast128_t
 {
     return detail::d128_fma_impl<true>(x, y, z);
 }

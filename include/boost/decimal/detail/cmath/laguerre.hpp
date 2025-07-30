@@ -25,7 +25,7 @@ namespace detail {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
           BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2,
           BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T3>
-constexpr auto laguerre_next(unsigned n, T1 x, T2 Ln, T3 Lnm1)
+constexpr auto laguerre_next(const unsigned n, const T1 x, const T2 Ln, const T3 Lnm1)
 {
     using promoted_type = promote_args_t<T1, T2, T3>;
     return ((2 * n + 1 - static_cast<promoted_type>(x)) * static_cast<promoted_type>(Ln) - n * static_cast<promoted_type>(Lnm1)) / (n + 1);
@@ -33,7 +33,7 @@ constexpr auto laguerre_next(unsigned n, T1 x, T2 Ln, T3 Lnm1)
 
 // Implement Laguerre polynomials via recurrence:
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto laguerre_impl(unsigned n, T x)
+constexpr auto laguerre_impl(const unsigned n, const T x)
 {
     T p0 {UINT64_C(1)};
     T p1 {UINT64_C(1) - x};
@@ -58,7 +58,7 @@ constexpr auto laguerre_impl(unsigned n, T x)
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto laguerre(unsigned n, T x)
+constexpr auto laguerre(const unsigned n, const T x)
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

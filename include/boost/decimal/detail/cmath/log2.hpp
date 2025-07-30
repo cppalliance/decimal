@@ -24,7 +24,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto log2_impl(T x) noexcept
+constexpr auto log2_impl(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     return log(x) / numbers::ln2_v<T>;
@@ -33,7 +33,7 @@ constexpr auto log2_impl(T x) noexcept
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto log2(T x) noexcept
+constexpr auto log2(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
