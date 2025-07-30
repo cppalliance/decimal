@@ -29,9 +29,9 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = std::numeric_limits<std::uint_fast32_t>::max() - 3;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = std::numeric_limits<std::uint_fast32_t>::max() - 2;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::uint_fast32_t>::max() - 1;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_inf = std::numeric_limits<std::uint32_t>::max() - 3;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_qnan = std::numeric_limits<std::uint32_t>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::uint32_t>::max() - 1;
 
 }
 
@@ -348,7 +348,7 @@ public:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> <= detail::decimal_val_v<decimal_fast32_t>), bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
-    friend constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign) noexcept -> decimal_fast32_t;
+    friend constexpr auto direct_init(significand_type significand, exponent_type exponent, bool sign) noexcept -> decimal_fast32_t;
     friend constexpr auto direct_init(const detail::decimal_fast32_t_components& x) noexcept -> decimal_fast32_t;
 
     // <cmath> or extensions that need to be friends
@@ -452,7 +452,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast32_t::decimal_fast32_t(Float val) noex
 #  pragma GCC diagnostic pop
 #endif
 
-constexpr auto direct_init(std::uint_fast32_t significand, std::uint_fast8_t exponent, bool sign = false) noexcept -> decimal_fast32_t
+constexpr auto direct_init(const decimal_fast32_t::significand_type significand, const decimal_fast32_t::exponent_type exponent, const bool sign = false) noexcept -> decimal_fast32_t
 {
     decimal_fast32_t val;
     val.significand_ = significand;
@@ -1474,7 +1474,7 @@ struct numeric_limits<boost::decimal::decimal_fast32_t>
     static constexpr int min_exponent10 = min_exponent;
     static constexpr int max_exponent = 96;
     static constexpr int max_exponent10 = max_exponent;
-    static constexpr bool traps = numeric_limits<std::uint_fast32_t>::traps;
+    static constexpr bool traps = numeric_limits<std::uint32_t>::traps;
     static constexpr bool tinyness_before = true;
 
     // Member functions
