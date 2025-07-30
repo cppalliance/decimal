@@ -57,7 +57,7 @@ using decimal_fast32_t_components = impl::decimal_components<std::uint32_t, std:
 
 using decimal64_t_components = impl::decimal_components<std::uint64_t, std::int32_t>;
 
-using decimal64_fast64_t_components = impl::decimal_components<std::uint64_t, std::int32_t>;
+using decimal_fast64_t_components = impl::decimal_components<std::uint64_t, std::int32_t>;
 
 using decimal128_t_components = impl::decimal_components<boost::int128::uint128_t, std::int32_t>;
 
