@@ -505,36 +505,36 @@ And on the same platform with GCC 13.3.0
 
 === x64 Windows Results
 
-Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.4
+Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.10
 
 ==== Addition
 
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 67,019
-| 0.974
+| 76,777
+| 0.961
 | `double`
-| 68,820
+| 79,897
 | 1.000
 | `decimal32_t`
-| 2,994,405
-| 43.511
+| 2,902,356
+| 36.326
 | `decimal64_t`
-| 4,531,755
-| 65.849
+| 3,569,820
+| 44.680
 | `decimal128_t`
-| 25,209,554
-| 366.311
+| 12,075,529
+| 151.139
 | `decimal_fast32_t`
-| 2,066,728
-| 30.031
+| 1,940,333
+| 24.285
 | `decimal_fast64_t`
-| 3,667,169
-| 53.286
+| 3,064,073
+| 38.350
 | `decimal_fast128_t`
-| 11,213,280
-| 162.936
+| 3,109,101
+| 38.914
 |===
 
 ==== Subtraction
@@ -542,29 +542,29 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 60,912
-| 0.976
+| 336,960
+| 1.042
 | `double`
-| 62,409
+| 323,282
 | 1.000
 | `decimal32_t`
-| 3,132,613
-| 50.194
+| 3,040,167
+| 9.404
 | `decimal64_t`
-| 3,864,498
-| 61.992
+| 3,617,843
+| 11.191
 | `decimal128_t`
-| 17,210,173
-| 275.764
+| 12,325,962
+| 38.128
 | `decimal_fast32_t`
-| 2,028,429
-| 32.502
+| 2,313,234
+| 7.155
 | `decimal_fast64_t`
-| 3,017,419
-| 48.349
+| 2,935,476
+| 9.080
 | `decimal_fast128_t`
-| 5,557,846
-| 89.055
+| 2,963,570
+| 9.167
 |===
 
 ==== Multiplication
@@ -572,29 +572,29 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 60,742
-| 0.969
+| 78,634
+| 1.000
 | `double`
-| 62,658
+| 78,649
 | 1.000
 | `decimal32_t`
-| 2,029,689
-| 32.393
+| 2,636,784
+| 33.526
 | `decimal64_t`
-| 8,805,524
-| 140.533
+| 3,861,139
+| 49.093
 | `decimal128_t`
-| 15,519,053
-| 247.689
+| 11,349,378
+| 144.304
 | `decimal_fast32_t`
-| 1,573,280
-| 25.109
+| 2,688,661
+| 34.186
 | `decimal_fast64_t`
-| 7,650,156
-| 122.094
+| 3,504,172
+| 44.554
 | `decimal_fast128_t`
-| 16,874,890
-| 269.317
+| 9,236,110
+| 117.434
 |===
 
 ==== Division
@@ -602,29 +602,29 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.11.
 |===
 | Type | Runtime (us) | Ratio to `double`
 | `float`
-| 75,437
+| 83,566
 | 0.936
 | `double`
-| 80,559
+| 89,317
 | 1.000
 | `decimal32_t`
-| 2,832,016
-| 45.198
+| 3,402,467
+| 38.094
 | `decimal64_t`
-| 11,640,789
-| 185.783
+| 4,663,830
+| 52.217
 | `decimal128_t`
-| 32,470,044
-| 518.211
+| 18,167,111
+| 203.400
 | `decimal_fast32_t`
-| 1,660,332
-| 26.498
+| 2,363,121
+| 26.458
 | `decimal_fast64_t`
-| 11,266,972
-| 179.817
+| 6,578,828
+| 73.657
 | `decimal_fast128_t`
-| 11,201,820
-| 178.777
+| 12,341,026
+| 138.171
 |===
 
 === M4 macOS Results
