@@ -36,16 +36,6 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_inf = std::numeric_limits<std::ui
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_qnan = std::numeric_limits<std::uint_fast64_t>::max() - 2;
 BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_snan = std::numeric_limits<std::uint_fast64_t>::max() - 1;
 
-struct decimal_fast64_t_components
-{
-    using significand_type = std::uint_fast64_t;
-    using biased_exponent_type = std::int_fast32_t;
-
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
-
 } // namespace detail
 
 BOOST_DECIMAL_EXPORT class decimal_fast64_t final
