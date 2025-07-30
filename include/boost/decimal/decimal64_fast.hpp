@@ -41,9 +41,9 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_snan = std::numeric_limits<std::u
 BOOST_DECIMAL_EXPORT class decimal_fast64_t final
 {
 public:
-    using significand_type = std::uint_fast64_t;
-    using exponent_type = std::uint_fast16_t;
-    using biased_exponent_type = std::int_fast32_t;
+    using significand_type = std::uint64_t;
+    using exponent_type = std::uint16_t;
+    using biased_exponent_type = std::int32_t;
 
 private:
     // In regular decimal64_t we have to decode the significand end exponent

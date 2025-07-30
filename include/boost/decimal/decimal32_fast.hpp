@@ -38,9 +38,9 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d32_fast_snan = std::numeric_limits<std::u
 BOOST_DECIMAL_EXPORT class decimal_fast32_t final
 {
 public:
-    using significand_type = std::uint_fast32_t;
-    using exponent_type = std::uint_fast8_t;
-    using biased_exponent_type = std::int_fast32_t;
+    using significand_type = std::uint32_t;
+    using exponent_type = std::uint8_t;
+    using biased_exponent_type = std::int32_t;
 
 private:
     // In regular decimal32_t we have to decode the 24 bits of the significand and the 8 bits of the exp
