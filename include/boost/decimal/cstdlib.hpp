@@ -35,7 +35,7 @@ namespace detail {
 
 // 3.8.2
 template <typename TargetDecimalType>
-inline auto strtod_calculation(const char* str, char** endptr, char* buffer, std::size_t str_length) noexcept -> TargetDecimalType
+inline auto strtod_calculation(const char* str, char** endptr, char* buffer, const std::size_t str_length) noexcept -> TargetDecimalType
 {
     using significand_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
                                                  std::numeric_limits<std::uint64_t>::digits),
@@ -123,7 +123,7 @@ inline auto strtod_impl(const char* str, char** endptr) noexcept -> TargetDecima
 
 // 3.9.2
 template <typename TargetDecimalType>
-inline auto wcstod_calculation(const wchar_t* str, wchar_t** endptr, char* buffer, std::size_t str_length) noexcept -> TargetDecimalType
+inline auto wcstod_calculation(const wchar_t* str, wchar_t** endptr, char* buffer, const std::size_t str_length) noexcept -> TargetDecimalType
 {
     // Convert all the characters from wchar_t to char and use regular strtod32
     for (std::size_t i {}; i < str_length; ++i)
