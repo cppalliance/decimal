@@ -8,7 +8,7 @@
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/normalize.hpp>
-#include <boost/int128.hpp>
+#include "../int128.hpp"
 #include <boost/decimal/detail/concepts.hpp>
 #include <boost/decimal/detail/config.hpp>
 
@@ -36,11 +36,11 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto frexp10_normalize(T1& sig, T2& exp) no
 
 // Returns the normalized significand and exponent to be cohort agnostic
 // Returns num in the range
-//   [1e06, 1e06 - 1] for decimal32
-//   [1e15, 1e15 - 1] for decimal64
+//   [1e06, 1e06 - 1] for decimal32_t
+//   [1e15, 1e15 - 1] for decimal64_t
 // If the conversion can not be performed returns UINT32_MAX and exp = 0
 BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type
+constexpr auto frexp10(const T num, int* expptr) noexcept -> typename T::significand_type
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(num) || isnan(num))

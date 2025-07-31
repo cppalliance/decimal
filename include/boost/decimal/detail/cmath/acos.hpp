@@ -27,7 +27,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto acos_impl(T x) noexcept
+constexpr auto acos_impl(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -46,7 +46,7 @@ constexpr auto acos_impl(T x) noexcept
     {
         result = std::numeric_limits<T>::quiet_NaN();
     }
-    else if (x < T{5, -1, true})
+    else if (x < T{-5, -1})
     {
         result = numbers::pi_v<T> - 2 * detail::asin_series(sqrt((1 - absx) / 2));
     }
@@ -69,7 +69,7 @@ constexpr auto acos_impl(T x) noexcept
 } // namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto acos(T x) noexcept
+constexpr auto acos(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -78,11 +78,11 @@ constexpr auto acos(T x) noexcept
 
     #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
 
-    using evaluation_type = detail::promote_args_t<T, decimal64>;
+    using evaluation_type = detail::promote_args_t<T, decimal64_t>;
 
     #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
 
-    using evaluation_type = detail::promote_args_t<T, decimal128>;
+    using evaluation_type = detail::promote_args_t<T, decimal128_t>;
 
     #endif
 

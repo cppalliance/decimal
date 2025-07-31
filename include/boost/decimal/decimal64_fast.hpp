@@ -2,10 +2,10 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_DECIMAL_DECIMAL64_FAST_HPP
-#define BOOST_DECIMAL_DECIMAL64_FAST_HPP
+#ifndef BOOST_DECIMAL_decimal_fast64_t_HPP
+#define BOOST_DECIMAL_decimal_fast64_t_HPP
 
-#include <boost/decimal/decimal64.hpp>
+#include <boost/decimal/decimal64_t.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/integer_search_trees.hpp>
@@ -19,6 +19,7 @@
 #include <boost/decimal/detail/ryu/ryu_generic_128.hpp>
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/cmath/next.hpp>
+#include <boost/decimal/detail/components.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -32,31 +33,21 @@ namespace decimal {
 
 namespace detail {
 
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_inf = std::numeric_limits<std::uint_fast64_t>::max() - 3;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_qnan = std::numeric_limits<std::uint_fast64_t>::max() - 2;
-BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_snan = std::numeric_limits<std::uint_fast64_t>::max() - 1;
-
-struct decimal64_fast_components
-{
-    using significand_type = std::uint_fast64_t;
-    using biased_exponent_type = std::int_fast32_t;
-
-    significand_type sig;
-    biased_exponent_type exp;
-    bool sign;
-};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_inf = std::numeric_limits<std::uint64_t>::max() - 3;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_qnan = std::numeric_limits<std::uint64_t>::max() - 2;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE auto d64_fast_snan = std::numeric_limits<std::uint64_t>::max() - 1;
 
 } // namespace detail
 
-BOOST_DECIMAL_EXPORT class decimal64_fast final
+BOOST_DECIMAL_EXPORT class decimal_fast64_t final
 {
 public:
-    using significand_type = std::uint_fast64_t;
-    using exponent_type = std::uint_fast16_t;
-    using biased_exponent_type = std::int_fast32_t;
+    using significand_type = std::uint64_t;
+    using exponent_type = std::uint16_t;
+    using biased_exponent_type = std::int32_t;
 
 private:
-    // In regular decimal64 we have to decode the significand end exponent
+    // In regular decimal64_t we have to decode the significand end exponent
     // Here we will store them directly to avoid the overhead of decoding
 
     significand_type significand_ {};
@@ -80,10 +71,10 @@ private:
 
     constexpr auto biased_exponent() const noexcept -> biased_exponent_type
     {
-        return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal64>;
+        return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal64_t>;
     }
 
-    // Equality template between any integer type and decimal32
+    // Equality template between any integer type and decimal32_t
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
@@ -93,7 +84,7 @@ private:
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal1> &&
                              detail::is_decimal_floating_point_v<Decimal2>), bool>;
 
-    // Template to compare operator< for any integer type and decimal32
+    // Template to compare operator< for any integer type and decimal32_t
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto less_impl(Decimal lhs, Integer rhs) noexcept
         -> std::enable_if_t<(detail::is_decimal_floating_point_v<Decimal> && detail::is_integral_v<Integer>), bool>;
@@ -114,7 +105,7 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
-    friend constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal64_fast& q, decimal64_fast& r) noexcept -> void;
+    friend constexpr auto d64_fast_div_impl(decimal_fast64_t lhs, decimal_fast64_t rhs, decimal_fast64_t& q, decimal_fast64_t& r) noexcept -> void;
 
     template <typename T>
     friend constexpr auto ilogb(T d) noexcept
@@ -124,7 +115,7 @@ private:
     friend constexpr auto logb(T num) noexcept
         BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T);
 
-    friend constexpr auto not_finite(decimal64_fast val) noexcept -> bool;
+    friend constexpr auto not_finite(decimal_fast64_t val) noexcept -> bool;
 
     template <typename DecimalType>
     friend constexpr auto to_dpd_d64(DecimalType val) noexcept
@@ -149,106 +140,115 @@ private:
     friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
 
 public:
-    constexpr decimal64_fast() noexcept = default;
+    constexpr decimal_fast64_t() noexcept = default;
 
     #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-    template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+    template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
     #else
-    template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool> = true>
+    template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
     #endif
-    constexpr decimal64_fast(T1 coeff, T2 exp, bool sign = false) noexcept;
+    constexpr decimal_fast64_t(T1 coeff, T2 exp, bool sign = false) noexcept;
+
+    #ifdef BOOST_DECIMAL_HAS_CONCEPTS
+    template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+    #else
+    template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool> = true>
+    #endif
+    constexpr decimal_fast64_t(T1 coeff, T2 exp) noexcept;
+
+    explicit constexpr decimal_fast64_t(bool value) noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_CONCEPTS
     template <BOOST_DECIMAL_INTEGRAL Integer>
     #else
     template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool> = true>
     #endif
-    constexpr decimal64_fast(Integer val) noexcept;
+    constexpr decimal_fast64_t(Integer val) noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_CONCEPTS
     template <BOOST_DECIMAL_REAL Float>
     #else
     template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool> = true>
     #endif
-    explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast(Float val) noexcept;
+    explicit BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast64_t(Float val) noexcept;
 
-    friend constexpr auto direct_init_d64(decimal64_fast::significand_type significand, decimal64_fast::exponent_type exponent, bool sign) noexcept -> decimal64_fast;
+    friend constexpr auto direct_init_d64(decimal_fast64_t::significand_type significand, decimal_fast64_t::exponent_type exponent, bool sign) noexcept -> decimal_fast64_t;
 
     // Classification functions
-    friend constexpr auto signbit(decimal64_fast val) noexcept -> bool;
-    friend constexpr auto isinf(decimal64_fast val) noexcept -> bool;
-    friend constexpr auto isnan(decimal64_fast val) noexcept -> bool;
-    friend constexpr auto issignaling(decimal64_fast val) noexcept -> bool;
-    friend constexpr auto isnormal(decimal64_fast val) noexcept -> bool;
-    friend constexpr auto isfinite(decimal64_fast val) noexcept -> bool;
+    friend constexpr auto signbit(decimal_fast64_t val) noexcept -> bool;
+    friend constexpr auto isinf(decimal_fast64_t val) noexcept -> bool;
+    friend constexpr auto isnan(decimal_fast64_t val) noexcept -> bool;
+    friend constexpr auto issignaling(decimal_fast64_t val) noexcept -> bool;
+    friend constexpr auto isnormal(decimal_fast64_t val) noexcept -> bool;
+    friend constexpr auto isfinite(decimal_fast64_t val) noexcept -> bool;
 
     // Comparison operator
-    friend constexpr auto operator==(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
-    friend constexpr auto operator!=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
-    friend constexpr auto operator<(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
-    friend constexpr auto operator<=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
-    friend constexpr auto operator>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
-    friend constexpr auto operator>=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool;
+    friend constexpr auto operator==(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> bool;
+    friend constexpr auto operator!=(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> bool;
+    friend constexpr auto operator<(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> bool;
+    friend constexpr auto operator<=(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> bool;
+    friend constexpr auto operator>(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> bool;
+    friend constexpr auto operator>=(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> bool;
 
     // Mixed type comparison operators
     template <typename Integer>
-    friend constexpr auto operator==(decimal64_fast lhs, Integer rhs) noexcept
+    friend constexpr auto operator==(decimal_fast64_t lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator==(Integer lhs, decimal64_fast rhs) noexcept
+    friend constexpr auto operator==(Integer lhs, decimal_fast64_t rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator!=(decimal64_fast lhs, Integer rhs) noexcept
+    friend constexpr auto operator!=(decimal_fast64_t lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator!=(Integer lhs, decimal64_fast rhs) noexcept
+    friend constexpr auto operator!=(Integer lhs, decimal_fast64_t rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator<(decimal64_fast lhs, Integer rhs) noexcept
+    friend constexpr auto operator<(decimal_fast64_t lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator<(Integer lhs, decimal64_fast rhs) noexcept
+    friend constexpr auto operator<(Integer lhs, decimal_fast64_t rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator<=(decimal64_fast lhs, Integer rhs) noexcept
+    friend constexpr auto operator<=(decimal_fast64_t lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator<=(Integer lhs, decimal64_fast rhs) noexcept
+    friend constexpr auto operator<=(Integer lhs, decimal_fast64_t rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator>(decimal64_fast lhs, Integer rhs) noexcept
+    friend constexpr auto operator>(decimal_fast64_t lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator>(Integer lhs, decimal64_fast rhs) noexcept
+    friend constexpr auto operator>(Integer lhs, decimal_fast64_t rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator>=(decimal64_fast lhs, Integer rhs) noexcept
+    friend constexpr auto operator>=(decimal_fast64_t lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator>=(Integer lhs, decimal64_fast rhs) noexcept
+    friend constexpr auto operator>=(Integer lhs, decimal_fast64_t rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     // C++20 Spaceship operator
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
-    friend constexpr auto operator<=>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> std::partial_ordering;
+    friend constexpr auto operator<=>(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> std::partial_ordering;
 
     template <typename Integer>
-    friend constexpr auto operator<=>(decimal64_fast lhs, Integer rhs) noexcept
+    friend constexpr auto operator<=>(decimal_fast64_t lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering);
 
     template <typename Integer>
-    friend constexpr auto operator<=>(Integer lhs, decimal64_fast rhs) noexcept
+    friend constexpr auto operator<=>(Integer lhs, decimal_fast64_t rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering);
     #endif
 
@@ -260,10 +260,6 @@ public:
     explicit constexpr operator unsigned long() const noexcept;
     explicit constexpr operator long long() const noexcept;
     explicit constexpr operator unsigned long long() const noexcept;
-    explicit constexpr operator std::int8_t() const noexcept;
-    explicit constexpr operator std::uint8_t() const noexcept;
-    explicit constexpr operator std::int16_t() const noexcept;
-    explicit constexpr operator std::uint16_t() const noexcept;
 
     #ifdef BOOST_DECIMAL_HAS_INT128
     explicit constexpr operator detail::builtin_int128_t() const noexcept;
@@ -288,130 +284,118 @@ public:
     #endif
 
     // Conversion to other decimal type
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> > detail::decimal_val_v<decimal64_fast>), bool> = true>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> > detail::decimal_val_v<decimal_fast64_t>), bool> = true>
     constexpr operator Decimal() const noexcept;
 
-    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> <= detail::decimal_val_v<decimal64_fast>), bool> = true>
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> <= detail::decimal_val_v<decimal_fast64_t>), bool> = true>
     explicit constexpr operator Decimal() const noexcept;
 
     // Unary Operators
-    friend constexpr auto operator+(decimal64_fast val) noexcept -> decimal64_fast;
-    friend constexpr auto operator-(decimal64_fast val) noexcept -> decimal64_fast;
+    friend constexpr auto operator+(decimal_fast64_t val) noexcept -> decimal_fast64_t;
+    friend constexpr auto operator-(decimal_fast64_t val) noexcept -> decimal_fast64_t;
 
     // Basic arithmetic operators
-    friend constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
-    friend constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
-    friend constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
-    friend constexpr auto operator/(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
-    friend constexpr auto operator%(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast;
+    friend constexpr auto operator+(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> decimal_fast64_t;
+    friend constexpr auto operator-(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> decimal_fast64_t;
+    friend constexpr auto operator*(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> decimal_fast64_t;
+    friend constexpr auto operator/(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> decimal_fast64_t;
+    friend constexpr auto operator%(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> decimal_fast64_t;
 
     // Mixed type arithmetic operators
     template <typename Integer>
-    friend constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+    friend constexpr auto operator+(decimal_fast64_t lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t);
 
     template <typename Integer>
-    friend constexpr auto operator+(Integer lhs, decimal64_fast rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+    friend constexpr auto operator+(Integer lhs, decimal_fast64_t rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t);
 
     template <typename Integer>
-    friend constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+    friend constexpr auto operator-(decimal_fast64_t lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t);
 
     template <typename Integer>
-    friend constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+    friend constexpr auto operator-(Integer lhs, decimal_fast64_t rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t);
 
     template <typename Integer>
-    friend constexpr auto operator*(decimal64_fast lhs, Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+    friend constexpr auto operator*(decimal_fast64_t lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t);
 
     template <typename Integer>
-    friend constexpr auto operator*(Integer lhs, decimal64_fast rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+    friend constexpr auto operator*(Integer lhs, decimal_fast64_t rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t);
 
     template <typename Integer>
-    friend constexpr auto operator/(decimal64_fast lhs, Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+    friend constexpr auto operator/(decimal_fast64_t lhs, Integer rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t);
 
     template <typename Integer>
-    friend constexpr auto operator/(Integer lhs, decimal64_fast rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast);
+    friend constexpr auto operator/(Integer lhs, decimal_fast64_t rhs) noexcept
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t);
 
     // Compound Operators
-    constexpr auto operator+=(decimal64_fast rhs) noexcept -> decimal64_fast&;
-    constexpr auto operator-=(decimal64_fast rhs) noexcept -> decimal64_fast&;
-    constexpr auto operator*=(decimal64_fast rhs) noexcept -> decimal64_fast&;
-    constexpr auto operator/=(decimal64_fast rhs) noexcept -> decimal64_fast&;
+    constexpr auto operator+=(decimal_fast64_t rhs) noexcept -> decimal_fast64_t&;
+    constexpr auto operator-=(decimal_fast64_t rhs) noexcept -> decimal_fast64_t&;
+    constexpr auto operator*=(decimal_fast64_t rhs) noexcept -> decimal_fast64_t&;
+    constexpr auto operator/=(decimal_fast64_t rhs) noexcept -> decimal_fast64_t&;
 
     // Mixed type compound operators
     template <typename Integer>
     constexpr auto operator+=(Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&);
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t&);
 
     template <typename Integer>
     constexpr auto operator-=(Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&);
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t&);
 
     template <typename Integer>
     constexpr auto operator*=(Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&);
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t&);
 
     template <typename Integer>
     constexpr auto operator/=(Integer rhs) noexcept
-        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&);
+        BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t&);
 
     // Increment and decrement
-    constexpr auto operator++() noexcept -> decimal64_fast&;
-    constexpr auto operator++(int) noexcept -> decimal64_fast&;
-    constexpr auto operator--() noexcept -> decimal64_fast&;
-    constexpr auto operator--(int) noexcept -> decimal64_fast&;
+    constexpr auto operator++() noexcept -> decimal_fast64_t&;
+    constexpr auto operator++(int) noexcept -> decimal_fast64_t&;
+    constexpr auto operator--() noexcept -> decimal_fast64_t&;
+    constexpr auto operator--(int) noexcept -> decimal_fast64_t&;
 
     // Cmath friend functions
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
-    friend constexpr auto copysignd64f(decimal64_fast mag, decimal64_fast sgn) noexcept -> decimal64_fast;
-    friend constexpr auto fmad64f(decimal64_fast x, decimal64_fast y, decimal64_fast z) noexcept -> decimal64_fast;
-    friend constexpr auto scalbnd64f(decimal64_fast num, int exp) noexcept -> decimal64_fast;
-    friend constexpr auto scalblnd64f(decimal64_fast num, long exp) noexcept -> decimal64_fast;
+    friend constexpr auto copysignd64f(decimal_fast64_t mag, decimal_fast64_t sgn) noexcept -> decimal_fast64_t;
+    friend constexpr auto fmad64f(decimal_fast64_t x, decimal_fast64_t y, decimal_fast64_t z) noexcept -> decimal_fast64_t;
+    friend constexpr auto scalbnd64f(decimal_fast64_t num, int exp) noexcept -> decimal_fast64_t;
+    friend constexpr auto scalblnd64f(decimal_fast64_t num, long exp) noexcept -> decimal_fast64_t;
 };
 
+BOOST_DECIMAL_EXPORT using decimal64_fast [[deprecated("Use re-named type decimal_fast64_t instead of decimal64_fast")]] = decimal_fast64_t;
+
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
-template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 #else
-template <typename T1, typename T2, std::enable_if_t<detail::is_integral_v<T1> && detail::is_integral_v<T2>, bool>>
+template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
 #endif
-constexpr decimal64_fast::decimal64_fast(T1 coeff, T2 exp, bool sign) noexcept
+constexpr decimal_fast64_t::decimal_fast64_t(T1 coeff, T2 exp, bool sign) noexcept
 {
-    // Older compilers have issues with conversions from __uint128, so we skip all that and use our uint128
-    #if defined(BOOST_DECIMAL_HAS_INT128) && (!defined(__GNUC__) || (defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 10)) && (!defined(__clang__) || (defined(__clang__) && __clang_major__ < 13))
-    using Unsigned_Integer_1 = detail::make_unsigned_t<T1>;
-    using Unsigned_Integer = std::conditional_t<std::is_same<Unsigned_Integer_1, detail::builtin_uint128_t>::value, int128::uint128_t, Unsigned_Integer_1>;
-    #else
-    using Unsigned_Integer = detail::make_unsigned_t<T1>;
-    #endif
+    using minimum_coefficient_size = std::conditional_t<(sizeof(T1) > sizeof(significand_type)), T1, significand_type>;
 
-    using Basis_Unsigned_Integer = std::conditional_t<std::numeric_limits<Unsigned_Integer>::digits10 < std::numeric_limits<significand_type>::digits10, significand_type, Unsigned_Integer>;
+    minimum_coefficient_size min_coeff {coeff};
 
-    const bool isneg {coeff < static_cast<T1>(0) || sign};
-    sign_ = isneg;
-    auto unsigned_coeff {static_cast<Basis_Unsigned_Integer>(detail::make_positive_unsigned(coeff))};
+    sign_ = sign;
 
-    // Normalize the value, so we don't have to worrya bout it with operations
-    detail::normalize<decimal64>(unsigned_coeff, exp, sign);
+    // Normalize the value, so we don't have to worry about it with operations
+    detail::normalize<decimal64_t>(min_coeff, exp, sign);
 
-    significand_ = static_cast<significand_type>(unsigned_coeff);
+    significand_ = static_cast<significand_type>(min_coeff);
 
-    // Normalize the handling of zeros
-    if (significand_ == UINT64_C(0))
-    {
-        exp = 0;
-    }
+    const auto biased_exp {significand_ == 0U ? 0 : exp + detail::bias_v<decimal64_t>};
 
-    const auto biased_exp {exp + detail::bias_v<decimal64>};
-
-    if (biased_exp > detail::max_biased_exp_v<decimal64>)
+    if (biased_exp > detail::max_biased_exp_v<decimal64_t>)
     {
         significand_ = detail::d64_fast_inf;
     }
@@ -423,19 +407,26 @@ constexpr decimal64_fast::decimal64_fast(T1 coeff, T2 exp, bool sign) noexcept
     {
         // Flush denorms to zero
         significand_ = static_cast<significand_type>(0);
-        exponent_ = static_cast<exponent_type>(0 + detail::bias_v<decimal64>);
+        exponent_ = static_cast<exponent_type>(detail::bias_v<decimal64_t>);
         sign_ = false;
     }
 }
+
+#ifdef BOOST_DECIMAL_HAS_CONCEPTS
+template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
+#else
+template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
+#endif
+constexpr decimal_fast64_t::decimal_fast64_t(const T1 coeff, const T2 exp) noexcept : decimal_fast64_t(detail::make_positive_unsigned(coeff), exp, coeff < 0) {}
+
+constexpr decimal_fast64_t::decimal_fast64_t(const bool value) noexcept : decimal_fast64_t(static_cast<significand_type>(value), 0, false) {}
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_INTEGRAL Integer>
 #else
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 #endif
-constexpr decimal64_fast::decimal64_fast(Integer val) noexcept : decimal64_fast{val, 0}
-{
-}
+constexpr decimal_fast64_t::decimal_fast64_t(const Integer val) noexcept : decimal_fast64_t{val, 0} {}
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -450,7 +441,7 @@ template <BOOST_DECIMAL_REAL Float>
 #else
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 #endif
-BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::decimal64_fast(Float val) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast64_t::decimal_fast64_t(const Float val) noexcept
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (val != val)
@@ -465,7 +456,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::decimal64_fast(Float val) noexcept
     #endif
     {
         const auto components {detail::ryu::floating_point_to_fd128(val)};
-        *this = decimal64_fast {components.mantissa, components.exponent, components.sign};
+        *this = decimal_fast64_t {components.mantissa, components.exponent, components.sign};
     }
 }
 
@@ -475,9 +466,11 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::decimal64_fast(Float val) noexcept
 #  pragma GCC diagnostic pop
 #endif
 
-constexpr auto direct_init_d64(decimal64_fast::significand_type significand, decimal64_fast::exponent_type exponent, bool sign) noexcept -> decimal64_fast
+constexpr auto direct_init_d64(const decimal_fast64_t::significand_type significand,
+                               const decimal_fast64_t::exponent_type exponent,
+                               const bool sign) noexcept -> decimal_fast64_t
 {
-    decimal64_fast val {};
+    decimal_fast64_t val {};
     val.significand_ = significand;
     val.exponent_ = exponent;
     val.sign_ = sign;
@@ -485,12 +478,12 @@ constexpr auto direct_init_d64(decimal64_fast::significand_type significand, dec
     return val;
 }
 
-constexpr auto signbit(decimal64_fast val) noexcept -> bool
+constexpr auto signbit(const decimal_fast64_t val) noexcept -> bool
 {
     return val.sign_;
 }
 
-constexpr auto isinf(decimal64_fast val) noexcept -> bool
+constexpr auto isinf(const decimal_fast64_t val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d64_fast_inf;
@@ -500,7 +493,7 @@ constexpr auto isinf(decimal64_fast val) noexcept -> bool
     #endif
 }
 
-constexpr auto isnan(decimal64_fast val) noexcept -> bool
+constexpr auto isnan(const decimal_fast64_t val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ >= detail::d64_fast_qnan;
@@ -510,7 +503,7 @@ constexpr auto isnan(decimal64_fast val) noexcept -> bool
     #endif
 }
 
-constexpr auto issignaling(decimal64_fast val) noexcept -> bool
+constexpr auto issignaling(const decimal_fast64_t val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d64_fast_snan;
@@ -520,10 +513,10 @@ constexpr auto issignaling(decimal64_fast val) noexcept -> bool
     #endif
 }
 
-constexpr auto isnormal(decimal64_fast val) noexcept -> bool
+constexpr auto isnormal(const decimal_fast64_t val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    if (val.exponent_ <= static_cast<decimal64_fast::exponent_type>(detail::precision_v<decimal64> - 1))
+    if (val.exponent_ <= static_cast<decimal_fast64_t::exponent_type>(detail::precision_v<decimal64_t> - 1))
     {
         return false;
     }
@@ -534,68 +527,68 @@ constexpr auto isnormal(decimal64_fast val) noexcept -> bool
     #endif
 }
 
-constexpr auto isfinite(decimal64_fast val) noexcept -> bool
+constexpr auto isfinite(const decimal_fast64_t val) noexcept -> bool
 {
     return val.significand_ < detail::d64_fast_inf;
 }
 
-BOOST_DECIMAL_FORCE_INLINE constexpr auto not_finite(decimal64_fast val) noexcept -> bool
+BOOST_DECIMAL_FORCE_INLINE constexpr auto not_finite(const decimal_fast64_t val) noexcept -> bool
 {
     return val.significand_ >= detail::d64_fast_inf;
 }
 
-constexpr auto operator==(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+constexpr auto operator==(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> bool
 {
     return fast_equality_impl(lhs, rhs);
 }
 
 template <typename Integer>
-constexpr auto operator==(decimal64_fast lhs, Integer rhs) noexcept
+constexpr auto operator==(const decimal_fast64_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return mixed_equality_impl(lhs, rhs);
 }
 
 template <typename Integer>
-constexpr auto operator==(Integer lhs, decimal64_fast rhs) noexcept
+constexpr auto operator==(const Integer lhs, const decimal_fast64_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return mixed_equality_impl(rhs, lhs);
 }
 
-constexpr auto operator!=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+constexpr auto operator!=(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> bool
 {
     return fast_inequality_impl(lhs, rhs);
 }
 
 template <typename Integer>
-constexpr auto operator!=(decimal64_fast lhs, Integer rhs) noexcept
+constexpr auto operator!=(const decimal_fast64_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return !(lhs == rhs);
 }
 
 template <typename Integer>
-constexpr auto operator!=(Integer lhs, decimal64_fast rhs) noexcept
+constexpr auto operator!=(const Integer lhs, const decimal_fast64_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return !(lhs == rhs);
 }
 
-constexpr auto operator<(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+constexpr auto operator<(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> bool
 {
     return fast_less_impl(lhs, rhs);
 }
 
 template <typename Integer>
-constexpr auto operator<(decimal64_fast lhs, Integer rhs) noexcept
+constexpr auto operator<(const decimal_fast64_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return less_impl(lhs, rhs);
 }
 
 template <typename Integer>
-constexpr auto operator<(Integer lhs, decimal64_fast rhs) noexcept
+constexpr auto operator<(const Integer lhs, const decimal_fast64_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -608,7 +601,7 @@ constexpr auto operator<(Integer lhs, decimal64_fast rhs) noexcept
     return !less_impl(rhs, lhs) && lhs != rhs;
 }
 
-constexpr auto operator<=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+constexpr auto operator<=(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
@@ -621,7 +614,7 @@ constexpr auto operator<=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bo
 }
 
 template <typename Integer>
-constexpr auto operator<=(decimal64_fast lhs, Integer rhs) noexcept
+constexpr auto operator<=(const decimal_fast64_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -635,7 +628,7 @@ constexpr auto operator<=(decimal64_fast lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator<=(Integer lhs, decimal64_fast rhs) noexcept
+constexpr auto operator<=(const Integer lhs, const decimal_fast64_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -648,26 +641,26 @@ constexpr auto operator<=(Integer lhs, decimal64_fast rhs) noexcept
     return !(rhs < lhs);
 }
 
-constexpr auto operator>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+constexpr auto operator>(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> bool
 {
     return rhs < lhs;
 }
 
 template <typename Integer>
-constexpr auto operator>(decimal64_fast lhs, Integer rhs) noexcept
+constexpr auto operator>(const decimal_fast64_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return rhs < lhs;
 }
 
 template <typename Integer>
-constexpr auto operator>(Integer lhs, decimal64_fast rhs) noexcept
+constexpr auto operator>(const Integer lhs, const decimal_fast64_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return rhs < lhs;
 }
 
-constexpr auto operator>=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bool
+constexpr auto operator>=(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
@@ -680,7 +673,7 @@ constexpr auto operator>=(decimal64_fast lhs, decimal64_fast rhs) noexcept -> bo
 }
 
 template <typename Integer>
-constexpr auto operator>=(decimal64_fast lhs, Integer rhs) noexcept
+constexpr auto operator>=(const decimal_fast64_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -694,7 +687,7 @@ constexpr auto operator>=(decimal64_fast lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator>=(Integer lhs, decimal64_fast rhs) noexcept
+constexpr auto operator>=(const Integer lhs, const decimal_fast64_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -709,7 +702,7 @@ constexpr auto operator>=(Integer lhs, decimal64_fast rhs) noexcept
 
 #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 
-constexpr auto operator<=>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> std::partial_ordering
+constexpr auto operator<=>(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> std::partial_ordering
 {
     if (lhs < rhs)
     {
@@ -728,7 +721,7 @@ constexpr auto operator<=>(decimal64_fast lhs, decimal64_fast rhs) noexcept -> s
 }
 
 template <typename Integer>
-constexpr auto operator<=>(decimal64_fast lhs, Integer rhs) noexcept
+constexpr auto operator<=>(const decimal_fast64_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
 {
     if (lhs < rhs)
@@ -748,7 +741,7 @@ constexpr auto operator<=>(decimal64_fast lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator<=>(Integer lhs, decimal64_fast rhs) noexcept
+constexpr auto operator<=>(const Integer lhs, const decimal_fast64_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
 {
     if (lhs < rhs)
@@ -769,140 +762,120 @@ constexpr auto operator<=>(Integer lhs, decimal64_fast rhs) noexcept
 
 #endif // BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 
-constexpr auto operator+(decimal64_fast val) noexcept -> decimal64_fast
+constexpr auto operator+(const decimal_fast64_t val) noexcept -> decimal_fast64_t
 {
     return val;
 }
 
-constexpr auto operator-(decimal64_fast val) noexcept -> decimal64_fast
+constexpr auto operator-(decimal_fast64_t val) noexcept -> decimal_fast64_t
 {
     val.sign_ = !val.sign_;
     return val;
 }
 
-constexpr decimal64_fast::operator bool() const noexcept
+constexpr decimal_fast64_t::operator bool() const noexcept
 {
-    constexpr decimal64_fast zero {0, 0};
+    constexpr decimal_fast64_t zero {0, 0};
     return *this != zero;
 }
 
-constexpr decimal64_fast::operator int() const noexcept
+constexpr decimal_fast64_t::operator int() const noexcept
 {
-    return to_integral<decimal64_fast, int>(*this);
+    return to_integral<decimal_fast64_t, int>(*this);
 }
 
-constexpr decimal64_fast::operator unsigned() const noexcept
+constexpr decimal_fast64_t::operator unsigned() const noexcept
 {
-    return to_integral<decimal64_fast, unsigned>(*this);
+    return to_integral<decimal_fast64_t, unsigned>(*this);
 }
 
-constexpr decimal64_fast::operator long() const noexcept
+constexpr decimal_fast64_t::operator long() const noexcept
 {
-    return to_integral<decimal64_fast, long>(*this);
+    return to_integral<decimal_fast64_t, long>(*this);
 }
 
-constexpr decimal64_fast::operator unsigned long() const noexcept
+constexpr decimal_fast64_t::operator unsigned long() const noexcept
 {
-    return to_integral<decimal64_fast, unsigned long>(*this);
+    return to_integral<decimal_fast64_t, unsigned long>(*this);
 }
 
-constexpr decimal64_fast::operator long long() const noexcept
+constexpr decimal_fast64_t::operator long long() const noexcept
 {
-    return to_integral<decimal64_fast, long long>(*this);
+    return to_integral<decimal_fast64_t, long long>(*this);
 }
 
-constexpr decimal64_fast::operator unsigned long long() const noexcept
+constexpr decimal_fast64_t::operator unsigned long long() const noexcept
 {
-    return to_integral<decimal64_fast, unsigned long long>(*this);
-}
-
-constexpr decimal64_fast::operator std::int8_t() const noexcept
-{
-    return to_integral<decimal64_fast, std::int8_t>(*this);
-}
-
-constexpr decimal64_fast::operator std::uint8_t() const noexcept
-{
-    return to_integral<decimal64_fast, std::uint8_t>(*this);
-}
-
-constexpr decimal64_fast::operator std::int16_t() const noexcept
-{
-    return to_integral<decimal64_fast, std::int16_t>(*this);
-}
-
-constexpr decimal64_fast::operator std::uint16_t() const noexcept
-{
-    return to_integral<decimal64_fast, std::uint16_t>(*this);
+    return to_integral<decimal_fast64_t, unsigned long long>(*this);
 }
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-constexpr decimal64_fast::operator detail::builtin_int128_t() const noexcept
+constexpr decimal_fast64_t::operator detail::builtin_int128_t() const noexcept
 {
-    return to_integral<decimal64_fast, detail::builtin_int128_t>(*this);
+    return to_integral<decimal_fast64_t, detail::builtin_int128_t>(*this);
 }
 
-constexpr decimal64_fast::operator detail::builtin_uint128_t() const noexcept
+constexpr decimal_fast64_t::operator detail::builtin_uint128_t() const noexcept
 {
-    return to_integral<decimal64_fast, detail::builtin_uint128_t>(*this);
+    return to_integral<decimal_fast64_t, detail::builtin_uint128_t>(*this);
 }
 
 #endif // BOOST_DECIMAL_HAS_INT128
 
-BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::operator float() const noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast64_t::operator float() const noexcept
 {
-    return to_float<decimal64_fast, float>(*this);
+    return to_float<decimal_fast64_t, float>(*this);
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::operator double() const noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast64_t::operator double() const noexcept
 {
-    return to_float<decimal64_fast, double>(*this);
+    return to_float<decimal_fast64_t, double>(*this);
 }
 
-BOOST_DECIMAL_CXX20_CONSTEXPR decimal64_fast::operator long double() const noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast64_t::operator long double() const noexcept
 {
-    return to_float<decimal64_fast, long double>(*this);
+    return to_float<decimal_fast64_t, long double>(*this);
 }
 
 #ifdef BOOST_DECIMAL_HAS_FLOAT16
-constexpr decimal64_fast::operator std::float16_t() const noexcept
+constexpr decimal_fast64_t::operator std::float16_t() const noexcept
 {
-    return static_cast<std::float16_t>(to_float<decimal64_fast, float>(*this));
+    return static_cast<std::float16_t>(to_float<decimal_fast64_t, float>(*this));
 }
 #endif
 #ifdef BOOST_DECIMAL_HAS_FLOAT32
-constexpr decimal64_fast::operator std::float32_t() const noexcept
+constexpr decimal_fast64_t::operator std::float32_t() const noexcept
 {
-    return static_cast<std::float32_t>(to_float<decimal64_fast, float>(*this));
+    return static_cast<std::float32_t>(to_float<decimal_fast64_t, float>(*this));
 }
 #endif
 #ifdef BOOST_DECIMAL_HAS_FLOAT64
-constexpr decimal64_fast::operator std::float64_t() const noexcept
+constexpr decimal_fast64_t::operator std::float64_t() const noexcept
 {
-    return static_cast<std::float64_t>(to_float<decimal64_fast, double>(*this));
+    return static_cast<std::float64_t>(to_float<decimal_fast64_t, double>(*this));
 }
 #endif
 #ifdef BOOST_DECIMAL_HAS_BRAINFLOAT16
-constexpr decimal64_fast::operator std::bfloat16_t() const noexcept
+constexpr decimal_fast64_t::operator std::bfloat16_t() const noexcept
 {
-    return static_cast<std::bfloat16_t>(to_float<decimal64_fast, float>(*this));
+    return static_cast<std::bfloat16_t>(to_float<decimal_fast64_t, float>(*this));
 }
 #endif
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> > detail::decimal_val_v<decimal64_fast>), bool>>
-constexpr decimal64_fast::operator Decimal() const noexcept
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> > detail::decimal_val_v<decimal_fast64_t>), bool>>
+constexpr decimal_fast64_t::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);
 }
 
-template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> <= detail::decimal_val_v<decimal64_fast>), bool>>
-constexpr decimal64_fast::operator Decimal() const noexcept
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> <= detail::decimal_val_v<decimal_fast64_t>), bool>>
+constexpr decimal_fast64_t::operator Decimal() const noexcept
 {
     return to_decimal<Decimal>(*this);
 }
 
-constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
+constexpr auto operator+(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> decimal_fast64_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs) || not_finite(rhs))
@@ -911,18 +884,18 @@ constexpr auto operator+(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::d64_add_impl<decimal64_fast>(
+    return detail::d64_add_impl<decimal_fast64_t>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), rhs.sign_,
             (abs(lhs) > abs(rhs)));
 }
 
 template <typename Integer>
-constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+constexpr auto operator+(const decimal_fast64_t lhs, const Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t)
 {
-    using promoted_significand_type = detail::promote_significand_t<decimal64_fast, Integer>;
-    using exp_type = decimal64_fast::biased_exponent_type;
+    using promoted_significand_type = detail::promote_significand_t<decimal_fast64_t, Integer>;
+    using exp_type = decimal_fast64_t::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs))
@@ -935,22 +908,22 @@ constexpr auto operator+(decimal64_fast lhs, Integer rhs) noexcept
     const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
 
     exp_type exp_rhs {0};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
-    const auto final_sig_rhs {static_cast<decimal64_fast::significand_type>(sig_rhs)};
+    detail::normalize<decimal64_t>(sig_rhs, exp_rhs);
+    const auto final_sig_rhs {static_cast<decimal_fast64_t::significand_type>(sig_rhs)};
 
-    return detail::d64_add_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+    return detail::d64_add_impl<decimal_fast64_t>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
                                                 final_sig_rhs, exp_rhs, (rhs < 0),
                                                 abs_lhs_bigger);
 }
 
 template <typename Integer>
-constexpr auto operator+(Integer lhs, decimal64_fast rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+constexpr auto operator+(const Integer lhs, const decimal_fast64_t rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t)
 {
     return rhs + lhs;
 }
 
-constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
+constexpr auto operator-(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> decimal_fast64_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs) || not_finite(rhs))
@@ -959,7 +932,7 @@ constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::d64_add_impl<decimal64_fast>(
+    return detail::d64_add_impl<decimal_fast64_t>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs.significand_, rhs.biased_exponent(), !rhs.sign_,
             abs(lhs) > abs(rhs)
@@ -967,11 +940,11 @@ constexpr auto operator-(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
 }
 
 template <typename Integer>
-constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+constexpr auto operator-(const decimal_fast64_t lhs, const Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t)
 {
-    using promoted_significand_type = detail::promote_significand_t<decimal64_fast, Integer>;
-    using exp_type = decimal64_fast::biased_exponent_type;
+    using promoted_significand_type = detail::promote_significand_t<decimal_fast64_t, Integer>;
+    using exp_type = decimal_fast64_t::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs))
@@ -984,20 +957,20 @@ constexpr auto operator-(decimal64_fast lhs, Integer rhs) noexcept
     const bool abs_lhs_bigger {abs(lhs) > detail::make_positive_unsigned(rhs)};
 
     exp_type exp_rhs {0};
-    detail::normalize<decimal64>(sig_rhs, exp_rhs);
-    const auto final_sig_rhs {static_cast<decimal64_fast::significand_type>(sig_rhs)};
+    detail::normalize<decimal64_t>(sig_rhs, exp_rhs);
+    const auto final_sig_rhs {static_cast<decimal_fast64_t::significand_type>(sig_rhs)};
 
-    return detail::d64_add_impl<decimal64_fast>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
+    return detail::d64_add_impl<decimal_fast64_t>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
                                                 final_sig_rhs, exp_rhs, !(rhs < 0),
                                                 abs_lhs_bigger);
 }
 
 template <typename Integer>
-constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+constexpr auto operator-(const Integer lhs, const decimal_fast64_t rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t)
 {
-    using promoted_significand_type = detail::promote_significand_t<decimal64_fast, Integer>;
-    using exp_type = decimal64_fast::biased_exponent_type;
+    using promoted_significand_type = detail::promote_significand_t<decimal_fast64_t, Integer>;
+    using exp_type = decimal_fast64_t::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(rhs))
@@ -1010,15 +983,15 @@ constexpr auto operator-(Integer lhs, decimal64_fast rhs) noexcept
     const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
 
     exp_type exp_lhs {0};
-    detail::normalize<decimal64>(sig_lhs, exp_lhs);
-    const auto final_sig_lhs {static_cast<decimal64_fast::significand_type>(sig_lhs)};
+    detail::normalize<decimal64_t>(sig_lhs, exp_lhs);
+    const auto final_sig_lhs {static_cast<decimal_fast64_t::significand_type>(sig_lhs)};
 
-    return detail::d64_add_impl<decimal64_fast>(final_sig_lhs, exp_lhs, (lhs < 0),
+    return detail::d64_add_impl<decimal_fast64_t>(final_sig_lhs, exp_lhs, (lhs < 0),
                                                 rhs.significand_, rhs.biased_exponent(), !rhs.sign_,
                                                 abs_lhs_bigger);
 }
 
-constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
+constexpr auto operator*(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> decimal_fast64_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs) || not_finite(rhs))
@@ -1027,15 +1000,15 @@ constexpr auto operator*(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
     }
     #endif
 
-    return detail::d64_mul_impl<decimal64_fast>(lhs, rhs);
+    return detail::d64_mul_impl<decimal_fast64_t>(lhs, rhs);
 }
 
 template <typename Integer>
-constexpr auto operator*(decimal64_fast lhs, Integer rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+constexpr auto operator*(const decimal_fast64_t lhs, const Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t)
 {
-    using promoted_significand_type = detail::promote_significand_t<decimal64, Integer>;
-    using exp_type = decimal64_fast::biased_exponent_type;
+    using promoted_significand_type = detail::promote_significand_t<decimal64_t, Integer>;
+    using exp_type = decimal_fast64_t::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs))
@@ -1046,31 +1019,31 @@ constexpr auto operator*(decimal64_fast lhs, Integer rhs) noexcept
 
     auto rhs_sig {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
     exp_type rhs_exp {0};
-    detail::normalize<decimal64>(rhs_sig, rhs_exp);
-    auto final_rhs_sig {static_cast<decimal64_fast::significand_type>(rhs_sig)};
+    detail::normalize<decimal64_t>(rhs_sig, rhs_exp);
+    auto final_rhs_sig {static_cast<decimal_fast64_t::significand_type>(rhs_sig)};
 
-    return detail::d64_mul_impl<decimal64_fast>(
+    return detail::d64_mul_impl<decimal_fast64_t>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             final_rhs_sig, rhs_exp, (rhs < 0)
             );
 }
 
 template <typename Integer>
-constexpr auto operator*(Integer lhs, decimal64_fast rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+constexpr auto operator*(const Integer lhs, const decimal_fast64_t rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t)
 {
     return rhs * lhs;
 }
 
-constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal64_fast& q, decimal64_fast& r) noexcept -> void
+constexpr auto d64_fast_div_impl(const decimal_fast64_t lhs, const decimal_fast64_t rhs, decimal_fast64_t& q, decimal_fast64_t& r) noexcept -> void
 {
     const bool sign {lhs.isneg() != rhs.isneg()};
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
-    constexpr decimal64_fast zero {0, 0};
-    constexpr decimal64_fast nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
-    constexpr decimal64_fast inf {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_inf, 0, false)};
+    constexpr decimal_fast64_t zero {0, 0};
+    constexpr decimal_fast64_t nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
+    constexpr decimal_fast64_t inf {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_inf, 0, false)};
 
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
@@ -1124,28 +1097,28 @@ constexpr auto d64_fast_div_impl(decimal64_fast lhs, decimal64_fast rhs, decimal
 
     // If rhs is greater than we need to offset the significands to get the correct values
     // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64>))};
+    constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64_t>))};
     const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.significand_) * tens_needed};
 
     const auto res_sig {big_sig_lhs / static_cast<unsigned_int128_type>(rhs.significand_)};
-    const auto res_exp {(lhs.biased_exponent() - detail::precision_v<decimal64>) - rhs.biased_exponent()};
+    const auto res_exp {(lhs.biased_exponent() - detail::precision_v<decimal64_t>) - rhs.biased_exponent()};
 
-    q = decimal64_fast{res_sig, res_exp, sign};
+    q = decimal_fast64_t{res_sig, res_exp, sign};
 }
 
-constexpr auto d64_fast_mod_impl(decimal64_fast lhs, decimal64_fast rhs, const decimal64_fast& q, decimal64_fast& r) noexcept -> void
+constexpr auto d64_fast_mod_impl(const decimal_fast64_t lhs, const decimal_fast64_t rhs, const decimal_fast64_t& q, decimal_fast64_t& r) noexcept -> void
 {
-    constexpr decimal64_fast zero {0, 0};
+    constexpr decimal_fast64_t zero {0, 0};
 
     // https://en.cppreference.com/w/cpp/numeric/math/fmod
     auto q_trunc {q > zero ? floor(q) : ceil(q)};
-    r = lhs - (decimal64_fast(q_trunc) * rhs);
+    r = lhs - (decimal_fast64_t(q_trunc) * rhs);
 }
 
-constexpr auto operator/(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
+constexpr auto operator/(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> decimal_fast64_t
 {
-    decimal64_fast q {};
-    decimal64_fast r {};
+    decimal_fast64_t q {};
+    decimal_fast64_t r {};
 
     d64_fast_div_impl(lhs, rhs, q, r);
 
@@ -1153,17 +1126,17 @@ constexpr auto operator/(decimal64_fast lhs, decimal64_fast rhs) noexcept -> dec
 }
 
 template <typename Integer>
-constexpr auto operator/(decimal64_fast lhs, Integer rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+constexpr auto operator/(const decimal_fast64_t lhs, const Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t)
 {
-    using promoted_significand_type = detail::promote_significand_t<decimal64_fast, Integer>;
-    using exp_type = detail::decimal64_fast_components::biased_exponent_type;
+    using promoted_significand_type = detail::promote_significand_t<decimal_fast64_t, Integer>;
+    using exp_type = detail::decimal_fast64_t_components::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
-    constexpr decimal64_fast zero {0, 0};
-    constexpr decimal64_fast nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
-    constexpr decimal64_fast inf {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_inf, 0, false)};
+    constexpr decimal_fast64_t zero {0, 0};
+    constexpr decimal_fast64_t nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
+    constexpr decimal_fast64_t inf {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_inf, 0, false)};
 
     const bool sign {lhs.isneg() != (rhs < 0)};
 
@@ -1189,29 +1162,29 @@ constexpr auto operator/(decimal64_fast lhs, Integer rhs) noexcept
 
     auto lhs_sig {lhs.full_significand()};
     auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal64>(lhs_sig, lhs_exp);
+    detail::normalize<decimal64_t>(lhs_sig, lhs_exp);
 
-    detail::decimal64_fast_components lhs_components {lhs_sig, lhs_exp, lhs.isneg()};
+    detail::decimal_fast64_t_components lhs_components {lhs_sig, lhs_exp, lhs.isneg()};
 
     auto rhs_sig {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
     exp_type rhs_exp {};
-    detail::decimal64_fast_components rhs_components {detail::shrink_significand<decimal64_fast::significand_type>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
+    detail::decimal_fast64_t_components rhs_components {detail::shrink_significand<decimal_fast64_t::significand_type>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
 
-    return detail::d64_generic_div_impl<decimal64_fast>(lhs_components, rhs_components);
+    return detail::d64_generic_div_impl<decimal_fast64_t>(lhs_components, rhs_components);
 }
 
 template <typename Integer>
-constexpr auto operator/(Integer lhs, decimal64_fast rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast)
+constexpr auto operator/(const Integer lhs, const decimal_fast64_t rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t)
 {
-    using promoted_significand_type = detail::promote_significand_t<decimal64_fast, Integer>;
-    using exp_type = detail::decimal64_fast_components::biased_exponent_type;
+    using promoted_significand_type = detail::promote_significand_t<decimal_fast64_t, Integer>;
+    using exp_type = detail::decimal_fast64_t_components::biased_exponent_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
-    constexpr decimal64_fast zero {0, 0};
-    constexpr decimal64_fast nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
-    constexpr decimal64_fast inf {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_inf, 0, false)};
+    constexpr decimal_fast64_t zero {0, 0};
+    constexpr decimal_fast64_t nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
+    constexpr decimal_fast64_t inf {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_inf, 0, false)};
 
     const bool sign {(lhs < 0) != rhs.isneg()};
 
@@ -1235,110 +1208,110 @@ constexpr auto operator/(Integer lhs, decimal64_fast rhs) noexcept
 
     auto rhs_sig {rhs.full_significand()};
     auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize<decimal64>(rhs_sig, rhs_exp);
-    detail::decimal64_fast_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
+    detail::normalize<decimal64_t>(rhs_sig, rhs_exp);
+    detail::decimal_fast64_t_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
 
     auto lhs_sig {static_cast<promoted_significand_type>(detail::make_positive_unsigned(lhs))};
     exp_type lhs_exp {};
-    detail::decimal64_fast_components lhs_components {detail::shrink_significand<decimal64_fast::significand_type>(lhs_sig, lhs_exp), lhs_exp, lhs < 0};
+    detail::decimal_fast64_t_components lhs_components {detail::shrink_significand<decimal_fast64_t::significand_type>(lhs_sig, lhs_exp), lhs_exp, lhs < 0};
 
-    return detail::d64_generic_div_impl<decimal64_fast>(lhs_components, rhs_components);
+    return detail::d64_generic_div_impl<decimal_fast64_t>(lhs_components, rhs_components);
 }
 
-constexpr auto operator%(decimal64_fast lhs, decimal64_fast rhs) noexcept -> decimal64_fast
+constexpr auto operator%(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> decimal_fast64_t
 {
-    decimal64_fast q {};
-    decimal64_fast r {};
+    decimal_fast64_t q {};
+    decimal_fast64_t r {};
     d64_fast_div_impl(lhs, rhs, q, r);
     d64_fast_mod_impl(lhs, rhs, q, r);
 
     return r;
 }
 
-constexpr auto decimal64_fast::operator+=(decimal64_fast rhs) noexcept -> decimal64_fast &
+constexpr auto decimal_fast64_t::operator+=(const decimal_fast64_t rhs) noexcept -> decimal_fast64_t &
 {
     *this = *this + rhs;
     return *this;
 }
 
-constexpr auto decimal64_fast::operator-=(decimal64_fast rhs) noexcept -> decimal64_fast &
+constexpr auto decimal_fast64_t::operator-=(const decimal_fast64_t rhs) noexcept -> decimal_fast64_t &
 {
     *this = *this - rhs;
     return *this;
 }
 
-constexpr auto decimal64_fast::operator*=(decimal64_fast rhs) noexcept -> decimal64_fast &
+constexpr auto decimal_fast64_t::operator*=(const decimal_fast64_t rhs) noexcept -> decimal_fast64_t &
 {
     *this = *this * rhs;
     return *this;
 }
 
-constexpr auto decimal64_fast::operator/=(decimal64_fast rhs) noexcept -> decimal64_fast &
+constexpr auto decimal_fast64_t::operator/=(const decimal_fast64_t rhs) noexcept -> decimal_fast64_t &
 {
     *this = *this / rhs;
     return *this;
 }
 
 template <typename Integer>
-constexpr auto decimal64_fast::operator+=(Integer rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&)
+constexpr auto decimal_fast64_t::operator+=(const Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t&)
 {
     *this = *this + rhs;
     return *this;
 }
 
 template <typename Integer>
-constexpr auto decimal64_fast::operator-=(Integer rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&)
+constexpr auto decimal_fast64_t::operator-=(const Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t&)
 {
     *this = *this - rhs;
     return *this;
 }
 
 template <typename Integer>
-constexpr auto decimal64_fast::operator*=(Integer rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&)
+constexpr auto decimal_fast64_t::operator*=(const Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t&)
 {
     *this = *this * rhs;
     return *this;
 }
 
 template <typename Integer>
-constexpr auto decimal64_fast::operator/=(Integer rhs) noexcept
-    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal64_fast&)
+constexpr auto decimal_fast64_t::operator/=(const Integer rhs) noexcept
+    BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast64_t&)
 {
     *this = *this / rhs;
     return *this;
 }
 
-constexpr auto decimal64_fast::operator++() noexcept -> decimal64_fast&
+constexpr auto decimal_fast64_t::operator++() noexcept -> decimal_fast64_t&
 {
-    constexpr decimal64_fast one {1, 0};
+    constexpr decimal_fast64_t one {1, 0};
     *this = *this + one;
     return *this;
 }
 
-constexpr auto decimal64_fast::operator++(int) noexcept -> decimal64_fast&
+constexpr auto decimal_fast64_t::operator++(int) noexcept -> decimal_fast64_t&
 {
     return ++(*this);
 }
 
-constexpr auto decimal64_fast::operator--() noexcept -> decimal64_fast&
+constexpr auto decimal_fast64_t::operator--() noexcept -> decimal_fast64_t&
 {
-    constexpr decimal64_fast one {1, 0};
+    constexpr decimal_fast64_t one {1, 0};
     *this = *this - one;
     return *this;
 }
 
-constexpr auto decimal64_fast::operator--(int) noexcept -> decimal64_fast&
+constexpr auto decimal_fast64_t::operator--(int) noexcept -> decimal_fast64_t&
 {
     return --(*this);
 }
 
-constexpr auto scalblnd64f(decimal64_fast num, long exp) noexcept -> decimal64_fast
+constexpr auto scalblnd64f(decimal_fast64_t num, const long exp) noexcept -> decimal_fast64_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
-    constexpr decimal64_fast zero {0, 0};
+    constexpr decimal_fast64_t zero {0, 0};
 
     if (num == zero || exp == 0 || not_finite(num))
     {
@@ -1346,17 +1319,17 @@ constexpr auto scalblnd64f(decimal64_fast num, long exp) noexcept -> decimal64_f
     }
     #endif
 
-    num = decimal64_fast(num.significand_, num.biased_exponent() + exp, num.sign_);
+    num = decimal_fast64_t(num.significand_, num.biased_exponent() + exp, num.sign_);
 
     return num;
 }
 
-constexpr auto scalbnd64f(decimal64_fast num, int expval) noexcept -> decimal64_fast
+constexpr auto scalbnd64f(const decimal_fast64_t num, const int expval) noexcept -> decimal_fast64_t
 {
     return scalblnd64f(num, static_cast<long>(expval));
 }
 
-constexpr auto copysignd64f(decimal64_fast mag, decimal64_fast sgn) noexcept -> decimal64_fast
+constexpr auto copysignd64f(decimal_fast64_t mag, const decimal_fast64_t sgn) noexcept -> decimal_fast64_t
 {
     mag.sign_ = sgn.sign_;
     return mag;
@@ -1369,9 +1342,9 @@ namespace std {
 
 BOOST_DECIMAL_EXPORT template <>
 #ifdef _MSC_VER
-class numeric_limits<boost::decimal::decimal64_fast>
+class numeric_limits<boost::decimal::decimal_fast64_t>
 #else
-struct numeric_limits<boost::decimal::decimal64_fast>
+struct numeric_limits<boost::decimal::decimal_fast64_t>
 #endif
 {
 #ifdef _MSC_VER
@@ -1404,24 +1377,24 @@ struct numeric_limits<boost::decimal::decimal64_fast>
     static constexpr int  min_exponent10 = min_exponent;
     static constexpr int  max_exponent = 384;
     static constexpr int  max_exponent10 = max_exponent;
-    static constexpr bool traps = numeric_limits<std::uint_fast64_t>::traps;
+    static constexpr bool traps = numeric_limits<std::uint64_t>::traps;
     static constexpr bool tinyness_before = true;
 
     // Member functions
-    static constexpr auto (min)        () -> boost::decimal::decimal64_fast { return {UINT32_C(1), min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal64_fast { return {UINT64_C(9'999'999'999'999'999), max_exponent - digits + 1}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal64_fast { return {UINT64_C(9'999'999'999'999'999), max_exponent - digits + 1, true}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal64_fast { return {UINT32_C(1), -digits + 1}; }
-    static constexpr auto round_error  () -> boost::decimal::decimal64_fast { return epsilon(); }
-    static constexpr auto infinity     () -> boost::decimal::decimal64_fast { return boost::decimal::direct_init_d64(
+    static constexpr auto (min)        () -> boost::decimal::decimal_fast64_t { return {UINT32_C(1), min_exponent}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal_fast64_t { return {UINT64_C(9'999'999'999'999'999), max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal_fast64_t { return {UINT64_C(9'999'999'999'999'999), max_exponent - digits + 1, true}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal_fast64_t { return {UINT32_C(1), -digits + 1}; }
+    static constexpr auto round_error  () -> boost::decimal::decimal_fast64_t { return epsilon(); }
+    static constexpr auto infinity     () -> boost::decimal::decimal_fast64_t { return boost::decimal::direct_init_d64(
                 boost::decimal::detail::d64_fast_inf, 0, false); }
-    static constexpr auto quiet_NaN    () -> boost::decimal::decimal64_fast { return boost::decimal::direct_init_d64(
+    static constexpr auto quiet_NaN    () -> boost::decimal::decimal_fast64_t { return boost::decimal::direct_init_d64(
                 boost::decimal::detail::d64_fast_qnan, 0, false); }
-    static constexpr auto signaling_NaN() -> boost::decimal::decimal64_fast { return boost::decimal::direct_init_d64(
+    static constexpr auto signaling_NaN() -> boost::decimal::decimal_fast64_t { return boost::decimal::direct_init_d64(
                 boost::decimal::detail::d64_fast_snan, 0, false); }
-    static constexpr auto denorm_min   () -> boost::decimal::decimal64_fast { return min(); }
+    static constexpr auto denorm_min   () -> boost::decimal::decimal_fast64_t { return min(); }
 };
 
 } // namespace std
 
-#endif //BOOST_DECIMAL_DECIMAL64_FAST_HPP
+#endif //BOOST_DECIMAL_decimal_fast64_t_HPP

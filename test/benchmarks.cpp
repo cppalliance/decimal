@@ -3,7 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#define BOOST_INT128_ALLOW_SIGN_CONVERSION
+#define BOOST_DECIMAL_DETAIL_INT128_ALLOW_SIGN_CONVERSION
+#define BOOST_DECIMAL_DETAIL_INT128_ALLOW_SIGN_COMPARE
 
 #include <boost/decimal.hpp>
 #include <chrono>
@@ -42,7 +43,7 @@
 
 #ifdef BOOST_DECIMAL_RUN_BENCHMARKS
 
-#if __cplusplus >= 201703L
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
 #if __has_include(<charconv>)
 #  include <charconv>
 #    if defined(__cpp_lib_to_chars) && __cpp_lib_to_chars >= 201611L
@@ -155,7 +156,7 @@ BOOST_DECIMAL_NO_INLINE void test_comparisons(const std::vector<T>& data_vec, co
 
     const auto t2 = std::chrono::steady_clock::now();
 
-    std::cout << "comparisons<" << std::left << std::setw(11) << label << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << "comparisons<" << std::left << std::setw(13) << label << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T, typename Func>
@@ -176,7 +177,7 @@ BOOST_DECIMAL_NO_INLINE void test_two_element_operation(const std::vector<T>& da
 
     const auto t2 = std::chrono::steady_clock::now();
 
-    std::cout << operation << "<" << std::left << std::setw(11) << type << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << operation << "<" << std::left << std::setw(13) << type << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T, typename Func>
@@ -195,7 +196,7 @@ BOOST_DECIMAL_NO_INLINE void test_one_element_operation(const std::vector<T>& da
 
     const auto t2 = std::chrono::steady_clock::now();
 
-    std::cout << operation << "<" << std::left << std::setw(11) << type << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << operation << "<" << std::left << std::setw(13) << type << ">: " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T>
@@ -247,7 +248,7 @@ static BOOST_DECIMAL_NO_INLINE void test_boost_to_chars( std::vector<T> const& d
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cout << "boost::decimal::to_chars<" << std::left << std::setw(11) << type << ">, " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << "boost::decimal::to_chars<" << std::left << std::setw(13) << type << ">, " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
@@ -276,7 +277,7 @@ static BOOST_DECIMAL_NO_INLINE void test_boost_to_chars( std::vector<T> const& d
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cout << "            std::to_chars<" << std::left << std::setw(10) << type << ">, " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << "           std::to_chars<" << std::left << std::setw(10) << type << "   >, " << label << ", " << precision << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 
@@ -363,7 +364,7 @@ BOOST_DECIMAL_NO_INLINE void test_boost_from_chars( std::vector<std::string> con
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cout << "           std::from_chars<" << std::left << std::setw(11) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << "           std::from_chars<" << std::left << std::setw(13) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T, std::enable_if_t<!std::is_floating_point<T>::value, bool> = true>
@@ -385,7 +386,7 @@ BOOST_DECIMAL_NO_INLINE void test_boost_from_chars( std::vector<std::string> con
 
     auto t2 = std::chrono::steady_clock::now();
 
-    std::cout << "boost::decimal::from_chars<" << std::left << std::setw(11) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
+    std::cerr << "boost::decimal::from_chars<" << std::left << std::setw(13) << type << ">, " << label << ": " << std::setw( 10 ) << ( t2 - t1 ) / 1us << " us (s=" << s << ")\n";
 }
 
 template <typename T>
@@ -404,103 +405,109 @@ int main()
 {
     const auto float_vector = generate_random_vector<float>();
     const auto double_vector = generate_random_vector<double>();
-    const auto dec32_vector = generate_random_vector<decimal32>();
-    const auto dec64_vector = generate_random_vector<decimal64>();
-    const auto dec128_vector = generate_random_vector<decimal128>();
+    const auto dec32_vector = generate_random_vector<decimal32_t>();
+    const auto dec64_vector = generate_random_vector<decimal64_t>();
+    const auto dec128_vector = generate_random_vector<decimal128_t>();
 
     // We use identical values to ensure fair comparison of IEEE vs fast types
-    const auto dec32_fast_vector = convert_copy_vector<decimal32_fast>(dec32_vector);
-    const auto dec64_fast_vector = convert_copy_vector<decimal64_fast>(dec64_vector);
-    const auto dec128_fast_vector = convert_copy_vector<decimal128_fast>(dec128_vector);
+    const auto dec32_fast_vector = convert_copy_vector<decimal_fast32_t>(dec32_vector);
+    const auto dec64_fast_vector = convert_copy_vector<decimal_fast64_t>(dec64_vector);
+    const auto dec128_fast_vector = convert_copy_vector<decimal_fast128_t>(dec128_vector);
 
-    std::cout << "===== Comparisons =====\n";
+    std::cerr << "===== Comparisons =====\n";
 
     test_comparisons(float_vector, "float");
     test_comparisons(double_vector, "double");
-    test_comparisons(dec32_vector, "decimal32");
-    test_comparisons(dec64_vector, "decimal64");
-    test_comparisons(dec128_vector, "decimal128");
+    test_comparisons(dec32_vector, "decimal32_t");
+    test_comparisons(dec64_vector, "decimal64_t");
+    test_comparisons(dec128_vector, "decimal128_t");
     test_comparisons(dec32_fast_vector, "dec32_fast");
     test_comparisons(dec64_fast_vector, "dec64_fast");
     test_comparisons(dec128_fast_vector, "dec128_fast");
 
-    std::cout << "\n===== Addition =====\n";
+    std::cerr << "\n===== Addition =====\n";
 
     test_two_element_operation(float_vector, std::plus<>(), "Addition", "float");
     test_two_element_operation(double_vector, std::plus<>(), "Addition", "double");
-    test_two_element_operation(dec32_vector, std::plus<>(), "Addition", "decimal32");
-    test_two_element_operation(dec64_vector, std::plus<>(), "Addition", "decimal64");
-    test_two_element_operation(dec128_vector, std::plus<>(), "Addition", "decimal128");
+    test_two_element_operation(dec32_vector, std::plus<>(), "Addition", "decimal32_t");
+    test_two_element_operation(dec64_vector, std::plus<>(), "Addition", "decimal64_t");
+    test_two_element_operation(dec128_vector, std::plus<>(), "Addition", "decimal128_t");
     test_two_element_operation(dec32_fast_vector, std::plus<>(), "Addition", "dec32_fast");
     test_two_element_operation(dec64_fast_vector, std::plus<>(), "Addition", "dec64_fast");
     test_two_element_operation(dec128_fast_vector, std::plus<>(), "Addition", "dec128_fast");
 
-    std::cout << "\n===== Subtraction =====\n";
+    std::cerr << "\n===== Subtraction =====\n";
 
     test_two_element_operation(float_vector, std::minus<>(), "Subtraction", "float");
     test_two_element_operation(double_vector, std::minus<>(), "Subtraction", "double");
-    test_two_element_operation(dec32_vector, std::minus<>(), "Subtraction", "decimal32");
-    test_two_element_operation(dec64_vector, std::minus<>(), "Subtraction", "decimal64");
-    test_two_element_operation(dec128_vector, std::minus<>(), "Subtraction", "decimal128");
+    test_two_element_operation(dec32_vector, std::minus<>(), "Subtraction", "decimal32_t");
+    test_two_element_operation(dec64_vector, std::minus<>(), "Subtraction", "decimal64_t");
+    test_two_element_operation(dec128_vector, std::minus<>(), "Subtraction", "decimal128_t");
     test_two_element_operation(dec32_fast_vector, std::minus<>(), "Subtraction", "dec32_fast");
     test_two_element_operation(dec64_fast_vector, std::minus<>(), "Subtraction", "dec64_fast");
     test_two_element_operation(dec128_fast_vector, std::minus<>(), "Subtraction", "dec128_fast");
 
-    std::cout << "\n===== Multiplication =====\n";
+    std::cerr << "\n===== Multiplication =====\n";
 
     test_two_element_operation(float_vector, std::multiplies<>(), "Multiplication", "float");
     test_two_element_operation(double_vector, std::multiplies<>(), "Multiplication", "double");
-    test_two_element_operation(dec32_vector, std::multiplies<>(), "Multiplication", "decimal32");
-    test_two_element_operation(dec64_vector, std::multiplies<>(), "Multiplication", "decimal64");
-    test_two_element_operation(dec128_vector, std::multiplies<>(), "Multiplication", "decimal128");
+    test_two_element_operation(dec32_vector, std::multiplies<>(), "Multiplication", "decimal32_t");
+    test_two_element_operation(dec64_vector, std::multiplies<>(), "Multiplication", "decimal64_t");
+    test_two_element_operation(dec128_vector, std::multiplies<>(), "Multiplication", "decimal128_t");
     test_two_element_operation(dec32_fast_vector, std::multiplies<>(), "Multiplication", "dec32_fast");
     test_two_element_operation(dec64_fast_vector, std::multiplies<>(), "Multiplication", "dec64_fast");
     test_two_element_operation(dec128_fast_vector, std::multiplies<>(), "Multiplication", "dec128_fast");
 
-    std::cout << "\n===== Division =====\n";
+    std::cerr << "\n===== Division =====\n";
 
     test_two_element_operation(float_vector, std::divides<>(), "Division", "float");
     test_two_element_operation(double_vector, std::divides<>(), "Division", "double");
-    test_two_element_operation(dec32_vector, std::divides<>(), "Division", "decimal32");
-    test_two_element_operation(dec64_vector, std::divides<>(), "Division", "decimal64");
-    test_two_element_operation(dec128_vector, std::divides<>(), "Division", "decimal128");
+    test_two_element_operation(dec32_vector, std::divides<>(), "Division", "decimal32_t");
+    test_two_element_operation(dec64_vector, std::divides<>(), "Division", "decimal64_t");
+    test_two_element_operation(dec128_vector, std::divides<>(), "Division", "decimal128_t");
     test_two_element_operation(dec32_fast_vector, std::divides<>(), "Division", "dec32_fast");
     test_two_element_operation(dec64_fast_vector, std::divides<>(), "Division", "dec64_fast");
     test_two_element_operation(dec128_fast_vector, std::divides<>(), "Division", "dec128_fast");
 
 #if 0
-    std::cout << "\n===== sqrt =====\n";
+    std::cerr << "\n===== sqrt =====\n";
 
     test_one_element_operation(float_vector, (float(*)(float))std::sqrt, "sqrt", "float");
     test_one_element_operation(double_vector, (double(*)(double))std::sqrt, "sqrt", "double");
-    test_one_element_operation(dec32_vector, (decimal32(*)(decimal32))sqrt, "sqrt", "decimal32");
-    test_one_element_operation(dec64_vector, (decimal64(*)(decimal64))sqrt, "sqrt", "decimal64");
-    test_one_element_operation(dec128_vector, (decimal128(*)(decimal128))sqrt, "sqrt", "decimal128");
+    test_one_element_operation(dec32_vector, (decimal32_t(*)(decimal32_t))sqrt, "sqrt", "decimal32_t");
+    test_one_element_operation(dec64_vector, (decimal64_t(*)(decimal64_t))sqrt, "sqrt", "decimal64_t");
+    test_one_element_operation(dec128_vector, (decimal128_t(*)(decimal128_t))sqrt, "sqrt", "decimal128_t");
 #endif
 #ifdef BOOST_DECIMAL_BENCHMARK_CHARCONV
-    std::cout << "\n===== <charconv> to_chars =====\n";
+    std::cerr << "\n===== <charconv> to_chars =====\n";
     test_to_chars<float>("float");
     test_to_chars<double>("double");
-    test_to_chars<decimal32>("decimal32");
-    test_to_chars<decimal64>("decimal64");
-    test_to_chars<decimal32_fast>("dec32_fast");
-    test_to_chars<decimal64_fast>("dec64_fast");
+    test_to_chars<decimal32_t>("decimal32_t");
+    test_to_chars<decimal64_t>("decimal64_t");
+    test_to_chars<decimal128_t>("decimal128_t");
+    test_to_chars<decimal_fast32_t>("dec32_fast");
+    test_to_chars<decimal_fast64_t>("dec64_fast");
+    test_to_chars<decimal_fast128_t>("dec128_fast");
 
-    std::cout << "\n===== <charconv> from_chars =====\n";
+    std::cerr << "\n===== <charconv> from_chars =====\n";
     test_from_chars<float>(false, "float");
     test_from_chars<float>(true, "float");
     test_from_chars<double>(false, "double");
     test_from_chars<double>(true, "double");
-    test_from_chars<decimal32>(false, "decimal32");
-    test_from_chars<decimal32>(true, "decimal32");
-    test_from_chars<decimal64>(false, "decimal64");
-    test_from_chars<decimal64>(true, "decimal64");
-    test_from_chars<decimal32>(false, "dec32_fast");
-    test_from_chars<decimal32>(true, "dec32_fast");
-    test_from_chars<decimal64>(false, "dec64_fast");
-    test_from_chars<decimal64>(true, "dec64_fast");
+    test_from_chars<decimal32_t>(false, "decimal32_t");
+    test_from_chars<decimal32_t>(true, "decimal32_t");
+    test_from_chars<decimal64_t>(false, "decimal64_t");
+    test_from_chars<decimal64_t>(true, "decimal64_t");
+    test_from_chars<decimal128_t>(false, "decimal128_t");
+    test_from_chars<decimal128_t>(true, "decimal128_t");
+    test_from_chars<decimal_fast32_t>(false, "dec32_fast");
+    test_from_chars<decimal_fast32_t>(true, "dec32_fast");
+    test_from_chars<decimal_fast64_t>(false, "dec64_fast");
+    test_from_chars<decimal_fast64_t>(true, "dec64_fast");
+    test_from_chars<decimal_fast128_t>(false, "dec128_fast");
+    test_from_chars<decimal_fast128_t>(true, "dec128_fast");
 #endif
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
     return 1;
 }
@@ -509,7 +516,7 @@ int main()
 
 int main()
 {
-    std::cout << "Benchmarks not run" << std::endl;
+    std::cerr << "Benchmarks not run" << std::endl;
     return 1;
 }
 

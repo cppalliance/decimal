@@ -2,9 +2,9 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/decimal64.hpp>
-#include <boost/decimal/decimal128.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
 #include <boost/decimal/string.hpp>
 #include <boost/decimal/iostream.hpp>
 #include <boost/core/lightweight_test.hpp>
@@ -23,9 +23,9 @@ void test()
     BOOST_TEST_EQ(to_string(T{10000}), "10000.000000");
     BOOST_TEST_EQ(to_string(T{210000}), "210000.000000");
     BOOST_TEST_EQ(to_string(T{2100000}), "2100000.000000");
-    BOOST_TEST_EQ(to_string(T{21, 6, true}), "-21000000.000000");
-    BOOST_TEST_EQ(to_string(T{211, 6, true}), "-211000000.000000");
-    BOOST_TEST_EQ(to_string(T{2111, 6, true}), "-2111000000.000000");
+    BOOST_TEST_EQ(to_string(T{21U, 6, true}), "-21000000.000000");
+    BOOST_TEST_EQ(to_string(T{211U, 6, true}), "-211000000.000000");
+    BOOST_TEST_EQ(to_string(T{2111U, 6, true}), "-2111000000.000000");
 
     BOOST_TEST_EQ(to_string(std::numeric_limits<T>::infinity()), "inf");
     BOOST_TEST_EQ(to_string(-std::numeric_limits<T>::infinity()), "-inf");
@@ -37,9 +37,9 @@ void test()
 
 int main()
 {
-    test<decimal32>();
-    test<decimal64>();
-    test<decimal128>();
+    test<decimal32_t>();
+    test<decimal64_t>();
+    test<decimal128_t>();
 
     return boost::report_errors();
 }

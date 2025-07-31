@@ -47,7 +47,7 @@ using namespace boost::decimal;
 template <typename Dec>
 void test_acos()
 {
-    constexpr auto max_iter {std::is_same<Dec, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<Dec, decimal128_t>::value ? N / 4 : N};
 
     for (std::size_t n {}; n < max_iter; ++n)
     {
@@ -170,10 +170,10 @@ void test_acos()
 
 int main()
 {
-    test_acos<decimal32>();
-    test_acos<decimal64>();
+    test_acos<decimal32_t>();
+    test_acos<decimal64_t>();
 
-    test_acos<decimal32_fast>();
+    test_acos<decimal_fast32_t>();
 
     return boost::report_errors();
 }

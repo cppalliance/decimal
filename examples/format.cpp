@@ -11,8 +11,8 @@
 
 int main()
 {
-    constexpr boost::decimal::decimal64 val1 {314, -2};
-    constexpr boost::decimal::decimal32 val2 {3141, -3};
+    constexpr boost::decimal::decimal64_t val1 {314, -2};
+    constexpr boost::decimal::decimal32_t val2 {3141, -3};
 
     std::cout << std::format("{:10.3e}", val1) << '\n';
     std::cout << std::format("{:10.3e}", val2) << std::endl;

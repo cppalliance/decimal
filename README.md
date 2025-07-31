@@ -6,6 +6,7 @@
 | Github Actions   | [![CI](https://github.com/cppalliance/decimal/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/ci.yml) | [![CI](https://github.com/cppalliance/decimal/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/ci.yml)
 | Codecov          | [![codecov](https://codecov.io/gh/cppalliance/decimal/branch/master/graph/badge.svg?token=drvY8nnV5S)](https://codecov.io/gh/cppalliance/decimal)                 | [![codecov](https://codecov.io/gh/cppalliance/decimal/graph/badge.svg?token=drvY8nnV5S)](https://codecov.io/gh/cppalliance/decimal) |
 | Fuzzing          | [![Fuzzing](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml) | [![Fuzzing](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/fuzz.yml) |
+| Metal            | [![Metal](https://github.com/cppalliance/decimal/actions/workflows/metal.yml/badge.svg?branch=master)](https://github.com/cppalliance/decimal/actions/workflows/metal.yml) | [![Metal](https://github.com/cppalliance/decimal/actions/workflows/metal.yml/badge.svg?branch=develop)](https://github.com/cppalliance/decimal/actions/workflows/metal.yml) |
 
 ---
 
@@ -51,12 +52,12 @@ conan create decimal/conan --build missing
 
 # Supported Platforms
 
-Boost.Decimal is tested natively on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon), and Windows (x32 and x64);
-as well as emulated PPC64LE and STM32 using QEMU with the following compilers:
+Boost.Decimal is tested natively on Ubuntu (x86_64, s390x, and aarch64), macOS (x86_64, and Apple Silicon),
+and Windows (x32 and x64); as well as emulated PPC64LE and ARM Cortex-M using QEMU with the following compilers:
 
 * GCC 7 and later
 * Clang 6 and later
-* Visual Studio 2017 and later
+* Visual Studio 2019 and later
 * Intel OneAPI DPC++
 
 # Synopsis
@@ -67,9 +68,9 @@ Decimal provides 3 IEEE-754 compliant types:
 namespace boost {
 namespace decimal {
 
-class decimal32;
-class decimal64;
-class decimal128;
+class decimal32_t;
+class decimal64_t;
+class decimal128_t;
 
 } //namespace decimal
 } //namespace boost
@@ -81,9 +82,9 @@ and also 3 similar but non-compliant types with improved runtime performance:
 namespace boost {
 namespace decimal {
 
-class decimal32_fast;
-class decimal64_fast;
-class decimal128_fast;
+class decimal_fast32_t;
+class decimal_fast64_t;
+class decimal_fast128_t;
 
 } //namespace decimal
 } //namespace boost
@@ -103,10 +104,10 @@ Using the decimal types is simple.
 
 int main()
 {
-    using boost::decimal::decimal32;
+    using boost::decimal::decimal32_t;
 
-    constexpr decimal32 a {2, -1}; // Constructs the number 0.2
-    constexpr decimal32 b {1, -1}; // Constructs the number 0.1
+    constexpr decimal32_t a {2, -1}; // Constructs the number 0.2
+    constexpr decimal32_t b {1, -1}; // Constructs the number 0.1
     auto sum {a + b};
 
     std::cout << sum << std::endl; // prints 0.3
@@ -122,7 +123,7 @@ int main()
 ```
 
 This intuitive straightforwardness is the same when using Standard-Library
-functions (such as STL functions, `<cmath>`-like functions and the like).
+functions (such as STL functions, `<cmath>` functions and the like).
 
 ```cpp
 #include <boost/decimal.hpp>
@@ -133,7 +134,7 @@ int main()
 {
     using namespace boost::decimal;
 
-    decimal64 val {-0.25}; // Construction from a double
+    decimal64_t val {-0.25}; // Construction from a double
     val = abs(val); // DO NOT call std::abs
 
     char buffer[256];
@@ -141,7 +142,7 @@ int main()
     assert(r_to); // checks std::errc()
     *r_to.ptr = '\0';
 
-    decimal64 return_value;
+    decimal64_t return_value;
     auto r_from = from_chars(buffer, buffer + std::strlen(buffer), return_value);
 
     assert(val == return_value);

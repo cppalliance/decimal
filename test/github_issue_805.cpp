@@ -19,12 +19,12 @@ void test()
 
 int main()
 {
-    test<decimal32>();
-    test<decimal64>();
-    test<decimal128>();
-    test<decimal32_fast>();
-    test<decimal64_fast>();
-    test<decimal128_fast>();
+    test<decimal32_t>();
+    test<decimal64_t>();
+    test<decimal128_t>();
+    test<decimal_fast32_t>();
+    test<decimal_fast64_t>();
+    test<decimal_fast128_t>();
 
     return boost::report_errors();
 }

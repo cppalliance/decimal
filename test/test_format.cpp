@@ -56,18 +56,18 @@ void test_general()
 
     if constexpr (std::numeric_limits<T>::digits10 <= 7)
     {
-        BOOST_TEST_EQ(std::format("{:g}", T {21, 6, true}), "-2.1e+07");
-        BOOST_TEST_EQ(std::format("{:g}", T {211, 6, true}), "-2.11e+08");
-        BOOST_TEST_EQ(std::format("{:g}", T {2111, 6, true}), "-2.111e+09");
-        BOOST_TEST_EQ(std::format("{:G}", T {21, 6, true}), "-2.1E+07");
-        BOOST_TEST_EQ(std::format("{:G}", T {211, 6, true}), "-2.11E+08");
-        BOOST_TEST_EQ(std::format("{:G}", T {2111, 6, true}), "-2.111E+09");
+        BOOST_TEST_EQ(std::format("{:g}", T {-21, 6}), "-2.1e+07");
+        BOOST_TEST_EQ(std::format("{:g}", T {-211, 6}), "-2.11e+08");
+        BOOST_TEST_EQ(std::format("{:g}", T {-2111, 6}), "-2.111e+09");
+        BOOST_TEST_EQ(std::format("{:G}", T {-21, 6}), "-2.1E+07");
+        BOOST_TEST_EQ(std::format("{:G}", T {-211, 6}), "-2.11E+08");
+        BOOST_TEST_EQ(std::format("{:G}", T {-2111, 6}), "-2.111E+09");
     }
     else
     {
-        BOOST_TEST_EQ(std::format("{:g}", T {21, 6, true}), "-21000000");
-        BOOST_TEST_EQ(std::format("{:g}", T {211, 6, true}), "-211000000");
-        BOOST_TEST_EQ(std::format("{:g}", T {2111, 6, true}), "-2111000000");
+        BOOST_TEST_EQ(std::format("{:g}", T {-21, 6}), "-21000000");
+        BOOST_TEST_EQ(std::format("{:g}", T {-211, 6}), "-211000000");
+        BOOST_TEST_EQ(std::format("{:g}", T {-2111, 6}), "-2111000000");
     }
 
     BOOST_TEST_EQ(std::format("{:g}", std::numeric_limits<T>::infinity()), "inf");
@@ -88,17 +88,17 @@ void test_general()
 template <typename T>
 void test_fixed()
 {
-    BOOST_TEST_EQ(std::format("{:f}", T {21, 6, true}), "-21000000.000000");
-    BOOST_TEST_EQ(std::format("{:f}", T {211, 6, true}), "-211000000.000000");
-    BOOST_TEST_EQ(std::format("{:f}", T {2111, 6, true}), "-2111000000.000000");
+    BOOST_TEST_EQ(std::format("{:f}", T {-21, 6}), "-21000000.000000");
+    BOOST_TEST_EQ(std::format("{:f}", T {-211, 6}), "-211000000.000000");
+    BOOST_TEST_EQ(std::format("{:f}", T {-2111, 6}), "-2111000000.000000");
 
-    BOOST_TEST_EQ(std::format("{:.0f}", T {21, 6, true}), std::string{"-21000000"});
-    BOOST_TEST_EQ(std::format("{:.0f}", T {211, 6, true}), std::string{"-211000000"});
-    BOOST_TEST_EQ(std::format("{:.0f}", T {2111, 6, true}), std::string{"-2111000000"});
+    BOOST_TEST_EQ(std::format("{:.0f}", T {-21, 6}), std::string{"-21000000"});
+    BOOST_TEST_EQ(std::format("{:.0f}", T {-211, 6}), std::string{"-211000000"});
+    BOOST_TEST_EQ(std::format("{:.0f}", T {-2111, 6}), std::string{"-2111000000"});
 
-    BOOST_TEST_EQ(std::format("{:.1f}", T {21, 6, true}), std::string{"-21000000.0"});
-    BOOST_TEST_EQ(std::format("{:.1f}", T {211, 6, true}), std::string{"-211000000.0"});
-    BOOST_TEST_EQ(std::format("{:.1f}", T {2111, 6, true}), std::string{"-2111000000.0"});
+    BOOST_TEST_EQ(std::format("{:.1f}", T {-21, 6}), std::string{"-21000000.0"});
+    BOOST_TEST_EQ(std::format("{:.1f}", T {-211, 6}), std::string{"-211000000.0"});
+    BOOST_TEST_EQ(std::format("{:.1f}", T {-2111, 6}), std::string{"-2111000000.0"});
 
     BOOST_TEST_EQ(std::format("{:.0f}", T {0}), "0");
     BOOST_TEST_EQ(std::format("{:f}", std::numeric_limits<T>::infinity()), "inf");
@@ -119,13 +119,13 @@ void test_fixed()
 template <typename T>
 void test_scientific()
 {
-    BOOST_TEST_EQ(std::format("{:e}", T {21, 6, true}), "-2.100000e+07");
-    BOOST_TEST_EQ(std::format("{:e}", T {211, 6, true}), "-2.110000e+08");
-    BOOST_TEST_EQ(std::format("{:e}", T {2111, 6, true}), "-2.111000e+09");
+    BOOST_TEST_EQ(std::format("{:e}", T {-21, 6}), "-2.100000e+07");
+    BOOST_TEST_EQ(std::format("{:e}", T {-211, 6}), "-2.110000e+08");
+    BOOST_TEST_EQ(std::format("{:e}", T {-2111, 6}), "-2.111000e+09");
 
-    BOOST_TEST_EQ(std::format("{:E}", T {21, 6, true}), "-2.100000E+07");
-    BOOST_TEST_EQ(std::format("{:E}", T {211, 6, true}), "-2.110000E+08");
-    BOOST_TEST_EQ(std::format("{:E}", T {2111, 6, true}), "-2.111000E+09");
+    BOOST_TEST_EQ(std::format("{:E}", T {-21, 6}), "-2.100000E+07");
+    BOOST_TEST_EQ(std::format("{:E}", T {-211, 6}), "-2.110000E+08");
+    BOOST_TEST_EQ(std::format("{:E}", T {-2111, 6}), "-2.111000E+09");
 
     BOOST_TEST_EQ(std::format("{:.0E}", T {0}), "0E+00");
     BOOST_TEST_EQ(std::format("{:e}", std::numeric_limits<T>::infinity()), "inf");
@@ -169,33 +169,33 @@ void test_hex()
 
 int main()
 {
-    test_general<decimal32>();
-    test_general<decimal32_fast>();
-    test_general<decimal64>();
-    test_general<decimal64_fast>();
-    test_general<decimal128>();
-    test_general<decimal128_fast>();
+    test_general<decimal32_t>();
+    test_general<decimal_fast32_t>();
+    test_general<decimal64_t>();
+    test_general<decimal_fast64_t>();
+    test_general<decimal128_t>();
+    test_general<decimal_fast128_t>();
 
-    test_fixed<decimal32>();
-    test_fixed<decimal32_fast>();
-    test_fixed<decimal64>();
-    test_fixed<decimal64_fast>();
-    test_fixed<decimal128>();
-    test_fixed<decimal128_fast>();
+    test_fixed<decimal32_t>();
+    test_fixed<decimal_fast32_t>();
+    test_fixed<decimal64_t>();
+    test_fixed<decimal_fast64_t>();
+    test_fixed<decimal128_t>();
+    test_fixed<decimal_fast128_t>();
 
-    test_scientific<decimal32>();
-    test_scientific<decimal32_fast>();
-    test_scientific<decimal64>();
-    test_scientific<decimal64_fast>();
-    test_scientific<decimal128>();
-    test_scientific<decimal128_fast>();
+    test_scientific<decimal32_t>();
+    test_scientific<decimal_fast32_t>();
+    test_scientific<decimal64_t>();
+    test_scientific<decimal_fast64_t>();
+    test_scientific<decimal128_t>();
+    test_scientific<decimal_fast128_t>();
 
-    test_hex<decimal32>();
-    test_hex<decimal32_fast>();
-    test_hex<decimal64>();
-    test_hex<decimal64_fast>();
-    test_hex<decimal128>();
-    test_hex<decimal128_fast>();
+    test_hex<decimal32_t>();
+    test_hex<decimal_fast32_t>();
+    test_hex<decimal64_t>();
+    test_hex<decimal_fast64_t>();
+    test_hex<decimal128_t>();
+    test_hex<decimal_fast128_t>();
 
     return boost::report_errors();
 }

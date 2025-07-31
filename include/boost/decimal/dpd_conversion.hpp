@@ -5,16 +5,16 @@
 #ifndef BOOST_DECIMAL_DPD_CONVERSION_HPP
 #define BOOST_DECIMAL_DPD_CONVERSION_HPP
 
-#include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/decimal64.hpp>
-#include <boost/decimal/decimal128.hpp>
-#include <boost/decimal/decimal32_fast.hpp>
-#include <boost/decimal/decimal64_fast.hpp>
-#include <boost/decimal/decimal128_fast.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
+#include <boost/decimal/decimal_fast32_t.hpp>
+#include <boost/decimal/decimal_fast64_t.hpp>
+#include <boost/decimal/decimal_fast128_t.hpp>
 #include <boost/decimal/bid_conversion.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/concepts.hpp>
-#include <boost/int128.hpp>
+#include "detail/int128.hpp"
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -27,7 +27,7 @@ namespace decimal {
 namespace detail {
 
 // See Table 3.4
-constexpr auto encode_dpd(std::uint8_t d1, std::uint8_t d2, std::uint8_t d3) -> std::uint16_t
+constexpr auto encode_dpd(const std::uint8_t d1, const std::uint8_t d2, const std::uint8_t d3) -> std::uint16_t
 {
     constexpr std::uint8_t b3_mask {0b0001};
     constexpr std::uint8_t b2_mask {0b0010};
@@ -241,7 +241,7 @@ constexpr auto encode_dpd(std::uint8_t d1, std::uint8_t d2, std::uint8_t d3) -> 
     return result;
 }
 
-constexpr auto decode_dpd(std::uint32_t dpd_bits, std::uint8_t& d3, std::uint8_t& d2, std::uint8_t& d1) -> void
+constexpr auto decode_dpd(const std::uint32_t dpd_bits, std::uint8_t& d3, std::uint8_t& d2, std::uint8_t& d1) -> void
 {
     // DPD decoding logic as per IEEE 754-2008
     std::uint8_t b[10] {};
@@ -319,13 +319,13 @@ constexpr auto decode_dpd(std::uint32_t dpd_bits, std::uint8_t& d3, std::uint8_t
 } // namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename DecimalType>
-constexpr auto to_dpd_d32(DecimalType val) noexcept
+constexpr auto to_dpd_d32(const DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint32_t)
 {
-    static_assert(std::is_same<DecimalType, decimal32>::value ||
-                  std::is_same<DecimalType, decimal32_fast>::value, "The input must be a 32-bit decimal type");
+    static_assert(std::is_same<DecimalType, decimal32_t>::value ||
+                  std::is_same<DecimalType, decimal_fast32_t>::value, "The input must be a 32-bit decimal type");
 
-    // In the non-finite cases the encodings are the same
+    // In the non-finite cases, the encodings are the same
     // 3.5.2.a and 3.5.2.b
     if (!isfinite(val))
     {
@@ -428,11 +428,11 @@ constexpr auto to_dpd_d32(DecimalType val) noexcept
     return dpd;
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal32_fast>
-constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast32_t>
+constexpr auto from_dpd_d32(const std::uint32_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
-    static_assert(std::is_same<DecimalType, decimal32>::value || std::is_same<DecimalType, decimal32_fast>::value,
+    static_assert(std::is_same<DecimalType, decimal32_t>::value || std::is_same<DecimalType, decimal_fast32_t>::value,
                   "Target decimal type must be 32-bits");
 
     // First we check for non-finite values
@@ -453,11 +453,15 @@ constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
         }
     }
 
+    constexpr std::uint32_t dpd_d32_exponent_mask {UINT32_C(0b0'00000'111111'0000000000'0000000000)};
+    constexpr std::uint32_t dpd_d32_significand_mask {UINT32_C(0b0'00000'000000'1111111111'1111111111)};
+    constexpr std::uint32_t dpd_d32_combination_mask {UINT32_C(0b0'11111'000000'0000000000'0000000000)};
+
     // The bit lengths are the same as used in the standard bid format
     const auto sign {(dpd & detail::d32_sign_mask) != 0};
-    const auto combination_field_bits {(dpd & detail::d32_combination_field_mask) >> 26U};
-    const auto exponent_field_bits {(dpd & detail::d32_exponent_mask) >> 20U};
-    const auto significand_bits {(dpd & detail::d32_significand_mask)};
+    const auto combination_field_bits {(dpd & dpd_d32_combination_mask) >> 26U};
+    const auto exponent_field_bits {(dpd & dpd_d32_exponent_mask) >> 20U};
+    const auto significand_bits {(dpd & dpd_d32_significand_mask)};
 
     // Case 1: 3.5.2.c.1.i
     // Combination field bits are 110XX or 11110X
@@ -514,11 +518,11 @@ constexpr auto from_dpd_d32(std::uint32_t dpd) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename DecimalType>
-constexpr auto to_dpd_d64(DecimalType val) noexcept
+constexpr auto to_dpd_d64(const DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::uint64_t)
 {
-    static_assert(std::is_same<DecimalType, decimal64>::value ||
-                  std::is_same<DecimalType, decimal64_fast>::value, "The input must be a 64-bit decimal type");
+    static_assert(std::is_same<DecimalType, decimal64_t>::value ||
+                  std::is_same<DecimalType, decimal_fast64_t>::value, "The input must be a 64-bit decimal type");
 
     // In the non-finite cases the encodings are the same
     // 3.5.2.a and 3.5.2.b
@@ -624,11 +628,11 @@ constexpr auto to_dpd_d64(DecimalType val) noexcept
     return dpd;
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal64_fast>
-constexpr auto from_dpd_d64(std::uint64_t dpd) noexcept
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast64_t>
+constexpr auto from_dpd_d64(const std::uint64_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
-    static_assert(std::is_same<DecimalType, decimal64>::value || std::is_same<DecimalType, decimal64_fast>::value,
+    static_assert(std::is_same<DecimalType, decimal64_t>::value || std::is_same<DecimalType, decimal_fast64_t>::value,
                   "Target decimal type must be 64-bits");
 
     // First we check for non-finite values
@@ -650,10 +654,15 @@ constexpr auto from_dpd_d64(std::uint64_t dpd) noexcept
     }
 
     // The bit lengths are the same as used in the standard bid format
+
+    constexpr std::uint64_t dpd_d64_combination_field_mask {UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
+    constexpr std::uint64_t dpd_d64_exponent_field_mask {UINT64_C(0b0'00000'11111111'0000000000'0000000000'0000000000'0000000000'0000000000)};
+    constexpr std::uint64_t dpd_d64_significand_field_mask {UINT64_C(0b0'00000'00000000'1111111111'1111111111'1111111111'1111111111'1111111111)};
+
     const auto sign {(dpd & detail::d64_sign_mask) != 0};
-    const auto combination_field_bits {(dpd & detail::d64_combination_field_mask) >> 58U};
-    const auto exponent_field_bits {(dpd & detail::d64_exponent_mask) >> 50U};
-    auto significand_bits {(dpd & detail::d64_significand_mask)};
+    const auto combination_field_bits {(dpd & dpd_d64_combination_field_mask) >> 58U};
+    const auto exponent_field_bits {(dpd & dpd_d64_exponent_field_mask) >> 50U};
+    auto significand_bits {(dpd & dpd_d64_significand_field_mask)};
 
     // Case 1: 3.5.2.c.1.i
     // Combination field bits are 110XX or 11110X
@@ -710,11 +719,11 @@ constexpr auto from_dpd_d64(std::uint64_t dpd) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename DecimalType>
-constexpr auto to_dpd_d128(DecimalType val) noexcept
+constexpr auto to_dpd_d128(const DecimalType val) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, boost::int128::uint128_t)
 {
-    static_assert(std::is_same<DecimalType, decimal128>::value ||
-                  std::is_same<DecimalType, decimal128_fast>::value, "The input must be a 128-bit decimal type");
+    static_assert(std::is_same<DecimalType, decimal128_t>::value ||
+                  std::is_same<DecimalType, decimal_fast128_t>::value, "The input must be a 128-bit decimal type");
 
     // In the non-finite cases the encodings are the same
     // 3.5.2.a and 3.5.2.b
@@ -732,7 +741,7 @@ constexpr auto to_dpd_d128(DecimalType val) noexcept
     // Set the sign bit as applicable
     if (sign)
     {
-        dpd.high |= detail::d128_sign_mask.high;
+        dpd.high |= detail::d128_sign_mask;
     }
 
     constexpr int num_digits {std::numeric_limits<DecimalType>::digits10};
@@ -820,11 +829,11 @@ constexpr auto to_dpd_d128(DecimalType val) noexcept
     return dpd;
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_fast>
-constexpr auto from_dpd_d128(int128::uint128_t dpd) noexcept
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal_fast128_t>
+constexpr auto from_dpd_d128(const int128::uint128_t dpd) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
-    static_assert(std::is_same<DecimalType, decimal128>::value || std::is_same<DecimalType, decimal128_fast>::value,
+    static_assert(std::is_same<DecimalType, decimal128_t>::value || std::is_same<DecimalType, decimal_fast128_t>::value,
                   "Target decimal type must be 128-bits");
 
     if ((dpd & detail::d128_inf_mask) == detail::d128_inf_mask)
@@ -843,11 +852,15 @@ constexpr auto from_dpd_d128(int128::uint128_t dpd) noexcept
         }
     }
 
+    constexpr std::uint64_t d128_dpd_combination_field_mask_high_bits {UINT64_C(0b0'11111'00000000'0000000000'0000000000'0000000000'0000000000'0000000000)};
+    constexpr std::uint64_t d128_dpd_exponent_mask_high_bits {UINT64_C(0b0'00000'111111111111'0000000000'0000000000'0000000000'0000000000'000000)};
+    constexpr int128::uint128_t d128_dpd_significand_mask {UINT64_C(0b1111111111'1111111111'1111111111'1111111111'111111), UINT64_MAX};
+
     // The bit lengths are the same as used in the standard bid format
-    const auto sign {(dpd.high & detail::d128_sign_mask.high) != 0};
-    const auto combination_field_bits {(dpd.high & detail::d128_combination_field_mask.high) >> 58U};
-    const auto exponent_field_bits {(dpd.high & detail::d128_exponent_mask.high) >> 46U};
-    auto significand_bits {(dpd & detail::d128_significand_mask)};
+    const auto sign {(dpd.high & detail::d128_sign_mask) != 0};
+    const auto combination_field_bits {(dpd.high & d128_dpd_combination_field_mask_high_bits) >> 58U};
+    const auto exponent_field_bits {(dpd.high & d128_dpd_exponent_mask_high_bits) >> 46U};
+    auto significand_bits {(dpd & d128_dpd_significand_mask)};
 
     // Case 1: 3.5.2.c.1.i
     // Combination field bits are 110XX or 11110X
@@ -904,59 +917,59 @@ constexpr auto from_dpd_d128(int128::uint128_t dpd) noexcept
     return DecimalType{significand, exp, sign};
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal32 val) noexcept -> std::uint32_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(const decimal32_t val) noexcept -> std::uint32_t
 {
     return to_dpd_d32(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal32_fast val) noexcept -> std::uint32_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(const decimal_fast32_t val) noexcept -> std::uint32_t
 {
     return to_dpd_d32(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal64 val) noexcept -> std::uint64_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(const decimal64_t val) noexcept -> std::uint64_t
 {
     return to_dpd_d64(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal64_fast val) noexcept -> std::uint64_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(const decimal_fast64_t val) noexcept -> std::uint64_t
 {
     return to_dpd_d64(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal128 val) noexcept -> int128::uint128_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(const decimal128_t val) noexcept -> int128::uint128_t
 {
     return to_dpd_d128(val);
 }
 
-BOOST_DECIMAL_EXPORT constexpr auto to_dpd(decimal128_fast val) noexcept -> int128::uint128_t
+BOOST_DECIMAL_EXPORT constexpr auto to_dpd(const decimal_fast128_t& val) noexcept -> int128::uint128_t
 {
     return to_dpd_d128(val);
 }
 
 BOOST_DECIMAL_EXPORT template <typename DecimalType>
-constexpr auto to_dpd(DecimalType val) noexcept
+constexpr auto to_dpd(const DecimalType val) noexcept
 {
     static_assert(detail::is_decimal_floating_point_v<DecimalType>, "Must be a decimal floating point type.");
     return to_dpd(val);
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal32_fast>
-constexpr auto from_dpd(std::uint32_t bits) noexcept
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal32_t>
+constexpr auto from_dpd(const std::uint32_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     return from_dpd_d32<DecimalType>(bits);
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal64_fast>
-constexpr auto from_dpd(std::uint64_t bits) noexcept
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal64_t>
+constexpr auto from_dpd(const std::uint64_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     return from_dpd_d64<DecimalType>(bits);
 }
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_fast>
-constexpr auto from_dpd(int128::uint128_t bits) noexcept
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_t>
+constexpr auto from_dpd(const int128::uint128_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     return from_dpd_d128<DecimalType>(bits);
@@ -964,8 +977,8 @@ constexpr auto from_dpd(int128::uint128_t bits) noexcept
 
 #ifdef BOOST_DECIMAL_HAS_INT128
 
-BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_fast>
-constexpr auto from_dpd(detail::builtin_uint128_t bits) noexcept
+BOOST_DECIMAL_EXPORT template <typename DecimalType = decimal128_t>
+constexpr auto from_dpd(const detail::builtin_uint128_t bits) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, DecimalType)
 {
     const int128::uint128_t converted_bits {bits};

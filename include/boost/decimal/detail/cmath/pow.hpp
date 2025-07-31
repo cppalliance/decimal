@@ -22,7 +22,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T, typename IntegralType>
-constexpr auto pow(T b, IntegralType p) noexcept
+constexpr auto pow(const T b, const IntegralType p) noexcept
     BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, T, detail::is_integral_v, IntegralType, T)
 {
     using local_integral_type = IntegralType;
@@ -147,7 +147,7 @@ constexpr auto pow(T b, IntegralType p) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto pow(T x, T a) noexcept
+constexpr auto pow(const T x, const T a) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero { 0, 0 };

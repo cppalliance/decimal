@@ -2,12 +2,12 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/decimal64.hpp>
-#include <boost/decimal/decimal128.hpp>
-#include <boost/decimal/decimal32_fast.hpp>
-#include <boost/decimal/decimal64_fast.hpp>
-#include <boost/decimal/decimal128_fast.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
+#include <boost/decimal/decimal_fast32_t.hpp>
+#include <boost/decimal/decimal_fast64_t.hpp>
+#include <boost/decimal/decimal_fast128_t.hpp>
 #include <boost/decimal/dpd_conversion.hpp>
 #include <boost/decimal/iostream.hpp>
 #include <boost/core/lightweight_test.hpp>
@@ -48,8 +48,8 @@ void test()
 template <typename T>
 void test_float_range()
 {
-    using float_type = std::conditional_t<std::is_same<T, decimal32>::value ||
-                                          std::is_same<T, decimal32_fast>::value, float, double>;
+    using float_type = std::conditional_t<std::is_same<T, decimal32_t>::value ||
+                                          std::is_same<T, decimal_fast32_t>::value, float, double>;
 
     std::mt19937_64 rng(42);
     std::uniform_real_distribution<float_type> dist(std::numeric_limits<float_type>::min(),
@@ -65,23 +65,23 @@ void test_float_range()
 
 int main()
 {
-    test<decimal32>();
-    test<decimal32_fast>();
+    test<decimal32_t>();
+    test<decimal_fast32_t>();
 
-    test_float_range<decimal32>();
-    test_float_range<decimal32_fast>();
+    test_float_range<decimal32_t>();
+    test_float_range<decimal_fast32_t>();
 
-    test<decimal64>();
-    test<decimal64_fast>();
+    test<decimal64_t>();
+    test<decimal_fast64_t>();
 
-    test_float_range<decimal64>();
-    test_float_range<decimal64_fast>();
+    test_float_range<decimal64_t>();
+    test_float_range<decimal_fast64_t>();
 
-    test<decimal128>();
-    test<decimal128_fast>();
+    test<decimal128_t>();
+    test<decimal_fast128_t>();
 
-    test_float_range<decimal128>();
-    test_float_range<decimal128_fast>();
+    test_float_range<decimal128_t>();
+    test_float_range<decimal_fast128_t>();
 
     return boost::report_errors();
 }

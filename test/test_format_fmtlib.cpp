@@ -176,33 +176,33 @@ void test_hex()
 
 int main()
 {
-    test_general<decimal32>();
-    test_general<decimal32_fast>();
-    test_general<decimal64>();
-    test_general<decimal64_fast>();
-    test_general<decimal128>();
-    test_general<decimal128_fast>();
+    test_general<decimal32_t>();
+    test_general<decimal_fast32_t>();
+    test_general<decimal64_t>();
+    test_general<decimal_fast64_t>();
+    test_general<decimal128_t>();
+    test_general<decimal_fast128_t>();
 
-    test_fixed<decimal32>();
-    test_fixed<decimal32_fast>();
-    test_fixed<decimal64>();
-    test_fixed<decimal64_fast>();
-    test_fixed<decimal128>();
-    test_fixed<decimal128_fast>();
+    test_fixed<decimal32_t>();
+    test_fixed<decimal_fast32_t>();
+    test_fixed<decimal64_t>();
+    test_fixed<decimal_fast64_t>();
+    test_fixed<decimal128_t>();
+    test_fixed<decimal_fast128_t>();
 
-    test_scientific<decimal32>();
-    test_scientific<decimal32_fast>();
-    test_scientific<decimal64>();
-    test_scientific<decimal64_fast>();
-    test_scientific<decimal128>();
-    test_scientific<decimal128_fast>();
+    test_scientific<decimal32_t>();
+    test_scientific<decimal_fast32_t>();
+    test_scientific<decimal64_t>();
+    test_scientific<decimal_fast64_t>();
+    test_scientific<decimal128_t>();
+    test_scientific<decimal_fast128_t>();
 
-    test_hex<decimal32>();
-    test_hex<decimal32_fast>();
-    test_hex<decimal64>();
-    test_hex<decimal64_fast>();
-    test_hex<decimal128>();
-    test_hex<decimal128_fast>();
+    test_hex<decimal32_t>();
+    test_hex<decimal_fast32_t>();
+    test_hex<decimal64_t>();
+    test_hex<decimal_fast64_t>();
+    test_hex<decimal128_t>();
+    test_hex<decimal_fast128_t>();
 
     return boost::report_errors();
 }

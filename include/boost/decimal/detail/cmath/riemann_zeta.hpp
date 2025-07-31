@@ -27,7 +27,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto riemann_zeta_impl(T x) noexcept
+constexpr auto riemann_zeta_impl(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto fpc = fpclassify(x);
@@ -42,7 +42,7 @@ constexpr auto riemann_zeta_impl(T x) noexcept
     {
         // The value of riemann_zeta(0) is 1/2.
 
-        result = T { 5, -1, true };
+        result = T { 5U, -1, true };
     }
     #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc != FP_NORMAL)
@@ -202,7 +202,7 @@ constexpr auto riemann_zeta_impl(T x) noexcept
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto riemann_zeta(T x) noexcept
+constexpr auto riemann_zeta(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -211,11 +211,11 @@ constexpr auto riemann_zeta(T x) noexcept
 
     #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
 
-    using evaluation_type = detail::promote_args_t<T, decimal64>;
+    using evaluation_type = detail::promote_args_t<T, decimal64_t>;
 
     #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
 
-    using evaluation_type = detail::promote_args_t<T, decimal128>;
+    using evaluation_type = detail::promote_args_t<T, decimal128_t>;
 
     #endif
 
@@ -223,7 +223,7 @@ constexpr auto riemann_zeta(T x) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename T, typename IntegralType>
-constexpr auto riemann_zeta(IntegralType n) noexcept
+constexpr auto riemann_zeta(const IntegralType n) noexcept
     BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, T, detail::is_integral_v, IntegralType, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -232,11 +232,11 @@ constexpr auto riemann_zeta(IntegralType n) noexcept
 
     #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
 
-    using evaluation_type = detail::promote_args_t<T, decimal64>;
+    using evaluation_type = detail::promote_args_t<T, decimal64_t>;
 
     #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
 
-    using evaluation_type = detail::promote_args_t<T, decimal128>;
+    using evaluation_type = detail::promote_args_t<T, decimal128_t>;
 
     #endif
 

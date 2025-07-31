@@ -23,7 +23,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto frexp_impl(T v, int* expon) noexcept
+constexpr auto frexp_impl(const T v, int* expon) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     // This implementation of frexp follows closely that of eval_frexp
@@ -101,7 +101,7 @@ constexpr auto frexp_impl(T v, int* expon) noexcept
 } // namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto frexp(T v, int* expon) noexcept
+constexpr auto frexp(const T v, int* expon) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -110,11 +110,11 @@ constexpr auto frexp(T v, int* expon) noexcept
 
     #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
 
-    using evaluation_type = detail::promote_args_t<T, decimal64>;
+    using evaluation_type = detail::promote_args_t<T, decimal64_t>;
 
     #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
 
-    using evaluation_type = detail::promote_args_t<T, decimal128>;
+    using evaluation_type = detail::promote_args_t<T, decimal128_t>;
 
     #endif
 

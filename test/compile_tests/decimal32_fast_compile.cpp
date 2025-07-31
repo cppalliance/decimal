@@ -2,7 +2,7 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/decimal_fast32_t.hpp>
 
 int main()
 {

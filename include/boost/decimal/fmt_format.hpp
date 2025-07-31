@@ -114,7 +114,7 @@ constexpr auto parse_impl(ParseContext &ctx)
 // If an edit is made to one copy and past it down the line
 
 template <>
-struct fmt::formatter<boost::decimal::decimal32>
+struct fmt::formatter<boost::decimal::decimal32_t>
 {
     constexpr formatter() : ctx_precision(6),
                             fmt(boost::decimal::chars_format::general),
@@ -140,7 +140,7 @@ struct fmt::formatter<boost::decimal::decimal32>
     }
 
     template <typename FormatContext>
-    auto format(const boost::decimal::decimal32 &v, FormatContext &ctx) const
+    auto format(const boost::decimal::decimal32_t &v, FormatContext &ctx) const
     {
         auto out = ctx.out();
         std::array<char, 128> buffer {};
@@ -174,7 +174,7 @@ struct fmt::formatter<boost::decimal::decimal32>
 };
 
 template <>
-struct fmt::formatter<boost::decimal::decimal32_fast>
+struct fmt::formatter<boost::decimal::decimal_fast32_t>
 {
     constexpr formatter() : ctx_precision(6),
                             fmt(boost::decimal::chars_format::general),
@@ -200,7 +200,7 @@ struct fmt::formatter<boost::decimal::decimal32_fast>
     }
 
     template <typename FormatContext>
-    auto format(const boost::decimal::decimal32_fast &v, FormatContext &ctx) const
+    auto format(const boost::decimal::decimal_fast32_t &v, FormatContext &ctx) const
     {
         auto out = ctx.out();
         std::array<char, 128> buffer {};
@@ -234,7 +234,7 @@ struct fmt::formatter<boost::decimal::decimal32_fast>
 };
 
 template <>
-struct fmt::formatter<boost::decimal::decimal64>
+struct fmt::formatter<boost::decimal::decimal64_t>
 {
     constexpr formatter() : ctx_precision(6),
                             fmt(boost::decimal::chars_format::general),
@@ -260,7 +260,7 @@ struct fmt::formatter<boost::decimal::decimal64>
     }
 
     template <typename FormatContext>
-    auto format(const boost::decimal::decimal64 &v, FormatContext &ctx) const
+    auto format(const boost::decimal::decimal64_t &v, FormatContext &ctx) const
     {
         auto out = ctx.out();
         std::array<char, 128> buffer {};
@@ -294,7 +294,7 @@ struct fmt::formatter<boost::decimal::decimal64>
 };
 
 template <>
-struct fmt::formatter<boost::decimal::decimal64_fast>
+struct fmt::formatter<boost::decimal::decimal_fast64_t>
 {
     constexpr formatter() : ctx_precision(6),
                             fmt(boost::decimal::chars_format::general),
@@ -320,7 +320,7 @@ struct fmt::formatter<boost::decimal::decimal64_fast>
     }
 
     template <typename FormatContext>
-    auto format(const boost::decimal::decimal64_fast &v, FormatContext &ctx) const
+    auto format(const boost::decimal::decimal_fast64_t &v, FormatContext &ctx) const
     {
         auto out = ctx.out();
         std::array<char, 128> buffer {};
@@ -354,7 +354,7 @@ struct fmt::formatter<boost::decimal::decimal64_fast>
 };
 
 template <>
-struct fmt::formatter<boost::decimal::decimal128>
+struct fmt::formatter<boost::decimal::decimal128_t>
 {
     constexpr formatter() : ctx_precision(6),
                             fmt(boost::decimal::chars_format::general),
@@ -380,7 +380,7 @@ struct fmt::formatter<boost::decimal::decimal128>
     }
 
     template <typename FormatContext>
-    auto format(const boost::decimal::decimal128 &v, FormatContext &ctx) const
+    auto format(const boost::decimal::decimal128_t &v, FormatContext &ctx) const
     {
         auto out = ctx.out();
         std::array<char, 128> buffer {};
@@ -414,7 +414,7 @@ struct fmt::formatter<boost::decimal::decimal128>
 };
 
 template <>
-struct fmt::formatter<boost::decimal::decimal128_fast>
+struct fmt::formatter<boost::decimal::decimal_fast128_t>
 {
     constexpr formatter() : ctx_precision(6),
                             fmt(boost::decimal::chars_format::general),
@@ -440,7 +440,7 @@ struct fmt::formatter<boost::decimal::decimal128_fast>
     }
 
     template <typename FormatContext>
-    auto format(const boost::decimal::decimal128_fast &v, FormatContext &ctx) const
+    auto format(const boost::decimal::decimal_fast128_t &v, FormatContext &ctx) const
     {
         auto out = ctx.out();
         std::array<char, 128> buffer {};

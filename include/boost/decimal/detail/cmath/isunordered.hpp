@@ -19,7 +19,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto isunordered(T lhs, T rhs) noexcept
+constexpr auto isunordered(const T lhs, const T rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH

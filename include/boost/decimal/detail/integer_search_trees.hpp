@@ -11,7 +11,7 @@
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/u256.hpp>
-#include <boost/int128/int128.hpp>
+#include "int128.hpp"
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <array>
@@ -106,12 +106,12 @@ constexpr int num_digits(const boost::int128::uint128_t& x) noexcept
     // Approximate log10
     const auto estimated_digits {(msb * 1000) / 3322 + 1}; // 1000/3322 ~= 1/log2(10)
 
-    if (estimated_digits < 39 && x >= impl::boost_int128_pow10[estimated_digits])
+    if (estimated_digits < 39 && x >= impl::BOOST_DECIMAL_DETAIL_INT128_pow10[estimated_digits])
     {
         return estimated_digits + 1;
     }
 
-    if (estimated_digits > 1 && x < impl::boost_int128_pow10[estimated_digits - 1])
+    if (estimated_digits > 1 && x < impl::BOOST_DECIMAL_DETAIL_INT128_pow10[estimated_digits - 1])
     {
         return estimated_digits - 1;
     }

@@ -8,7 +8,7 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/from_chars_result.hpp>
-#include <boost/int128.hpp>
+#include "int128.hpp"
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 

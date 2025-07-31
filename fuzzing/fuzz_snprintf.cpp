@@ -27,15 +27,15 @@ extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size
         {
             char buffer[20]; // Small enough it should overflow sometimes
 
-            boost::decimal::decimal32 f_val {};
+            boost::decimal::decimal32_t f_val {};
             boost::decimal::from_chars(c_data, c_data + size, f_val, formats[i]);
             boost::decimal::snprintf(buffer, sizeof(buffer), dec32_printf_formats[i], f_val);
 
-            boost::decimal::decimal64 val {};
+            boost::decimal::decimal64_t val {};
             boost::decimal::from_chars(c_data, c_data + size, val, formats[i]);
             boost::decimal::snprintf(buffer, sizeof(buffer), dec64_printf_formats[i], val);
 
-            boost::decimal::decimal128 ld_val {};
+            boost::decimal::decimal128_t ld_val {};
             boost::decimal::from_chars(c_data, c_data + size, ld_val, formats[i]);
             boost::decimal::snprintf(buffer, sizeof(buffer), dec128_printf_formats[i], ld_val);
         }

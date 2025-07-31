@@ -22,9 +22,9 @@ int main()
     BOOST_DECIMAL_ATTRIBUTE_UNUSED const auto pi_32 {"3.141592653589793238"_DF};
     BOOST_DECIMAL_ATTRIBUTE_UNUSED const auto pi_64 {"3.141592653589793238"_DD};
 
-    assert(float_equal(pi_32, static_cast<decimal32>(pi_64))); // Explicit conversion between decimal types
-    assert(float_equal(pi_32, boost::decimal::numbers::pi_v<decimal32>)); // Constants available in numbers namespace
-    assert(float_equal(pi_64, numbers::pi)); // Default constant type is decimal64
+    assert(float_equal(pi_32, static_cast<decimal32_t>(pi_64))); // Explicit conversion between decimal types
+    assert(float_equal(pi_32, boost::decimal::numbers::pi_v<decimal32_t>)); // Constants available in numbers namespace
+    assert(float_equal(pi_64, numbers::pi)); // Default constant type is decimal64_t
 
     return 0;
 }

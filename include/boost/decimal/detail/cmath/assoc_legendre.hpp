@@ -30,7 +30,7 @@ namespace detail {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
           BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2,
           BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T3>
-constexpr auto assoc_legendre_next(unsigned l, unsigned m, T1 x, T2 Pl, T3 Plm1) noexcept
+constexpr auto assoc_legendre_next(const unsigned l, const unsigned m, const T1 x, const T2 Pl, const T3 Plm1) noexcept
 {
     using result_type = promote_args_t<T1, T2, T3>;
     return ((2 * l + 1) * static_cast<result_type>(x) * static_cast<result_type>(Pl) - (l + m) * static_cast<result_type>(Plm1)) / (l + 1 - m);
@@ -38,7 +38,7 @@ constexpr auto assoc_legendre_next(unsigned l, unsigned m, T1 x, T2 Pl, T3 Plm1)
 
 // Implement Legendre P and Q polynomials via recurrence:
 template <typename T>
-constexpr auto assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_power) noexcept
+constexpr auto assoc_legendre_impl(const unsigned l, const unsigned m, const T x, const T sin_theta_power) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     if (x < -1 || x > 1 || l > 128)
@@ -95,7 +95,7 @@ constexpr auto assoc_legendre_impl(unsigned l, unsigned m, T x, T sin_theta_powe
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto assoc_legendre(unsigned n, unsigned m, T x) noexcept
+constexpr auto assoc_legendre(const unsigned n, const unsigned m, const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -104,11 +104,11 @@ constexpr auto assoc_legendre(unsigned n, unsigned m, T x) noexcept
 
     #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
 
-    using evaluation_type = detail::promote_args_t<T, decimal64>;
+    using evaluation_type = detail::promote_args_t<T, decimal64_t>;
 
     #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
 
-    using evaluation_type = detail::promote_args_t<T, decimal128>;
+    using evaluation_type = detail::promote_args_t<T, decimal128_t>;
 
     #endif
 

@@ -1,0 +1,6 @@
+name: decimal
+version: ~
+title: Boost.Decimal
+nav:
+  - modules/ROOT/nav.adoc
+start_page: overview.adoc

@@ -12,7 +12,7 @@
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
 #include <boost/decimal/detail/cmath/frexp10.hpp>
-#include <boost/int128.hpp>
+#include "../int128.hpp"
 #include <boost/decimal/detail/concepts.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -24,13 +24,13 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
+constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (const T val) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     using DivType = typename T::significand_type;
 
     constexpr T zero {0, 0};
-    constexpr T neg_one {1, 0, true};
+    constexpr T neg_one {1U, 0, true};
     const auto fp {fpclassify(val)};
 
     switch (fp)
@@ -66,7 +66,7 @@ constexpr auto floor BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T val) noexcept
     }
     else
     {
-        decimal_digits--;
+        --decimal_digits;
     }
 
     new_sig /= detail::pow10<DivType>(decimal_digits);

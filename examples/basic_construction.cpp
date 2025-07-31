@@ -10,9 +10,9 @@ int main()
 {
     using namespace boost::decimal;
 
-    constexpr decimal32 val_1 {100};         // Construction from an integer
-    constexpr decimal32 val_2 {10, 1};       // Construction from an integer and exponent
-    constexpr decimal32 val_3 {1, 2, false}; // Construction from an integer, exponent, and sign
+    constexpr decimal32_t val_1 {100};         // Construction from an integer
+    constexpr decimal32_t val_2 {10, 1};       // Construction from a signed integer and exponent
+    constexpr decimal32_t val_3 {1U, 2, false}; // Construction from an unsigned integer, exponent, and sign
 
     std::cout << "Val_1: " << val_1 << '\n'
               << "Val_2: " << val_2 << '\n'
@@ -23,9 +23,9 @@ int main()
         std::cout << "All equal values" << std::endl;
     }
 
-    constexpr decimal64 val_4 {decimal64{2, -1} + decimal64{1, -1}};
+    constexpr decimal64_t val_4 {decimal64_t{2, -1} + decimal64_t{1, -1}};
     constexpr double float_val_4 {0.2 + 0.1};
-    const decimal64 val_5 { float_val_4 };
+    const decimal64_t val_5 { float_val_4 };
 
     std::cout << std::setprecision(17) << "Val_4: " << val_4 << '\n'
               <<  "Float: " << float_val_4 << '\n'

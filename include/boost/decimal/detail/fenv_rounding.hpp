@@ -17,7 +17,7 @@ namespace detail {
 #ifdef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
 
 // Rounds the value provided and returns an offset of exponent values as required
-template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
+template <typename TargetType = decimal32_t, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
 constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 {
     using significand_type = std::conditional_t<decimal_val_v<TargetType> >= 128, int128::uint128_t, std::int64_t>;
@@ -42,7 +42,7 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 
 #else
 
-template <typename TargetType = decimal32, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
+template <typename TargetType = decimal32_t, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
 constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT(readability-function-cognitive-complexity)
 {
     using significand_type = std::conditional_t<decimal_val_v<TargetType> >= 128, int128::uint128_t, std::int64_t>;

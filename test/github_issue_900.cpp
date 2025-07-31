@@ -24,13 +24,13 @@ void to_chars_helper()
 
 int main()
 {
-    to_chars_helper<decimal32>();
-    to_chars_helper<decimal64>();
-    to_chars_helper<decimal128>();
+    to_chars_helper<decimal32_t>();
+    to_chars_helper<decimal64_t>();
+    to_chars_helper<decimal128_t>();
 
-    to_chars_helper<decimal32_fast>();
-    to_chars_helper<decimal64_fast>();
-    to_chars_helper<decimal128_fast>();
+    to_chars_helper<decimal_fast32_t>();
+    to_chars_helper<decimal_fast64_t>();
+    to_chars_helper<decimal_fast128_t>();
 
     return boost::report_errors();
 }

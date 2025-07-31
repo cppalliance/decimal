@@ -8,11 +8,11 @@
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
-#include <boost/int128.hpp>
+#include "int128.hpp"
 #include <boost/decimal/detail/u256.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
 #include <boost/decimal/detail/components.hpp>
-#include <boost/int128/int128.hpp>
+#include "int128.hpp"
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -147,6 +147,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
                                BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
+BOOST_DECIMAL_FORCE_INLINE
 constexpr auto d128_mul_impl(const T1& lhs_sig, const U1 lhs_exp, const bool lhs_sign,
                              const T2& rhs_sig, const U2 rhs_exp, const bool rhs_sign) noexcept -> ReturnType
 {

@@ -2,7 +2,7 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/decimal/decimal32_fast.hpp>
+#include <boost/decimal/decimal_fast32_t.hpp>
 #include <boost/decimal/iostream.hpp>
 #include <iostream>
 #include <random>
@@ -50,10 +50,10 @@ void random_addition(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
-        const decimal32_fast res = dec1 + dec2;
+        const decimal_fast32_t res = dec1 + dec2;
         const auto res_int = static_cast<T>(res);
 
         if (!BOOST_TEST_EQ(res_int, val1 + val2))
@@ -69,10 +69,10 @@ void random_addition(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal32_fast>::infinity() + decimal32_fast{0,0}));
-    BOOST_TEST(isinf(decimal32_fast{0,0} + std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal32_fast>::quiet_NaN() + decimal32_fast{0,0}));
-    BOOST_TEST(isnan(decimal32_fast{0,0} + std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast32_t>::infinity() + decimal_fast32_t{0,0}));
+    BOOST_TEST(isinf(decimal_fast32_t{0,0} + std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast32_t>::quiet_NaN() + decimal_fast32_t{0,0}));
+    BOOST_TEST(isnan(decimal_fast32_t{0,0} + std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -85,10 +85,10 @@ void random_mixed_addition(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const T trunc_val_2 {static_cast<T>(decimal32_fast(val2))};
+        const decimal_fast32_t dec1 {val1};
+        const T trunc_val_2 {static_cast<T>(decimal_fast32_t(val2))};
 
-        const decimal32_fast res = dec1 + trunc_val_2;
+        const decimal_fast32_t res = dec1 + trunc_val_2;
         const auto res_int = static_cast<T>(res);
 
         if (!BOOST_TEST_EQ(res_int, val1 + val2))
@@ -104,10 +104,10 @@ void random_mixed_addition(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal32_fast>::infinity() + dist(rng)));
-    BOOST_TEST(isinf(dist(rng) + std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal32_fast>::quiet_NaN() + dist(rng)));
-    BOOST_TEST(isnan(dist(rng) + std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast32_t>::infinity() + dist(rng)));
+    BOOST_TEST(isinf(dist(rng) + std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast32_t>::quiet_NaN() + dist(rng)));
+    BOOST_TEST(isnan(dist(rng) + std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -118,14 +118,14 @@ void random_converted_addition(T lower, T upper)
     for (std::size_t i {}; i < N; ++i)
     {
         // Convert these to and from to ensure rounding
-        const T val1 {static_cast<T>(decimal32_fast(dist(rng)))};
-        const T val2 {static_cast<T>(decimal32_fast(dist(rng)))};
+        const T val1 {static_cast<T>(decimal_fast32_t(dist(rng)))};
+        const T val2 {static_cast<T>(decimal_fast32_t(dist(rng)))};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
-        const decimal32_fast res {dec1 + dec2};
-        const decimal32_fast comp_val {val1 + val2};
+        const decimal_fast32_t res {dec1 + dec2};
+        const decimal_fast32_t comp_val {val1 + val2};
 
         if (!BOOST_TEST_EQ(res, comp_val))
         {
@@ -151,10 +151,10 @@ void random_subtraction(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
-        const decimal32_fast res = dec1 - dec2;
+        const decimal_fast32_t res = dec1 - dec2;
         const auto res_int = static_cast<T>(res);
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
@@ -170,10 +170,10 @@ void random_subtraction(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal32_fast>::infinity() - decimal32_fast{0,0}));
-    BOOST_TEST(isinf(decimal32_fast{0,0} - std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal32_fast>::quiet_NaN() - decimal32_fast{0,0}));
-    BOOST_TEST(isnan(decimal32_fast{0,0} - std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast32_t>::infinity() - decimal_fast32_t{0,0}));
+    BOOST_TEST(isinf(decimal_fast32_t{0,0} - std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast32_t>::quiet_NaN() - decimal_fast32_t{0,0}));
+    BOOST_TEST(isnan(decimal_fast32_t{0,0} - std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -186,10 +186,10 @@ void random_mixed_subtraction(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const T trunc_val_2 {static_cast<T>(decimal32_fast(val2))};
+        const decimal_fast32_t dec1 {val1};
+        const T trunc_val_2 {static_cast<T>(decimal_fast32_t(val2))};
 
-        const decimal32_fast res = dec1 - trunc_val_2;
+        const decimal_fast32_t res = dec1 - trunc_val_2;
         const auto res_int = static_cast<T>(res);
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
@@ -210,10 +210,10 @@ void random_mixed_subtraction(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const T trunc_val_1 {static_cast<T>(decimal32_fast(val1))};
-        const decimal32_fast dec2 {val2};
+        const T trunc_val_1 {static_cast<T>(decimal_fast32_t(val1))};
+        const decimal_fast32_t dec2 {val2};
 
-        const decimal32_fast res = trunc_val_1 - dec2;
+        const decimal_fast32_t res = trunc_val_1 - dec2;
         const auto res_int = static_cast<T>(res);
 
         if (!BOOST_TEST_EQ(res_int, val1 - val2))
@@ -229,10 +229,10 @@ void random_mixed_subtraction(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal32_fast>::infinity() - dist(rng)));
-    BOOST_TEST(isinf(dist(rng) - std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal32_fast>::quiet_NaN() - dist(rng)));
-    BOOST_TEST(isnan(dist(rng) - std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast32_t>::infinity() - dist(rng)));
+    BOOST_TEST(isinf(dist(rng) - std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast32_t>::quiet_NaN() - dist(rng)));
+    BOOST_TEST(isnan(dist(rng) - std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -245,11 +245,11 @@ void random_multiplication(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
-        const decimal32_fast res {dec1 * dec2};
-        const decimal32_fast res_int {val1 * val2};
+        const decimal_fast32_t res {dec1 * dec2};
+        const decimal_fast32_t res_int {val1 * val2};
 
         if (val1 * val2 == 0)
         {
@@ -270,10 +270,32 @@ void random_multiplication(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal32_fast>::infinity() * decimal32_fast(dist(rng))));
-    BOOST_TEST(isinf(decimal32_fast(dist(rng)) * std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal32_fast>::quiet_NaN() * decimal32_fast(dist(rng))));
-    BOOST_TEST(isnan(decimal32_fast(dist(rng)) * std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast32_t>::infinity() * decimal_fast32_t(dist(rng))));
+    BOOST_TEST(isinf(decimal_fast32_t(dist(rng)) * std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast32_t>::quiet_NaN() * decimal_fast32_t(dist(rng))));
+    BOOST_TEST(isnan(decimal_fast32_t(dist(rng)) * std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
+}
+
+template <typename T>
+void random_spot_multiplication(T val1, T val2)
+{
+    const decimal_fast32_t dec1 {val1};
+    const decimal_fast32_t dec2 {val2};
+
+    const decimal_fast32_t res {dec1 * dec2};
+    const decimal_fast32_t res_int {val1 * val2};
+
+    if (!BOOST_TEST_EQ(res, res_int))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "Val 1: " << val1
+                  << "\nDec 1: " << dec1
+                  << "\nVal 2: " << val2
+                  << "\nDec 2: " << dec2
+                  << "\nDec res: " << res
+                  << "\nInt res: " << val1 * val2 << std::endl;
+        // LCOV_EXCL_STOP
+    }
 }
 
 template <typename T>
@@ -286,11 +308,11 @@ void random_mixed_multiplication(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const T dec2 {static_cast<T>(decimal32_fast(val2))};
+        const decimal_fast32_t dec1 {val1};
+        const T dec2 {static_cast<T>(decimal_fast32_t(val2))};
 
-        const decimal32_fast res {dec1 * dec2};
-        const decimal32_fast res_int {val1 * val2};
+        const decimal_fast32_t res {dec1 * dec2};
+        const decimal_fast32_t res_int {val1 * val2};
 
         if (val1 * val2 == 0)
         {
@@ -311,10 +333,10 @@ void random_mixed_multiplication(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal32_fast>::infinity() * dist(rng)));
-    BOOST_TEST(isinf(dist(rng) * std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal32_fast>::quiet_NaN() * dist(rng)));
-    BOOST_TEST(isnan(dist(rng) * std::numeric_limits<decimal32_fast>::quiet_NaN()));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast32_t>::infinity() * dist(rng)));
+    BOOST_TEST(isinf(dist(rng) * std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast32_t>::quiet_NaN() * dist(rng)));
+    BOOST_TEST(isnan(dist(rng) * std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
 }
 
 template <typename T>
@@ -327,16 +349,16 @@ void random_division(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const decimal32_fast dec2 {val2};
+        const decimal_fast32_t dec1 {val1};
+        const decimal_fast32_t dec2 {val2};
 
-        const decimal32_fast res {dec1 / dec2};
-        const decimal32_fast res_int {static_cast<float>(val1) / static_cast<float>(val2)};
+        const decimal_fast32_t res {dec1 / dec2};
+        const decimal_fast32_t res_int {static_cast<float>(val1) / static_cast<float>(val2)};
 
         if (isinf(res) && isinf(res_int))
         {
         }
-        else if (!BOOST_TEST(abs(res - res_int) < decimal32_fast(1, -2)))
+        else if (!BOOST_TEST(abs(res - res_int) < decimal_fast32_t(1, -2)))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -349,11 +371,11 @@ void random_division(T lower, T upper)
         }
     }
 
-    BOOST_TEST(isinf(std::numeric_limits<decimal32_fast>::infinity() / decimal32_fast(dist(rng))));
-    BOOST_TEST(!isinf(decimal32_fast(dist(rng)) / std::numeric_limits<decimal32_fast>::infinity()));
-    BOOST_TEST(isnan(std::numeric_limits<decimal32_fast>::quiet_NaN() / decimal32_fast(dist(rng))));
-    BOOST_TEST(isnan(decimal32_fast(dist(rng)) / std::numeric_limits<decimal32_fast>::quiet_NaN()));
-    BOOST_TEST(isinf(decimal32_fast(dist(rng)) / decimal32_fast(0)));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast32_t>::infinity() / decimal_fast32_t(dist(rng))));
+    BOOST_TEST(!isinf(decimal_fast32_t(dist(rng)) / std::numeric_limits<decimal_fast32_t>::infinity()));
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast32_t>::quiet_NaN() / decimal_fast32_t(dist(rng))));
+    BOOST_TEST(isnan(decimal_fast32_t(dist(rng)) / std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
+    BOOST_TEST(isinf(decimal_fast32_t(dist(rng)) / decimal_fast32_t(0)));
 }
 
 template <typename T>
@@ -366,16 +388,16 @@ void random_mixed_division(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const decimal32_fast dec1 {val1};
-        const T dec2 {static_cast<T>(decimal32_fast(val2))};
+        const decimal_fast32_t dec1 {val1};
+        const T dec2 {static_cast<T>(decimal_fast32_t(val2))};
 
-        const decimal32_fast res {dec1 / dec2};
-        const decimal32_fast res_int {static_cast<float>(val1) / static_cast<float>(val2)};
+        const decimal_fast32_t res {dec1 / dec2};
+        const decimal_fast32_t res_int {static_cast<float>(val1) / static_cast<float>(val2)};
 
         if (isinf(res) && isinf(res_int))
         {
         }
-        else if (!BOOST_TEST(abs(res - res_int) < decimal32_fast(1, -3)))
+        else if (!BOOST_TEST(abs(res - res_int) < decimal_fast32_t(1, -3)))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -393,16 +415,16 @@ void random_mixed_division(T lower, T upper)
         const T val1 {dist(rng)};
         const T val2 {dist(rng)};
 
-        const T dec1 {static_cast<T>(decimal32_fast(val1))};
-        const decimal32_fast dec2 {val2};
+        const T dec1 {static_cast<T>(decimal_fast32_t(val1))};
+        const decimal_fast32_t dec2 {val2};
 
-        const decimal32_fast res {dec1 / dec2};
-        const decimal32_fast res_int {static_cast<double>(val1) / static_cast<double>(val2)};
+        const decimal_fast32_t res {dec1 / dec2};
+        const decimal_fast32_t res_int {static_cast<double>(val1) / static_cast<double>(val2)};
 
         if (isinf(res) && isinf(res_int))
         {
         }
-        else if (!BOOST_TEST(abs(res - res_int) < decimal32_fast(1, -1)))
+        else if (!BOOST_TEST(abs(res - res_int) < decimal_fast32_t(1, -1)))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
@@ -416,14 +438,39 @@ void random_mixed_division(T lower, T upper)
     }
 
     // Edge cases
-    const decimal32_fast val1 {dist(rng)};
-    const decimal32_fast zero {0, 0};
-    BOOST_TEST(isnan(std::numeric_limits<decimal32_fast>::quiet_NaN() / dist(rng)));
-    BOOST_TEST(isinf(std::numeric_limits<decimal32_fast>::infinity() / dist(rng)));
-    BOOST_TEST(isnan(dist(rng) / std::numeric_limits<decimal32_fast>::quiet_NaN()));
-    BOOST_TEST_EQ(abs(dist(rng) / std::numeric_limits<decimal32_fast>::infinity()), zero);
-    BOOST_TEST(isinf(decimal32_fast(dist(rng)) / 0));
+    const decimal_fast32_t val1 {dist(rng)};
+    const decimal_fast32_t zero {0, 0};
+    BOOST_TEST(isnan(std::numeric_limits<decimal_fast32_t>::quiet_NaN() / dist(rng)));
+    BOOST_TEST(isinf(std::numeric_limits<decimal_fast32_t>::infinity() / dist(rng)));
+    BOOST_TEST(isnan(dist(rng) / std::numeric_limits<decimal_fast32_t>::quiet_NaN()));
+    BOOST_TEST_EQ(abs(dist(rng) / std::numeric_limits<decimal_fast32_t>::infinity()), zero);
+    BOOST_TEST(isinf(decimal_fast32_t(dist(rng)) / 0));
     BOOST_TEST(isinf(val1 / zero));
+}
+
+template <typename T>
+void random_spot_division(T val1, T val2)
+{
+    const decimal_fast32_t dec1 {val1};
+    const decimal_fast32_t dec2 {val2};
+
+    const decimal_fast32_t res {dec1 / dec2};
+    const decimal_fast32_t res_int {static_cast<float>(val1) / static_cast<float>(val2)};
+
+    if (isinf(res) && isinf(res_int))
+    {
+    }
+    else if (!BOOST_TEST(abs(res - res_int) < decimal_fast32_t(1, -2)))
+    {
+        // LCOV_EXCL_START
+        std::cerr << "Val 1: " << val1
+                  << "\nDec 1: " << dec1
+                  << "\nVal 2: " << val2
+                  << "\nDec 2: " << dec2
+                  << "\nDec res: " << res
+                  << "\nInt res: " << static_cast<float>(val1) / static_cast<float>(val2) << std::endl;
+        // LCOV_EXCL_STOP
+    }
 }
 
 int main()
@@ -485,6 +532,11 @@ int main()
     // Positive values
     const auto sqrt_int_max = static_cast<int>(std::sqrt(static_cast<double>((std::numeric_limits<int>::max)())));
 
+    random_spot_multiplication(4477, 4139);
+    random_spot_multiplication(28270, 45750);
+    random_spot_multiplication(2137, 3272);
+    random_spot_multiplication(-26554, 22692);
+
     random_multiplication(0, 5'000);
     random_multiplication(0L, 5'000L);
     random_multiplication(0LL, 5'000LL);
@@ -513,6 +565,8 @@ int main()
     random_mixed_multiplication(-5'000L, 5'000L);
     random_mixed_multiplication(-5'000LL, 5'000LL);
     random_mixed_multiplication(-sqrt_int_max, sqrt_int_max);
+
+    random_spot_division(-23984, 2561);
 
     random_division(0, 5'000);
     random_division(0L, 5'000L);

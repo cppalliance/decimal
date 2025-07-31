@@ -18,7 +18,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto beta_impl(T x, T y) noexcept
+constexpr auto beta_impl(const T x, const T y) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -38,7 +38,7 @@ constexpr auto beta_impl(T x, T y) noexcept
 } // namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto beta(T y, T x) noexcept
+constexpr auto beta(const T y, const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -47,11 +47,11 @@ constexpr auto beta(T y, T x) noexcept
 
     #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
 
-    using evaluation_type = detail::promote_args_t<T, decimal64>;
+    using evaluation_type = detail::promote_args_t<T, decimal64_t>;
 
     #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
 
-    using evaluation_type = detail::promote_args_t<T, decimal128>;
+    using evaluation_type = detail::promote_args_t<T, decimal128_t>;
 
     #endif
 

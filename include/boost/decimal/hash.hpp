@@ -5,12 +5,12 @@
 #ifndef BOOST_DECIMAL_HASH_HPP
 #define BOOST_DECIMAL_HASH_HPP
 
-#include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/decimal64.hpp>
-#include <boost/decimal/decimal128.hpp>
-#include <boost/decimal/decimal32_fast.hpp>
-#include <boost/decimal/decimal64_fast.hpp>
-#include <boost/decimal/decimal128_fast.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
+#include <boost/decimal/decimal_fast32_t.hpp>
+#include <boost/decimal/decimal_fast64_t.hpp>
+#include <boost/decimal/decimal_fast128_t.hpp>
 #include <boost/decimal/detail/config.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -21,10 +21,10 @@
 namespace std {
 
 BOOST_DECIMAL_EXPORT template <>
-struct hash<boost::decimal::decimal32>
+struct hash<boost::decimal::decimal32_t>
 {
-    // Since the underlying type is a std::uint32_t we will rely on its hash function from the STL
-    auto operator()(const boost::decimal::decimal32& v) const noexcept -> std::size_t
+    // Since the underlying type is a std::uint32_t, we will rely on its hash function from the STL
+    auto operator()(const boost::decimal::decimal32_t& v) const noexcept -> std::size_t
     {
         std::uint32_t bits;
         std::memcpy(&bits, &v, sizeof(std::uint32_t));
@@ -34,10 +34,10 @@ struct hash<boost::decimal::decimal32>
 };
 
 BOOST_DECIMAL_EXPORT template <>
-struct hash<boost::decimal::decimal64>
+struct hash<boost::decimal::decimal64_t>
 {
-    // Since the underlying type is a std::uint64_t we will rely on its hash function from the STL
-    auto operator()(const boost::decimal::decimal64& v) const noexcept -> std::size_t
+    // Since the underlying type is a std::uint64_t, we will rely on its hash function from the STL
+    auto operator()(const boost::decimal::decimal64_t& v) const noexcept -> std::size_t
     {
         std::uint64_t bits;
         std::memcpy(&bits, &v, sizeof(std::uint64_t));
@@ -52,10 +52,10 @@ struct hash<boost::decimal::decimal64>
 #endif
 
 BOOST_DECIMAL_EXPORT template <>
-struct hash<boost::decimal::decimal128>
+struct hash<boost::decimal::decimal128_t>
 {
     // Take the xor of the two words and hash that
-    auto operator()(const boost::decimal::decimal128& v) const noexcept -> std::size_t
+    auto operator()(const boost::decimal::decimal128_t& v) const noexcept -> std::size_t
     {
         boost::int128::uint128_t bits;
         std::memcpy(&bits, &v, sizeof(boost::int128::uint128_t));
@@ -69,12 +69,12 @@ struct hash<boost::decimal::decimal128>
 #endif
 
 BOOST_DECIMAL_EXPORT template <>
-struct hash<boost::decimal::decimal32_fast>
+struct hash<boost::decimal::decimal_fast32_t>
 {
-    // Need to convert into decimal32 then apply our memcpy
-    auto operator()(const boost::decimal::decimal32_fast& v) const noexcept -> std::size_t
+    // Need to convert into decimal32_t then apply our memcpy
+    auto operator()(const boost::decimal::decimal_fast32_t& v) const noexcept -> std::size_t
     {
-        boost::decimal::decimal32 v_32 {v};
+        boost::decimal::decimal32_t v_32 {v};
         std::uint32_t bits;
         std::memcpy(&bits, &v_32, sizeof(std::uint32_t));
 
@@ -83,13 +83,13 @@ struct hash<boost::decimal::decimal32_fast>
 };
 
 BOOST_DECIMAL_EXPORT template <>
-struct hash<boost::decimal::decimal64_fast>
+struct hash<boost::decimal::decimal_fast64_t>
 {
-    // Since the underlying type is a std::uint64_t we will rely on its hash function from the STL
-    // First we convert to a decimal64 so they will have the same hash value
-    auto operator()(const boost::decimal::decimal64_fast& v) const noexcept -> std::size_t
+    // Since the underlying type is a std::uint64_t, we will rely on its hash function from the STL
+    // First we convert to a decimal64_t, so they will have the same hash value
+    auto operator()(const boost::decimal::decimal_fast64_t& v) const noexcept -> std::size_t
     {
-        boost::decimal::decimal64 v_64 {v};
+        boost::decimal::decimal64_t v_64 {v};
         std::uint64_t bits;
         std::memcpy(&bits, &v_64, sizeof(std::uint64_t));
 
@@ -103,12 +103,12 @@ struct hash<boost::decimal::decimal64_fast>
 #endif
 
 BOOST_DECIMAL_EXPORT template <>
-struct hash<boost::decimal::decimal128_fast>
+struct hash<boost::decimal::decimal_fast128_t>
 {
     // Take the xor of the two words and hash that
-    auto operator()(const boost::decimal::decimal128_fast& v) const noexcept -> std::size_t
+    auto operator()(const boost::decimal::decimal_fast128_t& v) const noexcept -> std::size_t
     {
-        boost::decimal::decimal128 v_128 {v};
+        boost::decimal::decimal128_t v_128 {v};
         boost::int128::uint128_t bits;
         std::memcpy(&bits, &v_128, sizeof(boost::int128::uint128_t));
 

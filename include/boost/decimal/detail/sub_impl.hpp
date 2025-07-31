@@ -8,7 +8,7 @@
 #include <boost/decimal/detail/shrink_significand.hpp>
 #include <boost/decimal/detail/apply_sign.hpp>
 #include <boost/decimal/detail/fenv_rounding.hpp>
-#include <boost/int128/int128.hpp>
+#include "int128.hpp"
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -25,14 +25,14 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 {
     auto delta_exp {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
 
-    if (delta_exp > detail::precision_v<decimal128> + 1)
+    if (delta_exp > detail::precision_v<decimal128_t> + 1)
     {
         // If the difference in exponents is more than the digits of accuracy
         // we return the larger of the two
         //
         // e.g. 1e20 - 1e-20 = 1e20
-        return abs_lhs_bigger ? ReturnType{lhs_sig, lhs_exp, false} :
-                                ReturnType{rhs_sig, rhs_exp, true};
+        return abs_lhs_bigger ? ReturnType{lhs_sig, lhs_exp, lhs_sign} :
+                                ReturnType{rhs_sig, rhs_exp, !rhs_sign};
     }
 
     // The two numbers can be subtracted together without special handling
@@ -65,7 +65,7 @@ constexpr auto d128_sub_impl(T lhs_sig, U lhs_exp, bool lhs_sign,
 
         if (delta_exp == 1)
         {
-            detail::fenv_round<decimal128>(sig_smaller, smaller_sign);
+            detail::fenv_round<decimal128_t>(sig_smaller, smaller_sign);
         }
     }
 

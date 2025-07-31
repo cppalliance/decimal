@@ -8,8 +8,7 @@
 // Extends the current type traits to include our types and __int128s
 #include <boost/decimal/fwd.hpp>
 #include <boost/decimal/detail/config.hpp>
-#include <boost/int128.hpp>
-#include <boost/int128/int128.hpp>
+#include "int128.hpp"
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <type_traits>
@@ -137,22 +136,22 @@ template <typename T>
 struct is_decimal_floating_point { static constexpr bool value = false; };
 
 template <>
-struct is_decimal_floating_point<decimal32> { static constexpr bool value = true; };
+struct is_decimal_floating_point<decimal32_t> { static constexpr bool value = true; };
 
 template <>
-struct is_decimal_floating_point<decimal64> { static constexpr bool value = true; };
+struct is_decimal_floating_point<decimal64_t> { static constexpr bool value = true; };
 
 template <>
-struct is_decimal_floating_point<decimal128> { static constexpr bool value = true; };
+struct is_decimal_floating_point<decimal128_t> { static constexpr bool value = true; };
 
 template <>
-struct is_decimal_floating_point<decimal32_fast> { static constexpr bool value = true; };
+struct is_decimal_floating_point<decimal_fast32_t> { static constexpr bool value = true; };
 
 template <>
-struct is_decimal_floating_point<decimal64_fast> { static constexpr bool value = true; };
+struct is_decimal_floating_point<decimal_fast64_t> { static constexpr bool value = true; };
 
 template <>
-struct is_decimal_floating_point<decimal128_fast> { static constexpr bool value = true; };
+struct is_decimal_floating_point<decimal_fast128_t> { static constexpr bool value = true; };
 
 template <typename T>
 constexpr bool is_decimal_floating_point<T>::value;
@@ -164,22 +163,22 @@ template <typename T>
 struct is_ieee_type { static constexpr bool value = false; };
 
 template <>
-struct is_ieee_type<decimal32> { static constexpr bool value = true; };
+struct is_ieee_type<decimal32_t> { static constexpr bool value = true; };
 
 template <>
-struct is_ieee_type<decimal64> { static constexpr bool value = true; };
+struct is_ieee_type<decimal64_t> { static constexpr bool value = true; };
 
 template <>
-struct is_ieee_type<decimal128> { static constexpr bool value = true; };
+struct is_ieee_type<decimal128_t> { static constexpr bool value = true; };
 
 template <>
-struct is_ieee_type<decimal32_fast> { static constexpr bool value = false; };
+struct is_ieee_type<decimal_fast32_t> { static constexpr bool value = false; };
 
 template <>
-struct is_ieee_type<decimal64_fast> { static constexpr bool value = false; };
+struct is_ieee_type<decimal_fast64_t> { static constexpr bool value = false; };
 
 template <>
-struct is_ieee_type<decimal128_fast> { static constexpr bool value = false; };
+struct is_ieee_type<decimal_fast128_t> { static constexpr bool value = false; };
 
 template <typename T>
 constexpr bool is_ieee_type_v = is_ieee_type<T>::value;

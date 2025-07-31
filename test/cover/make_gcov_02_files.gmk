@@ -15,11 +15,19 @@ FILES_EXCLUDE := $(PATH_SRC)/concepts_test.cpp                                  
                  $(PATH_SRC)/test_bad_evaluation_method.cpp                         \
                  $(PATH_SRC)/test_explicit_floats.cpp                               \
                  $(PATH_SRC)/test_from_chars.cpp                                    \
-                 $(PATH_SRC)/test_illegal_decimal32_fast_implicit_conversions.cpp   \
                  $(PATH_SRC)/test_illegal_decimal32_implicit_conversions.cpp        \
+                 $(PATH_SRC)/test_illegal_decimal32_fast_implicit_conversions.cpp   \
                  $(PATH_SRC)/test_illegal_decimal64_fast_implicit_conversions.cpp   \
                  $(PATH_SRC)/test_illegal_decimal64_implicit_conversions.cpp        \
                  $(PATH_SRC)/test_illegal_decimal128_implicit_conversions.cpp       \
+                 $(PATH_SRC)/test_decimal32.cpp                                     \
+                 $(PATH_SRC)/test_decimal64_basis.cpp                               \
+                 $(PATH_SRC)/test_decimal128_basis.cpp                              \
+                 $(PATH_SRC)/benchmarks.cpp                                         \
+                 $(PATH_SRC)/test_boost_math_univariate_stats.cpp                   \
+                 $(PATH_SRC)/benchmark_uint256.cpp                                  \
+                 $(PATH_SRC)/github_issue_519.cpp                                   \
+                 $(PATH_SRC)/test_fprintf.cpp                                       \
 
 
 FILES_EXCLUDE := $(basename $(FILES_EXCLUDE))

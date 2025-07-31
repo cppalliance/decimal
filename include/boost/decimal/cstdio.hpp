@@ -5,12 +5,12 @@
 #ifndef BOOST_DECIMAL_CSTDIO_HPP
 #define BOOST_DECIMAL_CSTDIO_HPP
 
-#include <boost/decimal/decimal32.hpp>
-#include <boost/decimal/decimal64.hpp>
-#include <boost/decimal/decimal128.hpp>
-#include <boost/decimal/decimal32_fast.hpp>
-#include <boost/decimal/decimal64_fast.hpp>
-#include <boost/decimal/decimal128_fast.hpp>
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
+#include <boost/decimal/decimal_fast32_t.hpp>
+#include <boost/decimal/decimal_fast64_t.hpp>
+#include <boost/decimal/decimal_fast128_t.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/locale_conversion.hpp>
 #include <boost/decimal/detail/parser.hpp>
@@ -27,9 +27,9 @@
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 
-// H is the type modifier used for decimal32
+// H is the type modifier used for decimal32_t
 // D is the type modifier used for deciaml64
-// DD is the type modifier used for decimal128
+// DD is the type modifier used for decimal128_t
 
 namespace boost {
 namespace decimal {
@@ -38,9 +38,9 @@ namespace detail {
 
 enum class decimal_type : unsigned
 {
-    decimal32 = 1 << 0,
-    decimal64 = 1 << 1,
-    decimal128 = 1 << 2
+    decimal32_t = 1 << 0,
+    decimal64_t = 1 << 1,
+    decimal128_t = 1 << 2
 };
 
 struct parameters
@@ -53,8 +53,8 @@ struct parameters
 
 inline auto parse_format(const char* format) -> parameters
 {
-    // If the format is unspecified or incorrect we will use this as the default values
-    parameters params {6, chars_format::general, decimal_type::decimal64, false};
+    // If the format is unspecified or incorrect, we will use this as the default values
+    parameters params {6, chars_format::general, decimal_type::decimal64_t, false};
 
     auto iter {format + 1};
     const auto last {format + std::strlen(format)};
@@ -89,7 +89,7 @@ inline auto parse_format(const char* format) -> parameters
     // Now get the type specifier
     if (*iter == 'H')
     {
-        params.return_type = decimal_type::decimal32;
+        params.return_type = decimal_type::decimal32_t;
         ++iter;
     }
     else if (*iter == 'D')
@@ -101,7 +101,7 @@ inline auto parse_format(const char* format) -> parameters
         }
         else if (*iter == 'D')
         {
-            params.return_type = decimal_type::decimal128;
+            params.return_type = decimal_type::decimal128_t;
             ++iter;
         }
     }
@@ -155,7 +155,7 @@ inline void make_uppercase(char* first, const char* last) noexcept
 }
 
 template <typename... T>
-inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format, T... values) noexcept
+inline auto snprintf_impl(char* buffer, const std::size_t buf_size, const char* format, const T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
     -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else
@@ -203,14 +203,14 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
         switch (params.return_type)
         {
             // Subtract 1 from all cases to ensure there is room to insert the null terminator
-            case detail::decimal_type::decimal32:
-                r = to_chars(buffer, buffer + buf_size - byte_count, static_cast<decimal32>(*value_iter), params.fmt, params.precision);
+            case detail::decimal_type::decimal32_t:
+                r = to_chars(buffer, buffer + buf_size - byte_count, static_cast<decimal32_t>(*value_iter), params.fmt, params.precision);
                 break;
-            case detail::decimal_type::decimal64:
-                r = to_chars(buffer, buffer + buf_size - byte_count, static_cast<decimal64>(*value_iter), params.fmt, params.precision);
+            case detail::decimal_type::decimal64_t:
+                r = to_chars(buffer, buffer + buf_size - byte_count, static_cast<decimal64_t>(*value_iter), params.fmt, params.precision);
                 break;
             default:
-                r = to_chars(buffer, buffer + buf_size - byte_count, static_cast<decimal128>(*value_iter), params.fmt, params.precision);
+                r = to_chars(buffer, buffer + buf_size - byte_count, static_cast<decimal128_t>(*value_iter), params.fmt, params.precision);
                 break;
         }
 
@@ -244,7 +244,7 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
 } // namespace detail
 
 template <typename... T>
-inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T... values) noexcept
+inline auto snprintf(char* buffer, const std::size_t buf_size, const char* format, const T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
     -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else
@@ -255,7 +255,7 @@ inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T..
 }
 
 template <typename... T>
-inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
+inline auto fprintf(std::FILE* buffer, const char* format, const T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
     -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else
@@ -306,7 +306,7 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
 }
 
 template <typename... T>
-inline auto printf(const char* format, T... values) noexcept
+inline auto printf(const char* format, const T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
     -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else

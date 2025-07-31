@@ -50,7 +50,7 @@ void test_from_chars_scientific()
 {
     std::uniform_real_distribution<float> dist(1e-10F, 1e10F);
 
-    constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<T, decimal128_t>::value ? N / 4 : N};
 
     for (std::size_t i {}; i < max_iter; ++i)
     {
@@ -87,7 +87,7 @@ void test_from_chars_fixed()
 {
     std::uniform_real_distribution<float> dist(1e-10F, 1e10F);
 
-    constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<T, decimal128_t>::value ? N / 4 : N};
 
     for (std::size_t i {}; i < max_iter; ++i)
     {
@@ -125,7 +125,7 @@ void test_from_chars_general()
 {
     std::uniform_real_distribution<float> dist(1e-10F, 1e10F);
 
-    constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<T, decimal128_t>::value ? N / 4 : N};
 
     for (std::size_t i {}; i < max_iter; ++i)
     {
@@ -213,7 +213,7 @@ void test_from_chars_scientific_std()
 {
     std::uniform_real_distribution<float> dist(1e-10F, 1e10F);
 
-    constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<T, decimal128_t>::value ? N / 4 : N};
 
     for (std::size_t i {}; i < max_iter; ++i)
     {
@@ -250,7 +250,7 @@ void test_from_chars_fixed_std()
 {
     std::uniform_real_distribution<float> dist(1e-10F, 1e10F);
 
-    constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<T, decimal128_t>::value ? N / 4 : N};
 
     for (std::size_t i {}; i < max_iter; ++i)
     {
@@ -288,7 +288,7 @@ void test_from_chars_general_std()
 {
     std::uniform_real_distribution<float> dist(1e-10F, 1e10F);
 
-    constexpr auto max_iter {std::is_same<T, decimal128>::value ? N / 4 : N};
+    constexpr auto max_iter {std::is_same<T, decimal128_t>::value ? N / 4 : N};
 
     for (std::size_t i {}; i < max_iter; ++i)
     {
@@ -346,67 +346,67 @@ void test_string_interface()
 
 int main()
 {
-    test_from_chars_scientific<decimal32>();
-    test_from_chars_scientific<decimal64>();
-    test_from_chars_scientific<decimal32_fast>();
-    test_from_chars_scientific<decimal64_fast>();
+    test_from_chars_scientific<decimal32_t>();
+    test_from_chars_scientific<decimal64_t>();
+    test_from_chars_scientific<decimal_fast32_t>();
+    test_from_chars_scientific<decimal_fast64_t>();
 
-    test_from_chars_fixed<decimal32>();
-    test_from_chars_fixed<decimal64>();
-    test_from_chars_fixed<decimal32_fast>();
-    test_from_chars_fixed<decimal64_fast>();
+    test_from_chars_fixed<decimal32_t>();
+    test_from_chars_fixed<decimal64_t>();
+    test_from_chars_fixed<decimal_fast32_t>();
+    test_from_chars_fixed<decimal_fast64_t>();
 
-    test_from_chars_general<decimal32>();
-    test_from_chars_general<decimal64>();
-    test_from_chars_general<decimal32_fast>();
-    test_from_chars_general<decimal64_fast>();
+    test_from_chars_general<decimal32_t>();
+    test_from_chars_general<decimal64_t>();
+    test_from_chars_general<decimal_fast32_t>();
+    test_from_chars_general<decimal_fast64_t>();
 
     #ifdef BOOST_DECIMAL_HAS_STD_CHARCONV
-    test_from_chars_scientific_std<decimal32>();
-    test_from_chars_scientific_std<decimal64>();
-    test_from_chars_scientific_std<decimal32_fast>();
-    test_from_chars_scientific_std<decimal64_fast>();
+    test_from_chars_scientific_std<decimal32_t>();
+    test_from_chars_scientific_std<decimal64_t>();
+    test_from_chars_scientific_std<decimal_fast32_t>();
+    test_from_chars_scientific_std<decimal_fast64_t>();
 
-    test_from_chars_fixed_std<decimal32>();
-    test_from_chars_fixed_std<decimal64>();
-    test_from_chars_fixed_std<decimal32_fast>();
-    test_from_chars_fixed_std<decimal64_fast>();
+    test_from_chars_fixed_std<decimal32_t>();
+    test_from_chars_fixed_std<decimal64_t>();
+    test_from_chars_fixed_std<decimal_fast32_t>();
+    test_from_chars_fixed_std<decimal_fast64_t>();
 
-    test_from_chars_general_std<decimal32>();
-    test_from_chars_general_std<decimal64>();
-    test_from_chars_general_std<decimal32_fast>();
-    test_from_chars_general_std<decimal64_fast>();
+    test_from_chars_general_std<decimal32_t>();
+    test_from_chars_general_std<decimal64_t>();
+    test_from_chars_general_std<decimal_fast32_t>();
+    test_from_chars_general_std<decimal_fast64_t>();
     #endif
 
-    test_non_finite_values<decimal32>();
-    test_non_finite_values<decimal64>();
-    test_non_finite_values<decimal32_fast>();
-    test_non_finite_values<decimal64_fast>();
+    test_non_finite_values<decimal32_t>();
+    test_non_finite_values<decimal64_t>();
+    test_non_finite_values<decimal_fast32_t>();
+    test_non_finite_values<decimal_fast64_t>();
 
-    test_hex_values<decimal32>();
-    test_hex_values<decimal64>();
-    test_hex_values<decimal32_fast>();
-    test_hex_values<decimal64_fast>();
+    test_hex_values<decimal32_t>();
+    test_hex_values<decimal64_t>();
+    test_hex_values<decimal_fast32_t>();
+    test_hex_values<decimal_fast64_t>();
 
-    test_string_interface<decimal32>();
-    test_string_interface<decimal64>();
-    test_string_interface<decimal32_fast>();
-    test_string_interface<decimal64_fast>();
+    test_string_interface<decimal32_t>();
+    test_string_interface<decimal64_t>();
+    test_string_interface<decimal_fast32_t>();
+    test_string_interface<decimal_fast64_t>();
 
     #if !defined(BOOST_DECIMAL_REDUCE_TEST_DEPTH)
-    test_from_chars_scientific<decimal128>();
-    test_from_chars_fixed<decimal128>();
-    test_from_chars_general<decimal128>();
-    test_non_finite_values<decimal128>();
-    test_hex_values<decimal128>();
-    test_string_interface<decimal128>();
+    test_from_chars_scientific<decimal128_t>();
+    test_from_chars_fixed<decimal128_t>();
+    test_from_chars_general<decimal128_t>();
+    test_non_finite_values<decimal128_t>();
+    test_hex_values<decimal128_t>();
+    test_string_interface<decimal128_t>();
 
-    test_from_chars_scientific<decimal128_fast>();
-    test_from_chars_fixed<decimal128_fast>();
-    test_from_chars_general<decimal128_fast>();
-    test_non_finite_values<decimal128_fast>();
-    test_hex_values<decimal128_fast>();
-    test_string_interface<decimal128_fast>();
+    test_from_chars_scientific<decimal_fast128_t>();
+    test_from_chars_fixed<decimal_fast128_t>();
+    test_from_chars_general<decimal_fast128_t>();
+    test_non_finite_values<decimal_fast128_t>();
+    test_hex_values<decimal_fast128_t>();
+    test_string_interface<decimal_fast128_t>();
     #endif
 
     return boost::report_errors();

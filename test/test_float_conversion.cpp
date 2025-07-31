@@ -73,8 +73,8 @@ void test_compute_float64()
     BOOST_TEST_EQ(compute_float64(1000, 5U * dist(gen), false, success), HUGE_VAL);
     BOOST_TEST_EQ(compute_float64(1000, 5U * dist(gen), true, success), -HUGE_VAL);
     BOOST_TEST_EQ(compute_float64(-325, 5U * dist(gen), false, success), 0.0);
-    BOOST_TEST_EQ(compute_float64(static_cast<std::int64_t>(dist(gen)) * 50, 0, false, success), 0.0);
-    BOOST_TEST_EQ(compute_float64(static_cast<std::int64_t>(dist(gen)) * 50, 0, true, success), 0.0);
+    BOOST_TEST_EQ(compute_float64(static_cast<std::int64_t>(dist(gen)) * 50U, 0, false, success), 0.0);
+    BOOST_TEST_EQ(compute_float64(static_cast<std::int64_t>(dist(gen)) * 50U, 0, true, success), 0.0);
     BOOST_TEST_EQ(compute_float64(300, UINT64_MAX, false, success), 0.0 * static_cast<double>(dist(gen)));
 
     // Composite
@@ -113,7 +113,7 @@ void test_generic_binary_to_decimal()
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<T, double>::value)
     {
         // Consider the following integral patterns potentially stored
-        // in a given decimal64.
+        // in a given decimal64_t.
 
         // 0x6A3A25E507BB83D9
         // 0x6A3800D0288A63E9
@@ -130,23 +130,23 @@ void test_generic_binary_to_decimal()
         {
             const std::uint64_t ui = bit_values;
 
-            // And we convert it via direct-memory access to a decimal64.
+            // And we convert it via direct-memory access to a decimal64_t.
 
             // In this particular example we assume that this number could
             // be the result of some calculation, initialization or any other
             // valid operations.
 
-            const boost::decimal::decimal64 dec = *reinterpret_cast<const boost::decimal::decimal64*>(&ui);
+            const boost::decimal::decimal64_t dec = *reinterpret_cast<const boost::decimal::decimal64_t*>(&ui);
 
-            // Now let's convert this decimal64 value to built-in double.
+            // Now let's convert this decimal64_t value to built-in double.
             // ISSUE: This cast seems to result in 0.
             const auto dbl = static_cast<double>(dec);
-            const boost::decimal::decimal64 return_dec(dbl);
+            const boost::decimal::decimal64_t return_dec(dbl);
 
             if (!BOOST_TEST(abs(dec - return_dec) <= 1 ))
             {
                 // LCOV_EXCL_START
-                std::cerr << std::scientific << std::setprecision(std::numeric_limits<boost::decimal::decimal64>::digits10)
+                std::cerr << std::scientific << std::setprecision(std::numeric_limits<boost::decimal::decimal64_t>::digits10)
                           << "       Dec: " << dec
                           << "\n       Dbl: " << dbl
                           << "\nReturn Dec: " << return_dec

@@ -3,13 +3,13 @@
 // https://www.boost.org/LICENSE_1_0.txt
 //
 // This is not a fully featured implementation of a 256-bit integer like int128::uint128_t is
-// u256 only contains the minimum amount that we need to perform operations like decimal128 mul
+// u256 only contains the minimum amount that we need to perform operations like decimal128_t mul
 
 #ifndef BOOST_DECIMAL_DETAIL_U256_HPP
 #define BOOST_DECIMAL_DETAIL_U256_HPP
 
 #include <boost/decimal/detail/config.hpp>
-#include <boost/int128.hpp>
+#include "int128.hpp"
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <cstdint>
@@ -746,7 +746,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 from_words(const std::uint32_t (&words
     u256 result {};
 
     #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
-    if (!BOOST_INT128_IS_CONSTANT_EVALUATED(words))
+    if (!BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(words))
     {
         std::memcpy(&result, words, sizeof(result));
     }
@@ -802,7 +802,7 @@ constexpr u256 knuth_mulitply(const std::uint32_t (&u)[u_size],
 constexpr void to_words(const u256& x, std::uint32_t (&words)[8]) noexcept
 {
     #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
-    if (!BOOST_INT128_IS_CONSTANT_EVALUATED(x))
+    if (!BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(x))
     {
         std::memcpy(words, &x, sizeof(x));
     }
@@ -935,7 +935,7 @@ constexpr std::size_t div_to_words(const boost::int128::uint128_t& x, std::uint3
         words[3] = static_cast<std::uint32_t>(static_cast<std::uint64_t>(x.high) >> 32);        // LCOV_EXCL_LINE
     }
 
-    BOOST_INT128_ASSERT_MSG(x != 0U, "Division by 0");
+    BOOST_DECIMAL_DETAIL_INT128_ASSERT_MSG(x != 0U, "Division by 0");
 
     std::size_t word_count {4};
     while (words[word_count - 1U] == 0U)
@@ -960,7 +960,7 @@ constexpr std::size_t div_to_words(const std::uint64_t x, std::uint32_t (&words)
         words[1] = static_cast<std::uint32_t>(x >> 32);
     }
 
-    BOOST_INT128_ASSERT_MSG(x != 0U, "Division by 0");
+    BOOST_DECIMAL_DETAIL_INT128_ASSERT_MSG(x != 0U, "Division by 0");
 
     std::size_t word_count {2};
     while (words[word_count - 1U] == 0U)
@@ -1012,7 +1012,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr u256 default_div(const u256& lhs, const Uns
     const auto m {div_to_words(lhs, u)};
     const auto n {div_to_words(rhs, v)};
 
-    BOOST_INT128_ASSERT(m >= n);
+    BOOST_DECIMAL_DETAIL_INT128_ASSERT(m >= n);
 
     int128::detail::impl::knuth_divide<false>(u, m, v, n, q);
 

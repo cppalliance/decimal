@@ -29,10 +29,10 @@ namespace decimal {
 namespace detail {
 
 template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
+constexpr auto rint_impl(T1& sig, T2 exp, const bool sign)
 {
-    using RoundType = std::conditional_t<std::is_same<T1, std::uint32_t>::value, decimal32,
-                      std::conditional_t<std::is_same<T1, std::uint64_t>::value, decimal64, decimal128>>;
+    using RoundType = std::conditional_t<std::is_same<T1, std::uint32_t>::value, decimal32_t,
+                      std::conditional_t<std::is_same<T1, std::uint64_t>::value, decimal64_t, decimal128_t>>;
 
     const T2 abs_exp { (exp < T2(0)) ? -exp : exp };
 
@@ -49,7 +49,7 @@ constexpr auto rint_impl(T1& sig, T2 exp, bool sign)
 #endif
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T, BOOST_DECIMAL_INTEGRAL Int>
-constexpr auto lrint_impl(T num) noexcept -> Int
+constexpr auto lrint_impl(const T num) noexcept -> Int
 {
     constexpr T zero {0, 0};
     constexpr T lmax {(std::numeric_limits<Int>::max)()};
@@ -61,7 +61,7 @@ constexpr auto lrint_impl(T num) noexcept -> Int
         // Implementation defined what to return here
         return std::numeric_limits<Int>::min();
     }
-    else if (abs(num) == zero)
+    if (abs(num) == zero)
     {
         return 0;
     }
@@ -113,7 +113,7 @@ constexpr auto lrint_impl(T num) noexcept -> Int
 
 // Rounds the number using the default rounding mode
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto rint(T num) noexcept
+constexpr auto rint(const T num) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero {0, 0};
@@ -150,14 +150,14 @@ constexpr auto rint(T num) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto lrint(T num) noexcept
+constexpr auto lrint(const T num) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, long)
 {
     return detail::lrint_impl<T, long>(num);
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto llrint(T num) noexcept
+constexpr auto llrint(const T num) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, long long)
 {
     return detail::lrint_impl<T, long long>(num);

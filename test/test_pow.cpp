@@ -1119,7 +1119,7 @@ auto main() -> int
   auto result_is_ok = true;
 
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = boost::decimal::decimal32_t;
     using float_type   = float;
 
     const auto test_pow_edge_is_ok   = local::test_pow_edge  <decimal_type, float_type>();
@@ -1134,7 +1134,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal32;
+    using decimal_type = boost::decimal::decimal32_t;
 
     const auto test_10_pow_n_is_ok   = local::test_10_pow_n<decimal_type>();
 
@@ -1142,7 +1142,7 @@ auto main() -> int
   }
 
   {
-    using decimal_type = boost::decimal::decimal64;
+    using decimal_type = boost::decimal::decimal64_t;
     using float_type   = double;
 
     const auto test_pow_edge_is_ok   = local::test_pow_edge  <decimal_type, float_type>();

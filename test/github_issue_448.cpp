@@ -43,13 +43,13 @@ void test_memset()
 
 int main()
 {
-    test_type_traits<boost::decimal::decimal32>();
-    test_type_traits<boost::decimal::decimal64>();
-    test_type_traits<boost::decimal::decimal128>();
+    test_type_traits<boost::decimal::decimal32_t>();
+    test_type_traits<boost::decimal::decimal64_t>();
+    test_type_traits<boost::decimal::decimal128_t>();
 
-    test_memset<boost::decimal::decimal32>();
-    test_memset<boost::decimal::decimal64>();
-    test_memset<boost::decimal::decimal128>();
+    test_memset<boost::decimal::decimal32_t>();
+    test_memset<boost::decimal::decimal64_t>();
+    test_memset<boost::decimal::decimal128_t>();
 
     return boost::report_errors();
 }
