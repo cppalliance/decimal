@@ -16,7 +16,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto exp2_impl(T num) noexcept
+constexpr auto exp2_impl(const T num) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T two {2, 0};
@@ -27,7 +27,7 @@ constexpr auto exp2_impl(T num) noexcept
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto exp2(T num) noexcept
+constexpr auto exp2(const T num) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

@@ -22,7 +22,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto modf(T x, T* iptr) noexcept
+constexpr auto modf(const T x, T* iptr) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero {0, 0};

@@ -19,7 +19,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto isgreater(T lhs, T rhs) noexcept
+constexpr auto isgreater(const T lhs, const T rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -33,7 +33,7 @@ constexpr auto isgreater(T lhs, T rhs) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto isgreaterequal(T lhs, T rhs) noexcept
+constexpr auto isgreaterequal(const T lhs, const T rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH

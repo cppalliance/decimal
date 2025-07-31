@@ -19,7 +19,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexcept
+constexpr auto abs BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (const T rhs) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     return signbit(rhs) ? -rhs : rhs;

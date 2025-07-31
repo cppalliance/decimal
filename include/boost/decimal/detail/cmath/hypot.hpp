@@ -26,7 +26,7 @@ namespace decimal {
 namespace detail {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto hypot_impl(T x, T y) noexcept
+constexpr auto hypot_impl(const T x, const T y) noexcept
 {
     constexpr T zero {0, 0};
 
@@ -72,7 +72,7 @@ constexpr auto hypot_impl(T x, T y) noexcept
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto hypot_impl(T x, T y, T z) noexcept
+constexpr auto hypot_impl(const T x, const T y, const T z) noexcept
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(x) || isinf(y) || isinf(z))
@@ -104,7 +104,7 @@ constexpr auto hypot_impl(T x, T y, T z) noexcept
 } // namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T1, typename T2>
-constexpr auto hypot(T1 x, T2 y) noexcept
+constexpr auto hypot(const T1 x, const T2 y) noexcept
     BOOST_DECIMAL_REQUIRES_TWO(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -127,7 +127,7 @@ constexpr auto hypot(T1 x, T2 y) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename T1, typename T2, typename T3>
-constexpr auto hypot(T1 x, T2 y, T3 z) noexcept
+constexpr auto hypot(const T1 x, const T2 y, const T3 z) noexcept
     BOOST_DECIMAL_REQUIRES_THREE(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2, detail::is_decimal_floating_point_v, T3)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

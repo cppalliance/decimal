@@ -24,7 +24,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto cbrt_impl(T x) noexcept
+constexpr auto cbrt_impl(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto fpc = fpclassify(x);
@@ -181,7 +181,7 @@ constexpr auto cbrt_impl(T x) noexcept
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto cbrt(T val) noexcept
+constexpr auto cbrt(const T val) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

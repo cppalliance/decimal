@@ -27,7 +27,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto riemann_zeta_impl(T x) noexcept
+constexpr auto riemann_zeta_impl(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     const auto fpc = fpclassify(x);
@@ -202,7 +202,7 @@ constexpr auto riemann_zeta_impl(T x) noexcept
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto riemann_zeta(T x) noexcept
+constexpr auto riemann_zeta(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -223,7 +223,7 @@ constexpr auto riemann_zeta(T x) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename T, typename IntegralType>
-constexpr auto riemann_zeta(IntegralType n) noexcept
+constexpr auto riemann_zeta(const IntegralType n) noexcept
     BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, T, detail::is_integral_v, IntegralType, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

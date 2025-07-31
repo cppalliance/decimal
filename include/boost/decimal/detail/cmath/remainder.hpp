@@ -20,7 +20,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto remainder(T x, T y) noexcept
+constexpr auto remainder(const T x, const T y) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero {0, 0};
