@@ -52,7 +52,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
             static_cast<void>(success);
     }
 
-    // The casts to result are redundant but in pre C++17 modes MSVC warns about implicit conversions
+    // The casts to result are redundant, but in pre C++17 modes MSVC warns about implicit conversions
     TargetType result {};
 
     auto sig {val.full_significand()};
