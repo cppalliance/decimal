@@ -170,12 +170,12 @@ public:
     friend constexpr auto direct_init_d128(significand_type significand, exponent_type exponent, bool sign) noexcept -> decimal_fast128_t;
 
     // Classification functions
-    friend constexpr auto signbit(decimal_fast128_t val) noexcept -> bool;
-    friend constexpr auto isinf(decimal_fast128_t val) noexcept -> bool;
-    friend constexpr auto isnan(decimal_fast128_t val) noexcept -> bool;
-    friend constexpr auto issignaling(decimal_fast128_t val) noexcept -> bool;
-    friend constexpr auto isnormal(decimal_fast128_t val) noexcept -> bool;
-    friend constexpr auto isfinite(decimal_fast128_t val) noexcept -> bool;
+    friend constexpr auto signbit(const decimal_fast128_t& val) noexcept -> bool;
+    friend constexpr auto isinf(const decimal_fast128_t& val) noexcept -> bool;
+    friend constexpr auto isnan(const decimal_fast128_t& val) noexcept -> bool;
+    friend constexpr auto issignaling(const decimal_fast128_t& val) noexcept -> bool;
+    friend constexpr auto isnormal(const decimal_fast128_t& val) noexcept -> bool;
+    friend constexpr auto isfinite(const decimal_fast128_t& val) noexcept -> bool;
 
     // Comparison operators
     friend constexpr auto operator==(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs) noexcept -> bool;
@@ -187,51 +187,51 @@ public:
 
     // Mixed comparison operators
     template <typename Integer>
-    friend constexpr auto operator==(decimal_fast128_t lhs, Integer rhs) noexcept
+    friend constexpr auto operator==(const decimal_fast128_t& lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator==(Integer lhs, decimal_fast128_t rhs) noexcept
+    friend constexpr auto operator==(Integer lhs, const decimal_fast128_t& rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator!=(decimal_fast128_t lhs, Integer rhs) noexcept
+    friend constexpr auto operator!=(const decimal_fast128_t& lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator!=(Integer lhs, decimal_fast128_t rhs) noexcept
+    friend constexpr auto operator!=(Integer lhs, const decimal_fast128_t& rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator<(decimal_fast128_t lhs, Integer rhs) noexcept
+    friend constexpr auto operator<(const decimal_fast128_t& lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator<(Integer lhs, decimal_fast128_t rhs) noexcept
+    friend constexpr auto operator<(Integer lhs, const decimal_fast128_t& rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator<=(decimal_fast128_t lhs, Integer rhs) noexcept
+    friend constexpr auto operator<=(const decimal_fast128_t& lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator<=(Integer lhs, decimal_fast128_t rhs) noexcept
+    friend constexpr auto operator<=(Integer lhs, const decimal_fast128_t& rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator>(decimal_fast128_t lhs, Integer rhs) noexcept
+    friend constexpr auto operator>(const decimal_fast128_t& lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator>(Integer lhs, decimal_fast128_t rhs) noexcept
+    friend constexpr auto operator>(Integer lhs, const decimal_fast128_t& rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator>=(decimal_fast128_t lhs, Integer rhs) noexcept
+    friend constexpr auto operator>=(const decimal_fast128_t& lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     template <typename Integer>
-    friend constexpr auto operator>=(Integer lhs, decimal_fast128_t rhs) noexcept
+    friend constexpr auto operator>=(Integer lhs, const decimal_fast128_t& rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool);
 
     #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
@@ -247,7 +247,7 @@ public:
     #endif
 
     // Unary arithmetic operators
-    friend constexpr auto operator+(decimal_fast128_t rhs) noexcept -> decimal_fast128_t;
+    friend constexpr auto operator+(const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t;
     friend constexpr auto operator-(decimal_fast128_t rhs) noexcept -> decimal_fast128_t;
 
     // Binary arithmetic operators
@@ -259,57 +259,57 @@ public:
 
     // Mixed type binary arithmetic operators
     template <typename Integer>
-    friend constexpr auto operator+(decimal_fast128_t lhs, Integer rhs) noexcept
+    friend constexpr auto operator+(const decimal_fast128_t& lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t);
 
     template <typename Integer>
-    friend constexpr auto operator+(Integer lhs, decimal_fast128_t rhs) noexcept
+    friend constexpr auto operator+(Integer lhs, const decimal_fast128_t& rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t);
 
     template <typename Integer>
-    friend constexpr auto operator-(decimal_fast128_t lhs, Integer rhs) noexcept
+    friend constexpr auto operator-(const decimal_fast128_t& lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t);
 
     template <typename Integer>
-    friend constexpr auto operator-(Integer lhs, decimal_fast128_t rhs) noexcept
+    friend constexpr auto operator-(Integer lhs, const decimal_fast128_t& rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t);
 
     template <typename Integer>
-    friend constexpr auto operator*(decimal_fast128_t lhs, Integer rhs) noexcept
+    friend constexpr auto operator*(const decimal_fast128_t& lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t);
 
     template <typename Integer>
-    friend constexpr auto operator*(Integer lhs, decimal_fast128_t rhs) noexcept
+    friend constexpr auto operator*(Integer lhs, const decimal_fast128_t& rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t);
 
     template <typename Integer>
-    friend constexpr auto operator/(decimal_fast128_t lhs, Integer rhs) noexcept
+    friend constexpr auto operator/(const decimal_fast128_t& lhs, Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t);
 
     template <typename Integer>
-    friend constexpr auto operator/(Integer lhs, decimal_fast128_t rhs) noexcept
+    friend constexpr auto operator/(Integer lhs, const decimal_fast128_t& rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t);
 
     // Compound Arithmetic Operators
-    constexpr auto operator+=(decimal_fast128_t rhs) noexcept -> decimal_fast128_t&;
+    constexpr auto operator+=(const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t&;
 
     template <typename Integer>
     constexpr auto operator+=(Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t&);
 
-    constexpr auto operator-=(decimal_fast128_t rhs) noexcept -> decimal_fast128_t&;
+    constexpr auto operator-=(const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t&;
 
     template <typename Integer>
     constexpr auto operator-=(Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t&);
 
-    constexpr auto operator*=(decimal_fast128_t rhs) noexcept -> decimal_fast128_t&;
+    constexpr auto operator*=(const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t&;
 
     template <typename Integer>
     constexpr auto operator*=(Integer rhs) noexcept
         BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t&);
 
-    constexpr auto operator/=(decimal_fast128_t rhs) noexcept -> decimal_fast128_t&;
+    constexpr auto operator/=(const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t&;
 
     template <typename Integer>
     constexpr auto operator/=(Integer rhs) noexcept
@@ -363,7 +363,7 @@ public:
     friend constexpr auto samequantumd128f(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs) noexcept -> bool;
 
     // 3.6.5 Quantum exponent
-    friend constexpr auto quantexpd128f(decimal_fast128_t x) noexcept -> int;
+    friend constexpr auto quantexpd128f(const decimal_fast128_t& x) noexcept -> int;
 
     // 3.6.6 Quantize
     friend constexpr auto quantized128f(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t;
@@ -414,18 +414,16 @@ template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 #else
 template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
 #endif
-constexpr decimal_fast128_t::decimal_fast128_t(T1 coeff, T2 exp) noexcept : decimal_fast128_t(detail::make_positive_unsigned(coeff), exp, coeff < 0) {}
+constexpr decimal_fast128_t::decimal_fast128_t(const T1 coeff, const T2 exp) noexcept : decimal_fast128_t(detail::make_positive_unsigned(coeff), exp, coeff < 0) {}
 
-constexpr decimal_fast128_t::decimal_fast128_t(bool value) noexcept : decimal_fast128_t(static_cast<significand_type>(value), 0, false) {}
+constexpr decimal_fast128_t::decimal_fast128_t(const bool value) noexcept : decimal_fast128_t(static_cast<significand_type>(value), 0, false) {}
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_INTEGRAL Integer>
 #else
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
 #endif
-constexpr decimal_fast128_t::decimal_fast128_t(Integer val) noexcept : decimal_fast128_t{val, 0}
-{
-}
+constexpr decimal_fast128_t::decimal_fast128_t(const Integer val) noexcept : decimal_fast128_t{val, 0} {}
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -440,7 +438,7 @@ template <BOOST_DECIMAL_REAL Float>
 #else
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
 #endif
-BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast128_t::decimal_fast128_t(Float val) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast128_t::decimal_fast128_t(const Float val) noexcept
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (val != val)
@@ -465,7 +463,9 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast128_t::decimal_fast128_t(Float val) no
 #  pragma GCC diagnostic pop
 #endif
 
-constexpr auto direct_init_d128(decimal_fast128_t::significand_type significand, decimal_fast128_t::exponent_type exponent, bool sign) noexcept -> decimal_fast128_t
+constexpr auto direct_init_d128(const decimal_fast128_t::significand_type significand,
+                                const decimal_fast128_t::exponent_type exponent,
+                                const bool sign) noexcept -> decimal_fast128_t
 {
     decimal_fast128_t val {};
     val.significand_ = significand;
@@ -475,12 +475,12 @@ constexpr auto direct_init_d128(decimal_fast128_t::significand_type significand,
     return val;
 }
 
-constexpr auto signbit(decimal_fast128_t val) noexcept -> bool
+constexpr auto signbit(const decimal_fast128_t& val) noexcept -> bool
 {
     return val.sign_;
 }
 
-constexpr auto isinf(decimal_fast128_t val) noexcept -> bool
+constexpr auto isinf(const decimal_fast128_t& val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high == detail::d128_fast_inf_high_bits;
@@ -490,7 +490,7 @@ constexpr auto isinf(decimal_fast128_t val) noexcept -> bool
     #endif
 }
 
-constexpr auto isnan(decimal_fast128_t val) noexcept -> bool
+constexpr auto isnan(const decimal_fast128_t& val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high >= detail::d128_fast_qnan_high_bits;
@@ -500,7 +500,7 @@ constexpr auto isnan(decimal_fast128_t val) noexcept -> bool
     #endif
 }
 
-constexpr auto issignaling(decimal_fast128_t val) noexcept -> bool
+constexpr auto issignaling(const decimal_fast128_t& val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high == detail::d128_fast_snan_high_bits;
@@ -510,7 +510,7 @@ constexpr auto issignaling(decimal_fast128_t val) noexcept -> bool
     #endif
 }
 
-constexpr auto isnormal(decimal_fast128_t val) noexcept -> bool
+constexpr auto isnormal(const decimal_fast128_t& val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (val.exponent_ <= static_cast<decimal_fast128_t::exponent_type>(detail::precision_v<decimal128_t> - 1))
@@ -524,7 +524,7 @@ constexpr auto isnormal(decimal_fast128_t val) noexcept -> bool
     #endif
 }
 
-constexpr auto isfinite(decimal_fast128_t val) noexcept -> bool
+constexpr auto isfinite(const decimal_fast128_t& val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_.high < detail::d128_fast_inf_high_bits;
@@ -550,14 +550,14 @@ constexpr auto operator==(const decimal_fast128_t& lhs, const decimal_fast128_t&
 }
 
 template <typename Integer>
-constexpr auto operator==(decimal_fast128_t lhs, Integer rhs) noexcept
+constexpr auto operator==(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return mixed_equality_impl(lhs, rhs);
 }
 
 template <typename Integer>
-constexpr auto operator==(Integer lhs, decimal_fast128_t rhs) noexcept
+constexpr auto operator==(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return mixed_equality_impl(rhs, lhs);
@@ -569,14 +569,14 @@ constexpr auto operator!=(const decimal_fast128_t& lhs, const decimal_fast128_t&
 }
 
 template <typename Integer>
-constexpr auto operator!=(decimal_fast128_t lhs, Integer rhs) noexcept
+constexpr auto operator!=(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return !(lhs == rhs);
 }
 
 template <typename Integer>
-constexpr auto operator!=(Integer lhs, decimal_fast128_t rhs) noexcept
+constexpr auto operator!=(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return !(lhs == rhs);
@@ -588,14 +588,14 @@ constexpr auto operator<(const decimal_fast128_t& lhs, const decimal_fast128_t& 
 }
 
 template <typename Integer>
-constexpr auto operator<(decimal_fast128_t lhs, Integer rhs) noexcept
+constexpr auto operator<(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return less_impl(lhs, rhs);
 }
 
 template <typename Integer>
-constexpr auto operator<(Integer lhs, decimal_fast128_t rhs) noexcept
+constexpr auto operator<(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -621,7 +621,7 @@ constexpr auto operator<=(const decimal_fast128_t& lhs, const decimal_fast128_t&
 }
 
 template <typename Integer>
-constexpr auto operator<=(decimal_fast128_t lhs, Integer rhs) noexcept
+constexpr auto operator<=(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -635,7 +635,7 @@ constexpr auto operator<=(decimal_fast128_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator<=(Integer lhs, decimal_fast128_t rhs) noexcept
+constexpr auto operator<=(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -654,14 +654,14 @@ constexpr auto operator>(const decimal_fast128_t& lhs, const decimal_fast128_t& 
 }
 
 template <typename Integer>
-constexpr auto operator>(decimal_fast128_t lhs, Integer rhs) noexcept
+constexpr auto operator>(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return rhs < lhs;
 }
 
 template <typename Integer>
-constexpr auto operator>(Integer lhs, decimal_fast128_t rhs) noexcept
+constexpr auto operator>(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return rhs < lhs;
@@ -680,7 +680,7 @@ constexpr auto operator>=(const decimal_fast128_t& lhs, const decimal_fast128_t&
 }
 
 template <typename Integer>
-constexpr auto operator>=(decimal_fast128_t lhs, Integer rhs) noexcept
+constexpr auto operator>=(const decimal_fast128_t& lhs, const Integer rhs) noexcept
 BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -694,7 +694,7 @@ BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 }
 
 template <typename Integer>
-constexpr auto operator>=(Integer lhs, decimal_fast128_t rhs) noexcept
+constexpr auto operator>=(const Integer lhs, const decimal_fast128_t& rhs) noexcept
 BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -728,7 +728,7 @@ constexpr auto operator<=>(const decimal_fast128_t& lhs, const decimal_fast128_t
 }
 
 template <typename Integer>
-constexpr auto operator<=>(const decimal_fast128_t& lhs, Integer rhs) noexcept
+constexpr auto operator<=>(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
 {
     if (lhs < rhs)
@@ -748,7 +748,7 @@ constexpr auto operator<=>(const decimal_fast128_t& lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator<=>(Integer lhs, const decimal_fast128_t& rhs) noexcept
+constexpr auto operator<=>(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
 {
     if (lhs < rhs)
@@ -769,7 +769,7 @@ constexpr auto operator<=>(Integer lhs, const decimal_fast128_t& rhs) noexcept
 
 #endif
 
-constexpr auto operator+(decimal_fast128_t rhs) noexcept -> decimal_fast128_t
+constexpr auto operator+(const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t
 {
     return rhs;
 }
@@ -796,7 +796,7 @@ constexpr auto operator+(const decimal_fast128_t& lhs, const decimal_fast128_t& 
 };
 
 template <typename Integer>
-constexpr auto operator+(decimal_fast128_t lhs, Integer rhs) noexcept
+constexpr auto operator+(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
     using exp_type = decimal_fast128_t::biased_exponent_type;
@@ -820,7 +820,7 @@ constexpr auto operator+(decimal_fast128_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator+(Integer lhs, decimal_fast128_t rhs) noexcept
+constexpr auto operator+(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
     return rhs + lhs;
@@ -842,7 +842,7 @@ constexpr auto operator-(const decimal_fast128_t& lhs, const decimal_fast128_t& 
 }
 
 template <typename Integer>
-constexpr auto operator-(decimal_fast128_t lhs, Integer rhs) noexcept
+constexpr auto operator-(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
     using exp_type = decimal_fast128_t::biased_exponent_type;
@@ -867,7 +867,7 @@ constexpr auto operator-(decimal_fast128_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator-(Integer lhs, decimal_fast128_t rhs) noexcept
+constexpr auto operator-(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
     using exp_type = decimal_fast128_t::biased_exponent_type;
@@ -905,7 +905,7 @@ constexpr auto operator*(const decimal_fast128_t& lhs, const decimal_fast128_t& 
 }
 
 template <typename Integer>
-constexpr auto operator*(decimal_fast128_t lhs, Integer rhs) noexcept
+constexpr auto operator*(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
     using exp_type = decimal_fast128_t::biased_exponent_type;
@@ -927,7 +927,7 @@ constexpr auto operator*(decimal_fast128_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator*(Integer lhs, decimal_fast128_t rhs) noexcept
+constexpr auto operator*(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
     return rhs * lhs;
@@ -1018,14 +1018,14 @@ constexpr auto operator/(const decimal_fast128_t& lhs, const decimal_fast128_t& 
 };
 
 template <typename Integer>
-constexpr auto operator/(decimal_fast128_t lhs, Integer rhs) noexcept
+constexpr auto operator/(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal_fast128_t zero {0, 0};
-    constexpr decimal_fast128_t nan {boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_qnan, 0, false)};
-    constexpr decimal_fast128_t inf {boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_inf, 0, false)};
+    constexpr decimal_fast128_t nan {direct_init_d128(detail::d128_fast_qnan, 0, false)};
+    constexpr decimal_fast128_t inf {direct_init_d128(detail::d128_fast_inf, 0, false)};
 
     const bool sign {lhs.isneg() != (rhs < 0)};
 
@@ -1049,10 +1049,10 @@ constexpr auto operator/(decimal_fast128_t lhs, Integer rhs) noexcept
     }
     #endif
 
-    detail::decimal_fast128_t_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.isneg()};
+    const detail::decimal_fast128_t_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.isneg()};
 
-    auto rhs_sig {detail::make_positive_unsigned(rhs)};
-    detail::decimal_fast128_t_components rhs_components {rhs_sig, 0, rhs < 0};
+    const auto rhs_sig {detail::make_positive_unsigned(rhs)};
+    const detail::decimal_fast128_t_components rhs_components {rhs_sig, 0, rhs < 0};
     detail::decimal_fast128_t_components q_components {};
 
     detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
@@ -1061,7 +1061,7 @@ constexpr auto operator/(decimal_fast128_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator/(Integer lhs, decimal_fast128_t rhs) noexcept
+constexpr auto operator/(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -1090,8 +1090,8 @@ constexpr auto operator/(Integer lhs, decimal_fast128_t rhs) noexcept
     }
     #endif
 
-    detail::decimal_fast128_t_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
-    detail::decimal_fast128_t_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.isneg()};
+    const detail::decimal_fast128_t_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
+    const detail::decimal_fast128_t_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.isneg()};
     detail::decimal_fast128_t_components q_components {};
 
     detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
@@ -1109,56 +1109,56 @@ constexpr auto operator%(const decimal_fast128_t& lhs, const decimal_fast128_t& 
     return r;
 };
 
-constexpr auto decimal_fast128_t::operator+=(decimal_fast128_t rhs) noexcept -> decimal_fast128_t&
+constexpr auto decimal_fast128_t::operator+=(const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t&
 {
     *this = *this + rhs;
     return *this;
 }
 
 template <typename Integer>
-constexpr auto decimal_fast128_t::operator+=(Integer rhs) noexcept
+constexpr auto decimal_fast128_t::operator+=(const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t&)
 {
     *this = *this + rhs;
     return *this;
 }
 
-constexpr auto decimal_fast128_t::operator-=(decimal_fast128_t rhs) noexcept -> decimal_fast128_t&
+constexpr auto decimal_fast128_t::operator-=(const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t&
 {
     *this = *this - rhs;
     return *this;
 }
 
 template <typename Integer>
-constexpr auto decimal_fast128_t::operator-=(Integer rhs) noexcept
+constexpr auto decimal_fast128_t::operator-=(const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t&)
 {
     *this = *this - rhs;
     return *this;
 }
 
-constexpr auto decimal_fast128_t::operator*=(decimal_fast128_t rhs) noexcept -> decimal_fast128_t&
+constexpr auto decimal_fast128_t::operator*=(const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t&
 {
     *this = *this * rhs;
     return *this;
 }
 
 template <typename Integer>
-constexpr auto decimal_fast128_t::operator*=(Integer rhs) noexcept
+constexpr auto decimal_fast128_t::operator*=(const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t&)
 {
     *this = *this * rhs;
     return *this;
 }
 
-constexpr auto decimal_fast128_t::operator/=(decimal_fast128_t rhs) noexcept -> decimal_fast128_t&
+constexpr auto decimal_fast128_t::operator/=(const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t&
 {
     *this = *this / rhs;
     return *this;
 }
 
 template <typename Integer>
-constexpr auto decimal_fast128_t::operator/=(Integer rhs) noexcept
+constexpr auto decimal_fast128_t::operator/=(const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t&)
 {
     *this = *this / rhs;
@@ -1261,13 +1261,13 @@ constexpr decimal_fast128_t::operator Decimal() const noexcept
     return to_decimal<Decimal>(*this);
 }
 
-constexpr auto copysignd128f(decimal_fast128_t mag, decimal_fast128_t sgn) noexcept -> decimal_fast128_t
+constexpr auto copysignd128f(decimal_fast128_t mag, const decimal_fast128_t sgn) noexcept -> decimal_fast128_t
 {
     mag.sign_ = sgn.sign_;
     return mag;
 }
 
-constexpr auto scalblnd128f(decimal_fast128_t num, long exp) noexcept -> decimal_fast128_t
+constexpr auto scalblnd128f(decimal_fast128_t num, const long exp) noexcept -> decimal_fast128_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal_fast128_t zero {0, 0};
@@ -1283,7 +1283,7 @@ constexpr auto scalblnd128f(decimal_fast128_t num, long exp) noexcept -> decimal
     return num;
 }
 
-constexpr auto scalbnd128f(decimal_fast128_t num, int exp) noexcept -> decimal_fast128_t
+constexpr auto scalbnd128f(const decimal_fast128_t num, const int exp) noexcept -> decimal_fast128_t
 {
     return scalblnd128f(num, static_cast<long>(exp));
 }
@@ -1315,7 +1315,7 @@ constexpr auto samequantumd128f(const decimal_fast128_t& lhs, const decimal_fast
 // 3.6.5
 // Effects: if x is finite, returns its quantum exponent.
 // Otherwise, a domain error occurs and INT_MIN is returned.
-constexpr auto quantexpd128f(decimal_fast128_t x) noexcept -> int
+constexpr auto quantexpd128f(const decimal_fast128_t& x) noexcept -> int
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (!isfinite(x))
