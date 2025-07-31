@@ -85,14 +85,14 @@ Intel Compiler:
 | 698,945
 | 4.856
 | Intel `Decimal32`
-| 2,023,493
-| 14.059
+| 2,411,294
+| 16.754
 | Intel `Decimal64`
-| 2,386,409
-| 16.581
+| 3,158,422
+| 21.945
 | Intel `Decimal128`
-| 3,203,050
-| 22.255
+| 3,389,883
+| 23.553
 |===
 
 GCC:
@@ -165,14 +165,14 @@ Intel Compiler:
 | 1,367,004
 | 15.092
 | Intel `Decimal32`
-| 1,159,069
-| 12.796
+| 1,242,797
+| 13.721
 | Intel `Decimal64`
-| 1,248,111
-| 13.779
+| 1,689,585
+| 18.653
 | Intel `Decimal128`
-| 2,099,084
-| 23.174
+| 1,958,345
+| 21.620
 |===
 
 GCC:
@@ -245,14 +245,14 @@ Intel Compiler:
 | 1,212,405
 | 16.564
 | Intel `Decimal32`
-| 1,275,562
-| 17.427
+| 1,922,108
+| 26.261
 | Intel `Decimal64`
-| 1,019,947
-| 13.935
+| 1,793,879
+| 24.509
 | Intel `Decimal128`
-| 2,162,490
-| 29.545
+| 2,397,372
+| 32.754
 |===
 
 GCC:
@@ -325,15 +325,14 @@ Intel Compiler:
 | 5,959,977
 | 81.870
 | Intel `Decimal32`
-| 931,655
-| 12.798
+| 1,375,434
+| 18.894
 | Intel `Decimal64`
-| 963,464
-| 13.235
-// For unknown reasons this function segfaults
-//| Intel `Decimal128`
-//| 2,162,490
-//| 29.545
+| 2,052,278
+| 28.191
+| Intel `Decimal128`
+| 5,964,489
+| 81.932
 |===
 
 GCC:
@@ -405,16 +404,15 @@ Intel Compiler:
 | `decimal_fast128_t`
 | 8,277,721
 | 79.750
-// For unknown reasons this function segfaults
-//| Intel `Decimal32`
-//| 931,655
-//| 12.798
-//| Intel `Decimal64`
-//| 963,464
-//| 13.235
-//| Intel `Decimal128`
-//| 2,162,490
-//| 29.545
+| Intel `Decimal32`
+| 1,561,213
+| 15.041
+| Intel `Decimal64`
+| 3,115,862
+| 30.019
+| Intel `Decimal128`
+| 7,474,712
+| 72.013
 |===
 
 GCC:
