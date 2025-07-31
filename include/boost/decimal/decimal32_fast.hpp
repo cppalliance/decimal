@@ -322,7 +322,7 @@ public:
     explicit constexpr operator detail::builtin_uint128_t() const noexcept;
     #endif
 
-    // 3.2.6 Conversion to floating-point type
+    // 3.2.6 Conversion to a floating-point type
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator float() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator double() const noexcept;
     explicit BOOST_DECIMAL_CXX20_CONSTEXPR operator long double() const noexcept;
@@ -341,7 +341,7 @@ public:
     #endif
 
 
-    // Conversion to other decimal type
+    // Conversion to another decimal type
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, std::enable_if_t<detail::is_decimal_floating_point_v<Decimal> && (detail::decimal_val_v<Decimal> > detail::decimal_val_v<decimal_fast32_t>), bool> = true>
     constexpr operator Decimal() const noexcept;
 
@@ -411,12 +411,12 @@ constexpr decimal_fast32_t::decimal_fast32_t(T1 coeff, T2 exp, bool sign) noexce
 }
 
 template <typename T1, typename T2, std::enable_if_t<!detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
-constexpr decimal_fast32_t::decimal_fast32_t(T1 coeff, T2 exp) noexcept : decimal_fast32_t(detail::make_positive_unsigned(coeff), exp, coeff < 0) {}
+constexpr decimal_fast32_t::decimal_fast32_t(const T1 coeff, const T2 exp) noexcept : decimal_fast32_t(detail::make_positive_unsigned(coeff), exp, coeff < 0) {}
 
-constexpr decimal_fast32_t::decimal_fast32_t(bool value) noexcept : decimal_fast32_t(static_cast<significand_type>(value), 0, false) {}
+constexpr decimal_fast32_t::decimal_fast32_t(const bool value) noexcept : decimal_fast32_t(static_cast<significand_type>(value), 0, false) {}
 
 template <typename Integer, std::enable_if_t<detail::is_integral_v<Integer>, bool>>
-constexpr decimal_fast32_t::decimal_fast32_t(Integer val) noexcept : decimal_fast32_t{val, 0} {}
+constexpr decimal_fast32_t::decimal_fast32_t(const Integer val) noexcept : decimal_fast32_t{val, 0} {}
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -427,7 +427,7 @@ constexpr decimal_fast32_t::decimal_fast32_t(Integer val) noexcept : decimal_fas
 #endif
 
 template <typename Float, std::enable_if_t<detail::is_floating_point_v<Float>, bool>>
-BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast32_t::decimal_fast32_t(Float val) noexcept
+BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast32_t::decimal_fast32_t(const Float val) noexcept
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (val != val)
@@ -472,12 +472,12 @@ constexpr auto direct_init(const detail::decimal_fast32_t_components& x) noexcep
     return val;
 }
 
-constexpr auto signbit(decimal_fast32_t val) noexcept -> bool
+constexpr auto signbit(const decimal_fast32_t val) noexcept -> bool
 {
     return val.sign_;
 }
 
-constexpr auto isinf(decimal_fast32_t val) noexcept -> bool
+constexpr auto isinf(const decimal_fast32_t val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d32_fast_inf;
@@ -487,7 +487,7 @@ constexpr auto isinf(decimal_fast32_t val) noexcept -> bool
     #endif
 }
 
-constexpr auto isnan(decimal_fast32_t val) noexcept -> bool
+constexpr auto isnan(const decimal_fast32_t val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ >= detail::d32_fast_qnan;
@@ -497,7 +497,7 @@ constexpr auto isnan(decimal_fast32_t val) noexcept -> bool
     #endif
 }
 
-constexpr auto issignaling(decimal_fast32_t val) noexcept -> bool
+constexpr auto issignaling(const decimal_fast32_t val) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     return val.significand_ == detail::d32_fast_snan;
@@ -507,7 +507,7 @@ constexpr auto issignaling(decimal_fast32_t val) noexcept -> bool
     #endif
 }
 
-constexpr auto isnormal(decimal_fast32_t val) noexcept -> bool
+constexpr auto isnormal(const decimal_fast32_t val) noexcept -> bool
 {
     return (val.significand_ != 0)
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -516,7 +516,7 @@ constexpr auto isnormal(decimal_fast32_t val) noexcept -> bool
     ;
 }
 
-constexpr auto isfinite(decimal_fast32_t val) noexcept -> bool
+constexpr auto isfinite(const decimal_fast32_t val) noexcept -> bool
 {
     return val.significand_ < detail::d32_fast_inf;
 }
@@ -526,22 +526,22 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto not_finite(const decimal_fast32_t& val
     return val.significand_ >= detail::d32_fast_inf;
 }
 
-constexpr auto operator==(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> bool
+constexpr auto operator==(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> bool
 {
     return fast_equality_impl(lhs, rhs);
 }
 
-constexpr auto operator!=(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> bool
+constexpr auto operator!=(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> bool
 {
     return fast_inequality_impl(lhs, rhs);
 }
 
-constexpr auto operator<(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> bool
+constexpr auto operator<(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> bool
 {
     return fast_less_impl(lhs, rhs);
 }
 
-constexpr auto operator<=(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> bool
+constexpr auto operator<=(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
@@ -553,12 +553,12 @@ constexpr auto operator<=(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -
     return !(rhs < lhs);
 }
 
-constexpr auto operator>(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> bool
+constexpr auto operator>(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> bool
 {
     return rhs < lhs;
 }
 
-constexpr auto operator>=(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> bool
+constexpr auto operator>=(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isnan(lhs) || isnan(rhs))
@@ -571,42 +571,42 @@ constexpr auto operator>=(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -
 }
 
 template <typename Integer>
-constexpr auto operator==(decimal_fast32_t lhs, Integer rhs) noexcept
+constexpr auto operator==(const decimal_fast32_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return mixed_equality_impl(lhs, rhs);
 }
 
 template <typename Integer>
-constexpr auto operator==(Integer lhs, decimal_fast32_t rhs) noexcept
+constexpr auto operator==(const Integer lhs, const decimal_fast32_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return mixed_equality_impl(rhs, lhs);
 }
 
 template <typename Integer>
-constexpr auto operator!=(decimal_fast32_t lhs, Integer rhs) noexcept
+constexpr auto operator!=(const decimal_fast32_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return !(lhs == rhs);
 }
 
 template <typename Integer>
-constexpr auto operator!=(Integer lhs, decimal_fast32_t rhs) noexcept
+constexpr auto operator!=(const Integer lhs, const decimal_fast32_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return !(lhs == rhs);
 }
 
 template <typename Integer>
-constexpr auto operator<(decimal_fast32_t lhs, Integer rhs) noexcept
+constexpr auto operator<(const decimal_fast32_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     return less_impl(lhs, rhs);
 }
 
 template <typename Integer>
-constexpr auto operator<(Integer lhs, decimal_fast32_t rhs) noexcept
+constexpr auto operator<(const Integer lhs, const decimal_fast32_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -617,7 +617,7 @@ constexpr auto operator<(Integer lhs, decimal_fast32_t rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator<=(decimal_fast32_t lhs, Integer rhs) noexcept
+constexpr auto operator<=(const decimal_fast32_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -628,7 +628,7 @@ constexpr auto operator<=(decimal_fast32_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator<=(Integer lhs, decimal_fast32_t rhs) noexcept
+constexpr auto operator<=(const Integer lhs, const decimal_fast32_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -639,7 +639,7 @@ constexpr auto operator<=(Integer lhs, decimal_fast32_t rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator>(decimal_fast32_t lhs, Integer rhs) noexcept
+constexpr auto operator>(const decimal_fast32_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -650,7 +650,7 @@ constexpr auto operator>(decimal_fast32_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator>(Integer lhs, decimal_fast32_t rhs) noexcept
+constexpr auto operator>(const Integer lhs, const decimal_fast32_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -661,7 +661,7 @@ constexpr auto operator>(Integer lhs, decimal_fast32_t rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator>=(decimal_fast32_t lhs, Integer rhs) noexcept
+constexpr auto operator>=(const decimal_fast32_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -672,7 +672,7 @@ constexpr auto operator>=(decimal_fast32_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator>=(Integer lhs, decimal_fast32_t rhs) noexcept
+constexpr auto operator>=(const Integer lhs, const decimal_fast32_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, bool)
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
@@ -684,7 +684,7 @@ constexpr auto operator>=(Integer lhs, decimal_fast32_t rhs) noexcept
 
 #ifdef BOOST_DECIMAL_HAS_SPACESHIP_OPERATOR
 
-constexpr auto operator<=>(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> std::partial_ordering
+constexpr auto operator<=>(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> std::partial_ordering
 {
     if (lhs < rhs)
     {
@@ -703,7 +703,7 @@ constexpr auto operator<=>(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept 
 }
 
 template <typename Integer>
-constexpr auto operator<=>(decimal_fast32_t lhs, Integer rhs) noexcept
+constexpr auto operator<=>(const decimal_fast32_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
 {
     if (lhs < rhs)
@@ -723,7 +723,7 @@ constexpr auto operator<=>(decimal_fast32_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator<=>(Integer lhs, decimal_fast32_t rhs) noexcept
+constexpr auto operator<=>(const Integer lhs, const decimal_fast32_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, std::partial_ordering)
 {
     if (lhs < rhs)
@@ -744,18 +744,18 @@ constexpr auto operator<=>(Integer lhs, decimal_fast32_t rhs) noexcept
 
 #endif
 
-constexpr auto operator+(decimal_fast32_t rhs) noexcept -> decimal_fast32_t
+constexpr auto operator+(const decimal_fast32_t rhs) noexcept -> decimal_fast32_t
 {
     return rhs;
 }
 
-constexpr auto operator-(decimal_fast32_t rhs) noexcept -> decimal_fast32_t
+constexpr auto operator-(decimal_fast32_t lhs) noexcept -> decimal_fast32_t
 {
-    rhs.sign_ = !rhs.sign_;
-    return rhs;
+    lhs.sign_ = !lhs.sign_;
+    return lhs;
 }
 
-constexpr auto operator+(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> decimal_fast32_t
+constexpr auto operator+(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> decimal_fast32_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (!isfinite(lhs) || !isfinite(rhs))
@@ -776,7 +776,7 @@ constexpr auto operator+(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept ->
 }
 
 template <typename Integer>
-constexpr auto operator+(decimal_fast32_t lhs, Integer rhs) noexcept
+constexpr auto operator+(const decimal_fast32_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t)
 {
     using promoted_significand_type = detail::promote_significand_t<decimal_fast32_t, Integer>;
@@ -800,13 +800,13 @@ constexpr auto operator+(decimal_fast32_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator+(Integer lhs, decimal_fast32_t rhs) noexcept
+constexpr auto operator+(const Integer lhs, const decimal_fast32_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t)
 {
     return rhs + lhs;
 }
 
-constexpr auto operator-(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> decimal_fast32_t
+constexpr auto operator-(const decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> decimal_fast32_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (!isfinite(lhs) || !isfinite(rhs))
@@ -829,7 +829,7 @@ constexpr auto operator-(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept ->
 }
 
 template <typename Integer>
-constexpr auto operator-(decimal_fast32_t lhs, Integer rhs) noexcept
+constexpr auto operator-(const decimal_fast32_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t)
 {
     using promoted_significand_type = detail::promote_significand_t<decimal_fast32_t, Integer>;
@@ -854,7 +854,7 @@ constexpr auto operator-(decimal_fast32_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator-(Integer lhs, decimal_fast32_t rhs) noexcept
+constexpr auto operator-(const Integer lhs, const decimal_fast32_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t)
 {
     using promoted_significand_type = detail::promote_significand_t<decimal_fast32_t, Integer>;
@@ -879,7 +879,7 @@ constexpr auto operator-(Integer lhs, decimal_fast32_t rhs) noexcept
     );
 }
 
-constexpr auto operator*(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> decimal_fast32_t
+constexpr auto operator*(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> decimal_fast32_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (!isfinite(lhs) || !isfinite(rhs))
@@ -911,7 +911,7 @@ constexpr auto operator*(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept ->
 }
 
 template <typename Integer>
-constexpr auto operator*(decimal_fast32_t lhs, Integer rhs) noexcept
+constexpr auto operator*(const decimal_fast32_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t)
 {
     using promoted_significand_type = detail::promote_significand_t<decimal_fast32_t, Integer>;
@@ -937,13 +937,13 @@ constexpr auto operator*(decimal_fast32_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator*(Integer lhs, decimal_fast32_t rhs) noexcept
+constexpr auto operator*(const Integer lhs, const decimal_fast32_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t)
 {
     return rhs * lhs;
 }
 
-constexpr auto div_impl(decimal_fast32_t lhs, decimal_fast32_t rhs, decimal_fast32_t& q, decimal_fast32_t& r) noexcept -> void
+constexpr auto div_impl(const decimal_fast32_t lhs, const decimal_fast32_t rhs, decimal_fast32_t& q, decimal_fast32_t& r) noexcept -> void
 {
     constexpr decimal_fast32_t zero {0, 0};
     
@@ -1023,7 +1023,7 @@ constexpr auto div_impl(decimal_fast32_t lhs, decimal_fast32_t rhs, decimal_fast
 
     if (BOOST_DECIMAL_LIKELY(res_exp >= 0))
     {
-        q = direct_init(static_cast<typename decimal_fast32_t::significand_type>(res_sig), static_cast<typename decimal_fast32_t::exponent_type>(res_exp), isneg);
+        q = direct_init(static_cast<decimal_fast32_t::significand_type>(res_sig), static_cast<decimal_fast32_t::exponent_type>(res_exp), isneg);
     }
     else
     {
@@ -1032,7 +1032,7 @@ constexpr auto div_impl(decimal_fast32_t lhs, decimal_fast32_t rhs, decimal_fast
     }
 }
 
-constexpr auto mod_impl(decimal_fast32_t lhs, decimal_fast32_t rhs, const decimal_fast32_t& q, decimal_fast32_t& r) noexcept -> void
+constexpr auto mod_impl(const decimal_fast32_t lhs, const decimal_fast32_t rhs, const decimal_fast32_t& q, decimal_fast32_t& r) noexcept -> void
 {
     constexpr decimal_fast32_t zero {0, 0};
 
@@ -1041,7 +1041,7 @@ constexpr auto mod_impl(decimal_fast32_t lhs, decimal_fast32_t rhs, const decima
     r = lhs - (decimal_fast32_t(q_trunc) * rhs);
 }
 
-constexpr auto operator/(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> decimal_fast32_t
+constexpr auto operator/(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> decimal_fast32_t
 {
     decimal_fast32_t q {};
     decimal_fast32_t r {};
@@ -1051,7 +1051,7 @@ constexpr auto operator/(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept ->
 }
 
 template <typename Integer>
-constexpr auto operator/(decimal_fast32_t lhs, Integer rhs) noexcept
+constexpr auto operator/(const decimal_fast32_t lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t)
 {
     using exp_type = decimal_fast32_t::biased_exponent_type;
@@ -1092,7 +1092,7 @@ constexpr auto operator/(decimal_fast32_t lhs, Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto operator/(Integer lhs, decimal_fast32_t rhs) noexcept
+constexpr auto operator/(const Integer lhs, const decimal_fast32_t rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t)
 {
     using exp_type = decimal_fast32_t::biased_exponent_type;
@@ -1131,7 +1131,7 @@ constexpr auto operator/(Integer lhs, decimal_fast32_t rhs) noexcept
     return detail::generic_div_impl<decimal_fast32_t>(lhs_components, rhs_components);
 }
 
-constexpr auto operator%(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> decimal_fast32_t
+constexpr auto operator%(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> decimal_fast32_t
 {
     decimal_fast32_t q {};
     decimal_fast32_t r {};
@@ -1141,38 +1141,38 @@ constexpr auto operator%(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept ->
     return r;
 }
 
-constexpr auto decimal_fast32_t::operator%=(decimal_fast32_t rhs) noexcept -> decimal_fast32_t&
+constexpr auto decimal_fast32_t::operator%=(const decimal_fast32_t rhs) noexcept -> decimal_fast32_t&
 {
     *this = *this % rhs;
     return *this;
 }
 
-constexpr auto decimal_fast32_t::operator+=(decimal_fast32_t rhs) noexcept -> decimal_fast32_t&
+constexpr auto decimal_fast32_t::operator+=(const decimal_fast32_t rhs) noexcept -> decimal_fast32_t&
 {
     *this = *this + rhs;
     return *this;
 }
 
-constexpr auto decimal_fast32_t::operator-=(decimal_fast32_t rhs) noexcept -> decimal_fast32_t&
+constexpr auto decimal_fast32_t::operator-=(const decimal_fast32_t rhs) noexcept -> decimal_fast32_t&
 {
     *this = *this - rhs;
     return *this;
 }
 
-constexpr auto decimal_fast32_t::operator*=(decimal_fast32_t rhs) noexcept -> decimal_fast32_t&
+constexpr auto decimal_fast32_t::operator*=(const decimal_fast32_t rhs) noexcept -> decimal_fast32_t&
 {
     *this = *this * rhs;
     return *this;
 }
 
-constexpr auto decimal_fast32_t::operator/=(decimal_fast32_t rhs) noexcept -> decimal_fast32_t&
+constexpr auto decimal_fast32_t::operator/=(const decimal_fast32_t rhs) noexcept -> decimal_fast32_t&
 {
     *this = *this / rhs;
     return *this;
 }
 
 template <typename Integer>
-constexpr auto decimal_fast32_t::operator+=(Integer rhs) noexcept
+constexpr auto decimal_fast32_t::operator+=(const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t&)
 {
     *this = *this + rhs;
@@ -1180,7 +1180,7 @@ constexpr auto decimal_fast32_t::operator+=(Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto decimal_fast32_t::operator-=(Integer rhs) noexcept
+constexpr auto decimal_fast32_t::operator-=(const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t&)
 {
     *this = *this - rhs;
@@ -1188,7 +1188,7 @@ constexpr auto decimal_fast32_t::operator-=(Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto decimal_fast32_t::operator*=(Integer rhs) noexcept
+constexpr auto decimal_fast32_t::operator*=(const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t&)
 {
     *this = *this * rhs;
@@ -1196,7 +1196,7 @@ constexpr auto decimal_fast32_t::operator*=(Integer rhs) noexcept
 }
 
 template <typename Integer>
-constexpr auto decimal_fast32_t::operator/=(Integer rhs) noexcept
+constexpr auto decimal_fast32_t::operator/=(const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast32_t&)
 {
     *this = *this / rhs;
@@ -1289,7 +1289,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast32_t::operator double() const noexcept
 
 BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast32_t::operator long double() const noexcept
 {
-    // TODO(mborland): Don't have an exact way of converting to various long doubles
+    // The precision and range of double already exceeds what decimal_fast32_t can provide
     return static_cast<long double>(to_float<decimal_fast32_t, double>(*this));
 }
 
@@ -1330,7 +1330,7 @@ constexpr decimal_fast32_t::operator Decimal() const noexcept
     return to_decimal<Decimal>(*this);
 }
 
-constexpr auto scalblnd32f(decimal_fast32_t num, long exp) noexcept -> decimal_fast32_t
+constexpr auto scalblnd32f(const decimal_fast32_t num, const long exp) noexcept -> decimal_fast32_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal_fast32_t zero {0, 0};
@@ -1341,17 +1341,17 @@ constexpr auto scalblnd32f(decimal_fast32_t num, long exp) noexcept -> decimal_f
     }
     #endif
 
-    num = decimal_fast32_t(num.significand_, num.biased_exponent() + exp, num.sign_);
+    const auto res {decimal_fast32_t(num.significand_, num.biased_exponent() + exp, num.sign_)};
 
-    return num;
+    return res;
 }
 
-constexpr auto scalbnd32f(decimal_fast32_t num, int expval) noexcept -> decimal_fast32_t
+constexpr auto scalbnd32f(const decimal_fast32_t num, const int expval) noexcept -> decimal_fast32_t
 {
     return scalblnd32f(num, static_cast<long>(expval));
 }
 
-constexpr auto copysignd32f(decimal_fast32_t mag, decimal_fast32_t sgn) noexcept -> decimal_fast32_t
+constexpr auto copysignd32f(decimal_fast32_t mag, const decimal_fast32_t sgn) noexcept -> decimal_fast32_t
 {
     mag.sign_ = sgn.sign_;
     return mag;
@@ -1361,7 +1361,7 @@ constexpr auto copysignd32f(decimal_fast32_t mag, decimal_fast32_t sgn) noexcept
 // If both x and y are NaN, or infinity, they have the same quantum exponents;
 // if exactly one operand is infinity or exactly one operand is NaN, they do not have the same quantum exponents.
 // The samequantum functions raise no exception.
-constexpr auto samequantumd32f(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> bool
+constexpr auto samequantumd32f(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> bool
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     const auto lhs_fp {fpclassify(lhs)};
@@ -1382,7 +1382,7 @@ constexpr auto samequantumd32f(decimal_fast32_t lhs, decimal_fast32_t rhs) noexc
 
 // Effects: if x is finite, returns its quantum exponent.
 // Otherwise, a domain error occurs and INT_MIN is returned.
-constexpr auto quantexpd32f(decimal_fast32_t x) noexcept -> int
+constexpr auto quantexpd32f(const decimal_fast32_t x) noexcept -> int
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (!isfinite(x))
@@ -1397,14 +1397,14 @@ constexpr auto quantexpd32f(decimal_fast32_t x) noexcept -> int
 // Returns: a number that is equal in value (except for any rounding) and sign to x,
 // and which has an exponent set to be equal to the exponent of y.
 // If the exponent is being increased, the value is correctly rounded according to the current rounding mode;
-// if the result does not have the same value as x, the "inexact" floating-point exception is raised.
+// if the result does not have the same value, as x, the "inexact" floating-point exception is raised.
 // If the exponent is being decreased and the significand of the result has more digits than the type would allow,
 // the "invalid" floating-point exception is raised and the result is NaN.
-// If one or both operands are NaN the result is NaN.
+// If one or both operands are NaN, the result is NaN.
 // Otherwise, if only one operand is infinity, the "invalid" floating-point exception is raised and the result is NaN.
 // If both operands are infinity, the result is DEC_INFINITY, with the same sign as x, converted to the type of x.
 // The quantize functions do not signal underflow.
-constexpr auto quantized32f(decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> decimal_fast32_t
+constexpr auto quantized32f(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> decimal_fast32_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Return the correct type of nan
