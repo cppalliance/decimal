@@ -22,7 +22,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto round(T num) noexcept
+constexpr auto round(const T num) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero {0, 0};
@@ -65,7 +65,7 @@ namespace detail {
 #endif
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T, BOOST_DECIMAL_INTEGRAL Int>
-constexpr auto int_round_impl(T num) noexcept -> Int
+constexpr auto int_round_impl(const T num) noexcept -> Int
 {
     constexpr T zero {0, 0};
     constexpr T lmax {(std::numeric_limits<Int>::max)()};
@@ -108,14 +108,14 @@ constexpr auto int_round_impl(T num) noexcept -> Int
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto lround(T num) noexcept
+constexpr auto lround(const T num) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, long)
 {
     return detail::int_round_impl<T, long>(num);
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto llround(T num) noexcept
+constexpr auto llround(const T num) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, long long)
 {
     return detail::int_round_impl<T, long long>(num);

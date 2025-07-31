@@ -22,7 +22,7 @@ namespace decimal {
 namespace detail {
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto ldexp_impl(T v, int e2) noexcept
+constexpr auto ldexp_impl(const T v, const int e2) noexcept
 {
     T result { };
 
@@ -61,7 +61,7 @@ constexpr auto ldexp_impl(T v, int e2) noexcept
 } // namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto ldexp(T v, int e2) noexcept
+constexpr auto ldexp(const T v, const int e2) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

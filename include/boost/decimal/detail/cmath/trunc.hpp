@@ -23,7 +23,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto trunc(T val) noexcept
+constexpr auto trunc(const T val) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     return (val > 0) ? floor(val) : ceil(val);

@@ -24,8 +24,10 @@
 namespace boost {
 namespace decimal {
 
+namespace detail {
+
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto tan(T x) noexcept
+constexpr auto tan_impl(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     T result { };
@@ -124,6 +126,29 @@ constexpr auto tan(T x) noexcept
     }
 
     return result;
+}
+
+} // namespace detail
+
+BOOST_DECIMAL_EXPORT template <typename T>
+constexpr auto tan(const T x) noexcept
+    BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
+{
+    #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+    using evaluation_type = T;
+
+    #elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+    using evaluation_type = detail::promote_args_t<T, decimal64_t>;
+
+    #else // BOOST_DECIMAL_DEC_EVAL_METHOD == 2
+
+    using evaluation_type = detail::promote_args_t<T, decimal128_t>;
+
+    #endif
+
+    return static_cast<T>(detail::tan_impl(static_cast<evaluation_type>(x)));
 }
 
 } // namespace decimal

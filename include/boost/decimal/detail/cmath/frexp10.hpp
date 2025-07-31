@@ -40,7 +40,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto frexp10_normalize(T1& sig, T2& exp) no
 //   [1e15, 1e15 - 1] for decimal64_t
 // If the conversion can not be performed returns UINT32_MAX and exp = 0
 BOOST_DECIMAL_EXPORT template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
-constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type
+constexpr auto frexp10(const T num, int* expptr) noexcept -> typename T::significand_type
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (isinf(num) || isnan(num))

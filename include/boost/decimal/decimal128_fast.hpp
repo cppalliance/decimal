@@ -44,8 +44,8 @@ BOOST_DECIMAL_EXPORT class decimal_fast128_t final
 {
 public:
     using significand_type = int128::uint128_t;
-    using exponent_type = std::uint_fast32_t;
-    using biased_exponent_type = std::int_fast32_t;
+    using exponent_type = std::uint32_t;
+    using biased_exponent_type = std::int32_t;
 
 private:
     // Instead of having to encode and decode at every operation

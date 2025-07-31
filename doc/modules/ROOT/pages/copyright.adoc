@@ -8,5 +8,5 @@ https://www.boost.org/LICENSE_1_0.txt
 = Copyright and License
 :idprefix: license_
 
-This documentation is copyright 2023 Matt Borland and is distributed under
+This documentation is copyright 2023 - 2025 Matt Borland and Chris Kormanyos, and is distributed under
 the http://www.boost.org/LICENSE_1_0.txt[Boost Software License, Version 1.0].

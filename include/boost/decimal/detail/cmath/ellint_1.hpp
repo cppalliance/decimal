@@ -31,7 +31,7 @@ namespace decimal {
 namespace detail {
 
 template <typename T>
-constexpr auto ellint_1_impl(T m, T phi) noexcept
+constexpr auto ellint_1_impl(const T m, const T phi) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
   constexpr T one { 1 };
@@ -129,7 +129,7 @@ constexpr auto ellint_1_impl(T m, T phi) noexcept
 }
 
 template <typename T>
-constexpr auto comp_ellint_1_impl(T m) noexcept
+constexpr auto comp_ellint_1_impl(const T m) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
   constexpr T one  { 1 };
@@ -165,7 +165,7 @@ constexpr auto comp_ellint_1_impl(T m) noexcept
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto ellint_1(T k, T phi) noexcept
+constexpr auto ellint_1(const T k, const T phi) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
@@ -186,7 +186,7 @@ constexpr auto ellint_1(T k, T phi) noexcept
 }
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto comp_ellint_1(T k) noexcept
+constexpr auto comp_ellint_1(const T k) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

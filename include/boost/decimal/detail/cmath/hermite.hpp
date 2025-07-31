@@ -25,14 +25,14 @@ namespace detail {
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T1,
           BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T2,
           BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T3>
-constexpr auto hermite_next(unsigned n, T1 x, T2 Hn, T3 Hnm1)
+constexpr auto hermite_next(const unsigned n, const T1 x, const T2 Hn, const T3 Hnm1)
 {
     using promoted_type = promote_args_t<T1, T2, T3>;
     return 2 * static_cast<promoted_type>(x) * static_cast<promoted_type>(Hn) - 2 * n * static_cast<promoted_type>(Hnm1);
 }
 
 template <typename T>
-constexpr auto hermite_impl(unsigned n, T x) noexcept
+constexpr auto hermite_impl(const unsigned n, const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     T p0 {UINT64_C(1)};
@@ -58,7 +58,7 @@ constexpr auto hermite_impl(unsigned n, T x) noexcept
 } //namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto hermite(unsigned n, T x) noexcept
+constexpr auto hermite(const unsigned n, const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

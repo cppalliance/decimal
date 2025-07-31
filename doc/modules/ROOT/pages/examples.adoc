@@ -10,6 +10,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 All examples can be found in the library `examples/` folder as well.
 
+[#examples_construction]
 == Construction from an Integer and Exponent
 
 [source, c++]
@@ -38,6 +39,7 @@ int main()
 This is the recommended way of constructing a fractional number as opposed to `decimal32_t a {0.2}`.
 The representation is exact with integers whereas you may get surprising or unwanted conversion from binary floating point
 
+[#examples_promotion]
 == Promotion
 
 [source, c++]
@@ -61,6 +63,7 @@ int main()
 }
 ----
 
+[#examples_charconv]
 == charconv
 
 [source, c++]
@@ -98,7 +101,7 @@ Output:
 Returned Value: 0.25
 ----
 
-
+[#examples_rounding_mode]
 == Rounding Mode
 [source, c++]
 ----
@@ -117,6 +120,7 @@ int main()
 }
 ----
 
+[#examples_generic_programming]
 == Generic Programming
 [source, c++]
 ----
@@ -157,6 +161,7 @@ int main()
 }
 ----
 
+[#examples_literals_constants]
 == Literals and Constants
 [source, c++]
 ----
@@ -186,6 +191,7 @@ int main()
 }
 ----
 
+[#examples_bit_conversions]
 == Bit Conversions
 [source, c++]
 ----
@@ -217,6 +223,7 @@ BID format: 31fc4b40
 DPD format: 35f00000
 ----
 
+[#examples_finance]
 == Financial Applications
 
 === Simple Moving Average
@@ -229,6 +236,7 @@ This serves as a framework for other calculations for securities.
 In the examples folder there is a file named `currency_conversion.cpp`.
 This example shows how to simply convert currencies based off a given exchange rate.
 
+[#examples_boost_math]
 == Boost.Math Integration
 
 === Bollinger Bands

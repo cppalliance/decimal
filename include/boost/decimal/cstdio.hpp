@@ -53,7 +53,7 @@ struct parameters
 
 inline auto parse_format(const char* format) -> parameters
 {
-    // If the format is unspecified or incorrect we will use this as the default values
+    // If the format is unspecified or incorrect, we will use this as the default values
     parameters params {6, chars_format::general, decimal_type::decimal64_t, false};
 
     auto iter {format + 1};
@@ -155,7 +155,7 @@ inline void make_uppercase(char* first, const char* last) noexcept
 }
 
 template <typename... T>
-inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format, T... values) noexcept
+inline auto snprintf_impl(char* buffer, const std::size_t buf_size, const char* format, const T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
     -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else
@@ -244,7 +244,7 @@ inline auto snprintf_impl(char* buffer, std::size_t buf_size, const char* format
 } // namespace detail
 
 template <typename... T>
-inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T... values) noexcept
+inline auto snprintf(char* buffer, const std::size_t buf_size, const char* format, const T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
     -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else
@@ -255,7 +255,7 @@ inline auto snprintf(char* buffer, std::size_t buf_size, const char* format, T..
 }
 
 template <typename... T>
-inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
+inline auto fprintf(std::FILE* buffer, const char* format, const T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
     -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else
@@ -306,7 +306,7 @@ inline auto fprintf(std::FILE* buffer, const char* format, T... values) noexcept
 }
 
 template <typename... T>
-inline auto printf(const char* format, T... values) noexcept
+inline auto printf(const char* format, const T... values) noexcept
     #ifndef BOOST_DECIMAL_HAS_CONCEPTS
     -> std::enable_if_t<detail::conjunction_v<detail::is_decimal_floating_point<T>...>, int>
     #else

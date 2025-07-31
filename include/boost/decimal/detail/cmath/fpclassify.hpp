@@ -20,7 +20,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexcept
+constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (const T rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, T, int)
 {
     constexpr T zero {0, 0};
@@ -37,15 +37,15 @@ constexpr auto fpclassify BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (T rhs) noexc
     {
         return FP_NORMAL;
     }
-    else if (isinf(rhs))
+    if (isinf(rhs))
     {
         return FP_INFINITE;
     }
-    else if (isnan(rhs))
+    if (isnan(rhs))
     {
         return FP_NAN;
     }
-    else if (abs(rhs) == zero)
+    if (abs(rhs) == zero)
     {
         return FP_ZERO;
     }

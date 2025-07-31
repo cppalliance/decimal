@@ -19,7 +19,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T1, typename T2>
-constexpr auto fmin(T1 lhs, T2 rhs) noexcept
+constexpr auto fmin(const T1 lhs, const T2 rhs) noexcept
     BOOST_DECIMAL_REQUIRES_TWO(detail::is_decimal_floating_point_v, T1, detail::is_decimal_floating_point_v, T2)
 {
     using promoted_type = detail::promote_args_t<T1, T2>;

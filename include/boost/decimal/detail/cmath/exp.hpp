@@ -93,7 +93,7 @@ constexpr auto exp_impl(T x) noexcept
 } // namespace detail
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto exp(T x) noexcept
+constexpr auto exp(const T x) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     #if BOOST_DECIMAL_DEC_EVAL_METHOD == 0

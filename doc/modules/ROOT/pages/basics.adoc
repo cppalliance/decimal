@@ -58,6 +58,33 @@ boost::decimal::decimal128_t pi {3.14};
 
 NOTE: Due to the differences in decimal and binary floating point numbers there may be a difference in the resulting representation in decimal format, and thus it is not recommended to construct from binary floating point numbers
 
+== Fundamental Operations
+
+The fundamental operations of numerical type (e.g. `>`, `==`, `+`, etc.) are overloaded.
+
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <cassert>
+
+int main()
+{
+    constexpr boost::decimal::decimal32_t lhs {5};
+    constexpr boost::decimal::decimal32_t rhs {1, -1};
+
+    assert(lhs > rhs);
+    assert(lhs != rhs);
+    assert(lhs + rhs > lhs);
+
+    auto new_lhs {lhs}; // Using auto is safe when constructring from existing decimal values
+    new_lhs += lhs;
+
+    assert(lhs < new_lhs);
+
+    return 0;
+}
+----
+
 == Using the Library
 
 The entire library can be accessed using the convenience header `<boost/decimal.hpp>`.

@@ -19,7 +19,7 @@ namespace boost {
 namespace decimal {
 
 BOOST_DECIMAL_EXPORT template <typename T>
-constexpr auto fmod(T lhs, T rhs) noexcept
+constexpr auto fmod(const T lhs, const T rhs) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     return lhs % rhs;
