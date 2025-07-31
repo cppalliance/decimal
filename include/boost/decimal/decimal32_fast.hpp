@@ -466,7 +466,7 @@ constexpr auto direct_init(const detail::decimal_fast32_t_components& x) noexcep
 {
     decimal_fast32_t val;
     val.significand_ = x.sig;
-    val.exponent_ = static_cast<std::uint_fast8_t>(static_cast<int>(x.exp) + detail::bias_v<decimal_fast32_t>);
+    val.exponent_ = static_cast<typename decimal_fast32_t::exponent_type>(static_cast<int>(x.exp) + detail::bias_v<decimal_fast32_t>);
     val.sign_ = x.sign;
 
     return val;
