@@ -147,6 +147,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_mul_impl(T lhs_sig, U lhs_exp, boo
 
 template <typename ReturnType, BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL U1,
                                BOOST_DECIMAL_INTEGRAL T2, BOOST_DECIMAL_INTEGRAL U2>
+BOOST_DECIMAL_FORCE_INLINE
 constexpr auto d128_mul_impl(const T1& lhs_sig, const U1 lhs_exp, const bool lhs_sign,
                              const T2& rhs_sig, const U2 rhs_exp, const bool rhs_sign) noexcept -> ReturnType
 {
