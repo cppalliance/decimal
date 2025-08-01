@@ -23,6 +23,11 @@ void fast_test()
     }
 }
 
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 template <typename DecimalType>
 void ieee_test()
 {
@@ -79,6 +84,10 @@ void ieee_test()
         BOOST_TEST_EQ(val, normalized_val);
     }
 }
+
+#if defined(__GNUC__) && __GNUC__ >= 8
+#  pragma GCC diagnostic pop
+#endif
 
 int main()
 {
