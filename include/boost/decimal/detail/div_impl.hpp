@@ -60,10 +60,6 @@ constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> Deci
     auto res_sig {big_sig_lhs / rhs.sig};
     auto res_exp {(lhs.exp - detail::precision_v<decimal64_t>) - rhs.exp};
 
-    if (res_sig == 0U)
-    {
-        sign = false;
-    }
 
     // Let the constructor handle shrinking it back down and rounding correctly
     return DecimalType{res_sig, res_exp, sign};
