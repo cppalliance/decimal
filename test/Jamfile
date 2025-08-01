@@ -28,6 +28,7 @@ project : requirements
   <toolset>gcc:<cxxflags>-Wold-style-cast
   #<toolset>gcc:<cxxflags>-Wduplicated-branches
   <toolset>gcc:<cxxflags>-Wfloat-equal
+  <toolset>gcc:<cxxflags>-Wshadow
 
   <toolset>clang:<cxxflags>-Wsign-conversion
   <toolset>clang:<cxxflags>-Wconversion
