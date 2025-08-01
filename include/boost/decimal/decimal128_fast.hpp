@@ -946,39 +946,43 @@ constexpr auto d128f_div_impl(const decimal_fast128_t& lhs, const decimal_fast12
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
 
-    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+    constexpr auto two_normal {FP_NORMAL * 2};
+    if (lhs_fp + rhs_fp != two_normal)
     {
-        q = nan;
-        r = nan;
-        return;
-    }
+        if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+        {
+            q = nan;
+            r = nan;
+            return;
+        }
 
-    switch (lhs_fp)
-    {
-        case FP_INFINITE:
-            q = sign ? -inf : inf;
-            r = zero;
-            return;
-        case FP_ZERO:
-            q = sign ? -zero : zero;
-            r = sign ? -zero : zero;
-            return;
-        default:
-            static_cast<void>(lhs);
-    }
+        switch (lhs_fp)
+        {
+            case FP_INFINITE:
+                q = sign ? -inf : inf;
+                r = zero;
+                return;
+            case FP_ZERO:
+                q = sign ? -zero : zero;
+                r = sign ? -zero : zero;
+                return;
+            default:
+                static_cast<void>(lhs);
+        }
 
-    switch (rhs_fp)
-    {
-        case FP_ZERO:
-            q = inf;
-            r = zero;
-            return;
-        case FP_INFINITE:
-            q = sign ? -zero : zero;
-            r = lhs;
-            return;
-        default:
-            static_cast<void>(rhs);
+        switch (rhs_fp)
+        {
+            case FP_ZERO:
+                q = inf;
+                r = zero;
+                return;
+            case FP_INFINITE:
+                q = sign ? -zero : zero;
+                r = lhs;
+                return;
+            default:
+                static_cast<void>(rhs);
+        }
     }
     #else
     static_cast<void>(r);
@@ -991,8 +995,8 @@ constexpr auto d128f_div_impl(const decimal_fast128_t& lhs, const decimal_fast12
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    detail::decimal_fast128_t_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.isneg()};
-    detail::decimal_fast128_t_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.isneg()};
+    const detail::decimal_fast128_t_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.isneg()};
+    const detail::decimal_fast128_t_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.isneg()};
     detail::decimal_fast128_t_components q_components {};
 
     detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
