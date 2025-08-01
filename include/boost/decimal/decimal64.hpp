@@ -1063,51 +1063,50 @@ constexpr auto d64_div_impl(const decimal64_t lhs, const decimal64_t rhs, decima
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
 
-    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+    constexpr auto two_normal {2 * FP_NORMAL};
+    if (lhs_fp + rhs_fp != two_normal)
     {
-        q = nan;
-        r = nan;
-        return;
-    }
+        if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+        {
+            q = nan;
+            r = nan;
+            return;
+        }
 
-    switch (lhs_fp)
-    {
-        case FP_INFINITE:
-            q = sign ? -inf : inf;
-            r = zero;
-            return;
-        case FP_ZERO:
-            q = sign ? -zero : zero;
-            r = sign ? -zero : zero;
-            return;
-        default:
-            static_cast<void>(lhs);
-    }
+        switch (lhs_fp)
+        {
+            case FP_INFINITE:
+                q = sign ? -inf : inf;
+                r = zero;
+                return;
+            case FP_ZERO:
+                q = sign ? -zero : zero;
+                r = sign ? -zero : zero;
+                return;
+            default:
+                static_cast<void>(lhs);
+        }
 
-    switch (rhs_fp)
-    {
-        case FP_ZERO:
-            q = inf;
-            r = zero;
-            return;
-        case FP_INFINITE:
-            q = sign ? -zero : zero;
-            r = lhs;
-            return;
-        default:
-            static_cast<void>(rhs);
+        switch (rhs_fp)
+        {
+            case FP_ZERO:
+                q = inf;
+                r = zero;
+                return;
+            case FP_INFINITE:
+                q = sign ? -zero : zero;
+                r = lhs;
+                return;
+            default:
+                static_cast<void>(rhs);
+        }
     }
     #else
     static_cast<void>(r);
     #endif
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize<decimal64_t>(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize<decimal64_t>(sig_rhs, exp_rhs);
+    auto lhs_components {lhs.to_components()};
+    detail::normalize<decimal64_t>(lhs_components.sig, lhs_components.exp);
 
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "sig lhs: " << sig_lhs
@@ -1116,10 +1115,7 @@ constexpr auto d64_div_impl(const decimal64_t lhs, const decimal64_t rhs, decima
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    detail::decimal64_t_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
-    detail::decimal64_t_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
-
-    q = detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs_components);
+    q = detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs.to_components());
 }
 
 constexpr auto d64_mod_impl(const decimal64_t lhs, const decimal64_t rhs, const decimal64_t& q, decimal64_t& r) noexcept -> void
