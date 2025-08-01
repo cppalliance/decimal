@@ -1115,7 +1115,7 @@ constexpr auto d64_div_impl(const decimal64_t lhs, const decimal64_t rhs, decima
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    q = detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs.to_components());
+    q = detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs.to_components(), sign);
 }
 
 constexpr auto d64_mod_impl(const decimal64_t lhs, const decimal64_t rhs, const decimal64_t& q, decimal64_t& r) noexcept -> void
@@ -1366,7 +1366,7 @@ constexpr auto operator/(const decimal64_t lhs, const Integer rhs) noexcept
     detail::normalize<decimal64_t>(rhs_sig, rhs_exp);
     detail::decimal64_t_components rhs_components {static_cast<sig_type>(rhs_sig), rhs_exp, rhs < 0};
 
-    return detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs_components);
+    return detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs_components, sign);
 }
 
 template <typename Integer>
@@ -1413,7 +1413,7 @@ constexpr auto operator/(const Integer lhs, const decimal64_t rhs) noexcept
     detail::decimal64_t_components lhs_components {static_cast<sig_type>(lhs_sig), lhs_exp, lhs < 0};
     detail::decimal64_t_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
 
-    return detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs_components);
+    return detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs_components, sign);
 }
 
 constexpr auto operator%(const decimal64_t lhs, const decimal64_t rhs) noexcept -> decimal64_t

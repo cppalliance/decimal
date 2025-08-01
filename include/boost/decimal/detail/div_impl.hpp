@@ -46,11 +46,9 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T
 }
 
 template <typename DecimalType, typename T>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> DecimalType
+BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs, const bool sign) noexcept -> DecimalType
 {
     using unsigned_int128_type = boost::int128::uint128_t;
-
-    bool sign {lhs.sign != rhs.sign};
 
     // If rhs is greater than we need to offset the significands to get the correct values
     // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
