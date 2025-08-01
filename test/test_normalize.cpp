@@ -59,12 +59,14 @@ void ieee_test()
     std::memcpy(&int6, &val6, sizeof(integer_type));
     std::memcpy(&int7, &val7, sizeof(integer_type));
     const std::array<integer_type, 7> vals {int1, int2, int3, int4, int5, int6, int7};
+    const std::array<DecimalType, 7> dec_vals {val1, val2, val3, val4, val5, val6, val7};
 
     for (std::size_t i {}; i < vals.size() - 1; ++i)
     {
         for (std::size_t j {i}; j < vals.size(); ++j)
         {
             BOOST_TEST_EQ(vals[i], vals[j]);
+            BOOST_TEST(std::memcmp(&dec_vals[i], &dec_vals[j], sizeof(DecimalType)) == 0);
         }
     }
 
