@@ -105,7 +105,7 @@ private:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetType, BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal>
     friend constexpr auto to_decimal(Decimal val) noexcept -> TargetType;
 
-    friend constexpr auto d64_fast_div_impl(decimal_fast64_t lhs, decimal_fast64_t rhs, decimal_fast64_t& q, decimal_fast64_t& r) noexcept -> void;
+    friend constexpr auto d64_fast_div_impl(const decimal_fast64_t& lhs, const decimal_fast64_t& rhs, decimal_fast64_t& q, decimal_fast64_t& r) noexcept -> void;
 
     template <typename T>
     friend constexpr auto ilogb(T d) noexcept
@@ -298,7 +298,7 @@ public:
     friend constexpr auto operator+(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> decimal_fast64_t;
     friend constexpr auto operator-(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> decimal_fast64_t;
     friend constexpr auto operator*(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> decimal_fast64_t;
-    friend constexpr auto operator/(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> decimal_fast64_t;
+    friend constexpr auto operator/(const decimal_fast64_t& lhs, const decimal_fast64_t& rhs) noexcept -> decimal_fast64_t;
     friend constexpr auto operator%(decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> decimal_fast64_t;
 
     // Mixed type arithmetic operators
@@ -1035,7 +1035,7 @@ constexpr auto operator*(const Integer lhs, const decimal_fast64_t rhs) noexcept
     return rhs * lhs;
 }
 
-constexpr auto d64_fast_div_impl(const decimal_fast64_t lhs, const decimal_fast64_t rhs, decimal_fast64_t& q, decimal_fast64_t& r) noexcept -> void
+constexpr auto d64_fast_div_impl(const decimal_fast64_t& lhs, const decimal_fast64_t& rhs, decimal_fast64_t& q, decimal_fast64_t& r) noexcept -> void
 {
     const bool sign {lhs.isneg() != rhs.isneg()};
 
@@ -1115,7 +1115,7 @@ constexpr auto d64_fast_mod_impl(const decimal_fast64_t lhs, const decimal_fast6
     r = lhs - (decimal_fast64_t(q_trunc) * rhs);
 }
 
-constexpr auto operator/(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> decimal_fast64_t
+constexpr auto operator/(const decimal_fast64_t& lhs, const decimal_fast64_t& rhs) noexcept -> decimal_fast64_t
 {
     decimal_fast64_t q {};
     decimal_fast64_t r {};
