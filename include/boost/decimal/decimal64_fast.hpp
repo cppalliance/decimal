@@ -1160,17 +1160,13 @@ constexpr auto operator/(const decimal_fast64_t lhs, const Integer rhs) noexcept
     }
     #endif
 
-    auto lhs_sig {lhs.full_significand()};
-    auto lhs_exp {lhs.biased_exponent()};
-    detail::normalize<decimal64_t>(lhs_sig, lhs_exp);
-
-    detail::decimal_fast64_t_components lhs_components {lhs_sig, lhs_exp, lhs.isneg()};
+    const detail::decimal_fast64_t_components lhs_components {lhs.full_significand(), lhs.biased_exponent(), lhs.isneg()};
 
     auto rhs_sig {static_cast<promoted_significand_type>(detail::make_positive_unsigned(rhs))};
     exp_type rhs_exp {};
     detail::decimal_fast64_t_components rhs_components {detail::shrink_significand<decimal_fast64_t::significand_type>(rhs_sig, rhs_exp), rhs_exp, rhs < 0};
 
-    return detail::d64_generic_div_impl<decimal_fast64_t>(lhs_components, rhs_components);
+    return detail::d64_generic_div_impl<decimal_fast64_t>(lhs_components, rhs_components, sign);
 }
 
 template <typename Integer>
@@ -1190,13 +1186,10 @@ constexpr auto operator/(const Integer lhs, const decimal_fast64_t rhs) noexcept
 
     const auto rhs_fp {fpclassify(rhs)};
 
-    if (rhs_fp == FP_NAN)
-    {
-        return nan;
-    }
-
     switch (rhs_fp)
     {
+        case FP_NAN:
+            return nan;
         case FP_INFINITE:
             return sign ? -zero : zero;
         case FP_ZERO:
@@ -1206,16 +1199,13 @@ constexpr auto operator/(const Integer lhs, const decimal_fast64_t rhs) noexcept
     }
     #endif
 
-    auto rhs_sig {rhs.full_significand()};
-    auto rhs_exp {rhs.biased_exponent()};
-    detail::normalize<decimal64_t>(rhs_sig, rhs_exp);
-    detail::decimal_fast64_t_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
+    const detail::decimal_fast64_t_components rhs_components {rhs.full_significand(), rhs.biased_exponent(), rhs.isneg()};
 
     auto lhs_sig {static_cast<promoted_significand_type>(detail::make_positive_unsigned(lhs))};
     exp_type lhs_exp {};
-    detail::decimal_fast64_t_components lhs_components {detail::shrink_significand<decimal_fast64_t::significand_type>(lhs_sig, lhs_exp), lhs_exp, lhs < 0};
+    const detail::decimal_fast64_t_components lhs_components {detail::shrink_significand<decimal_fast64_t::significand_type>(lhs_sig, lhs_exp), lhs_exp, lhs < 0};
 
-    return detail::d64_generic_div_impl<decimal_fast64_t>(lhs_components, rhs_components);
+    return detail::d64_generic_div_impl<decimal_fast64_t>(lhs_components, rhs_components, sign);
 }
 
 constexpr auto operator%(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> decimal_fast64_t
