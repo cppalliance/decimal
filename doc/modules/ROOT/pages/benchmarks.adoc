@@ -12,10 +12,10 @@ This section describes a range of performance benchmarks that have been run comp
 
 The values in the ratio column are how many times longer running a specific operation takes in comparison to the same operation with a `double`.
 
-IMPORTANT: On nearly all platforms there is hardware support for binary floating point math, so we are comparing hardware to software runtimes; *Decimal will be slower*
+IMPORTANT: On nearly all platforms, there is hardware support for binary floating point math, so we are comparing hardware to software runtimes; *Decimal will be slower*
 
-NOTE: Both the results from Intel and GCC types are from very close, but not identical benchmark routines since they are written in C instead of C\++.
-We assume they are close enough, and the differences between the C and C++ compilers are small enough, for fair comparison
+NOTE: Both the results from Intel and GCC types are from very close, but not identical benchmark routines since they are written in C instead of pass:[C++].
+We assume they are close enough, and the differences between the C and pass:[C++] compilers are small enough, for fair comparison
 
 == How to run the Benchmarks
 [#run_benchmarks_]
@@ -40,21 +40,22 @@ This is repeated 5 times to generate stable results.
 
 === Basic Mathematical Operations
 
-The benchmark for these operations generates a random vector containing 20,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
-This is repeated 5 times to generate stable results.
+The benchmark for these operations generates a random vector containing 20 million elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
+This is repeated five times to generate stable results.
 
 === `<charconv>`
 
-Parsing and serializing number exactly is one of the key features of decimal floating point types, so we must compare the performance of `<charconv>`. For all the following the results compare against STL provided `<charconv>` for 20,000,000 conversions.
-Since `<charconv>` is fully implemented in software for each type the performance gap between built-in `float` and `double` vs `decimal32_t` and `decimal64_t` is significantly smaller (or the decimal performance is better) than the hardware vs software performance gap seen above for basic operations.
+Parsing and serializing number exactly is one of the key features of decimal floating point types, so we must compare the performance of `<charconv>`.
+For all the following the results compare we compare against STL provided `<charconv>` for 20 million conversions.
+Since `<charconv>` is fully implemented in software for each type the performance gap between built-in `float` and `double` vs `decimal32_t` and `decimal64_t` is significantly smaller (or the decimal performance is better) than the hardware vs. software performance gap seen above for basic operations.
 
-To run these benchmarks yourself you will need a compiler with complete implementation of `<charconv>` and to run the benchmarks under C++17 or higher.
-At the time of writing this is limited to:
+To run these benchmarks yourself, you will need a compiler with complete implementation of `<charconv>` and to run the benchmarks under pass:[C++]17 or higher.
+At the time of writing, this is limited to:
 
 - GCC 11 or newer
 - MSVC 19.24 or newer
 
-These benchmarks are automatically disabled if your compiler does not provide feature complete `<charconv>` or if the language standard is set to C++14.
+These benchmarks are automatically disabled if your compiler does not provide feature complete `<charconv>` or if the language standard is set to pass:[C++]14.
 
 [#x64_linux_benchmarks]
 == x64 Linux
