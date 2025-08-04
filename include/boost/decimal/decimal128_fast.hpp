@@ -946,43 +946,40 @@ constexpr auto d128f_div_impl(const decimal_fast128_t& lhs, const decimal_fast12
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
 
-    constexpr auto two_normal {FP_NORMAL * 2};
-    if (lhs_fp + rhs_fp != two_normal)
+    // NAN has to come first
+    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
     {
-        if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
-        {
-            q = nan;
-            r = nan;
+        q = nan;
+        r = nan;
+        return;
+    }
+
+    switch (lhs_fp)
+    {
+        case FP_INFINITE:
+            q = sign ? -inf : inf;
+            r = zero;
             return;
-        }
+        case FP_ZERO:
+            q = sign ? -zero : zero;
+            r = sign ? -zero : zero;
+            return;
+        default:
+            static_cast<void>(lhs);
+    }
 
-        switch (lhs_fp)
-        {
-            case FP_INFINITE:
-                q = sign ? -inf : inf;
-                r = zero;
-                return;
-            case FP_ZERO:
-                q = sign ? -zero : zero;
-                r = sign ? -zero : zero;
-                return;
-            default:
-                static_cast<void>(lhs);
-        }
-
-        switch (rhs_fp)
-        {
-            case FP_ZERO:
-                q = inf;
-                r = zero;
-                return;
-            case FP_INFINITE:
-                q = sign ? -zero : zero;
-                r = lhs;
-                return;
-            default:
-                static_cast<void>(rhs);
-        }
+    switch (rhs_fp)
+    {
+        case FP_ZERO:
+            q = inf;
+            r = zero;
+            return;
+        case FP_INFINITE:
+            q = sign ? -zero : zero;
+            r = lhs;
+            return;
+        default:
+            static_cast<void>(rhs);
     }
     #else
     static_cast<void>(r);
@@ -995,13 +992,15 @@ constexpr auto d128f_div_impl(const decimal_fast128_t& lhs, const decimal_fast12
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    const detail::decimal_fast128_t_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.isneg()};
-    const detail::decimal_fast128_t_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.isneg()};
-    detail::decimal_fast128_t_components q_components {};
+    constexpr auto ten_pow_precision {detail::pow10(int128::uint128_t(detail::precision_v<decimal128_t>))};
+    const auto big_sig_lhs {detail::umul256(lhs.significand_, ten_pow_precision)};
 
-    detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
+    const auto res_sig {big_sig_lhs / rhs.significand_};
+    const auto res_exp {lhs.biased_exponent() - rhs.biased_exponent() - detail::precision_v<decimal128_t>};
 
-    q = decimal_fast128_t(q_components.sig, q_components.exp, q_components.sign);
+    BOOST_DECIMAL_ASSERT(res_sig < std::numeric_limits<int128::uint128_t>::max());
+
+    q = decimal_fast128_t(static_cast<int128::uint128_t>(res_sig), res_exp, sign);
 }
 
 constexpr auto d128f_mod_impl(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs, const decimal_fast128_t& q, decimal_fast128_t& r) -> void
