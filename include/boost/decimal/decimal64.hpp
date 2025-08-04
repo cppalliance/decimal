@@ -1052,13 +1052,13 @@ constexpr auto operator-(decimal64_t rhs) noexcept-> decimal64_t
 
 constexpr auto d64_div_impl(const decimal64_t lhs, const decimal64_t rhs, decimal64_t& q, decimal64_t& r) noexcept -> void
 {
+    const bool sign {lhs.isneg() != rhs.isneg()};
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64_t zero {0, 0};
     constexpr decimal64_t nan {boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask)};
     constexpr decimal64_t inf {boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask)};
-
-    const bool sign {lhs.isneg() != rhs.isneg()};
 
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
@@ -1097,17 +1097,13 @@ constexpr auto d64_div_impl(const decimal64_t lhs, const decimal64_t rhs, decima
         default:
             static_cast<void>(rhs);
     }
+
     #else
     static_cast<void>(r);
     #endif
 
-    auto sig_lhs {lhs.full_significand()};
-    auto exp_lhs {lhs.biased_exponent()};
-    detail::normalize<decimal64_t>(sig_lhs, exp_lhs);
-
-    auto sig_rhs {rhs.full_significand()};
-    auto exp_rhs {rhs.biased_exponent()};
-    detail::normalize<decimal64_t>(sig_rhs, exp_rhs);
+    auto lhs_components {lhs.to_components()};
+    detail::normalize<decimal64_t>(lhs_components.sig, lhs_components.exp);
 
     #ifdef BOOST_DECIMAL_DEBUG
     std::cerr << "sig lhs: " << sig_lhs
@@ -1116,10 +1112,7 @@ constexpr auto d64_div_impl(const decimal64_t lhs, const decimal64_t rhs, decima
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    detail::decimal64_t_components lhs_components {sig_lhs, exp_lhs, lhs.isneg()};
-    detail::decimal64_t_components rhs_components {sig_rhs, exp_rhs, rhs.isneg()};
-
-    q = detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs_components);
+    q = detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs.to_components(), sign);
 }
 
 constexpr auto d64_mod_impl(const decimal64_t lhs, const decimal64_t rhs, const decimal64_t& q, decimal64_t& r) noexcept -> void
@@ -1332,13 +1325,13 @@ constexpr auto operator/(const decimal64_t lhs, const Integer rhs) noexcept
     using exp_type = decimal64_t::biased_exponent_type;
     using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
 
+    const bool sign {lhs.isneg() != (rhs < 0)};
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64_t zero {0, 0};
     constexpr decimal64_t nan {boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask)};
     constexpr decimal64_t inf {boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask)};
-
-    const bool sign {lhs.isneg() != (rhs < 0)};
 
     const auto lhs_fp {fpclassify(lhs)};
 
@@ -1370,7 +1363,7 @@ constexpr auto operator/(const decimal64_t lhs, const Integer rhs) noexcept
     detail::normalize<decimal64_t>(rhs_sig, rhs_exp);
     detail::decimal64_t_components rhs_components {static_cast<sig_type>(rhs_sig), rhs_exp, rhs < 0};
 
-    return detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs_components);
+    return detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs_components, sign);
 }
 
 template <typename Integer>
@@ -1381,13 +1374,13 @@ constexpr auto operator/(const Integer lhs, const decimal64_t rhs) noexcept
     using exp_type = decimal64_t::biased_exponent_type;
     using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
 
+    const bool sign {(lhs < 0) != rhs.isneg()};
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64_t zero {0, 0};
     constexpr decimal64_t inf {boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask)};
     constexpr decimal64_t nan {boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask)};
-
-    const bool sign {(lhs < 0) != rhs.isneg()};
 
     const auto rhs_fp {fpclassify(rhs)};
 
@@ -1417,7 +1410,7 @@ constexpr auto operator/(const Integer lhs, const decimal64_t rhs) noexcept
     detail::decimal64_t_components lhs_components {static_cast<sig_type>(lhs_sig), lhs_exp, lhs < 0};
     detail::decimal64_t_components rhs_components {rhs_sig, rhs_exp, rhs.isneg()};
 
-    return detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs_components);
+    return detail::d64_generic_div_impl<decimal64_t>(lhs_components, rhs_components, sign);
 }
 
 constexpr auto operator%(const decimal64_t lhs, const decimal64_t rhs) noexcept -> decimal64_t

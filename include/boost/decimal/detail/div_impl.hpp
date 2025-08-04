@@ -46,27 +46,27 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T
 }
 
 template <typename DecimalType, typename T>
-constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs) noexcept -> DecimalType
+BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_generic_div_impl(const T& lhs, const T& rhs, const bool sign) noexcept -> DecimalType
 {
     using unsigned_int128_type = boost::int128::uint128_t;
 
-    bool sign {lhs.sign != rhs.sign};
-
     // If rhs is greater than we need to offset the significands to get the correct values
     // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    constexpr auto tens_needed {detail::pow10(static_cast<unsigned_int128_type>(detail::precision_v<decimal64_t>))};
+    constexpr auto tens_needed {detail::pow10(static_cast<std::uint64_t>(detail::precision_v<decimal64_t>))};
     const auto big_sig_lhs {static_cast<unsigned_int128_type>(lhs.sig) * tens_needed};
 
-    auto res_sig {big_sig_lhs / rhs.sig};
-    auto res_exp {(lhs.exp - detail::precision_v<decimal64_t>) - rhs.exp};
-
-    if (res_sig == 0U)
-    {
-        sign = false;
-    }
+    const auto res_sig {big_sig_lhs / rhs.sig};
+    const auto res_exp {(lhs.exp - detail::precision_v<decimal64_t>) - rhs.exp};
 
     // Let the constructor handle shrinking it back down and rounding correctly
-    return DecimalType{res_sig, res_exp, sign};
+    if (res_sig < std::numeric_limits<std::uint64_t>::max())
+    {
+        return DecimalType{static_cast<std::uint64_t>(res_sig), res_exp, sign};
+    }
+    else
+    {
+        return DecimalType{res_sig, res_exp, sign};
+    }
 }
 
 template <typename T>

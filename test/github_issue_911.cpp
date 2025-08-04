@@ -26,7 +26,8 @@ void test_issue()
 
 #ifdef BOOST_DECIMAL_TEST_BSON
 
-#include <bson-2.0.2/bson/bson.h>
+#if __has_include(<bson-2.1.0/bson/bson.h>)
+#include <bson-2.1.0/bson/bson.h>
 #include <random>
 #include <string>
 
@@ -46,8 +47,8 @@ void test_random_spots()
 
         const auto full_string {integer_string + "." + fractional_string};
 
-        bson_decimal128_t_t bson_res;
-        bson_decimal128_t_from_string(full_string.c_str(), &bson_res);
+        bson_decimal128_t bson_res;
+        bson_decimal128_from_string(full_string.c_str(), &bson_res);
 
         boost::decimal::decimal128_t boost_res;
         const auto r = boost::decimal::from_chars(full_string, boost_res);
@@ -89,8 +90,8 @@ void test_rounded_spots()
             ++current_length;
         }
 
-        bson_decimal128_t_t bson_res;
-        bson_decimal128_t_from_string(full_string.c_str(), &bson_res);
+        bson_decimal128_t bson_res;
+        bson_decimal128_from_string(full_string.c_str(), &bson_res);
 
         boost::decimal::decimal128_t boost_res;
         const auto r = boost::decimal::from_chars(full_string, boost_res);
@@ -116,6 +117,17 @@ int main()
 
     return boost::report_errors();
 }
+
+#else
+
+int main()
+{
+    test_issue();
+
+    return boost::report_errors();
+}
+
+#endif
 
 #else
 
