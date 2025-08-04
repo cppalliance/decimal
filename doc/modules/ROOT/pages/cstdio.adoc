@@ -12,6 +12,8 @@ The following functions analogous to those from `<cstdio>` are provided:
 
 [source, c++]
 ----
+#include <boost/decimal/cstdio.hpp>
+
 namespace boost {
 namespace decimal {
 

@@ -12,6 +12,8 @@ The following functions from `<functional>` are overloaded:
 
 [source, c++]
 ----
+#include <boost/decimal/hash.hpp>
+
 namespace std {
 
 template <>
