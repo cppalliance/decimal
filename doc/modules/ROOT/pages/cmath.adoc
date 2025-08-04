@@ -30,6 +30,8 @@ Additionally, all functions are marked `noexcept`.
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -86,6 +88,8 @@ constexpr decimal128_t nand128(const char* arg) noexcept;
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -126,6 +130,8 @@ constexpr DecimalType log1p(DecimalType x) noexcept;
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -163,6 +169,8 @@ constexpr DecimalType hypot(DecimalType x, DecimalType y, DecimalType z) noexcep
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -206,6 +214,8 @@ constexpr DecimalType atan2(DecimalType x, DecimalType y) noexcept;
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -243,6 +253,8 @@ constexpr DecimalType atanh(DecimalType x) noexcept;
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -279,6 +291,8 @@ constexpr DecimalType lgamma(DecimalType x) noexcept;
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -334,6 +348,8 @@ constexpr long long llrint(DecimalType x) noexcept;
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -390,6 +406,8 @@ constexpr DecimalType copysign(DecimalType mag, DecimalType sgn) noexcept;
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -454,6 +472,8 @@ The following functions have been implemented for decimal types:
 [source, c++]
 ----
 
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -513,6 +533,8 @@ Effects: If x is an sNaN returns true, otherwise returns false.
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -537,6 +559,8 @@ If exactly one operand is infinity or exactly one operand is NaN, they do not ha
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -559,6 +583,8 @@ Otherwise, `INT_MIN` is returned.
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -593,6 +619,8 @@ The quantize functions do not signal underflow.
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -610,6 +638,8 @@ The significand is normalized to the number of digits of precision the type has 
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -628,6 +658,8 @@ This function has *NO* effect on fast types since they are always normalized int
 
 [source, c++]
 ----
+#include <boost/decimal/cmath.hpp>
+
 namespace boost {
 namespace decimal {
 

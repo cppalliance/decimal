@@ -117,6 +117,8 @@ IMPORTANT: If `std::chars_format` is used the function will return a `std::from_
 == to_chars
 [source, c++]
 ----
+#include <boost/decimal/charconv.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -160,6 +162,8 @@ The library offers an additional feature for sizing buffers without specified pr
 == limits
 [source, c++]
 ----
+#include <boost/decimal/charconv.hpp>
+
 namespace boost {
 namespace decimal {
 
