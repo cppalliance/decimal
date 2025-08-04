@@ -1134,13 +1134,13 @@ constexpr auto operator/(const decimal_fast64_t lhs, const Integer rhs) noexcept
     using promoted_significand_type = detail::promote_significand_t<decimal_fast64_t, Integer>;
     using exp_type = detail::decimal_fast64_t_components::biased_exponent_type;
 
+    const bool sign {lhs.isneg() != (rhs < 0)};
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal_fast64_t zero {0, 0};
     constexpr decimal_fast64_t nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
     constexpr decimal_fast64_t inf {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_inf, 0, false)};
-
-    const bool sign {lhs.isneg() != (rhs < 0)};
 
     const auto lhs_fp {fpclassify(lhs)};
 
@@ -1178,13 +1178,13 @@ constexpr auto operator/(const Integer lhs, const decimal_fast64_t rhs) noexcept
     using promoted_significand_type = detail::promote_significand_t<decimal_fast64_t, Integer>;
     using exp_type = detail::decimal_fast64_t_components::biased_exponent_type;
 
+    const bool sign {(lhs < 0) != rhs.isneg()};
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal_fast64_t zero {0, 0};
     constexpr decimal_fast64_t nan {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_snan, 0, false)};
     constexpr decimal_fast64_t inf {boost::decimal::direct_init_d64(boost::decimal::detail::d64_fast_inf, 0, false)};
-
-    const bool sign {(lhs < 0) != rhs.isneg()};
 
     const auto rhs_fp {fpclassify(rhs)};
 

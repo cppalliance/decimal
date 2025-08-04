@@ -1052,55 +1052,52 @@ constexpr auto operator-(decimal64_t rhs) noexcept-> decimal64_t
 
 constexpr auto d64_div_impl(const decimal64_t lhs, const decimal64_t rhs, decimal64_t& q, decimal64_t& r) noexcept -> void
 {
+    const bool sign {lhs.isneg() != rhs.isneg()};
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64_t zero {0, 0};
     constexpr decimal64_t nan {boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask)};
     constexpr decimal64_t inf {boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask)};
 
-    const bool sign {lhs.isneg() != rhs.isneg()};
-
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
 
-    constexpr auto two_normal {2 * FP_NORMAL};
-    if (lhs_fp + rhs_fp != two_normal)
+    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
     {
-        if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
-        {
-            q = nan;
-            r = nan;
-            return;
-        }
-
-        switch (lhs_fp)
-        {
-            case FP_INFINITE:
-                q = sign ? -inf : inf;
-                r = zero;
-                return;
-            case FP_ZERO:
-                q = sign ? -zero : zero;
-                r = sign ? -zero : zero;
-                return;
-            default:
-                static_cast<void>(lhs);
-        }
-
-        switch (rhs_fp)
-        {
-            case FP_ZERO:
-                q = inf;
-                r = zero;
-                return;
-            case FP_INFINITE:
-                q = sign ? -zero : zero;
-                r = lhs;
-                return;
-            default:
-                static_cast<void>(rhs);
-        }
+        q = nan;
+        r = nan;
+        return;
     }
+
+    switch (lhs_fp)
+    {
+        case FP_INFINITE:
+            q = sign ? -inf : inf;
+            r = zero;
+            return;
+        case FP_ZERO:
+            q = sign ? -zero : zero;
+            r = sign ? -zero : zero;
+            return;
+        default:
+            static_cast<void>(lhs);
+    }
+
+    switch (rhs_fp)
+    {
+        case FP_ZERO:
+            q = inf;
+            r = zero;
+            return;
+        case FP_INFINITE:
+            q = sign ? -zero : zero;
+            r = lhs;
+            return;
+        default:
+            static_cast<void>(rhs);
+    }
+
     #else
     static_cast<void>(r);
     #endif
@@ -1328,13 +1325,13 @@ constexpr auto operator/(const decimal64_t lhs, const Integer rhs) noexcept
     using exp_type = decimal64_t::biased_exponent_type;
     using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
 
+    const bool sign {lhs.isneg() != (rhs < 0)};
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64_t zero {0, 0};
     constexpr decimal64_t nan {boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask)};
     constexpr decimal64_t inf {boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask)};
-
-    const bool sign {lhs.isneg() != (rhs < 0)};
 
     const auto lhs_fp {fpclassify(lhs)};
 
@@ -1377,13 +1374,13 @@ constexpr auto operator/(const Integer lhs, const decimal64_t rhs) noexcept
     using exp_type = decimal64_t::biased_exponent_type;
     using integer_type = std::conditional_t<(std::numeric_limits<Integer>::digits10 > std::numeric_limits<sig_type>::digits10), detail::make_unsigned_t<Integer>, sig_type>;
 
+    const bool sign {(lhs < 0) != rhs.isneg()};
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal64_t zero {0, 0};
     constexpr decimal64_t inf {boost::decimal::from_bits(boost::decimal::detail::d64_inf_mask)};
     constexpr decimal64_t nan {boost::decimal::from_bits(boost::decimal::detail::d64_snan_mask)};
-
-    const bool sign {(lhs < 0) != rhs.isneg()};
 
     const auto rhs_fp {fpclassify(rhs)};
 
