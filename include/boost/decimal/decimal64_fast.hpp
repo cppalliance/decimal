@@ -1103,7 +1103,9 @@ constexpr auto d64_fast_div_impl(const decimal_fast64_t& lhs, const decimal_fast
     const auto res_sig {big_sig_lhs / static_cast<unsigned_int128_type>(rhs.significand_)};
     const auto res_exp {(lhs.biased_exponent() - detail::precision_v<decimal64_t>) - rhs.biased_exponent()};
 
-    q = decimal_fast64_t{res_sig, res_exp, sign};
+    BOOST_DECIMAL_ASSERT(res_sig <= std::numeric_limits<std::uint64_t>::max());
+
+    q = decimal_fast64_t{static_cast<std::uint64_t>(res_sig), res_exp, sign};
 }
 
 constexpr auto d64_fast_mod_impl(const decimal_fast64_t lhs, const decimal_fast64_t rhs, const decimal_fast64_t& q, decimal_fast64_t& r) noexcept -> void
