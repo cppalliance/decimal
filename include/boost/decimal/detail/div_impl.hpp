@@ -59,7 +59,14 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto d64_generic_div_impl(const T& lhs, con
     const auto res_exp {(lhs.exp - detail::precision_v<decimal64_t>) - rhs.exp};
 
     // Let the constructor handle shrinking it back down and rounding correctly
-    return DecimalType{res_sig, res_exp, sign};
+    if (res_sig < std::numeric_limits<std::uint64_t>::max())
+    {
+        return DecimalType{static_cast<std::uint64_t>(res_sig), res_exp, sign};
+    }
+    else
+    {
+        return DecimalType{res_sig, res_exp, sign};
+    }
 }
 
 template <typename T>
