@@ -248,6 +248,9 @@ This example could be extended with the simple moving average to create full ban
 [#examples_format]
 == Formatting
 
+Boost.Decimal allows you to format your output with both `<format>` and `<fmt/format.h>` depending on your compiler support.
+
+[#examples_std_format]
 === `<format>`
 
 If your compiler provides `<format>` you can use that to format the output of your values:
@@ -270,6 +273,7 @@ int main()
 }
 ----
 
+[#examples_fmt_format]
 === `<fmt/format.hpp>`
 
 We also provide support for `{fmt}` so you can easily just swap the namespaces and headers on the above example:
