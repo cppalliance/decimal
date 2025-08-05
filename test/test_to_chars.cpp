@@ -91,7 +91,7 @@ void test_non_finite_values()
 template <typename T>
 void test_non_finite_invalid_size(T value)
 {
-    std::uniform_int_distribution<int> dist(1, 1);
+    std::uniform_int_distribution<int> dist(0, 1000);
     value = value * dist(rng);
     char buffer[1];
     auto to_r = to_chars(buffer, buffer + sizeof(buffer), value);
@@ -998,6 +998,14 @@ int main()
     test_non_finite_invalid_size(std::numeric_limits<decimal32_t>::infinity());
     test_non_finite_invalid_size(std::numeric_limits<decimal32_t>::quiet_NaN());
     test_non_finite_invalid_size(decimal32_t{0});
+
+    test_non_finite_invalid_size(std::numeric_limits<decimal64_t>::infinity());
+    test_non_finite_invalid_size(std::numeric_limits<decimal64_t>::quiet_NaN());
+    test_non_finite_invalid_size(decimal64_t{0});
+
+    test_non_finite_invalid_size(std::numeric_limits<decimal128_t>::infinity());
+    test_non_finite_invalid_size(std::numeric_limits<decimal128_t>::quiet_NaN());
+    test_non_finite_invalid_size(decimal128_t{0});
 
     return boost::report_errors();
 }
