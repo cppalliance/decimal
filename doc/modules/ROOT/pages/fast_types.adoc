@@ -9,6 +9,42 @@ https://www.boost.org/LICENSE_1_0.txt
 :idprefix: fast_types_
 
 Now that we have seen the three basic types as specified in IEEE-754 there are three additional adjacent types: `decimal_fast32_t`, `decimal_fast64_t`, and `decimal_fast128_t`.
-These types yield identical computational results, but with ~3x faster performance.
+These types yield identical computational results but with faster performance.
 These types make the classic tradeoff of space for time as they require more storage width than the IEEE 754 conformant type.
+For example `decimal32_t` is fundamentally:
 
+[source, c++]
+----
+class decimal32_t final
+{
+    std::uint32_t bits_;
+};
+----
+
+Where the value of `decimal32_t` is encoded into `bits_` per IEEE 754 BID encoding pattern.
+Conversely, the internals  of `decimal_fast32_t` are:
+
+[source, c++]
+----
+class decimal_fast32_t final
+{
+    std::uint32_t signficand_;
+    std::uint8_t exponent_;
+    bool sign_;
+};
+----
+
+Instead of having to decode the bits at every operation, `decimal_fast32_t` is able to skip this step.
+The other major difference is that `decimal32_t` has cohorts as previously discussed.
+This requires normalization to ensure correct results for the comparison:
+
+[source, c++]
+----
+decimal32_t a {20};
+decimal32_t b {2, 1};
+
+assert(a == b);
+----
+
+In this example `a` and `b` both have different encodings (cohorts), so they must be normalized before comparison.
+`decimal_fast32_t` and the other fast types store the significand and exponent in a normalized fashion, so once again we can skip that step for every operation.
