@@ -153,7 +153,7 @@ int main()
 
 # Full Documentation
 
-The complete documentation can be found at: https://cppalliance.org/decimal/decimal.html
+The complete documentation can be found at: https://develop.decimal.cpp.al/decimal/overview.html
 
 ## References
 
