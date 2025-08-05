@@ -132,8 +132,8 @@ namespace local
       BOOST_TEST(result_val_is_ok);
 
       if(!result_val_is_ok)
+      //LCOV_EXCL_START
       {
-        //LCOV_EXCL_START
         std::stringstream strm;
 
         strm <<   "x_flt  : " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << x_flt
@@ -142,8 +142,8 @@ namespace local
              << "\nval_dec: " << std::scientific << std::setprecision(std::numeric_limits<float_type>::digits10) << val_dec;
 
         std::cerr << strm.str();
-        // LCOV_EXCL_STOP
       }
+      // LCOV_EXCL_STOP
     }
 
     BOOST_TEST(result_is_ok);
