@@ -8,7 +8,7 @@
 #if __cplusplus > 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
 #  if __has_include(<print>)
 #    include <print>
-#    if __cpp_lib_print >= 202207L
+#    if defined(__cpp_lib_print) && __cpp_lib_print >= 202207L
 #      define BOOST_DECIMAL_HAS_PRINT_SUPPORT
 #    endif
 #  endif
