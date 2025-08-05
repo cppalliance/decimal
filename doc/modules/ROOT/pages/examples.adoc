@@ -244,3 +244,76 @@ This example shows how to simply convert currencies based off a given exchange r
 In the examples folder there is a file named `statistics.cpp`.
 This example demonstrates how to parse a file, and then leverage Boost.Math to compute statistics of that data set culminating with the values of the Bollinger Bands.
 This example could be extended with the simple moving average to create full bands based on the period of the moving average you would like.
+
+[#examples_format]
+== Formatting
+
+Boost.Decimal allows you to format your output with both `<format>` and `<fmt/format.h>` depending on your compiler support.
+
+[#examples_std_format]
+=== `<format>`
+
+If your compiler provides `<format>` you can use that to format the output of your values:
+
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <iostream>
+#include <format>
+
+int main()
+{
+    constexpr boost::decimal::decimal64_t val1 {314, -2};
+    constexpr boost::decimal::decimal32_t val2 {3141, -3};
+
+    std::cout << std::format("{:10.3e}", val1) << '\n';
+    std::cout << std::format("{:10.3e}", val2) << std::endl;
+
+    return 0;
+}
+----
+
+[#examples_fmt_format]
+=== `<fmt/format.hpp>`
+
+We also provide support for `{fmt}` so you can easily just swap the namespaces and headers on the above example:
+
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <iostream>
+#include <fmt/format.h>
+
+int main()
+{
+    constexpr boost::decimal::decimal64_t val1 {314, -2};
+    constexpr boost::decimal::decimal32_t val2 {3141, -3};
+
+    std::cout << fmt::format("{:10.3e}", val1) << '\n';
+    std::cout << fmt::format("{:10.3e}", val2) << std::endl;
+
+    return 0;
+}
+----
+
+[#examples_print]
+== `<print>`
+
+We can make one final change to our `<format>` example where instead of using `std::cout`, we use pass:[C++23's]  `<print>`:
+
+[source, c++]
+----
+#include <boost/decimal.hpp>
+#include <print>
+
+int main()
+{
+    constexpr boost::decimal::decimal64_t val1 {314, -2};
+    constexpr boost::decimal::decimal32_t val2 {3141, -3};
+
+    std::print("{:10.3e}\n", val1);
+    std::print("{:10.3e}\n", val2);
+
+    return 0;
+}
+----

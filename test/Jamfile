@@ -177,6 +177,8 @@ run ../examples/moving_average.cpp ;
 run ../examples/currency_conversion.cpp ;
 run ../examples/statistics.cpp ;
 run ../examples/format.cpp ;
+run ../examples/fmt_format.cpp ;
+run ../examples/print.cpp ;
 
 # Test compilation of separate headers
 compile compile_tests/bid_conversion.cpp ;
