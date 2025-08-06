@@ -57,7 +57,7 @@ constexpr auto ceil BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (const T val) noexc
     const bool is_neg {val < zero};
 
     const auto sig_dig {detail::precision_v<T>};
-    auto decimal_digits {sig_dig};
+    auto decimal_digits {static_cast<unsigned>(sig_dig)};
 
     if (sig_dig > abs_exp)
     {
