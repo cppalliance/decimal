@@ -8,6 +8,7 @@ https://www.boost.org/LICENSE_1_0.txt
 = Configuration Macros
 :idprefix: config_
 
+[#configuration_user]
 == User Configurable Macros
 
 The following configuration macros are available:
@@ -47,6 +48,7 @@ Again, it must be defined before inclusion of decimal headers like so:
 
 - `BOOST_DECIMAL_DEC_EVAL_METHOD`: See <cfloat> section for explanation
 
+[#configuration_automatic]
 == Automatic Configuration Macros
 
 - `BOOST_DECIMAL_CXX20_CONSTEXPR`: This is defined to `constexpr` when compiling with C++20 or greater, otherwise it expands to nothing.
