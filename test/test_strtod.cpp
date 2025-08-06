@@ -137,6 +137,8 @@ void test_strtod_edges()
     BOOST_TEST(isnan(boost::decimal::strtod<T>(junk_str, nullptr))) && BOOST_TEST_EQ(errno, EINVAL);
 }
 
+#ifndef BOOST_DECIMAL_DISABLE_EXCEPTIONS
+
 template <typename T>
 void test_locales()
 {
@@ -163,6 +165,8 @@ void test_locales()
     const auto val = boost::decimal::strtod<T>(buffer, &enddptr);
     BOOST_TEST_EQ(valdiation_value, val);
 }
+
+#endif
 
 template <typename T>
 void test_spot(const char* str, T val)
@@ -278,7 +282,7 @@ int main()
     test_alloc<decimal64_t>();
 
     // Homebrew GCC does not support locales
-    #if !(defined(__GNUC__) && __GNUC__ >= 5 && defined(__APPLE__)) && !defined(BOOST_DECIMAL_QEMU_TEST)
+    #if !(defined(__GNUC__) && __GNUC__ >= 5 && defined(__APPLE__)) && !defined(BOOST_DECIMAL_QEMU_TEST) && !defined(BOOST_DECIMAL_DISABLE_EXCEPTIONS)
     test_locales<decimal32_t>();
     test_locales<decimal64_t>();
     test_locales<decimal128_t>();

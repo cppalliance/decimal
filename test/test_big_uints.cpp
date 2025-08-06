@@ -2,7 +2,9 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#if defined(__MINGW32__)
+#include <boost/decimal.hpp>
+
+#if defined(__MINGW32__) || defined(BOOST_DECIMAL_DISABLE_EXCEPTIONS)
 
 // TODO(ckormanyos) disable -Werror in BJAM specifically for this file, as it gets
 // a hard-coded, non-removable warning (-Werror) propagated up from Multiprecision.
@@ -20,7 +22,6 @@ int main()
 // Propagates up from boost.math
 #define _SILENCE_CXX23_DENORM_DEPRECATION_WARNING
 
-#include <boost/decimal.hpp>
 #include <boost/decimal/detail/u256.hpp>
 
 #if defined(__clang__)

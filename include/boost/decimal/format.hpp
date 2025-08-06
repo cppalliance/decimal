@@ -5,12 +5,13 @@
 #ifndef BOOST_DECIMAL_FORMAT_HPP
 #define BOOST_DECIMAL_FORMAT_HPP
 
-// Many compilers seem to have <format> with completly broken support so narrow down our support range
+// Many compilers seem to have <format> with completely broken support so narrow down our support range
 #if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)) && !defined(BOOST_DECIMAL_DISABLE_CLIB) && \
     ((defined(__GNUC__) && __GNUC__ >= 13) || (defined(__clang__) && __clang_major__ >= 18) || (defined(_MSC_VER) && _MSC_VER >= 1940))
 
 #define BOOST_DECIMAL_HAS_FORMAT_SUPPORT
 
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/charconv.hpp>
 #include <algorithm>
 #include <format>
@@ -91,7 +92,7 @@ constexpr auto parse_impl(ParseContext &ctx)
                 break;
             // LCOV_EXCL_START
             default:
-                throw std::format_error("Invalid format specifier");
+                BOOST_DECIMAL_THROW_EXCEPTION(std::format_error("Invalid format specifier"));
             // LCOV_EXCL_STOP
         }
     }

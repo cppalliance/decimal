@@ -111,6 +111,8 @@ void test_ostream()
     BOOST_TEST_CSTR_EQ(neg_snan.str().c_str(), "-nan(snan)");
 }
 
+#ifndef BOOST_DECIMAL_DISABLE_EXCEPTIONS
+
 void test_locales()
 {
     const char buffer[] = "1,1897e+02";
@@ -142,13 +144,15 @@ void test_locales()
     BOOST_TEST_CSTR_EQ(out.str().c_str(), buffer);
 }
 
+#endif
+
 int main()
 {
     test_istream();
     test_ostream();
 
     // Homebrew GCC does not support locales
-    #if !(defined(__GNUC__) && __GNUC__ >= 5 && defined(__APPLE__)) && !defined(BOOST_DECIMAL_QEMU_TEST)
+    #if !(defined(__GNUC__) && __GNUC__ >= 5 && defined(__APPLE__)) && !defined(BOOST_DECIMAL_QEMU_TEST) && !defined(BOOST_DECIMAL_DISABLE_EXCEPTIONS)
     test_locales();
     #endif
 
