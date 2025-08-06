@@ -11,6 +11,7 @@
 
 #include <fmt/format.h>
 #include <fmt/base.h>
+#include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/charconv.hpp>
 #include <algorithm>
 #include <format>
@@ -93,10 +94,10 @@ constexpr auto parse_impl(ParseContext &ctx)
             case 'a':
                 fmt = chars_format::hex;
                 break;
-                // LCOV_EXCL_START
+            // LCOV_EXCL_START
             default:
-                throw std::logic_error("Invalid format specifier");
-                // LCOV_EXCL_STOP
+                BOOST_DECIMAL_THROW_EXCEPTION(std::logic_error("Invalid format specifier"));
+            // LCOV_EXCL_STOP
         }
     }
 
