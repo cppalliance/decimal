@@ -48,7 +48,7 @@ constexpr auto atan_impl(const T x) noexcept
     #ifndef BOOST_DECIMAL_FAST_MATH
     else if (fpc == FP_INFINITE)
     {
-        result = my_pi_half;
+        result = my_pi_half; // LCOV_EXCL_LINE False negative
     }
     #endif
     else
@@ -57,7 +57,7 @@ constexpr auto atan_impl(const T x) noexcept
 
         if (x <= T { 48 })
         {
-            // Define small-ish argiments to be less than 39/16.
+            // Define small-ish arguments to be less than 39/16.
             const bool is_smallish { x <= T { 24375, -4 } };
 
             // The portion of the algorithm for arc-tangent regarding scaling large-valued
