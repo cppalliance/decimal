@@ -369,12 +369,14 @@ typedef unsigned __int128 builtin_uint128_t;
 #      define BOOST_DECIMAL_THROW_EXCEPTION(expr) throw expr;
 #    else
 #      define BOOST_DECIMAL_THROW_EXCEPTION(expr)
+#      define BOOST_DECIMAL_DISABLE_EXCEPTIONS
 #    endif
 #  else
 #    ifdef __EXCEPTIONS
 #      define BOOST_DECIMAL_THROW_EXCEPTION(expr) throw expr;
 #    else
 #      define BOOST_DECIMAL_THROW_EXCEPTION(expr)
+#      define BOOST_DECIMAL_DISABLE_EXCEPTIONS
 #    endif
 #endif
 
