@@ -96,8 +96,8 @@ void test_comp_ellint()
     const auto distance  { boost::math::float_distance(float_res, dec_res) };
 
     if (!BOOST_TEST(std::abs(distance) < 256))
+    // LCOV_EXCL_START
     {
-      // LCOV_EXCL_START
       std::stringstream strm;
 
       strm <<   "arg_k: " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << k_dec_val
@@ -106,8 +106,8 @@ void test_comp_ellint()
            << "\nDist : " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << distance;
 
       std::cerr << strm.str() << std::endl;
-      // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_STOP
   }
 }
 
@@ -147,8 +147,8 @@ bool test_ellint(const int tol_factor)
     result_is_ok = (result_val_is_ok && result_is_ok);
 
     if(!result_val_is_ok)
+    // LCOV_EXCL_START
     {
-      // LCOV_EXCL_START
       std::stringstream strm;
 
       strm <<   "k_dec  : " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << k_dec
@@ -157,8 +157,8 @@ bool test_ellint(const int tol_factor)
            << "\nval_flt: " << std::setprecision(std::numeric_limits<decimal_type>::digits10) << val_flt;
 
       std::cerr << strm.str() << std::endl;
-      // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_STOP
   }
 
   return result_is_ok;
@@ -210,8 +210,8 @@ namespace local
     }
 
     if (!result_is_ok)
+    // LCOV_EXCL_START
     {
-      // LCOV_EXCL_START
       std::stringstream strm;
 
       strm << std::setprecision(std::numeric_limits<NumericType>::digits10)
@@ -221,8 +221,8 @@ namespace local
            << "\ntol  : " << tol;
 
       std::cerr << strm.str() << std::endl;
-      // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_STOP
 
     return result_is_ok;
   }

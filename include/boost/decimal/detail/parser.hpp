@@ -197,10 +197,13 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
         switch (r.ec)
         {
+            // The two invalid cases are here for completeness, but I don't think we can actually hit them
+            // LCOV_EXCL_START
             case std::errc::invalid_argument:
                 return {first, std::errc::invalid_argument};
             case std::errc::result_out_of_range:
                 return {next, std::errc::result_out_of_range};
+            // LCOV_EXCL_STOP
             default:
                 return {next, std::errc()};
         }
@@ -280,10 +283,13 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
         from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
         switch (r.ec)
         {
-            case std::errc::invalid_argument:
-                return {first, std::errc::invalid_argument};
+            // Out of range included for completeness, but I don't think we can actually reach it
+            // LCOV_EXCL_START
             case std::errc::result_out_of_range:
                 return {next, std::errc::result_out_of_range};
+            // LCOV_EXCL_STOP
+            case std::errc::invalid_argument:
+                return {first, std::errc::invalid_argument};
             default:
                 return {next, std::errc()};
         }
@@ -323,10 +329,12 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
             from_chars_result r = from_chars_dispatch(significand_buffer, significand_buffer + offset, significand, base);
             switch (r.ec)
             {
+                // LCOV_EXCL_START
                 case std::errc::invalid_argument:
                     return {first, std::errc::invalid_argument};
                 case std::errc::result_out_of_range:
                     return {next, std::errc::result_out_of_range};
+                // LCOV_EXCL_STOP
                 default:
                     break;
             }
@@ -339,7 +347,7 @@ constexpr auto parser(const char* first, const char* last, bool& sign, Unsigned_
     }
     else
     {
-        return {first, std::errc::invalid_argument};
+        return {first, std::errc::invalid_argument}; // LCOV_EXCL_LINE
     }
 
     // Finally we get the exponent
