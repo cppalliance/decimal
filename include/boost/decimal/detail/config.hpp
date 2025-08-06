@@ -354,4 +354,30 @@ typedef unsigned __int128 builtin_uint128_t;
 #  endif
 #endif
 
+// Detect if we can throw or not
+// First check if the user said no explicitly
+// Then check if it's been disabled elsewhere
+
+#ifdef BOOST_DECIMAL_DISABLE_EXCEPTIONS
+
+#  define BOOST_DECIMAL_THROW_EXCEPTION(expr)
+
+#else
+
+#  ifdef _MSC_VER
+#    ifdef _CPPUNWIND
+#      define BOOST_DECIMAL_THROW_EXCEPTION(expr) throw expr;
+#    else
+#      define BOOST_DECIMAL_THROW_EXCEPTION(expr)
+#    endif
+#  else
+#    ifdef __EXCEPTIONS
+#      define BOOST_DECIMAL_THROW_EXCEPTION(expr) throw expr;
+#    else
+#      define BOOST_DECIMAL_THROW_EXCEPTION(expr)
+#    endif
+#endif
+
+#endif // Exceptions
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
