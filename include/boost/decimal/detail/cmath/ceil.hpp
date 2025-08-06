@@ -28,9 +28,12 @@ constexpr auto ceil BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (const T val) noexc
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     using DivType = typename T::significand_type;
+    constexpr int inverse_eps {std::is_same<DivType, std::uint32_t>::value ? 7 :
+                                   std::is_same<DivType, std::uint64_t>::value ? 16 : 34};
 
     constexpr T zero {0, 0};
     constexpr T one {1, 0};
+    constexpr T max_comp_value {1u, inverse_eps};
     const auto fp {fpclassify(val)};
 
     switch (fp)
@@ -43,12 +46,17 @@ constexpr auto ceil BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (const T val) noexc
             static_cast<void>(val);
     }
 
+    if (val > zero && val >= max_comp_value)
+    {
+        return val;
+    }
+
     int exp_ptr {};
     auto new_sig {frexp10(val, &exp_ptr)};
     const auto abs_exp {detail::make_positive_unsigned(exp_ptr)};
     const bool is_neg {val < zero};
 
-    const auto sig_dig {static_cast<unsigned>(detail::num_digits(new_sig))};
+    const auto sig_dig {detail::precision_v<T>};
     auto decimal_digits {sig_dig};
 
     if (sig_dig > abs_exp)
@@ -58,10 +66,6 @@ constexpr auto ceil BOOST_DECIMAL_PREVENT_MACRO_SUBSTITUTION (const T val) noexc
     else if (exp_ptr < 1 && abs_exp >= sig_dig)
     {
         return is_neg ? zero : one;
-    }
-    else
-    {
-        --decimal_digits;
     }
 
     new_sig /= detail::pow10<DivType>(decimal_digits);
