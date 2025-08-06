@@ -30,3 +30,7 @@ comment:
   layout: 'reach,diff,flags,files,footer'
   behavior: default
   require_changes: no
+
+ignore:
+  # This is covered here: https://github.com/cppalliance/int128
+  - include/boost/decimal/detail/int128/*
