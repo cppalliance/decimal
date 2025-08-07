@@ -81,13 +81,19 @@ constexpr auto atan2_impl(const T y, const T x) noexcept
     {
         result = atan2_detail::pi_constants<T>::three_pi_over_four;
 
-        if (signy) { result = -result; }
+        if (signy)
+        {
+            result = -result; // LCOV_EXCL_LINE : False Negative
+        }
     }
     else if (fpcy == FP_INFINITE && fpcx == FP_INFINITE && !signx)
     {
         result = numbers::pi_over_four_v<T>;
 
-        if (signy) { result = -result; }
+        if (signy)
+        {
+            result = -result; // LCOV_EXCL_LINE : False Negative
+        }
     }
     #endif
     else if (fpcx == FP_ZERO)
