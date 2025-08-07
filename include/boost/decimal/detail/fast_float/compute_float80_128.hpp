@@ -95,7 +95,7 @@ constexpr auto compute_float80_128(std::int64_t q, const Unsigned_Integer &w,
         return fast_path(q, w, negative);
     }
 
-    if (w == 0 || q < smallest_power)
+    if (w == 0U || q < smallest_power)
     {
         success = true;
         return negative ? -0.0L : 0.0L;
