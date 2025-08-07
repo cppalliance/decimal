@@ -348,7 +348,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<long double>(long dou
 
 #endif
 
-#if defined(BOOST_DECIMAL_HAS_FLOAT128)
+#if defined(BOOST_DECIMAL_HAS_FLOAT128) && !defined(BOOST_DECIMAL_LDBL_IS_FLOAT128)
 
 template <>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto floating_point_to_fd128<__float128>(__float128 val) noexcept -> floating_decimal_128

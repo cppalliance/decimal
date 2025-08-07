@@ -382,4 +382,20 @@ typedef unsigned __int128 builtin_uint128_t;
 
 #endif // Exceptions
 
+#ifndef BOOST_DECIMAL_BULID_MODULE
+#  include <cfloat>
+#  include <type_traits>
+#endif
+
+// Check for PPC64LE with IEEE long double (which is an alias to __float128) or x64 with "-mlong-double-128"
+//
+// IBM128 has 106 Mantissa Digits whereas IEEE128 has 113
+// https://developers.redhat.com/articles/2023/05/16/benefits-fedora-38-long-double-transition-ppc64le#
+#if ((defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) && (defined(__LONG_DOUBLE_IEEE128__) || LDBL_MANT_DIG == 113))
+
+#define BOOST_DECIMAL_LDBL_IS_FLOAT128
+static_assert(std::is_same<long double, __float128>::value, "__float128 should be an alias to long double. Please open an issue at: https://github.com/cppalliance/decimal");
+
+#endif
+
 #endif // BOOST_DECIMAL_DETAIL_CONFIG_HPP
