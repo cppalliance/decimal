@@ -212,7 +212,7 @@ constexpr auto equal_parts_impl(T1 lhs_sig, U1 lhs_exp, bool lhs_sign,
         //
         // We try for multiplication even though it's a small range
         // Since it's an order of magnitude faster
-        if (delta_exp <= 4 && delta_exp >= 4)
+        if (delta_exp <= 4 && delta_exp >= -4)
         {
             if (delta_exp > 0)
             {
