@@ -50,27 +50,22 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
         return true;
     }
 
-    // Step 3: Check -0 == +0
-    auto lhs_sig {lhs.full_significand()};
-    auto rhs_sig {rhs.full_significand()};
-    if (lhs_sig == 0U && rhs_sig == 0U)
-    {
-        return true;
-    }
+    const auto lhs_components {lhs.to_components()};
+    const auto rhs_components {rhs.to_components()};
+
+    auto lhs_sig {lhs_components.sig};
+    auto rhs_sig {rhs_components.sig};
 
     // Step 4: Check signs
-    const auto lhs_neg {lhs.isneg()};
-    const auto rhs_neg {rhs.isneg()};
-
-    if (lhs_neg != rhs_neg)
+    if (lhs_components.sign != rhs_components.sign)
     {
-        return false;
+        return (lhs_sig == 0U && rhs_sig == 0U);
     }
 
     // Step 5: Check the exponents
     // If the difference is greater than we can represent in the significand than we can assume they are different
-    const auto lhs_exp {lhs.biased_exponent()};
-    const auto rhs_exp {rhs.biased_exponent()};
+    const auto lhs_exp {lhs_components.exp};
+    const auto rhs_exp {rhs_components.exp};
 
     const auto delta_exp {lhs_exp - rhs_exp};
 
