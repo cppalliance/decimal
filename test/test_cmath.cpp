@@ -211,6 +211,7 @@ void test_ceil()
     BOOST_TEST_EQ(ceil(Dec(27777, -4)), Dec(3, 0));
     BOOST_TEST_EQ(ceil(Dec(-27777, -4)), Dec(-2, 0));
     BOOST_TEST_EQ(ceil(Dec(2, 40)), Dec(2, 40));
+    BOOST_TEST_EQ(ceil(Dec(2, 10)), Dec(2, 10));
 
     // Bigger numbers
     BOOST_TEST_EQ(ceil(Dec(27777, -2)), Dec(278, 0));
