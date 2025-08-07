@@ -121,7 +121,7 @@ constexpr bool is_integral_v = is_integral<T>::value;
 template <typename T>
 struct is_floating_point { static constexpr bool value = std::is_floating_point<T>::value; };
 
-#ifdef BOOST_DECIMAL_HAS_FLOAT128
+#if defined(BOOST_DECIMAL_HAS_FLOAT128) && !defined(BOOST_DECIMAL_LDBL_IS_FLOAT128)
 template <>
 struct is_floating_point<__float128> { static constexpr bool value = true; };
 #endif
