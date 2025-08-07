@@ -86,7 +86,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto equality_impl(DecimalType lhs, Decimal
         //
         // We try for multiplication even though it's a small range
         // Since it's an order of magnitude faster
-        if (delta_exp <= 4 && delta_exp >= 4)
+        if (delta_exp <= 4 && delta_exp >= -4)
         {
             if (delta_exp > 0)
             {
