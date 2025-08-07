@@ -85,7 +85,7 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
         #if BOOST_DECIMAL_LDBL_BITS == 64
         result = static_cast<TargetType>(detail::fast_float::compute_float64(exp, new_sig, val.isneg(), success));
         #else
-        result = static_cast<TargetType>(detail::fast_float::compute_float80_128(exp, new_sig, val.isneg(), success));
+        result = static_cast<TargetType>(detail::fast_float::compute_float80_128(exp, sig, val.isneg(), success));
         #endif
     }
 
