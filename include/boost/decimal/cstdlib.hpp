@@ -132,7 +132,7 @@ inline auto wcstod_calculation(const wchar_t* str, wchar_t** endptr, char* buffe
         if (BOOST_DECIMAL_UNLIKELY(val > 255))
         {
             // Character can not be converted
-            return std::numeric_limits<TargetDecimalType>::quiet_NaN();
+            return std::numeric_limits<TargetDecimalType>::quiet_NaN(); // LCOV_EXCL_LINE
         }
 
         buffer[i] = static_cast<char>(val);

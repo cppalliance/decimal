@@ -12,6 +12,8 @@ The following macros analogous to those from `<cfloat>` for the decimal floating
 
 [source, c++]
 ----
+#include <boost/decimal/cfloat.hpp>
+
 
 // Number of digits in the coefficient
 #define BOOST_DECIMAL_DEC32_MANT_DIG  std::numeric_limits<boost::decimal::decimal32_t>:digits10

@@ -8,6 +8,7 @@ https://www.boost.org/LICENSE_1_0.txt
 = Configuration Macros
 :idprefix: config_
 
+[#configuration_user]
 == User Configurable Macros
 
 The following configuration macros are available:
@@ -17,6 +18,9 @@ The following configuration macros are available:
 - `BOOST_DECIMAL_DISABLE_IOSTREAM`: Disables the use of I/O streaming and removes all associated headers (e.g. `<iostream>`, `<iosfwd>`, `<cwchar>`, etc.)
 
 - `BOOST_DECIMAL_DISABLE_CLIB`: Defines both of the above macros. In testing this reduces ROM usage by ~50% and can be useful if running on embedded platforms.
+
+- `BOOST_DECIMAL_DISABLE_EXCEPTIONS`: This allows the user to disable any calls to `throw`.
+This macro will also be set automatically in the presence of `-fno-exceptions` or various `/EH` flags on MSVC.
 
 - `BOOST_DECIMAL_ALLOW_IMPLICIT_CONVERSIONS`: Allows a binary floating-point type (e.g. `double`) to be implicitly converted to a decimal floating point type.
 This option is not recommended, but can be useful if you want to use specific functionality from the standard library with internal conversions such as:
@@ -44,6 +48,7 @@ Again, it must be defined before inclusion of decimal headers like so:
 
 - `BOOST_DECIMAL_DEC_EVAL_METHOD`: See <cfloat> section for explanation
 
+[#configuration_automatic]
 == Automatic Configuration Macros
 
 - `BOOST_DECIMAL_CXX20_CONSTEXPR`: This is defined to `constexpr` when compiling with C++20 or greater, otherwise it expands to nothing.

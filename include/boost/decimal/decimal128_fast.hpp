@@ -935,17 +935,18 @@ constexpr auto operator*(const Integer lhs, const decimal_fast128_t& rhs) noexce
 
 constexpr auto d128f_div_impl(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs, decimal_fast128_t& q, decimal_fast128_t& r) noexcept -> void
 {
+    const bool sign {lhs.isneg() != rhs.isneg()};
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal_fast128_t zero {0, 0};
     constexpr decimal_fast128_t nan {boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_qnan, 0, false)};
     constexpr decimal_fast128_t inf {boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_inf, 0, false)};
 
-    const bool sign {lhs.isneg() != rhs.isneg()};
-
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
 
+    // NAN has to come first
     if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
     {
         q = nan;
@@ -991,13 +992,13 @@ constexpr auto d128f_div_impl(const decimal_fast128_t& lhs, const decimal_fast12
               << "\nexp rhs: " << exp_rhs << std::endl;
     #endif
 
-    detail::decimal_fast128_t_components lhs_components {lhs.significand_, lhs.biased_exponent(), lhs.isneg()};
-    detail::decimal_fast128_t_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.isneg()};
-    detail::decimal_fast128_t_components q_components {};
+    constexpr auto ten_pow_precision {detail::pow10(int128::uint128_t(detail::precision_v<decimal128_t>))};
+    const auto big_sig_lhs {detail::umul256(lhs.significand_, ten_pow_precision)};
 
-    detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
+    const auto res_sig {big_sig_lhs / rhs.significand_};
+    const auto res_exp {lhs.biased_exponent() - rhs.biased_exponent() - detail::precision_v<decimal128_t>};
 
-    q = decimal_fast128_t(q_components.sig, q_components.exp, q_components.sign);
+    q = decimal_fast128_t(static_cast<int128::uint128_t>(res_sig), res_exp, sign);
 }
 
 constexpr auto d128f_mod_impl(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs, const decimal_fast128_t& q, decimal_fast128_t& r) -> void

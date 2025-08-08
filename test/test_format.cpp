@@ -13,9 +13,6 @@ using namespace boost::decimal;
 template <typename T>
 void test_general()
 {
-    // For unknown reasons Clang does not like this empty bracket and throws compiler errors
-    #ifndef __clang__
-
     BOOST_TEST_EQ(std::format("{}", T{1}), "1");
     BOOST_TEST_EQ(std::format("{}", T{10}), "10");
     BOOST_TEST_EQ(std::format("{}", T{100}), "100");
@@ -43,8 +40,6 @@ void test_general()
     BOOST_TEST_EQ(std::format("{}", -std::numeric_limits<T>::quiet_NaN()), "-nan(ind)");
     BOOST_TEST_EQ(std::format("{}", std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
     BOOST_TEST_EQ(std::format("{}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
-
-    #endif // defined(__clang__)
 
     BOOST_TEST_EQ(std::format("{:g}", T{1}), "1");
     BOOST_TEST_EQ(std::format("{:g}", T{10}), "10");

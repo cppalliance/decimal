@@ -12,6 +12,10 @@ The following from `<limits>` are overloaded for each type with associated value
 
 [source, c++]
 ----
+#include <boost/decimal/decimal32_t.hpp>
+#include <boost/decimal/decimal64_t.hpp>
+#include <boost/decimal/decimal128_t.hpp>
+
 namespace std {
 
 template <>
@@ -144,4 +148,4 @@ struct numeric_limits<boost::decimal::decimal128_t>
 
 ----
 
-The fast types each have the same member values as their corresponding non-fast type above.
+The fast types each have the same member values as their corresponding non-fast type above, and are also contained in the same file as the class implementation.

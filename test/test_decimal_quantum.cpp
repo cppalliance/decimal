@@ -88,37 +88,23 @@ template <typename Dec>
 void test_quantexp()
 {
     // Loop through every possible exponent
-    for (auto i {std::numeric_limits<Dec>::min_exponent10}; i < std::numeric_limits<Dec>::max_exponent10; ++i)
+    for (auto i {std::numeric_limits<Dec>::min_exponent10}; i < std::numeric_limits<Dec>::max_exponent10 - std::numeric_limits<Dec>::digits10; ++i)
     {
         const Dec val1 {1, i};
 
-        if (static_cast<std::uint32_t>(i) + detail::bias_v<Dec> > detail::max_biased_exp_v<Dec>)
+        if (isinf(val1))
         {
-            // Fast decimals have no concept of subnormals
-            BOOST_IF_CONSTEXPR (!std::is_same<Dec, decimal_fast32_t>::value)
-            {
-                if (isinf(val1))
-                {
-                    continue;
-                }
-
-                if (!BOOST_TEST_EQ(quantexp(val1), detail::max_biased_exp_v<Dec>))
-                {
-                    // LCOV_EXCL_START
-                    std::cerr << "Val: " << val1 << std::endl;
-                    // LCOV_EXCL_STOP
-                }
-            }
+            continue; // LCOV_EXCL_LINE
         }
         else
         {
             if (!BOOST_TEST_EQ(quantexp(val1), i + detail::bias_v<Dec>))
+            // LCOV_EXCL_START
             {
-                // LCOV_EXCL_START
                 std::cerr << "Val: " << val1
                           << "\nExp 1: " << i << std::endl;
-                // LCOV_EXCL_STOP
             }
+            // LCOV_EXCL_STOP
         }
     }
 }

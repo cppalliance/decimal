@@ -73,8 +73,8 @@ namespace local
     }
 
     if (!result_is_ok)
+    // LCOV_EXCL_START
     {
-      // LCOV_EXCL_START
       std::stringstream strm;
 
       strm << std::setprecision(std::numeric_limits<NumericType>::digits10)
@@ -84,8 +84,8 @@ namespace local
            << "\ntol  : " << tol;
 
       std::cerr << strm.str() << std::endl;
-      // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_STOP
 
     return result_is_ok;
   }

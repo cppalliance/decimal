@@ -52,7 +52,7 @@ The example is padding modifiers can be done like so
 
 [source, c++]
 ----
-#include <boost/decimal.hpp>
+#include <boost/decimal.hpp> // or <boost/decimal/format.hpp>
 #include <format>
 #include <iostream>
 
@@ -72,12 +72,12 @@ int main()
 == `<fmt/format.h>`
 
 Support for `{fmt}` is available as long as `<fmt/format.h>` is present.
-All of the above information on modifiers is the same for fmtlib, just in a different namespace (i.e. `fmt::` instead of `std::`).
+All the above information on modifiers is the same for fmtlib, just in a different namespace (i.e. `fmt::` instead of `std::`).
 
 [source, c++]
 ----
 #include <fmt/format.h>
-#include <boost/decimal.hpp>
+#include <boost/decimal.hpp> // or <boost/decimal/fmt_format.hpp>
 #include <iostream>
 
 int main()

@@ -12,10 +12,10 @@ This section describes a range of performance benchmarks that have been run comp
 
 The values in the ratio column are how many times longer running a specific operation takes in comparison to the same operation with a `double`.
 
-IMPORTANT: On nearly all platforms there is hardware support for binary floating point math, so we are comparing hardware to software runtimes; *Decimal will be slower*
+IMPORTANT: On nearly all platforms, there is hardware support for binary floating point math, so we are comparing hardware to software runtimes; *Decimal will be slower*
 
-NOTE: Both the results from Intel and GCC types are from very close, but not identical benchmark routines since they are written in C instead of C\++.
-We assume they are close enough, and the differences between the C and C++ compilers are small enough, for fair comparison
+NOTE: Both the results from Intel and GCC types are from very close, but not identical benchmark routines since they are written in C instead of pass:[C++].
+We assume they are close enough, and the differences between the C and pass:[C++] compilers are small enough, for fair comparison
 
 == How to run the Benchmarks
 [#run_benchmarks_]
@@ -40,21 +40,22 @@ This is repeated 5 times to generate stable results.
 
 === Basic Mathematical Operations
 
-The benchmark for these operations generates a random vector containing 20,000,000 elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
-This is repeated 5 times to generate stable results.
+The benchmark for these operations generates a random vector containing 20 million elements and does operations `+`, `-`, `*`, `/` between `vec[i] and vec[i + 1]`.
+This is repeated five times to generate stable results.
 
 === `<charconv>`
 
-Parsing and serializing number exactly is one of the key features of decimal floating point types, so we must compare the performance of `<charconv>`. For all the following the results compare against STL provided `<charconv>` for 20,000,000 conversions.
-Since `<charconv>` is fully implemented in software for each type the performance gap between built-in `float` and `double` vs `decimal32_t` and `decimal64_t` is significantly smaller (or the decimal performance is better) than the hardware vs software performance gap seen above for basic operations.
+Parsing and serializing number exactly is one of the key features of decimal floating point types, so we must compare the performance of `<charconv>`.
+For all the following the results compare we compare against STL provided `<charconv>` for 20 million conversions.
+Since `<charconv>` is fully implemented in software for each type the performance gap between built-in `float` and `double` vs `decimal32_t` and `decimal64_t` is significantly smaller (or the decimal performance is better) than the hardware vs. software performance gap seen above for basic operations.
 
-To run these benchmarks yourself you will need a compiler with complete implementation of `<charconv>` and to run the benchmarks under C++17 or higher.
-At the time of writing this is limited to:
+To run these benchmarks yourself, you will need a compiler with complete implementation of `<charconv>` and to run the benchmarks under pass:[C++]17 or higher.
+At the time of writing, this is limited to:
 
 - GCC 11 or newer
 - MSVC 19.24 or newer
 
-These benchmarks are automatically disabled if your compiler does not provide feature complete `<charconv>` or if the language standard is set to C++14.
+These benchmarks are automatically disabled if your compiler does not provide feature complete `<charconv>` or if the language standard is set to pass:[C++]14.
 
 [#x64_linux_benchmarks]
 == x64 Linux
@@ -394,23 +395,23 @@ Intel Compiler:
 | 103,796
 | 1.000
 | `decimal32_t`
-| 2,125,437
-| 20.477
+| 2,134,312
+| 20.563
 | `decimal64_t`
-| 5,973,337
-| 57.549
+| 5,399,276
+| 52.018
 | `decimal128_t`
-| 9,482,403
-| 91.356
+| 10,012,578
+| 96.464
 | `decimal_fast32_t`
-| 1,011,695
-| 9.747
+| 1,558,774
+| 15.018
 | `decimal_fast64_t`
-| 2,138,793
-| 20.606
+| 1,597,873
+| 15.394
 | `decimal_fast128_t`
-| 8,277,721
-| 79.750
+| 8,105,004
+| 78.086
 | Intel `Decimal32`
 | 1,561,213
 | 15.041
@@ -436,20 +437,20 @@ GCC:
 | 2,396,732
 | 29.708
 | `decimal64_t`
-| 4,824,865
-| 59.805
+| 4,021,720
+| 49.850
 | `decimal128_t`
-| 10,751,669
-| 133.270
+| 10,677,625
+| 132.352
 | `decimal_fast32_t`
-| 1,103,023
-| 13.672
+| 1,083,011
+| 13.424
 | `decimal_fast64_t`
-| 2,384,925
-| 29.562
+| 1,851,520
+| 22.950
 | `decimal_fast128_t`
-| 8,332,936
-| 103.289
+| 8,121,160
+| 100.664
 | GCC `_Decimal32`
 | 5,082,812
 | 63.002
@@ -781,23 +782,23 @@ Run using an Intel i9-11900k chipset running Windows 11 and Visual Studio 17.14.
 | 89,317
 | 1.000
 | `decimal32_t`
-| 3,402,467
-| 38.094
+| 3,048,254
+| 34.128
 | `decimal64_t`
-| 4,663,830
-| 52.217
+| 3,282,819
+| 36.755
 | `decimal128_t`
-| 18,167,111
-| 203.400
+| 16,648,799
+| 186.401
 | `decimal_fast32_t`
-| 2,363,121
-| 26.458
+| 2,059,743
+| 23.061
 | `decimal_fast64_t`
-| 6,578,828
-| 73.657
+| 5,105,018
+| 57.156
 | `decimal_fast128_t`
-| 12,341,026
-| 138.171
+| 11,587,763
+| 129,737
 |===
 
 === `from_chars`
@@ -1120,23 +1121,23 @@ Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homeb
 | 17,145
 | 1.000
 | `decimal32_t`
-| 1,705,827
-| 97.951
+| 1,732,611
+| 101.056
 | `decimal64_t`
-| 3,912,831
-| 224.682
+| 3,558,094
+| 207.529
 | `decimal128_t`
-| 8,727,582
-| 501.153
+| 8,985,521
+| 524.090
 | `decimal_fast32_t`
-| 1,054,418
-| 60.547
+| 1,075,184
+| 62.711
 | `decimal_fast64_t`
-| 2,404,072
-| 138.046
+| 2,027,533
+| 118.258
 | `decimal_fast128_t`
-| 7,981,650
-| 458.320
+| 7,583,016
+| 442.287
 |===
 
 === `from_chars`
@@ -1249,7 +1250,7 @@ Run using a Macbook pro with M4 Max chipset running macOS Sequoia 15.5 and homeb
 | `decimal64_t`
 | 3,309,343
 | 0.673
-| `decimal128_t
+| `decimal128_t`
 | 5,962,030
 | 1.212
 | `decimal_fast32_t`

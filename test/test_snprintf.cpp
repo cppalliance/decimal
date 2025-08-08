@@ -80,7 +80,7 @@ void test_uppercase(T value, const char* format_sprintf, chars_format fmt = char
     BOOST_TEST_EQ(num_bytes, r.ptr - charconv_buffer);
 }
 
-#if !(defined(__APPLE__) && defined(__GNUC__) && !defined(__clang__))
+#if !(defined(__APPLE__) && defined(__GNUC__) && !defined(__clang__)) && !defined(BOOST_DECIMAL_DISABLE_EXCEPTIONS)
 void test_locales()
 {
     const char buffer[] = "1,1897e+02";
@@ -227,7 +227,7 @@ int main()
     test_bootstrap<decimal128_t>();
 
     // Homebrew gcc on mac does not support locales
-    #if !(defined(__APPLE__) && defined(__GNUC__) && !defined(__clang__)) && !defined(BOOST_DECIMAL_QEMU_TEST)
+    #if !(defined(__APPLE__) && defined(__GNUC__) && !defined(__clang__)) && !defined(BOOST_DECIMAL_QEMU_TEST) && !defined(BOOST_DECIMAL_DISABLE_EXCEPTIONS)
     test_locales();
     #endif
 

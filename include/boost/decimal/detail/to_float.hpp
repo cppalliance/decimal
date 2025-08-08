@@ -27,6 +27,10 @@ namespace decimal {
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4127)
+#endif
 
 template <typename Decimal, typename TargetType>
 BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
@@ -57,7 +61,16 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
 
     auto sig {val.full_significand()};
     auto exp {val.biased_exponent()};
-    const auto new_sig {detail::shrink_significand<std::uint64_t>(sig, exp)};
+    std::uint64_t new_sig {};
+
+    BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<typename Decimal::significand_type>::digits10 > std::numeric_limits<std::uint64_t>::digits10)
+    {
+        new_sig = detail::shrink_significand<std::uint64_t>(sig, exp);
+    }
+    else
+    {
+        new_sig = static_cast<std::uint64_t>(sig);
+    }
 
     BOOST_DECIMAL_IF_CONSTEXPR (std::is_same<TargetType, float>::value)
     {
@@ -71,8 +84,11 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
     {
         #if BOOST_DECIMAL_LDBL_BITS == 64
         result = static_cast<TargetType>(detail::fast_float::compute_float64(exp, new_sig, val.isneg(), success));
-        #else
+        #elif BOOST_DECIMAL_LDBL_BITS == 80
         result = static_cast<TargetType>(detail::fast_float::compute_float80_128(exp, new_sig, val.isneg(), success));
+        #else
+        static_cast<void>(new_sig);
+        result = static_cast<TargetType>(detail::fast_float::compute_float80_128(exp, sig, val.isneg(), success));
         #endif
     }
 
@@ -89,6 +105,9 @@ BOOST_DECIMAL_CXX20_CONSTEXPR auto to_float(Decimal val) noexcept
 
 #if defined(__GNUC__) && __GNUC__ >= 6
 #  pragma GCC diagnostic pop
+#endif
+#ifdef _MSC_VER
+#  pragma warning(pop)
 #endif
 
 } //namespace decimal

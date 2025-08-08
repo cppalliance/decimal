@@ -12,6 +12,8 @@ The following literals are offered to construct each of the types:
 
 [source, c++]
 ----
+#include <boost/decimal/literals.hpp>
+
 namespace boost {
 namespace decimal {
 

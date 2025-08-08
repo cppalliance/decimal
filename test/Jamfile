@@ -28,6 +28,7 @@ project : requirements
   <toolset>gcc:<cxxflags>-Wold-style-cast
   #<toolset>gcc:<cxxflags>-Wduplicated-branches
   <toolset>gcc:<cxxflags>-Wfloat-equal
+  <toolset>gcc:<cxxflags>-Wshadow
 
   <toolset>clang:<cxxflags>-Wsign-conversion
   <toolset>clang:<cxxflags>-Wconversion
@@ -147,6 +148,7 @@ run test_lgamma.cpp ;
 run test_log.cpp ;
 run test_log1p.cpp ;
 run test_log10.cpp ;
+run test_normalize.cpp ;
 run test_parser.cpp ;
 run test_pow.cpp ;
 run test_promotion.cpp ;
@@ -175,6 +177,8 @@ run ../examples/moving_average.cpp ;
 run ../examples/currency_conversion.cpp ;
 run ../examples/statistics.cpp ;
 run ../examples/format.cpp ;
+run ../examples/fmt_format.cpp ;
+run ../examples/print.cpp ;
 
 # Test compilation of separate headers
 compile compile_tests/bid_conversion.cpp ;

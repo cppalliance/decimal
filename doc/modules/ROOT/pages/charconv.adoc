@@ -117,6 +117,8 @@ IMPORTANT: If `std::chars_format` is used the function will return a `std::from_
 == to_chars
 [source, c++]
 ----
+#include <boost/decimal/charconv.hpp>
+
 namespace boost {
 namespace decimal {
 
@@ -150,7 +152,7 @@ NOTE: `BOOST_DECIMAL_CONSTEXPR` is defined if:
  - `_MSC_FULL_VER` >= 192528326
  - `\\__GNUC__` >= 9
  - Compiler has: `__builtin_is_constant_evaluated()`
- - C++20 support with: `std::is_constant_evaluated()`
+ - pass:[C++]20 support with: `std::is_constant_evaluated()`
 
 IMPORTANT: Same as `from_chars`, `boost::decimal::to_chars` will return a `std::to_chars_result` if `std::chars_format` is used to specify the format; otherwise it returns a `boost::decimal::to_chars_result`.
 
@@ -160,6 +162,8 @@ The library offers an additional feature for sizing buffers without specified pr
 == limits
 [source, c++]
 ----
+#include <boost/decimal/charconv.hpp>
+
 namespace boost {
 namespace decimal {
 

@@ -14,6 +14,9 @@ Should the user want to capture the bit format in BID or convert to DPD we offer
 
 [source, c++]
 ----
+#include <boost/decimal/bid_conversions.hpp>
+#include <boost/decimal/dpd_conversions.hpp>
+
 namespace boost {
 namespace decimal {
 

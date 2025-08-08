@@ -73,6 +73,7 @@
 #include <boost/decimal/detail/cmath/assoc_legendre.hpp>
 #include <boost/decimal/detail/cmath/rescale.hpp>
 #include <boost/decimal/detail/cmath/beta.hpp>
+#include <boost/decimal/detail/cmath/normalize.hpp>
 #include <boost/decimal/numbers.hpp>
 
 // Macros from 3.6.2
