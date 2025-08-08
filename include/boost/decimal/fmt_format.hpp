@@ -99,9 +99,14 @@ constexpr auto parse_impl(ParseContext &ctx)
                 BOOST_DECIMAL_THROW_EXCEPTION(std::logic_error("Invalid format specifier"));
             // LCOV_EXCL_STOP
         }
+        ++it;
     }
 
-    ++it;
+    // Verify we're at the closing brace
+    if (it != ctx.end() && *it != '}')
+    {
+        BOOST_DECIMAL_THROW_EXCEPTION(std::logic_error("Expected '}' in format string")); // LCOV_EXCL_LINE
+    }
 
     return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
 }
