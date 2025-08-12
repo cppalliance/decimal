@@ -2,13 +2,19 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
+#define FMT_HEADER_ONLY
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <limits>
 
 using namespace boost::decimal;
 
-#if defined(BOOST_DECIMAL_TEST_FMT) && defined(BOOST_DECIMAL_HAS_FMTLIB_SUPPORT)
+#if defined(BOOST_DECIMAL_HAS_FMTLIB_SUPPORT)
 
 #include <fmt/format.h>
 
