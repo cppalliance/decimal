@@ -25,9 +25,17 @@ namespace decimal {
 namespace detail {
 namespace fmt_detail {
 
+enum class sign_option
+{
+    plus,
+    minus,
+    space
+};
+
 template <typename ParseContext>
 constexpr auto parse_impl(ParseContext &ctx)
 {
+    auto sign_character = sign_option::minus;
     int ctx_precision = 6;
     boost::decimal::chars_format fmt = boost::decimal::chars_format::general;
     bool is_upper = false;
@@ -36,7 +44,29 @@ constexpr auto parse_impl(ParseContext &ctx)
 
     if (it == nullptr)
     {
-        return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
+        return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, sign_character, it);
+    }
+
+    // Check for a sign character
+    if (it != ctx.end())
+    {
+        switch (*it)
+        {
+            case '-':
+                sign_character = sign_option::minus;
+                ++it;
+                break;
+            case '+':
+                sign_character = sign_option::plus;
+                ++it;
+                break;
+            case ' ':
+                sign_character = sign_option::space;
+                ++it;
+                break;
+            default:
+                break;
+        }
     }
 
     // Check for a padding character
@@ -108,7 +138,7 @@ constexpr auto parse_impl(ParseContext &ctx)
         BOOST_DECIMAL_THROW_EXCEPTION(std::logic_error("Expected '}' in format string")); // LCOV_EXCL_LINE
     }
 
-    return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
+    return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, sign_character, it);
 }
 
 }
