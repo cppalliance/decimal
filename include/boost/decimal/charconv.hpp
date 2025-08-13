@@ -310,7 +310,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
                 const auto digits_to_remove {significand_digits - (local_precision + 2)};
                 significand /= pow10(static_cast<typename TargetDecimalType::significand_type>(digits_to_remove));
                 significand_digits -= digits_to_remove;
+                const auto original_sig {significand};
                 fenv_round(significand);
+                if (remove_trailing_zeros(original_sig + 1U).trimmed_number == 1U)
+                {
+                    ++exp;
+                }
             }
             else if (significand_digits > local_precision + 1)
             {
