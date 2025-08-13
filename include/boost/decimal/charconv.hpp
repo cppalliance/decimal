@@ -500,6 +500,27 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         num_dig -= static_cast<int>(zeros_removal.number_of_removed_zeros);
     }
 
+    // We could have the case where we are rounding 0.9999 to 1.000
+    if (-exponent >= 0 && -exponent < std::numeric_limits<target_decimal_significand_type>::digits10 &&
+        significand == detail::pow10<target_decimal_significand_type>(-exponent) && fmt == chars_format::fixed)
+    {
+        *first++ = '1';
+        if (local_precision > 0 && local_precision <= buffer_size)
+        {
+            *first++ = '.';
+            std::memset(first, '0', local_precision);
+            return {first + local_precision, std::errc{}};
+        }
+        else if (local_precision > buffer_size)
+        {
+            return {last, std::errc::value_too_large};
+        }
+        else
+        {
+            return {first, std::errc{}};
+        }
+    }
+
     // Make sure the result will fit in the buffer
     const std::ptrdiff_t total_length = total_buffer_length<TargetDecimalType>(num_dig, exponent, is_neg) + num_leading_zeros;
     if (total_length > buffer_size)
