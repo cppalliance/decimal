@@ -141,13 +141,102 @@ constexpr auto parse_impl(ParseContext &ctx)
     return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, sign_character, it);
 }
 
-}
-}
-}
-} // Namespace boost::decimal::detail::fmt_detail
+template <typename T>
+struct formatter
+{
+    sign_option sign;
+    chars_format fmt;
+    int padding_digits;
+    int ctx_precision;
+    bool is_upper;
 
-// All the following are identical except the type since fmt does not accept SFINAE
-// If an edit is made to one copy and past it down the line
+    constexpr formatter() : sign{sign_option::minus},
+                            fmt{chars_format::general},
+                            padding_digits{0},
+                            ctx_precision{6},
+                            is_upper{false} {}
+
+    constexpr auto parse(fmt::format_parse_context &ctx)
+    {
+        const auto res {boost::decimal::detail::fmt_detail::parse_impl(ctx)};
+
+        ctx_precision = std::get<0>(res);
+        fmt = std::get<1>(res);
+        is_upper = std::get<2>(res);
+        padding_digits = std::get<3>(res);
+        sign = std::get<4>(res);
+
+        return std::get<5>(res);
+    }
+
+    template <typename FormatContext>
+    auto format(const T& v, FormatContext& ctx) const
+    {
+        auto out = ctx.out();
+        std::array<char, 128> buffer {};
+        const auto r = boost::decimal::to_chars(buffer.data(), buffer.data() + buffer.size(), abs(v), fmt, ctx_precision);
+
+        std::string s(buffer.data(), static_cast<std::size_t>(r.ptr - buffer.data()));
+
+        if (is_upper)
+        {
+            #ifdef _MSC_VER
+            #  pragma warning(push)
+            #  pragma warning(disable : 4244)
+            #endif
+
+            std::transform(s.begin(), s.end(), s.begin(),
+                           [](unsigned char c)
+                           { return std::toupper(c); });
+
+            #ifdef _MSC_VER
+            #  pragma warning(pop)
+            #endif
+        }
+
+        if (s.size() < static_cast<std::size_t>(padding_digits))
+        {
+            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), ' ');
+        }
+
+        switch (sign)
+        {
+            case sign_option::minus:
+                if (v < 0)
+                {
+                    s.insert(s.begin(), '-');
+                }
+                break;
+            case sign_option::plus:
+                if (v > 0)
+                {
+                    s.insert(s.begin(), '+');
+                }
+                else
+                {
+                    s.insert(s.begin(), '-');
+                }
+                break;
+            case sign_option::space:
+                if (v > 0)
+                {
+                    s.insert(s.begin(), ' ');
+                }
+                else
+                {
+                    s.insert(s.begin(), '-');
+                }
+                break;
+        }
+
+        return std::copy(s.begin(), s.end(), out);
+    }
+};
+
+} // namespace fmt_detail
+} // namespace detail
+} // namespace decimal
+} // Namespace boost
 
 template <>
 struct fmt::formatter<boost::decimal::decimal32_t>
