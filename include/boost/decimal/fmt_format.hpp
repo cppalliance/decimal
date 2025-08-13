@@ -174,7 +174,37 @@ struct formatter
     {
         auto out = ctx.out();
         std::array<char, 128> buffer {};
-        const auto r = boost::decimal::to_chars(buffer.data(), buffer.data() + buffer.size(), abs(v), fmt, ctx_precision);
+        auto buffer_front = buffer.data();
+        bool has_sign {false};
+        switch (sign)
+        {
+            case sign_option::minus:
+                if (signbit(v))
+                {
+                    has_sign = true;
+                }
+                break;
+            case sign_option::plus:
+                if (!signbit(v))
+                {
+                    *buffer_front++ = '+';
+                }
+                has_sign = true;
+                break;
+            case sign_option::space:
+                if (!signbit(v))
+                {
+                    *buffer_front++ = ' ';
+                }
+                has_sign = true;
+                break;
+            // LCOV_EXCL_START
+            default:
+                BOOST_DECIMAL_UNREACHABLE;
+            // LCOV_EXCL_STOP
+        }
+
+        const auto r = boost::decimal::to_chars(buffer_front, buffer.data() + buffer.size(), v, fmt, ctx_precision);
 
         std::string s(buffer.data(), static_cast<std::size_t>(r.ptr - buffer.data()));
 
@@ -185,7 +215,7 @@ struct formatter
             #  pragma warning(disable : 4244)
             #endif
 
-            std::transform(s.begin(), s.end(), s.begin(),
+            std::transform(s.begin() + static_cast<std::size_t>(has_sign), s.end(), s.begin() + static_cast<std::size_t>(has_sign),
                            [](unsigned char c)
                            { return std::toupper(c); });
 
@@ -196,37 +226,7 @@ struct formatter
 
         if (s.size() < static_cast<std::size_t>(padding_digits))
         {
-            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), ' ');
-        }
-
-        switch (sign)
-        {
-            case sign_option::minus:
-                if (v < 0)
-                {
-                    s.insert(s.begin(), '-');
-                }
-                break;
-            case sign_option::plus:
-                if (v > 0)
-                {
-                    s.insert(s.begin(), '+');
-                }
-                else
-                {
-                    s.insert(s.begin(), '-');
-                }
-                break;
-            case sign_option::space:
-                if (v > 0)
-                {
-                    s.insert(s.begin(), ' ');
-                }
-                else
-                {
-                    s.insert(s.begin(), '-');
-                }
-                break;
+            s.insert(s.begin() + static_cast<std::size_t>(has_sign), static_cast<std::size_t>(padding_digits) - s.size(), '0');
         }
 
         return std::copy(s.begin(), s.end(), out);

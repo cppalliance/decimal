@@ -152,8 +152,8 @@ void test_scientific()
     BOOST_TEST_EQ(fmt::format("{:E}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
 
     // Padding to the front
-    BOOST_TEST_EQ(fmt::format("{:10.1E}", T {0}), "   0.0E+00");
-    BOOST_TEST_EQ(fmt::format("{:10.3E}", T {0}), " 0.000E+00");
+    BOOST_TEST_EQ(fmt::format("{:10.1E}", T {0}), "0000.0E+00");
+    BOOST_TEST_EQ(fmt::format("{:10.3E}", T {0}), "00.000E+00");
 }
 
 template <typename T>
