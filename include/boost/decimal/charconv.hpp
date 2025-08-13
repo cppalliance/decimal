@@ -304,7 +304,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
         {
             // If the precision is specified, we need to make sure the result is rounded correctly
             // using the current fenv rounding mode
-
+            
             if (significand_digits > local_precision + 2)
             {
                 const auto digits_to_remove {significand_digits - (local_precision + 2)};
@@ -315,11 +315,40 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
                 if (remove_trailing_zeros(original_sig + 1U).trimmed_number == 1U)
                 {
                     ++exp;
+                    if (exp == 0)
+                    {
+                        *first++ = '1';
+                        if (local_precision > 0)
+                        {
+                            *first++ = '.';
+                            std::memset(first, '0', static_cast<std::size_t>(local_precision));
+                            first += local_precision;
+                        }
+                        std::memcpy(first, "e+00", 4u);
+                        return {first + 4u, std::errc()};
+                    }
                 }
             }
             else if (significand_digits > local_precision + 1)
             {
+                const auto original_sig = significand;
                 fenv_round(significand);
+                if (remove_trailing_zeros(original_sig + 1U).trimmed_number == 1U)
+                {
+                    ++exp;
+                    if (exp == 0)
+                    {
+                        *first++ = '1';
+                        if (local_precision > 0)
+                        {
+                            *first++ = '.';
+                            std::memset(first, '0', static_cast<std::size_t>(local_precision));
+                            first += local_precision;
+                        }
+                        std::memcpy(first, "e+00", 4u);
+                        return {first + 4u, std::errc()};
+                    }
+                }
             }
         }
         else if (significand_digits < local_precision && fmt != chars_format::general)
