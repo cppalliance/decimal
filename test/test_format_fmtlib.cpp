@@ -63,6 +63,30 @@ void test_general()
     BOOST_TEST_EQ(fmt::format("{:g}", T{210000}), "210000");
     BOOST_TEST_EQ(fmt::format("{:g}", T{2100000}), "2100000");
 
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{1}), "+1");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{10}), "+10");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{100}), "+100");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{1000}), "+1000");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{10000}), "+10000");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{210000}), "+210000");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{2100000}), "+2100000");
+
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{1}), "1");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{10}), "10");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{100}), "100");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{1000}), "1000");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{10000}), "10000");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{210000}), "210000");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{2100000}), "2100000");
+
+    BOOST_TEST_EQ(fmt::format("{: g}", T{1}), " 1");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{10}), " 10");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{100}), " 100");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{1000}), " 1000");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{10000}), " 10000");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{210000}), " 210000");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{2100000}), " 2100000");
+
     BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T>::digits10 <= 7)
     {
         BOOST_TEST_EQ(fmt::format("{:g}", T {21u, 6, true}), "-2.1e+07");
@@ -77,6 +101,14 @@ void test_general()
         BOOST_TEST_EQ(fmt::format("{:g}", T {21u, 6, true}), "-21000000");
         BOOST_TEST_EQ(fmt::format("{:g}", T {211u, 6, true}), "-211000000");
         BOOST_TEST_EQ(fmt::format("{:g}", T {2111u, 6, true}), "-2111000000");
+
+        BOOST_TEST_EQ(fmt::format("{:-g}", T {21u, 6, true}), "-21000000");
+        BOOST_TEST_EQ(fmt::format("{:-g}", T {211u, 6, true}), "-211000000");
+        BOOST_TEST_EQ(fmt::format("{:-g}", T {2111u, 6, true}), "-2111000000");
+
+        BOOST_TEST_EQ(fmt::format("{:+g}", T {21u, 6, true}), "-21000000");
+        BOOST_TEST_EQ(fmt::format("{:+g}", T {211u, 6, true}), "-211000000");
+        BOOST_TEST_EQ(fmt::format("{:+g}", T {2111u, 6, true}), "-2111000000");
     }
 
     BOOST_TEST_EQ(fmt::format("{:g}", std::numeric_limits<T>::infinity()), "inf");
@@ -154,6 +186,11 @@ void test_scientific()
     // Padding to the front
     BOOST_TEST_EQ(fmt::format("{:10.1E}", T {0}), "0000.0E+00");
     BOOST_TEST_EQ(fmt::format("{:10.3E}", T {0}), "00.000E+00");
+
+    BOOST_TEST_EQ(fmt::format("{:+10.1E}", T {0}), "+000.0E+00");
+    BOOST_TEST_EQ(fmt::format("{:+10.3E}", T {0}), "+0.000E+00");
+    BOOST_TEST_EQ(fmt::format("{: 10.1E}", T {0}), " 000.0E+00");
+    BOOST_TEST_EQ(fmt::format("{: 10.3E}", T {0}), " 0.000E+00");
 }
 
 template <typename T>
