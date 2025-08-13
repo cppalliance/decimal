@@ -556,7 +556,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     {
         return {r.ptr, std::errc()};
     }
-    else if (abs_value >= 1)
+    else if (abs_value >= 1 || (significand == 1U && exponent == 0))
     {
         if (exponent < 0 && -exponent < buffer_size)
         {
