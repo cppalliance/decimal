@@ -25,9 +25,17 @@ namespace decimal {
 namespace detail {
 namespace fmt_detail {
 
+enum class sign_option
+{
+    plus,
+    minus,
+    space
+};
+
 template <typename ParseContext>
 constexpr auto parse_impl(ParseContext &ctx)
 {
+    auto sign_character = sign_option::minus;
     int ctx_precision = 6;
     boost::decimal::chars_format fmt = boost::decimal::chars_format::general;
     bool is_upper = false;
@@ -36,7 +44,29 @@ constexpr auto parse_impl(ParseContext &ctx)
 
     if (it == nullptr)
     {
-        return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
+        return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, sign_character, it);
+    }
+
+    // Check for a sign character
+    if (it != ctx.end())
+    {
+        switch (*it)
+        {
+            case '-':
+                sign_character = sign_option::minus;
+                ++it;
+                break;
+            case '+':
+                sign_character = sign_option::plus;
+                ++it;
+                break;
+            case ' ':
+                sign_character = sign_option::space;
+                ++it;
+                break;
+            default:
+                break;
+        }
     }
 
     // Check for a padding character
@@ -108,32 +138,25 @@ constexpr auto parse_impl(ParseContext &ctx)
         BOOST_DECIMAL_THROW_EXCEPTION(std::logic_error("Expected '}' in format string")); // LCOV_EXCL_LINE
     }
 
-    return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
+    return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, sign_character, it);
 }
 
-}
-}
-}
-} // Namespace boost::decimal::detail::fmt_detail
-
-// All the following are identical except the type since fmt does not accept SFINAE
-// If an edit is made to one copy and past it down the line
-
-template <>
-struct fmt::formatter<boost::decimal::decimal32_t>
+template <typename T>
+struct formatter
 {
-    constexpr formatter() : ctx_precision(6),
-                            fmt(boost::decimal::chars_format::general),
-                            is_upper(false),
-                            padding_digits(0)
-    {}
-
-    int ctx_precision;
-    boost::decimal::chars_format fmt;
-    bool is_upper;
+    sign_option sign;
+    chars_format fmt;
     int padding_digits;
+    int ctx_precision;
+    bool is_upper;
 
-    constexpr auto parse(format_parse_context &ctx)
+    constexpr formatter() : sign{sign_option::minus},
+                            fmt{chars_format::general},
+                            padding_digits{0},
+                            ctx_precision{6},
+                            is_upper{false} {}
+
+    constexpr auto parse(fmt::format_parse_context &ctx)
     {
         const auto res {boost::decimal::detail::fmt_detail::parse_impl(ctx)};
 
@@ -141,16 +164,47 @@ struct fmt::formatter<boost::decimal::decimal32_t>
         fmt = std::get<1>(res);
         is_upper = std::get<2>(res);
         padding_digits = std::get<3>(res);
+        sign = std::get<4>(res);
 
-        return std::get<4>(res);
+        return std::get<5>(res);
     }
 
     template <typename FormatContext>
-    auto format(const boost::decimal::decimal32_t &v, FormatContext &ctx) const
+    auto format(const T& v, FormatContext& ctx) const
     {
         auto out = ctx.out();
         std::array<char, 128> buffer {};
-        const auto r = boost::decimal::to_chars(buffer.data(), buffer.data() + buffer.size(), v, fmt, ctx_precision);
+        auto buffer_front = buffer.data();
+        bool has_sign {false};
+        switch (sign)
+        {
+            case sign_option::minus:
+                if (signbit(v))
+                {
+                    has_sign = true;
+                }
+                break;
+            case sign_option::plus:
+                if (!signbit(v))
+                {
+                    *buffer_front++ = '+';
+                }
+                has_sign = true;
+                break;
+            case sign_option::space:
+                if (!signbit(v))
+                {
+                    *buffer_front++ = ' ';
+                }
+                has_sign = true;
+                break;
+            // LCOV_EXCL_START
+            default:
+                BOOST_DECIMAL_UNREACHABLE;
+            // LCOV_EXCL_STOP
+        }
+
+        const auto r = boost::decimal::to_chars(buffer_front, buffer.data() + buffer.size(), v, fmt, ctx_precision);
 
         std::string s(buffer.data(), static_cast<std::size_t>(r.ptr - buffer.data()));
 
@@ -161,7 +215,7 @@ struct fmt::formatter<boost::decimal::decimal32_t>
             #  pragma warning(disable : 4244)
             #endif
 
-            std::transform(s.begin(), s.end(), s.begin(),
+            std::transform(s.begin() + static_cast<std::size_t>(has_sign), s.end(), s.begin() + static_cast<std::size_t>(has_sign),
                            [](unsigned char c)
                            { return std::toupper(c); });
 
@@ -172,312 +226,45 @@ struct fmt::formatter<boost::decimal::decimal32_t>
 
         if (s.size() < static_cast<std::size_t>(padding_digits))
         {
-            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), ' ');
+            s.insert(s.begin() + static_cast<std::size_t>(has_sign), static_cast<std::size_t>(padding_digits) - s.size(), '0');
         }
 
         return std::copy(s.begin(), s.end(), out);
     }
 };
+
+} // namespace fmt_detail
+} // namespace detail
+} // namespace decimal
+} // Namespace boost
+
+namespace fmt {
 
 template <>
-struct fmt::formatter<boost::decimal::decimal_fast32_t>
-{
-    constexpr formatter() : ctx_precision(6),
-                            fmt(boost::decimal::chars_format::general),
-                            is_upper(false),
-                            padding_digits(0)
-    {}
-
-    int ctx_precision;
-    boost::decimal::chars_format fmt;
-    bool is_upper;
-    int padding_digits;
-
-    constexpr auto parse(format_parse_context &ctx)
-    {
-        const auto res {boost::decimal::detail::fmt_detail::parse_impl(ctx)};
-
-        ctx_precision = std::get<0>(res);
-        fmt = std::get<1>(res);
-        is_upper = std::get<2>(res);
-        padding_digits = std::get<3>(res);
-
-        return std::get<4>(res);
-    }
-
-    template <typename FormatContext>
-    auto format(const boost::decimal::decimal_fast32_t &v, FormatContext &ctx) const
-    {
-        auto out = ctx.out();
-        std::array<char, 128> buffer {};
-        const auto r = boost::decimal::to_chars(buffer.data(), buffer.data() + buffer.size(), v, fmt, ctx_precision);
-
-        std::string s(buffer.data(), static_cast<std::size_t>(r.ptr - buffer.data()));
-
-        if (is_upper)
-        {
-            #ifdef _MSC_VER
-            #  pragma warning(push)
-            #  pragma warning(disable : 4244)
-            #endif
-
-            std::transform(s.begin(), s.end(), s.begin(),
-                           [](unsigned char c)
-                           { return std::toupper(c); });
-
-            #ifdef _MSC_VER
-            #  pragma warning(pop)
-            #endif
-        }
-
-        if (s.size() < static_cast<std::size_t>(padding_digits))
-        {
-            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), ' ');
-        }
-
-        return std::copy(s.begin(), s.end(), out);
-    }
-};
+struct formatter<boost::decimal::decimal32_t>
+    : public boost::decimal::detail::fmt_detail::formatter<boost::decimal::decimal32_t> {};
 
 template <>
-struct fmt::formatter<boost::decimal::decimal64_t>
-{
-    constexpr formatter() : ctx_precision(6),
-                            fmt(boost::decimal::chars_format::general),
-                            is_upper(false),
-                            padding_digits(0)
-    {}
-
-    int ctx_precision;
-    boost::decimal::chars_format fmt;
-    bool is_upper;
-    int padding_digits;
-
-    constexpr auto parse(format_parse_context &ctx)
-    {
-        const auto res {boost::decimal::detail::fmt_detail::parse_impl(ctx)};
-
-        ctx_precision = std::get<0>(res);
-        fmt = std::get<1>(res);
-        is_upper = std::get<2>(res);
-        padding_digits = std::get<3>(res);
-
-        return std::get<4>(res);
-    }
-
-    template <typename FormatContext>
-    auto format(const boost::decimal::decimal64_t &v, FormatContext &ctx) const
-    {
-        auto out = ctx.out();
-        std::array<char, 128> buffer {};
-        const auto r = boost::decimal::to_chars(buffer.data(), buffer.data() + buffer.size(), v, fmt, ctx_precision);
-
-        std::string s(buffer.data(), static_cast<std::size_t>(r.ptr - buffer.data()));
-
-        if (is_upper)
-        {
-            #ifdef _MSC_VER
-            #  pragma warning(push)
-            #  pragma warning(disable : 4244)
-            #endif
-
-            std::transform(s.begin(), s.end(), s.begin(),
-                           [](unsigned char c)
-                           { return std::toupper(c); });
-
-            #ifdef _MSC_VER
-            #  pragma warning(pop)
-            #endif
-        }
-
-        if (s.size() < static_cast<std::size_t>(padding_digits))
-        {
-            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), ' ');
-        }
-
-        return std::copy(s.begin(), s.end(), out);
-    }
-};
+struct formatter<boost::decimal::decimal_fast32_t>
+    : public boost::decimal::detail::fmt_detail::formatter<boost::decimal::decimal_fast32_t> {};
 
 template <>
-struct fmt::formatter<boost::decimal::decimal_fast64_t>
-{
-    constexpr formatter() : ctx_precision(6),
-                            fmt(boost::decimal::chars_format::general),
-                            is_upper(false),
-                            padding_digits(0)
-    {}
-
-    int ctx_precision;
-    boost::decimal::chars_format fmt;
-    bool is_upper;
-    int padding_digits;
-
-    constexpr auto parse(format_parse_context &ctx)
-    {
-        const auto res {boost::decimal::detail::fmt_detail::parse_impl(ctx)};
-
-        ctx_precision = std::get<0>(res);
-        fmt = std::get<1>(res);
-        is_upper = std::get<2>(res);
-        padding_digits = std::get<3>(res);
-
-        return std::get<4>(res);
-    }
-
-    template <typename FormatContext>
-    auto format(const boost::decimal::decimal_fast64_t &v, FormatContext &ctx) const
-    {
-        auto out = ctx.out();
-        std::array<char, 128> buffer {};
-        const auto r = boost::decimal::to_chars(buffer.data(), buffer.data() + buffer.size(), v, fmt, ctx_precision);
-
-        std::string s(buffer.data(), static_cast<std::size_t>(r.ptr - buffer.data()));
-
-        if (is_upper)
-        {
-            #ifdef _MSC_VER
-            #  pragma warning(push)
-            #  pragma warning(disable : 4244)
-            #endif
-
-            std::transform(s.begin(), s.end(), s.begin(),
-                           [](unsigned char c)
-                           { return std::toupper(c); });
-
-            #ifdef _MSC_VER
-            #  pragma warning(pop)
-            #endif
-        }
-
-        if (s.size() < static_cast<std::size_t>(padding_digits))
-        {
-            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), ' ');
-        }
-
-        return std::copy(s.begin(), s.end(), out);
-    }
-};
+struct formatter<boost::decimal::decimal64_t>
+    : public boost::decimal::detail::fmt_detail::formatter<boost::decimal::decimal64_t> {};
 
 template <>
-struct fmt::formatter<boost::decimal::decimal128_t>
-{
-    constexpr formatter() : ctx_precision(6),
-                            fmt(boost::decimal::chars_format::general),
-                            is_upper(false),
-                            padding_digits(0)
-    {}
-
-    int ctx_precision;
-    boost::decimal::chars_format fmt;
-    bool is_upper;
-    int padding_digits;
-
-    constexpr auto parse(format_parse_context &ctx)
-    {
-        const auto res {boost::decimal::detail::fmt_detail::parse_impl(ctx)};
-
-        ctx_precision = std::get<0>(res);
-        fmt = std::get<1>(res);
-        is_upper = std::get<2>(res);
-        padding_digits = std::get<3>(res);
-
-        return std::get<4>(res);
-    }
-
-    template <typename FormatContext>
-    auto format(const boost::decimal::decimal128_t &v, FormatContext &ctx) const
-    {
-        auto out = ctx.out();
-        std::array<char, 128> buffer {};
-        const auto r = boost::decimal::to_chars(buffer.data(), buffer.data() + buffer.size(), v, fmt, ctx_precision);
-
-        std::string s(buffer.data(), static_cast<std::size_t>(r.ptr - buffer.data()));
-
-        if (is_upper)
-        {
-            #ifdef _MSC_VER
-            #  pragma warning(push)
-            #  pragma warning(disable : 4244)
-            #endif
-
-            std::transform(s.begin(), s.end(), s.begin(),
-                           [](unsigned char c)
-                           { return std::toupper(c); });
-
-            #ifdef _MSC_VER
-            #  pragma warning(pop)
-            #endif
-        }
-
-        if (s.size() < static_cast<std::size_t>(padding_digits))
-        {
-            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), ' ');
-        }
-
-        return std::copy(s.begin(), s.end(), out);
-    }
-};
+struct formatter<boost::decimal::decimal_fast64_t>
+    : public boost::decimal::detail::fmt_detail::formatter<boost::decimal::decimal_fast64_t> {};
 
 template <>
-struct fmt::formatter<boost::decimal::decimal_fast128_t>
-{
-    constexpr formatter() : ctx_precision(6),
-                            fmt(boost::decimal::chars_format::general),
-                            is_upper(false),
-                            padding_digits(0)
-    {}
+struct formatter<boost::decimal::decimal128_t>
+    : public boost::decimal::detail::fmt_detail::formatter<boost::decimal::decimal128_t> {};
 
-    int ctx_precision;
-    boost::decimal::chars_format fmt;
-    bool is_upper;
-    int padding_digits;
+template <>
+struct formatter<boost::decimal::decimal_fast128_t>
+    : public boost::decimal::detail::fmt_detail::formatter<boost::decimal::decimal_fast128_t> {};
 
-    constexpr auto parse(format_parse_context &ctx)
-    {
-        const auto res {boost::decimal::detail::fmt_detail::parse_impl(ctx)};
-
-        ctx_precision = std::get<0>(res);
-        fmt = std::get<1>(res);
-        is_upper = std::get<2>(res);
-        padding_digits = std::get<3>(res);
-
-        return std::get<4>(res);
-    }
-
-    template <typename FormatContext>
-    auto format(const boost::decimal::decimal_fast128_t &v, FormatContext &ctx) const
-    {
-        auto out = ctx.out();
-        std::array<char, 128> buffer {};
-        const auto r = boost::decimal::to_chars(buffer.data(), buffer.data() + buffer.size(), v, fmt, ctx_precision);
-
-        std::string s(buffer.data(), static_cast<std::size_t>(r.ptr - buffer.data()));
-
-        if (is_upper)
-        {
-            #ifdef _MSC_VER
-            #  pragma warning(push)
-            #  pragma warning(disable : 4244)
-            #endif
-
-            std::transform(s.begin(), s.end(), s.begin(),
-                           [](unsigned char c)
-                           { return std::toupper(c); });
-
-            #ifdef _MSC_VER
-            #  pragma warning(pop)
-            #endif
-        }
-
-        if (s.size() < static_cast<std::size_t>(padding_digits))
-        {
-            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), ' ');
-        }
-
-        return std::copy(s.begin(), s.end(), out);
-    }
-};
+} // namespace fmt
 
 #endif // __has_include(<fmt/format.h>)
 
