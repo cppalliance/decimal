@@ -23,7 +23,7 @@ void test()
     BOOST_TEST_CSTR_EQ(buffer, "-9.9999999999984e-01");
 }
 
-void fixed_precision_test()
+void general_precision_test()
 {
     char buffer[256];
     const auto r = to_chars(buffer, buffer + sizeof(buffer), decimal_value, chars_format::general, 6);
@@ -32,10 +32,30 @@ void fixed_precision_test()
     BOOST_TEST_CSTR_EQ(buffer, "-1");
 }
 
+void fixed_precision_test()
+{
+    char buffer[256];
+    const auto r = to_chars(buffer, buffer + sizeof(buffer), decimal_value, chars_format::fixed, 6);
+    BOOST_TEST(r);
+    *r.ptr = '\0';
+    BOOST_TEST_CSTR_EQ(buffer, "-1.000000");
+}
+
+void scientific_precision_test()
+{
+    char buffer[256];
+    const auto r = to_chars(buffer, buffer + sizeof(buffer), decimal_value, chars_format::scientific, 6);
+    BOOST_TEST(r);
+    *r.ptr = '\0';
+    BOOST_TEST_CSTR_EQ(buffer, "-1.000000e+00");
+}
+
 int main()
 {
     test();
+    general_precision_test();
     fixed_precision_test();
+    scientific_precision_test();
 
     return boost::report_errors();
 }
