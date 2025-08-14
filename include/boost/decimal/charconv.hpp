@@ -304,7 +304,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
         {
             // If the precision is specified, we need to make sure the result is rounded correctly
             // using the current fenv rounding mode
-            
+
             if (significand_digits > local_precision + 2)
             {
                 const auto digits_to_remove {significand_digits - (local_precision + 2)};
@@ -537,7 +537,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         if (local_precision > 0 && local_precision <= buffer_size)
         {
             *first++ = '.';
-            std::memset(first, '0', local_precision);
+            std::memset(first, '0', static_cast<std::size_t>(local_precision));
             return {first + local_precision, std::errc{}};
         }
         else if (local_precision > buffer_size)
