@@ -854,6 +854,33 @@ void test_more_powers_10()
     test_value(T{1, 7}, "10000000", chars_format::fixed);
 }
 
+template <typename T>
+void test_nines()
+{
+    test_value(T{9999999, -7}, "1.000000", chars_format::fixed, 6);
+    test_value(T{9999999, -7}, "1.00000", chars_format::fixed, 5);
+    test_value(T{9999999, -7}, "1.0000", chars_format::fixed, 4);
+    test_value(T{9999999, -7}, "1.000", chars_format::fixed, 3);
+    test_value(T{9999999, -7}, "1.00", chars_format::fixed, 2);
+    test_value(T{9999999, -7}, "1.0", chars_format::fixed, 1);
+    test_value(T{9999999, -7}, "1", chars_format::fixed, 0);
+
+    test_value(T{9999999, -7}, "1", chars_format::general, 6);
+    test_value(T{9999999, -7}, "1", chars_format::general, 5);
+    test_value(T{9999999, -7}, "1", chars_format::general, 4);
+    test_value(T{9999999, -7}, "1", chars_format::general, 3);
+    test_value(T{9999999, -7}, "1", chars_format::general, 2);
+    test_value(T{9999999, -7}, "1", chars_format::general, 1);
+    test_value(T{9999999, -7}, "1", chars_format::general, 0);
+
+    test_value(T{9999999, -7}, "1.00000e+00", chars_format::scientific, 5);
+    test_value(T{9999999, -7}, "1.0000e+00", chars_format::scientific, 4);
+    test_value(T{9999999, -7}, "1.000e+00", chars_format::scientific, 3);
+    test_value(T{9999999, -7}, "1.00e+00", chars_format::scientific, 2);
+    test_value(T{9999999, -7}, "1.0e+00", chars_format::scientific, 1);
+    test_value(T{9999999, -7}, "1e+00", chars_format::scientific, 0);
+}
+
 int main()
 {
     test_non_finite_values<decimal32_t>();
@@ -1006,6 +1033,9 @@ int main()
     test_non_finite_invalid_size(std::numeric_limits<decimal128_t>::infinity());
     test_non_finite_invalid_size(std::numeric_limits<decimal128_t>::quiet_NaN());
     test_non_finite_invalid_size(decimal128_t{0});
+
+    test_nines<decimal32_t>();
+    test_nines<decimal64_t>();
 
     return boost::report_errors();
 }

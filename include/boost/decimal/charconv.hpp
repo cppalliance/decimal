@@ -310,11 +310,45 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
                 const auto digits_to_remove {significand_digits - (local_precision + 2)};
                 significand /= pow10(static_cast<typename TargetDecimalType::significand_type>(digits_to_remove));
                 significand_digits -= digits_to_remove;
+                const auto original_sig {significand};
                 fenv_round(significand);
+                if (remove_trailing_zeros(original_sig + 1U).trimmed_number == 1U)
+                {
+                    ++exp;
+                    if (exp == 0)
+                    {
+                        *first++ = '1';
+                        if (local_precision > 0)
+                        {
+                            *first++ = '.';
+                            std::memset(first, '0', static_cast<std::size_t>(local_precision));
+                            first += local_precision;
+                        }
+                        std::memcpy(first, "e+00", 4u);
+                        return {first + 4u, std::errc()};
+                    }
+                }
             }
             else if (significand_digits > local_precision + 1)
             {
+                const auto original_sig = significand;
                 fenv_round(significand);
+                if (remove_trailing_zeros(original_sig + 1U).trimmed_number == 1U)
+                {
+                    ++exp;
+                    if (exp == 0)
+                    {
+                        *first++ = '1';
+                        if (local_precision > 0)
+                        {
+                            *first++ = '.';
+                            std::memset(first, '0', static_cast<std::size_t>(local_precision));
+                            first += local_precision;
+                        }
+                        std::memcpy(first, "e+00", 4u);
+                        return {first + 4u, std::errc()};
+                    }
+                }
             }
         }
         else if (significand_digits < local_precision && fmt != chars_format::general)
@@ -495,6 +529,27 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         num_dig -= static_cast<int>(zeros_removal.number_of_removed_zeros);
     }
 
+    // We could have the case where we are rounding 0.9999 to 1.000
+    if (-exponent >= 0 && -exponent < std::numeric_limits<target_decimal_significand_type>::digits10 &&
+        significand == detail::pow10(static_cast<target_decimal_significand_type>(-exponent)) && fmt == chars_format::fixed)
+    {
+        *first++ = '1';
+        if (local_precision > 0 && local_precision <= buffer_size)
+        {
+            *first++ = '.';
+            std::memset(first, '0', static_cast<std::size_t>(local_precision));
+            return {first + local_precision, std::errc{}};
+        }
+        else if (local_precision > buffer_size)
+        {
+            return {last, std::errc::value_too_large};
+        }
+        else
+        {
+            return {first, std::errc{}};
+        }
+    }
+
     // Make sure the result will fit in the buffer
     const std::ptrdiff_t total_length = total_buffer_length<TargetDecimalType>(num_dig, exponent, is_neg) + num_leading_zeros;
     if (total_length > buffer_size)
@@ -556,7 +611,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
     {
         return {r.ptr, std::errc()};
     }
-    else if (abs_value >= 1)
+    else if (abs_value >= 1 || (significand == 1U && exponent == 0))
     {
         if (exponent < 0 && -exponent < buffer_size)
         {
