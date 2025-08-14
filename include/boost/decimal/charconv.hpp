@@ -531,7 +531,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 
     // We could have the case where we are rounding 0.9999 to 1.000
     if (-exponent >= 0 && -exponent < std::numeric_limits<target_decimal_significand_type>::digits10 &&
-        significand == detail::pow10<target_decimal_significand_type>(-exponent) && fmt == chars_format::fixed)
+        significand == detail::pow10(static_cast<target_decimal_significand_type>(-exponent)) && fmt == chars_format::fixed)
     {
         *first++ = '1';
         if (local_precision > 0 && local_precision <= buffer_size)
