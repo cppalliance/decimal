@@ -2,13 +2,19 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+
+#define FMT_HEADER_ONLY
 #include <boost/decimal.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <limits>
 
 using namespace boost::decimal;
 
-#if defined(BOOST_DECIMAL_TEST_FMT) && defined(BOOST_DECIMAL_HAS_FMTLIB_SUPPORT)
+#if defined(BOOST_DECIMAL_HAS_FMTLIB_SUPPORT)
 
 #include <fmt/format.h>
 
@@ -57,6 +63,30 @@ void test_general()
     BOOST_TEST_EQ(fmt::format("{:g}", T{210000}), "210000");
     BOOST_TEST_EQ(fmt::format("{:g}", T{2100000}), "2100000");
 
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{1}), "+1");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{10}), "+10");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{100}), "+100");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{1000}), "+1000");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{10000}), "+10000");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{210000}), "+210000");
+    BOOST_TEST_EQ(fmt::format("{:+g}", T{2100000}), "+2100000");
+
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{1}), "1");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{10}), "10");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{100}), "100");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{1000}), "1000");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{10000}), "10000");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{210000}), "210000");
+    BOOST_TEST_EQ(fmt::format("{:-g}", T{2100000}), "2100000");
+
+    BOOST_TEST_EQ(fmt::format("{: g}", T{1}), " 1");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{10}), " 10");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{100}), " 100");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{1000}), " 1000");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{10000}), " 10000");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{210000}), " 210000");
+    BOOST_TEST_EQ(fmt::format("{: g}", T{2100000}), " 2100000");
+
     BOOST_DECIMAL_IF_CONSTEXPR (std::numeric_limits<T>::digits10 <= 7)
     {
         BOOST_TEST_EQ(fmt::format("{:g}", T {21u, 6, true}), "-2.1e+07");
@@ -71,6 +101,14 @@ void test_general()
         BOOST_TEST_EQ(fmt::format("{:g}", T {21u, 6, true}), "-21000000");
         BOOST_TEST_EQ(fmt::format("{:g}", T {211u, 6, true}), "-211000000");
         BOOST_TEST_EQ(fmt::format("{:g}", T {2111u, 6, true}), "-2111000000");
+
+        BOOST_TEST_EQ(fmt::format("{:-g}", T {21u, 6, true}), "-21000000");
+        BOOST_TEST_EQ(fmt::format("{:-g}", T {211u, 6, true}), "-211000000");
+        BOOST_TEST_EQ(fmt::format("{:-g}", T {2111u, 6, true}), "-2111000000");
+
+        BOOST_TEST_EQ(fmt::format("{:+g}", T {21u, 6, true}), "-21000000");
+        BOOST_TEST_EQ(fmt::format("{:+g}", T {211u, 6, true}), "-211000000");
+        BOOST_TEST_EQ(fmt::format("{:+g}", T {2111u, 6, true}), "-2111000000");
     }
 
     BOOST_TEST_EQ(fmt::format("{:g}", std::numeric_limits<T>::infinity()), "inf");
@@ -146,8 +184,13 @@ void test_scientific()
     BOOST_TEST_EQ(fmt::format("{:E}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
 
     // Padding to the front
-    BOOST_TEST_EQ(fmt::format("{:10.1E}", T {0}), "   0.0E+00");
-    BOOST_TEST_EQ(fmt::format("{:10.3E}", T {0}), " 0.000E+00");
+    BOOST_TEST_EQ(fmt::format("{:10.1E}", T {0}), "0000.0E+00");
+    BOOST_TEST_EQ(fmt::format("{:10.3E}", T {0}), "00.000E+00");
+
+    BOOST_TEST_EQ(fmt::format("{:+10.1E}", T {0}), "+000.0E+00");
+    BOOST_TEST_EQ(fmt::format("{:+10.3E}", T {0}), "+0.000E+00");
+    BOOST_TEST_EQ(fmt::format("{: 10.1E}", T {0}), " 000.0E+00");
+    BOOST_TEST_EQ(fmt::format("{: 10.3E}", T {0}), " 0.000E+00");
 }
 
 template <typename T>
@@ -168,6 +211,13 @@ void test_hex()
     BOOST_TEST_EQ(fmt::format("{:A}", -std::numeric_limits<T>::quiet_NaN()), "-NAN(IND)");
     BOOST_TEST_EQ(fmt::format("{:A}", std::numeric_limits<T>::signaling_NaN()), "NAN(SNAN)");
     BOOST_TEST_EQ(fmt::format("{:A}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
+}
+
+template <typename T>
+void test_with_string()
+{
+    BOOST_TEST_EQ(std::format("Height is: {:.0f} meters", T {0}), "Height is: 0 meters");
+    BOOST_TEST_EQ(std::format("Height is: {} meters", T {2}), "Height is: 2 meters");
 }
 
 #ifdef _MSC_VER
@@ -203,6 +253,13 @@ int main()
     test_hex<decimal_fast64_t>();
     test_hex<decimal128_t>();
     test_hex<decimal_fast128_t>();
+
+    test_with_string<decimal32_t>();
+    test_with_string<decimal_fast32_t>();
+    test_with_string<decimal64_t>();
+    test_with_string<decimal_fast64_t>();
+    test_with_string<decimal128_t>();
+    test_with_string<decimal_fast128_t>();
 
     return boost::report_errors();
 }

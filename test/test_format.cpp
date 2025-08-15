@@ -130,6 +130,27 @@ void test_scientific()
     BOOST_TEST_EQ(std::format("{:e}", std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
     BOOST_TEST_EQ(std::format("{:e}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
 
+    BOOST_TEST_EQ(std::format("{:-e}", std::numeric_limits<T>::infinity()), "inf");
+    BOOST_TEST_EQ(std::format("{:-e}", -std::numeric_limits<T>::infinity()), "-inf");
+    BOOST_TEST_EQ(std::format("{:-e}", std::numeric_limits<T>::quiet_NaN()), "nan");
+    BOOST_TEST_EQ(std::format("{:-e}", -std::numeric_limits<T>::quiet_NaN()), "-nan(ind)");
+    BOOST_TEST_EQ(std::format("{:-e}", std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
+    BOOST_TEST_EQ(std::format("{:-e}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
+
+    BOOST_TEST_EQ(std::format("{:+e}", std::numeric_limits<T>::infinity()), "+inf");
+    BOOST_TEST_EQ(std::format("{:+e}", -std::numeric_limits<T>::infinity()), "-inf");
+    BOOST_TEST_EQ(std::format("{:+e}", std::numeric_limits<T>::quiet_NaN()), "+nan");
+    BOOST_TEST_EQ(std::format("{:+e}", -std::numeric_limits<T>::quiet_NaN()), "-nan(ind)");
+    BOOST_TEST_EQ(std::format("{:+e}", std::numeric_limits<T>::signaling_NaN()), "+nan(snan)");
+    BOOST_TEST_EQ(std::format("{:+e}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
+
+    BOOST_TEST_EQ(std::format("{: e}", std::numeric_limits<T>::infinity()), " inf");
+    BOOST_TEST_EQ(std::format("{: e}", -std::numeric_limits<T>::infinity()), "-inf");
+    BOOST_TEST_EQ(std::format("{: e}", std::numeric_limits<T>::quiet_NaN()), " nan");
+    BOOST_TEST_EQ(std::format("{: e}", -std::numeric_limits<T>::quiet_NaN()), "-nan(ind)");
+    BOOST_TEST_EQ(std::format("{: e}", std::numeric_limits<T>::signaling_NaN()), " nan(snan)");
+    BOOST_TEST_EQ(std::format("{: e}", -std::numeric_limits<T>::signaling_NaN()), "-nan(snan)");
+
     BOOST_TEST_EQ(std::format("{:E}", std::numeric_limits<T>::infinity()), "INF");
     BOOST_TEST_EQ(std::format("{:E}", -std::numeric_limits<T>::infinity()), "-INF");
     BOOST_TEST_EQ(std::format("{:E}", std::numeric_limits<T>::quiet_NaN()), "NAN");
@@ -138,8 +159,14 @@ void test_scientific()
     BOOST_TEST_EQ(std::format("{:E}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
 
     // Padding to the front
-    BOOST_TEST_EQ(std::format("{:10.1E}", T {0}), "   0.0E+00");
-    BOOST_TEST_EQ(std::format("{:10.3E}", T {0}), " 0.000E+00");
+    BOOST_TEST_EQ(std::format("{:10.1E}", T {0}), "0000.0E+00");
+    BOOST_TEST_EQ(std::format("{:10.3E}", T {0}), "00.000E+00");
+
+    BOOST_TEST_EQ(std::format("{:+10.1E}", T {0}), "+000.0E+00");
+    BOOST_TEST_EQ(std::format("{:+10.3E}", T {0}), "+0.000E+00");
+
+    BOOST_TEST_EQ(std::format("{: 10.1E}", T {0}), " 000.0E+00");
+    BOOST_TEST_EQ(std::format("{: 10.3E}", T {0}), " 0.000E+00");
 }
 
 template <typename T>
@@ -160,6 +187,13 @@ void test_hex()
     BOOST_TEST_EQ(std::format("{:A}", -std::numeric_limits<T>::quiet_NaN()), "-NAN(IND)");
     BOOST_TEST_EQ(std::format("{:A}", std::numeric_limits<T>::signaling_NaN()), "NAN(SNAN)");
     BOOST_TEST_EQ(std::format("{:A}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
+}
+
+template <typename T>
+void test_with_string()
+{
+    BOOST_TEST_EQ(std::format("Height is: {:.0f} meters", T {0}), "Height is: 0 meters");
+    BOOST_TEST_EQ(std::format("Height is: {} meters", T {2}), "Height is: 2 meters");
 }
 
 int main()
@@ -191,6 +225,13 @@ int main()
     test_hex<decimal_fast64_t>();
     test_hex<decimal128_t>();
     test_hex<decimal_fast128_t>();
+
+    test_with_string<decimal32_t>();
+    test_with_string<decimal_fast32_t>();
+    test_with_string<decimal64_t>();
+    test_with_string<decimal_fast64_t>();
+    test_with_string<decimal128_t>();
+    test_with_string<decimal_fast128_t>();
 
     return boost::report_errors();
 }

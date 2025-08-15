@@ -30,14 +30,44 @@
 
 namespace boost::decimal::detail {
 
+enum class format_sign_option
+{
+    plus,
+    minus,
+    space
+};
+
 template <typename ParseContext>
 constexpr auto parse_impl(ParseContext &ctx)
 {
+    auto sign_character = format_sign_option::minus;
     auto it {ctx.begin()};
     int ctx_precision = 6;
     boost::decimal::chars_format fmt = boost::decimal::chars_format::general;
     bool is_upper = false;
     int padding_digits = 0;
+
+    // Check for a sign character
+    if (it != ctx.end())
+    {
+        switch (*it)
+        {
+            case '-':
+                sign_character = format_sign_option::minus;
+                ++it;
+                break;
+            case '+':
+                sign_character = format_sign_option::plus;
+                ++it;
+                break;
+            case ' ':
+                sign_character = format_sign_option::space;
+                ++it;
+                break;
+            default:
+                break;
+        }
+    }
 
     // Check for a padding character
     while (it != ctx.end() && *it >= '0' && *it <= '9')
@@ -47,7 +77,7 @@ constexpr auto parse_impl(ParseContext &ctx)
     }
 
     // If there is a . then we need to capture the precision argument
-    if (*it == '.')
+    if (it != ctx.end() && *it == '.')
     {
         ++it;
         ctx_precision = 0;
@@ -104,7 +134,7 @@ constexpr auto parse_impl(ParseContext &ctx)
         BOOST_DECIMAL_THROW_EXCEPTION(std::format_error("Expected '}' in format string")); // LCOV_EXCL_LINE
     }
 
-    return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, it);
+    return std::make_tuple(ctx_precision, fmt, is_upper, padding_digits, sign_character, it);
 }
 
 } // Namespace boost::decimal::detail
@@ -114,16 +144,18 @@ namespace std {
 template <boost::decimal::detail::concepts::decimal_floating_point_type T>
 struct formatter<T>
 {
-    constexpr formatter() : ctx_precision(6),
-                            fmt(boost::decimal::chars_format::general),
-                            is_upper(false),
-                            padding_digits(0)
-    {}
-
-    int ctx_precision;
     boost::decimal::chars_format fmt;
-    bool is_upper;
+    boost::decimal::detail::format_sign_option sign;
+    int ctx_precision;
     int padding_digits;
+    bool is_upper;
+
+    constexpr formatter() : fmt(boost::decimal::chars_format::general),
+                            sign(boost::decimal::detail::format_sign_option::minus),
+                            ctx_precision(6),
+                            padding_digits(0),
+                            is_upper(false)
+    {}
 
     constexpr auto parse(format_parse_context &ctx)
     {
@@ -133,19 +165,51 @@ struct formatter<T>
         fmt = std::get<1>(res);
         is_upper = std::get<2>(res);
         padding_digits = std::get<3>(res);
+        sign = std::get<4>(res);
 
-        return std::get<4>(res);
+        return std::get<5>(res);
     }
 
     template <typename FormatContext>
     auto format(const T &v, FormatContext &ctx) const
     {
-        auto out = ctx.out();
-        std::array<char, 128> buffer {};
-        const auto r = boost::decimal::to_chars(buffer.data(), buffer.data() + buffer.size(), v, fmt, ctx_precision);
+        using namespace boost::decimal;
+        using namespace boost::decimal::detail;
 
-        std::string_view sv(buffer.data(), static_cast<std::size_t>(r.ptr - buffer.data()));
-        std::string s(sv);
+        std::array<char, 128> buffer {};
+        auto buffer_front = buffer.data();
+        bool has_sign {false};
+        switch (sign)
+        {
+            case format_sign_option::minus:
+                if (signbit(v))
+                {
+                    has_sign = true;
+                }
+                break;
+            case format_sign_option::plus:
+                if (!signbit(v))
+                {
+                    *buffer_front++ = '+';
+                }
+                has_sign = true;
+                break;
+            case format_sign_option::space:
+                if (!signbit(v))
+                {
+                    *buffer_front++ = ' ';
+                }
+                has_sign = true;
+                break;
+            // LCOV_EXCL_START
+            default:
+                BOOST_DECIMAL_UNREACHABLE;
+            // LCOV_EXCL_STOP
+        }
+
+        const auto r = to_chars(buffer_front, buffer.data() + buffer.size(), v, fmt, ctx_precision);
+
+        std::string s(buffer.data(), static_cast<std::size_t>(r.ptr - buffer.data()));
 
         if (is_upper)
         {
@@ -154,7 +218,7 @@ struct formatter<T>
             #  pragma warning(disable : 4244)
             #endif
 
-            std::transform(s.begin(), s.end(), s.begin(),
+            std::transform(s.begin() + static_cast<std::size_t>(has_sign), s.end(), s.begin() + static_cast<std::size_t>(has_sign),
                            [](unsigned char c)
                            { return std::toupper(c); });
 
@@ -165,10 +229,10 @@ struct formatter<T>
 
         if (s.size() < static_cast<std::size_t>(padding_digits))
         {
-            s.insert(s.begin(), static_cast<std::size_t>(padding_digits) - s.size(), ' ');
+            s.insert(s.begin() + static_cast<std::size_t>(has_sign), static_cast<std::size_t>(padding_digits) - s.size(), '0');
         }
 
-        return std::copy(s.begin(), s.end(), out);
+        return std::format_to(ctx.out(), "{}", s);
     }
 };
 
