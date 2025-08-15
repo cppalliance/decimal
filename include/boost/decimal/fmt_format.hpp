@@ -77,7 +77,7 @@ constexpr auto parse_impl(ParseContext &ctx)
     }
 
     // If there is a . then we need to capture the precision argument
-    if (*it == '.')
+    if (it != ctx.end() && *it == '.')
     {
         ++it;
         ctx_precision = 0;
@@ -172,7 +172,6 @@ struct formatter
     template <typename FormatContext>
     auto format(const T& v, FormatContext& ctx) const
     {
-        auto out = ctx.out();
         std::array<char, 128> buffer {};
         auto buffer_front = buffer.data();
         bool has_sign {false};
@@ -229,7 +228,7 @@ struct formatter
             s.insert(s.begin() + static_cast<std::size_t>(has_sign), static_cast<std::size_t>(padding_digits) - s.size(), '0');
         }
 
-        return std::copy(s.begin(), s.end(), out);
+        return fmt::format_to(ctx.out(), "{}", s);
     }
 };
 
