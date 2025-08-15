@@ -189,6 +189,13 @@ void test_hex()
     BOOST_TEST_EQ(std::format("{:A}", -std::numeric_limits<T>::signaling_NaN()), "-NAN(SNAN)");
 }
 
+template <typename T>
+void test_with_string()
+{
+    BOOST_TEST_EQ(std::format("Height is: {:.0f} meters", T {0}), "Height is: 0 meters");
+    BOOST_TEST_EQ(std::format("Height is: {} meters", T {2}), "Height is: 2 meters");
+}
+
 int main()
 {
     test_general<decimal32_t>();
@@ -218,6 +225,13 @@ int main()
     test_hex<decimal_fast64_t>();
     test_hex<decimal128_t>();
     test_hex<decimal_fast128_t>();
+
+    test_with_string<decimal32_t>();
+    test_with_string<decimal_fast32_t>();
+    test_with_string<decimal64_t>();
+    test_with_string<decimal_fast64_t>();
+    test_with_string<decimal128_t>();
+    test_with_string<decimal_fast128_t>();
 
     return boost::report_errors();
 }
