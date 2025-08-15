@@ -77,7 +77,7 @@ constexpr auto parse_impl(ParseContext &ctx)
     }
 
     // If there is a . then we need to capture the precision argument
-    if (*it == '.')
+    if (it != ctx.end() && *it == '.')
     {
         ++it;
         ctx_precision = 0;
