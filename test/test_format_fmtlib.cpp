@@ -216,8 +216,8 @@ void test_hex()
 template <typename T>
 void test_with_string()
 {
-    BOOST_TEST_EQ(std::format("Height is: {:.0f} meters", T {0}), "Height is: 0 meters");
-    BOOST_TEST_EQ(std::format("Height is: {} meters", T {2}), "Height is: 2 meters");
+    BOOST_TEST_EQ(fmt::format("Height is: {:.0f} meters", T {0}), "Height is: 0 meters");
+    BOOST_TEST_EQ(fmt::format("Height is: {} meters", T {2}), "Height is: 2 meters");
 }
 
 #ifdef _MSC_VER
