@@ -6,6 +6,11 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/boost_decimalTargets.cmake")
 
+# Recreate the alias for the imported target
+if(NOT TARGET Boost::decimal AND TARGET Boost::boost_decimal)
+    add_library(Boost::decimal ALIAS Boost::boost_decimal)
+endif()
+
 check_required_components(boost_decimal)
 
 set(boost_decimal_FOUND TRUE)
