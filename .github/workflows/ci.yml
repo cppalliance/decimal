@@ -759,9 +759,16 @@ jobs:
           cat > ~/standalone_test/CMakeLists.txt <<'EOF'
           cmake_minimum_required(VERSION 3.10)
           project(StandaloneTest)
+          
           find_package(boost_decimal REQUIRED)
           message(STATUS "boost_decimal found: ${boost_decimal_FOUND}")
-          message(STATUS "Boost::decimal target exists: ${TARGET Boost::decimal}")
+          
+          if(TARGET Boost::decimal)
+            message(STATUS "Boost::decimal target exists")
+          else()
+            message(FATAL_ERROR "Boost::decimal target does NOT exist")
+          endif()
+          
           add_executable(main main.cpp)
           target_link_libraries(main PRIVATE Boost::decimal)
           EOF
