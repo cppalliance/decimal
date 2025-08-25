@@ -2,7 +2,7 @@
 # Distributed under the Boost Software License, Version 1.0.
 # https://www.boost.org/LICENSE_1_0.txt
 
-cmake_minimum_required(VERSION 3.8...3.20)
+cmake_minimum_required(VERSION 3.10...3.20)
 
 # Set version explicitly if not part of Boost superproject
 if(NOT BOOST_SUPERPROJECT_VERSION)
@@ -27,7 +27,7 @@ if(NOT BOOST_SUPERPROJECT_VERSION)
 else()
 
     target_include_directories(boost_decimal INTERFACE include)
-    
+
 endif()
 
 target_compile_features(boost_decimal INTERFACE cxx_std_14)
