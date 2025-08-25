@@ -764,7 +764,7 @@ jobs:
           message(STATUS "boost_decimal found: ${boost_decimal_FOUND}")
           
           add_executable(main main.cpp)
-          target_link_libraries(main PRIVATE boost_decimal)
+          target_link_libraries(main PRIVATE Boost::decimal)
           EOF
           
           cat > ~/standalone_test/main.cpp <<'EOF'
@@ -772,7 +772,7 @@ jobs:
           #include <iostream>
           int main() {
               using namespace boost::decimal;
-              decimal32 d{456};
+              decimal32_t d{456};
               std::cout << "Value: " << d << "\n";
               return 0;
           }
@@ -850,7 +850,7 @@ jobs:
           #include <iostream>
           int main() {
               using namespace boost::decimal;
-              decimal32 d{42};
+              decimal32_t d{42};
               std::cout << "Value: " << d << "\n";
               return 0;
           }
@@ -920,7 +920,7 @@ jobs:
           #include <iostream>
           int main() {
               using namespace boost::decimal;
-              decimal32 d{123};
+              decimal32_t d{123};
               std::cout << "Value: " << d << "\n";
               return 0;
           }
