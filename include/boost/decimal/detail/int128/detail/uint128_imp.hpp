@@ -386,6 +386,10 @@ constexpr bool operator==(const uint128_t lhs, const uint128_t rhs) noexcept
 
     return lhs.low == rhs.low && lhs.high == rhs.high;
 
+    #elif defined (__x86_64__) && !defined(BOOST_INT128_NO_BUILTIN_INT128)
+
+    return static_cast<detail::builtin_u128>(lhs) == static_cast<detail::builtin_u128>(rhs);
+
     #elif (defined(__i386__) || defined(_M_IX86) || defined(_M_AMD64)) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION) && defined(__SSE2__)
 
     if (BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(lhs))
@@ -517,6 +521,10 @@ constexpr bool operator!=(const uint128_t lhs, const uint128_t rhs) noexcept
     #if defined(__aarch64__) || defined(_M_ARM64) || defined(_M_AMD64)
 
     return lhs.low != rhs.low || lhs.high != rhs.high;
+
+    #elif defined(__x86_64__) && !defined(BOOST_INT128_NO_BUILTIN_INT128)
+
+    return static_cast<detail::builtin_u128>(lhs) != static_cast<detail::builtin_u128>(rhs);
 
     #elif (defined(__i386__) || defined(_M_IX86)) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION) && defined(__SSE2__)
 
