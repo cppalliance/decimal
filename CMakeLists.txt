@@ -17,10 +17,7 @@ add_library(boost_decimal INTERFACE)
 
 add_library(Boost::decimal ALIAS boost_decimal)
 
-target_include_directories(boost_decimal INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-)
+target_include_directories(boost_decimal INTERFACE include)
 
 target_compile_features(boost_decimal INTERFACE cxx_std_14)
 
