@@ -32,8 +32,10 @@ git clone https://github.com/cppalliance/decimal
 cd decimal
 mkdir build && cd build
 cmake .. OR cmake .. -DCMAKE_INSTALL_PREFIX=/your/custom/path
-cmake --install .
+cmake --build . --target install
 ```
+
+then you can use `find_package(boost_decimal REQUIRED)`
 
 ## vcpkg
 
