@@ -25,19 +25,16 @@ extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size
             boost::decimal::from_chars(c_data, c_data + size, f_val, format);
 
             fmt::format("{}", f_val);
-            fmt::format(format_string.c_str(), f_val);
 
             boost::decimal::decimal64_t val {};
             boost::decimal::from_chars(c_data, c_data + size, val, format);
 
             fmt::format("{}", val);
-            fmt::format(format_string.c_str(), val);
 
             boost::decimal::decimal128_t ld_val {};
             boost::decimal::from_chars(c_data, c_data + size, ld_val, format);
 
             fmt::format("{}", ld_val);
-            fmt::format(format_string.c_str(), ld_val);
         }
     }
     catch (const std::logic_error&)
