@@ -42,7 +42,7 @@ extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size
             std::format(format_string.c_str(), ld_val);
         }
     }
-    catch (const std::logic_error&)
+    catch (const std::format_error&)
     {
         // It is expected that many paths will have invalid format strings
         return 0;
