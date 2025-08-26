@@ -4,6 +4,9 @@
 
 #define FMT_HEADER_ONLY
 #include <boost/decimal.hpp>
+
+#ifdef BOOST_DECIMAL_HAS_FMTLIB_SUPPORT
+
 #include <iostream>
 #include <exception>
 #include <string>
@@ -50,3 +53,12 @@ extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size
 
     return 0;
 }
+
+#else
+
+extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t*, std::size_t)
+{
+    return 0;
+}
+
+#endif
