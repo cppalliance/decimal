@@ -13,7 +13,7 @@
 Decimal is an implementation of IEEE-754:2008 decimal floating point numbers.
 See also [1].
 
-The library is is header-only, and requires C++14.
+The library is header-only, and requires C++14.
 It is compatible through C++14, 17, 20, 23 and beyond.
 
 # Notice
