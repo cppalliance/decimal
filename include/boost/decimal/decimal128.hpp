@@ -2064,7 +2064,7 @@ constexpr auto scalbnd128(decimal128_t num, const int expval) noexcept -> decima
 
 namespace std {
 
-BOOST_DECIMAL_EXPORT template<>
+template<>
 #ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal128_t>
 #else

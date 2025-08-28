@@ -2091,7 +2091,7 @@ constexpr auto copysignd32(decimal32_t mag, const decimal32_t sgn) noexcept -> d
 
 namespace std {
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 #ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal32_t>
 #else
