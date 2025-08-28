@@ -1332,7 +1332,7 @@ constexpr auto copysignd64f(decimal_fast64_t mag, const decimal_fast64_t sgn) no
 
 namespace std {
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 #ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal_fast64_t>
 #else

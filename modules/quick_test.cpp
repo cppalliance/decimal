@@ -9,7 +9,7 @@ import std;
 #include <iostream>
 #endif
 
-import boost2.decimal;
+import boost.decimal;
 
 int main()
 {

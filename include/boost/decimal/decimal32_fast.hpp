@@ -1436,7 +1436,7 @@ constexpr auto quantized32f(const decimal_fast32_t lhs, const decimal_fast32_t r
 
 namespace std {
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 #ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal_fast32_t>
 #else

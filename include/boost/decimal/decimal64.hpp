@@ -1994,7 +1994,7 @@ constexpr auto copysignd64(decimal64_t mag, const decimal64_t sgn) noexcept -> d
 
 namespace std {
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 #ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal64_t>
 #else

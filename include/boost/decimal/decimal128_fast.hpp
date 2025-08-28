@@ -1371,7 +1371,7 @@ constexpr auto quantized128f(const decimal_fast128_t& lhs, const decimal_fast128
 
 namespace std {
 
-BOOST_DECIMAL_EXPORT template<>
+template<>
 #ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal_fast128_t>
 #else

@@ -12,10 +12,10 @@ namespace boost {
 namespace int128 {
 namespace detail {
 
-static constexpr std::uint64_t low_word_mask {(std::numeric_limits<std::uint64_t>::max)()};
+BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t low_word_mask {(std::numeric_limits<std::uint64_t>::max)()};
 
 template <typename T>
-static constexpr T offset_value_v = static_cast<T>((std::numeric_limits<std::uint64_t>::max)());
+BOOST_DECIMAL_CONSTEXPR_VARIABLE T offset_value_v = static_cast<T>((std::numeric_limits<std::uint64_t>::max)());
 
 } // namespace detail
 } // namespace int128
