@@ -61,7 +61,7 @@ module;
 
 #define BOOST_DECIMAL_BUILD_MODULE
 
-export module boost2.decimal;
+export module boost.decimal;
 
 // Forward declarations are not available so add the contents of fwd.hpp here
 
