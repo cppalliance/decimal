@@ -26,7 +26,7 @@ struct streamable_overload
 };
 
 template <typename T>
-static constexpr bool is_streamable_overload_v = streamable_overload<T>::value;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE bool is_streamable_overload_v = streamable_overload<T>::value;
 
 } // namespace detail
 

@@ -17,7 +17,7 @@ namespace int128 {
 namespace detail {
 
 namespace impl {
-static constexpr unsigned char uchar_values[] =
+BOOST_DECIMAL_CONSTEXPR_VARIABLE unsigned char uchar_values[] =
      {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
       255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
       255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
