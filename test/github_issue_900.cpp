@@ -18,7 +18,7 @@ void to_chars_helper()
     if (BOOST_TEST(r))
     {
         *r.ptr = '\0';
-        BOOST_TEST_CSTR_EQ(buffer, "0.0e+00");
+        BOOST_TEST_CSTR_EQ(buffer, "0");
     }
 }
 

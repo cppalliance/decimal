@@ -79,7 +79,7 @@ void test_ostream()
     decimal64_t zero {0, 0};
     std::stringstream zero_out;
     zero_out << zero;
-    BOOST_TEST_CSTR_EQ(zero_out.str().c_str(), "0.0e+00");
+    BOOST_TEST_CSTR_EQ(zero_out.str().c_str(), "0");
 
     std::stringstream inf;
     inf << std::numeric_limits<decimal64_t>::infinity();
