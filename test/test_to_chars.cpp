@@ -881,6 +881,94 @@ void test_nines()
     test_value(T{9999999, -7}, "1e+00", chars_format::scientific, 0);
 }
 
+#if defined(__cpp_consteval) && __cpp_consteval >= 201811L
+
+#define BOOST_DECIMAL_CONSTEVAL_TEST
+
+template <typename T>
+consteval int test_immediate_value(T val, const char* result, chars_format fmt, int precision)
+{
+    char buffer[256] {};
+    auto r = to_chars(buffer, buffer + sizeof(buffer), val, fmt, precision);
+    *r.ptr = '\0';
+
+    if (!r)
+    {
+        return 1;
+    }
+
+    auto buffer_ptr = buffer;
+    while (buffer_ptr != r.ptr)
+    {
+        if (*result++ != *buffer_ptr++)
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+template <typename T>
+consteval int consteval_zero_test()
+{
+    constexpr T val {0, 0};
+
+    int errors {};
+
+    // General should always be the same
+    for (int precision = 0; precision < 50; ++precision)
+    {
+        errors += test_immediate_value(val, "0", chars_format::general, precision);
+    }
+
+    errors += test_immediate_value(val, "0e+00", chars_format::scientific, 0);
+    errors += test_immediate_value(val, "0.0e+00", chars_format::scientific, 1);
+    errors += test_immediate_value(val, "0.00e+00", chars_format::scientific, 2);
+    errors += test_immediate_value(val, "0.000e+00", chars_format::scientific, 3);
+    errors += test_immediate_value(val, "0.0000e+00", chars_format::scientific, 4);
+    errors += test_immediate_value(val, "0.00000e+00", chars_format::scientific, 5);
+    errors += test_immediate_value(val, "0.000000e+00", chars_format::scientific, 6);
+    errors += test_immediate_value(val, "0.0000000e+00", chars_format::scientific, 7);
+    errors += test_immediate_value(val, "0.00000000e+00", chars_format::scientific, 8);
+    errors += test_immediate_value(val, "0.000000000e+00", chars_format::scientific, 9);
+    errors += test_immediate_value(val, "0.0000000000e+00", chars_format::scientific, 10);
+    errors += test_immediate_value(val, "0.00000000000000000000000000000000000000000000000000e+00", chars_format::scientific, 50);
+
+    errors += test_immediate_value(val, "0p+00", chars_format::hex, 0);
+    errors += test_immediate_value(val, "0.0p+00", chars_format::hex, 1);
+    errors += test_immediate_value(val, "0.00p+00", chars_format::hex, 2);
+    errors += test_immediate_value(val, "0.000p+00", chars_format::hex, 3);
+    errors += test_immediate_value(val, "0.0000p+00", chars_format::hex, 4);
+    errors += test_immediate_value(val, "0.00000p+00", chars_format::hex, 5);
+    errors += test_immediate_value(val, "0.000000p+00", chars_format::hex, 6);
+    errors += test_immediate_value(val, "0.0000000p+00", chars_format::hex, 7);
+    errors += test_immediate_value(val, "0.00000000p+00", chars_format::hex, 8);
+    errors += test_immediate_value(val, "0.000000000p+00", chars_format::hex, 9);
+    errors += test_immediate_value(val, "0.0000000000p+00", chars_format::hex, 10);
+    errors += test_immediate_value(val, "0.00000000000000000000000000000000000000000000000000p+00", chars_format::hex, 50);
+
+    errors += test_immediate_value(val, "0", chars_format::fixed, 0);
+    errors += test_immediate_value(val, "0.0", chars_format::fixed, 1);
+    errors += test_immediate_value(val, "0.00", chars_format::fixed, 2);
+    errors += test_immediate_value(val, "0.000", chars_format::fixed, 3);
+    errors += test_immediate_value(val, "0.0000", chars_format::fixed, 4);
+    errors += test_immediate_value(val, "0.00000", chars_format::fixed, 5);
+    errors += test_immediate_value(val, "0.000000", chars_format::fixed, 6);
+    errors += test_immediate_value(val, "0.0000000", chars_format::fixed, 7);
+    errors += test_immediate_value(val, "0.00000000", chars_format::fixed, 8);
+    errors += test_immediate_value(val, "0.000000000", chars_format::fixed, 9);
+    errors += test_immediate_value(val, "0.0000000000", chars_format::fixed, 10);
+    errors += test_immediate_value(val, "0.00000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
+
+    errors += test_immediate_value(val, "0", chars_format::fixed, 0);
+
+    return errors;
+}
+
+
+#endif
+
 int main()
 {
     test_non_finite_values<decimal32_t>();
@@ -1033,6 +1121,18 @@ int main()
 
     test_nines<decimal32_t>();
     test_nines<decimal64_t>();
+
+    #ifdef BOOST_DECIMAL_CONSTEVAL_TEST
+
+    static_assert(consteval_zero_test<decimal32_t>() == 0);
+    static_assert(consteval_zero_test<decimal64_t>() == 0);
+    static_assert(consteval_zero_test<decimal128_t>() == 0);
+
+    static_assert(consteval_zero_test<decimal_fast32_t>() == 0);
+    static_assert(consteval_zero_test<decimal_fast64_t>() == 0);
+    static_assert(consteval_zero_test<decimal_fast128_t>() == 0);
+
+    #endif
 
     return boost::report_errors();
 }
