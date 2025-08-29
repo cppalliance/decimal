@@ -318,10 +318,10 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
                         if (local_precision > 0)
                         {
                             *first++ = '.';
-                            std::memset(first, '0', static_cast<std::size_t>(local_precision));
+                            detail::memset(first, '0', static_cast<std::size_t>(local_precision));
                             first += local_precision;
                         }
-                        std::memcpy(first, "e+00", 4u);
+                        detail::memcpy(first, "e+00", 4u);
                         return {first + 4u, std::errc()};
                     }
                 }
@@ -339,10 +339,10 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
                         if (local_precision > 0)
                         {
                             *first++ = '.';
-                            std::memset(first, '0', static_cast<std::size_t>(local_precision));
+                            detail::memset(first, '0', static_cast<std::size_t>(local_precision));
                             first += local_precision;
                         }
-                        std::memcpy(first, "e+00", 4u);
+                        detail::memcpy(first, "e+00", 4u);
                         return {first + 4u, std::errc()};
                     }
                 }
@@ -534,7 +534,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
         if (local_precision > 0 && local_precision <= buffer_size)
         {
             *first++ = '.';
-            std::memset(first, '0', static_cast<std::size_t>(local_precision));
+            detail::memset(first, '0', static_cast<std::size_t>(local_precision));
             return {first + local_precision, std::errc{}};
         }
         else if (local_precision > buffer_size)
