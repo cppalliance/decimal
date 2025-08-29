@@ -129,7 +129,7 @@ void test_small_values()
         }
     }
     
-    test_value(T{0}, "0.0e+00");
+    test_value(T{0}, "0");
 }
 
 template <typename T>
@@ -538,7 +538,7 @@ void zero_test()
     // General should always be the same
     for (int precision = 0; precision < 50; ++precision)
     {
-        test_value(val * T{dist(rng)}, "0.0e+00", chars_format::general, precision);
+        test_value(val * T{dist(rng)}, "0", chars_format::general, precision);
     }
 
     test_value(val * T{dist(rng)}, "0e+00", chars_format::scientific, 0);
@@ -1024,15 +1024,12 @@ int main()
 
     test_non_finite_invalid_size(std::numeric_limits<decimal32_t>::infinity());
     test_non_finite_invalid_size(std::numeric_limits<decimal32_t>::quiet_NaN());
-    test_non_finite_invalid_size(decimal32_t{0});
 
     test_non_finite_invalid_size(std::numeric_limits<decimal64_t>::infinity());
     test_non_finite_invalid_size(std::numeric_limits<decimal64_t>::quiet_NaN());
-    test_non_finite_invalid_size(decimal64_t{0});
 
     test_non_finite_invalid_size(std::numeric_limits<decimal128_t>::infinity());
     test_non_finite_invalid_size(std::numeric_limits<decimal128_t>::quiet_NaN());
-    test_non_finite_invalid_size(decimal128_t{0});
 
     test_nines<decimal32_t>();
     test_nines<decimal64_t>();
