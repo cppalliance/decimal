@@ -48,6 +48,7 @@ void test_general()
         BOOST_TEST_EQ(fmt::format("{}", T {2111u, 6}), "2111000000");
     }
 
+    BOOST_TEST_EQ(fmt::format("{}", T{}), "0");
     BOOST_TEST_EQ(fmt::format("{}", std::numeric_limits<T>::infinity()), "inf");
     BOOST_TEST_EQ(fmt::format("{}", -std::numeric_limits<T>::infinity()), "-inf");
     BOOST_TEST_EQ(fmt::format("{}", std::numeric_limits<T>::quiet_NaN()), "nan");
