@@ -185,11 +185,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
         case FP_ZERO:
             if (fmt == chars_format::general)
             {
-                if (buffer_len >= 7)
-                {
-                    boost::decimal::detail::memcpy(first, "0.0e+00", 7U);
-                    return {first + 7U, std::errc()};
-                }
+                *first++ = '0';
+                return {first, std::errc()};
             }
             else if (fmt == chars_format::hex || fmt == chars_format::scientific)
             {
