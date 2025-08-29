@@ -386,7 +386,7 @@ constexpr bool operator==(const uint128_t lhs, const uint128_t rhs) noexcept
 
     return lhs.low == rhs.low && lhs.high == rhs.high;
 
-    #elif defined (__x86_64__) && !defined(BOOST_INT128_NO_BUILTIN_INT128)
+    #elif defined (__x86_64__) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_BUILTIN_INT128)
 
     return static_cast<detail::builtin_u128>(lhs) == static_cast<detail::builtin_u128>(rhs);
 
@@ -522,7 +522,7 @@ constexpr bool operator!=(const uint128_t lhs, const uint128_t rhs) noexcept
 
     return lhs.low != rhs.low || lhs.high != rhs.high;
 
-    #elif defined(__x86_64__) && !defined(BOOST_INT128_NO_BUILTIN_INT128)
+    #elif defined(__x86_64__) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_BUILTIN_INT128)
 
     return static_cast<detail::builtin_u128>(lhs) != static_cast<detail::builtin_u128>(rhs);
 
