@@ -542,31 +542,27 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
         return {last, std::errc::value_too_large};
     }
 
-    bool is_neg {false};
+    char* current = first;
     if (signbit(value))
     {
-        *first++ = '-';
-        is_neg = true;
+        *current++ = '-';
     }
 
     const auto fp = fpclassify(value);
     if (!(fp == FP_NORMAL || fp == FP_SUBNORMAL))
     {
-        return to_chars_nonfinite(first, last, value, fp, fmt, -1);
+        return to_chars_nonfinite(current, last, value, fp, fmt, -1);
     }
 
     const auto components {value.to_components()};
-
-    const auto r {to_chars_integer_impl(first, last, components.sig)};
+    const auto r {to_chars_integer_impl(current, last, components.sig)};
 
     if (BOOST_DECIMAL_UNLIKELY(!r))
     {
         return r; // LCOV_EXCL_LINE
     }
 
-    // We now have the complete number written into the buffer
-    // The question now becomes where does the decimal point go
-    const auto num_digits {r.ptr - (first + 1)};
+    const auto num_digits {r.ptr - current};
     const auto exp {components.exp};
     const auto abs_exp {exp < 0 ? -exp : exp};
 
@@ -577,7 +573,7 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
 
     if (exp >= 0)
     {
-        if (buffer_size < num_digits + exp + static_cast<int>(is_neg))
+        if (buffer_size < (current - first) + num_digits + exp)
         {
             return {last, std::errc::value_too_large};
         }
@@ -585,31 +581,33 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
         detail::memset(r.ptr, '0', static_cast<std::size_t>(exp));
         return {r.ptr + exp, std::errc{}};
     }
-    else if (exp < 0 && abs_exp > num_digits)
+    else if (abs_exp < num_digits)
     {
-        if (buffer_size < num_digits + 1 + static_cast<int>(is_neg))
+        if (buffer_size < (current - first) + num_digits + 1)
         {
             return {last, std::errc::value_too_large};
         }
 
-        detail::memmove(r.ptr + exp + 1, r.ptr + exp, static_cast<std::size_t>(abs_exp));
-        detail::memset(r.ptr + exp, '.', 1U);
+        const auto decimal_pos {num_digits - abs_exp};
+        detail::memmove(current + decimal_pos + 1, current + decimal_pos, static_cast<std::size_t>(abs_exp));
+        current[decimal_pos] = '.';
 
-        return {r.ptr + 1U, std::errc{}};
+        return {r.ptr + 1, std::errc{}};
     }
     else
     {
-        if (buffer_size < num_digits + abs_exp + 1 + static_cast<int>(is_neg))
+        const auto leading_zeros {abs_exp - num_digits};
+        if (buffer_size < (current - first) + 2 + leading_zeros + num_digits)
         {
             return {last, std::errc::value_too_large};
         }
 
-        detail::memmove(r.ptr + abs_exp + 2, first, static_cast<std::size_t>(num_digits));
-        *first++ = '0';
-        *first++ = '.';
-        detail::memset(first, '0', static_cast<std::size_t>(abs_exp));
+        detail::memmove(current + 2 + leading_zeros, current, static_cast<std::size_t>(num_digits));
+        current[0] = '0';
+        current[1] = '.';
+        detail::memset(current + 2, '0', static_cast<std::size_t>(leading_zeros));
 
-        return {r.ptr + abs_exp + 2 + num_digits, std::errc{}};
+        return {current + 2 + leading_zeros + num_digits, std::errc{}};
     }
 
     BOOST_DECIMAL_UNREACHABLE; // LCOV_EXCL_LINE
