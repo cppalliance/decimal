@@ -272,20 +272,6 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt) noexcept -> to_chars_result
 {
-    if (first >= last)
-    {
-        return {last, std::errc::invalid_argument};
-    }
-
-    const auto buffer_size {last - first};
-    const auto real_precision {get_real_precision<TargetDecimalType>()};
-
-    // Dummy check the bounds
-    if (buffer_size < real_precision)
-    {
-        return {last, std::errc::value_too_large};
-    }
-
     if (signbit(value))
     {
         *first++ = '-';
@@ -297,6 +283,15 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
         return to_chars_nonfinite(first, last, value, fp, fmt, -1);
     }
 
+    const auto buffer_size {last - first};
+    const auto real_precision {get_real_precision<TargetDecimalType>()};
+
+    // Dummy check the bounds
+    if (buffer_size < real_precision)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
     using uint_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
                                               std::numeric_limits<std::uint64_t>::digits),
                                               int128::uint128_t, std::uint64_t>;
@@ -305,37 +300,30 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     // since we are always in the print shortest representation realm
     int exp {};
     auto significand {static_cast<uint_type>(frexp10(value, &exp))};
-    const auto trailing_zeros {detail::remove_trailing_zeros(significand)};
-    significand = trailing_zeros.trimmed_number;
-    exp += static_cast<int>(trailing_zeros.number_of_removed_zeros);
+    exp += static_cast<int>(std::numeric_limits<TargetDecimalType>::digits10 - 1);
 
-    // Use an offset of one since we need to insert the decimal point
-    const auto significant_digits {std::numeric_limits<TargetDecimalType>::digits10 - trailing_zeros.number_of_removed_zeros};
-    BOOST_DECIMAL_ASSERT(significant_digits != 0); // Should have been filtered out
+    auto r = to_chars_integer_impl<uint_type>(first + 1, last, significand);
 
-    exp += static_cast<int>(significant_digits - 1);
-
-    // If there is only one digit, and we don't need any fractional part
-    if (significant_digits == 1)
+    // Only real reason we will hit this is a buffer overflow,
+    // which we have already checked for
+    if (BOOST_DECIMAL_UNLIKELY(!r))
     {
-        *first++ = static_cast<char>(significand);
+        return r; // LCOV_EXCL_LINE
     }
-    else
+
+    // Any trailing zeros can be removed
+    // This is faster than stripping them from the normalized number
+    --r.ptr;
+    while (*r.ptr == '0')
     {
-        const auto r = to_chars_integer_impl<uint_type>(first + 1, last, significand);
-
-        // Only real reason we will hit this is a buffer overflow,
-        // which we have already checked for
-        if (BOOST_DECIMAL_UNLIKELY(!r))
-        {
-            return r; // LCOV_EXCL_LINE
-        }
-
-        // Insert our decimal point
-        *first = *(first + 1);
-        *(first + 1) = '.';
-        first = r.ptr;
+        --r.ptr;
     }
+    ++r.ptr;
+
+    // Insert our decimal point
+    *first = *(first + 1);
+    *(first + 1) = '.';
+    first = r.ptr;
 
     *first++ = 'e';
     if (exp >= 0)
@@ -348,6 +336,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
         exp = -exp;
     }
 
+    // Need at least two digits e.g. e-09
     if (exp < 10)
     {
         *first++ = '0';
