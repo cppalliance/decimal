@@ -192,7 +192,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
             {
                 if (buffer_len >= 7 + local_precision + 1)
                 {
-                    if (local_precision == 0)
+                    if (local_precision <= 0)
                     {
                         *first++ = '0';
                     }
@@ -201,7 +201,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
                         boost::decimal::detail::memcpy(first, "0.0", 3U);
                         first += 3U;
 
-                        if (local_precision != -1 && local_precision != 1)
+                        if (local_precision != 1)
                         {
                             boost::decimal::detail::memset(first, '0', static_cast<std::size_t>(local_precision - 1));
                             first += local_precision - 1;
