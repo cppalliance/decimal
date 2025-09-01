@@ -307,12 +307,13 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     auto significand {static_cast<uint_type>(frexp10(value, &exp))};
     const auto trailing_zeros {detail::remove_trailing_zeros(significand)};
     significand = trailing_zeros.trimmed_number;
-    exp += trailing_zeros.number_of_removed_zeros;
+    exp += static_cast<int>(trailing_zeros.number_of_removed_zeros);
 
     // Use an offset of one since we need to insert the decimal point
     const auto significant_digits {std::numeric_limits<TargetDecimalType>::digits10 - trailing_zeros.number_of_removed_zeros};
-    exp += significant_digits - 1;
     BOOST_DECIMAL_ASSERT(significant_digits != 0); // Should have been filtered out
+
+    exp += static_cast<int>(significant_digits - 1);
 
     // If there is only one digit, and we don't need any fractional part
     if (significant_digits == 1)
