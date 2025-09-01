@@ -323,7 +323,7 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
     auto exp {components.exp + num_digits - 1};
 
     // Make sure the result will fit in the buffer before continuing progress
-    const auto total_length {total_buffer_length<TargetDecimalType>(num_digits, exp, is_neg)};
+    const auto total_length {total_buffer_length<TargetDecimalType>(static_cast<int>(num_digits), exp, is_neg)};
     if (total_length > buffer_size)
     {
         return {last, std::errc::value_too_large};
@@ -582,7 +582,7 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
             return {last, std::errc::value_too_large};
         }
 
-        detail::memset(r.ptr, '0', exp);
+        detail::memset(r.ptr, '0', static_cast<std::size_t>(exp));
         return {r.ptr + exp, std::errc{}};
     }
     else if (exp < 0 && abs_exp > num_digits)
@@ -594,9 +594,8 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
 
         detail::memmove(r.ptr + exp + 1, r.ptr + exp, static_cast<std::size_t>(abs_exp));
         detail::memset(r.ptr + exp, '.', 1U);
-        ++r.ptr;
 
-        return {r.ptr, std::errc{}};
+        return {r.ptr + 1U, std::errc{}};
     }
     else
     {
@@ -608,7 +607,7 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
         detail::memmove(r.ptr + abs_exp + 2, first, static_cast<std::size_t>(num_digits));
         *first++ = '0';
         *first++ = '.';
-        detail::memset(first, '0', abs_exp);
+        detail::memset(first, '0', static_cast<std::size_t>(abs_exp));
 
         return {r.ptr + abs_exp + 2 + num_digits, std::errc{}};
     }
