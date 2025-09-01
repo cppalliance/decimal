@@ -75,6 +75,11 @@ private:
         return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal128_t>;
     }
 
+    constexpr auto to_components() const noexcept -> detail::decimal_fast128_t_components
+    {
+        return {full_significand(), biased_exponent(), isneg()};
+    }
+
     template <typename Decimal, typename TargetType>
     friend constexpr auto to_integral_128(Decimal val) noexcept
         BOOST_DECIMAL_REQUIRES_TWO_RETURN(detail::is_decimal_floating_point_v, Decimal, detail::is_integral_v, TargetType, TargetType);
@@ -133,6 +138,9 @@ private:
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+    friend constexpr auto detail::to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt) noexcept -> to_chars_result;
 
 public:
     constexpr decimal_fast128_t() noexcept = default;

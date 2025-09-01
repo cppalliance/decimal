@@ -71,6 +71,11 @@ private:
         return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal32_t>;
     }
 
+    constexpr auto to_components() const noexcept -> detail::decimal_fast32_t_components
+    {
+        return {full_significand(), biased_exponent(), isneg()};
+    }
+
     friend constexpr auto div_impl(decimal_fast32_t lhs, decimal_fast32_t rhs, decimal_fast32_t& q, decimal_fast32_t& r) noexcept -> void;
 
     friend constexpr auto mod_impl(decimal_fast32_t lhs, decimal_fast32_t rhs, const decimal_fast32_t& q, decimal_fast32_t& r) noexcept -> void;
@@ -132,6 +137,9 @@ private:
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+    friend constexpr auto detail::to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt) noexcept -> to_chars_result;
 
 public:
     constexpr decimal_fast32_t() noexcept = default;
