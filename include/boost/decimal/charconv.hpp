@@ -980,12 +980,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, const Target
                 }
                 else
                 {
-                    return to_chars_scientific_impl(first, last, value, fmt, local_precision);
+                    return to_chars_scientific_impl(first, last, value);
                 }
             case chars_format::fixed:
                 return to_chars_fixed_impl(first, last, value, fmt, local_precision);
             case chars_format::scientific:
-                return to_chars_scientific_impl(first, last, value, fmt, local_precision);
+                return to_chars_scientific_impl(first, last, value);
             case chars_format::hex:
                 return to_chars_hex_impl(first, last, value, local_precision); // LCOV_EXCL_LINE unreachable
         }
