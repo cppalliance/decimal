@@ -298,7 +298,7 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
 
     // Need to offset the exp for the fact that it's not 123e+2, it's 1.23e+4
     const auto components {value.to_components()};
-    auto r = to_chars_integer_impl<uint_type>(first + 1, last, components.sig);
+    auto r = to_chars_integer_impl(first + 1, last, static_cast<uint_type>(components.sig));
 
     // Only real reason we will hit this is a buffer overflow,
     // which we have already checked for
