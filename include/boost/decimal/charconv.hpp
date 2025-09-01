@@ -270,7 +270,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt) noexcept -> to_chars_result
+constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt) noexcept -> to_chars_result
 {
     if (signbit(value))
     {
@@ -300,7 +300,8 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     // since we are always in the print shortest representation realm
     int exp {};
     auto significand {static_cast<uint_type>(frexp10(value, &exp))};
-    exp += static_cast<int>(std::numeric_limits<TargetDecimalType>::digits10 - 1);
+    constexpr int exp_offset {std::numeric_limits<TargetDecimalType>::digits10 - 1};
+    exp += exp_offset;
 
     auto r = to_chars_integer_impl<uint_type>(first + 1, last, significand);
 

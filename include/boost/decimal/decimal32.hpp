@@ -39,6 +39,8 @@
 #include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/components.hpp>
 #include <boost/decimal/detail/cmath/next.hpp>
+#include <boost/decimal/detail/to_chars_result.hpp>
+#include <boost/decimal/detail/chars_format.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -90,6 +92,9 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_biggest_no_combination_signif
 
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_max_biased_exponent = UINT32_C(191);
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint32_t d32_max_significand_value = UINT32_C(9'999'999);
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt) noexcept -> to_chars_result;
 
 } // namespace detail
 
@@ -191,6 +196,9 @@ private:
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+    friend constexpr auto detail::to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt) noexcept -> to_chars_result;
 
 public:
     // 3.2.2.1 construct/copy/destroy:
