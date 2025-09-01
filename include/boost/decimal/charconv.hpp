@@ -881,7 +881,96 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 constexpr auto to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value) noexcept -> to_chars_result
 {
+    bool is_neg {false};
+    if (signbit(value))
+    {
+        *first++ = '-';
+        is_neg = true;
+    }
 
+    const auto fp = fpclassify(value);
+    if (!(fp == FP_NORMAL || fp == FP_SUBNORMAL))
+    {
+        return to_chars_nonfinite(first, last, value, fp, chars_format::hex, -1);
+    }
+
+    const auto buffer_size {last - first};
+    const auto real_precision {get_real_precision<TargetDecimalType>()};
+
+    // Dummy check the bounds
+    if (buffer_size < real_precision)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    using uint_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                              std::numeric_limits<std::uint64_t>::digits),
+                                              int128::uint128_t, std::uint64_t>;
+
+    // Need to offset the exp for the fact that it's not 123e+2, it's 1.23e+4
+    const auto components {value.to_components()};
+    auto r = to_chars_integer_impl(first + 1, last, static_cast<uint_type>(components.sig), 16);
+
+    // Only real reason we will hit this is a buffer overflow,
+    // which we have already checked for
+    if (BOOST_DECIMAL_UNLIKELY(!r))
+    {
+        return r; // LCOV_EXCL_LINE
+    }
+
+    const auto num_digits {r.ptr - (first + 1)};
+
+    // Any trailing zeros can be removed
+    // This is faster than stripping them from the normalized number
+    --r.ptr;
+    while (*r.ptr == '0')
+    {
+        --r.ptr;
+    }
+    ++r.ptr;
+
+    auto exp {components.exp + num_digits - 1};
+
+    // Make sure the result will fit in the buffer before continuing progress
+    const auto total_length {total_buffer_length<TargetDecimalType>(static_cast<int>(num_digits), exp, is_neg)};
+    if (total_length > buffer_size)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    // Insert our decimal point
+    if (num_digits != 1)
+    {
+        *first = *(first + 1);
+        *(first + 1) = '.';
+        first = r.ptr;
+    }
+
+    *first++ = 'p';
+    if (exp >= 0)
+    {
+        *first++ = '+';
+    }
+    else
+    {
+        *first++ = '-';
+        exp = -exp;
+    }
+
+    // Need at least two digits e.g. e-09
+    if (exp < 16)
+    {
+        *first++ = '0';
+    }
+
+    const auto exp_r {to_chars_integer_impl(first, last, exp, 16)};
+
+    if (BOOST_DECIMAL_UNLIKELY(!exp_r))
+    {
+        return exp_r; // LCOV_EXCL_LINE
+    }
+
+    return {exp_r.ptr, std::errc{}};
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
