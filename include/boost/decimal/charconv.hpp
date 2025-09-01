@@ -272,9 +272,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt) noexcept -> to_chars_result
 {
+    bool is_neg {false};
     if (signbit(value))
     {
         *first++ = '-';
+        is_neg = true;
     }
 
     const auto fp = fpclassify(value);
@@ -319,6 +321,13 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
     ++r.ptr;
 
     auto exp {components.exp + num_digits - 1};
+
+    // Make sure the result will fit in the buffer before continuing progress
+    const auto total_length {total_buffer_length<TargetDecimalType>(num_digits, exp, is_neg)};
+    if (total_length > buffer_size)
+    {
+        return {last, std::errc::value_too_large};
+    }
 
     // Insert our decimal point
     *first = *(first + 1);
