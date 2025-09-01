@@ -930,7 +930,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, const Target
     // Sanity check our bounds
     if (first >= last)
     {
-        return {last, std::errc::value_too_large};
+        return {last, std::errc::invalid_argument};
     }
 
     auto abs_value = abs(value);
