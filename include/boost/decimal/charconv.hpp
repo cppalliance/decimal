@@ -270,7 +270,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value) noexcept -> to_chars_result
+BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt) noexcept -> to_chars_result
 {
     if (first >= last)
     {
@@ -294,7 +294,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     const auto fp = fpclassify(value);
     if (!(fp == FP_NORMAL || fp == FP_SUBNORMAL))
     {
-        return to_chars_nonfinite(first, last, value, fp, chars_format::scientific, -1);
+        return to_chars_nonfinite(first, last, value, fp, fmt, -1);
     }
 
     using uint_type = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
@@ -980,12 +980,12 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, const Target
                 }
                 else
                 {
-                    return to_chars_scientific_impl(first, last, value);
+                    return to_chars_scientific_impl(first, last, value, fmt);
                 }
             case chars_format::fixed:
                 return to_chars_fixed_impl(first, last, value, fmt, local_precision);
             case chars_format::scientific:
-                return to_chars_scientific_impl(first, last, value);
+                return to_chars_scientific_impl(first, last, value, fmt);
             case chars_format::hex:
                 return to_chars_hex_impl(first, last, value, local_precision); // LCOV_EXCL_LINE unreachable
         }
