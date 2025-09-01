@@ -311,6 +311,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
 
     // Use an offset of one since we need to insert the decimal point
     const auto significant_digits {std::numeric_limits<TargetDecimalType>::digits10 - trailing_zeros.number_of_removed_zeros};
+    exp += significant_digits - 1;
     BOOST_DECIMAL_ASSERT(significant_digits != 0); // Should have been filtered out
 
     // If there is only one digit, and we don't need any fractional part
