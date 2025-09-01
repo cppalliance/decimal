@@ -74,6 +74,11 @@ private:
         return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal64_t>;
     }
 
+    constexpr auto to_components() const noexcept -> detail::decimal_fast64_t_components
+    {
+        return {full_significand(), biased_exponent(), isneg()};
+    }
+
     // Equality template between any integer type and decimal32_t
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept

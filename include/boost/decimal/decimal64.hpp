@@ -93,7 +93,7 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_max_significand_value = UINT6
 
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-constexpr auto detail::to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt) noexcept -> to_chars_result;
+constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt) noexcept -> to_chars_result;
 
 } //namespace detail
 

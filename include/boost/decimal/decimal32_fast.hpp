@@ -71,6 +71,11 @@ private:
         return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal32_t>;
     }
 
+    constexpr auto to_components() const noexcept -> detail::decimal_fast32_t_components
+    {
+        return {full_significand(), biased_exponent(), isneg()};
+    }
+
     friend constexpr auto div_impl(decimal_fast32_t lhs, decimal_fast32_t rhs, decimal_fast32_t& q, decimal_fast32_t& r) noexcept -> void;
 
     friend constexpr auto mod_impl(decimal_fast32_t lhs, decimal_fast32_t rhs, const decimal_fast32_t& q, decimal_fast32_t& r) noexcept -> void;
