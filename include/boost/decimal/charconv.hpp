@@ -577,7 +577,7 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
 
     if (exp >= 0)
     {
-        if (buffer_size < num_digits + exp)
+        if (buffer_size < num_digits + exp + static_cast<int>(is_neg))
         {
             return {last, std::errc::value_too_large};
         }
@@ -587,7 +587,7 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
     }
     else if (exp < 0 && abs_exp > num_digits)
     {
-        if (buffer_size < num_digits + 1)
+        if (buffer_size < num_digits + 1 + static_cast<int>(is_neg))
         {
             return {last, std::errc::value_too_large};
         }
@@ -600,7 +600,7 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
     }
     else
     {
-        if (buffer_size < num_digits + abs_exp + 1)
+        if (buffer_size < num_digits + abs_exp + 1 + static_cast<int>(is_neg))
         {
             return {last, std::errc::value_too_large};
         }
