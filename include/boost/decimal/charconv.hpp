@@ -296,14 +296,9 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
                                               std::numeric_limits<std::uint64_t>::digits),
                                               int128::uint128_t, std::uint64_t>;
 
-    // Normalize the value for consistency and then remove trailing zeros
-    // since we are always in the print shortest representation realm
-    int exp {};
-    auto significand {static_cast<uint_type>(frexp10(value, &exp))};
-    constexpr int exp_offset {std::numeric_limits<TargetDecimalType>::digits10 - 1};
-    exp += exp_offset;
-
-    auto r = to_chars_integer_impl<uint_type>(first + 1, last, significand);
+    // Need to offset the exp for the fact that it's not 123e+2, it's 1.23e+4
+    const auto components {value.to_components()};
+    auto r = to_chars_integer_impl<uint_type>(first + 1, last, components.sig);
 
     // Only real reason we will hit this is a buffer overflow,
     // which we have already checked for
@@ -311,6 +306,8 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
     {
         return r; // LCOV_EXCL_LINE
     }
+
+    const auto num_digits {r.ptr - (first + 1)};
 
     // Any trailing zeros can be removed
     // This is faster than stripping them from the normalized number
@@ -320,6 +317,8 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
         --r.ptr;
     }
     ++r.ptr;
+
+    auto exp {components.exp + num_digits - 1};
 
     // Insert our decimal point
     *first = *(first + 1);
