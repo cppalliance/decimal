@@ -319,47 +319,23 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
     if (significant_digits == 1)
     {
         *first++ = static_cast<char>(significand);
-        *first++ = 'e';
-
-        // Ensure we have a sign and at least 2 digits e.g. e+00
-        if (exp >= 0)
-        {
-            *first++ = '+';
-        }
-        else
-        {
-            *first++ = '-';
-            exp = -exp;
-        }
-
-        if (exp < 10)
-        {
-            *first++ = '0';
-        }
-
-        const auto exp_r {to_chars_integer_impl(first, last, exp)};
-
-        if (BOOST_DECIMAL_UNLIKELY(!exp_r))
-        {
-            return exp_r; // LCOV_EXCL_LINE
-        }
-
-        return {exp_r.ptr, std::errc{}};
     }
-
-    const auto r = to_chars_integer_impl<uint_type>(first + 1, last, significand);
-
-    // Only real reason we will hit this is a buffer overflow,
-    // which we have already checked for
-    if (BOOST_DECIMAL_UNLIKELY(!r))
+    else
     {
-        return r; // LCOV_EXCL_LINE
-    }
+        const auto r = to_chars_integer_impl<uint_type>(first + 1, last, significand);
 
-    // Insert our decimal point
-    *first = *(first + 1);
-    *(first + 1) = '.';
-    first = r.ptr;
+        // Only real reason we will hit this is a buffer overflow,
+        // which we have already checked for
+        if (BOOST_DECIMAL_UNLIKELY(!r))
+        {
+            return r; // LCOV_EXCL_LINE
+        }
+
+        // Insert our decimal point
+        *first = *(first + 1);
+        *(first + 1) = '.';
+        first = r.ptr;
+    }
 
     *first++ = 'e';
     if (exp >= 0)
