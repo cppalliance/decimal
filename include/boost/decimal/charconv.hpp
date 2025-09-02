@@ -879,7 +879,85 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const 
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value, const int local_precision = -1) noexcept -> to_chars_result
+constexpr auto to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value) noexcept -> to_chars_result
+{
+    using Unsigned_Integer = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
+                                                 std::numeric_limits<std::uint64_t>::digits),
+                                                 int128::uint128_t, std::uint64_t>;
+
+    bool is_neg {false};
+    if (signbit(value))
+    {
+        *first++ = '-';
+        is_neg = true;
+    }
+
+    const auto fp = fpclassify(value);
+    if (!(fp == FP_NORMAL || fp == FP_SUBNORMAL))
+    {
+        return to_chars_nonfinite(first, last, value, fp, chars_format::hex, -1);
+    }
+
+    const auto buffer_size {last - first};
+    const auto real_precision {get_real_precision<TargetDecimalType>()};
+
+    // Dummy check the bounds
+    if (buffer_size < real_precision)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    const auto components {value.to_components()};
+
+    auto exp {components.exp};
+    auto significand {static_cast<Unsigned_Integer>(components.sig)};
+    BOOST_DECIMAL_ASSERT(significand != 0U);
+
+    auto r = to_chars_integer_impl<Unsigned_Integer, Unsigned_Integer>(first + 1, last, significand, 16);
+    if (BOOST_DECIMAL_UNLIKELY(!r))
+    {
+        return r; // LCOV_EXCL_LINE
+    }
+
+    const auto current_digits {r.ptr - (first + 1) - 1};
+    exp += static_cast<int>(current_digits);
+
+    // Make sure the result will fit in the buffer before continuing progress
+    const auto total_length {total_buffer_length<TargetDecimalType>(static_cast<int>(current_digits), exp, is_neg)};
+    if (total_length > buffer_size)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    // Insert our decimal point
+    if (current_digits != 1)
+    {
+        *first = *(first + 1);
+        *(first + 1) = '.';
+        first = r.ptr;
+    }
+
+    *first++ = 'p';
+    if (exp < 0)
+    {
+        *first++ = '-';
+        exp = -exp;
+    }
+    else
+    {
+        *first++ = '+';
+    }
+
+    if (exp < 10)
+    {
+        *first++ = '0';
+    }
+
+    return to_chars_integer_impl<std::uint32_t>(first, last, static_cast<std::uint32_t>(exp));
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value, const int local_precision) noexcept -> to_chars_result
 {
     using Unsigned_Integer = std::conditional_t<(std::numeric_limits<typename TargetDecimalType::significand_type>::digits >
                                                  std::numeric_limits<std::uint64_t>::digits),
@@ -1045,7 +1123,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, const Target
             case chars_format::scientific:
                 return to_chars_scientific_impl(first, last, value, fmt);
             case chars_format::hex:
-                return to_chars_hex_impl(first, last, value, local_precision);
+                return to_chars_hex_impl(first, last, value);
             // LCOV_EXCL_START
             default:
                 BOOST_DECIMAL_UNREACHABLE;
