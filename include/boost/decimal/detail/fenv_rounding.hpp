@@ -74,7 +74,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         const auto round {fegetround()};
         int exp {1};
 
-        const auto trailing_num {val % 10U};
+        const auto trailing_num {static_cast<std::uint32_t>(val % 10U)};
         val /= 10U;
 
         // Default rounding mode
@@ -94,7 +94,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
                 break;
             case rounding_mode::fe_dec_to_nearest:
                 // Round to even or nearest
-                if (trailing_num > 5 || (trailing_num == 5U && ((val & 1U) == 1U)))
+                if (trailing_num > 5U || (trailing_num == 5U && ((val & 1U) == 1U)))
                 {
                     ++val;
                 }
