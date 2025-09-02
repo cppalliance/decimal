@@ -927,6 +927,13 @@ constexpr auto to_chars_hex_impl(char* first, char* last, const TargetDecimalTyp
     auto significand {static_cast<Unsigned_Integer>(components.sig)};
     BOOST_DECIMAL_ASSERT(significand != 0U);
 
+    if (significand % 10U == 0U)
+    {
+        const auto zero_removal {remove_trailing_zeros(significand)};
+        exp += zero_removal.number_of_removed_zeros;
+        significand = zero_removal.trimmed_number;
+    }
+
     auto r = to_chars_integer_impl<Unsigned_Integer, Unsigned_Integer>(first + 1, last, significand, 16);
     if (BOOST_DECIMAL_UNLIKELY(!r))
     {
