@@ -1,46 +1,21 @@
-// Copyright 2023 Matt Borland
+// Copyright 2025 Matt Borland
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef BOOST_DECIMAL_FENV_HPP
 #define BOOST_DECIMAL_FENV_HPP
 
-#include <boost/decimal/detail/config.hpp>
-
-#ifndef BOOST_DECIMAL_BUILD_MODULE
-#include <cfenv>
+#ifdef _MSC_VER
+// Expands to "This header is deprecated; use expr instead."
+#  define BOOST_DECIMAL_HEADER_DEPRECATED(expr) __pragma("This header is deprecated; use " expr " instead.")
+#else // GNU, Clang, Intel, IBM, etc.
+// Expands to "This header is deprecated use expr instead"
+#  define BOOST_DECIMAL_HEADER_DEPRECATED_MESSAGE(expr) _Pragma(#expr)
+#  define BOOST_DECIMAL_HEADER_DEPRECATED(expr) BOOST_DECIMAL_HEADER_DEPRECATED_MESSAGE(message "This header is deprecated use " expr " instead")
 #endif
 
-namespace boost {
-namespace decimal {
+BOOST_DECIMAL_HEADER_DEPRECATED("<boost/decimal/cfenv.hpp>");
 
-BOOST_DECIMAL_EXPORT enum class rounding_mode : unsigned
-{
-    fe_dec_downward = 1 << 0,
-    fe_dec_to_nearest = 1 << 1,
-    fe_dec_to_nearest_from_zero = 1 << 2,
-    fe_dec_toward_zero = 1 << 3,
-    fe_dec_upward = 1 << 4,
-    fe_dec_default = fe_dec_to_nearest_from_zero
-};
-
-BOOST_DECIMAL_INLINE_VARIABLE rounding_mode _boost_decimal_global_rounding_mode {rounding_mode::fe_dec_default};
-
-BOOST_DECIMAL_EXPORT inline auto fegetround() noexcept -> rounding_mode
-{
-    return _boost_decimal_global_rounding_mode;
-}
-
-// If we can't support constexpr and non-constexpr code paths we won't honor the updated rounding-mode,
-// since it will not be used anyway.
-// Return the default rounding mode
-BOOST_DECIMAL_EXPORT inline auto fesetround(const rounding_mode round) noexcept -> rounding_mode
-{
-    _boost_decimal_global_rounding_mode = round;
-    return round;
-}
-
-} // namespace decimal
-} // namespace boost
+#include <boost/decimal/cfenv.hpp>
 
 #endif //BOOST_DECIMAL_FENV_HPP

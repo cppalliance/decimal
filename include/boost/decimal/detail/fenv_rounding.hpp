@@ -5,7 +5,7 @@
 #ifndef BOOST_DECIMAL_DETAIL_FENV_ROUNDING_HPP
 #define BOOST_DECIMAL_DETAIL_FENV_ROUNDING_HPP
 
-#include <boost/decimal/fenv.hpp>
+#include <boost/decimal/cfenv.hpp>
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/config.hpp>

@@ -32,7 +32,7 @@
 #include <boost/decimal/decimal_fast128_t.hpp>
 #include <boost/decimal/cmath.hpp>
 #include <boost/decimal/cstdlib.hpp>
-#include <boost/decimal/fenv.hpp>
+#include <boost/decimal/cfenv.hpp>
 #include <boost/decimal/literals.hpp>
 #include <boost/decimal/hash.hpp>
 #include <boost/decimal/cfloat.hpp>
