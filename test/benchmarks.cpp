@@ -40,7 +40,6 @@
 
 #include <boost/random/uniform_int_distribution.hpp>
 
-
 #ifdef BOOST_DECIMAL_RUN_BENCHMARKS
 
 #if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)

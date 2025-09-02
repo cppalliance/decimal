@@ -272,9 +272,11 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_nonfinite(char* first, char* last, const T
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
 constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt) noexcept -> to_chars_result
 {
+    bool is_neg {false};
     if (signbit(value))
     {
         *first++ = '-';
+        is_neg = true;
     }
 
     const auto fp = fpclassify(value);
@@ -319,6 +321,13 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
     ++r.ptr;
 
     auto exp {components.exp + num_digits - 1};
+
+    // Make sure the result will fit in the buffer before continuing progress
+    const auto total_length {total_buffer_length<TargetDecimalType>(static_cast<int>(num_digits), exp, is_neg)};
+    if (total_length > buffer_size)
+    {
+        return {last, std::errc::value_too_large};
+    }
 
     // Insert our decimal point
     *first = *(first + 1);
@@ -522,7 +531,90 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_scientific_impl(char* first, char* last, c
 }
 
 template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
-BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt = chars_format::general, const int local_precision = -1) noexcept -> to_chars_result
+constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt) noexcept -> to_chars_result
+{
+    const auto buffer_size {last - first};
+    const auto real_precision {get_real_precision<TargetDecimalType>()};
+
+    // Dummy check the bounds
+    if (buffer_size < real_precision)
+    {
+        return {last, std::errc::value_too_large};
+    }
+
+    char* current = first;
+    if (signbit(value))
+    {
+        *current++ = '-';
+    }
+
+    const auto fp = fpclassify(value);
+    if (!(fp == FP_NORMAL || fp == FP_SUBNORMAL))
+    {
+        return to_chars_nonfinite(current, last, value, fp, fmt, -1);
+    }
+
+    const auto components {value.to_components()};
+    const auto r {to_chars_integer_impl(current, last, components.sig)};
+
+    if (BOOST_DECIMAL_UNLIKELY(!r))
+    {
+        return r; // LCOV_EXCL_LINE
+    }
+
+    const auto num_digits {r.ptr - current};
+    const auto exp {components.exp};
+    const auto abs_exp {exp < 0 ? -exp : exp};
+
+    // There are now three cases that we need to handle
+    // 1) We need to append trailing zeros e.g. 12345000000
+    // 2) We need to insert the decimal point 12.345
+    // 3) We need to append leading zeros e.g 0.0000012345
+
+    if (exp >= 0)
+    {
+        if (buffer_size < (current - first) + num_digits + exp)
+        {
+            return {last, std::errc::value_too_large};
+        }
+
+        detail::memset(r.ptr, '0', static_cast<std::size_t>(exp));
+        return {r.ptr + exp, std::errc{}};
+    }
+    else if (abs_exp < num_digits)
+    {
+        if (buffer_size < (current - first) + num_digits + 1)
+        {
+            return {last, std::errc::value_too_large};
+        }
+
+        const auto decimal_pos {num_digits - abs_exp};
+        detail::memmove(current + decimal_pos + 1, current + decimal_pos, static_cast<std::size_t>(abs_exp));
+        current[decimal_pos] = '.';
+
+        return {r.ptr + 1, std::errc{}};
+    }
+    else
+    {
+        const auto leading_zeros {abs_exp - num_digits};
+        if (buffer_size < (current - first) + 2 + leading_zeros + num_digits)
+        {
+            return {last, std::errc::value_too_large};
+        }
+
+        detail::memmove(current + 2 + leading_zeros, current, static_cast<std::size_t>(num_digits));
+        current[0] = '0';
+        current[1] = '.';
+        detail::memset(current + 2, '0', static_cast<std::size_t>(leading_zeros));
+
+        return {current + 2 + leading_zeros + num_digits, std::errc{}};
+    }
+
+    BOOST_DECIMAL_UNREACHABLE; // LCOV_EXCL_LINE
+}
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+BOOST_DECIMAL_CONSTEXPR auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt, const int local_precision) noexcept -> to_chars_result
 {
     using target_decimal_significand_type = typename TargetDecimalType::significand_type;
 
@@ -924,7 +1016,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, const Target
     // Sanity check our bounds
     if (first >= last)
     {
-        return {last, std::errc::value_too_large};
+        return {last, std::errc::invalid_argument};
     }
 
     auto abs_value = abs(value);
@@ -942,18 +1034,22 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, const Target
             case chars_format::general:
                 if (abs_value >= 1 && abs_value < max_fractional_value)
                 {
-                    return to_chars_fixed_impl(first, last, value, fmt, local_precision);
+                    return to_chars_fixed_impl(first, last, value, fmt);
                 }
                 else
                 {
                     return to_chars_scientific_impl(first, last, value, fmt);
                 }
             case chars_format::fixed:
-                return to_chars_fixed_impl(first, last, value, fmt, local_precision);
+                return to_chars_fixed_impl(first, last, value, fmt);
             case chars_format::scientific:
                 return to_chars_scientific_impl(first, last, value, fmt);
             case chars_format::hex:
-                return to_chars_hex_impl(first, last, value, local_precision); // LCOV_EXCL_LINE unreachable
+                return to_chars_hex_impl(first, last, value, local_precision);
+            // LCOV_EXCL_START
+            default:
+                BOOST_DECIMAL_UNREACHABLE;
+            // LCOV_EXCL_STOP
         }
     }
     else
@@ -978,9 +1074,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_impl(char* first, char* last, const Target
         }
     }
 
-    // LCOV_EXCL_START
-    return to_chars_scientific_impl(first, last, value, fmt, local_precision);
-    // LCOV_EXCL_STOP
+    return to_chars_scientific_impl(first, last, value, fmt, local_precision); // LCOV_EXCL_LINE
 }
 
 #ifdef _MSC_VER
