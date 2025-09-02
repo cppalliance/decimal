@@ -950,13 +950,17 @@ constexpr auto to_chars_hex_impl(char* first, char* last, const TargetDecimalTyp
         return {last, std::errc::value_too_large};
     }
 
-    // Insert our decimal point
-    if (current_digits != 1)
+    // Insert our decimal point (or don't in the 1 digit case)
+    *first = *(first + 1);
+    if (BOOST_DECIMAL_LIKELY(current_digits > 0))
     {
-        *first = *(first + 1);
         *(first + 1) = '.';
-        first = r.ptr;
     }
+    else
+    {
+        --r.ptr;
+    }
+    first = r.ptr;
 
     *first++ = 'p';
     if (exp < 0)
