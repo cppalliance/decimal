@@ -554,7 +554,14 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
         return to_chars_nonfinite(current, last, value, fp, fmt, -1);
     }
 
-    const auto components {value.to_components()};
+    auto components {value.to_components()};
+    if (components.sig % 10U == 0U)
+    {
+        const auto zeros_removal_result {remove_trailing_zeros(components.sig)};
+        components.sig = zeros_removal_result.trimmed_number;
+        components.exp += zeros_removal_result.number_of_removed_zeros;
+    }
+
     const auto r {to_chars_integer_impl(current, last, components.sig)};
 
     if (BOOST_DECIMAL_UNLIKELY(!r))
