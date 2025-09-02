@@ -93,16 +93,8 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
                 }
                 break;
             case rounding_mode::fe_dec_to_nearest:
-                // Round to even
-                if (trailing_num == 5U)
-                {
-                    if (val % 2U == 1U)
-                    {
-                        ++val;
-                    }
-                }
-                // ... or nearest
-                else if (trailing_num > 5U)
+                // Round to even or nearest
+                if (trailing_num > 5 || (trailing_num == 5U && ((val & 1U) == 1U)))
                 {
                     ++val;
                 }
