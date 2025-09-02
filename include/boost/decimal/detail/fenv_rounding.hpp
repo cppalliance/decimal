@@ -118,7 +118,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         // If the significand was e.g. 99'999'999 rounding up
         // would put it out of range again
 
-        if (static_cast<significand_type>(val) > max_significand_v<TargetType>)
+        if (BOOST_DECIMAL_UNLIKELY(static_cast<significand_type>(val) > max_significand_v<TargetType>))
         {
             val /= 10U;
             ++exp;
