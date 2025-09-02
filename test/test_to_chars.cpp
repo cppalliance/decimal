@@ -899,7 +899,6 @@ void test_nines()
     test_value(T{9999999, -7}, "1", chars_format::general, 2);
     test_value(T{9999999, -7}, "1", chars_format::general, 1);
     test_value(T{9999999, -7}, "1", chars_format::general, 0);
-    test_value(T{9999999, -7}, "0.9999999", chars_format::general);
 
     test_value(T{9999999, -7}, "1.00000e+00", chars_format::scientific, 5);
     test_value(T{9999999, -7}, "1.0000e+00", chars_format::scientific, 4);

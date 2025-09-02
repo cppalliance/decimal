@@ -309,8 +309,8 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
         return r; // LCOV_EXCL_LINE
     }
 
-    auto num_digits {r.ptr - (first + 1)};
-    auto exp {components.exp + num_digits - 1};
+    auto current_digits {r.ptr - (first + 1)};
+    auto exp {components.exp + current_digits - 1};
 
     // Any trailing zeros can be removed
     // This is faster than stripping them from the normalized number
@@ -318,12 +318,12 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
     while (*r.ptr == '0')
     {
         --r.ptr;
-        --num_digits;
+        --current_digits;
     }
     ++r.ptr;
 
     // Make sure the result will fit in the buffer before continuing progress
-    const auto total_length {total_buffer_length<TargetDecimalType>(static_cast<int>(num_digits), exp, is_neg)};
+    const auto total_length {total_buffer_length<TargetDecimalType>(static_cast<int>(current_digits), exp, is_neg)};
     if (total_length > buffer_size)
     {
         return {last, std::errc::value_too_large};
@@ -331,7 +331,7 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
 
     // Insert our decimal point (or don't in the 1 digit case)
     *first = *(first + 1);
-    if (BOOST_DECIMAL_LIKELY(num_digits != 1))
+    if (BOOST_DECIMAL_LIKELY(current_digits != 1))
     {
         *(first + 1) = '.';
     }
@@ -339,7 +339,6 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
     {
         --r.ptr;
     }
-
     first = r.ptr;
 
     *first++ = 'e';
