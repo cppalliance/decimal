@@ -309,7 +309,8 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
         return r; // LCOV_EXCL_LINE
     }
 
-    const auto num_digits {r.ptr - (first + 1)};
+    auto current_digits {r.ptr - (first + 1)};
+    auto exp {components.exp + current_digits - 1};
 
     // Any trailing zeros can be removed
     // This is faster than stripping them from the normalized number
@@ -317,21 +318,27 @@ constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDec
     while (*r.ptr == '0')
     {
         --r.ptr;
+        --current_digits;
     }
     ++r.ptr;
 
-    auto exp {components.exp + num_digits - 1};
-
     // Make sure the result will fit in the buffer before continuing progress
-    const auto total_length {total_buffer_length<TargetDecimalType>(static_cast<int>(num_digits), exp, is_neg)};
+    const auto total_length {total_buffer_length<TargetDecimalType>(static_cast<int>(current_digits), exp, is_neg)};
     if (total_length > buffer_size)
     {
         return {last, std::errc::value_too_large};
     }
 
-    // Insert our decimal point
+    // Insert our decimal point (or don't in the 1 digit case)
     *first = *(first + 1);
-    *(first + 1) = '.';
+    if (BOOST_DECIMAL_LIKELY(current_digits != 1))
+    {
+        *(first + 1) = '.';
+    }
+    else
+    {
+        --r.ptr;
+    }
     first = r.ptr;
 
     *first++ = 'e';
@@ -554,7 +561,14 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
         return to_chars_nonfinite(current, last, value, fp, fmt, -1);
     }
 
-    const auto components {value.to_components()};
+    auto components {value.to_components()};
+    if (components.sig % 10U == 0U)
+    {
+        const auto zeros_removal_result {remove_trailing_zeros(components.sig)};
+        components.sig = zeros_removal_result.trimmed_number;
+        components.exp += static_cast<int>(zeros_removal_result.number_of_removed_zeros);
+    }
+
     const auto r {to_chars_integer_impl(current, last, components.sig)};
 
     if (BOOST_DECIMAL_UNLIKELY(!r))
@@ -913,6 +927,13 @@ constexpr auto to_chars_hex_impl(char* first, char* last, const TargetDecimalTyp
     auto significand {static_cast<Unsigned_Integer>(components.sig)};
     BOOST_DECIMAL_ASSERT(significand != 0U);
 
+    if (significand % 10U == 0U)
+    {
+        const auto zero_removal {remove_trailing_zeros(significand)};
+        exp += static_cast<int>(zero_removal.number_of_removed_zeros);
+        significand = zero_removal.trimmed_number;
+    }
+
     auto r = to_chars_integer_impl<Unsigned_Integer, Unsigned_Integer>(first + 1, last, significand, 16);
     if (BOOST_DECIMAL_UNLIKELY(!r))
     {
@@ -929,13 +950,17 @@ constexpr auto to_chars_hex_impl(char* first, char* last, const TargetDecimalTyp
         return {last, std::errc::value_too_large};
     }
 
-    // Insert our decimal point
-    if (current_digits != 1)
+    // Insert our decimal point (or don't in the 1 digit case)
+    *first = *(first + 1);
+    if (BOOST_DECIMAL_LIKELY(current_digits > 0))
     {
-        *first = *(first + 1);
         *(first + 1) = '.';
-        first = r.ptr;
     }
+    else
+    {
+        --r.ptr;
+    }
+    first = r.ptr;
 
     *first++ = 'p';
     if (exp < 0)
@@ -997,7 +1022,7 @@ BOOST_DECIMAL_CONSTEXPR auto to_chars_hex_impl(char* first, char* last, const Ta
 
     // Calculate the number of bytes
     constexpr auto significand_bits = std::is_same<Unsigned_Integer, std::uint64_t>::value ? 64 : 128;
-    auto significand_digits = static_cast<int>(std::ceil(static_cast<double>(significand_bits - countl_zero(significand)) / 4));
+    auto significand_digits = static_cast<int>((static_cast<double>(significand_bits - countl_zero(significand) + 1) / 4));
     bool append_zeros = false;
 
     if (local_precision != -1)
