@@ -566,7 +566,7 @@ constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalT
     {
         const auto zeros_removal_result {remove_trailing_zeros(components.sig)};
         components.sig = zeros_removal_result.trimmed_number;
-        components.exp += zeros_removal_result.number_of_removed_zeros;
+        components.exp += static_cast<int>(zeros_removal_result.number_of_removed_zeros);
     }
 
     const auto r {to_chars_integer_impl(current, last, components.sig)};
@@ -930,7 +930,7 @@ constexpr auto to_chars_hex_impl(char* first, char* last, const TargetDecimalTyp
     if (significand % 10U == 0U)
     {
         const auto zero_removal {remove_trailing_zeros(significand)};
-        exp += zero_removal.number_of_removed_zeros;
+        exp += static_cast<int>(zero_removal.number_of_removed_zeros);
         significand = zero_removal.trimmed_number;
     }
 
