@@ -29,16 +29,19 @@ namespace decimal {
 namespace detail {
 
 template <BOOST_DECIMAL_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
-constexpr auto rint_impl(T1& sig, T2 exp, const bool sign)
+constexpr auto rint_impl(T1& sig, T2 exp, const bool)
 {
-    using RoundType = std::conditional_t<std::is_same<T1, std::uint32_t>::value, decimal32_t,
-                      std::conditional_t<std::is_same<T1, std::uint64_t>::value, decimal64_t, decimal128_t>>;
-
     const T2 abs_exp { (exp < T2(0)) ? -exp : exp };
 
     sig /= detail::pow10(static_cast<T1>(abs_exp - 1));
 
-    detail::fenv_round<RoundType>(sig, sign);
+    const auto trailing_num {static_cast<std::uint32_t>(sig % 10U)};
+    sig /= 10U;
+
+    if (trailing_num >= 5U)
+    {
+        ++sig;
+    }
 }
 
 // MSVC 14.1 warns of unary minus being applied to unsigned type from numeric_limits::min

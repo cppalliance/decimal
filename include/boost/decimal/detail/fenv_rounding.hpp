@@ -26,7 +26,7 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
     val /= 10U;
     int exp_delta {1};
 
-    if (trailing_num >= 5U)
+    if (trailing_num > 5U || (trailing_num == 5U && val % 2U == 0U))
     {
         ++val;
     }
@@ -53,7 +53,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         val /= 10U;
         int exp_delta {1};
 
-        if (trailing_num >= 5U)
+        if (trailing_num > 5U || (trailing_num == 5U && val % 2U == 0U))
         {
             ++val;
         }
@@ -74,7 +74,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         const auto round {fegetround()};
         int exp {1};
 
-        const auto trailing_num {val % 10U};
+        const auto trailing_num {static_cast<std::uint32_t>(val % 10U)};
         val /= 10U;
 
         // Default rounding mode
@@ -87,22 +87,14 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
                 }
                 break;
             case rounding_mode::fe_dec_downward:
-                if (trailing_num >= 5U && is_neg)
+                if (is_neg && trailing_num != 0U)
                 {
                     ++val;
                 }
                 break;
             case rounding_mode::fe_dec_to_nearest:
-                // Round to even
-                if (trailing_num == 5U)
-                {
-                    if (val % 2U == 1U)
-                    {
-                        ++val;
-                    }
-                }
-                // ... or nearest
-                else if (trailing_num > 5U)
+                // Round to even or nearest
+                if (trailing_num > 5U || (trailing_num == 5U && val % 2U == 0U))
                 {
                     ++val;
                 }
@@ -126,7 +118,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         // If the significand was e.g. 99'999'999 rounding up
         // would put it out of range again
 
-        if (static_cast<significand_type>(val) > max_significand_v<TargetType>)
+        if (BOOST_DECIMAL_UNLIKELY(static_cast<significand_type>(val) > max_significand_v<TargetType>))
         {
             val /= 10U;
             ++exp;

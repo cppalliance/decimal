@@ -29,7 +29,8 @@ void test_constants()
     BOOST_TEST_EQ(Dec(0.5641895835477562869), inv_sqrtpi_v<Dec>);
     BOOST_TEST_EQ(Dec(0.6931471805599453094), ln2_v<Dec>);
     BOOST_TEST_EQ(Dec(2.302585092994045684), ln10_v<Dec>);
-    BOOST_TEST_EQ(Dec(1.414213562373095049), sqrt2_v<Dec>);
+    constexpr Dec root2 = Dec{UINT64_C(1414213562373095049), -18}; // Rounds different for decimal32 since it terminates with 35
+    BOOST_TEST_EQ(root2, sqrt2_v<Dec>);
     BOOST_TEST_EQ(Dec(1.732050807568877294), sqrt3_v<Dec>);
     BOOST_TEST(abs(Dec(0.707106781186547524) - inv_sqrt2_v<Dec>) <= std::numeric_limits<Dec>::epsilon());
     BOOST_TEST(abs(Dec(0.5773502691896257645) - inv_sqrt3_v<Dec>) <= std::numeric_limits<Dec>::epsilon());

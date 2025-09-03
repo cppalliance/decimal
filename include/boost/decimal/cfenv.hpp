@@ -21,7 +21,7 @@ BOOST_DECIMAL_EXPORT enum class rounding_mode : unsigned
     fe_dec_to_nearest_from_zero = 1 << 2,
     fe_dec_toward_zero = 1 << 3,
     fe_dec_upward = 1 << 4,
-    fe_dec_default = fe_dec_to_nearest_from_zero
+    fe_dec_default = fe_dec_to_nearest
 };
 
 BOOST_DECIMAL_INLINE_VARIABLE rounding_mode _boost_decimal_global_rounding_mode {rounding_mode::fe_dec_default};

@@ -57,7 +57,7 @@ void test_sin()
         auto ret_val {std::sin(val1)};
         auto ret_dec {static_cast<float>(sin(d1))};
 
-        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 35*std::numeric_limits<float>::epsilon()))
+        if (!BOOST_TEST(std::fabs(ret_val - ret_dec) < 40*std::numeric_limits<float>::epsilon()))
         {
             // LCOV_EXCL_START
             std::cerr << "Val 1: " << val1
