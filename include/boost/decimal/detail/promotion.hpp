@@ -121,6 +121,23 @@ struct promote_args<T, Args...>
 template <typename... Args>
 using promote_args_t = typename promote_args<Args...>::type;
 
+#if BOOST_DECIMAL_DEC_EVAL_METHOD == 0
+
+template <typename T>
+using evaluation_type_t = T;
+
+#elif BOOST_DECIMAL_DEC_EVAL_METHOD == 1
+
+template <typename T>
+using evaluation_type_t = detail::promote_args_t<T, decimal64_t>;
+
+#else
+
+template <typename T>
+using evaluation_type_t = detail::promote_args_t<T, decimal128_t>;
+
+#endif
+
 } //namespace detail
 } //namespace decimal
 } //namespace boost
