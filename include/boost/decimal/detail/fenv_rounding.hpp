@@ -53,7 +53,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         val /= 10U;
         int exp_delta {1};
 
-        if (trailing_num >= 5U)
+        if (trailing_num > 5U || (trailing_num == 5U && ((val & 1U) == 1U)))
         {
             ++val;
         }
