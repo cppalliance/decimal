@@ -87,7 +87,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
                 }
                 break;
             case rounding_mode::fe_dec_downward:
-                if (trailing_num >= 5U && is_neg)
+                if (is_neg && trailing_num != 0U)
                 {
                     ++val;
                 }
