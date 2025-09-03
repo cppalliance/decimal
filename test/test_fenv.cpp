@@ -42,9 +42,9 @@ void test_constructor_rounding()
     BOOST_TEST(boost::decimal::fegetround() == rounding_mode::fe_dec_to_nearest);
 
     BOOST_TEST_EQ(decimal32_t(1, 0), decimal32_t(1, 0));
-    BOOST_TEST_EQ(decimal32_t(12'345'675, 0), decimal32_t(1'234'568, 1));
-    BOOST_TEST_EQ(decimal32_t(-12'345'675, 0), decimal32_t(-1'234'568, 1));
-    BOOST_TEST_EQ(decimal32_t(55'555'555, 0), decimal32_t(5'555'556, 1));
+    BOOST_TEST_EQ(decimal32_t(12'345'675, 0), decimal32_t(1'234'567, 1));
+    BOOST_TEST_EQ(decimal32_t(-12'345'675, 0), decimal32_t(-1'234'567, 1));
+    BOOST_TEST_EQ(decimal32_t(55'555'555, 0), decimal32_t(5'555'555, 1));
     BOOST_TEST_EQ(decimal32_t(55'555'556, 0), decimal32_t(5'555'556, 1));
 
     // Toward zero
