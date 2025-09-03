@@ -36,6 +36,7 @@ enums, constants and macros that are provided in this library.
 == Enums
 
 - xref:charconv.adoc#chars_format[chars_format]
+- xref:cfenv.adoc[rounding_mode]
 
 [#api_ref_constants]
 == Constants
