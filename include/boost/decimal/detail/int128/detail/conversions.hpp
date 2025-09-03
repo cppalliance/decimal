@@ -20,7 +20,7 @@ struct valid_overload
 };
 
 template <typename T>
-static constexpr bool is_valid_overload_v = valid_overload<T>::value;
+BOOST_DECIMAL_CONSTEXPR_VARIABLE bool is_valid_overload_v = valid_overload<T>::value;
 
 } // namespace detail
 

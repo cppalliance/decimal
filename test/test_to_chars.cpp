@@ -2,6 +2,12 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#if defined(__GNUC__) && __GNUC__ >= 10
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wstringop-overflow"
+#  pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 #include "mini_to_chars.hpp"
 #include <boost/decimal/decimal32_t.hpp>
 #include <boost/decimal/decimal64_t.hpp>
@@ -541,6 +547,7 @@ void zero_test()
         test_value(val * T{dist(rng)}, "0", chars_format::general, precision);
     }
 
+    test_value(val * T{dist(rng)}, "0e+00", chars_format::scientific);
     test_value(val * T{dist(rng)}, "0e+00", chars_format::scientific, 0);
     test_value(val * T{dist(rng)}, "0.0e+00", chars_format::scientific, 1);
     test_value(val * T{dist(rng)}, "0.00e+00", chars_format::scientific, 2);
@@ -554,6 +561,7 @@ void zero_test()
     test_value(val * T{dist(rng)}, "0.0000000000e+00", chars_format::scientific, 10);
     test_value(val * T{dist(rng)}, "0.00000000000000000000000000000000000000000000000000e+00", chars_format::scientific, 50);
 
+    test_value(val * T{dist(rng)}, "0p+00", chars_format::hex);
     test_value(val * T{dist(rng)}, "0p+00", chars_format::hex, 0);
     test_value(val * T{dist(rng)}, "0.0p+00", chars_format::hex, 1);
     test_value(val * T{dist(rng)}, "0.00p+00", chars_format::hex, 2);
@@ -591,6 +599,7 @@ void test_434_fixed()
 
     constexpr T test_zero_point_three {3, -1};
 
+    test_value(test_zero_point_three, "0.3", chars_format::fixed);
     test_value(test_zero_point_three, "0", chars_format::fixed, 0 * dist(rng));
     test_value(test_zero_point_three, "0.3", chars_format::fixed, 1 * dist(rng));
     test_value(test_zero_point_three, "0.30", chars_format::fixed, 2 * dist(rng));
@@ -607,6 +616,7 @@ void test_434_fixed()
 
     constexpr T test_one_and_quarter {125, -2};
 
+    test_value(test_one_and_quarter, "1.25", chars_format::fixed);
     test_value(test_one_and_quarter, "1", chars_format::fixed, 0 * dist(rng));
     test_value(test_one_and_quarter, "1.3", chars_format::fixed, 1 * dist(rng));
     test_value(test_one_and_quarter, "1.25", chars_format::fixed, 2 * dist(rng));
@@ -623,6 +633,7 @@ void test_434_fixed()
 
     constexpr T tweleve_and_half {125, -1};
 
+    test_value(tweleve_and_half, "12.5", chars_format::fixed);
     test_value(tweleve_and_half, "13", chars_format::fixed, 0 * dist(rng));
     test_value(tweleve_and_half, "12.5", chars_format::fixed, 1 * dist(rng));
     test_value(tweleve_and_half, "12.50", chars_format::fixed, 2 * dist(rng));
@@ -639,6 +650,7 @@ void test_434_fixed()
 
     constexpr T one_e_minus_two {1, -2};
 
+    test_value(one_e_minus_two, "0.01", chars_format::fixed);
     test_value(one_e_minus_two, "0.010000", chars_format::fixed, -1 * dist(rng));
     test_value(one_e_minus_two, "0", chars_format::fixed, 0 * dist(rng));
     test_value(one_e_minus_two, "0.0", chars_format::fixed, 1 * dist(rng));
@@ -656,6 +668,7 @@ void test_434_fixed()
 
     constexpr T one_e_minus_three {1, -3};
 
+    test_value(one_e_minus_three, "0.001", chars_format::fixed);
     test_value(one_e_minus_three, "0.001000", chars_format::fixed, -1 * dist(rng));
     test_value(one_e_minus_three, "0", chars_format::fixed, 0 * dist(rng));
     test_value(one_e_minus_three, "0.0", chars_format::fixed, 1 * dist(rng));
@@ -672,6 +685,7 @@ void test_434_fixed()
 
     constexpr T ten {1, 1};
 
+    test_value(ten, "10", chars_format::fixed);
     test_value(ten, "10.000000", chars_format::fixed, -1 * dist(rng));
     test_value(ten, "10", chars_format::fixed, 0 * dist(rng));
     test_value(ten, "10.0", chars_format::fixed, 1 * dist(rng));
@@ -688,6 +702,7 @@ void test_434_fixed()
 
     constexpr T twelve_and_half {125, -1};
 
+    test_value(twelve_and_half, "12.5", chars_format::fixed);
     test_value(twelve_and_half, "12.500000", chars_format::fixed, -1 * dist(rng));
     test_value(twelve_and_half, "13", chars_format::fixed, 0 * dist(rng));
     test_value(twelve_and_half, "12.5", chars_format::fixed, 1 * dist(rng));
@@ -710,6 +725,7 @@ void test_434_scientific()
 
     constexpr T test_zero_point_three {3, -1};
 
+    test_value(test_zero_point_three, "3e-01", chars_format::scientific);
     test_value(test_zero_point_three, "3e-01", chars_format::scientific, 0 * dist(rng));
     test_value(test_zero_point_three, "3.0e-01", chars_format::scientific, 1 * dist(rng));
     test_value(test_zero_point_three, "3.00e-01", chars_format::scientific, 2 * dist(rng));
@@ -726,6 +742,7 @@ void test_434_scientific()
 
     constexpr T test_one_and_quarter {125, -2};
 
+    test_value(test_one_and_quarter, "1.25e+00", chars_format::scientific);
     test_value(test_one_and_quarter, "1e+00", chars_format::scientific, 0 * dist(rng));
     test_value(test_one_and_quarter, "1.3e+00", chars_format::scientific, 1 * dist(rng));
     test_value(test_one_and_quarter, "1.25e+00", chars_format::scientific, 2 * dist(rng));
@@ -742,6 +759,7 @@ void test_434_scientific()
 
     constexpr T tweleve_and_half {125, -1};
 
+    test_value(tweleve_and_half, "1.25e+01", chars_format::scientific);
     test_value(tweleve_and_half, "1e+01", chars_format::scientific, 0 * dist(rng));
     test_value(tweleve_and_half, "1.3e+01", chars_format::scientific, 1 * dist(rng));
     test_value(tweleve_and_half, "1.25e+01", chars_format::scientific, 2 * dist(rng));
@@ -758,6 +776,7 @@ void test_434_scientific()
 
     constexpr T one_e_minus_two {1, -2};
 
+    test_value(one_e_minus_two, "1e-02", chars_format::scientific);
     test_value(one_e_minus_two, "1e-02", chars_format::scientific, 0 * dist(rng));
     test_value(one_e_minus_two, "1.0e-02", chars_format::scientific, 1 * dist(rng));
     test_value(one_e_minus_two, "1.00e-02", chars_format::scientific, 2 * dist(rng));
@@ -779,6 +798,7 @@ void test_434_hex()
 
     constexpr T one {1, 0};
 
+    test_value(one, "1p+00", chars_format::hex);
     test_value(one, "1p+00", chars_format::hex, 0 * dist(rng));
     test_value(one, "1.0p+00", chars_format::hex, 1 * dist(rng));
     test_value(one, "1.00p+00", chars_format::hex, 2 * dist(rng));
@@ -794,6 +814,7 @@ void test_434_hex()
 
     constexpr T test_zero_point_three {3, -1};
 
+    test_value(test_zero_point_three, "3p-01", chars_format::hex);
     test_value(test_zero_point_three, "3p-01", chars_format::hex, 0 * dist(rng));
     test_value(test_zero_point_three, "3.0p-01", chars_format::hex, 1 * dist(rng));
     test_value(test_zero_point_three, "3.00p-01", chars_format::hex, 2 * dist(rng));
@@ -809,6 +830,7 @@ void test_434_hex()
 
     constexpr T test_one_and_quarter {125, -2};
 
+    test_value(test_one_and_quarter, "7.dp-01", chars_format::hex);
     test_value(test_one_and_quarter, "8p-01", chars_format::hex, 0 * dist(rng));
     test_value(test_one_and_quarter, "7.dp-01", chars_format::hex, 1 * dist(rng));
     test_value(test_one_and_quarter, "7.d0p-01", chars_format::hex, 2 * dist(rng));
@@ -833,6 +855,10 @@ void test_777()
     test_value(value1, "-21000000", chars_format::fixed, 0);
     test_value(value2, "-211000000", chars_format::fixed, 0);
     test_value(value3, "-2111000000", chars_format::fixed, 0);
+
+    test_value(value1, "-21000000", chars_format::fixed);
+    test_value(value2, "-211000000", chars_format::fixed);
+    test_value(value3, "-2111000000", chars_format::fixed);
 }
 
 template <typename T>
@@ -864,6 +890,7 @@ void test_nines()
     test_value(T{9999999, -7}, "1.00", chars_format::fixed, 2);
     test_value(T{9999999, -7}, "1.0", chars_format::fixed, 1);
     test_value(T{9999999, -7}, "1", chars_format::fixed, 0);
+    test_value(T{9999999, -7}, "0.9999999", chars_format::fixed);
 
     test_value(T{9999999, -7}, "1", chars_format::general, 6);
     test_value(T{9999999, -7}, "1", chars_format::general, 5);
@@ -879,7 +906,96 @@ void test_nines()
     test_value(T{9999999, -7}, "1.00e+00", chars_format::scientific, 2);
     test_value(T{9999999, -7}, "1.0e+00", chars_format::scientific, 1);
     test_value(T{9999999, -7}, "1e+00", chars_format::scientific, 0);
+    test_value(T{9999999, -7}, "9.999999e-01", chars_format::scientific);
 }
+
+#if defined(__cpp_consteval) && __cpp_consteval >= 201811L
+
+#define BOOST_DECIMAL_CONSTEVAL_TEST
+
+template <typename T>
+consteval int test_immediate_value(T val, const char* result, chars_format fmt, int precision)
+{
+    char buffer[256] {};
+    auto r = to_chars(buffer, buffer + sizeof(buffer), val, fmt, precision);
+    *r.ptr = '\0';
+
+    if (!r)
+    {
+        return 1;
+    }
+
+    auto buffer_ptr = buffer;
+    while (buffer_ptr != r.ptr)
+    {
+        if (*result++ != *buffer_ptr++)
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+template <typename T>
+consteval int consteval_zero_test()
+{
+    constexpr T val {0, 0};
+
+    int errors {};
+
+    // General should always be the same
+    for (int precision = 0; precision < 50; ++precision)
+    {
+        errors += test_immediate_value(val, "0", chars_format::general, precision);
+    }
+
+    errors += test_immediate_value(val, "0e+00", chars_format::scientific, 0);
+    errors += test_immediate_value(val, "0.0e+00", chars_format::scientific, 1);
+    errors += test_immediate_value(val, "0.00e+00", chars_format::scientific, 2);
+    errors += test_immediate_value(val, "0.000e+00", chars_format::scientific, 3);
+    errors += test_immediate_value(val, "0.0000e+00", chars_format::scientific, 4);
+    errors += test_immediate_value(val, "0.00000e+00", chars_format::scientific, 5);
+    errors += test_immediate_value(val, "0.000000e+00", chars_format::scientific, 6);
+    errors += test_immediate_value(val, "0.0000000e+00", chars_format::scientific, 7);
+    errors += test_immediate_value(val, "0.00000000e+00", chars_format::scientific, 8);
+    errors += test_immediate_value(val, "0.000000000e+00", chars_format::scientific, 9);
+    errors += test_immediate_value(val, "0.0000000000e+00", chars_format::scientific, 10);
+    errors += test_immediate_value(val, "0.00000000000000000000000000000000000000000000000000e+00", chars_format::scientific, 50);
+
+    errors += test_immediate_value(val, "0p+00", chars_format::hex, 0);
+    errors += test_immediate_value(val, "0.0p+00", chars_format::hex, 1);
+    errors += test_immediate_value(val, "0.00p+00", chars_format::hex, 2);
+    errors += test_immediate_value(val, "0.000p+00", chars_format::hex, 3);
+    errors += test_immediate_value(val, "0.0000p+00", chars_format::hex, 4);
+    errors += test_immediate_value(val, "0.00000p+00", chars_format::hex, 5);
+    errors += test_immediate_value(val, "0.000000p+00", chars_format::hex, 6);
+    errors += test_immediate_value(val, "0.0000000p+00", chars_format::hex, 7);
+    errors += test_immediate_value(val, "0.00000000p+00", chars_format::hex, 8);
+    errors += test_immediate_value(val, "0.000000000p+00", chars_format::hex, 9);
+    errors += test_immediate_value(val, "0.0000000000p+00", chars_format::hex, 10);
+    errors += test_immediate_value(val, "0.00000000000000000000000000000000000000000000000000p+00", chars_format::hex, 50);
+
+    errors += test_immediate_value(val, "0", chars_format::fixed, 0);
+    errors += test_immediate_value(val, "0.0", chars_format::fixed, 1);
+    errors += test_immediate_value(val, "0.00", chars_format::fixed, 2);
+    errors += test_immediate_value(val, "0.000", chars_format::fixed, 3);
+    errors += test_immediate_value(val, "0.0000", chars_format::fixed, 4);
+    errors += test_immediate_value(val, "0.00000", chars_format::fixed, 5);
+    errors += test_immediate_value(val, "0.000000", chars_format::fixed, 6);
+    errors += test_immediate_value(val, "0.0000000", chars_format::fixed, 7);
+    errors += test_immediate_value(val, "0.00000000", chars_format::fixed, 8);
+    errors += test_immediate_value(val, "0.000000000", chars_format::fixed, 9);
+    errors += test_immediate_value(val, "0.0000000000", chars_format::fixed, 10);
+    errors += test_immediate_value(val, "0.00000000000000000000000000000000000000000000000000", chars_format::fixed, 50);
+
+    errors += test_immediate_value(val, "0", chars_format::fixed, 0);
+
+    return errors;
+}
+
+
+#endif
 
 int main()
 {
@@ -1033,6 +1149,18 @@ int main()
 
     test_nines<decimal32_t>();
     test_nines<decimal64_t>();
+
+    #ifdef BOOST_DECIMAL_CONSTEVAL_TEST
+
+    static_assert(consteval_zero_test<decimal32_t>() == 0);
+    static_assert(consteval_zero_test<decimal64_t>() == 0);
+    static_assert(consteval_zero_test<decimal128_t>() == 0);
+
+    static_assert(consteval_zero_test<decimal_fast32_t>() == 0);
+    static_assert(consteval_zero_test<decimal_fast64_t>() == 0);
+    static_assert(consteval_zero_test<decimal_fast128_t>() == 0);
+
+    #endif
 
     return boost::report_errors();
 }

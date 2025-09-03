@@ -13,7 +13,7 @@
 namespace boost {
 namespace decimal {
 
-template <typename DecimalType>
+BOOST_DECIMAL_EXPORT template <typename DecimalType>
 auto to_string(const DecimalType value)
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_decimal_floating_point_v, DecimalType, std::string)
 {

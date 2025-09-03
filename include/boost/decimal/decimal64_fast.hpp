@@ -74,6 +74,11 @@ private:
         return static_cast<biased_exponent_type>(exponent_) - detail::bias_v<decimal64_t>;
     }
 
+    constexpr auto to_components() const noexcept -> detail::decimal_fast64_t_components
+    {
+        return {full_significand(), biased_exponent(), isneg()};
+    }
+
     // Equality template between any integer type and decimal32_t
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE Decimal, BOOST_DECIMAL_INTEGRAL Integer>
     friend constexpr auto mixed_equality_impl(Decimal lhs, Integer rhs) noexcept
@@ -138,6 +143,15 @@ private:
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+    friend constexpr auto detail::to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt) noexcept -> to_chars_result;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+    friend constexpr auto detail::to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt) noexcept -> to_chars_result;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+    friend constexpr auto detail::to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value) noexcept -> to_chars_result;
 
 public:
     constexpr decimal_fast64_t() noexcept = default;
@@ -1332,7 +1346,7 @@ constexpr auto copysignd64f(decimal_fast64_t mag, const decimal_fast64_t sgn) no
 
 namespace std {
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 #ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal_fast64_t>
 #else

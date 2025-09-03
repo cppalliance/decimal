@@ -1513,8 +1513,10 @@ inline int128_t& int128_t::operator^=(const Integer rhs) noexcept
 // Left Shift Operator
 //=====================================
 
-template <BOOST_DECIMAL_DETAIL_INT128_DEFAULTED_INTEGER_CONCEPT>
-constexpr int128_t operator<<(const int128_t lhs, const Integer rhs) noexcept
+namespace detail {
+
+template <typename Integer>
+constexpr int128_t default_ls_impl(const int128_t lhs, const Integer rhs) noexcept
 {
     if (rhs < 0 || rhs >= 128)
     {
@@ -1544,6 +1546,107 @@ constexpr int128_t operator<<(const int128_t lhs, const Integer rhs) noexcept
         static_cast<std::int64_t>(high_part),
         lhs.low << rhs
     };
+}
+
+template <typename Integer>
+int128_t intrinsic_ls_impl(const int128_t lhs, const Integer rhs) noexcept
+{
+    if (BOOST_DECIMAL_DETAIL_INT128_UNLIKELY(rhs >= 128 || rhs < 0))
+    {
+        return {0, 0};
+    }
+
+    #ifdef BOOST_DECIMAL_DETAIL_INT128_HAS_INT128
+
+    #  if defined(__aarch64__)
+
+    #if defined(__GNUC__) && __GNUC__ >= 8
+    #  pragma GCC diagnostic push
+    #  pragma GCC diagnostic ignored "-Wclass-memaccess"
+    #endif
+
+    builtin_i128 value;
+    std::memcpy(&value, &lhs, sizeof(builtin_i128));
+    const auto res {value << rhs};
+
+    int128_t return_value;
+    std::memcpy(&return_value, &res, sizeof(int128_t));
+    return return_value;
+
+    #if defined(__GNUC__) && __GNUC__ >= 8
+    #  pragma GCC diagnostic pop
+    #endif
+
+    #  else
+
+    return static_cast<builtin_i128>(lhs) << rhs;
+
+    #  endif
+
+    #elif defined(_M_AMD64)
+
+    if (rhs >= 64)
+    {
+        return {static_cast<std::int64_t>(lhs.low << (rhs - 64)), 0};
+    }
+    else
+    {
+        int128_t res;
+        res.high = static_cast<std::int64_t>(__shiftleft128(lhs.low, static_cast<std::uint64_t>(lhs.high), static_cast<unsigned char>(rhs)));
+        res.low = lhs.low << rhs;
+
+        return res;
+    }
+
+    #else
+
+    if (BOOST_DECIMAL_DETAIL_INT128_UNLIKELY(rhs == 0))
+    {
+        return lhs;
+    }
+    if (rhs == 64)
+    {
+        return {static_cast<std::int64_t>(lhs.low), 0};
+    }
+
+    if (rhs > 64)
+    {
+        return {static_cast<std::int64_t>(lhs.low << (rhs - 64)), 0};
+    }
+
+    // For shifts < 64
+    const auto high_part = (static_cast<std::uint64_t>(lhs.high) << rhs) |
+                           (lhs.low >> (64 - rhs));
+
+    return {
+        static_cast<std::int64_t>(high_part),
+        lhs.low << rhs
+    };
+
+    #endif
+}
+
+} // namespace detail
+
+template <BOOST_DECIMAL_DETAIL_INT128_DEFAULTED_INTEGER_CONCEPT>
+constexpr int128_t operator<<(const int128_t lhs, const Integer rhs) noexcept
+{
+    #ifndef BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION
+
+    if (BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return detail::default_ls_impl(lhs, rhs); // LCOV_EXCL_LINE
+    }
+    else
+    {
+        return detail::intrinsic_ls_impl(lhs, rhs);
+    }
+
+    #else
+
+    return detail::default_ls_impl(lhs, rhs);
+
+    #endif
 }
 
 template <typename Integer, std::enable_if_t<detail::is_any_integer_v<Integer> && (sizeof(Integer) * 8 > 16), bool> = true>
@@ -1626,10 +1729,12 @@ inline int128_t& int128_t::operator<<=(const Integer rhs) noexcept
 // Right Shift Operator
 //=====================================
 
-template <BOOST_DECIMAL_DETAIL_INT128_DEFAULTED_INTEGER_CONCEPT>
-constexpr int128_t operator>>(const int128_t lhs, const Integer rhs) noexcept
+namespace detail {
+
+template <typename Integer>
+constexpr int128_t default_rs_impl(const int128_t lhs, const Integer rhs) noexcept
 {
-    if (rhs < 0 || rhs >= 128)
+    if (rhs >= 128 || rhs < 0 )
     {
         return lhs.high < 0 ? int128_t{-1, UINT64_MAX} : int128_t{0, 0};
     }
@@ -1639,12 +1744,7 @@ constexpr int128_t operator>>(const int128_t lhs, const Integer rhs) noexcept
         return lhs;
     }
 
-    if (rhs == 64)
-    {
-        return {lhs.high < 0 ? -1 : 0, static_cast<std::uint64_t>(lhs.high)};
-    }
-
-    if (rhs > 64)
+    if (rhs >= 64)
     {
         return {lhs.high < 0 ? -1 : 0, static_cast<std::uint64_t>(lhs.high >> (rhs - 64))};
     }
@@ -1658,6 +1758,104 @@ constexpr int128_t operator>>(const int128_t lhs, const Integer rhs) noexcept
         lhs.high >> rhs,
         low_part
     };
+}
+
+template <typename Integer>
+int128_t intrinsic_rs_impl(const int128_t lhs, const Integer rhs) noexcept
+{
+    if (BOOST_DECIMAL_DETAIL_INT128_UNLIKELY(rhs >= 128 || rhs < 0))
+    {
+        return {0, 0};
+    }
+
+    #ifdef BOOST_DECIMAL_DETAIL_INT128_HAS_INT128
+
+    #  if defined(__aarch64__)
+
+    #if defined(__GNUC__) && __GNUC__ >= 8
+    #  pragma GCC diagnostic push
+    #  pragma GCC diagnostic ignored "-Wclass-memaccess"
+    #endif
+
+    builtin_i128 value;
+    std::memcpy(&value, &lhs, sizeof(builtin_i128));
+    const auto res {value >> rhs};
+
+    int128_t return_value;
+    std::memcpy(&return_value, &res, sizeof(int128_t));
+    return return_value;
+
+    #if defined(__GNUC__) && __GNUC__ >= 8
+    #  pragma GCC diagnostic pop
+    #endif
+
+    #  else
+
+    return static_cast<builtin_i128>(lhs) >> rhs;
+
+    #  endif
+
+    #elif defined(_M_AMD64)
+
+    if (rhs >= 64)
+    {
+        return {lhs.high < 0 ? -1 : 0, static_cast<std::uint64_t>(lhs.high >> (rhs - 64))};
+    }
+    else
+    {
+        int128_t res;
+        res.low = __shiftright128(lhs.low, static_cast<std::uint64_t>(lhs.high), static_cast<unsigned char>(rhs));
+        res.high = lhs.high >> rhs;
+
+        return res;
+    }
+
+    #else
+
+    if (BOOST_DECIMAL_DETAIL_INT128_UNLIKELY(rhs == 0))
+    {
+        return lhs;
+    }
+
+    if (rhs >= 64)
+    {
+        return {lhs.high < 0 ? -1 : 0, static_cast<std::uint64_t>(lhs.high >> (rhs - 64))};
+    }
+
+    // For shifts < 64
+    const auto high_to_low {static_cast<std::uint64_t>(lhs.high) << (64 - rhs)};
+    const auto low_shifted {lhs.low >> rhs};
+    const auto low_part {high_to_low | low_shifted};
+
+    return {
+        lhs.high >> rhs,
+        low_part
+    };
+
+    #endif
+}
+
+} // namespace detail
+
+template <BOOST_DECIMAL_DETAIL_INT128_DEFAULTED_INTEGER_CONCEPT>
+constexpr int128_t operator>>(const int128_t lhs, const Integer rhs) noexcept
+{
+    #ifndef BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION
+
+    if (BOOST_DECIMAL_DETAIL_INT128_IS_CONSTANT_EVALUATED(lhs))
+    {
+        return detail::default_rs_impl(lhs, rhs); // LCOV_EXCL_LINE
+    }
+    else
+    {
+        return detail::intrinsic_rs_impl(lhs, rhs);
+    }
+
+    #else
+
+    return detail::default_rs_impl(lhs, rhs);
+
+    #endif
 }
 
 template <typename Integer, std::enable_if_t<detail::is_any_integer_v<Integer> && (sizeof(Integer) * 8 > 16), bool> = true>
@@ -1802,7 +2000,11 @@ BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr int128_t library_add(const in
 
 BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr int128_t default_add(const int128_t lhs, const int128_t rhs) noexcept
 {
-    #ifdef BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN_ADD_OVERFLOW
+    #if (defined(__x86_64__) || (defined(__aarch64__) && !defined(__APPLE__))) && !defined(_WIN32) && defined(BOOST_DECIMAL_DETAIL_INT128_HAS_INT128)
+
+    return static_cast<int128_t>(static_cast<detail::builtin_i128>(lhs) + static_cast<detail::builtin_i128>(rhs));
+
+    #elif defined(BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN_ADD_OVERFLOW)
 
     std::uint64_t result_low {};
     std::uint64_t result_high {};
@@ -1810,10 +2012,6 @@ BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr int128_t default_add(const in
     result_high = static_cast<std::uint64_t>(lhs.high) + static_cast<std::uint64_t>(rhs.high) + __builtin_add_overflow(lhs.low, rhs.low, &result_low);
 
     return int128_t{static_cast<std::int64_t>(result_high), result_low};
-
-    #elif defined(__x86_64__) && !defined(_WIN32) && defined(BOOST_DECIMAL_DETAIL_INT128_HAS_INT128)
-
-    return static_cast<detail::builtin_i128>(lhs) + static_cast<detail::builtin_i128>(rhs);
 
     #elif defined(__aarch64__) && !defined(__APPLE__) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION) && defined(__GNUC__) && defined(BOOST_DECIMAL_DETAIL_INT128_HAS_INT128)
 
@@ -1883,13 +2081,17 @@ BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr int128_t library_sub(const in
 
 BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr int128_t default_sub(const int128_t lhs, const int128_t rhs) noexcept
 {
-    #if defined(BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN_SUB_OVERFLOW)
+    #if defined(BOOST_DECIMAL_DETAIL_INT128_HAS_BUILTIN_SUB_OVERFLOW) && (!defined(__aarch64__) || defined(__APPLE__) || !defined(BOOST_DECIMAL_DETAIL_INT128_HAS_INT128))
 
     // __builtin_sub_overflow is marked constexpr so we don't need if consteval handling
     std::uint64_t result_low {};
     const auto result_high {static_cast<std::uint64_t>(lhs.high) - static_cast<std::uint64_t>(rhs.high) - static_cast<std::uint64_t>(__builtin_sub_overflow(lhs.low, rhs.low, &result_low))};
 
     return int128_t{static_cast<std::int64_t>(result_high), result_low};
+
+    #elif defined(__aarch64__) && !defined(__APPLE__) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION)
+
+    return static_cast<int128_t>(static_cast<detail::builtin_i128>(lhs) - static_cast<detail::builtin_i128>(rhs));
 
     #elif defined(_M_AMD64) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION)
 
@@ -2261,7 +2463,7 @@ BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE int128_t msvc_amd64_mul(const int128_t 
 
 BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr int128_t default_mul(const int128_t lhs, const int128_t rhs) noexcept
 {
-    #if (defined(__aarch64__) || defined(__x86_64__) || defined(__PPC__) || defined(__powerpc__)) && defined(__GNUC__) && !defined(__clang__) && defined(BOOST_DECIMAL_DETAIL_INT128_HAS_INT128)
+    #if ((defined(__aarch64__) && defined(__APPLE__)) || defined(__x86_64__) || defined(__PPC__) || defined(__powerpc__)) && defined(__GNUC__) && !defined(__clang__) && defined(BOOST_DECIMAL_DETAIL_INT128_HAS_INT128)
 
     #  if !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION)
 
@@ -2299,6 +2501,10 @@ BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr int128_t default_mul(const in
     return library_mul(lhs, rhs);
 
     #  endif
+
+    #elif defined(__aarch64__) && defined(BOOST_DECIMAL_DETAIL_INT128_HAS_INT128)
+
+    return static_cast<int128_t>(static_cast<detail::builtin_i128>(lhs) * static_cast<detail::builtin_i128>(rhs));
 
     #elif defined(_M_AMD64) && !defined(__GNUC__) && !defined(BOOST_DECIMAL_DETAIL_INT128_NO_CONSTEVAL_DETECTION)
 

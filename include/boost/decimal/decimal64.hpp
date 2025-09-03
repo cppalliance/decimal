@@ -41,6 +41,8 @@
 #include <boost/decimal/detail/promote_significand.hpp>
 #include <boost/decimal/detail/components.hpp>
 #include <boost/decimal/detail/cmath/next.hpp>
+#include <boost/decimal/detail/chars_format.hpp>
+#include <boost/decimal/detail/to_chars_result.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -88,6 +90,16 @@ BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_biggest_no_combination_signif
 
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_max_biased_exponent = UINT64_C(767);
 BOOST_DECIMAL_CONSTEXPR_VARIABLE std::uint64_t d64_max_significand_value = UINT64_C(9'999'999'999'999'999);
+
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+constexpr auto to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt) noexcept -> to_chars_result;
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+constexpr auto to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt) noexcept -> to_chars_result;
+
+template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+constexpr auto to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value) noexcept -> to_chars_result;
 
 } //namespace detail
 
@@ -195,6 +207,15 @@ private:
 
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE DecimalType>
     friend constexpr auto detail::nextafter_impl(DecimalType val, bool direction) noexcept -> DecimalType;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+    friend constexpr auto detail::to_chars_scientific_impl(char* first, char* last, const TargetDecimalType& value, chars_format fmt) noexcept -> to_chars_result;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+    friend constexpr auto detail::to_chars_fixed_impl(char* first, char* last, const TargetDecimalType& value, const chars_format fmt) noexcept -> to_chars_result;
+
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE TargetDecimalType>
+    friend constexpr auto detail::to_chars_hex_impl(char* first, char* last, const TargetDecimalType& value) noexcept -> to_chars_result;
 
 public:
     // 3.2.3.1 construct/copy/destroy
@@ -1994,7 +2015,7 @@ constexpr auto copysignd64(decimal64_t mag, const decimal64_t sgn) noexcept -> d
 
 namespace std {
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 #ifdef _MSC_VER
 class numeric_limits<boost::decimal::decimal64_t>
 #else

@@ -32,7 +32,7 @@
 #include <boost/decimal/decimal_fast128_t.hpp>
 #include <boost/decimal/cmath.hpp>
 #include <boost/decimal/cstdlib.hpp>
-#include <boost/decimal/fenv.hpp>
+#include <boost/decimal/cfenv.hpp>
 #include <boost/decimal/literals.hpp>
 #include <boost/decimal/hash.hpp>
 #include <boost/decimal/cfloat.hpp>
@@ -43,7 +43,10 @@
 #include <boost/decimal/bid_conversion.hpp>
 #include <boost/decimal/dpd_conversion.hpp>
 #include <boost/decimal/string.hpp>
+
+#ifndef BOOST_DECIMAL_BUILD_MODULE
 #include <boost/decimal/fmt_format.hpp>
+#endif
 
 #if defined(__clang__) && !defined(__GNUC__)
 #  pragma clang diagnostic pop

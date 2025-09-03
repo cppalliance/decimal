@@ -13,7 +13,7 @@
 Decimal is an implementation of IEEE-754:2008 decimal floating point numbers.
 See also [1].
 
-The library is is header-only, and requires C++14.
+The library is header-only, and requires C++14.
 It is compatible through C++14, 17, 20, 23 and beyond.
 
 # Notice
@@ -32,8 +32,10 @@ git clone https://github.com/cppalliance/decimal
 cd decimal
 mkdir build && cd build
 cmake .. OR cmake .. -DCMAKE_INSTALL_PREFIX=/your/custom/path
-cmake --install .
+cmake --build . --target install
 ```
+
+then you can use `find_package(boost_decimal REQUIRED)`
 
 ## vcpkg
 

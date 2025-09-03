@@ -20,7 +20,7 @@
 
 namespace std {
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 struct hash<boost::decimal::decimal32_t>
 {
     // Since the underlying type is a std::uint32_t, we will rely on its hash function from the STL
@@ -33,7 +33,7 @@ struct hash<boost::decimal::decimal32_t>
     }
 };
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 struct hash<boost::decimal::decimal64_t>
 {
     // Since the underlying type is a std::uint64_t, we will rely on its hash function from the STL
@@ -51,7 +51,7 @@ struct hash<boost::decimal::decimal64_t>
 #  pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 struct hash<boost::decimal::decimal128_t>
 {
     // Take the xor of the two words and hash that
@@ -68,7 +68,7 @@ struct hash<boost::decimal::decimal128_t>
 #  pragma GCC diagnostic pop
 #endif
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 struct hash<boost::decimal::decimal_fast32_t>
 {
     // Need to convert into decimal32_t then apply our memcpy
@@ -82,7 +82,7 @@ struct hash<boost::decimal::decimal_fast32_t>
     }
 };
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 struct hash<boost::decimal::decimal_fast64_t>
 {
     // Since the underlying type is a std::uint64_t, we will rely on its hash function from the STL
@@ -102,7 +102,7 @@ struct hash<boost::decimal::decimal_fast64_t>
 #  pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
 
-BOOST_DECIMAL_EXPORT template <>
+template <>
 struct hash<boost::decimal::decimal_fast128_t>
 {
     // Take the xor of the two words and hash that

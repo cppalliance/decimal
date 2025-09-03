@@ -728,6 +728,208 @@ jobs:
           cd ../boost-root/__build__
           ctest --output-on-failure --no-tests=error
 
+  posix-standalone-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+          - os: macos-13
+          - os: macos-14
+          - os: macos-15
+
+    runs-on: ${{matrix.os}}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure and Install
+        run: |
+          mkdir build && cd build
+          cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
+          cmake --build . --target install
+
+
+      - name: Test with find_package
+        run: |
+          export PKG_CONFIG_PATH=~/.local/lib/pkgconfig:$PKG_CONFIG_PATH
+          export CPATH=~/.local/include:$CPATH
+          
+          mkdir ~/standalone_test
+          cat > ~/standalone_test/CMakeLists.txt <<'EOF'
+          cmake_minimum_required(VERSION 3.10)
+          project(StandaloneTest)
+          
+          find_package(boost_decimal REQUIRED)
+          message(STATUS "boost_decimal found: ${boost_decimal_FOUND}")
+          
+          add_executable(main main.cpp)
+          target_link_libraries(main PRIVATE Boost::decimal)
+          EOF
+          
+          cat > ~/standalone_test/main.cpp <<'EOF'
+          #include <boost/decimal.hpp>
+          #include <iostream>
+          int main() {
+              using namespace boost::decimal;
+              decimal32_t d{456};
+              std::cout << "Value: " << d << "\n";
+              return 0;
+          }
+          EOF
+          
+          cd ~/standalone_test
+          mkdir build && cd build
+          cmake -DCMAKE_INSTALL_PREFIX=~/.local -DCMAKE_PREFIX_PATH=~/.local ..
+          cmake --build .
+
+  posix-cmake-find-package-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: sudo apt install pkg-config
+
+      - name: Setup Boost
+        run: |
+          echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
+          LIBRARY=${GITHUB_REPOSITORY#*/}
+          echo LIBRARY: $LIBRARY
+          echo "LIBRARY=$LIBRARY" >> $GITHUB_ENV
+          echo GITHUB_BASE_REF: $GITHUB_BASE_REF
+          echo GITHUB_REF: $GITHUB_REF
+          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
+          REF=${REF#refs/heads/}
+          echo REF: $REF
+          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
+          echo BOOST_BRANCH: $BOOST_BRANCH
+          cd ..
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          cd boost-root
+          mkdir -p libs/$LIBRARY
+          cp -r $GITHUB_WORKSPACE/* libs/$LIBRARY
+          git submodule update --init tools/boostdep
+          python tools/boostdep/depinst/depinst.py --git_args "--jobs 3" $LIBRARY
+
+      - name: Configure and Install
+        run: |
+          cd ../boost-root
+          mkdir __build_install__ && cd __build_install__
+          cmake -DBOOST_INCLUDE_LIBRARIES=$LIBRARY -DCMAKE_INSTALL_PREFIX=~/.local ..
+          cmake --build . --target install
+
+      - name: Create test project
+        run: |
+          export PKG_CONFIG_PATH=~/.local/lib/pkgconfig:$PKG_CONFIG_PATH
+          export CPATH=~/.local/include:$CPATH
+      
+          echo "Cflags: $(pkg-config --cflags boost_decimal)"
+          echo "Libs: $(pkg-config --libs boost_decimal)"
+      
+          mkdir -p ~/test_project
+          cat > ~/test_project/CMakeLists.txt <<'EOF'
+          cmake_minimum_required(VERSION 3.8)
+          project(TestFindPackage)
+  
+          find_package(boost_decimal REQUIRED)
+  
+          add_executable(test_main main.cpp)
+          target_link_libraries(test_main PRIVATE Boost::decimal)
+          EOF
+  
+          cat > ~/test_project/main.cpp <<'EOF'
+          #include <boost/decimal.hpp>
+          #include <iostream>
+          int main() {
+              using namespace boost::decimal;
+              decimal32_t d{42};
+              std::cout << "Value: " << d << "\n";
+              return 0;
+          }
+          EOF
+
+      - name: Test find_package
+        run: |
+          cd ~/test_project
+          mkdir build && cd build
+          cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
+          cmake --build .
+
+  posix-pkg-config-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: sudo apt install pkg-config
+
+      - name: Setup Boost
+        run: |
+          echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
+          LIBRARY=${GITHUB_REPOSITORY#*/}
+          echo LIBRARY: $LIBRARY
+          echo "LIBRARY=$LIBRARY" >> $GITHUB_ENV
+          echo GITHUB_BASE_REF: $GITHUB_BASE_REF
+          echo GITHUB_REF: $GITHUB_REF
+          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
+          REF=${REF#refs/heads/}
+          echo REF: $REF
+          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
+          echo BOOST_BRANCH: $BOOST_BRANCH
+          cd ..
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          cd boost-root
+          mkdir -p libs/$LIBRARY
+          cp -r $GITHUB_WORKSPACE/* libs/$LIBRARY
+          git submodule update --init tools/boostdep
+          python tools/boostdep/depinst/depinst.py --git_args "--jobs 3" $LIBRARY
+
+      - name: Configure and Install
+        run: |
+          cd ../boost-root
+          mkdir __build_install__ && cd __build_install__
+          cmake -DBOOST_INCLUDE_LIBRARIES=$LIBRARY -DCMAKE_INSTALL_PREFIX=~/.local ..
+          cmake --build . --target install
+
+      - name: Test pkg-config
+        run: |
+          export PKG_CONFIG_PATH=~/.local/lib/pkgconfig:$PKG_CONFIG_PATH
+          export CPATH=~/.local/include:$CPATH
+          
+          echo "Cflags: $(pkg-config --cflags boost_decimal)"
+          echo "Libs: $(pkg-config --libs boost_decimal)"
+  
+          mkdir -p ~/pkgconfig_test
+          cat > ~/pkgconfig_test/main.cpp <<'EOF'
+          #include <boost/decimal.hpp>
+          #include <iostream>
+          int main() {
+              using namespace boost::decimal;
+              decimal32_t d{123};
+              std::cout << "Value: " << d << "\n";
+              return 0;
+          }
+          EOF
+  
+          cd ~/pkgconfig_test
+          g++ main.cpp $(pkg-config --cflags --libs boost_decimal) -o test_pkgconfig
+          ./test_pkgconfig
+
   MSYS2:
     defaults:
       run:
