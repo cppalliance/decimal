@@ -10,9 +10,9 @@ using namespace boost::decimal;
 
 void test_environment()
 {
-    BOOST_TEST(boost::decimal::fegetround() == boost::decimal::rounding_mode::fe_dec_to_nearest_from_zero);
-    BOOST_TEST(boost::decimal::fesetround(boost::decimal::rounding_mode::fe_dec_to_nearest) == boost::decimal::rounding_mode::fe_dec_to_nearest);
     BOOST_TEST(boost::decimal::fegetround() == boost::decimal::rounding_mode::fe_dec_to_nearest);
+    BOOST_TEST(boost::decimal::fesetround(boost::decimal::rounding_mode::fe_dec_to_nearest_from_zero) == boost::decimal::rounding_mode::fe_dec_to_nearest_from_zero);
+    BOOST_TEST(boost::decimal::fegetround() == boost::decimal::rounding_mode::fe_dec_to_nearest_from_zero);
     BOOST_TEST(boost::decimal::fesetround(boost::decimal::rounding_mode::fe_dec_downward) == boost::decimal::rounding_mode::fe_dec_downward);
     BOOST_TEST(boost::decimal::fegetround() == boost::decimal::rounding_mode::fe_dec_downward);
     BOOST_TEST(boost::decimal::fesetround(boost::decimal::rounding_mode::fe_dec_upward) == boost::decimal::rounding_mode::fe_dec_upward);
