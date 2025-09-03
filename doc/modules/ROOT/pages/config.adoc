@@ -46,7 +46,7 @@ Again, it must be defined before inclusion of decimal headers like so:
 #include <boost/decimal.hpp>
 ----
 
-- `BOOST_DECIMAL_DEC_EVAL_METHOD`: See <cfloat> section for explanation
+- `BOOST_DECIMAL_DEC_EVAL_METHOD`: See xref:cfloat.adoc[`<cfloat>`] section for explanation
 
 [#configuration_automatic]
 == Automatic Configuration Macros
