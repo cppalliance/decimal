@@ -564,8 +564,6 @@ public:
     friend constexpr auto fmad128(decimal128_t x, decimal128_t y, decimal128_t z) noexcept -> decimal128_t;
 };
 
-BOOST_DECIMAL_EXPORT using decimal128 [[deprecated("Use re-named type decimal128_t instead of decimal128")]] = decimal128_t;
-
 #if !defined(BOOST_DECIMAL_DISABLE_IOSTREAM)
 inline std::string bit_string(decimal128_t rhs) noexcept
 {

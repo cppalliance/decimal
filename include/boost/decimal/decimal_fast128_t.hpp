@@ -383,8 +383,6 @@ public:
     friend constexpr auto quantized128f(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t;
 };
 
-BOOST_DECIMAL_EXPORT using decimal128_fast [[deprecated("Use re-named type decimal_fast128_t instead of decimal128_fast")]] = decimal_fast128_t;
-
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 #else

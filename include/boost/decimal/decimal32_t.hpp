@@ -583,8 +583,6 @@ private:
     constexpr auto edit_sign(bool sign) noexcept -> void;
 };
 
-BOOST_DECIMAL_EXPORT using decimal32 [[deprecated("Use the renamed decimal32_t instead of decimal32")]] = decimal32_t;
-
 #if defined(__GNUC__) && __GNUC__ >= 8
 #  pragma GCC diagnostic pop
 #endif

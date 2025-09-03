@@ -572,8 +572,6 @@ public:
     friend constexpr auto scalblnd64(decimal64_t num, long exp) noexcept -> decimal64_t;
 };
 
-BOOST_DECIMAL_EXPORT using decimal64 [[deprecated("Use re-named type decimal64_t instead of decimal64")]] = decimal64_t;
-
 #if defined(__GNUC__) && __GNUC__ >= 8
 #  pragma GCC diagnostic pop
 #endif
