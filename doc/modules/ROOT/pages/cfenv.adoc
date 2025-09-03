@@ -24,7 +24,7 @@ IMPORTANT: The rounding mode can only be changed at runtime. All `constexpr` cal
 
 [source, c++]
 ----
-#include <boost/decimal/ccfenv.hpp>
+#include <boost/decimal/cfenv.hpp>
 
 namespace boost {
 namespace decimal {
@@ -46,3 +46,4 @@ rounding_mode fesetround(rounding_mode round) noexcept;
 } //namespace boost
 ----
 
+Prior to v5.2.0 this header was `<boost/decimal/fenv.hpp>`, but has been changed to `<boost/decimal/cfenv.hpp>` for consistency with the STL.
