@@ -26,7 +26,7 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
     val /= 10U;
     int exp_delta {1};
 
-    if (trailing_num > 5U || (trailing_num == 5U && val % 2U == 0U))
+    if (trailing_num > 5U || (trailing_num == 5U && sticky) || (trailing_num == 5U && !sticky && val % 2U == 1U))
     {
         ++val;
     }
@@ -43,7 +43,7 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
 #else
 
 template <typename TargetType = decimal32_t, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
-constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT(readability-function-cognitive-complexity)
+constexpr auto fenv_round(T& val, bool is_neg = false, bool sticky = false) noexcept -> int // NOLINT(readability-function-cognitive-complexity)
 {
     using significand_type = std::conditional_t<decimal_val_v<TargetType> >= 128, int128::uint128_t, std::int64_t>;
 
@@ -53,7 +53,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
         val /= 10U;
         int exp_delta {1};
 
-        if (trailing_num > 5U || (trailing_num == 5U && val % 2U == 0U))
+        if (trailing_num > 5U || (trailing_num == 5U && sticky) || (trailing_num == 5U && !sticky && val % 2U == 1U))
         {
             ++val;
         }
@@ -94,7 +94,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false) noexcept -> int // NOLINT
                 break;
             case rounding_mode::fe_dec_to_nearest:
                 // Round to even or nearest
-                if (trailing_num > 5U || (trailing_num == 5U && val % 2U == 0U))
+                if (trailing_num > 5U || (trailing_num == 5U && sticky) || (trailing_num == 5U && !sticky && val % 2U == 1U))
                 {
                     ++val;
                 }

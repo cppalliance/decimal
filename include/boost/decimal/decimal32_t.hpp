@@ -606,6 +606,42 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
 
     bits_ = sign ? detail::d32_sign_mask : UINT32_C(0);
 
+    bool sticky {false};
+    if (exp + detail::bias < 0)
+    {
+        const auto shift {-(exp + detail::bias)};
+        for (int i = 0; i < shift - 1; ++i)
+        {
+            int d = coeff % 10u;
+            if (d != 0)
+            {
+                sticky = true;
+            }
+            exp += 1;
+            coeff /= 10u;
+        }
+
+        int g_digit = coeff % 10u;
+        exp += 1;
+        coeff /= 10u;
+
+        if (g_digit > 5)
+        {
+            ++coeff;
+        }
+        if (g_digit == 5 && sticky)
+        {
+            ++coeff;
+        }
+        if (g_digit == 5 && !sticky)
+        {
+            if (coeff % 10u % 2u == 1u)
+            {
+                ++coeff;
+            }
+        }
+    }
+
     // If the coeff is not in range, make it so
     // Only count the number of digits if we absolutely have to
     int coeff_digits {-1};
@@ -622,6 +658,10 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
             #  pragma GCC diagnostic ignored "-Wconversion"
             #endif
 
+            if (coeff % detail::pow10(static_cast<T1>(digits_to_remove)) != 0u)
+            {
+                sticky = true;
+            }
             coeff /= detail::pow10(static_cast<T1>(digits_to_remove));
 
             #if defined(__GNUC__) && !defined(__clang__)
@@ -629,11 +669,11 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
             #endif
 
             coeff_digits -= digits_to_remove;
-            exp += static_cast<T2>(detail::fenv_round(coeff, sign)) + digits_to_remove;
+            exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky)) + digits_to_remove;
         }
         else
         {
-            exp += static_cast<T2>(detail::fenv_round(coeff, sign));
+            exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky));
         }
     }
 
