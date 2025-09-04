@@ -148,7 +148,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto find_sticky_bit(T1& coeff, T2& exp, co
     if (biased_exp < 0)
     {
         const auto shift {static_cast<unsigned>(-biased_exp)};
-        const auto shift_p10 {detail::pow10(shift)};
+        const auto shift_p10 {detail::pow10<T1>(shift)};
         const auto shift_p10_min_1 {shift_p10 / 10U};
 
         const auto q {coeff / shift_p10};
