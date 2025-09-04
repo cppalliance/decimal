@@ -160,7 +160,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto find_sticky_bit(T1& coeff, T2& exp, co
         coeff = q;
         exp += static_cast<int>(shift);
 
-        if (guard_digits > 5U || (guard_digits == 5U && (sticky || (coeff % 10U) & 1U)))
+        if (guard_digits > 5U || (guard_digits == 5U && (sticky || (static_cast<std::uint64_t>(coeff) & 1U))))
         {
             ++coeff;
         }
