@@ -23,6 +23,8 @@ int main()
     BOOST_TEST_EQ("2345678.50"_DF, "2345678"_DF);
     BOOST_TEST_EQ("2345678.51"_DF, "2345679"_DF);
 
+    BOOST_TEST_EQ(("0"_DF + "8.4e-96"_DF), "8.4e-96"_DF);
+
     return boost::report_errors();
 }
 
