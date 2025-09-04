@@ -613,8 +613,7 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
     {
         bool sticky {detail::find_sticky_bit(coeff, exp, detail::bias_v<decimal32_t>)};
 
-        // Since we know that the unsigned coeff is >= 10'000'000 we can use this information to traverse pruned trees
-        coeff_digits = detail::d32_constructor_num_digits(coeff);
+        coeff_digits = detail::num_digits(coeff);
         if (coeff_digits > detail::precision + 1)
         {
             const auto digits_to_remove {coeff_digits - (detail::precision + 1)};
