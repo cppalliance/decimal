@@ -604,22 +604,10 @@ template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 #else
 template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
 #endif
-constexpr decimal32_t::decimal32_t(T1 coeff_init, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)
+constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)
 {
     static_assert(detail::is_integral_v<T1>, "Coefficient must be an integer");
     static_assert(detail::is_integral_v<T2>, "Exponent must be an integer");
-
-    using unsigned_coeff_type = detail::make_unsigned_t<T1>;
-
-    unsigned_coeff_type coeff {};
-    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T1>)
-    {
-        coeff = static_cast<unsigned_coeff_type>(coeff_init < 0 ? -coeff_init : coeff_init);
-    }
-    else
-    {
-        coeff = static_cast<unsigned_coeff_type>(coeff_init);
-    }
 
     bits_ = sign ? detail::d32_sign_mask : UINT32_C(0);
 
@@ -691,8 +679,8 @@ constexpr decimal32_t::decimal32_t(T1 coeff_init, T2 exp, bool sign) noexcept //
     }
 
     // If the exponent fits we do not need to use the combination field
-    const auto biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
-    if (biased_exp <= detail::d32_max_biased_exponent)
+    const auto biased_exp {static_cast<std::int32_t>(exp + detail::bias)};
+    if (BOOST_DECIMAL_LIKELY(biased_exp > 0) && biased_exp <= detail::d32_max_biased_exponent)
     {
         if (big_combination)
         {
