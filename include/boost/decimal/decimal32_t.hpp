@@ -630,9 +630,11 @@ constexpr decimal32_t::decimal32_t(T1 coeff_init, T2 exp, bool sign) noexcept //
     {
         bool sticky {detail::find_sticky_bit(coeff, exp, detail::bias_v<decimal32_t>)};
 
-        coeff_digits = detail::num_digits(coeff);
-        if (coeff_digits > detail::precision + 1)
+        if (!sticky)
         {
+            coeff_digits = detail::num_digits(coeff);
+            if (coeff_digits > detail::precision + 1)
+            {
                 const auto digits_to_remove {coeff_digits - (detail::precision + 1)};
 
                 #if defined(__GNUC__) && !defined(__clang__)
@@ -650,11 +652,18 @@ constexpr decimal32_t::decimal32_t(T1 coeff_init, T2 exp, bool sign) noexcept //
                 #  pragma GCC diagnostic pop
                 #endif
 
-            coeff_digits -= digits_to_remove;
-            exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky)) + digits_to_remove;
+                coeff_digits -= digits_to_remove;
+                exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky)) + digits_to_remove;
+            }
+            else
+            {
+                exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky));
+            }
         }
         else
         {
+            // This should already be handled in find_sticky_bit
+            BOOST_DECIMAL_ASSERT((coeff >= 1'000'000U && coeff <= 9'999'999U) || coeff == 0U);
             exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky));
         }
     }
