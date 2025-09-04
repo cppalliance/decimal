@@ -154,7 +154,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto find_sticky_bit(T1& coeff, T2& exp, co
         const auto q {coeff / shift_p10};
         const auto rem {coeff % shift_p10};
 
-        sticky = (rem != 0);
+        sticky = (rem != 0U);
 
         coeff = q;
         exp += static_cast<int>(shift);
