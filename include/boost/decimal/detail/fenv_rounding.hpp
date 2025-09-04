@@ -9,6 +9,7 @@
 #include <boost/decimal/detail/attributes.hpp>
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/config.hpp>
+#include <boost/decimal/detail/power_tables.hpp>
 
 namespace boost {
 namespace decimal {
@@ -126,40 +127,42 @@ template <typename T1, typename T2>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto find_sticky_bit(T1& coeff, T2& exp, const int exp_bias) noexcept
 {
     bool sticky {false};
+
+    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+    if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
+    {
+        // If we are in a rounding mode that does not depend on the sticky bit opt out early
+        // Unlikely that the user sets the global rounding mode anyway
+        if (BOOST_DECIMAL_UNLIKELY(_boost_decimal_global_rounding_mode == rounding_mode::fe_dec_to_nearest_from_zero ||
+                                   _boost_decimal_global_rounding_mode == rounding_mode::fe_dec_toward_zero))
+        {
+            return sticky;
+        }
+    }
+
+    #endif
+
     const auto biased_exp {exp + exp_bias};
 
     if (biased_exp < 0)
     {
-        const auto shift {-biased_exp};
-        for (int i = 0; i < shift - 1; ++i)
-        {
-            int d = coeff % 10u;
-            if (d != 0)
-            {
-                sticky = true;
-            }
-            exp += 1;
-            coeff /= 10u;
-        }
+        const auto shift {static_cast<unsigned>(-biased_exp)};
+        const auto shift_p10 {detail::pow10(shift)};
+        const auto shift_p10_min_1 {shift_p10 / 10U};
 
-        int g_digit = coeff % 10u;
-        exp += 1;
-        coeff /= 10u;
+        const auto q {coeff / shift_p10};
+        const auto rem {coeff % shift_p10};
 
-        if (g_digit > 5)
+        auto guard_digits {rem / shift_p10_min_1};
+        sticky = (rem % shift_p10) != 0U;
+
+        coeff = q;
+        exp += static_cast<int>(shift);
+
+        if (guard_digits > 5U || (guard_digits == 5U && (sticky || (coeff % 10U) & 1U)))
         {
             ++coeff;
-        }
-        if (g_digit == 5 && sticky)
-        {
-            ++coeff;
-        }
-        if (g_digit == 5 && !sticky)
-        {
-            if (coeff % 10u % 2u == 1u)
-            {
-                ++coeff;
-            }
         }
     }
 
