@@ -614,44 +614,35 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
     // If the coeff is not in range, make it so
     // Only count the number of digits if we absolutely have to
     int coeff_digits {-1};
-    if (coeff > detail::d32_max_significand_value)
+    if (coeff > detail::d32_max_significand_value || (exp + detail::bias < 0))
     {
         bool sticky_bit {detail::find_sticky_bit(coeff, exp, detail::bias_v<decimal32_t>)};
 
-        if (!sticky_bit)
+        coeff_digits = detail::num_digits(coeff);
+        if (coeff_digits > detail::precision + 1)
         {
-            coeff_digits = detail::num_digits(coeff);
-            if (coeff_digits > detail::precision + 1)
+            const auto digits_to_remove {coeff_digits - (detail::precision + 1)};
+
+            #if defined(__GNUC__) && !defined(__clang__)
+            #  pragma GCC diagnostic push
+            #  pragma GCC diagnostic ignored "-Wconversion"
+            #endif
+
+            if (coeff % detail::pow10(static_cast<T1>(digits_to_remove)) != 0u)
             {
-                const auto digits_to_remove {coeff_digits - (detail::precision + 1)};
-
-                #if defined(__GNUC__) && !defined(__clang__)
-                #  pragma GCC diagnostic push
-                #  pragma GCC diagnostic ignored "-Wconversion"
-                #endif
-
-                if (coeff % detail::pow10(static_cast<T1>(digits_to_remove)) != 0u)
-                {
-                    sticky_bit = true;
-                }
-                coeff /= detail::pow10(static_cast<T1>(digits_to_remove));
-
-                #if defined(__GNUC__) && !defined(__clang__)
-                #  pragma GCC diagnostic pop
-                #endif
-
-                coeff_digits -= digits_to_remove;
-                exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky_bit)) + digits_to_remove;
+                sticky_bit = true;
             }
-            else
-            {
-                exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky_bit));
-            }
+            coeff /= detail::pow10(static_cast<T1>(digits_to_remove));
+
+            #if defined(__GNUC__) && !defined(__clang__)
+            #  pragma GCC diagnostic pop
+            #endif
+
+            coeff_digits -= digits_to_remove;
+            exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky_bit)) + digits_to_remove;
         }
         else
         {
-            // This should already be handled in find_sticky_bit
-            BOOST_DECIMAL_ASSERT((coeff >= 1'000'000U && coeff <= 9'999'999U) || coeff == 0U);
             exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky_bit));
         }
     }

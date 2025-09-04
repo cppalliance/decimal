@@ -147,24 +147,17 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto find_sticky_bit(T1& coeff, T2& exp, co
 
     if (biased_exp < 0)
     {
-        const auto shift {static_cast<unsigned>(-biased_exp)};
+        const auto shift {static_cast<unsigned>(-biased_exp) - 1};
         const auto shift_p10 {detail::pow10<T1>(shift)};
-        const auto shift_p10_min_1 {shift_p10 / 10U};
 
         // TODO(mborland): in the uint128_t case we should expose a div_mod since the mod is already available
         const auto q {coeff / shift_p10};
         const auto rem {coeff % shift_p10};
 
-        auto guard_digits {rem / shift_p10_min_1};
-        sticky = (rem % shift_p10) != 0U;
+        sticky = (rem != 0);
 
         coeff = q;
         exp += static_cast<int>(shift);
-
-        if (guard_digits > 5U || (guard_digits == 5U && (sticky || (static_cast<std::uint64_t>(coeff) & 1U))))
-        {
-            ++coeff;
-        }
     }
 
     return sticky;
