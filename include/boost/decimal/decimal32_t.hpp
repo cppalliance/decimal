@@ -606,47 +606,13 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
 
     bits_ = sign ? detail::d32_sign_mask : UINT32_C(0);
 
-    bool sticky {false};
-    if (exp + detail::bias < 0)
-    {
-        const auto shift {-(exp + detail::bias)};
-        for (int i = 0; i < shift - 1; ++i)
-        {
-            int d = coeff % 10u;
-            if (d != 0)
-            {
-                sticky = true;
-            }
-            exp += 1;
-            coeff /= 10u;
-        }
-
-        int g_digit = coeff % 10u;
-        exp += 1;
-        coeff /= 10u;
-
-        if (g_digit > 5)
-        {
-            ++coeff;
-        }
-        if (g_digit == 5 && sticky)
-        {
-            ++coeff;
-        }
-        if (g_digit == 5 && !sticky)
-        {
-            if (coeff % 10u % 2u == 1u)
-            {
-                ++coeff;
-            }
-        }
-    }
-
     // If the coeff is not in range, make it so
     // Only count the number of digits if we absolutely have to
     int coeff_digits {-1};
     if (coeff > detail::d32_max_significand_value)
     {
+        bool sticky {detail::find_sticky_bit(coeff, exp, detail::bias_v<decimal32_t>)};
+
         // Since we know that the unsigned coeff is >= 10'000'000 we can use this information to traverse pruned trees
         coeff_digits = detail::d32_constructor_num_digits(coeff);
         if (coeff_digits > detail::precision + 1)

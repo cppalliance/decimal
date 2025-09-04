@@ -122,6 +122,50 @@ constexpr auto fenv_round(T& val, bool is_neg = false, bool sticky = false) noex
 
 #endif
 
+template <typename T1, typename T2>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto find_sticky_bit(T1& coeff, T2& exp, const int exp_bias) noexcept
+{
+    bool sticky {false};
+    const auto biased_exp {exp + exp_bias};
+
+    if (biased_exp < 0)
+    {
+        const auto shift {-biased_exp};
+        for (int i = 0; i < shift - 1; ++i)
+        {
+            int d = coeff % 10u;
+            if (d != 0)
+            {
+                sticky = true;
+            }
+            exp += 1;
+            coeff /= 10u;
+        }
+
+        int g_digit = coeff % 10u;
+        exp += 1;
+        coeff /= 10u;
+
+        if (g_digit > 5)
+        {
+            ++coeff;
+        }
+        if (g_digit == 5 && sticky)
+        {
+            ++coeff;
+        }
+        if (g_digit == 5 && !sticky)
+        {
+            if (coeff % 10u % 2u == 1u)
+            {
+                ++coeff;
+            }
+        }
+    }
+
+    return sticky;
+}
+
 } // namespace detail
 } // namespace decimal
 } // namespace boost
