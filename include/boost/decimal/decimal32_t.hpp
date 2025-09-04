@@ -628,9 +628,9 @@ constexpr decimal32_t::decimal32_t(T1 coeff_init, T2 exp, bool sign) noexcept //
     int coeff_digits {-1};
     if (coeff > detail::d32_max_significand_value)
     {
-        bool sticky {detail::find_sticky_bit(coeff, exp, detail::bias_v<decimal32_t>)};
+        bool sticky_bit {detail::find_sticky_bit(coeff, exp, detail::bias_v<decimal32_t>)};
 
-        if (!sticky)
+        if (!sticky_bit)
         {
             coeff_digits = detail::num_digits(coeff);
             if (coeff_digits > detail::precision + 1)
@@ -644,7 +644,7 @@ constexpr decimal32_t::decimal32_t(T1 coeff_init, T2 exp, bool sign) noexcept //
 
                 if (coeff % detail::pow10(static_cast<T1>(digits_to_remove)) != 0u)
                 {
-                    sticky = true;
+                    sticky_bit = true;
                 }
                 coeff /= detail::pow10(static_cast<T1>(digits_to_remove));
 
@@ -653,18 +653,18 @@ constexpr decimal32_t::decimal32_t(T1 coeff_init, T2 exp, bool sign) noexcept //
                 #endif
 
                 coeff_digits -= digits_to_remove;
-                exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky)) + digits_to_remove;
+                exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky_bit)) + digits_to_remove;
             }
             else
             {
-                exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky));
+                exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky_bit));
             }
         }
         else
         {
             // This should already be handled in find_sticky_bit
             BOOST_DECIMAL_ASSERT((coeff >= 1'000'000U && coeff <= 9'999'999U) || coeff == 0U);
-            exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky));
+            exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky_bit));
         }
     }
 
