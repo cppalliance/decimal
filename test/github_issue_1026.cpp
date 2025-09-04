@@ -27,6 +27,12 @@ int main()
     BOOST_TEST_EQ(("0"_DF + std::numeric_limits<decimal32_t>::denorm_min()), std::numeric_limits<decimal32_t>::denorm_min());
     BOOST_TEST_EQ((std::numeric_limits<decimal32_t>::denorm_min() + std::numeric_limits<decimal32_t>::denorm_min()), 2*std::numeric_limits<decimal32_t>::denorm_min());
 
+    BOOST_TEST_EQ("0"_DF + "8.4e-100"_DF, "8.4e-100"_DF);
+    BOOST_TEST_EQ("1"_DF * "1e-101"_DF, "1e-101"_DF);
+    BOOST_TEST_EQ("1e-101"_DF / "1"_DF, "1e-101"_DF);
+
+    BOOST_TEST_EQ("5.24289e-96"_DF / "1"_DF, "5.24289e-96"_DF);
+
     return boost::report_errors();
 }
 
