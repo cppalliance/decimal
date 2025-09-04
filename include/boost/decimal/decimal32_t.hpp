@@ -680,7 +680,7 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
 
     // If the exponent fits we do not need to use the combination field
     const auto biased_exp {static_cast<std::int32_t>(exp + detail::bias)};
-    if (BOOST_DECIMAL_LIKELY(biased_exp > 0) && biased_exp <= detail::d32_max_biased_exponent)
+    if (BOOST_DECIMAL_LIKELY(biased_exp >= 0 && biased_exp <= detail::d32_max_biased_exponent))
     {
         if (big_combination)
         {
