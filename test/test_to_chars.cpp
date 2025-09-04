@@ -999,6 +999,9 @@ consteval int consteval_zero_test()
 
 int main()
 {
+    // TODO(mborland): While building out sticky bits this is the best way to synchronize results across types
+    fesetround(rounding_mode::fe_dec_to_nearest_from_zero);
+
     test_non_finite_values<decimal32_t>();
     test_non_finite_values<decimal64_t>();
 

@@ -941,6 +941,9 @@ void spot_mixed_division(T val1, T val2)
 
 int main()
 {
+    // Match the rounding mode of integers
+    fesetround(rounding_mode::fe_dec_to_nearest_from_zero);
+
     // Values that won't exceed the range of the significand
     // Only positive values
     random_addition(0, 5'000'000);
