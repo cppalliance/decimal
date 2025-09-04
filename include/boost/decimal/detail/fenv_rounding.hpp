@@ -14,14 +14,11 @@ namespace boost {
 namespace decimal {
 namespace detail {
 
-#ifdef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+namespace impl {
 
-// Rounds the value provided and returns an offset of exponent values as required
-template <typename TargetType = decimal32_t, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
-constexpr auto fenv_round(T& val, bool = false) noexcept -> int
+template <typename T, typename U>
+constexpr auto fenv_round_constexpr_impl(T& val, const U max_sig, const bool, const bool sticky) noexcept
 {
-    using significand_type = std::conditional_t<decimal_val_v<TargetType> >= 128, int128::uint128_t, std::int64_t>;
-
     const auto trailing_num {val % 10U};
     val /= 10U;
     int exp_delta {1};
@@ -31,13 +28,27 @@ constexpr auto fenv_round(T& val, bool = false) noexcept -> int
         ++val;
     }
 
-    if (static_cast<significand_type>(val) > max_significand_v<TargetType>)
+    // If the significand was e.g. 99'999'999 rounding up
+    // would put it out of range again
+
+    if (static_cast<U>(val) > max_sig)
     {
         val /= 10U;
         ++exp_delta;
     }
 
     return exp_delta;
+}
+
+}
+
+#ifdef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+
+// Rounds the value provided and returns an offset of exponent values as required
+template <typename TargetType = decimal32_t, typename T, std::enable_if_t<is_integral_v<T>, bool> = true>
+constexpr auto fenv_round(T& val, bool is_neg = false, bool sticky = false) noexcept -> int
+{
+    return impl::fenv_round_constexpr_impl(val, max_significand_v<TargetType>, is_neg, sticky);
 }
 
 #else
@@ -49,25 +60,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false, bool sticky = false) noex
 
     if (BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
     {
-        const auto trailing_num {val % 10U};
-        val /= 10U;
-        int exp_delta {1};
-
-        if (trailing_num > 5U || (trailing_num == 5U && sticky) || (trailing_num == 5U && !sticky && val % 2U == 1U))
-        {
-            ++val;
-        }
-
-        // If the significand was e.g. 99'999'999 rounding up
-        // would put it out of range again
-
-        if (static_cast<significand_type>(val) > static_cast<significand_type>(max_significand_v<TargetType>))
-        {
-            val /= 10U;
-            ++exp_delta;
-        }
-
-        return exp_delta;
+        return impl::fenv_round_constexpr_impl(val, max_significand_v<TargetType>, is_neg, sticky);
     }
     else
     {
@@ -113,7 +106,6 @@ constexpr auto fenv_round(T& val, bool is_neg = false, bool sticky = false) noex
                 BOOST_DECIMAL_UNREACHABLE;
             // LCOV_EXCL_STOP
         }
-
 
         // If the significand was e.g. 99'999'999 rounding up
         // would put it out of range again
