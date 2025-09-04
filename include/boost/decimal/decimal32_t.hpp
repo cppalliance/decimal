@@ -583,6 +583,11 @@ private:
     constexpr auto edit_sign(bool sign) noexcept -> void;
 };
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4127)
+#endif
+
 #if defined(__GNUC__) && __GNUC__ >= 8
 #  pragma GCC diagnostic pop
 #endif
@@ -599,10 +604,22 @@ template <BOOST_DECIMAL_UNSIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
 #else
 template <typename T1, typename T2, std::enable_if_t<detail::is_unsigned_v<T1> && detail::is_integral_v<T2>, bool>>
 #endif
-constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)
+constexpr decimal32_t::decimal32_t(T1 coeff_init, T2 exp, bool sign) noexcept // NOLINT(readability-function-cognitive-complexity,misc-no-recursion)
 {
     static_assert(detail::is_integral_v<T1>, "Coefficient must be an integer");
     static_assert(detail::is_integral_v<T2>, "Exponent must be an integer");
+
+    using unsigned_coeff_type = detail::make_unsigned_t<T1>;
+
+    unsigned_coeff_type coeff {};
+    BOOST_DECIMAL_IF_CONSTEXPR (detail::is_signed_v<T1>)
+    {
+        coeff = static_cast<unsigned_coeff_type>(coeff_init < 0 ? -coeff_init : coeff_init);
+    }
+    else
+    {
+        coeff = static_cast<unsigned_coeff_type>(coeff_init);
+    }
 
     bits_ = sign ? detail::d32_sign_mask : UINT32_C(0);
 
@@ -616,22 +633,22 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
         coeff_digits = detail::num_digits(coeff);
         if (coeff_digits > detail::precision + 1)
         {
-            const auto digits_to_remove {coeff_digits - (detail::precision + 1)};
+                const auto digits_to_remove {coeff_digits - (detail::precision + 1)};
 
-            #if defined(__GNUC__) && !defined(__clang__)
-            #  pragma GCC diagnostic push
-            #  pragma GCC diagnostic ignored "-Wconversion"
-            #endif
+                #if defined(__GNUC__) && !defined(__clang__)
+                #  pragma GCC diagnostic push
+                #  pragma GCC diagnostic ignored "-Wconversion"
+                #endif
 
-            if (coeff % detail::pow10(static_cast<T1>(digits_to_remove)) != 0u)
-            {
-                sticky = true;
-            }
-            coeff /= detail::pow10(static_cast<T1>(digits_to_remove));
+                if (coeff % detail::pow10(static_cast<T1>(digits_to_remove)) != 0u)
+                {
+                    sticky = true;
+                }
+                coeff /= detail::pow10(static_cast<T1>(digits_to_remove));
 
-            #if defined(__GNUC__) && !defined(__clang__)
-            #  pragma GCC diagnostic pop
-            #endif
+                #if defined(__GNUC__) && !defined(__clang__)
+                #  pragma GCC diagnostic pop
+                #endif
 
             coeff_digits -= digits_to_remove;
             exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky)) + digits_to_remove;
@@ -701,6 +718,10 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
         }
     }
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>
