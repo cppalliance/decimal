@@ -151,6 +151,7 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto find_sticky_bit(T1& coeff, T2& exp, co
         const auto shift_p10 {detail::pow10<T1>(shift)};
         const auto shift_p10_min_1 {shift_p10 / 10U};
 
+        // TODO(mborland): in the uint128_t case we should expose a div_mod since the mod is already available
         const auto q {coeff / shift_p10};
         const auto rem {coeff % shift_p10};
 
