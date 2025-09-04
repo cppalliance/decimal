@@ -80,7 +80,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false, bool sticky = false) noex
                 }
                 break;
             case rounding_mode::fe_dec_downward:
-                if (is_neg && trailing_num != 0U)
+                if (is_neg && (trailing_num != 0U || sticky))
                 {
                     ++val;
                 }
@@ -96,7 +96,7 @@ constexpr auto fenv_round(T& val, bool is_neg = false, bool sticky = false) noex
                 // Do nothing
                 break;
             case rounding_mode::fe_dec_upward:
-                if (!is_neg && trailing_num != 0U)
+                if (!is_neg && (trailing_num != 0U || sticky))
                 {
                     ++val;
                 }
