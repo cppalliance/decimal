@@ -123,46 +123,6 @@ constexpr auto fenv_round(T& val, bool is_neg = false, bool sticky = false) noex
 
 #endif
 
-template <typename T1, typename T2>
-BOOST_DECIMAL_FORCE_INLINE constexpr auto find_sticky_bit(T1& coeff, T2& exp, const int exp_bias) noexcept
-{
-    bool sticky {false};
-
-    #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
-
-    if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(coeff))
-    {
-        // If we are in a rounding mode that does not depend on the sticky bit opt out early
-        // Unlikely that the user sets the global rounding mode anyway
-        if (BOOST_DECIMAL_UNLIKELY(_boost_decimal_global_rounding_mode == rounding_mode::fe_dec_to_nearest_from_zero ||
-                                   _boost_decimal_global_rounding_mode == rounding_mode::fe_dec_toward_zero))
-        {
-            return sticky;
-        }
-    }
-
-    #endif
-
-    const auto biased_exp {exp + exp_bias};
-
-    if (biased_exp < 0)
-    {
-        const auto shift {static_cast<unsigned>(-biased_exp) - 1};
-        const auto shift_p10 {detail::pow10<T1>(shift)};
-
-        // TODO(mborland): in the uint128_t case we should expose a div_mod since the mod is already available
-        const auto q {coeff / shift_p10};
-        const auto rem {coeff % shift_p10};
-
-        sticky = (rem != 0U);
-
-        coeff = q;
-        exp += static_cast<int>(shift);
-    }
-
-    return sticky;
-}
-
 } // namespace detail
 } // namespace decimal
 } // namespace boost
