@@ -32,13 +32,17 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T
     constexpr auto precision_offset {std::numeric_limits<div_type>::digits10 - precision};
     constexpr auto ten_pow_offset {detail::pow10(static_cast<div_type>(precision_offset))};
 
-    const bool sign {lhs.sign != rhs.sign};
-
     const auto big_sig_lhs {lhs.sig * ten_pow_offset};
-    BOOST_DECIMAL_ASSERT(big_sig_lhs != 0U); // This case should have been filtered out by fpclassify
 
     const auto res_sig {big_sig_lhs / rhs.sig};
     const auto res_exp {(lhs.exp - precision_offset) - rhs.exp};
+
+    // Normalizes sign handling
+    bool sign {lhs.sign != rhs.sign};
+    if (BOOST_DECIMAL_UNLIKELY(res_sig == 0U))
+    {
+        sign = false;
+    }
 
     // Let the constructor handle shrinking it back down and rounding correctly
     return DecimalType{res_sig, res_exp, sign};
