@@ -583,6 +583,11 @@ private:
     constexpr auto edit_sign(bool sign) noexcept -> void;
 };
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4127)
+#endif
+
 #if defined(__GNUC__) && __GNUC__ >= 8
 #  pragma GCC diagnostic pop
 #endif
@@ -609,32 +614,10 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
     // If the coeff is not in range, make it so
     // Only count the number of digits if we absolutely have to
     int coeff_digits {-1};
-    if (coeff > detail::d32_max_significand_value)
+    auto biased_exp {static_cast<int>(exp + detail::bias)};
+    if (coeff > detail::d32_max_significand_value || biased_exp < 0)
     {
-        // Since we know that the unsigned coeff is >= 10'000'000 we can use this information to traverse pruned trees
-        coeff_digits = detail::d32_constructor_num_digits(coeff);
-        if (coeff_digits > detail::precision + 1)
-        {
-            const auto digits_to_remove {coeff_digits - (detail::precision + 1)};
-
-            #if defined(__GNUC__) && !defined(__clang__)
-            #  pragma GCC diagnostic push
-            #  pragma GCC diagnostic ignored "-Wconversion"
-            #endif
-
-            coeff /= detail::pow10(static_cast<T1>(digits_to_remove));
-
-            #if defined(__GNUC__) && !defined(__clang__)
-            #  pragma GCC diagnostic pop
-            #endif
-
-            coeff_digits -= digits_to_remove;
-            exp += static_cast<T2>(detail::fenv_round(coeff, sign)) + digits_to_remove;
-        }
-        else
-        {
-            exp += static_cast<T2>(detail::fenv_round(coeff, sign));
-        }
+        coeff_digits = detail::coefficient_rounding<decimal32_t>(coeff, exp, biased_exp, sign);
     }
 
     auto reduced_coeff {static_cast<significand_type>(coeff)};
@@ -660,16 +643,15 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
     }
 
     // If the exponent fits we do not need to use the combination field
-    const auto biased_exp {static_cast<std::uint32_t>(exp + detail::bias)};
-    if (biased_exp <= detail::d32_max_biased_exponent)
+    if (BOOST_DECIMAL_LIKELY(biased_exp >= 0 && biased_exp <= static_cast<std::int32_t>(detail::d32_max_biased_exponent)))
     {
         if (big_combination)
         {
-            bits_ |= (biased_exp << detail::d32_11_exp_shift) & detail::d32_11_exp_mask;
+            bits_ |= (static_cast<std::uint32_t>(biased_exp) << detail::d32_11_exp_shift) & detail::d32_11_exp_mask;
         }
         else
         {
-            bits_ |= (biased_exp << detail::d32_not_11_exp_shift) & detail::d32_not_11_exp_mask;
+            bits_ |= (static_cast<std::uint32_t>(biased_exp) << detail::d32_not_11_exp_shift) & detail::d32_not_11_exp_mask;
         }
     }
     else
@@ -682,8 +664,8 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
             coeff_digits = detail::num_digits(reduced_coeff);
         }
 
-        const auto exp_delta {biased_exp - detail::d32_max_biased_exponent};
-        const auto digit_delta {coeff_digits - static_cast<int>(exp_delta)};
+        const auto exp_delta {biased_exp - static_cast<int>(detail::d32_max_biased_exponent)};
+        const auto digit_delta {coeff_digits - exp_delta};
         if (digit_delta > 0 && coeff_digits + digit_delta <= detail::precision)
         {
             exp -= digit_delta;
@@ -696,6 +678,10 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
         }
     }
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 #ifdef BOOST_DECIMAL_HAS_CONCEPTS
 template <BOOST_DECIMAL_SIGNED_INTEGRAL T1, BOOST_DECIMAL_INTEGRAL T2>

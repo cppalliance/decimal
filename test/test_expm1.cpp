@@ -326,8 +326,8 @@ auto main() -> int
 {
   auto result_is_ok = true;
 
-  const auto result_pos_is_ok = local::test_expm1(96, false, 0.03125L, 32.0L);
-  const auto result_neg_is_ok = local::test_expm1(96, true,  0.03125L, 32.0L);
+  const auto result_pos_is_ok = local::test_expm1(128, false, 0.03125L, 32.0L);
+  const auto result_neg_is_ok = local::test_expm1(128, true,  0.03125L, 32.0L);
 
   const auto result_pos_narrow_is_ok = local::test_expm1(24, false, 0.125L, 8.0L);
   const auto result_neg_narrow_is_ok = local::test_expm1(24, true,  0.125L, 8.0L);
