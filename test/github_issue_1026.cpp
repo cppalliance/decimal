@@ -33,6 +33,8 @@ int main()
 
     BOOST_TEST_EQ("5.24289e-96"_DF / "1"_DF, "5.24289e-96"_DF);
 
+    BOOST_TEST_EQ("1"_DF / "5.24289e-96"_DF, "1.907345e+95"_DF);
+
     return boost::report_errors();
 }
 
