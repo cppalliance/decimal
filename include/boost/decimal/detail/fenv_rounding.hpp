@@ -134,6 +134,13 @@ BOOST_DECIMAL_FORCE_INLINE constexpr auto coefficient_rounding(T1& coeff, T2& ex
     const auto shift_for_large_coeff {(coeff_digits - detail::precision_v<TargetDecimalType>) - 1};
     const auto shift {std::max(shift_for_small_exp, shift_for_large_coeff)};
 
+    if (BOOST_DECIMAL_UNLIKELY(shift > std::numeric_limits<T1>::digits10))
+    {
+        // Bounds check for our tables in pow10
+        coeff = 0;
+        return 1;
+    }
+
     // Do shifting
     const auto shift_pow_ten {detail::pow10(static_cast<T1>(shift))};
     const auto shifted_coeff {coeff / shift_pow_ten};
