@@ -647,11 +647,11 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
     {
         if (big_combination)
         {
-            bits_ |= (biased_exp << detail::d32_11_exp_shift) & detail::d32_11_exp_mask;
+            bits_ |= (static_cast<std::uint32_t>(biased_exp) << detail::d32_11_exp_shift) & detail::d32_11_exp_mask;
         }
         else
         {
-            bits_ |= (biased_exp << detail::d32_not_11_exp_shift) & detail::d32_not_11_exp_mask;
+            bits_ |= (static_cast<std::uint32_t>(biased_exp) << detail::d32_not_11_exp_shift) & detail::d32_not_11_exp_mask;
         }
     }
     else
@@ -664,8 +664,8 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
             coeff_digits = detail::num_digits(reduced_coeff);
         }
 
-        const auto exp_delta {biased_exp - detail::d32_max_biased_exponent};
-        const auto digit_delta {coeff_digits - static_cast<int>(exp_delta)};
+        const auto exp_delta {biased_exp - static_cast<int>(detail::d32_max_biased_exponent)};
+        const auto digit_delta {coeff_digits - exp_delta};
         if (digit_delta > 0 && coeff_digits + digit_delta <= detail::precision)
         {
             exp -= digit_delta;
