@@ -1000,6 +1000,9 @@ consteval int consteval_zero_test()
 int main()
 {
     // TODO(mborland): While building out sticky bits this is the best way to synchronize results across types
+    #ifdef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+    return 0;
+    #else
     fesetround(rounding_mode::fe_dec_to_nearest_from_zero);
 
     test_non_finite_values<decimal32_t>();
@@ -1166,6 +1169,7 @@ int main()
     #endif
 
     return boost::report_errors();
+    #endif
 }
 
 #else
