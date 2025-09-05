@@ -21,25 +21,24 @@ namespace detail {
 template <typename DecimalType, typename T>
 BOOST_DECIMAL_FORCE_INLINE constexpr auto generic_div_impl(const T& lhs, const T& rhs) noexcept -> DecimalType
 {
-    bool sign {lhs.sign != rhs.sign};
-
     // If rhs is greater than we need to offset the significands to get the correct values
     // e.g. 4/8 is 0 but 40/8 yields 5 in integer maths
-    constexpr auto ten_pow_precision {detail::pow10(static_cast<std::uint64_t>(detail::precision))};
-    const auto big_sig_lhs {static_cast<std::uint64_t>(lhs.sig) * ten_pow_precision};
+    //
+    // By expanding the offset to all the way to the value of numeric_limits<std::uint64_t>::digits10
+    // we can recover more of what would become the fraction to achieve better rounding
 
-    auto res_sig {big_sig_lhs / static_cast<std::uint64_t>(rhs.sig)};
-    auto res_exp {(lhs.exp - detail::precision) - rhs.exp};
+    using div_type = std::uint64_t;
 
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "\nres sig: " << res_sig_32
-              << "\nres exp: " << res_exp << std::endl;
-    #endif
+    constexpr auto precision_offset {std::numeric_limits<div_type>::digits10 - precision};
+    constexpr auto ten_pow_offset {detail::pow10(static_cast<div_type>(precision_offset))};
 
-    if (res_sig == 0U)
-    {
-        sign = false;
-    }
+    const bool sign {lhs.sign != rhs.sign};
+
+    const auto big_sig_lhs {lhs.sig * ten_pow_offset};
+    BOOST_DECIMAL_ASSERT(big_sig_lhs != 0U); // This case should have been filtered out by fpclassify
+
+    const auto res_sig {big_sig_lhs / rhs.sig};
+    const auto res_exp {(lhs.exp - precision_offset) - rhs.exp};
 
     // Let the constructor handle shrinking it back down and rounding correctly
     return DecimalType{res_sig, res_exp, sign};
