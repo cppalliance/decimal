@@ -10,6 +10,7 @@
 #include <boost/decimal/detail/type_traits.hpp>
 #include <boost/decimal/detail/config.hpp>
 #include <boost/decimal/detail/power_tables.hpp>
+#include <boost/decimal/detail/integer_search_trees.hpp>
 
 namespace boost {
 namespace decimal {
@@ -122,6 +123,36 @@ constexpr auto fenv_round(T& val, bool is_neg = false, bool sticky = false) noex
 }
 
 #endif
+
+template <typename TargetDecimalType, typename T1, typename T2, typename T3>
+BOOST_DECIMAL_FORCE_INLINE constexpr auto coefficient_rounding(T1& coeff, T2& exp, T3& biased_exp, const bool sign) noexcept
+{
+    auto coeff_digits {detail::num_digits(coeff)};
+
+    // How many digits need to be shifted?
+    const auto shift_for_small_exp {(-biased_exp) - 1};
+    const auto shift_for_large_coeff {(coeff_digits - detail::precision_v<TargetDecimalType>) - 1};
+    const auto shift {std::max(shift_for_small_exp, shift_for_large_coeff)};
+
+    // Do shifting
+    const auto shift_pow_ten {detail::pow10(static_cast<T1>(shift))};
+    const auto shifted_coeff {coeff / shift_pow_ten};
+    const auto trailing_digits {coeff % shift_pow_ten};
+
+    coeff = shifted_coeff;
+    const auto sticky {trailing_digits != 0u};
+    exp += shift;
+    biased_exp += shift;
+    coeff_digits -= shift;
+
+    // Do rounding
+    const auto removed_digits {detail::fenv_round(coeff, sign, sticky)};
+    exp += removed_digits;
+    biased_exp += removed_digits;
+    coeff_digits -= removed_digits;
+
+    return coeff_digits;
+}
 
 } // namespace detail
 } // namespace decimal

@@ -617,29 +617,7 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
     auto biased_exp {static_cast<int>(exp + detail::bias)};
     if (coeff > detail::d32_max_significand_value || biased_exp < 0)
     {
-        coeff_digits = detail::num_digits(coeff);
-
-        // How many digits need to be shifted?
-        const auto shift_for_small_exp {(-biased_exp) - 1};
-        const auto shift_for_large_coeff {(coeff_digits - detail::precision) - 1};
-        const auto shift {std::max(shift_for_small_exp, shift_for_large_coeff)};
-
-        // Do shifting
-        const auto shift_pow_ten {detail::pow10(static_cast<T1>(shift))};
-        const auto shifted_coeff {coeff / shift_pow_ten};
-        const auto trailing_digits {coeff % shift_pow_ten};
-
-        coeff = shifted_coeff;
-        const auto sticky {trailing_digits != 0u};
-        exp += shift;
-        biased_exp += shift;
-        coeff_digits -= shift;
-
-        // Do rounding
-        auto removed_digits = detail::fenv_round(coeff, sign, sticky);
-        exp += removed_digits;
-        biased_exp += removed_digits;
-        coeff_digits -= removed_digits;
+        coeff_digits = detail::coefficient_rounding<decimal32_t>(coeff, exp, biased_exp, sign);
     }
 
     auto reduced_coeff {static_cast<significand_type>(coeff)};
