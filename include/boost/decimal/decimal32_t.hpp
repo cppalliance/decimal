@@ -614,37 +614,32 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
     // If the coeff is not in range, make it so
     // Only count the number of digits if we absolutely have to
     int coeff_digits {-1};
-    if (coeff > detail::d32_max_significand_value || (exp + detail::bias < 0))
+    auto biased_exp {static_cast<int>(exp + detail::bias)};
+    if (coeff > detail::d32_max_significand_value || biased_exp < 0)
     {
-        bool sticky_bit {detail::find_sticky_bit(coeff, exp, detail::bias_v<decimal32_t>)};
-
         coeff_digits = detail::num_digits(coeff);
-        if (coeff_digits > detail::precision + 1)
-        {
-            const auto digits_to_remove {coeff_digits - (detail::precision + 1)};
 
-            #if defined(__GNUC__) && !defined(__clang__)
-            #  pragma GCC diagnostic push
-            #  pragma GCC diagnostic ignored "-Wconversion"
-            #endif
+        // How many digits need to be shifted?
+        const auto shift_for_small_exp {(-biased_exp) - 1};
+        const auto shift_for_large_coeff {(coeff_digits - detail::precision) - 1};
+        const auto shift {std::max(shift_for_small_exp, shift_for_large_coeff)};
 
-            if (coeff % detail::pow10(static_cast<T1>(digits_to_remove)) != 0u)
-            {
-                sticky_bit = true;
-            }
-            coeff /= detail::pow10(static_cast<T1>(digits_to_remove));
+        // Do shifting
+        const auto shift_pow_ten {detail::pow10(static_cast<T1>(shift))};
+        const auto shifted_coeff {coeff / shift_pow_ten};
+        const auto trailing_digits {coeff % shift_pow_ten};
 
-            #if defined(__GNUC__) && !defined(__clang__)
-            #  pragma GCC diagnostic pop
-            #endif
+        coeff = shifted_coeff;
+        const auto sticky {trailing_digits != 0u};
+        exp += shift;
+        biased_exp += shift;
+        coeff_digits -= shift;
 
-            coeff_digits -= digits_to_remove;
-            exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky_bit)) + digits_to_remove;
-        }
-        else
-        {
-            exp += static_cast<T2>(detail::fenv_round(coeff, sign, sticky_bit));
-        }
+        // Do rounding
+        auto removed_digits = detail::fenv_round(coeff, sign, sticky);
+        exp += removed_digits;
+        biased_exp += removed_digits;
+        coeff_digits -= removed_digits;
     }
 
     auto reduced_coeff {static_cast<significand_type>(coeff)};
@@ -670,7 +665,6 @@ constexpr decimal32_t::decimal32_t(T1 coeff, T2 exp, bool sign) noexcept // NOLI
     }
 
     // If the exponent fits we do not need to use the combination field
-    const auto biased_exp {static_cast<std::int32_t>(exp + detail::bias)};
     if (BOOST_DECIMAL_LIKELY(biased_exp >= 0 && biased_exp <= static_cast<std::int32_t>(detail::d32_max_biased_exponent)))
     {
         if (big_combination)
