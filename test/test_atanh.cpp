@@ -340,12 +340,12 @@ auto main() -> int
 
     const auto result_ctrl_is_ok =
     (
-         local::test_atanh_ctrl<decimal32_t>      (16)
-      && local::test_atanh_ctrl<decimal64_t>      (16)
-      && local::test_atanh_ctrl<decimal128_t>     (16)
-      && local::test_atanh_ctrl<decimal_fast32_t> (16)
-      && local::test_atanh_ctrl<decimal_fast64_t> (16)
-      && local::test_atanh_ctrl<decimal_fast128_t>(16)
+         local::test_atanh_ctrl<decimal32_t>      (8)
+      && local::test_atanh_ctrl<decimal64_t>      (8)
+      && local::test_atanh_ctrl<decimal128_t>     (8)
+      && local::test_atanh_ctrl<decimal_fast32_t> (8)
+      && local::test_atanh_ctrl<decimal_fast64_t> (8)
+      && local::test_atanh_ctrl<decimal_fast128_t>(8)
     );
 
     BOOST_TEST(result_ctrl_is_ok);

@@ -77,24 +77,12 @@ constexpr auto atanh_impl(const T x) noexcept
                 // approximation by Taylor series in x at 0 through order 9
                 const auto xsq = xx * xx;
 
-                constexpr T one_third { one / T { 3, 0 } };
-                constexpr T one_fifth { one / T { 5, 0 } };
+                constexpr T one_third   { one / T { 3, 0 } };
+                constexpr T one_fifth   { one / T { 5, 0 } };
                 constexpr T one_seventh { one / T { 7, 0 } };
-                constexpr T one_ninth { one / T { 9, 0 } };
+                constexpr T one_ninth   { one / T { 9, 0 } };
 
-                result = xx *
-                (
-                    one + xsq *
-                    (
-                        one_third + xsq *
-                        (
-                            one_fifth + xsq *
-                            (
-                                one_seventh + xsq * one_ninth
-                            )
-                        )
-                    )
-                );
+                result = xx * fma(xsq, fma(xsq, fma(xsq, fma(xsq, one_ninth, one_seventh), one_fifth), one_third), one);
             }
 
             if (b_neg) { result = -result; }

@@ -58,31 +58,12 @@ constexpr auto asinh_impl(const T x) noexcept
                 const auto inv_xsq = one / xsq;
 
                 constexpr T one_fourth { T { 1, 0 } / T { 4, 0 } };
-                constexpr T minus_three_over_32 { -T { 3, 0 } / T { 32, 0 } };
+                constexpr T three_over_32 { -T { 3, 0 } / T { 32, 0 } };
                 constexpr T five_over_96 { T { 5, 0 } / T { 96, 0 } };
-                constexpr T minus_thirty_five_over_1024 { -T { 35, 0 } / T { 1024, 0 } };
+                constexpr T thirty_five_over_1024 { -T { 35, 0 } / T { 1024, 0 } };
                 constexpr T sixty_three_over_2560 { T { 63, 0 } / T { 2560, 0 } };
 
-                result =
-                    numbers::ln2_v<T>
-                  + ::boost::decimal::log(x)
-                  + inv_xsq *
-                    (
-                        one_fourth
-                      + inv_xsq *
-                        (
-                            minus_three_over_32
-                          + inv_xsq *
-                            (
-                                five_over_96
-                              + inv_xsq *
-                                (
-                                    minus_thirty_five_over_1024
-                                  + inv_xsq * sixty_three_over_2560
-                                )
-                            )
-                        )
-                    );
+                result = numbers::ln2_v<T> + ::boost::decimal::log(x) + inv_xsq * fma(inv_xsq, fma(inv_xsq, fma(inv_xsq, fma(inv_xsq, sixty_three_over_2560, thirty_five_over_1024), five_over_96), three_over_32), one_fourth);
             }
             else if(x >= four_tenths)
             {
@@ -102,12 +83,12 @@ constexpr auto asinh_impl(const T x) noexcept
                 // Normal[Series[ArcSinh[x], {x, 0, 9}]]
                 // FullSimplify[%]
                 // HornerForm[%]
-                constexpr T minus_one_sixth { -T { 1, 0 } / T { 6, 0 } };
+                constexpr T one_sixth { -T { 1, 0 } / T { 6, 0 } };
                 constexpr T three_over_40 { T { 3, 0 } / T { 40, 0 } };
-                constexpr T minus_five_over_112 { -T { 5, 0 } / T { 112, 0 } };
+                constexpr T five_over_112 { -T { 5, 0 } / T { 112, 0 } };
                 constexpr T thirty_five_over_1152 { T { 35, 0 } / T { 1152, 0 } };
 
-                result = x * (one + xsq * (minus_one_sixth + xsq * (three_over_40 + xsq * (minus_five_over_112 + thirty_five_over_1152 * xsq))));
+                result = x * fma(xsq, fma(xsq, fma(xsq, fma(xsq, thirty_five_over_1152, five_over_112), three_over_40), one_sixth), one);
             }
         }
     }

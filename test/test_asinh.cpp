@@ -423,12 +423,12 @@ auto main() -> int
     BOOST_TEST(result_asinh_symmetry_dec_fast64_t_is_ok);
     BOOST_TEST(result_asinh_symmetry_dec_fast128_t_is_ok);
 
-    const bool result_asinh_dec32_t_is_ok       = local::test_asinh_ctrl<decimal32_t>      (16);
-    const bool result_asinh_dec64_t_is_ok       = local::test_asinh_ctrl<decimal64_t>      (16);
-    const bool result_asinh_dec128_t_is_ok      = local::test_asinh_ctrl<decimal128_t>     (16);
-    const bool result_asinh_dec_fast32_t_is_ok  = local::test_asinh_ctrl<decimal_fast32_t> (16);
-    const bool result_asinh_dec_fast64_t_is_ok  = local::test_asinh_ctrl<decimal_fast64_t> (16);
-    const bool result_asinh_dec_fast128_t_is_ok = local::test_asinh_ctrl<decimal_fast128_t>(16);
+    const bool result_asinh_dec32_t_is_ok       = local::test_asinh_ctrl<decimal32_t>      (8);
+    const bool result_asinh_dec64_t_is_ok       = local::test_asinh_ctrl<decimal64_t>      (8);
+    const bool result_asinh_dec128_t_is_ok      = local::test_asinh_ctrl<decimal128_t>     (8);
+    const bool result_asinh_dec_fast32_t_is_ok  = local::test_asinh_ctrl<decimal_fast32_t> (8);
+    const bool result_asinh_dec_fast64_t_is_ok  = local::test_asinh_ctrl<decimal_fast64_t> (8);
+    const bool result_asinh_dec_fast128_t_is_ok = local::test_asinh_ctrl<decimal_fast128_t>(8);
 
     BOOST_TEST(result_asinh_dec32_t_is_ok);
     BOOST_TEST(result_asinh_dec64_t_is_ok);
@@ -441,12 +441,12 @@ auto main() -> int
   {
     using namespace boost::decimal;
 
-    const bool result_asinh_ranges_dec32_t_is_ok       = local::test_asinh_ranges<decimal32_t>      (16);
-    const bool result_asinh_ranges_dec64_t_is_ok       = local::test_asinh_ranges<decimal64_t>      (16);
-    const bool result_asinh_ranges_dec128_t_is_ok      = local::test_asinh_ranges<decimal128_t>     (16);
-    const bool result_asinh_ranges_dec_fast32_t_is_ok  = local::test_asinh_ranges<decimal_fast32_t> (16);
-    const bool result_asinh_ranges_dec_fast64_t_is_ok  = local::test_asinh_ranges<decimal_fast64_t> (16);
-    const bool result_asinh_ranges_dec_fast128_t_is_ok = local::test_asinh_ranges<decimal_fast128_t>(16);
+    const bool result_asinh_ranges_dec32_t_is_ok       = local::test_asinh_ranges<decimal32_t>      (8);
+    const bool result_asinh_ranges_dec64_t_is_ok       = local::test_asinh_ranges<decimal64_t>      (8);
+    const bool result_asinh_ranges_dec128_t_is_ok      = local::test_asinh_ranges<decimal128_t>     (8);
+    const bool result_asinh_ranges_dec_fast32_t_is_ok  = local::test_asinh_ranges<decimal_fast32_t> (8);
+    const bool result_asinh_ranges_dec_fast64_t_is_ok  = local::test_asinh_ranges<decimal_fast64_t> (8);
+    const bool result_asinh_ranges_dec_fast128_t_is_ok = local::test_asinh_ranges<decimal_fast128_t>(8);
 
     BOOST_TEST(result_asinh_ranges_dec32_t_is_ok);
     BOOST_TEST(result_asinh_ranges_dec64_t_is_ok);
