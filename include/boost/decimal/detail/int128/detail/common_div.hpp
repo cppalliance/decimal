@@ -329,47 +329,6 @@ BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE
     vn[0] = needs_shift ? (v[0] << s) : v[0];
 }
 
-// Decimal-local: 8-word (256-bit) operand support for u256 division
-template <std::size_t v_size>
-BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr void unpack_v(std::uint32_t (&vn)[8], const std::uint32_t (&v)[v_size],
-    const bool needs_shift, const int s, const int complement_s, const std::integral_constant<std::size_t, 8>&) noexcept
-{
-    vn[7] = needs_shift ? ((v[7] << s) | (v[6] >> complement_s)) : v[7];
-    vn[6] = needs_shift ? ((v[6] << s) | (v[5] >> complement_s)) : v[6];
-    vn[5] = needs_shift ? ((v[5] << s) | (v[4] >> complement_s)) : v[5];
-    vn[4] = needs_shift ? ((v[4] << s) | (v[3] >> complement_s)) : v[4];
-    vn[3] = needs_shift ? ((v[3] << s) | (v[2] >> complement_s)) : v[3];
-    vn[2] = needs_shift ? ((v[2] << s) | (v[1] >> complement_s)) : v[2];
-    vn[1] = needs_shift ? ((v[1] << s) | (v[0] >> complement_s)) : v[1];
-    vn[0] = needs_shift ? (v[0] << s) : v[0];
-}
-
-template <std::size_t un_size, std::size_t u_size>
-BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr void unpack_u(std::uint32_t (&un)[un_size], const std::uint32_t (&u)[u_size],
-    const bool needs_shift, const int s, const int complement_s, const std::integral_constant<std::size_t, 4>&) noexcept
-{
-    un[4] = needs_shift ? (u[3] >> complement_s) : 0;
-    un[3] = needs_shift ? ((u[3] << s) | (u[2] >> complement_s)) : u[3];
-    un[2] = needs_shift ? ((u[2] << s) | (u[1] >> complement_s)) : u[2];
-    un[1] = needs_shift ? ((u[1] << s) | (u[0] >> complement_s)) : u[1];
-    un[0] = needs_shift ? (u[0] << s) : u[0];
-}
-
-template <std::size_t un_size, std::size_t u_size>
-BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE BOOST_DECIMAL_DETAIL_INT128_FORCE_INLINE constexpr void unpack_u(std::uint32_t (&un)[un_size], const std::uint32_t (&u)[u_size],
-    const bool needs_shift, const int s, const int complement_s, const std::integral_constant<std::size_t, 8>&) noexcept
-{
-    un[8] = needs_shift ? (u[7] >> complement_s) : 0;
-    un[7] = needs_shift ? ((u[7] << s) | (u[6] >> complement_s)) : u[7];
-    un[6] = needs_shift ? ((u[6] << s) | (u[5] >> complement_s)) : u[6];
-    un[5] = needs_shift ? ((u[5] << s) | (u[4] >> complement_s)) : u[5];
-    un[4] = needs_shift ? ((u[4] << s) | (u[3] >> complement_s)) : u[4];
-    un[3] = needs_shift ? ((u[3] << s) | (u[2] >> complement_s)) : u[3];
-    un[2] = needs_shift ? ((u[2] << s) | (u[1] >> complement_s)) : u[2];
-    un[1] = needs_shift ? ((u[1] << s) | (u[0] >> complement_s)) : u[1];
-    un[0] = needs_shift ? (u[0] << s) : u[0];
-}
-
 // See: The Art of Computer Programming Volume 2 (Semi-numerical algorithms) section 4.3.1
 // Algorithm D: Division of Non-negative integers
 template <bool need_remainder, std::size_t u_size, std::size_t v_size, std::size_t q_size>
@@ -383,14 +342,16 @@ BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE constexpr void knuth_divide(std::uint32_
     const bool needs_shift {s > 0};
 
     // Create normalized versions of u and v
-    // Decimal-local: sized for either 128-bit (4 word) or 256-bit (8 word) operands
-    constexpr std::size_t un_size {u_size == 8 ? 9 : 5};
-    constexpr std::size_t vn_size {v_size == 8 ? 8 : 4};
-    std::uint32_t un[un_size] {};
-    std::uint32_t vn[vn_size] {};
+    std::uint32_t un[5] {};
+    std::uint32_t vn[4] {};
 
-    static_assert(v_size == 8 || v_size == 4 || v_size == 2, "Unknown size for denominator");
-    unpack_u(un, u, needs_shift, s, complement_s, std::integral_constant<std::size_t, u_size>{});
+    un[4] = needs_shift ? (u[3] >> complement_s) : 0;
+    un[3] = needs_shift ? ((u[3] << s) | (u[2] >> complement_s)) : u[3];
+    un[2] = needs_shift ? ((u[2] << s) | (u[1] >> complement_s)) : u[2];
+    un[1] = needs_shift ? ((u[1] << s) | (u[0] >> complement_s)) : u[1];
+    un[0] = needs_shift ? (u[0] << s) : u[0];
+
+    static_assert(v_size == 4 || v_size == 2, "Unknown size for denominator");
     unpack_v(vn, v, needs_shift, s, complement_s, std::integral_constant<std::size_t, v_size>{});
 
     // D.2

@@ -1054,6 +1054,126 @@ BOOST_DECIMAL_CUDA_CONSTEXPR u256& u256::operator*=(const u256& rhs) noexcept
 
 namespace impl {
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4127) // Pre C++17 the if constexpr remainder part will hit this
+#endif
+
+// Knuth Algorithm D (TAOCP Vol. 2, 4.3.1) on 32-bit words, sized for 256-bit operands.
+// Divides the m word dividend u by the n word divisor v (m >= n >= 2, v[n - 1] != 0) and writes the
+// quotient to q. With need_remainder the remainder is left in u, otherwise u is scratch.
+// Decimal owns this copy so the vendored int128 division code needs no local changes.
+template <bool need_remainder>
+BOOST_DECIMAL_CUDA_CONSTEXPR void knuth_divide(std::uint32_t (&u)[8], const std::size_t m,
+                                              const std::uint32_t (&v)[8], const std::size_t n,
+                                              std::uint32_t (&q)[8]) noexcept
+{
+    // D.1: normalize so the top word of the divisor has its most significant bit set
+    const auto s {int128::detail::countl_zero(v[n - 1])};
+    const auto complement_s {32 - s};
+    const bool needs_shift {s > 0};
+
+    std::uint32_t un[9] {};
+    std::uint32_t vn[8] {};
+
+    for (std::size_t i {n - 1}; i > 0; --i)
+    {
+        vn[i] = needs_shift ? ((v[i] << s) | (v[i - 1] >> complement_s)) : v[i];
+    }
+    vn[0] = needs_shift ? (v[0] << s) : v[0];
+
+    un[m] = needs_shift ? (u[m - 1] >> complement_s) : 0;
+    for (std::size_t i {m - 1}; i > 0; --i)
+    {
+        un[i] = needs_shift ? ((u[i] << s) | (u[i - 1] >> complement_s)) : u[i];
+    }
+    un[0] = needs_shift ? (u[0] << s) : u[0];
+
+    // D.2
+    for (std::size_t j {m - n}; j != static_cast<std::size_t>(-1); --j)
+    {
+        // D.3: estimate the quotient digit from the top two words
+        const auto dividend {(static_cast<std::uint64_t>(un[j + n]) << 32) | un[j + n - 1]};
+        const auto divisor {static_cast<std::uint64_t>(vn[n - 1])};
+        auto q_hat {dividend / divisor};
+        auto r_hat {dividend % divisor};
+
+        while (q_hat > UINT32_MAX ||
+               (q_hat * vn[n - 2]) > ((r_hat << 32) | un[j + n - 2]))
+        {
+            --q_hat;
+            r_hat += vn[n - 1];
+            if (r_hat > UINT32_MAX)
+            {
+                break;
+            }
+        }
+
+        // D.4: multiply and subtract
+        std::int64_t borrow {};
+        for (std::size_t i {}; i < n; ++i)
+        {
+            const auto p {q_hat * vn[i]};
+            const auto p_lo {static_cast<std::uint32_t>(p & UINT32_MAX)};
+            const auto p_hi {static_cast<std::uint32_t>(p >> 32)};
+
+            borrow += static_cast<std::int64_t>(un[j + i]) - static_cast<std::int64_t>(p_lo);
+            un[j + i] = static_cast<std::uint32_t>(borrow & UINT32_MAX);
+            borrow >>= 32;
+
+            borrow -= p_hi;
+        }
+        borrow += un[j + n];
+        un[j + n] = static_cast<std::uint32_t>(borrow & UINT32_MAX);
+
+        // D.5
+        q[j] = static_cast<std::uint32_t>(q_hat & UINT32_MAX);
+        if (BOOST_DECIMAL_UNLIKELY(borrow < 0))
+        {
+            // D.6: the estimate was one too large, add the divisor back (probability about 4.7e-10)
+            --q[j];                                                             // LCOV_EXCL_LINE
+            std::uint64_t carry {};                                             // LCOV_EXCL_LINE
+            for (std::size_t i {}; i < n; ++i)                                  // LCOV_EXCL_LINE
+            {                                                                   // LCOV_EXCL_LINE
+                carry += static_cast<std::uint64_t>(un[j + i]) + vn[i];         // LCOV_EXCL_LINE
+                un[j + i] = static_cast<std::uint32_t>(carry & UINT32_MAX);     // LCOV_EXCL_LINE
+                carry >>= 32U;                                                  // LCOV_EXCL_LINE
+            }                                                                   // LCOV_EXCL_LINE
+            un[j + n] += static_cast<std::uint32_t>(carry & UINT32_MAX);        // LCOV_EXCL_LINE
+        }
+    }
+
+    // D.8: un-normalize the remainder into u
+    BOOST_DECIMAL_IF_CONSTEXPR (need_remainder)
+    {
+        if (s > 0)
+        {
+            for (std::size_t i {}; i < n - 1; ++i)
+            {
+                u[i] = (un[i] >> s) | (un[i + 1] << (32 - s));
+            }
+            u[n - 1] = un[n - 1] >> s;
+        }
+        else
+        {
+            for (std::size_t i {}; i < n; ++i)
+            {
+                u[i] = un[i];
+            }
+        }
+
+        // Clear anything left in u
+        for (std::size_t i {n}; i < m; ++i)
+        {
+            u[i] = 0;
+        }
+    }
+}
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
+
 BOOST_DECIMAL_CUDA_CONSTEXPR std::size_t div_to_words(const u256& x, std::uint32_t (&words)[8]) noexcept
 {
     #if !defined(BOOST_DECIMAL_NO_CONSTEVAL_DETECTION) && !BOOST_DECIMAL_ENDIAN_BIG_BYTE
@@ -1373,7 +1493,7 @@ BOOST_DECIMAL_FORCE_INLINE BOOST_DECIMAL_CUDA_CONSTEXPR u256 default_div(const u
         return u256{};
     }
 
-    int128::detail::impl::knuth_divide<false>(u, m, v, n, q);
+    knuth_divide<false>(u, m, v, n, q);
 
     return from_words(q);
 }
@@ -1444,7 +1564,7 @@ BOOST_DECIMAL_FORCE_INLINE BOOST_DECIMAL_CUDA_CONSTEXPR auto div_mod(const u256&
     }
     else
     {
-        int128::detail::impl::knuth_divide<true>(u, m, v, n, q);
+        knuth_divide<true>(u, m, v, n, q);
     }
 
      return {from_words(q), from_words(u)};
@@ -1530,7 +1650,7 @@ BOOST_DECIMAL_FORCE_INLINE BOOST_DECIMAL_CUDA_CONSTEXPR u256 default_mod(const u
         return lhs;
     }
 
-    int128::detail::impl::knuth_divide<true>(u, m, v, n, q);
+    knuth_divide<true>(u, m, v, n, q);
 
     return from_words(u);
 }
