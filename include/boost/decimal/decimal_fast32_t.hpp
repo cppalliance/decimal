@@ -1030,10 +1030,11 @@ constexpr auto operator+(const decimal_fast32_t rhs) noexcept -> decimal_fast32_
     return rhs;
 }
 
-constexpr auto operator-(decimal_fast32_t lhs) noexcept -> decimal_fast32_t
+// A write to a by-value parameter which is then returned is dropped by the MSVC 19.29
+// optimizer, thus every sign change here builds a new value instead.
+constexpr auto operator-(const decimal_fast32_t lhs) noexcept -> decimal_fast32_t
 {
-    lhs.sign_ = !lhs.sign_;
-    return lhs;
+    return direct_init(lhs.significand_, lhs.exponent_, !lhs.sign_);
 }
 
 constexpr auto operator+(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> decimal_fast32_t
@@ -1115,7 +1116,7 @@ constexpr auto operator+(const Integer lhs, const decimal_fast32_t rhs) noexcept
     return rhs + lhs;
 }
 
-constexpr auto operator-(const decimal_fast32_t lhs, decimal_fast32_t rhs) noexcept -> decimal_fast32_t
+constexpr auto operator-(const decimal_fast32_t lhs, const decimal_fast32_t rhs) noexcept -> decimal_fast32_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (!isfinite(lhs) || !isfinite(rhs))
@@ -1159,9 +1160,7 @@ constexpr auto operator-(const decimal_fast32_t lhs, decimal_fast32_t rhs) noexc
         }
     }
 
-    rhs.sign_ = !rhs.sign_;
-
-    return detail::add_impl<decimal_fast32_t>(lhs, rhs);
+    return detail::add_impl<decimal_fast32_t>(lhs, -rhs);
 }
 
 template <typename Integer>
@@ -1740,10 +1739,9 @@ constexpr auto scalbnd32f(const decimal_fast32_t num, const int expval) noexcept
     return scalblnd32f(num, static_cast<long>(expval));
 }
 
-constexpr auto copysignd32f(decimal_fast32_t mag, const decimal_fast32_t sgn) noexcept -> decimal_fast32_t
+constexpr auto copysignd32f(const decimal_fast32_t mag, const decimal_fast32_t sgn) noexcept -> decimal_fast32_t
 {
-    mag.sign_ = sgn.sign_;
-    return mag;
+    return direct_init(mag.significand_, mag.exponent_, sgn.sign_);
 }
 
 // Effects: determines if the quantum exponents of x and y are the same.

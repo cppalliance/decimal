@@ -1060,10 +1060,11 @@ constexpr auto operator+(const decimal_fast64_t val) noexcept -> decimal_fast64_
     return val;
 }
 
-constexpr auto operator-(decimal_fast64_t val) noexcept -> decimal_fast64_t
+// A write to a by-value parameter which is then returned is dropped by the MSVC 19.29
+// optimizer, thus every sign change here builds a new value instead.
+constexpr auto operator-(const decimal_fast64_t val) noexcept -> decimal_fast64_t
 {
-    val.sign_ = !val.sign_;
-    return val;
+    return direct_init_d64(val.significand_, val.exponent_, !val.sign_);
 }
 
 constexpr decimal_fast64_t::operator bool() const noexcept
@@ -1250,7 +1251,7 @@ constexpr auto operator+(const Integer lhs, const decimal_fast64_t rhs) noexcept
     return rhs + lhs;
 }
 
-constexpr auto operator-(const decimal_fast64_t lhs, decimal_fast64_t rhs) noexcept -> decimal_fast64_t
+constexpr auto operator-(const decimal_fast64_t lhs, const decimal_fast64_t rhs) noexcept -> decimal_fast64_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs) || not_finite(rhs))
@@ -1294,9 +1295,7 @@ constexpr auto operator-(const decimal_fast64_t lhs, decimal_fast64_t rhs) noexc
         }
     }
 
-    rhs.sign_ = !rhs.sign_;
-
-    return detail::add_impl<decimal_fast64_t>(lhs, rhs);
+    return detail::add_impl<decimal_fast64_t>(lhs, -rhs);
 }
 
 template <typename Integer>
@@ -1788,7 +1787,7 @@ constexpr auto quantexpd64f(const decimal_fast64_t x) noexcept -> int
     return x.biased_exponent();
 }
 
-constexpr auto scalblnd64f(decimal_fast64_t num, const long exp) noexcept -> decimal_fast64_t
+constexpr auto scalblnd64f(const decimal_fast64_t num, const long exp) noexcept -> decimal_fast64_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal_fast64_t zero {0, 0};
@@ -1799,9 +1798,7 @@ constexpr auto scalblnd64f(decimal_fast64_t num, const long exp) noexcept -> dec
     }
     #endif
 
-    num = decimal_fast64_t(num.significand_, num.biased_exponent() + exp, num.sign_);
-
-    return num;
+    return decimal_fast64_t(num.significand_, num.biased_exponent() + exp, num.sign_);
 }
 
 constexpr auto scalbnd64f(const decimal_fast64_t num, const int expval) noexcept -> decimal_fast64_t
@@ -1809,10 +1806,9 @@ constexpr auto scalbnd64f(const decimal_fast64_t num, const int expval) noexcept
     return scalblnd64f(num, static_cast<long>(expval));
 }
 
-constexpr auto copysignd64f(decimal_fast64_t mag, const decimal_fast64_t sgn) noexcept -> decimal_fast64_t
+constexpr auto copysignd64f(const decimal_fast64_t mag, const decimal_fast64_t sgn) noexcept -> decimal_fast64_t
 {
-    mag.sign_ = sgn.sign_;
-    return mag;
+    return direct_init_d64(mag.significand_, mag.exponent_, sgn.sign_);
 }
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)

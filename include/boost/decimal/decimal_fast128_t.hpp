@@ -1071,10 +1071,11 @@ constexpr auto operator+(const decimal_fast128_t& rhs) noexcept -> decimal_fast1
     return rhs;
 }
 
-constexpr auto operator-(decimal_fast128_t rhs) noexcept -> decimal_fast128_t
+// A write to a by-value parameter which is then returned is dropped by the MSVC 19.29
+// optimizer, thus every sign change here builds a new value instead.
+constexpr auto operator-(const decimal_fast128_t rhs) noexcept -> decimal_fast128_t
 {
-    rhs.sign_ = !rhs.sign_;
-    return rhs;
+    return direct_init_d128(rhs.significand_, rhs.exponent_, !rhs.sign_);
 }
 
 constexpr auto operator+(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t
@@ -1722,13 +1723,12 @@ constexpr decimal_fast128_t::operator Decimal() const noexcept
     return to_decimal<Decimal>(*this);
 }
 
-constexpr auto copysignd128f(decimal_fast128_t mag, const decimal_fast128_t sgn) noexcept -> decimal_fast128_t
+constexpr auto copysignd128f(const decimal_fast128_t mag, const decimal_fast128_t sgn) noexcept -> decimal_fast128_t
 {
-    mag.sign_ = sgn.sign_;
-    return mag;
+    return direct_init_d128(mag.significand_, mag.exponent_, sgn.sign_);
 }
 
-constexpr auto scalblnd128f(decimal_fast128_t num, const long exp) noexcept -> decimal_fast128_t
+constexpr auto scalblnd128f(const decimal_fast128_t num, const long exp) noexcept -> decimal_fast128_t
 {
     #ifndef BOOST_DECIMAL_FAST_MATH
     constexpr decimal_fast128_t zero {0, 0};
@@ -1739,9 +1739,7 @@ constexpr auto scalblnd128f(decimal_fast128_t num, const long exp) noexcept -> d
     }
     #endif
 
-    num = decimal_fast128_t(num.significand_, num.biased_exponent() + exp, num.sign_);
-
-    return num;
+    return decimal_fast128_t(num.significand_, num.biased_exponent() + exp, num.sign_);
 }
 
 constexpr auto scalbnd128f(const decimal_fast128_t num, const int exp) noexcept -> decimal_fast128_t
