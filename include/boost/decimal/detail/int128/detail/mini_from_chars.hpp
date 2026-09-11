@@ -303,7 +303,7 @@ BOOST_int128EST_EXPORT BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE constexpr int fro
 template <typename Integer>
 BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE constexpr Integer parse_literal(const char* first, const char* last) noexcept
 {
-    Integer value {};
+    Integer parse_value {};
 
     // A leading sign stays with the digits; a base prefix, if present, follows it.
     auto next = first;
@@ -343,7 +343,7 @@ BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE constexpr Integer parse_literal(const ch
     // Overflow is reported as EDOM; anything else short of full consumption is malformed.
     if (!prefixed)
     {
-        const auto status = from_chars_literal(first, last, value);
+        const auto status = from_chars_literal(first, last, parse_value);
         if (status == EDOM)
         {
             BOOST_DECIMAL_DETAIL_INT128_REJECT_LITERAL(parse_literal_out_of_range);
@@ -353,11 +353,11 @@ BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE constexpr Integer parse_literal(const ch
             BOOST_DECIMAL_DETAIL_INT128_REJECT_LITERAL(parse_invalid_literal);
         }
 
-        return value;
+        return parse_value;
     }
 
     // Prefixed: parse the magnitude in the detected base, then reapply the sign.
-    const auto status = from_chars_literal(next, last, value, base);
+    const auto status = from_chars_literal(next, last, parse_value, base);
     if (status == EDOM)
     {
         BOOST_DECIMAL_DETAIL_INT128_REJECT_LITERAL(parse_literal_out_of_range);
@@ -371,7 +371,7 @@ BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE constexpr Integer parse_literal(const ch
     {
         BOOST_DECIMAL_DETAIL_INT128_IF_CONSTEXPR (std::numeric_limits<Integer>::is_signed)
         {
-            value = static_cast<Integer>(-value);
+            parse_value = static_cast<Integer>(-parse_value);
         }
         else
         {
@@ -379,7 +379,7 @@ BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE constexpr Integer parse_literal(const ch
         }
     }
 
-    return value;
+    return parse_value;
 }
 
 } // namespace detail
