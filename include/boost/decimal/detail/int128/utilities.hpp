@@ -285,6 +285,11 @@ BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE constexpr uint128 ckd_widen(const T valu
     }
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4324)
+#endif
+
 // Sign and magnitude of an operand together with its 128-bit two's complement
 // image. magnitude is the absolute value; negative records the sign.
 struct ckd_operand
@@ -294,14 +299,6 @@ struct ckd_operand
     bool negative;
 };
 
-template <typename T>
-BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE constexpr ckd_operand ckd_decompose(const T value) noexcept
-{
-    const uint128 raw {ckd_widen(value)};
-    const bool negative {std::numeric_limits<T>::is_signed && ((raw >> 127) != 0U)};
-    return ckd_operand{raw, negative ? uint128{0} - raw : raw, negative};
-}
-
 // Exact signed sum of two operands given as (magnitude, sign). carry marks a
 // 129th bit, which no 128-bit or narrower target can represent.
 struct ckd_sum_result
@@ -310,6 +307,18 @@ struct ckd_sum_result
     bool negative;
     bool carry;
 };
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+template <typename T>
+BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE constexpr ckd_operand ckd_decompose(const T value) noexcept
+{
+    const uint128 raw {ckd_widen(value)};
+    const bool negative {std::numeric_limits<T>::is_signed && ((raw >> 127) != 0U)};
+    return ckd_operand{raw, negative ? uint128{0} - raw : raw, negative};
+}
 
 BOOST_DECIMAL_DETAIL_INT128_HOST_DEVICE constexpr ckd_sum_result ckd_signed_sum(const uint128 a_magnitude, const bool a_negative,
                                                                  const uint128 b_magnitude, const bool b_negative) noexcept
