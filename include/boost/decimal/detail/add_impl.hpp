@@ -362,104 +362,40 @@ BOOST_DECIMAL_CUDA_CONSTEXPR auto add_impl(const T& lhs, const T& rhs) noexcept 
                                     ReturnType{lhs.full_significand(), lhs.biased_exponent(), lhs.isneg()} :
                                     ReturnType{rhs.full_significand(), rhs.biased_exponent(), rhs.isneg()};
             }
-            else if (round == rounding_mode::fe_dec_downward)
+
+            // The direction of a mode depends on the sign of the result: upward on a negative
+            // result goes toward zero. Away from zero adds one to big, toward zero takes one.
+            const bool use_lhs {lhs_exp > rhs_exp};
+            const bool neg {use_lhs ? lhs.isneg() : rhs.isneg()};
+            const bool away {round == (neg ? rounding_mode::fe_dec_downward : rounding_mode::fe_dec_upward)};
+            auto big {use_lhs ? big_lhs : big_rhs};
+            auto big_exp {use_lhs ? lhs_exp : rhs_exp};
+
+            if (lhs.isneg() == rhs.isneg())
             {
-                // If we are subtracting even disparate numbers we need to round down
-                // E.g. "5e+95"_DF - "4e-100"_DF == "4.999999e+95"_DF
-                const auto use_lhs {big_lhs != 0U && (lhs_exp > rhs_exp)};
-
-                // Need to check for the case where we have 1e+95 - anything = 9.99999... without losing a nine
-                if (use_lhs)
+                // E.g. 5e+95 + 4e-100 is 5.000001e+95 away from zero and 5e+95 toward it
+                if (away)
                 {
-                    if (big_rhs != 0U && (lhs.isneg() != rhs.isneg()))
-                    {
-                        if (is_power_of_10(big_lhs))
-                        {
-                            --big_lhs;
-                            big_lhs *= 10U;
-                            big_lhs += 9U;
-                            --lhs_exp;
-                        }
-                        else
-                        {
-                            --big_lhs;
-                        }
-                    }
-
-                    return ReturnType{big_lhs, lhs_exp, lhs.isneg()};
+                    ++big;
+                }
+            }
+            else if (!away)
+            {
+                // E.g. 1e+95 - 4e-100 is 9.999999e+94 toward zero, thus a power of ten needs a digit
+                if (is_power_of_10(big))
+                {
+                    --big;
+                    big *= 10U;
+                    big += 9U;
+                    --big_exp;
                 }
                 else
                 {
-                    if (big_lhs != 0U && (lhs.isneg() != rhs.isneg()))
-                    {
-                        if (is_power_of_10(big_rhs))
-                        {
-                            --big_rhs;
-                            big_rhs *= 10U;
-                            big_rhs += 9U;
-                            --rhs_exp;
-                        }
-                        else
-                        {
-                            --big_rhs;
-                        }
-                    }
-
-                    return ReturnType{big_rhs, rhs_exp, rhs.isneg()};
+                    --big;
                 }
             }
-            else
-            {
-                // rounding mode == fe_dec_upward
-                // Unconditionally round up. Could be 5e+95 + 4e-100 -> 5.000001e+95
-                const bool use_lhs {big_lhs != 0U && (lhs_exp > rhs_exp)};
 
-                if (use_lhs)
-                {
-                    if (big_rhs != 0U)
-                    {
-                        if (lhs.isneg() != rhs.isneg())
-                        {
-                            if (is_power_of_10(big_lhs))
-                            {
-                                --big_lhs;
-                                big_lhs *= 10U;
-                                big_lhs += 9U;
-                                --lhs_exp;
-                            }
-                            else
-                            {
-                                --big_lhs;
-                            }
-                        }
-                        else
-                        {
-                            ++big_lhs;
-                        }
-                    }
-
-                    return ReturnType{big_lhs, lhs_exp, lhs.isneg()} ;
-                }
-                else
-                {
-                    if (big_lhs != 0U)
-                    {
-                        if (rhs.isneg() != lhs.isneg())
-                        {
-                            --big_rhs;
-                            big_rhs *= 10U;
-                            big_rhs += 9U;
-                            --rhs_exp;
-                        }
-                        else
-                        {
-                            ++big_rhs;
-                        }
-                    }
-
-                    return ReturnType{big_rhs, rhs_exp, rhs.isneg()};
-                }
-            }
+            return ReturnType{big, big_exp, neg};
         }
 
         if (lhs_exp < rhs_exp)
@@ -610,104 +546,40 @@ BOOST_DECIMAL_CUDA_CONSTEXPR auto d128_add_impl_new(const T& lhs, const T& rhs) 
                                     ReturnType{lhs.full_significand(), lhs.biased_exponent(), lhs.isneg()} :
                                     ReturnType{rhs.full_significand(), rhs.biased_exponent(), rhs.isneg()};
             }
-            else if (round == rounding_mode::fe_dec_downward)
+
+            // The direction of a mode depends on the sign of the result: upward on a negative
+            // result goes toward zero. Away from zero adds one to big, toward zero takes one.
+            const bool use_lhs {lhs_exp > rhs_exp};
+            const bool neg {use_lhs ? lhs.isneg() : rhs.isneg()};
+            const bool away {round == (neg ? rounding_mode::fe_dec_downward : rounding_mode::fe_dec_upward)};
+            auto big {use_lhs ? big_lhs : big_rhs};
+            auto big_exp {use_lhs ? lhs_exp : rhs_exp};
+
+            if (lhs.isneg() == rhs.isneg())
             {
-                // If we are subtracting even disparate numbers we need to round down
-                // E.g. "5e+95"_DF - "4e-100"_DF == "4.999999e+95"_DF
-                const auto use_lhs {big_lhs != 0U && (lhs_exp > rhs_exp)};
-
-                // Need to check for the case where we have 1e+95 - anything = 9.99999... without losing a nine
-                if (use_lhs)
+                // E.g. 5e+95 + 4e-100 is 5.000001e+95 away from zero and 5e+95 toward it
+                if (away)
                 {
-                    if (big_rhs != 0U && (lhs.isneg() != rhs.isneg()))
-                    {
-                        if (is_power_of_10(big_lhs))
-                        {
-                            --big_lhs;
-                            big_lhs *= 10U;
-                            big_lhs += 9U;
-                            --lhs_exp;
-                        }
-                        else
-                        {
-                            --big_lhs;
-                        }
-                    }
-
-                    return ReturnType{big_lhs, lhs_exp, lhs.isneg()};
+                    ++big;
+                }
+            }
+            else if (!away)
+            {
+                // E.g. 1e+95 - 4e-100 is 9.999999e+94 toward zero, thus a power of ten needs a digit
+                if (is_power_of_10(big))
+                {
+                    --big;
+                    big *= 10U;
+                    big += 9U;
+                    --big_exp;
                 }
                 else
                 {
-                    if (big_lhs != 0U && (lhs.isneg() != rhs.isneg()))
-                    {
-                        if (is_power_of_10(big_rhs))
-                        {
-                            --big_rhs;
-                            big_rhs *= 10U;
-                            big_rhs += 9U;
-                            --rhs_exp;
-                        }
-                        else
-                        {
-                            --big_rhs;
-                        }
-                    }
-
-                    return ReturnType{big_rhs, rhs_exp, rhs.isneg()};
+                    --big;
                 }
             }
-            else
-            {
-                // rounding mode == fe_dec_upward
-                // Unconditionally round up. Could be 5e+95 + 4e-100 -> 5.000001e+95
-                const bool use_lhs {big_lhs != 0U && (lhs_exp > rhs_exp)};
 
-                if (use_lhs)
-                {
-                    if (big_rhs != 0U)
-                    {
-                        if (lhs.isneg() != rhs.isneg())
-                        {
-                            if (is_power_of_10(big_lhs))
-                            {
-                                --big_lhs;
-                                big_lhs *= 10U;
-                                big_lhs += 9U;
-                                --lhs_exp;
-                            }
-                            else
-                            {
-                                --big_lhs;
-                            }
-                        }
-                        else
-                        {
-                            ++big_lhs;
-                        }
-                    }
-
-                    return ReturnType{big_lhs, lhs_exp, lhs.isneg()} ;
-                }
-                else
-                {
-                    if (big_lhs != 0U)
-                    {
-                        if (rhs.isneg() != lhs.isneg())
-                        {
-                            --big_rhs;
-                            big_rhs *= 10U;
-                            big_rhs += 9U;
-                            --rhs_exp;
-                        }
-                        else
-                        {
-                            ++big_rhs;
-                        }
-                    }
-
-                    return ReturnType{big_rhs, rhs_exp, rhs.isneg()};
-                }
-            }
+            return ReturnType{big, big_exp, neg};
         }
 
         const auto shift_pow10 {detail::pow10_256(shift)};
